@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <!--
+    4x4 Bayer matrix at ~50% intensity (threshold < 8). Each cell is 4x4 px.
+    Matrix:                 ON cells (value < 8):
+       0  8  2 10              x  .  x  .
+      12  4 14  6              .  x  .  x
+       3 11  1  9              x  .  x  .
+      15  7 13  5              .  x  .  x
+  -->
+  <g fill="currentColor">
+    <rect x="0"  y="0"  width="4" height="4"/>
+    <rect x="8"  y="0"  width="4" height="4"/>
+    <rect x="4"  y="4"  width="4" height="4"/>
+    <rect x="12" y="4"  width="4" height="4"/>
+    <rect x="0"  y="8"  width="4" height="4"/>
+    <rect x="8"  y="8"  width="4" height="4"/>
+    <rect x="4"  y="12" width="4" height="4"/>
+    <rect x="12" y="12" width="4" height="4"/>
+  </g>
+</svg>

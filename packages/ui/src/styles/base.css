@@ -1,0 +1,609 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * ============================================================================
+ *  Design tokens — see /docs/DESIGN.md for principles, page archetypes, voice.
+ *  Two tiers: PRIMITIVES (raw scales) → SEMANTIC (everything in components).
+ *  Components must reference semantic tokens only. Primitives are exposed as
+ *  Tailwind utilities (bg-vellum-50, text-ocean-500…) for escape hatches.
+ * ============================================================================
+ */
+
+/* ---------- 1. PRIMITIVES (palette in OKLCH for perceptual consistency) ---------- */
+
+:root {
+  /* Vellum — warm-cool off-whites and warm darks (cooled per R1.1) */
+  --vellum-50: oklch(0.9755 0.0067 97.35); /* #f8f7f2 — page bg light */
+  --vellum-100: oklch(0.9515 0.0108 95.17); /* #f1efe7 — card surface light */
+  --vellum-200: oklch(0.9126 0.0167 91.56); /* #e6e2d6 — hairline border */
+  --vellum-300: oklch(0.8479 0.0224 92.54); /* #d2cdbd — muted divider */
+  --vellum-400: oklch(0.6989 0.0235 92.59); /* #a39e8e */
+  --vellum-500: oklch(0.5138 0.0191 91.69); /* #6b675b */
+  --vellum-600: oklch(0.3886 0.0113 78.19); /* #48443e */
+  --vellum-700: oklch(0.2854 0.0094 88.76); /* #2c2a25 — ink */
+  --vellum-800: oklch(0.2098 0.0083 84.59); /* #1a1814 — deepest warm */
+  --vellum-900: oklch(0.1495 0.0067 92.35); /* #0c0b08 */
+
+  /* Ocean — warm navy hue-coherent around #144185 */
+  --ocean-50: oklch(0.9601 0.0103 261.79); /* #eef2f9 */
+  --ocean-100: oklch(0.8914 0.0233 258.36); /* #d2dceb */
+  --ocean-200: oklch(0.7795 0.0506 256.96); /* #a3b9d8 */
+  --ocean-300: oklch(0.6444 0.0874 260.85); /* #6f8ec3 */
+  --ocean-400: oklch(0.5112 0.125 259.4); /* #3865ad */
+  --ocean-500: oklch(0.3869 0.1243 259); /* #144185 — primary ocean */
+  --ocean-600: oklch(0.3249 0.1058 260.02); /* #0f3169 */
+  --ocean-700: oklch(0.2709 0.0885 260.59); /* #0a2451 — dark mode bg */
+  --ocean-800: oklch(0.2124 0.0669 261.16); /* #061737 */
+  --ocean-900: oklch(0.1574 0.0437 259.94); /* #030c1f */
+
+  /* Beacon — electric sibling-blue, used for interaction (links, focus, live UI) */
+  --beacon-300: oklch(0.7626 0.094 260.09); /* #8fb3ee */
+  --beacon-400: oklch(0.6768 0.1278 264.2); /* #6f95e6 */
+  --beacon-500: oklch(0.5933 0.1592 265.14); /* #4f78dc */
+  --beacon-600: oklch(0.4983 0.1648 263.63); /* #2f5bbf */
+
+  /* Ember — warm amber, used for emphasis (CTAs, accent rules, OG titles) */
+  --ember-300: oklch(0.7886 0.0898 69.22); /* #e0b07a */
+  --ember-400: oklch(0.7238 0.1079 71.42); /* #d09a55 */
+  --ember-500: oklch(0.6614 0.1207 71.71); /* #c08532 */
+  --ember-600: oklch(0.5578 0.105 70.99); /* #9a6822 */
+
+  /* Status */
+  --rust-500: oklch(0.5458 0.1467 37.06); /* #b54a2a — destructive */
+  --moss-500: oklch(0.5348 0.0828 145.32); /* #4d7a4f — success */
+  --gold-500: oklch(0.648 0.1229 85.73); /* #b08820 — warning */
+
+  /* Type */
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Tracking — project-specific custom names (don't shadow Tailwind defaults) */
+  --tracking-display: -0.03em;
+  --tracking-loose: 0.04em;
+
+  /* Containers — used as max-w-* utilities */
+  --container-prose: 42rem; /* body copy, ~65ch */
+  --container-wide: 56rem; /* code blocks, tables, figures */
+  --container-shell: 72rem; /* homepage, indexes */
+
+  /* Motion — used as duration-* utilities */
+  --duration-fast: 120ms;
+  --duration-normal: 150ms;
+  --duration-slow: 400ms;
+  --duration-signature: 600ms;
+  --ease-out-quart: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Patterns — see /docs/DESIGN.md §13 */
+  --pattern-dot-1px-8: url("/patterns/dot-1px-8.svg");
+  --pattern-bayer-2: url("/patterns/bayer-2.svg");
+  --pattern-bayer-4: url("/patterns/bayer-4.svg");
+  --pattern-hatch-iso: url("/patterns/hatch-iso.svg");
+  --pattern-grid-iso: url("/patterns/grid-iso.svg");
+  --pattern-opacity-faint: 0.06; /* page wash */
+  --pattern-opacity-soft: 0.1; /* default — corner dither, dividers */
+  --pattern-opacity-firm: 0.18; /* hero / OG / decorative emphasis */
+}
+
+/* ---------- 2. SEMANTIC TOKENS — LIGHT MODE (default) ---------- */
+
+:root {
+  /* shadcn standard names — do not rename; many components depend on these */
+  --background: var(--vellum-50);
+  --foreground: var(--vellum-800);
+  --card: var(--vellum-100);
+  --card-foreground: var(--vellum-800);
+  --popover: var(--vellum-50);
+  --popover-foreground: var(--vellum-800);
+  --primary: var(--ocean-500);
+  --primary-foreground: var(--vellum-50);
+  --secondary: var(--vellum-100);
+  --secondary-foreground: var(--vellum-700);
+  --muted: var(--vellum-100);
+  --muted-foreground: var(--vellum-500);
+  --accent: var(--ember-500);
+  --accent-foreground: var(--vellum-50);
+  --destructive: var(--rust-500);
+  --border: var(--vellum-200);
+  --input: var(--vellum-200);
+  --ring: var(--beacon-500);
+
+  /* Charts — kept for shadcn chart components; tuned to our blue family */
+  --chart-1: var(--ocean-500);
+  --chart-2: var(--ocean-300);
+  --chart-3: var(--beacon-500);
+  --chart-4: var(--ember-500);
+  --chart-5: var(--vellum-500);
+
+  /* Site-specific extensions (DESIGN.md §10) */
+  --bg-elevated: var(--vellum-100);
+  --bg-sunken: var(--vellum-200);
+  --fg-muted: var(--vellum-500);
+  --fg-subtle: var(--vellum-400);
+  --border-strong: var(--vellum-300);
+  --beacon: var(--beacon-500);
+  --success: var(--moss-500);
+  --warning: var(--gold-500);
+
+  /* Radius — Lyra-style architectural baseline; opt up via rounded-xs / -sm / -md / -lg */
+  --radius: 0;
+}
+
+/* ---------- 3. SEMANTIC TOKENS — DARK MODE (blueprint reversal, locked) ---------- */
+
+.dark {
+  --background: var(--ocean-700);
+  --foreground: var(--vellum-100);
+  --card: var(--ocean-600);
+  --card-foreground: var(--vellum-100);
+  --popover: var(--ocean-700);
+  --popover-foreground: var(--vellum-100);
+
+  /* Inversion: cream-on-ocean primary in dark mode (locked R1.2) */
+  --primary: var(--vellum-100);
+  --primary-foreground: var(--ocean-700);
+
+  --secondary: var(--ocean-600);
+  --secondary-foreground: var(--vellum-100);
+  --muted: var(--ocean-600);
+  --muted-foreground: var(--ocean-200);
+  --accent: var(--ember-400);
+  --accent-foreground: var(--ocean-800);
+  --destructive: var(--rust-500);
+  --border: var(--ocean-600);
+  --input: var(--ocean-600);
+  --ring: var(--beacon-400);
+
+  --chart-1: var(--ocean-300);
+  --chart-2: var(--beacon-400);
+  --chart-3: var(--vellum-100);
+  --chart-4: var(--ember-400);
+  --chart-5: var(--ocean-100);
+
+  --bg-elevated: var(--ocean-600);
+  --bg-sunken: var(--ocean-800);
+  --fg-muted: var(--ocean-200);
+  --fg-subtle: var(--ocean-300);
+  --border-strong: var(--ocean-500);
+  --beacon: var(--beacon-400);
+  --success: var(--moss-500);
+  --warning: var(--gold-500);
+}
+
+/* ---------- 4. TAILWIND THEME — exposes tokens as utilities (LSP picks these up) ---------- */
+
+@theme inline {
+  /* Type families */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  /* shadcn semantic colors → bg-background, text-foreground, bg-primary, etc. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Site semantic extensions → bg-bg-elevated, text-fg-muted, ring-beacon, etc. */
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-beacon: var(--beacon);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  /* Primitives exposed as utility colors — bg-vellum-50, text-ocean-500, border-ember-500 */
+  --color-vellum-50: var(--vellum-50);
+  --color-vellum-100: var(--vellum-100);
+  --color-vellum-200: var(--vellum-200);
+  --color-vellum-300: var(--vellum-300);
+  --color-vellum-400: var(--vellum-400);
+  --color-vellum-500: var(--vellum-500);
+  --color-vellum-600: var(--vellum-600);
+  --color-vellum-700: var(--vellum-700);
+  --color-vellum-800: var(--vellum-800);
+  --color-vellum-900: var(--vellum-900);
+
+  --color-ocean-50: var(--ocean-50);
+  --color-ocean-100: var(--ocean-100);
+  --color-ocean-200: var(--ocean-200);
+  --color-ocean-300: var(--ocean-300);
+  --color-ocean-400: var(--ocean-400);
+  --color-ocean-500: var(--ocean-500);
+  --color-ocean-600: var(--ocean-600);
+  --color-ocean-700: var(--ocean-700);
+  --color-ocean-800: var(--ocean-800);
+  --color-ocean-900: var(--ocean-900);
+
+  --color-beacon-300: var(--beacon-300);
+  --color-beacon-400: var(--beacon-400);
+  --color-beacon-500: var(--beacon-500);
+  --color-beacon-600: var(--beacon-600);
+
+  --color-ember-300: var(--ember-300);
+  --color-ember-400: var(--ember-400);
+  --color-ember-500: var(--ember-500);
+  --color-ember-600: var(--ember-600);
+
+  --color-rust-500: var(--rust-500);
+  --color-moss-500: var(--moss-500);
+  --color-gold-500: var(--gold-500);
+
+  /* Radius ladder (Lyra-style architectural — opt up explicitly) */
+  --radius-xs: 2px; /* chips, kbd, tags, favicon */
+  --radius-sm: 4px; /* buttons, inputs */
+  --radius-md: 6px; /* cards */
+  --radius-lg: 8px; /* dialogs, popovers */
+
+  /* Tracking — tracking-display, tracking-loose */
+  --tracking-display: var(--tracking-display);
+  --tracking-loose: var(--tracking-loose);
+
+  /* Container widths — max-w-prose, max-w-wide, max-w-shell */
+  --container-prose: var(--container-prose);
+  --container-wide: var(--container-wide);
+  --container-shell: var(--container-shell);
+
+  /*
+   * Type scale (DESIGN.md §11.4). Overrides Tailwind v4 defaults so the
+   * larger steps match our display-size brief. Line-height ratios target
+   * 1.5 at body sizes and tighten progressively at display sizes.
+   */
+  --text-xs: 0.75rem; /* 12 — captions, kbd, footnotes */
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.875rem; /* 14 — small UI, table cells */
+  --text-sm--line-height: calc(1.25 / 0.875);
+  --text-base: 1rem; /* 16 — body */
+  --text-base--line-height: calc(1.5 / 1);
+  --text-md: 1.125rem; /* 18 — wordmark in header, deck */
+  --text-md--line-height: calc(1.5 / 1.125);
+  --text-lg: 1.375rem; /* 22 — sub-headings */
+  --text-lg--line-height: calc(1.5 / 1.375);
+  --text-xl: 1.75rem; /* 28 — section headings */
+  --text-xl--line-height: calc(1.25 / 1.75);
+  --text-2xl: 2.25rem; /* 36 — page headings */
+  --text-2xl--line-height: calc(1.25 / 2.25);
+  --text-3xl: 3rem; /* 48 — post titles */
+  --text-3xl--line-height: calc(1.1 / 3);
+  --text-4xl: 4.5rem; /* 72 — display only */
+  --text-4xl--line-height: calc(1.05 / 4.5);
+
+  /* Motion — duration-fast, duration-normal, duration-slow, duration-signature */
+  --duration-fast: var(--duration-fast);
+  --duration-normal: var(--duration-normal);
+  --duration-slow: var(--duration-slow);
+  --duration-signature: var(--duration-signature);
+  --ease-out-quart: var(--ease-out-quart);
+}
+
+/* ---------- 5. BASE LAYER — body, defaults, focus ---------- */
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentcolor);
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    color-scheme: light dark;
+  }
+
+  body {
+    @apply font-sans bg-background text-foreground;
+    /* Faint dot-matrix wash — DESIGN.md §13.3 */
+    background-image: var(--pattern-dot-1px-8);
+    background-size: 8px 8px;
+    background-blend-mode: multiply;
+  }
+
+  .dark body {
+    background-blend-mode: screen;
+  }
+
+  /* Hide outline when navigating with the mouse; keep it for keyboard users */
+  .using-mouse * {
+    outline: none !important;
+  }
+}
+
+/* ---------- 6. CORNER-DITHER PRIMITIVE — DESIGN.md §13.2 (consumed by <Surface>) ---------- */
+
+@layer components {
+  .surface-dithered {
+    position: relative;
+  }
+
+  .surface-dithered::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: var(--pattern-bayer-4);
+    background-repeat: no-repeat;
+    background-size: 128px 128px;
+    color: var(--fg-subtle);
+    opacity: var(--pattern-opacity-soft);
+  }
+
+  .dither-tl::after {
+    background-position: top left;
+    mask-image: radial-gradient(circle at top left, #000, transparent 60%);
+    -webkit-mask-image: radial-gradient(
+      circle at top left,
+      #000,
+      transparent 60%
+    );
+  }
+  .dither-tr::after {
+    background-position: top right;
+    mask-image: radial-gradient(circle at top right, #000, transparent 60%);
+    -webkit-mask-image: radial-gradient(
+      circle at top right,
+      #000,
+      transparent 60%
+    );
+  }
+  .dither-bl::after {
+    background-position: bottom left;
+    mask-image: radial-gradient(circle at bottom left, #000, transparent 60%);
+    -webkit-mask-image: radial-gradient(
+      circle at bottom left,
+      #000,
+      transparent 60%
+    );
+  }
+  .dither-br::after {
+    background-position: bottom right;
+    mask-image: radial-gradient(circle at bottom right, #000, transparent 60%);
+    -webkit-mask-image: radial-gradient(
+      circle at bottom right,
+      #000,
+      transparent 60%
+    );
+  }
+
+  /*
+   * Prose — long-form post body styling (DESIGN.md §4.3).
+   * Applied via className="prose" on the article body wrapper. Tokens only;
+   * no raw colors. Stays within --measure-prose set by max-w-prose on the
+   * outer element.
+   */
+  .prose {
+    color: var(--foreground);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal, 1.6);
+  }
+  .prose > * + * {
+    margin-top: var(--space-4);
+  }
+  .prose h2 {
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xl);
+    font-weight: 500;
+    letter-spacing: var(--tracking-tight, -0.01em);
+    color: var(--foreground);
+  }
+  .prose h3 {
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--foreground);
+  }
+  .prose h4 {
+    margin-top: var(--space-5);
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--foreground);
+  }
+  .prose a {
+    color: var(--beacon);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--beacon) 40%, transparent);
+    text-underline-offset: 2px;
+  }
+  .prose a:hover {
+    text-decoration-color: var(--beacon);
+  }
+  .prose strong {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+  .prose em {
+    font-style: italic;
+  }
+  .prose code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--bg-sunken);
+    padding: 0.1em 0.35em;
+    border: 1px solid var(--border);
+  }
+  .prose pre {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    background: var(--bg-sunken);
+    border: 1px solid var(--border);
+    padding: var(--space-4);
+    overflow-x: auto;
+    line-height: var(--leading-snug, 1.4);
+    color: var(--foreground);
+  }
+  .prose pre code {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-size: 1em;
+    color: inherit;
+  }
+  /*
+   * When wrapped by the `<CodeBlock>` compound component (which carries
+   * `data-slot="code-block"` and a `not-prose` reset class), the inner
+   * `<pre>` should take its chrome from the wrapper, not the prose `pre`
+   * rule above. Reset the prose-applied background/border/padding so the
+   * wrapper's frame is the only one visible.
+   */
+  .prose [data-slot="code-block"] pre {
+    background-color: var(--shiki-light-bg);
+    border: 0;
+    padding: var(--space-3) var(--space-4);
+    margin: 0;
+  }
+  .dark .prose [data-slot="code-block"] pre {
+    background-color: var(--shiki-dark-bg);
+  }
+  /*
+   * Solarized light/dark via Shiki built-ins. With `defaultColor: false`
+   * Shiki emits `--shiki-light` and `--shiki-dark` on every span and no
+   * inline `color:` — we paint the chosen track here and flip under
+   * `.dark`. Apply globally so the rule works whether the `<pre>` is a
+   * loose `.prose pre` or wrapped by the `CodeBlock` (`.not-prose`).
+   */
+  pre.shiki,
+  pre.shiki span {
+    color: var(--shiki-light);
+  }
+  .dark pre.shiki,
+  .dark pre.shiki span {
+    color: var(--shiki-dark);
+  }
+  pre.shiki .line.highlighted {
+    background: var(--bg-elevated);
+    box-shadow: inset 2px 0 0 0 var(--ember-500);
+    margin: 0 calc(-1 * var(--space-4));
+    padding: 0 var(--space-4);
+  }
+  .prose ul,
+  .prose ol {
+    padding-left: var(--space-5);
+  }
+  .prose ul {
+    list-style: disc;
+  }
+  .prose ol {
+    list-style: decimal;
+  }
+  .prose li + li {
+    margin-top: var(--space-1);
+  }
+  .prose blockquote {
+    border-left: 2px solid var(--border-strong);
+    padding-left: var(--space-4);
+    color: var(--fg-muted);
+    font-style: italic;
+  }
+  .prose hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: var(--space-7) 0;
+  }
+  .prose img,
+  .prose figure {
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-5);
+  }
+  .prose figcaption {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    margin-top: var(--space-2);
+  }
+  /*
+   * Footnotes (DESIGN.md §4.3, §16). Inline expansion only at all
+   * breakpoints; marginalia deferred. MDX emits `<sup>` markers in body
+   * text and a `<section class="footnotes">` (or `<ol class="footnotes">`)
+   * at the end with backrefs.
+   */
+  .prose sup {
+    font-family: var(--font-mono);
+    font-size: 0.7em;
+    line-height: 0;
+    vertical-align: super;
+  }
+  .prose sup a {
+    color: var(--beacon);
+    text-decoration: none;
+    padding: 0 0.15em;
+  }
+  .prose sup a:hover {
+    text-decoration: underline;
+  }
+  .prose .footnotes {
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+    font-size: var(--text-sm);
+    color: var(--fg-muted);
+  }
+  .prose .footnotes ol {
+    padding-left: var(--space-5);
+  }
+  .prose .footnotes li {
+    margin-top: var(--space-2);
+  }
+  .prose .footnotes li:target {
+    color: var(--foreground);
+  }
+  .prose .footnote-backref {
+    font-family: var(--font-mono);
+    margin-left: 0.4em;
+    text-decoration: none;
+    color: var(--fg-subtle);
+  }
+  .prose .footnote-backref:hover {
+    color: var(--beacon);
+  }
+
+  /* Diagonal — both top-right and bottom-left, used for panels and dialogs */
+  .dither-diagonal::after {
+    background-image: var(--pattern-bayer-4), var(--pattern-bayer-4);
+    background-position:
+      top right,
+      bottom left;
+    background-repeat: no-repeat, no-repeat;
+    background-size:
+      128px 128px,
+      128px 128px;
+    mask-image:
+      radial-gradient(circle at top right, #000, transparent 60%),
+      radial-gradient(circle at bottom left, #000, transparent 60%);
+    mask-composite: add;
+    -webkit-mask-image:
+      radial-gradient(circle at top right, #000, transparent 60%),
+      radial-gradient(circle at bottom left, #000, transparent 60%);
+    -webkit-mask-composite: source-over;
+  }
+}

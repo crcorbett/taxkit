@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!--
+    Isometric grid: rhombus cells at 30° / -30° / vertical, 24px module.
+    Lines are drawn as paths spaced 24px apart along their perpendicular,
+    which evaluates to ~13.86px horizontal stride at 30°. Rendered into a
+    48x48 tile that is itself laid out by CSS background-repeat. Slight
+    seams between tiles are masked at the opacity (10%) we use this at.
+  -->
+  <g stroke="currentColor" stroke-width="1" fill="none" shape-rendering="geometricPrecision">
+    <!-- 30° lines (slope 1/√3) -->
+    <path d="M-24 13.86 L72 -41.57"/>
+    <path d="M-24 27.72 L72 -27.72"/>
+    <path d="M-24 41.57 L72 -13.86"/>
+    <path d="M-24 55.43 L72 0"/>
+    <path d="M-24 69.28 L72 13.86"/>
+    <path d="M-24 83.14 L72 27.72"/>
+    <!-- -30° lines (slope -1/√3) -->
+    <path d="M-24 -41.57 L72 13.86"/>
+    <path d="M-24 -27.72 L72 27.72"/>
+    <path d="M-24 -13.86 L72 41.57"/>
+    <path d="M-24 0 L72 55.43"/>
+    <path d="M-24 13.86 L72 69.28"/>
+    <path d="M-24 27.72 L72 83.14"/>
+  </g>
+</svg>

@@ -1,0 +1,46 @@
+{
+  "name": "@packages/tax",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "@packages/source": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./live": {
+      "@packages/source": "./src/live.ts",
+      "default": "./dist/live.js"
+    },
+    "./schemas": {
+      "@packages/source": "./src/schemas.ts",
+      "default": "./dist/schemas.js"
+    },
+    "./service": {
+      "@packages/source": "./src/service.ts",
+      "default": "./dist/service.js"
+    },
+    "./*": "./*"
+  },
+  "scripts": {
+    "build": "tsdown --config-loader unrun",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "effect": "catalog:effect"
+  },
+  "devDependencies": {
+    "tsdown": "^0.21.10",
+    "typescript": "catalog:typescript"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./live": "./dist/live.js",
+      "./schemas": "./dist/schemas.js",
+      "./service": "./dist/service.js",
+      "./*": "./*"
+    }
+  }
+}

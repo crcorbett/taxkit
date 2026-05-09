@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+  <!--
+    Crosshatch at 45° / -45°. Tiles seamlessly at 8x8.
+    "iso" reflects the architectural genre rather than strict 30° projection
+    (which can't tile cleanly at small sizes). For true 30° iso, use grid-iso.svg.
+  -->
+  <g stroke="currentColor" stroke-width="1" fill="none" shape-rendering="geometricPrecision">
+    <path d="M0 0 L8 8 M0 8 L8 0"/>
+  </g>
+</svg>

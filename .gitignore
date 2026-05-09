@@ -1,0 +1,83 @@
+# Dependencies
+node_modules/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# TurboRepo
+.turbo/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+out/
+.next/
+.cache/
+coverage/
+
+# TanStack Start / Vinxi / Nitro
+.output/
+.vinxi/
+.nitro/
+.tanstack/
+**/api/_build/
+server/build/
+public/build/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Vercel
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+
+# Sentry
+.env.sentry-build-plugin
+.vercel
+.claude/ralph-loop.local.md
+.claude/worktrees/
+
+# Temporary files
+tmp
+
+# Context
+.context/
+.chief/
+
+# OpenAPI schemas
+schema.yaml
+schema.json

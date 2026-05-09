@@ -1,0 +1,38 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "dev": "portless whattax bun --bun vite dev",
+    "build": "bun --bun vite build && tsc --noEmit",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "preview": "bun --bun vite preview",
+    "start": "bun run .output/server/index.mjs"
+  },
+  "dependencies": {
+    "@packages/core": "workspace:*",
+    "@fontsource-variable/geist": "catalog:ui",
+    "@fontsource-variable/geist-mono": "catalog:ui",
+    "@packages/tax": "workspace:*",
+    "@packages/ui": "workspace:*",
+    "@tabler/icons-react": "catalog:ui",
+    "@tanstack/react-router-devtools": "catalog:tanstack",
+    "@tanstack/react-router": "catalog:tanstack",
+    "@tanstack/react-start": "catalog:tanstack",
+    "effect": "catalog:effect",
+    "nitro": "catalog:utils",
+    "react": "catalog:react",
+    "react-dom": "catalog:react"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:build",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "@vitejs/plugin-react": "catalog:build",
+    "typescript": "catalog:typescript",
+    "vite": "catalog:build"
+  }
+}

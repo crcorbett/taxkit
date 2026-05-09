@@ -1,0 +1,167 @@
+{
+  "name": "@packages/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "@packages/source": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./lib/theme": {
+      "@packages/source": "./src/lib/theme.tsx",
+      "default": "./dist/lib/theme.js"
+    },
+    "./lib/utils": {
+      "@packages/source": "./src/lib/utils.ts",
+      "default": "./dist/lib/utils.js"
+    },
+    "./mdx/code-block": {
+      "@packages/source": "./src/mdx/code-block.tsx",
+      "default": "./dist/mdx/code-block.js"
+    },
+    "./mdx/picture": {
+      "@packages/source": "./src/mdx/picture.tsx",
+      "default": "./dist/mdx/picture.js"
+    },
+    "./ui/alert": {
+      "@packages/source": "./src/ui/alert.tsx",
+      "default": "./dist/ui/alert.js"
+    },
+    "./ui/alert-dialog": {
+      "@packages/source": "./src/ui/alert-dialog.tsx",
+      "default": "./dist/ui/alert-dialog.js"
+    },
+    "./ui/badge": {
+      "@packages/source": "./src/ui/badge.tsx",
+      "default": "./dist/ui/badge.js"
+    },
+    "./ui/button": {
+      "@packages/source": "./src/ui/button.tsx",
+      "default": "./dist/ui/button.js"
+    },
+    "./ui/card": {
+      "@packages/source": "./src/ui/card.tsx",
+      "default": "./dist/ui/card.js"
+    },
+    "./ui/combobox": {
+      "@packages/source": "./src/ui/combobox.tsx",
+      "default": "./dist/ui/combobox.js"
+    },
+    "./ui/date-mono": {
+      "@packages/source": "./src/ui/date-mono.tsx",
+      "default": "./dist/ui/date-mono.js"
+    },
+    "./ui/dropdown-menu": {
+      "@packages/source": "./src/ui/dropdown-menu.tsx",
+      "default": "./dist/ui/dropdown-menu.js"
+    },
+    "./ui/empty": {
+      "@packages/source": "./src/ui/empty.tsx",
+      "default": "./dist/ui/empty.js"
+    },
+    "./ui/field": {
+      "@packages/source": "./src/ui/field.tsx",
+      "default": "./dist/ui/field.js"
+    },
+    "./ui/input": {
+      "@packages/source": "./src/ui/input.tsx",
+      "default": "./dist/ui/input.js"
+    },
+    "./ui/input-group": {
+      "@packages/source": "./src/ui/input-group.tsx",
+      "default": "./dist/ui/input-group.js"
+    },
+    "./ui/label": {
+      "@packages/source": "./src/ui/label.tsx",
+      "default": "./dist/ui/label.js"
+    },
+    "./ui/select": {
+      "@packages/source": "./src/ui/select.tsx",
+      "default": "./dist/ui/select.js"
+    },
+    "./ui/separator": {
+      "@packages/source": "./src/ui/separator.tsx",
+      "default": "./dist/ui/separator.js"
+    },
+    "./ui/surface": {
+      "@packages/source": "./src/ui/surface.tsx",
+      "default": "./dist/ui/surface.js"
+    },
+    "./ui/textarea": {
+      "@packages/source": "./src/ui/textarea.tsx",
+      "default": "./dist/ui/textarea.js"
+    },
+    "./ui/theme-toggle": {
+      "@packages/source": "./src/ui/theme-toggle.tsx",
+      "default": "./dist/ui/theme-toggle.js"
+    },
+    "./ui/tooltip": {
+      "@packages/source": "./src/ui/tooltip.tsx",
+      "default": "./dist/ui/tooltip.js"
+    },
+    "./ui/wordmark": {
+      "@packages/source": "./src/ui/wordmark.tsx",
+      "default": "./dist/ui/wordmark.js"
+    },
+    "./*": "./*",
+    "./styles/*.css": "./src/styles/*.css"
+  },
+  "scripts": {
+    "build": "tsdown --config-loader unrun",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@base-ui/react": "catalog:ui",
+    "@fontsource-variable/geist": "catalog:ui",
+    "@fontsource-variable/geist-mono": "catalog:ui",
+    "@tabler/icons-react": "catalog:ui",
+    "class-variance-authority": "catalog:utils",
+    "clsx": "catalog:utils",
+    "date-fns": "catalog:utils",
+    "react": "catalog:react",
+    "tailwind-merge": "catalog:utils",
+    "tw-animate-css": "catalog:ui"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "shadcn": "catalog:ui",
+    "tailwindcss": "catalog:build",
+    "tsdown": "^0.21.10",
+    "typescript": "catalog:typescript"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./lib/theme": "./dist/lib/theme.js",
+      "./lib/utils": "./dist/lib/utils.js",
+      "./mdx/code-block": "./dist/mdx/code-block.js",
+      "./mdx/picture": "./dist/mdx/picture.js",
+      "./ui/alert": "./dist/ui/alert.js",
+      "./ui/alert-dialog": "./dist/ui/alert-dialog.js",
+      "./ui/badge": "./dist/ui/badge.js",
+      "./ui/button": "./dist/ui/button.js",
+      "./ui/card": "./dist/ui/card.js",
+      "./ui/combobox": "./dist/ui/combobox.js",
+      "./ui/date-mono": "./dist/ui/date-mono.js",
+      "./ui/dropdown-menu": "./dist/ui/dropdown-menu.js",
+      "./ui/empty": "./dist/ui/empty.js",
+      "./ui/field": "./dist/ui/field.js",
+      "./ui/input": "./dist/ui/input.js",
+      "./ui/input-group": "./dist/ui/input-group.js",
+      "./ui/label": "./dist/ui/label.js",
+      "./ui/select": "./dist/ui/select.js",
+      "./ui/separator": "./dist/ui/separator.js",
+      "./ui/surface": "./dist/ui/surface.js",
+      "./ui/textarea": "./dist/ui/textarea.js",
+      "./ui/theme-toggle": "./dist/ui/theme-toggle.js",
+      "./ui/tooltip": "./dist/ui/tooltip.js",
+      "./ui/wordmark": "./dist/ui/wordmark.js",
+      "./*": "./*",
+      "./styles/*.css": "./src/styles/*.css"
+    }
+  }
+}
