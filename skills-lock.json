@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "portless": {
+      "source": "vercel-labs/portless",
+      "sourceType": "github",
+      "computedHash": "036baf128b42f5bb1f3c74cfdd78fad00c94051d3700e1ea948026cc07ee146c"
+    }
+  }
+}
