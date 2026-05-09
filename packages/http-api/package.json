@@ -1,0 +1,64 @@
+{
+  "name": "@whattax/http-api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./api": {
+      "source": "./src/api.ts",
+      "types": "./dist/api.d.ts",
+      "default": "./dist/api.js"
+    },
+    "./client": {
+      "source": "./src/client/index.ts",
+      "types": "./dist/client/index.d.ts",
+      "default": "./dist/client/index.js"
+    },
+    "./client/live": {
+      "source": "./src/client/live.layer.ts",
+      "types": "./dist/client/live.layer.d.ts",
+      "default": "./dist/client/live.layer.js"
+    },
+    "./client/server": {
+      "source": "./src/client/server.layer.ts",
+      "types": "./dist/client/server.layer.d.ts",
+      "default": "./dist/client/server.layer.js"
+    },
+    "./server": {
+      "source": "./src/server.ts",
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    },
+    "./handlers": {
+      "source": "./src/handlers/index.ts",
+      "types": "./dist/handlers/index.d.ts",
+      "default": "./dist/handlers/index.js"
+    },
+    "./handlers/live": {
+      "source": "./src/handlers/live.ts",
+      "types": "./dist/handlers/live.d.ts",
+      "default": "./dist/handlers/live.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@effect/platform-node": "catalog:",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@whattax/tsconfig": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
