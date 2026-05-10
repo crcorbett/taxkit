@@ -1,13 +1,13 @@
 import { Effect, Layer } from "effect";
+import { ComponentId, type LedgerComponent } from "@whattax/core/ledger";
 import { audDollars } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
 import {
-  PaygWithholding,
-  PaygWithholdingFact,
-  type PayPeriod,
+  payPeriodToWeeklyFactor,
   TaxFreeThresholdClaimedFact,
   TaxablePayFact,
 } from "../facts/pay.js";
+import { PaygWithholdingComponentFact } from "../facts/withholdings.js";
 import {
   AtoSchedule1Table,
   type Schedule1Row,
@@ -18,16 +18,9 @@ export const PaygWithholdingRuleId = RuleId.make(
   "whattax/spike-au-pay/rule/PaygWithholding",
 );
 
-const periodToWeeklyFactor = (period: PayPeriod): number => {
-  switch (period) {
-    case "weekly":
-      return 1;
-    case "fortnightly":
-      return 0.5;
-    case "monthly":
-      return 3 / 13;
-  }
-};
+export const PaygWithholdingComponentId = ComponentId.make(
+  "whattax/spike-au-pay/component/Payg",
+);
 
 const findRow = (table: Schedule1Table, weeklyCents: number): Schedule1Row => {
   const row = table.rows.find((r) => {
@@ -46,10 +39,11 @@ const findRow = (table: Schedule1Table, weeklyCents: number): Schedule1Row => {
 /**
  * Spike scope: only Scale 2 (resident, tax-free threshold claimed).
  *
- * If the threshold is not claimed we fail — a real rule pack would dispatch to
- * Scale 1, but the spike keeps a single illustrative scale.
+ * Produces a LedgerComponent rather than a bare Money, so a downstream
+ * aggregator can combine it with other withholding components (e.g. STSL)
+ * without the PAYG rule needing to know about them.
  */
-export const PaygWithholdingLive = Layer.effect(PaygWithholdingFact)(
+export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
   Effect.gen(function* () {
     const taxable = yield* TaxablePayFact;
     const tftClaimed = yield* TaxFreeThresholdClaimedFact;
@@ -63,7 +57,7 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingFact)(
       );
     }
 
-    const weeklyFactor = periodToWeeklyFactor(taxable.period);
+    const weeklyFactor = payPeriodToWeeklyFactor(taxable.period);
     const weeklyCents = taxable.amount.cents * weeklyFactor;
     const weeklyDollars = weeklyCents / 100;
     const row = findRow(table, weeklyCents);
@@ -95,11 +89,16 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingFact)(
       children: [taxable.trace],
     });
 
-    return new PaygWithholding({
+    const component: LedgerComponent = {
+      _tag: "LedgerComponent",
+      id: PaygWithholdingComponentId,
+      label: "PAYG withholding",
       amount: periodWithholding,
-      period: taxable.period,
+      effect: "additive",
+      status: "active",
       trace,
-    });
+    };
+
+    return component;
   }),
 );
-

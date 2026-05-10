@@ -66,24 +66,19 @@ Trace output is part of the engine contract, not only debugging. It supports tru
 For additive annual-tax and pay calculations, use ledger components instead of hiding everything in one total.
 
 ```ts
-export class TaxComponent extends Schema.TaggedClass<TaxComponent>()(
-  "TaxComponent",
-  {
-    id: ComponentId,
-    label: Schema.String,
-    amount: Money,
-    effect: Schema.Literal(
-      "increase-tax",
-      "decrease-tax",
-      "information-only"
-    ),
-    status: Schema.Literal("active", "disabled", "zeroed"),
-    trace: TraceNode
-  }
-) {}
+export const LedgerComponent = Schema.TaggedStruct("LedgerComponent", {
+  id: ComponentId,
+  label: Schema.String,
+  amount: Money,
+  effect: Schema.Literals(["additive", "subtractive", "informational"]),
+  status: Schema.Literals(["active", "disabled", "zeroed"]),
+  trace: TraceNode,
+});
 ```
 
-Ledgers make output explanation clearer because each additive component can be inspected independently.
+`effect` is intentionally domain-neutral. The aggregator that consumes the components decides what additive/subtractive *means* in context: a pay-withholdings aggregator treats `additive` as "more withheld → less take-home"; an annual-tax aggregator treats `additive` as "more tax owed". Sharing the value type across domains lets `sumLedgerComponents` and other ledger utilities live in `@whattax/core/ledger`.
+
+Ledgers make output explanation clearer because each component can be inspected independently. Disabled and zeroed components stay in the trace for auditability and do not affect the total.
 
 ## Source References
 

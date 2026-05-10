@@ -5,12 +5,15 @@ import {
   GrossPay,
   GrossPayFact,
   NetPayFact,
-  PaygWithholdingFact,
   type PayPeriod,
   TaxablePayFact,
   TaxFreeThresholdClaimed,
   TaxFreeThresholdClaimedFact,
 } from "../facts/pay.js";
+import {
+  type PayWithholdingsLedger,
+  PayWithholdingsLedgerFact,
+} from "../facts/withholdings.js";
 
 export class TakeHomePayReport {
   readonly _tag = "TakeHomePayReport";
@@ -18,7 +21,8 @@ export class TakeHomePayReport {
     readonly fields: {
       readonly grossPay: Money;
       readonly taxablePay: Money;
-      readonly paygWithheld: Money;
+      readonly withholdings: PayWithholdingsLedger;
+      readonly withholdingsTotal: Money;
       readonly netPay: Money;
       readonly period: PayPeriod;
       readonly rulePackVersion: string;
@@ -31,8 +35,11 @@ export class TakeHomePayReport {
   get taxablePay(): Money {
     return this.fields.taxablePay;
   }
-  get paygWithheld(): Money {
-    return this.fields.paygWithheld;
+  get withholdings(): PayWithholdingsLedger {
+    return this.fields.withholdings;
+  }
+  get withholdingsTotal(): Money {
+    return this.fields.withholdingsTotal;
   }
   get netPay(): Money {
     return this.fields.netPay;
@@ -49,19 +56,20 @@ export class TakeHomePayReport {
 }
 
 /**
- * The calculator. Requires the three derived facts and surfaces the report
+ * The calculator. Requires the derived facts and surfaces the report
  * with a stitched trace tree rooted at NetPayFact.
  */
 export const CalculateTakeHomePay = Effect.gen(function* () {
   const gross = yield* GrossPayFact;
   const taxable = yield* TaxablePayFact;
-  const payg = yield* PaygWithholdingFact;
+  const ledger = yield* PayWithholdingsLedgerFact;
   const net = yield* NetPayFact;
 
   return new TakeHomePayReport({
     grossPay: gross.amount,
     taxablePay: taxable.amount,
-    paygWithheld: payg.amount,
+    withholdings: ledger,
+    withholdingsTotal: ledger.total,
     netPay: net.amount,
     period: gross.period,
     rulePackVersion: "spike-au-pay/0.0.0",

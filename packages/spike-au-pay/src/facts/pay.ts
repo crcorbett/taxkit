@@ -5,6 +5,24 @@ import type { TraceNode } from "@whattax/core/trace";
 
 export type PayPeriod = "weekly" | "fortnightly" | "monthly";
 
+/**
+ * Conversion factor from a period's pay amount to its weekly equivalent.
+ * `weeklyEquivalentCents = periodCents * payPeriodToWeeklyFactor(period)`.
+ *
+ * Lives next to the PayPeriod type because every withholding rule that
+ * dispatches off a weekly-equivalent table needs it (PAYG, STSL, …).
+ */
+export const payPeriodToWeeklyFactor = (period: PayPeriod): number => {
+  switch (period) {
+    case "weekly":
+      return 1;
+    case "fortnightly":
+      return 0.5;
+    case "monthly":
+      return 3 / 13;
+  }
+};
+
 export class GrossPay {
   readonly _tag = "GrossPay";
   constructor(
@@ -78,38 +96,6 @@ export const TaxablePayDescriptor = makeFactDescriptor({
   title: "Taxable pay for a single pay period",
   authority: "derived",
   tag: TaxablePayFact,
-});
-
-export class PaygWithholding {
-  readonly _tag = "PaygWithholding";
-  constructor(
-    readonly fields: {
-      readonly amount: Money;
-      readonly period: PayPeriod;
-      readonly trace: TraceNode;
-    },
-  ) {}
-  get amount(): Money {
-    return this.fields.amount;
-  }
-  get period(): PayPeriod {
-    return this.fields.period;
-  }
-  get trace(): TraceNode {
-    return this.fields.trace;
-  }
-}
-
-export class PaygWithholdingFact extends Context.Service<
-  PaygWithholdingFact,
-  PaygWithholding
->()("whattax/spike-au-pay/fact/PaygWithholding") {}
-
-export const PaygWithholdingDescriptor = makeFactDescriptor({
-  id: "whattax/spike-au-pay/fact/PaygWithholding",
-  title: "PAYG amount withheld for a single pay period",
-  authority: "derived",
-  tag: PaygWithholdingFact,
 });
 
 export class NetPay {

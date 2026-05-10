@@ -7,7 +7,9 @@ import {
   CalculateTakeHomePay,
   GrossPay,
   NetPayRuleId,
+  PaygWithholdingComponentId,
   PaygWithholdingRuleId,
+  PayWithholdingsLedgerRuleId,
   TakeHomeScenarioLive,
   TaxablePayRuleId,
   type TakeHomeScenarioInput,
@@ -36,13 +38,13 @@ describe("spike: AU take-home pay calculator (2025-26 rule pack)", () => {
       // weekly = 1500
       // bracket 3: a=0.32, b=180.0385  -> round(0.32*1500 - 180.0385) = round(299.9615) = 300
       // net = 1500 - 300 = 1200
-      expect(moneyEquals(report.paygWithheld, audDollars(300))).toBe(true);
+      expect(moneyEquals(report.withholdingsTotal, audDollars(300))).toBe(true);
       expect(moneyEquals(report.netPay, audDollars(1200))).toBe(true);
       expect(report.period).toBe("weekly");
     }),
   );
 
-  it.effect("trace tree shape: NetPay -> PAYG -> TaxablePay", () =>
+  it.effect("trace tree shape: NetPay -> Ledger -> PAYG component -> TaxablePay", () =>
     Effect.gen(function* () {
       const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
         grossPay: weekly1500,
@@ -52,7 +54,11 @@ describe("spike: AU take-home pay calculator (2025-26 rule pack)", () => {
       expect(report.trace.ruleId).toBe(NetPayRuleId);
       expect(report.trace.children.length).toBe(1);
 
-      const paygTrace = report.trace.children[0]!;
+      const ledgerTrace = report.trace.children[0]!;
+      expect(ledgerTrace.ruleId).toBe(PayWithholdingsLedgerRuleId);
+      expect(ledgerTrace.children.length).toBe(1);
+
+      const paygTrace = ledgerTrace.children[0]!;
       expect(paygTrace.ruleId).toBe(PaygWithholdingRuleId);
       expect(paygTrace.rounding).toBe("ato-withholding-rounding");
       expect(paygTrace.sources.length).toBe(1);
@@ -60,6 +66,14 @@ describe("spike: AU take-home pay calculator (2025-26 rule pack)", () => {
 
       const taxableTrace = paygTrace.children[0]!;
       expect(taxableTrace.ruleId).toBe(TaxablePayRuleId);
+
+      // ledger surfaces the active PAYG component
+      expect(report.withholdings.components.length).toBe(1);
+      expect(report.withholdings.components[0]!.id).toBe(
+        PaygWithholdingComponentId,
+      );
+      expect(report.withholdings.components[0]!.status).toBe("active");
+      expect(report.withholdings.components[0]!.effect).toBe("additive");
     }),
   );
 
@@ -88,7 +102,7 @@ describe("spike: AU take-home pay calculator (2025-26 rule pack)", () => {
         taxFreeThresholdClaimed: true,
       });
 
-      expect(moneyEquals(report.paygWithheld, aud(0))).toBe(true);
+      expect(moneyEquals(report.withholdingsTotal, aud(0))).toBe(true);
       expect(moneyEquals(report.netPay, audDollars(300))).toBe(true);
     }),
   );
@@ -104,7 +118,7 @@ describe("spike: AU take-home pay calculator (2025-26 rule pack)", () => {
       });
 
       // 3000 fortnightly = 1500 weekly equivalent -> $300 weekly withholding -> $600 fortnightly
-      expect(moneyEquals(report.paygWithheld, audDollars(600))).toBe(true);
+      expect(moneyEquals(report.withholdingsTotal, audDollars(600))).toBe(true);
       expect(moneyEquals(report.netPay, audDollars(2400))).toBe(true);
     }),
   );
@@ -120,7 +134,7 @@ describe("spike: AU take-home pay calculator (2024-25 rule pack)", () => {
 
       // 2024-25 single bracket above threshold: a=0.18, b=64
       // round(0.18 * 1500 - 64) = round(206) = 206
-      expect(moneyEquals(report.paygWithheld, audDollars(206))).toBe(true);
+      expect(moneyEquals(report.withholdingsTotal, audDollars(206))).toBe(true);
       expect(moneyEquals(report.netPay, audDollars(1294))).toBe(true);
     }),
   );

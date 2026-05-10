@@ -25,6 +25,11 @@
       "source": "./src/trace/index.ts",
       "types": "./dist/trace/index.d.ts",
       "default": "./dist/trace/index.js"
+    },
+    "./ledger": {
+      "source": "./src/ledger/index.ts",
+      "types": "./dist/ledger/index.d.ts",
+      "default": "./dist/ledger/index.js"
     }
   },
   "scripts": {

@@ -1,33 +1,29 @@
 import { Effect, Layer } from "effect";
 import { moneySub } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
-import {
-  GrossPayFact,
-  NetPay,
-  NetPayFact,
-  PaygWithholdingFact,
-} from "../facts/pay.js";
+import { GrossPayFact, NetPay, NetPayFact } from "../facts/pay.js";
+import { PayWithholdingsLedgerFact } from "../facts/withholdings.js";
 
 export const NetPayRuleId = RuleId.make("whattax/spike-au-pay/rule/NetPay");
 
 export const NetPayLive = Layer.effect(NetPayFact)(
   Effect.gen(function* () {
     const gross = yield* GrossPayFact;
-    const payg = yield* PaygWithholdingFact;
+    const ledger = yield* PayWithholdingsLedgerFact;
 
-    const netAmount = moneySub(gross.amount, payg.amount);
+    const netAmount = moneySub(gross.amount, ledger.total);
 
     const trace = TraceNode.make({
       ruleId: NetPayRuleId,
-      title: "Net pay = gross - PAYG withheld",
+      title: "Net pay = gross - withholdings ledger total",
       inputs: {
         grossCents: gross.amount.cents,
-        paygCents: payg.amount.cents,
+        withholdingsTotalCents: ledger.total.cents,
       },
-      formula: "net = gross - payg",
+      formula: "net = gross - withholdingsLedger.total",
       result: netAmount,
       sources: [],
-      children: [payg.trace],
+      children: [ledger.trace],
     });
 
     return new NetPay({
