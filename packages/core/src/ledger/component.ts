@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Match, Schema } from "effect";
 import { aud, Money, moneyAdd, moneySub } from "../primitives/money.js";
 import { TraceNode } from "../trace/node.js";
 
@@ -85,12 +85,10 @@ export const sumLedgerComponents = (
 ): Money =>
   components.reduce<Money>((acc, c) => {
     if (!isComponentContributing(c)) return acc;
-    switch (c.effect) {
-      case "additive":
-        return moneyAdd(acc, c.amount);
-      case "subtractive":
-        return moneySub(acc, c.amount);
-      case "informational":
-        return acc;
-    }
+    return Match.value(c.effect).pipe(
+      Match.when("additive", () => moneyAdd(acc, c.amount)),
+      Match.when("subtractive", () => moneySub(acc, c.amount)),
+      Match.when("informational", () => acc),
+      Match.exhaustive,
+    );
   }, aud(0));

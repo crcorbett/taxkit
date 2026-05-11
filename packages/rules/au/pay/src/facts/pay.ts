@@ -14,14 +14,12 @@ export type PayPeriod = typeof PayPeriod.Type;
  * dispatches off a weekly-equivalent table needs it (PAYG, STSL, …).
  */
 export const payPeriodToWeeklyFactor = (period: PayPeriod): number => {
-  switch (period) {
-    case "weekly":
-      return 1;
-    case "fortnightly":
-      return 0.5;
-    case "monthly":
-      return 3 / 13;
-  }
+  return Match.value(period).pipe(
+    Match.when("weekly", () => 1),
+    Match.when("fortnightly", () => 0.5),
+    Match.when("monthly", () => 3 / 13),
+    Match.exhaustive,
+  );
 };
 
 export const scaleWeeklyWithholdingToPayPeriodDollars = (

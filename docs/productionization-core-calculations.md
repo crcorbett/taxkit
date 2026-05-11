@@ -20,7 +20,7 @@ The work is scoped to core calculation functionality only: facts, parameters, ru
 - Expose facts and rules through typed `Context` services and `Layer`s so missing dependencies are visible at compile time.
 - Preserve deterministic calculation behavior: explicit inputs plus selected rule packs and parameter layers must produce reproducible reports/traces.
 - Treat trace, ledger, source references, graph metadata, and validation as part of the engine contract, not debugging add-ons.
-- Prefer Effect collections and algorithms (`HashMap`, `HashSet`, `Array`, `Graph`, `Option`) for engine validation logic instead of ad hoc JavaScript `Map`/`Set`/mutable arrays.
+- Prefer Effect collections and algorithms (`HashMap`, `HashSet`, `Array`, `Graph`, `Option`, `Match`) for engine validation and closed-domain dispatch logic instead of ad hoc JavaScript `Map`/`Set`/mutable arrays or non-exhaustive switches.
 - Do not introduce consumer/UI/API concerns into engine packages.
 
 ## Source Audit Summary
@@ -103,9 +103,10 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 
 - [x] Run focused engine typechecks.
 - [x] Run focused engine tests.
-- [ ] Run repo-wide typecheck if workspace dependency state allows it.
-- [ ] Run repo-wide tests if workspace dependency state allows it.
-- [ ] Record any environment blockers clearly in this file and in the final response.
+- [x] Run repo-wide typecheck if workspace dependency state allows it.
+- [x] Run repo-wide tests if workspace dependency state allows it.
+- [x] Record any environment blockers clearly in this file and in the final response.
+  - No environment blockers remain for the verified WhatTax checks.
 
 ## Checklist
 
@@ -117,7 +118,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - [x] Rule descriptors added.
 - [x] Graph validation added.
 - [x] Calculation coverage expanded.
-- [ ] Verification completed.
+- [x] Verification completed.
 
 ## Change Record
 
@@ -155,6 +156,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Added a shared pay-period withholding scaler so weekly and fortnightly conversion stays exact and monthly withholding rounds to whole dollars after conversion, matching the ATO pay-period method.
 - Refactored PAYG and STSL row lookups to use Effect `Array.findFirst` and `Option.match` rather than JavaScript `Array.find` plus nullable branching.
 - Refactored pay-period withholding scaling to use Effect `Match.value` plus `Match.exhaustive` rather than a TypeScript `switch`, so new `PayPeriod` variants fail typecheck until handled.
+- Replaced the remaining core/rule package `switch` statements with Effect `Match.value` plus `Match.exhaustive` for rounding modes, ledger component effects, and pay-period weekly-factor conversion; `rg "\bswitch\s*\(" packages/core/src packages/rules/au -g "*.ts"` now returns no matches.
 - Expanded PAYG tests for Scale 1, fortnightly, monthly nearest-dollar rounding, and tax-free-threshold behavior.
 - Expanded STSL tests for monthly PAYG+STSL rounding and the highest official Schedule 8 row.
 - Expanded annual-tax tests for income-tax threshold, LITO phase-out boundaries, Medicare levy threshold/shade-in/full-rate boundaries, and liability floor behavior.
@@ -166,3 +168,4 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Added graph tests that fail when a rule parameter's source is not listed on that rule descriptor.
 - Added trace/ledger snapshot tests for PAYG-only, PAYG+STSL, and annual-tax component explanation order, source refs, rounding modes, ledger effects, and ledger statuses.
 - Verification after descriptor/metadata/snapshot work: focused engine check-types pass, and rule-package tests pass with 38 tests across 6 files.
+- Repo-wide verification after final Effect `Match` cleanup: `pnpm check-types` passes with 9 successful Turbo tasks, and `pnpm test` passes with 6 successful Turbo tasks.

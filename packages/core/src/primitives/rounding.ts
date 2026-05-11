@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Match, Schema } from "effect";
 import { aud, type Money } from "./money.js";
 
 export const RoundingMode = Schema.Literals([
@@ -12,23 +12,17 @@ export const RoundingMode = Schema.Literals([
 ]);
 export type RoundingMode = typeof RoundingMode.Type;
 
-export const roundCentsToDollar = (cents: number, mode: RoundingMode): number => {
-  switch (mode) {
-    case "none":
-    case "round-to-nearest-cent":
-      return Math.round(cents);
-    case "floor-cent":
-      return Math.floor(cents);
-    case "ceil-cent":
-      return Math.ceil(cents);
-    case "floor-dollar":
-      return Math.floor(cents / 100) * 100;
-    case "ceil-dollar":
-      return Math.ceil(cents / 100) * 100;
-    case "ato-withholding-rounding":
-      return Math.round(cents / 100) * 100;
-  }
-};
+export const roundCentsToDollar = (cents: number, mode: RoundingMode): number =>
+  Match.value(mode).pipe(
+    Match.when("none", () => Math.round(cents)),
+    Match.when("round-to-nearest-cent", () => Math.round(cents)),
+    Match.when("floor-cent", () => Math.floor(cents)),
+    Match.when("ceil-cent", () => Math.ceil(cents)),
+    Match.when("floor-dollar", () => Math.floor(cents / 100) * 100),
+    Match.when("ceil-dollar", () => Math.ceil(cents / 100) * 100),
+    Match.when("ato-withholding-rounding", () => Math.round(cents / 100) * 100),
+    Match.exhaustive,
+  );
 
 export const roundMoney = (m: Money, mode: RoundingMode): Money =>
   aud(roundCentsToDollar(m.cents, mode));
