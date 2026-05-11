@@ -1,5 +1,5 @@
 import { Context, Schema } from "effect";
-import { makeFactDescriptor } from "@whattax/core";
+import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@whattax/core";
 import { LedgerComponent } from "@whattax/core/ledger";
 
 /**
@@ -25,6 +25,11 @@ export const StslDebtDescriptor = makeFactDescriptor({
   authority: "input",
   schema: StslDebt,
   tag: StslDebtFact,
+  question: new FactQuestion({
+    id: FactQuestionId.make("whattax/rules-au-stsl/question/StslDebt"),
+    prompt: "Study and training support loan debt",
+    inputKind: "boolean",
+  }),
 });
 
 /**

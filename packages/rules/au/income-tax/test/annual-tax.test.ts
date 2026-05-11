@@ -163,6 +163,66 @@ describe("AU annual income tax calculator (2025-26)", () => {
     }),
   );
 
+  it.effect("trace and ledger snapshot: annual components and source-backed order", () =>
+    Effect.gen(function* () {
+      const report = yield* runScenario(80_000);
+
+      expect({
+        traceRoot: report.trace.ruleId,
+        traceChildren: report.trace.children.map((child) => ({
+          ruleId: child.ruleId,
+          sourceKinds: child.sources.map((source) => source.kind),
+          rounding: child.rounding,
+        })),
+        ledger: report.ledger.components.map((component) => ({
+          id: component.id,
+          effect: component.effect,
+          status: component.status,
+          cents: component.amount.cents,
+        })),
+      }).toEqual({
+        traceRoot: AnnualTaxLedgerRuleId,
+        traceChildren: [
+          {
+            ruleId: IncomeTaxRuleId,
+            sourceKinds: ["ato-publication"],
+            rounding: "round-to-nearest-cent",
+          },
+          {
+            ruleId: LitoRuleId,
+            sourceKinds: ["ato-publication"],
+            rounding: "round-to-nearest-cent",
+          },
+          {
+            ruleId: MedicareLevyRuleId,
+            sourceKinds: ["ato-publication"],
+            rounding: "round-to-nearest-cent",
+          },
+        ],
+        ledger: [
+          {
+            id: IncomeTaxComponentId,
+            effect: "additive",
+            status: "active",
+            cents: 1_478_800,
+          },
+          {
+            id: LitoComponentId,
+            effect: "subtractive",
+            status: "zeroed",
+            cents: 0,
+          },
+          {
+            id: MedicareLevyComponentId,
+            effect: "additive",
+            status: "active",
+            cents: 160_000,
+          },
+        ],
+      });
+    }),
+  );
+
   it.effect("income tax and LITO boundary values stay on the intended brackets", () =>
     Effect.gen(function* () {
       const taxFreeThreshold = yield* runScenario(18_200);

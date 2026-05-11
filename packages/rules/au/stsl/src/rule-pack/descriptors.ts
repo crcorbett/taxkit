@@ -14,7 +14,10 @@ import {
   StslComponentDescriptor,
   StslDebtDescriptor,
 } from "../facts/stsl.js";
-import { StslSource2025_26 } from "../parameters/stsl-table.js";
+import {
+  AtoStslTableDescriptor,
+  StslSource2025_26,
+} from "../parameters/stsl-table.js";
 import { StslComponentLive, StslComponentRuleId } from "../rules/stsl-component.js";
 import { PayWithholdingsLedgerWithStslRuleId } from "../rules/withholdings-ledger-with-stsl.js";
 
@@ -23,6 +26,7 @@ export const StslComponentRuleDescriptor = makeRuleDescriptor({
   title: "STSL withholding component",
   provides: [StslComponentDescriptor],
   requires: [TaxablePayDescriptor, StslDebtDescriptor],
+  parameters: [AtoStslTableDescriptor],
   layer: StslComponentLive,
   sources: [StslSource2025_26],
   sourcePolicy: "required",

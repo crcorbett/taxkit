@@ -1,6 +1,7 @@
 import type { Layer } from "effect";
 import { Schema } from "effect";
 import type { FactDescriptor } from "../facts/descriptor.js";
+import type { AnyParameterDescriptor } from "../parameters/descriptor.js";
 import { RuleId, type SourceRef } from "../trace/node.js";
 
 export type AnyFactDescriptor = FactDescriptor<any, any>;
@@ -13,6 +14,7 @@ export interface RuleDescriptor<ROut = unknown, E = unknown, RIn = unknown> {
   readonly title: string;
   readonly provides: ReadonlyArray<AnyFactDescriptor>;
   readonly requires: ReadonlyArray<AnyFactDescriptor>;
+  readonly parameters?: ReadonlyArray<AnyParameterDescriptor>;
   readonly layer: Layer.Layer<ROut, E, RIn>;
   readonly sources: ReadonlyArray<SourceRef>;
   readonly sourcePolicy: RuleSourcePolicy;

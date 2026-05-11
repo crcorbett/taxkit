@@ -1,5 +1,5 @@
 import { Context, Schema } from "effect";
-import { makeFactDescriptor } from "@whattax/core";
+import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@whattax/core";
 import { Money } from "@whattax/core/primitives";
 import { PayPeriod } from "./pay.js";
 
@@ -26,4 +26,9 @@ export const SalarySacrificeDescriptor = makeFactDescriptor({
   authority: "input",
   schema: SalarySacrifice,
   tag: SalarySacrificeFact,
+  question: new FactQuestion({
+    id: FactQuestionId.make("whattax/rules-au-pay/question/SalarySacrifice"),
+    prompt: "Pre-tax salary sacrifice for the pay period",
+    inputKind: "money",
+  }),
 });

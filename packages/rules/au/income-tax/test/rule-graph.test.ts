@@ -12,4 +12,8 @@ describe("AU annual tax rule graph", () => {
 
     expect(issues).toEqual([]);
   });
+
+  it("surfaces caller question metadata on annual input facts", () => {
+    expect(AnnualTaxableIncomeDescriptor.question?.inputKind).toBe("money");
+  });
 });

@@ -1,4 +1,5 @@
 import { Context, Layer, Schema } from "effect";
+import { makeParameterDescriptor } from "@whattax/core/parameters";
 import { Cents, CentsOrInfinity, TaxRate, TaxYear, taxRate, taxYear } from "@whattax/core/primitives";
 import { SourceRef } from "@whattax/core/trace";
 
@@ -34,6 +35,14 @@ export const LitoSource2025_26 = SourceRef.make({
   title: "ATO low income tax offset",
   reference:
     "https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/tax-offsets/low-income-tax-offset",
+});
+
+export const AtoLitoTableDescriptor = makeParameterDescriptor({
+  id: "whattax/rules-au-income-tax/parameter/AtoLitoTable",
+  title: "ATO low income tax offset parameters",
+  schema: LitoTable,
+  tag: AtoLitoTable,
+  source: LitoSource2025_26,
 });
 
 // LITO 2025-26: max $700, phases out in two stages.

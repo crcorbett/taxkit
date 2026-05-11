@@ -1,5 +1,5 @@
 import { Context, Schema } from "effect";
-import { makeFactDescriptor } from "@whattax/core";
+import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@whattax/core";
 import { Money } from "@whattax/core/primitives";
 
 /**
@@ -24,4 +24,11 @@ export const AnnualTaxableIncomeDescriptor = makeFactDescriptor({
   authority: "input",
   schema: AnnualTaxableIncome,
   tag: AnnualTaxableIncomeFact,
+  question: new FactQuestion({
+    id: FactQuestionId.make(
+      "whattax/rules-au-income-tax/question/AnnualTaxableIncome",
+    ),
+    prompt: "Annual taxable income",
+    inputKind: "money",
+  }),
 });

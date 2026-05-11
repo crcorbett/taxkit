@@ -30,4 +30,8 @@ describe("AU STSL rule graph", () => {
 
     expect(issues).toEqual([]);
   });
+
+  it("surfaces caller question metadata on STSL input facts", () => {
+    expect(StslDebtDescriptor.question?.inputKind).toBe("boolean");
+  });
 });

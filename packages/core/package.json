@@ -21,6 +21,11 @@
       "types": "./dist/facts/index.d.ts",
       "default": "./dist/facts/index.js"
     },
+    "./parameters": {
+      "source": "./src/parameters/index.ts",
+      "types": "./dist/parameters/index.d.ts",
+      "default": "./dist/parameters/index.js"
+    },
     "./errors": {
       "source": "./src/errors/index.ts",
       "types": "./dist/errors/index.d.ts",

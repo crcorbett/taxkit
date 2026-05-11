@@ -150,6 +150,52 @@ describe("AU take-home pay with STSL", () => {
     }),
   );
 
+  it.effect("trace and ledger snapshot: PAYG plus STSL explanation order", () =>
+    Effect.gen(function* () {
+      const report = yield* stslScenario(weekly1500, stslEnabled);
+
+      expect({
+        root: report.trace.ruleId,
+        ledgerChildren: report.trace.children[0]!.children.map((child) => ({
+          ruleId: child.ruleId,
+          rounding: child.rounding,
+          sourceKinds: child.sources.map((source) => source.kind),
+        })),
+        ledger: report.withholdings.components.map((component) => ({
+          id: component.id,
+          status: component.status,
+          cents: component.amount.cents,
+        })),
+      }).toEqual({
+        root: NetPayRuleId,
+        ledgerChildren: [
+          {
+            ruleId: PaygWithholdingRuleId,
+            rounding: "ato-withholding-rounding",
+            sourceKinds: ["ato-publication"],
+          },
+          {
+            ruleId: StslComponentRuleId,
+            rounding: "ato-withholding-rounding",
+            sourceKinds: ["ato-publication"],
+          },
+        ],
+        ledger: [
+          {
+            id: PaygWithholdingComponentId,
+            status: "active",
+            cents: 30_400,
+          },
+          {
+            id: StslComponentId,
+            status: "active",
+            cents: 3_200,
+          },
+        ],
+      });
+    }),
+  );
+
   it.effect("+sacrifice only (no STSL): sacrifice reduces taxable pay and PAYG", () =>
     Effect.gen(function* () {
       // taxable = 1500 - 300 = 1200; PAYG = round(0.3227*1200.99 - 180.0385) = 208

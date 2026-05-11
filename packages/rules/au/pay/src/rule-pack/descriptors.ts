@@ -15,7 +15,10 @@ import {
   PaygWithholdingLive,
   PaygWithholdingRuleId,
 } from "../rules/payg-withholding.js";
-import { Schedule1Source2025_26 } from "../parameters/schedule1.js";
+import {
+  AtoSchedule1TableDescriptor,
+  Schedule1Source2025_26,
+} from "../parameters/schedule1.js";
 import {
   TaxablePayWithSacrificeLive,
   TaxablePayWithSacrificeRuleId,
@@ -51,6 +54,7 @@ export const PaygWithholdingRuleDescriptor = makeRuleDescriptor({
   title: "PAYG withholding",
   provides: [PaygWithholdingComponentDescriptor],
   requires: [TaxablePayDescriptor, TaxFreeThresholdClaimedDescriptor],
+  parameters: [AtoSchedule1TableDescriptor],
   layer: PaygWithholdingLive,
   sources: [Schedule1Source2025_26],
   sourcePolicy: "required",

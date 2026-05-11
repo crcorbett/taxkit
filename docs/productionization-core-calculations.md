@@ -50,7 +50,8 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
   - Likely split: pay facts/calculator in `@whattax/rules-au-pay`, PAYG withholding tables/rules in `@whattax/rules-au-payg`.
 - [x] Rename `packages/spike-au-stsl` to `@whattax/rules-au-stsl`.
 - [x] Rename `packages/spike-au-income-tax` to `@whattax/rules-au-income-tax`.
-- [ ] Decide whether Medicare remains in the first annual-tax rule pack or moves to `@whattax/rules-au-medicare`.
+- [x] Decide whether Medicare remains in the first annual-tax rule pack or moves to `@whattax/rules-au-medicare`.
+  - Decision: keep the initial non-SAPTO Medicare levy rule in `@whattax/rules-au-income-tax` while it is only used as one annual-liability component. Split to `@whattax/rules-au-medicare` when Medicare-family/SAPTO/private-health variants need their own independently swappable pack.
 - [x] Replace package imports, package names, lockfile entries, tests, and TS project references after renaming.
 - [x] Replace all runtime IDs containing `spike-*`.
   - Fact IDs.
@@ -66,9 +67,9 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 ## Type And Schema Productionization Plan
 
 - [x] Upgrade core fact descriptors to carry schemas, typed authority, and stable IDs.
-- [ ] Add optional question metadata where caller-collected input facts need it.
+- [x] Add optional question metadata where caller-collected input facts need it.
 - [x] Add initial rule descriptors with typed provided facts, required facts, source policy, and layer reference.
-- [ ] Add parameter descriptors or metadata where needed so parameter services can be included in graph validation.
+- [x] Add parameter descriptors or metadata where needed so parameter services can be included in graph validation.
 - [x] Convert pay facts to schema-backed values.
 - [x] Convert STSL facts and parameter tables to schema-backed values.
 - [x] Convert annual income-tax facts, components, ledger, parameter tables, and reports to schema-backed values.
@@ -85,7 +86,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - [x] STSL: realistic multi-bracket behavior or isolated official-scope subset, active/zeroed/disabled behavior, PAYG composition, and salary-sacrifice interaction where in scope.
 - [x] Annual tax: income-tax marginal brackets, LITO phase-out, Medicare levy threshold/shade-in/full-rate behavior, liability floor, and bracket/threshold boundary tests.
 - [x] Cross-rule composition: PAYG plus STSL plus salary sacrifice, annual tax additive/subtractive ledger components, missing dependency visibility, and explicit aggregator replacement.
-- [ ] Trace and ledger snapshots: rule IDs, source refs, inputs/outputs, rounding modes, ledger status, and explanation order.
+- [x] Trace and ledger snapshots: rule IDs, source refs, inputs/outputs, rounding modes, ledger status, and explanation order.
 
 ## Graph Validation Plan
 
@@ -94,8 +95,9 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - [x] Validate no duplicate providers unless explicitly replaced.
 - [x] Validate no cycles.
 - [x] Validate source references for descriptors that require sources.
-- [ ] Validate effective-date overlaps where effective periods are introduced.
-- [ ] Add tests that fail on descriptor/layer drift.
+- [x] Validate effective-date overlaps where effective periods are introduced.
+  - No effective-period overlap model has been introduced yet; current rule packs select one parameter-year layer explicitly. This remains a future validation hook when effective periods become part of parameter descriptors.
+- [x] Add tests that fail on descriptor/layer drift.
 
 ## Verification Plan
 
@@ -152,7 +154,15 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Added official ATO Schedule 1 Scale 1 rows and removed the previous typed "Scale 1 not implemented" failure path; PAYG now derives Scale 1/2 behavior from the tax-free-threshold fact.
 - Added a shared pay-period withholding scaler so weekly and fortnightly conversion stays exact and monthly withholding rounds to whole dollars after conversion, matching the ATO pay-period method.
 - Refactored PAYG and STSL row lookups to use Effect `Array.findFirst` and `Option.match` rather than JavaScript `Array.find` plus nullable branching.
+- Refactored pay-period withholding scaling to use Effect `Match.value` plus `Match.exhaustive` rather than a TypeScript `switch`, so new `PayPeriod` variants fail typecheck until handled.
 - Expanded PAYG tests for Scale 1, fortnightly, monthly nearest-dollar rounding, and tax-free-threshold behavior.
 - Expanded STSL tests for monthly PAYG+STSL rounding and the highest official Schedule 8 row.
 - Expanded annual-tax tests for income-tax threshold, LITO phase-out boundaries, Medicare levy threshold/shade-in/full-rate boundaries, and liability floor behavior.
 - Verification after coverage expansion: focused engine check-types pass, and rule-package tests pass with 31 tests across 6 files.
+- Kept the first Medicare levy implementation in `@whattax/rules-au-income-tax` until independent Medicare-family/SAPTO/private-health variants justify a separate `@whattax/rules-au-medicare` rule pack.
+- Added schema-backed question metadata for caller-collected input facts: gross pay, tax-free-threshold claimed, salary sacrifice, STSL debt, and annual taxable income.
+- Added core parameter descriptors and parameter metadata for PAYG Schedule 1, STSL Schedule 8, income-tax rates, LITO, and Medicare levy tables.
+- Extended rule descriptors with parameter descriptors and graph validation for parameter-source drift.
+- Added graph tests that fail when a rule parameter's source is not listed on that rule descriptor.
+- Added trace/ledger snapshot tests for PAYG-only, PAYG+STSL, and annual-tax component explanation order, source refs, rounding modes, ledger effects, and ledger statuses.
+- Verification after descriptor/metadata/snapshot work: focused engine check-types pass, and rule-package tests pass with 38 tests across 6 files.

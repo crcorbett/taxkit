@@ -1,4 +1,5 @@
 import { Context, Layer, Schema } from "effect";
+import { makeParameterDescriptor } from "@whattax/core/parameters";
 import { Cents, TaxRate, TaxYear, taxRate, taxYear } from "@whattax/core/primitives";
 import { SourceRef } from "@whattax/core/trace";
 
@@ -34,6 +35,14 @@ export const MedicareLevySource2025_26 = SourceRef.make({
   title: "ATO Medicare levy reduction thresholds for low-income earners",
   reference:
     "https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners",
+});
+
+export const AtoMedicareLevyTableDescriptor = makeParameterDescriptor({
+  id: "whattax/rules-au-income-tax/parameter/AtoMedicareLevyTable",
+  title: "ATO Medicare levy threshold and rate parameters",
+  schema: MedicareLevyTable,
+  tag: AtoMedicareLevyTable,
+  source: MedicareLevySource2025_26,
 });
 
 // Single non-SAPTO 2025-26: nil at/below $27,222, shade-in to $34,027, then 2% flat.

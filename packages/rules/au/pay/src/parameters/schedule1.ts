@@ -1,4 +1,5 @@
 import { Context, Layer, Schema } from "effect";
+import { makeParameterDescriptor } from "@whattax/core/parameters";
 import {
   Cents,
   CentsOrInfinity,
@@ -48,6 +49,14 @@ export const Schedule1Source2025_26 = SourceRef.make({
 });
 
 export const Schedule1Source2024_25 = Schedule1Source2025_26;
+
+export const AtoSchedule1TableDescriptor = makeParameterDescriptor({
+  id: "whattax/rules-au-pay/parameter/AtoSchedule1Table",
+  title: "ATO Schedule 1 withholding coefficients",
+  schema: Schedule1Table,
+  tag: AtoSchedule1Table,
+  source: Schedule1Source2025_26,
+});
 
 const table2025_26 = new Schedule1Table({
   year: taxYear("2025-26"),

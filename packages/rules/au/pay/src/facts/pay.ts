@@ -1,6 +1,6 @@
-import { Context, Schema } from "effect";
+import { Context, Match, Schema } from "effect";
 import { Money } from "@whattax/core";
-import { makeFactDescriptor } from "@whattax/core";
+import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@whattax/core";
 import { TraceNode } from "@whattax/core/trace";
 
 export const PayPeriod = Schema.Literals(["weekly", "fortnightly", "monthly"]);
@@ -27,16 +27,13 @@ export const payPeriodToWeeklyFactor = (period: PayPeriod): number => {
 export const scaleWeeklyWithholdingToPayPeriodDollars = (
   weeklyWithholdingDollars: number,
   period: PayPeriod,
-): number => {
-  switch (period) {
-    case "weekly":
-      return weeklyWithholdingDollars;
-    case "fortnightly":
-      return weeklyWithholdingDollars * 2;
-    case "monthly":
-      return Math.round((weeklyWithholdingDollars * 13) / 3);
-  }
-};
+): number =>
+  Match.value(period).pipe(
+    Match.when("weekly", () => weeklyWithholdingDollars),
+    Match.when("fortnightly", () => weeklyWithholdingDollars * 2),
+    Match.when("monthly", () => Math.round((weeklyWithholdingDollars * 13) / 3)),
+    Match.exhaustive,
+  );
 
 export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
   amount: Money,
@@ -53,6 +50,11 @@ export const GrossPayDescriptor = makeFactDescriptor({
   authority: "input",
   schema: GrossPay,
   tag: GrossPayFact,
+  question: new FactQuestion({
+    id: FactQuestionId.make("whattax/rules-au-pay/question/GrossPay"),
+    prompt: "Gross pay for the pay period",
+    inputKind: "money",
+  }),
 });
 
 export class TaxFreeThresholdClaimed
@@ -72,6 +74,13 @@ export const TaxFreeThresholdClaimedDescriptor = makeFactDescriptor({
   authority: "input",
   schema: TaxFreeThresholdClaimed,
   tag: TaxFreeThresholdClaimedFact,
+  question: new FactQuestion({
+    id: FactQuestionId.make(
+      "whattax/rules-au-pay/question/TaxFreeThresholdClaimed",
+    ),
+    prompt: "Tax-free threshold claimed",
+    inputKind: "boolean",
+  }),
 });
 
 export class TaxablePay extends Schema.TaggedClass<TaxablePay>()("TaxablePay", {

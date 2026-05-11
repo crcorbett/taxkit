@@ -6,6 +6,7 @@ export const GraphValidationIssueKind = Schema.Literals([
   "duplicate-provider",
   "missing-provider",
   "missing-source",
+  "parameter-source-mismatch",
   "cycle",
 ]);
 export type GraphValidationIssueKind = typeof GraphValidationIssueKind.Type;
@@ -17,6 +18,8 @@ export class GraphValidationIssue
   }) {}
 
 const factKey = (fact: AnyFactDescriptor): FactId => fact.id;
+const sourceKey = (source: { readonly kind: string; readonly reference: string }) =>
+  `${source.kind}:${source.reference}`;
 
 const makeIssue = (
   kind: GraphValidationIssueKind,
@@ -122,6 +125,29 @@ export const validateRuleGraph = (args: {
     },
   );
 
+  const parameterSourceIssues = Array.reduce(
+    args.rules,
+    Array.empty<GraphValidationIssue>(),
+    (issues, rule) => {
+      const sources = HashSet.fromIterable(Array.map(rule.sources, sourceKey));
+
+      return Array.reduce(
+        rule.parameters ?? Array.empty(),
+        issues,
+        (updatedIssues, parameter) =>
+          HashSet.has(sources, sourceKey(parameter.source))
+            ? updatedIssues
+            : Array.append(
+                updatedIssues,
+                makeIssue(
+                  "parameter-source-mismatch",
+                  `${rule.id} parameter ${parameter.id} source must be listed on rule sources`,
+                ),
+              ),
+      );
+    },
+  );
+
   const missingProviderIssues = Array.reduce(
     args.rules,
     Array.empty<GraphValidationIssue>(),
@@ -149,6 +175,7 @@ export const validateRuleGraph = (args: {
   return [
     ...sourceIssues,
     ...duplicateIssues,
+    ...parameterSourceIssues,
     ...missingProviderIssues,
     ...cycleIssues,
   ];

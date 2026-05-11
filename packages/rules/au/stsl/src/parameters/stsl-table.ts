@@ -1,4 +1,5 @@
 import { Context, Layer, Schema } from "effect";
+import { makeParameterDescriptor } from "@whattax/core/parameters";
 import {
   Cents,
   CentsOrInfinity,
@@ -37,6 +38,14 @@ export const StslSource2025_26 = SourceRef.make({
   title: "ATO Schedule 8 - Statement of formulas for calculating study and training support loans components",
   reference:
     "https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components",
+});
+
+export const AtoStslTableDescriptor = makeParameterDescriptor({
+  id: "whattax/rules-au-stsl/parameter/AtoStslTable",
+  title: "ATO Schedule 8 STSL withholding coefficients",
+  schema: StslTable,
+  tag: AtoStslTable,
+  source: StslSource2025_26,
 });
 
 const table2025_26 = new StslTable({

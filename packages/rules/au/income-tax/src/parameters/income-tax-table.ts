@@ -1,4 +1,5 @@
 import { Context, Layer, Schema } from "effect";
+import { makeParameterDescriptor } from "@whattax/core/parameters";
 import { Cents, CentsOrInfinity, TaxRate, TaxYear, taxRate, taxYear } from "@whattax/core/primitives";
 import { SourceRef } from "@whattax/core/trace";
 
@@ -36,6 +37,14 @@ export const IncomeTaxSource2025_26 = SourceRef.make({
   title: "ATO tax rates - Australian resident 2025-26",
   reference:
     "https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents",
+});
+
+export const AtoIncomeTaxTableDescriptor = makeParameterDescriptor({
+  id: "whattax/rules-au-income-tax/parameter/AtoIncomeTaxTable",
+  title: "ATO resident income tax rates",
+  schema: IncomeTaxTable,
+  tag: AtoIncomeTaxTable,
+  source: IncomeTaxSource2025_26,
 });
 
 // Resident individual tax rates 2025-26.

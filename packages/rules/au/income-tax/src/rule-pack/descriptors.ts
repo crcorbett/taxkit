@@ -16,15 +16,25 @@ import {
   MedicareLevyLive,
   MedicareLevyRuleId,
 } from "../rules/medicare-levy.js";
-import { IncomeTaxSource2025_26 } from "../parameters/income-tax-table.js";
-import { LitoSource2025_26 } from "../parameters/lito-table.js";
-import { MedicareLevySource2025_26 } from "../parameters/medicare-levy-table.js";
+import {
+  AtoIncomeTaxTableDescriptor,
+  IncomeTaxSource2025_26,
+} from "../parameters/income-tax-table.js";
+import {
+  AtoLitoTableDescriptor,
+  LitoSource2025_26,
+} from "../parameters/lito-table.js";
+import {
+  AtoMedicareLevyTableDescriptor,
+  MedicareLevySource2025_26,
+} from "../parameters/medicare-levy-table.js";
 
 export const IncomeTaxRuleDescriptor = makeRuleDescriptor({
   id: IncomeTaxRuleId,
   title: "Income tax at marginal rates",
   provides: [IncomeTaxComponentDescriptor],
   requires: [AnnualTaxableIncomeDescriptor],
+  parameters: [AtoIncomeTaxTableDescriptor],
   layer: IncomeTaxLive,
   sources: [IncomeTaxSource2025_26],
   sourcePolicy: "required",
@@ -35,6 +45,7 @@ export const LitoRuleDescriptor = makeRuleDescriptor({
   title: "Low Income Tax Offset",
   provides: [LitoComponentDescriptor],
   requires: [AnnualTaxableIncomeDescriptor],
+  parameters: [AtoLitoTableDescriptor],
   layer: LitoLive,
   sources: [LitoSource2025_26],
   sourcePolicy: "required",
@@ -45,6 +56,7 @@ export const MedicareLevyRuleDescriptor = makeRuleDescriptor({
   title: "Medicare Levy",
   provides: [MedicareLevyComponentDescriptor],
   requires: [AnnualTaxableIncomeDescriptor],
+  parameters: [AtoMedicareLevyTableDescriptor],
   layer: MedicareLevyLive,
   sources: [MedicareLevySource2025_26],
   sourcePolicy: "required",

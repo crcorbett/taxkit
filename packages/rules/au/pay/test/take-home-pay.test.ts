@@ -77,6 +77,57 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
     }),
   );
 
+  it.effect("trace and ledger snapshot: PAYG-only explanation order and sources", () =>
+    Effect.gen(function* () {
+      const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
+        grossPay: weekly1500,
+        taxFreeThresholdClaimed: true,
+      });
+
+      expect({
+        root: report.trace.ruleId,
+        explanationOrder: report.trace.children.map((child) => ({
+          ruleId: child.ruleId,
+          children: child.children.map((grandchild) => ({
+            ruleId: grandchild.ruleId,
+            rounding: grandchild.rounding,
+            sourceKinds: grandchild.sources.map((source) => source.kind),
+            children: grandchild.children.map((leaf) => leaf.ruleId),
+          })),
+        })),
+        ledger: report.withholdings.components.map((component) => ({
+          id: component.id,
+          effect: component.effect,
+          status: component.status,
+          cents: component.amount.cents,
+        })),
+      }).toEqual({
+        root: NetPayRuleId,
+        explanationOrder: [
+          {
+            ruleId: PayWithholdingsLedgerRuleId,
+            children: [
+              {
+                ruleId: PaygWithholdingRuleId,
+                rounding: "ato-withholding-rounding",
+                sourceKinds: ["ato-publication"],
+                children: [TaxablePayRuleId],
+              },
+            ],
+          },
+        ],
+        ledger: [
+          {
+            id: PaygWithholdingComponentId,
+            effect: "additive",
+            status: "active",
+            cents: 30_400,
+          },
+        ],
+      });
+    }),
+  );
+
   it.effect("determinism: two runs produce identical traces", () =>
     Effect.gen(function* () {
       const a = yield* runScenario(AuTakeHomePay2025_26_Live, {
