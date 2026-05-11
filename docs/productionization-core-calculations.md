@@ -76,7 +76,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - [x] Replace unbranded `string` years with branded income-year or parameter-year schemas.
 - [x] Replace raw percentage/rate numbers with branded rate schemas where they cross boundaries.
 - [x] Replace raw cents/range numbers with branded money/cent/range schemas where they cross boundaries.
-- [ ] Ensure scenario layers decode unknown/input values through Effect Schema and fail with typed errors.
+- [x] Ensure scenario layers decode unknown/input values through Effect Schema and fail with typed errors.
 - [x] Replace thrown errors and `Effect.die` calculation paths with typed tagged errors.
 
 ## Core Calculation Coverage Plan
@@ -110,7 +110,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - [x] Create this markdown tracker before code changes.
 - [x] Baseline branch/workspace status recorded.
 - [x] Package productionization completed.
-- [ ] Type/schema productionization completed.
+- [x] Type/schema productionization completed.
 - [x] Typed calculation errors added.
 - [x] Rule descriptors added.
 - [x] Graph validation added.
@@ -146,3 +146,6 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Replaced the STSL single-bracket validation shortcut with the official ATO Schedule 8 STSL component rows that apply from 24 September 2025 to 30 June 2026.
 - Exported official source refs from PAYG, STSL, annual tax, LITO, and Medicare parameter modules and marked the corresponding calculation rule descriptors as `sourcePolicy: "required"`.
 - Verification after official PAYG/STSL source work: focused engine check-types pass, and rule-package tests pass with 23 tests across 6 files.
+- Updated take-home-pay and annual-tax scenario layers to accept `unknown`, decode with `Schema.decodeUnknownEffect`, and provide facts through `Layer.effectContext`.
+- Added malformed-input regression tests for the scenario layers.
+- Verification after scenario-schema work: focused engine check-types pass, and rule-package tests pass with 25 tests across 6 files.

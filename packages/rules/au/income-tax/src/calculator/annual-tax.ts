@@ -1,4 +1,4 @@
-import { Effect, Layer, Schema } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 import { Money, aud } from "@whattax/core/primitives";
 import { TraceNode } from "@whattax/core/trace";
 import { AnnualTaxableIncome, AnnualTaxableIncomeFact } from "../facts/income.js";
@@ -31,11 +31,20 @@ export const CalculateAnnualTax = Effect.gen(function* () {
   });
 });
 
-export interface AnnualTaxScenarioInput {
-  readonly taxableIncome: Money;
-}
+export const AnnualTaxScenarioInputSchema = Schema.Struct({
+  taxableIncome: Money,
+});
 
-export const AnnualTaxScenarioLive = (input: AnnualTaxScenarioInput) =>
-  Layer.succeed(AnnualTaxableIncomeFact)(
-    new AnnualTaxableIncome({ income: input.taxableIncome }),
+export type AnnualTaxScenarioInput = typeof AnnualTaxScenarioInputSchema.Type;
+
+export const AnnualTaxScenarioLive = (input: unknown) =>
+  Layer.effectContext(
+    Schema.decodeUnknownEffect(AnnualTaxScenarioInputSchema)(input).pipe(
+      Effect.map((scenario) =>
+        Context.make(
+          AnnualTaxableIncomeFact,
+          new AnnualTaxableIncome({ income: scenario.taxableIncome }),
+        ),
+      ),
+    ),
   );

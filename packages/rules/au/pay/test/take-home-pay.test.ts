@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Layer } from "effect";
+import { Effect, Exit, Layer } from "effect";
 import { aud, audDollars, moneyEquals } from "@whattax/core/primitives";
 import {
   AuTakeHomePay2024_25_Live,
@@ -104,6 +104,26 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
 
       expect(moneyEquals(report.withholdingsTotal, aud(0))).toBe(true);
       expect(moneyEquals(report.netPay, audDollars(300))).toBe(true);
+    }),
+  );
+
+  it.effect("scenario layer rejects malformed input through Effect Schema", () =>
+    Effect.gen(function* () {
+      const exit = yield* CalculateTakeHomePay.pipe(
+        Effect.provide(
+          AuTakeHomePay2025_26_Live.pipe(
+            Layer.provideMerge(
+              TakeHomeScenarioLive({
+                grossPay: weekly1500,
+                taxFreeThresholdClaimed: "yes",
+              }),
+            ),
+          ),
+        ),
+        Effect.exit,
+      );
+
+      expect(Exit.isFailure(exit)).toBe(true);
     }),
   );
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Layer } from "effect";
+import { Effect, Exit, Layer } from "effect";
 import { aud, audDollars, moneyEquals } from "@whattax/core/primitives";
 import {
   AnnualTaxLedgerRuleId,
@@ -126,6 +126,23 @@ describe("AU annual income tax calculator (2025-26)", () => {
       expect(incomeTax!.status).toBe("active"); // Nil bracket is active; the rate happens to be 0.
       expect(moneyEquals(lito!.amount, audDollars(700))).toBe(true);
       expect(lito!.status).toBe("active");
+    }),
+  );
+
+  it.effect("scenario layer rejects malformed input through Effect Schema", () =>
+    Effect.gen(function* () {
+      const exit = yield* CalculateAnnualTax.pipe(
+        Effect.provide(
+          AuAnnualTax2025_26_Live.pipe(
+            Layer.provideMerge(
+              AnnualTaxScenarioLive({ taxableIncome: "80000" }),
+            ),
+          ),
+        ),
+        Effect.exit,
+      );
+
+      expect(Exit.isFailure(exit)).toBe(true);
     }),
   );
 

@@ -1,4 +1,4 @@
-import { Effect, Layer, Schema } from "effect";
+import { Context, Effect, Layer, Schema } from "effect";
 import { Money } from "@whattax/core/primitives";
 import { TraceNode } from "@whattax/core/trace";
 import {
@@ -49,15 +49,26 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
   });
 });
 
-export interface TakeHomeScenarioInput {
-  readonly grossPay: GrossPay;
-  readonly taxFreeThresholdClaimed: boolean;
-}
+export const TakeHomeScenarioInputSchema = Schema.Struct({
+  grossPay: GrossPay,
+  taxFreeThresholdClaimed: Schema.Boolean,
+});
 
-export const TakeHomeScenarioLive = (input: TakeHomeScenarioInput) =>
-  Layer.mergeAll(
-    Layer.succeed(GrossPayFact)(input.grossPay),
-    Layer.succeed(TaxFreeThresholdClaimedFact)(
-      new TaxFreeThresholdClaimed({ value: input.taxFreeThresholdClaimed }),
+export type TakeHomeScenarioInput = typeof TakeHomeScenarioInputSchema.Type;
+
+export const TakeHomeScenarioLive = (input: unknown) =>
+  Layer.effectContext(
+    Schema.decodeUnknownEffect(TakeHomeScenarioInputSchema)(input).pipe(
+      Effect.map((scenario) =>
+        Context.mergeAll(
+          Context.make(GrossPayFact, scenario.grossPay),
+          Context.make(
+            TaxFreeThresholdClaimedFact,
+            new TaxFreeThresholdClaimed({
+              value: scenario.taxFreeThresholdClaimed,
+            }),
+          ),
+        ),
+      ),
     ),
   );
