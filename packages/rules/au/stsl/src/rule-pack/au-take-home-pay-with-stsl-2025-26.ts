@@ -15,6 +15,8 @@ import { PayWithholdingsLedgerWithStslLive } from "../rules/withholdings-ledger-
  *
  * Requires (from a scenario layer):
  *   GrossPayFact + TaxFreeThresholdClaimedFact + StslDebtFact
+ *
+ * @since 0.1.0
  */
 export const AuTakeHomePayWithStsl2025_26_Live = NetPayLive.pipe(
   Layer.provideMerge(PayWithholdingsLedgerWithStslLive),

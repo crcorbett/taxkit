@@ -10,10 +10,20 @@ import { AnnualTaxableIncomeFact } from "../facts/income.js";
 import { AtoIncomeTaxTable } from "../parameters/income-tax-table.js";
 import type { IncomeTaxBracket } from "../parameters/income-tax-table.js";
 
+/**
+ * Rule id for marginal-rate Australian resident income tax.
+ *
+ * @since 0.1.0
+ */
 export const IncomeTaxRuleId = RuleId.make(
   "whattax/rules-au-income-tax/rule/IncomeTax"
 );
 
+/**
+ * Ledger component id for marginal-rate income tax.
+ *
+ * @since 0.1.0
+ */
 export const IncomeTaxComponentId = ComponentId.make(
   "whattax/rules-au-income-tax/component/IncomeTax"
 );
@@ -43,6 +53,9 @@ const findBracket = (
  *
  * Formula: tax = baseTaxCents + rate * (incomeCents - thresholdCents)
  * Rounding: nearest cent (ATO truncates; validation uses nearest for simplicity).
+ *
+ * @throws CalculationError when no income tax bracket covers the input income.
+ * @since 0.1.0
  */
 export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
   Effect.gen(function* () {
@@ -58,28 +71,28 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
     const taxAmount = aud(taxCents);
 
     const trace = TraceNode.make({
-      ruleId: IncomeTaxRuleId,
-      title: "Income tax at marginal rates",
+      children: [],
+      formula: "tax = baseTaxCents + round(rate * (income - threshold))",
       inputs: {
-        incomeCents,
-        bracketThresholdCents: bracket.thresholdCents,
-        rate: bracket.rate,
         baseTaxCents: bracket.baseTaxCents,
+        bracketThresholdCents: bracket.thresholdCents,
+        incomeCents,
+        rate: bracket.rate,
         tableYear: table.year,
       },
-      formula: "tax = baseTaxCents + round(rate * (income - threshold))",
       result: taxAmount,
       rounding: "round-to-nearest-cent",
+      ruleId: IncomeTaxRuleId,
       sources: [table.source],
-      children: [],
+      title: "Income tax at marginal rates",
     });
 
     const component: LedgerComponent = {
       _tag: "LedgerComponent",
-      id: IncomeTaxComponentId,
-      label: "Income tax",
       amount: taxAmount,
       effect: "additive",
+      id: IncomeTaxComponentId,
+      label: "Income tax",
       status: "active",
       trace,
     };

@@ -2,19 +2,41 @@ import { Array, Graph, HashMap, HashSet, Option, Schema } from "effect";
 
 import type { FactId } from "../facts/descriptor.js";
 import type {
+  AnyParameterDescriptor,
+  ParameterId,
+} from "../parameters/descriptor.js";
+import type { TaxYear } from "../primitives/tax.js";
+import type {
   AnyFactDescriptor,
   AnyRuleDescriptor,
 } from "../rules/descriptor.js";
 
+/**
+ * Kind of structural problem found in a selected rule graph.
+ *
+ * @since 0.1.0
+ */
 export const GraphValidationIssueKind = Schema.Literals([
   "duplicate-provider",
   "missing-provider",
   "missing-source",
+  "parameter-overlap",
   "parameter-source-mismatch",
   "cycle",
 ]);
+
+/**
+ * Kind of structural problem found in a selected rule graph.
+ *
+ * @since 0.1.0
+ */
 export type GraphValidationIssueKind = typeof GraphValidationIssueKind.Type;
 
+/**
+ * A structural validation issue found before composing rule layers.
+ *
+ * @since 0.1.0
+ */
 export class GraphValidationIssue extends Schema.TaggedClass<GraphValidationIssue>()(
   "GraphValidationIssue",
   {
@@ -28,6 +50,30 @@ const sourceKey = (source: {
   readonly kind: string;
   readonly reference: string;
 }) => `${source.kind}:${source.reference}`;
+const parameterInstanceKey = (parameter: AnyParameterDescriptor): string =>
+  `${parameter.id}:${sourceKey(parameter.source)}:${parameter.effectivePeriod.from}:${parameter.effectivePeriod.to ?? "open"}`;
+const taxYearStart = (year: TaxYear): number =>
+  Number.parseInt(String(year).slice(0, 4), 10);
+const effectivePeriodEnd = (
+  parameter: AnyParameterDescriptor
+): number | undefined =>
+  parameter.effectivePeriod.to === undefined
+    ? undefined
+    : taxYearStart(parameter.effectivePeriod.to);
+const parametersOverlap = (
+  left: AnyParameterDescriptor,
+  right: AnyParameterDescriptor
+): boolean => {
+  const leftStart = taxYearStart(left.effectivePeriod.from);
+  const rightStart = taxYearStart(right.effectivePeriod.from);
+  const leftEnd = effectivePeriodEnd(left);
+  const rightEnd = effectivePeriodEnd(right);
+
+  return (
+    leftStart <= (rightEnd ?? Number.POSITIVE_INFINITY) &&
+    rightStart <= (leftEnd ?? Number.POSITIVE_INFINITY)
+  );
+};
 
 const makeIssue = (
   kind: GraphValidationIssueKind,
@@ -50,6 +96,27 @@ const collectProviders = (
 
         return HashMap.set(updatedProviders, key, nextProviders);
       })
+  );
+
+const collectParameters = (
+  rules: readonly AnyRuleDescriptor[]
+): HashMap.HashMap<ParameterId, readonly AnyParameterDescriptor[]> =>
+  Array.reduce(
+    rules,
+    HashMap.empty<ParameterId, readonly AnyParameterDescriptor[]>(),
+    (parameters, rule) =>
+      Array.reduce(
+        rule.parameters ?? Array.empty<AnyParameterDescriptor>(),
+        parameters,
+        (updatedParameters, parameter) => {
+          const existing = HashMap.get(updatedParameters, parameter.id);
+          const nextParameters = Option.isSome(existing)
+            ? Array.append(existing.value, parameter)
+            : Array.of(parameter);
+
+          return HashMap.set(updatedParameters, parameter.id, nextParameters);
+        }
+      )
   );
 
 const buildDependencyGraph = (
@@ -88,11 +155,11 @@ const buildDependencyGraph = (
   });
 
 /**
- * Validates that a selected set of rule descriptors can be composed for the
- * supplied input facts.
+ * Validates that selected rule descriptors can be composed for input facts.
  *
  * The validator checks provider uniqueness, missing inputs or derived facts,
  * required official sources, parameter-source drift, and dependency cycles.
+ * @since 0.1.0
  */
 export const validateRuleGraph = (args: {
   readonly rules: readonly AnyRuleDescriptor[];
@@ -102,6 +169,7 @@ export const validateRuleGraph = (args: {
     Array.map(args.inputFacts ?? Array.empty<AnyFactDescriptor>(), factKey)
   );
   const providers = collectProviders(args.rules);
+  const parameters = collectParameters(args.rules);
 
   const sourceIssues = Array.reduce(
     args.rules,
@@ -165,6 +233,31 @@ export const validateRuleGraph = (args: {
     }
   );
 
+  const parameterOverlapIssues = HashMap.reduce(
+    parameters,
+    Array.empty<GraphValidationIssue>(),
+    (issues, parameterDescriptors, parameterId) =>
+      Array.reduce(parameterDescriptors, issues, (updatedIssues, parameter) => {
+        const overlapping = Array.findFirst(
+          parameterDescriptors,
+          (candidate) =>
+            parameterInstanceKey(candidate) !==
+              parameterInstanceKey(parameter) &&
+            parametersOverlap(candidate, parameter)
+        );
+
+        return Option.isSome(overlapping)
+          ? Array.append(
+              updatedIssues,
+              makeIssue(
+                "parameter-overlap",
+                `${parameterId} has overlapping effective periods`
+              )
+            )
+          : updatedIssues;
+      })
+  );
+
   const missingProviderIssues = Array.reduce(
     args.rules,
     Array.empty<GraphValidationIssue>(),
@@ -193,6 +286,7 @@ export const validateRuleGraph = (args: {
     ...sourceIssues,
     ...duplicateIssues,
     ...parameterSourceIssues,
+    ...parameterOverlapIssues,
     ...missingProviderIssues,
     ...cycleIssues,
   ];

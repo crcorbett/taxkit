@@ -19,10 +19,20 @@ import type {
   Schedule1Table,
 } from "../parameters/schedule1.js";
 
+/**
+ * Rule id for PAYG withholding using ATO Schedule 1 coefficients.
+ *
+ * @since 0.1.0
+ */
 export const PaygWithholdingRuleId = RuleId.make(
   "whattax/rules-au-pay/rule/PaygWithholding"
 );
 
+/**
+ * Ledger component id for PAYG withholding.
+ *
+ * @since 0.1.0
+ */
 export const PaygWithholdingComponentId = ComponentId.make(
   "whattax/rules-au-pay/component/Payg"
 );
@@ -56,6 +66,9 @@ const findRow = (
  * Produces a LedgerComponent rather than a bare Money, so a downstream
  * aggregator can combine it with other withholding components (e.g. STSL)
  * without the PAYG rule needing to know about them.
+ *
+ * @throws CalculationError when no Schedule 1 row covers the weekly-equivalent amount.
+ * @since 0.1.0
  */
 export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
   Effect.gen(function* () {
@@ -87,32 +100,32 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
     );
 
     const trace = TraceNode.make({
-      ruleId: PaygWithholdingRuleId,
-      title: `PAYG withholding (Schedule 1, ${scale})`,
-      inputs: {
-        taxablePeriodCents: taxable.amount.cents,
-        period: taxable.period,
-        scale,
-        weeklyEquivalentCents: weeklyCents,
-        weeklyFormulaCents,
-        a: row.a,
-        bDollars: row.bDollars,
-        scheduleYear: table.year,
-      },
+      children: [taxable.trace],
       formula:
         "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period",
+      inputs: {
+        a: row.a,
+        bDollars: row.bDollars,
+        period: taxable.period,
+        scale,
+        scheduleYear: table.year,
+        taxablePeriodCents: taxable.amount.cents,
+        weeklyEquivalentCents: weeklyCents,
+        weeklyFormulaCents,
+      },
       result: periodWithholding,
       rounding: "ato-withholding-rounding",
+      ruleId: PaygWithholdingRuleId,
       sources: [table.source],
-      children: [taxable.trace],
+      title: `PAYG withholding (Schedule 1, ${scale})`,
     });
 
     const component: LedgerComponent = {
       _tag: "LedgerComponent",
-      id: PaygWithholdingComponentId,
-      label: "PAYG withholding",
       amount: periodWithholding,
       effect: "additive",
+      id: PaygWithholdingComponentId,
+      label: "PAYG withholding",
       status: "active",
       trace,
     };

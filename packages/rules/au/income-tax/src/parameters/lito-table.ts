@@ -11,47 +11,67 @@ import { SourceRef } from "@whattax/core/trace";
 import { Context, Layer, Schema } from "effect";
 
 /**
- * LITO phase-out bracket.
+ * Low Income Tax Offset phase-out bracket.
  *
- * Formula: offset = max(0, fullOffsetCents - phaseOutRate * (incomeCents - thresholdCents))
- *
- * `fullOffsetCents` is the offset at the start of this bracket.
- * `phaseOutRate` is the per-cent reduction in offset per cent of income.
- * Phase-out brackets with phaseOutRate=0 are flat (no reduction).
+ * @since 0.1.0
  */
 export class LitoBracket extends Schema.TaggedClass<LitoBracket>()(
   "LitoBracket",
   {
-    thresholdCents: Cents,
-    maxCents: CentsOrInfinity,
     fullOffsetCents: Cents,
+    maxCents: CentsOrInfinity,
     phaseOutRate: TaxRate,
+    thresholdCents: Cents,
   }
 ) {}
 
+/**
+ * ATO Low Income Tax Offset table for one tax year.
+ *
+ * @since 0.1.0
+ */
 export class LitoTable extends Schema.TaggedClass<LitoTable>()("LitoTable", {
-  year: TaxYear,
   brackets: Schema.Array(LitoBracket),
   source: SourceRef,
+  year: TaxYear,
 }) {}
 
+/**
+ * Context tag for the active ATO Low Income Tax Offset table.
+ *
+ * @since 0.1.0
+ */
 export class AtoLitoTable extends Context.Service<AtoLitoTable, LitoTable>()(
   "whattax/rules-au-income-tax/parameter/AtoLitoTable"
 ) {}
 
+/**
+ * Source reference for ATO Low Income Tax Offset parameters.
+ *
+ * @since 0.1.0
+ */
 export const LitoSource2025_26 = SourceRef.make({
   kind: "ato-publication",
-  title: "ATO low income tax offset",
   reference:
     "https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/tax-offsets/low-income-tax-offset",
+  title: "ATO low income tax offset",
 });
 
+/**
+ * Parameter descriptor for the ATO Low Income Tax Offset table.
+ *
+ * @since 0.1.0
+ */
 export const AtoLitoTableDescriptor = makeParameterDescriptor({
+  effectivePeriod: {
+    from: taxYear("2025-26"),
+    to: taxYear("2025-26"),
+  },
   id: "whattax/rules-au-income-tax/parameter/AtoLitoTable",
-  title: "ATO low income tax offset parameters",
   schema: LitoTable,
-  tag: AtoLitoTable,
   source: LitoSource2025_26,
+  tag: AtoLitoTable,
+  title: "ATO low income tax offset parameters",
 });
 
 // LITO 2025-26: max $700, phases out in two stages.
@@ -60,34 +80,39 @@ export const AtoLitoTableDescriptor = makeParameterDescriptor({
 // Bracket 3: $45,001–$66,667 — phases out at 1.5c per $1 ($325 → $0)
 // Bracket 4: > $66,667 — nil
 const table2025_26 = new LitoTable({
-  year: taxYear("2025-26"),
   brackets: [
     new LitoBracket({
-      thresholdCents: Cents.make(0),
+      fullOffsetCents: Cents.make(70_000),
       maxCents: Cents.make(3_750_000),
-      fullOffsetCents: Cents.make(70_000),
       phaseOutRate: taxRate(0),
+      thresholdCents: Cents.make(0),
     }),
     new LitoBracket({
-      thresholdCents: Cents.make(3_750_000),
+      fullOffsetCents: Cents.make(70_000),
       maxCents: Cents.make(4_500_000),
-      fullOffsetCents: Cents.make(70_000),
       phaseOutRate: taxRate(0.05),
+      thresholdCents: Cents.make(3_750_000),
     }),
     new LitoBracket({
-      thresholdCents: Cents.make(4_500_000),
-      maxCents: Cents.make(6_666_700),
       fullOffsetCents: Cents.make(32_500),
+      maxCents: Cents.make(6_666_700),
       phaseOutRate: taxRate(0.015),
+      thresholdCents: Cents.make(4_500_000),
     }),
     new LitoBracket({
-      thresholdCents: Cents.make(6_666_700),
-      maxCents: "infinity",
       fullOffsetCents: Cents.make(0),
+      maxCents: "infinity",
       phaseOutRate: taxRate(0),
+      thresholdCents: Cents.make(6_666_700),
     }),
   ],
   source: LitoSource2025_26,
+  year: taxYear("2025-26"),
 });
 
+/**
+ * Live ATO Low Income Tax Offset parameter layer for 2025-26.
+ *
+ * @since 0.1.0
+ */
 export const AtoLito_2025_26_Live = Layer.succeed(AtoLitoTable)(table2025_26);

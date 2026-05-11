@@ -8,10 +8,20 @@ import { MedicareLevyComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
 import { AtoMedicareLevyTable } from "../parameters/medicare-levy-table.js";
 
+/**
+ * Rule id for the Medicare Levy component.
+ *
+ * @since 0.1.0
+ */
 export const MedicareLevyRuleId = RuleId.make(
   "whattax/rules-au-income-tax/rule/MedicareLevy"
 );
 
+/**
+ * Ledger component id for Medicare Levy.
+ *
+ * @since 0.1.0
+ */
 export const MedicareLevyComponentId = ComponentId.make(
   "whattax/rules-au-income-tax/component/MedicareLevy"
 );
@@ -23,6 +33,8 @@ export const MedicareLevyComponentId = ComponentId.make(
  *   income ≤ threshold                  → zeroed ($0)
  *   threshold < income ≤ shadeInMax     → shade-in: 10% × (income - threshold)
  *   income > shadeInMax                 → full rate: 2% × income
+ *
+ * @since 0.1.0
  */
 export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
   Effect.gen(function* () {
@@ -51,29 +63,29 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
     const status = levyCents === 0 ? "zeroed" : "active";
 
     const trace = TraceNode.make({
-      ruleId: MedicareLevyRuleId,
-      title: "Medicare Levy",
+      children: [],
+      formula,
       inputs: {
         incomeCents,
-        thresholdCents: table.thresholdCents,
+        levyRate: table.levyRate,
         shadeInMaxCents: table.shadeInMaxCents,
         shadeInRate: table.shadeInRate,
-        levyRate: table.levyRate,
         tableYear: table.year,
+        thresholdCents: table.thresholdCents,
       },
-      formula,
       result: levyAmount,
       rounding: "round-to-nearest-cent",
+      ruleId: MedicareLevyRuleId,
       sources: [table.source],
-      children: [],
+      title: "Medicare Levy",
     });
 
     const component: LedgerComponent = {
       _tag: "LedgerComponent",
-      id: MedicareLevyComponentId,
-      label: "Medicare Levy",
       amount: levyAmount,
       effect: "additive",
+      id: MedicareLevyComponentId,
+      label: "Medicare Levy",
       status,
       trace,
     };

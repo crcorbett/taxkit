@@ -1,2 +1,9 @@
-export * from "./stsl-component.js";
-export * from "./withholdings-ledger-with-stsl.js";
+export {
+  StslComponentId,
+  StslComponentLive,
+  StslComponentRuleId,
+} from "./stsl-component.js";
+export {
+  PayWithholdingsLedgerWithStslLive,
+  PayWithholdingsLedgerWithStslRuleId,
+} from "./withholdings-ledger-with-stsl.js";

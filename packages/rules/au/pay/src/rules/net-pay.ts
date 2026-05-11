@@ -5,8 +5,18 @@ import { Effect, Layer } from "effect";
 import { GrossPayFact, NetPay, NetPayFact } from "../facts/pay.js";
 import { PayWithholdingsLedgerFact } from "../facts/withholdings.js";
 
+/**
+ * Rule id for deriving take-home pay from gross pay and the withholding ledger.
+ *
+ * @since 0.1.0
+ */
 export const NetPayRuleId = RuleId.make("whattax/rules-au-pay/rule/NetPay");
 
+/**
+ * Derives net pay as gross pay less the aggregated withholding ledger total.
+ *
+ * @since 0.1.0
+ */
 export const NetPayLive = Layer.effect(NetPayFact)(
   Effect.gen(function* () {
     const gross = yield* GrossPayFact;
@@ -15,16 +25,16 @@ export const NetPayLive = Layer.effect(NetPayFact)(
     const netAmount = moneySub(gross.amount, ledger.total);
 
     const trace = TraceNode.make({
-      ruleId: NetPayRuleId,
-      title: "Net pay = gross - withholdings ledger total",
+      children: [ledger.trace],
+      formula: "net = gross - withholdingsLedger.total",
       inputs: {
         grossCents: gross.amount.cents,
         withholdingsTotalCents: ledger.total.cents,
       },
-      formula: "net = gross - withholdingsLedger.total",
       result: netAmount,
+      ruleId: NetPayRuleId,
       sources: [],
-      children: [ledger.trace],
+      title: "Net pay = gross - withholdings ledger total",
     });
 
     return new NetPay({

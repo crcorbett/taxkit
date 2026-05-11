@@ -1,1 +1,5 @@
-export * from "./rule-graph.js";
+export {
+  GraphValidationIssue,
+  GraphValidationIssueKind,
+  validateRuleGraph,
+} from "./rule-graph.js";

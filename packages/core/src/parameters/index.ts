@@ -1,1 +1,7 @@
-export * from "./descriptor.js";
+export {
+  ParameterId,
+  ParameterEffectivePeriod,
+  makeParameterDescriptor,
+  type AnyParameterDescriptor,
+  type ParameterDescriptor,
+} from "./descriptor.js";

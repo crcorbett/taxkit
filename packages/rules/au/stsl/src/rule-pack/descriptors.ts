@@ -20,31 +20,46 @@ import {
   PayWithholdingsLedgerWithStslRuleId,
 } from "../rules/withholdings-ledger-with-stsl.js";
 
+/**
+ * Rule descriptor for STSL withholding using ATO Schedule 8.
+ *
+ * @since 0.1.0
+ */
 export const StslComponentRuleDescriptor = makeRuleDescriptor({
   id: StslComponentRuleId,
-  title: "STSL withholding component",
+  layer: StslComponentLive,
+  parameters: [AtoStslTableDescriptor],
   provides: [StslComponentDescriptor],
   requires: [TaxablePayDescriptor, StslDebtDescriptor],
-  parameters: [AtoStslTableDescriptor],
-  layer: StslComponentLive,
-  sources: [StslSource2025_26],
   sourcePolicy: "required",
+  sources: [StslSource2025_26],
+  title: "STSL withholding component",
 });
 
+/**
+ * Rule descriptor for aggregating PAYG and STSL withholding components.
+ *
+ * @since 0.1.0
+ */
 export const PayWithholdingsLedgerWithStslRuleDescriptor = makeRuleDescriptor({
   id: PayWithholdingsLedgerWithStslRuleId,
-  title: "Pay withholdings ledger with STSL",
+  layer: PayWithholdingsLedgerWithStslLive,
   provides: [PayWithholdingsLedgerDescriptor],
   requires: [
     GrossPayDescriptor,
     PaygWithholdingComponentDescriptor,
     StslComponentDescriptor,
   ],
-  layer: PayWithholdingsLedgerWithStslLive,
-  sources: [],
   sourcePolicy: "not-required",
+  sources: [],
+  title: "Pay withholdings ledger with STSL",
 });
 
+/**
+ * Descriptor list for STSL additions to a take-home-pay rule pack.
+ *
+ * @since 0.1.0
+ */
 export const AuStslRuleDescriptors = [
   StslComponentRuleDescriptor,
   PayWithholdingsLedgerWithStslRuleDescriptor,

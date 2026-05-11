@@ -10,8 +10,18 @@ import { AnnualTaxableIncomeFact } from "../facts/income.js";
 import { AtoLitoTable } from "../parameters/lito-table.js";
 import type { LitoBracket } from "../parameters/lito-table.js";
 
+/**
+ * Rule id for the Low Income Tax Offset.
+ *
+ * @since 0.1.0
+ */
 export const LitoRuleId = RuleId.make("whattax/rules-au-income-tax/rule/Lito");
 
+/**
+ * Ledger component id for the Low Income Tax Offset.
+ *
+ * @since 0.1.0
+ */
 export const LitoComponentId = ComponentId.make(
   "whattax/rules-au-income-tax/component/Lito"
 );
@@ -48,6 +58,9 @@ const findBracket = (
  * the floor to zero is the calculator's responsibility, not the ledger's).
  *
  * Formula: offset = max(0, fullOffsetCents - phaseOutRate * (income - threshold))
+ *
+ * @throws CalculationError when no LITO bracket is available.
+ * @since 0.1.0
  */
 export const LitoLive = Layer.effect(LitoComponentFact)(
   Effect.gen(function* () {
@@ -66,29 +79,29 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     const status = offsetCents === 0 ? "zeroed" : "active";
 
     const trace = TraceNode.make({
-      ruleId: LitoRuleId,
-      title: "Low Income Tax Offset (LITO)",
+      children: [],
+      formula:
+        "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))",
       inputs: {
-        incomeCents,
         bracketThresholdCents: bracket.thresholdCents,
         fullOffsetCents: bracket.fullOffsetCents,
+        incomeCents,
         phaseOutRate: bracket.phaseOutRate,
         tableYear: table.year,
       },
-      formula:
-        "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))",
       result: offsetAmount,
       rounding: "round-to-nearest-cent",
+      ruleId: LitoRuleId,
       sources: [table.source],
-      children: [],
+      title: "Low Income Tax Offset (LITO)",
     });
 
     const component: LedgerComponent = {
       _tag: "LedgerComponent",
-      id: LitoComponentId,
-      label: "Low Income Tax Offset",
       amount: offsetAmount,
       effect: "subtractive",
+      id: LitoComponentId,
+      label: "Low Income Tax Offset",
       status,
       trace,
     };

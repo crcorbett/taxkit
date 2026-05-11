@@ -30,53 +30,78 @@ import {
   MedicareLevyRuleId,
 } from "../rules/medicare-levy.js";
 
+/**
+ * Rule descriptor for marginal-rate income tax.
+ *
+ * @since 0.1.0
+ */
 export const IncomeTaxRuleDescriptor = makeRuleDescriptor({
   id: IncomeTaxRuleId,
-  title: "Income tax at marginal rates",
+  layer: IncomeTaxLive,
+  parameters: [AtoIncomeTaxTableDescriptor],
   provides: [IncomeTaxComponentDescriptor],
   requires: [AnnualTaxableIncomeDescriptor],
-  parameters: [AtoIncomeTaxTableDescriptor],
-  layer: IncomeTaxLive,
-  sources: [IncomeTaxSource2025_26],
   sourcePolicy: "required",
+  sources: [IncomeTaxSource2025_26],
+  title: "Income tax at marginal rates",
 });
 
+/**
+ * Rule descriptor for the Low Income Tax Offset.
+ *
+ * @since 0.1.0
+ */
 export const LitoRuleDescriptor = makeRuleDescriptor({
   id: LitoRuleId,
-  title: "Low Income Tax Offset",
+  layer: LitoLive,
+  parameters: [AtoLitoTableDescriptor],
   provides: [LitoComponentDescriptor],
   requires: [AnnualTaxableIncomeDescriptor],
-  parameters: [AtoLitoTableDescriptor],
-  layer: LitoLive,
-  sources: [LitoSource2025_26],
   sourcePolicy: "required",
+  sources: [LitoSource2025_26],
+  title: "Low Income Tax Offset",
 });
 
+/**
+ * Rule descriptor for Medicare Levy.
+ *
+ * @since 0.1.0
+ */
 export const MedicareLevyRuleDescriptor = makeRuleDescriptor({
   id: MedicareLevyRuleId,
-  title: "Medicare Levy",
+  layer: MedicareLevyLive,
+  parameters: [AtoMedicareLevyTableDescriptor],
   provides: [MedicareLevyComponentDescriptor],
   requires: [AnnualTaxableIncomeDescriptor],
-  parameters: [AtoMedicareLevyTableDescriptor],
-  layer: MedicareLevyLive,
-  sources: [MedicareLevySource2025_26],
   sourcePolicy: "required",
+  sources: [MedicareLevySource2025_26],
+  title: "Medicare Levy",
 });
 
+/**
+ * Rule descriptor for aggregating annual tax components.
+ *
+ * @since 0.1.0
+ */
 export const AnnualTaxLedgerRuleDescriptor = makeRuleDescriptor({
   id: AnnualTaxLedgerRuleId,
-  title: "Annual tax ledger",
+  layer: AnnualTaxLedgerLive,
   provides: [AnnualTaxLedgerDescriptor],
   requires: [
     IncomeTaxComponentDescriptor,
     LitoComponentDescriptor,
     MedicareLevyComponentDescriptor,
   ],
-  layer: AnnualTaxLedgerLive,
-  sources: [],
   sourcePolicy: "not-required",
+  sources: [],
+  title: "Annual tax ledger",
 });
 
+/**
+ * Descriptor list for the 2025-26 annual tax rule pack.
+ *
+ * @since 0.1.0
+ */
 export const AuAnnualTaxRuleDescriptors = [
   IncomeTaxRuleDescriptor,
   LitoRuleDescriptor,

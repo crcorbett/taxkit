@@ -7,51 +7,70 @@ import { LedgerComponent } from "@whattax/core/ledger";
 import { Context, Schema } from "effect";
 
 /**
- * Whether the employee has an STSL (Study and Training Support Loan) debt
- * and is opting into withholding for it.
+ * Whether the employee has an STSL debt and wants STSL withholding included.
  *
- * `enabled: false` is *not* the same as omitting the fact: if a pack composes
- * the STSL-aware aggregator, it requires this fact at the type level. The
- * `enabled` flag drives whether the resulting component is `disabled` (shown
- * in the trace, contributes $0) or `active`/`zeroed` (computed normally).
+ * `enabled: false` keeps the STSL component visible in the trace as disabled
+ * when an STSL-aware pack is composed.
+ *
+ * @since 0.1.0
+ *
+ * @example
+ * ```ts
+ * import { StslDebt } from "@whattax/rules-au-stsl/facts"
+ *
+ * const stsl = new StslDebt({ enabled: true })
+ * ```
  */
 export class StslDebt extends Schema.TaggedClass<StslDebt>()("StslDebt", {
   enabled: Schema.Boolean,
 }) {}
 
+/**
+ * Context tag for caller-provided STSL debt status.
+ *
+ * @since 0.1.0
+ */
 export class StslDebtFact extends Context.Service<StslDebtFact, StslDebt>()(
   "whattax/rules-au-stsl/fact/StslDebt"
 ) {}
 
+/**
+ * Fact descriptor for STSL debt status.
+ *
+ * @since 0.1.0
+ */
 export const StslDebtDescriptor = makeFactDescriptor({
-  id: "whattax/rules-au-stsl/fact/StslDebt",
-  title: "Whether the employee has STSL debt and is opting into withholding",
   authority: "input",
-  schema: StslDebt,
-  tag: StslDebtFact,
+  id: "whattax/rules-au-stsl/fact/StslDebt",
   question: new FactQuestion({
     id: FactQuestionId.make("whattax/rules-au-stsl/question/StslDebt"),
-    prompt: "Study and training support loan debt",
     inputKind: "boolean",
+    prompt: "Study and training support loan debt",
   }),
+  schema: StslDebt,
+  tag: StslDebtFact,
+  title: "Whether the employee has STSL debt and is opting into withholding",
 });
 
 /**
- * STSL ledger component, produced by the StslComponentRule.
+ * Context tag for the STSL withholding ledger component.
  *
- * Modeled as its own fact so the base pack's PAYG-only aggregator never
- * depends on it. The STSL-aware aggregator depends on both
- * `PaygWithholdingComponentFact` and this.
+ * @since 0.1.0
  */
 export class StslComponentFact extends Context.Service<
   StslComponentFact,
   LedgerComponent
 >()("whattax/rules-au-stsl/fact/StslComponent") {}
 
+/**
+ * Fact descriptor for the STSL withholding component.
+ *
+ * @since 0.1.0
+ */
 export const StslComponentDescriptor = makeFactDescriptor({
-  id: "whattax/rules-au-stsl/fact/StslComponent",
-  title: "STSL withholding ledger component for a single pay period",
   authority: "derived",
+  id: "whattax/rules-au-stsl/fact/StslComponent",
   schema: LedgerComponent,
   tag: StslComponentFact,
+  title: "STSL withholding ledger component for a single pay period",
 });

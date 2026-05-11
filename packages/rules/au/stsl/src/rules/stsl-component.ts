@@ -14,10 +14,20 @@ import { StslComponentFact, StslDebtFact } from "../facts/stsl.js";
 import { AtoStslTable } from "../parameters/stsl-table.js";
 import type { StslRow, StslTable } from "../parameters/stsl-table.js";
 
+/**
+ * Rule id for the STSL withholding component.
+ *
+ * @since 0.1.0
+ */
 export const StslComponentRuleId = RuleId.make(
   "whattax/rules-au-stsl/rule/StslComponent"
 );
 
+/**
+ * Ledger component id for STSL withholding.
+ *
+ * @since 0.1.0
+ */
 export const StslComponentId = ComponentId.make(
   "whattax/rules-au-stsl/component/Stsl"
 );
@@ -47,6 +57,9 @@ const findRow = (
 
 /**
  * Current STSL component using ATO Schedule 8 marginal component rows.
+ *
+ * @throws CalculationError when no Schedule 8 row covers the weekly-equivalent amount.
+ * @since 0.1.0
  */
 export const StslComponentLive = Layer.effect(StslComponentFact)(
   Effect.gen(function* () {
@@ -55,28 +68,28 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     const table = yield* AtoStslTable;
 
     const baseTraceInputs = {
-      taxablePeriodCents: taxable.amount.cents,
-      period: taxable.period,
       enabled: stslDebt.enabled,
+      period: taxable.period,
       tableYear: table.year,
+      taxablePeriodCents: taxable.amount.cents,
     } as const;
 
     if (!stslDebt.enabled) {
       const trace = TraceNode.make({
-        ruleId: StslComponentRuleId,
-        title: "STSL withholding (opt-out - component disabled)",
-        inputs: baseTraceInputs,
-        formula: "stsl = 0 (opted out)",
-        result: aud(0),
-        sources: [table.source],
         children: [taxable.trace],
+        formula: "stsl = 0 (opted out)",
+        inputs: baseTraceInputs,
+        result: aud(0),
+        ruleId: StslComponentRuleId,
+        sources: [table.source],
+        title: "STSL withholding (opt-out - component disabled)",
       });
       const component: LedgerComponent = {
         _tag: "LedgerComponent",
-        id: StslComponentId,
-        label: "STSL withholding",
         amount: aud(0),
         effect: "additive",
+        id: StslComponentId,
+        label: "STSL withholding",
         status: "disabled",
         trace,
       };
@@ -97,27 +110,27 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
 
     if (weeklyWithholdingDollars === 0) {
       const trace = TraceNode.make({
-        ruleId: StslComponentRuleId,
-        title: "STSL withholding (zero component)",
+        children: [taxable.trace],
+        formula: "stsl = 0 (Schedule 8 component rounds to zero)",
         inputs: {
           ...baseTraceInputs,
-          weeklyEquivalentCents: weeklyCents,
-          weeklyFormulaCents,
           a: row.a,
           bDollars: row.bDollars,
+          weeklyEquivalentCents: weeklyCents,
+          weeklyFormulaCents,
         },
-        formula: "stsl = 0 (Schedule 8 component rounds to zero)",
         result: aud(0),
         rounding: "ato-withholding-rounding",
+        ruleId: StslComponentRuleId,
         sources: [table.source],
-        children: [taxable.trace],
+        title: "STSL withholding (zero component)",
       });
       const component: LedgerComponent = {
         _tag: "LedgerComponent",
-        id: StslComponentId,
-        label: "STSL withholding",
         amount: aud(0),
         effect: "additive",
+        id: StslComponentId,
+        label: "STSL withholding",
         status: "zeroed",
         trace,
       };
@@ -132,29 +145,29 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     );
 
     const trace = TraceNode.make({
-      ruleId: StslComponentRuleId,
-      title: "STSL withholding (Schedule 8)",
-      inputs: {
-        ...baseTraceInputs,
-        weeklyEquivalentCents: weeklyCents,
-        weeklyFormulaCents,
-        a: row.a,
-        bDollars: row.bDollars,
-      },
+      children: [taxable.trace],
       formula:
         "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period",
+      inputs: {
+        ...baseTraceInputs,
+        a: row.a,
+        bDollars: row.bDollars,
+        weeklyEquivalentCents: weeklyCents,
+        weeklyFormulaCents,
+      },
       result: periodWithholding,
       rounding: "ato-withholding-rounding",
+      ruleId: StslComponentRuleId,
       sources: [table.source],
-      children: [taxable.trace],
+      title: "STSL withholding (Schedule 8)",
     });
 
     const component: LedgerComponent = {
       _tag: "LedgerComponent",
-      id: StslComponentId,
-      label: "STSL withholding",
       amount: periodWithholding,
       effect: "additive",
+      id: StslComponentId,
+      label: "STSL withholding",
       status: "active",
       trace,
     };

@@ -177,57 +177,57 @@ describe("AU annual income tax calculator (2025-26)", () => {
         const report = yield* runScenario(80_000);
 
         expect({
-          traceRoot: report.trace.ruleId,
+          ledger: report.ledger.components.map((component) => ({
+            cents: component.amount.cents,
+            effect: component.effect,
+            id: component.id,
+            status: component.status,
+          })),
           traceChildren: report.trace.children.map((child) => ({
+            rounding: child.rounding,
             ruleId: child.ruleId,
             sourceKinds: child.sources.map((source) => source.kind),
-            rounding: child.rounding,
           })),
-          ledger: report.ledger.components.map((component) => ({
-            id: component.id,
-            effect: component.effect,
-            status: component.status,
-            cents: component.amount.cents,
-          })),
+          traceRoot: report.trace.ruleId,
         }).toEqual({
-          traceRoot: AnnualTaxLedgerRuleId,
-          traceChildren: [
-            {
-              ruleId: IncomeTaxRuleId,
-              sourceKinds: ["ato-publication"],
-              rounding: "round-to-nearest-cent",
-            },
-            {
-              ruleId: LitoRuleId,
-              sourceKinds: ["ato-publication"],
-              rounding: "round-to-nearest-cent",
-            },
-            {
-              ruleId: MedicareLevyRuleId,
-              sourceKinds: ["ato-publication"],
-              rounding: "round-to-nearest-cent",
-            },
-          ],
           ledger: [
             {
-              id: IncomeTaxComponentId,
-              effect: "additive",
-              status: "active",
               cents: 1_478_800,
-            },
-            {
-              id: LitoComponentId,
-              effect: "subtractive",
-              status: "zeroed",
-              cents: 0,
-            },
-            {
-              id: MedicareLevyComponentId,
               effect: "additive",
+              id: IncomeTaxComponentId,
               status: "active",
+            },
+            {
+              cents: 0,
+              effect: "subtractive",
+              id: LitoComponentId,
+              status: "zeroed",
+            },
+            {
               cents: 160_000,
+              effect: "additive",
+              id: MedicareLevyComponentId,
+              status: "active",
             },
           ],
+          traceChildren: [
+            {
+              rounding: "round-to-nearest-cent",
+              ruleId: IncomeTaxRuleId,
+              sourceKinds: ["ato-publication"],
+            },
+            {
+              rounding: "round-to-nearest-cent",
+              ruleId: LitoRuleId,
+              sourceKinds: ["ato-publication"],
+            },
+            {
+              rounding: "round-to-nearest-cent",
+              ruleId: MedicareLevyRuleId,
+              sourceKinds: ["ato-publication"],
+            },
+          ],
+          traceRoot: AnnualTaxLedgerRuleId,
         });
       })
   );

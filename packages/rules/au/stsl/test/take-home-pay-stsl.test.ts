@@ -169,43 +169,43 @@ describe("AU take-home pay with STSL", () => {
       const report = yield* stslScenario(weekly1500, stslEnabled);
 
       expect({
-        root: report.trace.ruleId,
-        ledgerChildren: report.trace.children[0]!.children.map((child) => ({
-          ruleId: child.ruleId,
-          rounding: child.rounding,
-          sourceKinds: child.sources.map((source) => source.kind),
-        })),
         ledger: report.withholdings.components.map((component) => ({
+          cents: component.amount.cents,
           id: component.id,
           status: component.status,
-          cents: component.amount.cents,
         })),
+        ledgerChildren: report.trace.children[0]!.children.map((child) => ({
+          rounding: child.rounding,
+          ruleId: child.ruleId,
+          sourceKinds: child.sources.map((source) => source.kind),
+        })),
+        root: report.trace.ruleId,
       }).toEqual({
-        root: NetPayRuleId,
-        ledgerChildren: [
-          {
-            ruleId: PaygWithholdingRuleId,
-            rounding: "ato-withholding-rounding",
-            sourceKinds: ["ato-publication"],
-          },
-          {
-            ruleId: StslComponentRuleId,
-            rounding: "ato-withholding-rounding",
-            sourceKinds: ["ato-publication"],
-          },
-        ],
         ledger: [
           {
+            cents: 30_400,
             id: PaygWithholdingComponentId,
             status: "active",
-            cents: 30_400,
           },
           {
+            cents: 3200,
             id: StslComponentId,
             status: "active",
-            cents: 3200,
           },
         ],
+        ledgerChildren: [
+          {
+            rounding: "ato-withholding-rounding",
+            ruleId: PaygWithholdingRuleId,
+            sourceKinds: ["ato-publication"],
+          },
+          {
+            rounding: "ato-withholding-rounding",
+            ruleId: StslComponentRuleId,
+            sourceKinds: ["ato-publication"],
+          },
+        ],
+        root: NetPayRuleId,
       });
     })
   );

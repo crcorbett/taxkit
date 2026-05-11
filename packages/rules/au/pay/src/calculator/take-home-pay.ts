@@ -16,23 +16,35 @@ import {
   PayWithholdingsLedgerFact,
 } from "../facts/withholdings.js";
 
+/**
+ * Take-home pay report for one Australian pay-period scenario.
+ *
+ * The report preserves gross pay, taxable pay, the withholding ledger,
+ * final net pay, and the trace rooted at the net-pay rule.
+ *
+ * @since 0.1.0
+ */
 export class TakeHomePayReport extends Schema.TaggedClass<TakeHomePayReport>()(
   "TakeHomePayReport",
   {
     grossPay: Money,
-    taxablePay: Money,
-    withholdings: PayWithholdingsLedger,
-    withholdingsTotal: Money,
     netPay: Money,
     period: PayPeriod,
     rulePackVersion: Schema.String,
+    taxablePay: Money,
     trace: TraceNode,
+    withholdings: PayWithholdingsLedger,
+    withholdingsTotal: Money,
   }
 ) {}
 
 /**
- * The calculator. Requires the derived facts and surfaces the report
- * with a stitched trace tree rooted at NetPayFact.
+ * Calculates the take-home pay report from the facts supplied by a rule pack.
+ *
+ * Requires the derived `TaxablePayFact`, `PayWithholdingsLedgerFact`, and
+ * `NetPayFact`; scenario input is supplied separately by `TakeHomeScenarioLive`.
+ *
+ * @since 0.1.0
  */
 export const CalculateTakeHomePay = Effect.gen(function* () {
   const gross = yield* GrossPayFact;
@@ -42,23 +54,40 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
 
   return new TakeHomePayReport({
     grossPay: gross.amount,
-    taxablePay: taxable.amount,
-    withholdings: ledger,
-    withholdingsTotal: ledger.total,
     netPay: net.amount,
     period: gross.period,
     rulePackVersion: "rules-au-pay/0.0.0",
+    taxablePay: taxable.amount,
     trace: net.trace,
+    withholdings: ledger,
+    withholdingsTotal: ledger.total,
   });
 });
 
+/**
+ * Input schema for the standard take-home-pay scenario helper.
+ *
+ * @since 0.1.0
+ */
 export const TakeHomeScenarioInputSchema = Schema.Struct({
   grossPay: GrossPay,
   taxFreeThresholdClaimed: Schema.Boolean,
 });
 
+/**
+ * Input type for the standard take-home-pay scenario helper.
+ *
+ * @since 0.1.0
+ */
 export type TakeHomeScenarioInput = typeof TakeHomeScenarioInputSchema.Type;
 
+/**
+ * Builds the scenario layer for gross pay and tax-free-threshold status.
+ *
+ * @param input - Unknown input decoded by `TakeHomeScenarioInputSchema`.
+ * @returns A layer providing `GrossPayFact` and `TaxFreeThresholdClaimedFact`.
+ * @since 0.1.0
+ */
 export const TakeHomeScenarioLive = (input: unknown) =>
   Layer.effectContext(
     Schema.decodeUnknownEffect(TakeHomeScenarioInputSchema)(input).pipe(

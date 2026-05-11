@@ -7,10 +7,20 @@ import { Money } from "@whattax/core/primitives";
 import { Context, Schema } from "effect";
 
 /**
- * Annual taxable income — the base for income tax and Medicare Levy.
+ * Annual taxable income used by the Australian annual tax rules.
  *
- * An *input* fact: provided by the caller, not derived within this package.
- * In the full system this would be derived from gross income minus deductions.
+ * This is an input fact: callers provide the assessed taxable income rather
+ * than asking this package to derive it from gross income and deductions.
+ *
+ * @since 0.1.0
+ *
+ * @example
+ * ```ts
+ * import { audDollars } from "@whattax/core/primitives"
+ * import { AnnualTaxableIncome } from "@whattax/rules-au-income-tax/facts"
+ *
+ * const income = new AnnualTaxableIncome({ income: audDollars(95_000) })
+ * ```
  */
 export class AnnualTaxableIncome extends Schema.TaggedClass<AnnualTaxableIncome>()(
   "AnnualTaxableIncome",
@@ -19,22 +29,32 @@ export class AnnualTaxableIncome extends Schema.TaggedClass<AnnualTaxableIncome>
   }
 ) {}
 
+/**
+ * Context tag for caller-provided annual taxable income.
+ *
+ * @since 0.1.0
+ */
 export class AnnualTaxableIncomeFact extends Context.Service<
   AnnualTaxableIncomeFact,
   AnnualTaxableIncome
 >()("whattax/rules-au-income-tax/fact/AnnualTaxableIncome") {}
 
+/**
+ * Fact descriptor for annual taxable income and its money-input question.
+ *
+ * @since 0.1.0
+ */
 export const AnnualTaxableIncomeDescriptor = makeFactDescriptor({
-  id: "whattax/rules-au-income-tax/fact/AnnualTaxableIncome",
-  title: "Annual taxable income",
   authority: "input",
-  schema: AnnualTaxableIncome,
-  tag: AnnualTaxableIncomeFact,
+  id: "whattax/rules-au-income-tax/fact/AnnualTaxableIncome",
   question: new FactQuestion({
     id: FactQuestionId.make(
       "whattax/rules-au-income-tax/question/AnnualTaxableIncome"
     ),
-    prompt: "Annual taxable income",
     inputKind: "money",
+    prompt: "Annual taxable income",
   }),
+  schema: AnnualTaxableIncome,
+  tag: AnnualTaxableIncomeFact,
+  title: "Annual taxable income",
 });

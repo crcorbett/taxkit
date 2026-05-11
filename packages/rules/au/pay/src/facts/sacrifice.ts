@@ -9,10 +9,20 @@ import { Context, Schema } from "effect";
 import { PayPeriod } from "./pay.js";
 
 /**
- * Pre-tax salary sacrifice for a single pay period.
+ * Pre-tax salary sacrifice for one pay period.
  *
- * An *input* fact: only required when a pack composes the
- * sacrifice-aware TaxablePay rule. The base pack does not require it.
+ * This input fact is required only by sacrifice-aware rule packs. The base
+ * take-home-pay pack does not require it.
+ *
+ * @since 0.1.0
+ *
+ * @example
+ * ```ts
+ * import { audDollars } from "@whattax/core/primitives"
+ * import { SalarySacrifice } from "@whattax/rules-au-pay/facts"
+ *
+ * const sacrifice = new SalarySacrifice({ amount: audDollars(250), period: "weekly" })
+ * ```
  */
 export class SalarySacrifice extends Schema.TaggedClass<SalarySacrifice>()(
   "SalarySacrifice",
@@ -22,20 +32,30 @@ export class SalarySacrifice extends Schema.TaggedClass<SalarySacrifice>()(
   }
 ) {}
 
+/**
+ * Context tag for caller-provided pre-tax salary sacrifice.
+ *
+ * @since 0.1.0
+ */
 export class SalarySacrificeFact extends Context.Service<
   SalarySacrificeFact,
   SalarySacrifice
 >()("whattax/rules-au-pay/fact/SalarySacrifice") {}
 
+/**
+ * Fact descriptor for pre-tax salary sacrifice.
+ *
+ * @since 0.1.0
+ */
 export const SalarySacrificeDescriptor = makeFactDescriptor({
-  id: "whattax/rules-au-pay/fact/SalarySacrifice",
-  title: "Pre-tax salary sacrifice for a single pay period",
   authority: "input",
-  schema: SalarySacrifice,
-  tag: SalarySacrificeFact,
+  id: "whattax/rules-au-pay/fact/SalarySacrifice",
   question: new FactQuestion({
     id: FactQuestionId.make("whattax/rules-au-pay/question/SalarySacrifice"),
-    prompt: "Pre-tax salary sacrifice for the pay period",
     inputKind: "money",
+    prompt: "Pre-tax salary sacrifice for the pay period",
   }),
+  schema: SalarySacrifice,
+  tag: SalarySacrificeFact,
+  title: "Pre-tax salary sacrifice for a single pay period",
 });

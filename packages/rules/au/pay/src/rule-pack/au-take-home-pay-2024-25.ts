@@ -7,8 +7,12 @@ import { TaxablePayLive } from "../rules/taxable-pay.js";
 import { PayWithholdingsLedgerLive } from "../rules/withholdings-ledger.js";
 
 /**
- * Same algorithms as 2025-26, swapped parameter table only — proves the
- * algorithm/data separation claim from the architecture docs.
+ * AU resident take-home pay 2024-25.
+ *
+ * Uses the same rule algorithms as the 2025-26 pack with the 2024-25
+ * Schedule 1 parameter table.
+ *
+ * @since 0.1.0
  */
 export const AuTakeHomePay2024_25_Live = NetPayLive.pipe(
   Layer.provideMerge(PayWithholdingsLedgerLive),

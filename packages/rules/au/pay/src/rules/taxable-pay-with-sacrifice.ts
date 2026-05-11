@@ -6,6 +6,11 @@ import { Effect, Layer } from "effect";
 import { GrossPayFact, TaxablePay, TaxablePayFact } from "../facts/pay.js";
 import { SalarySacrificeFact } from "../facts/sacrifice.js";
 
+/**
+ * Rule id for deriving taxable pay after pre-tax salary sacrifice.
+ *
+ * @since 0.1.0
+ */
 export const TaxablePayWithSacrificeRuleId = RuleId.make(
   "whattax/rules-au-pay/rule/TaxablePayWithSacrifice"
 );
@@ -16,6 +21,9 @@ export const TaxablePayWithSacrificeRuleId = RuleId.make(
  * Replaces (does not augment) the base `TaxablePayLive`: a pack composes
  * one or the other. Period mismatch between gross and sacrifice fails the
  * effect — pre-rate-table conversion is not a concern of this implementation.
+ *
+ * @throws CalculationError when gross pay and salary sacrifice periods differ.
+ * @since 0.1.0
  */
 export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
   Effect.gen(function* () {
@@ -33,17 +41,17 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
     const taxableAmount = moneySub(gross.amount, sacrifice.amount);
 
     const trace = TraceNode.make({
-      ruleId: TaxablePayWithSacrificeRuleId,
-      title: "Taxable pay with pre-tax salary sacrifice",
+      children: [],
+      formula: "taxable = gross - sacrifice",
       inputs: {
         grossCents: gross.amount.cents,
-        sacrificeCents: sacrifice.amount.cents,
         period: gross.period,
+        sacrificeCents: sacrifice.amount.cents,
       },
-      formula: "taxable = gross - sacrifice",
       result: taxableAmount,
+      ruleId: TaxablePayWithSacrificeRuleId,
       sources: [],
-      children: [],
+      title: "Taxable pay with pre-tax salary sacrifice",
     });
 
     return new TaxablePay({

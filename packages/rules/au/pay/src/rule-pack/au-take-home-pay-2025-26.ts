@@ -16,6 +16,8 @@ import { PayWithholdingsLedgerLive } from "../rules/withholdings-ledger.js";
  * `PayWithholdingsLedgerLive` over `PaygWithholdingLive` only. A validation pack
  * that adds another withholding (e.g. STSL) replaces this aggregator with one
  * that depends on both components.
+ *
+ * @since 0.1.0
  */
 export const AuTakeHomePay2025_26_Live = NetPayLive.pipe(
   Layer.provideMerge(PayWithholdingsLedgerLive),

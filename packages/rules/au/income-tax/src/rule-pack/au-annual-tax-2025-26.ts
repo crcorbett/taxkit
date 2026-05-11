@@ -13,6 +13,8 @@ import { MedicareLevyLive } from "../rules/medicare-levy.js";
  *
  * Provides: AnnualTaxLedgerFact
  * Requires (from a scenario layer): AnnualTaxableIncomeFact
+ *
+ * @since 0.1.0
  */
 export const AuAnnualTax2025_26_Live = AnnualTaxLedgerLive.pipe(
   Layer.provideMerge(IncomeTaxLive),

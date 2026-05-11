@@ -11,6 +11,8 @@ import { PayWithholdingsLedgerLive } from "../rules/withholdings-ledger.js";
  *
  * Requires (from a scenario layer):
  *   GrossPayFact + TaxFreeThresholdClaimedFact + SalarySacrificeFact
+ *
+ * @since 0.1.0
  */
 export const AuTakeHomePayWithSacrifice2025_26_Live = NetPayLive.pipe(
   Layer.provideMerge(PayWithholdingsLedgerLive),

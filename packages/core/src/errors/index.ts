@@ -1,1 +1,1 @@
-export * from "./calculation-error.js";
+export { CalculationError } from "./calculation-error.js";

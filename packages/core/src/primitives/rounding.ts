@@ -3,6 +3,11 @@ import { Match, Schema } from "effect";
 import { aud } from "./money.js";
 import type { Money } from "./money.js";
 
+/**
+ * Rounding policies used by formula evaluation and trace output.
+ *
+ * @since 0.1.0
+ */
 export const RoundingMode = Schema.Literals([
   "none",
   "round-to-nearest-cent",
@@ -12,8 +17,26 @@ export const RoundingMode = Schema.Literals([
   "ceil-dollar",
   "ato-withholding-rounding",
 ]);
+
+/**
+ * Rounding policies used by formula evaluation and trace output.
+ *
+ * @since 0.1.0
+ */
 export type RoundingMode = typeof RoundingMode.Type;
 
+/**
+ * Rounds a cent amount according to a named calculation policy.
+ *
+ * @example
+ * ```ts
+ * import { roundCentsToDollar } from "@whattax/core";
+ *
+ * const rounded = roundCentsToDollar(12_345, "ato-withholding-rounding");
+ * ```
+ *
+ * @since 0.1.0
+ */
 export const roundCentsToDollar = (cents: number, mode: RoundingMode): number =>
   Match.value(mode).pipe(
     Match.when("none", () => Math.round(cents)),
@@ -26,5 +49,10 @@ export const roundCentsToDollar = (cents: number, mode: RoundingMode): number =>
     Match.exhaustive
   );
 
+/**
+ * Rounds a money value according to a named calculation policy.
+ *
+ * @since 0.1.0
+ */
 export const roundMoney = (m: Money, mode: RoundingMode): Money =>
   aud(roundCentsToDollar(m.cents, mode));

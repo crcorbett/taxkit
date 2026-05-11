@@ -5,12 +5,12 @@ import { TraceNode } from "@whattax/core/trace";
 import { Context, Schema } from "effect";
 
 /**
- * Aggregated annual tax ledger.
+ * Aggregated annual tax ledger before calculator-level liability flooring.
  *
- * `rawLiability` is the direct sum of all components (may be negative when
- * offsets exceed tax). `rawLiability` is the ledger's responsibility.
- * Flooring to zero is the *calculator's* responsibility — kept out of the
- * ledger so callers can inspect the raw arithmetic.
+ * `rawLiability` is the direct sum of income tax, subtractive offsets, and
+ * Medicare Levy. It can be negative when offsets exceed positive components.
+ *
+ * @since 0.1.0
  */
 export class AnnualTaxLedger extends Schema.TaggedClass<AnnualTaxLedger>()(
   "AnnualTaxLedger",
@@ -21,15 +21,25 @@ export class AnnualTaxLedger extends Schema.TaggedClass<AnnualTaxLedger>()(
   }
 ) {}
 
+/**
+ * Context tag for the derived annual tax ledger.
+ *
+ * @since 0.1.0
+ */
 export class AnnualTaxLedgerFact extends Context.Service<
   AnnualTaxLedgerFact,
   AnnualTaxLedger
 >()("whattax/rules-au-income-tax/fact/AnnualTaxLedger") {}
 
+/**
+ * Fact descriptor for the aggregated annual tax ledger.
+ *
+ * @since 0.1.0
+ */
 export const AnnualTaxLedgerDescriptor = makeFactDescriptor({
-  id: "whattax/rules-au-income-tax/fact/AnnualTaxLedger",
-  title: "Aggregated annual tax ledger",
   authority: "derived",
+  id: "whattax/rules-au-income-tax/fact/AnnualTaxLedger",
   schema: AnnualTaxLedger,
   tag: AnnualTaxLedgerFact,
+  title: "Aggregated annual tax ledger",
 });

@@ -30,57 +30,87 @@ import {
   PayWithholdingsLedgerRuleId,
 } from "../rules/withholdings-ledger.js";
 
+/**
+ * Rule descriptor for deriving taxable pay without pre-tax sacrifice.
+ *
+ * @since 0.1.0
+ */
 export const TaxablePayRuleDescriptor = makeRuleDescriptor({
   id: TaxablePayRuleId,
-  title: "Taxable pay",
+  layer: TaxablePayLive,
   provides: [TaxablePayDescriptor],
   requires: [GrossPayDescriptor],
-  layer: TaxablePayLive,
-  sources: [],
   sourcePolicy: "not-required",
+  sources: [],
+  title: "Taxable pay",
 });
 
+/**
+ * Rule descriptor for deriving taxable pay with pre-tax salary sacrifice.
+ *
+ * @since 0.1.0
+ */
 export const TaxablePayWithSacrificeRuleDescriptor = makeRuleDescriptor({
   id: TaxablePayWithSacrificeRuleId,
-  title: "Taxable pay with salary sacrifice",
+  layer: TaxablePayWithSacrificeLive,
   provides: [TaxablePayDescriptor],
   requires: [GrossPayDescriptor, SalarySacrificeDescriptor],
-  layer: TaxablePayWithSacrificeLive,
-  sources: [],
   sourcePolicy: "not-required",
+  sources: [],
+  title: "Taxable pay with salary sacrifice",
 });
 
+/**
+ * Rule descriptor for PAYG withholding using ATO Schedule 1.
+ *
+ * @since 0.1.0
+ */
 export const PaygWithholdingRuleDescriptor = makeRuleDescriptor({
   id: PaygWithholdingRuleId,
-  title: "PAYG withholding",
+  layer: PaygWithholdingLive,
+  parameters: [AtoSchedule1TableDescriptor],
   provides: [PaygWithholdingComponentDescriptor],
   requires: [TaxablePayDescriptor, TaxFreeThresholdClaimedDescriptor],
-  parameters: [AtoSchedule1TableDescriptor],
-  layer: PaygWithholdingLive,
-  sources: [Schedule1Source2025_26],
   sourcePolicy: "required",
+  sources: [Schedule1Source2025_26],
+  title: "PAYG withholding",
 });
 
+/**
+ * Rule descriptor for the base PAYG-only withholding ledger.
+ *
+ * @since 0.1.0
+ */
 export const PayWithholdingsLedgerRuleDescriptor = makeRuleDescriptor({
   id: PayWithholdingsLedgerRuleId,
-  title: "Pay withholdings ledger",
+  layer: PayWithholdingsLedgerLive,
   provides: [PayWithholdingsLedgerDescriptor],
   requires: [GrossPayDescriptor, PaygWithholdingComponentDescriptor],
-  layer: PayWithholdingsLedgerLive,
-  sources: [],
   sourcePolicy: "not-required",
+  sources: [],
+  title: "Pay withholdings ledger",
 });
 
+/**
+ * Rule descriptor for deriving net pay from gross pay and withholdings.
+ *
+ * @since 0.1.0
+ */
 export const NetPayRuleDescriptor = makeRuleDescriptor({
   id: NetPayRuleId,
-  title: "Net pay",
+  layer: NetPayLive,
   provides: [NetPayDescriptor],
   requires: [GrossPayDescriptor, PayWithholdingsLedgerDescriptor],
-  layer: NetPayLive,
-  sources: [],
   sourcePolicy: "not-required",
+  sources: [],
+  title: "Net pay",
 });
 
+/**
+ * Descriptor list for the base Australian take-home-pay rule pack.
+ *
+ * @since 0.1.0
+ */
 export const AuTakeHomePayRuleDescriptors = [
   TaxablePayRuleDescriptor,
   PaygWithholdingRuleDescriptor,
@@ -88,6 +118,11 @@ export const AuTakeHomePayRuleDescriptors = [
   NetPayRuleDescriptor,
 ] as const;
 
+/**
+ * Descriptor list for the salary-sacrifice take-home-pay rule pack.
+ *
+ * @since 0.1.0
+ */
 export const AuTakeHomePayWithSacrificeRuleDescriptors = [
   TaxablePayWithSacrificeRuleDescriptor,
   PaygWithholdingRuleDescriptor,
