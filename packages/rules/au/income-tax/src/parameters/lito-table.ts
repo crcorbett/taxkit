@@ -29,7 +29,7 @@ export class AtoLitoTable extends Context.Service<
   LitoTable
 >()("whattax/rules-au-income-tax/parameter/AtoLitoTable") {}
 
-const validationSource2025_26 = SourceRef.make({
+export const LitoSource2025_26 = SourceRef.make({
   kind: "ato-publication",
   title: "ATO low income tax offset",
   reference:
@@ -49,7 +49,7 @@ const table2025_26 = new LitoTable({
     new LitoBracket({ thresholdCents: Cents.make(4_500_000),  maxCents: Cents.make(6_666_700),  fullOffsetCents: Cents.make(32_500), phaseOutRate: taxRate(0.015) }),
     new LitoBracket({ thresholdCents: Cents.make(6_666_700),  maxCents: "infinity", fullOffsetCents: Cents.make(0),      phaseOutRate: taxRate(0) }),
   ],
-  source: validationSource2025_26,
+  source: LitoSource2025_26,
 });
 
 export const AtoLito_2025_26_Live = Layer.succeed(AtoLitoTable)(table2025_26);

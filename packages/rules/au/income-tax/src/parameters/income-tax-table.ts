@@ -31,7 +31,7 @@ export class AtoIncomeTaxTable extends Context.Service<
   IncomeTaxTable
 >()("whattax/rules-au-income-tax/parameter/AtoIncomeTaxTable") {}
 
-const validationSource2025_26 = SourceRef.make({
+export const IncomeTaxSource2025_26 = SourceRef.make({
   kind: "ato-publication",
   title: "ATO tax rates - Australian resident 2025-26",
   reference:
@@ -50,7 +50,7 @@ const table2025_26 = new IncomeTaxTable({
     new IncomeTaxBracket({ thresholdCents: Cents.make(13_500_000), maxCents: Cents.make(19_000_000), rate: taxRate(0.37),  baseTaxCents: Cents.make(3_128_800) }),
     new IncomeTaxBracket({ thresholdCents: Cents.make(19_000_000), maxCents: "infinity", rate: taxRate(0.45),  baseTaxCents: Cents.make(5_163_800) }),
   ],
-  source: validationSource2025_26,
+  source: IncomeTaxSource2025_26,
 });
 
 export const AtoIncomeTax_2025_26_Live = Layer.succeed(AtoIncomeTaxTable)(table2025_26);

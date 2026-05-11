@@ -29,7 +29,7 @@ export class AtoMedicareLevyTable extends Context.Service<
   MedicareLevyTable
 >()("whattax/rules-au-income-tax/parameter/AtoMedicareLevyTable") {}
 
-const validationSource2025_26 = SourceRef.make({
+export const MedicareLevySource2025_26 = SourceRef.make({
   kind: "ato-publication",
   title: "ATO Medicare levy reduction thresholds for low-income earners",
   reference:
@@ -43,7 +43,7 @@ const table2025_26 = new MedicareLevyTable({
   shadeInMaxCents: Cents.make(3_402_700),
   shadeInRate: taxRate(0.10),
   levyRate: taxRate(0.02),
-  source: validationSource2025_26,
+  source: MedicareLevySource2025_26,
 });
 
 export const AtoMedicareLevy_2025_26_Live = Layer.succeed(AtoMedicareLevyTable)(table2025_26);

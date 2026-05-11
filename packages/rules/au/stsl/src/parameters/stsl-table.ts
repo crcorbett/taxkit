@@ -1,18 +1,30 @@
 import { Context, Layer, Schema } from "effect";
-import { Cents, TaxRate, TaxYear, taxRate, taxYear } from "@whattax/core/primitives";
+import {
+  Cents,
+  CentsOrInfinity,
+  DecimalCoefficient,
+  TaxYear,
+  decimalCoefficient,
+  taxYear,
+} from "@whattax/core/primitives";
 import { SourceRef } from "@whattax/core/trace";
 
 /**
- * Current STSL table: single-bracket simplification of the real ATO STSL
- * formula. Real STSL is a multi-bracket percentage-of-income; the validation model's
- * job is to prove a *new package can add a withholding component* using the
- * same parameter-table pattern as Schedule 1 — not to compute realistic
- * STSL.
+ * ATO Schedule 8 STSL coefficient row.
+ *
+ * Formula: component = a * x - b
+ * where x is whole weekly dollars plus 99 cents.
  */
+export class StslRow extends Schema.TaggedClass<StslRow>()("StslRow", {
+  weeklyMinCents: Cents,
+  weeklyMaxCents: CentsOrInfinity,
+  a: DecimalCoefficient,
+  bDollars: DecimalCoefficient,
+}) {}
+
 export class StslTable extends Schema.TaggedClass<StslTable>()("StslTable", {
   year: TaxYear,
-  weeklyThresholdCents: Cents,
-  rate: TaxRate,
+  rows: Schema.Array(StslRow),
   source: SourceRef,
 }) {}
 
@@ -20,17 +32,42 @@ export class AtoStslTable extends Context.Service<AtoStslTable, StslTable>()(
   "whattax/rules-au-stsl/parameter/AtoStslTable",
 ) {}
 
-const validationSource2025_26 = SourceRef.make({
-  kind: "internal-validation",
-  title: "Illustrative AU STSL single-bracket table for 2025-26 validation",
-  reference: "validation-fixture/stsl/2025-26",
+export const StslSource2025_26 = SourceRef.make({
+  kind: "ato-publication",
+  title: "ATO Schedule 8 - Statement of formulas for calculating study and training support loans components",
+  reference:
+    "https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components",
 });
 
 const table2025_26 = new StslTable({
   year: taxYear("2025-26"),
-  weeklyThresholdCents: Cents.make(110_000),
-  rate: taxRate(0.04),
-  source: validationSource2025_26,
+  rows: [
+    new StslRow({
+      weeklyMinCents: Cents.make(0),
+      weeklyMaxCents: Cents.make(128_799),
+      a: decimalCoefficient(0),
+      bDollars: decimalCoefficient(0),
+    }),
+    new StslRow({
+      weeklyMinCents: Cents.make(128_800),
+      weeklyMaxCents: Cents.make(240_299),
+      a: decimalCoefficient(0.15),
+      bDollars: decimalCoefficient(193.2692),
+    }),
+    new StslRow({
+      weeklyMinCents: Cents.make(240_300),
+      weeklyMaxCents: Cents.make(344_699),
+      a: decimalCoefficient(0.17),
+      bDollars: decimalCoefficient(241.3462),
+    }),
+    new StslRow({
+      weeklyMinCents: Cents.make(344_700),
+      weeklyMaxCents: "infinity",
+      a: decimalCoefficient(0.10),
+      bDollars: decimalCoefficient(0),
+    }),
+  ],
+  source: StslSource2025_26,
 });
 
 export const AtoStsl_2025_26_Live = Layer.succeed(AtoStslTable)(table2025_26);

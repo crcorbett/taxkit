@@ -26,6 +26,7 @@ import {
 } from "../src/index.js";
 
 const weekly1500 = new GrossPay({ amount: audDollars(1500), period: "weekly" });
+const weekly1800 = new GrossPay({ amount: audDollars(1800), period: "weekly" });
 const weekly1000 = new GrossPay({ amount: audDollars(1000), period: "weekly" });
 const sacrifice300 = new SalarySacrifice({
   amount: audDollars(300),
@@ -93,11 +94,11 @@ const sacrificeOnlyScenario = (grossPay: GrossPay, sacrifice: SalarySacrifice) =
 describe("AU take-home pay with STSL", () => {
   it.effect("STSL active: PAYG + STSL both contribute", () =>
     Effect.gen(function* () {
-      // $1500/week: PAYG = round(0.32*1500 - 180.0385) = 300, STSL = round(0.04*1500) = 60
+      // $1500/week: PAYG = 304, STSL = round(0.15*1500.99 - 193.2692) = 32
       const report = yield* stslScenario(weekly1500, stslEnabled);
 
-      expect(moneyEquals(report.withholdingsTotal, audDollars(360))).toBe(true);
-      expect(moneyEquals(report.netPay, audDollars(1140))).toBe(true);
+      expect(moneyEquals(report.withholdingsTotal, audDollars(336))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(1164))).toBe(true);
       expect(report.withholdings.components.length).toBe(2);
       expect(report.withholdings.components[0]!.id).toBe(
         PaygWithholdingComponentId,
@@ -105,17 +106,17 @@ describe("AU take-home pay with STSL", () => {
       expect(report.withholdings.components[0]!.status).toBe("active");
       expect(report.withholdings.components[1]!.id).toBe(StslComponentId);
       expect(report.withholdings.components[1]!.status).toBe("active");
-      expect(moneyEquals(report.withholdings.components[1]!.amount, audDollars(60))).toBe(true);
+      expect(moneyEquals(report.withholdings.components[1]!.amount, audDollars(32))).toBe(true);
     }),
   );
 
   it.effect("STSL zeroed: below repayment threshold appears in ledger with $0", () =>
     Effect.gen(function* () {
-      // $1000/week < $1100 threshold: bracket 3 (a=0.32): round(0.32*1000 - 180.0385) = 140, STSL = 0 (zeroed)
+      // $1000/week: PAYG = 143, STSL = 0 (zeroed)
       const report = yield* stslScenario(weekly1000, stslEnabled);
 
-      expect(moneyEquals(report.withholdingsTotal, audDollars(140))).toBe(true);
-      expect(moneyEquals(report.netPay, audDollars(860))).toBe(true);
+      expect(moneyEquals(report.withholdingsTotal, audDollars(143))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(857))).toBe(true);
       expect(report.withholdings.components.length).toBe(2);
       expect(report.withholdings.components[1]!.id).toBe(StslComponentId);
       expect(report.withholdings.components[1]!.status).toBe("zeroed");
@@ -127,16 +128,16 @@ describe("AU take-home pay with STSL", () => {
       // enabled=false: STSL component is disabled, $0, same net as PAYG-only
       const report = yield* stslScenario(weekly1500, stslDisabled);
 
-      // PAYG only: 300, STSL: 0 (disabled, not contributing)
-      expect(moneyEquals(report.withholdingsTotal, audDollars(300))).toBe(true);
-      expect(moneyEquals(report.netPay, audDollars(1200))).toBe(true);
+      // PAYG only: 304, STSL: 0 (disabled, not contributing)
+      expect(moneyEquals(report.withholdingsTotal, audDollars(304))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(1196))).toBe(true);
       expect(report.withholdings.components.length).toBe(2);
       expect(report.withholdings.components[1]!.id).toBe(StslComponentId);
       expect(report.withholdings.components[1]!.status).toBe("disabled");
     }),
   );
 
-  it.effect("trace tree: NetPay → Ledger → [PAYG, STSL] → TaxablePay", () =>
+  it.effect("trace tree: NetPay -> Ledger -> [PAYG, STSL] -> TaxablePay", () =>
     Effect.gen(function* () {
       const report = yield* stslScenario(weekly1500, stslEnabled);
 
@@ -151,12 +152,12 @@ describe("AU take-home pay with STSL", () => {
 
   it.effect("+sacrifice only (no STSL): sacrifice reduces taxable pay and PAYG", () =>
     Effect.gen(function* () {
-      // taxable = 1500 - 300 = 1200; PAYG = round(0.32*1200 - 180.0385) = round(203.96) = 204
+      // taxable = 1500 - 300 = 1200; PAYG = round(0.3227*1200.99 - 180.0385) = 208
       const report = yield* sacrificeOnlyScenario(weekly1500, sacrifice300);
 
       expect(moneyEquals(report.taxablePay, audDollars(1200))).toBe(true);
-      expect(moneyEquals(report.withholdingsTotal, audDollars(204))).toBe(true);
-      expect(moneyEquals(report.netPay, audDollars(1296))).toBe(true);
+      expect(moneyEquals(report.withholdingsTotal, audDollars(208))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(1292))).toBe(true);
       expect(report.withholdings.components.length).toBe(1);
 
       const taxableTrace = report.trace.children[0]!.children[0]!.children[0]!;
@@ -166,21 +167,21 @@ describe("AU take-home pay with STSL", () => {
 
   it.effect("+both: STSL + sacrifice, STSL applies to post-sacrifice taxable", () =>
     Effect.gen(function* () {
-      // taxable = 1500 - 300 = 1200; PAYG = 204; STSL = round(0.04*1200) = 48; total = 252; net = 1248
+      // taxable = 1800 - 300 = 1500; PAYG = 304; STSL = 32; total = 336; net = 1464
       const report = yield* stslWithSacrificeScenario(
-        weekly1500,
+        weekly1800,
         stslEnabled,
         sacrifice300,
       );
 
-      expect(moneyEquals(report.taxablePay, audDollars(1200))).toBe(true);
-      expect(moneyEquals(report.withholdingsTotal, audDollars(252))).toBe(true);
-      expect(moneyEquals(report.netPay, audDollars(1248))).toBe(true);
+      expect(moneyEquals(report.taxablePay, audDollars(1500))).toBe(true);
+      expect(moneyEquals(report.withholdingsTotal, audDollars(336))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(1464))).toBe(true);
       expect(report.withholdings.components[0]!.id).toBe(
         PaygWithholdingComponentId,
       );
       expect(report.withholdings.components[1]!.id).toBe(StslComponentId);
-      expect(moneyEquals(report.withholdings.components[1]!.amount, audDollars(48))).toBe(true);
+      expect(moneyEquals(report.withholdings.components[1]!.amount, audDollars(32))).toBe(true);
     }),
   );
 });

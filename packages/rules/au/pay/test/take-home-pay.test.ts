@@ -35,11 +35,11 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         taxFreeThresholdClaimed: true,
       });
 
-      // weekly = 1500
-      // bracket 3: a=0.32, b=180.0385  -> round(0.32*1500 - 180.0385) = round(299.9615) = 300
-      // net = 1500 - 300 = 1200
-      expect(moneyEquals(report.withholdingsTotal, audDollars(300))).toBe(true);
-      expect(moneyEquals(report.netPay, audDollars(1200))).toBe(true);
+      // x = 1500.99
+      // bracket: a=0.32, b=176.5769 -> round(0.32*1500.99 - 176.5769) = 304
+      // net = 1500 - 304 = 1196
+      expect(moneyEquals(report.withholdingsTotal, audDollars(304))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(1196))).toBe(true);
       expect(report.period).toBe("weekly");
     }),
   );
@@ -62,7 +62,7 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
       expect(paygTrace.ruleId).toBe(PaygWithholdingRuleId);
       expect(paygTrace.rounding).toBe("ato-withholding-rounding");
       expect(paygTrace.sources.length).toBe(1);
-      expect(paygTrace.sources[0]!.reference).toBe("validation-fixture/2025-26");
+      expect(paygTrace.sources[0]!.kind).toBe("ato-publication");
 
       const taxableTrace = paygTrace.children[0]!;
       expect(taxableTrace.ruleId).toBe(TaxablePayRuleId);
@@ -117,25 +117,25 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         taxFreeThresholdClaimed: true,
       });
 
-      // 3000 fortnightly = 1500 weekly equivalent -> $300 weekly withholding -> $600 fortnightly
-      expect(moneyEquals(report.withholdingsTotal, audDollars(600))).toBe(true);
-      expect(moneyEquals(report.netPay, audDollars(2400))).toBe(true);
+      // 3000 fortnightly = 1500 weekly equivalent -> $304 weekly withholding -> $608 fortnightly
+      expect(moneyEquals(report.withholdingsTotal, audDollars(608))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(2392))).toBe(true);
     }),
   );
 });
 
 describe("AU take-home pay calculator (2024-25 rule pack)", () => {
-  it.effect("parameter swap changes withholding deterministically", () =>
+  it.effect("uses the official Schedule 1 coefficients for the 2024-25 pack", () =>
     Effect.gen(function* () {
       const report = yield* runScenario(AuTakeHomePay2024_25_Live, {
         grossPay: weekly1500,
         taxFreeThresholdClaimed: true,
       });
 
-      // 2024-25 single bracket above threshold: a=0.18, b=64
-      // round(0.18 * 1500 - 64) = round(206) = 206
-      expect(moneyEquals(report.withholdingsTotal, audDollars(206))).toBe(true);
-      expect(moneyEquals(report.netPay, audDollars(1294))).toBe(true);
+      // Schedule 1 was last updated for 1 July 2024, so the 2024-25 and
+      // 2025-26 packs currently share the same official coefficients.
+      expect(moneyEquals(report.withholdingsTotal, audDollars(304))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(1196))).toBe(true);
     }),
   );
 });

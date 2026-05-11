@@ -16,6 +16,9 @@ import {
   MedicareLevyLive,
   MedicareLevyRuleId,
 } from "../rules/medicare-levy.js";
+import { IncomeTaxSource2025_26 } from "../parameters/income-tax-table.js";
+import { LitoSource2025_26 } from "../parameters/lito-table.js";
+import { MedicareLevySource2025_26 } from "../parameters/medicare-levy-table.js";
 
 export const IncomeTaxRuleDescriptor = makeRuleDescriptor({
   id: IncomeTaxRuleId,
@@ -23,8 +26,8 @@ export const IncomeTaxRuleDescriptor = makeRuleDescriptor({
   provides: [IncomeTaxComponentDescriptor],
   requires: [AnnualTaxableIncomeDescriptor],
   layer: IncomeTaxLive,
-  sources: [],
-  sourcePolicy: "not-required",
+  sources: [IncomeTaxSource2025_26],
+  sourcePolicy: "required",
 });
 
 export const LitoRuleDescriptor = makeRuleDescriptor({
@@ -33,8 +36,8 @@ export const LitoRuleDescriptor = makeRuleDescriptor({
   provides: [LitoComponentDescriptor],
   requires: [AnnualTaxableIncomeDescriptor],
   layer: LitoLive,
-  sources: [],
-  sourcePolicy: "not-required",
+  sources: [LitoSource2025_26],
+  sourcePolicy: "required",
 });
 
 export const MedicareLevyRuleDescriptor = makeRuleDescriptor({
@@ -43,8 +46,8 @@ export const MedicareLevyRuleDescriptor = makeRuleDescriptor({
   provides: [MedicareLevyComponentDescriptor],
   requires: [AnnualTaxableIncomeDescriptor],
   layer: MedicareLevyLive,
-  sources: [],
-  sourcePolicy: "not-required",
+  sources: [MedicareLevySource2025_26],
+  sourcePolicy: "required",
 });
 
 export const AnnualTaxLedgerRuleDescriptor = makeRuleDescriptor({

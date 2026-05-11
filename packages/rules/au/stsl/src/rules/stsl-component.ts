@@ -6,8 +6,13 @@ import {
   payPeriodToWeeklyFactor,
   TaxablePayFact,
 } from "@whattax/rules-au-pay/facts";
+import { CalculationError } from "@whattax/core/errors";
 import { StslComponentFact, StslDebtFact } from "../facts/stsl.js";
-import { AtoStslTable } from "../parameters/stsl-table.js";
+import {
+  AtoStslTable,
+  type StslRow,
+  type StslTable,
+} from "../parameters/stsl-table.js";
 
 export const StslComponentRuleId = RuleId.make(
   "whattax/rules-au-stsl/rule/StslComponent",
@@ -17,13 +22,27 @@ export const StslComponentId = ComponentId.make(
   "whattax/rules-au-stsl/component/Stsl",
 );
 
+const findRow = (
+  table: StslTable,
+  weeklyFormulaCents: number,
+): Effect.Effect<StslRow, CalculationError> => {
+  const row = table.rows.find((r) => {
+    if (weeklyFormulaCents < r.weeklyMinCents) return false;
+    if (r.weeklyMaxCents === "infinity") return true;
+    return weeklyFormulaCents <= r.weeklyMaxCents;
+  });
+
+  return row
+    ? Effect.succeed(row)
+    : Effect.fail(
+        new CalculationError({
+          message: `whattax/rules-au-stsl: no STSL row covers weekly formula cents=${weeklyFormulaCents}`,
+        }),
+      );
+};
+
 /**
- * Current STSL component: simplified single-bracket withholding.
- *
- * Status mapping demonstrates all three statuses on the same rule:
- * - StslDebt.enabled = false   → status `disabled` (component shown in trace, $0)
- * - enabled, weekly < threshold → status `zeroed`   (rule says zero, $0)
- * - enabled, weekly ≥ threshold → status `active`   (rule contributes)
+ * Current STSL component using ATO Schedule 8 marginal component rows.
  */
 export const StslComponentLive = Layer.effect(StslComponentFact)(
   Effect.gen(function* () {
@@ -35,15 +54,13 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       taxablePeriodCents: taxable.amount.cents,
       period: taxable.period,
       enabled: stslDebt.enabled,
-      weeklyThresholdCents: table.weeklyThresholdCents,
-      rate: table.rate,
       tableYear: table.year,
     } as const;
 
     if (!stslDebt.enabled) {
       const trace = TraceNode.make({
         ruleId: StslComponentRuleId,
-        title: "STSL withholding (opt-out — component disabled)",
+        title: "STSL withholding (opt-out - component disabled)",
         inputs: baseTraceInputs,
         formula: "stsl = 0 (opted out)",
         result: aud(0),
@@ -64,13 +81,28 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
 
     const weeklyFactor = payPeriodToWeeklyFactor(taxable.period);
     const weeklyCents = taxable.amount.cents * weeklyFactor;
+    const weeklyFormulaDollars = Math.floor(weeklyCents / 100) + 0.99;
+    const weeklyFormulaCents = Math.round(weeklyFormulaDollars * 100);
+    const row = yield* findRow(table, weeklyFormulaCents);
+    const weeklyWithholdingDollarsRaw =
+      row.a * weeklyFormulaDollars - row.bDollars;
+    const weeklyWithholdingDollars = Math.max(
+      0,
+      Math.round(weeklyWithholdingDollarsRaw),
+    );
 
-    if (weeklyCents < table.weeklyThresholdCents) {
+    if (weeklyWithholdingDollars === 0) {
       const trace = TraceNode.make({
         ruleId: StslComponentRuleId,
-        title: "STSL withholding (below repayment threshold)",
-        inputs: { ...baseTraceInputs, weeklyEquivalentCents: weeklyCents },
-        formula: "stsl = 0 (weekly equivalent below threshold)",
+        title: "STSL withholding (zero component)",
+        inputs: {
+          ...baseTraceInputs,
+          weeklyEquivalentCents: weeklyCents,
+          weeklyFormulaCents,
+          a: row.a,
+          bDollars: row.bDollars,
+        },
+        formula: "stsl = 0 (Schedule 8 component rounds to zero)",
         result: aud(0),
         rounding: "ato-withholding-rounding",
         sources: [table.source],
@@ -88,15 +120,20 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       return component;
     }
 
-    const weeklyDollars = weeklyCents / 100;
-    const weeklyWithholdingDollars = Math.round(table.rate * weeklyDollars);
     const periodWithholding = audDollars(weeklyWithholdingDollars / weeklyFactor);
 
     const trace = TraceNode.make({
       ruleId: StslComponentRuleId,
-      title: "STSL withholding (single-bracket validation rule)",
-      inputs: { ...baseTraceInputs, weeklyEquivalentCents: weeklyCents },
-      formula: "stsl = round(rate * weeklyEarnings) / weeklyFactor",
+      title: "STSL withholding (Schedule 8)",
+      inputs: {
+        ...baseTraceInputs,
+        weeklyEquivalentCents: weeklyCents,
+        weeklyFormulaCents,
+        a: row.a,
+        bDollars: row.bDollars,
+      },
+      formula:
+        "stsl = round(a * (whole weekly dollars + 0.99) - b) / weeklyFactor",
       result: periodWithholding,
       rounding: "ato-withholding-rounding",
       sources: [table.source],

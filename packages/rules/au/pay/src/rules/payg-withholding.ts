@@ -25,18 +25,18 @@ export const PaygWithholdingComponentId = ComponentId.make(
 
 const findRow = (
   table: Schedule1Table,
-  weeklyCents: number,
+  weeklyFormulaCents: number,
 ): Effect.Effect<Schedule1Row, CalculationError> => {
   const row = table.rows.find((r) => {
-    if (weeklyCents < r.weeklyMinCents) return false;
+    if (weeklyFormulaCents < r.weeklyMinCents) return false;
     if (r.weeklyMaxCents === "infinity") return true;
-    return weeklyCents <= r.weeklyMaxCents;
+    return weeklyFormulaCents <= r.weeklyMaxCents;
   });
   return row
     ? Effect.succeed(row)
     : Effect.fail(
         new CalculationError({
-          message: `whattax/rules-au-pay: no Schedule1 row covers weekly cents=${weeklyCents}`,
+          message: `whattax/rules-au-pay: no Schedule1 row covers weekly formula cents=${weeklyFormulaCents}`,
         }),
       );
 };
@@ -65,10 +65,11 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
 
     const weeklyFactor = payPeriodToWeeklyFactor(taxable.period);
     const weeklyCents = taxable.amount.cents * weeklyFactor;
-    const weeklyDollars = weeklyCents / 100;
-    const row = yield* findRow(table, weeklyCents);
+    const weeklyFormulaDollars = Math.floor(weeklyCents / 100) + 0.99;
+    const weeklyFormulaCents = Math.round(weeklyFormulaDollars * 100);
+    const row = yield* findRow(table, weeklyFormulaCents);
 
-    const weeklyWithholdingDollarsRaw = row.a * weeklyDollars - row.bDollars;
+    const weeklyWithholdingDollarsRaw = row.a * weeklyFormulaDollars - row.bDollars;
     const weeklyWithholdingDollarsRounded = Math.round(
       weeklyWithholdingDollarsRaw,
     );
@@ -84,11 +85,13 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
         taxablePeriodCents: taxable.amount.cents,
         period: taxable.period,
         weeklyEquivalentCents: weeklyCents,
+        weeklyFormulaCents,
         a: row.a,
         bDollars: row.bDollars,
         scheduleYear: table.year,
       },
-      formula: "withholding = round(a * weeklyEarnings - b) / weeklyFactor",
+      formula:
+        "withholding = round(a * (whole weekly dollars + 0.99) - b) / weeklyFactor",
       result: periodWithholding,
       rounding: "ato-withholding-rounding",
       sources: [table.source],

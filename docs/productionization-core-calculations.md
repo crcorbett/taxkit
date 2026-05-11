@@ -130,7 +130,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Added `packages/rules/au/*` to the WhatTax workspace and refreshed `pnpm-lock.yaml`; `pnpm list --depth -1 --recursive` now shows all three rule packages.
 - Updated the TypeScript base config to use `lib: ["ESNext"]` and removed rule-package/core `ES2022` overrides.
 - Verification: `pnpm --filter @whattax/core --filter @whattax/rules-au-pay --filter @whattax/rules-au-stsl --filter @whattax/rules-au-income-tax check-types` passes.
-- Removed remaining `spike`/`spike-fixture` names from runtime packages and tests; validation-only tables now use `internal-validation` / `validation-fixture` source refs until the official-source data slice replaces them.
+- Removed remaining `spike`/`spike-fixture` names from runtime packages and tests; the first productionization commit temporarily kept validation-only parameter source refs before the official-source data slice replaced them.
 - Made fact descriptors schema-aware and converted current pay, STSL, annual-tax facts, ledgers, parameter tables, and calculator reports to schema-backed classes.
 - Added branded core tax primitives for tax years, rates, decimal coefficients, and cents-or-infinity boundaries.
 - Added schema-backed `CalculationError` and replaced rule-level `throw`/`Effect.die` failures with typed `Effect.fail(...)` paths.
@@ -141,3 +141,8 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Refactored graph validation to use Effect `HashMap`, `HashSet`, `Array`, `Option`, and the built-in `Graph.directed` / `Graph.isAcyclic` APIs instead of JavaScript `Map`, `Set`, and hand-rolled DFS.
 - Updated annual income-tax parameters to official 2025-26 resident brackets, LITO, and Medicare levy threshold/shade-in source refs; refreshed annual-tax expected values to match those official tables.
 - Verification after annual-tax/source and graph-refactor work: `pnpm --filter @whattax/core --filter @whattax/rules-au-pay --filter @whattax/rules-au-stsl --filter @whattax/rules-au-income-tax check-types` passes, and `pnpm --filter @whattax/rules-au-pay --filter @whattax/rules-au-stsl --filter @whattax/rules-au-income-tax test` passes with 23 tests across 6 files.
+- Commit `55eb808` records the first verified productionization slice in the WhatTax submodule; parent adad commit `cefb981` records that submodule pointer.
+- Replaced PAYG Schedule 1 validation coefficients with the official ATO Scale 2 coefficient rows and the ATO `whole weekly dollars + 99 cents` formula input.
+- Replaced the STSL single-bracket validation shortcut with the official ATO Schedule 8 STSL component rows that apply from 24 September 2025 to 30 June 2026.
+- Exported official source refs from PAYG, STSL, annual tax, LITO, and Medicare parameter modules and marked the corresponding calculation rule descriptors as `sourcePolicy: "required"`.
+- Verification after official PAYG/STSL source work: focused engine check-types pass, and rule-package tests pass with 23 tests across 6 files.
