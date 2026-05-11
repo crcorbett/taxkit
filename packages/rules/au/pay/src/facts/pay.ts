@@ -24,6 +24,20 @@ export const payPeriodToWeeklyFactor = (period: PayPeriod): number => {
   }
 };
 
+export const scaleWeeklyWithholdingToPayPeriodDollars = (
+  weeklyWithholdingDollars: number,
+  period: PayPeriod,
+): number => {
+  switch (period) {
+    case "weekly":
+      return weeklyWithholdingDollars;
+    case "fortnightly":
+      return weeklyWithholdingDollars * 2;
+    case "monthly":
+      return Math.round((weeklyWithholdingDollars * 13) / 3);
+  }
+};
+
 export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
   amount: Money,
   period: PayPeriod,

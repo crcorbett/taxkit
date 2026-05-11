@@ -162,4 +162,37 @@ describe("AU annual income tax calculator (2025-26)", () => {
       expect(medicare!.id).toBe(MedicareLevyComponentId);
     }),
   );
+
+  it.effect("income tax and LITO boundary values stay on the intended brackets", () =>
+    Effect.gen(function* () {
+      const taxFreeThreshold = yield* runScenario(18_200);
+      expect(moneyEquals(taxFreeThreshold.ledger.components[0]!.amount, aud(0))).toBe(true);
+      expect(moneyEquals(taxFreeThreshold.ledger.components[1]!.amount, audDollars(700))).toBe(true);
+      expect(moneyEquals(taxFreeThreshold.liability, aud(0))).toBe(true);
+
+      const litoFirstPhaseEnd = yield* runScenario(45_000);
+      expect(moneyEquals(litoFirstPhaseEnd.ledger.components[0]!.amount, audDollars(4288))).toBe(true);
+      expect(moneyEquals(litoFirstPhaseEnd.ledger.components[1]!.amount, audDollars(325))).toBe(true);
+
+      const litoCeiling = yield* runScenario(66_667);
+      expect(moneyEquals(litoCeiling.ledger.components[1]!.amount, aud(0))).toBe(true);
+      expect(litoCeiling.ledger.components[1]!.status).toBe("zeroed");
+    }),
+  );
+
+  it.effect("Medicare threshold, shade-in, and full-rate boundary behavior", () =>
+    Effect.gen(function* () {
+      const belowThreshold = yield* runScenario(27_222);
+      expect(moneyEquals(belowThreshold.ledger.components[2]!.amount, aud(0))).toBe(true);
+      expect(belowThreshold.ledger.components[2]!.status).toBe("zeroed");
+
+      const shadeInBoundary = yield* runScenario(34_027);
+      expect(moneyEquals(shadeInBoundary.ledger.components[2]!.amount, aud(68_050))).toBe(true);
+      expect(shadeInBoundary.ledger.components[2]!.status).toBe("active");
+
+      const fullRate = yield* runScenario(34_028);
+      expect(moneyEquals(fullRate.ledger.components[2]!.amount, aud(68_056))).toBe(true);
+      expect(fullRate.ledger.components[2]!.status).toBe("active");
+    }),
+  );
 });

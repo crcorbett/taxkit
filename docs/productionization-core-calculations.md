@@ -81,10 +81,10 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 
 ## Core Calculation Coverage Plan
 
-- [ ] PAYG withholding: official-source-backed Schedule 1 table coverage, Scale 1/2 behavior, tax-free-threshold true/false, weekly/fortnightly/monthly, rounding, and threshold boundaries.
-- [ ] STSL: realistic multi-bracket behavior or isolated official-scope subset, active/zeroed/disabled behavior, PAYG composition, and salary-sacrifice interaction where in scope.
-- [ ] Annual tax: income-tax marginal brackets, LITO phase-out, Medicare levy threshold/shade-in/full-rate behavior, liability floor, and bracket/threshold boundary tests.
-- [ ] Cross-rule composition: PAYG plus STSL plus salary sacrifice, annual tax additive/subtractive ledger components, missing dependency visibility, and explicit aggregator replacement.
+- [x] PAYG withholding: official-source-backed Schedule 1 table coverage, Scale 1/2 behavior, tax-free-threshold true/false, weekly/fortnightly/monthly, rounding, and threshold boundaries.
+- [x] STSL: realistic multi-bracket behavior or isolated official-scope subset, active/zeroed/disabled behavior, PAYG composition, and salary-sacrifice interaction where in scope.
+- [x] Annual tax: income-tax marginal brackets, LITO phase-out, Medicare levy threshold/shade-in/full-rate behavior, liability floor, and bracket/threshold boundary tests.
+- [x] Cross-rule composition: PAYG plus STSL plus salary sacrifice, annual tax additive/subtractive ledger components, missing dependency visibility, and explicit aggregator replacement.
 - [ ] Trace and ledger snapshots: rule IDs, source refs, inputs/outputs, rounding modes, ledger status, and explanation order.
 
 ## Graph Validation Plan
@@ -114,7 +114,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - [x] Typed calculation errors added.
 - [x] Rule descriptors added.
 - [x] Graph validation added.
-- [ ] Calculation coverage expanded.
+- [x] Calculation coverage expanded.
 - [ ] Verification completed.
 
 ## Change Record
@@ -149,3 +149,10 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Updated take-home-pay and annual-tax scenario layers to accept `unknown`, decode with `Schema.decodeUnknownEffect`, and provide facts through `Layer.effectContext`.
 - Added malformed-input regression tests for the scenario layers.
 - Verification after scenario-schema work: focused engine check-types pass, and rule-package tests pass with 25 tests across 6 files.
+- Added official ATO Schedule 1 Scale 1 rows and removed the previous typed "Scale 1 not implemented" failure path; PAYG now derives Scale 1/2 behavior from the tax-free-threshold fact.
+- Added a shared pay-period withholding scaler so weekly and fortnightly conversion stays exact and monthly withholding rounds to whole dollars after conversion, matching the ATO pay-period method.
+- Refactored PAYG and STSL row lookups to use Effect `Array.findFirst` and `Option.match` rather than JavaScript `Array.find` plus nullable branching.
+- Expanded PAYG tests for Scale 1, fortnightly, monthly nearest-dollar rounding, and tax-free-threshold behavior.
+- Expanded STSL tests for monthly PAYG+STSL rounding and the highest official Schedule 8 row.
+- Expanded annual-tax tests for income-tax threshold, LITO phase-out boundaries, Medicare levy threshold/shade-in/full-rate boundaries, and liability floor behavior.
+- Verification after coverage expansion: focused engine check-types pass, and rule-package tests pass with 31 tests across 6 files.

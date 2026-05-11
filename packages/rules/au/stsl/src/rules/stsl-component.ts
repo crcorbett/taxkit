@@ -1,9 +1,10 @@
-import { Effect, Layer } from "effect";
+import { Array, Effect, Layer, Option } from "effect";
 import { ComponentId, type LedgerComponent } from "@whattax/core/ledger";
 import { aud, audDollars } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
 import {
   payPeriodToWeeklyFactor,
+  scaleWeeklyWithholdingToPayPeriodDollars,
   TaxablePayFact,
 } from "@whattax/rules-au-pay/facts";
 import { CalculationError } from "@whattax/core/errors";
@@ -26,19 +27,23 @@ const findRow = (
   table: StslTable,
   weeklyFormulaCents: number,
 ): Effect.Effect<StslRow, CalculationError> => {
-  const row = table.rows.find((r) => {
-    if (weeklyFormulaCents < r.weeklyMinCents) return false;
-    if (r.weeklyMaxCents === "infinity") return true;
-    return weeklyFormulaCents <= r.weeklyMaxCents;
-  });
+  const row = Array.findFirst(
+    table.rows,
+    (r) =>
+      weeklyFormulaCents >= r.weeklyMinCents &&
+      (r.weeklyMaxCents === "infinity" ||
+        weeklyFormulaCents <= r.weeklyMaxCents),
+  );
 
-  return row
-    ? Effect.succeed(row)
-    : Effect.fail(
+  return Option.match(row, {
+    onNone: () =>
+      Effect.fail(
         new CalculationError({
           message: `whattax/rules-au-stsl: no STSL row covers weekly formula cents=${weeklyFormulaCents}`,
         }),
-      );
+      ),
+    onSome: Effect.succeed,
+  });
 };
 
 /**
@@ -120,7 +125,12 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       return component;
     }
 
-    const periodWithholding = audDollars(weeklyWithholdingDollars / weeklyFactor);
+    const periodWithholding = audDollars(
+      scaleWeeklyWithholdingToPayPeriodDollars(
+        weeklyWithholdingDollars,
+        taxable.period,
+      ),
+    );
 
     const trace = TraceNode.make({
       ruleId: StslComponentRuleId,
@@ -133,7 +143,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         bDollars: row.bDollars,
       },
       formula:
-        "stsl = round(a * (whole weekly dollars + 0.99) - b) / weeklyFactor",
+        "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period",
       result: periodWithholding,
       rounding: "ato-withholding-rounding",
       sources: [table.source],

@@ -184,4 +184,33 @@ describe("AU take-home pay with STSL", () => {
       expect(moneyEquals(report.withholdings.components[1]!.amount, audDollars(32))).toBe(true);
     }),
   );
+
+  it.effect("monthly period: PAYG and STSL both use nearest-dollar monthly conversion", () =>
+    Effect.gen(function* () {
+      const report = yield* stslScenario(
+        new GrossPay({ amount: audDollars(6500), period: "monthly" }),
+        stslEnabled,
+      );
+
+      // 6500 monthly = 1500 weekly equivalent. PAYG: round(304*13/3)=1317.
+      // STSL: weekly component 32, monthly round(32*13/3)=139.
+      expect(moneyEquals(report.withholdingsTotal, audDollars(1456))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(5044))).toBe(true);
+      expect(moneyEquals(report.withholdings.components[0]!.amount, audDollars(1317))).toBe(true);
+      expect(moneyEquals(report.withholdings.components[1]!.amount, audDollars(139))).toBe(true);
+    }),
+  );
+
+  it.effect("STSL highest official row remains active at high weekly income", () =>
+    Effect.gen(function* () {
+      const report = yield* stslScenario(
+        new GrossPay({ amount: audDollars(3500), period: "weekly" }),
+        stslEnabled,
+      );
+
+      // Schedule 8 final row: round(0.10*3500.99) = 350.
+      expect(moneyEquals(report.withholdings.components[1]!.amount, audDollars(350))).toBe(true);
+      expect(report.withholdings.components[1]!.status).toBe("active");
+    }),
+  );
 });

@@ -107,6 +107,22 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
     }),
   );
 
+  it.effect("Scale 1 applies when the tax-free threshold is not claimed", () =>
+    Effect.gen(function* () {
+      const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
+        grossPay: weekly1500,
+        taxFreeThresholdClaimed: false,
+      });
+
+      // Schedule 1 Scale 1: round(0.32*1500.99 - 65.7202) = 415
+      expect(moneyEquals(report.withholdingsTotal, audDollars(415))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(1085))).toBe(true);
+
+      const paygTrace = report.trace.children[0]!.children[0]!;
+      expect(paygTrace.inputs).toMatchObject({ scale: "scale1" });
+    }),
+  );
+
   it.effect("scenario layer rejects malformed input through Effect Schema", () =>
     Effect.gen(function* () {
       const exit = yield* CalculateTakeHomePay.pipe(
@@ -140,6 +156,22 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
       // 3000 fortnightly = 1500 weekly equivalent -> $304 weekly withholding -> $608 fortnightly
       expect(moneyEquals(report.withholdingsTotal, audDollars(608))).toBe(true);
       expect(moneyEquals(report.netPay, audDollars(2392))).toBe(true);
+    }),
+  );
+
+  it.effect("monthly period: rounds the converted monthly withholding to dollars", () =>
+    Effect.gen(function* () {
+      const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
+        grossPay: new GrossPay({
+          amount: audDollars(6500),
+          period: "monthly",
+        }),
+        taxFreeThresholdClaimed: true,
+      });
+
+      // 6500 monthly = 1500 weekly equivalent -> $304 weekly -> round(304*13/3) = $1317 monthly
+      expect(moneyEquals(report.withholdingsTotal, audDollars(1317))).toBe(true);
+      expect(moneyEquals(report.netPay, audDollars(5183))).toBe(true);
     }),
   );
 });
