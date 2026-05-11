@@ -44,7 +44,7 @@ export interface LedgerComponent {
   readonly trace: TraceNode;
 }
 
-interface LedgerComponentEncoded {
+export interface LedgerComponentEncoded {
   readonly _tag: "LedgerComponent";
   readonly id: string;
   readonly label: string;

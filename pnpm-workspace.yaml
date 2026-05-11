@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "packages/rules/au/*"
 
 catalog:
   "@effect/platform": "0.96.1"

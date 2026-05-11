@@ -1,5 +1,5 @@
 {
-  "name": "@whattax/core",
+  "name": "@whattax/rules-au-pay",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,52 +11,47 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./primitives": {
-      "source": "./src/primitives/index.ts",
-      "types": "./dist/primitives/index.d.ts",
-      "default": "./dist/primitives/index.js"
-    },
     "./facts": {
       "source": "./src/facts/index.ts",
       "types": "./dist/facts/index.d.ts",
       "default": "./dist/facts/index.js"
     },
-    "./errors": {
-      "source": "./src/errors/index.ts",
-      "types": "./dist/errors/index.d.ts",
-      "default": "./dist/errors/index.js"
+    "./parameters": {
+      "source": "./src/parameters/index.ts",
+      "types": "./dist/parameters/index.d.ts",
+      "default": "./dist/parameters/index.js"
     },
     "./rules": {
       "source": "./src/rules/index.ts",
       "types": "./dist/rules/index.d.ts",
       "default": "./dist/rules/index.js"
     },
-    "./graph": {
-      "source": "./src/graph/index.ts",
-      "types": "./dist/graph/index.d.ts",
-      "default": "./dist/graph/index.js"
+    "./calculator": {
+      "source": "./src/calculator/index.ts",
+      "types": "./dist/calculator/index.d.ts",
+      "default": "./dist/calculator/index.js"
     },
-    "./trace": {
-      "source": "./src/trace/index.ts",
-      "types": "./dist/trace/index.d.ts",
-      "default": "./dist/trace/index.js"
-    },
-    "./ledger": {
-      "source": "./src/ledger/index.ts",
-      "types": "./dist/ledger/index.d.ts",
-      "default": "./dist/ledger/index.js"
+    "./rule-pack": {
+      "source": "./src/rule-pack/index.ts",
+      "types": "./dist/rule-pack/index.d.ts",
+      "default": "./dist/rule-pack/index.js"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
+    "test": "vitest run",
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
+    "@whattax/core": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "@types/node": "catalog:",
     "@whattax/tsconfig": "workspace:*",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

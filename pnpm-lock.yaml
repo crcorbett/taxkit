@@ -150,11 +150,11 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/spike-au-pay:
+  packages/rules/au/income-tax:
     dependencies:
       '@whattax/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.60
@@ -167,7 +167,60 @@ importers:
         version: 24.12.3
       '@whattax/tsconfig':
         specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../../../tsconfig
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.5(@types/node@24.12.3)(vite@8.0.11(@types/node@24.12.3)(jiti@2.7.0)(yaml@2.8.4))
+
+  packages/rules/au/pay:
+    dependencies:
+      '@whattax/core':
+        specifier: workspace:*
+        version: link:../../../core
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-beta.60
+    devDependencies:
+      '@effect/vitest':
+        specifier: 'catalog:'
+        version: 4.0.0-beta.60(effect@4.0.0-beta.60)(vitest@4.1.5(@types/node@24.12.3)(vite@8.0.11(@types/node@24.12.3)(jiti@2.7.0)(yaml@2.8.4)))
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.12.3
+      '@whattax/tsconfig':
+        specifier: workspace:*
+        version: link:../../../tsconfig
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.5(@types/node@24.12.3)(vite@8.0.11(@types/node@24.12.3)(jiti@2.7.0)(yaml@2.8.4))
+
+  packages/rules/au/stsl:
+    dependencies:
+      '@whattax/core':
+        specifier: workspace:*
+        version: link:../../../core
+      '@whattax/rules-au-pay':
+        specifier: workspace:*
+        version: link:../pay
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-beta.60
+    devDependencies:
+      '@effect/vitest':
+        specifier: 'catalog:'
+        version: 4.0.0-beta.60(effect@4.0.0-beta.60)(vitest@4.1.5(@types/node@24.12.3)(vite@8.0.11(@types/node@24.12.3)(jiti@2.7.0)(yaml@2.8.4)))
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.12.3
+      '@whattax/tsconfig':
+        specifier: workspace:*
+        version: link:../../../tsconfig
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

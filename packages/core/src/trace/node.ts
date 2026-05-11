@@ -8,7 +8,7 @@ export const SourceKind = Schema.Literals([
   "ato-publication",
   "legislation",
   "regulation",
-  "internal-spike",
+  "internal-validation",
 ]);
 export type SourceKind = typeof SourceKind.Type;
 
@@ -31,7 +31,7 @@ export interface TraceNode {
   readonly children: ReadonlyArray<TraceNode>;
 }
 
-interface TraceNodeEncoded {
+export interface TraceNodeEncoded {
   readonly _tag: "TraceNode";
   readonly ruleId: string;
   readonly title: string;
