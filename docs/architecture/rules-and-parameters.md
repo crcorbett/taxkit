@@ -30,16 +30,15 @@ Descriptors are required for graph visualization, validation, explanation, docum
 
 ```ts
 export interface RuleDescriptor<ROut, E, RIn> {
-  readonly id: RuleId;
-  readonly title: string;
   readonly domain: RuleDomain;
+  readonly id: RuleId;
+  readonly layer: Layer.Layer<ROut, E, RIn>;
+  readonly parameters?: ReadonlyArray<ParameterDescriptor.Any>;
   readonly provides: ReadonlyArray<FactDescriptor.Any>;
   readonly requires: ReadonlyArray<FactDescriptor.Any>;
-  readonly layer: Layer.Layer<ROut, E, RIn>;
-  readonly effective: EffectivePeriod;
+  readonly sourcePolicy: RuleSourcePolicy;
   readonly sources: ReadonlyArray<SourceRef>;
-  readonly togglePolicy: RuleTogglePolicy;
-  readonly tracePolicy: TracePolicy;
+  readonly title: string;
 }
 ```
 
@@ -61,6 +60,12 @@ export const AtoSchedule1_2025_26_Live = Layer.succeed(
 ```
 
 This lets consumers swap tax-year parameters without changing algorithms.
+
+Parameter descriptors include the source reference and effective tax-year
+period for the table they describe. Graph validation reports overlapping
+effective periods for different descriptors with the same parameter ID, so a
+rule pack cannot accidentally compose two competing ATO tables for the same
+service and year.
 
 ```txt
 PaygWithholdingLive
@@ -122,7 +127,6 @@ gross-up
 annualise / periodise
 loan amortisation
 ledger component adjustment
-aggregation
 aggregation
 ```
 

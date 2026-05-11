@@ -5,6 +5,7 @@ import { Effect } from "effect";
 import { getRouteRuntime } from "#/lib/route-runtime";
 
 export const Route = createFileRoute("/")({
+  component: HomePage,
   loader: async (loaderContext) => {
     const runtime = getRouteRuntime(loaderContext);
     const health = await runtime.runPromise(
@@ -15,11 +16,10 @@ export const Route = createFileRoute("/")({
     );
 
     return {
-      status: health.status,
       service: health.service,
+      status: health.status,
     };
   },
-  component: HomePage,
 });
 
 function HomePage() {

@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
   "compilerOptions": {
-    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "lib": ["ES2025", "DOM"],
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "jsx": "react-jsx",

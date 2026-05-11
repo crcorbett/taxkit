@@ -31,6 +31,7 @@ explicit WhatTax input facts
 
 ## Documents
 
+- [Architecture atlas](../architecture.md)
 - [Package boundaries](./package-boundaries.md)
 - [Facts](./facts.md)
 - [Rules and parameters](./rules-and-parameters.md)

@@ -7,7 +7,7 @@ quality tools.
 
 ## Documents
 
-- [Effect TypeScript patterns](./effect-ts-patterns.md)
+- [Code patterns](./code-patterns.md)
 - [Formatting, linting, and dependency hygiene](./tooling.md)
 - [Docstring conventions](./docstrings.md)
 - [Productionization audit](./productionization-audit.md)

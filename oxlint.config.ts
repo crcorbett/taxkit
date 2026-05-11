@@ -27,8 +27,6 @@ export default defineConfig({
     "func-names": "off",
     "func-style": "off",
     "max-classes-per-file": "off",
-    "oxc/no-barrel-file": "off",
-    "sort-keys": "off",
     "unicorn/no-array-method-this-argument": "off",
   },
 });

@@ -10,8 +10,8 @@ export const HealthHandlerLive = HttpApiBuilder.group(
     Effect.succeed(
       handlers.handle("getHealth", () =>
         Effect.succeed({
-          status: "ok" as const,
           service: "whattax" as const,
+          status: "ok" as const,
         })
       )
     )

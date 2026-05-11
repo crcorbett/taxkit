@@ -11,7 +11,7 @@ The work is scoped to core calculation functionality only: facts, parameters, ru
 ## Architectural Constraints
 
 - Keep the implementation extremely type-safe and Effect TS-native.
-- Use the most modern TypeScript library baseline supported by the repo compiler. TypeScript 5.9 does not accept `ES2025` as a `lib` value, so the base config uses `ESNext`.
+- Use the most modern TypeScript library baseline supported by the repo compiler. The repository now uses TypeScript 6 with `lib: ["ES2025"]`.
 - Use Effect `Layer` composition as the primary rule and parameter composition mechanism.
 - Use Effect Schema for every boundary value, persisted value, report shape, trace shape, and parameter table.
 - Prefer branded schema values and derived types over plain strings, unbranded numbers, and structural-only contracts.
@@ -62,7 +62,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
   - Error messages.
   - Test descriptions.
 - [x] Remove `internal-spike` / `spike-fixture` source references from production rules.
-- [x] Refresh the WhatTax workspace lockfile so new workspaces are present and Turbo no longer warns about missing packages.
+- [x] Refresh the WhatTax workspace lockfile so new Bun workspaces are present and Turbo no longer warns about missing packages.
 
 ## Type And Schema Productionization Plan
 
@@ -96,7 +96,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - [x] Validate no cycles.
 - [x] Validate source references for descriptors that require sources.
 - [x] Validate effective-date overlaps where effective periods are introduced.
-  - No effective-period overlap model has been introduced yet; current rule packs select one parameter-year layer explicitly. This remains a future validation hook when effective periods become part of parameter descriptors.
+  - Parameter descriptors now carry effective tax-year periods, and graph validation reports overlapping parameter descriptors for the same parameter ID.
 - [x] Add tests that fail on descriptor/layer drift.
 
 ## Verification Plan
@@ -130,9 +130,9 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
   - `packages/rules/au/pay` as `@whattax/rules-au-pay`.
   - `packages/rules/au/stsl` as `@whattax/rules-au-stsl`.
   - `packages/rules/au/income-tax` as `@whattax/rules-au-income-tax`.
-- Added `packages/rules/au/*` to the WhatTax workspace and refreshed `pnpm-lock.yaml`; `pnpm list --depth -1 --recursive` now shows all three rule packages.
-- Updated the TypeScript base config to use `lib: ["ESNext"]` and removed rule-package/core `ES2022` overrides.
-- Verification: `pnpm --filter @whattax/core --filter @whattax/rules-au-pay --filter @whattax/rules-au-stsl --filter @whattax/rules-au-income-tax check-types` passes.
+- Added `packages/rules/au/*` to the WhatTax workspace and refreshed the workspace lockfile so all three rule packages are first-class packages.
+- Updated the TypeScript base config away from rule-package/core `ES2022` overrides.
+- Verification: focused engine `check-types` passes.
 - Removed remaining `spike`/`spike-fixture` names from runtime packages and tests; the first productionization commit temporarily kept validation-only parameter source refs before the official-source data slice replaced them.
 - Made fact descriptors schema-aware and converted current pay, STSL, annual-tax facts, ledgers, parameter tables, and calculator reports to schema-backed classes.
 - Added branded core tax primitives for tax years, rates, decimal coefficients, and cents-or-infinity boundaries.
@@ -143,7 +143,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Verification after graph work: focused engine check-types pass; rule-package tests now cover 23 tests across 6 files and pass.
 - Refactored graph validation to use Effect `HashMap`, `HashSet`, `Array`, `Option`, and the built-in `Graph.directed` / `Graph.isAcyclic` APIs instead of JavaScript `Map`, `Set`, and hand-rolled DFS.
 - Updated annual income-tax parameters to official 2025-26 resident brackets, LITO, and Medicare levy threshold/shade-in source refs; refreshed annual-tax expected values to match those official tables.
-- Verification after annual-tax/source and graph-refactor work: `pnpm --filter @whattax/core --filter @whattax/rules-au-pay --filter @whattax/rules-au-stsl --filter @whattax/rules-au-income-tax check-types` passes, and `pnpm --filter @whattax/rules-au-pay --filter @whattax/rules-au-stsl --filter @whattax/rules-au-income-tax test` passes with 23 tests across 6 files.
+- Verification after annual-tax/source and graph-refactor work: focused engine `check-types` passes, and focused rule-package tests pass with 23 tests across 6 files.
 - Commit `55eb808` records the first verified productionization slice in the WhatTax submodule; parent adad commit `cefb981` records that submodule pointer.
 - Replaced PAYG Schedule 1 validation coefficients with the official ATO Scale 2 coefficient rows and the ATO `whole weekly dollars + 99 cents` formula input.
 - Replaced the STSL single-bracket validation shortcut with the official ATO Schedule 8 STSL component rows that apply from 24 September 2025 to 30 June 2026.
@@ -168,4 +168,15 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Added graph tests that fail when a rule parameter's source is not listed on that rule descriptor.
 - Added trace/ledger snapshot tests for PAYG-only, PAYG+STSL, and annual-tax component explanation order, source refs, rounding modes, ledger effects, and ledger statuses.
 - Verification after descriptor/metadata/snapshot work: focused engine check-types pass, and rule-package tests pass with 38 tests across 6 files.
-- Repo-wide verification after final Effect `Match` cleanup: `pnpm check-types` passes with 9 successful Turbo tasks, and `pnpm test` passes with 6 successful Turbo tasks.
+- Repo-wide verification after final Effect `Match` cleanup: `check-types` passes with 9 successful Turbo tasks, and `test` passes with 6 successful Turbo tasks.
+
+### 2026-05-12
+
+- Migrated the repository from pnpm to Bun workspaces, added `bun.lock`, and removed `pnpm-workspace.yaml` / `pnpm-lock.yaml`.
+- Upgraded the workspace TypeScript catalog and dev dependency to TypeScript 6.0.3, then set the base compiler lib to `ES2025`.
+- Configured Oxlint and Oxfmt to extend Ultracite provider configs directly, keeping `sort-keys`, `oxc/no-barrel-file`, and `jsdoc/check-tag-names` enforced.
+- Replaced package `export *` barrels with explicit named exports so public entrypoints stay reviewable and bundler-friendly.
+- Added public JSDoc coverage across core primitives, descriptors, graph validation, and AU rule packages without invalid `@category` tags.
+- Added parameter effective periods and graph validation for overlapping parameter descriptors.
+- Added descriptor-driven graph snapshots for AU pay, STSL, and income-tax rule packs.
+- Added repository standards docs for code patterns, docstrings, tooling, and the architecture atlas.

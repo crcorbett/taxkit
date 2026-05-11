@@ -6,8 +6,8 @@ import {
 } from "effect/unstable/httpapi";
 
 export const HealthResponse = Schema.Struct({
-  status: Schema.Literal("ok"),
   service: Schema.Literal("whattax"),
+  status: Schema.Literal("ok"),
 });
 
 export const GetHealthEndpoint = HttpApiEndpoint.get("getHealth", "/health", {

@@ -10,22 +10,22 @@ import type { RouterContext } from "#/lib/route-runtime";
 import "../styles.css";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
+  component: RootComponent,
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       {
-        name: "viewport",
         content: "width=device-width, initial-scale=1",
+        name: "viewport",
       },
       { title: "WhatTax" },
       {
-        name: "description",
         content: "WhatTax public app.",
+        name: "description",
       },
     ],
   }),
   shellComponent: RootShell,
-  component: RootComponent,
 });
 
 function RootShell({ children }: { readonly children: React.ReactNode }) {

@@ -1,34 +1,38 @@
 # Productionization Audit
 
-This audit captures the next structural improvements identified after
-productionizing the initial core calculation packages.
+This audit captures structural improvements completed while hardening the core
+calculation packages and repository standards.
 
 ## Completed In This Pass
 
 - Added Ultracite with the Oxlint/Oxfmt provider.
-- Added root `pnpm check` and `pnpm fix` scripts through Ultracite.
+- Migrated the repository to Bun workspaces and root catalog dependency
+  management.
+- Added root `bun run check` and `bun run fix` scripts through Ultracite.
 - Enabled Oxlint type-aware mode with `oxlint-tsgolint`.
 - Added Knip as the repository dependency and workspace hygiene check.
-- Set TypeScript libs to `ES2024`, the newest concrete lib accepted by the
-  current TypeScript compiler. `ES2025` should be adopted once TypeScript
-  exposes it as a valid `lib` target.
-- Documented Effect patterns, formatting/lint rules, and docstring conventions.
+- Upgraded to TypeScript 6 and set the base lib to `ES2025`.
+- Replaced `export *` barrels with explicit named exports.
+- Added parameter effective periods and graph validation for overlapping
+  parameter descriptors.
+- Added GitHub Actions quality checks for `check`, `knip`, `check-types`, and
+  `test`.
+- Documented code patterns, formatting/lint rules, and docstring conventions.
 
-## Structural Improvements To Prioritize
+## Structural Improvements
 
-1. Add docstrings to all public core primitives, descriptor types, rule layers,
-   and parameter services before the first public release.
-2. Introduce a first-class effective-period type for parameter descriptors, then
-   replace the current placeholder graph note with real overlap validation.
-3. Split large parameter modules only when a table grows independent behavior.
-   Until then, colocating row schema, table schema, service tag, descriptor, and
-   source ref is acceptable.
-4. Add rule-pack-level generated graph snapshots once descriptor generation is
-   stable.
-5. Decide whether package barrels should remain broad or move toward explicit
-   named export files before publishing stable package entrypoints.
-6. Add CI jobs for `pnpm check`, `pnpm knip`, `pnpm check-types`, and
-   `pnpm test`.
+1. Done: public core primitives, descriptors, rule layers, parameter services,
+   and official AU rule packages now have public JSDoc coverage.
+2. Done: parameter descriptors include effective periods, and graph validation
+   reports overlapping parameter periods.
+3. Addressed: large parameter modules remain colocated because row schema,
+   table schema, service tag, descriptor, source ref, and live layer still form
+   one cohesive unit. Split only when a table grows independent behavior.
+4. Done: descriptor-driven rule-pack graph snapshots are stable fixtures in
+   the AU pay, STSL, and income-tax graph test suites.
+5. Done: package entrypoints use explicit named exports instead of broad
+   barrels.
+6. Done: CI runs Bun-backed `check`, `knip`, `check-types`, and `test`.
 
 ## Audit Findings
 
@@ -36,13 +40,10 @@ productionizing the initial core calculation packages.
   `HashMap`, `HashSet`, `Array`, `Option`, and `Graph`.
 - Closed-domain dispatch now uses `Match.exhaustive`; there are no remaining
   `switch` statements in `packages/core/src` or `packages/rules/au`.
-- The repo had no formatter/linter/dependency hygiene toolchain before this
-  pass. Ultracite and Knip are now configured at the root.
-- Public API barrels are intentional for an open-source library, so the
-  Ultracite `no-barrel-file` rule is disabled rather than forcing private deep
-  imports.
-- Object key sorting is disabled because tax parameter rows, traces, and source
-  refs need review-friendly domain ordering.
+- Ultracite and Knip are configured at the root and enforced through Bun.
+- Explicit named exports are required for package entrypoints; `export *`
+  barrels are not allowed.
+- Object key sorting is enabled and followed across source and tests.
 - Public rule descriptors keep their full `Layer` generics, while graph
   validation consumes a structural erased descriptor that excludes the layer
   field. This avoids `any` while keeping graph validation independent from layer
