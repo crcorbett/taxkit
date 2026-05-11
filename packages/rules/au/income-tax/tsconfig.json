@@ -5,6 +5,7 @@
     "rootDir": ".",
     "outDir": "dist",
     "tsBuildInfoFile": ".tsbuildinfo",
-    "types": ["node"]
+    "types": ["node"],
+    "strictNullChecks": true
   }
 }

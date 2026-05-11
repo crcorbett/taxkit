@@ -1,6 +1,7 @@
-import { Effect, Layer } from "effect";
 import { sumLedgerComponents } from "@whattax/core/ledger";
 import { RuleId, TraceNode } from "@whattax/core/trace";
+import { Effect, Layer } from "effect";
+
 import {
   IncomeTaxComponentFact,
   LitoComponentFact,
@@ -9,7 +10,7 @@ import {
 import { AnnualTaxLedger, AnnualTaxLedgerFact } from "../facts/ledger.js";
 
 export const AnnualTaxLedgerRuleId = RuleId.make(
-  "whattax/rules-au-income-tax/rule/AnnualTaxLedger",
+  "whattax/rules-au-income-tax/rule/AnnualTaxLedger"
 );
 
 /**
@@ -43,5 +44,5 @@ export const AnnualTaxLedgerLive = Layer.effect(AnnualTaxLedgerFact)(
     });
 
     return new AnnualTaxLedger({ components, rawLiability, trace });
-  }),
+  })
 );

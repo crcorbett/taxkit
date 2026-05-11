@@ -1,11 +1,13 @@
-import { Effect, Layer } from "effect";
 import {
   isComponentContributing,
-  type LedgerComponent,
   sumLedgerComponents,
 } from "@whattax/core/ledger";
+import type { LedgerComponent } from "@whattax/core/ledger";
 import { RuleId, TraceNode } from "@whattax/core/trace";
-import { GrossPayFact, type PayPeriod } from "../facts/pay.js";
+import { Effect, Layer } from "effect";
+
+import { GrossPayFact } from "../facts/pay.js";
+import type { PayPeriod } from "../facts/pay.js";
 import {
   PayWithholdingsLedger,
   PayWithholdingsLedgerFact,
@@ -13,7 +15,7 @@ import {
 } from "../facts/withholdings.js";
 
 export const PayWithholdingsLedgerRuleId = RuleId.make(
-  "whattax/rules-au-pay/rule/PayWithholdingsLedger",
+  "whattax/rules-au-pay/rule/PayWithholdingsLedger"
 );
 
 /**
@@ -23,8 +25,8 @@ export const PayWithholdingsLedgerRuleId = RuleId.make(
  * across packs.
  */
 export const buildPayWithholdingsLedger = (
-  components: ReadonlyArray<LedgerComponent>,
-  period: PayPeriod,
+  components: readonly LedgerComponent[],
+  period: PayPeriod
 ): PayWithholdingsLedger => {
   const total = sumLedgerComponents(components);
   const trace = TraceNode.make({
@@ -52,11 +54,11 @@ export const buildPayWithholdingsLedger = (
  * the two aggregators stay separate by design — composition is explicit.
  */
 export const PayWithholdingsLedgerLive = Layer.effect(
-  PayWithholdingsLedgerFact,
+  PayWithholdingsLedgerFact
 )(
   Effect.gen(function* () {
     const gross = yield* GrossPayFact;
     const payg = yield* PaygWithholdingComponentFact;
     return buildPayWithholdingsLedger([payg], gross.period);
-  }),
+  })
 );

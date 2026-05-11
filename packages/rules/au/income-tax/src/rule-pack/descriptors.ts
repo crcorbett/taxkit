@@ -1,4 +1,5 @@
 import { makeRuleDescriptor } from "@whattax/core/rules";
+
 import {
   IncomeTaxComponentDescriptor,
   LitoComponentDescriptor,
@@ -6,16 +7,6 @@ import {
 } from "../facts/components.js";
 import { AnnualTaxableIncomeDescriptor } from "../facts/income.js";
 import { AnnualTaxLedgerDescriptor } from "../facts/ledger.js";
-import {
-  AnnualTaxLedgerLive,
-  AnnualTaxLedgerRuleId,
-} from "../rules/annual-tax-ledger.js";
-import { IncomeTaxLive, IncomeTaxRuleId } from "../rules/income-tax.js";
-import { LitoLive, LitoRuleId } from "../rules/lito.js";
-import {
-  MedicareLevyLive,
-  MedicareLevyRuleId,
-} from "../rules/medicare-levy.js";
 import {
   AtoIncomeTaxTableDescriptor,
   IncomeTaxSource2025_26,
@@ -28,6 +19,16 @@ import {
   AtoMedicareLevyTableDescriptor,
   MedicareLevySource2025_26,
 } from "../parameters/medicare-levy-table.js";
+import {
+  AnnualTaxLedgerLive,
+  AnnualTaxLedgerRuleId,
+} from "../rules/annual-tax-ledger.js";
+import { IncomeTaxLive, IncomeTaxRuleId } from "../rules/income-tax.js";
+import { LitoLive, LitoRuleId } from "../rules/lito.js";
+import {
+  MedicareLevyLive,
+  MedicareLevyRuleId,
+} from "../rules/medicare-levy.js";
 
 export const IncomeTaxRuleDescriptor = makeRuleDescriptor({
   id: IncomeTaxRuleId,

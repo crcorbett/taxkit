@@ -55,7 +55,7 @@ export class TraceNode extends Schema.TaggedClass<TraceNode>()("TraceNode", {
   result: Schema.Unknown,
   rounding: Schema.optional(RoundingMode),
   sources: Schema.Array(SourceRef),
-  children: Schema.Array(Schema.suspend(() => TraceNode))
+  children: Schema.Array(Schema.suspend(() => TraceNode)),
 }) {}
 ```
 
@@ -76,7 +76,7 @@ export const LedgerComponent = Schema.TaggedStruct("LedgerComponent", {
 });
 ```
 
-`effect` is intentionally domain-neutral. The aggregator that consumes the components decides what additive/subtractive *means* in context: a pay-withholdings aggregator treats `additive` as "more withheld → less take-home"; an annual-tax aggregator treats `additive` as "more tax owed". Sharing the value type across domains lets `sumLedgerComponents` and other ledger utilities live in `@whattax/core/ledger`.
+`effect` is intentionally domain-neutral. The aggregator that consumes the components decides what additive/subtractive _means_ in context: a pay-withholdings aggregator treats `additive` as "more withheld → less take-home"; an annual-tax aggregator treats `additive` as "more tax owed". Sharing the value type across domains lets `sumLedgerComponents` and other ledger utilities live in `@whattax/core/ledger`.
 
 Ledgers make output explanation clearer because each component can be inspected independently. Disabled and zeroed components stay in the trace for auditability and do not affect the total.
 

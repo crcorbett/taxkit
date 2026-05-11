@@ -1,29 +1,32 @@
 import type { WhatTaxHttpApiService } from "@whattax/http-api/client";
 import type { Effect, Exit } from "effect";
 
-export type WhatTaxRouteRuntime = {
+export interface WhatTaxRouteRuntime {
   readonly runPromise: <A, E>(
     effect: Effect.Effect<A, E, WhatTaxHttpApiService>
   ) => Promise<A>;
   readonly runPromiseExit: <A, E>(
     effect: Effect.Effect<A, E, WhatTaxHttpApiService>
   ) => Promise<Exit.Exit<A, E>>;
-};
+}
 
-export type WhatTaxServerContext = {
+export interface WhatTaxServerContext {
   readonly api: WhatTaxRouteRuntime;
   readonly handleApiRequest: (request: Request) => Promise<Response>;
-};
+}
 
-export type RouterContext = {
+export interface RouterContext {
   readonly api: WhatTaxRouteRuntime;
   readonly serverContext?: WhatTaxServerContext | undefined;
-};
+}
 
-export type RouteLoaderContext = {
+export interface RouteLoaderContext {
   readonly context: RouterContext;
   readonly serverContext?: WhatTaxServerContext | undefined;
-};
+}
 
-export const getRouteRuntime = ({ context, serverContext }: RouteLoaderContext) =>
+export const getRouteRuntime = ({
+  context,
+  serverContext,
+}: RouteLoaderContext) =>
   serverContext?.api ?? context.serverContext?.api ?? context.api;

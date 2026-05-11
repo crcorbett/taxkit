@@ -1,12 +1,13 @@
+import type { Register } from "@tanstack/react-router";
 import {
   createStartHandler,
   defaultStreamHandler,
 } from "@tanstack/react-start/server";
 import type { RequestHandler } from "@tanstack/react-start/server";
-import type { Register } from "@tanstack/react-router";
-import { apiHandler } from "#/lib/server/api-handler.server";
-import { appRuntime } from "#/lib/runtime.server";
+
 import type { WhatTaxServerContext } from "#/lib/route-runtime";
+import { appRuntime } from "#/lib/runtime.server";
+import { apiHandler } from "#/lib/server/api-handler.server";
 
 type WhatTaxServerRequestContext = WhatTaxServerContext & {
   readonly serverContext?: WhatTaxServerContext;
@@ -27,7 +28,9 @@ const whatTaxServerContext: WhatTaxServerContext = {
 
 const fetch = createStartHandler(defaultStreamHandler);
 
-type ServerEntry = { fetch: RequestHandler<Register> };
+interface ServerEntry {
+  fetch: RequestHandler<Register>;
+}
 
 function createServerEntry(entry: ServerEntry): ServerEntry {
   return {

@@ -17,7 +17,7 @@ Example:
 ```ts
 export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
   amount: Money,
-  period: PayPeriod
+  period: PayPeriod,
 }) {}
 
 export class GrossPayFact extends Context.Tag("whattax/fact/GrossPay")<
@@ -34,12 +34,12 @@ Descriptors are metadata for tools, questions, graph validation and documentatio
 
 ```ts
 export interface FactDescriptor<A, I, R, Tag> {
-  readonly id: FactId
-  readonly title: string
-  readonly schema: Schema.Schema<A, I, R>
-  readonly tag: Context.Tag<Tag, A>
-  readonly authority: FactAuthorityPolicy
-  readonly question?: QuestionDescriptor
+  readonly id: FactId;
+  readonly title: string;
+  readonly schema: Schema.Schema<A, I, R>;
+  readonly tag: Context.Tag<Tag, A>;
+  readonly authority: FactAuthorityPolicy;
+  readonly question?: QuestionDescriptor;
 }
 ```
 
@@ -66,10 +66,10 @@ Scenarios and facts must preserve the relevant date dimensions.
 
 ```ts
 export interface ScenarioDates {
-  readonly calculationDate: LocalDate
-  readonly paymentDate?: LocalDate
-  readonly incomeYear?: IncomeYear
-  readonly fbtYear?: FbtYear
+  readonly calculationDate: LocalDate;
+  readonly paymentDate?: LocalDate;
+  readonly incomeYear?: IncomeYear;
+  readonly fbtYear?: FbtYear;
 }
 ```
 
@@ -90,7 +90,7 @@ export const RoundingMode = Schema.Literal(
   "floor-dollar",
   "ceil-dollar",
   "ato-withholding-rounding"
-)
+);
 ```
 
 Facts should avoid default values that materially alter tax outcomes. Do not default whether a person has HELP/STSL debt, claims the tax-free threshold, has health insurance cover or has a work-use percentage.
@@ -100,8 +100,9 @@ Facts should avoid default values that materially alter tax outcomes. Do not def
 Fact descriptors may include question metadata so the UI and CLI can ask only for missing facts required by a selected goal.
 
 ```ts
-export class QuestionDescriptor
-  extends Schema.TaggedClass<QuestionDescriptor>()("QuestionDescriptor", {
+export class QuestionDescriptor extends Schema.TaggedClass<QuestionDescriptor>()(
+  "QuestionDescriptor",
+  {
     id: QuestionId,
     label: Schema.String,
     help: Schema.optional(Schema.String),
@@ -113,6 +114,7 @@ export class QuestionDescriptor
       "select",
       "percentage",
       "text"
-    )
-  }) {}
+    ),
+  }
+) {}
 ```

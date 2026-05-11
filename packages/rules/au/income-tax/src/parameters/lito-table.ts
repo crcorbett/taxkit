@@ -1,7 +1,14 @@
-import { Context, Layer, Schema } from "effect";
 import { makeParameterDescriptor } from "@whattax/core/parameters";
-import { Cents, CentsOrInfinity, TaxRate, TaxYear, taxRate, taxYear } from "@whattax/core/primitives";
+import {
+  Cents,
+  CentsOrInfinity,
+  TaxRate,
+  TaxYear,
+  taxRate,
+  taxYear,
+} from "@whattax/core/primitives";
 import { SourceRef } from "@whattax/core/trace";
+import { Context, Layer, Schema } from "effect";
 
 /**
  * LITO phase-out bracket.
@@ -12,12 +19,15 @@ import { SourceRef } from "@whattax/core/trace";
  * `phaseOutRate` is the per-cent reduction in offset per cent of income.
  * Phase-out brackets with phaseOutRate=0 are flat (no reduction).
  */
-export class LitoBracket extends Schema.TaggedClass<LitoBracket>()("LitoBracket", {
-  thresholdCents: Cents,
-  maxCents: CentsOrInfinity,
-  fullOffsetCents: Cents,
-  phaseOutRate: TaxRate,
-}) {}
+export class LitoBracket extends Schema.TaggedClass<LitoBracket>()(
+  "LitoBracket",
+  {
+    thresholdCents: Cents,
+    maxCents: CentsOrInfinity,
+    fullOffsetCents: Cents,
+    phaseOutRate: TaxRate,
+  }
+) {}
 
 export class LitoTable extends Schema.TaggedClass<LitoTable>()("LitoTable", {
   year: TaxYear,
@@ -25,10 +35,9 @@ export class LitoTable extends Schema.TaggedClass<LitoTable>()("LitoTable", {
   source: SourceRef,
 }) {}
 
-export class AtoLitoTable extends Context.Service<
-  AtoLitoTable,
-  LitoTable
->()("whattax/rules-au-income-tax/parameter/AtoLitoTable") {}
+export class AtoLitoTable extends Context.Service<AtoLitoTable, LitoTable>()(
+  "whattax/rules-au-income-tax/parameter/AtoLitoTable"
+) {}
 
 export const LitoSource2025_26 = SourceRef.make({
   kind: "ato-publication",
@@ -53,10 +62,30 @@ export const AtoLitoTableDescriptor = makeParameterDescriptor({
 const table2025_26 = new LitoTable({
   year: taxYear("2025-26"),
   brackets: [
-    new LitoBracket({ thresholdCents: Cents.make(0),          maxCents: Cents.make(3_750_000),  fullOffsetCents: Cents.make(70_000), phaseOutRate: taxRate(0) }),
-    new LitoBracket({ thresholdCents: Cents.make(3_750_000),  maxCents: Cents.make(4_500_000),  fullOffsetCents: Cents.make(70_000), phaseOutRate: taxRate(0.05) }),
-    new LitoBracket({ thresholdCents: Cents.make(4_500_000),  maxCents: Cents.make(6_666_700),  fullOffsetCents: Cents.make(32_500), phaseOutRate: taxRate(0.015) }),
-    new LitoBracket({ thresholdCents: Cents.make(6_666_700),  maxCents: "infinity", fullOffsetCents: Cents.make(0),      phaseOutRate: taxRate(0) }),
+    new LitoBracket({
+      thresholdCents: Cents.make(0),
+      maxCents: Cents.make(3_750_000),
+      fullOffsetCents: Cents.make(70_000),
+      phaseOutRate: taxRate(0),
+    }),
+    new LitoBracket({
+      thresholdCents: Cents.make(3_750_000),
+      maxCents: Cents.make(4_500_000),
+      fullOffsetCents: Cents.make(70_000),
+      phaseOutRate: taxRate(0.05),
+    }),
+    new LitoBracket({
+      thresholdCents: Cents.make(4_500_000),
+      maxCents: Cents.make(6_666_700),
+      fullOffsetCents: Cents.make(32_500),
+      phaseOutRate: taxRate(0.015),
+    }),
+    new LitoBracket({
+      thresholdCents: Cents.make(6_666_700),
+      maxCents: "infinity",
+      fullOffsetCents: Cents.make(0),
+      phaseOutRate: taxRate(0),
+    }),
   ],
   source: LitoSource2025_26,
 });

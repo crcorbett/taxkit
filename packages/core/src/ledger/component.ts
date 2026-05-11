@@ -1,9 +1,10 @@
-import { Match, Schema } from "effect";
+import { Array, Match, Schema } from "effect";
+
 import { aud, Money, moneyAdd, moneySub } from "../primitives/money.js";
 import { TraceNode } from "../trace/node.js";
 
 export const ComponentId = Schema.String.pipe(
-  Schema.brand("whattax/ComponentId"),
+  Schema.brand("whattax/ComponentId")
 );
 export type ComponentId = typeof ComponentId.Type;
 
@@ -81,14 +82,17 @@ export const isComponentContributing = (c: LedgerComponent): boolean =>
  * ignored. Currency-safety is delegated to `moneyAdd`/`moneySub`.
  */
 export const sumLedgerComponents = (
-  components: ReadonlyArray<LedgerComponent>,
+  components: readonly LedgerComponent[]
 ): Money =>
-  components.reduce<Money>((acc, c) => {
-    if (!isComponentContributing(c)) return acc;
+  Array.reduce(components, aud(0), (acc, c) => {
+    if (!isComponentContributing(c)) {
+      return acc;
+    }
+
     return Match.value(c.effect).pipe(
       Match.when("additive", () => moneyAdd(acc, c.amount)),
       Match.when("subtractive", () => moneySub(acc, c.amount)),
       Match.when("informational", () => acc),
-      Match.exhaustive,
+      Match.exhaustive
     );
-  }, aud(0));
+  });

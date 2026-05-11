@@ -1,4 +1,5 @@
 import { Layer } from "effect";
+
 import { AtoIncomeTax_2025_26_Live } from "../parameters/income-tax-table.js";
 import { AtoLito_2025_26_Live } from "../parameters/lito-table.js";
 import { AtoMedicareLevy_2025_26_Live } from "../parameters/medicare-levy-table.js";
@@ -19,5 +20,5 @@ export const AuAnnualTax2025_26_Live = AnnualTaxLedgerLive.pipe(
   Layer.provideMerge(MedicareLevyLive),
   Layer.provideMerge(AtoIncomeTax_2025_26_Live),
   Layer.provideMerge(AtoLito_2025_26_Live),
-  Layer.provideMerge(AtoMedicareLevy_2025_26_Live),
+  Layer.provideMerge(AtoMedicareLevy_2025_26_Live)
 );

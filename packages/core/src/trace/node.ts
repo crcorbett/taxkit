@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+
 import { RoundingMode } from "../primitives/rounding.js";
 
 export const RuleId = Schema.String.pipe(Schema.brand("whattax/RuleId"));
@@ -23,24 +24,24 @@ export interface TraceNode {
   readonly _tag: "TraceNode";
   readonly ruleId: RuleId;
   readonly title: string;
-  readonly inputs: { readonly [k: string]: unknown };
+  readonly inputs: Readonly<Record<string, unknown>>;
   readonly formula?: string | undefined;
   readonly result: unknown;
   readonly rounding?: RoundingMode | undefined;
-  readonly sources: ReadonlyArray<SourceRef>;
-  readonly children: ReadonlyArray<TraceNode>;
+  readonly sources: readonly SourceRef[];
+  readonly children: readonly TraceNode[];
 }
 
 export interface TraceNodeEncoded {
   readonly _tag: "TraceNode";
   readonly ruleId: string;
   readonly title: string;
-  readonly inputs: { readonly [k: string]: unknown };
+  readonly inputs: Readonly<Record<string, unknown>>;
   readonly formula?: string | undefined;
   readonly result: unknown;
   readonly rounding?: typeof RoundingMode.Encoded | undefined;
-  readonly sources: ReadonlyArray<typeof SourceRef.Encoded>;
-  readonly children: ReadonlyArray<TraceNodeEncoded>;
+  readonly sources: readonly (typeof SourceRef.Encoded)[];
+  readonly children: readonly TraceNodeEncoded[];
 }
 
 export const TraceNode: Schema.Codec<TraceNode, TraceNodeEncoded> =
@@ -53,6 +54,6 @@ export const TraceNode: Schema.Codec<TraceNode, TraceNodeEncoded> =
     rounding: Schema.optional(RoundingMode),
     sources: Schema.Array(SourceRef),
     children: Schema.Array(
-      Schema.suspend((): Schema.Codec<TraceNode, TraceNodeEncoded> => TraceNode),
+      Schema.suspend((): Schema.Codec<TraceNode, TraceNodeEncoded> => TraceNode)
     ),
   });

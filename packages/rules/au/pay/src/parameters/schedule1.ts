@@ -1,4 +1,3 @@
-import { Context, Layer, Schema } from "effect";
 import { makeParameterDescriptor } from "@whattax/core/parameters";
 import {
   Cents,
@@ -9,6 +8,7 @@ import {
   taxYear,
 } from "@whattax/core/primitives";
 import { SourceRef } from "@whattax/core/trace";
+import { Context, Layer, Schema } from "effect";
 
 export const Schedule1Scale = Schema.Literals(["scale1", "scale2"]);
 export type Schedule1Scale = typeof Schedule1Scale.Type;
@@ -20,21 +20,25 @@ export type Schedule1Scale = typeof Schedule1Scale.Type;
  * weekly-equivalent earnings, then rounded to the nearest dollar and converted
  * back to the period.
  */
-export class Schedule1Row
-  extends Schema.TaggedClass<Schedule1Row>()("Schedule1Row", {
+export class Schedule1Row extends Schema.TaggedClass<Schedule1Row>()(
+  "Schedule1Row",
+  {
     scale: Schedule1Scale,
     weeklyMinCents: Cents,
     weeklyMaxCents: CentsOrInfinity,
     a: DecimalCoefficient,
     bDollars: DecimalCoefficient,
-  }) {}
+  }
+) {}
 
-export class Schedule1Table
-  extends Schema.TaggedClass<Schedule1Table>()("Schedule1Table", {
+export class Schedule1Table extends Schema.TaggedClass<Schedule1Table>()(
+  "Schedule1Table",
+  {
     year: TaxYear,
     rows: Schema.Array(Schedule1Row),
     source: SourceRef,
-  }) {}
+  }
+) {}
 
 export class AtoSchedule1Table extends Context.Service<
   AtoSchedule1Table,
@@ -43,12 +47,13 @@ export class AtoSchedule1Table extends Context.Service<
 
 export const Schedule1Source2025_26 = SourceRef.make({
   kind: "ato-publication",
-  title: "ATO Schedule 1 - Statement of formulas for calculating amounts to be withheld",
+  title:
+    "ATO Schedule 1 - Statement of formulas for calculating amounts to be withheld",
   reference:
     "https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld",
 });
 
-export const Schedule1Source2024_25 = Schedule1Source2025_26;
+const Schedule1Source2024_25 = Schedule1Source2025_26;
 
 export const AtoSchedule1TableDescriptor = makeParameterDescriptor({
   id: "whattax/rules-au-pay/parameter/AtoSchedule1Table",
@@ -183,10 +188,8 @@ const table2024_25 = new Schedule1Table({
   source: Schedule1Source2024_25,
 });
 
-export const AtoSchedule1_2025_26_Live = Layer.succeed(AtoSchedule1Table)(
-  table2025_26,
-);
+export const AtoSchedule1_2025_26_Live =
+  Layer.succeed(AtoSchedule1Table)(table2025_26);
 
-export const AtoSchedule1_2024_25_Live = Layer.succeed(AtoSchedule1Table)(
-  table2024_25,
-);
+export const AtoSchedule1_2024_25_Live =
+  Layer.succeed(AtoSchedule1Table)(table2024_25);

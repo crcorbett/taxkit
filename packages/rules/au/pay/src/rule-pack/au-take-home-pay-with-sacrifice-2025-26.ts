@@ -1,4 +1,5 @@
 import { Layer } from "effect";
+
 import { AtoSchedule1_2025_26_Live } from "../parameters/schedule1.js";
 import { NetPayLive } from "../rules/net-pay.js";
 import { PaygWithholdingLive } from "../rules/payg-withholding.js";
@@ -15,5 +16,5 @@ export const AuTakeHomePayWithSacrifice2025_26_Live = NetPayLive.pipe(
   Layer.provideMerge(PayWithholdingsLedgerLive),
   Layer.provideMerge(PaygWithholdingLive),
   Layer.provideMerge(TaxablePayWithSacrificeLive),
-  Layer.provideMerge(AtoSchedule1_2025_26_Live),
+  Layer.provideMerge(AtoSchedule1_2025_26_Live)
 );

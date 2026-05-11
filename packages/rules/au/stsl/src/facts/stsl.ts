@@ -1,6 +1,10 @@
-import { Context, Schema } from "effect";
-import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@whattax/core";
+import {
+  FactQuestion,
+  FactQuestionId,
+  makeFactDescriptor,
+} from "@whattax/core";
 import { LedgerComponent } from "@whattax/core/ledger";
+import { Context, Schema } from "effect";
 
 /**
  * Whether the employee has an STSL (Study and Training Support Loan) debt
@@ -16,7 +20,7 @@ export class StslDebt extends Schema.TaggedClass<StslDebt>()("StslDebt", {
 }) {}
 
 export class StslDebtFact extends Context.Service<StslDebtFact, StslDebt>()(
-  "whattax/rules-au-stsl/fact/StslDebt",
+  "whattax/rules-au-stsl/fact/StslDebt"
 ) {}
 
 export const StslDebtDescriptor = makeFactDescriptor({

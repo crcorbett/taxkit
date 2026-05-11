@@ -1,13 +1,10 @@
-import { Effect, Layer } from "effect";
 import { RuleId, TraceNode } from "@whattax/core/trace";
-import {
-  GrossPayFact,
-  TaxablePay,
-  TaxablePayFact,
-} from "../facts/pay.js";
+import { Effect, Layer } from "effect";
+
+import { GrossPayFact, TaxablePay, TaxablePayFact } from "../facts/pay.js";
 
 export const TaxablePayRuleId = RuleId.make(
-  "whattax/rules-au-pay/rule/TaxablePay",
+  "whattax/rules-au-pay/rule/TaxablePay"
 );
 
 /**
@@ -36,5 +33,5 @@ export const TaxablePayLive = Layer.effect(TaxablePayFact)(
       period: gross.period,
       trace,
     });
-  }),
+  })
 );

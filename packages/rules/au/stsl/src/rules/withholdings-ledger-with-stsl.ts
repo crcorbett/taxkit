@@ -1,13 +1,16 @@
-import { Effect, Layer } from "effect";
-import { GrossPayFact } from "@whattax/rules-au-pay/facts";
-import { PayWithholdingsLedgerFact } from "@whattax/rules-au-pay/facts";
-import { PaygWithholdingComponentFact } from "@whattax/rules-au-pay/facts";
-import { buildPayWithholdingsLedger } from "@whattax/rules-au-pay/rules";
 import { RuleId } from "@whattax/core/trace";
+import {
+  GrossPayFact,
+  PayWithholdingsLedgerFact,
+  PaygWithholdingComponentFact,
+} from "@whattax/rules-au-pay/facts";
+import { buildPayWithholdingsLedger } from "@whattax/rules-au-pay/rules";
+import { Effect, Layer } from "effect";
+
 import { StslComponentFact } from "../facts/stsl.js";
 
 export const PayWithholdingsLedgerWithStslRuleId = RuleId.make(
-  "whattax/rules-au-stsl/rule/PayWithholdingsLedgerWithStsl",
+  "whattax/rules-au-stsl/rule/PayWithholdingsLedgerWithStsl"
 );
 
 /**
@@ -19,12 +22,12 @@ export const PayWithholdingsLedgerWithStslRuleId = RuleId.make(
  * boundary; rules-au-pay does not depend on rules-au-stsl.
  */
 export const PayWithholdingsLedgerWithStslLive = Layer.effect(
-  PayWithholdingsLedgerFact,
+  PayWithholdingsLedgerFact
 )(
   Effect.gen(function* () {
     const gross = yield* GrossPayFact;
     const payg = yield* PaygWithholdingComponentFact;
     const stsl = yield* StslComponentFact;
     return buildPayWithholdingsLedger([payg, stsl], gross.period);
-  }),
+  })
 );

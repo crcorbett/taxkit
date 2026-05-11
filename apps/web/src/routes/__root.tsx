@@ -4,7 +4,9 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+
 import type { RouterContext } from "#/lib/route-runtime";
+
 import "../styles.css";
 
 export const Route = createRootRouteWithContext<RouterContext>()({

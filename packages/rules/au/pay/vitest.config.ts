@@ -13,7 +13,7 @@ export default defineConfig({
     include: ["test/**/*.test.ts"],
     server: {
       deps: {
-        inline: [/^@whattax\//],
+        inline: [/^@whattax\//u],
       },
     },
   },

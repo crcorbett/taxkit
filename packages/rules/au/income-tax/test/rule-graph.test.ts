@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { validateRuleGraph } from "@whattax/core/graph";
+
 import { AnnualTaxableIncomeDescriptor } from "../src/facts/income.js";
 import { AuAnnualTaxRuleDescriptors } from "../src/rule-pack/descriptors.js";
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { validateRuleGraph } from "@whattax/core/graph";
 import { SourceRef } from "@whattax/core/trace";
+
 import {
   GrossPayDescriptor,
   TaxFreeThresholdClaimedDescriptor,
@@ -47,7 +48,7 @@ describe("AU take-home pay rule graph", () => {
   it("surfaces caller question metadata on input fact descriptors", () => {
     expect(GrossPayDescriptor.question?.inputKind).toBe("money");
     expect(TaxFreeThresholdClaimedDescriptor.question?.inputKind).toBe(
-      "boolean",
+      "boolean"
     );
     expect(SalarySacrificeDescriptor.question?.inputKind).toBe("money");
   });
@@ -74,7 +75,7 @@ describe("AU take-home pay rule graph", () => {
     });
 
     expect(issues.map((issue) => issue.kind)).toContain(
-      "parameter-source-mismatch",
+      "parameter-source-mismatch"
     );
   });
 });

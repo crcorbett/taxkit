@@ -1,6 +1,6 @@
-import { Context } from "effect";
 import { makeFactDescriptor } from "@whattax/core";
 import { LedgerComponent } from "@whattax/core/ledger";
+import { Context } from "effect";
 
 export class IncomeTaxComponentFact extends Context.Service<
   IncomeTaxComponentFact,

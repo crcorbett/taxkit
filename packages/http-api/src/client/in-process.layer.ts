@@ -1,6 +1,7 @@
+import { Layer } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 import { HttpApiClient } from "effect/unstable/httpapi";
-import { Layer } from "effect";
+
 import { WhatTaxApi } from "../api.js";
 import { WhatTaxHttpApiService } from "./service.js";
 
@@ -14,8 +15,10 @@ const makeInProcessFetch = (handler: InProcessWhatTaxApiHandler) => {
   };
 
   return Object.assign(
-    (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) =>
-      handler(new Request(input, init)),
+    async (
+      input: Parameters<typeof fetch>[0],
+      init?: Parameters<typeof fetch>[1]
+    ) => await handler(new Request(input, init)),
     "preconnect" in fetchStatics ? { preconnect: fetchStatics.preconnect } : {}
   ) as typeof fetch;
 };

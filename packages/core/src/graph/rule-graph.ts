@@ -1,6 +1,10 @@
 import { Array, Graph, HashMap, HashSet, Option, Schema } from "effect";
+
 import type { FactId } from "../facts/descriptor.js";
-import type { AnyFactDescriptor, AnyRuleDescriptor } from "../rules/descriptor.js";
+import type {
+  AnyFactDescriptor,
+  AnyRuleDescriptor,
+} from "../rules/descriptor.js";
 
 export const GraphValidationIssueKind = Schema.Literals([
   "duplicate-provider",
@@ -11,27 +15,31 @@ export const GraphValidationIssueKind = Schema.Literals([
 ]);
 export type GraphValidationIssueKind = typeof GraphValidationIssueKind.Type;
 
-export class GraphValidationIssue
-  extends Schema.TaggedClass<GraphValidationIssue>()("GraphValidationIssue", {
+export class GraphValidationIssue extends Schema.TaggedClass<GraphValidationIssue>()(
+  "GraphValidationIssue",
+  {
     kind: GraphValidationIssueKind,
     message: Schema.String,
-  }) {}
+  }
+) {}
 
 const factKey = (fact: AnyFactDescriptor): FactId => fact.id;
-const sourceKey = (source: { readonly kind: string; readonly reference: string }) =>
-  `${source.kind}:${source.reference}`;
+const sourceKey = (source: {
+  readonly kind: string;
+  readonly reference: string;
+}) => `${source.kind}:${source.reference}`;
 
 const makeIssue = (
   kind: GraphValidationIssueKind,
-  message: string,
+  message: string
 ): GraphValidationIssue => new GraphValidationIssue({ kind, message });
 
 const collectProviders = (
-  rules: ReadonlyArray<AnyRuleDescriptor>,
-): HashMap.HashMap<FactId, ReadonlyArray<AnyRuleDescriptor>> =>
+  rules: readonly AnyRuleDescriptor[]
+): HashMap.HashMap<FactId, readonly AnyRuleDescriptor[]> =>
   Array.reduce(
     rules,
-    HashMap.empty<FactId, ReadonlyArray<AnyRuleDescriptor>>(),
+    HashMap.empty<FactId, readonly AnyRuleDescriptor[]>(),
     (providers, rule) =>
       Array.reduce(rule.provides, providers, (updatedProviders, provided) => {
         const key = factKey(provided);
@@ -41,12 +49,12 @@ const collectProviders = (
           : Array.of(rule);
 
         return HashMap.set(updatedProviders, key, nextProviders);
-      }),
+      })
   );
 
 const buildDependencyGraph = (
-  rules: ReadonlyArray<AnyRuleDescriptor>,
-  providers: HashMap.HashMap<FactId, ReadonlyArray<AnyRuleDescriptor>>,
+  rules: readonly AnyRuleDescriptor[],
+  providers: HashMap.HashMap<FactId, readonly AnyRuleDescriptor[]>
 ): Graph.DirectedGraph<FactId, string> =>
   Graph.directed<FactId, string>((mutable) => {
     let nodeIndices = HashMap.empty<FactId, Graph.NodeIndex>();
@@ -59,7 +67,9 @@ const buildDependencyGraph = (
       for (const required of rule.requires) {
         const requiredKey = factKey(required);
         const sourceIndex = HashMap.get(nodeIndices, requiredKey);
-        if (Option.isNone(sourceIndex)) continue;
+        if (Option.isNone(sourceIndex)) {
+          continue;
+        }
 
         for (const provided of rule.provides) {
           const providedKey = factKey(provided);
@@ -69,7 +79,7 @@ const buildDependencyGraph = (
               mutable,
               sourceIndex.value,
               targetIndex.value,
-              `${requiredKey} -> ${providedKey}`,
+              `${requiredKey} -> ${providedKey}`
             );
           }
         }
@@ -77,12 +87,19 @@ const buildDependencyGraph = (
     }
   });
 
+/**
+ * Validates that a selected set of rule descriptors can be composed for the
+ * supplied input facts.
+ *
+ * The validator checks provider uniqueness, missing inputs or derived facts,
+ * required official sources, parameter-source drift, and dependency cycles.
+ */
 export const validateRuleGraph = (args: {
-  readonly rules: ReadonlyArray<AnyRuleDescriptor>;
-  readonly inputFacts?: ReadonlyArray<AnyFactDescriptor>;
-}): ReadonlyArray<GraphValidationIssue> => {
+  readonly rules: readonly AnyRuleDescriptor[];
+  readonly inputFacts?: readonly AnyFactDescriptor[];
+}): readonly GraphValidationIssue[] => {
   const inputFacts = HashSet.fromIterable(
-    Array.map(args.inputFacts ?? Array.empty<AnyFactDescriptor>(), factKey),
+    Array.map(args.inputFacts ?? Array.empty<AnyFactDescriptor>(), factKey)
   );
   const providers = collectProviders(args.rules);
 
@@ -95,10 +112,10 @@ export const validateRuleGraph = (args: {
             issues,
             makeIssue(
               "missing-source",
-              `${rule.id} requires at least one source reference`,
-            ),
+              `${rule.id} requires at least one source reference`
+            )
           )
-        : issues,
+        : issues
   );
 
   const duplicateIssues = HashMap.reduce(
@@ -107,7 +124,7 @@ export const validateRuleGraph = (args: {
     (issues, factProviders, factId) => {
       const duplicateProviders = Array.filter(
         factProviders,
-        (provider) => !provider.allowDuplicateProvides,
+        (provider) => provider.allowDuplicateProvides !== true
       );
 
       return duplicateProviders.length > 1
@@ -117,12 +134,12 @@ export const validateRuleGraph = (args: {
               "duplicate-provider",
               `${factId} is provided by ${Array.join(
                 Array.map(duplicateProviders, (provider) => provider.id),
-                ", ",
-              )}`,
-            ),
+                ", "
+              )}`
+            )
           )
         : issues;
-    },
+    }
   );
 
   const parameterSourceIssues = Array.reduce(
@@ -141,11 +158,11 @@ export const validateRuleGraph = (args: {
                 updatedIssues,
                 makeIssue(
                   "parameter-source-mismatch",
-                  `${rule.id} parameter ${parameter.id} source must be listed on rule sources`,
-                ),
-              ),
+                  `${rule.id} parameter ${parameter.id} source must be listed on rule sources`
+                )
+              )
       );
-    },
+    }
   );
 
   const missingProviderIssues = Array.reduce(
@@ -160,11 +177,11 @@ export const validateRuleGraph = (args: {
               updatedIssues,
               makeIssue(
                 "missing-provider",
-                `${rule.id} requires ${key}, but no input fact or rule provides it`,
-              ),
+                `${rule.id} requires ${key}, but no input fact or rule provides it`
+              )
             )
           : updatedIssues;
-      }),
+      })
   );
 
   const dependencyGraph = buildDependencyGraph(args.rules, providers);

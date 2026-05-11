@@ -1,25 +1,24 @@
 import { makeRuleDescriptor } from "@whattax/core/rules";
 import {
   GrossPayDescriptor,
-  TaxablePayDescriptor,
-} from "@whattax/rules-au-pay/facts";
-import {
   PayWithholdingsLedgerDescriptor,
   PaygWithholdingComponentDescriptor,
+  TaxablePayDescriptor,
 } from "@whattax/rules-au-pay/facts";
-import {
-  PayWithholdingsLedgerWithStslLive,
-} from "../rules/withholdings-ledger-with-stsl.js";
-import {
-  StslComponentDescriptor,
-  StslDebtDescriptor,
-} from "../facts/stsl.js";
+
+import { StslComponentDescriptor, StslDebtDescriptor } from "../facts/stsl.js";
 import {
   AtoStslTableDescriptor,
   StslSource2025_26,
 } from "../parameters/stsl-table.js";
-import { StslComponentLive, StslComponentRuleId } from "../rules/stsl-component.js";
-import { PayWithholdingsLedgerWithStslRuleId } from "../rules/withholdings-ledger-with-stsl.js";
+import {
+  StslComponentLive,
+  StslComponentRuleId,
+} from "../rules/stsl-component.js";
+import {
+  PayWithholdingsLedgerWithStslLive,
+  PayWithholdingsLedgerWithStslRuleId,
+} from "../rules/withholdings-ledger-with-stsl.js";
 
 export const StslComponentRuleDescriptor = makeRuleDescriptor({
   id: StslComponentRuleId,

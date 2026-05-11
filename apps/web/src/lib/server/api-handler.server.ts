@@ -1,9 +1,11 @@
 import "@tanstack/react-start/server-only";
-
-import * as HttpRouter from "effect/unstable/http/HttpRouter";
 import { WhatTaxServerLayer } from "@whattax/http-api/server";
+import { Context } from "effect";
+import * as HttpRouter from "effect/unstable/http/HttpRouter";
 
 const { handler, dispose } = HttpRouter.toWebHandler(WhatTaxServerLayer);
+type HandlerOptions = NonNullable<Parameters<typeof handler>[1]>;
+const handlerOptions = Context.empty() satisfies HandlerOptions;
 
 let signalRegistered = false;
 
@@ -27,7 +29,7 @@ const ensureDisposeOnShutdown = () => {
   });
 };
 
-export const apiHandler = (request: Request): Promise<Response> => {
+export const apiHandler = async (request: Request): Promise<Response> => {
   ensureDisposeOnShutdown();
-  return handler(request, {} as never);
+  return await handler(request, handlerOptions);
 };

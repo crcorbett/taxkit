@@ -1,4 +1,3 @@
-import { Context, Layer, Schema } from "effect";
 import { makeParameterDescriptor } from "@whattax/core/parameters";
 import {
   Cents,
@@ -9,6 +8,7 @@ import {
   taxYear,
 } from "@whattax/core/primitives";
 import { SourceRef } from "@whattax/core/trace";
+import { Context, Layer, Schema } from "effect";
 
 /**
  * ATO Schedule 8 STSL coefficient row.
@@ -30,12 +30,13 @@ export class StslTable extends Schema.TaggedClass<StslTable>()("StslTable", {
 }) {}
 
 export class AtoStslTable extends Context.Service<AtoStslTable, StslTable>()(
-  "whattax/rules-au-stsl/parameter/AtoStslTable",
+  "whattax/rules-au-stsl/parameter/AtoStslTable"
 ) {}
 
 export const StslSource2025_26 = SourceRef.make({
   kind: "ato-publication",
-  title: "ATO Schedule 8 - Statement of formulas for calculating study and training support loans components",
+  title:
+    "ATO Schedule 8 - Statement of formulas for calculating study and training support loans components",
   reference:
     "https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components",
 });
@@ -72,7 +73,7 @@ const table2025_26 = new StslTable({
     new StslRow({
       weeklyMinCents: Cents.make(344_700),
       weeklyMaxCents: "infinity",
-      a: decimalCoefficient(0.10),
+      a: decimalCoefficient(0.1),
       bDollars: decimalCoefficient(0),
     }),
   ],

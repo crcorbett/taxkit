@@ -1,10 +1,11 @@
-import { Layer } from "effect";
 import { AtoSchedule1_2025_26_Live } from "@whattax/rules-au-pay/parameters";
 import {
   NetPayLive,
   PaygWithholdingLive,
   TaxablePayLive,
 } from "@whattax/rules-au-pay/rules";
+import { Layer } from "effect";
+
 import { AtoStsl_2025_26_Live } from "../parameters/stsl-table.js";
 import { StslComponentLive } from "../rules/stsl-component.js";
 import { PayWithholdingsLedgerWithStslLive } from "../rules/withholdings-ledger-with-stsl.js";
@@ -21,5 +22,5 @@ export const AuTakeHomePayWithStsl2025_26_Live = NetPayLive.pipe(
   Layer.provideMerge(PaygWithholdingLive),
   Layer.provideMerge(TaxablePayLive),
   Layer.provideMerge(AtoSchedule1_2025_26_Live),
-  Layer.provideMerge(AtoStsl_2025_26_Live),
+  Layer.provideMerge(AtoStsl_2025_26_Live)
 );

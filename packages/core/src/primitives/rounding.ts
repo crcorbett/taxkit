@@ -1,5 +1,7 @@
 import { Match, Schema } from "effect";
-import { aud, type Money } from "./money.js";
+
+import { aud } from "./money.js";
+import type { Money } from "./money.js";
 
 export const RoundingMode = Schema.Literals([
   "none",
@@ -21,7 +23,7 @@ export const roundCentsToDollar = (cents: number, mode: RoundingMode): number =>
     Match.when("floor-dollar", () => Math.floor(cents / 100) * 100),
     Match.when("ceil-dollar", () => Math.ceil(cents / 100) * 100),
     Match.when("ato-withholding-rounding", () => Math.round(cents / 100) * 100),
-    Match.exhaustive,
+    Match.exhaustive
   );
 
 export const roundMoney = (m: Money, mode: RoundingMode): Money =>

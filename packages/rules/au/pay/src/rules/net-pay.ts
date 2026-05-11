@@ -1,6 +1,7 @@
-import { Effect, Layer } from "effect";
 import { moneySub } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
+import { Effect, Layer } from "effect";
+
 import { GrossPayFact, NetPay, NetPayFact } from "../facts/pay.js";
 import { PayWithholdingsLedgerFact } from "../facts/withholdings.js";
 
@@ -31,5 +32,5 @@ export const NetPayLive = Layer.effect(NetPayFact)(
       period: gross.period,
       trace,
     });
-  }),
+  })
 );

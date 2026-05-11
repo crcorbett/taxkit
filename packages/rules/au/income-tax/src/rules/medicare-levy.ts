@@ -1,17 +1,19 @@
-import { Effect, Layer } from "effect";
-import { ComponentId, type LedgerComponent } from "@whattax/core/ledger";
+import { ComponentId } from "@whattax/core/ledger";
+import type { LedgerComponent } from "@whattax/core/ledger";
 import { aud } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
-import { AnnualTaxableIncomeFact } from "../facts/income.js";
+import { Effect, Layer } from "effect";
+
 import { MedicareLevyComponentFact } from "../facts/components.js";
+import { AnnualTaxableIncomeFact } from "../facts/income.js";
 import { AtoMedicareLevyTable } from "../parameters/medicare-levy-table.js";
 
 export const MedicareLevyRuleId = RuleId.make(
-  "whattax/rules-au-income-tax/rule/MedicareLevy",
+  "whattax/rules-au-income-tax/rule/MedicareLevy"
 );
 
 export const MedicareLevyComponentId = ComponentId.make(
-  "whattax/rules-au-income-tax/component/MedicareLevy",
+  "whattax/rules-au-income-tax/component/MedicareLevy"
 );
 
 /**
@@ -36,7 +38,9 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
       levyCents = 0;
       formula = "levy = 0 (below threshold)";
     } else if (incomeCents <= table.shadeInMaxCents) {
-      levyCents = Math.round(table.shadeInRate * (incomeCents - table.thresholdCents));
+      levyCents = Math.round(
+        table.shadeInRate * (incomeCents - table.thresholdCents)
+      );
       formula = "levy = round(shadeInRate * (income - threshold))";
     } else {
       levyCents = Math.round(table.levyRate * incomeCents);
@@ -74,5 +78,5 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
       trace,
     };
     return component;
-  }),
+  })
 );

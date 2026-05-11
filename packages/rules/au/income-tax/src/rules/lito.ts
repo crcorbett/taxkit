@@ -1,31 +1,42 @@
-import { Effect, Layer } from "effect";
-import { ComponentId, type LedgerComponent } from "@whattax/core/ledger";
+import { CalculationError } from "@whattax/core/errors";
+import { ComponentId } from "@whattax/core/ledger";
+import type { LedgerComponent } from "@whattax/core/ledger";
 import { aud } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
-import { AnnualTaxableIncomeFact } from "../facts/income.js";
-import { LitoComponentFact } from "../facts/components.js";
-import { AtoLitoTable, type LitoBracket } from "../parameters/lito-table.js";
+import { Array, Effect, Layer, Option } from "effect";
 
-export const LitoRuleId = RuleId.make(
-  "whattax/rules-au-income-tax/rule/Lito",
-);
+import { LitoComponentFact } from "../facts/components.js";
+import { AnnualTaxableIncomeFact } from "../facts/income.js";
+import { AtoLitoTable } from "../parameters/lito-table.js";
+import type { LitoBracket } from "../parameters/lito-table.js";
+
+export const LitoRuleId = RuleId.make("whattax/rules-au-income-tax/rule/Lito");
 
 export const LitoComponentId = ComponentId.make(
-  "whattax/rules-au-income-tax/component/Lito",
+  "whattax/rules-au-income-tax/component/Lito"
 );
 
 const findBracket = (
-  brackets: ReadonlyArray<LitoBracket>,
-  incomeCents: number,
-): LitoBracket => {
-  // Iterate highest-threshold-first; first match wins.
-  // Uses > (not >=) so $37,500 stays in the flat bracket, not the phase-out bracket.
-  for (let i = brackets.length - 1; i >= 0; i--) {
-    const b = brackets[i]!;
-    if (incomeCents > b.thresholdCents) return b;
-  }
-  // Income of $0 falls through; return the first bracket (flat full offset).
-  return brackets[0]!;
+  brackets: readonly LitoBracket[],
+  incomeCents: number
+): Effect.Effect<LitoBracket, CalculationError> => {
+  const bracket = Option.orElse(
+    Array.findFirst(
+      Array.reverse(brackets),
+      (b) => incomeCents > b.thresholdCents
+    ),
+    () => Array.head(brackets)
+  );
+
+  return Option.match(bracket, {
+    onNone: () =>
+      Effect.fail(
+        new CalculationError({
+          message: `whattax/rules-au-income-tax: no LITO bracket covers income=${incomeCents} cents`,
+        })
+      ),
+    onSome: Effect.succeed,
+  });
 };
 
 /**
@@ -44,11 +55,11 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     const table = yield* AtoLitoTable;
 
     const incomeCents = income.income.cents;
-    const bracket = findBracket(table.brackets, incomeCents);
+    const bracket = yield* findBracket(table.brackets, incomeCents);
 
     const rawOffsetCents = Math.round(
       bracket.fullOffsetCents -
-        bracket.phaseOutRate * (incomeCents - bracket.thresholdCents),
+        bracket.phaseOutRate * (incomeCents - bracket.thresholdCents)
     );
     const offsetCents = Math.max(0, rawOffsetCents);
     const offsetAmount = aud(offsetCents);
@@ -64,7 +75,8 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
         phaseOutRate: bracket.phaseOutRate,
         tableYear: table.year,
       },
-      formula: "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))",
+      formula:
+        "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))",
       result: offsetAmount,
       rounding: "round-to-nearest-cent",
       sources: [table.source],
@@ -81,5 +93,5 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
       trace,
     };
     return component;
-  }),
+  })
 );

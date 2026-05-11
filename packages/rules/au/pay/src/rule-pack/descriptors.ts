@@ -1,4 +1,5 @@
 import { makeRuleDescriptor } from "@whattax/core/rules";
+
 import {
   GrossPayDescriptor,
   NetPayDescriptor,
@@ -10,15 +11,15 @@ import {
   PayWithholdingsLedgerDescriptor,
   PaygWithholdingComponentDescriptor,
 } from "../facts/withholdings.js";
+import {
+  AtoSchedule1TableDescriptor,
+  Schedule1Source2025_26,
+} from "../parameters/schedule1.js";
 import { NetPayLive, NetPayRuleId } from "../rules/net-pay.js";
 import {
   PaygWithholdingLive,
   PaygWithholdingRuleId,
 } from "../rules/payg-withholding.js";
-import {
-  AtoSchedule1TableDescriptor,
-  Schedule1Source2025_26,
-} from "../parameters/schedule1.js";
 import {
   TaxablePayWithSacrificeLive,
   TaxablePayWithSacrificeRuleId,

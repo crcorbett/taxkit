@@ -1,6 +1,7 @@
-import { Context, Effect, Layer, Schema } from "effect";
 import { Money } from "@whattax/core/primitives";
 import { TraceNode } from "@whattax/core/trace";
+import { Context, Effect, Layer, Schema } from "effect";
+
 import {
   GrossPay,
   GrossPayFact,
@@ -15,8 +16,9 @@ import {
   PayWithholdingsLedgerFact,
 } from "../facts/withholdings.js";
 
-export class TakeHomePayReport
-  extends Schema.TaggedClass<TakeHomePayReport>()("TakeHomePayReport", {
+export class TakeHomePayReport extends Schema.TaggedClass<TakeHomePayReport>()(
+  "TakeHomePayReport",
+  {
     grossPay: Money,
     taxablePay: Money,
     withholdings: PayWithholdingsLedger,
@@ -25,7 +27,8 @@ export class TakeHomePayReport
     period: PayPeriod,
     rulePackVersion: Schema.String,
     trace: TraceNode,
-  }) {}
+  }
+) {}
 
 /**
  * The calculator. Requires the derived facts and surfaces the report
@@ -66,9 +69,9 @@ export const TakeHomeScenarioLive = (input: unknown) =>
             TaxFreeThresholdClaimedFact,
             new TaxFreeThresholdClaimed({
               value: scenario.taxFreeThresholdClaimed,
-            }),
-          ),
-        ),
-      ),
-    ),
+            })
+          )
+        )
+      )
+    )
   );

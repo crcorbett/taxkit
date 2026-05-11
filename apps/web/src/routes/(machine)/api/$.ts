@@ -1,24 +1,32 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import type { WhatTaxServerContext } from "#/lib/route-runtime";
 
-const requireServerContext = (context: unknown): WhatTaxServerContext => {
-  const serverContext = (context as { serverContext?: WhatTaxServerContext })
-    .serverContext;
+const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
+  typeof value === "object" && value !== null;
 
-  if (!serverContext) {
+const isWhatTaxServerContext = (
+  value: unknown
+): value is WhatTaxServerContext =>
+  isRecord(value) && typeof value.handleApiRequest === "function";
+
+const requireServerContext = (context: unknown): WhatTaxServerContext => {
+  const serverContext = isRecord(context) ? context.serverContext : undefined;
+
+  if (!isWhatTaxServerContext(serverContext)) {
     throw new Error("WhatTax server context is required for API routes");
   }
 
   return serverContext;
 };
 
-const serve = ({
+const serve = async ({
   context,
   request,
 }: {
   readonly context: unknown;
   readonly request: Request;
-}) => requireServerContext(context).handleApiRequest(request);
+}) => await requireServerContext(context).handleApiRequest(request);
 
 export const Route = createFileRoute("/(machine)/api/$")({
   server: {

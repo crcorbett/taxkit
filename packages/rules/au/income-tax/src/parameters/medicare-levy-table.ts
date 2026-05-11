@@ -1,7 +1,13 @@
-import { Context, Layer, Schema } from "effect";
 import { makeParameterDescriptor } from "@whattax/core/parameters";
-import { Cents, TaxRate, TaxYear, taxRate, taxYear } from "@whattax/core/primitives";
+import {
+  Cents,
+  TaxRate,
+  TaxYear,
+  taxRate,
+  taxYear,
+} from "@whattax/core/primitives";
 import { SourceRef } from "@whattax/core/trace";
+import { Context, Layer, Schema } from "effect";
 
 /**
  * Medicare Levy parameter table.
@@ -15,15 +21,17 @@ import { SourceRef } from "@whattax/core/trace";
  * The shade-in max is chosen so the two formulas produce the same value
  * at the boundary: shadeInRate*(shadeInMax-threshold) = levyRate*shadeInMax
  */
-export class MedicareLevyTable
-  extends Schema.TaggedClass<MedicareLevyTable>()("MedicareLevyTable", {
+export class MedicareLevyTable extends Schema.TaggedClass<MedicareLevyTable>()(
+  "MedicareLevyTable",
+  {
     year: TaxYear,
     thresholdCents: Cents,
     shadeInMaxCents: Cents,
     shadeInRate: TaxRate,
     levyRate: TaxRate,
     source: SourceRef,
-  }) {}
+  }
+) {}
 
 export class AtoMedicareLevyTable extends Context.Service<
   AtoMedicareLevyTable,
@@ -50,9 +58,10 @@ const table2025_26 = new MedicareLevyTable({
   year: taxYear("2025-26"),
   thresholdCents: Cents.make(2_722_200),
   shadeInMaxCents: Cents.make(3_402_700),
-  shadeInRate: taxRate(0.10),
+  shadeInRate: taxRate(0.1),
   levyRate: taxRate(0.02),
   source: MedicareLevySource2025_26,
 });
 
-export const AtoMedicareLevy_2025_26_Live = Layer.succeed(AtoMedicareLevyTable)(table2025_26);
+export const AtoMedicareLevy_2025_26_Live =
+  Layer.succeed(AtoMedicareLevyTable)(table2025_26);

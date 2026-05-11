@@ -5,5 +5,5 @@ export class CalculationError extends Schema.TaggedErrorClass<CalculationError>(
   {
     message: Schema.String,
     cause: Schema.optional(Schema.Unknown),
-  },
+  }
 ) {}

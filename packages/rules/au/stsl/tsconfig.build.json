@@ -3,6 +3,7 @@
   "include": ["src/**/*.ts"],
   "compilerOptions": {
     "rootDir": "src",
-    "noEmit": false
+    "noEmit": false,
+    "strictNullChecks": true
   }
 }

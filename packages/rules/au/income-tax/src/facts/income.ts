@@ -1,6 +1,10 @@
-import { Context, Schema } from "effect";
-import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@whattax/core";
+import {
+  FactQuestion,
+  FactQuestionId,
+  makeFactDescriptor,
+} from "@whattax/core";
 import { Money } from "@whattax/core/primitives";
+import { Context, Schema } from "effect";
 
 /**
  * Annual taxable income — the base for income tax and Medicare Levy.
@@ -8,10 +12,12 @@ import { Money } from "@whattax/core/primitives";
  * An *input* fact: provided by the caller, not derived within this package.
  * In the full system this would be derived from gross income minus deductions.
  */
-export class AnnualTaxableIncome
-  extends Schema.TaggedClass<AnnualTaxableIncome>()("AnnualTaxableIncome", {
+export class AnnualTaxableIncome extends Schema.TaggedClass<AnnualTaxableIncome>()(
+  "AnnualTaxableIncome",
+  {
     income: Money,
-  }) {}
+  }
+) {}
 
 export class AnnualTaxableIncomeFact extends Context.Service<
   AnnualTaxableIncomeFact,
@@ -26,7 +32,7 @@ export const AnnualTaxableIncomeDescriptor = makeFactDescriptor({
   tag: AnnualTaxableIncomeFact,
   question: new FactQuestion({
     id: FactQuestionId.make(
-      "whattax/rules-au-income-tax/question/AnnualTaxableIncome",
+      "whattax/rules-au-income-tax/question/AnnualTaxableIncome"
     ),
     prompt: "Annual taxable income",
     inputKind: "money",

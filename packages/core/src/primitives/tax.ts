@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+
 import { Cents } from "./money.js";
 
 export const TaxYear = Schema.String.pipe(Schema.brand("whattax/TaxYear"));
@@ -8,7 +9,7 @@ export const TaxRate = Schema.Number.pipe(Schema.brand("whattax/TaxRate"));
 export type TaxRate = typeof TaxRate.Type;
 
 export const DecimalCoefficient = Schema.Number.pipe(
-  Schema.brand("whattax/DecimalCoefficient"),
+  Schema.brand("whattax/DecimalCoefficient")
 );
 export type DecimalCoefficient = typeof DecimalCoefficient.Type;
 

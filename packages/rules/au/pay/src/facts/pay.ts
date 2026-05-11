@@ -1,7 +1,11 @@
-import { Context, Match, Schema } from "effect";
-import { Money } from "@whattax/core";
-import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@whattax/core";
+import {
+  FactQuestion,
+  FactQuestionId,
+  Money,
+  makeFactDescriptor,
+} from "@whattax/core";
 import { TraceNode } from "@whattax/core/trace";
+import { Context, Match, Schema } from "effect";
 
 export const PayPeriod = Schema.Literals(["weekly", "fortnightly", "monthly"]);
 export type PayPeriod = typeof PayPeriod.Type;
@@ -13,24 +17,25 @@ export type PayPeriod = typeof PayPeriod.Type;
  * Lives next to the PayPeriod type because every withholding rule that
  * dispatches off a weekly-equivalent table needs it (PAYG, STSL, …).
  */
-export const payPeriodToWeeklyFactor = (period: PayPeriod): number => {
-  return Match.value(period).pipe(
+export const payPeriodToWeeklyFactor = (period: PayPeriod): number =>
+  Match.value(period).pipe(
     Match.when("weekly", () => 1),
     Match.when("fortnightly", () => 0.5),
     Match.when("monthly", () => 3 / 13),
-    Match.exhaustive,
+    Match.exhaustive
   );
-};
 
 export const scaleWeeklyWithholdingToPayPeriodDollars = (
   weeklyWithholdingDollars: number,
-  period: PayPeriod,
+  period: PayPeriod
 ): number =>
   Match.value(period).pipe(
     Match.when("weekly", () => weeklyWithholdingDollars),
     Match.when("fortnightly", () => weeklyWithholdingDollars * 2),
-    Match.when("monthly", () => Math.round((weeklyWithholdingDollars * 13) / 3)),
-    Match.exhaustive,
+    Match.when("monthly", () =>
+      Math.round((weeklyWithholdingDollars * 13) / 3)
+    ),
+    Match.exhaustive
   );
 
 export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
@@ -39,7 +44,7 @@ export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
 }) {}
 
 export class GrossPayFact extends Context.Service<GrossPayFact, GrossPay>()(
-  "whattax/rules-au-pay/fact/GrossPay",
+  "whattax/rules-au-pay/fact/GrossPay"
 ) {}
 
 export const GrossPayDescriptor = makeFactDescriptor({
@@ -55,11 +60,10 @@ export const GrossPayDescriptor = makeFactDescriptor({
   }),
 });
 
-export class TaxFreeThresholdClaimed
-  extends Schema.TaggedClass<TaxFreeThresholdClaimed>()(
-    "TaxFreeThresholdClaimed",
-    { value: Schema.Boolean },
-  ) {}
+export class TaxFreeThresholdClaimed extends Schema.TaggedClass<TaxFreeThresholdClaimed>()(
+  "TaxFreeThresholdClaimed",
+  { value: Schema.Boolean }
+) {}
 
 export class TaxFreeThresholdClaimedFact extends Context.Service<
   TaxFreeThresholdClaimedFact,
@@ -74,7 +78,7 @@ export const TaxFreeThresholdClaimedDescriptor = makeFactDescriptor({
   tag: TaxFreeThresholdClaimedFact,
   question: new FactQuestion({
     id: FactQuestionId.make(
-      "whattax/rules-au-pay/question/TaxFreeThresholdClaimed",
+      "whattax/rules-au-pay/question/TaxFreeThresholdClaimed"
     ),
     prompt: "Tax-free threshold claimed",
     inputKind: "boolean",
@@ -87,9 +91,10 @@ export class TaxablePay extends Schema.TaggedClass<TaxablePay>()("TaxablePay", {
   trace: TraceNode,
 }) {}
 
-export class TaxablePayFact extends Context.Service<TaxablePayFact, TaxablePay>()(
-  "whattax/rules-au-pay/fact/TaxablePay",
-) {}
+export class TaxablePayFact extends Context.Service<
+  TaxablePayFact,
+  TaxablePay
+>()("whattax/rules-au-pay/fact/TaxablePay") {}
 
 export const TaxablePayDescriptor = makeFactDescriptor({
   id: "whattax/rules-au-pay/fact/TaxablePay",
@@ -106,7 +111,7 @@ export class NetPay extends Schema.TaggedClass<NetPay>()("NetPay", {
 }) {}
 
 export class NetPayFact extends Context.Service<NetPayFact, NetPay>()(
-  "whattax/rules-au-pay/fact/NetPay",
+  "whattax/rules-au-pay/fact/NetPay"
 ) {}
 
 export const NetPayDescriptor = makeFactDescriptor({

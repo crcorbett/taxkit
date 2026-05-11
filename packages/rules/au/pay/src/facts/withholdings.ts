@@ -1,8 +1,9 @@
-import { Context, Schema } from "effect";
 import { makeFactDescriptor } from "@whattax/core";
 import { LedgerComponent } from "@whattax/core/ledger";
 import { Money } from "@whattax/core/primitives";
 import { TraceNode } from "@whattax/core/trace";
+import { Context, Schema } from "effect";
+
 import { PayPeriod } from "./pay.js";
 
 /**
@@ -34,13 +35,15 @@ export const PaygWithholdingComponentDescriptor = makeFactDescriptor({
  * zeroed components and `information-only`). Disabled components remain in
  * `components` so the trace can show that they were considered.
  */
-export class PayWithholdingsLedger
-  extends Schema.TaggedClass<PayWithholdingsLedger>()("PayWithholdingsLedger", {
+export class PayWithholdingsLedger extends Schema.TaggedClass<PayWithholdingsLedger>()(
+  "PayWithholdingsLedger",
+  {
     components: Schema.Array(LedgerComponent),
     total: Money,
     period: PayPeriod,
     trace: TraceNode,
-  }) {}
+  }
+) {}
 
 export class PayWithholdingsLedgerFact extends Context.Service<
   PayWithholdingsLedgerFact,

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": [
+    "apps/web/src/routeTree.gen.ts",
+    "**/dist/**",
+    "**/.output/**",
+    "**/.turbo/**",
+  ],
+  "ignoreDependencies": [
+    "@types/node",
+    "@types/react",
+    "@types/react-dom",
+    "@whattax/tsconfig",
+    "typescript",
+  ],
+  "ignoreExportsUsedInFile": true,
+  "workspaces": {
+    ".": {
+      "entry": [
+        "package.json",
+        "turbo.json",
+        "oxfmt.config.ts",
+        "oxlint.config.ts",
+      ],
+      "project": ["*.ts", "*.json", "*.jsonc", "docs/**/*.md"],
+    },
+    "apps/web": {
+      "entry": [
+        "src/server.ts",
+        "src/router.tsx",
+        "src/routes/**/*.ts",
+        "src/routes/**/*.tsx",
+        "vite.config.ts",
+      ],
+      "project": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"],
+    },
+    "packages/core": {
+      "entry": ["src/index.ts", "src/*/index.ts"],
+      "project": ["src/**/*.ts"],
+    },
+    "packages/http-api": {
+      "entry": [
+        "src/index.ts",
+        "src/api.ts",
+        "src/client/index.ts",
+        "src/client/*.ts",
+        "src/handlers/index.ts",
+        "src/handlers/*.ts",
+        "src/server.ts",
+      ],
+      "project": ["src/**/*.ts"],
+    },
+    "packages/rules/au/income-tax": {
+      "entry": ["src/index.ts", "src/*/index.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+    },
+    "packages/rules/au/pay": {
+      "entry": ["src/index.ts", "src/*/index.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+    },
+    "packages/rules/au/stsl": {
+      "entry": ["src/index.ts", "src/*/index.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+    },
+  },
+}

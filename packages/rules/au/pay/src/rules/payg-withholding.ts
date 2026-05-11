@@ -1,34 +1,36 @@
-import { Array, Effect, Layer, Option } from "effect";
 import { CalculationError } from "@whattax/core/errors";
-import { ComponentId, type LedgerComponent } from "@whattax/core/ledger";
+import { ComponentId } from "@whattax/core/ledger";
+import type { LedgerComponent } from "@whattax/core/ledger";
 import { audDollars } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
+import { Array, Effect, Layer, Option } from "effect";
+
 import {
   payPeriodToWeeklyFactor,
-  scaleWeeklyWithholdingToPayPeriodDollars,
   TaxFreeThresholdClaimedFact,
   TaxablePayFact,
+  scaleWeeklyWithholdingToPayPeriodDollars,
 } from "../facts/pay.js";
 import { PaygWithholdingComponentFact } from "../facts/withholdings.js";
-import {
-  AtoSchedule1Table,
-  type Schedule1Scale,
-  type Schedule1Row,
-  type Schedule1Table,
+import { AtoSchedule1Table } from "../parameters/schedule1.js";
+import type {
+  Schedule1Row,
+  Schedule1Scale,
+  Schedule1Table,
 } from "../parameters/schedule1.js";
 
 export const PaygWithholdingRuleId = RuleId.make(
-  "whattax/rules-au-pay/rule/PaygWithholding",
+  "whattax/rules-au-pay/rule/PaygWithholding"
 );
 
 export const PaygWithholdingComponentId = ComponentId.make(
-  "whattax/rules-au-pay/component/Payg",
+  "whattax/rules-au-pay/component/Payg"
 );
 
 const findRow = (
   table: Schedule1Table,
   scale: Schedule1Scale,
-  weeklyFormulaCents: number,
+  weeklyFormulaCents: number
 ): Effect.Effect<Schedule1Row, CalculationError> => {
   const row = Array.findFirst(
     table.rows,
@@ -36,7 +38,7 @@ const findRow = (
       r.scale === scale &&
       weeklyFormulaCents >= r.weeklyMinCents &&
       (r.weeklyMaxCents === "infinity" ||
-        weeklyFormulaCents <= r.weeklyMaxCents),
+        weeklyFormulaCents <= r.weeklyMaxCents)
   );
 
   return Option.match(row, {
@@ -44,7 +46,7 @@ const findRow = (
       Effect.fail(
         new CalculationError({
           message: `whattax/rules-au-pay: no Schedule1 ${scale} row covers weekly formula cents=${weeklyFormulaCents}`,
-        }),
+        })
       ),
     onSome: Effect.succeed,
   });
@@ -68,16 +70,20 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
     const scale = tftClaimed.value ? "scale2" : "scale1";
     const row = yield* findRow(table, scale, weeklyFormulaCents);
 
-    const weeklyWithholdingDollarsRaw = row.a * weeklyFormulaDollars - row.bDollars;
+    const weeklyWithholdingDollarsRaw =
+      row.a * weeklyFormulaDollars - row.bDollars;
     const weeklyWithholdingDollarsRounded = Math.round(
-      weeklyWithholdingDollarsRaw,
+      weeklyWithholdingDollarsRaw
     );
-    const weeklyWithholdingDollars = Math.max(0, weeklyWithholdingDollarsRounded);
+    const weeklyWithholdingDollars = Math.max(
+      0,
+      weeklyWithholdingDollarsRounded
+    );
     const periodWithholding = audDollars(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
-        taxable.period,
-      ),
+        taxable.period
+      )
     );
 
     const trace = TraceNode.make({
@@ -112,5 +118,5 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
     };
 
     return component;
-  }),
+  })
 );

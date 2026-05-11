@@ -1,6 +1,11 @@
-import { Context, Schema } from "effect";
-import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@whattax/core";
+import {
+  FactQuestion,
+  FactQuestionId,
+  makeFactDescriptor,
+} from "@whattax/core";
 import { Money } from "@whattax/core/primitives";
+import { Context, Schema } from "effect";
+
 import { PayPeriod } from "./pay.js";
 
 /**
@@ -9,11 +14,13 @@ import { PayPeriod } from "./pay.js";
  * An *input* fact: only required when a pack composes the
  * sacrifice-aware TaxablePay rule. The base pack does not require it.
  */
-export class SalarySacrifice
-  extends Schema.TaggedClass<SalarySacrifice>()("SalarySacrifice", {
+export class SalarySacrifice extends Schema.TaggedClass<SalarySacrifice>()(
+  "SalarySacrifice",
+  {
     amount: Money,
     period: PayPeriod,
-  }) {}
+  }
+) {}
 
 export class SalarySacrificeFact extends Context.Service<
   SalarySacrificeFact,

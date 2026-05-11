@@ -14,12 +14,12 @@ export const TaxablePayLive: Layer.Layer<
 > = Layer.effect(
   TaxablePayFact,
   Effect.gen(function* () {
-    const grossPay = yield* GrossPayFact
-    const salarySacrifice = yield* SalarySacrificeFact
+    const grossPay = yield* GrossPayFact;
+    const salarySacrifice = yield* SalarySacrificeFact;
 
-    return deriveTaxablePay(grossPay, salarySacrifice)
+    return deriveTaxablePay(grossPay, salarySacrifice);
   })
-)
+);
 ```
 
 If a calculator still has `R != never` after rule and scenario layers are provided, the selected world is missing dependencies.
@@ -30,16 +30,16 @@ Descriptors are required for graph visualization, validation, explanation, docum
 
 ```ts
 export interface RuleDescriptor<ROut, E, RIn> {
-  readonly id: RuleId
-  readonly title: string
-  readonly domain: RuleDomain
-  readonly provides: ReadonlyArray<FactDescriptor.Any>
-  readonly requires: ReadonlyArray<FactDescriptor.Any>
-  readonly layer: Layer.Layer<ROut, E, RIn>
-  readonly effective: EffectivePeriod
-  readonly sources: ReadonlyArray<SourceRef>
-  readonly togglePolicy: RuleTogglePolicy
-  readonly tracePolicy: TracePolicy
+  readonly id: RuleId;
+  readonly title: string;
+  readonly domain: RuleDomain;
+  readonly provides: ReadonlyArray<FactDescriptor.Any>;
+  readonly requires: ReadonlyArray<FactDescriptor.Any>;
+  readonly layer: Layer.Layer<ROut, E, RIn>;
+  readonly effective: EffectivePeriod;
+  readonly sources: ReadonlyArray<SourceRef>;
+  readonly togglePolicy: RuleTogglePolicy;
+  readonly tracePolicy: TracePolicy;
 }
 ```
 
@@ -50,14 +50,14 @@ The descriptor must match the actual layer. CI graph validation should catch des
 Parameter tables are services, not imported globals. Algorithms depend on parameter services.
 
 ```ts
-export class AtoSchedule1Table
-  extends Context.Tag("whattax/au/payg/AtoSchedule1Table")<
-    AtoSchedule1Table,
-    Schedule1Table
-  >() {}
+export class AtoSchedule1Table extends Context.Tag(
+  "whattax/au/payg/AtoSchedule1Table"
+)<AtoSchedule1Table, Schedule1Table>() {}
 
-export const AtoSchedule1_2025_26_Live =
-  Layer.succeed(AtoSchedule1Table, schedule1_2025_26)
+export const AtoSchedule1_2025_26_Live = Layer.succeed(
+  AtoSchedule1Table,
+  schedule1_2025_26
+);
 ```
 
 This lets consumers swap tax-year parameters without changing algorithms.

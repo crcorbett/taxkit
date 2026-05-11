@@ -1,8 +1,8 @@
-import { Context, Schema } from "effect";
 import { makeFactDescriptor } from "@whattax/core";
 import { LedgerComponent } from "@whattax/core/ledger";
 import { Money } from "@whattax/core/primitives";
 import { TraceNode } from "@whattax/core/trace";
+import { Context, Schema } from "effect";
 
 /**
  * Aggregated annual tax ledger.
@@ -12,12 +12,14 @@ import { TraceNode } from "@whattax/core/trace";
  * Flooring to zero is the *calculator's* responsibility — kept out of the
  * ledger so callers can inspect the raw arithmetic.
  */
-export class AnnualTaxLedger
-  extends Schema.TaggedClass<AnnualTaxLedger>()("AnnualTaxLedger", {
+export class AnnualTaxLedger extends Schema.TaggedClass<AnnualTaxLedger>()(
+  "AnnualTaxLedger",
+  {
     components: Schema.Array(LedgerComponent),
     rawLiability: Money,
     trace: TraceNode,
-  }) {}
+  }
+) {}
 
 export class AnnualTaxLedgerFact extends Context.Service<
   AnnualTaxLedgerFact,

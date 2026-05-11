@@ -1,38 +1,37 @@
-import { Array, Effect, Layer, Option } from "effect";
-import { ComponentId, type LedgerComponent } from "@whattax/core/ledger";
+import { CalculationError } from "@whattax/core/errors";
+import { ComponentId } from "@whattax/core/ledger";
+import type { LedgerComponent } from "@whattax/core/ledger";
 import { aud, audDollars } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
 import {
   payPeriodToWeeklyFactor,
-  scaleWeeklyWithholdingToPayPeriodDollars,
   TaxablePayFact,
+  scaleWeeklyWithholdingToPayPeriodDollars,
 } from "@whattax/rules-au-pay/facts";
-import { CalculationError } from "@whattax/core/errors";
+import { Array, Effect, Layer, Option } from "effect";
+
 import { StslComponentFact, StslDebtFact } from "../facts/stsl.js";
-import {
-  AtoStslTable,
-  type StslRow,
-  type StslTable,
-} from "../parameters/stsl-table.js";
+import { AtoStslTable } from "../parameters/stsl-table.js";
+import type { StslRow, StslTable } from "../parameters/stsl-table.js";
 
 export const StslComponentRuleId = RuleId.make(
-  "whattax/rules-au-stsl/rule/StslComponent",
+  "whattax/rules-au-stsl/rule/StslComponent"
 );
 
 export const StslComponentId = ComponentId.make(
-  "whattax/rules-au-stsl/component/Stsl",
+  "whattax/rules-au-stsl/component/Stsl"
 );
 
 const findRow = (
   table: StslTable,
-  weeklyFormulaCents: number,
+  weeklyFormulaCents: number
 ): Effect.Effect<StslRow, CalculationError> => {
   const row = Array.findFirst(
     table.rows,
     (r) =>
       weeklyFormulaCents >= r.weeklyMinCents &&
       (r.weeklyMaxCents === "infinity" ||
-        weeklyFormulaCents <= r.weeklyMaxCents),
+        weeklyFormulaCents <= r.weeklyMaxCents)
   );
 
   return Option.match(row, {
@@ -40,7 +39,7 @@ const findRow = (
       Effect.fail(
         new CalculationError({
           message: `whattax/rules-au-stsl: no STSL row covers weekly formula cents=${weeklyFormulaCents}`,
-        }),
+        })
       ),
     onSome: Effect.succeed,
   });
@@ -93,7 +92,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       row.a * weeklyFormulaDollars - row.bDollars;
     const weeklyWithholdingDollars = Math.max(
       0,
-      Math.round(weeklyWithholdingDollarsRaw),
+      Math.round(weeklyWithholdingDollarsRaw)
     );
 
     if (weeklyWithholdingDollars === 0) {
@@ -128,8 +127,8 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     const periodWithholding = audDollars(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
-        taxable.period,
-      ),
+        taxable.period
+      )
     );
 
     const trace = TraceNode.make({
@@ -160,5 +159,5 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       trace,
     };
     return component;
-  }),
+  })
 );

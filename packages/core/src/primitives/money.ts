@@ -19,9 +19,7 @@ export const audDollars = (dollars: number): Money =>
 
 export const moneyAdd = (a: Money, b: Money): Money => {
   if (a.currency !== b.currency) {
-    throw new Error(
-      `whattax/core: cannot add money in ${a.currency} and ${b.currency}`,
-    );
+    throw new Error("whattax/core: cannot add money with different currencies");
   }
   return aud(a.cents + b.cents);
 };
@@ -29,7 +27,7 @@ export const moneyAdd = (a: Money, b: Money): Money => {
 export const moneySub = (a: Money, b: Money): Money => {
   if (a.currency !== b.currency) {
     throw new Error(
-      `whattax/core: cannot subtract money in ${a.currency} and ${b.currency}`,
+      "whattax/core: cannot subtract money with different currencies"
     );
   }
   return aud(a.cents - b.cents);
