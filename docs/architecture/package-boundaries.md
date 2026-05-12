@@ -105,9 +105,12 @@ WhatTax packages must not depend on application-layer code. React is allowed onl
 - OpenAPI generation
 - API boundary schemas
 
-`@whattax/sdk-typescript` owns:
+`whattax` or `@whattax/sdk` owns:
 
-- typed client functions for the public API
+- direct in-process calculation facade
+- plain TypeScript `WhatTax.{method}` entrypoint
+- Effect-native `whattax/effect` entrypoint
+- typed client functions for the public API where needed
 - browser-safe types and schemas
 - SDK examples and compatibility tests
 
@@ -129,7 +132,7 @@ packages/rules/au/payg       -> @whattax/rules-au-payg
 packages/rules/au/super      -> @whattax/rules-au-super
 packages/domain/au/dates     -> @whattax/domain-au-dates
 packages/api/http            -> @whattax/api-http
-packages/sdk/typescript      -> @whattax/sdk-typescript
+packages/sdk/typescript      -> whattax or @whattax/sdk
 packages/docs/fumadocs       -> @whattax/docs-fumadocs
 ```
 

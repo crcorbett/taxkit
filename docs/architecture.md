@@ -21,6 +21,15 @@ This atlas is the fastest path through the WhatTax docs.
   boundary.
 - [Testing and validation](./architecture/testing-and-validation.md): current
   validation approach and expected quality gates.
+
+## Implementation Specs
+
+- [SDK facade export](./specs/sdk-facade.md): public `WhatTax.{method}`
+  facade, plain TypeScript export, `/effect` export, HTTP handler usage and
+  package export boundaries.
+
+## Productionization Records
+
 - [Core calculation productionization](./productionization-core-calculations.md):
   original spike-to-production checklist and change record.
 - [Core hardening productionization](./productionization-core-hardening.md):

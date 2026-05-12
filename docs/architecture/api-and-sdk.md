@@ -4,6 +4,8 @@ WhatTax should publish a reusable API app server and TypeScript SDK around the o
 
 The API and SDK are part of this repository because they expose reusable tax calculation capabilities through stable, documented boundaries.
 
+See [SDK facade export](../specs/sdk-facade.md) for the implementation spec for the public `WhatTax.{method}` facade, the plain TypeScript entrypoint and the `/effect` entrypoint.
+
 ## API Package
 
 The API package should live under:
@@ -51,29 +53,34 @@ GET  /api/docs/openapi.json
 
 Inputs and outputs should decode through Effect Schema. Outputs should include reports, traces and diagnostics where relevant.
 
-## TypeScript SDK
+## TypeScript SDK Facade
 
-The SDK package should live under:
+The primary SDK package should live under:
 
 ```txt
 packages/sdk/typescript
 ```
 
-Package name:
+Preferred public package name:
 
 ```txt
-@whattax/sdk-typescript
+whattax
 ```
+
+If the unscoped package name is unavailable at first publish, use `@whattax/sdk` with the same export contract.
 
 It owns:
 
-- browser-safe API client
+- direct in-process calculation facade
+- plain TypeScript `WhatTax.{method}` entrypoint
+- Effect-native `whattax/effect` entrypoint
+- browser-safe API client helpers where needed
 - server-side client helpers
 - exported input and output schemas
 - typed calculator request builders
 - examples for Node and browser usage
 
-The SDK must not import server handlers or Node-only modules from browser-safe entrypoints.
+The SDK must not import server handlers or Node-only modules from browser-safe entrypoints. It also must not expose Effect runtime types from the plain TypeScript entrypoint.
 
 ## Export Boundaries
 
@@ -83,14 +90,16 @@ Recommended SDK exports:
 {
   "exports": {
     ".": "./src/index.ts",
+    "./effect": "./src/effect.ts",
     "./client": "./src/client/index.ts",
     "./schemas": "./src/schemas/index.ts",
-    "./server": "./src/server/index.ts"
+    "./server": "./src/server/index.ts",
+    "./testing": "./src/testing/index.ts"
   }
 }
 ```
 
-`./client` and `./schemas` must be browser-safe. `./server` may include Node/server-only helpers.
+`.` should expose the plain `WhatTax` facade. `./effect` should expose the Effect-native `WhatTax` facade used by HTTP handlers. `./client` and `./schemas` must be browser-safe. `./server` may include Node/server-only helpers.
 
 ## Fumadocs Site
 
