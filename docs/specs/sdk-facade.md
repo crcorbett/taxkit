@@ -55,6 +55,8 @@ The SDK should follow the strongest ergonomics from mature TypeScript SDKs:
 - Configuration is explicit and serializable where possible.
 - Static convenience helpers may exist, but they should delegate to a configured client rather than becoming hidden global state.
 - Every public method is documented, typed from Schema and stable across runtimes.
+- Rule composition is always Layer-backed. Public plain TypeScript modules may hide Effect in their signatures, but they must preserve the same compile-time capability information as the underlying Layer.
+- Loose arrays of rule descriptors or runtime-only rule-pack objects are not canonical SDK inputs.
 
 Reference SDK patterns:
 
@@ -67,9 +69,7 @@ The plain TypeScript facade should prefer this shape:
 import { WhatTax } from "whattax";
 import { au } from "whattax/au";
 
-const whattax = WhatTax.create({
-  rulePacks: [au.rulePacks.payg({ taxYear: "2025-26" })],
-});
+const whattax = WhatTax.create(au.modules.payg({ taxYear: "2025-26" }));
 
 const result = await whattax.calculations.calculate(
   au.calculations.payg.withholding,
@@ -96,6 +96,95 @@ const result = await auTax.payg.calculateWithholding({
 ```
 
 The first example is the canonical architecture because it keeps calculations and rule packs explicit. The second example is allowed as a thin jurisdiction-specific convenience layer over the same descriptors and client runtime.
+
+## Compile-Time Strictness Contract
+
+The SDK must preserve Effect's compile-time dependency tracking even for plain TypeScript consumers. Ergonomics can wrap Effect, but they must not erase it into runtime-only arrays.
+
+The canonical public composition unit is a typed module:
+
+```ts
+export interface WhatTaxModule<
+  Id extends string,
+  Jurisdiction extends string,
+  Period,
+  Provides,
+  Requires,
+  Calculations,
+  E = never,
+> {
+  readonly id: Id;
+  readonly jurisdiction: Jurisdiction;
+  readonly period: Period;
+  readonly layer: Layer.Layer<Provides, E, Requires>;
+  readonly calculations: Calculations;
+  readonly descriptors: ModuleDescriptors<Provides, Requires>;
+}
+```
+
+The public plain TypeScript entrypoint may not expose `Layer` in user-facing method signatures, but its implementation type must still retain the module's `Provides`, `Requires`, `Calculations`, `Jurisdiction` and `Period` type parameters.
+
+`WhatTax.create(...)` should preserve the exact module tuple and return a client narrowed to the calculations those modules provide:
+
+```ts
+declare const create: <
+  const Modules extends readonly WhatTaxModule<
+    string,
+    string,
+    unknown,
+    unknown,
+    unknown,
+    unknown
+  >[],
+>(
+  ...modules: Modules
+) => WhatTaxClient<ModuleCapabilities<Modules>>;
+```
+
+The `calculate` method should only accept calculations supported by the client capabilities:
+
+```ts
+declare const calculate: <
+  Capabilities,
+  Calculation extends SupportedCalculation<Capabilities>,
+>(
+  calculation: Calculation,
+  input: CalculationInput<Calculation>
+) => Promise<CalculationOutput<Calculation>>;
+```
+
+This means the following should fail at compile time, not only at graph-validation time:
+
+```ts
+const whattax = WhatTax.create(au.modules.payg({ taxYear: "2025-26" }));
+
+// @ts-expect-error annual income tax is not provided by the PAYG-only module.
+await whattax.calculations.calculate(au.calculations.incomeTax.annual, input);
+```
+
+Tax years, jurisdictions and rule-set versions must be type dimensions, not untyped runtime strings. They should be generic branded literals carried by the module type:
+
+```ts
+type AuIncomeYear<Year extends string> = Brand.Brand<
+  Year,
+  "whattax/AU/IncomeYear"
+>;
+
+declare const payg: <const Year extends SupportedAuIncomeYear>(options: {
+  readonly taxYear: Year;
+}) => WhatTaxModule<
+  `au/payg/${Year}`,
+  "AU",
+  AuIncomeYear<Year>,
+  PaygProvidedServices<Year>,
+  PaygRequiredServices<Year>,
+  PaygCalculations<Year>
+>;
+```
+
+Future tax years or jurisdictions should extend the supported branded unions and module factories. They should not require changing the root SDK client shape.
+
+The SDK may still run graph validation at runtime, but runtime validation is a backstop. Compile-time module capabilities are the primary safety mechanism.
 
 ## Export Map
 
@@ -151,9 +240,7 @@ Plain consumers should be able to import the default facade and create a client:
 import { WhatTax } from "whattax";
 import { au } from "whattax/au";
 
-const whattax = WhatTax.create({
-  rulePacks: [au.rulePacks.payg({ taxYear: "2025-26" })],
-});
+const whattax = WhatTax.create(au.modules.payg({ taxYear: "2025-26" }));
 
 const result = await whattax.calculations.calculate(
   au.calculations.payg.withholding,
@@ -175,7 +262,7 @@ const result = await WhatTax.calculate({
     payPeriod: "fortnightly",
     taxFreeThresholdClaimed: true,
   },
-  rulePacks: [au.rulePacks.payg({ taxYear: "2025-26" })],
+  module: au.modules.payg({ taxYear: "2025-26" }),
 });
 ```
 
@@ -241,6 +328,8 @@ export interface WhatTaxClient {
 }
 ```
 
+The actual exported type should be generic, e.g. `WhatTaxClient<Capabilities>`, so these resource namespaces are narrowed by the modules passed to `WhatTax.create(...)`. The non-generic shape above is only the ergonomic surface.
+
 Inputs and outputs from the plain facade should be JSON-safe DTOs. Internal branded Schema classes, BigDecimal values, HashMaps, Chunks and graph nodes may be used by the engine, but plain facade return values should be stable values that can cross HTTP, worker and persistence boundaries.
 
 ## Effect-Native Usage
@@ -252,9 +341,7 @@ import { Effect } from "effect";
 import { WhatTax } from "whattax/effect";
 import { au } from "whattax/au/effect";
 
-const program = WhatTax.make({
-  rulePacks: [au.rulePacks.payg({ taxYear: "2025-26" })],
-}).pipe(
+const program = WhatTax.make(au.modules.payg({ taxYear: "2025-26" })).pipe(
   Effect.flatMap((whattax) =>
     whattax.calculations.calculate(au.calculations.payg.withholding, input)
   )
@@ -266,13 +353,16 @@ const result = await Effect.runPromise(program);
 The `/effect` methods should return typed Effect programs:
 
 ```ts
-declare const calculate: <I, O, R>(
-  calculation: CalculationDescriptor<I, O, R>,
-  input: I
+declare const calculate: <
+  Capabilities,
+  Calculation extends SupportedCalculation<Capabilities>,
+>(
+  calculation: Calculation,
+  input: CalculationInput<Calculation>
 ) => Effect.Effect<
-  O,
-  WhatTaxError,
-  CalculatorEngine | RulePackRegistry | ParameterTableRegistry
+  CalculationOutput<Calculation>,
+  WhatTaxError<Calculation>,
+  CalculationRequirements<Calculation>
 >;
 ```
 
@@ -298,6 +388,20 @@ export const WhatTax = {
 ```
 
 `layers` should provide generic SDK services. Jurisdiction-specific production compositions such as AU rule packs belong in jurisdiction subpaths like `whattax/au/effect`. Runtime construction belongs at the edge; reusable Layers belong in the SDK and rule packages.
+
+The Effect-native module factory should expose the underlying Layer directly:
+
+```ts
+const payg2025 = au.modules.payg({ taxYear: "2025-26" });
+
+payg2025.layer satisfies Layer.Layer<
+  PaygProvidedServices<"2025-26">,
+  never,
+  PaygRequiredServices<"2025-26">
+>;
+```
+
+Plain SDK helpers should use the same module value internally rather than creating a parallel runtime-only representation.
 
 ## Method Contract
 
@@ -417,9 +521,7 @@ import { WhatTax } from "whattax/effect";
 export const TakeHomePayHandler = HttpApiBuilder.handler(
   "calculateTakeHomePay",
   ({ payload }) =>
-    WhatTax.make({
-      rulePacks: [au.rulePacks.payg({ taxYear: payload.taxYear })],
-    }).pipe(
+    WhatTax.make(au.modules.payg({ taxYear: payload.taxYear })).pipe(
       Effect.flatMap((whattax) =>
         whattax.calculations.calculate(
           au.calculations.payg.withholding,
@@ -442,6 +544,7 @@ The SDK facade implementation should include:
 - plain facade tests for success and documented error cases
 - `safe` facade tests for discriminated result behavior
 - Effect facade tests proving Layer substitution changes calculation behavior intentionally
+- type-level negative tests using `@ts-expect-error` for unsupported calculations, incompatible module periods and missing required facts
 - schema round-trip tests for all public input and output DTOs
 - handler parity tests proving HTTP handlers return the same encoded result as `whattax/effect`
 - bundle/import tests proving the plain and schemas entrypoints do not import server-only modules
@@ -463,14 +566,15 @@ Docstrings on public SDK methods should follow `docs/standards/docstrings.md`: c
 
 1. Create `packages/sdk/typescript` with `bun`, TypeScript 6, Ultracite, Oxfmt, Oxlint and Knip wired through workspace scripts.
 2. Add generic public descriptors for calculations, facts, rules, parameters, graphs and reports.
-3. Add public schemas for the generic SDK contracts and derive encoded/type aliases from Schema.
-4. Implement the Effect-native client factory, resource namespaces and calculation execution over the existing engine.
-5. Implement the plain client factory by decoding input, running the Effect facade with configured Layers, encoding output and mapping typed errors to public DTOs.
-6. Add an AU subpath module that exports AU rule packs, calculation descriptors and thin local convenience clients.
-7. Move HTTP API handlers to `whattax/effect` plus explicit jurisdiction modules so handlers and SDK users share one calculation contract.
-8. Add export-map, subpath, schema, Layer-substitution, safe-result and handler-parity tests.
-9. Add SDK quickstart documentation and public docstrings.
-10. Add a changeset for the new package and any public package exports changed by the integration.
+3. Add `WhatTaxModule` as the canonical Layer-backed composition unit with branded jurisdiction, period and capability type parameters.
+4. Add public schemas for the generic SDK contracts and derive encoded/type aliases from Schema.
+5. Implement the Effect-native client factory, resource namespaces and calculation execution over typed modules.
+6. Implement the plain client factory by decoding input, running the Effect facade with module Layers, encoding output and mapping typed errors to public DTOs.
+7. Add an AU subpath module that exports AU typed modules, calculation descriptors and thin local convenience clients.
+8. Move HTTP API handlers to `whattax/effect` plus explicit jurisdiction modules so handlers and SDK users share one calculation contract.
+9. Add export-map, subpath, schema, Layer-substitution, type-negative, safe-result and handler-parity tests.
+10. Add SDK quickstart documentation and public docstrings.
+11. Add a changeset for the new package and any public package exports changed by the integration.
 
 ## Open Decisions
 

@@ -75,6 +75,7 @@ It owns:
 - plain TypeScript `WhatTax.create(...)` client factory and `WhatTax.{method}` generic helpers
 - Effect-native `whattax/effect` entrypoint
 - jurisdiction-specific opt-in subpaths such as `whattax/au`
+- Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
 - browser-safe API client helpers where needed
 - server-side client helpers
 - exported input and output schemas
@@ -102,7 +103,7 @@ Recommended SDK exports:
 }
 ```
 
-`.` should expose the plain, jurisdiction-neutral `WhatTax` facade. `./effect` should expose the Effect-native `WhatTax` facade used by HTTP handlers. Jurisdiction subpaths such as `./au` and `./au/effect` should expose local rule packs, calculation descriptors and thin convenience clients without making the root bundle import those rules. `./client` and `./schemas` must be browser-safe. `./server` may include Node/server-only helpers.
+`.` should expose the plain, jurisdiction-neutral `WhatTax` facade. `./effect` should expose the Effect-native `WhatTax` facade used by HTTP handlers. Jurisdiction subpaths such as `./au` and `./au/effect` should expose local Layer-backed modules, calculation descriptors and thin convenience clients without making the root bundle import those rules. `./client` and `./schemas` must be browser-safe. `./server` may include Node/server-only helpers.
 
 ## Fumadocs Site
 
