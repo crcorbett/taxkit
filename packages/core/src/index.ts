@@ -1,3 +1,11 @@
+export {
+  CalculationDiagnostics,
+  CalculationEngine,
+  CalculationEngineLive,
+  type CalculationEngineService,
+  type CalculationRequest,
+  type CalculationResult,
+} from "./engine/calculation-engine.js";
 export { CalculationError } from "./errors/calculation-error.js";
 export {
   FactAuthority,
@@ -45,11 +53,21 @@ export {
   roundMoney,
 } from "./primitives/rounding.js";
 export {
+  DateInterval,
+  IsoDate,
+  australianTaxYearInterval,
+  dateInterval,
+  dateIntervalsOverlap,
+  isoDate,
+} from "./primitives/date.js";
+export {
   CentsOrInfinity,
   DecimalCoefficient,
   TaxRate,
   TaxYear,
   decimalCoefficient,
+  decimalDollarsToCents,
+  multiplyCentsByDecimal,
   taxRate,
   taxYear,
 } from "./primitives/tax.js";
@@ -58,12 +76,19 @@ export {
   makeRuleDescriptor,
   type AnyFactDescriptor,
   type AnyRuleDescriptor,
+  type FactDescriptorServices,
+  type ParameterDescriptorServices,
   type RuleDescriptor,
+  type RuleDescriptorInput,
 } from "./rules/descriptor.js";
 export {
   RuleId,
+  SourceArtifact,
+  SourceChecksum,
+  SourceExtract,
   SourceKind,
   SourceRef,
   TraceNode,
+  sourceChecksum,
   type TraceNodeEncoded,
 } from "./trace/node.js";

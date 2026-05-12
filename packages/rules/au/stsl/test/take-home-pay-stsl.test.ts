@@ -15,8 +15,6 @@ import {
   TaxablePayWithSacrificeRuleId,
   AuTakeHomePayWithSacrifice2025_26_Live,
 } from "@whattax/rules-au-pay";
-import { Effect, Layer } from "effect";
-
 import {
   AuTakeHomePayWithStsl2025_26_Live,
   AuTakeHomePayWithStslAndSacrifice2025_26_Live,
@@ -24,7 +22,8 @@ import {
   StslComponentRuleId,
   StslDebt,
   StslDebtFact,
-} from "../src/index.js";
+} from "@whattax/rules-au-stsl";
+import { Effect, Layer } from "effect";
 
 const weekly1500 = new GrossPay({ amount: audDollars(1500), period: "weekly" });
 const weekly1800 = new GrossPay({ amount: audDollars(1800), period: "weekly" });

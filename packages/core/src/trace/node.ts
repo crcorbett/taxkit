@@ -1,5 +1,6 @@
 import { Schema } from "effect";
 
+import { IsoDate } from "../primitives/date.js";
 import { RoundingMode } from "../primitives/rounding.js";
 
 /**
@@ -51,6 +52,59 @@ export const SourceRef = Schema.TaggedStruct("SourceRef", {
  * @since 0.1.0
  */
 export type SourceRef = typeof SourceRef.Type;
+
+/**
+ * Stable checksum for an extracted official source artifact.
+ *
+ * @since 0.1.0
+ */
+export const SourceChecksum = Schema.String.pipe(
+  Schema.brand("whattax/SourceChecksum")
+);
+
+/**
+ * Stable checksum for an extracted official source artifact.
+ *
+ * @since 0.1.0
+ */
+export type SourceChecksum = typeof SourceChecksum.Type;
+
+/**
+ * Metadata for the extracted rows used by a parameter table.
+ *
+ * @since 0.1.0
+ */
+export class SourceExtract extends Schema.TaggedClass<SourceExtract>()(
+  "SourceExtract",
+  {
+    rowCount: Schema.Int,
+    shape: Schema.String,
+  }
+) {}
+
+/**
+ * Canonical audit record for official parameter data.
+ *
+ * @since 0.1.0
+ */
+export class SourceArtifact extends Schema.TaggedClass<SourceArtifact>()(
+  "SourceArtifact",
+  {
+    checksum: SourceChecksum,
+    documentVersion: Schema.String,
+    extract: SourceExtract,
+    retrievedOn: IsoDate,
+    source: SourceRef,
+  }
+) {}
+
+/**
+ * Brands a source artifact checksum.
+ *
+ * @since 0.1.0
+ */
+export const sourceChecksum = (value: string): SourceChecksum =>
+  SourceChecksum.make(value);
 
 /**
  * Explanation tree for a calculated value.

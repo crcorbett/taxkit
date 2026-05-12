@@ -1,6 +1,6 @@
 import { ComponentId } from "@whattax/core/ledger";
 import type { LedgerComponent } from "@whattax/core/ledger";
-import { aud } from "@whattax/core/primitives";
+import { aud, multiplyCentsByDecimal } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
 import { Effect, Layer } from "effect";
 
@@ -50,12 +50,13 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
       levyCents = 0;
       formula = "levy = 0 (below threshold)";
     } else if (incomeCents <= table.shadeInMaxCents) {
-      levyCents = Math.round(
-        table.shadeInRate * (incomeCents - table.thresholdCents)
+      levyCents = multiplyCentsByDecimal(
+        incomeCents - table.thresholdCents,
+        table.shadeInRate
       );
       formula = "levy = round(shadeInRate * (income - threshold))";
     } else {
-      levyCents = Math.round(table.levyRate * incomeCents);
+      levyCents = multiplyCentsByDecimal(incomeCents, table.levyRate);
       formula = "levy = round(levyRate * income)";
     }
 

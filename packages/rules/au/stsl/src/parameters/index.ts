@@ -7,6 +7,7 @@ export {
   AtoStslTable,
   AtoStslTableDescriptor,
   AtoStsl_2025_26_Live,
+  StslArtifact2025_26,
   StslRow,
   StslSource2025_26,
   StslTable,

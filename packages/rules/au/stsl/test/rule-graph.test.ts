@@ -10,9 +10,8 @@ import {
   PaygWithholdingRuleDescriptor,
   TaxablePayRuleDescriptor,
 } from "@whattax/rules-au-pay/rule-pack";
-
-import { StslDebtDescriptor } from "../src/facts/stsl.js";
-import { AuStslRuleDescriptors } from "../src/rule-pack/descriptors.js";
+import { StslDebtDescriptor } from "@whattax/rules-au-stsl/facts";
+import { AuStslRuleDescriptors } from "@whattax/rules-au-stsl/rule-pack";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
   rules.map((rule) => ({
@@ -21,6 +20,13 @@ const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
       effectivePeriod: parameter.effectivePeriod,
       id: parameter.id,
       source: parameter.source.kind,
+      sourceArtifact: parameter.sourceArtifact
+        ? {
+            checksum: parameter.sourceArtifact.checksum,
+            retrievedOn: parameter.sourceArtifact.retrievedOn,
+            rowCount: parameter.sourceArtifact.extract.rowCount,
+          }
+        : undefined,
     })),
     provides: rule.provides.map((fact) => fact.id),
     requires: rule.requires.map((fact) => fact.id),
@@ -58,11 +64,16 @@ describe("AU STSL rule graph", () => {
           "parameters": [
             {
               "effectivePeriod": {
-                "from": "2025-26",
-                "to": "2025-26",
+                "from": "2025-09-24",
+                "toExclusive": "2026-07-01",
               },
               "id": "whattax/rules-au-stsl/parameter/AtoStslTable",
               "source": "ato-publication",
+              "sourceArtifact": {
+                "checksum": "sha256:59f5c35e2b9c4a05a5c50bdf3d3993e167a57fa11a0d9fd95f0fb7cc9e884f82",
+                "retrievedOn": "2026-05-12",
+                "rowCount": 4,
+              },
             },
           ],
           "provides": [

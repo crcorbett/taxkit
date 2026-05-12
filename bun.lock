@@ -30,7 +30,6 @@
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "@vitejs/plugin-react": "catalog:",
-        "@whattax/tsconfig": "workspace:*",
         "nitro": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
@@ -43,7 +42,6 @@
         "effect": "catalog:",
       },
       "devDependencies": {
-        "@whattax/tsconfig": "workspace:*",
         "typescript": "catalog:",
       },
     },
@@ -55,7 +53,6 @@
       },
       "devDependencies": {
         "@types/node": "catalog:",
-        "@whattax/tsconfig": "workspace:*",
         "typescript": "catalog:",
       },
     },
@@ -69,7 +66,6 @@
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "@types/node": "catalog:",
-        "@whattax/tsconfig": "workspace:*",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
@@ -84,7 +80,6 @@
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "@types/node": "catalog:",
-        "@whattax/tsconfig": "workspace:*",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
@@ -100,7 +95,6 @@
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "@types/node": "catalog:",
-        "@whattax/tsconfig": "workspace:*",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },

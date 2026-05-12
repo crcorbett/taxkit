@@ -24,7 +24,6 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
-    "@whattax/tsconfig": "workspace:*",
     "nitro": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"

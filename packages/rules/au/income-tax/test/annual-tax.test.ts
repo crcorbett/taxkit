@@ -1,7 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
+import { CalculationEngine, CalculationEngineLive } from "@whattax/core/engine";
 import { aud, audDollars, moneyEquals } from "@whattax/core/primitives";
-import { Effect, Exit, Layer } from "effect";
-
 import {
   AnnualTaxLedgerRuleId,
   AnnualTaxScenarioLive,
@@ -13,18 +12,23 @@ import {
   LitoRuleId,
   MedicareLevyComponentId,
   MedicareLevyRuleId,
-} from "../src/index.js";
+} from "@whattax/rules-au-income-tax";
+import { Effect, Exit, Layer } from "effect";
 
 const runScenario = (incomeDollars: number) =>
-  CalculateAnnualTax.pipe(
-    Effect.provide(
-      AuAnnualTax2025_26_Live.pipe(
+  Effect.gen(function* () {
+    const engine = yield* CalculationEngine;
+    const result = yield* engine.run({
+      calculation: CalculateAnnualTax,
+      layer: AuAnnualTax2025_26_Live.pipe(
         Layer.provideMerge(
           AnnualTaxScenarioLive({ taxableIncome: audDollars(incomeDollars) })
         )
-      )
-    )
-  );
+      ),
+    });
+
+    return result.report;
+  }).pipe(Effect.provide(CalculationEngineLive));
 
 describe("AU annual income tax calculator (2025-26)", () => {
   it.effect("high income $80k: all three components, LITO zeroed", () =>

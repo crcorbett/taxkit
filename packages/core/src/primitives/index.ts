@@ -1,4 +1,12 @@
 export {
+  DateInterval,
+  IsoDate,
+  australianTaxYearInterval,
+  dateInterval,
+  dateIntervalsOverlap,
+  isoDate,
+} from "./date.js";
+export {
   Cents,
   Currency,
   Money,
@@ -15,6 +23,8 @@ export {
   TaxRate,
   TaxYear,
   decimalCoefficient,
+  decimalDollarsToCents,
+  multiplyCentsByDecimal,
   taxRate,
   taxYear,
 } from "./tax.js";

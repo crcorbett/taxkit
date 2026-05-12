@@ -17,6 +17,7 @@ library with stable package boundaries and predictable bundle behavior.
 - `knip` is configured in `knip.jsonc` for unused dependency and workspace
   hygiene.
 - TypeScript 6 is used with `ES2025` lib support.
+- Changesets record package-facing changes before release automation exists.
 
 ## Root Commands
 
@@ -31,6 +32,12 @@ bun run test
 Use `bun run check` for style and lint checks. Use `bun run fix` only when you
 intend to accept formatter and safe lint fixes. Use `bun run knip` before
 publishing or when changing package boundaries.
+
+Add a changeset for package-facing changes:
+
+```sh
+bunx changeset
+```
 
 ## Ultracite Rules
 
@@ -67,6 +74,7 @@ Current WhatTax-specific overrides are narrow:
 
 ## Knip Rules
 
-Knip is configured at the root because WhatTax is a monorepo. Package entrypoints
-are listed explicitly so public export maps are treated as intentional. Knip is
-part of the required quality gate alongside `check`, `check-types`, and `test`.
+Knip is configured at the root because WhatTax is a monorepo. Keep this config
+lean: remove unused package dependencies or expose intentional public exports
+through entrypoints before adding ignores. Knip is part of the required quality
+gate alongside `check`, `check-types`, and `test`.

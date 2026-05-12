@@ -8,6 +8,7 @@ export {
   AtoSchedule1TableDescriptor,
   AtoSchedule1_2024_25_Live,
   AtoSchedule1_2025_26_Live,
+  Schedule1Artifact2025_26,
   Schedule1Row,
   Schedule1Scale,
   Schedule1Source2025_26,

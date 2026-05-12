@@ -32,6 +32,8 @@ export const taxYear = (value: string): TaxYear => TaxYear.make(value);
   facts.
 - Calculation failures should use typed tagged errors, normally
   `CalculationError`, rather than `throw` or `Effect.die`.
+- Decimal tax rates and official formula coefficients should use Effect
+  `BigDecimal`-backed primitives, not plain JavaScript numbers.
 - Keep caller-provided facts, derived facts, and parameter services distinct in
   both types and descriptors.
 
@@ -170,9 +172,34 @@ export const scaleWeeklyWithholdingToPayPeriodDollars = (
   source policy, sources, and parameter descriptors.
 - Parameter descriptors must identify the schema, tag, source reference, and
   effective period used by the rule.
+- Effective periods use half-open ISO date intervals so mid-year official
+  changes can be represented precisely.
+- Official parameter descriptors should include `SourceArtifact` metadata with a
+  checksum, retrieval date, document version, and extracted row shape.
 - Graph validation must catch missing providers, duplicate providers, missing
   required sources, parameter-source drift, parameter effective-period overlap,
   and cycles.
+
+## Calculation Engine
+
+Core orchestration should use the `CalculationEngine` service. Consumers select
+the calculation program, rule-pack layer, and scenario layer; the engine provides
+the environment and returns the report with diagnostics.
+
+```ts
+import { CalculationEngine, CalculationEngineLive } from "@whattax/core/engine";
+import { Effect, Layer } from "effect";
+
+const program = Effect.gen(function* () {
+  const engine = yield* CalculationEngine;
+  return yield* engine.run({
+    calculation: CalculateTakeHomePay,
+    layer: AuTakeHomePay2025_26_Live.pipe(
+      Layer.provideMerge(TakeHomeScenarioLive(input))
+    ),
+  });
+}).pipe(Effect.provide(CalculationEngineLive));
+```
 
 ## Public Exports
 

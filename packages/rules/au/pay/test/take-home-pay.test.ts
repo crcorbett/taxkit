@@ -1,7 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
+import { CalculationEngine, CalculationEngineLive } from "@whattax/core/engine";
 import { aud, audDollars, moneyEquals } from "@whattax/core/primitives";
-import { Effect, Exit, Layer } from "effect";
-
 import {
   AuTakeHomePay2024_25_Live,
   AuTakeHomePay2025_26_Live,
@@ -13,16 +12,23 @@ import {
   PayWithholdingsLedgerRuleId,
   TakeHomeScenarioLive,
   TaxablePayRuleId,
-} from "../src/index.js";
-import type { TakeHomeScenarioInput } from "../src/index.js";
+} from "@whattax/rules-au-pay";
+import type { TakeHomeScenarioInput } from "@whattax/rules-au-pay";
+import { Effect, Exit, Layer } from "effect";
 
 const runScenario = (
   pack: typeof AuTakeHomePay2025_26_Live,
   input: TakeHomeScenarioInput
 ) =>
-  CalculateTakeHomePay.pipe(
-    Effect.provide(pack.pipe(Layer.provideMerge(TakeHomeScenarioLive(input))))
-  );
+  Effect.gen(function* () {
+    const engine = yield* CalculationEngine;
+    const result = yield* engine.run({
+      calculation: CalculateTakeHomePay,
+      layer: pack.pipe(Layer.provideMerge(TakeHomeScenarioLive(input))),
+    });
+
+    return result.report;
+  }).pipe(Effect.provide(CalculationEngineLive));
 
 const weekly1500 = new GrossPay({ amount: audDollars(1500), period: "weekly" });
 

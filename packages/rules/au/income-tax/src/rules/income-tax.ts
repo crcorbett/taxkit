@@ -1,7 +1,7 @@
 import { CalculationError } from "@whattax/core/errors";
 import { ComponentId } from "@whattax/core/ledger";
 import type { LedgerComponent } from "@whattax/core/ledger";
-import { aud } from "@whattax/core/primitives";
+import { aud, multiplyCentsByDecimal } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
 import { Array, Effect, Layer, Option } from "effect";
 
@@ -64,10 +64,12 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
 
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
-    const taxCents = Math.round(
+    const taxCents =
       bracket.baseTaxCents +
-        bracket.rate * (incomeCents - bracket.thresholdCents)
-    );
+      multiplyCentsByDecimal(
+        incomeCents - bracket.thresholdCents,
+        bracket.rate
+      );
     const taxAmount = aud(taxCents);
 
     const trace = TraceNode.make({

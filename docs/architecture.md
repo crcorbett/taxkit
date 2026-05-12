@@ -21,6 +21,11 @@ This atlas is the fastest path through the WhatTax docs.
   boundary.
 - [Testing and validation](./architecture/testing-and-validation.md): current
   validation approach and expected quality gates.
+- [Core calculation productionization](./productionization-core-calculations.md):
+  original spike-to-production checklist and change record.
+- [Core hardening productionization](./productionization-core-hardening.md):
+  typed descriptors, date intervals, source artifacts, BigDecimal arithmetic,
+  engine service, and test hygiene follow-up checklist.
 
 ## Engineering Standards
 

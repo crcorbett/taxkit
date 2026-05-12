@@ -7,6 +7,7 @@ export {
   AtoIncomeTaxTable,
   AtoIncomeTaxTableDescriptor,
   AtoIncomeTax_2025_26_Live,
+  IncomeTaxArtifact2025_26,
   IncomeTaxBracket,
   IncomeTaxSource2025_26,
   IncomeTaxTable,
@@ -15,6 +16,7 @@ export {
   AtoLitoTable,
   AtoLitoTableDescriptor,
   AtoLito_2025_26_Live,
+  LitoArtifact2025_26,
   LitoBracket,
   LitoSource2025_26,
   LitoTable,
@@ -23,6 +25,7 @@ export {
   AtoMedicareLevyTable,
   AtoMedicareLevyTableDescriptor,
   AtoMedicareLevy_2025_26_Live,
+  MedicareLevyArtifact2025_26,
   MedicareLevySource2025_26,
   MedicareLevyTable,
 } from "./medicare-levy-table.js";

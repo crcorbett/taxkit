@@ -5,7 +5,7 @@ import type {
   AnyParameterDescriptor,
   ParameterId,
 } from "../parameters/descriptor.js";
-import type { TaxYear } from "../primitives/tax.js";
+import { dateIntervalsOverlap } from "../primitives/date.js";
 import type {
   AnyFactDescriptor,
   AnyRuleDescriptor,
@@ -51,29 +51,11 @@ const sourceKey = (source: {
   readonly reference: string;
 }) => `${source.kind}:${source.reference}`;
 const parameterInstanceKey = (parameter: AnyParameterDescriptor): string =>
-  `${parameter.id}:${sourceKey(parameter.source)}:${parameter.effectivePeriod.from}:${parameter.effectivePeriod.to ?? "open"}`;
-const taxYearStart = (year: TaxYear): number =>
-  Number.parseInt(String(year).slice(0, 4), 10);
-const effectivePeriodEnd = (
-  parameter: AnyParameterDescriptor
-): number | undefined =>
-  parameter.effectivePeriod.to === undefined
-    ? undefined
-    : taxYearStart(parameter.effectivePeriod.to);
+  `${parameter.id}:${sourceKey(parameter.source)}:${parameter.effectivePeriod.from}:${parameter.effectivePeriod.toExclusive ?? "open"}`;
 const parametersOverlap = (
   left: AnyParameterDescriptor,
   right: AnyParameterDescriptor
-): boolean => {
-  const leftStart = taxYearStart(left.effectivePeriod.from);
-  const rightStart = taxYearStart(right.effectivePeriod.from);
-  const leftEnd = effectivePeriodEnd(left);
-  const rightEnd = effectivePeriodEnd(right);
-
-  return (
-    leftStart <= (rightEnd ?? Number.POSITIVE_INFINITY) &&
-    rightStart <= (leftEnd ?? Number.POSITIVE_INFINITY)
-  );
-};
+): boolean => dateIntervalsOverlap(left.effectivePeriod, right.effectivePeriod);
 
 const makeIssue = (
   kind: GraphValidationIssueKind,

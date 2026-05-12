@@ -2,7 +2,10 @@ import type { Layer } from "effect";
 import { Schema } from "effect";
 
 import type { FactDescriptor } from "../facts/descriptor.js";
-import type { AnyParameterDescriptor } from "../parameters/descriptor.js";
+import type {
+  AnyParameterDescriptor,
+  ParameterDescriptor,
+} from "../parameters/descriptor.js";
 import type { RuleId, SourceRef } from "../trace/node.js";
 
 /**
@@ -11,6 +14,30 @@ import type { RuleId, SourceRef } from "../trace/node.js";
  * @since 0.1.0
  */
 export type AnyFactDescriptor = FactDescriptor<unknown, unknown>;
+
+/**
+ * Extracts the service tag represented by a fact descriptor tuple.
+ *
+ * @since 0.1.0
+ */
+export type FactDescriptorServices<
+  Descriptors extends readonly AnyFactDescriptor[],
+> =
+  Descriptors[number] extends FactDescriptor<infer Self, unknown>
+    ? Self
+    : never;
+
+/**
+ * Extracts the service tag represented by a parameter descriptor tuple.
+ *
+ * @since 0.1.0
+ */
+export type ParameterDescriptorServices<
+  Descriptors extends readonly AnyParameterDescriptor[],
+> =
+  Descriptors[number] extends ParameterDescriptor<infer Self, unknown>
+    ? Self
+    : never;
 
 /**
  * Source evidence policy for a rule descriptor.
@@ -49,6 +76,36 @@ export interface RuleDescriptor<ROut = unknown, E = unknown, RIn = unknown> {
 }
 
 /**
+ * Compile-time checked descriptor input for a rule layer.
+ *
+ * `provides`, `requires`, and `parameters` are tuples so the layer's provided
+ * and required services can be inferred from the descriptors rather than
+ * repeated manually.
+ *
+ * @since 0.1.0
+ */
+export interface RuleDescriptorInput<
+  Provides extends readonly AnyFactDescriptor[],
+  Requires extends readonly AnyFactDescriptor[],
+  Parameters extends readonly AnyParameterDescriptor[],
+  E,
+> {
+  readonly id: RuleId;
+  readonly title: string;
+  readonly provides: Provides;
+  readonly requires: Requires;
+  readonly parameters?: Parameters;
+  readonly layer: Layer.Layer<
+    FactDescriptorServices<Provides>,
+    E,
+    FactDescriptorServices<Requires> | ParameterDescriptorServices<Parameters>
+  >;
+  readonly sources: readonly SourceRef[];
+  readonly sourcePolicy: RuleSourcePolicy;
+  readonly allowDuplicateProvides?: boolean;
+}
+
+/**
  * Erased descriptor used by graph validation when the layer type is preserved
  * on each concrete descriptor but not needed by the validator.
  *
@@ -70,6 +127,19 @@ export interface AnyRuleDescriptor {
  *
  * @since 0.1.0
  */
-export const makeRuleDescriptor = <ROut, E, RIn>(
-  descriptor: RuleDescriptor<ROut, E, RIn>
-): RuleDescriptor<ROut, E, RIn> => descriptor;
+export const makeRuleDescriptor = <
+  const Provides extends readonly AnyFactDescriptor[],
+  const Requires extends readonly AnyFactDescriptor[],
+  const Parameters extends readonly AnyParameterDescriptor[] = readonly [],
+  E = never,
+>(
+  descriptor: RuleDescriptorInput<Provides, Requires, Parameters, E>
+): RuleDescriptor<
+  FactDescriptorServices<Provides>,
+  E,
+  FactDescriptorServices<Requires> | ParameterDescriptorServices<Parameters>
+> & {
+  readonly parameters?: Parameters;
+  readonly provides: Provides;
+  readonly requires: Requires;
+} => descriptor;

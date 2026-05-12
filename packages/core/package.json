@@ -31,6 +31,11 @@
       "types": "./dist/errors/index.d.ts",
       "default": "./dist/errors/index.js"
     },
+    "./engine": {
+      "source": "./src/engine/index.ts",
+      "types": "./dist/engine/index.d.ts",
+      "default": "./dist/engine/index.js"
+    },
     "./rules": {
       "source": "./src/rules/index.ts",
       "types": "./dist/rules/index.d.ts",
@@ -61,7 +66,6 @@
     "effect": "catalog:"
   },
   "devDependencies": {
-    "@whattax/tsconfig": "workspace:*",
     "typescript": "catalog:"
   }
 }

@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { BigDecimal, Schema } from "effect";
 
 import { Cents } from "./money.js";
 
@@ -17,14 +17,16 @@ export const TaxYear = Schema.String.pipe(Schema.brand("whattax/TaxYear"));
 export type TaxYear = typeof TaxYear.Type;
 
 /**
- * A tax rate stored as a decimal fraction, for example `0.325` for 32.5%.
+ * A tax rate stored as an exact decimal fraction, for example `0.325` for
+ * 32.5%.
  *
  * @since 0.1.0
  */
-export const TaxRate = Schema.Number.pipe(Schema.brand("whattax/TaxRate"));
+export const TaxRate = Schema.BigDecimal.pipe(Schema.brand("whattax/TaxRate"));
 
 /**
- * A tax rate stored as a decimal fraction, for example `0.325` for 32.5%.
+ * A tax rate stored as an exact decimal fraction, for example `0.325` for
+ * 32.5%.
  *
  * @since 0.1.0
  */
@@ -35,7 +37,7 @@ export type TaxRate = typeof TaxRate.Type;
  *
  * @since 0.1.0
  */
-export const DecimalCoefficient = Schema.Number.pipe(
+export const DecimalCoefficient = Schema.BigDecimal.pipe(
   Schema.brand("whattax/DecimalCoefficient")
 );
 
@@ -71,16 +73,62 @@ export type CentsOrInfinity = typeof CentsOrInfinity.Type;
 export const taxYear = (value: string): TaxYear => TaxYear.make(value);
 
 /**
- * Brands a number as a decimal tax rate.
+ * Parses and brands a string as a decimal tax rate.
  *
  * @since 0.1.0
  */
-export const taxRate = (value: number): TaxRate => TaxRate.make(value);
+export const taxRate = (value: string): TaxRate =>
+  TaxRate.make(BigDecimal.fromStringUnsafe(value));
 
 /**
- * Brands a number as a decimal coefficient.
+ * Parses and brands a string as a decimal coefficient.
  *
  * @since 0.1.0
  */
-export const decimalCoefficient = (value: number): DecimalCoefficient =>
-  DecimalCoefficient.make(value);
+export const decimalCoefficient = (value: string): DecimalCoefficient =>
+  DecimalCoefficient.make(BigDecimal.fromStringUnsafe(value));
+
+const roundScaledInteger = (value: bigint, scale: number): bigint => {
+  if (scale === 0) {
+    return value;
+  }
+
+  const divisor = 10n ** BigInt(scale);
+  const half = divisor / 2n;
+  return value >= 0n ? (value + half) / divisor : (value - half) / divisor;
+};
+
+const roundBigDecimalToInteger = (value: BigDecimal.BigDecimal): bigint =>
+  value.scale <= 0
+    ? value.value * 10n ** BigInt(Math.abs(value.scale))
+    : roundScaledInteger(value.value, value.scale);
+
+/**
+ * Multiplies integer cents by a decimal coefficient and rounds once to cents.
+ *
+ * The coefficient is an Effect `BigDecimal`, so rule formulas avoid binary
+ * floating-point operations. This is the preferred helper for tax rates,
+ * phase-out rates, and official formula coefficients.
+ *
+ * @since 0.1.0
+ */
+export const multiplyCentsByDecimal = (
+  cents: number,
+  coefficient: TaxRate | DecimalCoefficient
+): Cents => {
+  const product = BigDecimal.multiply(
+    BigDecimal.make(BigInt(cents), 0),
+    coefficient
+  );
+  return Cents.make(Number(roundBigDecimalToInteger(product)));
+};
+
+/**
+ * Converts a decimal dollar amount from an official table into integer cents.
+ *
+ * @since 0.1.0
+ */
+export const decimalDollarsToCents = (dollars: DecimalCoefficient): Cents => {
+  const cents = BigDecimal.multiply(dollars, BigDecimal.make(100n, 0));
+  return Cents.make(Number(roundBigDecimalToInteger(cents)));
+};

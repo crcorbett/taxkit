@@ -3,10 +3,17 @@ import {
   Cents,
   TaxRate,
   TaxYear,
+  australianTaxYearInterval,
+  isoDate,
   taxRate,
   taxYear,
 } from "@whattax/core/primitives";
-import { SourceRef } from "@whattax/core/trace";
+import {
+  SourceArtifact,
+  SourceExtract,
+  SourceRef,
+  sourceChecksum,
+} from "@whattax/core/trace";
 import { Context, Layer, Schema } from "effect";
 
 /**
@@ -52,27 +59,43 @@ export const MedicareLevySource2025_26 = SourceRef.make({
 });
 
 /**
+ * Canonical extraction metadata for the Medicare Levy threshold table.
+ *
+ * @since 0.1.0
+ */
+export const MedicareLevyArtifact2025_26 = new SourceArtifact({
+  checksum: sourceChecksum(
+    "sha256:d3b8ab27d44a3b0dc9d84b81c09a5f1af0cfa197f9f96deab47d19362195c987"
+  ),
+  documentVersion: "2025-26",
+  extract: new SourceExtract({
+    rowCount: 1,
+    shape: "MedicareLevyTable",
+  }),
+  retrievedOn: isoDate("2026-05-12"),
+  source: MedicareLevySource2025_26,
+});
+
+/**
  * Parameter descriptor for the ATO Medicare Levy table.
  *
  * @since 0.1.0
  */
 export const AtoMedicareLevyTableDescriptor = makeParameterDescriptor({
-  effectivePeriod: {
-    from: taxYear("2025-26"),
-    to: taxYear("2025-26"),
-  },
+  effectivePeriod: australianTaxYearInterval("2025-26"),
   id: "whattax/rules-au-income-tax/parameter/AtoMedicareLevyTable",
   schema: MedicareLevyTable,
   source: MedicareLevySource2025_26,
+  sourceArtifact: MedicareLevyArtifact2025_26,
   tag: AtoMedicareLevyTable,
   title: "ATO Medicare levy threshold and rate parameters",
 });
 
 // Single non-SAPTO 2025-26: nil at/below $27,222, shade-in to $34,027, then 2% flat.
 const table2025_26 = new MedicareLevyTable({
-  levyRate: taxRate(0.02),
+  levyRate: taxRate("0.02"),
   shadeInMaxCents: Cents.make(3_402_700),
-  shadeInRate: taxRate(0.1),
+  shadeInRate: taxRate("0.1"),
   source: MedicareLevySource2025_26,
   thresholdCents: Cents.make(2_722_200),
   year: taxYear("2025-26"),

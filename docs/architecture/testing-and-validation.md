@@ -79,7 +79,23 @@ Trace snapshot tests should verify:
 - ledger component status
 - explanation order
 
-Snapshots should be stable enough for review, but not so broad that unrelated formatting changes hide calculation changes.
+Snapshots should be stable enough for review, but not so broad that unrelated
+formatting changes hide calculation changes.
+
+## Test Placement And Imports
+
+Package tests live outside `src` by default so production builds can include
+only `src/**/*.ts` without special test excludes.
+
+Use package public imports for black-box tests:
+
+```ts
+import { AuTakeHomePay2025_26_Live } from "@whattax/rules-au-pay";
+import { AtoSchedule1TableDescriptor } from "@whattax/rules-au-pay/parameters";
+```
+
+Use relative `../src/...` imports only for deliberate white-box tests of private
+helpers that are not part of the package API.
 
 ## Reproducibility
 

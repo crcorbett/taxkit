@@ -4,10 +4,17 @@ import {
   CentsOrInfinity,
   DecimalCoefficient,
   TaxYear,
+  dateInterval,
   decimalCoefficient,
+  isoDate,
   taxYear,
 } from "@whattax/core/primitives";
-import { SourceRef } from "@whattax/core/trace";
+import {
+  SourceArtifact,
+  SourceExtract,
+  SourceRef,
+  sourceChecksum,
+} from "@whattax/core/trace";
 import { Context, Layer, Schema } from "effect";
 
 /**
@@ -59,18 +66,37 @@ export const StslSource2025_26 = SourceRef.make({
 });
 
 /**
+ * Canonical extraction metadata for the Schedule 8 STSL table.
+ *
+ * @since 0.1.0
+ */
+export const StslArtifact2025_26 = new SourceArtifact({
+  checksum: sourceChecksum(
+    "sha256:59f5c35e2b9c4a05a5c50bdf3d3993e167a57fa11a0d9fd95f0fb7cc9e884f82"
+  ),
+  documentVersion: "2025-09-24 to 2026-06-30",
+  extract: new SourceExtract({
+    rowCount: 4,
+    shape: "StslRow[]",
+  }),
+  retrievedOn: isoDate("2026-05-12"),
+  source: StslSource2025_26,
+});
+
+/**
  * Parameter descriptor for the ATO Schedule 8 STSL coefficient table.
  *
  * @since 0.1.0
  */
 export const AtoStslTableDescriptor = makeParameterDescriptor({
-  effectivePeriod: {
-    from: taxYear("2025-26"),
-    to: taxYear("2025-26"),
-  },
+  effectivePeriod: dateInterval({
+    from: "2025-09-24",
+    toExclusive: "2026-07-01",
+  }),
   id: "whattax/rules-au-stsl/parameter/AtoStslTable",
   schema: StslTable,
   source: StslSource2025_26,
+  sourceArtifact: StslArtifact2025_26,
   tag: AtoStslTable,
   title: "ATO Schedule 8 STSL withholding coefficients",
 });
@@ -78,26 +104,26 @@ export const AtoStslTableDescriptor = makeParameterDescriptor({
 const table2025_26 = new StslTable({
   rows: [
     new StslRow({
-      a: decimalCoefficient(0),
-      bDollars: decimalCoefficient(0),
+      a: decimalCoefficient("0"),
+      bDollars: decimalCoefficient("0"),
       weeklyMaxCents: Cents.make(128_799),
       weeklyMinCents: Cents.make(0),
     }),
     new StslRow({
-      a: decimalCoefficient(0.15),
-      bDollars: decimalCoefficient(193.2692),
+      a: decimalCoefficient("0.15"),
+      bDollars: decimalCoefficient("193.2692"),
       weeklyMaxCents: Cents.make(240_299),
       weeklyMinCents: Cents.make(128_800),
     }),
     new StslRow({
-      a: decimalCoefficient(0.17),
-      bDollars: decimalCoefficient(241.3462),
+      a: decimalCoefficient("0.17"),
+      bDollars: decimalCoefficient("241.3462"),
       weeklyMaxCents: Cents.make(344_699),
       weeklyMinCents: Cents.make(240_300),
     }),
     new StslRow({
-      a: decimalCoefficient(0.1),
-      bDollars: decimalCoefficient(0),
+      a: decimalCoefficient("0.1"),
+      bDollars: decimalCoefficient("0"),
       weeklyMaxCents: "infinity",
       weeklyMinCents: Cents.make(344_700),
     }),

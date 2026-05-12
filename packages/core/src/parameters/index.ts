@@ -1,6 +1,6 @@
 export {
-  ParameterId,
   ParameterEffectivePeriod,
+  ParameterId,
   makeParameterDescriptor,
   type AnyParameterDescriptor,
   type ParameterDescriptor,

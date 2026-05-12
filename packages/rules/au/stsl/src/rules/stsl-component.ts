@@ -1,7 +1,12 @@
 import { CalculationError } from "@whattax/core/errors";
 import { ComponentId } from "@whattax/core/ledger";
 import type { LedgerComponent } from "@whattax/core/ledger";
-import { aud, audDollars } from "@whattax/core/primitives";
+import {
+  aud,
+  decimalDollarsToCents,
+  multiplyCentsByDecimal,
+  roundCentsToDollar,
+} from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
 import {
   payPeriodToWeeklyFactor,
@@ -98,15 +103,17 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
 
     const weeklyFactor = payPeriodToWeeklyFactor(taxable.period);
     const weeklyCents = taxable.amount.cents * weeklyFactor;
-    const weeklyFormulaDollars = Math.floor(weeklyCents / 100) + 0.99;
-    const weeklyFormulaCents = Math.round(weeklyFormulaDollars * 100);
+    const weeklyFormulaCents = Math.floor(weeklyCents / 100) * 100 + 99;
     const row = yield* findRow(table, weeklyFormulaCents);
-    const weeklyWithholdingDollarsRaw =
-      row.a * weeklyFormulaDollars - row.bDollars;
-    const weeklyWithholdingDollars = Math.max(
-      0,
-      Math.round(weeklyWithholdingDollarsRaw)
+    const weeklyWithholdingCentsRaw =
+      multiplyCentsByDecimal(weeklyFormulaCents, row.a) -
+      decimalDollarsToCents(row.bDollars);
+    const weeklyWithholdingCentsRounded = roundCentsToDollar(
+      weeklyWithholdingCentsRaw,
+      "ato-withholding-rounding"
     );
+    const weeklyWithholdingDollars =
+      Math.max(0, weeklyWithholdingCentsRounded) / 100;
 
     if (weeklyWithholdingDollars === 0) {
       const trace = TraceNode.make({
@@ -137,11 +144,11 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       return component;
     }
 
-    const periodWithholding = audDollars(
+    const periodWithholding = aud(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
         taxable.period
-      )
+      ) * 100
     );
 
     const trace = TraceNode.make({
@@ -154,6 +161,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         bDollars: row.bDollars,
         weeklyEquivalentCents: weeklyCents,
         weeklyFormulaCents,
+        weeklyWithholdingCentsRaw,
       },
       result: periodWithholding,
       rounding: "ato-withholding-rounding",

@@ -1,20 +1,19 @@
 import { describe, expect, it } from "@effect/vitest";
 import { validateRuleGraph } from "@whattax/core/graph";
-import { taxYear } from "@whattax/core/primitives";
+import { isoDate } from "@whattax/core/primitives";
 import type { AnyRuleDescriptor } from "@whattax/core/rules";
 import { SourceRef } from "@whattax/core/trace";
-
 import {
   GrossPayDescriptor,
+  SalarySacrificeDescriptor,
   TaxFreeThresholdClaimedDescriptor,
-} from "../src/facts/pay.js";
-import { SalarySacrificeDescriptor } from "../src/facts/sacrifice.js";
-import { AtoSchedule1TableDescriptor } from "../src/parameters/schedule1.js";
+} from "@whattax/rules-au-pay/facts";
+import { AtoSchedule1TableDescriptor } from "@whattax/rules-au-pay/parameters";
 import {
   AuTakeHomePayRuleDescriptors,
   AuTakeHomePayWithSacrificeRuleDescriptors,
   PaygWithholdingRuleDescriptor,
-} from "../src/rule-pack/descriptors.js";
+} from "@whattax/rules-au-pay/rule-pack";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
   rules.map((rule) => ({
@@ -23,6 +22,13 @@ const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
       effectivePeriod: parameter.effectivePeriod,
       id: parameter.id,
       source: parameter.source.kind,
+      sourceArtifact: parameter.sourceArtifact
+        ? {
+            checksum: parameter.sourceArtifact.checksum,
+            retrievedOn: parameter.sourceArtifact.retrievedOn,
+            rowCount: parameter.sourceArtifact.extract.rowCount,
+          }
+        : undefined,
     })),
     provides: rule.provides.map((fact) => fact.id),
     requires: rule.requires.map((fact) => fact.id),
@@ -77,11 +83,16 @@ describe("AU take-home pay rule graph", () => {
             "parameters": [
               {
                 "effectivePeriod": {
-                  "from": "2025-26",
-                  "to": "2025-26",
+                  "from": "2025-07-01",
+                  "toExclusive": "2026-07-01",
                 },
                 "id": "whattax/rules-au-pay/parameter/AtoSchedule1Table",
                 "source": "ato-publication",
+                "sourceArtifact": {
+                  "checksum": "sha256:4e65d8a6b04f94b2f7fb7d2f4b219c4ad05fb8a4a9938d7b8fc36c012594c9f5",
+                  "retrievedOn": "2026-05-12",
+                  "rowCount": 15,
+                },
               },
             ],
             "provides": [
@@ -138,11 +149,16 @@ describe("AU take-home pay rule graph", () => {
             "parameters": [
               {
                 "effectivePeriod": {
-                  "from": "2025-26",
-                  "to": "2025-26",
+                  "from": "2025-07-01",
+                  "toExclusive": "2026-07-01",
                 },
                 "id": "whattax/rules-au-pay/parameter/AtoSchedule1Table",
                 "source": "ato-publication",
+                "sourceArtifact": {
+                  "checksum": "sha256:4e65d8a6b04f94b2f7fb7d2f4b219c4ad05fb8a4a9938d7b8fc36c012594c9f5",
+                  "retrievedOn": "2026-05-12",
+                  "rowCount": 15,
+                },
               },
             ],
             "provides": [
@@ -244,8 +260,8 @@ describe("AU take-home pay rule graph", () => {
             {
               ...AtoSchedule1TableDescriptor,
               effectivePeriod: {
-                from: taxYear("2025-26"),
-                to: taxYear("2026-27"),
+                from: isoDate("2025-10-01"),
+                toExclusive: isoDate("2026-07-01"),
               },
               source: overlappingSource,
             },

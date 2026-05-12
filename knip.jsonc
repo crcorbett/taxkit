@@ -6,14 +6,6 @@
     "**/.output/**",
     "**/.turbo/**",
   ],
-  "ignoreDependencies": [
-    "@types/node",
-    "@types/react",
-    "@types/react-dom",
-    "@whattax/tsconfig",
-    "typescript",
-  ],
-  "ignoreExportsUsedInFile": true,
   "workspaces": {
     ".": {
       "entry": [

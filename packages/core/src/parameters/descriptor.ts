@@ -1,9 +1,8 @@
 import { Schema } from "effect";
 import type { Context } from "effect";
 
-import { TaxYear } from "../primitives/tax.js";
-import type { TaxYear as TaxYearType } from "../primitives/tax.js";
-import type { SourceRef } from "../trace/node.js";
+import { DateInterval } from "../primitives/date.js";
+import type { SourceArtifact, SourceRef } from "../trace/node.js";
 
 /**
  * Stable identifier for an official parameter service.
@@ -22,21 +21,17 @@ export const ParameterId = Schema.String.pipe(
 export type ParameterId = typeof ParameterId.Type;
 
 /**
- * Tax-year range in which a parameter descriptor is valid.
+ * Date range in which a parameter descriptor is valid.
  *
- * `to` is optional for an open-ended rule source, but official annual rule
- * packs should normally use closed one-year ranges so graph validation can
- * detect accidental overlap between alternative parameter tables.
+ * The interval is half-open: `[from, toExclusive)`. Date-level precision is
+ * required because official tax changes can start mid-year.
  *
  * @since 0.1.0
  */
-export const ParameterEffectivePeriod = Schema.Struct({
-  from: TaxYear,
-  to: Schema.optional(TaxYear),
-});
+export const ParameterEffectivePeriod = DateInterval;
 
 /**
- * Tax-year range in which a parameter descriptor is valid.
+ * Date range in which a parameter descriptor is valid.
  *
  * @since 0.1.0
  */
@@ -55,6 +50,7 @@ export interface ParameterDescriptor<Self, Shape> {
   readonly id: ParameterId;
   readonly schema: Schema.Schema<Shape>;
   readonly source: SourceRef;
+  readonly sourceArtifact?: SourceArtifact;
   readonly tag: Context.Key<Self, Shape>;
   readonly title: string;
 }
@@ -72,13 +68,11 @@ export type AnyParameterDescriptor = ParameterDescriptor<unknown, unknown>;
  * @since 0.1.0
  */
 export const makeParameterDescriptor = <Self, Shape>(args: {
-  readonly effectivePeriod: {
-    readonly from: TaxYearType;
-    readonly to?: TaxYearType;
-  };
+  readonly effectivePeriod: ParameterEffectivePeriod;
   readonly id: string;
   readonly schema: Schema.Schema<Shape>;
   readonly source: SourceRef;
+  readonly sourceArtifact?: SourceArtifact;
   readonly tag: Context.Key<Self, Shape>;
   readonly title: string;
 }): ParameterDescriptor<Self, Shape> => ({
@@ -86,6 +80,9 @@ export const makeParameterDescriptor = <Self, Shape>(args: {
   id: ParameterId.make(args.id),
   schema: args.schema,
   source: args.source,
+  ...(args.sourceArtifact === undefined
+    ? {}
+    : { sourceArtifact: args.sourceArtifact }),
   tag: args.tag,
   title: args.title,
 });

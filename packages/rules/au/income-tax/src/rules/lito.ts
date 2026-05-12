@@ -1,7 +1,7 @@
 import { CalculationError } from "@whattax/core/errors";
 import { ComponentId } from "@whattax/core/ledger";
 import type { LedgerComponent } from "@whattax/core/ledger";
-import { aud } from "@whattax/core/primitives";
+import { aud, multiplyCentsByDecimal } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
 import { Array, Effect, Layer, Option } from "effect";
 
@@ -70,10 +70,12 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
 
-    const rawOffsetCents = Math.round(
+    const rawOffsetCents =
       bracket.fullOffsetCents -
-        bracket.phaseOutRate * (incomeCents - bracket.thresholdCents)
-    );
+      multiplyCentsByDecimal(
+        incomeCents - bracket.thresholdCents,
+        bracket.phaseOutRate
+      );
     const offsetCents = Math.max(0, rawOffsetCents);
     const offsetAmount = aud(offsetCents);
     const status = offsetCents === 0 ? "zeroed" : "active";

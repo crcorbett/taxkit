@@ -1,9 +1,8 @@
 import { describe, expect, it } from "@effect/vitest";
 import { validateRuleGraph } from "@whattax/core/graph";
 import type { AnyRuleDescriptor } from "@whattax/core/rules";
-
-import { AnnualTaxableIncomeDescriptor } from "../src/facts/income.js";
-import { AuAnnualTaxRuleDescriptors } from "../src/rule-pack/descriptors.js";
+import { AnnualTaxableIncomeDescriptor } from "@whattax/rules-au-income-tax/facts";
+import { AuAnnualTaxRuleDescriptors } from "@whattax/rules-au-income-tax/rule-pack";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
   rules.map((rule) => ({
@@ -12,6 +11,13 @@ const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
       effectivePeriod: parameter.effectivePeriod,
       id: parameter.id,
       source: parameter.source.kind,
+      sourceArtifact: parameter.sourceArtifact
+        ? {
+            checksum: parameter.sourceArtifact.checksum,
+            retrievedOn: parameter.sourceArtifact.retrievedOn,
+            rowCount: parameter.sourceArtifact.extract.rowCount,
+          }
+        : undefined,
     })),
     provides: rule.provides.map((fact) => fact.id),
     requires: rule.requires.map((fact) => fact.id),
@@ -40,11 +46,16 @@ describe("AU annual tax rule graph", () => {
           "parameters": [
             {
               "effectivePeriod": {
-                "from": "2025-26",
-                "to": "2025-26",
+                "from": "2025-07-01",
+                "toExclusive": "2026-07-01",
               },
               "id": "whattax/rules-au-income-tax/parameter/AtoIncomeTaxTable",
               "source": "ato-publication",
+              "sourceArtifact": {
+                "checksum": "sha256:7cc3b3d6e7823ff7a9b8f145c2809db0e5f8c8cf19d01c56dbd511f52ff33e63",
+                "retrievedOn": "2026-05-12",
+                "rowCount": 5,
+              },
             },
           ],
           "provides": [
@@ -62,11 +73,16 @@ describe("AU annual tax rule graph", () => {
           "parameters": [
             {
               "effectivePeriod": {
-                "from": "2025-26",
-                "to": "2025-26",
+                "from": "2025-07-01",
+                "toExclusive": "2026-07-01",
               },
               "id": "whattax/rules-au-income-tax/parameter/AtoLitoTable",
               "source": "ato-publication",
+              "sourceArtifact": {
+                "checksum": "sha256:c31c69c4417f08f7bc9dced2c3a95d80e19885b7ee5e16b8931fe6ea0c761d9f",
+                "retrievedOn": "2026-05-12",
+                "rowCount": 4,
+              },
             },
           ],
           "provides": [
@@ -84,11 +100,16 @@ describe("AU annual tax rule graph", () => {
           "parameters": [
             {
               "effectivePeriod": {
-                "from": "2025-26",
-                "to": "2025-26",
+                "from": "2025-07-01",
+                "toExclusive": "2026-07-01",
               },
               "id": "whattax/rules-au-income-tax/parameter/AtoMedicareLevyTable",
               "source": "ato-publication",
+              "sourceArtifact": {
+                "checksum": "sha256:d3b8ab27d44a3b0dc9d84b81c09a5f1af0cfa197f9f96deab47d19362195c987",
+                "retrievedOn": "2026-05-12",
+                "rowCount": 1,
+              },
             },
           ],
           "provides": [

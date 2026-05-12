@@ -1,7 +1,12 @@
 import { CalculationError } from "@whattax/core/errors";
 import { ComponentId } from "@whattax/core/ledger";
 import type { LedgerComponent } from "@whattax/core/ledger";
-import { audDollars } from "@whattax/core/primitives";
+import {
+  aud,
+  decimalDollarsToCents,
+  multiplyCentsByDecimal,
+  roundCentsToDollar,
+} from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
 import { Array, Effect, Layer, Option } from "effect";
 
@@ -78,25 +83,24 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
 
     const weeklyFactor = payPeriodToWeeklyFactor(taxable.period);
     const weeklyCents = taxable.amount.cents * weeklyFactor;
-    const weeklyFormulaDollars = Math.floor(weeklyCents / 100) + 0.99;
-    const weeklyFormulaCents = Math.round(weeklyFormulaDollars * 100);
+    const weeklyFormulaCents = Math.floor(weeklyCents / 100) * 100 + 99;
     const scale = tftClaimed.value ? "scale2" : "scale1";
     const row = yield* findRow(table, scale, weeklyFormulaCents);
 
-    const weeklyWithholdingDollarsRaw =
-      row.a * weeklyFormulaDollars - row.bDollars;
-    const weeklyWithholdingDollarsRounded = Math.round(
-      weeklyWithholdingDollarsRaw
+    const weeklyWithholdingCentsRaw =
+      multiplyCentsByDecimal(weeklyFormulaCents, row.a) -
+      decimalDollarsToCents(row.bDollars);
+    const weeklyWithholdingCentsRounded = roundCentsToDollar(
+      weeklyWithholdingCentsRaw,
+      "ato-withholding-rounding"
     );
-    const weeklyWithholdingDollars = Math.max(
-      0,
-      weeklyWithholdingDollarsRounded
-    );
-    const periodWithholding = audDollars(
+    const weeklyWithholdingDollars =
+      Math.max(0, weeklyWithholdingCentsRounded) / 100;
+    const periodWithholding = aud(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
         taxable.period
-      )
+      ) * 100
     );
 
     const trace = TraceNode.make({
@@ -112,6 +116,7 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
         taxablePeriodCents: taxable.amount.cents,
         weeklyEquivalentCents: weeklyCents,
         weeklyFormulaCents,
+        weeklyWithholdingCentsRaw,
       },
       result: periodWithholding,
       rounding: "ato-withholding-rounding",

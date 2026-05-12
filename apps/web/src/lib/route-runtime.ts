@@ -1,7 +1,7 @@
 import type { WhatTaxHttpApiService } from "@whattax/http-api/client";
 import type { Effect, Exit } from "effect";
 
-export interface WhatTaxRouteRuntime {
+interface WhatTaxRouteRuntime {
   readonly runPromise: <A, E>(
     effect: Effect.Effect<A, E, WhatTaxHttpApiService>
   ) => Promise<A>;
