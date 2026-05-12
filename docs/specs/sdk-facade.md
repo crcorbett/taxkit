@@ -62,6 +62,7 @@ Reference SDK patterns:
 
 - [Stripe server-side SDKs](https://docs.stripe.com/sdks/server-side) document `StripeClient` as the entry point for resource discovery, multiple independently configured clients and testability without static methods.
 - [Vercel SDK](https://vercel.com/docs/sdk) documents a type-safe TypeScript SDK initialized with a `Vercel` client object that exposes platform resources and methods.
+- [Alchemy custom providers](https://v2.alchemy.run/guides/custom-provider/) separate typed resource declarations from provider Layers. WhatTax should adopt the declaration/provider/binding shape, but use tax-domain names and semantics rather than IaC lifecycle names.
 
 The plain TypeScript facade should prefer this shape:
 
@@ -186,6 +187,84 @@ Future tax years or jurisdictions should extend the supported branded unions and
 
 The SDK may still run graph validation at runtime, but runtime validation is a backstop. Compile-time module capabilities are the primary safety mechanism.
 
+## Declarations, Providers And Bindings
+
+The SDK should use an Alchemy-inspired architecture without importing its IaC lifecycle model. WhatTax declarations describe typed tax-domain capabilities. Providers implement those declarations through Effect Layers. Bindings describe typed dependency edges between declarations.
+
+Use tax-domain names:
+
+- `Calculation` declares input, output, required services and diagnostics for a calculation.
+- `Fact` declares a branded fact value and its service tag.
+- `Rule` declares provided facts, required facts, parameters and trace metadata.
+- `Parameter` declares an official or user-supplied parameter table/service.
+- `Provider` implements a declaration as a typed service in an Effect `Layer`.
+- `Binding` records a typed relationship between a provider and the declarations it requires or provides.
+- `WhatTaxModule` bundles compatible providers and bindings into one typed composition unit.
+
+Do not adopt IaC lifecycle names such as `reconcile`, `delete`, `diff` or `read` for tax calculations. The useful pattern is the type architecture: declaration first, provider implementation second, Layer composition third.
+
+Example calculation declaration:
+
+```ts
+export type PaygWithholdingCalculation = Calculation<
+  "au.payg.withholding",
+  PaygWithholdingInput,
+  PaygWithholdingReport,
+  {
+    readonly jurisdiction: "AU";
+    readonly period: AuIncomeYear<"2025-26">;
+    readonly requires: GrossPayFact | TaxFreeThresholdClaimedFact;
+    readonly provides: PaygWithholdingComponentFact;
+  }
+>;
+
+export const PaygWithholdingCalculation =
+  Calculation<PaygWithholdingCalculation>("au.payg.withholding");
+```
+
+Example provider implementation:
+
+```ts
+export const PaygWithholdingProvider = CalculationProvider.effect(
+  PaygWithholdingCalculation,
+  Effect.gen(function* () {
+    const schedule = yield* AtoSchedule1Table;
+
+    return PaygWithholdingCalculation.Provider.of({
+      calculate: (input) => calculatePaygWithholding(input, schedule),
+    });
+  })
+);
+```
+
+The provider constructor should enforce that `calculate` accepts the declared input type, returns the declared output type and requires only the services declared by the provider's Layer. Dependencies yielded inside the provider construction Effect become requirements on the resulting Layer.
+
+Bindings should be first-class typed values, not only graph metadata:
+
+```ts
+export const PaygWithholdingBindings = Binding.all(
+  Binding.requires(PaygWithholdingCalculation, GrossPayFact),
+  Binding.requires(PaygWithholdingCalculation, TaxFreeThresholdClaimedFact),
+  Binding.requires(PaygWithholdingCalculation, AtoSchedule1Table),
+  Binding.provides(PaygWithholdingCalculation, PaygWithholdingComponentFact)
+);
+```
+
+Bindings feed runtime graph validation and docs, but their types also contribute to `ModuleCapabilities<Modules>`. A module with missing or incompatible bindings should fail type-level tests before runtime validation is needed.
+
+The plain and Effect entrypoints must share these same declarations, providers, bindings and modules:
+
+```txt
+Calculation / Fact / Rule / Parameter declarations
+  -> Provider Layers
+  -> Bindings
+  -> WhatTaxModule
+  -> whattax/effect client
+  -> whattax plain Promise client
+```
+
+The plain client may create and manage a runtime internally. It must not create an alternate non-Effect provider registry.
+
 ## Export Map
 
 The package should expose explicit entrypoints:
@@ -226,7 +305,7 @@ The package should expose explicit entrypoints:
 
 `"./effect"` is the Effect-native facade. It may expose `Effect`, `Layer`, services, branded Schema classes, typed errors, graph validation and trace controls.
 
-`"./au"` is the Australian jurisdiction module. It may expose AU rule packs, calculation descriptors, local presets and local convenience clients. `./au/effect` exposes the same jurisdiction-specific capabilities as Effect-native descriptors and Layers. Neither entrypoint may be required by the root SDK unless a consumer imports it.
+`"./au"` is the Australian jurisdiction module. It may expose AU typed modules, calculation declarations, fact declarations, rule declarations, parameter declarations, bindings, local presets and local convenience clients. `./au/effect` exposes the same jurisdiction-specific capabilities with direct provider Layer access. Neither entrypoint may be required by the root SDK unless a consumer imports it.
 
 `"./schemas"` exports browser-safe public schemas and derived DTO types. It should not export server-only handlers, filesystem fixtures or package-internal rule implementation details.
 
@@ -331,6 +410,8 @@ export interface WhatTaxClient {
 The actual exported type should be generic, e.g. `WhatTaxClient<Capabilities>`, so these resource namespaces are narrowed by the modules passed to `WhatTax.create(...)`. The non-generic shape above is only the ergonomic surface.
 
 Inputs and outputs from the plain facade should be JSON-safe DTOs. Internal branded Schema classes, BigDecimal values, HashMaps, Chunks and graph nodes may be used by the engine, but plain facade return values should be stable values that can cross HTTP, worker and persistence boundaries.
+
+The plain facade is Effect hidden, not Effect removed. It should use the same module Layer, provider declarations, bindings and calculation descriptors as the Effect facade, then execute them through a managed runtime and convert the result to plain `Promise` or `safe` return values.
 
 ## Effect-Native Usage
 
@@ -545,6 +626,8 @@ The SDK facade implementation should include:
 - `safe` facade tests for discriminated result behavior
 - Effect facade tests proving Layer substitution changes calculation behavior intentionally
 - type-level negative tests using `@ts-expect-error` for unsupported calculations, incompatible module periods and missing required facts
+- type-level provider tests proving provider method inputs, outputs and Layer requirements match their declarations
+- binding tests proving declaration/provider edges feed both graph validation and module capability types
 - schema round-trip tests for all public input and output DTOs
 - handler parity tests proving HTTP handlers return the same encoded result as `whattax/effect`
 - bundle/import tests proving the plain and schemas entrypoints do not import server-only modules
@@ -565,16 +648,18 @@ Docstrings on public SDK methods should follow `docs/standards/docstrings.md`: c
 ## Implementation Plan
 
 1. Create `packages/sdk/typescript` with `bun`, TypeScript 6, Ultracite, Oxfmt, Oxlint and Knip wired through workspace scripts.
-2. Add generic public descriptors for calculations, facts, rules, parameters, graphs and reports.
-3. Add `WhatTaxModule` as the canonical Layer-backed composition unit with branded jurisdiction, period and capability type parameters.
-4. Add public schemas for the generic SDK contracts and derive encoded/type aliases from Schema.
-5. Implement the Effect-native client factory, resource namespaces and calculation execution over typed modules.
-6. Implement the plain client factory by decoding input, running the Effect facade with module Layers, encoding output and mapping typed errors to public DTOs.
-7. Add an AU subpath module that exports AU typed modules, calculation descriptors and thin local convenience clients.
-8. Move HTTP API handlers to `whattax/effect` plus explicit jurisdiction modules so handlers and SDK users share one calculation contract.
-9. Add export-map, subpath, schema, Layer-substitution, type-negative, safe-result and handler-parity tests.
-10. Add SDK quickstart documentation and public docstrings.
-11. Add a changeset for the new package and any public package exports changed by the integration.
+2. Add generic public declarations for calculations, facts, rules, parameters, graphs and reports.
+3. Add typed provider constructors such as `CalculationProvider.effect(...)` and `RuleProvider.effect(...)` that return Effect Layers while enforcing declaration method contracts.
+4. Add typed `Binding` helpers for `requires`, `provides` and composition into graph metadata.
+5. Add `WhatTaxModule` as the canonical Layer-backed composition unit with branded jurisdiction, period and capability type parameters.
+6. Add public schemas for the generic SDK contracts and derive encoded/type aliases from Schema.
+7. Implement the Effect-native client factory, resource namespaces and calculation execution over typed modules.
+8. Implement the plain client factory by decoding input, running the Effect facade with module Layers, encoding output and mapping typed errors to public DTOs.
+9. Add an AU subpath module that exports AU typed modules, declarations, providers, bindings and thin local convenience clients.
+10. Move HTTP API handlers to `whattax/effect` plus explicit jurisdiction modules so handlers and SDK users share one calculation contract.
+11. Add export-map, subpath, schema, Layer-substitution, provider-contract, binding, type-negative, safe-result and handler-parity tests.
+12. Add SDK quickstart documentation and public docstrings.
+13. Add a changeset for the new package and any public package exports changed by the integration.
 
 ## Open Decisions
 

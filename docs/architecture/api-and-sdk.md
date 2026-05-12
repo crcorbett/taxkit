@@ -76,6 +76,7 @@ It owns:
 - Effect-native `whattax/effect` entrypoint
 - jurisdiction-specific opt-in subpaths such as `whattax/au`
 - Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
+- typed declarations, provider Layers and bindings shared by plain and Effect entrypoints
 - browser-safe API client helpers where needed
 - server-side client helpers
 - exported input and output schemas
