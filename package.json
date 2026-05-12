@@ -27,15 +27,18 @@
   "type": "module",
   "scripts": {
     "build": "turbo run build",
-    "check-types": "turbo run check-types",
-    "test": "turbo run test",
-    "dev": "turbo run dev --filter=web",
-    "clean": "turbo run clean",
+    "changeset": "changeset",
     "check": "ultracite check --type-aware",
+    "check-types": "turbo run check-types",
+    "clean": "turbo run clean",
+    "dev": "turbo run dev --filter=web",
     "fix": "ultracite fix --type-aware",
-    "knip": "knip --no-progress --no-config-hints"
+    "knip": "knip --no-progress --no-config-hints",
+    "test": "turbo run test",
+    "version-packages": "changeset version"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "knip": "6.12.2",
     "oxfmt": "0.48.0",
     "oxlint": "1.63.0",

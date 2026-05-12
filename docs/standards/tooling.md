@@ -18,6 +18,7 @@ library with stable package boundaries and predictable bundle behavior.
   hygiene.
 - TypeScript 6 is used with `ES2025` lib support.
 - Changesets record package-facing changes before release automation exists.
+  See [Versioning and Changesets](./versioning.md).
 
 ## Root Commands
 
@@ -25,6 +26,8 @@ library with stable package boundaries and predictable bundle behavior.
 bun run check
 bun run fix
 bun run knip
+bun run changeset
+bun run version-packages
 bun run check-types
 bun run test
 ```
@@ -36,7 +39,7 @@ publishing or when changing package boundaries.
 Add a changeset for package-facing changes:
 
 ```sh
-bunx changeset
+bun run changeset
 ```
 
 ## Ultracite Rules

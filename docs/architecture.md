@@ -35,5 +35,7 @@ This atlas is the fastest path through the WhatTax docs.
   that follow Ultracite's lint contract.
 - [Formatting, linting, and dependency hygiene](./standards/tooling.md): Bun,
   Ultracite, Oxfmt, Oxlint, Knip, and TypeScript 6.
+- [Versioning and Changesets](./standards/versioning.md): fixed release-train
+  package versioning and changelog workflow.
 - [Productionization audit](./standards/productionization-audit.md): completed
   hardening work and remaining structural follow-ups.

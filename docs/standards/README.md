@@ -8,6 +8,7 @@ quality tools.
 ## Documents
 
 - [Code patterns](./code-patterns.md)
-- [Formatting, linting, and dependency hygiene](./tooling.md)
 - [Docstring conventions](./docstrings.md)
+- [Formatting, linting, and dependency hygiene](./tooling.md)
+- [Versioning and Changesets](./versioning.md)
 - [Productionization audit](./productionization-audit.md)
