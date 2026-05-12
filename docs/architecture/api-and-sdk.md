@@ -72,8 +72,9 @@ If the unscoped package name is unavailable at first publish, use `@whattax/sdk`
 It owns:
 
 - direct in-process calculation facade
-- plain TypeScript `WhatTax.{method}` entrypoint
+- plain TypeScript `WhatTax.create(...)` client factory and `WhatTax.{method}` generic helpers
 - Effect-native `whattax/effect` entrypoint
+- jurisdiction-specific opt-in subpaths such as `whattax/au`
 - browser-safe API client helpers where needed
 - server-side client helpers
 - exported input and output schemas
@@ -90,7 +91,9 @@ Recommended SDK exports:
 {
   "exports": {
     ".": "./src/index.ts",
+    "./au": "./src/au.ts",
     "./effect": "./src/effect.ts",
+    "./au/effect": "./src/au-effect.ts",
     "./client": "./src/client/index.ts",
     "./schemas": "./src/schemas/index.ts",
     "./server": "./src/server/index.ts",
@@ -99,7 +102,7 @@ Recommended SDK exports:
 }
 ```
 
-`.` should expose the plain `WhatTax` facade. `./effect` should expose the Effect-native `WhatTax` facade used by HTTP handlers. `./client` and `./schemas` must be browser-safe. `./server` may include Node/server-only helpers.
+`.` should expose the plain, jurisdiction-neutral `WhatTax` facade. `./effect` should expose the Effect-native `WhatTax` facade used by HTTP handlers. Jurisdiction subpaths such as `./au` and `./au/effect` should expose local rule packs, calculation descriptors and thin convenience clients without making the root bundle import those rules. `./client` and `./schemas` must be browser-safe. `./server` may include Node/server-only helpers.
 
 ## Fumadocs Site
 

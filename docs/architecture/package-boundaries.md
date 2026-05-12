@@ -108,8 +108,9 @@ WhatTax packages must not depend on application-layer code. React is allowed onl
 `whattax` or `@whattax/sdk` owns:
 
 - direct in-process calculation facade
-- plain TypeScript `WhatTax.{method}` entrypoint
+- plain TypeScript `WhatTax.create(...)` client factory and `WhatTax.{method}` generic helpers
 - Effect-native `whattax/effect` entrypoint
+- jurisdiction-specific opt-in subpaths such as `whattax/au`
 - typed client functions for the public API where needed
 - browser-safe types and schemas
 - SDK examples and compatibility tests
