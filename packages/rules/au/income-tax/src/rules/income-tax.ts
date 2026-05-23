@@ -2,7 +2,7 @@ import { CalculationError } from "@whattax/core/errors";
 import { ComponentId, LedgerComponent } from "@whattax/core/ledger";
 import { aud, multiplyCentsByDecimal } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
-import { Array, Effect, Layer, Option } from "effect";
+import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import { IncomeTaxComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
@@ -78,7 +78,7 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
         baseTaxCents: bracket.baseTaxCents,
         bracketThresholdCents: bracket.thresholdCents,
         incomeCents,
-        rate: bracket.rate,
+        rate: BigDecimal.format(bracket.rate),
         tableYear: table.year,
       },
       result: taxAmount,

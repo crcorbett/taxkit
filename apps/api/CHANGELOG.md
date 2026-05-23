@@ -4,6 +4,9 @@
 
 ### Patch Changes
 
+- Added `POST /api/v1/calculators/:calculatorId/calculate` for public
+  calculator execution across take-home pay, PAYG withholdings and annual
+  income tax, with schema-guided fact decode errors.
 - Added public calculator metadata routes for jurisdictions, tax years,
   calculator discovery, calculator schema metadata, graph diagnostics, facts
   and rules.

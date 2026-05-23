@@ -7,7 +7,7 @@ import {
   roundCentsToDollar,
 } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
-import { Array, Effect, Layer, Option } from "effect";
+import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import {
   payPeriodToWeeklyFactor,
@@ -107,8 +107,8 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
       formula:
         "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period",
       inputs: {
-        a: row.a,
-        bDollars: row.bDollars,
+        a: BigDecimal.format(row.a),
+        bDollars: BigDecimal.format(row.bDollars),
         period: taxable.period,
         scale,
         scheduleYear: table.year,

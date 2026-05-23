@@ -1,7 +1,7 @@
 import { ComponentId, LedgerComponent } from "@whattax/core/ledger";
 import { aud, multiplyCentsByDecimal } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
-import { Effect, Layer } from "effect";
+import { BigDecimal, Effect, Layer } from "effect";
 
 import { MedicareLevyComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
@@ -67,9 +67,9 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
       formula,
       inputs: {
         incomeCents,
-        levyRate: table.levyRate,
+        levyRate: BigDecimal.format(table.levyRate),
         shadeInMaxCents: table.shadeInMaxCents,
-        shadeInRate: table.shadeInRate,
+        shadeInRate: BigDecimal.format(table.shadeInRate),
         tableYear: table.year,
         thresholdCents: table.thresholdCents,
       },

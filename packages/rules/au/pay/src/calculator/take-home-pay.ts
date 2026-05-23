@@ -65,6 +65,18 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
 });
 
 /**
+ * Calculates the pay-period withholding ledger from the standard pay scenario.
+ *
+ * This is the withholding-specific calculator entrypoint over the same
+ * scenario and PAYG ledger facts used by take-home pay.
+ *
+ * @since 0.1.0
+ */
+export const CalculatePayWithholdings = Effect.gen(function* () {
+  return yield* PayWithholdingsLedgerFact;
+});
+
+/**
  * Input schema for the standard take-home-pay scenario helper.
  *
  * @since 0.1.0

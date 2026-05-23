@@ -9,5 +9,5 @@ export class WhatTaxApi extends HttpApi.make("WhatTaxApi")
   .annotate(OpenApi.Title, "WhatTax API")
   .annotate(
     OpenApi.Description,
-    "HTTP API for WhatTax health checks and public calculator metadata."
+    "HTTP API for WhatTax health checks, public calculator metadata and public calculator execution."
   ) {}

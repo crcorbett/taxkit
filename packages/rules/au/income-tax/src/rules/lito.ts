@@ -2,7 +2,7 @@ import { CalculationError } from "@whattax/core/errors";
 import { ComponentId, LedgerComponent } from "@whattax/core/ledger";
 import { aud, multiplyCentsByDecimal } from "@whattax/core/primitives";
 import { RuleId, TraceNode } from "@whattax/core/trace";
-import { Array, Effect, Layer, Option } from "effect";
+import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import { LitoComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
@@ -87,7 +87,7 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
         bracketThresholdCents: bracket.thresholdCents,
         fullOffsetCents: bracket.fullOffsetCents,
         incomeCents,
-        phaseOutRate: bracket.phaseOutRate,
+        phaseOutRate: BigDecimal.format(bracket.phaseOutRate),
         tableYear: table.year,
       },
       result: offsetAmount,

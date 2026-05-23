@@ -26,15 +26,17 @@ The implemented API surface is:
 - `GET /api/v1/calculators`
 - `GET /api/v1/calculators/:calculatorId`
 - `GET /api/v1/calculators/:calculatorId/schema`
+- `POST /api/v1/calculators/:calculatorId/calculate`
 - `GET /api/v1/calculators/:calculatorId/graph`
 - `GET /api/v1/facts`
 - `GET /api/v1/rules`
 
 The public calculation API metadata routes expose the initial calculator
 catalog, canonical fact descriptors, canonical rule descriptors and graph
-validation diagnostics for the implemented AU rule packages. Calculation
-execution is not exposed yet; `POST /api/v1/calculators/:calculatorId/calculate`
-is intentionally deferred.
+validation diagnostics for the implemented AU rule packages. The calculation
+route decodes canonical scenario facts, selects the cataloged rule-pack layer
+and runs through `CalculationEngine` for take-home pay, PAYG withholdings and
+annual income tax.
 
 ## Main Areas
 
@@ -115,6 +117,8 @@ bun run --filter=@whattax/http-api check-types
 - Keep browser consumers on client exports; do not import server handlers into
   browser code.
 - Keep endpoint request and response shapes schema-owned.
+- Keep calculation execution catalog-driven, scenario-schema decoded and
+  `CalculationEngine` based.
 - Keep metadata responses derived from canonical fact descriptors, rule
   descriptors, source refs, parameter periods and graph diagnostics from the
   owning engine and rule packages.

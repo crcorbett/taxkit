@@ -1,4 +1,6 @@
 import {
+  CalculationDiagnostics,
+  CalculationEngine,
   FactAuthority,
   FactId,
   FactQuestion,
@@ -9,8 +11,13 @@ import {
   RuleSourcePolicy,
   SourceRef,
 } from "@whattax/core";
-import type { AnyFactDescriptor, AnyRuleDescriptor } from "@whattax/core";
+import type {
+  AnyFactDescriptor,
+  AnyRuleDescriptor,
+  CalculationResult,
+} from "@whattax/core";
 import {
+  AnnualTaxScenarioLive,
   AnnualTaxLedgerDescriptor,
   AnnualTaxReport,
   AnnualTaxableIncomeDescriptor,
@@ -22,6 +29,7 @@ import {
   AuPayWithholdings2025_26_Live,
   AuTakeHomePay2025_26_Live,
   AuTakeHomePayRuleDescriptors,
+  CalculatePayWithholdings,
   CalculateTakeHomePay,
   GrossPayDescriptor,
   NetPayDescriptor,
@@ -31,15 +39,24 @@ import {
   PaygWithholdingComponentDescriptor,
   PaygWithholdingRuleDescriptor,
   TakeHomePayReport,
+  TakeHomeScenarioLive,
   TaxablePayDescriptor,
   TaxablePayRuleDescriptor,
   TaxFreeThresholdClaimedDescriptor,
 } from "@whattax/rules-au-pay";
-import type { Effect, Layer, Option, Schema } from "effect";
-import { Array, Data, HashMap, Schema as SchemaApi } from "effect";
+import type { Layer, Option, Schema } from "effect";
+import {
+  Array,
+  Data,
+  Effect,
+  HashMap,
+  Layer as LayerApi,
+  Schema as SchemaApi,
+} from "effect";
 import {
   HttpApiEndpoint,
   HttpApiGroup,
+  HttpApiSchema,
   OpenApi,
 } from "effect/unstable/httpapi";
 
@@ -77,9 +94,19 @@ export class SchemaDecodeIssue extends SchemaApi.TaggedClass<SchemaDecodeIssue>(
   }
 ) {}
 
+export const SchemaDecodeHelp = SchemaApi.Struct({
+  factId: FactId,
+  question: SchemaApi.optional(FactQuestion),
+  title: SchemaApi.String,
+});
+
+export type SchemaDecodeHelp = typeof SchemaDecodeHelp.Type;
+
 export class PublicSchemaDecodeError extends SchemaApi.TaggedClass<PublicSchemaDecodeError>()(
   "PublicSchemaDecodeError",
   {
+    calculatorId: SchemaApi.optional(CalculatorId),
+    help: SchemaApi.optional(SchemaApi.Array(SchemaDecodeHelp)),
     issues: SchemaApi.Array(SchemaDecodeIssue),
     message: SchemaApi.String,
   }
@@ -115,7 +142,7 @@ export type PublicApiError = typeof PublicApiError.Type;
 
 export const PublicErrorEnvelope = SchemaApi.Struct({
   error: PublicApiError,
-});
+}).pipe(HttpApiSchema.status("BadRequest"));
 
 export type PublicErrorEnvelope = typeof PublicErrorEnvelope.Type;
 
@@ -181,6 +208,12 @@ export const HelpQuery = SchemaApi.Struct({
 });
 
 export type HelpQuery = typeof HelpQuery.Type;
+
+export const CalculationQuery = SchemaApi.Struct({
+  help: SchemaApi.optional(HelpMode),
+});
+
+export type CalculationQuery = typeof CalculationQuery.Type;
 
 export const DescriptorFilterQuery = SchemaApi.Struct({
   calculator: SchemaApi.optional(CalculatorId),
@@ -269,9 +302,43 @@ export const CalculatorGraphResponse = SchemaApi.Struct({
 
 export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
 
+export const PublicCalculationRequest = SchemaApi.Struct({
+  facts: SchemaApi.Unknown,
+  jurisdiction: SchemaApi.optional(SchemaApi.Literal("AU")),
+  taxYear: SchemaApi.optional(SchemaApi.Literal("2025-26")),
+});
+
+export type PublicCalculationRequest = typeof PublicCalculationRequest.Type;
+
+export const PublicCalculationReport = SchemaApi.Union([
+  TakeHomePayReport,
+  PayWithholdingsLedger,
+  AnnualTaxReport,
+]);
+
+export type PublicCalculationReport = typeof PublicCalculationReport.Type;
+
+export const PublicCalculationResponse = SchemaApi.Struct({
+  calculator: CalculatorCatalogItem,
+  diagnostics: CalculationDiagnostics,
+  report: PublicCalculationReport,
+});
+
+export type PublicCalculationResponse = typeof PublicCalculationResponse.Type;
+
 type CalculatorProgram = Effect.Effect<unknown, unknown, unknown>;
 
+type CalculatorExecution = (
+  facts: unknown,
+  validationIssues: readonly GraphValidationIssue[]
+) => Effect.Effect<
+  CalculationResult<PublicCalculationReport>,
+  unknown,
+  CalculationEngine
+>;
+
 export interface CalculatorCatalogEntry {
+  readonly calculate: CalculatorExecution;
   readonly calculatorId: CalculatorId;
   readonly context: CalculatorContext;
   readonly description: string;
@@ -318,6 +385,8 @@ class RuleGraphEdgeData extends Data.Class<RuleGraphEdge> {}
 
 class CalculatorGraphResponseData extends Data.Class<CalculatorGraphResponse> {}
 
+export class PublicCalculationResponseData extends Data.Class<PublicCalculationResponse> {}
+
 const ContextAu2025_26 = new CalculatorContextData({
   jurisdiction: "AU",
   taxYear: "2025-26",
@@ -327,6 +396,17 @@ const SupportedHelpModes = HelpMode.literals;
 
 const CatalogEntries: readonly CalculatorCatalogEntry[] = [
   new CalculatorCatalogEntryData({
+    calculate: (facts, validationIssues) =>
+      Effect.gen(function* () {
+        const engine = yield* CalculationEngine;
+        return yield* engine.run({
+          calculation: CalculateTakeHomePay,
+          layer: AuTakeHomePay2025_26_Live.pipe(
+            LayerApi.provideMerge(TakeHomeScenarioLive(facts))
+          ),
+          validationIssues,
+        });
+      }),
     calculatorId: "au.pay.take-home",
     context: ContextAu2025_26,
     description:
@@ -347,6 +427,17 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     title: "AU take-home pay",
   }),
   new CalculatorCatalogEntryData({
+    calculate: (facts, validationIssues) =>
+      Effect.gen(function* () {
+        const engine = yield* CalculationEngine;
+        return yield* engine.run({
+          calculation: CalculatePayWithholdings,
+          layer: AuPayWithholdings2025_26_Live.pipe(
+            LayerApi.provideMerge(TakeHomeScenarioLive(facts))
+          ),
+          validationIssues,
+        });
+      }),
     calculatorId: "au.pay.withholdings",
     context: ContextAu2025_26,
     description: "Australian PAYG-only pay-period withholding ledger.",
@@ -356,6 +447,7 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
       PaygWithholdingComponentDescriptor,
       PayWithholdingsLedgerDescriptor,
     ],
+    program: CalculatePayWithholdings,
     reportSchema: PayWithholdingsLedger,
     reportSchemaName: "PayWithholdingsLedger",
     ruleDescriptors: [
@@ -368,6 +460,17 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     title: "AU pay withholdings",
   }),
   new CalculatorCatalogEntryData({
+    calculate: (facts, validationIssues) =>
+      Effect.gen(function* () {
+        const engine = yield* CalculationEngine;
+        return yield* engine.run({
+          calculation: CalculateAnnualTax,
+          layer: AuAnnualTax2025_26_Live.pipe(
+            LayerApi.provideMerge(AnnualTaxScenarioLive(facts))
+          ),
+          validationIssues,
+        });
+      }),
     calculatorId: "au.income-tax.annual",
     context: ContextAu2025_26,
     description: "Australian annual income tax liability estimate.",
@@ -659,6 +762,21 @@ const GetCalculatorGraphEndpoint = HttpApiEndpoint.get(
   "Return graph edges and canonical graph validation diagnostics for one calculator."
 );
 
+const CalculateEndpoint = HttpApiEndpoint.post(
+  "calculate",
+  "/calculators/:calculatorId/calculate",
+  {
+    error: PublicErrorEnvelope,
+    params: CalculatorParams,
+    payload: PublicCalculationRequest,
+    query: CalculationQuery,
+    success: PublicCalculationResponse,
+  }
+).annotate(
+  OpenApi.Description,
+  "Run one public calculator using canonical scenario decoding and rule-pack layers."
+);
+
 const ListFactsEndpoint = HttpApiEndpoint.get("listFacts", "/facts", {
   query: DescriptorFilterQuery,
   success: FactsResponse,
@@ -684,6 +802,7 @@ export class PublicCalculationMetadataGroup extends HttpApiGroup.make(
   .add(GetCalculatorEndpoint)
   .add(GetCalculatorSchemaEndpoint)
   .add(GetCalculatorGraphEndpoint)
+  .add(CalculateEndpoint)
   .add(ListFactsEndpoint)
   .add(ListRulesEndpoint)
   .prefix("/api/v1")
