@@ -24,11 +24,25 @@ confidence: medium
 
 | Task | Status | Notes |
 | --- | --- | --- |
-| API-001 | pending | Add standalone Bun API app and lifecycle runtime. |
+| API-001 | complete | Added standalone Bun API app with one process `ManagedRuntime`, Bun server layer and signal disposal. |
 | API-002 | pending | Rewire web app to external API. |
 | API-003 | pending | Remove TanStack-mounted API routes. |
 | API-004 | pending | Update docs and final verification. |
 
 ## Validation Log
 
-- Pending.
+- 2026-05-23 API-001:
+  - `bun run --filter=api check-types` passed.
+  - `bun run --filter=api build` passed.
+  - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
+    Turbo typecheck.
+  - Ran `API_PORT=4012 bun run --filter=api start`; `GET /api/health`
+    returned `200 {"service":"whattax","status":"ok"}`.
+  - Ran `GET /api/docs/openapi.json`; response parsed as OpenAPI `3.1.0`
+    with title `WhatTax API` and `/api/health` present.
+  - Ran `API_PORT=4013 bun apps/api/src/index.ts`, sent `SIGTERM` to the Bun
+    entrypoint process, and observed `WhatTax API received SIGTERM; shutting
+    down` followed by `WhatTax API stopped` with exit code `0`.
+  - Audited `apps/api/src/runtime.ts`, `apps/api/src/server.ts` and
+    `apps/api/src/index.ts`: the app creates one `ManagedRuntime` at process
+    startup and no runtime inside request handling.
