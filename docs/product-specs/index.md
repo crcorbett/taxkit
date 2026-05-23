@@ -15,6 +15,7 @@ Specs:
 - [Documentation structure and development docs](./documentation-structure-and-development-docs.md)
 - [Documentation improvement roadmap](./documentation-improvement-roadmap.md)
 - [Extract API app](./extract-api-app.md)
+- [Public calculation API routes](./public-calculation-api-routes.md)
 
 Authoring guides:
 

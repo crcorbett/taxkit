@@ -1,0 +1,224 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/public-calculation-api-routes.md",
+  "title": "Public Calculation API Route Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-05-24",
+  "principles": [
+    "Keep public API routes calculator, fact, rule and graph driven.",
+    "Keep jurisdiction, tax year and rule-pack options as schema-backed calculator context.",
+    "Reuse canonical schemas, descriptors, tagged errors and report types from owning packages.",
+    "Return Effect Schema decode issues with field paths and descriptor-backed help.",
+    "Keep apps/api thin; calculation contracts and handlers stay in packages/http-api.",
+    "Use Effect Layers, CalculationEngine and canonical rule-pack Layers for execution.",
+    "Keep OpenAPI generated from Effect HTTP API definitions."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit only after each coherent implementation slice passes verification, Changeset review and API contract review.",
+    "requiredBeforeFinalPR": [
+      "bun run verification",
+      "bun run changeset or explicit no-changeset rationale",
+      "OpenAPI JSON includes the implemented public calculation routes",
+      "API smoke checks for metadata routes and at least one successful calculation",
+      "API smoke check for schema-guided validation error help",
+      "Architecture audit against docs/architecture/api-and-sdk.md, facts.md, rules-and-parameters.md, calculators.md and graph-trace-ledgers.md"
+    ],
+    "evidenceRequired": [
+      "Changed-file summary",
+      "Changeset path and release-train impact, or no-changeset rationale",
+      "API changelog update for public route changes",
+      "`bun run verification` result",
+      "OpenAPI route evidence",
+      "Successful calculation response sample",
+      "Schema error response sample",
+      "Canonical schema/type reuse audit"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "PUBLIC-API-001",
+      "title": "Create the calculator catalog and shared API schemas",
+      "type": "foundation",
+      "dependsOn": [],
+      "goal": "Add the schema-backed catalog and API boundary types needed for calculator, fact, rule and graph routes without implementing public calculation execution yet.",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
+      "scope": [
+        "packages/http-api/src/groups",
+        "packages/http-api/src/handlers",
+        "packages/http-api/src/api.ts",
+        "packages/http-api/src/index.ts",
+        "packages/http-api/README.md",
+        "packages/core/src",
+        "packages/rules/au/pay/src",
+        "packages/rules/au/income-tax/src",
+        "packages/rules/au/stsl/src"
+      ],
+      "outputs": [
+        "Schema-backed calculator ID and context schemas",
+        "Schema-backed help mode schema",
+        "Schema-backed public error envelope for schema decode and unsupported calculator/context failures",
+        "Initial calculator catalog entries for au.pay.take-home, au.pay.withholdings and au.income-tax.annual",
+        "Catalog entries reference canonical fact descriptors, rule descriptors, report schemas and rule-pack Layers",
+        "Package README note for public calculation API schema ownership"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run --filter=@whattax/http-api check-types",
+        "Search changed files for mirrored canonical fields such as local id: string definitions where an owning branded ID/schema exists",
+        "Search changed files for Object.entries, Object.values, manual _tag objects, unsafe casts and non-null assertions",
+        "bun run changeset"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "Catalog and API boundary schemas are Effect Schema-backed",
+        "Canonical descriptors and report schemas are imported from owning packages",
+        "No calculation route is exposed yet unless its handler is complete",
+        "Parent agent verified canonical schema/type/id reuse",
+        "Changeset covers @whattax/http-api and any package whose public exports changed"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "PUBLIC-API-002",
+      "title": "Implement metadata, schema, facts, rules and graph routes",
+      "type": "api-contract",
+      "dependsOn": [
+        "PUBLIC-API-001"
+      ],
+      "goal": "Expose calculator discovery and graph/question-planning metadata before calculation execution.",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
+      "scope": [
+        "packages/http-api/src/api.ts",
+        "packages/http-api/src/groups",
+        "packages/http-api/src/handlers",
+        "packages/http-api/src/server/live.layer.ts",
+        "packages/http-api/README.md",
+        "apps/api/CHANGELOG.md"
+      ],
+      "outputs": [
+        "GET /api/v1/jurisdictions",
+        "GET /api/v1/tax-years",
+        "GET /api/v1/calculators",
+        "GET /api/v1/calculators/:calculatorId",
+        "GET /api/v1/calculators/:calculatorId/schema",
+        "GET /api/v1/calculators/:calculatorId/graph",
+        "GET /api/v1/facts",
+        "GET /api/v1/rules",
+        "OpenAPI annotations for each route",
+        "API changelog entry for public metadata routes"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run --filter=@whattax/http-api check-types",
+        "Run apps/api locally and request /api/docs/openapi.json",
+        "Smoke check at least /api/v1/calculators, /api/v1/calculators/au.pay.take-home/schema?help=full, /api/v1/facts?calculator=au.pay.take-home and /api/v1/rules?calculator=au.pay.take-home",
+        "Confirm metadata routes expose canonical fact descriptors and rule descriptors rather than copied DTO fields",
+        "bun run changeset"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "Metadata routes are generated through Effect HTTP API groups",
+        "OpenAPI JSON contains every implemented route",
+        "Graph route returns canonical graph diagnostics shape",
+        "Facts and rules routes support calculator, jurisdiction and taxYear filters",
+        "API changelog documents the new public metadata surface"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "PUBLIC-API-003",
+      "title": "Implement schema-guided calculation execution",
+      "type": "api-runtime",
+      "dependsOn": [
+        "PUBLIC-API-002"
+      ],
+      "goal": "Expose POST /api/v1/calculators/:calculatorId/calculate with canonical scenario decoding, rule-pack Layer selection, CalculationEngine execution and schema-guided errors.",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
+      "scope": [
+        "packages/http-api/src/groups",
+        "packages/http-api/src/handlers",
+        "packages/http-api/src/client",
+        "packages/http-api/src/api.ts",
+        "packages/core/src/engine",
+        "packages/rules/au/pay/src",
+        "packages/rules/au/income-tax/src",
+        "packages/rules/au/stsl/src",
+        "apps/api/CHANGELOG.md"
+      ],
+      "outputs": [
+        "POST /api/v1/calculators/:calculatorId/calculate",
+        "Successful calculation responses for au.pay.take-home, au.pay.withholdings and au.income-tax.annual",
+        "Schema-guided decode error responses with missing field paths and descriptor-backed help",
+        "Unsupported calculator/context error responses",
+        "Client exports updated for browser-safe route consumption",
+        "API changelog entry for public calculation execution"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run --filter=@whattax/http-api check-types",
+        "Run apps/api locally and smoke check successful au.pay.take-home calculation",
+        "Run apps/api locally and smoke check successful au.income-tax.annual calculation",
+        "Run apps/api locally and smoke check a schema error for missing grossPay.period with help=errors",
+        "Confirm calculation handlers use CalculationEngine and canonical rule-pack/scenario Layers",
+        "Confirm request handlers do not create runtimes or import app runtime modules",
+        "bun run changeset"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "Calculation route returns schema-backed report, diagnostics, trace and ledger values where relevant",
+        "Schema errors are machine-readable and include help metadata when requested",
+        "Rule-pack dispatch stays Layer-based and calculator-driven",
+        "withholdings calculation reuses the take-home calculation path rather than creating a divergent engine",
+        "API changelog documents public calculation execution"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "PUBLIC-API-004",
+      "title": "Document, test and version the public calculation API",
+      "type": "docs-and-release",
+      "dependsOn": [
+        "PUBLIC-API-003"
+      ],
+      "goal": "Make the public calculation API discoverable, tested, versioned and aligned with the architecture docs.",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
+      "scope": [
+        "README.md",
+        "CHANGELOG.md",
+        "apps/api/README.md",
+        "apps/api/CHANGELOG.md",
+        "packages/http-api/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/public-calculation-api-routes.md",
+        "docs/product-specs/public-calculation-api-routes.tasks.json",
+        ".changeset"
+      ],
+      "outputs": [
+        "Public API usage docs",
+        "Architecture docs aligned with implemented routes",
+        "Root changelog and API changelog updates",
+        "Changeset covering public API route implementation",
+        "Final OpenAPI and smoke-test evidence"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun changeset status --verbose",
+        "Run apps/api locally and capture OpenAPI JSON route evidence",
+        "Smoke check metadata route, successful calculation route and schema error route",
+        "Audit docs for stale /api/v1/au route-family guidance",
+        "Audit docs for missing Changeset/changelog guidance"
+      ],
+      "browserVerification": [
+        "Open /api/docs and confirm the public calculation routes are visible"
+      ],
+      "completionCriteria": [
+        "Docs describe calculator/fact/rule route model as canonical",
+        "Root and API changelogs include public calculation API route changes",
+        "Changesets status previews the intended fixed release-train bump",
+        "Final verification evidence is recorded in the handoff"
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}

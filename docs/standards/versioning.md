@@ -65,7 +65,8 @@ bun run changeset status --verbose
 
 ## Rules
 
-- Every package-facing API, behavior, or tooling change needs a changeset.
+- Every package-facing API, behavior, tooling or public documentation change
+  needs a changeset.
 - Use the highest required semver bump across the release train.
 - Keep changeset summaries user-facing; describe the public effect of the
   change, not the implementation mechanics only.
@@ -80,5 +81,8 @@ bun run changeset status --verbose
 - For public API-facing changes, update `apps/api/CHANGELOG.md` in the same
   slice. Treat it as the public HTTP API contract/deployment changelog, not a
   Changesets-generated package changelog.
+- Public docs and specs are versioned too when they affect package behavior,
+  API behavior, install guidance, route design or generated documentation.
+  Docs-only typo fixes can use an explicit no-changeset rationale.
 - Keep package `private: true` until the package is ready for npm publication.
   Changesets still manages versions while packages are private.

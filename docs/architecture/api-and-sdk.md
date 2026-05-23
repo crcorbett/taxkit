@@ -114,18 +114,39 @@ the app remains a thin transport over the calculation engine.
 
 ## Endpoint Shape
 
-Future calculation endpoints should be calculation-goal oriented:
+Future calculation endpoints should be calculator, fact, rule and graph
+oriented rather than jurisdiction-route oriented. Jurisdiction, tax year,
+rule-pack options and capability filters are request context and metadata, not
+top-level route families.
+
+The public calculation API should start from stable generic resources:
 
 ```txt
-POST /api/calculate/take-home-pay
-POST /api/calculate/payg-withholding
-POST /api/calculate/annual-tax-estimate
-GET  /api/rules/au/:year
-GET  /api/graph/:calculator
-GET  /api/docs/openapi.json
+GET  /api/v1/jurisdictions
+GET  /api/v1/tax-years
+GET  /api/v1/calculators
+GET  /api/v1/calculators/:calculatorId
+GET  /api/v1/calculators/:calculatorId/schema
+POST /api/v1/calculators/:calculatorId/calculate
+GET  /api/v1/calculators/:calculatorId/graph
+GET  /api/v1/facts
+GET  /api/v1/rules
 ```
 
-Inputs and outputs should decode through Effect Schema. Outputs should include reports, traces and diagnostics where relevant.
+Calculator IDs may include jurisdiction segments, such as
+`au.pay.take-home`, but route structure must remain portable to future
+jurisdictions. Do not add `/api/v1/au/*` as the primary public route shape.
+
+Inputs and outputs must decode through Effect Schema. Schema decode failures
+should return structured issue details, missing/invalid field paths and
+descriptor-backed help so clients can guide users toward the facts required by
+the selected calculator. Outputs should include reports, traces, ledgers and
+diagnostics where relevant.
+
+Metadata and calculation routes may accept a `help` query parameter for richer
+client guidance. Help output should be generated from canonical schemas, fact
+descriptors, rule descriptors, graph diagnostics and source references instead
+of hand-written route-specific DTOs.
 
 ## TypeScript SDK Facade
 
