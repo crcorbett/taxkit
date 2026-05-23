@@ -1,4 +1,14 @@
-import { FactId, RuleId } from "@whattax/core";
+import {
+  FactAuthority,
+  FactId,
+  FactQuestion,
+  GraphValidationIssue,
+  ParameterEffectivePeriod,
+  ParameterId,
+  RuleId,
+  RuleSourcePolicy,
+  SourceRef,
+} from "@whattax/core";
 import type { AnyFactDescriptor, AnyRuleDescriptor } from "@whattax/core";
 import {
   AnnualTaxLedgerDescriptor,
@@ -27,6 +37,11 @@ import {
 } from "@whattax/rules-au-pay";
 import type { Effect, Layer, Option, Schema } from "effect";
 import { Array, Data, HashMap, Schema as SchemaApi } from "effect";
+import {
+  HttpApiEndpoint,
+  HttpApiGroup,
+  OpenApi,
+} from "effect/unstable/httpapi";
 
 export const CalculatorId = SchemaApi.Literals([
   "au.pay.take-home",
@@ -104,6 +119,8 @@ export const PublicErrorEnvelope = SchemaApi.Struct({
 
 export type PublicErrorEnvelope = typeof PublicErrorEnvelope.Type;
 
+export class PublicErrorEnvelopeData extends Data.Class<PublicErrorEnvelope> {}
+
 export const CalculatorCatalogItem = SchemaApi.Struct({
   calculatorId: CalculatorId,
   context: CalculatorContext,
@@ -123,6 +140,134 @@ export const CalculatorCatalogResponse = SchemaApi.Struct({
 });
 
 export type CalculatorCatalogResponse = typeof CalculatorCatalogResponse.Type;
+
+const Jurisdiction = SchemaApi.Struct({
+  code: SchemaApi.Literal("AU"),
+  title: SchemaApi.String,
+});
+
+type Jurisdiction = typeof Jurisdiction.Type;
+
+const JurisdictionsResponse = SchemaApi.Struct({
+  jurisdictions: SchemaApi.Array(Jurisdiction),
+});
+
+type JurisdictionsResponse = typeof JurisdictionsResponse.Type;
+
+const TaxYear = SchemaApi.Struct({
+  jurisdiction: SchemaApi.Literal("AU"),
+  taxYear: SchemaApi.Literal("2025-26"),
+});
+
+type TaxYear = typeof TaxYear.Type;
+
+const TaxYearsResponse = SchemaApi.Struct({
+  taxYears: SchemaApi.Array(TaxYear),
+});
+
+type TaxYearsResponse = typeof TaxYearsResponse.Type;
+
+export const MetadataQuery = SchemaApi.Struct({
+  jurisdiction: SchemaApi.optional(SchemaApi.Literal("AU")),
+  taxYear: SchemaApi.optional(SchemaApi.Literal("2025-26")),
+});
+
+export type MetadataQuery = typeof MetadataQuery.Type;
+
+export const HelpQuery = SchemaApi.Struct({
+  help: SchemaApi.optional(HelpMode),
+  jurisdiction: SchemaApi.optional(SchemaApi.Literal("AU")),
+  taxYear: SchemaApi.optional(SchemaApi.Literal("2025-26")),
+});
+
+export type HelpQuery = typeof HelpQuery.Type;
+
+export const DescriptorFilterQuery = SchemaApi.Struct({
+  calculator: SchemaApi.optional(CalculatorId),
+  jurisdiction: SchemaApi.optional(SchemaApi.Literal("AU")),
+  taxYear: SchemaApi.optional(SchemaApi.Literal("2025-26")),
+});
+
+export type DescriptorFilterQuery = typeof DescriptorFilterQuery.Type;
+
+const CalculatorParams = SchemaApi.Struct({
+  calculatorId: CalculatorId,
+});
+
+type CalculatorParams = typeof CalculatorParams.Type;
+
+export const ParameterDescriptorMetadata = SchemaApi.Struct({
+  effectivePeriod: ParameterEffectivePeriod,
+  id: ParameterId,
+  source: SourceRef,
+  title: SchemaApi.String,
+});
+
+export type ParameterDescriptorMetadata =
+  typeof ParameterDescriptorMetadata.Type;
+
+export const FactDescriptorMetadata = SchemaApi.Struct({
+  authority: FactAuthority,
+  id: FactId,
+  question: SchemaApi.optional(FactQuestion),
+  schemaTag: SchemaApi.String,
+  title: SchemaApi.String,
+});
+
+export type FactDescriptorMetadata = typeof FactDescriptorMetadata.Type;
+
+export const RuleDescriptorMetadata = SchemaApi.Struct({
+  allowDuplicateProvides: SchemaApi.optional(SchemaApi.Boolean),
+  id: RuleId,
+  parameters: SchemaApi.Array(ParameterDescriptorMetadata),
+  provides: SchemaApi.Array(FactId),
+  requires: SchemaApi.Array(FactId),
+  sourcePolicy: RuleSourcePolicy,
+  sources: SchemaApi.Array(SourceRef),
+  title: SchemaApi.String,
+});
+
+export type RuleDescriptorMetadata = typeof RuleDescriptorMetadata.Type;
+
+export const FactsResponse = SchemaApi.Struct({
+  facts: SchemaApi.Array(FactDescriptorMetadata),
+});
+
+export type FactsResponse = typeof FactsResponse.Type;
+
+export const RulesResponse = SchemaApi.Struct({
+  rules: SchemaApi.Array(RuleDescriptorMetadata),
+});
+
+export type RulesResponse = typeof RulesResponse.Type;
+
+export const CalculatorSchemaResponse = SchemaApi.Struct({
+  calculator: CalculatorCatalogItem,
+  inputFacts: SchemaApi.Array(FactDescriptorMetadata),
+  outputFacts: SchemaApi.Array(FactDescriptorMetadata),
+  reportSchemaName: SchemaApi.String,
+  rules: SchemaApi.Array(RuleDescriptorMetadata),
+});
+
+export type CalculatorSchemaResponse = typeof CalculatorSchemaResponse.Type;
+
+export const RuleGraphEdge = SchemaApi.Struct({
+  from: FactId,
+  ruleId: RuleId,
+  to: FactId,
+});
+
+export type RuleGraphEdge = typeof RuleGraphEdge.Type;
+
+export const CalculatorGraphResponse = SchemaApi.Struct({
+  calculator: CalculatorCatalogItem,
+  edges: SchemaApi.Array(RuleGraphEdge),
+  facts: SchemaApi.Array(FactDescriptorMetadata),
+  rules: SchemaApi.Array(RuleDescriptorMetadata),
+  validationIssues: SchemaApi.Array(GraphValidationIssue),
+});
+
+export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
 
 type CalculatorProgram = Effect.Effect<unknown, unknown, unknown>;
 
@@ -147,7 +292,31 @@ class CalculatorCatalogEntryData extends Data.Class<CalculatorCatalogEntry> {}
 
 class CalculatorCatalogItemData extends Data.Class<CalculatorCatalogItem> {}
 
-class CalculatorCatalogResponseData extends Data.Class<CalculatorCatalogResponse> {}
+export class CalculatorCatalogResponseData extends Data.Class<CalculatorCatalogResponse> {}
+
+class JurisdictionData extends Data.Class<Jurisdiction> {}
+
+class JurisdictionsResponseData extends Data.Class<JurisdictionsResponse> {}
+
+class TaxYearData extends Data.Class<TaxYear> {}
+
+class TaxYearsResponseData extends Data.Class<TaxYearsResponse> {}
+
+class ParameterDescriptorMetadataData extends Data.Class<ParameterDescriptorMetadata> {}
+
+class FactDescriptorMetadataData extends Data.Class<FactDescriptorMetadata> {}
+
+class RuleDescriptorMetadataData extends Data.Class<RuleDescriptorMetadata> {}
+
+class FactsResponseData extends Data.Class<FactsResponse> {}
+
+class RulesResponseData extends Data.Class<RulesResponse> {}
+
+class CalculatorSchemaResponseData extends Data.Class<CalculatorSchemaResponse> {}
+
+class RuleGraphEdgeData extends Data.Class<RuleGraphEdge> {}
+
+class CalculatorGraphResponseData extends Data.Class<CalculatorGraphResponse> {}
 
 const ContextAu2025_26 = new CalculatorContextData({
   jurisdiction: "AU",
@@ -156,7 +325,7 @@ const ContextAu2025_26 = new CalculatorContextData({
 
 const SupportedHelpModes = HelpMode.literals;
 
-const CatalogEntries = [
+const CatalogEntries: readonly CalculatorCatalogEntry[] = [
   new CalculatorCatalogEntryData({
     calculatorId: "au.pay.take-home",
     context: ContextAu2025_26,
@@ -212,10 +381,16 @@ const CatalogEntries = [
     supportedHelpModes: SupportedHelpModes,
     title: "AU annual income tax",
   }),
-] as const;
+];
 
 export const CalculatorCatalog = HashMap.fromIterable(
-  Array.map(CatalogEntries, (entry) => [entry.calculatorId, entry] as const)
+  Array.map(
+    CatalogEntries,
+    (entry): readonly [CalculatorId, CalculatorCatalogEntry] => [
+      entry.calculatorId,
+      entry,
+    ]
+  )
 );
 
 export const listCalculatorCatalogEntries =
@@ -252,3 +427,264 @@ export const CalculatorCatalogResponseValue = new CalculatorCatalogResponseData(
     calculators: CalculatorCatalogItems,
   }
 );
+
+export const JurisdictionsResponseValue = new JurisdictionsResponseData({
+  jurisdictions: [
+    new JurisdictionData({
+      code: "AU",
+      title: "Australia",
+    }),
+  ],
+});
+
+export const TaxYearsResponseValue = new TaxYearsResponseData({
+  taxYears: [
+    new TaxYearData({
+      jurisdiction: "AU",
+      taxYear: "2025-26",
+    }),
+  ],
+});
+
+const schemaTag = (schema: Schema.Top): string => schema.ast._tag;
+
+const toFactDescriptorMetadata = (
+  descriptor: AnyFactDescriptor
+): FactDescriptorMetadata =>
+  new FactDescriptorMetadataData({
+    authority: descriptor.authority,
+    id: descriptor.id,
+    ...(descriptor.question === undefined
+      ? {}
+      : { question: descriptor.question }),
+    schemaTag: schemaTag(descriptor.schema),
+    title: descriptor.title,
+  });
+
+const toParameterDescriptorMetadata = (
+  descriptor: NonNullable<AnyRuleDescriptor["parameters"]>[number]
+): ParameterDescriptorMetadata =>
+  new ParameterDescriptorMetadataData({
+    effectivePeriod: descriptor.effectivePeriod,
+    id: descriptor.id,
+    source: descriptor.source,
+    title: descriptor.title,
+  });
+
+const toRuleDescriptorMetadata = (
+  descriptor: AnyRuleDescriptor
+): RuleDescriptorMetadata =>
+  new RuleDescriptorMetadataData({
+    ...(descriptor.allowDuplicateProvides === undefined
+      ? {}
+      : { allowDuplicateProvides: descriptor.allowDuplicateProvides }),
+    id: descriptor.id,
+    parameters: Array.map(
+      descriptor.parameters ?? Array.empty(),
+      toParameterDescriptorMetadata
+    ),
+    provides: Array.map(descriptor.provides, (fact) => fact.id),
+    requires: Array.map(descriptor.requires, (fact) => fact.id),
+    sourcePolicy: descriptor.sourcePolicy,
+    sources: descriptor.sources,
+    title: descriptor.title,
+  });
+
+const collectFacts = (
+  entries: readonly CalculatorCatalogEntry[]
+): readonly AnyFactDescriptor[] =>
+  Array.fromIterable(
+    HashMap.values(
+      Array.reduce(
+        entries,
+        HashMap.empty<FactId, AnyFactDescriptor>(),
+        (facts, entry) =>
+          Array.reduce(
+            Array.appendAll(entry.inputFacts, entry.outputFacts),
+            facts,
+            (updatedFacts, fact) => HashMap.set(updatedFacts, fact.id, fact)
+          )
+      )
+    )
+  );
+
+const collectRules = (
+  entries: readonly CalculatorCatalogEntry[]
+): readonly AnyRuleDescriptor[] =>
+  Array.fromIterable(
+    HashMap.values(
+      Array.reduce(
+        entries,
+        HashMap.empty<RuleId, AnyRuleDescriptor>(),
+        (rules, entry) =>
+          Array.reduce(entry.ruleDescriptors, rules, (updatedRules, rule) =>
+            HashMap.set(updatedRules, rule.id, rule)
+          )
+      )
+    )
+  );
+
+export const toFactsResponse = (
+  entries: readonly CalculatorCatalogEntry[]
+): FactsResponse =>
+  new FactsResponseData({
+    facts: Array.map(collectFacts(entries), toFactDescriptorMetadata),
+  });
+
+export const toRulesResponse = (
+  entries: readonly CalculatorCatalogEntry[]
+): RulesResponse =>
+  new RulesResponseData({
+    rules: Array.map(collectRules(entries), toRuleDescriptorMetadata),
+  });
+
+export const toCalculatorSchemaResponse = (
+  entry: CalculatorCatalogEntry
+): CalculatorSchemaResponse =>
+  new CalculatorSchemaResponseData({
+    calculator: toCalculatorCatalogItem(entry),
+    inputFacts: Array.map(entry.inputFacts, toFactDescriptorMetadata),
+    outputFacts: Array.map(entry.outputFacts, toFactDescriptorMetadata),
+    reportSchemaName: entry.reportSchemaName,
+    rules: Array.map(entry.ruleDescriptors, toRuleDescriptorMetadata),
+  });
+
+const toRuleGraphEdges = (
+  rules: readonly AnyRuleDescriptor[]
+): readonly RuleGraphEdge[] =>
+  Array.flatMap(rules, (rule) =>
+    Array.flatMap(rule.requires, (required) =>
+      Array.map(
+        rule.provides,
+        (provided) =>
+          new RuleGraphEdgeData({
+            from: required.id,
+            ruleId: rule.id,
+            to: provided.id,
+          })
+      )
+    )
+  );
+
+export const toCalculatorGraphResponse = (args: {
+  readonly entry: CalculatorCatalogEntry;
+  readonly validationIssues: readonly GraphValidationIssue[];
+}): CalculatorGraphResponse =>
+  new CalculatorGraphResponseData({
+    calculator: toCalculatorCatalogItem(args.entry),
+    edges: toRuleGraphEdges(args.entry.ruleDescriptors),
+    facts: Array.map(collectFacts([args.entry]), toFactDescriptorMetadata),
+    rules: Array.map(args.entry.ruleDescriptors, toRuleDescriptorMetadata),
+    validationIssues: args.validationIssues,
+  });
+
+export const filterCalculatorEntries = (
+  query: DescriptorFilterQuery | HelpQuery | MetadataQuery
+): readonly CalculatorCatalogEntry[] =>
+  Array.filter(listCalculatorCatalogEntries(), (entry) => {
+    const calculatorMatches =
+      !("calculator" in query) ||
+      query.calculator === undefined ||
+      query.calculator === entry.calculatorId;
+    const jurisdictionMatches =
+      query.jurisdiction === undefined ||
+      query.jurisdiction === entry.context.jurisdiction;
+    const taxYearMatches =
+      query.taxYear === undefined || query.taxYear === entry.context.taxYear;
+
+    return calculatorMatches && jurisdictionMatches && taxYearMatches;
+  });
+
+const GetJurisdictionsEndpoint = HttpApiEndpoint.get(
+  "getJurisdictions",
+  "/jurisdictions",
+  {
+    success: JurisdictionsResponse,
+  }
+).annotate(OpenApi.Description, "List supported public API jurisdictions.");
+
+const GetTaxYearsEndpoint = HttpApiEndpoint.get("getTaxYears", "/tax-years", {
+  query: MetadataQuery,
+  success: TaxYearsResponse,
+}).annotate(
+  OpenApi.Description,
+  "List supported tax years for a jurisdiction."
+);
+
+const ListCalculatorsEndpoint = HttpApiEndpoint.get(
+  "listCalculators",
+  "/calculators",
+  {
+    query: MetadataQuery,
+    success: CalculatorCatalogResponse,
+  }
+).annotate(OpenApi.Description, "List public calculator catalog entries.");
+
+const GetCalculatorEndpoint = HttpApiEndpoint.get(
+  "getCalculator",
+  "/calculators/:calculatorId",
+  {
+    error: PublicErrorEnvelope,
+    params: CalculatorParams,
+    query: HelpQuery,
+    success: CalculatorCatalogItem,
+  }
+).annotate(OpenApi.Description, "Return one public calculator catalog entry.");
+
+const GetCalculatorSchemaEndpoint = HttpApiEndpoint.get(
+  "getCalculatorSchema",
+  "/calculators/:calculatorId/schema",
+  {
+    error: PublicErrorEnvelope,
+    params: CalculatorParams,
+    query: HelpQuery,
+    success: CalculatorSchemaResponse,
+  }
+).annotate(
+  OpenApi.Description,
+  "Return fact, rule and report schema metadata for one calculator."
+);
+
+const GetCalculatorGraphEndpoint = HttpApiEndpoint.get(
+  "getCalculatorGraph",
+  "/calculators/:calculatorId/graph",
+  {
+    error: PublicErrorEnvelope,
+    params: CalculatorParams,
+    query: MetadataQuery,
+    success: CalculatorGraphResponse,
+  }
+).annotate(
+  OpenApi.Description,
+  "Return graph edges and canonical graph validation diagnostics for one calculator."
+);
+
+const ListFactsEndpoint = HttpApiEndpoint.get("listFacts", "/facts", {
+  query: DescriptorFilterQuery,
+  success: FactsResponse,
+}).annotate(
+  OpenApi.Description,
+  "List canonical fact descriptors, optionally filtered by calculator context."
+);
+
+const ListRulesEndpoint = HttpApiEndpoint.get("listRules", "/rules", {
+  query: DescriptorFilterQuery,
+  success: RulesResponse,
+}).annotate(
+  OpenApi.Description,
+  "List canonical rule descriptors, optionally filtered by calculator context."
+);
+
+export class PublicCalculationMetadataGroup extends HttpApiGroup.make(
+  "publicCalculationMetadata"
+)
+  .add(GetJurisdictionsEndpoint)
+  .add(GetTaxYearsEndpoint)
+  .add(ListCalculatorsEndpoint)
+  .add(GetCalculatorEndpoint)
+  .add(GetCalculatorSchemaEndpoint)
+  .add(GetCalculatorGraphEndpoint)
+  .add(ListFactsEndpoint)
+  .add(ListRulesEndpoint)
+  .prefix("/api/v1")
+  .annotate(OpenApi.Title, "Public calculation metadata") {}

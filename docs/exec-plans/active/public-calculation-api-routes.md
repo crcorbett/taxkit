@@ -1,0 +1,77 @@
+---
+status: active
+last_reviewed: 2026-05-24
+source_of_truth: docs
+confidence: medium
+---
+
+# Public Calculation API Routes Execution Plan
+
+## Goal
+
+Implement [Public calculation API routes](../../product-specs/public-calculation-api-routes.md)
+through the ordered task list at
+[public-calculation-api-routes.tasks.json](../../product-specs/public-calculation-api-routes.tasks.json).
+
+The rollout MUST stay calculator, fact, rule and graph driven. Jurisdiction and
+tax year are schema-backed calculator context, not route-family structure.
+
+## Operating Rules
+
+- Implement one task-list slice at a time.
+- Delegate exactly one bounded task to a subagent where useful.
+- Parent-review each diff against the spec, task object and architecture docs
+  before accepting the slice.
+- Run `bun run verification` for each accepted slice.
+- Keep Changeset and API changelog evidence current for package-facing and
+  public API-facing work.
+- Commit only after the coherent slice passes verification and review.
+
+## Task Status
+
+| Task | Status | Notes |
+| --- | --- | --- |
+| PUBLIC-API-001 | complete | Added schema-backed calculator catalog foundation and canonical PAYG-only withholding layer. Parent verification passed. Commit `e730352`. |
+| PUBLIC-API-002 | complete | Added metadata, schema, facts, rules and graph routes. Parent verification passed. |
+| PUBLIC-API-003 | pending | Implement schema-guided calculation execution. |
+| PUBLIC-API-004 | pending | Document, test and version the public calculation API. |
+
+## Validation Log
+
+### PUBLIC-API-001
+
+- Commit: `e730352 Add public calculator catalog schemas`
+- Verification:
+  - `bun run verification` passed.
+  - `bun changeset status --verbose` previews a fixed release-train patch bump
+    to `0.0.2`.
+- Parent review:
+  - Catalog entries reuse canonical fact descriptors, rule descriptors, report
+    schemas and rule-pack layers.
+  - `@whattax/http-api` dependencies on implemented rule packages are aligned
+    with the API package owning calculator metadata and future handlers.
+  - No public calculation execution routes were added in this slice.
+
+### PUBLIC-API-002
+
+- Verification:
+  - `bun run verification` passed.
+  - `bun run --filter=@whattax/http-api check-types` passed.
+  - `bun changeset status --verbose` previews a fixed release-train patch bump
+    to `0.0.2`.
+- API smoke checks:
+  - Started `apps/api` on `127.0.0.1:4017`.
+  - `/api/docs/openapi.json` contains the public metadata route family.
+  - `/api/v1/calculators` returns the initial three calculator IDs.
+  - `/api/v1/calculators/au.pay.take-home/schema?help=full` returns
+    canonical fact IDs, rule IDs and descriptor metadata.
+  - `/api/v1/facts?calculator=au.pay.take-home` and
+    `/api/v1/rules?calculator=au.pay.take-home` return descriptor-derived
+    metadata.
+  - `/api/v1/calculators/au.pay.take-home/graph` returns graph edges and an
+    empty canonical graph validation issue list.
+- Parent review:
+  - Routes are implemented through the Effect HTTP API group and handler layer.
+  - Metadata values are derived from canonical fact descriptors, rule
+    descriptors, source refs, parameter periods and graph diagnostics.
+  - No public calculation execution route was added in this slice.

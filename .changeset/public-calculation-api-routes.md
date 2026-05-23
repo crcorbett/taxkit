@@ -11,3 +11,8 @@ Add the initial public calculation API schema foundation, including
 schema-backed calculator IDs, context and help-mode contracts, public error
 envelopes and the initial AU calculator catalog. Add a canonical PAYG-only
 withholding rule-pack layer for the withholding catalog entry.
+
+Expose public metadata routes for jurisdictions, tax years, calculator
+discovery, calculator schema metadata, graph diagnostics, canonical fact
+descriptors and canonical rule descriptors. Calculation execution remains
+deferred.

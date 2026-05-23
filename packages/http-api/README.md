@@ -7,32 +7,42 @@ confidence: medium
 
 # HTTP API
 
-Effect HTTP API package for the current WhatTax health endpoint and API server
-wiring.
+Effect HTTP API package for the current WhatTax health endpoint, public
+calculation metadata endpoints and API server wiring.
 
 ## Scope
 
 `@whattax/http-api` owns the current HTTP API contract, generated OpenAPI
-metadata, health handler and typed client helpers used by WhatTax apps.
+metadata, health and public calculation metadata handlers, and typed client
+helpers used by WhatTax apps.
 
-The implemented API surface is intentionally small:
+The implemented API surface is:
 
 - `GET /api/health`
 - `GET /api/docs`
 - `GET /api/docs/openapi.json`
+- `GET /api/v1/jurisdictions`
+- `GET /api/v1/tax-years`
+- `GET /api/v1/calculators`
+- `GET /api/v1/calculators/:calculatorId`
+- `GET /api/v1/calculators/:calculatorId/schema`
+- `GET /api/v1/calculators/:calculatorId/graph`
+- `GET /api/v1/facts`
+- `GET /api/v1/rules`
 
-The package also owns the public calculation API boundary schemas and initial
-calculator catalog used by the planned `/api/v1/calculators` route family.
-Those schemas live with the API group modules and compose canonical facts,
-rules, report schemas and rule-pack layers from the owning engine and rule
-packages instead of mirroring their fields locally.
+The public calculation API metadata routes expose the initial calculator
+catalog, canonical fact descriptors, canonical rule descriptors and graph
+validation diagnostics for the implemented AU rule packages. Calculation
+execution is not exposed yet; `POST /api/v1/calculators/:calculatorId/calculate`
+is intentionally deferred.
 
 ## Main Areas
 
 - `src/api.ts`: `WhatTaxApi` definition and OpenAPI annotations.
 - `src/groups/health.ts`: health endpoint schema and route group.
 - `src/groups/calculators.ts`: public calculator IDs, context/help schemas,
-  error envelopes and the initial schema-backed calculator catalog.
+  error envelopes, metadata route schemas, OpenAPI annotations and the initial
+  schema-backed calculator catalog.
 - `src/handlers/`: server-side handlers and handler layers.
 - `src/server/live.layer.ts`: server route layer, CORS middleware, Scalar docs
   route and OpenAPI JSON route.
@@ -101,10 +111,13 @@ bun run --filter=@whattax/http-api check-types
 
 ## Guardrails
 
-- Do not document calculation endpoints until they are implemented.
+- Do not document calculation execution endpoints until they are implemented.
 - Keep browser consumers on client exports; do not import server handlers into
   browser code.
 - Keep endpoint request and response shapes schema-owned.
+- Keep metadata responses derived from canonical fact descriptors, rule
+  descriptors, source refs, parameter periods and graph diagnostics from the
+  owning engine and rule packages.
 - Add OpenAPI annotations with new API groups so docs stay generated from the
   contract.
 - Add tests or focused verification when new endpoints, handlers or client
