@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WhatTax Repo Status Outline</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f8fb;
+        --paper: #ffffff;
+        --ink: #17202a;
+        --muted: #607083;
+        --line: #d9e0e8;
+        --blue: #175cd3;
+        --green: #13795b;
+        --amber: #9a6700;
+        --red: #b42318;
+        --slate: #344054;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.55;
+      }
+
+      main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+
+      header {
+        margin-bottom: 32px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.15;
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: 42px;
+        margin-bottom: 12px;
+      }
+
+      h2 {
+        font-size: 24px;
+        margin-bottom: 16px;
+      }
+
+      h3 {
+        font-size: 17px;
+        margin-bottom: 8px;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      a {
+        color: var(--blue);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+      }
+
+      .lede {
+        max-width: 780px;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 4px 10px;
+        background: var(--paper);
+        color: var(--slate);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      section {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 24px;
+        margin-top: 18px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .item {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+        min-height: 100%;
+      }
+
+      .item p,
+      li {
+        color: var(--muted);
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      .status {
+        display: inline-flex;
+        margin-bottom: 10px;
+        border-radius: 999px;
+        padding: 3px 9px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .done {
+        background: #e8f7f0;
+        color: var(--green);
+      }
+
+      .partial {
+        background: #fff6df;
+        color: var(--amber);
+      }
+
+      .not-started {
+        background: #ffeceb;
+        color: var(--red);
+      }
+
+      .neutral {
+        background: #eef4ff;
+        color: var(--blue);
+      }
+
+      code {
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 1px 5px;
+        background: #f8fafc;
+        color: #27364a;
+        font-size: 0.92em;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 4px;
+        font-size: 14px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 10px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--slate);
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      footer {
+        color: var(--muted);
+        margin-top: 24px;
+        font-size: 13px;
+      }
+
+      @media (max-width: 820px) {
+        main {
+          padding: 32px 16px 56px;
+        }
+
+        h1 {
+          font-size: 32px;
+        }
+
+        .grid,
+        .two {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>WhatTax Repo Status Outline</h1>
+        <p class="lede">
+          High-level view of how the repository currently works, what has been
+          completed, and what remains to be built. This is a manually refreshed
+          local snapshot reviewed on <code>2026-05-23</code>, not the canonical
+          source of truth.
+        </p>
+        <div class="meta">
+          <span class="pill">Repo: WhatTax</span>
+          <span class="pill">Branch: main</span>
+          <span class="pill">Last reviewed: 2026-05-23</span>
+          <span class="pill">Snapshot: manual</span>
+        </div>
+      </header>
+
+      <section>
+        <h2>Current Shape</h2>
+        <div class="grid">
+          <div class="item">
+            <span class="status done">Completed</span>
+            <h3>Monorepo Scaffold</h3>
+            <p>
+              Root package uses pnpm and Turbo. Current scripts are
+              <code>dev</code>, <code>check-types</code>, <code>build</code>,
+              and <code>clean</code>.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status done">Completed</span>
+            <h3>Web Runtime Proof</h3>
+            <p>
+              <code>apps/web</code> is a TanStack Start app with separate
+              server and client managed runtimes.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status partial">Partial</span>
+            <h3>HTTP API</h3>
+            <p>
+              <code>@whattax/http-api</code> exists with Effect HTTP API
+              boundaries and a health endpoint at <code>/api/health</code>.
+              Calculation endpoints are not implemented yet.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>How The Repo Works Today</h2>
+        <div class="grid two">
+          <div class="item">
+            <h3>Runtime Flow</h3>
+            <ul>
+              <li>The root route in <code>apps/web</code> loads health data.</li>
+              <li>
+                It resolves the route runtime and yields
+                <code>WhatTaxHttpApiService</code>.
+              </li>
+              <li>
+                The service calls <code>api.health.getHealth()</code> through
+                the browser-safe client boundary.
+              </li>
+              <li>
+                The page renders the returned <code>ok</code> status.
+              </li>
+            </ul>
+          </div>
+          <div class="item">
+            <h3>Package Boundaries</h3>
+            <ul>
+              <li><code>apps/web</code> owns the current app shell.</li>
+              <li><code>packages/http-api</code> owns the current API contract.</li>
+              <li><code>packages/tsconfig</code> owns shared TypeScript config.</li>
+              <li>
+                <code>packages/core</code>, <code>packages/scripts</code>, and
+                <code>packages/ui</code> currently have README coverage but no
+                implemented package manifests.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Completed Work</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Area</th>
+              <th>Status</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Repo scaffold</td>
+              <td>Done</td>
+              <td>pnpm workspace, Turbo tasks, TypeScript config, web app and API package are present.</td>
+            </tr>
+            <tr>
+              <td>Health API</td>
+              <td>Done</td>
+              <td>Effect HTTP API exposes <code>GET /api/health</code> returning <code>{ status: "ok", service: "whattax" }</code>.</td>
+            </tr>
+            <tr>
+              <td>Web integration</td>
+              <td>Done</td>
+              <td>The root page calls the API client through the route runtime and displays health status.</td>
+            </tr>
+            <tr>
+              <td>Architecture docs</td>
+              <td>Done for baseline</td>
+              <td>Canonical docs now cover facts, rules, calculators, graph/trace/ledgers, API/SDK, ownership, frontend, content, deployment and quality.</td>
+            </tr>
+            <tr>
+              <td>Planning structure</td>
+              <td>Done for baseline</td>
+              <td>Product specs, exec plans, design docs, references and documentation audit buckets exist.</td>
+            </tr>
+            <tr>
+              <td>Agent routing</td>
+              <td>Done</td>
+              <td><code>AGENTS.md</code> is a short atlas and PRD writer/implementer skills are present.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Not Completed Yet</h2>
+        <div class="grid">
+          <div class="item">
+            <span class="status not-started">Not started</span>
+            <h3>Tax Engine</h3>
+            <p>
+              No core primitives, facts, rule descriptors, parameter services,
+              rule packs, calculators, traces or ledgers have been implemented.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status not-started">Not started</span>
+            <h3>Calculation API</h3>
+            <p>
+              Planned endpoints such as take-home pay, PAYG withholding, annual
+              tax estimate, rule metadata and graph output do not exist yet.
+              The health-only API already exposes docs at <code>/api/docs</code>
+              and OpenAPI JSON at <code>/api/docs/openapi.json</code>.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status not-started">Not started</span>
+            <h3>SDK</h3>
+            <p>
+              <code>@whattax/sdk-typescript</code> is designed in docs but has
+              not been scaffolded or implemented.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status not-started">Not started</span>
+            <h3>Docs Site</h3>
+            <p>
+              <code>apps/docs</code> and any Fumadocs package are planned but
+              not present.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status partial">Partial</span>
+            <h3>README Coverage</h3>
+            <p>
+              Existing package roots now have README coverage. Planned roots
+              such as <code>packages/core</code>, <code>packages/scripts</code>,
+              and <code>packages/ui</code> are documented as planned ownership
+              areas, not implemented packages.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status not-started">Not started</span>
+            <h3>Validation Harness</h3>
+            <p>
+              Golden tests, graph validation, trace snapshots, package export
+              checks and API/SDK parity tests are planned but not implemented.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Current Development Priority</h2>
+        <ol>
+          <li>Keep root and package docs clear about current versus planned surfaces.</li>
+          <li>Build the first engine slice under <code>packages/core</code>.</li>
+          <li>Define schema-backed primitives, fact descriptors and Effect service helpers.</li>
+          <li>Implement one vertical calculator path before broad package expansion.</li>
+          <li>Add tests and graph/trace validation with the first real rule package.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Useful Local Entry Points</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Need</th>
+              <th>File</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Agent atlas</td>
+              <td><a href="../AGENTS.md">AGENTS.md</a></td>
+            </tr>
+            <tr>
+              <td>Architecture index</td>
+              <td><a href="architecture/README.md">docs/architecture/README.md</a></td>
+            </tr>
+            <tr>
+              <td>Current documentation spec</td>
+              <td><a href="product-specs/documentation-structure-and-development-docs.md">docs/product-specs/documentation-structure-and-development-docs.md</a></td>
+            </tr>
+            <tr>
+              <td>Documentation audit</td>
+              <td><a href="documentation-audit/README.md">docs/documentation-audit/README.md</a></td>
+            </tr>
+            <tr>
+              <td>Web app docs</td>
+              <td><a href="../apps/web/README.md">apps/web/README.md</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <footer>
+        Generated as a static, local status page. It is intentionally a snapshot
+        rather than a canonical source of truth; update it when repo structure
+        changes materially.
+      </footer>
+    </main>
+  </body>
+</html>

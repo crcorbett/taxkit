@@ -1,0 +1,143 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/documentation-improvement-roadmap.md",
+  "title": "Documentation Improvement Roadmap Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-05-23",
+  "principles": [
+    "Make current implementation distinct from planned architecture.",
+    "Keep root AGENTS.md short and route deeper instead of duplicating docs.",
+    "Use package root READMEs for package-local scope and guardrails.",
+    "Treat docs/repo-status-outline.html as a snapshot, not source of truth."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit only after the coherent documentation slice passes verification.",
+    "requiredBeforeFinalPR": [
+      "pnpm check-types",
+      "pnpm build",
+      "Audit README and AGENTS links against files that exist",
+      "Audit planned package references for clear planned/current wording"
+    ],
+    "evidenceRequired": [
+      "Changed-file summary",
+      "README coverage summary",
+      "Verification command results",
+      "Remaining documentation gaps"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "DOC-IMPROVE-001",
+      "title": "Fill README coverage for existing packages",
+      "type": "docs",
+      "dependsOn": [],
+      "goal": "Document the package roots that already exist so local package ownership is clear.",
+      "scope": [
+        "packages/http-api/README.md",
+        "packages/tsconfig/README.md",
+        "docs/documentation-audit/README.md"
+      ],
+      "outputs": [
+        "README for @whattax/http-api",
+        "README for @whattax/tsconfig",
+        "Updated README coverage in documentation audit"
+      ],
+      "mandatoryVerification": [
+        "Each README includes scope, main areas, runtime shape, guardrails and related docs",
+        "Documentation audit no longer lists packages/http-api or packages/tsconfig as missing README coverage"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "Existing package roots with package.json have package READMEs",
+        "No package README claims unimplemented calculation behavior exists"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DOC-IMPROVE-002",
+      "title": "Refresh the root README",
+      "type": "docs",
+      "dependsOn": ["DOC-IMPROVE-001"],
+      "goal": "Make README.md a useful human entrypoint without turning it into a manual.",
+      "scope": [
+        "README.md",
+        "docs/repo-status-outline.html"
+      ],
+      "outputs": [
+        "Root README with current repo state, commands and docs entrypoints",
+        "Status snapshot linked or documented from README"
+      ],
+      "mandatoryVerification": [
+        "README links point at existing files",
+        "README distinguishes implemented surfaces from planned package families"
+      ],
+      "browserVerification": [
+        "Open docs/repo-status-outline.html locally if the snapshot is changed"
+      ],
+      "completionCriteria": [
+        "A new contributor can identify current app/API surfaces and next docs entrypoints from README.md",
+        "The HTML snapshot is explicitly described as a snapshot"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DOC-IMPROVE-003",
+      "title": "Clarify current versus planned architecture docs",
+      "type": "docs",
+      "dependsOn": ["DOC-IMPROVE-002"],
+      "goal": "Prevent planned package families from being mistaken for implemented code.",
+      "scope": [
+        "docs/architecture/README.md",
+        "docs/architecture/package-ownership.md",
+        "docs/architecture/package-boundaries.md",
+        "packages/core/README.md",
+        "packages/scripts/README.md",
+        "packages/ui/README.md"
+      ],
+      "outputs": [
+        "Current/planned wording pass across architecture docs",
+        "Consistent planned-package wording in near-term package READMEs"
+      ],
+      "mandatoryVerification": [
+        "Architecture docs identify current implemented surfaces",
+        "Planned packages are marked as planned where relevant"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "No root or architecture doc routes users to a missing implementation as if it exists",
+        "Package ownership guidance remains forward-looking without hiding current gaps"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DOC-IMPROVE-004",
+      "title": "Add docs maintenance guidance and final audit",
+      "type": "audit",
+      "dependsOn": ["DOC-IMPROVE-003"],
+      "goal": "Define when future changes must update docs and verify the documentation set.",
+      "scope": [
+        "docs/design-docs/agent-first-documentation.md",
+        "docs/documentation-audit/README.md",
+        "AGENTS.md"
+      ],
+      "outputs": [
+        "Docs maintenance convention",
+        "Updated audit with remaining gaps",
+        "Final link and terminology audit"
+      ],
+      "mandatoryVerification": [
+        "pnpm check-types",
+        "pnpm build",
+        "Audit root atlas links against existing files",
+        "Audit docs for stale missing-README claims"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "Docs maintenance rules are concise and tied to real ownership changes",
+        "Documentation audit records the next remaining priorities",
+        "Verification commands pass"
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}
