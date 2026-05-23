@@ -48,12 +48,24 @@ bun run --filter=api build
 bun run --filter=api clean
 ```
 
+For local UI development, run the API and web app in separate terminals:
+
+```sh
+bun run --filter=api dev
+bun run --filter=web dev
+```
+
+The web app defaults to `http://127.0.0.1:4000` for API calls. Override the API
+origin with `WHATTAX_API_BASE_URL` for SSR and `VITE_WHATTAX_API_BASE_URL` for
+browser navigation.
+
 ## Guardrails
 
 - Do not define API contracts in this app.
 - Do not create a `ManagedRuntime` inside request handling.
 - Keep process-owned resources in `ApiAppLayer` so runtime disposal releases
   them.
+- Keep `apps/web` as an HTTP client of this app, not an in-process API mount.
 
 ## Related Docs
 

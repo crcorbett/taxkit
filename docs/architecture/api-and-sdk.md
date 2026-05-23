@@ -7,13 +7,50 @@ confidence: high
 
 # API And SDK
 
-WhatTax should publish a reusable API app server and TypeScript SDK around the open-source calculation engine.
+WhatTax should publish a reusable API app server and TypeScript SDK around the
+open-source calculation engine.
 
-The API and SDK are part of this repository because they expose reusable tax calculation capabilities through stable, documented boundaries.
+The API and SDK are part of this repository because they expose reusable tax
+calculation capabilities through stable, documented boundaries.
 
-## API Package
+## Current API Runtime
 
-The API package should live under:
+`apps/api` is the current API runtime owner. It is a standalone Bun process
+that owns host/port config, process startup, one process-lifetime Effect
+`ManagedRuntime`, Bun request serving and graceful shutdown. It delegates API
+contracts, handlers, schemas and generated docs to `packages/http-api`.
+
+The current implemented API surface is health/docs only:
+
+```txt
+GET /api/health
+GET /api/docs
+GET /api/docs/openapi.json
+```
+
+`apps/web` consumes this API over HTTP. It must not mount the canonical API or
+import server-only `@whattax/http-api` exports.
+
+## Current API Package
+
+The current API package lives under:
+
+```txt
+packages/http-api
+```
+
+Package name:
+
+```txt
+@whattax/http-api
+```
+
+It owns the current Effect HTTP API definitions, health endpoint schema,
+server route layer, OpenAPI metadata and typed client helpers.
+
+## Planned API Package
+
+Longer term, the calculation API package may move toward:
 
 ```txt
 packages/api/http
@@ -33,19 +70,21 @@ It owns:
 - OpenAPI generation
 - handler layers that compose rule packs and calculators
 
-## API App
+## Planned API App Scope
 
-The API app server should live under:
+The reusable API app server lives under:
 
 ```txt
 apps/api
 ```
 
-It is a reusable server for open-source and integration use. Applications may run their own API servers that import WhatTax packages or call this API, but the app remains a thin transport over the calculation engine.
+It is a reusable server for open-source and integration use. Applications may
+run their own API servers that import WhatTax packages or call this API, but
+the app remains a thin transport over the calculation engine.
 
 ## Endpoint Shape
 
-Endpoints should be calculation-goal oriented:
+Future calculation endpoints should be calculation-goal oriented:
 
 ```txt
 POST /api/calculate/take-home-pay

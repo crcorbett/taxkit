@@ -12,8 +12,9 @@ Current TanStack Start scaffold for WhatTax.
 ## Scope
 
 `apps/web` proves the current browser/server runtime split and calls the
-Effect HTTP API health endpoint. It is not the long-term calculation engine and
-should not own tax-domain contracts.
+standalone Effect HTTP API service owned by `apps/api`. It is not the
+long-term calculation engine and should not own tax-domain contracts or API
+request handling.
 
 ## Main Areas
 
@@ -53,6 +54,10 @@ bun run --filter=web dev
 bun run --filter=web check-types
 bun run --filter=web build
 ```
+
+Run `apps/api` before loading the web root locally. Without the API process,
+the root route should fail with an attributable HTTP transport error rather
+than silently falling back to an in-process API.
 
 ## Related Docs
 

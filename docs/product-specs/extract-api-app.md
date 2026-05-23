@@ -19,11 +19,22 @@ a standalone service. Longer-term package naming or placement changes should
 follow [API and SDK](../architecture/api-and-sdk.md) and
 [Package ownership](../architecture/package-ownership.md).
 
+## Implementation Status
+
+Implemented on 2026-05-23:
+
+- `apps/api` is the standalone Bun API runtime.
+- `apps/web` calls the API over HTTP for SSR and browser navigation.
+- The TanStack-mounted `/api/$` route and in-process API handler were removed.
+- Final verification evidence is tracked in
+  [the active execution plan](../exec-plans/active/extract-api-app.md).
+
 ## Problem
 
-`apps/web` currently proves the browser/server runtime split by mounting the
-Effect API inside the TanStack Start server. That is useful for the scaffold,
-but it conflates the public web surface with the reusable API runtime.
+Before this extraction, `apps/web` proved the browser/server runtime split by
+mounting the Effect API inside the TanStack Start server. That is useful for
+the scaffold, but it conflates the public web surface with the reusable API
+runtime.
 
 This makes it harder to deploy, scale, test and document the API as its own
 open-source integration surface. It also leaves `apps/web` with server-only API

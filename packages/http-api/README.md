@@ -26,8 +26,9 @@ The implemented API surface is intentionally small:
 - `src/api.ts`: `WhatTaxApi` definition and OpenAPI annotations.
 - `src/groups/health.ts`: health endpoint schema and route group.
 - `src/handlers/`: server-side handlers and handler layers.
-- `src/server.ts`: server route layer, Scalar docs route and OpenAPI JSON
-  route.
+- `src/server/live.layer.ts`: server route layer, CORS middleware, Scalar docs
+  route and OpenAPI JSON route.
+- `src/server.ts`: server export boundary for `WhatTaxServerLayer`.
 - `src/client/`: typed Effect HTTP API client helpers and layers.
 
 Export paths:
@@ -49,6 +50,10 @@ The package is built as ESM TypeScript. Runtime exports are split by boundary:
 - server runtimes may use `@whattax/http-api/server`
 - app or test code that needs in-process wiring can use the client layers
 - handler exports are server-side and should not be imported from browser code
+
+`ApiRoutesLive` owns reusable route middleware such as CORS inside this package.
+App packages should provide a platform HTTP server and process config, not
+duplicate API route middleware.
 
 Current responses are schema-backed with Effect Schema. The health response is:
 

@@ -18,6 +18,7 @@ Current tracked documentation entrypoints:
 - `docs/exec-plans/`
 - `docs/product-specs/`
 - `docs/references/`
+- `apps/api/README.md`
 - `apps/web/README.md`
 - `packages/core/README.md`
 - `packages/http-api/README.md`
@@ -33,6 +34,7 @@ content/posts, deployment and testing quality.
 
 Current app/package roots with package manifests:
 
+- `apps/api`: covered by `apps/api/README.md`
 - `apps/web`: covered by `apps/web/README.md`
 - `packages/http-api`: covered by `packages/http-api/README.md`
 - `packages/tsconfig`: covered by `packages/tsconfig/README.md`
@@ -53,9 +55,10 @@ Requested near-term package roots:
 - Planned package roots `packages/core`, `packages/scripts` and `packages/ui`
   have README guidance only. They still need package manifests, source exports
   and verification before they become runtime packages.
-- `apps/api`, `apps/docs`, `packages/api/*`, `packages/sdk/*`,
-  `packages/domain/*` and `packages/rules/*` remain planned architecture, not
-  implemented code.
+- `apps/docs`, `packages/api/*`, `packages/sdk/*`, `packages/domain/*` and
+  `packages/rules/*` remain planned architecture, not implemented code.
+- `apps/api` is implemented as a standalone health/docs API runtime, but
+  production calculation endpoints are still not implemented.
 - No generated documentation inventory exists yet; this audit is maintained by
   hand.
 
@@ -83,12 +86,10 @@ At audit time, check that:
 1. Create the first engine package slice under `packages/core/*` and keep its
    README aligned as code appears.
 2. Add `apps/docs` only when the public docs app is actually scaffolded.
-3. Add `apps/api` only when calculation endpoints move beyond the health
-   scaffold.
-4. Add package-boundary tests once browser-safe and server-only export surfaces
+3. Add package-boundary tests once browser-safe and server-only export surfaces
    exist beyond the current health API.
-5. Decide whether the status snapshot should stay manual or become generated
+4. Decide whether the status snapshot should stay manual or become generated
    once repo status changes frequently enough to justify automation.
-6. Add a generated docs inventory only if manual audit drift becomes a recurring
+5. Add a generated docs inventory only if manual audit drift becomes a recurring
    source of mistakes.
-7. Keep this audit updated when new package roots or docs buckets are added.
+6. Keep this audit updated when new package roots or docs buckets are added.

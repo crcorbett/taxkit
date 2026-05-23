@@ -10,15 +10,18 @@ confidence: medium
 WhatTax is the public monorepo for the open-source tax engine, API, SDK and
 documentation site.
 
-The repo is early. The implemented surface is a TanStack Start web scaffold, an
-Effect HTTP API package with a health endpoint and shared TypeScript config.
-The tax engine, calculator endpoints, SDK package and docs site are planned but
-not implemented yet.
+The repo is early. The implemented surface is a standalone Bun API app, a
+TanStack Start web scaffold that calls that API, an Effect HTTP API package
+with a health endpoint and shared TypeScript config. The tax engine,
+calculator endpoints, SDK package and docs site are planned but not
+implemented yet.
 
 ## What Exists Today
 
-- [apps/web](./apps/web/README.md): TanStack Start app that loads the current
-  health API through server/client runtime boundaries.
+- [apps/api](./apps/api/README.md): standalone Bun process that owns API
+  startup, listening config and Effect runtime teardown for `/api/*`.
+- [apps/web](./apps/web/README.md): TanStack Start app that loads health data
+  from `apps/api` through server/client runtime boundaries.
 - [packages/http-api](./packages/http-api/README.md): Effect HTTP API contract,
   server handler exports and browser-safe client exports for `GET /api/health`.
 - [packages/tsconfig](./packages/tsconfig/README.md): shared TypeScript config
@@ -45,13 +48,16 @@ Start with:
 
 ```sh
 bun install
-bun run dev
+bun run --filter=api dev
+bun run --filter=web dev
 bun run verification
 ```
 
-`bun run dev` starts the current web app. `bun run verification` is the
-baseline verification command for documentation, package wiring and scaffold
-changes.
+Run `apps/api` and `apps/web` in separate terminals for local UI development.
+`apps/api` defaults to `http://127.0.0.1:4000`; `apps/web` uses that origin
+unless `WHATTAX_API_BASE_URL` or `VITE_WHATTAX_API_BASE_URL` is set. `bun run
+verification` is the baseline verification command for documentation, package
+wiring and scaffold changes.
 
 ## Documentation Entry Points
 
@@ -81,11 +87,13 @@ file:///Users/cooper/Projects/whattax/docs/repo-status-outline.html
 
 ## Runtime Boundary
 
-- `apps/web/src/lib/runtime.server.ts` is the only server `ManagedRuntime`.
-- `apps/web/src/lib/runtime.client.ts` is the only client `ManagedRuntime`.
-- `apps/web/src/lib/server/api-handler.server.ts` is the only app-side import
-  of `@whattax/http-api/server`.
+- `apps/api` is the API runtime owner. It creates one process-lifetime
+  `ManagedRuntime`, serves `packages/http-api` through Bun and disposes scoped
+  resources on shutdown.
+- `apps/web/src/lib/runtime.server.ts` and
+  `apps/web/src/lib/runtime.client.ts` own the web SSR and browser client
+  runtimes. They call the standalone API over HTTP.
 - `@whattax/http-api/client` and `@whattax/http-api/client/live` are
   browser-safe.
 - `@whattax/http-api/client/server`, `@whattax/http-api/server` and handler
-  exports are server-only.
+  exports are server-only and should stay out of `apps/web`.

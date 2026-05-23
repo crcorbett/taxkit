@@ -49,6 +49,7 @@ fast.
 
 | Path | Owns |
 | --- | --- |
+| `apps/api` | standalone Bun API runtime and health/docs endpoints |
 | `apps/web` | current TanStack Start scaffold and health-check UI |
 | `packages/http-api` | current Effect HTTP API package |
 | `packages/tsconfig` | shared TypeScript config |

@@ -13,4 +13,8 @@ export default defineConfig({
     ".turbo/**",
     ".vercel/**",
   ],
+  rules: {
+    "func-name-matching": "off",
+    "func-names": "off",
+  },
 });

@@ -247,9 +247,9 @@
             <span class="status done">Completed</span>
             <h3>Monorepo Scaffold</h3>
             <p>
-              Root package uses Bun and Turbo. Current scripts are
+              Root package uses Bun and Turbo. Current scripts include
               <code>dev</code>, <code>check-types</code>, <code>build</code>,
-              and <code>clean</code>.
+              <code>verification</code>, and <code>clean</code>.
             </p>
           </div>
           <div class="item">
@@ -257,13 +257,15 @@
             <h3>Web Runtime Proof</h3>
             <p>
               <code>apps/web</code> is a TanStack Start app with separate
-              server and client managed runtimes.
+              server and client managed runtimes that call the standalone API
+              over HTTP.
             </p>
           </div>
           <div class="item">
             <span class="status partial">Partial</span>
             <h3>HTTP API</h3>
             <p>
+              <code>apps/api</code> runs the Bun API process, while
               <code>@whattax/http-api</code> exists with Effect HTTP API
               boundaries and a health endpoint at <code>/api/health</code>.
               Calculation endpoints are not implemented yet.
@@ -285,7 +287,7 @@
               </li>
               <li>
                 The service calls <code>api.health.getHealth()</code> through
-                the browser-safe client boundary.
+                the browser-safe client boundary against <code>apps/api</code>.
               </li>
               <li>
                 The page renders the returned <code>ok</code> status.
@@ -295,6 +297,7 @@
           <div class="item">
             <h3>Package Boundaries</h3>
             <ul>
+              <li><code>apps/api</code> owns the current API runtime.</li>
               <li><code>apps/web</code> owns the current app shell.</li>
               <li><code>packages/http-api</code> owns the current API contract.</li>
               <li><code>packages/tsconfig</code> owns shared TypeScript config.</li>
@@ -322,17 +325,17 @@
             <tr>
               <td>Repo scaffold</td>
               <td>Done</td>
-              <td>Bun workspace, Turbo tasks, TypeScript config, web app and API package are present.</td>
+              <td>Bun workspace, Turbo tasks, TypeScript config, API app, web app and API package are present.</td>
             </tr>
             <tr>
               <td>Health API</td>
               <td>Done</td>
-              <td>Effect HTTP API exposes <code>GET /api/health</code> returning <code>{ status: "ok", service: "whattax" }</code>.</td>
+              <td><code>apps/api</code> serves the Effect HTTP API at <code>GET /api/health</code>, returning <code>{ status: "ok", service: "whattax" }</code>.</td>
             </tr>
             <tr>
               <td>Web integration</td>
               <td>Done</td>
-              <td>The root page calls the API client through the route runtime and displays health status.</td>
+              <td>The root page calls the standalone API through the route runtime and displays health status.</td>
             </tr>
             <tr>
               <td>Architecture docs</td>
@@ -447,6 +450,10 @@
             <tr>
               <td>Documentation audit</td>
               <td><a href="documentation-audit/README.md">docs/documentation-audit/README.md</a></td>
+            </tr>
+            <tr>
+              <td>API app docs</td>
+              <td><a href="../apps/api/README.md">apps/api/README.md</a></td>
             </tr>
             <tr>
               <td>Web app docs</td>
