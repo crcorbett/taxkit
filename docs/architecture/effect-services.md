@@ -29,6 +29,42 @@ Core service categories:
 - calculator programs that require facts and return schema-backed reports
 - API and SDK services that adapt transport inputs to engine inputs
 
+## Effect-Native Primitives
+
+WhatTax code MUST use Effect-native primitives and platform APIs when they fit
+the problem. This is a consistency and reliability rule, not a style
+preference.
+
+Use:
+
+- `Data`, `Schema`, `Schema.TaggedClass`, `Schema.TaggedStruct`,
+  `Data.TaggedClass` and `Data.TaggedError` for domain values and expected
+  errors.
+- `Array`, `Chunk`, `HashSet`, `HashMap`, `Record`, `Option`, `Result`,
+  `Exit` and `Match` for collection processing, lookup results, closed-domain
+  dispatch and program results.
+- `Context`, `Context.Service`, `Layer`, `Config`, `ConfigProvider`,
+  `ManagedRuntime`, Bun runtime/platform APIs and `Command` for dependency
+  injection, configuration, app runtime lifecycle and process/platform work.
+
+Do not fall back to ad hoc classes, manual `_tag` object literals, mutable
+JavaScript `Map`/`Set` indexes, nullable lookups, `switch`, `Object.values`,
+`Object.entries`, custom env parsing, manual process signal orchestration,
+request-local runtime creation or hand-rolled runtime wrappers when Effect
+owns the pattern.
+
+## Runtime Composition
+
+Use `ManagedRuntime.make(...)` for module-scoped app runtimes that run many
+Effects against the same fully provided service graph, such as web SSR and
+browser client runtimes. Do not create a `ManagedRuntime` inside route loaders,
+React components, request handlers or per-operation helpers.
+
+Use `@effect/platform-bun/BunRuntime.runMain(...)` for Bun process entrypoints
+where the root Effect is the process lifecycle. Process entrypoints should
+compose config, platform layers and server layers, then let Effect
+interruption/scopes release resources.
+
 ## Callsite Error Handling
 
 One-off Effect error handling MUST stay at the callsite. Error transformations
@@ -59,6 +95,12 @@ reduces complex duplication.
   in the owning package's public schema module. Exported types MUST be derived
   from those schemas. Runtime and handler files should compose services and
   layers, not define or duplicate reusable shapes inline.
+- Canonical ids, branded scalar fields, request/response shapes, facts,
+  descriptors and tagged values MUST be declared once by the owning package.
+  Consumers MUST import and reuse the owning schema, type, constructor, service
+  tag or branded id. Do not redeclare canonical fields as local primitives such
+  as `id: string`, `ruleId: string` or object mirrors outside the owning
+  schema/type source.
 - Use `Layer` composition for rule packs and scenario inputs.
 - Keep parameter data separate from algorithms.
 - Use tagged errors for expected domain failures.

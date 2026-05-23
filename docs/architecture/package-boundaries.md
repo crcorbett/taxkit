@@ -18,14 +18,19 @@ This page is a target architecture, not a list of implemented packages.
 
 Implemented packages and apps:
 
+- `apps/api`
 - `apps/web`
+- `packages/core`
 - `packages/http-api`
+- `packages/rules/au/income-tax`
+- `packages/rules/au/pay`
+- `packages/rules/au/stsl`
+- `packages/testing`
 - `packages/tsconfig`
 
 Planned ownership directories with README guidance but no package manifest or
 runtime source yet:
 
-- `packages/core`
 - `packages/scripts`
 - `packages/ui`
 
@@ -101,7 +106,7 @@ WhatTax packages must not depend on application-layer code. React is allowed onl
 
 ## Package Responsibilities
 
-Planned `@whattax/core-*` packages will own:
+Implemented `@whattax/core` owns:
 
 - branded primitives such as money, dates, percentages and ids
 - fact descriptor helpers
@@ -110,6 +115,7 @@ Planned `@whattax/core-*` packages will own:
 - trace and ledger types
 - common tagged errors
 - Effect `Context.Tag` / `Layer` helpers
+- calculation engine orchestration
 
 Planned `@whattax/domain-au-*` packages will own:
 
@@ -117,25 +123,30 @@ Planned `@whattax/domain-au-*` packages will own:
 - pay periods and date dimensions
 - Australian tax-domain facts that are not specific to one rule pack
 
-Planned `@whattax/rules-au-pay` will own:
+Implemented `@whattax/rules-au-pay` owns:
 
 - gross pay, taxable pay, net pay and pay event facts
 - pay-period conversions
 - salary sacrifice effects where they affect pay calculations
 - payslip reconciliation target facts, but not payslip parsing
 
-Planned `@whattax/rules-au-payg` will own:
+Current PAYG withholding behavior is implemented inside
+`@whattax/rules-au-pay`. A later split to `@whattax/rules-au-payg` should keep
+canonical schemas, ids and parameter services with the owning package.
+
+Planned `@whattax/rules-au-payg` may own:
 
 - ATO withholding schedule schemas
 - PAYG withholding algorithms
 - PAYG parameter table services
 - PAYG withholding traces and golden tests
 
-Planned `@whattax/rules-au-stsl`, `@whattax/rules-au-super`,
-`@whattax/rules-au-income-tax`, `@whattax/rules-au-medicare`,
-`@whattax/rules-au-fbt`, `@whattax/rules-au-mortgage` and
-`@whattax/rules-au-deductions` will own their corresponding facts,
-algorithms, parameter tables and official rule packs.
+Implemented `@whattax/rules-au-stsl` and
+`@whattax/rules-au-income-tax` own their corresponding facts, algorithms,
+parameter tables and official rule packs. Planned `@whattax/rules-au-super`,
+`@whattax/rules-au-medicare`, `@whattax/rules-au-fbt`,
+`@whattax/rules-au-mortgage` and `@whattax/rules-au-deductions` will own their
+corresponding facts, algorithms, parameter tables and official rule packs.
 
 Planned `@whattax/api-http` will own:
 

@@ -22,7 +22,11 @@ Current tracked documentation entrypoints:
 - `apps/web/README.md`
 - `packages/core/README.md`
 - `packages/http-api/README.md`
+- `packages/rules/au/income-tax/README.md`
+- `packages/rules/au/pay/README.md`
+- `packages/rules/au/stsl/README.md`
 - `packages/scripts/README.md`
+- `packages/testing/README.md`
 - `packages/tsconfig/README.md`
 - `packages/ui/README.md`
 
@@ -36,12 +40,17 @@ Current app/package roots with package manifests:
 
 - `apps/api`: covered by `apps/api/README.md`
 - `apps/web`: covered by `apps/web/README.md`
+- `packages/core`: covered by `packages/core/README.md`
 - `packages/http-api`: covered by `packages/http-api/README.md`
+- `packages/rules/au/income-tax`: covered by
+  `packages/rules/au/income-tax/README.md`
+- `packages/rules/au/pay`: covered by `packages/rules/au/pay/README.md`
+- `packages/rules/au/stsl`: covered by `packages/rules/au/stsl/README.md`
+- `packages/testing`: covered by `packages/testing/README.md`
 - `packages/tsconfig`: covered by `packages/tsconfig/README.md`
 
 Requested near-term package roots:
 
-- `packages/core`: covered by `packages/core/README.md`
 - `packages/scripts`: covered by `packages/scripts/README.md`
 - `packages/ui`: covered by `packages/ui/README.md`
 
@@ -52,11 +61,12 @@ Requested near-term package roots:
 - `docs/repo-status-outline.html` is a manual snapshot. It is linked from the
   root README, but it can drift and must be refreshed after material repo-shape
   or implemented-surface changes.
-- Planned package roots `packages/core`, `packages/scripts` and `packages/ui`
-  have README guidance only. They still need package manifests, source exports
-  and verification before they become runtime packages.
+- Planned package roots `packages/scripts` and `packages/ui` have README
+  guidance only. They still need package manifests, source exports and
+  verification before they become runtime packages.
 - `apps/docs`, `packages/api/*`, `packages/sdk/*`, `packages/domain/*` and
-  `packages/rules/*` remain planned architecture, not implemented code.
+  remaining unimplemented `packages/rules/*` families remain planned
+  architecture, not implemented code.
 - `apps/api` is implemented as a standalone health/docs API runtime, but
   production calculation endpoints are still not implemented.
 - No generated documentation inventory exists yet; this audit is maintained by

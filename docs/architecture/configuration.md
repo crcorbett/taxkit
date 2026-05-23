@@ -113,6 +113,10 @@ When composed with `ServiceViteEnvConfigFragment`, this maps `baseUrl` to
   package-owned env namespaces are allowed and should live with the package
   config fragment.
 - Keep one-off config error transformation inline at the runtime callsite.
+- Use Effect `Config`, `ConfigProvider`, `Schema`, `Layer` and platform
+  runtime primitives for configuration. Do not parse `process.env` or
+  `import.meta.env` by hand when an Effect config/schema composition can own
+  the shape.
 
 ## Related Docs
 

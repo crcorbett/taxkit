@@ -14,9 +14,9 @@ library with stable package boundaries and predictable bundle behavior.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt`.
 - `oxlint-tsgolint` is installed and `ultracite check --type-aware` is the
   default root check command.
-- `knip` is configured in `knip.jsonc` for unused dependency and workspace
+- `knip` is configured in `knip.json` for unused dependency and workspace
   hygiene.
-- TypeScript 6 is used with `ES2025` lib support.
+- TypeScript is cataloged at the root and uses `ES2025` lib support.
 - Changesets record package-facing changes before release automation exists.
   See [Versioning and Changesets](./versioning.md).
 
@@ -35,6 +35,11 @@ bun run test
 Use `bun run check` for style and lint checks. Use `bun run fix` only when you
 intend to accept formatter and safe lint fixes. Use `bun run knip` before
 publishing or when changing package boundaries.
+
+Use `bun run verification` after changes that affect docs routing, package
+exports, Effect config composition, HTTP API contracts, runtime layers or
+shared schemas. Package-filtered commands are useful during iteration, but
+finish with the root verification gate when package wiring may be affected.
 
 Add a changeset for package-facing changes:
 

@@ -20,16 +20,17 @@ planned architecture and next build steps.
 
 ## Problem
 
-The repo is still early. It has a working web scaffold, a health-only Effect
-HTTP API package and a strong architecture direction, but most engine packages
-are not implemented yet. That creates a documentation risk: planned package
-families can read like current code, and developers or agents can lose time
-following aspirational paths.
+The repo is still early. It has a working standalone API app, web scaffold,
+health-only Effect HTTP API package, core engine package and first Australian
+rule packages, while public calculation HTTP endpoints, SDK and docs app remain
+planned. That creates a documentation risk: planned package families can read
+like current code, and developers or agents can lose time following
+aspirational paths.
 
 The current documentation audit already identifies the first gaps:
 
-- existing package roots `packages/http-api` and `packages/tsconfig` do not
-  have package READMEs
+- package README coverage must stay aligned as new package roots gain
+  manifests, source exports and verification
 - root `README.md` is still a minimal landing page rather than a useful
   human-facing repo overview
 - the architecture docs describe future packages that are not yet present
@@ -51,7 +52,7 @@ The current documentation audit already identifies the first gaps:
 
 ## Non-goals
 
-- Implement tax engine packages.
+- Implement additional tax engine packages.
 - Scaffold `apps/api`, `apps/docs` or `@whattax/sdk-typescript`.
 - Create a full documentation website.
 - Replace architecture docs with a generated status page.

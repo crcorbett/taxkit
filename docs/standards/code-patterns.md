@@ -5,12 +5,21 @@ calculation states difficult to represent, keep official rule data separate
 from algorithms, and expose enough metadata for graph validation, traces, and
 documentation.
 
+Effect-native primitives are mandatory where they fit. Use `Data`, `Schema`,
+`Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`,
+`Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and
+`ManagedRuntime` before reaching for ad hoc standard TypeScript equivalents.
+
 ## Boundary Values
 
 - Define externally visible values with `Schema`.
 - Brand domain primitives that should not be mixed accidentally, such as fact
   IDs, rule IDs, component IDs, cents, rates, tax years, and effective periods.
 - Derive public TypeScript types from schemas with `typeof Schema.Type`.
+- Reuse canonical schema-derived types, branded ids, service tags, tagged
+  errors and constructors from the owning package. Do not mirror canonical
+  fields as local primitives such as `id: string` outside the owning
+  schema/type source.
 - Decode unknown caller input at scenario and API boundaries with Effect Schema.
 - Prefer `Schema.TaggedClass` or `Schema.TaggedStruct` when a value crosses a
   package boundary or appears in traces, ledgers, reports, or descriptors.
@@ -206,3 +215,14 @@ const program = Effect.gen(function* () {
 Use explicit named exports in package entrypoints. Avoid `export *` barrels:
 Ultracite's `oxc/no-barrel-file` rule is enabled because explicit exports make
 public API shape clearer and help bundlers avoid loading unrelated modules.
+
+## Runtime And HTTP API Patterns
+
+Use `HttpApi`, `HttpApiGroup`, `HttpApiEndpoint` and
+`HttpApiBuilder.group(...)` for HTTP contracts and handlers. API packages
+expose contract, handler and route layers; app packages provide platform
+runtimes and runtime config.
+
+Use `ManagedRuntime.make(...)` for module-scoped web/server-client runtimes and
+`BunRuntime.runMain(...)` for Bun process entrypoints. Do not create runtimes
+inside request handlers, route loaders or React components.

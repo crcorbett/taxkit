@@ -12,9 +12,10 @@ documentation site.
 
 The repo is early. The implemented surface is a standalone Bun API app, a
 TanStack Start web scaffold that calls that API, an Effect HTTP API package
-with a health endpoint and shared TypeScript config. The tax engine,
-calculator endpoints, SDK package and docs site are planned but not
-implemented yet.
+with a health endpoint, deterministic core engine primitives, Australian pay,
+income-tax and STSL rule packages, shared testing helpers and shared
+TypeScript config. Calculation HTTP endpoints, SDK package and docs site are
+planned but not implemented yet.
 
 ## What Exists Today
 
@@ -24,11 +25,19 @@ implemented yet.
   from `apps/api` through server/client runtime boundaries.
 - [packages/http-api](./packages/http-api/README.md): Effect HTTP API contract,
   server handler exports and browser-safe client exports for `GET /api/health`.
+- [packages/core](./packages/core/README.md): deterministic engine primitives,
+  schema-backed facts, rule descriptors, graph validation, trace and ledger
+  contracts and calculation engine service.
+- `packages/rules/au/*`: implemented Australian pay, annual income-tax and
+  STSL rule packages with Effect rule layers, official parameter services,
+  calculators and golden tests.
+- [packages/testing](./packages/testing/README.md): shared test helpers for
+  workspace packages.
 - [packages/tsconfig](./packages/tsconfig/README.md): shared TypeScript config
   presets.
-- [packages/core](./packages/core/README.md), [packages/scripts](./packages/scripts/README.md)
-  and [packages/ui](./packages/ui/README.md): documented planned ownership
-  areas without package manifests or runtime code yet.
+- [packages/scripts](./packages/scripts/README.md) and
+  [packages/ui](./packages/ui/README.md): documented planned ownership areas
+  without package manifests or runtime code yet.
 
 ## Planned Package Families
 
@@ -63,6 +72,11 @@ scaffold changes.
 ## Documentation Entry Points
 
 - [AGENTS.md](./AGENTS.md): short atlas for agents and task routing.
+- [CLAUDE.md](./CLAUDE.md): Claude-compatible pointer to the canonical root
+  operating rules.
+- Engineering conventions start with [Effect services](./docs/architecture/effect-services.md),
+  [Configuration](./docs/architecture/configuration.md), [Package ownership](./docs/architecture/package-ownership.md)
+  and [Code patterns](./docs/standards/code-patterns.md).
 - [Product specs](./docs/product-specs/index.md): current implementation
   intent and task lists.
 - [Exec plans](./docs/exec-plans/README.md): live and completed rollout plans.

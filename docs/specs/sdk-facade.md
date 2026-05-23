@@ -647,7 +647,7 @@ Docstrings on public SDK methods should follow `docs/standards/docstrings.md`: c
 
 ## Implementation Plan
 
-1. Create `packages/sdk/typescript` with `bun`, TypeScript 6, Ultracite, Oxfmt, Oxlint and Knip wired through workspace scripts.
+1. Create `packages/sdk/typescript` with `bun`, the cataloged TypeScript/ES2025 baseline, Ultracite, Oxfmt, Oxlint and Knip wired through workspace scripts.
 2. Add generic public declarations for calculations, facts, rules, parameters, graphs and reports.
 3. Add typed provider constructors such as `CalculationProvider.effect(...)` and `RuleProvider.effect(...)` that return Effect Layers while enforcing declaration method contracts.
 4. Add typed `Binding` helpers for `requires`, `provides` and composition into graph metadata.

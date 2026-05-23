@@ -49,5 +49,8 @@ confidence: high | medium | low
 - Link to architecture docs instead of restating them.
 - Keep specs compact enough to scan quickly.
 - Make acceptance criteria concrete enough to verify.
+- For multi-slice delegated work, acceptance criteria must require parent
+  review of each subagent diff against the spec, task list and architecture
+  docs before the next task begins.
 - Use `bun run verification` as the default repo-level acceptance gate when a
   spec changes code, docs wiring, package metadata or task plans.

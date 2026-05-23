@@ -20,12 +20,16 @@ Current implemented code lives in:
 
 - `apps/api`
 - `apps/web`
+- `packages/core`
 - `packages/http-api`
+- `packages/rules/au/income-tax`
+- `packages/rules/au/pay`
+- `packages/rules/au/stsl`
+- `packages/testing`
 - `packages/tsconfig`
 
 Current planned ownership placeholders:
 
-- `packages/core`
 - `packages/scripts`
 - `packages/ui`
 
@@ -35,17 +39,23 @@ and source exports exist.
 
 ## Main Areas
 
-`packages/core/*`
-: Planned shared primitives, fact descriptors, rule descriptors, graph
-metadata, trace and ledger contracts, common tagged errors and Effect helpers.
+`packages/core`
+: Implemented shared primitives, fact descriptors, rule descriptors, graph
+metadata, trace and ledger contracts, common tagged errors and calculation
+engine service.
 
 `packages/domain/au/*`
 : Planned Australian date dimensions and domain facts that are not owned by a
 single rule pack.
 
 `packages/rules/au/*`
-: Planned official Australian rule packs, parameter tables, algorithms, source
-references, graph metadata and golden tests.
+: Official Australian rule packs, parameter tables, algorithms, source
+references, graph metadata and golden tests. Current implemented packages are
+`pay`, `income-tax` and `stsl`.
+
+`packages/testing`
+: Shared test helpers for workspace packages. It must not become a back door
+for production-only runtime helpers.
 
 `packages/api/http`
 : Planned long-term home for Effect HTTP API definitions, boundary schemas,
@@ -72,6 +82,10 @@ belongs in apps or explicitly server-only package exports.
 ## Guardrails
 
 - Define canonical schemas in the owning package.
+- Owning packages define canonical schemas, schema-derived types, branded ids,
+  constructors, service tags and tagged errors. Non-owners may adapt unknown
+  inputs at boundaries, but MUST import the canonical contracts instead of
+  redeclaring object shapes or fields such as `id: string`.
 - Define reusable config schemas in the package that owns the runtime contract,
   then compose and provide them from app-specific config modules.
 - Import from the owner instead of redefining boundary values locally.

@@ -38,11 +38,10 @@ the parent before the next slice begins.
   manual snapshot, and health-only API docs/OpenAPI wording matches current
   `packages/http-api/src/server.ts`.
 - DOC-IMPROVE-003: worker updated architecture and planned package README
-  wording. Parent audit confirmed implemented surfaces are listed separately
-  from planned packages, `packages/core`, `packages/scripts`, and
-  `packages/ui` are documentation-only placeholders, and planned packages are
-  not described as importable runtime packages. `bun run verification` passed
-  after refreshing local Bun workspace links with `bun install`.
+  wording. Parent audit confirmed implemented surfaces were listed separately
+  from then-planned packages, and planned packages were not described as
+  importable runtime packages. `bun run verification` passed after refreshing
+  local Bun workspace links with `bun install`.
 - DOC-IMPROVE-004: worker added docs maintenance routing to `AGENTS.md`,
   expanded maintenance triggers in `docs/design-docs/agent-first-documentation.md`,
   and refreshed `docs/documentation-audit/README.md` with remaining gaps and

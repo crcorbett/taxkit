@@ -11,7 +11,7 @@ The work is scoped to core calculation functionality only: facts, parameters, ru
 ## Architectural Constraints
 
 - Keep the implementation extremely type-safe and Effect TS-native.
-- Use the most modern TypeScript library baseline supported by the repo compiler. The repository now uses TypeScript 6 with `lib: ["ES2025"]`.
+- Use the most modern TypeScript library baseline supported by the repo compiler. The repository uses the cataloged TypeScript version with `lib: ["ES2025"]`.
 - Use Effect `Layer` composition as the primary rule and parameter composition mechanism.
 - Use Effect Schema for every boundary value, persisted value, report shape, trace shape, and parameter table.
 - Prefer branded schema values and derived types over plain strings, unbranded numbers, and structural-only contracts.
@@ -173,7 +173,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 ### 2026-05-12
 
 - Migrated the repository from pnpm to Bun workspaces, added `bun.lock`, and removed `pnpm-workspace.yaml` / `pnpm-lock.yaml`.
-- Upgraded the workspace TypeScript catalog and dev dependency to TypeScript 6.0.3, then set the base compiler lib to `ES2025`.
+- Updated the workspace TypeScript catalog and dev dependency, then set the base compiler lib to `ES2025`.
 - Configured Oxlint and Oxfmt to extend Ultracite provider configs directly, keeping `sort-keys`, `oxc/no-barrel-file`, and `jsdoc/check-tag-names` enforced.
 - Replaced package `export *` barrels with explicit named exports so public entrypoints stay reviewable and bundler-friendly.
 - Added public JSDoc coverage across core primitives, descriptors, graph validation, and AU rule packages without invalid `@category` tags.

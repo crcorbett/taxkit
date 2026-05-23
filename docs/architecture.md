@@ -43,7 +43,7 @@ This atlas is the fastest path through the WhatTax docs.
 - [Docstring conventions](./standards/docstrings.md): public API JSDoc rules
   that follow Ultracite's lint contract.
 - [Formatting, linting, and dependency hygiene](./standards/tooling.md): Bun,
-  Ultracite, Oxfmt, Oxlint, Knip, and TypeScript 6.
+  Ultracite, Oxfmt, Oxlint, Knip, and the cataloged TypeScript/ES2025 baseline.
 - [Versioning and Changesets](./standards/versioning.md): fixed release-train
   package versioning and changelog workflow.
 - [Productionization audit](./standards/productionization-audit.md): completed

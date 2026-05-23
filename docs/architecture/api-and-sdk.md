@@ -36,6 +36,14 @@ GET /api/docs/openapi.json
 `apps/web` consumes this API over HTTP. It must not mount the canonical API or
 import server-only `@whattax/http-api` exports.
 
+API process entrypoints should be Effect programs run with
+`@effect/platform-bun/BunRuntime.runMain(...)`. The app owns process config,
+platform server creation and root lifecycle. The HTTP API package owns
+`HttpApi` definitions, `HttpApiBuilder.group(...)` handlers, generated docs
+and reusable route layers. Apps should provide a platform `HttpServer` and
+serve the package route layer. Packages must not call `Bun.serve`, read
+process env or own process signal handling.
+
 ## Current API Package
 
 The current API package lives under:
@@ -64,6 +72,11 @@ Runtime app modules should keep app-owned schemas in colocated `schemas.ts`
 files and derive exported types from those schemas. Server startup files should
 consume canonical schema values and compose config, layers and runtime lifecycle
 only.
+
+Every public HTTP request and response schema should live in the owning API
+group or an owning package schema module. If downstream code needs the type,
+export it from the same module as a schema-derived type. Do not hand-write DTO
+interfaces or duplicate response shapes in handlers, clients or apps.
 
 ## Planned API Package
 

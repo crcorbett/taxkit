@@ -7,31 +7,39 @@ confidence: high
 
 # WhatTax Architecture
 
-This directory is the implementation reference for the planned WhatTax tax
-calculator architecture. It is also the routing guide for the small surface
-that exists today.
+This directory is the implementation reference for the WhatTax tax calculator
+architecture. It is also the routing guide for the implemented surface that
+exists today.
 
-WhatTax is the open-source engine repository. Today it contains a TanStack
-Start web scaffold, the `@whattax/http-api` health endpoint package, shared
-TypeScript config, documentation, and planned ownership directories. It does
-not yet contain the deterministic engine packages, rule packs, calculation
-programs, public API app, Fumadocs site, or TypeScript SDK described by these
-architecture docs.
+WhatTax is the open-source engine repository. Today it contains a standalone
+Bun API app, a TanStack Start web scaffold, the `@whattax/http-api` health
+endpoint package, deterministic core engine primitives, Australian pay,
+income-tax and STSL rule packages, shared testing helpers, shared TypeScript
+config and documentation. Public calculation HTTP endpoints, the Fumadocs site
+and TypeScript SDK remain planned.
 
 ## Current Implementation
 
 Implemented surfaces:
 
 - `apps/web`: TanStack Start scaffold that loads the health endpoint.
+- `apps/api`: standalone Bun API runtime for the current API surface.
 - `packages/http-api`: Effect HTTP API package for the current health route,
   docs page and OpenAPI JSON.
+- `packages/core`: deterministic primitives, fact/rule/parameter descriptors,
+  graph validation, trace and ledger contracts and calculation engine service.
+- `packages/rules/au/pay`: Australian take-home pay and PAYG withholding rule
+  pack.
+- `packages/rules/au/income-tax`: Australian annual income-tax rule pack.
+- `packages/rules/au/stsl`: Australian STSL withholding rule pack.
+- `packages/testing`: shared test helpers for workspace packages.
 - `packages/tsconfig`: shared TypeScript configuration presets.
 - `docs/**`: architecture, product specs, execution plans, references and
 documentation audits.
 
-Planned ownership directories such as `packages/core`, `packages/scripts` and
-`packages/ui` currently contain README guidance only. They are not runtime
-packages until a package manifest, source exports and verification are added.
+Planned ownership directories such as `packages/scripts` and `packages/ui`
+currently contain README guidance only. They are not runtime packages until a
+package manifest, source exports and verification are added.
 
 ## Core Model
 
@@ -83,7 +91,14 @@ explicit WhatTax input facts
 
 1. Use Effect `Layer`s as the rule composition mechanism.
 2. Use Effect Schema for every boundary value and persisted value.
-3. Keep engine input facts separate from application state.
-4. Keep yearly parameters separate from algorithms.
-5. Make traces and graph validation part of the first implementation, not a later add-on.
-6. Keep WhatTax engine packages independent of application packages.
+3. Use Effect-native primitives and platform APIs when they fit: `Data`,
+   `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`,
+   `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`,
+   `Platform`, `Command` and `ManagedRuntime`.
+4. Reuse canonical schemas, schema-derived types, branded ids, service tags,
+   tagged errors and constructors from the owning package. Never mirror
+   canonical fields such as `id: string` outside the owning schema/type source.
+5. Keep engine input facts separate from application state.
+6. Keep yearly parameters separate from algorithms.
+7. Make traces and graph validation part of the first implementation, not a later add-on.
+8. Keep WhatTax engine packages independent of application packages.

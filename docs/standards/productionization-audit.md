@@ -11,7 +11,8 @@ calculation packages and repository standards.
 - Added root `bun run check` and `bun run fix` scripts through Ultracite.
 - Enabled Oxlint type-aware mode with `oxlint-tsgolint`.
 - Added Knip as the repository dependency and workspace hygiene check.
-- Upgraded to TypeScript 6 and set the base lib to `ES2025`.
+- Set the base TypeScript lib to `ES2025` and keep the compiler version in the
+  root Bun catalog.
 - Replaced `export *` barrels with explicit named exports.
 - Added parameter effective periods and graph validation for overlapping
   parameter descriptors.

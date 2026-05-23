@@ -2,44 +2,54 @@
 status: canonical
 last_reviewed: 2026-05-23
 source_of_truth: package-readme
-confidence: low
+confidence: medium
 ---
 
-# Core Packages
+# Core
 
-Planned home for shared deterministic WhatTax engine primitives. This directory
-is currently documentation-only: it has no package manifest, source exports or
-runtime code.
+Shared deterministic WhatTax engine primitives and orchestration package.
 
 ## Scope
 
-`packages/core` should eventually group foundational packages for primitives,
-facts, rule descriptors, graph metadata, traces, ledgers, common tagged errors
-and Effect helpers.
+`packages/core` owns foundational primitives, facts, rule descriptors, graph
+metadata, traces, ledgers, common tagged errors and the calculation engine
+service.
 
 ## Main Areas
 
-Planned subpackages:
-
-- `primitives`
-- `facts`
-- `rules`
-- `graph`
-- `trace`
+- `src/primitives`: money, rounding, dates and tax scalar helpers
+- `src/facts`: fact descriptors and service metadata
+- `src/rules`: rule descriptors
+- `src/parameters`: parameter descriptors
+- `src/graph`: rule graph validation
+- `src/trace`: schema-backed trace nodes
+- `src/ledger`: schema-backed ledger components
+- `src/engine`: calculation engine service
 
 ## Runtime Shape
 
-When implemented, core packages should be deterministic and reusable. They
-should not import app runtime code, React, HTTP handlers or filesystem
-adapters.
+Core is deterministic and reusable. It must not import app runtime code, React,
+HTTP handlers or filesystem adapters.
 
 ## Guardrails
 
-- Use Effect Schema for boundary values.
+- Use Effect Schema for boundary values and derive exported types from
+  canonical schemas.
+- Reuse canonical schemas, branded ids and constructors. Do not redeclare
+  canonical fields such as `id: string` in consumers.
+- Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,
+  `Context`, `Layer`, `Record`, `Result` and `Exit` where they fit.
 - Keep money and rounding explicit.
 - Use package-owned descriptors and tagged errors.
 - Keep engine inputs separate from application state.
-- Add tests and package exports with each implemented subpackage.
+- Add tests and explicit package exports with each new public subpath.
+
+## Commands
+
+```sh
+bun run --filter=@whattax/core check-types
+bun run --filter=@whattax/core build
+```
 
 ## Related Docs
 

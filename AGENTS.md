@@ -16,7 +16,16 @@ fast.
 - Prefer the smallest correct change that matches repo boundaries.
 - Keep public WhatTax docs focused on the open-source engine, API, SDK and docs
   site.
-- Use Effect services, layers, schemas and tagged errors for engine boundaries.
+- MUST use Effect-native primitives and platform APIs when they fit:
+  `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`,
+  `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`,
+  `Platform`, `Command` and `ManagedRuntime`. Do not fall back to ad hoc
+  standard TypeScript shapes, mutable collections, manual env parsing, manual
+  process lifecycle code or hand-rolled runtime wrappers when Effect owns the
+  pattern.
+- MUST reuse canonical schemas, types, branded ids, service tags, tagged errors
+  and constructors from the owning package. Never mirror canonical fields such
+  as `id: string` outside the owning schema/type source.
 - MUST keep one-off Effect error handling and transformations inline at the
   callsite; do not extract tiny wrapper or mapper helpers. See
   `docs/architecture/effect-services.md`.
@@ -57,7 +66,11 @@ fast.
 | `apps/web` | current TanStack Start scaffold and health-check UI |
 | `packages/http-api` | current Effect HTTP API package |
 | `packages/tsconfig` | shared TypeScript config |
-| `packages/core` | planned deterministic engine primitives and metadata |
+| `packages/core` | implemented deterministic engine primitives, descriptors, graph, trace, ledgers and calculation engine |
+| `packages/rules/au/pay` | implemented Australian take-home pay and PAYG withholding rule pack |
+| `packages/rules/au/income-tax` | implemented Australian annual income tax rule pack |
+| `packages/rules/au/stsl` | implemented Australian STSL withholding rule pack |
+| `packages/testing` | shared test helpers for workspace packages |
 | `packages/scripts` | planned repo automation and validation scripts |
 | `packages/ui` | planned shared UI primitives |
 | `docs/architecture` | durable architecture and boundaries |
