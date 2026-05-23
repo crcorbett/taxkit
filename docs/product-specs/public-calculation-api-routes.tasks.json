@@ -2,7 +2,7 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/public-calculation-api-routes.md",
   "title": "Public Calculation API Route Tasks",
-  "status": "draft",
+  "status": "implemented",
   "last_reviewed": "2026-05-24",
   "principles": [
     "Keep public API routes calculator, fact, rule and graph driven.",

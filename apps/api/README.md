@@ -39,6 +39,20 @@ Environment overrides:
 - `GET /api/health`
 - `GET /api/docs`
 - `GET /api/docs/openapi.json`
+- `GET /api/v1/jurisdictions`
+- `GET /api/v1/tax-years`
+- `GET /api/v1/calculators`
+- `GET /api/v1/calculators/:calculatorId`
+- `GET /api/v1/calculators/:calculatorId/schema`
+- `POST /api/v1/calculators/:calculatorId/calculate`
+- `GET /api/v1/calculators/:calculatorId/graph`
+- `GET /api/v1/facts`
+- `GET /api/v1/rules`
+
+Public calculation routes are calculator, fact, rule and graph driven.
+Jurisdiction and tax year are calculator context, not top-level route families.
+The initial calculator IDs are `au.pay.take-home`, `au.pay.withholdings` and
+`au.income-tax.annual`.
 
 ## Changelog
 
@@ -73,6 +87,10 @@ Use the portless URL for local API smoke checks:
 
 ```sh
 curl https://api.whattax.localhost/api/health
+curl https://api.whattax.localhost/api/v1/calculators
+curl -X POST https://api.whattax.localhost/api/v1/calculators/au.pay.take-home/calculate \
+  -H 'content-type: application/json' \
+  -d '{"facts":{"grossPay":{"_tag":"GrossPay","amount":{"_tag":"Money","cents":150000,"currency":"AUD"},"period":"weekly"},"taxFreeThresholdClaimed":true}}'
 ```
 
 ## Guardrails

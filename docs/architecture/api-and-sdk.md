@@ -25,12 +25,21 @@ that owns host/port config, process startup through
 shutdown through Effect interruption and scoped layer finalizers. It delegates
 API contracts, handlers, schemas and generated docs to `packages/http-api`.
 
-The current implemented API surface is health/docs only:
+The current implemented API surface is:
 
 ```txt
 GET /api/health
 GET /api/docs
 GET /api/docs/openapi.json
+GET /api/v1/jurisdictions
+GET /api/v1/tax-years
+GET /api/v1/calculators
+GET /api/v1/calculators/:calculatorId
+GET /api/v1/calculators/:calculatorId/schema
+POST /api/v1/calculators/:calculatorId/calculate
+GET /api/v1/calculators/:calculatorId/graph
+GET /api/v1/facts
+GET /api/v1/rules
 ```
 
 `apps/web` consumes this API over HTTP. It must not mount the canonical API or
@@ -114,12 +123,12 @@ the app remains a thin transport over the calculation engine.
 
 ## Endpoint Shape
 
-Future calculation endpoints should be calculator, fact, rule and graph
-oriented rather than jurisdiction-route oriented. Jurisdiction, tax year,
-rule-pack options and capability filters are request context and metadata, not
-top-level route families.
+Calculation endpoints are calculator, fact, rule and graph oriented rather
+than jurisdiction-route oriented. Jurisdiction, tax year, rule-pack options and
+capability filters are request context and metadata, not top-level route
+families.
 
-The public calculation API should start from stable generic resources:
+The public calculation API uses stable generic resources:
 
 ```txt
 GET  /api/v1/jurisdictions

@@ -4,6 +4,10 @@
 
 ### Patch Changes
 
+- Added public calculator metadata and execution routes for the initial
+  calculator catalog: take-home pay, PAYG withholdings and annual income tax.
+  The public route model is calculator, fact, rule and graph driven rather than
+  jurisdiction-route driven.
 - Hardened the calculation engine with typed rule descriptor builders,
   date-level parameter effective periods, source artifact metadata, Effect
   BigDecimal-backed tax rates and coefficients, and a reusable

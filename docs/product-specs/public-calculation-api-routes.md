@@ -1,6 +1,6 @@
 ---
-status: draft
-last_reviewed: 2026-05-23
+status: implemented
+last_reviewed: 2026-05-24
 source_of_truth: docs
 confidence: medium
 ---
@@ -27,6 +27,25 @@ packages:
 
 The route model must remain ready for future jurisdictions without adding a new
 route family per country.
+
+## Implementation Status
+
+Implemented in the current API package and app:
+
+- public metadata routes for jurisdictions, tax years, calculators, calculator
+  schema metadata, calculator graph diagnostics, facts and rules
+- `POST /api/v1/calculators/:calculatorId/calculate`
+- initial calculators `au.pay.take-home`, `au.pay.withholdings` and
+  `au.income-tax.annual`
+- schema-guided decode errors with field paths and descriptor-backed help for
+  `help=errors` and `help=full`
+- generated OpenAPI documentation at `/api/docs` and `/api/docs/openapi.json`
+
+Still future work beyond this spec:
+
+- richer `help=schema`, `help=examples` and `help=sources` payloads
+- STSL and salary-sacrifice calculator variants in the public catalog
+- SDK package consumption of these schemas and routes
 
 ## Problem
 

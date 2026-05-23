@@ -34,7 +34,7 @@ tax year are schema-backed calculator context, not route-family structure.
 | PUBLIC-API-001 | complete | Added schema-backed calculator catalog foundation and canonical PAYG-only withholding layer. Parent verification passed. Commit `e730352`. |
 | PUBLIC-API-002 | complete | Added metadata, schema, facts, rules and graph routes. Parent verification passed. |
 | PUBLIC-API-003 | complete | Added schema-guided calculation execution. Parent verification passed. |
-| PUBLIC-API-004 | pending | Document, test and version the public calculation API. |
+| PUBLIC-API-004 | complete | Updated docs, changelogs, versioning evidence and final smoke evidence. |
 
 ## Validation Log
 
@@ -106,3 +106,32 @@ tax year are schema-backed calculator context, not route-family structure.
   - Request handlers do not create runtimes or import app runtime modules.
   - Rule trace inputs now encode decimal coefficients as strings so public
     schema responses remain JSON-compatible.
+
+### PUBLIC-API-004
+
+- Verification:
+  - `bun run verification` passed.
+  - `bun changeset status --verbose` previews a fixed release-train patch bump
+    to `0.0.2`.
+- API smoke checks:
+  - Started `apps/api` on `127.0.0.1:4017`.
+  - `/api/docs/openapi.json` lists the implemented public API route family:
+    jurisdictions, tax years, calculators, calculator detail, schema, graph,
+    calculate, facts and rules.
+  - `/api/v1/calculators` returns `au.pay.take-home`,
+    `au.pay.withholdings` and `au.income-tax.annual`.
+  - `POST /api/v1/calculators/au.pay.take-home/calculate` returned
+    `netPay.cents = 119600`, `withholdingsTotal.cents = 30400` and zero graph
+    issues.
+  - Missing `grossPay.period` with `help=errors` returned `400 Bad Request`
+    with issue path `["grossPay", "period"]` and descriptor-backed help.
+- Docs and versioning review:
+  - Root README, API app README, API/SDK architecture, testing/quality,
+    product spec, task list and root changelog now describe the implemented
+    public calculation API.
+  - `/api/v1/au/*` appears only as an explicit anti-pattern in the spec and
+    architecture docs.
+  - Changeset and app changelog coverage remains current for public API and
+    package-facing changes.
+  - Browser automation was not exposed in this turn; generated OpenAPI and
+    HTTP smoke evidence were used for route visibility.

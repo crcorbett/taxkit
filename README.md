@@ -12,9 +12,9 @@ documentation site.
 
 The repo is early. The implemented surface is a standalone Bun API app, a
 TanStack Start web scaffold that calls that API, an Effect HTTP API package
-with a health endpoint, deterministic core engine primitives, Australian pay,
-income-tax and STSL rule packages, shared testing helpers and shared
-TypeScript config. Calculation HTTP endpoints, SDK package and docs site are
+with health, metadata and public calculation endpoints, deterministic core
+engine primitives, Australian pay, income-tax and STSL rule packages, shared
+testing helpers and shared TypeScript config. The SDK package and docs site are
 planned but not implemented yet.
 
 ## What Exists Today
@@ -24,7 +24,8 @@ planned but not implemented yet.
 - [apps/web](./apps/web/README.md): TanStack Start app that loads health data
   from `apps/api` through server/client runtime boundaries.
 - [packages/http-api](./packages/http-api/README.md): Effect HTTP API contract,
-  server handler exports and browser-safe client exports for `GET /api/health`.
+  generated docs, public calculator metadata and calculation execution routes,
+  server handler exports and browser-safe client exports.
 - [packages/core](./packages/core/README.md): deterministic engine primitives,
   schema-backed facts, rule descriptors, graph validation, trace and ledger
   contracts and calculation engine service.

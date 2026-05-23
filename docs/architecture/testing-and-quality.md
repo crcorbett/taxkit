@@ -34,6 +34,16 @@ The current repo baseline is scaffold-level verification:
 bun run verification
 ```
 
+Public API route work should also capture contract evidence from the standalone
+API app:
+
+- generated OpenAPI route evidence from `/api/docs/openapi.json`
+- at least one metadata route smoke check
+- at least one successful calculation route smoke check
+- at least one schema-guided error response with field paths and descriptor
+  help
+- Changeset status evidence for package-facing changes
+
 ## Guardrails
 
 - A rule pack is incomplete without source references and golden tests.
