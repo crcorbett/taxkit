@@ -29,6 +29,8 @@ The implemented API surface is intentionally small:
 - `src/server/live.layer.ts`: server route layer, CORS middleware, Scalar docs
   route and OpenAPI JSON route.
 - `src/server.ts`: server export boundary for `WhatTaxServerLayer`.
+- `src/config.ts`: package-owned client config schema and neutral `httpApi`
+  config source.
 - `src/client/`: typed Effect HTTP API client helpers and layers.
 
 Export paths:
@@ -38,6 +40,7 @@ Export paths:
 - `@whattax/http-api/client`
 - `@whattax/http-api/client/live`
 - `@whattax/http-api/client/server`
+- `@whattax/http-api/config`
 - `@whattax/http-api/server`
 - `@whattax/http-api/handlers`
 - `@whattax/http-api/handlers/live`
@@ -54,6 +57,13 @@ The package is built as ESM TypeScript. Runtime exports are split by boundary:
 `ApiRoutesLive` owns reusable route middleware such as CORS inside this package.
 App packages should provide a platform HTTP server and process config, not
 duplicate API route middleware.
+
+`@whattax/http-api/config` owns the reusable client config schema, type and
+keyed config fragment. Apps should compose that fragment into runtime-specific
+config modules, then provide server or client environment values through Effect
+`ConfigProvider` composition. The package owns its env namespaces, including
+`WHATTAX_API_*` and `VITE_WHATTAX_API_*`. See
+`docs/architecture/configuration.md`.
 
 Current responses are schema-backed with Effect Schema. The health response is:
 

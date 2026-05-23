@@ -31,6 +31,7 @@ Environment overrides:
 
 - `API_HOST`
 - `API_PORT`
+- `PORT` as the fallback port supplied by portless
 
 ## Routes
 
@@ -55,9 +56,10 @@ bun run --filter=api dev
 bun run --filter=web dev
 ```
 
-The web app defaults to `http://127.0.0.1:4000` for API calls. Override the API
-origin with `WHATTAX_API_BASE_URL` for SSR and `VITE_WHATTAX_API_BASE_URL` for
-browser navigation.
+`bun run --filter=api dev` serves this app through portless at
+`https://api.whattax.localhost`. `bun run --filter=web dev` injects that URL
+into `WHATTAX_API_BASE_URL` for SSR and `VITE_WHATTAX_API_BASE_URL` for browser
+navigation.
 
 ## Guardrails
 

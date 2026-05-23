@@ -6,7 +6,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "portless whattax vite dev",
+    "dev": "WHATTAX_API_BASE_URL=$(portless get api.whattax) VITE_WHATTAX_API_BASE_URL=$(portless get api.whattax) portless run --name whattax vite dev",
     "build": "vite build",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf .output .tanstack .turbo node_modules/.vite"

@@ -24,7 +24,10 @@ export class ApiServerConfig extends Context.Service<
 
 const ApiServerConfigSource = Config.all({
   host: Config.string("API_HOST").pipe(Config.withDefault(defaultHost)),
-  port: Config.port("API_PORT").pipe(Config.withDefault(defaultPort)),
+  port: Config.port("API_PORT").pipe(
+    Config.orElse(() => Config.port("PORT")),
+    Config.withDefault(defaultPort)
+  ),
 });
 
 const loadApiServerConfig = ApiServerConfigSource.parse(

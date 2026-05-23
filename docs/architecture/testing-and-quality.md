@@ -40,6 +40,10 @@ bun run verification
 - Graph validation failures should fail the build.
 - API responses must stay schema-backed.
 - Browser-safe exports must not import Node-only modules.
+- Oxlint can enforce restricted APIs, such as banned `Object.*` enumeration
+  helpers, but it does not currently provide a safe built-in rule for banning
+  functions below a minimum line count. Prefer review and architecture guidance
+  for tiny one-off wrapper or mapper helpers.
 - Verification evidence should be recorded in specs, task lists or exec plans
   when work spans multiple packages.
 

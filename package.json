@@ -28,12 +28,12 @@
   "scripts": {
     "build": "turbo run build",
     "check-types": "turbo run check-types",
-    "format": "oxfmt -c oxfmt.config.mjs --write . --no-error-on-unmatched-pattern",
-    "format:check": "oxfmt -c oxfmt.config.mjs --check . --no-error-on-unmatched-pattern",
+    "format": "oxfmt -c oxfmt.config.ts --write . --no-error-on-unmatched-pattern",
+    "format:check": "oxfmt -c oxfmt.config.ts --check . --no-error-on-unmatched-pattern",
     "knip": "knip --no-progress --no-config-hints",
-    "lint": "oxlint -c oxlint.config.mjs . --no-error-on-unmatched-pattern",
+    "lint": "oxlint -c oxlint.config.ts . --no-error-on-unmatched-pattern",
     "verification": "bun run lint && bun run format:check && bun run knip && bun run check-types",
-    "dev": "turbo run dev --filter=web",
+    "dev": "portless proxy start --https && turbo run dev --filter=api --filter=web",
     "clean": "turbo run clean"
   },
   "devDependencies": {

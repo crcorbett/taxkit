@@ -17,6 +17,9 @@ fast.
 - Keep public WhatTax docs focused on the open-source engine, API, SDK and docs
   site.
 - Use Effect services, layers, schemas and tagged errors for engine boundaries.
+- MUST keep one-off Effect error handling and transformations inline at the
+  callsite; do not extract tiny wrapper or mapper helpers. See
+  `docs/architecture/effect-services.md`.
 - Verify with `bun run verification` when docs, package wiring or code changes
   can affect the repo.
 
@@ -28,6 +31,7 @@ fast.
 | architecture | `docs/architecture/README.md` |
 | package placement | `docs/architecture/package-ownership.md` |
 | Effect services and layers | `docs/architecture/effect-services.md` |
+| configuration | `docs/architecture/configuration.md` |
 | facts and boundary values | `docs/architecture/facts.md` |
 | rules and parameters | `docs/architecture/rules-and-parameters.md` |
 | calculators | `docs/architecture/calculators.md` |

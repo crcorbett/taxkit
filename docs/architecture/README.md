@@ -65,6 +65,7 @@ explicit WhatTax input facts
 - [Package boundaries](./package-boundaries.md)
 - [Package ownership](./package-ownership.md)
 - [Effect services](./effect-services.md)
+- [Configuration](./configuration.md)
 - [Facts](./facts.md)
 - [Rules and parameters](./rules-and-parameters.md)
 - [Calculators](./calculators.md)

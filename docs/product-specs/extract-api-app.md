@@ -138,8 +138,9 @@ GET /api/docs
 GET /api/docs/openapi.json
 ```
 
-The web app should call the API using a configurable base URL, with a local
-default that targets the Bun API app.
+The web app should call the API using a configurable base URL. Local dev scripts
+inject the API URL from portless; deployed environments should provide explicit
+API base URL values.
 
 ## Risks And Tradeoffs
 

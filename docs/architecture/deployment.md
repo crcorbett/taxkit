@@ -40,9 +40,11 @@ bun run --filter=api dev
 bun run --filter=web dev
 ```
 
-`apps/api` defaults to `http://127.0.0.1:4000`. The web app uses that origin by
-default and can be pointed elsewhere with `WHATTAX_API_BASE_URL` and
-`VITE_WHATTAX_API_BASE_URL`.
+`apps/api` dev runs through portless as `https://api.whattax.localhost`.
+`apps/web` dev injects that URL into `WHATTAX_API_BASE_URL` and
+`VITE_WHATTAX_API_BASE_URL` before serving through portless as
+`https://whattax.localhost`. Production deployment should provide equivalent
+API base URL environment values explicitly.
 
 ## Guardrails
 

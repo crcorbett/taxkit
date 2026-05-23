@@ -18,6 +18,7 @@ contains the proposed package map and dependency direction.
 
 Current implemented code lives in:
 
+- `apps/api`
 - `apps/web`
 - `packages/http-api`
 - `packages/tsconfig`
@@ -59,6 +60,10 @@ examples and compatibility tests.
 : Current scaffold app. It proves the runtime boundary and health endpoint
 while the public docs/API app structure is being built.
 
+`apps/api`
+: Current standalone Bun API runtime. It owns process config, startup,
+shutdown and platform serving for the implemented API app.
+
 ## Runtime Shape
 
 Engine packages should be deterministic and reusable. Runtime-specific code
@@ -67,6 +72,8 @@ belongs in apps or explicitly server-only package exports.
 ## Guardrails
 
 - Define canonical schemas in the owning package.
+- Define reusable config schemas in the package that owns the runtime contract,
+  then compose and provide them from app-specific config modules.
 - Import from the owner instead of redefining boundary values locally.
 - Add server-only exports for filesystem, HTTP server and Node adapters.
 - Keep React in apps or docs packages only.

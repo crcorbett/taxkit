@@ -46,7 +46,14 @@ Package name:
 ```
 
 It owns the current Effect HTTP API definitions, health endpoint schema,
-server route layer, OpenAPI metadata and typed client helpers.
+server route layer, OpenAPI metadata, typed client helpers and reusable client
+config schema.
+
+`@whattax/http-api/config` exports the package-owned HTTP API client config
+schema, type and keyed config fragment. Apps compose that fragment into their
+own runtime config modules and provide runtime-specific values, such as server
+process env or Vite client env, through `ConfigProvider` composition instead of
+redefining API client config keys or env prefixes locally.
 
 ## Planned API Package
 

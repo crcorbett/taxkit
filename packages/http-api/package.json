@@ -31,6 +31,11 @@
       "types": "./dist/client/server.layer.d.ts",
       "default": "./dist/client/server.layer.js"
     },
+    "./config": {
+      "source": "./src/config.ts",
+      "types": "./dist/config.d.ts",
+      "default": "./dist/config.js"
+    },
     "./server": {
       "source": "./src/server.ts",
       "types": "./dist/server.d.ts",

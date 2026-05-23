@@ -53,11 +53,12 @@ bun run --filter=web dev
 bun run verification
 ```
 
-Run `apps/api` and `apps/web` in separate terminals for local UI development.
-`apps/api` defaults to `http://127.0.0.1:4000`; `apps/web` uses that origin
-unless `WHATTAX_API_BASE_URL` or `VITE_WHATTAX_API_BASE_URL` is set. `bun run
-verification` is the baseline verification command for documentation, package
-wiring and scaffold changes.
+`bun run --filter=api dev` serves the API through portless at
+`https://api.whattax.localhost`. `bun run --filter=web dev` injects that
+portless URL into `WHATTAX_API_BASE_URL` and `VITE_WHATTAX_API_BASE_URL` before
+serving the web app at `https://whattax.localhost`. `bun run verification` is
+the baseline verification command for documentation, package wiring and
+scaffold changes.
 
 ## Documentation Entry Points
 

@@ -46,7 +46,12 @@ The web runtime reads:
 - `WHATTAX_API_BASE_URL` for server-rendered loaders
 - `VITE_WHATTAX_API_BASE_URL` for browser navigation
 
-Both default to the local API origin, `http://127.0.0.1:4000`.
+Both runtime-specific values are mapped into the package-owned
+`@whattax/http-api/config` schema by `apps/web/src/lib/config.server.ts` and
+`apps/web/src/lib/config.client.ts`. Those modules use
+`ConfigProvider.constantCase` and `ConfigProvider.nested(...)` to map the schema
+key `baseUrl` to runtime env names. Local dev scripts inject them from
+`portless get api.whattax`; deployed environments should set them explicitly.
 
 ## Guardrails
 

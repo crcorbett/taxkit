@@ -29,12 +29,37 @@ Core service categories:
 - calculator programs that require facts and return schema-backed reports
 - API and SDK services that adapt transport inputs to engine inputs
 
+## Callsite Error Handling
+
+One-off Effect error handling MUST stay at the callsite. Error transformations
+MUST live directly beside the operation whose failure is being transformed:
+
+```ts
+program.pipe(
+  Effect.mapError(
+    (cause) =>
+      new BoundaryError({
+        cause,
+        message: `Failed to load boundary config: ${cause.message}`,
+      })
+  )
+);
+```
+
+Do not extract one-off helpers such as `mapConfigError`, `toBoundaryError` or
+`createRuntimeLayer` only to wrap a single `Effect.mapError`, `Effect.catchTag`,
+`Effect.catchAll` or `Effect.catchAllDefect` call. Extraction is allowed only
+when the helper is reused across boundaries, owns a real policy, or materially
+reduces complex duplication.
+
 ## Guardrails
 
 - Use `Effect.Schema` for boundary and persisted values.
 - Use `Layer` composition for rule packs and scenario inputs.
 - Keep parameter data separate from algorithms.
 - Use tagged errors for expected domain failures.
+- Keep one-off error mapping and transformation logic inline at the callsite;
+  tiny mapper or wrapper helpers are not allowed.
 - Avoid local DTO mirrors when an owning schema already exists.
 - Keep engine services independent of React, request handlers and app state.
 

@@ -35,9 +35,10 @@ The web runtime reads the API origin from:
 - `WHATTAX_API_BASE_URL` on the server
 - `VITE_WHATTAX_API_BASE_URL` in the browser
 
-Both default to `http://127.0.0.1:4000`, which is the local `apps/api`
-default. Do not include `/api` in the base URL; the typed API client owns route
-prefixes.
+Both are required runtime config values and are validated with Effect Config and
+Effect Schema. `bun run --filter=web dev` injects both from
+`portless get api.whattax`. Do not include `/api` in the base URL; the typed
+API client owns route prefixes.
 
 ## Guardrails
 

@@ -10,15 +10,12 @@ export type InProcessWhatTaxApiHandler = (
 ) => Promise<Response>;
 
 const makeInProcessFetch = (handler: InProcessWhatTaxApiHandler) => {
-  const fetchStatics = globalThis.fetch as typeof fetch & {
-    readonly preconnect?: unknown;
-  };
+  const fetch: typeof globalThis.fetch = (
+    input: Parameters<typeof fetch>[0],
+    init?: Parameters<typeof fetch>[1]
+  ) => handler(new Request(input, init));
 
-  return Object.assign(
-    (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) =>
-      handler(new Request(input, init)),
-    "preconnect" in fetchStatics ? { preconnect: fetchStatics.preconnect } : {}
-  ) as typeof fetch;
+  return fetch;
 };
 
 export const makeInProcessFetchLayer = (handler: InProcessWhatTaxApiHandler) =>
