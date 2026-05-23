@@ -82,7 +82,8 @@ fixed release-train package versions and changelogs.
 - [CLAUDE.md](./CLAUDE.md): Claude-compatible pointer to the canonical root
   operating rules.
 - [CHANGELOG.md](./CHANGELOG.md): root release-train changelog. Package-level
-  changelogs live beside each implemented package.
+  changelogs live beside each implemented package, and public app/API
+  changelogs live beside the owning app.
 - Engineering conventions start with [Effect services](./docs/architecture/effect-services.md),
   [Configuration](./docs/architecture/configuration.md), [Package ownership](./docs/architecture/package-ownership.md)
   and [Code patterns](./docs/standards/code-patterns.md).

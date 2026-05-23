@@ -40,6 +40,13 @@ Environment overrides:
 - `GET /api/docs`
 - `GET /api/docs/openapi.json`
 
+## Changelog
+
+Public API contract and deployment-facing changes are tracked in
+[CHANGELOG.md](./CHANGELOG.md). Package-level API contract changes are also
+tracked in [`@whattax/http-api`](../../packages/http-api/CHANGELOG.md) through
+Changesets.
+
 ## Commands
 
 ```sh

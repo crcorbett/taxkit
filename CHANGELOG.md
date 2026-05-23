@@ -8,8 +8,13 @@
   date-level parameter effective periods, source artifact metadata, Effect
   BigDecimal-backed tax rates and coefficients, and a reusable
   `CalculationEngine` service.
+- Added the standalone Bun API runtime and initial public health/docs routes.
 - Introduced the fixed release-train versioning workflow so implemented
   `@whattax/*` packages can be installed as one compatible version set.
+
+### App Changelogs
+
+- [WhatTax API](./apps/api/CHANGELOG.md)
 
 ### Package Changelogs
 
