@@ -57,6 +57,8 @@ export default defineConfig({
     "typescript/no-non-null-assertion": "error",
     "typescript/no-unnecessary-type-assertion": "error",
     "typescript/no-unsafe-type-assertion": "error",
+    // Effect Array supports data-first calls like Array.filter(items, predicate);
+    // this Unicorn rule misreads that second argument as a native Array thisArg.
     "unicorn/no-array-method-this-argument": "off",
     "whattax-no-switch/no-switch": "error",
     "whattax/no-manual-tag": "error",
