@@ -21,10 +21,18 @@ The implemented API surface is intentionally small:
 - `GET /api/docs`
 - `GET /api/docs/openapi.json`
 
+The package also owns the public calculation API boundary schemas and initial
+calculator catalog used by the planned `/api/v1/calculators` route family.
+Those schemas live with the API group modules and compose canonical facts,
+rules, report schemas and rule-pack layers from the owning engine and rule
+packages instead of mirroring their fields locally.
+
 ## Main Areas
 
 - `src/api.ts`: `WhatTaxApi` definition and OpenAPI annotations.
 - `src/groups/health.ts`: health endpoint schema and route group.
+- `src/groups/calculators.ts`: public calculator IDs, context/help schemas,
+  error envelopes and the initial schema-backed calculator catalog.
 - `src/handlers/`: server-side handlers and handler layers.
 - `src/server/live.layer.ts`: server route layer, CORS middleware, Scalar docs
   route and OpenAPI JSON route.

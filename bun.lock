@@ -51,7 +51,7 @@
     },
     "packages/core": {
       "name": "@whattax/core",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -61,8 +61,11 @@
     },
     "packages/http-api": {
       "name": "@whattax/http-api",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
+        "@whattax/core": "workspace:*",
+        "@whattax/rules-au-income-tax": "workspace:*",
+        "@whattax/rules-au-pay": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
@@ -72,7 +75,7 @@
     },
     "packages/rules/au/income-tax": {
       "name": "@whattax/rules-au-income-tax",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "@whattax/core": "workspace:*",
         "effect": "catalog:",
@@ -87,7 +90,7 @@
     },
     "packages/rules/au/pay": {
       "name": "@whattax/rules-au-pay",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "@whattax/core": "workspace:*",
         "effect": "catalog:",
@@ -102,7 +105,7 @@
     },
     "packages/rules/au/stsl": {
       "name": "@whattax/rules-au-stsl",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "@whattax/core": "workspace:*",
         "@whattax/rules-au-pay": "workspace:*",
@@ -118,7 +121,7 @@
     },
     "packages/testing": {
       "name": "@whattax/testing",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
@@ -126,7 +129,7 @@
     },
     "packages/tsconfig": {
       "name": "@whattax/tsconfig",
-      "version": "0.0.0",
+      "version": "0.0.1",
     },
   },
   "catalog": {

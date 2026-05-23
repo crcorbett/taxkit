@@ -1,1 +1,21 @@
 export { WhatTaxApi } from "./api.js";
+export {
+  CalculatorCatalog,
+  CalculatorCatalogItem,
+  CalculatorCatalogItems,
+  CalculatorCatalogResponse,
+  CalculatorCatalogResponseValue,
+  CalculatorContext,
+  CalculatorId,
+  HelpMode,
+  PublicApiError,
+  PublicErrorEnvelope,
+  PublicSchemaDecodeError,
+  SchemaDecodeIssue,
+  UnsupportedCalculatorContextError,
+  UnsupportedCalculatorError,
+  getCalculatorCatalogEntry,
+  listCalculatorCatalogEntries,
+  toCalculatorCatalogItem,
+  type CalculatorCatalogEntry,
+} from "./groups/calculators.js";

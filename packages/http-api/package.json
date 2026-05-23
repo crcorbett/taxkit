@@ -58,6 +58,9 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
+    "@whattax/core": "workspace:*",
+    "@whattax/rules-au-income-tax": "workspace:*",
+    "@whattax/rules-au-pay": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
