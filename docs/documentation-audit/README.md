@@ -45,23 +45,50 @@ Requested near-term package roots:
 
 ## Missing Or Stale Docs
 
-- The root `README.md` still reads as a minimal landing page. It is acceptable
-  for now, but it should eventually route to the docs buckets and package
-  READMEs more explicitly.
 - An active exec plan exists for the documentation improvement roadmap. No
   other active exec-plan examples exist yet.
-- The architecture docs describe package families that are not implemented yet;
-  root routing should avoid presenting those planned packages as current code.
+- `docs/repo-status-outline.html` is a manual snapshot. It is linked from the
+  root README, but it can drift and must be refreshed after material repo-shape
+  or implemented-surface changes.
+- Planned package roots `packages/core`, `packages/scripts` and `packages/ui`
+  have README guidance only. They still need package manifests, source exports
+  and verification before they become runtime packages.
+- `apps/api`, `apps/docs`, `packages/api/*`, `packages/sdk/*`,
+  `packages/domain/*` and `packages/rules/*` remain planned architecture, not
+  implemented code.
+- No generated documentation inventory exists yet; this audit is maintained by
+  hand.
+
+## Docs Maintenance Convention
+
+The canonical maintenance convention lives in
+`docs/design-docs/agent-first-documentation.md`.
+
+At audit time, check that:
+
+- new package or app roots have local READMEs when they gain manifests, exports
+  or commands
+- root routing only links to files and package roots that exist
+- ownership, runtime boundary and public-surface changes update the owning
+  architecture docs
+- specs and sibling task lists stay aligned when sequencing or acceptance
+  criteria change
+- `docs/repo-status-outline.html` is refreshed or explicitly treated as a
+  snapshot
+- planned package families stay labelled as planned until manifests, source
+  exports and verification exist
 
 ## Proposed Migration Priorities
 
-1. Refresh the root `README.md` so it routes to current package docs, docs
-   buckets and the status snapshot.
-2. Create the first engine package slice under `packages/core/*` and keep its
+1. Create the first engine package slice under `packages/core/*` and keep its
    README aligned as code appears.
-3. Add `apps/docs` only when the public docs app is actually scaffolded.
-4. Add `apps/api` only when calculation endpoints move beyond the health
+2. Add `apps/docs` only when the public docs app is actually scaffolded.
+3. Add `apps/api` only when calculation endpoints move beyond the health
    scaffold.
-5. Add package-boundary tests once browser-safe and server-only export surfaces
+4. Add package-boundary tests once browser-safe and server-only export surfaces
    exist beyond the current health API.
-6. Keep this audit updated when new package roots or docs buckets are added.
+5. Decide whether the status snapshot should stay manual or become generated
+   once repo status changes frequently enough to justify automation.
+6. Add a generated docs inventory only if manual audit drift becomes a recurring
+   source of mistakes.
+7. Keep this audit updated when new package roots or docs buckets are added.

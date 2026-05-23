@@ -23,7 +23,7 @@ the parent before the next slice begins.
 - [x] DOC-IMPROVE-001: Fill README coverage for existing packages
 - [x] DOC-IMPROVE-002: Refresh the root README
 - [x] DOC-IMPROVE-003: Clarify current versus planned architecture docs
-- [ ] DOC-IMPROVE-004: Add docs maintenance guidance and final audit (delegated)
+- [x] DOC-IMPROVE-004: Add docs maintenance guidance and final audit
 
 ## Validation Evidence
 
@@ -43,6 +43,11 @@ the parent before the next slice begins.
   `packages/ui` are documentation-only placeholders, and planned packages are
   not described as importable runtime packages. `pnpm check-types` passed after
   refreshing local pnpm symlinks with `pnpm install`.
+- DOC-IMPROVE-004: worker added docs maintenance routing to `AGENTS.md`,
+  expanded maintenance triggers in `docs/design-docs/agent-first-documentation.md`,
+  and refreshed `docs/documentation-audit/README.md` with remaining gaps and
+  migration priorities. Parent final audit confirmed root atlas paths resolve,
+  stale missing-README claims are gone, and final verification passed.
 
 ## Decisions
 
@@ -51,4 +56,5 @@ the parent before the next slice begins.
 
 ## Follow-On Debt
 
-Pending final audit.
+- Decide later whether `docs/repo-status-outline.html` should become generated
+  once repo status changes frequently enough to justify automation.

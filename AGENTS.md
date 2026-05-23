@@ -41,6 +41,7 @@ fast.
 | spec authoring | `docs/product-specs/writing-specs.md` |
 | implementation plans | `docs/exec-plans/README.md` |
 | design docs | `docs/design-docs/index.md` |
+| docs maintenance | `docs/design-docs/agent-first-documentation.md` |
 | external references | `docs/references/README.md` |
 | documentation audit | `docs/documentation-audit/README.md` |
 
@@ -68,6 +69,7 @@ fast.
 | new implementation intent | write a spec in `docs/product-specs/` |
 | multi-slice implementation | add a task list beside the spec and an active exec plan |
 | package-local guidance | update the package root `README.md` |
+| docs routing or repo shape change | update `README.md`, `AGENTS.md`, the documentation audit and the status snapshot when needed |
 | public docs/content direction | start at `docs/architecture/content-and-posts.md` |
 | browser/app behavior | start at `apps/web/README.md` and `docs/architecture/frontend.md` |
 | API behavior | start at `docs/architecture/api-and-sdk.md` |
@@ -79,4 +81,8 @@ fast.
 - Do not add root atlas links to files that do not exist.
 - App and package root `README.md` files are canonical local docs.
 - `docs/architecture/*` should define durable boundaries, not work logs.
+- Planned package areas must stay labelled as planned until package manifests,
+  source exports and verification exist.
+- `docs/repo-status-outline.html` is a manually refreshed snapshot, not a
+  source of truth.
 - Treat old or imported planning material as source material until revalidated.
