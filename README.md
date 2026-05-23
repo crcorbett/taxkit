@@ -1,3 +1,10 @@
+---
+status: canonical
+last_reviewed: 2026-05-23
+source_of_truth: root-docs
+confidence: medium
+---
+
 # WhatTax
 
 Public monorepo for WhatTax.

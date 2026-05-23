@@ -1,3 +1,10 @@
+---
+status: canonical
+last_reviewed: 2026-05-23
+source_of_truth: docs
+confidence: high
+---
+
 # Graph, Trace And Ledgers
 
 Effect `Layer` composition provides compile-time dependency tracking. Graph metadata provides runtime tooling, validation and explanation.

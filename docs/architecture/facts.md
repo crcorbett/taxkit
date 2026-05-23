@@ -1,3 +1,10 @@
+---
+status: canonical
+last_reviewed: 2026-05-23
+source_of_truth: docs
+confidence: high
+---
+
 # Facts
 
 Facts are the typed dependency units of the calculation engine. A fact is not just an object shape. It has a schema-backed value, a stable identity and an Effect `Context.Tag` provider.

@@ -1,3 +1,10 @@
+---
+status: canonical
+last_reviewed: 2026-05-23
+source_of_truth: docs
+confidence: high
+---
+
 # Rules And Parameters
 
 Rules are Effect `Layer`s. Metadata describes rules for tooling, but execution is driven by typed Effect dependencies.

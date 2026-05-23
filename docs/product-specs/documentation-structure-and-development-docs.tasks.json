@@ -1,0 +1,132 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/documentation-structure-and-development-docs.md",
+  "title": "Documentation Structure And Development Docs Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-05-23",
+  "principles": [
+    "Keep root AGENTS.md as a short routing atlas.",
+    "Add canonical docs only when they have a clear owner.",
+    "Do not link to aspirational files from the root atlas.",
+    "Keep public WhatTax docs focused on the open-source engine."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit only after the documentation slice and verification pass.",
+    "requiredBeforeFinalPR": [
+      "pnpm check-types",
+      "pnpm build",
+      "Audit .agents, AGENTS.md, architecture docs, package READMEs and root README for unintended Mobius-specific routing"
+    ],
+    "evidenceRequired": [
+      "Changed-file summary",
+      "Docs inventory update",
+      "Verification command results",
+      "Audit of root atlas links against existing files"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "DOCS-001",
+      "title": "Import and adapt PRD skills",
+      "type": "foundation",
+      "dependsOn": [],
+      "goal": "Make the local repo capable of writing and implementing specs with the canonical docs flow.",
+      "scope": [
+        ".agents/skills/prd-writer/SKILL.md",
+        ".agents/skills/prd-implementer/SKILL.md"
+      ],
+      "outputs": [
+        "WhatTax-adapted PRD writer skill",
+        "WhatTax-adapted PRD implementer skill"
+      ],
+      "mandatoryVerification": [
+        "Skill docs do not route to Mobius-specific architecture files"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "Both skills exist under .agents/skills",
+        "Skill start-here docs exist in this repo"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DOCS-002",
+      "title": "Create canonical docs buckets and metadata",
+      "type": "docs",
+      "dependsOn": ["DOCS-001"],
+      "goal": "Create a stable documentation structure that future specs and agents can route through.",
+      "scope": [
+        "docs/architecture",
+        "docs/design-docs",
+        "docs/exec-plans",
+        "docs/product-specs",
+        "docs/references"
+      ],
+      "outputs": [
+        "Bucket entrypoints",
+        "Freshness metadata on canonical docs",
+        "Focused architecture topic docs"
+      ],
+      "mandatoryVerification": [
+        "All root atlas links point at existing files",
+        "Canonical docs include status, last_reviewed, source_of_truth and confidence"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "Docs buckets exist",
+        "Architecture index routes to focused docs"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DOCS-003",
+      "title": "Normalize app and package README coverage",
+      "type": "docs",
+      "dependsOn": ["DOCS-002"],
+      "goal": "Give current and planned package roots compact local docs before implementation begins.",
+      "scope": [
+        "apps/web/README.md",
+        "packages/core/README.md",
+        "packages/scripts/README.md",
+        "packages/ui/README.md"
+      ],
+      "outputs": [
+        "README coverage for requested app and package roots"
+      ],
+      "mandatoryVerification": [
+        "Each README includes scope, main areas, runtime shape, guardrails and related docs"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "Requested README files exist and match the compact pattern"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DOCS-004",
+      "title": "Add documentation audit and final verification",
+      "type": "audit",
+      "dependsOn": ["DOCS-003"],
+      "goal": "Record the current documentation baseline and verify the repo remains healthy.",
+      "scope": [
+        "docs/documentation-audit/README.md",
+        "AGENTS.md"
+      ],
+      "outputs": [
+        "Documentation audit",
+        "Short root atlas"
+      ],
+      "mandatoryVerification": [
+        "pnpm check-types",
+        "pnpm build",
+        "Audit root atlas for missing links"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "Audit records inventory, README coverage, missing/stale docs and migration priorities",
+        "Verification commands pass"
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}

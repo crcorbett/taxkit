@@ -1,3 +1,10 @@
+---
+status: canonical
+last_reviewed: 2026-05-23
+source_of_truth: docs
+confidence: high
+---
+
 # WhatTax Architecture
 
 This directory is the implementation reference for the WhatTax tax calculator architecture.
@@ -32,11 +39,17 @@ explicit WhatTax input facts
 ## Documents
 
 - [Package boundaries](./package-boundaries.md)
+- [Package ownership](./package-ownership.md)
+- [Effect services](./effect-services.md)
 - [Facts](./facts.md)
 - [Rules and parameters](./rules-and-parameters.md)
 - [Calculators](./calculators.md)
 - [Graph, trace and ledgers](./graph-trace-ledgers.md)
 - [API and SDK](./api-and-sdk.md)
+- [Frontend](./frontend.md)
+- [Content and posts](./content-and-posts.md)
+- [Deployment](./deployment.md)
+- [Testing and quality](./testing-and-quality.md)
 - [Testing and validation](./testing-and-validation.md)
 
 ## Immediate Implementation Bias

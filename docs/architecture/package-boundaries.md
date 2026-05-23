@@ -1,3 +1,10 @@
+---
+status: canonical
+last_reviewed: 2026-05-23
+source_of_truth: docs
+confidence: high
+---
+
 # Package Boundaries
 
 WhatTax should grow as a package-oriented monorepo for the open-source tax engine, docs, API server and TypeScript SDK. Package dependencies must point from foundational packages toward rule packages, API packages and apps. Engine packages must stay deterministic and reusable.

@@ -1,3 +1,10 @@
+---
+status: canonical
+last_reviewed: 2026-05-23
+source_of_truth: docs
+confidence: high
+---
+
 # API And SDK
 
 WhatTax should publish a reusable API app server and TypeScript SDK around the open-source calculation engine.

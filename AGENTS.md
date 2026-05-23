@@ -1,0 +1,82 @@
+---
+status: canonical
+last_reviewed: 2026-05-23
+source_of_truth: root-docs
+confidence: medium
+---
+
+# WhatTax
+
+Root map and behavior contract. Keep this file short. Route into deeper docs
+fast.
+
+## Working Rules
+
+- Read the relevant docs and current files before editing.
+- Prefer the smallest correct change that matches repo boundaries.
+- Keep public WhatTax docs focused on the open-source engine, API, SDK and docs
+  site.
+- Use Effect services, layers, schemas and tagged errors for engine boundaries.
+- Verify with `pnpm check-types` and `pnpm build` when docs or package wiring
+  changes can affect the repo.
+
+## Atlas
+
+| Need | Start |
+| --- | --- |
+| repo overview | `README.md` |
+| architecture | `docs/architecture/README.md` |
+| package placement | `docs/architecture/package-ownership.md` |
+| Effect services and layers | `docs/architecture/effect-services.md` |
+| facts and boundary values | `docs/architecture/facts.md` |
+| rules and parameters | `docs/architecture/rules-and-parameters.md` |
+| calculators | `docs/architecture/calculators.md` |
+| graph, trace and ledgers | `docs/architecture/graph-trace-ledgers.md` |
+| API and SDK | `docs/architecture/api-and-sdk.md` |
+| frontend/runtime split | `docs/architecture/frontend.md` |
+| content and docs site | `docs/architecture/content-and-posts.md` |
+| deployment | `docs/architecture/deployment.md` |
+| testing and quality | `docs/architecture/testing-and-quality.md` |
+| specs | `docs/product-specs/index.md` |
+| spec authoring | `docs/product-specs/writing-specs.md` |
+| implementation plans | `docs/exec-plans/README.md` |
+| design docs | `docs/design-docs/index.md` |
+| external references | `docs/references/README.md` |
+| documentation audit | `docs/documentation-audit/README.md` |
+
+## Repo Map
+
+| Path | Owns |
+| --- | --- |
+| `apps/web` | current TanStack Start scaffold and health-check UI |
+| `packages/http-api` | current Effect HTTP API package |
+| `packages/tsconfig` | shared TypeScript config |
+| `packages/core` | planned deterministic engine primitives and metadata |
+| `packages/scripts` | planned repo automation and validation scripts |
+| `packages/ui` | planned shared UI primitives |
+| `docs/architecture` | durable architecture and boundaries |
+| `docs/product-specs` | current specs and task lists |
+| `docs/exec-plans` | active implementation plans and validation logs |
+| `docs/design-docs` | durable engineering and documentation beliefs |
+| `docs/references` | external/vendor references |
+
+## Routing By Task Type
+
+| Task | Route |
+| --- | --- |
+| new architecture or boundary decision | update or link `docs/architecture/*` |
+| new implementation intent | write a spec in `docs/product-specs/` |
+| multi-slice implementation | add a task list beside the spec and an active exec plan |
+| package-local guidance | update the package root `README.md` |
+| public docs/content direction | start at `docs/architecture/content-and-posts.md` |
+| browser/app behavior | start at `apps/web/README.md` and `docs/architecture/frontend.md` |
+| API behavior | start at `docs/architecture/api-and-sdk.md` |
+| validation or CI quality | start at `docs/architecture/testing-and-quality.md` |
+
+## Guardrails
+
+- Root `AGENTS.md` is a map, not a manual.
+- Do not add root atlas links to files that do not exist.
+- App and package root `README.md` files are canonical local docs.
+- `docs/architecture/*` should define durable boundaries, not work logs.
+- Treat old or imported planning material as source material until revalidated.
