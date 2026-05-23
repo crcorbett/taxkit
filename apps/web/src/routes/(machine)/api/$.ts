@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import type { WhatTaxServerContext } from "#/lib/route-runtime";
 
 const requireServerContext = (context: unknown): WhatTaxServerContext => {
-  const serverContext = (context as { serverContext?: WhatTaxServerContext })
-    .serverContext;
+  const { serverContext } = context as {
+    serverContext?: WhatTaxServerContext;
+  };
 
   if (!serverContext) {
     throw new Error("WhatTax server context is required for API routes");

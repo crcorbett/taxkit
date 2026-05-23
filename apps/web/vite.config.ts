@@ -10,17 +10,6 @@ export default defineConfig(({ command }) => {
     optimizeDeps: {
       exclude: ["@whattax/http-api"],
     },
-    resolve: {
-      conditions: useSourceWorkspacePackages ? ["source"] : undefined,
-      tsconfigPaths: true,
-    },
-    ssr: {
-      resolve: useSourceWorkspacePackages
-        ? {
-            conditions: ["source", "node"],
-          }
-        : undefined,
-    },
     plugins: [
       tanstackStart(),
       viteReact(),
@@ -33,5 +22,16 @@ export default defineConfig(({ command }) => {
         },
       }),
     ],
+    resolve: {
+      conditions: useSourceWorkspacePackages ? ["source"] : undefined,
+      tsconfigPaths: true,
+    },
+    ssr: {
+      resolve: useSourceWorkspacePackages
+        ? {
+            conditions: ["source", "node"],
+          }
+        : undefined,
+    },
   };
 });

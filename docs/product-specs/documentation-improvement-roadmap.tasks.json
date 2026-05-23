@@ -13,15 +13,14 @@
   "globalVerification": {
     "commitPolicy": "Commit only after the coherent documentation slice passes verification.",
     "requiredBeforeFinalPR": [
-      "pnpm check-types",
-      "pnpm build",
+      "bun run verification",
       "Audit README and AGENTS links against files that exist",
       "Audit planned package references for clear planned/current wording"
     ],
     "evidenceRequired": [
       "Changed-file summary",
       "README coverage summary",
-      "Verification command results",
+      "`bun run verification` result",
       "Remaining documentation gaps"
     ]
   },
@@ -43,6 +42,7 @@
         "Updated README coverage in documentation audit"
       ],
       "mandatoryVerification": [
+        "bun run verification",
         "Each README includes scope, main areas, runtime shape, guardrails and related docs",
         "Documentation audit no longer lists packages/http-api or packages/tsconfig as missing README coverage"
       ],
@@ -57,7 +57,9 @@
       "id": "DOC-IMPROVE-002",
       "title": "Refresh the root README",
       "type": "docs",
-      "dependsOn": ["DOC-IMPROVE-001"],
+      "dependsOn": [
+        "DOC-IMPROVE-001"
+      ],
       "goal": "Make README.md a useful human entrypoint without turning it into a manual.",
       "scope": [
         "README.md",
@@ -68,6 +70,7 @@
         "Status snapshot linked or documented from README"
       ],
       "mandatoryVerification": [
+        "bun run verification",
         "README links point at existing files",
         "README distinguishes implemented surfaces from planned package families"
       ],
@@ -84,7 +87,9 @@
       "id": "DOC-IMPROVE-003",
       "title": "Clarify current versus planned architecture docs",
       "type": "docs",
-      "dependsOn": ["DOC-IMPROVE-002"],
+      "dependsOn": [
+        "DOC-IMPROVE-002"
+      ],
       "goal": "Prevent planned package families from being mistaken for implemented code.",
       "scope": [
         "docs/architecture/README.md",
@@ -99,6 +104,7 @@
         "Consistent planned-package wording in near-term package READMEs"
       ],
       "mandatoryVerification": [
+        "bun run verification",
         "Architecture docs identify current implemented surfaces",
         "Planned packages are marked as planned where relevant"
       ],
@@ -113,7 +119,9 @@
       "id": "DOC-IMPROVE-004",
       "title": "Add docs maintenance guidance and final audit",
       "type": "audit",
-      "dependsOn": ["DOC-IMPROVE-003"],
+      "dependsOn": [
+        "DOC-IMPROVE-003"
+      ],
       "goal": "Define when future changes must update docs and verify the documentation set.",
       "scope": [
         "docs/design-docs/agent-first-documentation.md",
@@ -126,8 +134,7 @@
         "Final link and terminology audit"
       ],
       "mandatoryVerification": [
-        "pnpm check-types",
-        "pnpm build",
+        "bun run verification",
         "Audit root atlas links against existing files",
         "Audit docs for stale missing-README claims"
       ],
@@ -135,7 +142,7 @@
       "completionCriteria": [
         "Docs maintenance rules are concise and tied to real ownership changes",
         "Documentation audit records the next remaining priorities",
-        "Verification commands pass"
+        "`bun run verification` passes"
       ],
       "commitAfterPassing": true
     }

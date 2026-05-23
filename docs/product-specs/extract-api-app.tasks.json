@@ -1,0 +1,192 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/extract-api-app.md",
+  "title": "Extract API App Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-05-23",
+  "principles": [
+    "Keep apps/api thin and process-focused.",
+    "Create exactly one ManagedRuntime for the Bun API process.",
+    "Treat startup, shutdown and teardown as Effect lifecycle concerns.",
+    "Keep API contracts, handlers and schemas in packages/http-api for this extraction.",
+    "Remove TanStack Start API mounting once the Bun API app is canonical.",
+    "Verify browser-safe web imports after rewiring the client."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit only after each implementation spike reaches a working repo state and its verification gates pass.",
+    "requiredBeforeFinalPR": [
+      "bun run verification",
+      "API smoke check against /api/health",
+      "Web smoke check that the health UI reads from apps/api",
+      "Import audit proving apps/web does not import server-only http-api exports"
+    ],
+    "evidenceRequired": [
+      "Changed-file summary",
+      "Local run commands and ports",
+      "API smoke response",
+      "Web route verification result",
+      "Typecheck and build command results"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "API-001",
+      "title": "Add the standalone Bun API app",
+      "type": "foundation",
+      "dependsOn": [],
+      "goal": "Create apps/api as a runnable Bun process that serves the existing Effect HTTP API layer.",
+      "scope": [
+        "apps/api/package.json",
+        "apps/api/tsconfig.json",
+        "apps/api/src/config.ts",
+        "apps/api/src/runtime.ts",
+        "apps/api/src/server.ts",
+        "apps/api/src/index.ts",
+        "apps/api/README.md",
+        "root package.json workspaces.catalog configuration",
+        "turbo.json"
+      ],
+      "outputs": [
+        "ApiAppLayer that owns process resources",
+        "Single ManagedRuntime for the Bun API process",
+        "Bun API entrypoint",
+        "Signal-aware startup and shutdown path",
+        "Host and port config with local defaults",
+        "Local dev, build, check-types and clean scripts",
+        "API app README"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run --filter=api check-types",
+        "bun run --filter=api build",
+        "Run the API app locally and request /api/health",
+        "Request /api/docs/openapi.json and confirm JSON is returned",
+        "Send SIGTERM to the API process and confirm runtime disposal runs without an unhandled rejection",
+        "Inspect the app code and confirm request handling does not create a ManagedRuntime per request"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "apps/api starts without apps/web",
+        "apps/api creates exactly one ManagedRuntime for process lifetime",
+        "SIGINT and SIGTERM close the runtime and stop the Bun server",
+        "The API app delegates request handling to packages/http-api",
+        "No API contracts are duplicated in apps/api"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "API-002",
+      "title": "Rewire the web app to the external API",
+      "type": "integration",
+      "dependsOn": [
+        "API-001"
+      ],
+      "goal": "Make apps/web consume apps/api over HTTP for both SSR loaders and browser navigation.",
+      "scope": [
+        "apps/web/src/lib/runtime.client.ts",
+        "apps/web/src/lib/runtime.server.ts",
+        "apps/web/src/lib/runtime.ts",
+        "apps/web/src/lib/route-runtime.ts",
+        "apps/web/src/router.tsx",
+        "apps/web/package.json",
+        "apps/web/README.md"
+      ],
+      "outputs": [
+        "Configured HTTP client layer for web",
+        "Documented API base URL config",
+        "Removed in-process API client dependency from web runtime"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run --filter=web check-types",
+        "Run apps/api and apps/web together",
+        "Verify the root web route renders health data from apps/api",
+        "Search apps/web for @whattax/http-api/server and @whattax/http-api/client/server imports"
+      ],
+      "browserVerification": [
+        "Open the local web app and confirm the health UI renders while apps/api is running",
+        "Stop apps/api and confirm the failure mode is visible and attributable to the API service"
+      ],
+      "completionCriteria": [
+        "Web runtime has no in-process API calls",
+        "Root route data comes from the standalone API service"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "API-003",
+      "title": "Remove TanStack-mounted API routes",
+      "type": "cleanup",
+      "dependsOn": [
+        "API-002"
+      ],
+      "goal": "Delete the app-side server API mount and simplify TanStack Start server context.",
+      "scope": [
+        "apps/web/src/routes/(machine)/api/$.ts",
+        "apps/web/src/lib/server/api-handler.server.ts",
+        "apps/web/src/server.ts",
+        "apps/web/src/routeTree.gen.ts"
+      ],
+      "outputs": [
+        "Removed machine API route",
+        "Simplified web server entrypoint",
+        "Regenerated TanStack route tree if needed"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run --filter=web check-types",
+        "bun run --filter=web build",
+        "Search apps/web for server-only API imports",
+        "Run web with apps/api and verify the root route still works"
+      ],
+      "browserVerification": [
+        "Confirm /api/health is not served by apps/web",
+        "Confirm the web root still renders health data through the external API"
+      ],
+      "completionCriteria": [
+        "apps/web no longer owns API request handling",
+        "The web server context no longer carries API handler functions"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "API-004",
+      "title": "Update repo docs and final verification",
+      "type": "docs",
+      "dependsOn": [
+        "API-003"
+      ],
+      "goal": "Make the new app boundary discoverable and prove the repo remains healthy.",
+      "scope": [
+        "README.md",
+        "AGENTS.md",
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/deployment.md",
+        "docs/product-specs/extract-api-app.md"
+      ],
+      "outputs": [
+        "Updated runtime boundary docs",
+        "Updated local development commands",
+        "Final verification evidence"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "API smoke check against /api/health",
+        "Web smoke check against the local root route",
+        "Audit root atlas and package README links for missing files"
+      ],
+      "browserVerification": [
+        "Open the local web root and confirm it renders the API health state"
+      ],
+      "completionCriteria": [
+        "Docs describe apps/api as the API runtime owner",
+        "Docs no longer describe apps/web as mounting the canonical API",
+        "Repo-level verification passes"
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}

@@ -115,7 +115,7 @@ The current documentation audit already identifies the first gaps:
   with a clear refresh expectation.
 - The documentation audit is updated to reflect README coverage changes and any
   remaining gaps.
-- `pnpm check-types` and `pnpm build` pass after the documentation changes.
+- `bun run verification` passes after the documentation changes.
 
 ## References
 

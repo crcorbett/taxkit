@@ -33,7 +33,7 @@ updated when `apps/api`, `apps/docs` or package publishing becomes real.
 
 - Do not couple engine packages to deployment providers.
 - Keep server-only handlers behind explicit server exports.
-- Verify `pnpm check-types` and `pnpm build` before deployment changes.
+- Verify `bun run verification` before deployment changes.
 - Add deployment-specific checks only when a real deploy target exists.
 
 ## Related Docs

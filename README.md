@@ -44,14 +44,14 @@ Start with:
 ## Commands
 
 ```sh
-pnpm install
-pnpm dev
-pnpm check-types
-pnpm build
+bun install
+bun run dev
+bun run verification
 ```
 
-`pnpm dev` starts the current web app. `pnpm check-types` and `pnpm build` are
-the baseline verification commands for documentation and scaffold changes.
+`bun run dev` starts the current web app. `bun run verification` is the
+baseline verification command for documentation, package wiring and scaffold
+changes.
 
 ## Documentation Entry Points
 

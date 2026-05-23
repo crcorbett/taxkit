@@ -42,8 +42,7 @@ This package does not define build or typecheck scripts today. Validate
 consumers through the repo-level commands:
 
 ```sh
-pnpm check-types
-pnpm build
+bun run verification
 ```
 
 ## Guardrails

@@ -64,16 +64,16 @@ Current responses are schema-backed with Effect Schema. The health response is:
 From the package root:
 
 ```sh
-pnpm build
-pnpm check-types
-pnpm clean
+bun run build
+bun run check-types
+bun run clean
 ```
 
 From the repo root:
 
 ```sh
-pnpm --filter @whattax/http-api build
-pnpm --filter @whattax/http-api check-types
+bun run --filter=@whattax/http-api build
+bun run --filter=@whattax/http-api check-types
 ```
 
 ## Guardrails

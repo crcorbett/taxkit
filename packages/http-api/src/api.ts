@@ -1,4 +1,5 @@
 import { HttpApi, OpenApi } from "effect/unstable/httpapi";
+
 import { HealthGroup } from "./groups/health.js";
 
 export class WhatTaxApi extends HttpApi.make("WhatTaxApi")

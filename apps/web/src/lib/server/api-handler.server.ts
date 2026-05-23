@@ -1,7 +1,6 @@
 import "@tanstack/react-start/server-only";
-
-import * as HttpRouter from "effect/unstable/http/HttpRouter";
 import { WhatTaxServerLayer } from "@whattax/http-api/server";
+import * as HttpRouter from "effect/unstable/http/HttpRouter";
 
 const { handler, dispose } = HttpRouter.toWebHandler(WhatTaxServerLayer);
 

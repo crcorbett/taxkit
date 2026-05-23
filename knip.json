@@ -1,0 +1,48 @@
+{
+  "$schema": "./node_modules/knip/schema.json",
+  "ignore": ["docs/**", "apps/web/src/routeTree.gen.ts"],
+  "ignoreDependencies": ["@effect/platform-node", "@whattax/tsconfig"],
+  "ignoreFiles": [
+    "apps/web/src/lib/server/api-handler.server.ts",
+    "apps/web/src/server.ts",
+    "packages/http-api/src/groups/index.ts"
+  ],
+  "ignoreIssues": {
+    "apps/web/src/lib/route-runtime.ts": ["types"],
+    "packages/http-api/src/client/in-process.layer.ts": ["exports"],
+    "packages/http-api/src/client/service.ts": ["duplicates"],
+    "packages/http-api/src/groups/health.ts": ["exports", "types"]
+  },
+  "ignoreBinaries": ["oxlint", "oxfmt"],
+  "workspaces": {
+    ".": {
+      "entry": ["package.json", "turbo.json"],
+      "project": ["*.json"],
+      "ignoreDependencies": ["typescript"]
+    },
+    "apps/web": {
+      "entry": [
+        "src/router.tsx",
+        "src/server.ts",
+        "src/routes/**/*.{ts,tsx}",
+        "vite.config.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
+      "ignoreDependencies": ["@tanstack/router-plugin", "@whattax/tsconfig"]
+    },
+    "packages/http-api": {
+      "entry": [
+        "src/index.ts",
+        "src/api.ts",
+        "src/client/index.ts",
+        "src/client/live.layer.ts",
+        "src/client/server.layer.ts",
+        "src/server.ts",
+        "src/handlers/index.ts",
+        "src/handlers/live.ts"
+      ],
+      "project": ["src/**/*.ts"],
+      "ignoreDependencies": ["@effect/platform-node", "@whattax/tsconfig"]
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { Effect, Layer } from "effect";
 import * as HttpRouter from "effect/unstable/http/HttpRouter";
 import * as HttpServer from "effect/unstable/http/HttpServer";
 import * as HttpServerResponse from "effect/unstable/http/HttpServerResponse";
@@ -6,7 +7,7 @@ import {
   HttpApiScalar,
   OpenApi,
 } from "effect/unstable/httpapi";
-import { Effect, Layer } from "effect";
+
 import { WhatTaxApi } from "./api.js";
 import { HealthHandlerLive } from "./handlers/health.js";
 

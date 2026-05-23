@@ -93,7 +93,7 @@ future work is implementation debt, spec debt or stale planning.
   `packages/scripts/README.md` and `packages/ui/README.md` exist.
 - `docs/documentation-audit/README.md` records inventory, package README
   coverage, missing/stale docs and migration priorities.
-- `pnpm check-types` and `pnpm build` still pass.
+- `bun run verification` still passes.
 
 ## References
 

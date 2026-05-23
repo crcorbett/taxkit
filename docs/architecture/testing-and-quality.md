@@ -31,8 +31,7 @@ requirements live in [Testing and validation](./testing-and-validation.md).
 The current repo baseline is scaffold-level verification:
 
 ```bash
-pnpm check-types
-pnpm build
+bun run verification
 ```
 
 ## Guardrails

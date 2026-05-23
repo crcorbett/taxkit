@@ -1,6 +1,7 @@
+import { Layer } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 import { HttpApiClient } from "effect/unstable/httpapi";
-import { Layer } from "effect";
+
 import { WhatTaxApi } from "../api.js";
 import { WhatTaxHttpApiService } from "./service.js";
 

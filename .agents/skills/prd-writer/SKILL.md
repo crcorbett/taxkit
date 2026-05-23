@@ -46,6 +46,10 @@ Task lists should follow `docs/product-specs/writing-task-lists.md`: include
 principles, global verification, ordered tasks, mandatory verification,
 browser verification where relevant, completion criteria, and
 `commitAfterPassing` for each implementation spike.
+Use `bun run verification` as the default repo-health gate in
+`globalVerification.requiredBeforeFinalPR` and in each task's
+`mandatoryVerification`, then add task-specific smoke tests, browser checks, or
+architecture audits as additional gates.
 
 ## Common References
 
@@ -62,6 +66,6 @@ browser verification where relevant, completion criteria, and
 - Reuse old or imported planning material only as source material to revalidate.
 - Keep specs compact, current, and ownership-aware.
 - Keep task lists concrete: each task should produce a working repo state and
-  name the tests, typechecks, browser checks, and architecture audits required
-  before it can be considered complete.
+  name `bun run verification` plus any task-specific tests, browser checks, and
+  architecture audits required before it can be considered complete.
 - Do not generate package-by-package code tutorials unless the user explicitly asks for that depth.

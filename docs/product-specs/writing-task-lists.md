@@ -22,7 +22,7 @@ and explicit verification gates.
   "principles": [],
   "globalVerification": {
     "commitPolicy": "",
-    "requiredBeforeFinalPR": [],
+    "requiredBeforeFinalPR": ["bun run verification"],
     "evidenceRequired": []
   },
   "tasks": []
@@ -36,7 +36,7 @@ Each task should:
 - produce a reviewable repo state
 - prove one or two important assumptions
 - name concrete outputs
-- include mandatory verification gates
+- include `bun run verification` in mandatory verification gates
 - include browser verification when a user-facing route changes
 - include architecture audits when boundaries, schemas or runtime ownership move
 

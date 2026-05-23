@@ -14,7 +14,8 @@ Implement specs in small, verifiable slices.
 1. Read the target spec and task list.
 2. Audit current code and docs before editing.
 3. Implement the smallest useful slice.
-4. Run the task's mandatory verification.
+4. Run the task's mandatory verification, including `bun run verification`
+   unless the task explicitly documents a narrower gate.
 5. Record validation evidence in the active exec plan when one exists.
 6. Commit only after the coherent slice passes verification.
 
@@ -22,5 +23,6 @@ Implement specs in small, verifiable slices.
 
 - Keep implementation aligned with package ownership docs.
 - Prefer Effect services, layers, schemas and tagged errors for engine work.
-- Do not defer all verification to the final slice.
+- Do not defer `bun run verification` or task-specific checks to the final
+  slice.
 - Keep public docs neutral to downstream private products.

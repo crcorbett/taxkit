@@ -26,7 +26,8 @@ Read in this order:
   parent agent reviews, audits, verifies, and accepts each task before
   delegating the next one.
 - Start with a tracer bullet before broadening.
-- Verify after each meaningful slice with typechecks, targeted tests, and builds where relevant.
+- Verify after each meaningful slice with `bun run verification`, plus targeted
+  tests, browser checks, or runtime smoke tests where relevant.
 - Keep the active execution plan current while code moves.
 - Prefer compile-time safety, canonical schemas, and canonical typed errors from owning packages.
 - Use mock layers for external providers in automated tests unless the task
@@ -68,12 +69,13 @@ Before accepting a task, audit for:
 
 ## Verification Baseline
 
-After each meaningful step, choose the smallest verification set that proves the change:
+After each task-list slice, run the task's mandatory verification. By default,
+that includes:
 
-1. filtered `check-types`
-2. targeted tests
-3. filtered build when runtime output changed
-4. browser/runtime verification for user-facing flows
+1. `bun run verification`
+2. targeted tests or smoke checks named by the task
+3. browser/runtime verification for user-facing flows
+4. architecture or import audits when boundaries move
 
 Do not defer verification until the end of the rollout.
 

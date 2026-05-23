@@ -39,9 +39,9 @@ code.
 ## Commands
 
 ```bash
-pnpm --filter=web dev
-pnpm --filter=web check-types
-pnpm --filter=web build
+bun run --filter=web dev
+bun run --filter=web check-types
+bun run --filter=web build
 ```
 
 ## Related Docs

@@ -17,8 +17,8 @@ fast.
 - Keep public WhatTax docs focused on the open-source engine, API, SDK and docs
   site.
 - Use Effect services, layers, schemas and tagged errors for engine boundaries.
-- Verify with `pnpm check-types` and `pnpm build` when docs or package wiring
-  changes can affect the repo.
+- Verify with `bun run verification` when docs, package wiring or code changes
+  can affect the repo.
 
 ## Atlas
 

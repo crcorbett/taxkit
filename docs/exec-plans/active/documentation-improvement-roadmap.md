@@ -31,7 +31,7 @@ the parent before the next slice begins.
   `packages/tsconfig/README.md`, and `docs/documentation-audit/README.md`.
   Parent audit confirmed required README sections, confirmed the audit no
   longer lists those packages as missing README coverage, and ran
-  `pnpm check-types` successfully.
+  `bun run verification` successfully.
 - DOC-IMPROVE-002: worker refreshed `README.md` and
   `docs/repo-status-outline.html`. Parent audit confirmed README local links
   resolve, current/planned sections are distinct, the HTML is labelled as a
@@ -41,14 +41,13 @@ the parent before the next slice begins.
   wording. Parent audit confirmed implemented surfaces are listed separately
   from planned packages, `packages/core`, `packages/scripts`, and
   `packages/ui` are documentation-only placeholders, and planned packages are
-  not described as importable runtime packages. `pnpm check-types` passed after
-  refreshing local pnpm symlinks with `pnpm install`.
+  not described as importable runtime packages. `bun run verification` passed
+  after refreshing local Bun workspace links with `bun install`.
 - DOC-IMPROVE-004: worker added docs maintenance routing to `AGENTS.md`,
   expanded maintenance triggers in `docs/design-docs/agent-first-documentation.md`,
   and refreshed `docs/documentation-audit/README.md` with remaining gaps and
   migration priorities. Parent final audit confirmed root atlas paths resolve,
-  stale missing-README claims are gone, and `pnpm check-types` plus
-  `pnpm build` passed.
+  stale missing-README claims are gone, and `bun run verification` passed.
 
 ## Decisions
 
