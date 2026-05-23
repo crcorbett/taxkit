@@ -15,6 +15,10 @@ calculation capabilities through stable, documented boundaries.
 
 ## Current API Runtime
 
+See [SDK facade export](../specs/sdk-facade.md) for the implementation spec for
+the public `WhatTax.{method}` facade, the plain TypeScript entrypoint and the
+`/effect` entrypoint.
+
 `apps/api` is the current API runtime owner. It is a standalone Bun process
 that owns host/port config, process startup through
 `@effect/platform-bun/BunRuntime.runMain`, Bun request serving and graceful
@@ -110,29 +114,37 @@ GET  /api/docs/openapi.json
 
 Inputs and outputs should decode through Effect Schema. Outputs should include reports, traces and diagnostics where relevant.
 
-## TypeScript SDK
+## TypeScript SDK Facade
 
-The SDK package should live under:
+The primary SDK package should live under:
 
 ```txt
 packages/sdk/typescript
 ```
 
-Package name:
+Preferred public package name:
 
 ```txt
-@whattax/sdk-typescript
+whattax
 ```
+
+If the unscoped package name is unavailable at first publish, use `@whattax/sdk` with the same export contract.
 
 It owns:
 
-- browser-safe API client
+- direct in-process calculation facade
+- plain TypeScript `WhatTax.create(...)` client factory and `WhatTax.{method}` generic helpers
+- Effect-native `whattax/effect` entrypoint
+- jurisdiction-specific opt-in subpaths such as `whattax/au`
+- Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
+- typed declarations, provider Layers and bindings shared by plain and Effect entrypoints
+- browser-safe API client helpers where needed
 - server-side client helpers
 - exported input and output schemas
 - typed calculator request builders
 - examples for Node and browser usage
 
-The SDK must not import server handlers or Node-only modules from browser-safe entrypoints.
+The SDK must not import server handlers or Node-only modules from browser-safe entrypoints. It also must not expose Effect runtime types from the plain TypeScript entrypoint.
 
 ## Export Boundaries
 
@@ -142,14 +154,18 @@ Recommended SDK exports:
 {
   "exports": {
     ".": "./src/index.ts",
+    "./au": "./src/au.ts",
+    "./effect": "./src/effect.ts",
+    "./au/effect": "./src/au-effect.ts",
     "./client": "./src/client/index.ts",
     "./schemas": "./src/schemas/index.ts",
-    "./server": "./src/server/index.ts"
+    "./server": "./src/server/index.ts",
+    "./testing": "./src/testing/index.ts"
   }
 }
 ```
 
-`./client` and `./schemas` must be browser-safe. `./server` may include Node/server-only helpers.
+`.` should expose the plain, jurisdiction-neutral `WhatTax` facade. `./effect` should expose the Effect-native `WhatTax` facade used by HTTP handlers. Jurisdiction subpaths such as `./au` and `./au/effect` should expose local Layer-backed modules, calculation descriptors and thin convenience clients without making the root bundle import those rules. `./client` and `./schemas` must be browser-safe. `./server` may include Node/server-only helpers.
 
 ## Fumadocs Site
 

@@ -62,6 +62,7 @@ explicit WhatTax input facts
 
 ## Documents
 
+- [Architecture atlas](../architecture.md)
 - [Package boundaries](./package-boundaries.md)
 - [Package ownership](./package-ownership.md)
 - [Effect services](./effect-services.md)
@@ -76,6 +77,7 @@ explicit WhatTax input facts
 - [Deployment](./deployment.md)
 - [Testing and quality](./testing-and-quality.md)
 - [Testing and validation](./testing-and-validation.md)
+- [Engineering standards](../standards/README.md)
 
 ## Immediate Implementation Bias
 

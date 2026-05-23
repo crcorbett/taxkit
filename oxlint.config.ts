@@ -20,6 +20,7 @@ export default defineConfig({
   rules: {
     "func-name-matching": "off",
     "func-names": "off",
+    "max-classes-per-file": "off",
     "no-restricted-properties": [
       "error",
       {
@@ -56,6 +57,7 @@ export default defineConfig({
     "typescript/no-non-null-assertion": "error",
     "typescript/no-unnecessary-type-assertion": "error",
     "typescript/no-unsafe-type-assertion": "error",
+    "unicorn/no-array-method-this-argument": "off",
     "whattax-no-switch/no-switch": "error",
     "whattax/no-manual-tag": "error",
   },

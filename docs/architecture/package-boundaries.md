@@ -144,9 +144,15 @@ Planned `@whattax/api-http` will own:
 - OpenAPI generation
 - API boundary schemas
 
-Planned `@whattax/sdk-typescript` will own:
+`whattax` or `@whattax/sdk` owns:
 
-- typed client functions for the public API
+- direct in-process calculation facade
+- plain TypeScript `WhatTax.create(...)` client factory and `WhatTax.{method}` generic helpers
+- Effect-native `whattax/effect` entrypoint
+- jurisdiction-specific opt-in subpaths such as `whattax/au`
+- Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
+- typed declarations, provider Layers and bindings shared by plain and Effect entrypoints
+- typed client functions for the public API where needed
 - browser-safe types and schemas
 - SDK examples and compatibility tests
 
@@ -168,7 +174,7 @@ packages/rules/au/payg       -> @whattax/rules-au-payg
 packages/rules/au/super      -> @whattax/rules-au-super
 packages/domain/au/dates     -> @whattax/domain-au-dates
 packages/api/http            -> @whattax/api-http
-packages/sdk/typescript      -> @whattax/sdk-typescript
+packages/sdk/typescript      -> whattax or @whattax/sdk
 packages/docs/fumadocs       -> @whattax/docs-fumadocs
 ```
 

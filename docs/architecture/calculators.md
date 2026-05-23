@@ -13,18 +13,18 @@ A calculator is an Effect program that requires facts and returns a report. It d
 
 ```ts
 export const CalculateTakeHomePay = Effect.gen(function* () {
-  const grossPay = yield* GrossPayFact
-  const taxablePay = yield* TaxablePayFact
-  const payg = yield* PaygWithholdingFact
-  const netPay = yield* NetPayFact
+  const grossPay = yield* GrossPayFact;
+  const taxablePay = yield* TaxablePayFact;
+  const payg = yield* PaygWithholdingFact;
+  const netPay = yield* NetPayFact;
 
   return new TakeHomePayReport({
     grossPay,
     taxablePay,
     payg,
-    netPay
-  })
-})
+    netPay,
+  });
+});
 ```
 
 The calculator should be small and declarative. Rule layers derive the facts. Scenario layers provide the accepted inputs.
@@ -35,7 +35,7 @@ The calculator should be small and declarative. Rule layers derive the facts. Sc
 const result = await CalculateTakeHomePay.pipe(
   Effect.provide(AuEmployeePay2025_26.Live),
   Effect.provide(EmployeeScenario.fromUserInput(input))
-)
+);
 ```
 
 The compiler should show unresolved requirements if a rule pack or scenario is missing.

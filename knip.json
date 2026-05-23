@@ -1,12 +1,7 @@
 {
   "$schema": "./node_modules/knip/schema.json",
   "ignore": ["docs/**", "apps/web/src/routeTree.gen.ts"],
-  "ignoreDependencies": ["@effect/platform-node", "@whattax/tsconfig"],
-  "ignoreFiles": [
-    "apps/web/src/lib/server/api-handler.server.ts",
-    "apps/web/src/server.ts",
-    "packages/http-api/src/groups/index.ts"
-  ],
+  "ignoreDependencies": ["@whattax/tsconfig"],
   "ignoreIssues": {
     "apps/web/src/lib/route-runtime.ts": ["types"],
     "packages/http-api/src/client/in-process.layer.ts": ["exports"],
@@ -16,9 +11,19 @@
   "ignoreBinaries": ["oxlint", "oxfmt"],
   "workspaces": {
     ".": {
-      "entry": ["package.json", "turbo.json"],
-      "project": ["*.json"],
+      "entry": [
+        "package.json",
+        "turbo.json",
+        "oxfmt.config.ts",
+        "oxlint.config.ts"
+      ],
+      "project": ["*.json", "*.ts"],
       "ignoreDependencies": ["typescript"]
+    },
+    "apps/api": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts"],
+      "ignoreDependencies": ["@whattax/tsconfig"]
     },
     "apps/web": {
       "entry": [
@@ -29,6 +34,10 @@
       ],
       "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
       "ignoreDependencies": ["@tanstack/router-plugin", "@whattax/tsconfig"]
+    },
+    "packages/core": {
+      "entry": ["src/index.ts", "src/*/index.ts"],
+      "project": ["src/**/*.ts"]
     },
     "packages/http-api": {
       "entry": [
@@ -43,6 +52,18 @@
       ],
       "project": ["src/**/*.ts"],
       "ignoreDependencies": ["@effect/platform-node", "@whattax/tsconfig"]
+    },
+    "packages/rules/au/income-tax": {
+      "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/rules/au/pay": {
+      "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/rules/au/stsl": {
+      "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
     }
   }
 }
