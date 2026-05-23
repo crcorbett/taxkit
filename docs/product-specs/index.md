@@ -13,6 +13,7 @@ the architecture docs that own durable boundaries.
 Specs:
 
 - [Documentation structure and development docs](./documentation-structure-and-development-docs.md)
+- [Documentation improvement roadmap](./documentation-improvement-roadmap.md)
 
 Authoring guides:
 

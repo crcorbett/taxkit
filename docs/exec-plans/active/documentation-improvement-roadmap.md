@@ -47,7 +47,8 @@ the parent before the next slice begins.
   expanded maintenance triggers in `docs/design-docs/agent-first-documentation.md`,
   and refreshed `docs/documentation-audit/README.md` with remaining gaps and
   migration priorities. Parent final audit confirmed root atlas paths resolve,
-  stale missing-README claims are gone, and final verification passed.
+  stale missing-README claims are gone, and `pnpm check-types` plus
+  `pnpm build` passed.
 
 ## Decisions
 
