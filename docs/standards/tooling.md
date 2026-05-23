@@ -27,7 +27,7 @@ bun run check
 bun run fix
 bun run knip
 bun run changeset
-bun run version-packages
+bun run version-repo
 bun run check-types
 bun run test
 ```
@@ -45,6 +45,13 @@ Add a changeset for package-facing changes:
 
 ```sh
 bun run changeset
+```
+
+Apply pending Changesets to the fixed release-train package versions and
+changelogs only when intentionally preparing a versioning commit:
+
+```sh
+bun run version-repo
 ```
 
 ## Ultracite Rules

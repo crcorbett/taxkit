@@ -28,6 +28,9 @@ Read in this order:
 - Start with a tracer bullet before broadening.
 - Verify after each meaningful slice with `bun run verification`, plus targeted
   tests, browser checks, or runtime smoke tests where relevant.
+- Add or update a Changeset for every package-facing slice before committing.
+  If a slice is docs-only, app-internal, or otherwise not package-facing, record
+  that reason in the handoff.
 - Keep the active execution plan current while code moves.
 - Prefer compile-time safety, canonical schemas, and canonical typed errors from owning packages.
 - MUST use Effect-native primitives and platform APIs when they fit:
@@ -95,10 +98,12 @@ Implementation rules:
 - Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.
 - Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.
 - Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.
+- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.
 
 Verification and handoff:
 
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
+- Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
 - Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.
 ```
@@ -110,8 +115,10 @@ that includes:
 
 1. `bun run verification`
 2. targeted tests or smoke checks named by the task
-3. browser/runtime verification for user-facing flows
-4. architecture or import audits when boundaries move
+3. `bun run changeset` for package-facing changes, or an explicit no-changeset
+   rationale for docs-only/app-internal work
+4. browser/runtime verification for user-facing flows
+5. architecture or import audits when boundaries move
 
 Do not defer verification until the end of the rollout.
 

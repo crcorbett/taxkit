@@ -16,8 +16,12 @@ Implement specs in small, verifiable slices.
 3. Implement the smallest useful slice.
 4. Run the task's mandatory verification, including `bun run verification`
    unless the task explicitly documents a narrower gate.
-5. Record validation evidence in the active exec plan when one exists.
-6. Commit only after the coherent slice passes verification.
+5. Add or update a Changeset for package-facing changes, or record why the
+   slice is not package-facing.
+6. Record validation and versioning evidence in the active exec plan when one
+   exists.
+7. Commit only after the coherent slice passes verification and the Changeset
+   decision is reviewed.
 
 ## Guardrails
 
@@ -33,6 +37,13 @@ Implement specs in small, verifiable slices.
 - MUST keep one-off Effect error handling and transformations inline at the
   callsite.
 - Do not defer `bun run verification` or task-specific checks to the final
+  slice.
+- Do not defer Changesets to the final slice for package-facing work. Each
+  coherent package-facing slice must include a changeset before commit, unless
+  the user explicitly asks to batch changesets.
+- Do not run `bun run version-repo` during normal implementation unless the user
+  explicitly asks to version the repo. Versioning consumes pending Changesets
+  into package versions and changelogs and should be a deliberate release-prep
   slice.
 - Keep public docs neutral to downstream private products.
 
@@ -54,9 +65,11 @@ Implementation rules:
 - Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.
 - Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.
 - Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.
+- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.
 
 Verification and handoff:
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
+- Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
 - Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.
 ```

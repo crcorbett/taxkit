@@ -41,7 +41,8 @@
     "lint": "oxlint -c oxlint.config.ts . --no-error-on-unmatched-pattern",
     "test": "turbo run test",
     "verification": "bun run lint && bun run format:check && bun run knip && bun run check-types",
-    "version-packages": "changeset version"
+    "version-packages": "changeset version",
+    "version-repo": "changeset version"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",

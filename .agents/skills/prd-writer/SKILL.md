@@ -45,11 +45,15 @@ For small work, a single spec may be enough.
 Task lists should follow `docs/product-specs/writing-task-lists.md`: include
 principles, global verification, ordered tasks, mandatory verification,
 browser verification where relevant, completion criteria, and
-`commitAfterPassing` for each implementation spike.
+changeset/changelog requirements plus `commitAfterPassing` for each
+implementation spike.
 Use `bun run verification` as the default repo-health gate in
 `globalVerification.requiredBeforeFinalPR` and in each task's
 `mandatoryVerification`, then add task-specific smoke tests, browser checks, or
 architecture audits as additional gates.
+Use `bun run changeset` as the default gate for package-facing changes. The
+task list must require either a changeset or an explicit note that the task is
+docs-only, app-internal, or otherwise not package-facing.
 
 Delegated implementation task lists MUST include an implementation prompt, or
 equivalent task field, that embeds the mandatory subagent contract from
@@ -78,10 +82,12 @@ Implementation rules:
 - Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.
 - Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.
 - Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.
+- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.
 
 Verification and handoff:
 
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
+- Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
 - Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.
 ```
@@ -102,5 +108,7 @@ Verification and handoff:
 - Keep specs compact, current, and ownership-aware.
 - Keep task lists concrete: each task should produce a working repo state and
   name `bun run verification` plus any task-specific tests, browser checks, and
-  architecture audits required before it can be considered complete.
+  architecture audits required before it can be considered complete. Package-facing
+  tasks must also name `bun run changeset` or explicitly state why no Changeset
+  is required.
 - Do not generate package-by-package code tutorials unless the user explicitly asks for that depth.

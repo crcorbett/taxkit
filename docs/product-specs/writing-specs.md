@@ -29,8 +29,9 @@ Use this guide when creating a new SPEC, PRD or design brief for WhatTax.
 5. Ownership and boundaries
 6. Proposed approach
 7. Risks and tradeoffs
-8. Acceptance criteria
-9. References
+8. Versioning and changelog impact
+9. Acceptance criteria
+10. References
 
 ## Freshness Metadata
 
@@ -54,3 +55,7 @@ confidence: high | medium | low
   docs before the next task begins.
 - Use `bun run verification` as the default repo-level acceptance gate when a
   spec changes code, docs wiring, package metadata or task plans.
+- Package-facing specs must define the expected Changeset impact: affected
+  release-train packages, semver bump level, and user-facing changelog theme.
+  Specs that do not affect package installation, package exports or package
+  behavior must say that no Changeset is required and why.

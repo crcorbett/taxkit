@@ -60,6 +60,8 @@ bun install
 bun run --filter=api dev
 bun run --filter=web dev
 bun run verification
+bun run changeset
+bun run version-repo
 ```
 
 `bun run --filter=api dev` serves the API through portless at
@@ -68,6 +70,11 @@ portless URL into `WHATTAX_API_BASE_URL` and `VITE_WHATTAX_API_BASE_URL` before
 serving the web app at `https://whattax.localhost`. `bun run verification` is
 the baseline verification command for documentation, package wiring and
 scaffold changes.
+
+Package-facing changes must include a Changeset. Use `bun run changeset` during
+implementation to record the user-facing package impact, and use
+`bun run version-repo` only when intentionally consuming pending Changesets into
+fixed release-train package versions and changelogs.
 
 ## Documentation Entry Points
 

@@ -22,8 +22,13 @@ and explicit verification gates.
   "principles": [],
   "globalVerification": {
     "commitPolicy": "",
-    "requiredBeforeFinalPR": ["bun run verification"],
-    "evidenceRequired": []
+    "requiredBeforeFinalPR": [
+      "bun run verification",
+      "bun run changeset or explicit no-changeset rationale"
+    ],
+    "evidenceRequired": [
+      "Changeset path and release-train impact, or no-changeset rationale"
+    ]
   },
   "tasks": []
 }
@@ -41,10 +46,14 @@ Example task shape:
   "id": "task-001",
   "title": "Implement the first end-to-end slice",
   "implementationPrompt": "Paste the Mandatory Subagent Contract here, followed by task-specific files, outputs and gates.",
-  "mandatoryVerification": ["bun run verification"],
+  "mandatoryVerification": [
+    "bun run verification",
+    "bun run changeset or explicit no-changeset rationale"
+  ],
   "completionCriteria": [
     "Parent agent reviewed the diff against the spec, task and architecture docs.",
     "Parent agent verified canonical Effect/schema/type/id reuse.",
+    "Parent agent verified the Changeset or accepted the no-changeset rationale.",
     "Parent agent accepted the task before the next delegation."
   ],
   "commitAfterPassing": true
@@ -59,6 +68,8 @@ Each task should:
 - prove one or two important assumptions
 - name concrete outputs
 - include `bun run verification` in mandatory verification gates
+- include `bun run changeset` for package-facing changes, or an explicit
+  no-changeset rationale for docs-only/app-internal work
 - include browser verification when a user-facing route changes
 - include architecture audits when boundaries, schemas or runtime ownership move
 - include Effect-native and canonical-type prompt guidance when delegated

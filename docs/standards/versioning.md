@@ -11,14 +11,15 @@ All `@whattax/*` packages are in one fixed version group:
 - `@whattax/rules-au-income-tax`
 - `@whattax/rules-au-pay`
 - `@whattax/rules-au-stsl`
+- `@whattax/testing`
 - `@whattax/tsconfig`
 
 When any package in this group is released, every package in the group receives
 the same version. This follows the Effect-style release train model: packages
 are tested, documented, and consumed as one compatible set.
 
-The web app is not part of the release train. It is an internal docs/app
-workspace and does not have an independently managed package version.
+Apps are not part of the release train. They are internal runtime workspaces and
+do not have independently managed package versions.
 
 ## Changeset Config
 
@@ -47,7 +48,7 @@ bun run changeset
 Apply pending changesets to package versions and changelogs:
 
 ```sh
-bun run version-packages
+bun run version-repo
 ```
 
 Inspect pending releases without modifying files:
@@ -63,6 +64,9 @@ bun run changeset status --verbose
 - Keep changeset summaries user-facing; describe the public effect of the
   change, not the implementation mechanics only.
 - Do not manually edit package versions during normal work. Let
-  `bun run version-packages` consume changesets and update versions together.
+  `bun run version-repo` consume changesets and update versions together.
+- Use `bun run version-repo` in a dedicated versioning commit or release-prep
+  slice. Normal implementation commits should add changesets, not consume them,
+  unless the user explicitly asks to version the repo.
 - Keep package `private: true` until the package is ready for npm publication.
   Changesets still manages versions while packages are private.

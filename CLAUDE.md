@@ -28,6 +28,9 @@ This file exists for Claude-compatible tooling and MUST stay aligned with
   `Effect.catchAllDefect`.
 - Verify with `bun run verification` when docs, package wiring or code changes
   can affect the repo.
+- For package-facing work, add or update a Changeset before committing. Use
+  `bun run changeset` to record the change and `bun run version-repo` only when
+  intentionally applying pending release-train versions and changelogs.
 
 Start deeper work at:
 

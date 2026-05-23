@@ -4,6 +4,7 @@
 "@whattax/rules-au-income-tax": patch
 "@whattax/rules-au-pay": patch
 "@whattax/rules-au-stsl": patch
+"@whattax/testing": patch
 "@whattax/tsconfig": patch
 ---
 

@@ -31,6 +31,9 @@ fast.
   `docs/architecture/effect-services.md`.
 - Verify with `bun run verification` when docs, package wiring or code changes
   can affect the repo.
+- For package-facing work, add or update a Changeset before committing. Use
+  `bun run changeset` to record the change and `bun run version-repo` only when
+  intentionally applying pending release-train versions and changelogs.
 
 ## Atlas
 
