@@ -26,8 +26,17 @@ should not own tax-domain contracts.
 ## Runtime Shape
 
 The root route loads `@whattax/http-api/client` through the route runtime and
-renders API health status. Server-only API exports must stay out of browser
-code.
+renders API health status from the standalone API service over HTTP.
+Server-only API exports must stay out of browser code.
+
+The web runtime reads the API origin from:
+
+- `WHATTAX_API_BASE_URL` on the server
+- `VITE_WHATTAX_API_BASE_URL` in the browser
+
+Both default to `http://127.0.0.1:4000`, which is the local `apps/api`
+default. Do not include `/api` in the base URL; the typed API client owns route
+prefixes.
 
 ## Guardrails
 
@@ -39,6 +48,7 @@ code.
 ## Commands
 
 ```bash
+bun run --filter=api dev
 bun run --filter=web dev
 bun run --filter=web check-types
 bun run --filter=web build

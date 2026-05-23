@@ -25,7 +25,7 @@ confidence: medium
 | Task | Status | Notes |
 | --- | --- | --- |
 | API-001 | complete | Added standalone Bun API app with one process `ManagedRuntime`, Bun server layer and signal disposal. |
-| API-002 | pending | Rewire web app to external API. |
+| API-002 | complete | Rewired web server and browser runtimes to the standalone API over HTTP. |
 | API-003 | pending | Remove TanStack-mounted API routes. |
 | API-004 | pending | Update docs and final verification. |
 
@@ -46,3 +46,24 @@ confidence: medium
   - Audited `apps/api/src/runtime.ts`, `apps/api/src/server.ts` and
     `apps/api/src/index.ts`: the app creates one `ManagedRuntime` at process
     startup and no runtime inside request handling.
+- 2026-05-23 API-002:
+  - `bun x tsc --help` confirmed TypeScript `5.9.3` supports concrete
+    `ES2024` and `ESNext` targets, not `ES2025`; set the repo target and
+    package libs to `ES2024`.
+  - `bun run --filter=web check-types` passed.
+  - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
+    Turbo typecheck.
+  - Ran `bun run --filter=api start` on `http://127.0.0.1:4000` and
+    `bun run --filter=web dev` on `http://127.0.0.1:4722`.
+  - `GET http://127.0.0.1:4000/api/health` returned
+    `200 {"service":"whattax","status":"ok"}`.
+  - `GET http://127.0.0.1:4722/` returned `200` and contained
+    `API status: <strong>ok</strong>`.
+  - With `apps/api` stopped and `apps/web` still running,
+    `GET http://127.0.0.1:4722/` returned `500` containing
+    `Transport error (GET http://127.0.0.1:4000/api/health)`.
+  - Import audit: `apps/web` has no
+    `@whattax/http-api/client/server` imports. The only
+    `@whattax/http-api/server` source import remains in
+    `apps/web/src/lib/server/api-handler.server.ts`, intentionally pending
+    API-003 removal.

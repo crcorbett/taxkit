@@ -12,8 +12,8 @@ export const Route = createFileRoute("/")({
       <section className="home">
         <h1>WhatTax</h1>
         <p>
-          TanStack Start app with a single server runtime, a single client
-          runtime, and an Effect HTTP API mounted at <code>/api/*</code>.
+          TanStack Start app with server and client runtimes calling the
+          standalone Effect HTTP API service.
         </p>
         <p>
           API status: <strong>{health.status}</strong>

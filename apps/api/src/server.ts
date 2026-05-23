@@ -36,7 +36,9 @@ const BunHttpServerLive = Layer.effect(
   })
 );
 
-const ApiHttpServerLive = HttpRouter.serve(WhatTaxServerLayer).pipe(
+const ApiRoutesLive = WhatTaxServerLayer.pipe(Layer.provide(HttpRouter.cors()));
+
+const ApiHttpServerLive = HttpRouter.serve(ApiRoutesLive).pipe(
   Layer.provide(BunHttpServerLive.pipe(Layer.provide(ApiServerConfigLive)))
 );
 
