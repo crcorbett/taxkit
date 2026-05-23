@@ -7,9 +7,31 @@ confidence: high
 
 # WhatTax Architecture
 
-This directory is the implementation reference for the WhatTax tax calculator architecture.
+This directory is the implementation reference for the planned WhatTax tax
+calculator architecture. It is also the routing guide for the small surface
+that exists today.
 
-WhatTax is the open-source engine repository. It owns Australian tax domain types, facts, primitives, rule packs, calculation programs, graph metadata, traces, a Fumadocs documentation site, a reusable API app server and a TypeScript SDK.
+WhatTax is the open-source engine repository. Today it contains a TanStack
+Start web scaffold, the `@whattax/http-api` health endpoint package, shared
+TypeScript config, documentation, and planned ownership directories. It does
+not yet contain the deterministic engine packages, rule packs, calculation
+programs, public API app, Fumadocs site, or TypeScript SDK described by these
+architecture docs.
+
+## Current Implementation
+
+Implemented surfaces:
+
+- `apps/web`: TanStack Start scaffold that loads the health endpoint.
+- `packages/http-api`: Effect HTTP API package for the current health route,
+  docs page and OpenAPI JSON.
+- `packages/tsconfig`: shared TypeScript configuration presets.
+- `docs/**`: architecture, product specs, execution plans, references and
+documentation audits.
+
+Planned ownership directories such as `packages/core`, `packages/scripts` and
+`packages/ui` currently contain README guidance only. They are not runtime
+packages until a package manifest, source exports and verification are added.
 
 ## Core Model
 
@@ -23,7 +45,9 @@ Schema-branded domain values
   -> trace, ledger, graph and report output
 ```
 
-The engine is deterministic. Given the same accepted facts, rule layers, parameter layers, dates and policies, it must produce the same output and trace.
+The planned engine is deterministic. Given the same accepted facts, rule
+layers, parameter layers, dates and policies, it must produce the same output
+and trace.
 
 ## Authority Boundary
 

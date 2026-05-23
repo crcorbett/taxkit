@@ -7,35 +7,53 @@ confidence: medium
 
 # Package Ownership
 
-Package ownership defines where new WhatTax code belongs and which package is
-allowed to define canonical contracts.
+Package ownership defines where new WhatTax code should belong as the repo
+grows and which package will be allowed to define canonical contracts. It does
+not imply that every named package exists today.
 
 ## Scope
 
 This doc routes ownership decisions. [Package boundaries](./package-boundaries.md)
 contains the proposed package map and dependency direction.
 
+Current implemented code lives in:
+
+- `apps/web`
+- `packages/http-api`
+- `packages/tsconfig`
+
+Current planned ownership placeholders:
+
+- `packages/core`
+- `packages/scripts`
+- `packages/ui`
+
+The placeholder directories contain README guidance only. Do not route runtime
+imports, source ownership or build expectations to them until package manifests
+and source exports exist.
+
 ## Main Areas
 
 `packages/core/*`
-: Shared primitives, fact descriptors, rule descriptors, graph metadata, trace
-and ledger contracts, common tagged errors and Effect helpers.
+: Planned shared primitives, fact descriptors, rule descriptors, graph
+metadata, trace and ledger contracts, common tagged errors and Effect helpers.
 
 `packages/domain/au/*`
-: Australian date dimensions and domain facts that are not owned by a single
-rule pack.
+: Planned Australian date dimensions and domain facts that are not owned by a
+single rule pack.
 
 `packages/rules/au/*`
-: Official Australian rule packs, parameter tables, algorithms, source
+: Planned official Australian rule packs, parameter tables, algorithms, source
 references, graph metadata and golden tests.
 
 `packages/api/http`
-: Effect HTTP API definitions, boundary schemas, server handlers, OpenAPI and
-handler layers that compose engine calculators.
+: Planned long-term home for Effect HTTP API definitions, boundary schemas,
+server handlers, OpenAPI and handler layers that compose engine calculators.
+The implemented API package is currently `packages/http-api`.
 
 `packages/sdk/typescript`
-: Browser-safe client, schemas, request builders, server helpers, examples and
-compatibility tests.
+: Planned browser-safe client, schemas, request builders, server helpers,
+examples and compatibility tests.
 
 `apps/web`
 : Current scaffold app. It proves the runtime boundary and health endpoint

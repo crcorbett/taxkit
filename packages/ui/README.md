@@ -7,13 +7,14 @@ confidence: low
 
 # UI
 
-Planned shared UI package for WhatTax-owned apps.
+Planned shared UI package for WhatTax-owned apps. This directory is currently
+documentation-only: it has no package manifest, source exports or runtime code.
 
 ## Scope
 
-`packages/ui` should exist only when repeated UI components or design tokens
-are shared across WhatTax apps. It should not own tax rules, API contracts or
-calculator state.
+`packages/ui` should exist as a runtime package only when repeated UI
+components or design tokens are shared across WhatTax apps. It should not own
+tax rules, API contracts or calculator state.
 
 ## Main Areas
 
@@ -26,7 +27,7 @@ Potential future areas:
 
 ## Runtime Shape
 
-UI code may depend on React when the package exists as an app-facing package.
+When implemented, UI code may depend on React as an app-facing package.
 Browser-safe constraints still apply: do not import server-only handlers or
 Node-only modules.
 

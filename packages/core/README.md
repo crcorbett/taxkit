@@ -7,13 +7,15 @@ confidence: low
 
 # Core Packages
 
-Planned home for shared deterministic WhatTax engine primitives.
+Planned home for shared deterministic WhatTax engine primitives. This directory
+is currently documentation-only: it has no package manifest, source exports or
+runtime code.
 
 ## Scope
 
-`packages/core` should group foundational packages for primitives, facts, rule
-descriptors, graph metadata, traces, ledgers, common tagged errors and Effect
-helpers.
+`packages/core` should eventually group foundational packages for primitives,
+facts, rule descriptors, graph metadata, traces, ledgers, common tagged errors
+and Effect helpers.
 
 ## Main Areas
 
@@ -27,8 +29,9 @@ Planned subpackages:
 
 ## Runtime Shape
 
-Core packages should be deterministic and reusable. They should not import app
-runtime code, React, HTTP handlers or filesystem adapters.
+When implemented, core packages should be deterministic and reusable. They
+should not import app runtime code, React, HTTP handlers or filesystem
+adapters.
 
 ## Guardrails
 

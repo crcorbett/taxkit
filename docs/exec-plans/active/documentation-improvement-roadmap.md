@@ -22,8 +22,8 @@ the parent before the next slice begins.
 
 - [x] DOC-IMPROVE-001: Fill README coverage for existing packages
 - [x] DOC-IMPROVE-002: Refresh the root README
-- [ ] DOC-IMPROVE-003: Clarify current versus planned architecture docs (delegated)
-- [ ] DOC-IMPROVE-004: Add docs maintenance guidance and final audit
+- [x] DOC-IMPROVE-003: Clarify current versus planned architecture docs
+- [ ] DOC-IMPROVE-004: Add docs maintenance guidance and final audit (delegated)
 
 ## Validation Evidence
 
@@ -37,6 +37,12 @@ the parent before the next slice begins.
   resolve, current/planned sections are distinct, the HTML is labelled as a
   manual snapshot, and health-only API docs/OpenAPI wording matches current
   `packages/http-api/src/server.ts`.
+- DOC-IMPROVE-003: worker updated architecture and planned package README
+  wording. Parent audit confirmed implemented surfaces are listed separately
+  from planned packages, `packages/core`, `packages/scripts`, and
+  `packages/ui` are documentation-only placeholders, and planned packages are
+  not described as importable runtime packages. `pnpm check-types` passed after
+  refreshing local pnpm symlinks with `pnpm install`.
 
 ## Decisions
 
