@@ -55,9 +55,17 @@ reduces complex duplication.
 ## Guardrails
 
 - Use `Effect.Schema` for boundary and persisted values.
+- Schemas and tagged value shapes MUST live in colocated `schemas.ts` files, or
+  in the owning package's public schema module. Exported types MUST be derived
+  from those schemas. Runtime and handler files should compose services and
+  layers, not define or duplicate reusable shapes inline.
 - Use `Layer` composition for rule packs and scenario inputs.
 - Keep parameter data separate from algorithms.
 - Use tagged errors for expected domain failures.
+- Manual `_tag` object literals are not allowed. Tagged values MUST be
+  constructed with `Data.TaggedClass`, `Data.TaggedError`,
+  `Schema.TaggedClass`, or an owning package constructor built from those
+  primitives.
 - Keep one-off error mapping and transformation logic inline at the callsite;
   tiny mapper or wrapper helpers are not allowed.
 - Avoid local DTO mirrors when an owning schema already exists.

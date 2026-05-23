@@ -1,40 +1,20 @@
+import * as BunRuntime from "@effect/platform-bun/BunRuntime";
+import { Console, Effect } from "effect";
+
 import { ApiServerConfig } from "./config.js";
-import { makeApiRuntime } from "./runtime.js";
+import { ApiAppLayer } from "./server.js";
 
-const runtime = makeApiRuntime();
+const ApiMain = Effect.gen(function* apiMain() {
+  const config = yield* ApiServerConfig;
 
-let shutdownStarted = false;
+  yield* Console.info(
+    `WhatTax API listening on http://${config.address.hostname}:${config.address.port}`
+  );
 
-const shutdown = async (signal: NodeJS.Signals) => {
-  if (shutdownStarted) {
-    return;
-  }
+  yield* Effect.never;
+}).pipe(
+  Effect.ensuring(Console.info("WhatTax API stopped")),
+  Effect.provide(ApiAppLayer)
+);
 
-  shutdownStarted = true;
-  console.info(`WhatTax API received ${signal}; shutting down`);
-
-  try {
-    await runtime.dispose();
-    console.info("WhatTax API stopped");
-    process.exit(0);
-  } catch (error) {
-    console.error("WhatTax API shutdown failed", error);
-    process.exit(1);
-  }
-};
-
-process.once("SIGINT", (signal) => {
-  void shutdown(signal);
-});
-process.once("SIGTERM", (signal) => {
-  void shutdown(signal);
-});
-
-try {
-  const config = await runtime.runPromise(ApiServerConfig.asEffect());
-  console.info(`WhatTax API listening on http://${config.host}:${config.port}`);
-} catch (error) {
-  console.error("WhatTax API failed to start", error);
-  await runtime.dispose();
-  process.exit(1);
-}
+BunRuntime.runMain(ApiMain);

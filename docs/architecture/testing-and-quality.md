@@ -44,6 +44,9 @@ bun run verification
   helpers, but it does not currently provide a safe built-in rule for banning
   functions below a minimum line count. Prefer review and architecture guidance
   for tiny one-off wrapper or mapper helpers.
+- `bun run lint` includes custom Oxlint rules for repo-specific Effect
+  conventions, including the ban on manual `_tag` object literals. Use
+  `Data.TaggedClass`, `Data.TaggedError`, or `Schema.TaggedClass` instead.
 - Verification evidence should be recorded in specs, task lists or exec plans
   when work spans multiple packages.
 

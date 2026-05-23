@@ -7,9 +7,6 @@ export default defineConfig(({ command }) => {
   const useSourceWorkspacePackages = command !== "build";
 
   return {
-    optimizeDeps: {
-      exclude: ["@whattax/http-api"],
-    },
     plugins: [
       tanstackStart(),
       viteReact(),

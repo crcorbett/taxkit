@@ -11,6 +11,7 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
+    "@effect/platform-bun": "catalog:",
     "@whattax/http-api": "workspace:*",
     "effect": "catalog:"
   },

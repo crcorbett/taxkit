@@ -16,9 +16,10 @@ calculation capabilities through stable, documented boundaries.
 ## Current API Runtime
 
 `apps/api` is the current API runtime owner. It is a standalone Bun process
-that owns host/port config, process startup, one process-lifetime Effect
-`ManagedRuntime`, Bun request serving and graceful shutdown. It delegates API
-contracts, handlers, schemas and generated docs to `packages/http-api`.
+that owns host/port config, process startup through
+`@effect/platform-bun/BunRuntime.runMain`, Bun request serving and graceful
+shutdown through Effect interruption and scoped layer finalizers. It delegates
+API contracts, handlers, schemas and generated docs to `packages/http-api`.
 
 The current implemented API surface is health/docs only:
 
@@ -54,6 +55,11 @@ schema, type and keyed config fragment. Apps compose that fragment into their
 own runtime config modules and provide runtime-specific values, such as server
 process env or Vite client env, through `ConfigProvider` composition instead of
 redefining API client config keys or env prefixes locally.
+
+Runtime app modules should keep app-owned schemas in colocated `schemas.ts`
+files and derive exported types from those schemas. Server startup files should
+consume canonical schema values and compose config, layers and runtime lifecycle
+only.
 
 ## Planned API Package
 

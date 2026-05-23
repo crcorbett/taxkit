@@ -24,7 +24,7 @@ confidence: medium
 
 | Task | Status | Notes |
 | --- | --- | --- |
-| API-001 | complete | Added standalone Bun API app with one process `ManagedRuntime`, Bun server layer and signal disposal. |
+| API-001 | complete | Added standalone Bun API app with an Effect `BunRuntime.runMain` entrypoint, Bun server layer and scoped shutdown. |
 | API-002 | complete | Rewired web server and browser runtimes to the standalone API over HTTP. |
 | API-003 | complete | Removed TanStack-mounted API route and in-process web API handler context. |
 | API-004 | complete | Updated repo docs for the standalone API boundary and completed final verification. |
@@ -41,11 +41,10 @@ confidence: medium
   - Ran `GET /api/docs/openapi.json`; response parsed as OpenAPI `3.1.0`
     with title `WhatTax API` and `/api/health` present.
   - Ran `API_PORT=4013 bun apps/api/src/index.ts`, sent `SIGTERM` to the Bun
-    entrypoint process, and observed `WhatTax API received SIGTERM; shutting
-    down` followed by `WhatTax API stopped` with exit code `0`.
-  - Audited `apps/api/src/runtime.ts`, `apps/api/src/server.ts` and
-    `apps/api/src/index.ts`: the app creates one `ManagedRuntime` at process
-    startup and no runtime inside request handling.
+    entrypoint process, and observed graceful shutdown with exit code `0`.
+  - Audited `apps/api/src/server.ts` and `apps/api/src/index.ts`: the app runs
+    one Effect entrypoint with `BunRuntime.runMain` and creates no runtime
+    inside request handling.
 - 2026-05-23 API-002:
   - `bun x tsc --help` confirmed TypeScript `5.9.3` supports concrete
     `ES2024` and `ESNext` targets, not `ES2025`; set the repo target and
@@ -53,15 +52,15 @@ confidence: medium
   - `bun run --filter=web check-types` passed.
   - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
     Turbo typecheck.
-  - Ran `bun run --filter=api start` on `http://127.0.0.1:4000` and
-    `bun run --filter=web dev` on `http://127.0.0.1:4722`.
-  - `GET http://127.0.0.1:4000/api/health` returned
+  - Ran `bun run --filter=api dev` on `https://api.whattax.localhost` and
+    `bun run --filter=web dev` on `https://whattax.localhost`.
+  - `GET https://api.whattax.localhost/api/health` returned
     `200 {"service":"whattax","status":"ok"}`.
-  - `GET http://127.0.0.1:4722/` returned `200` and contained
+  - `GET https://whattax.localhost/` returned `200` and contained
     `API status: <strong>ok</strong>`.
   - With `apps/api` stopped and `apps/web` still running,
-    `GET http://127.0.0.1:4722/` returned `500` containing
-    `Transport error (GET http://127.0.0.1:4000/api/health)`.
+    `GET https://whattax.localhost/` returned `500` containing an attributable
+    API transport error.
   - Import audit: `apps/web` has no
     `@whattax/http-api/client/server` imports. The only
     `@whattax/http-api/server` source import remains in
@@ -74,13 +73,13 @@ confidence: medium
     `unstable/http/HttpRouter.js`, but exited `0`.
   - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
     Turbo typecheck.
-  - Ran `bun run --filter=api start` on `http://127.0.0.1:4000` and
-    `bun run --filter=web dev` on `http://127.0.0.1:4285`.
-  - `GET http://127.0.0.1:4000/api/health` returned
+  - Ran `bun run --filter=api dev` on `https://api.whattax.localhost` and
+    `bun run --filter=web dev` on `https://whattax.localhost`.
+  - `GET https://api.whattax.localhost/api/health` returned
     `200 {"service":"whattax","status":"ok"}`.
-  - `GET http://127.0.0.1:4285/` returned `200` and contained
+  - `GET https://whattax.localhost/` returned `200` and contained
     `API status: <strong>ok</strong>`.
-  - `GET http://127.0.0.1:4285/api/health` returned a web `404` HTML page,
+  - `GET https://whattax.localhost/api/health` returned a web `404` HTML page,
     confirming `apps/web` no longer serves the API route.
   - Import audit: `apps/web/src` has no remaining
     `@whattax/http-api/server`, `@whattax/http-api/client/server`,
@@ -90,17 +89,16 @@ confidence: medium
     owner and `apps/web` is only an HTTP client of that API.
   - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
     Turbo typecheck.
-  - Ran `API_PORT=4024 bun run --filter=api start` on
-    `http://127.0.0.1:4024`.
-  - Ran
-    `WHATTAX_API_BASE_URL=http://127.0.0.1:4024 VITE_WHATTAX_API_BASE_URL=http://127.0.0.1:4024 bun run --filter=web dev`
-    on `http://127.0.0.1:4804`.
-  - `GET http://127.0.0.1:4024/api/health` returned
+  - Ran `bun run --filter=api dev` on `https://api.whattax.localhost`.
+  - Ran `bun run --filter=web dev` on `https://whattax.localhost`, with the
+    web dev script injecting `portless get api.whattax` into both API base URL
+    environment variables.
+  - `GET https://api.whattax.localhost/api/health` returned
     `200 {"service":"whattax","status":"ok"}`.
-  - `GET http://127.0.0.1:4804/` returned `200` and contained
+  - `GET https://whattax.localhost/` returned `200` and contained
     `API status: <strong>ok</strong>`.
   - Browser verification used headless system Chrome against
-    `http://127.0.0.1:4804/`; the rendered DOM contained
+    `https://whattax.localhost/`; the rendered DOM contained
     `API status: <strong>ok</strong>`.
   - Audited root atlas and app/package README links/path references; checked
     107 references and found no missing files.
@@ -117,14 +115,13 @@ confidence: medium
     `Effect.gen(function* () { ... })` callbacks are allowed.
   - Re-ran `bun run verification`; Oxlint, Oxfmt check, Knip and Turbo
     typecheck all passed after the ownership and config refactor.
-  - Re-ran smoke checks with `API_PORT=4026 bun run --filter=api start` and
-    `WHATTAX_API_BASE_URL=http://127.0.0.1:4026 VITE_WHATTAX_API_BASE_URL=http://127.0.0.1:4026 bun run --filter=web dev`
-    on `http://127.0.0.1:4740`.
-  - `GET http://127.0.0.1:4026/api/health` returned
+  - Re-ran smoke checks with `bun run --filter=api dev` and
+    `bun run --filter=web dev` through portless.
+  - `GET https://api.whattax.localhost/api/health` returned
     `200 {"service":"whattax","status":"ok"}`.
-  - `GET http://127.0.0.1:4026/api/docs/openapi.json` parsed as OpenAPI
+  - `GET https://api.whattax.localhost/api/docs/openapi.json` parsed as OpenAPI
     `3.1.0` with title `WhatTax API` and `/api/health` present.
-  - `GET http://127.0.0.1:4740/` returned `200` and contained
+  - `GET https://whattax.localhost/` returned `200` and contained
     `API status: <strong>ok</strong>`.
-  - `GET http://127.0.0.1:4740/api/health` returned a web `404` HTML page,
+  - `GET https://whattax.localhost/api/health` returned a web `404` HTML page,
     confirming `apps/web` still does not serve the API route.

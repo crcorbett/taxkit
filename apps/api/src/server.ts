@@ -12,11 +12,7 @@ const BunHttpServerLive = Layer.effect(
     const config = yield* ApiServerConfig;
 
     return HttpServer.make({
-      address: {
-        _tag: "TcpAddress",
-        hostname: config.host,
-        port: config.port,
-      },
+      address: config.address,
       serve: (httpEffect, middleware) =>
         Effect.acquireRelease(
           Effect.sync(() => {
@@ -26,8 +22,8 @@ const BunHttpServerLive = Layer.effect(
 
             return Bun.serve({
               fetch: (request) => handler(request),
-              hostname: config.host,
-              port: config.port,
+              hostname: config.address.hostname,
+              port: config.address.port,
             });
           }),
           (server) => Effect.sync(() => server.stop(true))

@@ -60,6 +60,11 @@ Run `apps/api` before loading the web root locally. Without the API process,
 the root route should fail with an attributable HTTP transport error rather
 than silently falling back to an in-process API.
 
+Use the portless URLs for local browser and app-to-app checks:
+
+- API: `https://api.whattax.localhost`
+- Web: `https://whattax.localhost`
+
 ## Related Docs
 
 - `docs/architecture/frontend.md`

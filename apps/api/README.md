@@ -17,10 +17,11 @@ schemas, generated OpenAPI and docs routes stay in `packages/http-api`.
 
 ## Runtime Shape
 
-The process creates exactly one Effect `ManagedRuntime` from `ApiAppLayer`.
-Startup runs through that runtime, requests are served by the Bun-backed
-`HttpServer` layer, and `SIGINT` or `SIGTERM` disposes the runtime so scoped
-finalizers stop the Bun server.
+The process entrypoint is an Effect program run with
+`@effect/platform-bun/BunRuntime.runMain`. Startup reads `ApiServerConfig` from
+`ApiAppLayer`, requests are served by the Bun-backed `HttpServer` layer, and
+`SIGINT` or `SIGTERM` interrupts the root Effect fiber so scoped finalizers stop
+the Bun server.
 
 Local defaults:
 
@@ -61,12 +62,24 @@ bun run --filter=web dev
 into `WHATTAX_API_BASE_URL` for SSR and `VITE_WHATTAX_API_BASE_URL` for browser
 navigation.
 
+Use the portless URL for local API smoke checks:
+
+```sh
+curl https://api.whattax.localhost/api/health
+```
+
 ## Guardrails
 
 - Do not define API contracts in this app.
-- Do not create a `ManagedRuntime` inside request handling.
-- Keep process-owned resources in `ApiAppLayer` so runtime disposal releases
-  them.
+- Keep app-owned schemas in `schemas.ts` and derive exported types from those
+  schemas. Runtime files should consume canonical schema values and compose
+  layers/startup logic, not redefine reusable shapes inline.
+- Do not manually wire process signal handlers, `process.exit`, mutable
+  shutdown flags or `try/catch` around Effect startup. The process entrypoint
+  should be an Effect program run through `BunRuntime.runMain`.
+- Do not create a runtime inside request handling.
+- Keep process-owned resources in `ApiAppLayer` so root fiber interruption
+  releases them through scoped finalizers.
 - Keep `apps/web` as an HTTP client of this app, not an in-process API mount.
 
 ## Related Docs

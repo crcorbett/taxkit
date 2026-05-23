@@ -45,8 +45,9 @@ handler wiring that should belong to a dedicated API app.
 - Add a standalone Bun API app under `apps/api`.
 - Keep API behavior owned by `packages/http-api`.
 - Run the API server through the existing Effect HTTP `WhatTaxServerLayer`.
-- Create one Bun API `ManagedRuntime` from the app layer and use it as the
-  only runtime for startup, request handling and teardown.
+- Run the Bun API entrypoint as an Effect program through
+  `@effect/platform-bun/BunRuntime.runMain` so signals, exit codes and root
+  fiber interruption are owned by Effect.
 - Keep `apps/api` thin: process config, server startup, request handling and
   shutdown only.
 - Rewire `apps/web` to call the standalone API over HTTP through browser-safe
@@ -86,8 +87,9 @@ handler wiring that should belong to a dedicated API app.
    coverage for the new app.
 3. Add explicit API app config for host and port. Defaults should support local
    development without extra env setup.
-4. Create `ManagedRuntime.make(ApiAppLayer)` in the Bun app boundary, start the
-   server through that runtime and dispose the runtime during process teardown.
+4. Run an entrypoint Effect with `BunRuntime.runMain`, start the server
+   through the provided app layer and release it through scoped layer
+   finalizers on root fiber interruption.
 5. Update `packages/http-api` only where needed to make the server handler easy
    to reuse without importing TanStack-specific code.
 6. Update `apps/web` so both server-rendered loaders and browser transitions
@@ -97,29 +99,28 @@ handler wiring that should belong to a dedicated API app.
    context wiring once no route depends on them.
 8. Update docs and scripts so local development can run web and API together.
 
-## ManagedRuntime Lifecycle
+## Process Lifecycle
 
-The Bun API app should follow the Effect v4 `ManagedRuntime` lifecycle:
+The Bun API app should follow the Effect v4 process lifecycle:
 
 ```txt
-ApiAppLayer -> ManagedRuntime.make(ApiAppLayer) -> run startup effect -> serve
-SIGINT/SIGTERM -> interrupt root fiber -> dispose runtime -> close scoped resources
+ApiAppLayer -> BunRuntime.runMain(entrypoint Effect) -> serve
+SIGINT/SIGTERM -> interrupt root fiber -> close scoped resources
 ```
 
 Requirements:
 
-- The Bun API app owns exactly one `ManagedRuntime` for the process.
-- The runtime is created from an app layer that includes the HTTP API handler
-  and any scoped resources the API process owns.
-- Startup should run through `runtime.runPromise(...)` or a root effect launched
-  with `Runtime.makeRunMain(...)`, not through ad hoc unscoped promises.
+- The Bun API app entrypoint is an Effect program run with `BunRuntime.runMain`.
+- The app layer includes the HTTP API handler and any scoped resources the API
+  process owns.
+- Startup should run through the root Effect program, not through ad hoc
+  unscoped promises.
 - Long-running server work should be interruptible. On `SIGINT` and `SIGTERM`,
-  the root fiber should be interrupted and `runtime.dispose()` or
-  `runtime.disposeEffect` must run exactly once.
+  `BunRuntime.runMain` should interrupt the root fiber and Effect should run
+  scoped finalizers exactly once.
 - Scoped layer finalizers must be the teardown mechanism for owned resources,
   including the Bun server stop path.
-- Request handling may call the prebuilt handler from the runtime context, but
-  it must not create a new runtime per request.
+- Request handling must not create a new runtime per request.
 
 ## Runtime Shape
 
@@ -158,9 +159,8 @@ API base URL values.
 ## Acceptance Criteria
 
 - `apps/api` exists and runs a Bun server for `WhatTaxServerLayer`.
-- `apps/api` owns a single Effect `ManagedRuntime` that handles startup,
-  shutdown and teardown.
-- `SIGINT` and `SIGTERM` trigger runtime disposal and release scoped resources.
+- `apps/api` runs its entrypoint through `BunRuntime.runMain`.
+- `SIGINT` and `SIGTERM` interrupt the root fiber and release scoped resources.
 - `apps/api` serves `/api/health`, `/api/docs` and `/api/docs/openapi.json`.
 - `apps/web` no longer imports `@whattax/http-api/server` or
   `@whattax/http-api/client/server`.

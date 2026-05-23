@@ -13,6 +13,10 @@ export default defineConfig({
     ".turbo/**",
     ".vercel/**",
   ],
+  jsPlugins: [
+    "./tools/oxlint/no-switch-plugin.js",
+    "./tools/oxlint/whattax-rules.js",
+  ],
   rules: {
     "func-name-matching": "off",
     "func-names": "off",
@@ -52,5 +56,7 @@ export default defineConfig({
     "typescript/no-non-null-assertion": "error",
     "typescript/no-unnecessary-type-assertion": "error",
     "typescript/no-unsafe-type-assertion": "error",
+    "whattax-no-switch/no-switch": "error",
+    "whattax/no-manual-tag": "error",
   },
 });

@@ -1,21 +1,14 @@
 import { Config, ConfigProvider, Context, Effect, Layer, Schema } from "effect";
 
+import {
+  ApiServerConfigSchema,
+  ApiServerConfigSourceSchema,
+  ApiServerTcpAddressSchema,
+} from "./schemas.js";
+import type { ApiServerConfigService } from "./schemas.js";
+
 const defaultHost = "127.0.0.1";
 const defaultPort = 4000;
-
-const ApiServerConfigSchema = Schema.Struct({
-  host: Schema.NonEmptyString,
-  port: Schema.Int.check(
-    Schema.isBetween({
-      maximum: 65_535,
-      minimum: 1,
-    })
-  ),
-});
-
-export type ApiServerConfigService = Schema.Schema.Type<
-  typeof ApiServerConfigSchema
->;
 
 export class ApiServerConfig extends Context.Service<
   ApiServerConfig,
@@ -34,9 +27,17 @@ const loadApiServerConfig = ApiServerConfigSource.parse(
   ConfigProvider.fromEnv()
 ).pipe(
   Effect.flatMap((source) =>
-    Schema.decodeUnknownEffect(ApiServerConfigSchema)({
+    Schema.decodeUnknownEffect(ApiServerConfigSourceSchema)({
       host: source.host.trim() || defaultHost,
       port: source.port,
+    })
+  ),
+  Effect.map((source) =>
+    ApiServerConfigSchema.make({
+      address: ApiServerTcpAddressSchema.make({
+        hostname: source.host,
+        port: source.port,
+      }),
     })
   )
 );
