@@ -10,23 +10,12 @@ export interface WhatTaxRouteRuntime {
   ) => Promise<Exit.Exit<A, E>>;
 }
 
-export interface WhatTaxServerContext {
-  readonly api: WhatTaxRouteRuntime;
-  readonly handleApiRequest: (request: Request) => Promise<Response>;
-}
-
 export interface RouterContext {
   readonly api: WhatTaxRouteRuntime;
-  readonly serverContext?: WhatTaxServerContext | undefined;
 }
 
 export interface RouteLoaderContext {
   readonly context: RouterContext;
-  readonly serverContext?: WhatTaxServerContext | undefined;
 }
 
-export const getRouteRuntime = ({
-  context,
-  serverContext,
-}: RouteLoaderContext) =>
-  serverContext?.api ?? context.serverContext?.api ?? context.api;
+export const getRouteRuntime = ({ context }: RouteLoaderContext) => context.api;

@@ -26,7 +26,7 @@ confidence: medium
 | --- | --- | --- |
 | API-001 | complete | Added standalone Bun API app with one process `ManagedRuntime`, Bun server layer and signal disposal. |
 | API-002 | complete | Rewired web server and browser runtimes to the standalone API over HTTP. |
-| API-003 | pending | Remove TanStack-mounted API routes. |
+| API-003 | complete | Removed TanStack-mounted API route and in-process web API handler context. |
 | API-004 | pending | Update docs and final verification. |
 
 ## Validation Log
@@ -67,3 +67,21 @@ confidence: medium
     `@whattax/http-api/server` source import remains in
     `apps/web/src/lib/server/api-handler.server.ts`, intentionally pending
     API-003 removal.
+- 2026-05-23 API-003:
+  - `bun run --filter=web check-types` passed.
+  - `bun run --filter=web build` passed. Build emitted a Rolldown
+    `INVALID_ANNOTATION` warning from Effect's published
+    `unstable/http/HttpRouter.js`, but exited `0`.
+  - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
+    Turbo typecheck.
+  - Ran `bun run --filter=api start` on `http://127.0.0.1:4000` and
+    `bun run --filter=web dev` on `http://127.0.0.1:4285`.
+  - `GET http://127.0.0.1:4000/api/health` returned
+    `200 {"service":"whattax","status":"ok"}`.
+  - `GET http://127.0.0.1:4285/` returned `200` and contained
+    `API status: <strong>ok</strong>`.
+  - `GET http://127.0.0.1:4285/api/health` returned a web `404` HTML page,
+    confirming `apps/web` no longer serves the API route.
+  - Import audit: `apps/web/src` has no remaining
+    `@whattax/http-api/server`, `@whattax/http-api/client/server`,
+    `handleApiRequest`, `api-handler` or `serverContext` matches.
