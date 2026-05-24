@@ -1,10 +1,34 @@
+import { PublicApiError } from "@whattax/calculators/schemas";
 import type { PublicCalculatorError } from "@whattax/calculators/schemas";
-import { Cause, Data, Schema } from "effect";
+import { Array, Cause, Data, Option, Schema } from "effect";
+
+export class WhatTaxSchemaDecodeError extends Schema.TaggedErrorClass<WhatTaxSchemaDecodeError>()(
+  "WhatTaxSchemaDecodeError",
+  {
+    message: Schema.String,
+  }
+) {}
+
+export class WhatTaxUnexpectedError extends Schema.TaggedErrorClass<WhatTaxUnexpectedError>()(
+  "WhatTaxUnexpectedError",
+  {
+    message: Schema.String,
+  }
+) {}
+
+export const WhatTaxCalculationErrorDetail = Schema.Union([
+  PublicApiError,
+  WhatTaxSchemaDecodeError,
+  WhatTaxUnexpectedError,
+]);
+
+export type WhatTaxCalculationErrorDetail =
+  typeof WhatTaxCalculationErrorDetail.Type;
 
 export class WhatTaxCalculationError extends Schema.TaggedErrorClass<WhatTaxCalculationError>()(
   "WhatTaxCalculationError",
   {
-    cause: Schema.Unknown,
+    error: WhatTaxCalculationErrorDetail,
     message: Schema.String,
   }
 ) {}
@@ -23,8 +47,19 @@ export type WhatTaxSafeResult<Value> = WhatTaxFailure | WhatTaxSuccess<Value>;
 
 export const toWhatTaxCalculationError = (
   cause: Cause.Cause<PublicCalculatorError | Schema.SchemaError>
-): WhatTaxCalculationError =>
-  new WhatTaxCalculationError({
-    cause,
-    message: Cause.pretty(cause),
+): WhatTaxCalculationError => {
+  const message = Cause.pretty(cause);
+
+  return new WhatTaxCalculationError({
+    error: Array.findFirst(cause.reasons, Cause.isFailReason).pipe(
+      Option.match({
+        onNone: () => new WhatTaxUnexpectedError({ message }),
+        onSome: (failure) =>
+          Schema.isSchemaError(failure.error)
+            ? new WhatTaxSchemaDecodeError({ message })
+            : failure.error,
+      })
+    ),
+    message,
   });
+};

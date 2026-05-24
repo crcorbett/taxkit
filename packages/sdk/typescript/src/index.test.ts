@@ -49,6 +49,7 @@ describe("plain SDK facade", () => {
     expect(result._tag).toBe("WhatTaxFailure");
     if (result._tag === "WhatTaxFailure") {
       expect(result.error).toBeInstanceOf(WhatTaxCalculationError);
+      expect(result.error.error._tag).toBe("CalculatorInputDecodeError");
       expect(result.error.message).toContain(
         "Invalid facts for au.pay.take-home"
       );

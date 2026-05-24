@@ -38,9 +38,15 @@ export type {
 export {
   WhatTaxCalculationError,
   WhatTaxFailure,
+  WhatTaxSchemaDecodeError,
   WhatTaxSuccess,
+  WhatTaxUnexpectedError,
 } from "./errors.js";
-export type { WhatTaxError, WhatTaxSafeResult } from "./errors.js";
+export type {
+  WhatTaxCalculationErrorDetail,
+  WhatTaxError,
+  WhatTaxSafeResult,
+} from "./errors.js";
 
 const WhatTaxLayer = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
