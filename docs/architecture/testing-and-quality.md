@@ -57,6 +57,20 @@ API app:
 - `bun run lint` includes custom Oxlint rules for repo-specific Effect
   conventions, including the ban on manual `_tag` object literals. Use
   `Data.TaggedClass`, `Data.TaggedError`, or `Schema.TaggedClass` instead.
+- `bun run lint` also enforces service/runtime boundaries: `service.ts` files
+  must not export `Live`, `Mock` or `Test` layers, and runtime execution must
+  stay in app entrypoints, runtime files, server files or layer boundary files.
+- Calculator service code under `packages/calculators/src` has stricter custom
+  Oxlint rules that ban raw `typeof`, `instanceof`, `in`, `=== undefined`,
+  conditional object-spread shaping and jurisdiction/tax-year `??` defaults.
+  These rules enforce Schema, Option, Match and schema-owned optional fields for
+  public calculator policy. The same scope also bans raw `null` comparison,
+  nested wrapper-call composition, native array pipelines, native `Map`/`Set`,
+  thrown exceptions, `async`/`await`/`new Promise`, ad hoc
+  `JSON.parse`/`JSON.stringify` and hidden time/randomness so calculator
+  services use pipe-first composition, Effect `Array`, `Chunk`, `HashMap`,
+  `HashSet`, `Effect`, `Layer`, `Clock`, `Random` and schema codecs instead of
+  vanilla JavaScript/TypeScript escape hatches.
 - Verification evidence should be recorded in specs, task lists or exec plans
   when work spans multiple packages.
 

@@ -1,0 +1,231 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/extract-public-calculator-service.md",
+  "title": "Extract Public Calculator Service Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-05-24",
+  "principles": [
+    "Keep calculators reusable across HTTP, SDK, CLI and in-process callers.",
+    "Keep HTTP handlers thin transport adapters over Effect service methods.",
+    "Keep core deterministic and lower level than calculator orchestration.",
+    "Reuse canonical schemas, descriptors, tagged errors, services, scenario layers, rule-pack layers and report schemas from owning packages.",
+    "MUST use Option, Match and schema-owned optional fields for optional request and response policy; do not use raw undefined branching, raw null comparison, conditional object spreads or jurisdiction-specific defaults.",
+    "MUST use pipe-first composition for sequential calculator transformations and Effect pipelines; do not hide data flow inside nested wrapper calls.",
+    "Preserve public route behavior and generated OpenAPI shape while moving ownership."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit only after each coherent implementation slice passes verification, Changeset review and architecture review.",
+    "requiredBeforeFinalPR": [
+      "bun run verification",
+      "bun run changeset or explicit no-changeset rationale",
+      "bun changeset status --verbose",
+      "OpenAPI JSON still includes the public calculator metadata and calculate routes",
+      "API smoke checks for metadata route, successful calculation route and schema-guided validation error",
+      "Architecture audit against docs/architecture/package-ownership.md, package-boundaries.md, effect-services.md and api-and-sdk.md"
+    ],
+    "evidenceRequired": [
+      "Changed-file summary",
+      "Changeset path and release-train impact, or no-changeset rationale",
+      "`bun run verification` result",
+      "OpenAPI route evidence",
+      "Successful calculation response sample",
+      "Schema error response sample",
+      "Thin-handler audit for packages/http-api/src/handlers/calculators.ts",
+      "Effect-native optionality and primitive audit showing no payload.jurisdiction ?? \"AU\", raw null/undefined checks, conditional help object spreads, nested wrapper transformations, inline schema issue path probes, native array pipelines, native Map/Set, thrown exceptions, async/await/new Promise, JSON.parse/stringify or hidden Date/Math.random usage remain in calculator service code",
+      "Dependency-direction audit showing @whattax/calculators does not import @whattax/http-api or app modules"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "CALC-SVC-001",
+      "title": "Create the calculators package shell and ownership docs",
+      "type": "foundation",
+      "dependsOn": [],
+      "goal": "Create @whattax/calculators as a workspace package with package docs, exports and build/typecheck wiring, without moving runtime behavior yet.",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.\n\nTask-specific scope: create `packages/calculators` package files, README and exports only. Do not move handler logic yet.",
+      "scope": [
+        "packages/calculators",
+        "package.json",
+        "turbo.json",
+        "tsconfig.json",
+        "docs/architecture/package-ownership.md",
+        "docs/architecture/package-boundaries.md",
+        ".changeset"
+      ],
+      "outputs": [
+        "packages/calculators/package.json",
+        "packages/calculators/README.md",
+        "packages/calculators/tsconfig.json",
+        "packages/calculators/tsconfig.build.json",
+        "packages/calculators/src/index.ts",
+        "Package exports that do not expose HTTP or app runtime modules",
+        "Changeset covering the new package shell"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run --filter=@whattax/calculators check-types",
+        "bun run --filter=@whattax/calculators build",
+        "Create or retain lint coverage proving the calculators package is checked by scoped WhatTax Oxlint rules",
+        "bun changeset status --verbose",
+        "Search packages/calculators for imports from @whattax/http-api, apps/api, apps/web and runtime.server/runtime.client"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "@whattax/calculators is a workspace package with explicit exports",
+        "The package README states ownership and dependency boundaries",
+        "No runtime behavior moved yet",
+        "Parent agent verified package ownership alignment",
+        "Changeset covers the new package"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CALC-SVC-002",
+      "title": "Move calculator schemas, catalog and metadata projections",
+      "type": "package-refactor",
+      "dependsOn": [
+        "CALC-SVC-001"
+      ],
+      "goal": "Move reusable calculator schemas, catalog entries and metadata response construction out of @whattax/http-api into @whattax/calculators.",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.\n\nTask-specific scope: move schemas/catalog/metadata projection from `packages/http-api/src/groups/calculators.ts` to `packages/calculators/src/**`; leave HTTP endpoints and handlers working.",
+      "scope": [
+        "packages/calculators/src",
+        "packages/http-api/src/groups/calculators.ts",
+        "packages/http-api/src/index.ts",
+        "packages/http-api/package.json",
+        "packages/http-api/README.md",
+        "packages/calculators/README.md",
+        ".changeset"
+      ],
+      "outputs": [
+        "CalculatorId, CalculatorContext, HelpMode and public calculator schemas exported from @whattax/calculators",
+        "Calculator catalog entries exported from @whattax/calculators",
+        "Metadata projection functions exported from @whattax/calculators",
+        "@whattax/http-api route group imports calculator schemas instead of owning them",
+        "Compatibility exports from @whattax/http-api where needed"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run --filter=@whattax/calculators check-types",
+        "bun run --filter=@whattax/http-api check-types",
+        "Search changed files for Object.entries, Object.values, manual _tag objects, unsafe casts and non-null assertions",
+        "Confirm scoped WhatTax Oxlint rules reject typeof, instanceof, in, null/undefined comparison, conditional object spreads, jurisdiction/taxYear ?? defaults, nested wrapper transformations, native array pipelines, native Map/Set, throw, async/await/new Promise, JSON.parse/stringify and Date/Math.random in packages/calculators/src",
+        "Search @whattax/http-api group files for remaining catalog entries and descriptor transformation logic",
+        "Audit moved transformation code for required pipe-first composition when data flow is clearer left-to-right",
+        "bun changeset status --verbose"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "@whattax/calculators owns reusable calculator schemas, catalog and metadata construction",
+        "@whattax/http-api route definitions still generate the same public paths",
+        "No public route behavior intentionally changes",
+        "Parent agent verified canonical schema/type/id reuse",
+        "Changeset impact is documented"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CALC-SVC-003",
+      "title": "Move calculation execution and expected error shaping into service methods",
+      "type": "service-refactor",
+      "dependsOn": [
+        "CALC-SVC-002"
+      ],
+      "goal": "Make @whattax/calculators own public calculator service methods so HTTP handlers become thin wrappers.",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.\n\nTask-specific scope: create `PublicCalculatorService` and live layer, move lookup/context validation/graph validation/calculation execution/schema-error shaping into it, and reduce `packages/http-api/src/handlers/calculators.ts` to service calls.",
+      "scope": [
+        "packages/calculators/src/service.ts",
+        "packages/calculators/src/live.ts",
+        "packages/calculators/src/errors.ts",
+        "packages/http-api/src/handlers/calculators.ts",
+        "packages/http-api/src/handlers/live.ts",
+        "packages/http-api/src/server/live.layer.ts",
+        "packages/http-api/package.json",
+        ".changeset"
+      ],
+      "outputs": [
+        "PublicCalculatorService tag/interface",
+        "PublicCalculatorServiceLive layer",
+        "Service methods for all public calculator metadata and calculate operations",
+        "HTTP handlers that delegate to service methods",
+        "Service-owned schema decode error shaping with descriptor-backed help",
+        "Layer composition that provides CalculationEngineLive and PublicCalculatorServiceLive once, not per request"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run --filter=@whattax/calculators check-types",
+        "bun run --filter=@whattax/http-api check-types",
+        "Run apps/api locally and request /api/docs/openapi.json",
+        "Smoke check /api/v1/calculators",
+        "Smoke check successful POST /api/v1/calculators/au.pay.take-home/calculate",
+        "Smoke check missing grossPay.period with help=errors",
+        "Audit packages/http-api/src/handlers/calculators.ts for validateRuleGraph, SchemaIssue, CalculationEngineLive, descriptor mapping and rule-pack layer composition",
+        "Audit packages/http-api/src/handlers/calculators.ts for raw undefined context branches, payload.jurisdiction defaults, conditional help object spreads and inline schema issue path formatting",
+        "Audit packages/calculators service code for Option/Match-based optional context and catalog lookup policy",
+        "Confirm scoped WhatTax Oxlint rules are active for packages/calculators/src, including Effect primitive rules for Option/Match optionality, pipe-first composition, Array/Chunk, HashMap/HashSet, tagged Effect failures, schema codecs and Clock/Random boundaries",
+        "Audit packages/calculators for imports from @whattax/http-api or apps",
+        "bun changeset status --verbose"
+      ],
+      "browserVerification": [],
+      "completionCriteria": [
+        "HTTP handlers are thin wrappers around PublicCalculatorService methods",
+        "Expected error shaping is service-owned",
+        "No request-local runtimes are created",
+        "Public route behavior remains compatible",
+        "Parent agent verified thin-handler and dependency-direction audits"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CALC-SVC-004",
+      "title": "Document and verify the calculators package boundary",
+      "type": "docs-and-release",
+      "dependsOn": [
+        "CALC-SVC-003"
+      ],
+      "goal": "Finalize docs, changelog and verification evidence for the calculator service extraction.",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.\n\nTask-specific scope: update docs and release notes; do not move additional runtime logic unless fixing a verification failure.",
+      "scope": [
+        "README.md",
+        "CHANGELOG.md",
+        "packages/calculators/README.md",
+        "packages/http-api/README.md",
+        "docs/architecture/package-ownership.md",
+        "docs/architecture/package-boundaries.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/effect-services.md",
+        "docs/product-specs/extract-public-calculator-service.md",
+        "docs/product-specs/extract-public-calculator-service.tasks.json",
+        ".changeset"
+      ],
+      "outputs": [
+        "Docs describe @whattax/calculators as the canonical calculator orchestration package",
+        "HTTP API docs describe thin handler ownership",
+        "Root docs link the new package once implemented",
+        "Package ownership docs move packages/calculators from planned placeholder language to implemented package ownership after package.json and source exports exist",
+        "Changeset and changelog evidence are current",
+        "Final smoke and architecture audit evidence"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun changeset status --verbose",
+        "Run apps/api locally and capture OpenAPI JSON route evidence",
+        "Smoke check metadata route, successful calculation route and schema error route",
+        "Audit docs for stale nested API calculator package references",
+        "Audit package ownership docs so packages/calculators is no longer described as a planned placeholder once implemented",
+        "Audit docs for stale claims that calculator business logic belongs in HTTP handlers"
+      ],
+      "browserVerification": [
+        "Open /api/docs and confirm the public calculation routes are visible if a browser tool is available; otherwise record generated OpenAPI evidence"
+      ],
+      "completionCriteria": [
+        "Docs and package READMEs agree on the calculators package boundary",
+        "Package ownership docs describe packages/calculators as implemented once the package manifest and source exports exist",
+        "No stale nested API calculator package references remain",
+        "Changesets status previews the intended fixed release-train bump",
+        "Final verification evidence is recorded in the handoff"
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}

@@ -27,7 +27,15 @@ Core service categories:
 - parameter services for tax-year tables and constants
 - rule layers that derive facts from facts and parameters
 - calculator programs that require facts and return schema-backed reports
-- API and SDK services that adapt transport inputs to engine inputs
+- calculator, API and SDK services that adapt transport, CLI or plain-client
+  inputs to engine inputs
+
+Public calculator services should live in `packages/calculators`, not HTTP
+handler modules. A calculator service method should own calculator lookup,
+context validation, metadata projection, graph diagnostics, scenario layer
+composition, `CalculationEngine` execution and expected error shaping. HTTP
+handlers should only pass route input to the service and return the resulting
+schema-backed value or tagged error envelope.
 
 ## Effect-Native Primitives
 
@@ -52,6 +60,18 @@ JavaScript `Map`/`Set` indexes, nullable lookups, `switch`, `Object.values`,
 `Object.entries`, custom env parsing, manual process signal orchestration,
 request-local runtime creation or hand-rolled runtime wrappers when Effect
 owns the pattern.
+
+For optional request values, use schema optionality plus `Option`/`Match` at
+the service boundary. Code MUST NOT use undefined checks and defaulting such
+as `payload.jurisdiction ?? "AU"` to invent missing calculator context.
+Missing context MUST either remain absent, be decoded by a schema that
+explicitly owns the default, or fail with a tagged expected error.
+
+Code MUST use pipe-first composition for readable Effect and data pipelines
+when it keeps the source value visible and data flow clearer, for example
+`query.pipe(filterCalculatorEntries, toFactsResponse)`. Do not nest
+transformations in wrapper calls when a left-to-right pipeline makes ownership
+and flow clearer.
 
 ## Runtime Composition
 
@@ -111,7 +131,15 @@ reduces complex duplication.
 - Keep one-off error mapping and transformation logic inline at the callsite;
   tiny mapper or wrapper helpers are not allowed.
 - Avoid local DTO mirrors when an owning schema already exists.
+- MUST use schema-owned optional fields instead of conditional object-spread
+  transforms for response shaping. Complex response-shaping policy MUST live in
+  the owning service package, not an HTTP handler.
+- Keep schema issue formatting in owning schema/error modules or services. Do
+  not inline ad hoc `typeof`/`in` object probes in handlers.
 - Keep engine services independent of React, request handlers and app state.
+- Keep HTTP handlers thin. Do not put reusable calculator transformation,
+  graph assembly, calculation dispatch or expected error-shaping policy in
+  `HttpApiBuilder.group(...)` handlers.
 
 ## Related Docs
 

@@ -17,6 +17,27 @@ export default defineConfig({
     "./tools/oxlint/no-switch-plugin.js",
     "./tools/oxlint/whattax-rules.js",
   ],
+  overrides: [
+    {
+      files: ["packages/calculators/src/**/*.ts"],
+      rules: {
+        "whattax/no-ambient-time-or-random": "error",
+        "whattax/no-async-await-promise": "error",
+        "whattax/no-conditional-object-spread": "error",
+        "whattax/no-context-nullish-default": "error",
+        "whattax/no-in-operator": "error",
+        "whattax/no-instanceof": "error",
+        "whattax/no-json-parse-stringify": "error",
+        "whattax/no-native-array-methods": "error",
+        "whattax/no-native-collections": "error",
+        "whattax/no-nested-wrapper-calls": "error",
+        "whattax/no-nullish-comparison": "error",
+        "whattax/no-throw": "error",
+        "whattax/no-typeof": "error",
+        "whattax/no-undefined-comparison": "error",
+      },
+    },
+  ],
   rules: {
     "func-name-matching": "off",
     "func-names": "off",
@@ -61,6 +82,8 @@ export default defineConfig({
     // this Unicorn rule misreads that second argument as a native Array thisArg.
     "unicorn/no-array-method-this-argument": "off",
     "whattax-no-switch/no-switch": "error",
+    "whattax/no-layer-exports-in-service-files": "error",
     "whattax/no-manual-tag": "error",
+    "whattax/no-runtime-execution-outside-boundaries": "error",
   },
 });

@@ -23,6 +23,14 @@ fast.
   standard TypeScript shapes, mutable collections, manual env parsing, manual
   process lifecycle code or hand-rolled runtime wrappers when Effect owns the
   pattern.
+- MUST use `Option`, `Match` and schema-owned optional fields for optional
+  request and response policy. Do not use raw `undefined` branching,
+  conditional object-spread response shaping or jurisdiction-specific defaults
+  such as `payload.jurisdiction ?? "AU"` unless an owning schema explicitly
+  defines that default.
+- MUST use pipe-first composition for calculator transformations and Effect
+  pipelines when data flow is clearer left-to-right. Do not hide flow inside
+  nested wrapper calls when a pipeline makes ownership and sequencing clearer.
 - MUST reuse canonical schemas, types, branded ids, service tags, tagged errors
   and constructors from the owning package. Never mirror canonical fields such
   as `id: string` outside the owning schema/type source.

@@ -123,7 +123,8 @@ const isInputFact = HashSet.has(inputFacts, required.id);
 ### `Option`
 
 Use `Option.match`, `Option.isSome`, or `Option.isNone` for lookups. Do not
-encode missing values with `undefined` branches in validation algorithms.
+encode missing values with `undefined` or `null` branches in validation
+algorithms.
 
 ```ts
 const row = Array.findFirst(
@@ -136,6 +137,71 @@ return Option.match(row, {
   onSome: Effect.succeed,
 });
 ```
+
+For optional request fields, model optionality with `Schema.optional` and
+normalize at the boundary into `Option` when branching is needed. Code MUST NOT
+use `value ?? "AU"` or similar defaults to invent jurisdiction, tax year or
+calculator context. Missing context MUST remain missing unless an owning schema
+explicitly defines a default. Nullable inputs MUST be modeled with
+`Schema.NullOr` or a schema transform and normalized with
+`Option.fromNullable`; code MUST NOT compare directly against `null`.
+
+```ts
+const requestedJurisdiction = Option.fromNullable(payload.jurisdiction);
+
+return requestedJurisdiction.pipe(
+  Option.match({
+    onNone: () => Effect.fail(new MissingCalculatorContextError(...)),
+    onSome: (jurisdiction) =>
+      jurisdiction === entry.context.jurisdiction
+        ? Effect.void
+        : Effect.fail(new UnsupportedCalculatorContextError(...)),
+  })
+);
+```
+
+## Functional Composition
+
+Code MUST use pipe-first composition for transformations and service pipelines
+when data flow is clearer left-to-right. Do not use nested wrapper calls such
+as `toFactsResponse(filterCalculatorEntries(query))` when the same logic reads
+left-to-right:
+
+```ts
+query.pipe(filterCalculatorEntries, toFactsResponse);
+```
+
+Use named reusable operations only when they own a real policy or are reused.
+Do not extract tiny one-off wrappers just to hide a single function call.
+
+Service contract files MUST NOT export `Live`, `Mock` or `Test` layers. Keep
+`service.ts` focused on the `Context.Service` contract and canonical
+schemas/types. Put production wiring in `live.layer.ts` and test wiring in
+`test.layer.ts` or test helpers.
+
+## Optional Object Shapes
+
+Code MUST use schema-owned optional keys to model optional output fields. Code
+MUST NOT build objects with conditional spread blocks such as:
+
+```ts
+{
+  ...(includeHelp ? { help } : {})
+}
+```
+
+Instead, construct the schema-backed value with the optional field set to an
+`Option`-derived value or left as the schema's optional absence in one clear
+callsite. If the conditional shape becomes complex, the policy MUST move into
+the owning service method and the handler MUST remain a service call.
+
+## Schema Issue Formatting
+
+Schema issue path formatting is boundary policy. Code MUST NOT inline ad hoc
+checks such as `typeof segment === "object" && "key" in segment` inside
+handlers. Represent path segments with an owning schema/type and format them in
+the service or schema-error module using Effect primitives such as `Array`,
+`Option` and `Match`.
 
 ### `Graph`
 
@@ -225,4 +291,5 @@ runtimes and runtime config.
 
 Use `ManagedRuntime.make(...)` for module-scoped web/server-client runtimes and
 `BunRuntime.runMain(...)` for Bun process entrypoints. Do not create runtimes
-inside request handlers, route loaders or React components.
+inside request handlers, route loaders, React components, package services or
+calculator orchestration code.

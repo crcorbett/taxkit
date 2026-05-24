@@ -71,6 +71,14 @@ It owns the current Effect HTTP API definitions, health endpoint schema,
 server route layer, OpenAPI metadata, typed client helpers and reusable client
 config schema.
 
+The current package also temporarily owns public calculator catalog and
+handler logic. That ownership should move into `packages/calculators` so
+HTTP handlers become thin wrappers around package-owned services. After that
+split, `@whattax/http-api` should own transport contracts, HTTP status
+annotations, OpenAPI generation, typed HTTP clients and server route layers,
+but not reusable calculator metadata transformations, graph assembly,
+calculation dispatch or schema-error shaping.
+
 `@whattax/http-api/config` exports the package-owned HTTP API client config
 schema, type and keyed config fragment. Apps compose that fragment into their
 own runtime config modules and provide runtime-specific values, such as server
@@ -87,9 +95,40 @@ group or an owning package schema module. If downstream code needs the type,
 export it from the same module as a schema-derived type. Do not hand-write DTO
 interfaces or duplicate response shapes in handlers, clients or apps.
 
+Route-only HTTP envelopes, query schemas and status annotations stay in
+`@whattax/http-api`. Reusable calculator IDs, context, help modes, response
+payloads and service errors live in `@whattax/calculators` once that package
+exists.
+
+## Planned Calculator Package
+
+The reusable calculator orchestration package should live under:
+
+```txt
+packages/calculators
+```
+
+Package name:
+
+```txt
+@whattax/calculators
+```
+
+It owns:
+
+- reusable calculator catalog schemas and service methods
+- catalog entries that compose canonical fact descriptors, rule descriptors,
+  report schemas, scenario layers and rule-pack layers
+- metadata transformations for calculator, fact, rule and graph responses
+- schema-guided expected error shaping with descriptor-backed help
+- calculation execution through `CalculationEngine`
+
+HTTP, SDK, CLI and in-process callers should consume this service instead of
+implementing calculator business logic locally.
+
 ## Planned API Package
 
-Longer term, the calculation API package may move toward:
+Longer term, the HTTP API package may move toward:
 
 ```txt
 packages/api/http
@@ -105,9 +144,9 @@ It owns:
 
 - Effect HTTP API definitions
 - calculation endpoint schemas
-- server handlers
+- thin server handlers that delegate to `@whattax/calculators`
 - OpenAPI generation
-- handler layers that compose rule packs and calculators
+- HTTP status annotations and generated HTTP client helpers
 
 ## Planned API App Scope
 

@@ -18,6 +18,14 @@ This file exists for Claude-compatible tooling and MUST stay aligned with
   `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`,
   `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`,
   `Platform`, `Command` and `ManagedRuntime`.
+- MUST use `Option`, `Match` and schema-owned optional fields for optional
+  request and response policy. Do not use raw `undefined` branching,
+  conditional object-spread response shaping or jurisdiction-specific defaults
+  such as `payload.jurisdiction ?? "AU"` unless an owning schema explicitly
+  defines that default.
+- MUST use pipe-first composition for calculator transformations and Effect
+  pipelines when data flow is clearer left-to-right. Do not hide flow inside
+  nested wrapper calls when a pipeline makes ownership and sequencing clearer.
 - MUST reuse canonical schemas, schema-derived types, branded ids, service
   tags, tagged errors and constructors from the owning package. Do not create
   local DTO mirrors or redeclare canonical fields such as `id: string` outside

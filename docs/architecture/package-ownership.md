@@ -30,6 +30,8 @@ Current implemented code lives in:
 
 Current planned ownership placeholders:
 
+- `packages/api/http`
+- `packages/calculators`
 - `packages/scripts`
 - `packages/ui`
 
@@ -59,8 +61,16 @@ for production-only runtime helpers.
 
 `packages/api/http`
 : Planned long-term home for Effect HTTP API definitions, boundary schemas,
-server handlers, OpenAPI and handler layers that compose engine calculators.
-The implemented API package is currently `packages/http-api`.
+thin server handlers, OpenAPI and HTTP status/transport annotations. The
+implemented API package is currently `packages/http-api`.
+
+`packages/calculators`
+: Planned reusable calculator orchestration package. It should own calculator
+catalog schemas, calculator service methods, metadata projections, graph
+response construction, schema-guided error shaping and rule-pack/scenario
+composition used by HTTP, SDK, CLI and in-process callers. It should depend on
+`packages/core` and rule packages, but it must not depend on HTTP handlers,
+SDK clients, CLI commands or app runtime modules.
 
 `packages/sdk/typescript`
 : Planned browser-safe client, schemas, request builders, server helpers,
@@ -91,7 +101,13 @@ belongs in apps or explicitly server-only package exports.
 - Import from the owner instead of redefining boundary values locally.
 - Add server-only exports for filesystem, HTTP server and Node adapters.
 - Keep React in apps or docs packages only.
-- Do not add flat engine packages once nested ownership exists.
+- Do not add flat engine packages once nested domain or rule ownership exists.
+  `packages/calculators` is allowed because it is a cross-surface
+  orchestration package rather than a jurisdiction/domain/rule package.
+- Keep HTTP handlers thin. Transport handlers may extract route parameters and
+  call package-owned services, but reusable calculator lookup, metadata
+  transformation, graph assembly, calculation dispatch and expected error
+  shaping belong in service packages such as `packages/calculators`.
 
 ## Related Docs
 

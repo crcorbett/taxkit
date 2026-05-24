@@ -18,12 +18,12 @@ consumer workflows.
 - Keep values Schema-backed and branded at public boundaries.
 - Keep rules, parameters, scenarios, and the engine expressed as Effect
   services and Layers.
-- Prefer Effect primitives and algorithms over ad hoc JavaScript collections.
+- MUST use Effect primitives and algorithms over ad hoc JavaScript collections.
 - Use Effect `BigDecimal` for official decimal rates and coefficients.
 - Use date-level effective intervals where official rules can change mid-year.
 - Keep source artifact metadata close to the official parameter descriptor.
 - Keep tests outside `src` unless build config explicitly excludes them.
-- Prefer public package entrypoints in tests; use deep `src` imports only for
+- Use public package entrypoints in tests; use deep `src` imports only for
   intentional white-box tests.
 - Keep Knip configuration lean by fixing package metadata before adding
   ignores.

@@ -78,6 +78,66 @@ Current WhatTax-specific overrides are narrow:
 - `unicorn/no-array-method-this-argument`: Effect `Array` helpers are not native
   JavaScript array method `thisArg` usage.
 
+Current WhatTax-specific custom rules:
+
+- `whattax/no-manual-tag`: bans manual `_tag` object literals. Use
+  `Data.TaggedClass`, `Data.TaggedError`, `Schema.TaggedClass`, or an owning
+  package constructor.
+- `whattax/no-layer-exports-in-service-files`: bans `Live`, `Mock` and `Test`
+  layer exports from `service.ts`/`services.ts` files. Service files own
+  `Context.Service` contracts and canonical schemas; production wiring belongs
+  in `live.layer.ts`, test wiring belongs in `test.layer.ts` or test helpers.
+- `whattax/no-runtime-execution-outside-boundaries`: bans direct Effect runtime
+  execution outside app/runtime boundary files. Package and service logic must
+  return `Effect` values and layers; app entrypoints and runtime modules own
+  `BunRuntime.runMain`, `ManagedRuntime.make` and runtime disposal.
+- `whattax-no-switch/no-switch`: bans `switch`. Use Effect `Match` with
+  exhaustive handling.
+- `whattax/no-typeof`, `whattax/no-instanceof` and
+  `whattax/no-in-operator`: scoped to `packages/calculators/src`. Calculator
+  service code must decode with Schema and branch with `Option`, `Result`,
+  `Exit` or `Match` instead of ad hoc runtime type probes.
+- `whattax/no-undefined-comparison`: scoped to `packages/calculators/src`.
+  Optional request policy must use `Schema.optional` plus `Option`, not
+  `=== undefined` or `!== undefined`.
+- `whattax/no-nullish-comparison`: scoped to `packages/calculators/src`.
+  Nullable request policy must use `Schema.NullOr` or schema transforms plus
+  `Option.fromNullable`, not raw `null` comparison.
+- `whattax/no-conditional-object-spread`: scoped to
+  `packages/calculators/src`. Optional response fields must be schema-owned,
+  not built with conditional object spreads.
+- `whattax/no-context-nullish-default`: scoped to
+  `packages/calculators/src`. Calculator context must not invent jurisdiction
+  or tax-year defaults with `??`; missing context must remain absent or fail
+  through an owning schema/tagged error.
+- `whattax/no-nested-wrapper-calls`: scoped to `packages/calculators/src`.
+  Sequential calculator transformations must use pipe-first data flow such as
+  `query.pipe(filterEntries, toResponse)` or `pipe(query, filterEntries,
+  toResponse)`, not nested wrappers such as `toResponse(filterEntries(query))`.
+- `whattax/no-native-array-methods`: scoped to `packages/calculators/src`.
+  Calculator services must use Effect `Array` or `Chunk` helpers such as
+  `Array.filter(items, predicate)`, `Array.findFirst(...)` and `Chunk.map(...)`
+  instead of native `items.filter(...)`, `items.find(...)` or
+  `items.reduce(...)`.
+- `whattax/no-native-collections`: scoped to `packages/calculators/src`.
+  Calculator services must use `HashMap` and `HashSet`, with `Option`-based
+  lookups, instead of native `Map` and `Set` constructors.
+- `whattax/no-throw`: scoped to `packages/calculators/src`. Calculator
+  failures must be typed tagged errors returned through `Effect.fail`,
+  `Effect.try` or `Effect.tryPromise`, not thrown exceptions.
+- `whattax/no-async-await-promise`: scoped to `packages/calculators/src`.
+  Calculator services must return `Effect` values and compose them with
+  `Effect.gen`, `Effect.flatMap`, `Effect.all`, `Layer` and service
+  dependencies instead of `async`, `await` or `new Promise`.
+- `whattax/no-json-parse-stringify`: scoped to `packages/calculators/src`.
+  Calculator boundary values must be decoded and encoded by owning schemas, for
+  example `Schema.decodeUnknown`, `Schema.decodeJson`, `Schema.encode` or
+  `Schema.encodeJson`, not ad hoc `JSON.parse` or `JSON.stringify`.
+- `whattax/no-ambient-time-or-random`: scoped to `packages/calculators/src`.
+  Calculator logic must receive time/randomness as explicit canonical input or
+  through Effect boundary services such as `Clock` and `Random`; deterministic
+  calculator services must not hide `Date.now`, `new Date` or `Math.random`.
+
 ## Formatting Rules
 
 - Let Oxfmt own whitespace, quotes, import sorting, and wrapping.

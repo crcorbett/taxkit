@@ -23,3 +23,7 @@ calculator catalog. Calculation requests decode canonical scenario facts, use
 catalog-selected rule-pack layers and run through `CalculationEngine`; schema
 decode failures return machine-readable issue paths plus descriptor-backed help
 when requested.
+
+Document the follow-up extraction of reusable calculator orchestration into a
+new `@whattax/calculators` package so HTTP handlers can become thin transport
+adapters over package-owned Effect services.

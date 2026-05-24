@@ -14,13 +14,13 @@ The work is scoped to core calculation functionality only: facts, parameters, ru
 - Use the most modern TypeScript library baseline supported by the repo compiler. The repository uses the cataloged TypeScript version with `lib: ["ES2025"]`.
 - Use Effect `Layer` composition as the primary rule and parameter composition mechanism.
 - Use Effect Schema for every boundary value, persisted value, report shape, trace shape, and parameter table.
-- Prefer branded schema values and derived types over plain strings, unbranded numbers, and structural-only contracts.
+- Use branded schema values and derived types over plain strings, unbranded numbers, and structural-only contracts.
 - Keep input facts, derived facts, and parameter services separate.
 - Keep algorithms separate from tax-year data.
 - Expose facts and rules through typed `Context` services and `Layer`s so missing dependencies are visible at compile time.
 - Preserve deterministic calculation behavior: explicit inputs plus selected rule packs and parameter layers must produce reproducible reports/traces.
 - Treat trace, ledger, source references, graph metadata, and validation as part of the engine contract, not debugging add-ons.
-- Prefer Effect collections and algorithms (`HashMap`, `HashSet`, `Array`, `Graph`, `Option`, `Match`) for engine validation and closed-domain dispatch logic instead of ad hoc JavaScript `Map`/`Set`/mutable arrays or non-exhaustive switches.
+- MUST use Effect collections and algorithms (`HashMap`, `HashSet`, `Array`, `Graph`, `Option`, `Match`) for engine validation and closed-domain dispatch logic instead of ad hoc JavaScript `Map`/`Set`/mutable arrays or non-exhaustive switches.
 - Do not introduce consumer/UI/API concerns into engine packages.
 
 ## Source Audit Summary

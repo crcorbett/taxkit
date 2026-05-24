@@ -75,6 +75,8 @@ packages/
       fbt/
       mortgage/
 
+  calculators/
+
   api/
     http/
 
@@ -99,6 +101,7 @@ the deterministic engine must not import from them.
 packages/core/**
   <- packages/domain/**
   <- packages/rules/**
+  <- packages/calculators/**
   <- packages/api/** / packages/sdk/** / packages/cli/** / apps/**
 ```
 
@@ -148,12 +151,29 @@ parameter tables and official rule packs. Planned `@whattax/rules-au-super`,
 `@whattax/rules-au-mortgage` and `@whattax/rules-au-deductions` will own their
 corresponding facts, algorithms, parameter tables and official rule packs.
 
+Planned `@whattax/calculators` will own:
+
+- reusable calculator catalog schemas and entries
+- calculator service tags and live layers
+- metadata projections for calculator, fact, rule and graph discovery
+- schema-guided expected error shaping for calculation inputs
+- composition of canonical scenario layers, rule-pack layers and
+  `CalculationEngine`
+- reusable service methods for HTTP handlers, SDK helpers, CLI commands and
+  direct in-process consumers
+
+It must not own OpenAPI annotations, HTTP status mapping, Bun serving, process
+config, app runtime lifecycle, SDK client transport or CLI command parsing.
+
 Planned `@whattax/api-http` will own:
 
 - Effect HTTP API groups for public calculation endpoints
-- server handlers that compose engine rule packs and calculators
+- thin server handlers that call package-owned API services
 - OpenAPI generation
 - API boundary schemas
+
+HTTP API packages should not own calculator catalog transformations or
+calculation business logic when a reusable API service package exists.
 
 `whattax` or `@whattax/sdk` owns:
 
@@ -185,11 +205,15 @@ packages/rules/au/payg       -> @whattax/rules-au-payg
 packages/rules/au/super      -> @whattax/rules-au-super
 packages/domain/au/dates     -> @whattax/domain-au-dates
 packages/api/http            -> @whattax/api-http
+packages/calculators         -> @whattax/calculators
 packages/sdk/typescript      -> whattax or @whattax/sdk
 packages/docs/fumadocs       -> @whattax/docs-fumadocs
 ```
 
 Avoid flat package sprawl such as `packages/au-payg`, `packages/au-super` and `packages/http-api` once the engine packages start growing.
+`packages/calculators` is the exception for cross-surface calculator
+orchestration because it is intentionally shared by HTTP, SDK, CLI and
+in-process callers.
 
 ## Export Rules
 
