@@ -5,6 +5,7 @@
     "packages": [
       "apps/*",
       "packages/*",
+      "packages/sdk/*",
       "packages/rules/au/*"
     ],
     "catalog": {

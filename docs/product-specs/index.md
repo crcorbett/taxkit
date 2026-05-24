@@ -17,6 +17,7 @@ Specs:
 - [Extract API app](./extract-api-app.md)
 - [Extract public calculator service](./extract-public-calculator-service.md)
 - [Public calculation API routes](./public-calculation-api-routes.md)
+- [TypeScript SDK and publishing](./typescript-sdk-and-publishing.md)
 
 Authoring guides:
 

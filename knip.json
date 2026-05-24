@@ -57,6 +57,19 @@
       "entry": ["src/index.ts"],
       "project": ["src/**/*.ts"]
     },
+    "packages/sdk/typescript": {
+      "entry": [
+        "src/index.ts",
+        "src/effect.ts",
+        "src/au.ts",
+        "src/au-effect.ts",
+        "src/schemas/index.ts",
+        "src/testing/index.ts",
+        "scripts/check-import-boundaries.ts"
+      ],
+      "project": ["src/**/*.ts", "scripts/**/*.ts"],
+      "ignoreDependencies": ["@types/bun"]
+    },
     "packages/rules/au/income-tax": {
       "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]

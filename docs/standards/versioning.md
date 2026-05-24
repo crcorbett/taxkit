@@ -15,6 +15,7 @@ All `@whattax/*` packages are in one fixed version group:
 - `@whattax/rules-au-income-tax`
 - `@whattax/rules-au-pay`
 - `@whattax/rules-au-stsl`
+- `@whattax/sdk`
 - `@whattax/testing`
 - `@whattax/tsconfig`
 

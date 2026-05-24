@@ -138,6 +138,14 @@
         "vitest": "catalog:",
       },
     },
+    "packages/sdk/typescript": {
+      "name": "@whattax/sdk",
+      "version": "0.0.1",
+      "devDependencies": {
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
     "packages/testing": {
       "name": "@whattax/testing",
       "version": "0.0.1",
@@ -601,6 +609,8 @@
     "@whattax/rules-au-pay": ["@whattax/rules-au-pay@workspace:packages/rules/au/pay"],
 
     "@whattax/rules-au-stsl": ["@whattax/rules-au-stsl@workspace:packages/rules/au/stsl"],
+
+    "@whattax/sdk": ["@whattax/sdk@workspace:packages/sdk/typescript"],
 
     "@whattax/testing": ["@whattax/testing@workspace:packages/testing"],
 

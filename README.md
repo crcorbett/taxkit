@@ -15,7 +15,8 @@ TanStack Start web scaffold that calls that API, an Effect HTTP API package
 with health, metadata and public calculation endpoints, a reusable calculator
 orchestration package, deterministic core engine primitives, Australian pay,
 income-tax and STSL rule packages, shared testing helpers and shared TypeScript
-config. The SDK package and docs site are planned but not implemented yet.
+config, and a scaffolded private TypeScript SDK package. The SDK facade and
+docs site are planned but not implemented yet.
 
 ## What Exists Today
 
@@ -29,6 +30,8 @@ config. The SDK package and docs site are planned but not implemented yet.
 - [packages/calculators](./packages/calculators/README.md): reusable public
   calculator orchestration package for catalog metadata, graph construction,
   calculation dispatch and schema-guided expected error shaping.
+- [packages/sdk/typescript](./packages/sdk/typescript/README.md): scaffolded
+  private TypeScript SDK package for the planned public SDK facade.
 - [packages/core](./packages/core/README.md): deterministic engine primitives,
   schema-backed facts, rule descriptors, graph validation, trace and ledger
   contracts and calculation engine service.

@@ -23,6 +23,7 @@ Current implemented code lives in:
 - `packages/core`
 - `packages/calculators`
 - `packages/http-api`
+- `packages/sdk/typescript`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
@@ -73,8 +74,10 @@ It depends on `packages/core` and rule packages, but it must not depend on HTTP
 handlers, SDK clients, CLI commands or app runtime modules.
 
 `packages/sdk/typescript`
-: Planned browser-safe client, schemas, request builders, server helpers,
-examples and compatibility tests.
+: Scaffolded private TypeScript SDK package for the planned public SDK facade.
+It owns browser-safe schemas, typed calculation facades, Effect-native subpaths,
+jurisdiction modules, examples and compatibility tests. It must not depend on
+`@whattax/http-api`; HTTP transports consume the SDK rather than the reverse.
 
 `apps/web`
 : Current scaffold app. It proves the runtime boundary and health endpoint

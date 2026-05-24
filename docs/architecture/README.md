@@ -16,7 +16,7 @@ Bun API app, a TanStack Start web scaffold, the `@whattax/http-api` health
 endpoint package, deterministic core engine primitives, Australian pay,
 income-tax and STSL rule packages, shared testing helpers, shared TypeScript
 config and documentation. Public calculation HTTP endpoints, the Fumadocs site
-and TypeScript SDK remain planned.
+and TypeScript SDK facade remain planned; the private SDK package shell exists.
 
 ## Current Implementation
 
@@ -26,6 +26,8 @@ Implemented surfaces:
 - `apps/api`: standalone Bun API runtime for the current API surface.
 - `packages/http-api`: Effect HTTP API package for the current health route,
   docs page and OpenAPI JSON.
+- `packages/sdk/typescript`: scaffolded private TypeScript SDK package with
+  explicit export paths for the planned public SDK facade.
 - `packages/core`: deterministic primitives, fact/rule/parameter descriptors,
   graph validation, trace and ledger contracts and calculation engine service.
 - `packages/rules/au/pay`: Australian take-home pay and PAYG withholding rule

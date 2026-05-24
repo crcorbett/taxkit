@@ -76,6 +76,7 @@ fast.
 | `apps/api` | standalone Bun API runtime and health/docs endpoints |
 | `apps/web` | current TanStack Start scaffold and health-check UI |
 | `packages/http-api` | current Effect HTTP API package |
+| `packages/sdk/typescript` | scaffolded private TypeScript SDK package |
 | `packages/tsconfig` | shared TypeScript config |
 | `packages/core` | implemented deterministic engine primitives, descriptors, graph, trace, ledgers and calculation engine |
 | `packages/rules/au/pay` | implemented Australian take-home pay and PAYG withholding rule pack |

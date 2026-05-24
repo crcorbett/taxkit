@@ -23,6 +23,7 @@ Implemented packages and apps:
 - `packages/calculators`
 - `packages/core`
 - `packages/http-api`
+- `packages/sdk/typescript`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
@@ -177,7 +178,8 @@ Planned `@whattax/api-http` will own:
 HTTP API packages should not own calculator catalog transformations or
 calculation business logic when a reusable API service package exists.
 
-`whattax` or `@whattax/sdk` owns:
+Scaffolded `@whattax/sdk`, published later as `whattax` or `@whattax/sdk`,
+owns:
 
 - direct in-process calculation facade
 - plain TypeScript `WhatTax.create(...)` client factory and `WhatTax.{method}` generic helpers
