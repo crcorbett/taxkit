@@ -24,7 +24,7 @@ passes its required gates and Changeset decision.
 | Task | Status | Notes |
 | --- | --- | --- |
 | SDK-001 | complete | Scaffolded `@whattax/sdk` package, export map and import-boundary check. |
-| SDK-002 | pending | Strict typed descriptors and Effect facade over calculators. |
+| SDK-002 | complete | Strict typed descriptors and Effect facade over calculators implemented and verified. |
 | SDK-003 | pending | Plain facade, safe results and AU module subpath. |
 | SDK-004 | pending | HTTP API consumes SDK facade. |
 | SDK-005 | pending | Downstream consumer validation. |
@@ -70,6 +70,38 @@ passes its required gates and Changeset decision.
 - Parent review also aligned the new private `@whattax/sdk` package with the
   Changesets fixed group and current package-state docs in `README.md`,
   `AGENTS.md`, `docs/architecture/*` and `docs/standards/versioning.md`.
+
+### 2026-05-24 - SDK-002 typed descriptors and Effect facade
+
+- Added schema-backed typed SDK calculation and module descriptors in
+  `packages/sdk/typescript/src/types.ts`.
+- Added `@whattax/sdk/effect` calculation execution through
+  `PublicCalculatorService`; the facade preserves descriptor-specific input and
+  output types while keeping calculator/domain failures in the Effect error
+  channel.
+- Added internal AU descriptor instances for current calculator catalog entries:
+  `au.pay.take-home`, `au.pay.withholdings` and `au.income-tax.annual`.
+  The root SDK entrypoint exports only generic types and does not import AU rule
+  packages.
+- Added focused type-level coverage for unsupported calculations, mismatched
+  input facts and unsupported tax-year literals through
+  `bun run --filter=@whattax/sdk test-types`.
+- Added runtime parity coverage proving SDK Effect facade success parity with
+  `PublicCalculatorService`, guided input error parity and annual-tax descriptor
+  executability.
+- Added Changeset `.changeset/sdk-effect-descriptors.md` for `@whattax/sdk`
+  patch impact.
+- Verification:
+  - `bun run --filter=@whattax/sdk check-types` passed.
+  - `bun run --filter=@whattax/sdk test-types` passed.
+  - `bun run --filter=@whattax/sdk test` passed.
+  - `bun run --filter=@whattax/sdk build` passed.
+  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run verification` passed.
+  - `bun run changeset status --verbose` passed and includes
+    `@whattax/sdk` patch release impact from
+    `.changeset/sdk-effect-descriptors.md` and
+    `.changeset/sdk-typescript-scaffold.md`.
 
 ## Open Risks
 

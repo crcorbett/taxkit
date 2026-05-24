@@ -41,10 +41,22 @@
     "build": "tsc -p tsconfig.build.json",
     "check-boundaries": "bun run scripts/check-import-boundaries.ts",
     "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test-types": "tsc -p tsconfig.type-tests.json --noEmit",
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
+  "dependencies": {
+    "@whattax/calculators": "workspace:*",
+    "@whattax/rules-au-income-tax": "workspace:*",
+    "@whattax/rules-au-pay": "workspace:*",
+    "effect": "catalog:"
+  },
   "devDependencies": {
+    "@effect/vitest": "catalog:",
     "@types/bun": "catalog:",
-    "typescript": "catalog:"
+    "@whattax/core": "workspace:*",
+    "@whattax/testing": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
