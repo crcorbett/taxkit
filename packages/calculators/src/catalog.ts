@@ -13,6 +13,7 @@ import {
   AuAnnualTaxCalculatorId,
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
+  AnnualTaxScenarioInputSchema,
   AnnualTaxableIncomeDescriptor,
   AuAnnualTax2025_26_Live,
   AuAnnualTaxRuleDescriptors,
@@ -39,6 +40,7 @@ import {
   TaxablePayDescriptor,
   TaxablePayRuleDescriptor,
   TaxFreeThresholdClaimedDescriptor,
+  TakeHomeScenarioInputSchema,
 } from "@whattax/rules-au-pay";
 import type { Option, Schema } from "effect";
 import { Array, Data, Effect, HashMap, Layer } from "effect";
@@ -61,12 +63,17 @@ type CalculatorExecution = (
   CalculationEngine
 >;
 
+type CalculatorInputSchema =
+  | typeof AnnualTaxScenarioInputSchema
+  | typeof TakeHomeScenarioInputSchema;
+
 export interface CalculatorCatalogEntry {
   readonly calculate: CalculatorExecution;
   readonly calculatorId: CalculatorId;
   readonly context: CalculatorContext;
   readonly description: string;
   readonly inputFacts: readonly AnyFactDescriptor[];
+  readonly inputSchema: CalculatorInputSchema;
   readonly outputFacts: readonly AnyFactDescriptor[];
   readonly reportSchema: Schema.Top;
   readonly reportSchemaName: string;
@@ -118,6 +125,7 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     description:
       "Australian pay-period take-home pay after PAYG-only withholdings.",
     inputFacts: [GrossPayDescriptor, TaxFreeThresholdClaimedDescriptor],
+    inputSchema: TakeHomeScenarioInputSchema,
     outputFacts: [
       NetPayDescriptor,
       TaxablePayDescriptor,
@@ -148,6 +156,7 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     context: PayContextAu2025_26,
     description: "Australian PAYG-only pay-period withholding ledger.",
     inputFacts: [GrossPayDescriptor, TaxFreeThresholdClaimedDescriptor],
+    inputSchema: TakeHomeScenarioInputSchema,
     outputFacts: [
       TaxablePayDescriptor,
       PaygWithholdingComponentDescriptor,
@@ -181,6 +190,7 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     context: AnnualTaxContextAu2025_26,
     description: "Australian annual income tax liability estimate.",
     inputFacts: [AnnualTaxableIncomeDescriptor],
+    inputSchema: AnnualTaxScenarioInputSchema,
     outputFacts: [AnnualTaxLedgerDescriptor],
     program: CalculateAnnualTax,
     reportSchema: AnnualTaxReport,

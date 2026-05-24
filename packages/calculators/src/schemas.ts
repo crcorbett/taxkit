@@ -13,6 +13,7 @@ import {
 } from "@whattax/core";
 import {
   AnnualTaxReport,
+  AnnualTaxScenarioInputSchema,
   AuAnnualTaxCalculatorId,
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
@@ -23,6 +24,7 @@ import {
   AuPayTaxYear,
   PayWithholdingsLedger,
   TakeHomePayReport,
+  TakeHomeScenarioInputSchema,
 } from "@whattax/rules-au-pay";
 import { Data, Schema } from "effect";
 
@@ -340,8 +342,24 @@ export const CalculatorGraphResponse = Schema.Struct({
 
 export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
 
+/**
+ * Public calculate facts accepted by the generic calculate route.
+ *
+ * This union is intentionally composed from canonical rule-owned scenario
+ * schemas so generated API docs and clients can see the supported fact shapes.
+ * The calculator service still decodes the value again with the selected
+ * catalog entry's `inputSchema`, because the route-level union cannot depend
+ * on the `calculatorId` path parameter.
+ */
+export const PublicCalculationFacts = Schema.Union([
+  TakeHomeScenarioInputSchema,
+  AnnualTaxScenarioInputSchema,
+]);
+
+export type PublicCalculationFacts = typeof PublicCalculationFacts.Type;
+
 export const PublicCalculationRequest = Schema.Struct({
-  facts: Schema.Unknown,
+  facts: PublicCalculationFacts,
   ...OptionalCalculatorContextFields,
 });
 

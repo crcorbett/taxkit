@@ -42,18 +42,10 @@ const calculateWithEntry = (
       inputFacts: entry.inputFacts,
       rules: entry.ruleDescriptors,
     });
-    const result = yield* entry
-      .calculate(request.payload.facts, validationIssues)
-      .pipe(Effect.provideService(CalculationEngine, engine));
-
-    return new PublicCalculationResponseData({
-      calculator: toCalculatorCatalogItem(entry),
-      diagnostics: result.diagnostics,
-      report: result.report,
-    });
-  }).pipe(
-    Effect.catchIf(Schema.isSchemaError, (error) =>
-      Effect.fail(
+    const facts = yield* Schema.decodeUnknownEffect(entry.inputSchema)(
+      request.payload.facts
+    ).pipe(
+      Effect.mapError((error) =>
         toCalculatorInputDecodeError({
           calculatorId: request.calculatorId,
           entry,
@@ -61,8 +53,29 @@ const calculateWithEntry = (
           issue: error.issue,
         })
       )
-    )
-  );
+    );
+    const result = yield* entry
+      .calculate(facts, validationIssues)
+      .pipe(
+        Effect.catchIf(Schema.isSchemaError, (error) =>
+          Effect.fail(
+            toCalculatorInputDecodeError({
+              calculatorId: request.calculatorId,
+              entry,
+              help: Option.fromNullishOr(request.help),
+              issue: error.issue,
+            })
+          )
+        )
+      )
+      .pipe(Effect.provideService(CalculationEngine, engine));
+
+    return new PublicCalculationResponseData({
+      calculator: toCalculatorCatalogItem(entry),
+      diagnostics: result.diagnostics,
+      report: result.report,
+    });
+  });
 
 /**
  * Live public calculator service backed by the static calculator catalog.

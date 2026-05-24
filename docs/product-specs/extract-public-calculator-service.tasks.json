@@ -11,6 +11,8 @@
     "Reuse canonical schemas, descriptors, tagged errors, services, scenario layers, rule-pack layers and report schemas from owning packages.",
     "MUST use Option, Match and schema-owned optional fields for optional request and response policy; do not use raw undefined branching, raw null comparison, conditional object spreads or jurisdiction-specific defaults.",
     "MUST use pipe-first composition for sequential calculator transformations and Effect pipelines; do not hide data flow inside nested wrapper calls.",
+    "MUST expose public calculation facts as a union of canonical calculator input schemas, not Schema.Unknown.",
+    "MUST validate calculation facts again against the selected calculator catalog entry so incompatible calculator/facts combinations return calculator-specific help.",
     "Preserve public route behavior and generated OpenAPI shape while moving ownership."
   ],
   "globalVerification": {
@@ -20,6 +22,7 @@
       "bun run changeset or explicit no-changeset rationale",
       "bun changeset status --verbose",
       "OpenAPI JSON still includes the public calculator metadata and calculate routes",
+      "OpenAPI JSON for POST /api/v1/calculators/{calculatorId}/calculate exposes the union of supported canonical calculator facts schemas",
       "API smoke checks for metadata route, successful calculation route and schema-guided validation error",
       "Architecture audit against docs/architecture/package-ownership.md, package-boundaries.md, effect-services.md and api-and-sdk.md"
     ],
@@ -30,6 +33,7 @@
       "OpenAPI route evidence",
       "Successful calculation response sample",
       "Schema error response sample",
+      "OpenAPI request-body evidence showing supported public calculation fact schemas are not Schema.Unknown",
       "Thin-handler audit for packages/http-api/src/handlers/calculators.ts",
       "Effect-native optionality and primitive audit showing no payload.jurisdiction ?? \"AU\", raw null/undefined checks, conditional help object spreads, nested wrapper transformations, inline schema issue path probes, native array pipelines, native Map/Set, thrown exceptions, async/await/new Promise, JSON.parse/stringify or hidden Date/Math.random usage remain in calculator service code",
       "Dependency-direction audit showing @whattax/calculators does not import @whattax/http-api or app modules"
@@ -224,6 +228,59 @@
         "No stale nested API calculator package references remain",
         "Changesets status previews the intended fixed release-train bump",
         "Final verification evidence is recorded in the handoff"
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CALC-SVC-005",
+      "title": "Tighten public calculation facts schemas",
+      "type": "schema-refactor",
+      "dependsOn": [
+        "CALC-SVC-003"
+      ],
+      "goal": "Replace the generic public calculate facts contract with a union of canonical calculator input schemas while keeping selected-calculator validation and help in the service layer.",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.\n\nTask-specific scope: make `PublicCalculationFacts` a union of canonical rule-owned calculator input schemas such as `TakeHomeScenarioInputSchema` and `AnnualTaxScenarioInputSchema`; add an `inputSchema` reference to each calculator catalog entry; decode facts with the selected entry's input schema inside `PublicCalculatorService.calculate`; keep `POST /api/v1/calculators/:calculatorId/calculate` as the public route.",
+      "scope": [
+        "packages/calculators/src/schemas.ts",
+        "packages/calculators/src/catalog.ts",
+        "packages/calculators/src/live.layer.ts",
+        "packages/calculators/src/errors.ts",
+        "packages/http-api/src/groups/calculators.ts",
+        "packages/calculators/__tests__",
+        "packages/http-api/__tests__",
+        "packages/rules/au/*/src/calculator",
+        ".changeset"
+      ],
+      "outputs": [
+        "PublicCalculationFacts is a Schema.Union of canonical calculator input schemas from owning rule packages",
+        "PublicCalculationRequest.facts uses PublicCalculationFacts instead of Schema.Unknown",
+        "Each CalculatorCatalogEntry references the canonical input schema accepted by that calculator",
+        "PublicCalculatorService.calculate decodes request.payload.facts with the selected entry inputSchema before execution",
+        "Incompatible calculator/facts combinations return CalculatorInputDecodeError with descriptor-backed help for the selected calculator",
+        "HTTP API OpenAPI output shows supported calculator facts schemas for the generic calculate route",
+        "Effect Vitest coverage for successful service calculation, HTTP in-process calculation and incompatible facts errors"
+      ],
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run test",
+        "bun run --filter=@whattax/calculators test",
+        "bun run --filter=@whattax/http-api test",
+        "Run apps/api locally and request /api/docs/openapi.json",
+        "Inspect /api/docs/openapi.json and confirm POST /api/v1/calculators/{calculatorId}/calculate requestBody exposes the canonical facts union instead of Schema.Unknown",
+        "Smoke check successful POST /api/v1/calculators/au.pay.take-home/calculate",
+        "Smoke check a valid annual-tax facts payload sent to au.pay.take-home returns CalculatorInputDecodeError with pay-calculator help",
+        "Search packages/calculators/src and packages/http-api/src for `facts: Schema.Unknown`",
+        "bun changeset status --verbose"
+      ],
+      "browserVerification": [
+        "Open /api/docs and confirm the calculate request body shows supported fact shapes if a browser tool is available; otherwise record generated OpenAPI evidence"
+      ],
+      "completionCriteria": [
+        "The public calculate route remains generic by calculatorId",
+        "Generated API docs expose concrete supported fact shapes",
+        "The service still owns selected-calculator compatibility and descriptor-backed help",
+        "No canonical fact schemas are mirrored or locally redefined",
+        "Parent agent reviewed OpenAPI, service decode flow and tests before accepting"
       ],
       "commitAfterPassing": true
     }

@@ -53,7 +53,8 @@ on HTTP handlers, OpenAPI generation or app runtime modules.
 - Keep `@whattax/http-api` responsible for route schemas, OpenAPI/status
   annotations, typed HTTP clients and thin handler adapters.
 - Keep `apps/api` as a runtime-only Bun app.
-- Preserve the implemented public route behavior and generated OpenAPI shape.
+- Preserve the implemented public route paths while improving the generated
+  OpenAPI request-body shape for calculator facts.
 - Reuse canonical schemas, descriptors, tagged errors, services, scenario
   layers, rule-pack layers and report schemas from owning packages.
 
@@ -87,6 +88,8 @@ support.
 - fact/rule/graph response construction
 - calculation dispatch through canonical scenario/rule-pack layers and
   `CalculationEngine`
+- public calculation facts schema composition that reuses canonical
+  calculator-specific input schemas from rule packages
 - schema decode error shaping with descriptor-backed help
 - expected calculation/domain failures as typed failures, including canonical
   `CalculationError`
@@ -184,6 +187,56 @@ Expected failures should be tagged errors or schema-backed error envelopes from
 the service package. HTTP-specific status decoration belongs in
 `@whattax/http-api`.
 
+### Public Calculation Facts Schema
+
+The public calculate route remains:
+
+```txt
+POST /api/v1/calculators/:calculatorId/calculate
+```
+
+The route payload MUST NOT use `facts: Schema.Unknown` as the public contract.
+`@whattax/calculators` should export a composed `PublicCalculationFacts`
+schema that is a union of the canonical calculator input schemas from the
+owning rule packages:
+
+```ts
+export const PublicCalculationFacts = Schema.Union([
+  TakeHomeScenarioInputSchema,
+  AnnualTaxScenarioInputSchema,
+]);
+```
+
+`PublicCalculationRequest` should then use that union:
+
+```ts
+export const PublicCalculationRequest = Schema.Struct({
+  facts: PublicCalculationFacts,
+  ...OptionalCalculatorContextFields,
+});
+```
+
+This keeps one stable route while allowing generated clients and OpenAPI docs
+to show the currently supported fact shapes. The tradeoff is that the route
+schema can only say “facts must match one supported calculator input shape,”
+not “this path parameter requires exactly this facts shape.” Effect `HttpApi`
+does not currently provide dependent request-body schemas selected by a path
+parameter.
+
+The calculator service MUST still validate facts against the selected
+calculator catalog entry. Each `CalculatorCatalogEntry` should reference the
+canonical input schema it accepts, for example:
+
+```ts
+readonly inputSchema: Schema.Schema<Input>;
+```
+
+`calculate` should look up the entry by `calculatorId`, decode
+`request.payload.facts` with `entry.inputSchema`, and map decode failures to
+`CalculatorInputDecodeError` with descriptor-backed help. This catches cases
+where the route-level union accepts a valid fact shape for another calculator
+but that shape is incompatible with the selected calculator.
+
 Service implementation rules:
 
 - Optional request and response fields MUST be represented by schema-owned
@@ -222,6 +275,10 @@ Service implementation rules:
   use `Effect.die` for schema decode failures, `CalculationError` or other
   recoverable domain/API errors. Use `Effect.die` only for defects outside the
   declared service contract.
+- Calculator input decode MUST use the selected catalog entry's canonical
+  `inputSchema` at the service boundary. Do not rely only on the route-level
+  `PublicCalculationFacts` union, because that union is intentionally
+  calculator-neutral.
 - Service contract files MUST define `Context.Service` contracts and canonical
   schemas only. Do not export `Live`, `Mock` or `Test` layers from `service.ts`;
   put production wiring in `live.layer.ts` and test wiring in `test.layer.ts` or
@@ -330,6 +387,13 @@ Update:
   response/error construction.
 - Public route behavior remains compatible for metadata, calculation success
   and schema-guided error responses.
+- `PublicCalculationRequest.facts` reuses canonical rule-owned calculator input
+  schemas through a union instead of `Schema.Unknown`.
+- The selected calculator catalog entry performs the final canonical
+  input-schema decode and incompatible calculator/facts combinations return
+  `CalculatorInputDecodeError` with descriptor-backed help.
+- OpenAPI for `POST /api/v1/calculators/:calculatorId/calculate` exposes the
+  union of supported public calculator fact shapes.
 - `bun run verification` passes.
 - `bun changeset status --verbose` previews the expected release-train impact.
 

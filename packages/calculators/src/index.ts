@@ -50,6 +50,7 @@ export {
   ParameterDescriptorMetadata,
   PublicApiError,
   type PublicCalculatorError,
+  PublicCalculationFacts,
   PublicCalculationReport,
   PublicCalculationRequest,
   PublicCalculationResponse,

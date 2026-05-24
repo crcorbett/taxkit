@@ -194,6 +194,10 @@ values from owning packages. If a new API envelope is needed, it belongs in
 `packages/http-api/src/groups/<group>.ts` and must expose schema-derived types.
 Do not mirror canonical field definitions or hand-write transport DTOs.
 
+Calculation fact payloads must reuse canonical calculator input schemas from
+the owning rule packages. The public API must not publish `facts: unknown` as
+the calculate contract.
+
 ## Proposed Approach
 
 ### Architecture Alignment
@@ -258,6 +262,32 @@ HTTP package is the first consumer. If the SDK facade or calculator catalog is
 implemented first, the context schema should move to that owning package and
 `packages/http-api` should import it. Jurisdiction and tax-year values should
 use branded schemas once reused outside one module.
+
+### Calculation Facts
+
+The calculate route remains generic:
+
+```txt
+POST /api/v1/calculators/:calculatorId/calculate
+```
+
+The request body should expose facts as a union of canonical calculator input
+schemas:
+
+```ts
+PublicCalculationFacts = Schema.Union([
+  TakeHomeScenarioInputSchema,
+  AnnualTaxScenarioInputSchema,
+]);
+```
+
+This gives generated clients and OpenAPI docs concrete fact shapes while
+preserving a calculator-id route model. Because the route schema is not
+dependent on the path parameter, the calculator service must perform a second
+decode against the selected calculator's canonical input schema. If the facts
+match another calculator but not the selected calculator, the response should
+be a schema-backed `CalculatorInputDecodeError` with descriptor-backed help for
+the selected calculator.
 
 Initial calculator IDs:
 
