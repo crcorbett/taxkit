@@ -16,10 +16,25 @@
       "types": "./dist/catalog.d.ts",
       "default": "./dist/catalog.js"
     },
+    "./errors": {
+      "source": "./src/errors.ts",
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
+    },
     "./metadata": {
       "source": "./src/metadata.ts",
       "types": "./dist/metadata.d.ts",
       "default": "./dist/metadata.js"
+    },
+    "./service": {
+      "source": "./src/service.ts",
+      "types": "./dist/service.d.ts",
+      "default": "./dist/service.js"
+    },
+    "./live": {
+      "source": "./src/live.layer.ts",
+      "types": "./dist/live.layer.d.ts",
+      "default": "./dist/live.layer.js"
     },
     "./schemas": {
       "source": "./src/schemas.ts",

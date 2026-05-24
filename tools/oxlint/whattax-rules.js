@@ -268,6 +268,7 @@ const nativeArrayMethods = new Set([
 const effectCollectionNamespaces = new Set([
   "Array",
   "Chunk",
+  "Effect",
   "HashMap",
   "HashSet",
   "Option",

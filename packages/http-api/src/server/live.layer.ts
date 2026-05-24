@@ -1,3 +1,5 @@
+import { PublicCalculatorServiceLive } from "@whattax/calculators";
+import { CalculationEngineLive } from "@whattax/core";
 import { Effect, Layer } from "effect";
 import * as HttpRouter from "effect/unstable/http/HttpRouter";
 import * as HttpServer from "effect/unstable/http/HttpServer";
@@ -14,7 +16,10 @@ import { HealthHandlerLive } from "../handlers/health.js";
 
 const ApiRoutes = HttpApiBuilder.layer(WhatTaxApi).pipe(
   Layer.provide(PublicCalculationMetadataHandlerLive),
-  Layer.provide(HealthHandlerLive)
+  Layer.provide(HealthHandlerLive),
+  HttpRouter.provideRequest(
+    PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
+  )
 );
 
 const openApiSpec = OpenApi.fromApi(WhatTaxApi);

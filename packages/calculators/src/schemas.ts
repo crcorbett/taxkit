@@ -81,8 +81,8 @@ export class UnsupportedCalculatorContextError extends Schema.TaggedClass<Unsupp
   "UnsupportedCalculatorContextError",
   {
     context: Schema.Struct({
-      jurisdiction: Schema.String,
-      taxYear: Schema.String,
+      jurisdiction: Schema.optional(Schema.String),
+      taxYear: Schema.optional(Schema.String),
     }),
     message: Schema.String,
     requestedCalculator: CalculatorId,
@@ -96,6 +96,8 @@ export const PublicApiError = Schema.Union([
 ]);
 
 export type PublicApiError = typeof PublicApiError.Type;
+
+export type PublicCalculatorError = PublicApiError;
 
 export const CalculatorCatalogItem = Schema.Struct({
   calculatorId: CalculatorId,
@@ -163,6 +165,23 @@ export const CalculationQuery = Schema.Struct({
 });
 
 export type CalculationQuery = typeof CalculationQuery.Type;
+
+export const GetCalculatorRequest = Schema.Struct({
+  calculatorId: CalculatorId,
+  help: Schema.optional(HelpMode),
+  jurisdiction: Schema.optional(Schema.Literal("AU")),
+  taxYear: Schema.optional(Schema.Literal("2025-26")),
+});
+
+export type GetCalculatorRequest = typeof GetCalculatorRequest.Type;
+
+export const GetCalculatorGraphRequest = Schema.Struct({
+  calculatorId: CalculatorId,
+  jurisdiction: Schema.optional(Schema.Literal("AU")),
+  taxYear: Schema.optional(Schema.Literal("2025-26")),
+});
+
+export type GetCalculatorGraphRequest = typeof GetCalculatorGraphRequest.Type;
 
 export const DescriptorFilterQuery = Schema.Struct({
   calculator: Schema.optional(CalculatorId),
@@ -252,6 +271,15 @@ export const PublicCalculationRequest = Schema.Struct({
 });
 
 export type PublicCalculationRequest = typeof PublicCalculationRequest.Type;
+
+export const PublicCalculationServiceRequest = Schema.Struct({
+  calculatorId: CalculatorId,
+  help: Schema.optional(HelpMode),
+  payload: PublicCalculationRequest,
+});
+
+export type PublicCalculationServiceRequest =
+  typeof PublicCalculationServiceRequest.Type;
 
 export const PublicCalculationReport = Schema.Union([
   TakeHomePayReport,

@@ -69,6 +69,9 @@ export default defineConfig({
         property: "values",
       },
     ],
+    // Effect pipelines intentionally use callback combinators like
+    // Effect.mapError/Effect.flatMap instead of async/await.
+    "promise/prefer-await-to-callbacks": "off",
     "typescript/consistent-type-assertions": [
       "error",
       {

@@ -5,6 +5,10 @@ export {
   type CalculatorCatalogEntry,
 } from "./catalog.js";
 export {
+  toPublicSchemaDecodeError,
+  toUnsupportedCalculatorContextError,
+} from "./errors.js";
+export {
   CalculatorCatalogItems,
   CalculatorCatalogResponseValue,
   JurisdictionsResponseValue,
@@ -17,6 +21,11 @@ export {
   toRulesResponse,
 } from "./metadata.js";
 export {
+  PublicCalculatorService,
+  type PublicCalculatorServiceShape,
+} from "./service.js";
+export { PublicCalculatorServiceLive } from "./live.layer.js";
+export {
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
   CalculatorCatalogResponseData,
@@ -28,6 +37,8 @@ export {
   DescriptorFilterQuery,
   FactDescriptorMetadata,
   FactsResponse,
+  GetCalculatorGraphRequest,
+  GetCalculatorRequest,
   HelpMode,
   HelpQuery,
   Jurisdiction,
@@ -35,10 +46,12 @@ export {
   MetadataQuery,
   ParameterDescriptorMetadata,
   PublicApiError,
+  type PublicCalculatorError,
   PublicCalculationReport,
   PublicCalculationRequest,
   PublicCalculationResponse,
   PublicCalculationResponseData,
+  PublicCalculationServiceRequest,
   PublicSchemaDecodeError,
   RuleDescriptorMetadata,
   RuleGraphEdge,

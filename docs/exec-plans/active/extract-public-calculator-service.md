@@ -33,7 +33,7 @@ must become thin transport adapters over `@whattax/calculators` service methods.
 | --- | --- | --- |
 | CALC-SVC-001 | complete | Added `@whattax/calculators` package shell. Parent verification passed. Commit `0bb699b`. |
 | CALC-SVC-002 | complete | Moved reusable schemas, catalog and metadata projections into `@whattax/calculators`. Parent verification passed. |
-| CALC-SVC-003 | pending | Move calculation execution and expected error shaping into service methods. |
+| CALC-SVC-003 | complete | Moved calculation execution and expected error shaping into `PublicCalculatorService`. Parent verification and API smoke passed. |
 | CALC-SVC-004 | pending | Final docs, changelog and smoke evidence. |
 
 ## Validation Log
@@ -91,3 +91,53 @@ must become thin transport adapters over `@whattax/calculators` service methods.
     literals, unsafe casts or non-null assertions in changed source files.
   - `packages/http-api/src/groups/calculators.ts` no longer contains catalog
     entries or descriptor transformation logic.
+
+### CALC-SVC-003
+
+- Verification:
+  - `bun run --filter=@whattax/calculators check-types` passed.
+  - `bun run --filter=@whattax/http-api check-types` passed.
+  - `bun run verification` passed.
+  - `bun changeset status --verbose` previews patch bumps for
+    `@whattax/calculators` and `@whattax/http-api`.
+- API smoke:
+  - Started `apps/api` with `API_HOST=127.0.0.1 API_PORT=4027`.
+  - `/api/docs/openapi.json` includes all public `/api/v1` calculator,
+    fact and rule routes, including
+    `/api/v1/calculators/{calculatorId}/calculate`.
+  - `/api/v1/calculators` returns `au.pay.take-home`,
+    `au.pay.withholdings` and `au.income-tax.annual`.
+  - `POST /api/v1/calculators/au.pay.take-home/calculate` returned
+    `200 OK`, `calculatorId = au.pay.take-home`, `netPay.cents = 119600`
+    `withholdingsTotal.cents = 30400` and no graph issues.
+  - Missing `grossPay.period` with `help=errors` returned `400 Bad Request`
+    with issue path `["grossPay", "period"]` and descriptor-backed help.
+- Lint coverage:
+  - Temporary `packages/calculators/src/__oxlint-scope-check.ts`
+    intentionally failed with WhatTax scoped lint rules for raw `typeof`,
+    `in`, undefined comparison, conditional object spread, context `??`
+    defaulting, thrown errors, native array methods, native `Map`,
+    ad hoc JSON and `await new Promise`.
+  - The temporary fixture was removed before verification.
+- Parent review:
+  - `packages/calculators/src/service.ts` defines the
+    `PublicCalculatorService` contract only.
+  - `packages/calculators/src/live.layer.ts` owns catalog lookup, optional
+    context validation through `Option`, graph validation, calculation
+    execution and response construction.
+  - `packages/calculators/src/errors.ts` owns schema decode issue formatting
+    and descriptor-backed help construction.
+  - `packages/http-api/src/handlers/calculators.ts` delegates route input to
+    `PublicCalculatorService` and maps tagged service errors into the
+    route-only `PublicErrorEnvelope`.
+  - `packages/http-api/src/server/live.layer.ts` composes
+    `PublicCalculatorServiceLive` with `CalculationEngineLive` through
+    `HttpRouter.provideRequest(...)` so request handlers see the service at
+    runtime.
+  - Audits found no `@whattax/http-api` or app imports in
+    `packages/calculators/src`.
+  - Audits found no `validateRuleGraph`, `SchemaIssue`,
+    `CalculationEngineLive`, rule-pack layer composition, raw undefined
+    context branches, payload jurisdiction defaults, conditional help object
+    spreads or inline schema issue path formatting in
+    `packages/http-api/src/handlers/calculators.ts`.
