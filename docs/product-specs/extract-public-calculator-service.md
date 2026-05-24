@@ -28,10 +28,11 @@ Target package name:
 
 ## Problem
 
-`packages/http-api/src/handlers/calculators.ts` currently performs calculator
+Before this extraction started,
+`packages/http-api/src/handlers/calculators.ts` performed calculator
 lookup, context validation, graph validation, calculation execution, schema
 decode error formatting and response construction. Some reusable catalog and
-metadata transformation logic also lives in
+metadata transformation logic also lived in
 `packages/http-api/src/groups/calculators.ts`.
 
 That makes `@whattax/http-api` more than a transport package. It also makes

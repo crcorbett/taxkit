@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-05-24
 source_of_truth: package-readme
 confidence: medium
 ---
@@ -8,14 +8,16 @@ confidence: medium
 # HTTP API
 
 Effect HTTP API package for the current WhatTax health endpoint, public
-calculation metadata endpoints and API server wiring.
+calculation endpoints, generated docs and API server route wiring.
 
 ## Scope
 
 `@whattax/http-api` owns the current HTTP API contract, generated OpenAPI
-metadata, health and public calculation handlers, HTTP status envelopes and
-typed client helpers used by WhatTax apps. Reusable calculator schemas, catalog
-entries and metadata projections now live in `@whattax/calculators`.
+metadata, health and public calculation routes, HTTP status envelopes, thin
+handler adapters and typed client helpers used by WhatTax apps. Reusable
+calculator schemas, catalog entries, metadata projections, graph construction,
+calculation dispatch and schema-guided expected error shaping live in
+`@whattax/calculators`.
 
 The implemented API surface is:
 
@@ -34,9 +36,9 @@ The implemented API surface is:
 
 The public calculation API routes expose the reusable calculator catalog,
 canonical fact descriptors, canonical rule descriptors and graph validation
-diagnostics from `@whattax/calculators`. The calculation route still performs
-HTTP handler-side expected error shaping until the calculator service extraction
-moves that behavior behind `PublicCalculatorService`.
+diagnostics from `@whattax/calculators`. Handler implementations pass route
+params, query values and payloads to `PublicCalculatorService` and map tagged
+service failures into route-owned HTTP error envelopes.
 
 ## Main Areas
 
@@ -45,9 +47,9 @@ moves that behavior behind `PublicCalculatorService`.
 - `src/groups/calculators.ts`: public calculation HTTP route schemas, bad
   request envelope, OpenAPI annotations and compatibility exports from
   `@whattax/calculators`.
-- `src/handlers/`: server-side handlers and handler layers.
+- `src/handlers/`: server-side thin handler adapters and handler layers.
 - `src/server/live.layer.ts`: server route layer, CORS middleware, Scalar docs
-  route and OpenAPI JSON route.
+  route, OpenAPI JSON route and calculator service layer composition.
 - `src/server.ts`: server export boundary for `WhatTaxServerLayer`.
 - `src/config.ts`: package-owned client config schema and neutral `httpApi`
   config source.
@@ -69,7 +71,10 @@ Reusable calculator exports:
 
 - `@whattax/calculators`
 - `@whattax/calculators/catalog`
+- `@whattax/calculators/errors`
+- `@whattax/calculators/live`
 - `@whattax/calculators/metadata`
+- `@whattax/calculators/service`
 - `@whattax/calculators/schemas`
 
 ## Runtime Shape
@@ -92,7 +97,9 @@ config modules, then provide server or client environment values through Effect
 `WHATTAX_API_*` and `VITE_WHATTAX_API_*`. See
 `docs/architecture/configuration.md`.
 
-Current responses are schema-backed with Effect Schema. The health response is:
+Current responses are schema-backed with Effect Schema. Calculator response
+schemas are imported from `@whattax/calculators`; route-only HTTP envelopes and
+status annotations stay in this package. The health response is:
 
 ```ts
 {
@@ -120,17 +127,20 @@ bun run --filter=@whattax/http-api check-types
 
 ## Guardrails
 
-- Do not document calculation execution endpoints until they are implemented.
 - Keep browser consumers on client exports; do not import server handlers into
   browser code.
 - Keep endpoint request and response shapes schema-owned; route-only HTTP
   envelopes stay here and reusable calculator payload schemas live in
   `@whattax/calculators`.
-- Keep calculation execution catalog-driven, scenario-schema decoded and
-  `CalculationEngine` based.
+- Keep calculation execution delegated to `PublicCalculatorService`, which is
+  catalog-driven, scenario-schema decoded and `CalculationEngine` based.
 - Keep metadata responses derived from canonical fact descriptors, rule
   descriptors, source refs, parameter periods and graph diagnostics from the
   owning engine and rule packages.
+- Keep handlers thin. They may extract route input and translate tagged
+  service errors to HTTP status envelopes; reusable calculator lookup,
+  metadata transformation, graph assembly, calculation dispatch and expected
+  error shaping stay in `@whattax/calculators`.
 - Add OpenAPI annotations with new API groups so docs stay generated from the
   contract.
 - Add tests or focused verification when new endpoints, handlers or client

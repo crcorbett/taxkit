@@ -16,9 +16,9 @@ catalog, metadata, graph, calculation and expected-error behavior used by HTTP,
 SDK, CLI and direct in-process callers.
 
 The package currently owns reusable calculator schemas, catalog entries and
-metadata projections. HTTP handlers still own transport wiring and expected
-error handling until the remaining calculator service extraction tasks move
-those policies behind service methods.
+metadata projections, the `PublicCalculatorService` contract, production live
+layer, calculator graph construction, calculation dispatch and schema-guided
+expected error shaping. HTTP handlers own transport wiring only.
 
 ## Ownership
 
@@ -26,9 +26,6 @@ This package owns:
 
 - calculator catalog schemas and entries
 - metadata projections for calculator, fact, rule and graph discovery
-
-This package will also own:
-
 - calculator service tags and layers
 - schema-guided expected error shaping for calculation inputs
 - composition of canonical scenario layers, rule-pack layers and
@@ -68,7 +65,10 @@ bun run --filter=@whattax/calculators build
 
 - `@whattax/calculators`
 - `@whattax/calculators/catalog`
+- `@whattax/calculators/errors`
+- `@whattax/calculators/live`
 - `@whattax/calculators/metadata`
+- `@whattax/calculators/service`
 - `@whattax/calculators/schemas`
 
 ## Related Docs

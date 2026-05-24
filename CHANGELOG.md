@@ -8,6 +8,9 @@
   calculator catalog: take-home pay, PAYG withholdings and annual income tax.
   The public route model is calculator, fact, rule and graph driven rather than
   jurisdiction-route driven.
+- Extracted reusable calculator orchestration into `@whattax/calculators`, with
+  HTTP handlers acting as thin transport adapters over the public calculator
+  service.
 - Hardened the calculation engine with typed rule descriptor builders,
   date-level parameter effective periods, source artifact metadata, Effect
   BigDecimal-backed tax rates and coefficients, and a reusable
@@ -23,6 +26,8 @@
 ### Package Changelogs
 
 - [`@whattax/core`](./packages/core/CHANGELOG.md)
+- `@whattax/calculators`: pending first package changelog generation through
+  the release-train Changeset workflow.
 - [`@whattax/http-api`](./packages/http-api/CHANGELOG.md)
 - [`@whattax/rules-au-income-tax`](./packages/rules/au/income-tax/CHANGELOG.md)
 - [`@whattax/rules-au-pay`](./packages/rules/au/pay/CHANGELOG.md)

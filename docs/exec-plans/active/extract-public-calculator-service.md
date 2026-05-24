@@ -34,7 +34,7 @@ must become thin transport adapters over `@whattax/calculators` service methods.
 | CALC-SVC-001 | complete | Added `@whattax/calculators` package shell. Parent verification passed. Commit `0bb699b`. |
 | CALC-SVC-002 | complete | Moved reusable schemas, catalog and metadata projections into `@whattax/calculators`. Parent verification passed. |
 | CALC-SVC-003 | complete | Moved calculation execution and expected error shaping into `PublicCalculatorService`. Parent verification and API smoke passed. |
-| CALC-SVC-004 | pending | Final docs, changelog and smoke evidence. |
+| CALC-SVC-004 | complete | Final docs, changelog and smoke evidence. |
 
 ## Validation Log
 
@@ -141,3 +141,35 @@ must become thin transport adapters over `@whattax/calculators` service methods.
     context branches, payload jurisdiction defaults, conditional help object
     spreads or inline schema issue path formatting in
     `packages/http-api/src/handlers/calculators.ts`.
+
+### CALC-SVC-004
+
+- Verification:
+  - `bun run verification` passed.
+  - `bun changeset status --verbose` passed and previews fixed release-train
+    patch bumps, including `@whattax/calculators 0.0.2` and
+    `@whattax/http-api 0.0.2`.
+- API smoke:
+  - Started `apps/api` with `API_HOST=127.0.0.1 API_PORT=4027`.
+  - `/api/docs/openapi.json` includes all public `/api/v1` calculator,
+    fact and rule routes, including
+    `/api/v1/calculators/{calculatorId}/calculate`.
+  - `/api/v1/calculators` returns `au.pay.take-home`,
+    `au.pay.withholdings` and `au.income-tax.annual`.
+  - `POST /api/v1/calculators/au.pay.take-home/calculate` returned
+    `200 OK`, `calculatorId = au.pay.take-home`, `netPay.cents = 119600`,
+    `withholdingsTotal.cents = 30400` and `graphIssueCount = 0`.
+  - Missing `grossPay.period` with `help=errors` returned `400 Bad Request`
+    with `_tag = PublicSchemaDecodeError`, issue path
+    `["grossPay", "period"]` and two descriptor-backed help entries.
+- Docs and release audit:
+  - Root docs and package READMEs now describe `@whattax/calculators` as the
+    reusable calculator orchestration package.
+  - `@whattax/http-api` docs now describe thin transport handlers over
+    `PublicCalculatorService`.
+  - Package ownership docs describe `packages/calculators` as implemented, not
+    a planned placeholder or package shell.
+  - `CHANGELOG.md` and `.changeset/public-calculator-service.md` describe the
+    release-train impact without running `bun run version-repo`.
+  - Stale-doc audits found no nested API calculator package references and no
+    claims that calculator business logic belongs in HTTP handlers.

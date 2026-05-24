@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-05-24
 source_of_truth: docs
 confidence: high
 ---
@@ -71,13 +71,10 @@ It owns the current Effect HTTP API definitions, health endpoint schema,
 server route layer, OpenAPI metadata, typed client helpers and reusable client
 config schema.
 
-The current package also temporarily owns public calculator catalog and
-handler logic. That ownership should move into `packages/calculators` so
-HTTP handlers become thin wrappers around package-owned services. After that
-split, `@whattax/http-api` should own transport contracts, HTTP status
-annotations, OpenAPI generation, typed HTTP clients and server route layers,
-but not reusable calculator metadata transformations, graph assembly,
-calculation dispatch or schema-error shaping.
+`@whattax/http-api` owns transport contracts, HTTP status annotations, OpenAPI
+generation, typed HTTP clients, server route layers and thin handler adapters.
+Reusable calculator catalog entries, metadata transformations, graph assembly,
+calculation dispatch and schema-error shaping live in `@whattax/calculators`.
 
 `@whattax/http-api/config` exports the package-owned HTTP API client config
 schema, type and keyed config fragment. Apps compose that fragment into their
@@ -97,12 +94,11 @@ interfaces or duplicate response shapes in handlers, clients or apps.
 
 Route-only HTTP envelopes, query schemas and status annotations stay in
 `@whattax/http-api`. Reusable calculator IDs, context, help modes, response
-payloads and service errors live in `@whattax/calculators` once that package
-exists.
+payloads and service errors live in `@whattax/calculators`.
 
-## Planned Calculator Package
+## Current Calculator Package
 
-The reusable calculator orchestration package should live under:
+The reusable calculator orchestration package lives under:
 
 ```txt
 packages/calculators

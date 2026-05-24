@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-05-24
 source_of_truth: docs
 confidence: high
 ---
@@ -152,7 +152,8 @@ parameter tables and official rule packs. Planned `@whattax/rules-au-super`,
 `@whattax/rules-au-mortgage` and `@whattax/rules-au-deductions` will own their
 corresponding facts, algorithms, parameter tables and official rule packs.
 
-Implemented `@whattax/calculators` shell owns the package boundary for:
+Implemented `@whattax/calculators` owns the reusable calculator orchestration
+boundary for:
 
 - reusable calculator catalog schemas and entries
 - calculator service tags and live layers
@@ -162,9 +163,6 @@ Implemented `@whattax/calculators` shell owns the package boundary for:
   `CalculationEngine`
 - reusable service methods for HTTP handlers, SDK helpers, CLI commands and
   direct in-process consumers
-
-Runtime behavior still lives in `@whattax/http-api` until the extraction tasks
-move it into the package.
 
 It must not own OpenAPI annotations, HTTP status mapping, Bun serving, process
 config, app runtime lifecycle, SDK client transport or CLI command parsing.

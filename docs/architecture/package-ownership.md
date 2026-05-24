@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-05-24
 source_of_truth: docs
 confidence: medium
 ---
@@ -65,14 +65,12 @@ thin server handlers, OpenAPI and HTTP status/transport annotations. The
 implemented API package is currently `packages/http-api`.
 
 `packages/calculators`
-: Implemented reusable calculator orchestration package shell. It owns the
-package boundary for calculator catalog schemas, calculator service methods,
-metadata projections, graph response construction, schema-guided error shaping
-and rule-pack/scenario composition used by HTTP, SDK, CLI and in-process
-callers. Runtime behavior remains in `@whattax/http-api` until the extraction
-tasks move it. It should depend on `packages/core` and rule packages, but it
-must not depend on HTTP handlers, SDK clients, CLI commands or app runtime
-modules.
+: Implemented reusable calculator orchestration package. It owns calculator
+catalog schemas, calculator service methods, metadata projections, graph
+response construction, schema-guided error shaping and rule-pack/scenario
+composition used by HTTP, SDK, CLI and in-process callers. It depends on
+`packages/core` and rule packages, but it must not depend on HTTP handlers,
+SDK clients, CLI commands or app runtime modules.
 
 `packages/sdk/typescript`
 : Planned browser-safe client, schemas, request builders, server helpers,
