@@ -13,8 +13,9 @@ calculation metadata endpoints and API server wiring.
 ## Scope
 
 `@whattax/http-api` owns the current HTTP API contract, generated OpenAPI
-metadata, health and public calculation metadata handlers, and typed client
-helpers used by WhatTax apps.
+metadata, health and public calculation handlers, HTTP status envelopes and
+typed client helpers used by WhatTax apps. Reusable calculator schemas, catalog
+entries and metadata projections now live in `@whattax/calculators`.
 
 The implemented API surface is:
 
@@ -31,20 +32,19 @@ The implemented API surface is:
 - `GET /api/v1/facts`
 - `GET /api/v1/rules`
 
-The public calculation API metadata routes expose the initial calculator
-catalog, canonical fact descriptors, canonical rule descriptors and graph
-validation diagnostics for the implemented AU rule packages. The calculation
-route decodes canonical scenario facts, selects the cataloged rule-pack layer
-and runs through `CalculationEngine` for take-home pay, PAYG withholdings and
-annual income tax.
+The public calculation API routes expose the reusable calculator catalog,
+canonical fact descriptors, canonical rule descriptors and graph validation
+diagnostics from `@whattax/calculators`. The calculation route still performs
+HTTP handler-side expected error shaping until the calculator service extraction
+moves that behavior behind `PublicCalculatorService`.
 
 ## Main Areas
 
 - `src/api.ts`: `WhatTaxApi` definition and OpenAPI annotations.
 - `src/groups/health.ts`: health endpoint schema and route group.
-- `src/groups/calculators.ts`: public calculator IDs, context/help schemas,
-  error envelopes, metadata route schemas, OpenAPI annotations and the initial
-  schema-backed calculator catalog.
+- `src/groups/calculators.ts`: public calculation HTTP route schemas, bad
+  request envelope, OpenAPI annotations and compatibility exports from
+  `@whattax/calculators`.
 - `src/handlers/`: server-side handlers and handler layers.
 - `src/server/live.layer.ts`: server route layer, CORS middleware, Scalar docs
   route and OpenAPI JSON route.
@@ -64,6 +64,13 @@ Export paths:
 - `@whattax/http-api/server`
 - `@whattax/http-api/handlers`
 - `@whattax/http-api/handlers/live`
+
+Reusable calculator exports:
+
+- `@whattax/calculators`
+- `@whattax/calculators/catalog`
+- `@whattax/calculators/metadata`
+- `@whattax/calculators/schemas`
 
 ## Runtime Shape
 
@@ -116,7 +123,9 @@ bun run --filter=@whattax/http-api check-types
 - Do not document calculation execution endpoints until they are implemented.
 - Keep browser consumers on client exports; do not import server handlers into
   browser code.
-- Keep endpoint request and response shapes schema-owned.
+- Keep endpoint request and response shapes schema-owned; route-only HTTP
+  envelopes stay here and reusable calculator payload schemas live in
+  `@whattax/calculators`.
 - Keep calculation execution catalog-driven, scenario-schema decoded and
   `CalculationEngine` based.
 - Keep metadata responses derived from canonical fact descriptors, rule

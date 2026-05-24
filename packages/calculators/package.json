@@ -10,12 +10,33 @@
       "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./catalog": {
+      "source": "./src/catalog.ts",
+      "types": "./dist/catalog.d.ts",
+      "default": "./dist/catalog.js"
+    },
+    "./metadata": {
+      "source": "./src/metadata.ts",
+      "types": "./dist/metadata.d.ts",
+      "default": "./dist/metadata.js"
+    },
+    "./schemas": {
+      "source": "./src/schemas.ts",
+      "types": "./dist/schemas.d.ts",
+      "default": "./dist/schemas.js"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@whattax/core": "workspace:*",
+    "@whattax/rules-au-income-tax": "workspace:*",
+    "@whattax/rules-au-pay": "workspace:*",
+    "effect": "catalog:"
   },
   "devDependencies": {
     "typescript": "catalog:"

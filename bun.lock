@@ -52,6 +52,12 @@
     "packages/calculators": {
       "name": "@whattax/calculators",
       "version": "0.0.1",
+      "dependencies": {
+        "@whattax/core": "workspace:*",
+        "@whattax/rules-au-income-tax": "workspace:*",
+        "@whattax/rules-au-pay": "workspace:*",
+        "effect": "catalog:",
+      },
       "devDependencies": {
         "typescript": "catalog:",
       },
@@ -70,9 +76,8 @@
       "name": "@whattax/http-api",
       "version": "0.0.1",
       "dependencies": {
+        "@whattax/calculators": "workspace:*",
         "@whattax/core": "workspace:*",
-        "@whattax/rules-au-income-tax": "workspace:*",
-        "@whattax/rules-au-pay": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {

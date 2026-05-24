@@ -15,16 +15,21 @@ Reusable public calculator orchestration package.
 catalog, metadata, graph, calculation and expected-error behavior used by HTTP,
 SDK, CLI and direct in-process callers.
 
-This package is currently a shell. Runtime behavior still lives in
-`@whattax/http-api` until the calculator service extraction tasks move it.
+The package currently owns reusable calculator schemas, catalog entries and
+metadata projections. HTTP handlers still own transport wiring and expected
+error handling until the remaining calculator service extraction tasks move
+those policies behind service methods.
 
 ## Ownership
 
-This package will own:
+This package owns:
 
 - calculator catalog schemas and entries
-- calculator service tags and layers
 - metadata projections for calculator, fact, rule and graph discovery
+
+This package will also own:
+
+- calculator service tags and layers
 - schema-guided expected error shaping for calculation inputs
 - composition of canonical scenario layers, rule-pack layers and
   `CalculationEngine`
@@ -58,6 +63,13 @@ This package must not own:
 bun run --filter=@whattax/calculators check-types
 bun run --filter=@whattax/calculators build
 ```
+
+## Public Exports
+
+- `@whattax/calculators`
+- `@whattax/calculators/catalog`
+- `@whattax/calculators/metadata`
+- `@whattax/calculators/schemas`
 
 ## Related Docs
 
