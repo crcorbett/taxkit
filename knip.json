@@ -53,6 +53,10 @@
       "project": ["src/**/*.ts"],
       "ignoreDependencies": ["@effect/platform-node", "@whattax/tsconfig"]
     },
+    "packages/calculators": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts"]
+    },
     "packages/rules/au/income-tax": {
       "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]

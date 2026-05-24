@@ -20,6 +20,7 @@ Implemented packages and apps:
 
 - `apps/api`
 - `apps/web`
+- `packages/calculators`
 - `packages/core`
 - `packages/http-api`
 - `packages/rules/au/income-tax`
@@ -151,7 +152,7 @@ parameter tables and official rule packs. Planned `@whattax/rules-au-super`,
 `@whattax/rules-au-mortgage` and `@whattax/rules-au-deductions` will own their
 corresponding facts, algorithms, parameter tables and official rule packs.
 
-Planned `@whattax/calculators` will own:
+Implemented `@whattax/calculators` shell owns the package boundary for:
 
 - reusable calculator catalog schemas and entries
 - calculator service tags and live layers
@@ -161,6 +162,9 @@ Planned `@whattax/calculators` will own:
   `CalculationEngine`
 - reusable service methods for HTTP handlers, SDK helpers, CLI commands and
   direct in-process consumers
+
+Runtime behavior still lives in `@whattax/http-api` until the extraction tasks
+move it into the package.
 
 It must not own OpenAPI annotations, HTTP status mapping, Bun serving, process
 config, app runtime lifecycle, SDK client transport or CLI command parsing.

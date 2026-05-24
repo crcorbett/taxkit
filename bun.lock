@@ -49,6 +49,13 @@
         "vite": "catalog:",
       },
     },
+    "packages/calculators": {
+      "name": "@whattax/calculators",
+      "version": "0.0.1",
+      "devDependencies": {
+        "typescript": "catalog:",
+      },
+    },
     "packages/core": {
       "name": "@whattax/core",
       "version": "0.0.1",
@@ -570,6 +577,8 @@
     "@vitest/spy": ["@vitest/spy@4.1.7", "", {}, "sha512-kbkI5LMWakyuTIvs6fUJ5qdIVb1XVKsYJAT4OJ938cHMROYMSfmoQdZy0aaAnjbbc8F61vkoTqz/Az+/HiIu5Q=="],
 
     "@vitest/utils": ["@vitest/utils@4.1.7", "", { "dependencies": { "@vitest/pretty-format": "4.1.7", "convert-source-map": "^2.0.0", "tinyrainbow": "^3.1.0" } }, "sha512-T532WBu791cBxJlCl6SO+J14l81DQx6uQHm1bQbmCDY7nqlEIgkza/UFnSBNaUtSf41unldDFjdOBYEQC4b5Hw=="],
+
+    "@whattax/calculators": ["@whattax/calculators@workspace:packages/calculators"],
 
     "@whattax/core": ["@whattax/core@workspace:packages/core"],
 

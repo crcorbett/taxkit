@@ -21,6 +21,7 @@ Current implemented code lives in:
 - `apps/api`
 - `apps/web`
 - `packages/core`
+- `packages/calculators`
 - `packages/http-api`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
@@ -31,7 +32,6 @@ Current implemented code lives in:
 Current planned ownership placeholders:
 
 - `packages/api/http`
-- `packages/calculators`
 - `packages/scripts`
 - `packages/ui`
 
@@ -65,12 +65,14 @@ thin server handlers, OpenAPI and HTTP status/transport annotations. The
 implemented API package is currently `packages/http-api`.
 
 `packages/calculators`
-: Planned reusable calculator orchestration package. It should own calculator
-catalog schemas, calculator service methods, metadata projections, graph
-response construction, schema-guided error shaping and rule-pack/scenario
-composition used by HTTP, SDK, CLI and in-process callers. It should depend on
-`packages/core` and rule packages, but it must not depend on HTTP handlers,
-SDK clients, CLI commands or app runtime modules.
+: Implemented reusable calculator orchestration package shell. It owns the
+package boundary for calculator catalog schemas, calculator service methods,
+metadata projections, graph response construction, schema-guided error shaping
+and rule-pack/scenario composition used by HTTP, SDK, CLI and in-process
+callers. Runtime behavior remains in `@whattax/http-api` until the extraction
+tasks move it. It should depend on `packages/core` and rule packages, but it
+must not depend on HTTP handlers, SDK clients, CLI commands or app runtime
+modules.
 
 `packages/sdk/typescript`
 : Planned browser-safe client, schemas, request builders, server helpers,
