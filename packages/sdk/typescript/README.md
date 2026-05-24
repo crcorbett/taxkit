@@ -1,5 +1,5 @@
 ---
-status: scaffold
+status: implemented
 last_reviewed: 2026-05-24
 source_of_truth: package-readme
 confidence: medium
@@ -7,7 +7,7 @@ confidence: medium
 
 # TypeScript SDK
 
-Scaffold for the public WhatTax TypeScript SDK package.
+Public WhatTax TypeScript SDK package.
 
 ## Scope
 
@@ -16,10 +16,52 @@ in-process WhatTax calculations, schema exports and typed module composition.
 The package is private while the SDK surface is implemented and downstream
 consumer validation is recorded.
 
-This scaffold establishes package metadata, TypeScript build wiring and
-explicit export paths only. Calculator execution, typed descriptors, the plain
-facade, AU convenience clients, HTTP API integration and downstream validation
-belong to later SDK tasks.
+The package currently exposes typed descriptor composition, an Effect-native
+facade, a plain Promise facade and Australian module helpers for the current
+public calculator catalog. HTTP API integration, downstream validation and
+publication release prep belong to later SDK tasks.
+
+## Plain Facade
+
+```ts
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+
+const report = await WhatTax.calculate(au.calculations.takeHomePay, {
+  grossPay,
+  taxFreeThresholdClaimed: true,
+});
+
+const safeResult = await WhatTax.safe.calculate(au.calculations.takeHomePay, {
+  grossPay,
+  taxFreeThresholdClaimed: true,
+});
+```
+
+The plain facade returns Promises and does not expose Effect runtime types in
+method signatures. `safe` methods return SDK-owned Data result values:
+`WhatTaxSuccess` or `WhatTaxFailure`.
+
+## AU Subpath
+
+```ts
+import { au } from "@whattax/sdk/au";
+
+const payReport = await au.pay.takeHomePay({
+  grossPay,
+  taxFreeThresholdClaimed: true,
+});
+
+const client = au.createClient();
+const annualTax = await client.calculations.calculate(
+  au.calculations.annualIncomeTax,
+  { taxableIncome }
+);
+```
+
+AU helpers are thin wrappers over the same generic SDK descriptors. Type tests
+prove wrong calculator/module pairings and incompatible facts fail at compile
+time.
 
 ## Export Paths
 
@@ -47,8 +89,10 @@ entrypoints may expose Effect-native types once the facade is implemented.
 ## Commands
 
 ```sh
+bun run --filter=@whattax/sdk test
 bun run --filter=@whattax/sdk check-types
 bun run --filter=@whattax/sdk build
+bun run --filter=@whattax/sdk test-types
 bun run --filter=@whattax/sdk check-boundaries
 ```
 

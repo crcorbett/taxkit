@@ -1,1 +1,6 @@
-export const WhatTaxSdkSchemasStatus = "scaffold" as const;
+export {
+  WhatTaxCalculationError,
+  WhatTaxFailure,
+  WhatTaxSuccess,
+} from "../errors.js";
+export type { WhatTaxError, WhatTaxSafeResult } from "../errors.js";

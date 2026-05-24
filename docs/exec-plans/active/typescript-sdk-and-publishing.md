@@ -25,7 +25,7 @@ passes its required gates and Changeset decision.
 | --- | --- | --- |
 | SDK-001 | complete | Scaffolded `@whattax/sdk` package, export map and import-boundary check. |
 | SDK-002 | complete | Strict typed descriptors and Effect facade over calculators implemented and verified. |
-| SDK-003 | pending | Plain facade, safe results and AU module subpath. |
+| SDK-003 | complete | Plain Promise facade, Data-owned safe results and AU module subpath implemented and verified. |
 | SDK-004 | pending | HTTP API consumes SDK facade. |
 | SDK-005 | pending | Downstream consumer validation. |
 | SDK-006 | pending | Publication release-prep slice. |
@@ -103,6 +103,37 @@ passes its required gates and Changeset decision.
     `.changeset/sdk-effect-descriptors.md` and
     `.changeset/sdk-typescript-scaffold.md`.
 
+### 2026-05-24 - SDK-003 plain facade, safe results and AU subpath
+
+- Added the browser-safe plain `WhatTax` facade in
+  `packages/sdk/typescript/src/index.ts` with Promise-returning `calculate`,
+  `safe.calculate` and module-scoped `createClient` methods over the existing
+  generic SDK descriptor model.
+- Added SDK-owned error and safe-result values in
+  `packages/sdk/typescript/src/errors.ts`; safe methods return Data-owned
+  `WhatTaxSuccess` or `WhatTaxFailure` values and failures wrap the canonical
+  calculator/schema failure cause without mirroring calculator DTOs.
+- Added `@whattax/sdk/au` typed current AU module exports and thin convenience
+  helpers for take-home pay, PAYG withholdings and annual income tax.
+- Added `@whattax/sdk/au/effect` AU Effect client wiring for the same module
+  descriptors.
+- Added plain facade and AU runtime tests plus type-level misuse coverage for
+  wrong module/calculation pairings and incompatible fact inputs.
+- Added Changeset `.changeset/sdk-plain-facade.md` for `@whattax/sdk` patch
+  impact.
+- Verification:
+  - `bun run --filter=@whattax/sdk test` passed.
+  - `bun run --filter=@whattax/sdk check-types` passed.
+  - `bun run --filter=@whattax/sdk build` passed.
+  - `bun run --filter=@whattax/sdk test-types` passed.
+  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run verification` passed.
+  - `bun run changeset status --verbose` passed and includes
+    `@whattax/sdk` patch release impact from
+    `.changeset/sdk-plain-facade.md`,
+    `.changeset/sdk-effect-descriptors.md` and
+    `.changeset/sdk-typescript-scaffold.md`.
+
 ## Open Risks
 
 - Package name availability must be checked live only during release prep.
@@ -110,6 +141,5 @@ passes its required gates and Changeset decision.
   `@whattax/http-api`.
 - Downstream validation must be recorded without naming private downstream
   products in public WhatTax docs.
-- SDK-001 uses placeholder entrypoints only; typed descriptors, facade
-  behavior, runtime parity tests and downstream validation remain in later SDK
-  tasks.
+- HTTP API integration, downstream validation and publication release prep
+  remain in later SDK tasks.
