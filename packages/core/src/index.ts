@@ -62,11 +62,15 @@ export {
 } from "./primitives/date.js";
 export {
   CentsOrInfinity,
+  CalculatorId,
   DecimalCoefficient,
+  Jurisdiction,
   TaxRate,
   TaxYear,
+  calculatorId,
   decimalCoefficient,
   decimalDollarsToCents,
+  jurisdiction,
   multiplyCentsByDecimal,
   taxRate,
   taxYear,

@@ -71,12 +71,16 @@ on HTTP handlers, OpenAPI generation or app runtime modules.
 diagnostics, trace, ledgers, common tagged errors and `CalculationEngine`.
 
 Rule packages own canonical facts, report schemas, scenario layers, rule-pack
-layers, parameter services and rule descriptors.
+layers, parameter services, rule descriptors, calculator ids and supported
+calculator context literals for their jurisdiction/rule domain. Shared scalar
+brands such as calculator id, jurisdiction and tax year belong in
+`packages/core`; rule packages narrow those brands to the concrete values they
+support.
 
 `@whattax/calculators` should own:
 
-- `CalculatorId`, calculator context and public help-mode schemas until a more
-  foundational package owns them
+- composed public calculator schemas that reuse rule-owned calculator ids,
+  jurisdictions, tax years, facts, reports and descriptors
 - public calculator catalog entries
 - calculator service tag/interface and live layer
 - public calculator metadata response construction
@@ -84,8 +88,9 @@ layers, parameter services and rule descriptors.
 - calculation dispatch through canonical scenario/rule-pack layers and
   `CalculationEngine`
 - schema decode error shaping with descriptor-backed help
-- Option/Match-based optional context validation without jurisdiction-specific
-  defaults
+- expected calculation/domain failures as typed failures, including canonical
+  `CalculationError`
+- schema-owned optional context fields without jurisdiction-specific defaults
 - MUST use schema-owned optional response fields instead of conditional
   object-spread construction
 - schema issue path formatting through reusable service/error policy
@@ -181,11 +186,15 @@ the service package. HTTP-specific status decoration belongs in
 
 Service implementation rules:
 
-- Normalize optional request fields and catalog lookup results to `Option` at
-  the service boundary, then branch with `Option.match`, `Match` or another
-  Effect-native equivalent. Do not use raw `undefined` conditionals for service
-  policy. Nullable input must be owned by `Schema.NullOr` or schema transforms
-  and normalized with `Option.fromNullable`, not raw `null` comparison.
+- Optional request and response fields MUST be represented by schema-owned
+  optional fields. Branch with `Option.match`, `Match` or another
+  Effect-native equivalent when service policy genuinely needs to inspect an
+  optional value. Do not use raw `undefined` conditionals for service policy.
+  Nullable input must be owned by `Schema.NullOr` or schema transforms and
+  normalized with `Option.fromNullable`, not raw `null` comparison.
+- Catalog lookup results should stay as `Option` until the callsite that needs
+  an `Effect` failure. Convert with `Effect.fromOption` and map missing-entry
+  failures inline so error context matches the request being served.
 - Do not invent defaults for missing jurisdiction, tax year or calculator
   context. Missing context should be absent or fail through a schema/tagged
   error unless a canonical schema explicitly owns a default.
@@ -209,6 +218,10 @@ Service implementation rules:
   `Effect.gen`, `Effect.flatMap`, `Effect.all`, `Effect.async`,
   `Effect.promise` or `Effect.tryPromise` at the correct boundary with inline
   tagged-error mapping.
+- Expected calculation failures MUST remain in the typed error channel. Do not
+  use `Effect.die` for schema decode failures, `CalculationError` or other
+  recoverable domain/API errors. Use `Effect.die` only for defects outside the
+  declared service contract.
 - Service contract files MUST define `Context.Service` contracts and canonical
   schemas only. Do not export `Live`, `Mock` or `Test` layers from `service.ts`;
   put production wiring in `live.layer.ts` and test wiring in `test.layer.ts` or

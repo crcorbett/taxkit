@@ -1,4 +1,5 @@
 import {
+  CalculationError,
   CalculationDiagnostics,
   FactAuthority,
   FactId,
@@ -10,27 +11,82 @@ import {
   RuleSourcePolicy,
   SourceRef,
 } from "@whattax/core";
-import { AnnualTaxReport } from "@whattax/rules-au-income-tax";
 import {
+  AnnualTaxReport,
+  AuAnnualTaxCalculatorId,
+  AuAnnualTaxJurisdiction,
+  AuAnnualTaxYear,
+} from "@whattax/rules-au-income-tax";
+import {
+  AuPayCalculatorId,
+  AuPayJurisdiction,
+  AuPayTaxYear,
   PayWithholdingsLedger,
   TakeHomePayReport,
 } from "@whattax/rules-au-pay";
 import { Data, Schema } from "effect";
 
-export const CalculatorId = Schema.Literals([
-  "au.pay.take-home",
-  "au.pay.withholdings",
-  "au.income-tax.annual",
+/**
+ * Public calculator ids supported by this package.
+ *
+ * The literals are owned by the rule packages. This package only composes them
+ * into the public calculator API surface so it cannot drift from rule-owned
+ * calculator metadata.
+ */
+export const CalculatorId = Schema.Union([
+  AuPayCalculatorId,
+  AuAnnualTaxCalculatorId,
 ]);
 
 export type CalculatorId = typeof CalculatorId.Type;
 
+/**
+ * Public jurisdictions supported by the composed calculator catalog.
+ *
+ * Jurisdiction literals remain canonical in the owning rule package; adding a
+ * new jurisdiction should extend the relevant rule package first.
+ */
+export const CalculatorJurisdiction = Schema.Union([
+  AuPayJurisdiction,
+  AuAnnualTaxJurisdiction,
+]);
+
+export type CalculatorJurisdiction = typeof CalculatorJurisdiction.Type;
+
+/**
+ * Public tax years supported by the composed calculator catalog.
+ */
+export const CalculatorTaxYear = Schema.Union([AuPayTaxYear, AuAnnualTaxYear]);
+
+export type CalculatorTaxYear = typeof CalculatorTaxYear.Type;
+
+const CalculatorContextFields = {
+  jurisdiction: CalculatorJurisdiction,
+  taxYear: CalculatorTaxYear,
+};
+
+const OptionalCalculatorContextFields = {
+  jurisdiction: Schema.optional(CalculatorJurisdiction),
+  taxYear: Schema.optional(CalculatorTaxYear),
+};
+
 export const CalculatorContext = Schema.Struct({
-  jurisdiction: Schema.Literal("AU"),
-  taxYear: Schema.Literal("2025-26"),
+  ...CalculatorContextFields,
 });
 
 export type CalculatorContext = typeof CalculatorContext.Type;
+
+/**
+ * Optional calculator context supplied by list/detail/calculate requests.
+ *
+ * Optionality belongs in this schema so service code can use typed request
+ * values without raw `undefined` checks or conditional response shaping.
+ */
+export const CalculatorContextQuery = Schema.Struct({
+  ...OptionalCalculatorContextFields,
+});
+
+export type CalculatorContextQuery = typeof CalculatorContextQuery.Type;
 
 export const HelpMode = Schema.Literals([
   "none",
@@ -43,32 +99,45 @@ export const HelpMode = Schema.Literals([
 
 export type HelpMode = typeof HelpMode.Type;
 
-export class SchemaDecodeIssue extends Schema.TaggedClass<SchemaDecodeIssue>()(
-  "SchemaDecodeIssue",
+/**
+ * Transport-safe representation of one schema decode issue.
+ */
+export class CalculatorInputIssue extends Schema.TaggedClass<CalculatorInputIssue>()(
+  "CalculatorInputIssue",
   {
     message: Schema.String,
     path: Schema.Array(Schema.String),
   }
 ) {}
 
-export const SchemaDecodeHelp = Schema.Struct({
+/**
+ * Field-level guidance returned when the caller asks for error help.
+ */
+export const CalculatorInputHelp = Schema.Struct({
   factId: FactId,
   question: Schema.optional(FactQuestion),
   title: Schema.String,
 });
 
-export type SchemaDecodeHelp = typeof SchemaDecodeHelp.Type;
+export type CalculatorInputHelp = typeof CalculatorInputHelp.Type;
 
-export class PublicSchemaDecodeError extends Schema.TaggedClass<PublicSchemaDecodeError>()(
-  "PublicSchemaDecodeError",
+/**
+ * Public error returned when request facts do not match the calculator's input
+ * fact schema.
+ */
+export class CalculatorInputDecodeError extends Schema.TaggedClass<CalculatorInputDecodeError>()(
+  "CalculatorInputDecodeError",
   {
     calculatorId: Schema.optional(CalculatorId),
-    help: Schema.optional(Schema.Array(SchemaDecodeHelp)),
-    issues: Schema.Array(SchemaDecodeIssue),
+    help: Schema.optional(Schema.Array(CalculatorInputHelp)),
+    issues: Schema.Array(CalculatorInputIssue),
     message: Schema.String,
   }
 ) {}
 
+/**
+ * Public error for a supported request shape that names no catalog entry.
+ */
 export class UnsupportedCalculatorError extends Schema.TaggedClass<UnsupportedCalculatorError>()(
   "UnsupportedCalculatorError",
   {
@@ -77,20 +146,21 @@ export class UnsupportedCalculatorError extends Schema.TaggedClass<UnsupportedCa
   }
 ) {}
 
+/**
+ * Public error for calculator/context combinations that are not in the catalog.
+ */
 export class UnsupportedCalculatorContextError extends Schema.TaggedClass<UnsupportedCalculatorContextError>()(
   "UnsupportedCalculatorContextError",
   {
-    context: Schema.Struct({
-      jurisdiction: Schema.optional(Schema.String),
-      taxYear: Schema.optional(Schema.String),
-    }),
+    context: CalculatorContextQuery,
     message: Schema.String,
     requestedCalculator: CalculatorId,
   }
 ) {}
 
 export const PublicApiError = Schema.Union([
-  PublicSchemaDecodeError,
+  CalculationError,
+  CalculatorInputDecodeError,
   UnsupportedCalculatorError,
   UnsupportedCalculatorContextError,
 ]);
@@ -99,6 +169,9 @@ export type PublicApiError = typeof PublicApiError.Type;
 
 export type PublicCalculatorError = PublicApiError;
 
+/**
+ * Catalog entry shape returned by discovery endpoints.
+ */
 export const CalculatorCatalogItem = Schema.Struct({
   calculatorId: CalculatorId,
   context: CalculatorContext,
@@ -120,7 +193,7 @@ export const CalculatorCatalogResponse = Schema.Struct({
 export type CalculatorCatalogResponse = typeof CalculatorCatalogResponse.Type;
 
 export const Jurisdiction = Schema.Struct({
-  code: Schema.Literal("AU"),
+  code: CalculatorJurisdiction,
   title: Schema.String,
 });
 
@@ -133,8 +206,7 @@ export const JurisdictionsResponse = Schema.Struct({
 export type JurisdictionsResponse = typeof JurisdictionsResponse.Type;
 
 export const TaxYear = Schema.Struct({
-  jurisdiction: Schema.Literal("AU"),
-  taxYear: Schema.Literal("2025-26"),
+  ...CalculatorContextFields,
 });
 
 export type TaxYear = typeof TaxYear.Type;
@@ -146,16 +218,14 @@ export const TaxYearsResponse = Schema.Struct({
 export type TaxYearsResponse = typeof TaxYearsResponse.Type;
 
 export const MetadataQuery = Schema.Struct({
-  jurisdiction: Schema.optional(Schema.Literal("AU")),
-  taxYear: Schema.optional(Schema.Literal("2025-26")),
+  ...OptionalCalculatorContextFields,
 });
 
 export type MetadataQuery = typeof MetadataQuery.Type;
 
 export const HelpQuery = Schema.Struct({
   help: Schema.optional(HelpMode),
-  jurisdiction: Schema.optional(Schema.Literal("AU")),
-  taxYear: Schema.optional(Schema.Literal("2025-26")),
+  ...OptionalCalculatorContextFields,
 });
 
 export type HelpQuery = typeof HelpQuery.Type;
@@ -169,28 +239,28 @@ export type CalculationQuery = typeof CalculationQuery.Type;
 export const GetCalculatorRequest = Schema.Struct({
   calculatorId: CalculatorId,
   help: Schema.optional(HelpMode),
-  jurisdiction: Schema.optional(Schema.Literal("AU")),
-  taxYear: Schema.optional(Schema.Literal("2025-26")),
+  ...OptionalCalculatorContextFields,
 });
 
 export type GetCalculatorRequest = typeof GetCalculatorRequest.Type;
 
 export const GetCalculatorGraphRequest = Schema.Struct({
   calculatorId: CalculatorId,
-  jurisdiction: Schema.optional(Schema.Literal("AU")),
-  taxYear: Schema.optional(Schema.Literal("2025-26")),
+  ...OptionalCalculatorContextFields,
 });
 
 export type GetCalculatorGraphRequest = typeof GetCalculatorGraphRequest.Type;
 
 export const DescriptorFilterQuery = Schema.Struct({
   calculator: Schema.optional(CalculatorId),
-  jurisdiction: Schema.optional(Schema.Literal("AU")),
-  taxYear: Schema.optional(Schema.Literal("2025-26")),
+  ...OptionalCalculatorContextFields,
 });
 
 export type DescriptorFilterQuery = typeof DescriptorFilterQuery.Type;
 
+/**
+ * Public metadata for one parameter descriptor.
+ */
 export const ParameterDescriptorMetadata = Schema.Struct({
   effectivePeriod: ParameterEffectivePeriod,
   id: ParameterId,
@@ -201,6 +271,9 @@ export const ParameterDescriptorMetadata = Schema.Struct({
 export type ParameterDescriptorMetadata =
   typeof ParameterDescriptorMetadata.Type;
 
+/**
+ * Public metadata for one input or output fact descriptor.
+ */
 export const FactDescriptorMetadata = Schema.Struct({
   authority: FactAuthority,
   id: FactId,
@@ -211,6 +284,9 @@ export const FactDescriptorMetadata = Schema.Struct({
 
 export type FactDescriptorMetadata = typeof FactDescriptorMetadata.Type;
 
+/**
+ * Public metadata for one rule descriptor and its dependency edges.
+ */
 export const RuleDescriptorMetadata = Schema.Struct({
   allowDuplicateProvides: Schema.optional(Schema.Boolean),
   id: RuleId,
@@ -266,12 +342,15 @@ export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
 
 export const PublicCalculationRequest = Schema.Struct({
   facts: Schema.Unknown,
-  jurisdiction: Schema.optional(Schema.Literal("AU")),
-  taxYear: Schema.optional(Schema.Literal("2025-26")),
+  ...OptionalCalculatorContextFields,
 });
 
 export type PublicCalculationRequest = typeof PublicCalculationRequest.Type;
 
+/**
+ * Service-level calculation request after route params, query params and JSON
+ * body have been decoded by the HTTP API package.
+ */
 export const PublicCalculationServiceRequest = Schema.Struct({
   calculatorId: CalculatorId,
   help: Schema.optional(HelpMode),
@@ -289,6 +368,10 @@ export const PublicCalculationReport = Schema.Union([
 
 export type PublicCalculationReport = typeof PublicCalculationReport.Type;
 
+/**
+ * Public calculation response with catalog metadata, diagnostics and the typed
+ * calculator-specific report.
+ */
 export const PublicCalculationResponse = Schema.Struct({
   calculator: CalculatorCatalogItem,
   diagnostics: CalculationDiagnostics,

@@ -3,6 +3,38 @@ import { BigDecimal, Schema } from "effect";
 import { Cents } from "./money.js";
 
 /**
+ * A stable calculator identifier such as `au.pay.take-home`.
+ *
+ * @since 0.1.0
+ */
+export const CalculatorId = Schema.String.pipe(
+  Schema.brand("whattax/CalculatorId")
+);
+
+/**
+ * A stable calculator identifier such as `au.pay.take-home`.
+ *
+ * @since 0.1.0
+ */
+export type CalculatorId = typeof CalculatorId.Type;
+
+/**
+ * A stable jurisdiction identifier such as `AU`.
+ *
+ * @since 0.1.0
+ */
+export const Jurisdiction = Schema.String.pipe(
+  Schema.brand("whattax/Jurisdiction")
+);
+
+/**
+ * A stable jurisdiction identifier such as `AU`.
+ *
+ * @since 0.1.0
+ */
+export type Jurisdiction = typeof Jurisdiction.Type;
+
+/**
  * A stable tax year identifier such as `2025-26`.
  *
  * @since 0.1.0
@@ -64,6 +96,22 @@ export const CentsOrInfinity = Schema.Union([
  * @since 0.1.0
  */
 export type CentsOrInfinity = typeof CentsOrInfinity.Type;
+
+/**
+ * Brands a string as a calculator identifier.
+ *
+ * @since 0.1.0
+ */
+export const calculatorId = (value: string): CalculatorId =>
+  CalculatorId.make(value);
+
+/**
+ * Brands a string as a jurisdiction identifier.
+ *
+ * @since 0.1.0
+ */
+export const jurisdiction = (value: string): Jurisdiction =>
+  Jurisdiction.make(value);
 
 /**
  * Brands a string as a tax year identifier.

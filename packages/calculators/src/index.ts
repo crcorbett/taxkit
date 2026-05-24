@@ -4,10 +4,7 @@ export {
   listCalculatorCatalogEntries,
   type CalculatorCatalogEntry,
 } from "./catalog.js";
-export {
-  toPublicSchemaDecodeError,
-  toUnsupportedCalculatorContextError,
-} from "./errors.js";
+export { toCalculatorInputDecodeError } from "./errors.js";
 export {
   CalculatorCatalogItems,
   CalculatorCatalogResponseValue,
@@ -30,9 +27,15 @@ export {
   CalculatorCatalogResponse,
   CalculatorCatalogResponseData,
   CalculatorContext,
+  CalculatorContextQuery,
   CalculatorGraphResponse,
   CalculatorId,
+  CalculatorInputDecodeError,
+  CalculatorInputHelp,
+  CalculatorInputIssue,
+  CalculatorJurisdiction,
   CalculatorSchemaResponse,
+  CalculatorTaxYear,
   CalculationQuery,
   DescriptorFilterQuery,
   FactDescriptorMetadata,
@@ -52,12 +55,9 @@ export {
   PublicCalculationResponse,
   PublicCalculationResponseData,
   PublicCalculationServiceRequest,
-  PublicSchemaDecodeError,
   RuleDescriptorMetadata,
   RuleGraphEdge,
   RulesResponse,
-  SchemaDecodeHelp,
-  SchemaDecodeIssue,
   TaxYear,
   TaxYearsResponse,
   UnsupportedCalculatorContextError,

@@ -52,8 +52,8 @@ single rule pack.
 
 `packages/rules/au/*`
 : Official Australian rule packs, parameter tables, algorithms, source
-references, graph metadata and golden tests. Current implemented packages are
-`pay`, `income-tax` and `stsl`.
+references, graph metadata, rule-owned calculator ids/context literals and
+golden tests. Current implemented packages are `pay`, `income-tax` and `stsl`.
 
 `packages/testing`
 : Shared test helpers for workspace packages. It must not become a back door
@@ -66,11 +66,11 @@ implemented API package is currently `packages/http-api`.
 
 `packages/calculators`
 : Implemented reusable calculator orchestration package. It owns calculator
-catalog schemas, calculator service methods, metadata projections, graph
-response construction, schema-guided error shaping and rule-pack/scenario
-composition used by HTTP, SDK, CLI and in-process callers. It depends on
-`packages/core` and rule packages, but it must not depend on HTTP handlers,
-SDK clients, CLI commands or app runtime modules.
+catalog composition schemas, calculator service methods, metadata projections,
+graph response construction, schema-guided error shaping and
+rule-pack/scenario composition used by HTTP, SDK, CLI and in-process callers.
+It depends on `packages/core` and rule packages, but it must not depend on HTTP
+handlers, SDK clients, CLI commands or app runtime modules.
 
 `packages/sdk/typescript`
 : Planned browser-safe client, schemas, request builders, server helpers,

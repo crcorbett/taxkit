@@ -9,6 +9,12 @@ confidence: high
 
 A calculator is an Effect program that requires facts and returns a report. It does not import global rule registries and it does not mutate shared state.
 
+Calculator ids and context values are canonical boundary values. Shared scalar
+brands such as `CalculatorId`, `Jurisdiction` and `TaxYear` live in
+`packages/core`; rule packages narrow those brands to the literal ids,
+jurisdictions and tax years they support. Reusable orchestration code must
+compose those rule-owned schemas instead of redeclaring local string fields.
+
 ## Calculator Pattern
 
 ```ts
@@ -68,6 +74,11 @@ User input
 ```
 
 Scenario construction must fail if required boundary values are invalid. It should not silently coerce ambiguous tax-significant values.
+
+Expected failures stay in the typed Effect error channel. Schema decode errors
+should be mapped to schema-backed public errors at the service boundary, and
+domain failures such as `CalculationError` should propagate as failures. Do not
+use `Effect.die` for recoverable calculator, schema or domain errors.
 
 ## Calculation Runs
 

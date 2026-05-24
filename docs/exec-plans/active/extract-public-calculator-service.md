@@ -160,7 +160,7 @@ must become thin transport adapters over `@whattax/calculators` service methods.
     `200 OK`, `calculatorId = au.pay.take-home`, `netPay.cents = 119600`,
     `withholdingsTotal.cents = 30400` and `graphIssueCount = 0`.
   - Missing `grossPay.period` with `help=errors` returned `400 Bad Request`
-    with `_tag = PublicSchemaDecodeError`, issue path
+    with `_tag = CalculatorInputDecodeError`, issue path
     `["grossPay", "period"]` and two descriptor-backed help entries.
 - Docs and release audit:
   - Root docs and package READMEs now describe `@whattax/calculators` as the

@@ -11,3 +11,13 @@ export {
   TakeHomeScenarioLive,
   type TakeHomeScenarioInput,
 } from "./take-home-pay.js";
+export {
+  AuPayCalculatorId,
+  AuPayContext,
+  AuPayJurisdiction,
+  AuPayTaxYear,
+  type AuPayCalculatorId as AuPayCalculatorIdType,
+  type AuPayContext as AuPayContextType,
+  type AuPayJurisdiction as AuPayJurisdictionType,
+  type AuPayTaxYear as AuPayTaxYearType,
+} from "./metadata.js";

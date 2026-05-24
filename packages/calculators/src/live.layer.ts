@@ -4,10 +4,7 @@ import { pipe } from "effect/Function";
 
 import type { CalculatorCatalogEntry } from "./catalog.js";
 import { getCalculatorCatalogEntry } from "./catalog.js";
-import {
-  toPublicSchemaDecodeError,
-  toUnsupportedCalculatorContextError,
-} from "./errors.js";
+import { toCalculatorInputDecodeError } from "./errors.js";
 import {
   JurisdictionsResponseValue,
   TaxYearsResponseValue,
@@ -21,115 +18,26 @@ import {
 import {
   CalculatorCatalogResponseData,
   PublicCalculationResponseData,
+  UnsupportedCalculatorContextError,
 } from "./schemas.js";
-import type {
-  GetCalculatorGraphRequest,
-  GetCalculatorRequest,
-  PublicCalculationServiceRequest,
-  PublicCalculatorError,
-} from "./schemas.js";
+import type { PublicCalculationServiceRequest } from "./schemas.js";
 import { PublicCalculatorService } from "./service.js";
 
-interface RequestedContext {
-  readonly calculatorId: GetCalculatorRequest["calculatorId"];
-  readonly jurisdiction: Option.Option<GetCalculatorRequest["jurisdiction"]>;
-  readonly taxYear: Option.Option<GetCalculatorRequest["taxYear"]>;
-}
-
-const requestedContext = (
-  request: GetCalculatorGraphRequest | GetCalculatorRequest
-): RequestedContext => ({
-  calculatorId: request.calculatorId,
-  jurisdiction: Option.fromNullishOr(request.jurisdiction),
-  taxYear: Option.fromNullishOr(request.taxYear),
-});
-
-const requestedCalculationContext = (
-  request: PublicCalculationServiceRequest
-): RequestedContext => ({
-  calculatorId: request.calculatorId,
-  jurisdiction: Option.fromNullishOr(request.payload.jurisdiction),
-  taxYear: Option.fromNullishOr(request.payload.taxYear),
-});
-
-const validateRequestedJurisdiction = (
-  entry: CalculatorCatalogEntry,
-  request: RequestedContext
-): Effect.Effect<void, PublicCalculatorError> =>
-  request.jurisdiction.pipe(
-    Option.match({
-      onNone: () => Effect.void,
-      onSome: (jurisdiction) =>
-        jurisdiction === entry.context.jurisdiction
-          ? Effect.void
-          : Effect.fail(
-              toUnsupportedCalculatorContextError({
-                calculatorId: request.calculatorId,
-                jurisdiction: request.jurisdiction,
-                taxYear: request.taxYear,
-              })
-            ),
-    })
-  );
-
-const validateRequestedTaxYear = (
-  entry: CalculatorCatalogEntry,
-  request: RequestedContext
-): Effect.Effect<void, PublicCalculatorError> =>
-  request.taxYear.pipe(
-    Option.match({
-      onNone: () => Effect.void,
-      onSome: (taxYear) =>
-        taxYear === entry.context.taxYear
-          ? Effect.void
-          : Effect.fail(
-              toUnsupportedCalculatorContextError({
-                calculatorId: request.calculatorId,
-                jurisdiction: request.jurisdiction,
-                taxYear: request.taxYear,
-              })
-            ),
-    })
-  );
-
-const getCalculatorEntry = (
-  request: GetCalculatorGraphRequest | GetCalculatorRequest
-): Effect.Effect<CalculatorCatalogEntry, PublicCalculatorError> => {
-  const context = requestedContext(request);
-
-  return Effect.fromOption(
-    getCalculatorCatalogEntry(context.calculatorId)
-  ).pipe(
-    Effect.mapError(() => toUnsupportedCalculatorContextError(context)),
-    Effect.flatMap((entry) =>
-      Effect.gen(function* () {
-        yield* validateRequestedJurisdiction(entry, context);
-        yield* validateRequestedTaxYear(entry, context);
-
-        return entry;
-      })
-    )
-  );
-};
-
-const getCalculationEntry = (
-  context: RequestedContext
-): Effect.Effect<CalculatorCatalogEntry, PublicCalculatorError> =>
-  Effect.fromOption(getCalculatorCatalogEntry(context.calculatorId)).pipe(
-    Effect.mapError(() => toUnsupportedCalculatorContextError(context))
-  );
-
+/**
+ * Runs a public calculation for a resolved catalog entry.
+ *
+ * The catalog entry owns the rule descriptors, input fact schema and report
+ * schema. This keeps calculation policy in the service layer so HTTP handlers
+ * can stay thin transport adapters.
+ */
 const calculateWithEntry = (
   entry: CalculatorCatalogEntry,
   request: PublicCalculationServiceRequest,
   engine: CalculationEngine["Service"]
 ) =>
   Effect.gen(function* () {
-    const context = requestedCalculationContext(request);
-
-    yield* validateRequestedJurisdiction(entry, context);
-    yield* validateRequestedTaxYear(entry, context);
-
+    // Graph validation is deterministic metadata, so expose it beside the
+    // calculation result instead of hiding it behind request transport logic.
     const validationIssues = validateRuleGraph({
       inputFacts: entry.inputFacts,
       rules: entry.ruleDescriptors,
@@ -144,22 +52,25 @@ const calculateWithEntry = (
       report: result.report,
     });
   }).pipe(
-    Effect.matchEffect({
-      onFailure: (error) =>
-        Schema.isSchemaError(error)
-          ? Effect.fail(
-              toPublicSchemaDecodeError({
-                calculatorId: request.calculatorId,
-                entry,
-                help: Option.fromNullishOr(request.help),
-                issue: error.issue,
-              })
-            )
-          : Effect.die(error),
-      onSuccess: Effect.succeed,
-    })
+    Effect.catchIf(Schema.isSchemaError, (error) =>
+      Effect.fail(
+        toCalculatorInputDecodeError({
+          calculatorId: request.calculatorId,
+          entry,
+          help: Option.fromNullishOr(request.help),
+          issue: error.issue,
+        })
+      )
+    )
   );
 
+/**
+ * Live public calculator service backed by the static calculator catalog.
+ *
+ * Invalid literal values are rejected by the request schemas before this layer
+ * runs. Missing calculator ids are mapped inline in each method so the error
+ * includes the request shape that the caller provided.
+ */
 export const PublicCalculatorServiceLive = Layer.effect(
   PublicCalculatorService
 )(
@@ -168,19 +79,32 @@ export const PublicCalculatorServiceLive = Layer.effect(
 
     return PublicCalculatorService.of({
       calculate: (request) =>
-        Effect.suspend(() => {
-          const context = requestedCalculationContext(request);
-
-          return getCalculationEntry(context).pipe(
-            Effect.flatMap((entry) =>
-              calculateWithEntry(entry, request, engine)
-            )
-          );
-        }),
+        Effect.fromOption(getCalculatorCatalogEntry(request.calculatorId)).pipe(
+          Effect.mapError(
+            () =>
+              new UnsupportedCalculatorContextError({
+                context: request.payload,
+                message: `${request.calculatorId} is not available for the requested context`,
+                requestedCalculator: request.calculatorId,
+              })
+          ),
+          Effect.flatMap((entry) => calculateWithEntry(entry, request, engine))
+        ),
       getCalculator: (request) =>
-        getCalculatorEntry(request).pipe(Effect.map(toCalculatorCatalogItem)),
+        Effect.fromOption(getCalculatorCatalogEntry(request.calculatorId)).pipe(
+          Effect.map(toCalculatorCatalogItem),
+          Effect.catchTag("NoSuchElementError", () =>
+            Effect.fail(
+              new UnsupportedCalculatorContextError({
+                context: request,
+                message: `${request.calculatorId} is not available for the requested context`,
+                requestedCalculator: request.calculatorId,
+              })
+            )
+          )
+        ),
       getCalculatorGraph: (request) =>
-        getCalculatorEntry(request).pipe(
+        Effect.fromOption(getCalculatorCatalogEntry(request.calculatorId)).pipe(
           Effect.map((entry) =>
             toCalculatorGraphResponse({
               entry,
@@ -189,11 +113,29 @@ export const PublicCalculatorServiceLive = Layer.effect(
                 rules: entry.ruleDescriptors,
               }),
             })
+          ),
+          Effect.catchTag("NoSuchElementError", () =>
+            Effect.fail(
+              new UnsupportedCalculatorContextError({
+                context: request,
+                message: `${request.calculatorId} is not available for the requested context`,
+                requestedCalculator: request.calculatorId,
+              })
+            )
           )
         ),
       getCalculatorSchema: (request) =>
-        getCalculatorEntry(request).pipe(
-          Effect.map(toCalculatorSchemaResponse)
+        Effect.fromOption(getCalculatorCatalogEntry(request.calculatorId)).pipe(
+          Effect.map(toCalculatorSchemaResponse),
+          Effect.catchTag("NoSuchElementError", () =>
+            Effect.fail(
+              new UnsupportedCalculatorContextError({
+                context: request,
+                message: `${request.calculatorId} is not available for the requested context`,
+                requestedCalculator: request.calculatorId,
+              })
+            )
+          )
         ),
       listCalculators: (query) =>
         Effect.succeed(

@@ -93,8 +93,9 @@ export it from the same module as a schema-derived type. Do not hand-write DTO
 interfaces or duplicate response shapes in handlers, clients or apps.
 
 Route-only HTTP envelopes, query schemas and status annotations stay in
-`@whattax/http-api`. Reusable calculator IDs, context, help modes, response
-payloads and service errors live in `@whattax/calculators`.
+`@whattax/http-api`. Rule-owned calculator IDs and supported context literals
+are composed by `@whattax/calculators`; reusable help modes, response payloads
+and calculator service errors live in `@whattax/calculators`.
 
 ## Current Calculator Package
 
@@ -112,12 +113,14 @@ Package name:
 
 It owns:
 
-- reusable calculator catalog schemas and service methods
+- reusable calculator catalog schemas and service methods that compose
+  rule-owned calculator id and context schemas
 - catalog entries that compose canonical fact descriptors, rule descriptors,
   report schemas, scenario layers and rule-pack layers
 - metadata transformations for calculator, fact, rule and graph responses
 - schema-guided expected error shaping with descriptor-backed help
 - calculation execution through `CalculationEngine`
+- typed propagation of expected domain failures such as `CalculationError`
 
 HTTP, SDK, CLI and in-process callers should consume this service instead of
 implementing calculator business logic locally.
@@ -186,6 +189,10 @@ should return structured issue details, missing/invalid field paths and
 descriptor-backed help so clients can guide users toward the facts required by
 the selected calculator. Outputs should include reports, traces, ledgers and
 diagnostics where relevant.
+
+Calculation/domain failures that are part of the engine contract should remain
+typed failures and be encoded through the public error envelope. They should
+not be converted into Effect defects.
 
 Metadata and calculation routes may accept a `help` query parameter for richer
 client guidance. Help output should be generated from canonical schemas, fact

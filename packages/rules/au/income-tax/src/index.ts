@@ -11,6 +11,16 @@ export {
   type AnnualTaxScenarioInput,
 } from "./calculator/annual-tax.js";
 export {
+  AuAnnualTaxCalculatorId,
+  AuAnnualTaxContext,
+  AuAnnualTaxJurisdiction,
+  AuAnnualTaxYear,
+  type AuAnnualTaxCalculatorId as AuAnnualTaxCalculatorIdType,
+  type AuAnnualTaxContext as AuAnnualTaxContextType,
+  type AuAnnualTaxJurisdiction as AuAnnualTaxJurisdictionType,
+  type AuAnnualTaxYear as AuAnnualTaxYearType,
+} from "./calculator/metadata.js";
+export {
   IncomeTaxComponentDescriptor,
   IncomeTaxComponentFact,
   LitoComponentDescriptor,

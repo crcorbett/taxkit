@@ -4,6 +4,7 @@ import type {
   FactId,
   RuleId,
 } from "@whattax/core";
+import { AuPayJurisdiction, AuPayTaxYear } from "@whattax/rules-au-pay";
 import { Array, Data, HashMap, Option } from "effect";
 import type { Schema } from "effect";
 
@@ -82,7 +83,7 @@ export const CalculatorCatalogResponseValue = new CalculatorCatalogResponseData(
 export const JurisdictionsResponseValue = new JurisdictionsResponseData({
   jurisdictions: [
     new JurisdictionData({
-      code: "AU",
+      code: AuPayJurisdiction.make("AU"),
       title: "Australia",
     }),
   ],
@@ -91,8 +92,8 @@ export const JurisdictionsResponseValue = new JurisdictionsResponseData({
 export const TaxYearsResponseValue = new TaxYearsResponseData({
   taxYears: [
     new TaxYearData({
-      jurisdiction: "AU",
-      taxYear: "2025-26",
+      jurisdiction: AuPayJurisdiction.make("AU"),
+      taxYear: AuPayTaxYear.make("2025-26"),
     }),
   ],
 });

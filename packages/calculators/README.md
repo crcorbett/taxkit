@@ -24,7 +24,7 @@ expected error shaping. HTTP handlers own transport wiring only.
 
 This package owns:
 
-- calculator catalog schemas and entries
+- calculator catalog composition schemas and entries
 - metadata projections for calculator, fact, rule and graph discovery
 - calculator service tags and layers
 - schema-guided expected error shaping for calculation inputs
@@ -42,10 +42,14 @@ This package must not own:
 
 - Reuse canonical schemas, descriptors, service tags, tagged errors and
   constructors from owning packages.
+- Compose rule-owned calculator ids, jurisdictions and tax years. Do not
+  redeclare supported calculator context literals in this package.
 - Use Effect-native primitives where they fit: `Schema`, `Option`, `Match`,
   `Array`, `Chunk`, `HashMap`, `HashSet`, `Context`, `Layer`, `Result` and
   `Exit`.
 - Keep schema and tagged value shapes in owning schema modules.
+- Keep expected domain failures in the typed error channel. Use `Effect.die`
+  only for defects outside the service contract.
 - Use schema-owned optional fields instead of conditional response-shaping
   object spreads.
 - Keep runtime execution outside this package. Calculator code returns Effect

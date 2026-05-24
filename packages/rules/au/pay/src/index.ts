@@ -12,6 +12,16 @@ export {
   type TakeHomeScenarioInput,
 } from "./calculator/take-home-pay.js";
 export {
+  AuPayCalculatorId,
+  AuPayContext,
+  AuPayJurisdiction,
+  AuPayTaxYear,
+  type AuPayCalculatorId as AuPayCalculatorIdType,
+  type AuPayContext as AuPayContextType,
+  type AuPayJurisdiction as AuPayJurisdictionType,
+  type AuPayTaxYear as AuPayTaxYearType,
+} from "./calculator/metadata.js";
+export {
   GrossPay,
   GrossPayDescriptor,
   GrossPayFact,

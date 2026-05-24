@@ -124,6 +124,11 @@ reduces complex duplication.
 - Use `Layer` composition for rule packs and scenario inputs.
 - Keep parameter data separate from algorithms.
 - Use tagged errors for expected domain failures.
+- Expected domain and API failures MUST remain in the typed Effect error
+  channel. Do not use `Effect.die` for schema decode failures,
+  `CalculationError`, unsupported calculator/context errors, config decode
+  failures or other recoverable service-contract errors. Reserve defects for
+  impossible states outside the declared contract.
 - Manual `_tag` object literals are not allowed. Tagged values MUST be
   constructed with `Data.TaggedClass`, `Data.TaggedError`,
   `Schema.TaggedClass`, or an owning package constructor built from those
