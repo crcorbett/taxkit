@@ -27,7 +27,7 @@ passes its required gates and Changeset decision.
 | SDK-002 | complete | Strict typed descriptors and Effect facade over calculators implemented and verified. |
 | SDK-003 | complete | Plain Promise facade, Data-owned safe results and AU module subpath implemented and verified. |
 | SDK-004 | complete | HTTP API calculate handler consumes the SDK Effect facade and preserves HTTP envelopes. |
-| SDK-005 | pending | Downstream consumer validation. |
+| SDK-005 | complete | Downstream workspace validates SDK consumption through the normal vendored package boundary. |
 | SDK-006 | pending | Publication release-prep slice. |
 
 ## Validation Log
@@ -163,9 +163,26 @@ passes its required gates and Changeset decision.
   - `bun run changeset status --verbose` passed and includes
     `.changeset/sdk-http-api-consumer.md`.
 
+### 2026-05-24 - SDK-005 downstream consumer validation
+
+- Advanced the downstream workspace's vendored WhatTax boundary to the accepted
+  SDK-004 commit and included the current SDK workspace path in downstream
+  package resolution.
+- Added a real downstream browser-app flow that imports `@whattax/sdk/au` and
+  calls the plain AU annual-income-tax helper while preserving the existing
+  HTTP API health flow.
+- Added a downstream type-only misuse assertion proving annual income tax
+  rejects a raw numeric taxable income and requires canonical Money input.
+- No WhatTax package-facing code changed in this slice, so no new Changeset was
+  required. Existing pending SDK Changesets still cover SDK-001 through
+  SDK-004 package changes.
+- Verification:
+  - Downstream `pnpm check-types` passed.
+  - Downstream `pnpm --filter web build` passed.
+  - `bun run verification` passed in WhatTax.
+  - `bun run changeset status --verbose` passed in WhatTax.
+
 ## Open Risks
 
 - Package name availability must be checked live only during release prep.
-- Downstream validation must be recorded without naming private downstream
-  products in public WhatTax docs.
-- Downstream validation and publication release prep remain in later SDK tasks.
+- Publication release prep remains in SDK-006.
