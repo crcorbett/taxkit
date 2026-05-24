@@ -73,8 +73,11 @@ config schema.
 
 `@whattax/http-api` owns transport contracts, HTTP status annotations, OpenAPI
 generation, typed HTTP clients, server route layers and thin handler adapters.
-Reusable calculator catalog entries, metadata transformations, graph assembly,
-calculation dispatch and schema-error shaping live in `@whattax/calculators`.
+Reusable calculator catalog entries, metadata transformations, graph assembly
+and schema-error shaping live in `@whattax/calculators`. Calculation endpoint
+execution should consume a request-preserving SDK facade as a normal in-process
+consumer so the HTTP package proves the public SDK boundary without making the
+SDK depend on HTTP transport code.
 
 `@whattax/http-api/config` exports the package-owned HTTP API client config
 schema, type and keyed config fragment. Apps compose that fragment into their
@@ -264,7 +267,12 @@ Recommended SDK exports:
 }
 ```
 
-`.` should expose the plain, jurisdiction-neutral `WhatTax` facade. `./effect` should expose the Effect-native `WhatTax` facade used by HTTP handlers. Jurisdiction subpaths such as `./au` and `./au/effect` should expose local Layer-backed modules, calculation descriptors and thin convenience clients without making the root bundle import those rules. `./client` and `./schemas` must be browser-safe. `./server` may include Node/server-only helpers.
+`.` should expose the plain, jurisdiction-neutral `WhatTax` facade. `./effect`
+should expose the Effect-native `WhatTax` facade used by HTTP handlers.
+Jurisdiction subpaths such as `./au` and `./au/effect` should expose local
+Layer-backed modules, calculation descriptors and thin convenience clients
+without making the root bundle import those rules. `./client` and `./schemas`
+must be browser-safe. `./server` may include Node/server-only helpers.
 
 ## Fumadocs Site
 

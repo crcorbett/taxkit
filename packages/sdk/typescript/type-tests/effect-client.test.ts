@@ -1,7 +1,15 @@
 import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
+import {
+  AuPayJurisdiction,
+  AuPayTaxYear,
+  GrossPay,
+} from "@whattax/rules-au-pay";
 
-import { createEffectClient, defineSdkCalculation } from "../src/effect.js";
+import {
+  calculateRequest,
+  createEffectClient,
+  defineSdkCalculation,
+} from "../src/effect.js";
 import {
   AuAnnualIncomeTaxCalculation,
   AuIncomeTax2025_26Module,
@@ -26,6 +34,20 @@ payClient.calculations.calculate(AuPayTakeHomeCalculation, {
 fullClient.calculations.calculate(AuAnnualIncomeTaxCalculation, {
   taxableIncome: aud(9_000_000),
 });
+calculateRequest(AuPayTakeHomeCalculation, {
+  help: "errors",
+  payload: {
+    facts: {
+      grossPay: new GrossPay({
+        amount: aud(165_400),
+        period: "weekly",
+      }),
+      taxFreeThresholdClaimed: true,
+    },
+    jurisdiction: AuPayJurisdiction.make("AU"),
+    taxYear: AuPayTaxYear.make("2025-26"),
+  },
+});
 
 // @ts-expect-error annual income tax is not provided by the pay-only module.
 payClient.calculations.calculate(AuAnnualIncomeTaxCalculation, {
@@ -44,6 +66,14 @@ fullClient.calculations.calculate(AuAnnualIncomeTaxCalculation, {
 payClient.calculations.calculate(AuPayTakeHomeCalculation, {
   // @ts-expect-error annual-tax facts cannot be submitted to take-home pay.
   taxableIncome: aud(9_000_000),
+});
+calculateRequest(AuPayTakeHomeCalculation, {
+  payload: {
+    facts: {
+      // @ts-expect-error request-preserving Effect facade still binds facts to the selected descriptor.
+      taxableIncome: aud(9_000_000),
+    },
+  },
 });
 
 defineSdkCalculation({

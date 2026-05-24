@@ -26,7 +26,7 @@ passes its required gates and Changeset decision.
 | SDK-001 | complete | Scaffolded `@whattax/sdk` package, export map and import-boundary check. |
 | SDK-002 | complete | Strict typed descriptors and Effect facade over calculators implemented and verified. |
 | SDK-003 | complete | Plain Promise facade, Data-owned safe results and AU module subpath implemented and verified. |
-| SDK-004 | pending | HTTP API consumes SDK facade. |
+| SDK-004 | complete | HTTP API calculate handler consumes the SDK Effect facade and preserves HTTP envelopes. |
 | SDK-005 | pending | Downstream consumer validation. |
 | SDK-006 | pending | Publication release-prep slice. |
 
@@ -134,12 +134,38 @@ passes its required gates and Changeset decision.
     `.changeset/sdk-effect-descriptors.md` and
     `.changeset/sdk-typescript-scaffold.md`.
 
+### 2026-05-24 - SDK-004 HTTP API SDK consumer integration
+
+- Added `@whattax/sdk` as a dependency of `@whattax/http-api`; the SDK package
+  still has no dependency on `@whattax/http-api`.
+- Updated the public calculate handler so HTTP remains the owner of route
+  schemas, status annotations and error envelopes while calculation execution
+  goes through request-preserving `@whattax/sdk/effect` descriptors.
+- Preserved the existing HTTP calculation response shape by assembling
+  calculator metadata and graph diagnostics from `PublicCalculatorService`
+  around the SDK-produced typed report.
+- Extended HTTP API tests to compare HTTP success reports and guided input
+  errors against the same request context through the SDK Effect facade.
+- Extended SDK type tests to prove the request-preserving Effect facade still
+  binds facts to the selected descriptor.
+- Extended the SDK import-boundary check so it proves SDK-to-HTTP isolation and
+  the intended HTTP-API-to-SDK dependency direction.
+- Added Changeset `.changeset/sdk-http-api-consumer.md` for
+  `@whattax/http-api` and `@whattax/sdk` patch impact.
+- Verification:
+  - `bun run --filter=@whattax/sdk test` passed.
+  - `bun run --filter=@whattax/http-api test` passed.
+  - `bun run --filter=@whattax/sdk check-types` passed.
+  - `bun run --filter=@whattax/http-api check-types` passed.
+  - `bun run --filter=@whattax/sdk build` passed.
+  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run verification` passed.
+  - `bun run changeset status --verbose` passed and includes
+    `.changeset/sdk-http-api-consumer.md`.
+
 ## Open Risks
 
 - Package name availability must be checked live only during release prep.
-- `@whattax/http-api` must consume the SDK; the SDK must not depend on
-  `@whattax/http-api`.
 - Downstream validation must be recorded without naming private downstream
   products in public WhatTax docs.
-- HTTP API integration, downstream validation and publication release prep
-  remain in later SDK tasks.
+- Downstream validation and publication release prep remain in later SDK tasks.

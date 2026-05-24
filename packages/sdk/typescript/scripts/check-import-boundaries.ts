@@ -8,6 +8,7 @@ interface PackageManifest {
 const sdkRoot = new URL("..", import.meta.url);
 const sourceRoot = new URL("src", sdkRoot);
 const packageJsonUrl = new URL("package.json", sdkRoot);
+const httpApiPackageJsonUrl = new URL("../../http-api/package.json", sdkRoot);
 const rootEntrypoint = new URL("src/index.ts", sdkRoot);
 const browserEntrypoints = [
   rootEntrypoint,
@@ -16,11 +17,20 @@ const browserEntrypoints = [
 ] satisfies URL[];
 
 const packageManifest: PackageManifest = await Bun.file(packageJsonUrl).json();
+const httpApiPackageManifest: PackageManifest = await Bun.file(
+  httpApiPackageJsonUrl
+).json();
 const dependencySections = [
   packageManifest.dependencies,
   packageManifest.devDependencies,
   packageManifest.optionalDependencies,
   packageManifest.peerDependencies,
+] satisfies readonly (Readonly<Record<string, string>> | undefined)[];
+const httpApiDependencySections = [
+  httpApiPackageManifest.dependencies,
+  httpApiPackageManifest.devDependencies,
+  httpApiPackageManifest.optionalDependencies,
+  httpApiPackageManifest.peerDependencies,
 ] satisfies readonly (Readonly<Record<string, string>> | undefined)[];
 
 const failures: string[] = [];
@@ -31,6 +41,16 @@ if (
   )
 ) {
   failures.push("SDK package metadata must not depend on @whattax/http-api.");
+}
+
+if (
+  !httpApiDependencySections.some(
+    (dependencies) => dependencies?.["@whattax/sdk"] !== undefined
+  )
+) {
+  failures.push(
+    "HTTP API package metadata must depend on @whattax/sdk for the transport integration direction."
+  );
 }
 
 const httpApiImports =

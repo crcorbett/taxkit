@@ -61,6 +61,7 @@
   "dependencies": {
     "@whattax/calculators": "workspace:*",
     "@whattax/core": "workspace:*",
+    "@whattax/sdk": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
