@@ -54,6 +54,13 @@ Jurisdiction and tax year are calculator context, not top-level route families.
 The initial calculator IDs are `au.pay.take-home`, `au.pay.withholdings` and
 `au.income-tax.annual`.
 
+Calculate payloads use canonical schema values from the rule packages. The
+generated OpenAPI request body shows supported fact shapes under `facts.anyOf`;
+for example, take-home-pay JSON includes tagged `GrossPay` and `Money` values.
+The calculator service validates facts again against the selected calculator,
+so annual-tax facts sent to `au.pay.take-home` return pay-calculator input help
+instead of being treated as a valid take-home request.
+
 ## Changelog
 
 Public API contract and deployment-facing changes are tracked in

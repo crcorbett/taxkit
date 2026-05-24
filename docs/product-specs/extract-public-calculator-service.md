@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implemented
 last_reviewed: 2026-05-24
 source_of_truth: docs
 confidence: medium
@@ -78,7 +78,7 @@ brands such as calculator id, jurisdiction and tax year belong in
 `packages/core`; rule packages narrow those brands to the concrete values they
 support.
 
-`@whattax/calculators` should own:
+`@whattax/calculators` owns:
 
 - composed public calculator schemas that reuse rule-owned calculator ids,
   jurisdictions, tax years, facts, reports and descriptors
@@ -123,7 +123,7 @@ packages/core
 
 ### Package Shape
 
-Create:
+Implemented shape:
 
 ```txt
 packages/calculators/
@@ -138,12 +138,11 @@ packages/calculators/
     metadata.ts
     errors.ts
     service.ts
-    live.ts
+    live.layer.ts
 ```
 
-The exact file split can change if implementation proves a smaller local
-structure is clearer, but reusable schemas must live in `schemas.ts` or an
-owning public schema module, not inline with handler logic.
+Reusable schemas must stay in an owning public schema module, not inline with
+handler logic.
 
 ### Service Shape
 
@@ -196,9 +195,9 @@ POST /api/v1/calculators/:calculatorId/calculate
 ```
 
 The route payload MUST NOT use `facts: Schema.Unknown` as the public contract.
-`@whattax/calculators` should export a composed `PublicCalculationFacts`
-schema that is a union of the canonical calculator input schemas from the
-owning rule packages:
+`@whattax/calculators` exports a composed `PublicCalculationFacts` schema that
+is a union of the canonical calculator input schemas from the owning rule
+packages:
 
 ```ts
 export const PublicCalculationFacts = Schema.Union([
@@ -207,7 +206,7 @@ export const PublicCalculationFacts = Schema.Union([
 ]);
 ```
 
-`PublicCalculationRequest` should then use that union:
+`PublicCalculationRequest` uses that union:
 
 ```ts
 export const PublicCalculationRequest = Schema.Struct({
@@ -224,18 +223,24 @@ does not currently provide dependent request-body schemas selected by a path
 parameter.
 
 The calculator service MUST still validate facts against the selected
-calculator catalog entry. Each `CalculatorCatalogEntry` should reference the
+calculator catalog entry. Each `CalculatorCatalogEntry` references the
 canonical input schema it accepts, for example:
 
 ```ts
 readonly inputSchema: Schema.Schema<Input>;
 ```
 
-`calculate` should look up the entry by `calculatorId`, decode
+`calculate` looks up the entry by `calculatorId`, decodes
 `request.payload.facts` with `entry.inputSchema`, and map decode failures to
 `CalculatorInputDecodeError` with descriptor-backed help. This catches cases
 where the route-level union accepts a valid fact shape for another calculator
 but that shape is incompatible with the selected calculator.
+
+Public JSON callers must send canonical schema values, including tagged values
+where the owning schema requires them. For example, take-home pay facts include
+`grossPay._tag = "GrossPay"` and `grossPay.amount._tag = "Money"`. The OpenAPI
+request body for `POST /api/v1/calculators/{calculatorId}/calculate` exposes
+these canonical shapes through `facts.anyOf`.
 
 Service implementation rules:
 
@@ -394,6 +399,9 @@ Update:
   `CalculatorInputDecodeError` with descriptor-backed help.
 - OpenAPI for `POST /api/v1/calculators/:calculatorId/calculate` exposes the
   union of supported public calculator fact shapes.
+- Effect Vitest coverage covers public calculator service journeys, in-process
+  HTTP calculation and incompatible fact payloads that match a different
+  calculator's canonical input schema.
 - `bun run verification` passes.
 - `bun changeset status --verbose` previews the expected release-train impact.
 

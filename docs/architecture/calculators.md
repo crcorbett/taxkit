@@ -80,6 +80,14 @@ should be mapped to schema-backed public errors at the service boundary, and
 domain failures such as `CalculationError` should propagate as failures. Do not
 use `Effect.die` for recoverable calculator, schema or domain errors.
 
+Public calculator orchestration must keep request facts tied to canonical
+scenario schemas. `@whattax/calculators` composes the generic public calculate
+contract as a union of rule-owned scenario input schemas so API docs and
+clients can see concrete fact shapes, then decodes again with the selected
+catalog entry's `inputSchema` before running the calculator. Do not replace
+this with `Schema.Unknown`, mirrored fact DTOs or a loose record of arbitrary
+values.
+
 ## Calculation Runs
 
 A calculation run is a deterministic composition of explicit inputs, rule packs and parameter layers.

@@ -1,5 +1,5 @@
 ---
-status: active
+status: complete
 last_reviewed: 2026-05-24
 source_of_truth: docs
 confidence: medium
@@ -35,6 +35,7 @@ must become thin transport adapters over `@whattax/calculators` service methods.
 | CALC-SVC-002 | complete | Moved reusable schemas, catalog and metadata projections into `@whattax/calculators`. Parent verification passed. |
 | CALC-SVC-003 | complete | Moved calculation execution and expected error shaping into `PublicCalculatorService`. Parent verification and API smoke passed. |
 | CALC-SVC-004 | complete | Final docs, changelog and smoke evidence. |
+| CALC-SVC-005 | complete | Tightened public calculate facts to canonical rule-owned schema unions with selected-calculator input decoding. Parent verification, tests and portless API smoke passed. Commit `984ced5`. |
 
 ## Validation Log
 
@@ -173,3 +174,39 @@ must become thin transport adapters over `@whattax/calculators` service methods.
     release-train impact without running `bun run version-repo`.
   - Stale-doc audits found no nested API calculator package references and no
     claims that calculator business logic belongs in HTTP handlers.
+
+### CALC-SVC-005
+
+- Commit: `984ced5 Tighten public calculation facts schemas`
+- Verification:
+  - `bun run verification` passed.
+  - `bun run test` passed.
+  - `bun run --filter=@whattax/calculators test` passed.
+  - `bun run --filter=@whattax/http-api test` passed.
+- API smoke:
+  - Started `apps/api` through portless at
+    `https://api.whattax.localhost`.
+  - `/api/docs/openapi.json` shows
+    `POST /api/v1/calculators/{calculatorId}/calculate` request facts as
+    `facts.anyOf`, including take-home/pay-withholdings facts and annual-tax
+    facts.
+  - `POST /api/v1/calculators/au.pay.take-home/calculate` with tagged
+    canonical `GrossPay` and `Money` values returned `200 OK`,
+    `netPay.cents = 270600` and `withholdingsTotal.cents = 75600`.
+  - Annual-tax facts sent to `au.pay.take-home` with `help=errors` returned
+    `400 Bad Request` with `_tag = CalculatorInputDecodeError`, issue path
+    `["grossPay"]` and descriptor-backed pay-calculator help.
+- Parent review:
+  - `PublicCalculationFacts` is a `Schema.Union` of canonical rule-owned
+    `TakeHomeScenarioInputSchema` and `AnnualTaxScenarioInputSchema`.
+  - `PublicCalculationRequest.facts` no longer uses `Schema.Unknown`.
+  - Each calculator catalog entry carries the canonical `inputSchema` it
+    accepts.
+  - `PublicCalculatorService.calculate` decodes `request.payload.facts` with
+    the selected entry `inputSchema` before running the calculator.
+  - Tests cover public calculator service scenarios, in-process HTTP
+    calculation and incompatible calculator/facts errors.
+  - Residual tradeoff is intentional: route-level client inference is a union
+    across all supported calculator fact shapes because the single generic
+    route is not dependent on `calculatorId`; selected-calculator compatibility
+    is enforced in the service layer.

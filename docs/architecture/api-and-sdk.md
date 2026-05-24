@@ -190,6 +190,20 @@ descriptor-backed help so clients can guide users toward the facts required by
 the selected calculator. Outputs should include reports, traces, ledgers and
 diagnostics where relevant.
 
+The generic calculate route exposes request facts as a union of canonical
+rule-owned calculator input schemas, not `Schema.Unknown`. OpenAPI should show
+the supported fact shapes under `facts.anyOf`; current public shapes include
+take-home/pay-withholdings input facts and annual-tax input facts. Because
+Effect HTTP route schemas are not dependent on the `calculatorId` path
+parameter, `@whattax/calculators` must decode `payload.facts` again with the
+selected catalog entry's canonical `inputSchema` before execution. A payload
+that is valid for a different calculator must fail as
+`CalculatorInputDecodeError` with descriptor-backed help for the selected
+calculator.
+
+Public JSON examples must use canonical schema values, including tagged values
+such as `GrossPay` and `Money` where the owning schema requires those tags.
+
 Calculation/domain failures that are part of the engine contract should remain
 typed failures and be encoded through the public error envelope. They should
 not be converted into Effect defects.

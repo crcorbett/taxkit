@@ -30,6 +30,10 @@ This package owns:
 - schema-guided expected error shaping for calculation inputs
 - composition of canonical scenario layers, rule-pack layers and
   `CalculationEngine`
+- the `PublicCalculationFacts` union that composes canonical rule-owned
+  calculator input schemas for generated API docs and typed clients
+- selected-calculator input decoding through each catalog entry's canonical
+  `inputSchema`
 
 This package must not own:
 
@@ -42,6 +46,12 @@ This package must not own:
 
 - Reuse canonical schemas, descriptors, service tags, tagged errors and
   constructors from owning packages.
+- Public calculation facts must compose rule-owned scenario input schemas; do
+  not use `Schema.Unknown`, mirrored fact DTOs or loose arbitrary records for
+  the calculate contract.
+- Decode calculate payload facts with the selected catalog entry's
+  `inputSchema` before execution so valid facts for the wrong calculator return
+  `CalculatorInputDecodeError` with descriptor-backed help.
 - Compose rule-owned calculator ids, jurisdictions and tax years. Do not
   redeclare supported calculator context literals in this package.
 - Use Effect-native primitives where they fit: `Schema`, `Option`, `Match`,

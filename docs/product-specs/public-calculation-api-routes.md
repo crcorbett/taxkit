@@ -37,6 +37,12 @@ Implemented in the current API package and app:
 - `POST /api/v1/calculators/:calculatorId/calculate`
 - initial calculators `au.pay.take-home`, `au.pay.withholdings` and
   `au.income-tax.annual`
+- public calculate facts exposed as an OpenAPI `anyOf` union of canonical
+  rule-owned input schemas, currently take-home/pay-withholdings facts and
+  annual-tax facts
+- selected-calculator fact validation in `@whattax/calculators`, so a payload
+  that is valid for one calculator but incompatible with the selected
+  calculator returns calculator-specific help
 - schema-guided decode errors with field paths and descriptor-backed help for
   `help=errors` and `help=full`
 - generated OpenAPI documentation at `/api/docs` and `/api/docs/openapi.json`
@@ -194,9 +200,9 @@ values from owning packages. If a new API envelope is needed, it belongs in
 `packages/http-api/src/groups/<group>.ts` and must expose schema-derived types.
 Do not mirror canonical field definitions or hand-write transport DTOs.
 
-Calculation fact payloads must reuse canonical calculator input schemas from
-the owning rule packages. The public API must not publish `facts: unknown` as
-the calculate contract.
+Calculation fact payloads reuse canonical calculator input schemas from the
+owning rule packages. The public API must not publish `facts: unknown` as the
+calculate contract.
 
 ## Proposed Approach
 
@@ -271,7 +277,7 @@ The calculate route remains generic:
 POST /api/v1/calculators/:calculatorId/calculate
 ```
 
-The request body should expose facts as a union of canonical calculator input
+The request body exposes facts as a union of canonical calculator input
 schemas:
 
 ```ts
@@ -282,12 +288,35 @@ PublicCalculationFacts = Schema.Union([
 ```
 
 This gives generated clients and OpenAPI docs concrete fact shapes while
-preserving a calculator-id route model. Because the route schema is not
-dependent on the path parameter, the calculator service must perform a second
-decode against the selected calculator's canonical input schema. If the facts
-match another calculator but not the selected calculator, the response should
-be a schema-backed `CalculatorInputDecodeError` with descriptor-backed help for
-the selected calculator.
+preserving a calculator-id route model. The generated request body exposes
+these as `facts.anyOf`. Because the route schema is not dependent on the path
+parameter, the calculator service performs a second decode against the selected
+calculator's canonical input schema. If the facts match another calculator but
+not the selected calculator, the response is a schema-backed
+`CalculatorInputDecodeError` with descriptor-backed help for the selected
+calculator.
+
+Public JSON callers must send canonical schema values. For example,
+take-home-pay facts use tagged `GrossPay` and `Money` values:
+
+```json
+{
+  "facts": {
+    "grossPay": {
+      "_tag": "GrossPay",
+      "amount": {
+        "_tag": "Money",
+        "cents": 346200,
+        "currency": "AUD"
+      },
+      "period": "fortnightly"
+    },
+    "taxFreeThresholdClaimed": true
+  },
+  "jurisdiction": "AU",
+  "taxYear": "2025-26"
+}
+```
 
 Initial calculator IDs:
 

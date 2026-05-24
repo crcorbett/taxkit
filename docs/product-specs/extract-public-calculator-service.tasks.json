@@ -2,7 +2,7 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/extract-public-calculator-service.md",
   "title": "Extract Public Calculator Service Tasks",
-  "status": "draft",
+  "status": "implemented",
   "last_reviewed": "2026-05-24",
   "principles": [
     "Keep calculators reusable across HTTP, SDK, CLI and in-process callers.",
@@ -42,6 +42,7 @@
   "tasks": [
     {
       "id": "CALC-SVC-001",
+      "status": "complete",
       "title": "Create the calculators package shell and ownership docs",
       "type": "foundation",
       "dependsOn": [],
@@ -85,6 +86,7 @@
     },
     {
       "id": "CALC-SVC-002",
+      "status": "complete",
       "title": "Move calculator schemas, catalog and metadata projections",
       "type": "package-refactor",
       "dependsOn": [
@@ -130,6 +132,7 @@
     },
     {
       "id": "CALC-SVC-003",
+      "status": "complete",
       "title": "Move calculation execution and expected error shaping into service methods",
       "type": "service-refactor",
       "dependsOn": [
@@ -182,6 +185,7 @@
     },
     {
       "id": "CALC-SVC-004",
+      "status": "complete",
       "title": "Document and verify the calculators package boundary",
       "type": "docs-and-release",
       "dependsOn": [
@@ -233,6 +237,7 @@
     },
     {
       "id": "CALC-SVC-005",
+      "status": "complete",
       "title": "Tighten public calculation facts schemas",
       "type": "schema-refactor",
       "dependsOn": [

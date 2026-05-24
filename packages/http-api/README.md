@@ -40,6 +40,15 @@ diagnostics from `@whattax/calculators`. Handler implementations pass route
 params, query values and payloads to `PublicCalculatorService` and map tagged
 service failures into route-owned HTTP error envelopes.
 
+The calculate request body imports `PublicCalculationRequest` from
+`@whattax/calculators`. Its `facts` field is a union of canonical rule-owned
+input schemas, so generated OpenAPI exposes concrete supported fact shapes
+under `facts.anyOf` instead of `Schema.Unknown`. HTTP handlers must not try to
+select or transform calculator facts locally; `PublicCalculatorService`
+performs the selected-calculator `inputSchema` decode and returns
+`CalculatorInputDecodeError` with descriptor-backed help for incompatible
+calculator/facts combinations.
+
 ## Main Areas
 
 - `src/api.ts`: `WhatTaxApi` definition and OpenAPI annotations.
@@ -132,6 +141,8 @@ bun run --filter=@whattax/http-api check-types
 - Keep endpoint request and response shapes schema-owned; route-only HTTP
   envelopes stay here and reusable calculator payload schemas live in
   `@whattax/calculators`.
+- Keep calculate facts imported from `@whattax/calculators` so OpenAPI and
+  typed clients reflect canonical rule-owned fact shapes.
 - Keep calculation execution delegated to `PublicCalculatorService`, which is
   catalog-driven, scenario-schema decoded and `CalculationEngine` based.
 - Keep metadata responses derived from canonical fact descriptors, rule
