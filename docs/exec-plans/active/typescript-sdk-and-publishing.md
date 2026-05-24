@@ -28,7 +28,7 @@ passes its required gates and Changeset decision.
 | SDK-003 | complete | Plain Promise facade, Data-owned safe results and AU module subpath implemented and verified. |
 | SDK-004 | complete | HTTP API calculate handler consumes the SDK Effect facade and preserves HTTP envelopes. |
 | SDK-005 | complete | Downstream workspace validates SDK consumption through the normal vendored package boundary. |
-| SDK-006 | pending | Publication release-prep slice. |
+| SDK-006 | complete | Release-prep evidence recorded; no publication action taken. |
 
 ## Validation Log
 
@@ -182,7 +182,38 @@ passes its required gates and Changeset decision.
   - `bun run verification` passed in WhatTax.
   - `bun run changeset status --verbose` passed in WhatTax.
 
+### 2026-05-24 - SDK-006 publication release prep
+
+- Checked npm registry package names live on 2026-05-24:
+  - `npm view whattax name version --json` returned 404.
+  - `npm view @whattax/sdk name version --json` returned 404.
+  - `npm view @whattax/core name version --json` returned 404.
+- Kept the SDK package name as `@whattax/sdk` for this release-prep slice.
+  The unscoped `whattax` name remains a future explicit release decision
+  because the monorepo root currently owns that package name locally.
+- Added SDK package metadata for publication readiness while keeping
+  `private: true`: description, public publish config, side-effect metadata
+  and a `files` allowlist.
+- Updated the SDK build config so packed artifacts exclude compiled test files.
+- Confirmed `npm pack --dry-run --json packages/sdk/typescript` now includes
+  only `README.md`, `dist/**` and `package.json`.
+- Confirmed `bun pm pack` rewrites workspace and catalog dependency protocols
+  to concrete versions in the packed package metadata.
+- Confirmed packed install/import smoke in a temporary consumer with the packed
+  SDK tarball and local file dependencies for current private internal packages:
+  root, AU, Effect, AU Effect, schemas and testing entrypoints all imported.
+- Did not remove `private: true`, run `bun run version-repo` or publish.
+- Added Changeset `.changeset/sdk-release-prep.md` for `@whattax/sdk` patch
+  impact.
+- Verification:
+  - `bun run build` passed.
+  - `bun run --filter=@whattax/sdk check-types` passed.
+  - `bun run --filter=@whattax/sdk test-types` passed.
+  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - Packed install/import smoke passed from the generated tarball.
+
 ## Open Risks
 
-- Package name availability must be checked live only during release prep.
-- Publication release prep remains in SDK-006.
+- Recheck package-name availability immediately before any actual publication.
+- Publication still requires explicit approval to remove `private: true`, run
+  `bun run version-repo` and publish.

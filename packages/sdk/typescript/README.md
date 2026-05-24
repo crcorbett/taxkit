@@ -75,6 +75,18 @@ time.
 The root, AU and schema entrypoints are intended to remain browser-safe. Effect
 entrypoints may expose Effect-native types once the facade is implemented.
 
+## Publication Readiness
+
+The package remains `private: true` until an explicit release approval removes
+that flag. The first release-prep pass verified on 2026-05-24 that both
+`whattax` and `@whattax/sdk` returned npm registry 404 responses, so neither
+name had a visible public package at that point. Recheck package-name
+availability immediately before any publication decision.
+
+Packed artifacts should include only `dist`, `README.md` and package metadata.
+Do not run `bun run version-repo`, remove `private: true` or publish from this
+package without an explicit release-prep approval.
+
 ## Guardrails
 
 - Keep this package independent from `@whattax/http-api`.
