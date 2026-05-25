@@ -48,8 +48,8 @@ import { Array, Data, Effect, HashMap, Layer } from "effect";
 import type {
   CalculatorContext,
   CalculatorId,
+  CalculatorRunReport,
   HelpMode,
-  PublicCalculationReport,
 } from "./schemas.js";
 
 type CalculatorProgram = Effect.Effect<unknown, unknown, unknown>;
@@ -58,7 +58,7 @@ type CalculatorExecution = (
   facts: unknown,
   validationIssues: readonly GraphValidationIssue[]
 ) => Effect.Effect<
-  CalculationResult<PublicCalculationReport>,
+  CalculationResult<CalculatorRunReport>,
   CalculationError | Schema.SchemaError,
   CalculationEngine
 >;

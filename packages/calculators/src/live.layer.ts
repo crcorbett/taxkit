@@ -17,10 +17,10 @@ import {
 } from "./metadata.js";
 import {
   CalculatorCatalogResponseData,
-  PublicCalculationResponseData,
+  CalculatorRunResponseData,
   UnsupportedCalculatorContextError,
 } from "./schemas.js";
-import type { PublicCalculationServiceRequest } from "./schemas.js";
+import type { CalculatorRunServiceRequest } from "./schemas.js";
 import { PublicCalculatorService } from "./service.js";
 
 /**
@@ -32,7 +32,7 @@ import { PublicCalculatorService } from "./service.js";
  */
 const calculateWithEntry = (
   entry: CalculatorCatalogEntry,
-  request: PublicCalculationServiceRequest,
+  request: CalculatorRunServiceRequest,
   engine: CalculationEngine["Service"]
 ) =>
   Effect.gen(function* () {
@@ -70,7 +70,7 @@ const calculateWithEntry = (
       )
       .pipe(Effect.provideService(CalculationEngine, engine));
 
-    return new PublicCalculationResponseData({
+    return new CalculatorRunResponseData({
       calculator: toCalculatorCatalogItem(entry),
       diagnostics: result.diagnostics,
       report: result.report,

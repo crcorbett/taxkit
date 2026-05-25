@@ -6,32 +6,32 @@ import type {
   CalculatorCatalogResponse,
   CalculatorGraphResponse,
   CalculatorSchemaResponse,
+  CalculatorRunResponse,
+  CalculatorRunServiceRequest,
+  CalculatorServiceError,
   DescriptorFilterQuery,
   FactsResponse,
   GetCalculatorGraphRequest,
   GetCalculatorRequest,
   JurisdictionsResponse,
   MetadataQuery,
-  PublicCalculationResponse,
-  PublicCalculationServiceRequest,
-  PublicCalculatorError,
   RulesResponse,
   TaxYearsResponse,
 } from "./schemas.js";
 
 export interface PublicCalculatorServiceShape {
   readonly calculate: (
-    request: PublicCalculationServiceRequest
-  ) => Effect.Effect<PublicCalculationResponse, PublicCalculatorError>;
+    request: CalculatorRunServiceRequest
+  ) => Effect.Effect<CalculatorRunResponse, CalculatorServiceError>;
   readonly getCalculator: (
     request: GetCalculatorRequest
-  ) => Effect.Effect<CalculatorCatalogItem, PublicCalculatorError>;
+  ) => Effect.Effect<CalculatorCatalogItem, CalculatorServiceError>;
   readonly getCalculatorGraph: (
     request: GetCalculatorGraphRequest
-  ) => Effect.Effect<CalculatorGraphResponse, PublicCalculatorError>;
+  ) => Effect.Effect<CalculatorGraphResponse, CalculatorServiceError>;
   readonly getCalculatorSchema: (
     request: GetCalculatorRequest
-  ) => Effect.Effect<CalculatorSchemaResponse, PublicCalculatorError>;
+  ) => Effect.Effect<CalculatorSchemaResponse, CalculatorServiceError>;
   readonly listCalculators: (
     query: MetadataQuery
   ) => Effect.Effect<CalculatorCatalogResponse>;

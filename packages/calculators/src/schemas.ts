@@ -160,16 +160,31 @@ export class UnsupportedCalculatorContextError extends Schema.TaggedClass<Unsupp
   }
 ) {}
 
-export const PublicApiError = Schema.Union([
+export const CalculatorServiceError = Schema.Union([
   CalculationError,
   CalculatorInputDecodeError,
   UnsupportedCalculatorError,
   UnsupportedCalculatorContextError,
 ]);
 
-export type PublicApiError = typeof PublicApiError.Type;
+export type CalculatorServiceError = typeof CalculatorServiceError.Type;
 
-export type PublicCalculatorError = PublicApiError;
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorServiceError`.
+ */
+export const PublicApiError = CalculatorServiceError.annotate({
+  title: "PublicApiError",
+});
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorServiceError`.
+ */
+export type PublicApiError = CalculatorServiceError;
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorServiceError`.
+ */
+export type PublicCalculatorError = CalculatorServiceError;
 
 /**
  * Catalog entry shape returned by discovery endpoints.
@@ -343,7 +358,7 @@ export const CalculatorGraphResponse = Schema.Struct({
 export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
 
 /**
- * Public calculate facts accepted by the generic calculate route.
+ * Calculator run facts accepted by the generic calculate route.
  *
  * This union is intentionally composed from canonical rule-owned scenario
  * schemas so generated API docs and clients can see the supported fact shapes.
@@ -351,53 +366,119 @@ export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
  * catalog entry's `inputSchema`, because the route-level union cannot depend
  * on the `calculatorId` path parameter.
  */
-export const PublicCalculationFacts = Schema.Union([
+export const CalculatorRunFacts = Schema.Union([
   TakeHomeScenarioInputSchema,
   AnnualTaxScenarioInputSchema,
 ]);
 
-export type PublicCalculationFacts = typeof PublicCalculationFacts.Type;
+export type CalculatorRunFacts = typeof CalculatorRunFacts.Type;
 
-export const PublicCalculationRequest = Schema.Struct({
-  facts: PublicCalculationFacts,
+export const CalculatorRunRequest = Schema.Struct({
+  facts: CalculatorRunFacts,
   ...OptionalCalculatorContextFields,
 });
 
-export type PublicCalculationRequest = typeof PublicCalculationRequest.Type;
+export type CalculatorRunRequest = typeof CalculatorRunRequest.Type;
 
 /**
  * Service-level calculation request after route params, query params and JSON
  * body have been decoded by the HTTP API package.
  */
-export const PublicCalculationServiceRequest = Schema.Struct({
+export const CalculatorRunServiceRequest = Schema.Struct({
   calculatorId: CalculatorId,
   help: Schema.optional(HelpMode),
-  payload: PublicCalculationRequest,
+  payload: CalculatorRunRequest,
 });
 
-export type PublicCalculationServiceRequest =
-  typeof PublicCalculationServiceRequest.Type;
+export type CalculatorRunServiceRequest =
+  typeof CalculatorRunServiceRequest.Type;
 
-export const PublicCalculationReport = Schema.Union([
+export const CalculatorRunReport = Schema.Union([
   TakeHomePayReport,
   PayWithholdingsLedger,
   AnnualTaxReport,
 ]);
 
-export type PublicCalculationReport = typeof PublicCalculationReport.Type;
+export type CalculatorRunReport = typeof CalculatorRunReport.Type;
 
 /**
- * Public calculation response with catalog metadata, diagnostics and the typed
+ * Calculator run response with catalog metadata, diagnostics and the typed
  * calculator-specific report.
  */
-export const PublicCalculationResponse = Schema.Struct({
+export const CalculatorRunResponse = Schema.Struct({
   calculator: CalculatorCatalogItem,
   diagnostics: CalculationDiagnostics,
-  report: PublicCalculationReport,
+  report: CalculatorRunReport,
 });
 
-export type PublicCalculationResponse = typeof PublicCalculationResponse.Type;
+export type CalculatorRunResponse = typeof CalculatorRunResponse.Type;
 
 export class CalculatorCatalogResponseData extends Data.Class<CalculatorCatalogResponse> {}
 
-export class PublicCalculationResponseData extends Data.Class<PublicCalculationResponse> {}
+export class CalculatorRunResponseData extends Data.Class<CalculatorRunResponse> {}
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunFacts`.
+ */
+export const PublicCalculationFacts = CalculatorRunFacts.annotate({
+  title: "PublicCalculationFacts",
+});
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunFacts`.
+ */
+export type PublicCalculationFacts = CalculatorRunFacts;
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunRequest`.
+ */
+export const PublicCalculationRequest = CalculatorRunRequest.annotate({
+  title: "PublicCalculationRequest",
+});
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunRequest`.
+ */
+export type PublicCalculationRequest = CalculatorRunRequest;
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunServiceRequest`.
+ */
+export const PublicCalculationServiceRequest =
+  CalculatorRunServiceRequest.annotate({
+    title: "PublicCalculationServiceRequest",
+  });
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunServiceRequest`.
+ */
+export type PublicCalculationServiceRequest = CalculatorRunServiceRequest;
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunReport`.
+ */
+export const PublicCalculationReport = CalculatorRunReport.annotate({
+  title: "PublicCalculationReport",
+});
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunReport`.
+ */
+export type PublicCalculationReport = CalculatorRunReport;
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunResponse`.
+ */
+export const PublicCalculationResponse = CalculatorRunResponse.annotate({
+  title: "PublicCalculationResponse",
+});
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunResponse`.
+ */
+export type PublicCalculationResponse = CalculatorRunResponse;
+
+/**
+ * @deprecated Transitional API-era alias. Use `CalculatorRunResponseData`.
+ */
+export class PublicCalculationResponseData extends CalculatorRunResponseData {}

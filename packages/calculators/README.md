@@ -30,10 +30,14 @@ This package owns:
 - schema-guided expected error shaping for calculation inputs
 - composition of canonical scenario layers, rule-pack layers and
   `CalculationEngine`
-- the `PublicCalculationFacts` union that composes canonical rule-owned
+- the `CalculatorRunFacts` union that composes canonical rule-owned
   calculator input schemas for generated API docs and typed clients
 - selected-calculator input decoding through each catalog entry's canonical
   `inputSchema`
+
+`PublicCalculation*`, `PublicApiError` and `PublicCalculatorError` exports are
+transitional API-era aliases while SDK and HTTP consumers migrate to the
+canonical `CalculatorRun*` and `CalculatorServiceError` names.
 
 This package must not own:
 
