@@ -161,13 +161,13 @@ export class PublicCalculatorService extends Context.Service<
     ) => Effect.Effect<CalculatorCatalogResponse>;
     readonly getCalculator: (
       request: GetCalculatorRequest
-    ) => Effect.Effect<CalculatorCatalogItem, PublicCalculatorError>;
+    ) => Effect.Effect<CalculatorCatalogItem, CalculatorServiceError>;
     readonly getCalculatorSchema: (
       request: GetCalculatorRequest
-    ) => Effect.Effect<CalculatorSchemaResponse, PublicCalculatorError>;
+    ) => Effect.Effect<CalculatorSchemaResponse, CalculatorServiceError>;
     readonly getCalculatorGraph: (
       request: GetCalculatorGraphRequest
-    ) => Effect.Effect<CalculatorGraphResponse, PublicCalculatorError>;
+    ) => Effect.Effect<CalculatorGraphResponse, CalculatorServiceError>;
     readonly listFacts: (
       query: DescriptorFilterQuery
     ) => Effect.Effect<FactsResponse>;
@@ -175,8 +175,8 @@ export class PublicCalculatorService extends Context.Service<
       query: DescriptorFilterQuery
     ) => Effect.Effect<RulesResponse>;
     readonly calculate: (
-      request: PublicCalculationServiceRequest
-    ) => Effect.Effect<PublicCalculationResponse, PublicCalculatorError>;
+      request: CalculatorRunServiceRequest
+    ) => Effect.Effect<CalculatorRunResponse, CalculatorServiceError>;
   }
 >()("@whattax/calculators/PublicCalculatorService") {}
 ```
@@ -195,22 +195,22 @@ POST /api/v1/calculators/:calculatorId/calculate
 ```
 
 The route payload MUST NOT use `facts: Schema.Unknown` as the public contract.
-`@whattax/calculators` exports a composed `PublicCalculationFacts` schema that
+`@whattax/calculators` exports a composed `CalculatorRunFacts` schema that
 is a union of the canonical calculator input schemas from the owning rule
 packages:
 
 ```ts
-export const PublicCalculationFacts = Schema.Union([
+export const CalculatorRunFacts = Schema.Union([
   TakeHomeScenarioInputSchema,
   AnnualTaxScenarioInputSchema,
 ]);
 ```
 
-`PublicCalculationRequest` uses that union:
+`CalculatorRunRequest` uses that union:
 
 ```ts
-export const PublicCalculationRequest = Schema.Struct({
-  facts: PublicCalculationFacts,
+export const CalculatorRunRequest = Schema.Struct({
+  facts: CalculatorRunFacts,
   ...OptionalCalculatorContextFields,
 });
 ```
@@ -282,7 +282,7 @@ Service implementation rules:
   declared service contract.
 - Calculator input decode MUST use the selected catalog entry's canonical
   `inputSchema` at the service boundary. Do not rely only on the route-level
-  `PublicCalculationFacts` union, because that union is intentionally
+  `CalculatorRunFacts` union, because that union is intentionally
   calculator-neutral.
 - Service contract files MUST define `Context.Service` contracts and canonical
   schemas only. Do not export `Live`, `Mock` or `Test` layers from `service.ts`;
@@ -392,7 +392,7 @@ Update:
   response/error construction.
 - Public route behavior remains compatible for metadata, calculation success
   and schema-guided error responses.
-- `PublicCalculationRequest.facts` reuses canonical rule-owned calculator input
+- `CalculatorRunRequest.facts` reuses canonical rule-owned calculator input
   schemas through a union instead of `Schema.Unknown`.
 - The selected calculator catalog entry performs the final canonical
   input-schema decode and incompatible calculator/facts combinations return

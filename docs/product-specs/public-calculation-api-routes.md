@@ -281,7 +281,7 @@ The request body exposes facts as a union of canonical calculator input
 schemas:
 
 ```ts
-PublicCalculationFacts = Schema.Union([
+CalculatorRunFacts = Schema.Union([
   TakeHomeScenarioInputSchema,
   AnnualTaxScenarioInputSchema,
 ]);
