@@ -3,8 +3,8 @@ import type {
   CalculatorId,
   CalculatorJurisdiction,
   CalculatorTaxYear,
-  PublicCalculationFacts,
-  PublicCalculationReport,
+  CalculatorRunFacts,
+  CalculatorRunReport,
 } from "@whattax/calculators/schemas";
 import { PublicCalculatorService } from "@whattax/calculators/service";
 import type { PublicCalculatorServiceShape } from "@whattax/calculators/service";
@@ -70,8 +70,8 @@ export interface WhatTaxClient<Modules extends readonly AnyWhatTaxModule[]> {
       const Id extends CalculatorId,
       const Jurisdiction extends CalculatorJurisdiction,
       const TaxYear extends CalculatorTaxYear,
-      const InputSchema extends Schema.Schema<PublicCalculationFacts>,
-      const OutputSchema extends Schema.Decoder<PublicCalculationReport, never>,
+      const InputSchema extends Schema.Schema<CalculatorRunFacts>,
+      const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
       const Calculation extends ModuleCalculation<Modules> &
         SdkCalculation<Id, Jurisdiction, TaxYear, InputSchema, OutputSchema>,
     >(
@@ -83,11 +83,8 @@ export interface WhatTaxClient<Modules extends readonly AnyWhatTaxModule[]> {
         const Id extends CalculatorId,
         const Jurisdiction extends CalculatorJurisdiction,
         const TaxYear extends CalculatorTaxYear,
-        const InputSchema extends Schema.Schema<PublicCalculationFacts>,
-        const OutputSchema extends Schema.Decoder<
-          PublicCalculationReport,
-          never
-        >,
+        const InputSchema extends Schema.Schema<CalculatorRunFacts>,
+        const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
         const Calculation extends ModuleCalculation<Modules> &
           SdkCalculation<Id, Jurisdiction, TaxYear, InputSchema, OutputSchema>,
       >(
@@ -102,8 +99,8 @@ export const calculateSafe = async <
   const Id extends CalculatorId,
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
-  const InputSchema extends Schema.Schema<PublicCalculationFacts>,
-  const OutputSchema extends Schema.Decoder<PublicCalculationReport, never>,
+  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
 >(
   calculation: SdkCalculation<
     Id,
@@ -157,8 +154,8 @@ export const calculate = async <
   const Id extends CalculatorId,
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
-  const InputSchema extends Schema.Schema<PublicCalculationFacts>,
-  const OutputSchema extends Schema.Decoder<PublicCalculationReport, never>,
+  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
 >(
   calculation: SdkCalculation<
     Id,

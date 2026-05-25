@@ -1,5 +1,5 @@
-import { PublicApiError } from "@whattax/calculators/schemas";
-import type { PublicCalculatorError } from "@whattax/calculators/schemas";
+import { CalculatorServiceError } from "@whattax/calculators/schemas";
+import type { CalculatorServiceError as CalculatorServiceErrorType } from "@whattax/calculators/schemas";
 import { Array, Cause, Data, Option, Schema } from "effect";
 
 export class WhatTaxSchemaDecodeError extends Schema.TaggedErrorClass<WhatTaxSchemaDecodeError>()(
@@ -17,7 +17,7 @@ export class WhatTaxUnexpectedError extends Schema.TaggedErrorClass<WhatTaxUnexp
 ) {}
 
 export const WhatTaxCalculationErrorDetail = Schema.Union([
-  PublicApiError,
+  CalculatorServiceError,
   WhatTaxSchemaDecodeError,
   WhatTaxUnexpectedError,
 ]);
@@ -46,7 +46,7 @@ export class WhatTaxFailure extends Data.TaggedClass("WhatTaxFailure")<{
 export type WhatTaxSafeResult<Value> = WhatTaxFailure | WhatTaxSuccess<Value>;
 
 export const toWhatTaxCalculationError = (
-  cause: Cause.Cause<PublicCalculatorError | Schema.SchemaError>
+  cause: Cause.Cause<CalculatorServiceErrorType | Schema.SchemaError>
 ): WhatTaxCalculationError => {
   const message = Cause.pretty(cause);
 

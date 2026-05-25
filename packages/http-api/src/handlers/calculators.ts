@@ -1,6 +1,6 @@
 import {
+  CalculatorRunResponseData,
   PublicCalculatorService,
-  PublicCalculationResponseData,
 } from "@whattax/calculators";
 import type { CalculatorId } from "@whattax/calculators";
 import { CalculationDiagnostics } from "@whattax/core";
@@ -133,7 +133,7 @@ export const PublicCalculationMetadataHandlerLive = HttpApiBuilder.group(
               taxYear: payload.taxYear,
             });
 
-            return new PublicCalculationResponseData({
+            return new CalculatorRunResponseData({
               calculator,
               diagnostics: new CalculationDiagnostics({
                 graphIssues: graph.validationIssues,

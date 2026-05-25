@@ -2,8 +2,8 @@ import type {
   CalculatorId,
   CalculatorJurisdiction,
   CalculatorTaxYear,
-  PublicCalculationFacts,
-  PublicCalculationReport,
+  CalculatorRunFacts,
+  CalculatorRunReport,
 } from "@whattax/calculators/schemas";
 import { Effect, Exit, Schema } from "effect";
 
@@ -11,8 +11,8 @@ export interface SdkCalculation<
   Id extends CalculatorId,
   Jurisdiction extends CalculatorJurisdiction,
   TaxYear extends CalculatorTaxYear,
-  InputSchema extends Schema.Schema<PublicCalculationFacts>,
-  OutputSchema extends Schema.Decoder<PublicCalculationReport, never>,
+  InputSchema extends Schema.Schema<CalculatorRunFacts>,
+  OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
 > {
   readonly calculatorId: Id;
   readonly decodeOutput: (
@@ -28,8 +28,8 @@ export interface SdkCalculationDefinition<
   Id extends CalculatorId,
   Jurisdiction extends CalculatorJurisdiction,
   TaxYear extends CalculatorTaxYear,
-  InputSchema extends Schema.Schema<PublicCalculationFacts>,
-  OutputSchema extends Schema.Decoder<PublicCalculationReport, never>,
+  InputSchema extends Schema.Schema<CalculatorRunFacts>,
+  OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
 > {
   readonly calculatorId: Id;
   readonly inputSchema: InputSchema;
@@ -42,8 +42,8 @@ export type AnySdkCalculation = SdkCalculation<
   CalculatorId,
   CalculatorJurisdiction,
   CalculatorTaxYear,
-  Schema.Schema<PublicCalculationFacts>,
-  Schema.Decoder<PublicCalculationReport, never>
+  Schema.Schema<CalculatorRunFacts>,
+  Schema.Decoder<CalculatorRunReport, never>
 >;
 
 export interface WhatTaxModule<
@@ -84,8 +84,8 @@ export const defineSdkCalculation = <
   const Id extends CalculatorId,
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
-  const InputSchema extends Schema.Schema<PublicCalculationFacts>,
-  const OutputSchema extends Schema.Decoder<PublicCalculationReport, never>,
+  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
 >(
   calculation: SdkCalculationDefinition<
     Id,

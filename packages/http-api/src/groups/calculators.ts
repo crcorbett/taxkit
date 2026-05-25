@@ -4,15 +4,15 @@ import {
   CalculatorGraphResponse,
   CalculatorId,
   CalculatorSchemaResponse,
+  CalculatorServiceError,
   CalculationQuery,
   DescriptorFilterQuery,
   FactsResponse,
   HelpQuery,
   JurisdictionsResponse,
   MetadataQuery,
-  PublicApiError,
-  PublicCalculationRequest,
-  PublicCalculationResponse,
+  CalculatorRunRequest,
+  CalculatorRunResponse,
   RulesResponse,
   TaxYearsResponse,
 } from "@whattax/calculators";
@@ -36,11 +36,11 @@ export {
   CalculatorInputHelp,
   CalculatorInputIssue,
   CalculationQuery,
+  CalculatorRunReport,
+  CalculatorRunRequest,
+  CalculatorRunResponse,
+  CalculatorServiceError,
   HelpMode,
-  PublicApiError,
-  PublicCalculationReport,
-  PublicCalculationRequest,
-  PublicCalculationResponse,
   UnsupportedCalculatorContextError,
   UnsupportedCalculatorError,
   getCalculatorCatalogEntry,
@@ -50,7 +50,7 @@ export {
 } from "@whattax/calculators";
 
 export const PublicErrorEnvelope = Schema.Struct({
-  error: PublicApiError,
+  error: CalculatorServiceError,
 }).pipe(HttpApiSchema.status("BadRequest"));
 
 export type PublicErrorEnvelope = typeof PublicErrorEnvelope.Type;
@@ -131,9 +131,9 @@ const CalculateEndpoint = HttpApiEndpoint.post(
   {
     error: PublicErrorEnvelope,
     params: CalculatorParams,
-    payload: PublicCalculationRequest,
+    payload: CalculatorRunRequest,
     query: CalculationQuery,
-    success: PublicCalculationResponse,
+    success: CalculatorRunResponse,
   }
 ).annotate(
   OpenApi.Description,

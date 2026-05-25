@@ -18,8 +18,11 @@ consumer validation is recorded.
 
 The package currently exposes typed descriptor composition, an Effect-native
 facade, a plain Promise facade and Australian module helpers for the current
-public calculator catalog. HTTP API integration, downstream validation and
-publication release prep belong to later SDK tasks.
+public calculator catalog. The descriptor and facade generics consume
+calculator-owned `CalculatorRunFacts`, `CalculatorRunReport` and
+`CalculatorServiceError` contracts rather than HTTP transport aliases.
+HTTP API integration, downstream validation and publication release prep belong
+to later SDK tasks.
 
 ## Plain Facade
 

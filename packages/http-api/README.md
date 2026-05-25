@@ -40,7 +40,7 @@ diagnostics from `@whattax/calculators`. Handler implementations pass route
 params, query values and payloads to `PublicCalculatorService` and map tagged
 service failures into route-owned HTTP error envelopes.
 
-The calculate request body imports `PublicCalculationRequest` from
+The calculate request body imports `CalculatorRunRequest` from
 `@whattax/calculators`. Its `facts` field is a union of canonical rule-owned
 input schemas, so generated OpenAPI exposes concrete supported fact shapes
 under `facts.anyOf` instead of `Schema.Unknown`. HTTP handlers must not try to

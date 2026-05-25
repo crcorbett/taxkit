@@ -2,11 +2,11 @@ import type {
   CalculatorId,
   CalculatorJurisdiction,
   CalculatorTaxYear,
-  PublicCalculationRequest,
-  PublicCalculationFacts,
-  PublicCalculatorError,
-  PublicCalculationReport,
-  PublicCalculationServiceRequest,
+  CalculatorRunRequest,
+  CalculatorRunFacts,
+  CalculatorServiceError,
+  CalculatorRunReport,
+  CalculatorRunServiceRequest,
 } from "@whattax/calculators/schemas";
 import { PublicCalculatorService } from "@whattax/calculators/service";
 import type { PublicCalculatorServiceShape } from "@whattax/calculators/service";
@@ -43,14 +43,14 @@ const publicCalculatorService: Effect.Effect<
 > = Effect.service(PublicCalculatorService);
 
 export type SdkCalculationPayload<Input> = Omit<
-  PublicCalculationRequest,
+  CalculatorRunRequest,
   "facts"
 > & {
   readonly facts: Input;
 };
 
 export type SdkCalculationServiceRequest<Input> = Omit<
-  PublicCalculationServiceRequest,
+  CalculatorRunServiceRequest,
   "calculatorId" | "payload"
 > & {
   readonly payload: SdkCalculationPayload<Input>;
@@ -60,8 +60,8 @@ export const calculateRequest = <
   const Id extends CalculatorId,
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
-  const InputSchema extends Schema.Schema<PublicCalculationFacts>,
-  const OutputSchema extends Schema.Decoder<PublicCalculationReport, never>,
+  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
 >(
   calculation: SdkCalculation<
     Id,
@@ -73,7 +73,7 @@ export const calculateRequest = <
   request: SdkCalculationServiceRequest<InputSchema["Type"]>
 ): Effect.Effect<
   OutputSchema["Type"],
-  PublicCalculatorError | Schema.SchemaError,
+  CalculatorServiceError | Schema.SchemaError,
   WhatTaxEffectRequirements
 > =>
   publicCalculatorService.pipe(
@@ -93,8 +93,8 @@ export const calculate = <
   const Id extends CalculatorId,
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
-  const InputSchema extends Schema.Schema<PublicCalculationFacts>,
-  const OutputSchema extends Schema.Decoder<PublicCalculationReport, never>,
+  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
 >(
   calculation: SdkCalculation<
     Id,
@@ -106,7 +106,7 @@ export const calculate = <
   input: InputSchema["Type"]
 ): Effect.Effect<
   OutputSchema["Type"],
-  PublicCalculatorError | Schema.SchemaError,
+  CalculatorServiceError | Schema.SchemaError,
   WhatTaxEffectRequirements
 > =>
   calculateRequest(calculation, {
