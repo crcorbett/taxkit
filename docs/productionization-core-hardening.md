@@ -10,7 +10,7 @@ compile-time rule metadata, effective-period modelling, source artifact
 auditability, numeric precision, engine orchestration, and repository hygiene.
 
 The work is scoped to calculation-engine packages and their supporting
-standards. It does not include UI, API route design, SDK ergonomics, or adad
+standards. It does not include UI, API route design, SDK ergonomics, or private downstream
 consumer workflows.
 
 ## Constraints

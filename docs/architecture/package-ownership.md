@@ -70,8 +70,12 @@ implemented API package is currently `packages/http-api`.
 catalog composition schemas, calculator service methods, metadata projections,
 graph response construction, schema-guided error shaping and
 rule-pack/scenario composition used by HTTP, SDK, CLI and in-process callers.
-It depends on `packages/core` and rule packages, but it must not depend on HTTP
-handlers, SDK clients, CLI commands or app runtime modules.
+It also owns the canonical reusable calculator run schemas named
+`CalculatorRun*` and the `CalculatorServiceError` union. HTTP-only public
+envelopes and status annotations stay in `packages/http-api`; SDK schema
+exports may re-export calculator-owned run contracts but must not duplicate
+them. It depends on `packages/core` and rule packages, but it must not depend
+on HTTP handlers, SDK clients, CLI commands or app runtime modules.
 
 `packages/sdk/typescript`
 : Scaffolded private TypeScript SDK package for the planned public SDK facade.

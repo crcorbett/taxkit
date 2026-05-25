@@ -32,12 +32,18 @@ This package owns:
   `CalculationEngine`
 - the `CalculatorRunFacts` union that composes canonical rule-owned
   calculator input schemas for generated API docs and typed clients
+- `CalculatorRunRequest`, `CalculatorRunServiceRequest`,
+  `CalculatorRunReport`, `CalculatorRunResponse` and
+  `CalculatorRunResponseData` as the canonical reusable calculator execution
+  contract for SDK, HTTP, CLI and in-process callers
+- `CalculatorServiceError` as the canonical reusable calculator service error
+  union
 - selected-calculator input decoding through each catalog entry's canonical
   `inputSchema`
 
 `PublicCalculation*`, `PublicApiError` and `PublicCalculatorError` exports are
-transitional API-era aliases while SDK and HTTP consumers migrate to the
-canonical `CalculatorRun*` and `CalculatorServiceError` names.
+deprecated transitional API-era aliases. New SDK, HTTP and in-process code
+should use the canonical `CalculatorRun*` and `CalculatorServiceError` names.
 
 This package must not own:
 
@@ -50,9 +56,9 @@ This package must not own:
 
 - Reuse canonical schemas, descriptors, service tags, tagged errors and
   constructors from owning packages.
-- Public calculation facts must compose rule-owned scenario input schemas; do
-  not use `Schema.Unknown`, mirrored fact DTOs or loose arbitrary records for
-  the calculate contract.
+- `CalculatorRunFacts` must compose rule-owned scenario input schemas; do not
+  use `Schema.Unknown`, mirrored fact DTOs or loose arbitrary records for the
+  calculate contract.
 - Decode calculate payload facts with the selected catalog entry's
   `inputSchema` before execution so valid facts for the wrong calculator return
   `CalculatorInputDecodeError` with descriptor-backed help.

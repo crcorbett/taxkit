@@ -40,14 +40,16 @@ diagnostics from `@whattax/calculators`. Handler implementations pass route
 params, query values and payloads to `PublicCalculatorService` and map tagged
 service failures into route-owned HTTP error envelopes.
 
-The calculate request body imports `CalculatorRunRequest` from
-`@whattax/calculators`. Its `facts` field is a union of canonical rule-owned
-input schemas, so generated OpenAPI exposes concrete supported fact shapes
-under `facts.anyOf` instead of `Schema.Unknown`. HTTP handlers must not try to
-select or transform calculator facts locally; `PublicCalculatorService`
-performs the selected-calculator `inputSchema` decode and returns
-`CalculatorInputDecodeError` with descriptor-backed help for incompatible
-calculator/facts combinations.
+The calculate route imports reusable `CalculatorRun*` schemas and
+`CalculatorServiceError` from `@whattax/calculators`. `CalculatorRunRequest`
+has a `facts` field that is a union of canonical rule-owned input schemas, so
+generated OpenAPI exposes concrete supported fact shapes under `facts.anyOf`
+instead of `Schema.Unknown`. HTTP-only names such as `PublicErrorEnvelope`
+stay in this package because they describe transport status encoding. HTTP
+handlers must not try to select or transform calculator facts locally;
+`PublicCalculatorService` performs the selected-calculator `inputSchema` decode
+and returns `CalculatorInputDecodeError` with descriptor-backed help for
+incompatible calculator/facts combinations.
 
 ## Main Areas
 
@@ -139,7 +141,7 @@ bun run --filter=@whattax/http-api check-types
 - Keep browser consumers on client exports; do not import server handlers into
   browser code.
 - Keep endpoint request and response shapes schema-owned; route-only HTTP
-  envelopes stay here and reusable calculator payload schemas live in
+  envelopes stay here and reusable `CalculatorRun*` payload schemas live in
   `@whattax/calculators`.
 - Keep calculate facts imported from `@whattax/calculators` so OpenAPI and
   typed clients reflect canonical rule-owned fact shapes.

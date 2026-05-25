@@ -97,9 +97,10 @@ calculator ids, supported context literals, rule-pack layers, parameter layers
 and golden tests.
 
 `@whattax/calculators` owns reusable calculator orchestration: catalog entries,
-metadata responses, graph responses, `PublicCalculatorService`,
-`PublicCalculationFacts`, selected-calculator `inputSchema` decode,
-calculation dispatch and schema-guided public errors.
+metadata responses, graph responses, `PublicCalculatorService`, canonical
+`CalculatorRun*` schemas, `CalculatorServiceError`, selected-calculator
+`inputSchema` decode, calculation dispatch and schema-guided calculator
+service errors.
 
 `@whattax/http-api` owns HTTP transport contracts, OpenAPI annotations, HTTP
 status envelopes, typed HTTP clients and route handlers. It should import SDK
@@ -160,17 +161,35 @@ packages/sdk/typescript/
     types.ts
 ```
 
-Use explicit export paths:
+Use explicit publish export paths:
 
 ```json
 {
   "exports": {
-    ".": "./src/index.ts",
-    "./au": "./src/au.ts",
-    "./au/effect": "./src/au-effect.ts",
-    "./effect": "./src/effect.ts",
-    "./schemas": "./src/schemas/index.ts",
-    "./testing": "./src/testing/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./effect": {
+      "types": "./dist/effect.d.ts",
+      "default": "./dist/effect.js"
+    },
+    "./au": {
+      "types": "./dist/au.d.ts",
+      "default": "./dist/au.js"
+    },
+    "./au/effect": {
+      "types": "./dist/au-effect.d.ts",
+      "default": "./dist/au-effect.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "default": "./dist/schemas/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
+    }
   }
 }
 ```
@@ -179,6 +198,11 @@ Use explicit export paths:
 `"./au/effect"` may expose Effect-native types and layers. If a future SDK
 server-only export is needed, it must still not import `@whattax/http-api`;
 transport-owned helpers belong in transport packages.
+
+The publish manifest must be dist-only unless source files are intentionally
+packed and source-condition consumers are explicitly supported. The current SDK
+contract excludes `source` conditions and validates packed entrypoints with the
+package artifact smoke check.
 
 ### Strict Typed Descriptor Model
 
@@ -341,7 +365,8 @@ compare:
 
 - plain SDK facade result
 - `whattax/effect` result
-- `PublicCalculatorService.calculate(...)` result
+- `PublicCalculatorService.calculate(...)` result using `CalculatorRun*`
+  request and response schemas
 - HTTP API result after `@whattax/http-api` consumes the SDK facade
 
 Coverage must include:
@@ -459,6 +484,9 @@ slice unless explicitly requested.
   API for success and guided error cases.
 - Export-map and browser-safety tests prove plain/browser entrypoints do not
   import server-only modules or `@whattax/http-api`.
+- `@whattax/sdk/schemas` re-exports canonical calculator-owned
+  `CalculatorRun*` and `CalculatorServiceError` contracts without local schema
+  mirrors.
 - Import-boundary tests prove the SDK has no package metadata or source import
   dependency on `@whattax/http-api`.
 - Downstream workspace validation passes before publication.

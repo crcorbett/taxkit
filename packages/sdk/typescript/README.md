@@ -21,8 +21,8 @@ facade, a plain Promise facade and Australian module helpers for the current
 public calculator catalog. The descriptor and facade generics consume
 calculator-owned `CalculatorRunFacts`, `CalculatorRunReport` and
 `CalculatorServiceError` contracts rather than HTTP transport aliases.
-HTTP API integration, downstream validation and publication release prep belong
-to later SDK tasks.
+The HTTP API consumes the SDK like an in-process downstream consumer, while the
+SDK remains independent from `@whattax/http-api`.
 
 ## Plain Facade
 
@@ -100,7 +100,8 @@ time.
 The root, AU and schema entrypoints are intended to remain browser-safe. Effect
 entrypoints expose Effect-native types for consumers that want service/layer
 composition. The publish manifest is dist-only and does not expose `source`
-conditions.
+conditions; `bun run --filter=@whattax/sdk check-packed-artifact` validates
+that every public export resolves to packed files.
 
 `@whattax/sdk/schemas` re-exports calculator-owned run contracts for consumer
 convenience:
