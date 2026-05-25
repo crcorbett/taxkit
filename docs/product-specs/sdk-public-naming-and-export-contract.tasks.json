@@ -1,0 +1,172 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/sdk-public-naming-and-export-contract.md",
+  "title": "SDK Public Naming And Export Contract Implementation Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-05-25",
+  "principles": [
+    "Prefer domain/runtime names over access-level names for reusable calculator schemas.",
+    "Keep HTTP-only public/transport names inside @whattax/http-api.",
+    "Reuse canonical schemas, branded ids, tagged errors and constructors from owning packages.",
+    "Preserve SDK compile-time safety and calculator-service runtime parity.",
+    "Keep the published SDK export map aligned with packed files."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit after each coherent package-facing slice passes mandatory verification and parent review.",
+    "requiredBeforeFinalPR": [
+      "bun run verification",
+      "bun run changeset status --verbose",
+      "packed SDK artifact import smoke test",
+      "downstream workspace validation evidence"
+    ],
+    "evidenceRequired": [
+      "Changed files and ownership summary",
+      "Canonical naming migration summary and any transitional aliases",
+      "Changeset path and release-train impact, or explicit no-changeset rationale",
+      "Type-test evidence for SDK compile-time safety",
+      "Runtime parity evidence for calculator service, SDK and HTTP API",
+      "Export-map and packed-artifact evidence",
+      "Downstream workspace validation evidence"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "SDK-NAME-001",
+      "title": "Rename reusable calculator execution schemas",
+      "type": "canonical-schema-naming",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.\n\nTask-specific scope: in `@whattax/calculators`, introduce canonical `CalculatorRun*` and `CalculatorServiceError` schema/type/data names for reusable calculator execution. Update package-local code and tests. Use transitional `PublicCalculation*` aliases only if needed for later tasks, and document them as transitional. Do not update SDK or HTTP API beyond what is required for this package to compile.",
+      "outputs": [
+        "packages/calculators/src/schemas.ts",
+        "packages/calculators/src/service.ts",
+        "packages/calculators/src/live.layer.ts",
+        "packages/calculators/src/catalog.ts",
+        "packages/calculators/src/index.ts",
+        "packages/calculators/README.md",
+        "packages/calculators/**/*.test.ts",
+        ".changeset/*"
+      ],
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/calculators test",
+        "bun run --filter=@whattax/calculators check-types",
+        "bun run --filter=@whattax/calculators build",
+        "rg audit proving reusable calculator execution canonical exports use CalculatorRun* names",
+        "bun run verification",
+        "bun run changeset",
+        "bun run changeset status --verbose"
+      ],
+      "completionCriteria": [
+        "`CalculatorRunFacts`, `CalculatorRunRequest`, `CalculatorRunServiceRequest`, `CalculatorRunReport`, `CalculatorRunResponse`, `CalculatorRunResponseData` and `CalculatorServiceError` exist as canonical calculator-owned names.",
+        "Any retained `PublicCalculation*` aliases are explicitly transitional and not documented as preferred names.",
+        "No mirrored DTOs or duplicate schemas are introduced.",
+        "Parent agent reviewed canonical schema/type/id reuse.",
+        "Parent agent verified the Changeset."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "SDK-NAME-002",
+      "title": "Migrate SDK and HTTP API to canonical run names",
+      "type": "sdk-http-migration",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.\n\nTask-specific scope: update `@whattax/sdk` and `@whattax/http-api` imports/types/docs/tests to consume `CalculatorRun*` and `CalculatorServiceError` names. Keep HTTP route-only names such as `PublicErrorEnvelope` in HTTP API. Preserve the SDK request-preserving Effect facade and plain facade behavior.",
+      "outputs": [
+        "packages/sdk/typescript/src/**",
+        "packages/sdk/typescript/type-tests/**",
+        "packages/sdk/typescript/README.md",
+        "packages/http-api/src/**",
+        "packages/http-api/__tests__/**",
+        "packages/http-api/README.md",
+        ".changeset/*"
+      ],
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/sdk test",
+        "bun run --filter=@whattax/sdk test-types",
+        "bun run --filter=@whattax/sdk check-types",
+        "bun run --filter=@whattax/sdk build",
+        "bun run --filter=@whattax/http-api test",
+        "bun run --filter=@whattax/http-api check-types",
+        "bun run --filter=@whattax/http-api build",
+        "bun run --filter=@whattax/sdk check-boundaries",
+        "rg audit proving SDK preferred imports use CalculatorRun* names",
+        "bun run verification",
+        "bun run changeset",
+        "bun run changeset status --verbose"
+      ],
+      "completionCriteria": [
+        "SDK descriptor generics use `CalculatorRunFacts` and `CalculatorRunReport` names.",
+        "SDK error details use `CalculatorServiceError` for canonical calculator failures.",
+        "HTTP calculate route still uses canonical calculator run request/response schemas while preserving HTTP envelopes.",
+        "Runtime parity tests still compare SDK, calculator service and HTTP API success/error behavior.",
+        "Type tests still prove mismatched facts and unsupported module capabilities fail at compile time.",
+        "Parent agent verified no SDK dependency on `@whattax/http-api`."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "SDK-NAME-003",
+      "title": "Lock published SDK export map and schema exports",
+      "type": "export-contract",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.\n\nTask-specific scope: update the SDK export map to match packed files, remove packed-missing `source` export conditions unless source files are intentionally included, and make `@whattax/sdk/schemas` re-export canonical `CalculatorRun*`, `CalculatorServiceError` and SDK-owned error schemas. Add export-map and packed-artifact smoke tests or scripts.",
+      "outputs": [
+        "packages/sdk/typescript/package.json",
+        "packages/sdk/typescript/src/schemas/index.ts",
+        "packages/sdk/typescript/scripts/*",
+        "packages/sdk/typescript/README.md",
+        "docs/architecture/api-and-sdk.md",
+        ".changeset/*"
+      ],
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/sdk test",
+        "bun run --filter=@whattax/sdk check-types",
+        "bun run --filter=@whattax/sdk build",
+        "bun run --filter=@whattax/sdk test-types",
+        "bun run --filter=@whattax/sdk check-boundaries",
+        "npm pack --dry-run --json packages/sdk/typescript or equivalent packed file audit",
+        "packed artifact import smoke test for root, AU, Effect, AU Effect, schemas and testing entrypoints",
+        "bun run verification",
+        "bun run changeset",
+        "bun run changeset status --verbose"
+      ],
+      "completionCriteria": [
+        "Published SDK export paths resolve only to files present in the packed artifact.",
+        "`@whattax/sdk/schemas` re-exports canonical calculator-run schemas from `@whattax/calculators` without duplication.",
+        "Root, AU and schemas entrypoints remain browser-safe.",
+        "Packed artifact no longer includes compiled test files, source files or source-only export conditions unless intentionally documented.",
+        "Parent agent verified packed artifact evidence and Changeset impact."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "SDK-NAME-004",
+      "title": "Update docs and downstream validation for final names",
+      "type": "docs-downstream-validation",
+      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.\n\nTask-specific scope: update public docs, package READMEs and downstream validation to use the final `CalculatorRun*`/`CalculatorServiceError` names and locked SDK export contract. Keep public WhatTax docs neutral and do not name private downstream product details.",
+      "outputs": [
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/package-ownership.md",
+        "docs/product-specs/typescript-sdk-and-publishing.md",
+        "packages/calculators/README.md",
+        "packages/http-api/README.md",
+        "packages/sdk/typescript/README.md",
+        "Downstream workspace validation evidence recorded in handoff or active exec plan",
+        ".changeset/* or explicit no-changeset rationale"
+      ],
+      "mandatoryVerification": [
+        "bun run verification in WhatTax",
+        "bun run changeset status --verbose in WhatTax",
+        "downstream workspace typecheck command",
+        "downstream browser/build check if SDK is consumed by browser code",
+        "downstream type-level misuse assertion remains valid",
+        "rg audit proving public docs advertise CalculatorRun* names and not PublicCalculation* names as preferred SDK/calculator vocabulary",
+        "bun run changeset or explicit no-changeset rationale"
+      ],
+      "completionCriteria": [
+        "Architecture docs explain `CalculatorRun*` ownership and keep HTTP-only public names in HTTP API.",
+        "SDK README and package docs advertise the locked export contract.",
+        "Downstream workspace consumes the SDK successfully with the final exported names.",
+        "No public WhatTax docs mention private downstream product names.",
+        "Parent agent reviewed downstream validation evidence and accepted the no-changeset or Changeset decision."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}
