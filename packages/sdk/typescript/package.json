@@ -13,32 +13,26 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "./effect": {
-      "source": "./src/effect.ts",
       "types": "./dist/effect.d.ts",
       "default": "./dist/effect.js"
     },
     "./au": {
-      "source": "./src/au.ts",
       "types": "./dist/au.d.ts",
       "default": "./dist/au.js"
     },
     "./au/effect": {
-      "source": "./src/au-effect.ts",
       "types": "./dist/au-effect.d.ts",
       "default": "./dist/au-effect.js"
     },
     "./schemas": {
-      "source": "./src/schemas/index.ts",
       "types": "./dist/schemas/index.d.ts",
       "default": "./dist/schemas/index.js"
     },
     "./testing": {
-      "source": "./src/testing/index.ts",
       "types": "./dist/testing/index.d.ts",
       "default": "./dist/testing/index.js"
     }
@@ -49,6 +43,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "check-boundaries": "bun run scripts/check-import-boundaries.ts",
+    "check-packed-artifact": "bun run scripts/check-packed-artifact.ts",
     "check-types": "tsc --noEmit",
     "test": "vitest run",
     "test-types": "tsc -p tsconfig.type-tests.json --noEmit",

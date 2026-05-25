@@ -250,19 +250,38 @@ The SDK must not import server handlers or Node-only modules from browser-safe e
 
 ## Export Boundaries
 
-Recommended SDK exports:
+The SDK package should publish a dist-only export map. Workspace-local source
+conditions are useful during early scaffolding, but they must not appear in the
+publish manifest unless source files are also intentionally packed and
+supported.
 
 ```json
 {
   "exports": {
-    ".": "./src/index.ts",
-    "./au": "./src/au.ts",
-    "./effect": "./src/effect.ts",
-    "./au/effect": "./src/au-effect.ts",
-    "./client": "./src/client/index.ts",
-    "./schemas": "./src/schemas/index.ts",
-    "./server": "./src/server/index.ts",
-    "./testing": "./src/testing/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./effect": {
+      "types": "./dist/effect.d.ts",
+      "default": "./dist/effect.js"
+    },
+    "./au": {
+      "types": "./dist/au.d.ts",
+      "default": "./dist/au.js"
+    },
+    "./au/effect": {
+      "types": "./dist/au-effect.d.ts",
+      "default": "./dist/au-effect.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "default": "./dist/schemas/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
+    }
   }
 }
 ```
@@ -271,8 +290,10 @@ Recommended SDK exports:
 should expose the Effect-native `WhatTax` facade used by HTTP handlers.
 Jurisdiction subpaths such as `./au` and `./au/effect` should expose local
 Layer-backed modules, calculation descriptors and thin convenience clients
-without making the root bundle import those rules. `./client` and `./schemas`
-must be browser-safe. `./server` may include Node/server-only helpers.
+without making the root bundle import those rules. `./schemas` must be
+browser-safe and re-export calculator-owned `CalculatorRun*` schemas and
+`CalculatorServiceError` without duplicating them. `./testing` may expose
+test-only descriptors and helpers for consumers validating type behavior.
 
 ## Fumadocs Site
 

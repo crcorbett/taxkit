@@ -1,4 +1,13 @@
 export {
+  CalculatorRunFacts,
+  CalculatorRunReport,
+  CalculatorRunRequest,
+  CalculatorRunResponse,
+  CalculatorRunResponseData,
+  CalculatorRunServiceRequest,
+  CalculatorServiceError,
+} from "@whattax/calculators/schemas";
+export {
   WhatTaxCalculationError,
   WhatTaxFailure,
   WhatTaxSchemaDecodeError,

@@ -68,15 +68,54 @@ time.
 
 ## Export Paths
 
-- `@whattax/sdk`
-- `@whattax/sdk/effect`
-- `@whattax/sdk/au`
-- `@whattax/sdk/au/effect`
-- `@whattax/sdk/schemas`
-- `@whattax/sdk/testing`
+```json
+{
+  ".": {
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
+  },
+  "./effect": {
+    "types": "./dist/effect.d.ts",
+    "default": "./dist/effect.js"
+  },
+  "./au": {
+    "types": "./dist/au.d.ts",
+    "default": "./dist/au.js"
+  },
+  "./au/effect": {
+    "types": "./dist/au-effect.d.ts",
+    "default": "./dist/au-effect.js"
+  },
+  "./schemas": {
+    "types": "./dist/schemas/index.d.ts",
+    "default": "./dist/schemas/index.js"
+  },
+  "./testing": {
+    "types": "./dist/testing/index.d.ts",
+    "default": "./dist/testing/index.js"
+  }
+}
+```
 
 The root, AU and schema entrypoints are intended to remain browser-safe. Effect
-entrypoints may expose Effect-native types once the facade is implemented.
+entrypoints expose Effect-native types for consumers that want service/layer
+composition. The publish manifest is dist-only and does not expose `source`
+conditions.
+
+`@whattax/sdk/schemas` re-exports calculator-owned run contracts for consumer
+convenience:
+
+- `CalculatorRunFacts`
+- `CalculatorRunRequest`
+- `CalculatorRunServiceRequest`
+- `CalculatorRunReport`
+- `CalculatorRunResponse`
+- `CalculatorRunResponseData`
+- `CalculatorServiceError`
+
+It also exports SDK-owned safe-result and error schemas such as
+`WhatTaxCalculationError`, `WhatTaxCalculationErrorDetail`,
+`WhatTaxSchemaDecodeError` and `WhatTaxUnexpectedError`.
 
 ## Publication Readiness
 
@@ -109,6 +148,7 @@ bun run --filter=@whattax/sdk check-types
 bun run --filter=@whattax/sdk build
 bun run --filter=@whattax/sdk test-types
 bun run --filter=@whattax/sdk check-boundaries
+bun run --filter=@whattax/sdk check-packed-artifact
 ```
 
 ## Related Docs
