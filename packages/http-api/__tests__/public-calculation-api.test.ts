@@ -4,7 +4,7 @@ import { CalculationEngineLive } from "@whattax/core";
 import { aud } from "@whattax/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@whattax/rules-au-pay";
 import { AuPayTakeHomeCalculation } from "@whattax/sdk/au/effect";
-import { calculateRequest as calculateSdkRequest } from "@whattax/sdk/effect";
+import { calculateReportRequest as calculateSdkReportRequest } from "@whattax/sdk/effect";
 import { expectAt } from "@whattax/testing";
 import { Cause, Effect, Exit, Layer } from "effect";
 
@@ -34,7 +34,7 @@ describe("WhatTax public calculation HTTP API", () => {
     Effect.gen(function* () {
       const client = yield* WhatTaxHttpApiService;
       const facts = grossPayFacts(346_200, "fortnightly", true);
-      const response = yield* client.publicCalculationMetadata.calculate({
+      const response = yield* client.calculatorApi.calculate({
         params: {
           calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
         },
@@ -47,13 +47,16 @@ describe("WhatTax public calculation HTTP API", () => {
           help: "errors",
         },
       });
-      const sdkReport = yield* calculateSdkRequest(AuPayTakeHomeCalculation, {
-        payload: {
-          facts,
-          jurisdiction: "AU",
-          taxYear: "2025-26",
-        },
-      });
+      const sdkReport = yield* calculateSdkReportRequest(
+        AuPayTakeHomeCalculation,
+        {
+          payload: {
+            facts,
+            jurisdiction: "AU",
+            taxYear: "2025-26",
+          },
+        }
+      );
 
       expect(response.calculator.calculatorId).toBe("au.pay.take-home");
       expect(response.report._tag).toBe("TakeHomePayReport");
@@ -72,7 +75,7 @@ describe("WhatTax public calculation HTTP API", () => {
         const invalidFacts = {
           taxableIncome: aud(9_000_000),
         };
-        const exit = yield* client.publicCalculationMetadata
+        const exit = yield* client.calculatorApi
           .calculate({
             params: {
               calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
@@ -87,15 +90,18 @@ describe("WhatTax public calculation HTTP API", () => {
             },
           })
           .pipe(Effect.exit);
-        const sdkExit = yield* calculateSdkRequest(AuPayTakeHomeCalculation, {
-          help: "errors",
-          payload: {
-            // @ts-expect-error runtime parity covers invalid external input after the typed boundary is bypassed.
-            facts: invalidFacts,
-            jurisdiction: "AU",
-            taxYear: "2025-26",
-          },
-        }).pipe(Effect.exit);
+        const sdkExit = yield* calculateSdkReportRequest(
+          AuPayTakeHomeCalculation,
+          {
+            help: "errors",
+            payload: {
+              // @ts-expect-error runtime parity covers invalid external input after the typed boundary is bypassed.
+              facts: invalidFacts,
+              jurisdiction: "AU",
+              taxYear: "2025-26",
+            },
+          }
+        ).pipe(Effect.exit);
 
         expect(Exit.isFailure(exit)).toBe(true);
         expect(Exit.isFailure(sdkExit)).toBe(true);

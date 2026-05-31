@@ -49,13 +49,13 @@ export {
   type CalculatorCatalogEntry,
 } from "@whattax/calculators";
 
-export const PublicErrorEnvelope = Schema.Struct({
+export const CalculatorApiErrorEnvelope = Schema.Struct({
   error: CalculatorServiceError,
 }).pipe(HttpApiSchema.status("BadRequest"));
 
-export type PublicErrorEnvelope = typeof PublicErrorEnvelope.Type;
+export type CalculatorApiErrorEnvelope = typeof CalculatorApiErrorEnvelope.Type;
 
-export class PublicErrorEnvelopeData extends Data.Class<PublicErrorEnvelope> {}
+export class CalculatorApiErrorEnvelopeData extends Data.Class<CalculatorApiErrorEnvelope> {}
 
 const CalculatorParams = Schema.Struct({
   calculatorId: CalculatorId,
@@ -90,7 +90,7 @@ const GetCalculatorEndpoint = HttpApiEndpoint.get(
   "getCalculator",
   "/calculators/:calculatorId",
   {
-    error: PublicErrorEnvelope,
+    error: CalculatorApiErrorEnvelope,
     params: CalculatorParams,
     query: HelpQuery,
     success: CalculatorCatalogItem,
@@ -101,7 +101,7 @@ const GetCalculatorSchemaEndpoint = HttpApiEndpoint.get(
   "getCalculatorSchema",
   "/calculators/:calculatorId/schema",
   {
-    error: PublicErrorEnvelope,
+    error: CalculatorApiErrorEnvelope,
     params: CalculatorParams,
     query: HelpQuery,
     success: CalculatorSchemaResponse,
@@ -115,7 +115,7 @@ const GetCalculatorGraphEndpoint = HttpApiEndpoint.get(
   "getCalculatorGraph",
   "/calculators/:calculatorId/graph",
   {
-    error: PublicErrorEnvelope,
+    error: CalculatorApiErrorEnvelope,
     params: CalculatorParams,
     query: MetadataQuery,
     success: CalculatorGraphResponse,
@@ -129,7 +129,7 @@ const CalculateEndpoint = HttpApiEndpoint.post(
   "calculate",
   "/calculators/:calculatorId/calculate",
   {
-    error: PublicErrorEnvelope,
+    error: CalculatorApiErrorEnvelope,
     params: CalculatorParams,
     payload: CalculatorRunRequest,
     query: CalculationQuery,
@@ -156,9 +156,7 @@ const ListRulesEndpoint = HttpApiEndpoint.get("listRules", "/rules", {
   "List canonical rule descriptors, optionally filtered by calculator context."
 );
 
-export class PublicCalculationMetadataGroup extends HttpApiGroup.make(
-  "publicCalculationMetadata"
-)
+export class CalculatorApiGroup extends HttpApiGroup.make("calculatorApi")
   .add(GetJurisdictionsEndpoint)
   .add(GetTaxYearsEndpoint)
   .add(ListCalculatorsEndpoint)
@@ -169,4 +167,4 @@ export class PublicCalculationMetadataGroup extends HttpApiGroup.make(
   .add(ListFactsEndpoint)
   .add(ListRulesEndpoint)
   .prefix("/api/v1")
-  .annotate(OpenApi.Title, "Public calculation metadata") {}
+  .annotate(OpenApi.Title, "Calculator API") {}

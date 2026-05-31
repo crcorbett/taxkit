@@ -96,11 +96,12 @@ export it from the same module as a schema-derived type. Do not hand-write DTO
 interfaces or duplicate response shapes in handlers, clients or apps.
 
 Route-only HTTP envelopes, query schemas and status annotations stay in
-`@whattax/http-api`. HTTP-facing names such as `PublicErrorEnvelope` may stay
-in the transport package because they describe route exposure and status
-encoding. Rule-owned calculator IDs and supported context literals are composed
-by `@whattax/calculators`; reusable help modes, calculator run payloads and
-calculator service errors live in `@whattax/calculators`.
+`@whattax/http-api`. HTTP-facing names such as
+`CalculatorApiErrorEnvelope` stay in the transport package because they
+describe calculator API status encoding. Rule-owned calculator IDs and
+supported context literals are composed by `@whattax/calculators`; reusable
+help modes, calculator run payloads and calculator service errors live in
+`@whattax/calculators`.
 
 ## Current Calculator Package
 

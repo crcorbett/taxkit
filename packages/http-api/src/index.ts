@@ -16,7 +16,7 @@ export {
   CalculatorServiceError,
   CalculationQuery,
   HelpMode,
-  PublicErrorEnvelope,
+  CalculatorApiErrorEnvelope,
   UnsupportedCalculatorContextError,
   UnsupportedCalculatorError,
   getCalculatorCatalogEntry,

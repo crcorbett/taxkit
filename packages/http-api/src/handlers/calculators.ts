@@ -9,13 +9,13 @@ import {
   AuPayTakeHomeCalculation,
   AuPayWithholdingsCalculation,
 } from "@whattax/sdk/au/effect";
-import { calculateRequest as calculateSdkRequest } from "@whattax/sdk/effect";
+import { calculateReportRequest as calculateSdkReportRequest } from "@whattax/sdk/effect";
 import type { AnySdkCalculation } from "@whattax/sdk/effect";
 import { Array, Effect, HashMap, Option, Schema } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { WhatTaxApi } from "../api.js";
-import { PublicErrorEnvelopeData } from "../groups/calculators.js";
+import { CalculatorApiErrorEnvelopeData } from "../groups/calculators.js";
 
 const SdkCalculations = [
   AuPayTakeHomeCalculation,
@@ -41,9 +41,9 @@ const sdkCalculationFor = (calculatorId: CalculatorId): AnySdkCalculation =>
     )
   );
 
-export const PublicCalculationMetadataHandlerLive = HttpApiBuilder.group(
+export const CalculatorApiHandlerLive = HttpApiBuilder.group(
   WhatTaxApi,
-  "publicCalculationMetadata",
+  "calculatorApi",
   (handlers) =>
     Effect.succeed(
       handlers
@@ -75,7 +75,7 @@ export const PublicCalculationMetadataHandlerLive = HttpApiBuilder.group(
           }).pipe(
             Effect.mapError(
               (error) =>
-                new PublicErrorEnvelopeData({
+                new CalculatorApiErrorEnvelopeData({
                   error,
                 })
             )
@@ -91,7 +91,7 @@ export const PublicCalculationMetadataHandlerLive = HttpApiBuilder.group(
           }).pipe(
             Effect.mapError(
               (error) =>
-                new PublicErrorEnvelopeData({
+                new CalculatorApiErrorEnvelopeData({
                   error,
                 })
             )
@@ -107,7 +107,7 @@ export const PublicCalculationMetadataHandlerLive = HttpApiBuilder.group(
           }).pipe(
             Effect.mapError(
               (error) =>
-                new PublicErrorEnvelopeData({
+                new CalculatorApiErrorEnvelopeData({
                   error,
                 })
             )
@@ -117,7 +117,7 @@ export const PublicCalculationMetadataHandlerLive = HttpApiBuilder.group(
           Effect.gen(function* () {
             const service = yield* PublicCalculatorService;
             const sdkCalculation = sdkCalculationFor(params.calculatorId);
-            const report = yield* calculateSdkRequest(sdkCalculation, {
+            const report = yield* calculateSdkReportRequest(sdkCalculation, {
               payload,
               ...query,
             }).pipe(Effect.catchIf(Schema.isSchemaError, Effect.die));
@@ -143,7 +143,7 @@ export const PublicCalculationMetadataHandlerLive = HttpApiBuilder.group(
           }).pipe(
             Effect.mapError(
               (error) =>
-                new PublicErrorEnvelopeData({
+                new CalculatorApiErrorEnvelopeData({
                   error,
                 })
             )

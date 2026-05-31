@@ -24,6 +24,11 @@ calculator-owned `CalculatorRunFacts`, `CalculatorRunReport` and
 The HTTP API consumes the SDK like an in-process downstream consumer, while the
 SDK remains independent from `@whattax/http-api`.
 
+Effect-native report helpers are named for the report-only boundary:
+`calculateReport` accepts descriptor-typed facts and `calculateReportRequest`
+accepts a request payload while preserving descriptor-specific input and output
+typing. `createClient` builds an Effect client for selected SDK modules.
+
 ## Plain Facade
 
 ```ts

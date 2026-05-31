@@ -1,4 +1,4 @@
-import { createEffectClient } from "./effect.js";
+import { createClient } from "./effect.js";
 import {
   AuIncomeTax2025_26Module,
   AuPay2025_26Module,
@@ -14,5 +14,5 @@ export {
 
 export const auEffect = {
   createClient: () =>
-    createEffectClient(AuPay2025_26Module, AuIncomeTax2025_26Module),
+    createClient(AuPay2025_26Module, AuIncomeTax2025_26Module),
 } as const;

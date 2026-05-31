@@ -44,8 +44,9 @@ The calculate route imports reusable `CalculatorRun*` schemas and
 `CalculatorServiceError` from `@whattax/calculators`. `CalculatorRunRequest`
 has a `facts` field that is a union of canonical rule-owned input schemas, so
 generated OpenAPI exposes concrete supported fact shapes under `facts.anyOf`
-instead of `Schema.Unknown`. HTTP-only names such as `PublicErrorEnvelope`
-stay in this package because they describe transport status encoding. HTTP
+instead of `Schema.Unknown`. HTTP-only names such as
+`CalculatorApiErrorEnvelope` stay in this package because they describe
+calculator API transport status encoding. HTTP
 handlers must not try to select or transform calculator facts locally;
 `PublicCalculatorService` performs the selected-calculator `inputSchema` decode
 and returns `CalculatorInputDecodeError` with descriptor-backed help for

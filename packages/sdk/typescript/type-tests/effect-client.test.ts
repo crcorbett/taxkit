@@ -6,8 +6,8 @@ import {
 } from "@whattax/rules-au-pay";
 
 import {
-  calculateRequest,
-  createEffectClient,
+  calculateReportRequest,
+  createClient,
   defineSdkCalculation,
 } from "../src/effect.js";
 import {
@@ -17,13 +17,10 @@ import {
   AuPayTakeHomeCalculation,
 } from "../src/testing/index.js";
 
-const payClient = createEffectClient(AuPay2025_26Module);
-const fullClient = createEffectClient(
-  AuPay2025_26Module,
-  AuIncomeTax2025_26Module
-);
+const payClient = createClient(AuPay2025_26Module);
+const fullClient = createClient(AuPay2025_26Module, AuIncomeTax2025_26Module);
 
-payClient.calculations.calculate(AuPayTakeHomeCalculation, {
+payClient.calculations.calculateReport(AuPayTakeHomeCalculation, {
   grossPay: new GrossPay({
     amount: aud(165_400),
     period: "weekly",
@@ -31,10 +28,10 @@ payClient.calculations.calculate(AuPayTakeHomeCalculation, {
   taxFreeThresholdClaimed: true,
 });
 
-fullClient.calculations.calculate(AuAnnualIncomeTaxCalculation, {
+fullClient.calculations.calculateReport(AuAnnualIncomeTaxCalculation, {
   taxableIncome: aud(9_000_000),
 });
-calculateRequest(AuPayTakeHomeCalculation, {
+calculateReportRequest(AuPayTakeHomeCalculation, {
   help: "errors",
   payload: {
     facts: {
@@ -50,11 +47,11 @@ calculateRequest(AuPayTakeHomeCalculation, {
 });
 
 // @ts-expect-error annual income tax is not provided by the pay-only module.
-payClient.calculations.calculate(AuAnnualIncomeTaxCalculation, {
+payClient.calculations.calculateReport(AuAnnualIncomeTaxCalculation, {
   taxableIncome: aud(9_000_000),
 });
 
-fullClient.calculations.calculate(AuAnnualIncomeTaxCalculation, {
+fullClient.calculations.calculateReport(AuAnnualIncomeTaxCalculation, {
   // @ts-expect-error take-home facts cannot be submitted to annual tax.
   grossPay: new GrossPay({
     amount: aud(165_400),
@@ -63,11 +60,11 @@ fullClient.calculations.calculate(AuAnnualIncomeTaxCalculation, {
   taxFreeThresholdClaimed: true,
 });
 
-payClient.calculations.calculate(AuPayTakeHomeCalculation, {
+payClient.calculations.calculateReport(AuPayTakeHomeCalculation, {
   // @ts-expect-error annual-tax facts cannot be submitted to take-home pay.
   taxableIncome: aud(9_000_000),
 });
-calculateRequest(AuPayTakeHomeCalculation, {
+calculateReportRequest(AuPayTakeHomeCalculation, {
   payload: {
     facts: {
       // @ts-expect-error request-preserving Effect facade still binds facts to the selected descriptor.

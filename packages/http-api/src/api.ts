@@ -1,11 +1,11 @@
 import { HttpApi, OpenApi } from "effect/unstable/httpapi";
 
-import { PublicCalculationMetadataGroup } from "./groups/calculators.js";
+import { CalculatorApiGroup } from "./groups/calculators.js";
 import { HealthGroup } from "./groups/health.js";
 
 export class WhatTaxApi extends HttpApi.make("WhatTaxApi")
   .add(HealthGroup)
-  .add(PublicCalculationMetadataGroup)
+  .add(CalculatorApiGroup)
   .annotate(OpenApi.Title, "WhatTax API")
   .annotate(
     OpenApi.Description,

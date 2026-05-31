@@ -7,7 +7,7 @@ import { AuPayCalculatorId, GrossPay } from "@whattax/rules-au-pay";
 import { expectAt } from "@whattax/testing";
 import { Cause, Effect, Exit, Layer } from "effect";
 
-import { calculate } from "./effect.js";
+import { calculateReport } from "./effect.js";
 import {
   AuAnnualIncomeTaxCalculation,
   AuPayTakeHomeCalculation,
@@ -31,7 +31,7 @@ describe("Effect SDK facade", () => {
     () =>
       Effect.gen(function* () {
         const service = yield* PublicCalculatorService;
-        const sdkResult = yield* calculate(
+        const sdkResult = yield* calculateReport(
           AuPayTakeHomeCalculation,
           takeHomeFacts
         );
@@ -54,7 +54,7 @@ describe("Effect SDK facade", () => {
       const invalidFacts = {
         taxableIncome: aud(9_000_000),
       };
-      const sdkExit = yield* calculate(
+      const sdkExit = yield* calculateReport(
         AuPayTakeHomeCalculation,
         // @ts-expect-error runtime parity covers invalid external input after the typed boundary is bypassed.
         invalidFacts
@@ -93,7 +93,7 @@ describe("Effect SDK facade", () => {
     "keeps annual-tax descriptors executable through the same facade",
     () =>
       Effect.gen(function* () {
-        const report = yield* calculate(AuAnnualIncomeTaxCalculation, {
+        const report = yield* calculateReport(AuAnnualIncomeTaxCalculation, {
           taxableIncome: aud(9_000_000),
         });
 

@@ -42,21 +42,21 @@ const publicCalculatorService: Effect.Effect<
   WhatTaxEffectRequirements
 > = Effect.service(PublicCalculatorService);
 
-export type SdkCalculationPayload<Input> = Omit<
+export type SdkCalculatorRunPayload<Input> = Omit<
   CalculatorRunRequest,
   "facts"
 > & {
   readonly facts: Input;
 };
 
-export type SdkCalculationServiceRequest<Input> = Omit<
+export type SdkCalculatorRunServiceRequest<Input> = Omit<
   CalculatorRunServiceRequest,
   "calculatorId" | "payload"
 > & {
-  readonly payload: SdkCalculationPayload<Input>;
+  readonly payload: SdkCalculatorRunPayload<Input>;
 };
 
-export const calculateRequest = <
+export const calculateReportRequest = <
   const Id extends CalculatorId,
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
@@ -70,7 +70,7 @@ export const calculateRequest = <
     InputSchema,
     OutputSchema
   >,
-  request: SdkCalculationServiceRequest<InputSchema["Type"]>
+  request: SdkCalculatorRunServiceRequest<InputSchema["Type"]>
 ): Effect.Effect<
   OutputSchema["Type"],
   CalculatorServiceError | Schema.SchemaError,
@@ -89,7 +89,7 @@ export const calculateRequest = <
     })
   );
 
-export const calculate = <
+export const calculateReport = <
   const Id extends CalculatorId,
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
@@ -109,7 +109,7 @@ export const calculate = <
   CalculatorServiceError | Schema.SchemaError,
   WhatTaxEffectRequirements
 > =>
-  calculateRequest(calculation, {
+  calculateReportRequest(calculation, {
     payload: {
       facts: input,
       jurisdiction: calculation.jurisdiction,
@@ -117,15 +117,13 @@ export const calculate = <
     },
   });
 
-export const createEffectClient = <
-  const Modules extends readonly AnyWhatTaxModule[],
->(
+export const createClient = <const Modules extends readonly AnyWhatTaxModule[]>(
   ..._modules: Modules
 ) => ({
   calculations: {
-    calculate: <const Calculation extends ModuleCalculation<Modules>>(
+    calculateReport: <const Calculation extends ModuleCalculation<Modules>>(
       calculation: Calculation,
       input: CalculationInput<Calculation>
-    ) => calculate(calculation, input),
+    ) => calculateReport(calculation, input),
   },
 });

@@ -11,11 +11,11 @@ import {
 } from "effect/unstable/httpapi";
 
 import { WhatTaxApi } from "../api.js";
-import { PublicCalculationMetadataHandlerLive } from "../handlers/calculators.js";
+import { CalculatorApiHandlerLive } from "../handlers/calculators.js";
 import { HealthHandlerLive } from "../handlers/health.js";
 
 const ApiRoutes = HttpApiBuilder.layer(WhatTaxApi).pipe(
-  Layer.provide(PublicCalculationMetadataHandlerLive),
+  Layer.provide(CalculatorApiHandlerLive),
   Layer.provide(HealthHandlerLive),
   HttpRouter.provideRequest(
     PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
