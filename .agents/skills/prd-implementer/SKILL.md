@@ -32,6 +32,8 @@ Read in this order:
   If a slice is docs-only, app-internal, or otherwise not package-facing, record
   that reason in the handoff.
 - Keep the active execution plan current while code moves.
+- Review the target spec's call-graph diagrams before editing and report
+  whether the final implementation still matches them.
 - Prefer compile-time safety, canonical schemas, and canonical typed errors from owning packages.
 - MUST use Effect-native primitives and platform APIs when they fit:
   `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`,
@@ -77,6 +79,8 @@ Before accepting a task, audit for:
   mirrors, or stringly branching when an Effect/schema-owned approach fits
 - browser code consumes browser-safe API/SDK exports
 - package-local README and architecture docs stay aligned when ownership moves
+- runtime/package call graphs in the spec still match the implementation, or
+  the spec/docs were updated with the final graph
 
 ## Subagent Prompt Block
 
@@ -89,6 +93,7 @@ Before editing:
 
 - Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.
 - Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.
+- Review the spec's call-graph diagrams before editing, and update/report them if implementation discovers a different final graph.
 
 Implementation rules:
 
@@ -105,6 +110,7 @@ Verification and handoff:
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
+- Report whether the final implementation still matches the spec's call graph.
 - Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.
 ```
 

@@ -26,6 +26,8 @@ Read in this order:
 - Prefer one compact canonical spec over a sprawling PRD bundle.
 - Prefer progressive, end-to-end implementation spikes with explicit
   verification gates over package-by-package TODO lists.
+- Include compact call-graph diagrams in specs that describe runtime behavior,
+  package boundaries, API/SDK flows, frontend data flow or test/runtime wiring.
 - Link to architecture docs instead of restating service, API, frontend or
   package-ownership guidance.
 
@@ -47,6 +49,9 @@ principles, global verification, ordered tasks, mandatory verification,
 browser verification where relevant, completion criteria, and
 changeset/changelog requirements plus `commitAfterPassing` for each
 implementation spike.
+Specs and task lists that move runtime or package boundaries must include
+current/target call graphs and require implementers to verify the final call
+graph against code.
 Use `bun run verification` as the default repo-health gate in
 `globalVerification.requiredBeforeFinalPR` and in each task's
 `mandatoryVerification`, then add task-specific smoke tests, browser checks, or
@@ -73,6 +78,7 @@ Before editing:
 
 - Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.
 - Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.
+- Review the spec's call-graph diagrams before editing, and update/report them if implementation discovers a different final graph.
 
 Implementation rules:
 
@@ -89,6 +95,7 @@ Verification and handoff:
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
+- Report whether the final implementation still matches the spec's call graph.
 - Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.
 ```
 
@@ -106,6 +113,8 @@ Verification and handoff:
 
 - Reuse old or imported planning material only as source material to revalidate.
 - Keep specs compact, current, and ownership-aware.
+- For runtime, API, SDK, frontend and package-boundary specs, include concise
+  `Production:` and `Tests:` call-graph diagrams using fenced `ts` blocks.
 - Keep task lists concrete: each task should produce a working repo state and
   name `bun run verification` plus any task-specific tests, browser checks, and
   architecture audits required before it can be considered complete. Package-facing

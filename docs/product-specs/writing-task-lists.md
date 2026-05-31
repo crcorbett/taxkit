@@ -27,6 +27,7 @@ and explicit verification gates.
       "bun run changeset or explicit no-changeset rationale"
     ],
     "evidenceRequired": [
+      "Current and final call graph summary when runtime or package boundaries move",
       "Changeset path and release-train impact, or no-changeset rationale"
     ]
   },
@@ -38,6 +39,14 @@ Tasks that will be delegated should include an implementation prompt, or an
 equivalent field in the task object, that embeds the mandatory subagent
 contract from `docs/exec-plans/implementing-specs.md` followed by task-specific
 files, outputs and verification gates.
+
+When the sibling spec includes call graphs, delegated tasks must instruct the
+implementer to review those graphs before editing and report whether the final
+implementation still matches them. Boundary-moving tasks should include an
+`rg` audit or equivalent code inspection proving the final call graph's
+important negative claims, such as "HTTP calculate does not construct the
+calculator response" or "browser entrypoints do not import server-only
+modules."
 
 Example task shape:
 
@@ -52,6 +61,7 @@ Example task shape:
   ],
   "completionCriteria": [
     "Parent agent reviewed the diff against the spec, task and architecture docs.",
+    "Parent agent verified the final call graph against the implementation.",
     "Parent agent verified canonical Effect/schema/type/id reuse.",
     "Parent agent verified the Changeset or accepted the no-changeset rationale.",
     "Parent agent accepted the task before the next delegation."
@@ -72,6 +82,7 @@ Each task should:
   no-changeset rationale for docs-only/app-internal work
 - include browser verification when a user-facing route changes
 - include architecture audits when boundaries, schemas or runtime ownership move
+- include call-graph review and negative audits when runtime/package flows move
 - include Effect-native and canonical-type prompt guidance when delegated
 - require parent review and acceptance before the next delegated task starts
 

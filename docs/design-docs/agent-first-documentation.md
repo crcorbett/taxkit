@@ -26,6 +26,9 @@ of truth.
 - Keep public WhatTax docs focused on the open-source engine, API, SDK and docs
   site.
 - Add freshness metadata to canonical docs.
+- Include compact call-graph diagrams in docs that describe runtime behavior,
+  service/package boundaries, API/SDK flows, frontend data flow or test layer
+  wiring.
 
 ## Maintenance Triggers
 
@@ -40,13 +43,14 @@ public surfaces, implementation intent or development workflow.
   the repo root.
 - Runtime boundary change: update the local README and architecture doc in the
   same slice, especially for server-only exports, browser-safe exports and
-  Effect layer composition.
+  Effect layer composition. Include current and final call graphs when an
+  existing flow changes.
 - New architecture boundary: update the owning `docs/architecture/*` page and
   link it from `docs/architecture/README.md` only after the file exists.
 - Public API, SDK or browser/runtime change: update package READMEs and the
   relevant architecture page in the same slice.
 - Spec change: update the product spec and its sibling task list together when
-  sequencing, verification gates or acceptance criteria change.
+  sequencing, verification gates, call graphs or acceptance criteria change.
 - Multi-slice implementation: add or update the active exec plan before work
   begins, then record validation evidence as slices land.
 - Status snapshot change: refresh `docs/repo-status-outline.html` after

@@ -14,13 +14,15 @@ Implement specs in small, verifiable slices.
 1. Read the target spec and task list.
 2. Audit current code and docs before editing.
 3. Implement the smallest useful slice.
-4. Run the task's mandatory verification, including `bun run verification`
+4. Verify that any spec call-graph diagrams still match the implementation, or
+   update the spec/docs with the final graph.
+5. Run the task's mandatory verification, including `bun run verification`
    unless the task explicitly documents a narrower gate.
-5. Add or update a Changeset for package-facing changes, or record why the
+6. Add or update a Changeset for package-facing changes, or record why the
    slice is not package-facing.
-6. Record validation and versioning evidence in the active exec plan when one
+7. Record validation and versioning evidence in the active exec plan when one
    exists.
-7. Commit only after the coherent slice passes verification and the Changeset
+8. Commit only after the coherent slice passes verification and the Changeset
    decision is reviewed.
 
 ## Guardrails
@@ -46,6 +48,8 @@ Implement specs in small, verifiable slices.
   into package versions and changelogs and should be a deliberate release-prep
   slice.
 - Keep public docs neutral to downstream private products.
+- Runtime, API, SDK, frontend and package-boundary changes must leave the
+  relevant spec/architecture call graphs accurate.
 
 ## Mandatory Subagent Contract
 
@@ -57,6 +61,7 @@ You are implementing exactly one task from the WhatTax spec/task list.
 Before editing:
 - Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.
 - Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.
+- Review the spec's call-graph diagrams before editing, and update/report them if implementation discovers a different final graph.
 
 Implementation rules:
 - MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.
@@ -71,5 +76,6 @@ Verification and handoff:
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
+- Report whether the final implementation still matches the spec's call graph.
 - Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.
 ```
