@@ -7,7 +7,7 @@ import { AuPayCalculatorId, GrossPay } from "@whattax/rules-au-pay";
 import { expectAt } from "@whattax/testing";
 import { Cause, Effect, Exit, Layer } from "effect";
 
-import { calculateReport } from "./effect.js";
+import { calculateReport, calculateRunRequest } from "./effect.js";
 import {
   AuAnnualIncomeTaxCalculation,
   AuPayTakeHomeCalculation,
@@ -26,6 +26,32 @@ const takeHomeFacts = {
 };
 
 describe("Effect SDK facade", () => {
+  it.effect(
+    "returns the full canonical calculator run response with decoded report",
+    () =>
+      Effect.gen(function* () {
+        const service = yield* PublicCalculatorService;
+        const sdkResult = yield* calculateRunRequest(AuPayTakeHomeCalculation, {
+          payload: {
+            facts: takeHomeFacts,
+            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+            taxYear: AuPayTakeHomeCalculation.taxYear,
+          },
+        });
+        const serviceResult = yield* service.calculate({
+          calculatorId: AuPayTakeHomeCalculation.calculatorId,
+          payload: {
+            facts: takeHomeFacts,
+            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+            taxYear: AuPayTakeHomeCalculation.taxYear,
+          },
+        });
+
+        expect(sdkResult).toEqual(serviceResult);
+        expect(sdkResult.report._tag).toBe("TakeHomePayReport");
+      }).pipe(Effect.provide(ServiceLive))
+  );
+
   it.effect(
     "matches PublicCalculatorService for a successful calculation",
     () =>

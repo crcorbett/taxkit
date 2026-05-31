@@ -25,7 +25,7 @@ task.
 | Task | Status | Notes |
 | --- | --- | --- |
 | SDK-HTTP-001 | complete | Renamed API and SDK public symbols for clearer call graphs; verification passed. |
-| SDK-HTTP-002 | pending | Add SDK Effect full-run helper. |
+| SDK-HTTP-002 | complete | Added SDK Effect full-run helper with descriptor-narrowed response typing; verification passed. |
 | SDK-HTTP-003 | pending | Make HTTP calculate delegate to SDK full-run helper. |
 | SDK-HTTP-004 | pending | Document final call graph and downstream evidence. |
 
@@ -72,3 +72,35 @@ task.
 - `bun run changeset` was attempted after adding the explicit Changeset; the
   command is interactive and exited after failing to open `/dev/tty`.
   `bun run changeset status --verbose` confirms the release-train impact.
+
+### 2026-05-31 - SDK-HTTP-002 SDK Full-Run Helper Slice
+
+- Added `calculateRunRequest` to `@whattax/sdk/effect`. The helper calls
+  `PublicCalculatorService.calculate`, decodes the descriptor output report and
+  returns the canonical calculator run response shape with the report narrowed
+  to `OutputSchema["Type"]`.
+- Added `SdkCalculatorRunResponse<Report>` as a type-level projection over
+  calculator-owned `CalculatorRunResponse`; no runtime DTO or schema mirror was
+  introduced.
+- Made `calculateReportRequest` delegate through `calculateRunRequest`, keeping
+  `calculateReport` as the facts-only convenience over the request-preserving
+  helper.
+- Added SDK runtime coverage proving full-run helper parity with
+  `PublicCalculatorService.calculate`, plus type-test coverage for
+  descriptor-narrowed response typing and invalid facts rejection.
+- Kept HTTP handler behavior unchanged for this slice; the calculate route
+  still becomes thin in SDK-HTTP-003.
+- Updated `.changeset/clear-api-sdk-names.md` to include the SDK Effect
+  full-run helper in the existing patch release note.
+- Verification passed:
+  `bun run --filter=@whattax/sdk test`,
+  `bun run --filter=@whattax/sdk test-types`,
+  `bun run --filter=@whattax/sdk check-types`,
+  `bun run --filter=@whattax/sdk build`,
+  `bun run --filter=@whattax/sdk check-boundaries`,
+  `rg -n 'calculateRunRequest|calculateReportRequest' packages/sdk/typescript/src packages/sdk/typescript/type-tests packages/sdk/typescript/README.md docs/product-specs/sdk-backed-http-api-thin-wrapper.md`,
+  `bun run verification` and `bun run changeset status --verbose`.
+- The implemented SDK call graph matches the spec:
+  `calculateRunRequest -> PublicCalculatorService.calculate -> descriptor.decodeOutput(response.report) -> typed calculator response`;
+  `calculateReportRequest -> calculateRunRequest -> response.report`;
+  `calculateReport -> calculateReportRequest`.

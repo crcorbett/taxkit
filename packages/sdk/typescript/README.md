@@ -27,7 +27,10 @@ SDK remains independent from `@whattax/http-api`.
 Effect-native report helpers are named for the report-only boundary:
 `calculateReport` accepts descriptor-typed facts and `calculateReportRequest`
 accepts a request payload while preserving descriptor-specific input and output
-typing. `createClient` builds an Effect client for selected SDK modules.
+typing. `calculateRunRequest` returns the canonical calculator run response
+with the descriptor-decoded report type preserved for transports and advanced
+Effect consumers. `createClient` builds an Effect client for selected SDK
+modules.
 
 ## Plain Facade
 

@@ -1,14 +1,22 @@
+import type { CalculatorServiceError } from "@whattax/calculators/schemas";
 import { aud } from "@whattax/core/primitives";
 import {
   AuPayJurisdiction,
   AuPayTaxYear,
   GrossPay,
 } from "@whattax/rules-au-pay";
+import type { TakeHomePayReport } from "@whattax/rules-au-pay";
+import type { Effect, Schema } from "effect";
 
 import {
+  calculateRunRequest,
   calculateReportRequest,
   createClient,
   defineSdkCalculation,
+} from "../src/effect.js";
+import type {
+  SdkCalculatorRunResponse,
+  WhatTaxEffectRequirements,
 } from "../src/effect.js";
 import {
   AuAnnualIncomeTaxCalculation,
@@ -30,6 +38,23 @@ payClient.calculations.calculateReport(AuPayTakeHomeCalculation, {
 
 fullClient.calculations.calculateReport(AuAnnualIncomeTaxCalculation, {
   taxableIncome: aud(9_000_000),
+});
+const _fullRun: Effect.Effect<
+  SdkCalculatorRunResponse<TakeHomePayReport>,
+  CalculatorServiceError | Schema.SchemaError,
+  WhatTaxEffectRequirements
+> = calculateRunRequest(AuPayTakeHomeCalculation, {
+  payload: {
+    facts: {
+      grossPay: new GrossPay({
+        amount: aud(165_400),
+        period: "weekly",
+      }),
+      taxFreeThresholdClaimed: true,
+    },
+    jurisdiction: AuPayJurisdiction.make("AU"),
+    taxYear: AuPayTaxYear.make("2025-26"),
+  },
 });
 calculateReportRequest(AuPayTakeHomeCalculation, {
   help: "errors",
@@ -68,6 +93,14 @@ calculateReportRequest(AuPayTakeHomeCalculation, {
   payload: {
     facts: {
       // @ts-expect-error request-preserving Effect facade still binds facts to the selected descriptor.
+      taxableIncome: aud(9_000_000),
+    },
+  },
+});
+calculateRunRequest(AuPayTakeHomeCalculation, {
+  payload: {
+    facts: {
+      // @ts-expect-error full-run Effect facade still binds facts to the selected descriptor.
       taxableIncome: aud(9_000_000),
     },
   },

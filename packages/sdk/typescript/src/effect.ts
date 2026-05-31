@@ -6,6 +6,7 @@ import type {
   CalculatorRunFacts,
   CalculatorServiceError,
   CalculatorRunReport,
+  CalculatorRunResponse,
   CalculatorRunServiceRequest,
 } from "@whattax/calculators/schemas";
 import { PublicCalculatorService } from "@whattax/calculators/service";
@@ -56,6 +57,57 @@ export type SdkCalculatorRunServiceRequest<Input> = Omit<
   readonly payload: SdkCalculatorRunPayload<Input>;
 };
 
+export type SdkCalculatorRunResponse<Report> = Omit<
+  CalculatorRunResponse,
+  "report"
+> & {
+  readonly report: Report;
+};
+
+export const calculateRunRequest = <
+  const Id extends CalculatorId,
+  const Jurisdiction extends CalculatorJurisdiction,
+  const TaxYear extends CalculatorTaxYear,
+  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+>(
+  calculation: SdkCalculation<
+    Id,
+    Jurisdiction,
+    TaxYear,
+    InputSchema,
+    OutputSchema
+  >,
+  request: SdkCalculatorRunServiceRequest<InputSchema["Type"]>
+): Effect.Effect<
+  SdkCalculatorRunResponse<OutputSchema["Type"]>,
+  CalculatorServiceError | Schema.SchemaError,
+  WhatTaxEffectRequirements
+> =>
+  publicCalculatorService.pipe(
+    Effect.flatMap((service) => {
+      const { calculatorId, decodeOutput } = calculation;
+
+      return service
+        .calculate({
+          calculatorId,
+          ...request,
+        })
+        .pipe(
+          Effect.flatMap((response) =>
+            decodeOutput(response.report).pipe(
+              Effect.map(
+                (report): SdkCalculatorRunResponse<OutputSchema["Type"]> => ({
+                  ...response,
+                  report,
+                })
+              )
+            )
+          )
+        );
+    })
+  );
+
 export const calculateReportRequest = <
   const Id extends CalculatorId,
   const Jurisdiction extends CalculatorJurisdiction,
@@ -76,17 +128,8 @@ export const calculateReportRequest = <
   CalculatorServiceError | Schema.SchemaError,
   WhatTaxEffectRequirements
 > =>
-  publicCalculatorService.pipe(
-    Effect.flatMap((service) => {
-      const { calculatorId, decodeOutput } = calculation;
-
-      return service
-        .calculate({
-          calculatorId,
-          ...request,
-        })
-        .pipe(Effect.flatMap((response) => decodeOutput(response.report)));
-    })
+  calculateRunRequest(calculation, request).pipe(
+    Effect.map((run) => run.report)
   );
 
 export const calculateReport = <
