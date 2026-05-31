@@ -1,0 +1,102 @@
+---
+title: "SDK reference"
+description: "Find the public TypeScript SDK entrypoints and their owning package exports."
+status: "draft"
+---
+
+# SDK reference
+
+Use this page when you need the stable SDK names after you have chosen an
+integration path.
+
+## Entry points
+
+| Import                   | Use                                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `@whattax/sdk`           | Use `WhatTax.calculate`, `WhatTax.safe.calculate` and `WhatTax.createClient`.                        |
+| `@whattax/sdk/au`        | Use Australian calculator helpers such as `au.incomeTax.annual`.                                     |
+| `@whattax/sdk/effect`    | Use `calculateRunRequest`, `calculateReportRequest`, `calculateReport` and the Effect client helper. |
+| `@whattax/sdk/au/effect` | Use Australian calculation descriptors in Effect programs.                                           |
+| `@whattax/sdk/schemas`   | Import schema-facing types that are re-exported for SDK consumers.                                   |
+
+The SDK package remains private until release approval. The public import
+shape is still the developer contract used by docs and examples.
+
+## Plain SDK
+
+Use `WhatTax.calculate` when you already have descriptor-typed input and want a
+Promise for the report:
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+
+const report = await WhatTax.calculate(au.calculations.annualIncomeTax, {
+  taxableIncome: aud(9_000_000),
+});
+```
+
+Use the AU helper when you do not need to pass the descriptor yourself:
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { au } from "@whattax/sdk/au";
+
+const report = await au.incomeTax.annual({
+  taxableIncome: aud(9_000_000),
+});
+```
+
+## Safe SDK
+
+Use `WhatTax.safe.calculate` when expected calculator failures should be values:
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+
+const result = await WhatTax.safe.calculate(au.calculations.annualIncomeTax, {
+  taxableIncome: aud(9_000_000),
+});
+
+if (result._tag === "WhatTaxSuccess") {
+  console.log(result.value.liability.cents);
+}
+```
+
+## Effect SDK
+
+Use `calculateRunRequest` when you need a full `CalculatorRunResponse` with the
+descriptor-decoded report:
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { AuAnnualIncomeTaxCalculation } from "@whattax/sdk/au/effect";
+import { calculateRunRequest } from "@whattax/sdk/effect";
+
+const effect = calculateRunRequest(AuAnnualIncomeTaxCalculation, {
+  payload: {
+    facts: { taxableIncome: aud(9_000_000) },
+    jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
+    taxYear: AuAnnualIncomeTaxCalculation.taxYear,
+  },
+});
+```
+
+Use `calculateReportRequest` when you have a full request and only need the
+report. Use `calculateReport` when you already have descriptor-typed facts.
+
+## Owning sources
+
+- SDK facade: [`packages/sdk/typescript/src/index.ts`](../../../../packages/sdk/typescript/src/index.ts)
+- AU helpers: [`packages/sdk/typescript/src/au.ts`](../../../../packages/sdk/typescript/src/au.ts)
+- Effect helpers: [`packages/sdk/typescript/src/effect.ts`](../../../../packages/sdk/typescript/src/effect.ts)
+
+## Used by
+
+- [Run your first calculation](../start/run-your-first-calculation.mdx)
+- [Plain SDK](../sdk/plain-sdk.mdx)
+- [Effect SDK](../sdk/effect-sdk.mdx)
+- [Examples](./examples.mdx)

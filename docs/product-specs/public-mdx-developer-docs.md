@@ -418,6 +418,7 @@ Reference
   Schema reference
   Error reference
   API reference
+  Examples
   Changelog
   Versioning
   Release notes
@@ -426,6 +427,10 @@ Reference
 Reference pages should be concise and mechanically checkable. Where possible,
 generate or derive them from package exports, OpenAPI and schema metadata
 instead of maintaining hand-written copies.
+
+The accepted final navigation keeps examples under Reference because the
+current `apps/docs/navigation.json` contract has one primary section tree and
+does not yet support separate Resources anchors.
 
 ## MDX authoring standards
 

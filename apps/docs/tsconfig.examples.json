@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
+    "paths": {
+      "@whattax/calculators": ["../../packages/calculators/src/index.ts"],
+      "@whattax/calculators/live": [
+        "../../packages/calculators/src/live.layer.ts"
+      ],
+      "@whattax/calculators/*": ["../../packages/calculators/src/*.ts"],
+      "@whattax/core": ["../../packages/core/src/index.ts"],
+      "@whattax/core/*": ["../../packages/core/src/*/index.ts"],
+      "@whattax/rules-au-income-tax": [
+        "../../packages/rules/au/income-tax/src/index.ts"
+      ],
+      "@whattax/rules-au-income-tax/*": [
+        "../../packages/rules/au/income-tax/src/*/index.ts"
+      ],
+      "@whattax/rules-au-pay": ["../../packages/rules/au/pay/src/index.ts"],
+      "@whattax/rules-au-pay/*": ["../../packages/rules/au/pay/src/*/index.ts"],
+      "@whattax/sdk": ["../../packages/sdk/typescript/src/index.ts"],
+      "@whattax/sdk/au": ["../../packages/sdk/typescript/src/au.ts"],
+      "@whattax/sdk/au/effect": [
+        "../../packages/sdk/typescript/src/au-effect.ts"
+      ],
+      "@whattax/sdk/effect": ["../../packages/sdk/typescript/src/effect.ts"],
+      "@whattax/sdk/schemas": [
+        "../../packages/sdk/typescript/src/schemas/index.ts"
+      ]
+    },
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2024",
+    "typeRoots": [
+      "../../node_modules/.bun/@types+bun@1.3.14/node_modules/@types"
+    ],
+    "types": ["bun"]
+  },
+  "include": ["examples/**/*.ts"]
+}

@@ -1,0 +1,66 @@
+---
+title: "API reference"
+description: "Find the public HTTP API routes and generated reference sources."
+status: "draft"
+---
+
+# API reference
+
+Use this page when you need the current HTTP route list and the generated
+reference source.
+
+## Generated reference
+
+The endpoint contract is generated from `@whattax/http-api`.
+
+```txt
+GET /api/docs
+GET /api/docs/openapi.json
+```
+
+Use `/api/docs/openapi.json` as the field-level source of truth for generated
+clients and endpoint reference pages.
+
+## Current routes
+
+| Method | Path                                          | Use                                                          |
+| ------ | --------------------------------------------- | ------------------------------------------------------------ |
+| `GET`  | `/api/health`                                 | Check the API process.                                       |
+| `GET`  | `/api/v1/jurisdictions`                       | List supported public jurisdictions.                         |
+| `GET`  | `/api/v1/tax-years`                           | List supported calculator tax years.                         |
+| `GET`  | `/api/v1/calculators`                         | List public calculator catalogue entries.                    |
+| `GET`  | `/api/v1/calculators/:calculatorId`           | Read one calculator metadata entry.                          |
+| `GET`  | `/api/v1/calculators/:calculatorId/schema`    | Read input facts, output facts and rules for one calculator. |
+| `POST` | `/api/v1/calculators/:calculatorId/calculate` | Run one calculator with a `CalculatorRunRequest`.            |
+| `GET`  | `/api/v1/calculators/:calculatorId/graph`     | Read the calculator fact and rule graph.                     |
+| `GET`  | `/api/v1/facts`                               | List public fact descriptor metadata.                        |
+| `GET`  | `/api/v1/rules`                               | List public rule descriptor metadata.                        |
+
+## Calculate route
+
+The calculate route is a thin HTTP transport over the SDK Effect helper.
+
+```ts
+Production: HTTP calculate
+
+HTTP caller
+  -> @whattax/http-api route contract
+    -> CalculatorApiHandlerLive
+      -> @whattax/sdk/effect calculateRunRequest
+        -> PublicCalculatorService.calculate
+          -> CalculationEngine
+      -> CalculatorApiErrorEnvelope for CalculatorServiceError
+```
+
+## Owning sources
+
+- API definition: [`packages/http-api/src/api.ts`](../../../../packages/http-api/src/api.ts)
+- Calculator group: [`packages/http-api/src/groups/calculators.ts`](../../../../packages/http-api/src/groups/calculators.ts)
+- API runtime: [`apps/api/src/server.ts`](../../../../apps/api/src/server.ts)
+
+## Used by
+
+- [OpenAPI reference](../api/openapi-reference.mdx)
+- [Endpoints](../api/endpoints.mdx)
+- [Build a browser app with the HTTP API](../guides/build-a-browser-app-with-the-http-api.mdx)
+- [Examples](./examples.mdx)

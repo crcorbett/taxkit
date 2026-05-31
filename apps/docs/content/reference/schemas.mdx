@@ -1,0 +1,73 @@
+---
+title: "Schema reference"
+description: "Find the canonical calculator request, response and service error schemas."
+status: "draft"
+---
+
+# Schema reference
+
+Use this page when you need the canonical schema names for SDK, HTTP and test
+fixtures.
+
+## CalculatorRunRequest
+
+`CalculatorRunRequest` is the public request body schema for a calculator run.
+It is owned by `@whattax/calculators`.
+
+| Field          | Type                              | Notes                                                              |
+| -------------- | --------------------------------- | ------------------------------------------------------------------ |
+| `facts`        | `CalculatorRunFacts`              | A union of rule-owned scenario input schemas.                      |
+| `jurisdiction` | optional `CalculatorJurisdiction` | Omit only when the selected calculator has one supported context.  |
+| `taxYear`      | optional `CalculatorTaxYear`      | Omit only when the selected calculator has one supported tax year. |
+
+The `facts` union is intentionally composed from canonical rule package
+schemas. Do not mirror request DTOs in application code when the SDK or API
+schema already owns the shape.
+
+## CalculatorRunResponse
+
+`CalculatorRunResponse` is the canonical full run response.
+
+| Field         | Type                     | Notes                                                                                               |
+| ------------- | ------------------------ | --------------------------------------------------------------------------------------------------- |
+| `calculator`  | `CalculatorCatalogItem`  | Metadata for the selected calculator and context.                                                   |
+| `diagnostics` | `CalculationDiagnostics` | Graph and calculation diagnostics returned by the engine.                                           |
+| `report`      | `CalculatorRunReport`    | The calculator-specific report union. SDK helpers narrow this through the descriptor output schema. |
+
+## CalculatorServiceError
+
+`CalculatorServiceError` is the expected calculator service failure union.
+
+| Error                               | When you see it                                                            |
+| ----------------------------------- | -------------------------------------------------------------------------- |
+| `CalculatorInputDecodeError`        | Request facts do not match the selected calculator input schema.           |
+| `UnsupportedCalculatorError`        | The requested calculator id is not in the public catalogue.                |
+| `UnsupportedCalculatorContextError` | The calculator exists, but not for the requested jurisdiction or tax year. |
+| `CalculationError`                  | The calculation engine returned a source-backed domain failure.            |
+
+## Runtime graph
+
+```ts
+Production: schema ownership
+
+SDK or HTTP caller
+  -> CalculatorRunRequest
+    -> CalculatorRunFacts
+      -> rule-owned scenario input schema
+    -> PublicCalculatorService.calculate
+      -> CalculatorRunResponse
+      -> CalculatorServiceError for expected failures
+```
+
+## Owning sources
+
+- Calculator schemas: [`packages/calculators/src/schemas.ts`](../../../../packages/calculators/src/schemas.ts)
+- Calculator error projection: [`packages/calculators/src/errors.ts`](../../../../packages/calculators/src/errors.ts)
+- SDK schema re-exports: [`packages/sdk/typescript/src/schemas/index.ts`](../../../../packages/sdk/typescript/src/schemas/index.ts)
+
+## Used by
+
+- [Type safety](../sdk/type-safety.mdx)
+- [API errors](../api/errors.mdx)
+- [Error reference](./errors.mdx)
+- [Examples](./examples.mdx)

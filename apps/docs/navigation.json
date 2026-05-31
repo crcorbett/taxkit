@@ -384,7 +384,65 @@
       "path": "/reference",
       "source": "content/reference/index.mdx",
       "pageType": "section index",
-      "primaryReader": "Application integrator"
+      "primaryReader": "Application integrator",
+      "pages": [
+        {
+          "title": "SDK reference",
+          "path": "/reference/sdk",
+          "source": "content/reference/sdk.mdx",
+          "pageType": "reference",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Schema reference",
+          "path": "/reference/schemas",
+          "source": "content/reference/schemas.mdx",
+          "pageType": "reference",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Error reference",
+          "path": "/reference/errors",
+          "source": "content/reference/errors.mdx",
+          "pageType": "reference",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "API reference",
+          "path": "/reference/api",
+          "source": "content/reference/api.mdx",
+          "pageType": "reference",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Examples",
+          "path": "/reference/examples",
+          "source": "content/reference/examples.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Changelog",
+          "path": "/reference/changelog",
+          "source": "content/reference/changelog.mdx",
+          "pageType": "changelog or release note",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Versioning",
+          "path": "/reference/versioning",
+          "source": "content/reference/versioning.mdx",
+          "pageType": "reference",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Release notes",
+          "path": "/reference/release-notes",
+          "source": "content/reference/release-notes.mdx",
+          "pageType": "changelog or release note",
+          "primaryReader": "Application integrator"
+        }
+      ]
     }
   ]
 }

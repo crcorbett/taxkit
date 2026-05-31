@@ -28,7 +28,7 @@ task.
 | DOCS-MDX-002 | complete | Added public Start and SDK MDX pages covering the SDK quickstart, install path, first calculation, SDK-vs-API choice, plain SDK, safe SDK, Effect SDK, schemas and type safety. |
 | DOCS-MDX-003 | complete | Added API, guides and concepts MDX pages, navigation entries and generated-reference follow-up. |
 | DOCS-MDX-004 | complete | Added Contributing MDX pages for contribution routing, facts, rules, calculators, tax years, incorrect-result fixes, testing, source citations, naming/schema standards, Effect service standards, backward compatibility, Changesets, PR evidence and review expectations. |
-| DOCS-MDX-005 | pending | Add reference, examples and final docs validation. |
+| DOCS-MDX-005 | complete | Added Reference pages, examples, final navigation, docs validation config and final validation evidence. |
 
 ## Validation log
 
@@ -271,3 +271,78 @@ task.
   `calculateRunRequest`, `PublicCalculatorService.calculate` and
   `CalculationEngine` rather than putting tax logic in transport or SDK
   adapters.
+
+### 2026-06-01 - DOCS-MDX-005 implementation
+
+- Read the public MDX developer docs spec, `DOCS-MDX-005`, API/SDK, content,
+  facts, calculators and testing architecture docs and the documentation
+  standards suite.
+- Loaded the reference, section-index, guide and changelog/release-note
+  templates.
+- Loaded the SDK evaluator, application integrator, API consumer and
+  type-safety focused developer journeys.
+- Added Reference pages for SDK, schemas, errors, API, examples, changelog,
+  versioning and release notes.
+- Added example files covering:
+  - Node/server SDK route usage
+  - browser HTTP `fetch` usage
+  - Effect `calculateRunRequest` construction
+  - `WhatTax.safe.calculate` error handling
+- Added `apps/docs/scripts/validate-content.mjs` for MDX content-root
+  validation of frontmatter, balanced fences, navigation sources, local links,
+  banned marketing language, stale public names and private downstream product
+  terms.
+- Added `apps/docs/tsconfig.examples.json` so example files can type-check
+  against current package source exports while `apps/docs` remains a content
+  root without a package manifest.
+- Updated `apps/docs/navigation.json` so final Reference child pages are part
+  of the navigation contract.
+- Updated the spec Reference section with the accepted final placement of
+  Examples under Reference because the current navigation contract does not
+  yet support separate Resources anchors.
+- Docs app typecheck/build remains unavailable because `apps/docs` still has
+  no package manifest or docs framework runtime. Example type-checking is
+  covered by `apps/docs/tsconfig.examples.json`.
+- Validation passed:
+  - `bun run build`
+  - `bun run verification`
+  - `node apps/docs/scripts/validate-content.mjs`
+  - `bunx tsc -p apps/docs/tsconfig.examples.json --noEmit`
+  - `jq empty apps/docs/navigation.json && jq empty apps/docs/navigation.schema.json`
+  - `git diff --check`
+  - `test ! -f apps/docs/package.json && echo 'apps/docs has no package manifest or docs runtime package'`
+  - SDK example smoke checks:
+    - `bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/node-server.ts`
+    - `bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/effect.ts`
+    - `bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/error-handling.ts`
+  - API example smoke check:
+    - `bun run --filter=api --elide-lines=0 start`
+    - `bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/browser-http.ts`
+  - OpenAPI/reference generation smoke check:
+    - `curl -fsS http://127.0.0.1:4000/api/docs/openapi.json` confirmed
+      title `WhatTax API` and 10 paths including the calculate route.
+  - Documentation standards audit scans:
+    - banned marketing language: no matches in `apps/docs/content` or
+      `apps/docs/examples`
+    - stale public names: no matches for `calculateRequest`,
+      `createEffectClient`, `PublicCalculationMetadata*` or
+      `PublicErrorEnvelope`
+    - private downstream product terms: no matches for `adad`, `SaaS`,
+      `paid`, `simulation`, `AI`, `private downstream` or `private product`
+    - current public names verified across Reference docs and examples:
+      `WhatTax.calculate`, `WhatTax.safe.calculate`, `au.incomeTax.annual`,
+      `calculateRunRequest`, `calculateReportRequest`, `calculateReport`,
+      `CalculatorRunRequest`, `CalculatorRunResponse` and
+      `CalculatorServiceError`
+  - `bun run changeset status --verbose`
+- Changeset rationale: no new Changeset was required because this slice only
+  changes public MDX content, docs examples, validation config, navigation,
+  the accepted docs spec structure and this active execution plan. It does not
+  change package exports, package README behaviour, package metadata or
+  runtime behaviour.
+- Final call graph still matches the spec. Public docs requests route through
+  `apps/docs/navigation.json` into MDX pages and examples. HTTP calculate
+  documentation still routes through `CalculatorApiHandlerLive` to
+  `@whattax/sdk/effect` `calculateRunRequest`,
+  `PublicCalculatorService.calculate` and `CalculationEngine`, with
+  `CalculatorApiErrorEnvelope` for expected service errors.

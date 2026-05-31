@@ -1,0 +1,52 @@
+---
+title: "Release notes"
+description: "Write public release notes from applied changelogs and pending Changesets."
+status: "draft"
+---
+
+# Release notes
+
+Use this page when you need to prepare reader-facing release notes from the
+repository changelog and applied package changelogs.
+
+## Source order
+
+Use sources in this order:
+
+1. Applied package changelogs after `bun run version-repo`.
+2. The repository [`CHANGELOG.md`](../../../../CHANGELOG.md).
+3. Pending `.changeset/*.md` files only before a release is applied.
+4. Public docs pages when the release changes SDK, API or contribution
+   behaviour.
+
+Do not describe unreleased package behaviour as available unless the package
+manifest, source export and verification evidence exist.
+
+## Release note shape
+
+```md
+# Version 0.0.1
+
+## Changed
+
+- Added public calculator metadata and execution routes.
+- Added the standalone Bun API runtime.
+
+## Migration notes
+
+No migration is required for first release consumers.
+```
+
+## Review checklist
+
+- Name the affected public SDK, API, calculator or package surface.
+- Explain required migration steps, if any.
+- Link to the owning guide or reference page.
+- Avoid downstream application details.
+- Confirm `bun run changeset status --verbose` before handoff.
+
+## Related pages
+
+- [Changelog](./changelog.mdx)
+- [Versioning](./versioning.mdx)
+- [PR evidence checklist](../contributing/pr-evidence-checklist.mdx)

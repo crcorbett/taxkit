@@ -1,0 +1,77 @@
+---
+title: "Error reference"
+description: "Handle expected WhatTax SDK, calculator service and HTTP API errors."
+status: "draft"
+---
+
+# Error reference
+
+Use this page when you need to map expected failures from SDK calls or HTTP
+responses.
+
+## SDK errors
+
+`WhatTax.safe.calculate` returns a tagged success or failure value.
+
+| Result           | Meaning                                                |
+| ---------------- | ------------------------------------------------------ |
+| `WhatTaxSuccess` | The calculation returned a descriptor-decoded report.  |
+| `WhatTaxFailure` | The calculation failed with `WhatTaxCalculationError`. |
+
+`WhatTaxCalculationError.error` can contain a `CalculatorServiceError`, a
+schema decode error from descriptor output decoding or an unexpected defect
+wrapper.
+
+## CalculatorServiceError
+
+The calculator service uses `CalculatorServiceError` for expected failures.
+
+| Error                               | Handling guidance                                               |
+| ----------------------------------- | --------------------------------------------------------------- |
+| `CalculatorInputDecodeError`        | Show issue paths and optional descriptor help.                  |
+| `UnsupportedCalculatorError`        | Treat the calculator id as an integration error.                |
+| `UnsupportedCalculatorContextError` | Ask the caller to choose a supported jurisdiction and tax year. |
+| `CalculationError`                  | Preserve the domain message and source context for review.      |
+
+## HTTP errors
+
+The HTTP API wraps expected calculator service failures in
+`CalculatorApiErrorEnvelope`. The envelope is owned by `@whattax/http-api`
+because it describes transport status encoding.
+
+```json
+{
+  "error": {
+    "_tag": "CalculatorInputDecodeError",
+    "issues": [{ "path": ["grossPay"], "message": "Expected GrossPay" }],
+    "message": "Invalid facts for au.pay.take-home"
+  }
+}
+```
+
+Use `?help=errors` when you want descriptor-backed field help for invalid
+facts.
+
+## Error flow
+
+```ts
+Production: expected calculator failure
+
+Caller
+  -> WhatTax.safe.calculate or HTTP calculate
+    -> PublicCalculatorService.calculate
+      -> CalculatorServiceError
+    -> WhatTaxFailure or CalculatorApiErrorEnvelope
+```
+
+## Owning sources
+
+- SDK errors: [`packages/sdk/typescript/src/errors.ts`](../../../../packages/sdk/typescript/src/errors.ts)
+- Calculator service errors: [`packages/calculators/src/schemas.ts`](../../../../packages/calculators/src/schemas.ts)
+- HTTP API error envelope: [`packages/http-api/src/groups/calculators.ts`](../../../../packages/http-api/src/groups/calculators.ts)
+
+## Used by
+
+- [Handle validation errors](../guides/handle-validation-errors.mdx)
+- [API errors](../api/errors.mdx)
+- [Schema reference](./schemas.mdx)

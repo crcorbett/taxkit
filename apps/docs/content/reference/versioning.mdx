@@ -1,0 +1,56 @@
+---
+title: "Versioning"
+description: "Understand WhatTax release-train versioning and Changeset expectations."
+status: "draft"
+---
+
+# Versioning
+
+Use this page when you need to decide whether a docs, SDK, API or rule change
+needs release metadata.
+
+## Release train
+
+WhatTax uses a fixed release-train workflow for implemented packages. Package
+versions should move together when `bun run version-repo` applies pending
+Changesets.
+
+```ts
+Production: release metadata
+
+package-facing change
+  -> Changeset
+    -> bun run changeset status --verbose
+    -> bun run version-repo during release prep
+    -> package changelogs and versions
+```
+
+## When to add a Changeset
+
+Add a Changeset when you change package-facing behaviour:
+
+- package exports
+- package README behaviour or commands
+- public SDK helper shape
+- HTTP API request, response or status shape
+- calculator schemas, errors, rule behaviour or package metadata
+
+Record a no-Changeset rationale when the change is docs-only, app-internal or
+execution-plan-only.
+
+## Commands
+
+```sh
+bun run changeset
+bun run changeset status --verbose
+```
+
+Run `bun run version-repo` only when you intend to apply pending release-train
+versions and changelogs.
+
+## Related pages
+
+- [Changelog](./changelog.mdx)
+- [Release notes](./release-notes.mdx)
+- [Backward compatibility](../contributing/backward-compatibility.mdx)
+- [Changesets](../contributing/changesets.mdx)

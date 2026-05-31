@@ -1,0 +1,49 @@
+---
+title: "Examples"
+description: "Run copyable SDK, HTTP, Effect and error-handling examples."
+status: "draft"
+---
+
+# Examples
+
+Use these examples when you want a short file that exercises one public
+integration path.
+
+## Example files
+
+| Example             | Path                                                                       | Covers                                                                  |
+| ------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Node server route   | [`apps/docs/examples/node-server.ts`](../../examples/node-server.ts)       | Calling `au.pay.takeHomePay` from a server route.                       |
+| Browser HTTP caller | [`apps/docs/examples/browser-http.ts`](../../examples/browser-http.ts)     | Posting a `CalculatorRunRequest` JSON payload with `fetch`.             |
+| Effect request      | [`apps/docs/examples/effect.ts`](../../examples/effect.ts)                 | Constructing a `calculateRunRequest` program for an Effect application. |
+| Error handling      | [`apps/docs/examples/error-handling.ts`](../../examples/error-handling.ts) | Reading a `WhatTax.safe.calculate` failure value.                       |
+
+## Run SDK examples
+
+Build the workspace first so package exports resolve through `dist`:
+
+```sh
+bun run build
+bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/node-server.ts
+bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/effect.ts
+bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/error-handling.ts
+```
+
+## Run the browser HTTP example
+
+Start the API app, then run the browser-shaped `fetch` example:
+
+```sh
+bun run --filter=api --elide-lines=0 start
+bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/browser-http.ts
+```
+
+The browser example uses only JSON and `fetch`, so the same request body can be
+used from browser code or another runtime.
+
+## Related pages
+
+- [SDK reference](./sdk.mdx)
+- [API reference](./api.mdx)
+- [Error reference](./errors.mdx)
+- [Test your integration](../guides/test-your-integration.mdx)

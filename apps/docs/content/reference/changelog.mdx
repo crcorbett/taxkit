@@ -1,0 +1,41 @@
+---
+title: "Changelog"
+description: "Find the current public changelog and package changelog sources."
+status: "draft"
+---
+
+# Changelog
+
+Use this page when you need release history after a version has been applied.
+
+## Current changelog sources
+
+| Source                                                       | Owns                                                                |
+| ------------------------------------------------------------ | ------------------------------------------------------------------- |
+| [`CHANGELOG.md`](../../../../CHANGELOG.md)                   | Repository-level release summary and package changelog index.       |
+| [`apps/api/CHANGELOG.md`](../../../../apps/api/CHANGELOG.md) | API app release notes.                                              |
+| Package `CHANGELOG.md` files                                 | Package-local release history after the release train is versioned. |
+| `.changeset/*.md`                                            | Pending release intent before `bun run version-repo` is applied.    |
+
+## Current release
+
+The current repository changelog records version `0.0.1`. It includes the
+public calculator API routes, calculator orchestration package, calculation
+engine hardening, API runtime and fixed release-train workflow.
+
+## Pending changes
+
+Before a release is cut, inspect pending Changesets:
+
+```sh
+bun run changeset status --verbose
+```
+
+Do not copy pending Changeset text into a public changelog by hand. Apply the
+release train with `bun run version-repo` only during deliberate release prep.
+
+## Related pages
+
+- [Versioning](./versioning.mdx)
+- [Release notes](./release-notes.mdx)
+- [Changesets](../contributing/changesets.mdx)
