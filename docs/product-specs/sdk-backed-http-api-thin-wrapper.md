@@ -22,6 +22,11 @@ This spec moves full calculator-run response assembly behind the SDK Effect
 facade while keeping HTTP route schemas, status annotations, OpenAPI metadata
 and HTTP error envelopes in `@whattax/http-api`.
 
+It also renames the confusing API and SDK public symbols that now show up in
+call graphs. Names should describe the runtime boundary they represent:
+calculator API transport, calculator run execution or typed report-only
+convenience.
+
 ## Problem
 
 The current calculate call graph is split:
@@ -52,6 +57,9 @@ This proves the SDK boundary but leaves two issues:
   transport boundary
 - success parity between HTTP and SDK relies on the handler stitching together
   service calls instead of delegating one complete run operation
+- names such as `PublicCalculationMetadataHandlerLive` and
+  `calculateRequest` hide the actual boundary: a calculator API handler is
+  running calculator execution through a report-only SDK helper
 
 ## Goals
 
@@ -59,6 +67,8 @@ This proves the SDK boundary but leaves two issues:
   descriptor-specific report type preserved.
 - Make the HTTP calculate handler call one SDK full-run helper and map only
   HTTP transport errors/envelopes.
+- Rename API and SDK public symbols so call graphs read as calculator API
+  transport delegating to calculator-run SDK helpers.
 - Keep `@whattax/sdk` independent of `@whattax/http-api`.
 - Keep `@whattax/http-api` as the owner of route paths, params, query schemas,
   status annotations, OpenAPI metadata and HTTP error envelopes.
@@ -77,6 +87,8 @@ This proves the SDK boundary but leaves two issues:
 - Do not publish the SDK or remove `private: true`.
 - Do not redesign metadata/list/schema/graph routes in this slice unless a
   verification failure requires a narrow fix.
+- Do not preserve old names indefinitely. Transitional aliases may exist during
+  migration, but docs and call graphs should advertise only the final names.
 
 ## Ownership And Boundaries
 
@@ -91,7 +103,7 @@ This proves the SDK boundary but leaves two issues:
 - `HttpApiGroup` and `HttpApiEndpoint` definitions
 - path params, query schemas and payload/status annotations
 - OpenAPI descriptions
-- `PublicErrorEnvelope`
+- `CalculatorApiErrorEnvelope`
 - mapping typed SDK/calculator failures to HTTP error envelopes
 
 `@whattax/calculators` remains the reusable calculation service owner:
@@ -104,6 +116,44 @@ This proves the SDK boundary but leaves two issues:
 
 ## Proposed Approach
 
+### Naming Contract
+
+Rename API and SDK symbols before simplifying the call graph so implementation
+and docs are easier to audit.
+
+HTTP API names:
+
+| Current name | Target name | Notes |
+| --- | --- | --- |
+| `PublicCalculationMetadataGroup` | `CalculatorApiGroup` | The group owns the calculator API surface, not only metadata. |
+| `PublicCalculationMetadataHandlerLive` | `CalculatorApiHandlerLive` | The handler layer owns all calculator API handlers, including calculate. |
+| `PublicErrorEnvelope` | `CalculatorApiErrorEnvelope` | HTTP-owned bad-request envelope for calculator API failures. |
+| `PublicErrorEnvelopeData` | `CalculatorApiErrorEnvelopeData` | Data constructor for the HTTP envelope. |
+
+SDK Effect names:
+
+| Current name | Target name | Notes |
+| --- | --- | --- |
+| `calculateRequest` | `calculateReportRequest` | Report-only helper over a request payload. |
+| `calculate` | `calculateReport` | Report-only helper over facts input. |
+| new helper | `calculateRunRequest` | Full calculator-run response helper for transports and advanced consumers. |
+| `createEffectClient` | `createClient` | The `/effect` subpath already communicates Effect usage. |
+| `SdkCalculationPayload` | `SdkCalculatorRunPayload` | Request payload with descriptor-narrowed facts. |
+| `SdkCalculationServiceRequest` | `SdkCalculatorRunServiceRequest` | Service request without route-owned calculator id. |
+| new type | `SdkCalculatorRunResponse` | Compile-time projection over `CalculatorRunResponse` with narrowed report. |
+
+Plain SDK names:
+
+| Current name | Target name | Notes |
+| --- | --- | --- |
+| `WhatTax.calculate` | keep | The plain facade is intentionally ergonomic and report-only. |
+| `WhatTax.safe.calculate` | keep | Safe report-only plain facade. |
+| optional new helper | `WhatTax.calculateRun` | Plain full-run helper may be added later, but is not required for the HTTP cleanup. |
+
+Transitional aliases may be retained inside the SDK and HTTP API during the
+repo migration, but they must be marked deprecated and omitted from README
+examples, architecture docs and call graphs before publication.
+
 ### Target Production Call Graph
 
 ```ts
@@ -111,7 +161,7 @@ Production: target HTTP calculate
 
 apps/api Bun process
   -> WhatTaxServerLayer
-    -> PublicCalculationMetadataHandlerLive
+    -> CalculatorApiHandlerLive
       -> sdkCalculationFor(params.calculatorId)
       -> @whattax/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
@@ -123,7 +173,7 @@ apps/api Bun process
           -> CalculatorRunResponseData
         -> descriptor output decode for response.report
         -> typed CalculatorRunResponse with narrowed report
-      -> PublicErrorEnvelope on CalculatorServiceError
+      -> CalculatorApiErrorEnvelope on CalculatorServiceError
 ```
 
 The HTTP handler should not call `getCalculator`, `getCalculatorGraph` or
@@ -144,11 +194,11 @@ Effect consumer
     -> response with report narrowed to OutputSchema["Type"]
 
 Report-only helpers
-  -> calculateRequest(...)
+  -> calculateReportRequest(...)
     -> calculateRunRequest(...)
     -> response.report
-  -> calculate(...)
-    -> calculateRequest(...)
+  -> calculateReport(...)
+    -> calculateReportRequest(...)
 ```
 
 The full-run return type may be an SDK-owned type-level projection over
@@ -196,7 +246,7 @@ channel.
 CalculatorServiceError | Schema.SchemaError
 ```
 
-`CalculatorServiceError` should map to `PublicErrorEnvelope` in
+`CalculatorServiceError` should map to `CalculatorApiErrorEnvelope` in
 `@whattax/http-api`.
 
 `Schema.SchemaError` from descriptor output decode is outside the declared
@@ -215,7 +265,7 @@ Production: metadata routes
 
 HTTP handlers
   -> PublicCalculatorService.listCalculators / getCalculator / getCalculatorGraph
-  -> PublicErrorEnvelope for expected lookup/context failures
+  -> CalculatorApiErrorEnvelope for expected lookup/context failures
 ```
 
 A later uniform SDK catalog facade can move those routes through the SDK too.
@@ -239,11 +289,11 @@ Tests: HTTP calculate thin wrapper
 
 HTTP API tests
   -> WhatTaxServerLayer
-    -> PublicCalculationMetadataHandlerLive
+    -> CalculatorApiHandlerLive
       -> @whattax/sdk/effect calculateRunRequest
         -> PublicCalculatorServiceLive
   -> success response matches SDK full-run response
-  -> CalculatorInputDecodeError still maps to PublicErrorEnvelope
+  -> CalculatorInputDecodeError still maps to CalculatorApiErrorEnvelope
 ```
 
 ```ts
@@ -277,6 +327,8 @@ Required verification:
 - A full-run SDK helper adds another public SDK function. It is worth doing
   before publication because it prevents HTTP-only response assembly from
   becoming the de facto reusable contract.
+- Renaming pre-publication API/SDK symbols creates short-term repo churn, but
+  avoids locking confusing names into the published package and docs.
 - The SDK full-run helper needs a type-level response projection. That is a
   narrow SDK-owned type convenience, not a duplicated runtime schema.
 - Metadata routes will still call `PublicCalculatorService` directly until a
@@ -287,9 +339,11 @@ Required verification:
 
 Package-facing impact:
 
-- `@whattax/sdk`: patch for new Effect full-run helper and exported type.
+- `@whattax/sdk`: patch for clearer Effect helper/type names, a new Effect
+  full-run helper and exported response type.
 - `@whattax/http-api`: patch for handler behavior moving behind the SDK
-  facade while preserving route behavior.
+  facade and clearer calculator API group/envelope names while preserving
+  route behavior.
 
 No `@whattax/calculators` Changeset is expected unless implementation changes
 calculator-owned schemas, service contracts or runtime behavior.
@@ -298,14 +352,18 @@ calculator-owned schemas, service contracts or runtime behavior.
 
 - `@whattax/sdk/effect` exports a full-run helper that returns the canonical
   calculator response shape with descriptor-narrowed `report` typing.
-- Existing SDK report-only helpers delegate through the full-run helper instead
-  of reimplementing service calls.
+- SDK Effect report-only helpers are named `calculateReportRequest` and
+  `calculateReport`, and delegate through the full-run helper instead of
+  reimplementing service calls.
 - The HTTP calculate handler calls one SDK full-run helper for successful
   calculation execution.
 - The HTTP calculate handler no longer calls `getCalculator`,
   `getCalculatorGraph` or constructs `CalculatorRunResponseData`.
+- HTTP calculator API symbols are renamed to `CalculatorApiGroup`,
+  `CalculatorApiHandlerLive`, `CalculatorApiErrorEnvelope` and
+  `CalculatorApiErrorEnvelopeData`.
 - HTTP route schemas, status annotations, OpenAPI metadata and
-  `PublicErrorEnvelope` remain in `@whattax/http-api`.
+  `CalculatorApiErrorEnvelope` remain in `@whattax/http-api`.
 - SDK import-boundary checks still prove no dependency on `@whattax/http-api`.
 - Runtime parity tests prove HTTP success/error behavior still matches the SDK
   and calculator service.
