@@ -1,0 +1,51 @@
+---
+title: "Contributing"
+description: "Propose and prepare changes to facts, rules, calculators and tax-year support."
+status: "draft"
+---
+
+# Contributing
+
+Use this section when you want to propose a tax behaviour change and prepare a
+pull request with source evidence, tests and release-impact notes.
+
+## Planned pages
+
+- Overview
+- What are you changing?
+- Contribution workflow
+- Domain model
+- Add a fact
+- Add a rule
+- Add a calculator
+- Add a tax year
+- Fix an incorrect result
+- Testing
+- Standards
+- Pull requests
+
+## Contribution flow
+
+```mermaid
+flowchart TD
+  Change["What are you changing?"]
+  Fact["Add a fact"]
+  Rule["Add a rule"]
+  Calculator["Add a calculator"]
+  TaxYear["Add a tax year"]
+  Evidence["Prepare PR evidence"]
+  Change --> Fact
+  Change --> Rule
+  Change --> Calculator
+  Change --> TaxYear
+  Fact --> Evidence
+  Rule --> Evidence
+  Calculator --> Evidence
+  TaxYear --> Evidence
+```
+
+## Related sections
+
+- [Concepts](../concepts/index.mdx)
+- [Guides](../guides/index.mdx)
+- [Reference](../reference/index.mdx)

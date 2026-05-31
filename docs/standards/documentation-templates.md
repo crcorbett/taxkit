@@ -36,6 +36,7 @@ Every page should answer:
 | API reference overview | The reader needs narrative context before generated API reference. | [API reference overview](./documentation-templates/api-reference-overview.md) |
 | Contribution guide | The reader needs to propose or implement a repo contribution. | [Contribution guide](./documentation-templates/contribution-guide.md) |
 | Reference | The reader needs stable field, schema, API or SDK facts. | [Reference](./documentation-templates/reference.md) |
+| Section index | The reader needs to understand what a docs section contains and where to go next. | [Section index](./documentation-templates/section-index.md) |
 | Troubleshooting | The reader has a known failure mode. | [Troubleshooting](./documentation-templates/troubleshooting.md) |
 | Changelog or release note | The reader needs release impact and migration notes. | [Changelog or release note](./documentation-templates/changelog-or-release-note.md) |
 

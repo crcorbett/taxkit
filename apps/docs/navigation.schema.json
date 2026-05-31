@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WhatTax docs navigation",
+  "type": "object",
+  "required": ["status", "contentRoot", "primaryNavigation"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "contentRoot": {
+      "type": "string"
+    },
+    "primaryNavigation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "path", "source", "pageType", "primaryReader"],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "pageType": {
+            "type": "string"
+          },
+          "primaryReader": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "./navigation.schema.json",
+  "status": "draft",
+  "contentRoot": "apps/docs/content",
+  "primaryNavigation": [
+    {
+      "title": "Start",
+      "path": "/start",
+      "source": "content/start/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "SDK evaluator"
+    },
+    {
+      "title": "SDK",
+      "path": "/sdk",
+      "source": "content/sdk/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "SDK evaluator"
+    },
+    {
+      "title": "API",
+      "path": "/api",
+      "source": "content/api/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "API consumer"
+    },
+    {
+      "title": "Guides",
+      "path": "/guides",
+      "source": "content/guides/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "Application integrator"
+    },
+    {
+      "title": "Concepts",
+      "path": "/concepts",
+      "source": "content/concepts/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "Type-safety focused developer"
+    },
+    {
+      "title": "Contributing",
+      "path": "/contributing",
+      "source": "content/contributing/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "New contributor"
+    },
+    {
+      "title": "Reference",
+      "path": "/reference",
+      "source": "content/reference/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "Application integrator"
+    }
+  ]
+}

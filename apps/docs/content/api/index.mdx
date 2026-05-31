@@ -1,0 +1,36 @@
+---
+title: "API"
+description: "Call WhatTax over HTTP when the caller cannot import the SDK."
+status: "draft"
+---
+
+# API
+
+Use this section when your caller needs HTTP transport, generated endpoint
+contracts or OpenAPI reference material.
+
+## Planned pages
+
+- Overview
+- Authentication and deployment assumptions
+- Errors
+- OpenAPI reference
+- Endpoints
+
+## Runtime graph
+
+```ts
+Production: HTTP calculate
+
+HTTP caller
+  -> @whattax/http-api route contract
+    -> CalculatorApiHandlerLive
+      -> @whattax/sdk/effect calculateRunRequest
+        -> PublicCalculatorService.calculate
+```
+
+## Related sections
+
+- [SDK](../sdk/index.mdx)
+- [Guides](../guides/index.mdx)
+- [Reference](../reference/index.mdx)
