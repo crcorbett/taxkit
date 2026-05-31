@@ -167,3 +167,31 @@ task.
   `CalculatorApiHandlerLive` to `@whattax/sdk/effect` `calculateRunRequest`,
   then to `PublicCalculatorService.calculate` and `CalculationEngine`, with
   `CalculatorApiErrorEnvelope` for expected service errors.
+
+### 2026-06-01 - DOCS-MDX-003 parent acceptance
+
+- Parent reviewed the committed API, guides and concepts slice in
+  `0beb1b8 Add API guides and concepts docs`.
+- Confirmed the changed file scope is limited to API, Guides and Concepts MDX
+  pages, navigation and this execution plan.
+- Verified `apps/docs/navigation.json` and
+  `apps/docs/navigation.schema.json` parse successfully with `jq empty`.
+- Audited every navigation `source` entry for API, Guides and Concepts and
+  confirmed each MDX file exists.
+- Audited API, Guides and Concepts MDX pages for frontmatter, balanced code
+  fences and valid relative links.
+- Confirmed public docs may link to deeper architecture docs under the current
+  documentation architecture standard and spec.
+- Audited API, Guides and Concepts pages for banned marketing wording, private
+  downstream product names and stale SDK/API names; no matches were found.
+- Verified current public API/SDK names appear across the slice:
+  `WhatTax.calculate`, `WhatTax.safe.calculate`, `au.incomeTax.annual`,
+  `calculateRunRequest`, `calculateReportRequest`, `calculateReport`,
+  `CalculatorRunRequest`, `CalculatorRunResponse` and
+  `CalculatorServiceError`.
+- Verified the HTTP calculate over SDK call graph appears in the public API and
+  concept docs.
+- Verification passed:
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Accepted `DOCS-MDX-003` for the parent gate.
