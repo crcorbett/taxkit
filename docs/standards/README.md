@@ -9,6 +9,12 @@ quality tools.
 
 - [Code patterns](./code-patterns.md)
 - [Docstring conventions](./docstrings.md)
+- [Documentation architecture](./documentation-architecture.md)
+- [Documentation review](./documentation-review.md)
+- [Documentation style](./documentation-style.md)
+- [Documentation templates](./documentation-templates.md)
+- [Documentation user journeys](./documentation-user-journeys.md)
+- [Documentation writing](./documentation-writing.md)
 - [Formatting, linting, and dependency hygiene](./tooling.md)
 - [Versioning and Changesets](./versioning.md)
 - [Productionization audit](./productionization-audit.md)
