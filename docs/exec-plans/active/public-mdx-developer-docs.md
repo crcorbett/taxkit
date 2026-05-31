@@ -96,3 +96,27 @@ task.
 - Changeset rationale: no new Changeset was required because this slice is
   public docs content and navigation only. It does not change package exports,
   package README behaviour or runtime behaviour.
+
+### 2026-06-01 - DOCS-MDX-002 parent acceptance
+
+- Parent reviewed the committed Start and SDK docs slice in
+  `607a1b6 Add Start and SDK developer docs`.
+- Verified `apps/docs/navigation.json` and
+  `apps/docs/navigation.schema.json` parse successfully with `jq empty`.
+- Audited every Start and SDK navigation `source` entry and confirmed each MDX
+  file exists.
+- Audited Start and SDK MDX pages for frontmatter, balanced code fences and
+  valid relative links.
+- Audited Start and SDK docs for banned marketing wording and stale SDK/API
+  names including `calculateRequest`, `createEffectClient`,
+  `PublicCalculationMetadata` and `PublicErrorEnvelope`; no matches were
+  found.
+- Verified current public SDK names appear across the Start and SDK docs:
+  `WhatTax.calculate`, `WhatTax.safe.calculate`, `calculateRunRequest`,
+  `calculateReportRequest`, `calculateReport`, `CalculatorRunRequest`,
+  `CalculatorRunResponse` and `CalculatorServiceError`.
+- Verification passed:
+  - `bun run --filter=@whattax/sdk test-types`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Accepted `DOCS-MDX-002` for the parent gate.
