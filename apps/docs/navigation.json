@@ -277,7 +277,107 @@
       "path": "/contributing",
       "source": "content/contributing/index.mdx",
       "pageType": "section index",
-      "primaryReader": "New contributor"
+      "primaryReader": "New contributor",
+      "pages": [
+        {
+          "title": "What are you changing?",
+          "path": "/contributing/what-are-you-changing",
+          "source": "content/contributing/what-are-you-changing.mdx",
+          "pageType": "decision page",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Add a fact",
+          "path": "/contributing/add-a-fact",
+          "source": "content/contributing/add-a-fact.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Add a rule",
+          "path": "/contributing/add-a-rule",
+          "source": "content/contributing/add-a-rule.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Add a calculator",
+          "path": "/contributing/add-a-calculator",
+          "source": "content/contributing/add-a-calculator.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Add a tax year",
+          "path": "/contributing/add-a-tax-year",
+          "source": "content/contributing/add-a-tax-year.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Fix an incorrect result",
+          "path": "/contributing/fix-an-incorrect-result",
+          "source": "content/contributing/fix-an-incorrect-result.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Testing standards",
+          "path": "/contributing/testing-standards",
+          "source": "content/contributing/testing-standards.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "Source citation standards",
+          "path": "/contributing/source-citation-standards",
+          "source": "content/contributing/source-citation-standards.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "Naming and schema standards",
+          "path": "/contributing/naming-and-schema-standards",
+          "source": "content/contributing/naming-and-schema-standards.mdx",
+          "pageType": "reference",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Effect service standards",
+          "path": "/contributing/effect-service-standards",
+          "source": "content/contributing/effect-service-standards.mdx",
+          "pageType": "reference",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Backward compatibility",
+          "path": "/contributing/backward-compatibility",
+          "source": "content/contributing/backward-compatibility.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "Changesets",
+          "path": "/contributing/changesets",
+          "source": "content/contributing/changesets.mdx",
+          "pageType": "reference",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "PR evidence checklist",
+          "path": "/contributing/pr-evidence-checklist",
+          "source": "content/contributing/pr-evidence-checklist.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "Review expectations",
+          "path": "/contributing/review-expectations",
+          "source": "content/contributing/review-expectations.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        }
+      ]
     },
     {
       "title": "Reference",

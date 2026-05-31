@@ -1,0 +1,48 @@
+---
+title: "Effect service standards"
+description: "Keep tax behaviour in Effect services, layers and canonical tagged errors."
+status: "draft"
+---
+
+# Effect service standards
+
+Use this page when a contribution adds service contracts, layers, parameter
+providers, calculator execution or expected error handling.
+
+## Service boundaries
+
+Use Effect services and layers for tax behaviour:
+
+- facts are provided through `Context.Tag`
+- parameter tables are services
+- rules are `Layer`s
+- calculators are Effect programs that require facts and return reports
+- expected domain failures stay in the typed error channel
+
+`@whattax/calculators` owns reusable calculator service policy. HTTP handlers
+and SDK helpers must not hide tax business logic or duplicate calculator
+lookup, fact decoding, rule execution, graph assembly or expected error
+shaping.
+
+## Effect-native primitives
+
+Use Effect-native primitives when they fit:
+
+- `Data`, `Schema`, `Schema.TaggedClass` and `Data.TaggedError`
+- `Array`, `Chunk`, `HashSet`, `HashMap`, `Record`, `Option`, `Result`,
+  `Exit` and `Match`
+- `Context`, `Layer`, `Config`, `Service`, `ManagedRuntime`, `Bun`,
+  `Platform` and `Command`
+
+Do not create ad hoc tagged objects, mutable `Map` or `Set` indexes, manual
+env parsing or per-request runtime wrappers when an Effect primitive owns the
+pattern.
+
+## Error handling
+
+Keep one-off `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` and
+`Effect.catchAllDefect` transformations inline at the callsite. Extract a
+helper only when it owns reusable policy or removes meaningful duplication.
+
+For the full rule set, read
+[Effect services](../../../../docs/architecture/effect-services.md).

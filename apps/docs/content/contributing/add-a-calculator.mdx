@@ -1,0 +1,67 @@
+---
+title: "Add a calculator"
+description: "Add a public calculation goal with canonical inputs, report schemas and compatibility tests."
+status: "draft"
+---
+
+# Add a calculator
+
+Use this guide when you need a new public calculation goal or report, such as
+a new withholding, annual tax or repayment calculation.
+
+## Before you start
+
+- Read [Calculators](../../../../docs/architecture/calculators.md).
+- Read the public boundary in
+  [API and SDK](../../../../docs/architecture/api-and-sdk.md).
+- Inspect the calculator catalogue in `@whattax/calculators`.
+
+The rule package owns the calculator program, report schema and rule-pack
+layer. `@whattax/calculators` owns reusable catalogue entries,
+`CalculatorRunRequest`, `CalculatorRunResponse`, `CalculatorServiceError`,
+metadata projections, graph construction and service execution.
+
+## Proposal
+
+Describe:
+
+- the calculation goal and report fields
+- the accepted input facts and scenario context
+- the rule packs and parameter services required for each supported tax year
+- the canonical calculator ID, jurisdiction and tax-year literals
+- expected errors and validation help
+- API and SDK compatibility impact
+
+## Implementation
+
+Keep the calculator small. It should require facts and return a schema-backed
+report. Rule layers should derive tax facts.
+
+```txt
+accepted input facts
+  -> scenario layer
+  -> official rule pack layer
+  -> calculator program
+  -> schema-backed report
+```
+
+Do not place calculator business logic in `@whattax/http-api` handlers, SDK
+helpers or docs-only examples. HTTP and SDK layers must call the canonical
+calculator boundary and preserve `CalculatorRun*` contracts.
+
+## Tests
+
+Your evidence should include:
+
+- golden tests for the calculator output
+- graph validation for every required and provided fact
+- schema decode tests for calculator input and report schemas
+- type tests for SDK descriptor inference
+- API compatibility tests for `POST /api/v1/calculators/:calculatorId/calculate`
+- SDK compatibility tests for `WhatTax.calculate`, `WhatTax.safe.calculate`
+  and any jurisdiction helper such as `au.incomeTax.annual`
+
+## Pull request evidence
+
+Attach source citations, test output, compatibility notes and a Changeset or
+no-Changeset rationale in [PR evidence checklist](./pr-evidence-checklist.mdx).

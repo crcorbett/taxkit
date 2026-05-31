@@ -1,0 +1,50 @@
+---
+title: "Source citation standards"
+description: "Cite official tax sources, effective periods and review evidence for tax behaviour changes."
+status: "draft"
+---
+
+# Source citation standards
+
+Use this page when you add or review tax facts, rules, parameter tables,
+calculators or incorrect-result fixes.
+
+## Required citation details
+
+Each source citation should include:
+
+- publisher or authority
+- document title
+- section, schedule, table or page range
+- URL or stable reference
+- access date
+- effective period or tax year
+- the rule, parameter or fact that uses the source
+
+Prefer official sources. If you use a secondary source for context, explain
+which official source proves the implemented behaviour.
+
+## Parameter periods
+
+Parameter descriptors must include source references and effective periods.
+When a table supports a tax year, the descriptor should make overlap and
+period review possible.
+
+```txt
+source citation
+  -> parameter descriptor
+  -> effective period
+  -> rule descriptor
+  -> trace and graph metadata
+```
+
+## Pull request notes
+
+In your PR, group source citations beside the changed facts, rules,
+calculators or tax years. Add a short note when a source changes public API,
+SDK, report, trace or ledger behaviour.
+
+For deeper rules, read
+[Rules and parameters](../../../../docs/architecture/rules-and-parameters.md)
+and
+[Graph, trace and ledgers](../../../../docs/architecture/graph-trace-ledgers.md).

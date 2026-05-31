@@ -1,0 +1,52 @@
+---
+title: "Naming and schema standards"
+description: "Use canonical schemas, branded IDs and current public API and SDK names."
+status: "draft"
+---
+
+# Naming and schema standards
+
+Use this page when you add public or package-facing names for facts, rules,
+calculators, HTTP requests or SDK helpers.
+
+## Use canonical owners
+
+| Contract                                                                     | Owner                                |
+| ---------------------------------------------------------------------------- | ------------------------------------ |
+| `FactId`, fact descriptors and shared fact contracts                         | `@whattax/core`                      |
+| `RuleId`, rule descriptors, traces and source refs                           | `@whattax/core`                      |
+| Rule-specific facts, parameter services, rule IDs and calculator literals    | Owning `@whattax/rules-au-*` package |
+| `CalculatorRunRequest`, `CalculatorRunResponse` and `CalculatorServiceError` | `@whattax/calculators`               |
+| HTTP route status envelopes and OpenAPI annotations                          | `@whattax/http-api`                  |
+| `WhatTax.calculate`, `WhatTax.safe.calculate` and SDK helper descriptors     | `@whattax/sdk`                       |
+
+Import the owning schema, type, branded constructor, descriptor or service tag.
+Do not redeclare canonical fields such as `id: string`, `ruleId: string`,
+`taxYear: string` or transport-only mirrors when an owner already exists.
+
+## Use current public names
+
+Use these names in public docs and package-facing code:
+
+- `WhatTax.calculate`
+- `WhatTax.safe.calculate`
+- `au.incomeTax.annual`
+- `calculateRunRequest`
+- `calculateReportRequest`
+- `calculateReport`
+- `CalculatorRunRequest`
+- `CalculatorRunResponse`
+- `CalculatorServiceError`
+
+Do not introduce stale names in new docs or code. Migration docs may mention
+old names only when they are explicitly documenting a migration.
+
+## Optional policy
+
+Use schema-owned optional fields, `Option` and `Match` for optional request
+and response policy. Do not use conditional object spread to hide fields or
+raw `undefined` branching to invent defaults.
+
+For deeper rules, read
+[Effect services](../../../../docs/architecture/effect-services.md) and
+[Package ownership](../../../../docs/architecture/package-ownership.md).

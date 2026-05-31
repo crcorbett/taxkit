@@ -1,0 +1,63 @@
+---
+title: "Testing standards"
+description: "Choose the required tests for facts, rules, calculators, tax years and public contracts."
+status: "draft"
+---
+
+# Testing standards
+
+Use this page when you need to decide which tests and validation evidence a
+tax behaviour change needs.
+
+## Required evidence by change
+
+| Change           | Required evidence                                                                                        |
+| ---------------- | -------------------------------------------------------------------------------------------------------- |
+| Fact             | schema decode tests, graph validation, type tests if public input types change                           |
+| Rule             | source reference validation, graph checks, golden tests, trace snapshots when rule IDs or ledgers change |
+| Calculator       | schema tests, golden tests, graph validation, API compatibility tests and SDK compatibility tests        |
+| Tax year         | parameter schema validation, effective-date checks, golden tests, API metadata tests and SDK type tests  |
+| Incorrect result | failing regression first, source citation, passing golden test and compatibility notes                   |
+
+## Test types
+
+Golden tests should use official examples or reviewed scenarios and live with
+the rule package they validate.
+
+Type tests should prove public SDK descriptors reject unsupported facts,
+calculator IDs, jurisdictions and tax years at compile time.
+
+API compatibility tests should prove `CalculatorRunRequest`,
+`CalculatorRunResponse` and route-owned error envelopes still match public
+HTTP expectations.
+
+SDK compatibility tests should prove `WhatTax.calculate`,
+`WhatTax.safe.calculate`, `calculateRunRequest`, `calculateReportRequest`,
+`calculateReport` and jurisdiction helpers still infer the expected input,
+report and error types.
+
+## Commands
+
+Use package-specific commands when your change is local:
+
+```sh
+bun run --filter=@whattax/rules-au-pay test
+bun run --filter=@whattax/rules-au-income-tax test
+bun run --filter=@whattax/rules-au-stsl test
+bun run --filter=@whattax/calculators test
+bun run --filter=@whattax/http-api test
+bun run --filter=@whattax/sdk test-types
+```
+
+Before handoff, run the repository gate:
+
+```sh
+bun run verification
+```
+
+## Source of truth
+
+For the full quality model, read
+[Testing and quality](../../../../docs/architecture/testing-and-quality.md)
+and
+[Testing and validation](../../../../docs/architecture/testing-and-validation.md).

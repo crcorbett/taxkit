@@ -1,0 +1,46 @@
+---
+title: "Review expectations"
+description: "Understand how maintainers review source evidence, tests, compatibility and docs."
+status: "draft"
+---
+
+# Review expectations
+
+Use this page when you want to know how a maintainer will review a
+contribution.
+
+## What reviewers check
+
+Reviewers check:
+
+- the contribution is routed to the owning package
+- source citations prove the changed tax behaviour
+- facts, rules, calculators and tax years use canonical schemas and branded
+  IDs
+- HTTP and SDK layers do not hide tax business logic
+- golden tests, type tests, API compatibility tests and SDK compatibility
+  tests match the changed surface
+- expected errors use canonical tagged errors such as `CalculatorServiceError`
+- optional policy uses schema-owned fields, `Option` and `Match`
+- public docs use current names and avoid stale aliases
+- release-impact notes and Changesets are correct
+
+## Documentation review
+
+When docs change, reviewers also check:
+
+- second person voice
+- Australian spelling
+- sentence-case headings
+- no marketing language
+- links resolve to the source of truth
+- diagrams clarify a decision, ownership path or validation flow
+
+Read [Documentation review](../../../../docs/standards/documentation-review.md)
+for the full audit checklist.
+
+## Return requests
+
+A reviewer may ask you to update the PR when evidence is missing, ownership is
+wrong, a public contract changed without compatibility notes or tax behaviour
+appears in HTTP, SDK or docs-only code.

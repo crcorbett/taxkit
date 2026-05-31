@@ -27,7 +27,7 @@ task.
 | DOCS-MDX-001 | complete | Chose `apps/docs/content` as the MDX content root and added the draft navigation contract without scaffolding a docs app package. |
 | DOCS-MDX-002 | complete | Added public Start and SDK MDX pages covering the SDK quickstart, install path, first calculation, SDK-vs-API choice, plain SDK, safe SDK, Effect SDK, schemas and type safety. |
 | DOCS-MDX-003 | complete | Added API, guides and concepts MDX pages, navigation entries and generated-reference follow-up. |
-| DOCS-MDX-004 | pending | Write contribution docs for facts, rules, calculators and PRs. |
+| DOCS-MDX-004 | complete | Added Contributing MDX pages for contribution routing, facts, rules, calculators, tax years, incorrect-result fixes, testing, source citations, naming/schema standards, Effect service standards, backward compatibility, Changesets, PR evidence and review expectations. |
 | DOCS-MDX-005 | pending | Add reference, examples and final docs validation. |
 
 ## Validation log
@@ -195,3 +195,55 @@ task.
   - `bun run verification`
   - `bun run changeset status --verbose`
 - Accepted `DOCS-MDX-003` for the parent gate.
+
+### 2026-06-01 - DOCS-MDX-004 implementation
+
+- Read the public MDX developer docs spec, `DOCS-MDX-004`, relevant package
+  ownership, API/SDK, facts, rules, calculators, Effect services, testing and
+  documentation standards docs.
+- Loaded the contribution-guide and section-index templates.
+- Loaded the new-contributor, correctness-reviewer and documentation
+  contributor journeys.
+- Added Contributing pages for:
+  - what-are-you-changing router
+  - add-a-fact, add-a-rule, add-a-calculator and add-a-tax-year guides
+  - incorrect-result fixes
+  - testing standards, source citation standards, naming/schema standards and
+    Effect service standards
+  - backward compatibility, Changesets, PR evidence and review expectations
+- Updated `apps/docs/navigation.json` so Contributing child pages are part of
+  the draft navigation contract.
+- Kept the slice limited to DOCS-MDX-004 outputs. `DOCS-MDX-005` remains
+  pending and was not implemented.
+- Docs app typecheck/build remains unavailable because `apps/docs` has no
+  package manifest, docs framework runtime or app-local build script.
+- MDX content-root validation passed for frontmatter, balanced fences, local
+  links and navigation source files across 53 MDX files.
+- Documentation standards audit passed for the new Contributing docs:
+  second-person voice, Australian spelling, sentence-case headings, no banned
+  marketing language, useful flowcharts, current SDK/API names and canonical
+  schema/type references.
+- Local link audit passed for the public MDX content root.
+- Required coverage audit passed for facts, rules, calculators, tax years,
+  source citations, golden tests, type tests, API compatibility tests, SDK
+  compatibility tests and Changesets.
+- Verification passed:
+  - `jq empty apps/docs/navigation.json && jq empty apps/docs/navigation.schema.json`
+  - MDX content-root validation for frontmatter, balanced fences, local links
+    and navigation sources
+  - documentation review audit scans for banned language and stale SDK/API
+    names
+  - `rg -n "facts|rules|calculators|tax years|source citations|golden tests|type tests|API compatibility tests|SDK compatibility tests|Changesets" apps/docs/content/contributing`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Changeset rationale: no new Changeset was required because this slice only
+  changes public MDX content, docs navigation and the active execution plan. It
+  does not change package exports, package README behaviour or runtime
+  behaviour.
+- Final call graph still matches the spec. Contributor learning still routes
+  from Contributing / What are you changing? into fact, rule, calculator,
+  tax-year and incorrect-result guides, then into PR evidence. Public HTTP and
+  SDK docs still route calculation behaviour through `@whattax/sdk/effect`
+  `calculateRunRequest`, `PublicCalculatorService.calculate` and
+  `CalculationEngine` rather than putting tax logic in transport or SDK
+  adapters.

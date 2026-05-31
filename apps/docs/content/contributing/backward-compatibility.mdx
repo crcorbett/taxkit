@@ -1,0 +1,44 @@
+---
+title: "Backward compatibility"
+description: "Check API, SDK, schema and release impact before changing public contracts."
+status: "draft"
+---
+
+# Backward compatibility
+
+Use this page before you change facts, calculator inputs, report fields,
+errors, HTTP routes, SDK helpers or exported schema names.
+
+## Public contract surfaces
+
+| Surface                  | Compatibility evidence                                            |
+| ------------------------ | ----------------------------------------------------------------- |
+| Calculator request facts | schema decode tests, OpenAPI evidence and SDK type tests          |
+| Calculator reports       | golden tests, API compatibility tests and SDK compatibility tests |
+| Expected errors          | `CalculatorServiceError` tests and HTTP status envelope tests     |
+| HTTP endpoints           | route tests and generated OpenAPI review                          |
+| SDK helpers              | type tests, packed artifact checks and browser-safe import checks |
+| Tax-year metadata        | API metadata tests and SDK descriptor tests                       |
+
+Breaking changes need an explicit release-impact note and a Changeset when
+package-facing behaviour changes.
+
+## HTTP and SDK rule
+
+HTTP and SDK layers adapt public callers to the calculator boundary. They must
+not hide tax business logic or make incompatible tax results look compatible.
+If tax behaviour changes, update the owning fact, rule, parameter, calculator
+or service package and then prove the public layer still reflects that owner.
+
+## Review notes
+
+Your PR should state:
+
+- whether request or response schemas changed
+- whether public SDK helper input or output types changed
+- whether generated OpenAPI output changed
+- whether existing calculator IDs, jurisdictions or tax years still work
+- whether the change needs a Changeset
+
+Read [API and SDK](../../../../docs/architecture/api-and-sdk.md) before
+changing transport or SDK contracts.

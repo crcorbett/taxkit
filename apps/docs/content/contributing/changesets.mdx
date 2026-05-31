@@ -1,0 +1,49 @@
+---
+title: "Changesets"
+description: "Record package-facing release impact or state why a Changeset is not required."
+status: "draft"
+---
+
+# Changesets
+
+Use this page when your contribution changes package-facing behaviour,
+exports, public schemas, package READMEs or runtime contracts.
+
+## When you need a Changeset
+
+Add or update a Changeset when you change:
+
+- public package exports
+- SDK helper behaviour or types
+- HTTP API contract behaviour
+- calculator request or response schemas
+- package README behaviour
+- rule package behaviour that affects published calculation output
+
+Run:
+
+```sh
+bun run changeset
+```
+
+Then check the pending release state:
+
+```sh
+bun run changeset status --verbose
+```
+
+Do not run `bun run version-repo` unless you are intentionally applying the
+pending release train.
+
+## When a Changeset is not required
+
+Docs-only changes inside `apps/docs/content`, navigation updates and active
+exec-plan validation notes do not need a Changeset when they do not change
+package exports, package README behaviour or runtime behaviour.
+
+State the no-Changeset rationale in your PR and handoff.
+
+## PR evidence
+
+Link the Changeset path or write the no-Changeset rationale in
+[PR evidence checklist](./pr-evidence-checklist.mdx).

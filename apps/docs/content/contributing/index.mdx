@@ -9,20 +9,14 @@ status: "draft"
 Use this section when you want to propose a tax behaviour change and prepare a
 pull request with source evidence, tests and release-impact notes.
 
-## Planned pages
+## Start with your intent
 
-- Overview
-- What are you changing?
-- Contribution workflow
-- Domain model
-- Add a fact
-- Add a rule
-- Add a calculator
-- Add a tax year
-- Fix an incorrect result
-- Testing
-- Standards
-- Pull requests
+- [What are you changing?](./what-are-you-changing.mdx) routes common
+  contribution intentions to the right guide.
+- [Fix an incorrect result](./fix-an-incorrect-result.mdx) explains how to
+  reproduce and correct a calculation issue.
+- [PR evidence checklist](./pr-evidence-checklist.mdx) lists the evidence your
+  pull request must include.
 
 ## Contribution flow
 
@@ -33,19 +27,40 @@ flowchart TD
   Rule["Add a rule"]
   Calculator["Add a calculator"]
   TaxYear["Add a tax year"]
+  Incorrect["Fix an incorrect result"]
   Evidence["Prepare PR evidence"]
   Change --> Fact
   Change --> Rule
   Change --> Calculator
   Change --> TaxYear
+  Change --> Incorrect
   Fact --> Evidence
   Rule --> Evidence
   Calculator --> Evidence
   TaxYear --> Evidence
+  Incorrect --> Evidence
 ```
+
+## Contribution guides
+
+- [Add a fact](./add-a-fact.mdx)
+- [Add a rule](./add-a-rule.mdx)
+- [Add a calculator](./add-a-calculator.mdx)
+- [Add a tax year](./add-a-tax-year.mdx)
+
+## Standards
+
+- [Testing standards](./testing-standards.mdx)
+- [Source citation standards](./source-citation-standards.mdx)
+- [Naming and schema standards](./naming-and-schema-standards.mdx)
+- [Effect service standards](./effect-service-standards.mdx)
+- [Backward compatibility](./backward-compatibility.mdx)
+- [Changesets](./changesets.mdx)
+- [Review expectations](./review-expectations.mdx)
 
 ## Related sections
 
 - [Concepts](../concepts/index.mdx)
 - [Guides](../guides/index.mdx)
 - [Reference](../reference/index.mdx)
+- [Package ownership](../../../../docs/architecture/package-ownership.md)

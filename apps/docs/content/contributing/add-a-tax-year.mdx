@@ -1,0 +1,69 @@
+---
+title: "Add a tax year"
+description: "Add tax-year support with parameter periods, catalogue context and compatibility evidence."
+status: "draft"
+---
+
+# Add a tax year
+
+Use this guide when a supported calculator needs a new official tax year,
+parameter period or date boundary.
+
+## Before you start
+
+- Read [Rules and parameters](../../../../docs/architecture/rules-and-parameters.md).
+- Read [Calculators](../../../../docs/architecture/calculators.md).
+- Check the current supported tax years in
+  [Jurisdictions and tax years](../concepts/jurisdictions-and-tax-years.mdx).
+
+Rule packages own tax-year parameter tables and rule-pack composition.
+`@whattax/core` owns the shared `TaxYear` brand and
+`australianTaxYearInterval`. Rule packages narrow that brand to supported
+literals such as `AuPayTaxYear` or `AuAnnualTaxYear`.
+
+## Proposal
+
+Document:
+
+- the official source for each table or rate
+- the effective start and end dates
+- the calculator IDs and jurisdictions the year supports
+- the parameter service that owns each table
+- expected differences from the previous year
+- release impact for API metadata and SDK descriptors
+
+## Implementation
+
+Add tax-year data as schema-validated parameters. Compose it into the owning
+rule pack and calculator catalogue only after golden tests prove the year.
+
+```txt
+official source
+  -> parameter table schema
+  -> parameter descriptor with effective period
+  -> rule-pack layer
+  -> calculator catalogue entry
+  -> API and SDK metadata
+```
+
+Do not default missing request context to a jurisdiction or tax year in HTTP,
+SDK or calculator service code. Missing context must be absent, schema-owned
+or rejected with a tagged expected error.
+
+## Tests
+
+Your evidence should include:
+
+- parameter schema validation
+- source reference validation
+- effective-date overlap checks
+- golden tests for the new tax year
+- date-boundary tests around year start and end
+- API compatibility tests proving metadata lists the year
+- SDK compatibility tests proving unsupported tax-year literals still fail
+  type tests
+
+## Pull request evidence
+
+Include source citations, changed parameter periods, commands and release
+impact in [PR evidence checklist](./pr-evidence-checklist.mdx).

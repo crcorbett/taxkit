@@ -1,0 +1,49 @@
+---
+title: "Fix an incorrect result"
+description: "Reproduce, diagnose and correct a calculation result with source evidence and regression tests."
+status: "draft"
+---
+
+# Fix an incorrect result
+
+Use this guide when a WhatTax result appears to disagree with an official
+source, a published example or a known scenario.
+
+## Before you start
+
+- Reproduce the calculation with the public SDK or HTTP API.
+- Capture the input facts, calculator ID, jurisdiction, tax year and report.
+- Find the owning package with
+  [What are you changing?](./what-are-you-changing.mdx).
+
+Do not patch an HTTP response or SDK helper to mask a tax result. Incorrect
+tax behaviour belongs in the owning fact, rule, parameter, calculator or
+catalogue boundary.
+
+## Diagnosis
+
+Work from evidence:
+
+1. Compare the result with an official source or known scenario.
+2. Inspect trace output and source references.
+3. Identify the first incorrect fact, parameter, rule or ledger component.
+4. Add a failing golden test or regression test before the fix.
+5. Fix the owning package.
+6. Re-run compatibility tests if public API or SDK output changes.
+
+## Tests
+
+Your evidence should include:
+
+- the failing scenario before the fix
+- a golden test or regression test that would fail without the fix
+- trace or ledger evidence when rule order or component values changed
+- type tests when public input types changed
+- API compatibility tests when HTTP output or errors changed
+- SDK compatibility tests when SDK output or errors changed
+
+## Pull request evidence
+
+Your PR must include source citations, the failing and passing test evidence,
+compatibility notes and release-impact notes. Use
+[PR evidence checklist](./pr-evidence-checklist.mdx).

@@ -1,0 +1,75 @@
+---
+title: "Add a fact"
+description: "Add a canonical fact with schema, descriptor, ownership and tests."
+status: "draft"
+---
+
+# Add a fact
+
+Use this guide when you need a new input fact, derived fact, parameter fact or
+question prompt for a calculator.
+
+## Before you start
+
+- Find the owning package in
+  [Package ownership](../../../../docs/architecture/package-ownership.md).
+- Read the current fact model in
+  [Facts](../../../../docs/architecture/facts.md).
+- Check whether an existing fact descriptor already covers the tax behaviour.
+
+Shared primitives, `FactId` and common descriptor contracts live in
+`@whattax/core`. Rule-specific facts should live in the rule package that owns
+the rule, parameter table and golden tests.
+
+## Proposal
+
+Describe the fact before you code:
+
+- whether it is an input fact, derived fact or parameter fact
+- the source that proves the fact is tax-significant
+- the schema-backed value and branded fields it needs
+- the `Context.Tag` that provides the value
+- the descriptor title, authority policy and question metadata
+- which calculators will accept or derive it
+
+Do not mirror canonical fields such as `id: string` in a local DTO. Import the
+owning `FactId`, schema, descriptor, constructor or service tag.
+
+## Implementation
+
+Define the fact in the owning package and keep the descriptor beside the
+package-owned rule or scenario input that uses it.
+
+```ts
+export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
+  amount: Money,
+  period: PayPeriod,
+}) {}
+
+export class GrossPayFact extends Context.Tag("whattax/fact/GrossPay")<
+  GrossPayFact,
+  GrossPay
+>() {}
+```
+
+Use schema-owned optional fields with `Option` and `Match` when the fact has
+optional policy. Do not create default values that change a tax outcome, such
+as assuming a HELP/STSL debt answer or a tax-free threshold claim.
+
+## Tests
+
+Your evidence should include:
+
+- schema decode tests for valid and invalid fact values
+- type tests when the fact changes a public SDK or calculator input type
+- graph validation evidence showing the fact is provided and required by the
+  expected rules
+- golden tests when the fact changes a tax calculation result
+- API compatibility tests when the fact appears in `CalculatorRunRequest`
+- SDK compatibility tests when SDK helpers accept the fact
+
+## Pull request evidence
+
+Link the source citation for the fact, list the owning package, show the test
+commands you ran and explain compatibility impact in
+[PR evidence checklist](./pr-evidence-checklist.mdx).

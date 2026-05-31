@@ -1,0 +1,67 @@
+---
+title: "Add a rule"
+description: "Add a source-backed rule with parameter services, descriptors and golden tests."
+status: "draft"
+---
+
+# Add a rule
+
+Use this guide when you need a source-backed calculation rule, threshold,
+coefficient formula, parameter table or derived fact.
+
+## Before you start
+
+- Read [Rules and parameters](../../../../docs/architecture/rules-and-parameters.md).
+- Read [Testing and quality](../../../../docs/architecture/testing-and-quality.md).
+- Find the rule package that owns the tax area:
+  `@whattax/rules-au-pay`, `@whattax/rules-au-income-tax` or
+  `@whattax/rules-au-stsl`.
+
+The rule package owns the rule layer, parameter service, descriptor, source
+references, graph metadata, rule-pack composition and golden tests.
+
+## Proposal
+
+Before implementation, write down:
+
+- the official source and section, table, schedule or page range
+- the effective period and tax year
+- the input facts and parameter services the rule requires
+- the facts, traces or ledger components the rule provides
+- the rounding mode and edge cases
+- whether the change needs API compatibility tests or SDK compatibility tests
+
+## Implementation
+
+Rules are Effect `Layer`s. Parameter tables are services, not imported
+globals.
+
+```ts
+export const AtoSchedule1_2025_26_Live = Layer.succeed(
+  AtoSchedule1Table,
+  schedule1_2025_26
+);
+```
+
+Keep algorithm code separate from yearly data. Most tax-year updates should
+add schema-validated parameter data and golden tests without rewriting the
+rule algorithm.
+
+## Tests
+
+Your evidence should include:
+
+- source reference validation for each official source
+- effective-date overlap checks for parameter descriptors
+- graph cycle and duplicate-provider checks
+- golden tests from official examples or known scenarios
+- date-boundary tests when thresholds change across periods
+- trace snapshot tests when rule IDs, source references or ledgers change
+- package export or type tests when public exports change
+
+## Pull request evidence
+
+Use [Source citation standards](./source-citation-standards.mdx) and
+[PR evidence checklist](./pr-evidence-checklist.mdx). Explain whether the
+rule changes public API or SDK behaviour, even when endpoint shapes do not
+change.
