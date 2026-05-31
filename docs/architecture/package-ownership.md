@@ -82,6 +82,10 @@ on HTTP handlers, SDK clients, CLI commands or app runtime modules.
 It owns browser-safe schemas, typed calculation facades, Effect-native subpaths,
 jurisdiction modules, examples and compatibility tests. It must not depend on
 `@whattax/http-api`; HTTP transports consume the SDK rather than the reverse.
+Its Effect entrypoint owns request-preserving calculator helpers such as
+`calculateRunRequest`, `calculateReportRequest` and `calculateReport`, while
+reusing calculator-owned `CalculatorRun*` schemas and
+`CalculatorServiceError`.
 
 `apps/web`
 : Current scaffold app. It proves the runtime boundary and health endpoint
@@ -114,7 +118,10 @@ belongs in apps or explicitly server-only package exports.
 - Keep HTTP handlers thin. Transport handlers may extract route parameters and
   call package-owned services, but reusable calculator lookup, metadata
   transformation, graph assembly, calculation dispatch and expected error
-  shaping belong in service packages such as `packages/calculators`.
+  shaping belong in service packages such as `packages/calculators`. The
+  current calculate handler is thinner still: it selects the SDK descriptor for
+  the route calculator id, calls `@whattax/sdk/effect` `calculateRunRequest`
+  once, and maps only transport envelopes.
 
 ## Related Docs
 

@@ -32,6 +32,24 @@ with the descriptor-decoded report type preserved for transports and advanced
 Effect consumers. `createClient` builds an Effect client for selected SDK
 modules.
 
+```ts
+Production: SDK Effect full run
+
+Effect consumer
+  -> calculateRunRequest(descriptor, request)
+    -> PublicCalculatorService.calculate({ calculatorId, ...request })
+      -> CalculatorRunResponse
+    -> descriptor output decode for response.report
+    -> typed CalculatorRunResponse with narrowed report
+
+Report-only helpers
+  -> calculateReportRequest(...)
+    -> calculateRunRequest(...)
+    -> response.report
+  -> calculateReport(...)
+    -> calculateReportRequest(...)
+```
+
 ## Plain Facade
 
 ```ts

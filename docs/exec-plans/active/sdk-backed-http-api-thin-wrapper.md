@@ -27,7 +27,7 @@ task.
 | SDK-HTTP-001 | complete | Renamed API and SDK public symbols for clearer call graphs; verification passed. |
 | SDK-HTTP-002 | complete | Added SDK Effect full-run helper with descriptor-narrowed response typing; verification passed. |
 | SDK-HTTP-003 | complete | HTTP calculate delegates to SDK full-run helper; verification passed. |
-| SDK-HTTP-004 | pending | Document final call graph and downstream evidence. |
+| SDK-HTTP-004 | complete | Documented final call graph and downstream evidence; verification passed. |
 
 ## Validation Log
 
@@ -133,3 +133,24 @@ task.
   `bun run verification` and `bun run changeset status --verbose`.
 - Implemented call graph:
   `CalculatorApiHandlerLive -> sdkCalculationFor(params.calculatorId) -> @whattax/sdk/effect calculateRunRequest -> PublicCalculatorService.calculate -> CalculatorRunResponseData -> descriptor output decode -> typed calculator response -> CalculatorApiErrorEnvelope on CalculatorServiceError`.
+
+### 2026-05-31 - SDK-HTTP-004 Docs And Downstream Evidence Slice
+
+- Updated durable architecture docs and package READMEs with final production
+  and test call graphs for HTTP calculate over the SDK full-run helper.
+- Updated package ownership guidance to make `@whattax/sdk/effect`
+  `calculateRunRequest`, `calculateReportRequest` and `calculateReport`
+  ownership explicit, while keeping `CalculatorRun*` schemas and
+  `CalculatorServiceError` in `@whattax/calculators`.
+- No additional Changeset was required for this slice because it is docs-only;
+  the package-facing rename, SDK helper and HTTP thin-wrapper behavior are
+  already covered by `.changeset/clear-api-sdk-names.md`.
+- Downstream validation evidence:
+  `/Users/cooper/Projects/adad/vendor/whattax` was checked out to the final
+  committed WhatTax implementation for this spec, and
+  `/Users/cooper/Projects/adad` passed `pnpm check-types` and `pnpm build`.
+  The downstream app uses the SDK plain facade and HTTP client without
+  adopting any deprecated names.
+- Documentation audit target:
+  `rg -n 'Production: HTTP calculate|Tests: HTTP over SDK|calculateRunRequest|CalculatorApiHandlerLive|CalculatorApiGroup' docs/architecture packages/*/README.md docs/exec-plans/active/sdk-backed-http-api-thin-wrapper.md`
+  confirms the final public names and call graphs are present in durable docs.

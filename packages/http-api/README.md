@@ -41,6 +41,36 @@ and query values to `PublicCalculatorService`. The calculate handler delegates
 one full run to `@whattax/sdk/effect` `calculateRunRequest`, then maps tagged
 service failures into route-owned HTTP error envelopes.
 
+```ts
+Production: HTTP calculate
+
+apps/api Bun process
+  -> WhatTaxServerLayer
+    -> CalculatorApiHandlerLive
+      -> sdkCalculationFor(params.calculatorId)
+      -> @whattax/sdk/effect calculateRunRequest
+        -> PublicCalculatorService.calculate
+          -> CalculatorCatalogEntry.inputSchema decode
+          -> CalculationEngine
+          -> CalculatorRunResponseData
+        -> descriptor output decode for response.report
+        -> typed CalculatorRunResponse with narrowed report
+      -> CalculatorApiErrorEnvelope on CalculatorServiceError
+```
+
+```ts
+Tests: in-process HTTP client
+
+HTTP API tests
+  -> WhatTaxApiInProcessClientLive
+    -> CalculatorApiHandlerLive
+      -> @whattax/sdk/effect calculateRunRequest
+        -> PublicCalculatorServiceLive
+          -> CalculationEngineLive
+  -> success response equals SDK full-run response
+  -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
+```
+
 The calculate route imports reusable `CalculatorRun*` schemas and
 `CalculatorServiceError` from `@whattax/calculators`. `CalculatorRunRequest`
 has a `facts` field that is a union of canonical rule-owned input schemas, so

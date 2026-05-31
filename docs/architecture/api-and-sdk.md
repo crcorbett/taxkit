@@ -74,10 +74,10 @@ config schema.
 `@whattax/http-api` owns transport contracts, HTTP status annotations, OpenAPI
 generation, typed HTTP clients, server route layers and thin handler adapters.
 Reusable calculator catalog entries, metadata transformations, graph assembly
-and schema-error shaping live in `@whattax/calculators`. Calculation endpoint
-execution should consume a request-preserving SDK facade as a normal in-process
-consumer so the HTTP package proves the public SDK boundary without making the
-SDK depend on HTTP transport code.
+and schema-error shaping live in `@whattax/calculators`. The calculate route
+executes through the request-preserving `@whattax/sdk/effect`
+`calculateRunRequest` helper as a normal in-process consumer, proving the
+public SDK boundary without making the SDK depend on HTTP transport code.
 
 `@whattax/http-api/config` exports the package-owned HTTP API client config
 schema, type and keyed config fragment. Apps compose that fragment into their
@@ -102,6 +102,76 @@ describe calculator API status encoding. Rule-owned calculator IDs and
 supported context literals are composed by `@whattax/calculators`; reusable
 help modes, calculator run payloads and calculator service errors live in
 `@whattax/calculators`.
+
+The final calculate-route production graph is:
+
+```ts
+Production: HTTP calculate
+
+apps/api Bun process
+  -> WhatTaxServerLayer
+    -> CalculatorApiHandlerLive
+      -> sdkCalculationFor(params.calculatorId)
+      -> @whattax/sdk/effect calculateRunRequest
+        -> PublicCalculatorService.calculate
+          -> CalculatorCatalogEntry.inputSchema decode
+          -> CalculationEngine
+            -> rule package scenario layer
+            -> official rule pack layer
+            -> calculator program
+          -> CalculatorRunResponseData
+        -> descriptor output decode for response.report
+        -> typed CalculatorRunResponse with narrowed report
+      -> CalculatorApiErrorEnvelope on CalculatorServiceError
+```
+
+Metadata routes stay direct service adapters until a broader SDK catalog
+facade exists:
+
+```ts
+Production: metadata routes
+
+CalculatorApiHandlerLive
+  -> PublicCalculatorService.listCalculators / getCalculator / getCalculatorGraph
+  -> calculator-owned metadata response schemas
+  -> CalculatorApiErrorEnvelope for expected lookup/context failures
+```
+
+The SDK Effect full-run graph is:
+
+```ts
+Production: SDK Effect full run
+
+Effect consumer
+  -> @whattax/sdk/effect calculateRunRequest(descriptor, request)
+    -> PublicCalculatorService.calculate({ calculatorId, ...request })
+      -> CalculatorRunServiceRequest
+      -> CalculatorRunResponse
+    -> descriptor.decodeOutput(response.report)
+    -> response with report narrowed to OutputSchema["Type"]
+
+Report-only helpers
+  -> calculateReportRequest(...)
+    -> calculateRunRequest(...)
+    -> response.report
+  -> calculateReport(...)
+    -> calculateReportRequest(...)
+```
+
+The matching test graph is:
+
+```ts
+Tests: HTTP over SDK
+
+HTTP API tests
+  -> WhatTaxApiInProcessClientLive
+    -> CalculatorApiHandlerLive
+      -> @whattax/sdk/effect calculateRunRequest
+        -> PublicCalculatorServiceLive
+          -> CalculationEngineLive
+  -> success response equals SDK full-run response
+  -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
+```
 
 ## Current Calculator Package
 
