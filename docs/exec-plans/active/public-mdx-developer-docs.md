@@ -196,6 +196,30 @@ task.
   - `bun run changeset status --verbose`
 - Accepted `DOCS-MDX-003` for the parent gate.
 
+### 2026-06-01 - DOCS-MDX-004 parent acceptance
+
+- Parent reviewed the committed contributing docs slice in
+  `70689f8 Add contributing developer docs`.
+- Confirmed the changed file scope is limited to Contributing MDX pages,
+  navigation and this execution plan.
+- Verified `apps/docs/navigation.json` and
+  `apps/docs/navigation.schema.json` parse successfully with `jq empty`.
+- Audited every contributing navigation `source` entry and confirmed each MDX
+  file exists.
+- Audited contributing MDX pages for frontmatter, balanced code fences and
+  valid relative links.
+- Audited the section for banned marketing wording, private downstream product
+  names and stale SDK/API names; no matches were found.
+- Verified required contributing coverage for facts, rules, calculators, tax
+  years, source citations, golden tests, type tests, API compatibility tests,
+  SDK compatibility tests and Changesets.
+- Verified contributing docs state that HTTP and SDK layers must not hide tax
+  business logic.
+- Verification passed:
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Accepted `DOCS-MDX-004` for the parent gate.
+
 ### 2026-06-01 - DOCS-MDX-004 implementation
 
 - Read the public MDX developer docs spec, `DOCS-MDX-004`, relevant package
