@@ -1,0 +1,38 @@
+---
+title: "Jurisdictions and tax years"
+description: "Understand how calculator context selects supported tax behaviour."
+status: "draft"
+---
+
+# Jurisdictions and tax years
+
+Jurisdiction and tax year are calculator context values. They are not separate
+top-level route families.
+
+## When this matters
+
+Pass context when you need a specific supported tax year or want metadata
+filtered to a jurisdiction. Do not default tax-significant context in your
+application unless the owning schema defines that default.
+
+## How it works
+
+```json
+{
+  "facts": {
+    "taxableIncome": { "_tag": "Money", "cents": 9000000, "currency": "AUD" }
+  },
+  "jurisdiction": "AU",
+  "taxYear": "2025-26"
+}
+```
+
+The calculator package composes supported jurisdiction and tax-year literals
+from rule packages. Unsupported combinations return a
+`CalculatorServiceError`.
+
+## Related concepts
+
+- [Calculators](./calculators.mdx)
+- [API endpoints](../api/endpoints.mdx)
+- [API and SDK architecture](../../../../docs/architecture/api-and-sdk.md)

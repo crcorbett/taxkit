@@ -1,0 +1,42 @@
+---
+title: "Facts"
+description: "Understand the canonical input and derived values used by calculators."
+status: "draft"
+---
+
+# Facts
+
+Facts are schema-backed values with stable identities. They are not arbitrary
+request fields.
+
+## When this matters
+
+You work with facts when you build calculator input, show calculator help or
+review why a value was accepted or rejected. A structurally similar object is
+not the same fact unless it matches the owning schema.
+
+## How it works
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { GrossPay } from "@whattax/rules-au-pay";
+
+const grossPay = new GrossPay({
+  amount: aud(165_400),
+  period: "weekly",
+});
+```
+
+The `GrossPay` tag and `Money` value are part of the boundary. HTTP callers
+send the tagged JSON form; SDK callers use the constructors.
+
+## Fact authority
+
+Input facts are supplied by the caller. Derived facts are produced by rules.
+Parameter facts and services provide tax-year tables, rates and constants.
+
+## Related concepts
+
+- [Money and branded values](./money-and-branded-values.mdx)
+- [Rules](./rules.mdx)
+- [Facts architecture](../../../../docs/architecture/facts.md)

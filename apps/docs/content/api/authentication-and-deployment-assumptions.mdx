@@ -1,0 +1,52 @@
+---
+title: "Authentication and deployment assumptions"
+description: "Understand the current HTTP API deployment boundary before you call it."
+status: "draft"
+---
+
+# Authentication and deployment assumptions
+
+Use this page before wiring a public client to the HTTP API. It records the
+current deployment assumptions without turning them into a field-level endpoint
+reference.
+
+## Current assumptions
+
+The current API runtime is `apps/api`. It serves the reusable HTTP contract
+from `@whattax/http-api` and exposes local defaults on `127.0.0.1:4000`.
+
+There is no public authentication contract in this documentation slice. Treat
+authentication, tenant routing and public hosting as application-owned until a
+future API deployment spec defines them.
+
+## Local routes
+
+Local development uses the API app or the portless route described in
+`apps/api/README.md`:
+
+```sh
+bun run --filter=api start
+curl http://127.0.0.1:4000/api/health
+curl http://127.0.0.1:4000/api/docs/openapi.json
+```
+
+If you run through portless, use:
+
+```sh
+bun run --filter=api dev
+curl https://api.whattax.localhost/api/health
+```
+
+## Caller responsibilities
+
+- Send `content-type: application/json` for calculate requests.
+- Pass canonical calculator facts in the request body.
+- Keep application authentication outside the calculator payload.
+- Read endpoint fields from the generated [OpenAPI reference](./openapi-reference.mdx).
+- Handle `CalculatorApiErrorEnvelope` for expected calculator service errors.
+
+## Related pages
+
+- [API overview](./overview.mdx)
+- [Endpoints](./endpoints.mdx)
+- [Errors](./errors.mdx)

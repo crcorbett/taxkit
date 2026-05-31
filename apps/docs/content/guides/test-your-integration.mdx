@@ -1,0 +1,76 @@
+---
+title: "Test your integration"
+description: "Add smoke tests for SDK or HTTP calculator integration."
+status: "draft"
+---
+
+# Test your integration
+
+Use this guide when you need evidence that your application still calls
+WhatTax with the expected facts and handles expected failures.
+
+## Before you start
+
+- Choose SDK or HTTP in [Choose SDK or HTTP API](../start/choose-sdk-or-api.mdx).
+- Keep one success case and one validation failure case.
+- Assert cents, report tags and error tags instead of snapshotting a full
+  report.
+
+## Steps
+
+1. Add a success test for the calculator you call.
+2. Add a validation failure test.
+3. Run your app tests and the relevant WhatTax package test when working in
+   this repo.
+
+## Example
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { GrossPay } from "@whattax/rules-au-pay";
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+import { expect, test } from "vitest";
+
+test("calculates weekly take-home pay", async () => {
+  const report = await au.pay.takeHomePay({
+    grossPay: new GrossPay({
+      amount: aud(165_400),
+      period: "weekly",
+    }),
+    taxFreeThresholdClaimed: true,
+  });
+
+  expect(report._tag).toBe("TakeHomePayReport");
+  expect(report.netPay.cents).toBe(130_100);
+});
+
+test("returns a typed validation failure", async () => {
+  const result = await WhatTax.safe.calculate(au.calculations.takeHomePay, {
+    taxableIncome: aud(9_000_000),
+  } as never);
+
+  expect(result._tag).toBe("WhatTaxFailure");
+});
+```
+
+## Verify the result
+
+Run your application's test command. Inside this repository, the SDK type and
+unit tests are:
+
+```sh
+bun run --filter=@whattax/sdk test
+bun run --filter=@whattax/sdk test-types
+```
+
+## Handle errors
+
+Test the error tag your application relies on. Do not assert a full error
+message unless the message is part of your user-facing contract.
+
+## Related pages
+
+- [Safe SDK](../sdk/safe-sdk.mdx)
+- [API errors](../api/errors.mdx)
+- [Diagnostics](../concepts/diagnostics.mdx)

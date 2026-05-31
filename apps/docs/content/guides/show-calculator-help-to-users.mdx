@@ -1,0 +1,76 @@
+---
+title: "Show calculator help to users"
+description: "Use calculator schema and error help to guide user input."
+status: "draft"
+---
+
+# Show calculator help to users
+
+Use this guide when your UI needs labels, required facts or validation help
+for the selected calculator.
+
+## Before you start
+
+- Choose a calculator ID such as `au.pay.take-home`.
+- Use HTTP for browser clients that cannot import rule packages.
+- Keep the generated OpenAPI reference as the endpoint field source.
+
+## Steps
+
+1. Fetch calculator schema metadata.
+2. Render fact titles and question metadata.
+3. Call calculate with `help=errors` when validation fails.
+4. Show returned issue paths beside your fields.
+
+## Example
+
+```ts
+const calculatorId = "au.pay.take-home";
+
+const schemaResponse = await fetch(
+  `http://127.0.0.1:4000/api/v1/calculators/${calculatorId}/schema?help=schema`
+);
+
+if (!schemaResponse.ok) {
+  throw new Error("Could not load calculator schema");
+}
+
+const schema = await schemaResponse.json();
+
+console.log(
+  schema.inputFacts.map(
+    (fact: { id: string; title: string }) => `${fact.id}: ${fact.title}`
+  )
+);
+```
+
+## Verify the result
+
+Expected output includes fact descriptors for gross pay and the tax-free
+threshold claim used by the take-home pay calculator.
+
+## Handle errors
+
+When calculate fails, request error help:
+
+```ts
+const response = await fetch(
+  `http://127.0.0.1:4000/api/v1/calculators/${calculatorId}/calculate?help=errors`,
+  {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ facts: {} }),
+  }
+);
+
+if (!response.ok) {
+  const body = await response.json();
+  console.error(body.error.help ?? body.error.issues);
+}
+```
+
+## Related pages
+
+- [Facts](../concepts/facts.mdx)
+- [Diagnostics](../concepts/diagnostics.mdx)
+- [API errors](../api/errors.mdx)

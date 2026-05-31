@@ -1,0 +1,74 @@
+---
+title: "API overview"
+description: "Use HTTP as a thin transport over the SDK and calculator boundary."
+status: "draft"
+---
+
+# API overview
+
+Use the HTTP API when the caller cannot import the TypeScript SDK, such as a
+browser client, another language runtime or a service that needs an OpenAPI
+contract. If your caller can run TypeScript in-process, start with the
+[plain SDK](../sdk/plain-sdk.mdx).
+
+## Use HTTP when
+
+| Caller need                                | Use                                          |
+| ------------------------------------------ | -------------------------------------------- |
+| Server-side TypeScript calculation         | [Plain SDK](../sdk/plain-sdk.mdx)            |
+| Effect application or in-process transport | [Effect SDK](../sdk/effect-sdk.mdx)          |
+| Browser or non-TypeScript caller           | HTTP API                                     |
+| Generated endpoint contract                | [OpenAPI reference](./openapi-reference.mdx) |
+
+## Runtime model
+
+The API does not own tax logic. It decodes transport input, calls the same SDK
+and calculator service boundary as an in-process consumer, then returns the
+service result or an HTTP error envelope.
+
+```ts
+Production: HTTP calculate
+
+HTTP caller
+  -> @whattax/http-api route contract
+    -> CalculatorApiHandlerLive
+      -> @whattax/sdk/effect calculateRunRequest
+        -> PublicCalculatorService.calculate
+          -> CalculationEngine
+      -> CalculatorApiErrorEnvelope for expected service errors
+```
+
+The calculate route proves the public call graph by using
+`calculateRunRequest`. It still validates facts against the selected
+calculator, so a payload accepted by the generic HTTP schema can fail if it is
+for a different calculator.
+
+## Request model
+
+Calculation requests use `CalculatorRunRequest`:
+
+```json
+{
+  "facts": {
+    "grossPay": {
+      "_tag": "GrossPay",
+      "amount": { "_tag": "Money", "cents": 346200, "currency": "AUD" },
+      "period": "fortnightly"
+    },
+    "taxFreeThresholdClaimed": true
+  },
+  "jurisdiction": "AU",
+  "taxYear": "2025-26"
+}
+```
+
+Use canonical tagged values such as `GrossPay` and `Money` where the owning
+schema requires them. The generated OpenAPI document shows supported
+`facts.anyOf` shapes for the current public calculators.
+
+## Related pages
+
+- [Endpoints](./endpoints.mdx)
+- [Errors](./errors.mdx)
+- [OpenAPI reference](./openapi-reference.mdx)
+- [Build a browser app with the HTTP API](../guides/build-a-browser-app-with-the-http-api.mdx)

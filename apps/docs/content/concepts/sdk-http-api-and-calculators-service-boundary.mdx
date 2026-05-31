@@ -1,0 +1,54 @@
+---
+title: "SDK, HTTP API and calculators service boundary"
+description: "Understand where SDK, HTTP and calculator service responsibilities sit."
+status: "draft"
+---
+
+# SDK, HTTP API and calculators service boundary
+
+WhatTax has one calculator boundary with multiple caller surfaces. The SDK is
+the primary in-process surface. HTTP is a transport over that same calculator
+path.
+
+## When this matters
+
+Use this model when deciding where code should live. Tax logic belongs in
+rules and calculators, not in HTTP handlers, browser clients or docs examples.
+
+## How it works
+
+```ts
+Production: SDK and HTTP boundary
+
+Plain TypeScript caller
+  -> WhatTax.calculate / WhatTax.safe.calculate / au.incomeTax.annual
+    -> @whattax/sdk/effect calculateReportRequest
+      -> @whattax/sdk/effect calculateRunRequest
+        -> PublicCalculatorService.calculate
+          -> CalculationEngine
+
+HTTP caller
+  -> @whattax/http-api route contract
+    -> CalculatorApiHandlerLive
+      -> @whattax/sdk/effect calculateRunRequest
+        -> PublicCalculatorService.calculate
+          -> CalculationEngine
+```
+
+The HTTP calculate route uses `calculateRunRequest` so the transport path and
+the SDK path share the calculator service contract.
+
+## Boundary rules
+
+- Use the SDK when TypeScript can run in-process.
+- Use HTTP when the caller needs transport or OpenAPI.
+- Keep endpoint field detail in generated OpenAPI.
+- Keep canonical facts, reports and `CalculatorServiceError` in the owning
+  calculator packages.
+
+## Related concepts
+
+- [API overview](../api/overview.mdx)
+- [Plain SDK](../sdk/plain-sdk.mdx)
+- [Effect SDK](../sdk/effect-sdk.mdx)
+- [API and SDK architecture](../../../../docs/architecture/api-and-sdk.md)

@@ -9,13 +9,13 @@ status: "draft"
 Use this section when your caller needs HTTP transport, generated endpoint
 contracts or OpenAPI reference material.
 
-## Planned pages
+## Pages
 
-- Overview
-- Authentication and deployment assumptions
-- Errors
-- OpenAPI reference
-- Endpoints
+- [Overview](./overview.mdx)
+- [Authentication and deployment assumptions](./authentication-and-deployment-assumptions.mdx)
+- [Errors](./errors.mdx)
+- [OpenAPI reference](./openapi-reference.mdx)
+- [Endpoints](./endpoints.mdx)
 
 ## Runtime graph
 
@@ -27,6 +27,7 @@ HTTP caller
     -> CalculatorApiHandlerLive
       -> @whattax/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
+          -> CalculationEngine
 ```
 
 ## Related sections

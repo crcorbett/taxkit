@@ -1,0 +1,89 @@
+---
+title: "API errors"
+description: "Handle expected calculator service failures returned by the HTTP API."
+status: "draft"
+---
+
+# API errors
+
+The HTTP API wraps expected calculator service failures in
+`CalculatorApiErrorEnvelope`. The `error` field is the canonical
+`CalculatorServiceError` union from the calculator package.
+
+## Error model
+
+```json
+{
+  "error": {
+    "_tag": "CalculatorInputDecodeError",
+    "calculatorId": "au.pay.take-home",
+    "message": "Invalid facts for au.pay.take-home",
+    "issues": [
+      {
+        "_tag": "CalculatorInputIssue",
+        "message": "Expected GrossPay",
+        "path": ["grossPay"]
+      }
+    ]
+  }
+}
+```
+
+Expected failures stay in the service error channel. The current public union
+includes calculator input decode failures, unsupported calculator errors,
+unsupported calculator context errors and calculation errors.
+
+## Handle an error response
+
+```ts
+type ApiErrorEnvelope = {
+  error: {
+    _tag: string;
+    message: string;
+    issues?: ReadonlyArray<{ path: ReadonlyArray<string>; message: string }>;
+  };
+};
+
+const response = await fetch(
+  "http://127.0.0.1:4000/api/v1/calculators/au.pay.take-home/calculate",
+  {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      facts: {
+        taxableIncome: { _tag: "Money", cents: 9000000, currency: "AUD" },
+      },
+      jurisdiction: "AU",
+      taxYear: "2025-26",
+    }),
+  }
+);
+
+if (!response.ok) {
+  const body = (await response.json()) as ApiErrorEnvelope;
+  console.error(body.error._tag, body.error.message);
+  for (const issue of body.error.issues ?? []) {
+    console.error(issue.path.join("."), issue.message);
+  }
+}
+```
+
+Expected output for this shape is a `CalculatorInputDecodeError` because annual
+income facts are not valid facts for `au.pay.take-home`.
+
+## Add help
+
+Append `?help=errors` when you want descriptor-backed help for invalid input:
+
+```txt
+POST /api/v1/calculators/au.pay.take-home/calculate?help=errors
+```
+
+The help data comes from canonical fact descriptors. Do not maintain a
+separate application copy of calculator fields.
+
+## Related pages
+
+- [Handle validation errors](../guides/handle-validation-errors.mdx)
+- [Show calculator help to users](../guides/show-calculator-help-to-users.mdx)
+- [Schemas](../sdk/schemas.mdx)

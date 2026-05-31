@@ -1,0 +1,37 @@
+---
+title: "Calculators"
+description: "Understand how calculators turn canonical input facts into reports."
+status: "draft"
+---
+
+# Calculators
+
+A calculator is the public unit you ask WhatTax to run. It accepts canonical
+facts, composes the matching rules and returns a schema-backed report.
+
+## When this matters
+
+Choose the calculator before you build a form, an API payload or a test. The
+selected calculator decides which facts are accepted and which report shape is
+returned.
+
+## How it works
+
+```ts
+CalculatorRunRequest
+  -> selected calculator catalog entry
+    -> canonical input fact schema decode
+    -> rule pack and parameter layers
+    -> report schema
+```
+
+For most TypeScript callers, use `au.incomeTax.annual` or
+`WhatTax.calculate`. For HTTP callers, pass the calculator ID in the route and
+the facts in the `CalculatorRunRequest` body.
+
+## Related concepts
+
+- [Facts](./facts.mdx)
+- [Rules](./rules.mdx)
+- [Reports](./reports.mdx)
+- [Calculators architecture](../../../../docs/architecture/calculators.md)

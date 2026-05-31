@@ -103,21 +103,174 @@
       "path": "/api",
       "source": "content/api/index.mdx",
       "pageType": "section index",
-      "primaryReader": "API consumer"
+      "primaryReader": "API consumer",
+      "pages": [
+        {
+          "title": "Overview",
+          "path": "/api/overview",
+          "source": "content/api/overview.mdx",
+          "pageType": "api reference overview",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Authentication and deployment assumptions",
+          "path": "/api/authentication-and-deployment-assumptions",
+          "source": "content/api/authentication-and-deployment-assumptions.mdx",
+          "pageType": "reference",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Errors",
+          "path": "/api/errors",
+          "source": "content/api/errors.mdx",
+          "pageType": "troubleshooting",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "OpenAPI reference",
+          "path": "/api/openapi-reference",
+          "source": "content/api/openapi-reference.mdx",
+          "pageType": "api reference overview",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Endpoints",
+          "path": "/api/endpoints",
+          "source": "content/api/endpoints.mdx",
+          "pageType": "reference",
+          "primaryReader": "API consumer"
+        }
+      ]
     },
     {
       "title": "Guides",
       "path": "/guides",
       "source": "content/guides/index.mdx",
       "pageType": "section index",
-      "primaryReader": "Application integrator"
+      "primaryReader": "Application integrator",
+      "pages": [
+        {
+          "title": "Calculate Australian take-home pay",
+          "path": "/guides/calculate-australian-take-home-pay",
+          "source": "content/guides/calculate-australian-take-home-pay.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Calculate annual income tax",
+          "path": "/guides/calculate-annual-income-tax",
+          "source": "content/guides/calculate-annual-income-tax.mdx",
+          "pageType": "guide",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Handle validation errors",
+          "path": "/guides/handle-validation-errors",
+          "source": "content/guides/handle-validation-errors.mdx",
+          "pageType": "guide",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Show calculator help to users",
+          "path": "/guides/show-calculator-help-to-users",
+          "source": "content/guides/show-calculator-help-to-users.mdx",
+          "pageType": "guide",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Build a server route with the SDK",
+          "path": "/guides/build-a-server-route-with-the-sdk",
+          "source": "content/guides/build-a-server-route-with-the-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Build a browser app with the HTTP API",
+          "path": "/guides/build-a-browser-app-with-the-http-api",
+          "source": "content/guides/build-a-browser-app-with-the-http-api.mdx",
+          "pageType": "guide",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Test your integration",
+          "path": "/guides/test-your-integration",
+          "source": "content/guides/test-your-integration.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Migrate from raw HTTP to SDK",
+          "path": "/guides/migrate-from-raw-http-to-sdk",
+          "source": "content/guides/migrate-from-raw-http-to-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        }
+      ]
     },
     {
       "title": "Concepts",
       "path": "/concepts",
       "source": "content/concepts/index.mdx",
       "pageType": "section index",
-      "primaryReader": "Type-safety focused developer"
+      "primaryReader": "Type-safety focused developer",
+      "pages": [
+        {
+          "title": "Calculators",
+          "path": "/concepts/calculators",
+          "source": "content/concepts/calculators.mdx",
+          "pageType": "concept",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Facts",
+          "path": "/concepts/facts",
+          "source": "content/concepts/facts.mdx",
+          "pageType": "concept",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Rules",
+          "path": "/concepts/rules",
+          "source": "content/concepts/rules.mdx",
+          "pageType": "concept",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Jurisdictions and tax years",
+          "path": "/concepts/jurisdictions-and-tax-years",
+          "source": "content/concepts/jurisdictions-and-tax-years.mdx",
+          "pageType": "concept",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Money and branded values",
+          "path": "/concepts/money-and-branded-values",
+          "source": "content/concepts/money-and-branded-values.mdx",
+          "pageType": "concept",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Reports",
+          "path": "/concepts/reports",
+          "source": "content/concepts/reports.mdx",
+          "pageType": "concept",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Diagnostics",
+          "path": "/concepts/diagnostics",
+          "source": "content/concepts/diagnostics.mdx",
+          "pageType": "concept",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "SDK, HTTP API and calculators service boundary",
+          "path": "/concepts/sdk-http-api-and-calculators-service-boundary",
+          "source": "content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+          "pageType": "concept",
+          "primaryReader": "Application integrator"
+        }
+      ]
     },
     {
       "title": "Contributing",

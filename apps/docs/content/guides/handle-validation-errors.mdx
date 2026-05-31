@@ -1,0 +1,71 @@
+---
+title: "Handle validation errors"
+description: "Read schema decode failures from SDK and HTTP calculator calls."
+status: "draft"
+---
+
+# Handle validation errors
+
+Use this guide when calculator input comes from a form, API request or any
+untyped source.
+
+## Before you start
+
+- Read [Type safety](../sdk/type-safety.mdx).
+- Choose the SDK safe facade or the HTTP API error envelope.
+- Keep canonical fact values tied to the selected calculator.
+
+## Steps
+
+1. Prefer typed SDK helpers for trusted TypeScript data.
+2. Use `WhatTax.safe.calculate` when expected failures should be values.
+3. Use `?help=errors` with HTTP calls when you want field guidance.
+4. Display issue paths from the calculator error rather than maintaining a
+   separate list of fields.
+
+## Example
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+
+const result = await WhatTax.safe.calculate(
+  au.calculations.takeHomePay,
+  // External input can bypass compile-time checks before it reaches this call.
+  { taxableIncome: aud(9_000_000) } as never
+);
+
+if (result._tag === "WhatTaxFailure") {
+  const error = result.error.error;
+  console.log(error._tag);
+  console.log(result.error.message);
+}
+```
+
+## Verify the result
+
+Expected output includes:
+
+```txt
+CalculatorInputDecodeError
+Invalid facts for au.pay.take-home
+```
+
+## HTTP error handling
+
+For HTTP callers, read `CalculatorApiErrorEnvelope.error`:
+
+```ts
+const body = await response.json();
+
+if (!response.ok) {
+  console.error(body.error._tag, body.error.message);
+}
+```
+
+## Related pages
+
+- [API errors](../api/errors.mdx)
+- [Safe SDK](../sdk/safe-sdk.mdx)
+- [Show calculator help to users](./show-calculator-help-to-users.mdx)

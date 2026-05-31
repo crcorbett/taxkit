@@ -1,0 +1,78 @@
+---
+title: "Calculate annual income tax"
+description: "Run the AU annual income tax calculator with a branded money value."
+status: "draft"
+---
+
+# Calculate annual income tax
+
+Use this guide when you need the current Australian annual income tax report
+from TypeScript.
+
+## Before you start
+
+- Install the SDK with [Install the SDK](../start/install-the-sdk.mdx).
+- Use `au.incomeTax.annual` for the common plain SDK path.
+- Pass taxable income as `Money` in cents.
+
+## Steps
+
+1. Import `aud` and the AU SDK helper.
+2. Convert taxable income to a `Money` value.
+3. Call `au.incomeTax.annual`.
+4. Read `liability` and the report ledger.
+
+## Example
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { au } from "@whattax/sdk/au";
+
+const report = await au.incomeTax.annual({
+  taxableIncome: aud(9_000_000),
+});
+
+console.log({
+  kind: report._tag,
+  liabilityCents: report.liability.cents,
+  components: report.ledger.components.length,
+});
+```
+
+## Verify the result
+
+Expected output:
+
+```json
+{
+  "kind": "AnnualTaxReport",
+  "liabilityCents": 1958800,
+  "components": 3
+}
+```
+
+The liability value is cents. `1958800` means $19,588.00.
+
+## Handle errors
+
+Use `WhatTax.safe.calculate` when you need a result value:
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+
+const result = await WhatTax.safe.calculate(au.calculations.annualIncomeTax, {
+  taxableIncome: aud(9_000_000),
+});
+
+if (result._tag === "WhatTaxFailure") {
+  console.error(result.error.message);
+}
+```
+
+## Related pages
+
+- [Run your first calculation](../start/run-your-first-calculation.mdx)
+- [Reports](../concepts/reports.mdx)
+- [Money and branded values](../concepts/money-and-branded-values.mdx)

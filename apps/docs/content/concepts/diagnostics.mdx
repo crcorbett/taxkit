@@ -1,0 +1,48 @@
+---
+title: "Diagnostics"
+description: "Understand graph issues, trace data and validation help returned with calculations."
+status: "draft"
+---
+
+# Diagnostics
+
+Diagnostics explain calculation health and metadata quality. They are part of
+the public calculation model, not private debug output.
+
+## When this matters
+
+Use diagnostics when you need to show validation issues, inspect graph health
+or test that a calculator ran without metadata problems.
+
+## How it works
+
+`CalculatorRunResponse` includes a `diagnostics` field beside the calculator
+metadata and report:
+
+```ts
+const response = await client.calculatorApi.calculate({
+  params: { calculatorId },
+  payload,
+  query: { help: "errors" },
+});
+
+console.log(response.diagnostics.graphIssues.length);
+```
+
+Expected output for the current take-home pay success fixture is:
+
+```txt
+0
+```
+
+## Trace and graph data
+
+Trace data records which rule ran, what it used, what it produced and which
+sources support it. Graph data exposes dependency edges and validation issues
+through the calculator graph endpoint.
+
+## Related concepts
+
+- [Reports](./reports.mdx)
+- [Rules](./rules.mdx)
+- [Graph, trace and ledgers architecture](../../../../docs/architecture/graph-trace-ledgers.md)

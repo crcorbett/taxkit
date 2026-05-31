@@ -1,0 +1,75 @@
+---
+title: "Build a browser app with the HTTP API"
+description: "Call the calculator API from a browser when you cannot import the SDK."
+status: "draft"
+---
+
+# Build a browser app with the HTTP API
+
+Use this guide when a browser client needs a calculator result and cannot run
+the TypeScript SDK in-process.
+
+## Before you start
+
+- Run the API app locally or point at your deployed API base URL.
+- Read [Authentication and deployment assumptions](../api/authentication-and-deployment-assumptions.mdx).
+- Use canonical JSON values for tagged facts.
+
+## Steps
+
+1. Build a `CalculatorRunRequest` JSON body.
+2. Send it to the calculate endpoint.
+3. Check `response.ok`.
+4. Render either the report or `CalculatorApiErrorEnvelope.error`.
+
+## Example
+
+```ts
+const response = await fetch(
+  "http://127.0.0.1:4000/api/v1/calculators/au.pay.take-home/calculate",
+  {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      facts: {
+        grossPay: {
+          _tag: "GrossPay",
+          amount: { _tag: "Money", cents: 346200, currency: "AUD" },
+          period: "fortnightly",
+        },
+        taxFreeThresholdClaimed: true,
+      },
+      jurisdiction: "AU",
+      taxYear: "2025-26",
+    }),
+  }
+);
+
+const body = await response.json();
+
+if (!response.ok) {
+  console.error(body.error.message);
+} else {
+  console.log(body.report.netPay.cents);
+}
+```
+
+## Verify the result
+
+Expected output:
+
+```txt
+270600
+```
+
+## Handle errors
+
+For invalid facts, the API returns `CalculatorApiErrorEnvelope` with a
+`CalculatorServiceError` in `error`. Add `?help=errors` when you want
+descriptor-backed field help.
+
+## Related pages
+
+- [API overview](../api/overview.mdx)
+- [Endpoints](../api/endpoints.mdx)
+- [API errors](../api/errors.mdx)

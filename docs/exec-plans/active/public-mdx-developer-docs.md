@@ -26,7 +26,7 @@ task.
 | --- | --- | --- |
 | DOCS-MDX-001 | complete | Chose `apps/docs/content` as the MDX content root and added the draft navigation contract without scaffolding a docs app package. |
 | DOCS-MDX-002 | complete | Added public Start and SDK MDX pages covering the SDK quickstart, install path, first calculation, SDK-vs-API choice, plain SDK, safe SDK, Effect SDK, schemas and type safety. |
-| DOCS-MDX-003 | pending | Write API, guides and concepts docs. |
+| DOCS-MDX-003 | complete | Added API, guides and concepts MDX pages, navigation entries and generated-reference follow-up. |
 | DOCS-MDX-004 | pending | Write contribution docs for facts, rules, calculators and PRs. |
 | DOCS-MDX-005 | pending | Add reference, examples and final docs validation. |
 
@@ -120,3 +120,50 @@ task.
   - `bun run verification`
   - `bun run changeset status --verbose`
 - Accepted `DOCS-MDX-002` for the parent gate.
+
+### 2026-06-01 - DOCS-MDX-003 implementation
+
+- Read the public MDX developer docs spec, `DOCS-MDX-003`, relevant API/SDK,
+  content, facts, rules, calculators and graph architecture docs and the
+  documentation standards suite.
+- Loaded the relevant page templates: API reference overview, guide, concept,
+  reference, troubleshooting and section index.
+- Loaded the relevant reader journeys: API consumer, application integrator,
+  type-safety focused developer, SDK evaluator and correctness reviewer.
+- Added API pages for overview, authentication and deployment assumptions,
+  errors, OpenAPI reference routing and endpoint routing.
+- Added guide pages for take-home pay, annual income tax, validation errors,
+  calculator help, server-route SDK integration, browser HTTP integration,
+  integration tests and migration from raw HTTP to SDK.
+- Added concept pages for calculators, facts, rules, jurisdictions and tax
+  years, money and branded values, reports, diagnostics and the SDK/HTTP/API
+  calculators service boundary.
+- Updated `apps/docs/navigation.json` so API, Guides and Concepts child pages
+  are part of the draft navigation contract.
+- Recorded the generated-reference follow-up in
+  `apps/docs/content/api/openapi-reference.mdx` because `apps/docs` remains a
+  content root only and has no generated-reference ingestion pipeline yet.
+- Docs app typecheck/build remains unavailable because `apps/docs` has no
+  package manifest or runtime package yet.
+- Verification passed:
+  - `jq empty apps/docs/navigation.json && jq empty apps/docs/navigation.schema.json`
+  - MDX content-root validation for frontmatter, balanced fences, local links
+    and navigation sources
+  - API OpenAPI smoke check against `GET /api/docs/openapi.json` on a local
+    API app instance
+  - API calculate smoke check against
+    `POST /api/v1/calculators/au.pay.take-home/calculate`
+  - documentation review audit for guide prerequisites, examples, expected
+    output, error handling, banned language, stale SDK/API names, current
+    public names, useful call graphs and HTTP-over-SDK call graph coverage
+  - `git diff --check`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Changeset rationale: no new Changeset was required because this slice only
+  changes public MDX content, docs navigation and the active execution plan. It
+  does not change package exports, package README behaviour or runtime
+  behaviour.
+- Final call graph still matches the spec: HTTP calculate routes through
+  `CalculatorApiHandlerLive` to `@whattax/sdk/effect` `calculateRunRequest`,
+  then to `PublicCalculatorService.calculate` and `CalculationEngine`, with
+  `CalculatorApiErrorEnvelope` for expected service errors.

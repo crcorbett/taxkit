@@ -1,0 +1,85 @@
+---
+title: "Migrate from raw HTTP to SDK"
+description: "Move server-side TypeScript callers from fetch requests to SDK calls."
+status: "draft"
+---
+
+# Migrate from raw HTTP to SDK
+
+Use this guide when a server-side TypeScript caller currently uses raw HTTP
+but can import the SDK directly.
+
+## Before you start
+
+- Confirm the caller runs in a TypeScript runtime that can import workspace or
+  published packages.
+- Keep HTTP for browser and non-TypeScript callers.
+- Read [Plain SDK](../sdk/plain-sdk.mdx).
+
+## Steps
+
+1. Replace the fetch request with an SDK helper.
+2. Replace JSON tagged values with constructors such as `aud` and `GrossPay`.
+3. Replace HTTP error envelope handling with `WhatTax.safe.calculate` where
+   you need result values.
+4. Keep integration tests for the same input and expected cents.
+
+## Example
+
+Before:
+
+```ts
+const response = await fetch(
+  "http://127.0.0.1:4000/api/v1/calculators/au.income-tax.annual/calculate",
+  {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      facts: {
+        taxableIncome: { _tag: "Money", cents: 9000000, currency: "AUD" },
+      },
+      jurisdiction: "AU",
+      taxYear: "2025-26",
+    }),
+  }
+);
+
+const body = await response.json();
+```
+
+After:
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { au } from "@whattax/sdk/au";
+
+const report = await au.incomeTax.annual({
+  taxableIncome: aud(9_000_000),
+});
+```
+
+## Verify the result
+
+Both calls should produce annual tax liability of `1958800` cents for taxable
+income of $90,000.00.
+
+## Handle errors
+
+Raw HTTP returns `CalculatorApiErrorEnvelope`. The SDK safe facade returns
+`WhatTaxFailure`:
+
+```ts
+const result = await au.incomeTax.safe.annual({
+  taxableIncome: aud(9_000_000),
+});
+
+if (result._tag === "WhatTaxFailure") {
+  console.error(result.error.message);
+}
+```
+
+## Related pages
+
+- [Choose SDK or HTTP API](../start/choose-sdk-or-api.mdx)
+- [API overview](../api/overview.mdx)
+- [Plain SDK](../sdk/plain-sdk.mdx)

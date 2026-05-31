@@ -1,0 +1,53 @@
+---
+title: "OpenAPI reference"
+description: "Use the generated OpenAPI document as the endpoint contract."
+status: "draft"
+---
+
+# OpenAPI reference
+
+Use generated OpenAPI for endpoint paths, parameters, request bodies and
+response schemas. Narrative API pages explain when to use HTTP, how errors
+work and how the API relates to the SDK.
+
+## Generated source
+
+The current API package generates the OpenAPI document from
+`@whattax/http-api` route definitions. The API app serves it at:
+
+```txt
+GET /api/docs/openapi.json
+```
+
+The local Scalar viewer is served at:
+
+```txt
+GET /api/docs
+```
+
+## Smoke check
+
+Run the API locally, then fetch the generated document:
+
+```sh
+bun run --filter=api start
+curl http://127.0.0.1:4000/api/docs/openapi.json
+```
+
+The document should include the calculate path and `CalculatorRunRequest`
+payload schema. If a future docs app embeds generated reference pages, the
+embed should consume this generated document rather than copying endpoint
+fields by hand.
+
+## Generated-reference follow-up
+
+`apps/docs` is currently a content root only. It has no package manifest,
+MDX runtime or generated-reference ingestion pipeline. A later reference slice
+should add a docs-app integration that reads `/api/docs/openapi.json` or an
+equivalent generated artifact and renders endpoint reference pages from it.
+
+## Related pages
+
+- [Endpoints](./endpoints.mdx)
+- [API overview](./overview.mdx)
+- [API and SDK architecture](../../../../docs/architecture/api-and-sdk.md)

@@ -1,0 +1,40 @@
+---
+title: "Rules"
+description: "Understand how source-backed rules derive facts and reports."
+status: "draft"
+---
+
+# Rules
+
+Rules derive facts from other facts and parameter services. They are the
+source-backed calculation steps behind calculator reports.
+
+## When this matters
+
+You usually do not call rules directly as an API or SDK consumer. You need the
+model when you inspect graph metadata, review diagnostics or contribute tax
+behaviour.
+
+## How it works
+
+```txt
+GrossPay
+  -> taxable pay rule
+  -> PAYG withholding rule
+  -> net pay rule
+  -> TakeHomePayReport
+```
+
+Rules have descriptors so WhatTax can expose graph edges, source references
+and required facts through metadata endpoints.
+
+## Parameters
+
+Tax-year rates and thresholds are services. The same algorithm can be paired
+with different parameter layers for different effective periods.
+
+## Related concepts
+
+- [Calculators](./calculators.mdx)
+- [Diagnostics](./diagnostics.mdx)
+- [Rules and parameters architecture](../../../../docs/architecture/rules-and-parameters.md)

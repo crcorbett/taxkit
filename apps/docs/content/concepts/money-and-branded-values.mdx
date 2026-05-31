@@ -1,0 +1,40 @@
+---
+title: "Money and branded values"
+description: "Use schema-owned constructors and branded values for calculation input."
+status: "draft"
+---
+
+# Money and branded values
+
+WhatTax uses branded and schema-backed values for tax-significant data. Money
+uses integer cents and a currency, not floating-point dollars.
+
+## When this matters
+
+Use branded constructors when building SDK input. Send tagged JSON values when
+calling HTTP. This keeps input aligned with canonical schemas and avoids
+application-specific DTOs.
+
+## How it works
+
+```ts
+import { aud } from "@whattax/core/primitives";
+
+const taxableIncome = aud(9_000_000);
+```
+
+The matching HTTP JSON is:
+
+```json
+{ "_tag": "Money", "cents": 9000000, "currency": "AUD" }
+```
+
+`CalculatorId`, `Jurisdiction` and `TaxYear` are also branded or literal
+boundary values owned by packages. Use exported values and schemas instead of
+duplicating string fields in reusable code.
+
+## Related concepts
+
+- [Facts](./facts.mdx)
+- [Type safety](../sdk/type-safety.mdx)
+- [Facts architecture](../../../../docs/architecture/facts.md)
