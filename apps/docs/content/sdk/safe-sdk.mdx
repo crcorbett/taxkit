@@ -1,0 +1,58 @@
+---
+title: "Safe SDK"
+description: "Return typed success or failure values from SDK calculations."
+status: "draft"
+---
+
+# Safe SDK
+
+Use the safe SDK when expected failures should be returned as values instead of
+rejected Promises.
+
+## Call `WhatTax.safe.calculate`
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+
+const result = await WhatTax.safe.calculate(au.calculations.annualIncomeTax, {
+  taxableIncome: aud(9_000_000),
+});
+
+if (result._tag === "WhatTaxSuccess") {
+  console.log(result.value.liability.cents);
+}
+
+if (result._tag === "WhatTaxFailure") {
+  console.error(result.error._tag);
+}
+```
+
+The result is either `WhatTaxSuccess` with the calculator report or
+`WhatTaxFailure` with an SDK-owned error value.
+
+## Call AU safe helpers
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { au } from "@whattax/sdk/au";
+
+const result = await au.incomeTax.safe.annual({
+  taxableIncome: aud(9_000_000),
+});
+```
+
+## When to use it
+
+Use the safe facade when your application already models expected failures as
+data, or when you want to handle schema decode errors in the same branch as
+calculation failures.
+
+Use `WhatTax.calculate` when rejected Promises fit your existing control flow.
+
+## Related pages
+
+- [Plain SDK](./plain-sdk.mdx)
+- [Schemas](./schemas.mdx)
+- [Type safety](./type-safety.mdx)

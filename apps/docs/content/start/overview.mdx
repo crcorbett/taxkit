@@ -1,0 +1,56 @@
+---
+title: "Overview"
+description: "Learn where to start with the WhatTax SDK and HTTP API."
+status: "draft"
+---
+
+# Overview
+
+Use WhatTax when you need source-backed tax calculations from TypeScript or
+over HTTP. Start with the TypeScript SDK when your application can import
+WhatTax packages. Use the HTTP API when the caller is a browser, another
+language or a service boundary that should not run the SDK in-process.
+
+## Choose your first path
+
+| You need to                                           | Start with                                        |
+| ----------------------------------------------------- | ------------------------------------------------- |
+| Run one calculation from TypeScript                   | [Quickstart](./quickstart.mdx)                    |
+| Add WhatTax to a server application                   | [Plain SDK](../sdk/plain-sdk.mdx)                 |
+| Return typed success or failure values                | [Safe SDK](../sdk/safe-sdk.mdx)                   |
+| Compose WhatTax inside an Effect application          | [Effect SDK](../sdk/effect-sdk.mdx)               |
+| Call WhatTax from a browser or non-TypeScript service | [Choose SDK or HTTP API](./choose-sdk-or-api.mdx) |
+
+## How the public surfaces fit
+
+```ts
+Production: public integration surfaces
+
+TypeScript application
+  -> @whattax/sdk plain facade
+    -> calculator service
+
+Effect application or in-process transport
+  -> @whattax/sdk/effect
+    -> calculator service
+
+Browser or non-TypeScript caller
+  -> HTTP API
+    -> @whattax/sdk/effect
+      -> calculator service
+```
+
+The SDK and API use the same calculator-owned schemas and branded values. This
+keeps request validation, calculator reports and expected errors aligned across
+surfaces.
+
+## Current release status
+
+The TypeScript SDK package is still private until release approval. The docs
+show the intended public package shape and the current workspace exports.
+
+## Next steps
+
+- Run your first calculation with the [quickstart](./quickstart.mdx).
+- Compare integration surfaces in [Choose SDK or HTTP API](./choose-sdk-or-api.mdx).
+- Read the [TypeScript SDK](../sdk/typescript-sdk.mdx) page for the SDK surface.

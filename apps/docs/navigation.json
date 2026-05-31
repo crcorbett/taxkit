@@ -8,14 +8,95 @@
       "path": "/start",
       "source": "content/start/index.mdx",
       "pageType": "section index",
-      "primaryReader": "SDK evaluator"
+      "primaryReader": "SDK evaluator",
+      "pages": [
+        {
+          "title": "Overview",
+          "path": "/start/overview",
+          "source": "content/start/overview.mdx",
+          "pageType": "section index",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Quickstart",
+          "path": "/start/quickstart",
+          "source": "content/start/quickstart.mdx",
+          "pageType": "quickstart",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Install the SDK",
+          "path": "/start/install-the-sdk",
+          "source": "content/start/install-the-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Run your first calculation",
+          "path": "/start/run-your-first-calculation",
+          "source": "content/start/run-your-first-calculation.mdx",
+          "pageType": "guide",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Choose SDK or HTTP API",
+          "path": "/start/choose-sdk-or-api",
+          "source": "content/start/choose-sdk-or-api.mdx",
+          "pageType": "decision page",
+          "primaryReader": "Application integrator"
+        }
+      ]
     },
     {
       "title": "SDK",
       "path": "/sdk",
       "source": "content/sdk/index.mdx",
       "pageType": "section index",
-      "primaryReader": "SDK evaluator"
+      "primaryReader": "SDK evaluator",
+      "pages": [
+        {
+          "title": "TypeScript SDK",
+          "path": "/sdk/typescript-sdk",
+          "source": "content/sdk/typescript-sdk.mdx",
+          "pageType": "concept",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Plain SDK",
+          "path": "/sdk/plain-sdk",
+          "source": "content/sdk/plain-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Safe SDK",
+          "path": "/sdk/safe-sdk",
+          "source": "content/sdk/safe-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Effect SDK",
+          "path": "/sdk/effect-sdk",
+          "source": "content/sdk/effect-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Schemas",
+          "path": "/sdk/schemas",
+          "source": "content/sdk/schemas.mdx",
+          "pageType": "reference",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Type safety",
+          "path": "/sdk/type-safety",
+          "source": "content/sdk/type-safety.mdx",
+          "pageType": "concept",
+          "primaryReader": "Type-safety focused developer"
+        }
+      ]
     },
     {
       "title": "API",

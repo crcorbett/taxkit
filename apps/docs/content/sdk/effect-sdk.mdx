@@ -1,0 +1,112 @@
+---
+title: "Effect SDK"
+description: "Compose WhatTax calculations in Effect applications and in-process transports."
+status: "draft"
+---
+
+# Effect SDK
+
+Use the Effect SDK when your application already composes services with Effect,
+or when an in-process transport needs the full calculator run response. Most
+server-side TypeScript applications should start with the [Plain SDK](./plain-sdk.mdx).
+
+## Runtime graph
+
+```ts
+Production: SDK Effect full run
+
+Effect consumer
+  -> calculateRunRequest(descriptor, request)
+    -> PublicCalculatorService.calculate
+      -> CalculatorRunResponse
+    -> descriptor output decode for response.report
+    -> typed CalculatorRunResponse with narrowed report
+
+Report-only helpers
+  -> calculateReportRequest(...)
+    -> calculateRunRequest(...)
+    -> response.report
+  -> calculateReport(...)
+    -> calculateReportRequest(...)
+```
+
+## Return the full run response
+
+Use `calculateRunRequest` when you need the canonical `CalculatorRunResponse`
+shape with a descriptor-decoded report type.
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { calculateRunRequest } from "@whattax/sdk/effect";
+import { AuAnnualIncomeTaxCalculation } from "@whattax/sdk/au/effect";
+
+const effect = calculateRunRequest(AuAnnualIncomeTaxCalculation, {
+  payload: {
+    facts: { taxableIncome: aud(9_000_000) },
+    jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
+    taxYear: AuAnnualIncomeTaxCalculation.taxYear,
+  },
+});
+```
+
+## Return only the report
+
+Use `calculateReportRequest` when you have a full request payload but only need
+the report.
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { calculateReportRequest } from "@whattax/sdk/effect";
+import { AuAnnualIncomeTaxCalculation } from "@whattax/sdk/au/effect";
+
+const effect = calculateReportRequest(AuAnnualIncomeTaxCalculation, {
+  payload: {
+    facts: { taxableIncome: aud(9_000_000) },
+    jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
+    taxYear: AuAnnualIncomeTaxCalculation.taxYear,
+  },
+});
+```
+
+Use `calculateReport` when you already have descriptor-typed facts:
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { calculateReport } from "@whattax/sdk/effect";
+import { AuAnnualIncomeTaxCalculation } from "@whattax/sdk/au/effect";
+
+const effect = calculateReport(AuAnnualIncomeTaxCalculation, {
+  taxableIncome: aud(9_000_000),
+});
+```
+
+## Use an Effect client
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { createClient } from "@whattax/sdk/effect";
+import {
+  AuIncomeTax2025_26Module,
+  AuAnnualIncomeTaxCalculation,
+} from "@whattax/sdk/au/effect";
+
+const client = createClient(AuIncomeTax2025_26Module);
+
+const effect = client.calculations.calculateReport(
+  AuAnnualIncomeTaxCalculation,
+  { taxableIncome: aud(9_000_000) }
+);
+```
+
+## Requirements
+
+Effect helpers require `PublicCalculatorService` in the environment. The plain
+SDK provides its own runtime. The Effect SDK leaves service provision to the
+consumer so application layers and tests can choose the calculator service
+implementation.
+
+## Related pages
+
+- [Plain SDK](./plain-sdk.mdx)
+- [Schemas](./schemas.mdx)
+- [Choose SDK or HTTP API](../start/choose-sdk-or-api.mdx)

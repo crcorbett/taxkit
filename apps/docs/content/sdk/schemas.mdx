@@ -1,0 +1,57 @@
+---
+title: "Schemas"
+description: "Use canonical calculator run schemas and SDK result schemas."
+status: "draft"
+---
+
+# Schemas
+
+Use SDK schema exports when your application needs the canonical calculator run
+contracts or safe-result error shapes.
+
+## Import schemas
+
+```ts
+import {
+  CalculatorRunFacts,
+  CalculatorRunRequest,
+  CalculatorRunResponse,
+  CalculatorRunServiceRequest,
+  CalculatorServiceError,
+} from "@whattax/sdk/schemas";
+```
+
+These names are re-exported from the calculator package for consumer
+convenience. The calculator package remains the source of truth for the
+`CalculatorRun*` contracts and `CalculatorServiceError`.
+
+## Common contracts
+
+| Name                          | Use                                           |
+| ----------------------------- | --------------------------------------------- |
+| `CalculatorRunFacts`          | Canonical facts accepted by calculator runs.  |
+| `CalculatorRunRequest`        | Public calculator run payload shape.          |
+| `CalculatorRunServiceRequest` | Service-level request with the calculator id. |
+| `CalculatorRunResponse`       | Canonical run response shape.                 |
+| `CalculatorServiceError`      | Expected calculator service failure union.    |
+
+## Safe-result schemas
+
+The SDK also exports safe-result and error schemas:
+
+```ts
+import {
+  WhatTaxFailure,
+  WhatTaxSchemaDecodeError,
+  WhatTaxSuccess,
+} from "@whattax/sdk/schemas";
+```
+
+Use these when you persist, inspect or validate results returned by
+`WhatTax.safe.calculate`.
+
+## Related pages
+
+- [Safe SDK](./safe-sdk.mdx)
+- [Effect SDK](./effect-sdk.mdx)
+- [Type safety](./type-safety.mdx)

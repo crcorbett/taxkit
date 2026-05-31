@@ -1,0 +1,54 @@
+---
+title: "Install the SDK"
+description: "Install the target TypeScript SDK packages and understand the current release status."
+status: "draft"
+---
+
+# Install the SDK
+
+Install the TypeScript SDK when your application can run WhatTax in-process.
+Use the HTTP API instead when the caller cannot import TypeScript packages.
+
+## Current package status
+
+The SDK is still private until release approval. These commands document the
+target public install shape and match the current workspace package names.
+
+## Install packages
+
+```sh
+bun add @whattax/sdk @whattax/core
+```
+
+Use `@whattax/core` for canonical branded values such as `aud`. Use
+`@whattax/sdk` for calculation descriptors, the plain facade, safe facade,
+Effect facade and schema re-exports.
+
+## Choose an entrypoint
+
+| Entrypoint             | Use when                                                               |
+| ---------------------- | ---------------------------------------------------------------------- |
+| `@whattax/sdk`         | You want `WhatTax.calculate` or `WhatTax.safe.calculate`.              |
+| `@whattax/sdk/au`      | You want Australian helper methods such as `au.incomeTax.annual`.      |
+| `@whattax/sdk/effect`  | You want Effect programs, service requirements and full run responses. |
+| `@whattax/sdk/schemas` | You want canonical calculator run schemas and SDK error schemas.       |
+
+## Verify an import
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+
+const report = await WhatTax.calculate(au.calculations.annualIncomeTax, {
+  taxableIncome: aud(9_000_000),
+});
+
+console.log(report.liability.cents);
+```
+
+## Next steps
+
+- Run the [quickstart](./quickstart.mdx).
+- Read [Plain SDK](../sdk/plain-sdk.mdx) for server-side TypeScript use.
+- Read [Effect SDK](../sdk/effect-sdk.mdx) for advanced in-process transport.

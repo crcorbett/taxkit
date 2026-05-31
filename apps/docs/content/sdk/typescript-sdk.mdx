@@ -1,0 +1,63 @@
+---
+title: "TypeScript SDK"
+description: "Understand the public TypeScript SDK entrypoints and when to use them."
+status: "draft"
+---
+
+# TypeScript SDK
+
+Use the TypeScript SDK when your application can run WhatTax calculations
+in-process. The plain facade is the beginner path. The safe facade returns
+typed result values. The Effect facade is for advanced service composition and
+in-process transports.
+
+## Entrypoints
+
+| Entrypoint             | Use when                                                                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `@whattax/sdk`         | You want `WhatTax.calculate`, `WhatTax.safe.calculate` or `WhatTax.createClient`.                           |
+| `@whattax/sdk/au`      | You want Australian calculator helpers and descriptors.                                                     |
+| `@whattax/sdk/effect`  | You want `calculateRunRequest`, `calculateReportRequest`, `calculateReport` or Effect service requirements. |
+| `@whattax/sdk/schemas` | You want `CalculatorRunRequest`, `CalculatorRunResponse`, `CalculatorServiceError` and SDK result schemas.  |
+
+## Beginner path
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { au } from "@whattax/sdk/au";
+
+const report = await au.incomeTax.annual({
+  taxableIncome: aud(9_000_000),
+});
+```
+
+Australian helpers keep the first calculation compact while still using the
+same descriptor and schema contracts as the generic SDK facade.
+
+## Generic path
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+
+const report = await WhatTax.calculate(au.calculations.annualIncomeTax, {
+  taxableIncome: aud(9_000_000),
+});
+```
+
+## Advanced Effect path
+
+Use the Effect SDK when you want to provide `PublicCalculatorService` through
+your own Effect layer or when an in-process transport needs the full
+`CalculatorRunResponse`.
+
+```ts
+import { calculateRunRequest } from "@whattax/sdk/effect";
+```
+
+## Next steps
+
+- Read [Plain SDK](./plain-sdk.mdx) for Promise-based usage.
+- Read [Safe SDK](./safe-sdk.mdx) for typed success and failure results.
+- Read [Effect SDK](./effect-sdk.mdx) for service composition.

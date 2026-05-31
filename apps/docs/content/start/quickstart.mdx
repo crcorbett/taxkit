@@ -1,0 +1,76 @@
+---
+title: "Quickstart"
+description: "Install the SDK shape and run one Australian income tax calculation."
+status: "draft"
+---
+
+# Quickstart
+
+Run one Australian annual income tax calculation with the plain TypeScript SDK.
+This is the recommended first path for TypeScript applications.
+
+## Before you start
+
+You need a TypeScript runtime that can import ESM packages. The SDK package is
+private until release approval, so run this from the WhatTax workspace for now.
+
+## Install
+
+The intended public install shape is:
+
+```sh
+bun add @whattax/sdk @whattax/core
+```
+
+Inside this repository, the workspace provides those packages already.
+
+## Run a calculation
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { au } from "@whattax/sdk/au";
+
+const report = await au.incomeTax.annual({
+  taxableIncome: aud(9_000_000),
+});
+
+console.log(report.liability.cents);
+```
+
+`aud(9_000_000)` represents AUD 90,000.00 as integer cents. The calculator
+returns a typed annual income tax report.
+
+## Expected result
+
+The report includes money values, ledger entries and calculator-specific
+fields. Access fields directly from the typed report:
+
+```ts
+console.log(report.liability.currency);
+console.log(report.rawLiability.cents);
+```
+
+## Handle errors
+
+Use the safe facade when you want a typed result instead of a rejected Promise:
+
+```ts
+import { aud } from "@whattax/core/primitives";
+import { WhatTax } from "@whattax/sdk";
+import { au } from "@whattax/sdk/au";
+
+const result = await WhatTax.safe.calculate(au.calculations.annualIncomeTax, {
+  taxableIncome: aud(9_000_000),
+});
+
+if (result._tag === "WhatTaxSuccess") {
+  console.log(result.value.liability.cents);
+}
+```
+
+## Next steps
+
+- Use [Run your first calculation](./run-your-first-calculation.mdx) for a
+  fuller copyable script.
+- Compare surfaces in [Choose SDK or HTTP API](./choose-sdk-or-api.mdx).
+- Read [Type safety](../sdk/type-safety.mdx) before accepting user input.

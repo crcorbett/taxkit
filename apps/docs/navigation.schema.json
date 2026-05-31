@@ -33,6 +33,37 @@
           },
           "primaryReader": {
             "type": "string"
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "title",
+                "path",
+                "source",
+                "pageType",
+                "primaryReader"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "pageType": {
+                  "type": "string"
+                },
+                "primaryReader": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
           }
         },
         "additionalProperties": false

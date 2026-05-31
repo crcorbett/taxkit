@@ -25,7 +25,7 @@ task.
 | Task | Status | Notes |
 | --- | --- | --- |
 | DOCS-MDX-001 | complete | Chose `apps/docs/content` as the MDX content root and added the draft navigation contract without scaffolding a docs app package. |
-| DOCS-MDX-002 | pending | Write Start and SDK developer docs. |
+| DOCS-MDX-002 | complete | Added public Start and SDK MDX pages covering the SDK quickstart, install path, first calculation, SDK-vs-API choice, plain SDK, safe SDK, Effect SDK, schemas and type safety. |
 | DOCS-MDX-003 | pending | Write API, guides and concepts docs. |
 | DOCS-MDX-004 | pending | Write contribution docs for facts, rules, calculators and PRs. |
 | DOCS-MDX-005 | pending | Add reference, examples and final docs validation. |
@@ -68,4 +68,31 @@ task.
     references
 - Changeset rationale: no new Changeset was required because this slice is
   docs/spec/standards/content-root only and does not change package exports,
+  package README behaviour or runtime behaviour.
+
+### 2026-06-01 - DOCS-MDX-002 implementation
+
+- Read the public MDX developer docs spec, `DOCS-MDX-002`, implementation
+  guidance, relevant API/SDK and content architecture docs and the
+  documentation standards suite.
+- Loaded the relevant page templates: quickstart, decision page, guide,
+  concept and reference.
+- Loaded the relevant reader journeys: SDK evaluator, application integrator,
+  type-safety focused developer and API consumer.
+- Added Start pages for overview, quickstart, install, first calculation and
+  SDK-vs-API selection.
+- Added SDK pages for the TypeScript SDK, plain SDK, safe SDK, Effect SDK,
+  schemas and type safety.
+- Updated `apps/docs/navigation.json` and its schema so Start and SDK child
+  pages are part of the docs navigation contract.
+- Kept API, guides, concepts, contributing and reference sections as indexes
+  only because later tasks own those sections.
+- MDX build validation is still limited because `apps/docs` has no package
+  manifest, MDX compiler or runtime yet. This slice used JSON validation,
+  source-existence checks and frontmatter/fence audits instead.
+- Snippet extraction is not automated yet. This slice validated examples
+  against current SDK exports with the SDK type-test command and recorded the
+  extraction gap as follow-up evidence.
+- Changeset rationale: no new Changeset was required because this slice is
+  public docs content and navigation only. It does not change package exports,
   package README behaviour or runtime behaviour.
