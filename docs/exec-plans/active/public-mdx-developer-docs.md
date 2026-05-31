@@ -346,3 +346,36 @@ task.
   `@whattax/sdk/effect` `calculateRunRequest`,
   `PublicCalculatorService.calculate` and `CalculationEngine`, with
   `CalculatorApiErrorEnvelope` for expected service errors.
+
+### 2026-06-01 - DOCS-MDX-005 parent acceptance
+
+- Parent reviewed the committed Reference, examples and validation slice in
+  `c2a231e Add reference docs and examples`.
+- Confirmed the changed file scope is limited to Reference MDX pages, docs
+  example files, docs validation config/scripts, navigation, accepted spec
+  structure notes and this execution plan.
+- Verified `apps/docs/navigation.json` and
+  `apps/docs/navigation.schema.json` parse successfully with `jq empty`.
+- Ran `node apps/docs/scripts/validate-content.mjs`; it validated 61 MDX files,
+  61 navigation entries and local links.
+- Ran `bunx tsc -p apps/docs/tsconfig.examples.json --noEmit`; example files
+  type-check against current package source exports.
+- Audited public docs and examples for stale public names, banned marketing
+  language and private downstream product terms; no matches were found.
+- Ran `bun run build` and `bun run verification`; both passed.
+- Ran SDK example smokes for the Node/server, Effect and safe error-handling
+  examples; each exited 0 with expected output. Bun printed its known
+  `--tsconfig-override` internal diagnostic after successful execution.
+- Ran the browser HTTP example against a local API app; it exited 0 and
+  returned calculator JSON. The API server was stopped after the smoke check.
+- Ran the OpenAPI smoke against `GET /api/docs/openapi.json`; it returned
+  `WhatTax API` with 10 paths including
+  `/api/v1/calculators/{calculatorId}/calculate`.
+- Ran `bun run changeset status --verbose`; existing pending package
+  Changesets are unchanged.
+- No new Changeset was required because the final slice changes public docs
+  content, examples, validation config, navigation, accepted spec notes and
+  execution-plan evidence only. It does not change package exports, package
+  README behaviour, package metadata or runtime behaviour.
+- Accepted `DOCS-MDX-005` for the parent gate and completed the public MDX
+  developer documentation implementation.
