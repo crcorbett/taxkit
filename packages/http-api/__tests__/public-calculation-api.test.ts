@@ -4,7 +4,7 @@ import { CalculationEngineLive } from "@whattax/core";
 import { aud } from "@whattax/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@whattax/rules-au-pay";
 import { AuPayTakeHomeCalculation } from "@whattax/sdk/au/effect";
-import { calculateReportRequest as calculateSdkReportRequest } from "@whattax/sdk/effect";
+import { calculateRunRequest as calculateSdkRunRequest } from "@whattax/sdk/effect";
 import { expectAt } from "@whattax/testing";
 import { Cause, Effect, Exit, Layer } from "effect";
 
@@ -47,7 +47,7 @@ describe("WhatTax public calculation HTTP API", () => {
           help: "errors",
         },
       });
-      const sdkReport = yield* calculateSdkReportRequest(
+      const sdkResponse = yield* calculateSdkRunRequest(
         AuPayTakeHomeCalculation,
         {
           payload: {
@@ -60,7 +60,7 @@ describe("WhatTax public calculation HTTP API", () => {
 
       expect(response.calculator.calculatorId).toBe("au.pay.take-home");
       expect(response.report._tag).toBe("TakeHomePayReport");
-      expect(response.report).toEqual(sdkReport);
+      expect(response).toEqual(sdkResponse);
       expect(response.report.withholdingsTotal.cents).toBe(75_600);
       expect(response.report.netPay.cents).toBe(270_600);
       expect(response.diagnostics.graphIssues.length).toBe(0);
@@ -90,7 +90,7 @@ describe("WhatTax public calculation HTTP API", () => {
             },
           })
           .pipe(Effect.exit);
-        const sdkExit = yield* calculateSdkReportRequest(
+        const sdkExit = yield* calculateSdkRunRequest(
           AuPayTakeHomeCalculation,
           {
             help: "errors",

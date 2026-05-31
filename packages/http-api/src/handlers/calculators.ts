@@ -1,15 +1,11 @@
-import {
-  CalculatorRunResponseData,
-  PublicCalculatorService,
-} from "@whattax/calculators";
+import { PublicCalculatorService } from "@whattax/calculators";
 import type { CalculatorId } from "@whattax/calculators";
-import { CalculationDiagnostics } from "@whattax/core";
 import {
   AuAnnualIncomeTaxCalculation,
   AuPayTakeHomeCalculation,
   AuPayWithholdingsCalculation,
 } from "@whattax/sdk/au/effect";
-import { calculateReportRequest as calculateSdkReportRequest } from "@whattax/sdk/effect";
+import { calculateRunRequest as calculateSdkRunRequest } from "@whattax/sdk/effect";
 import type { AnySdkCalculation } from "@whattax/sdk/effect";
 import { Array, Effect, HashMap, Option, Schema } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
@@ -115,31 +111,11 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
         )
         .handle("calculate", ({ params, payload, query }) =>
           Effect.gen(function* () {
-            const service = yield* PublicCalculatorService;
             const sdkCalculation = sdkCalculationFor(params.calculatorId);
-            const report = yield* calculateSdkReportRequest(sdkCalculation, {
+            return yield* calculateSdkRunRequest(sdkCalculation, {
               payload,
               ...query,
             }).pipe(Effect.catchIf(Schema.isSchemaError, Effect.die));
-            const calculator = yield* service.getCalculator({
-              calculatorId: params.calculatorId,
-              help: query.help,
-              jurisdiction: payload.jurisdiction,
-              taxYear: payload.taxYear,
-            });
-            const graph = yield* service.getCalculatorGraph({
-              calculatorId: params.calculatorId,
-              jurisdiction: payload.jurisdiction,
-              taxYear: payload.taxYear,
-            });
-
-            return new CalculatorRunResponseData({
-              calculator,
-              diagnostics: new CalculationDiagnostics({
-                graphIssues: graph.validationIssues,
-              }),
-              report,
-            });
           }).pipe(
             Effect.mapError(
               (error) =>

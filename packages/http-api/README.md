@@ -36,8 +36,9 @@ The implemented API surface is:
 
 The public calculation API routes expose the reusable calculator catalog,
 canonical fact descriptors, canonical rule descriptors and graph validation
-diagnostics from `@whattax/calculators`. Handler implementations pass route
-params, query values and payloads to `PublicCalculatorService` and map tagged
+diagnostics from `@whattax/calculators`. Metadata handlers pass route params
+and query values to `PublicCalculatorService`. The calculate handler delegates
+one full run to `@whattax/sdk/effect` `calculateRunRequest`, then maps tagged
 service failures into route-owned HTTP error envelopes.
 
 The calculate route imports reusable `CalculatorRun*` schemas and
@@ -146,8 +147,9 @@ bun run --filter=@whattax/http-api check-types
   `@whattax/calculators`.
 - Keep calculate facts imported from `@whattax/calculators` so OpenAPI and
   typed clients reflect canonical rule-owned fact shapes.
-- Keep calculation execution delegated to `PublicCalculatorService`, which is
-  catalog-driven, scenario-schema decoded and `CalculationEngine` based.
+- Keep calculation execution delegated through `@whattax/sdk/effect`
+  `calculateRunRequest`, which uses `PublicCalculatorService` for the
+  catalog-driven, scenario-schema decoded and `CalculationEngine` based run.
 - Keep metadata responses derived from canonical fact descriptors, rule
   descriptors, source refs, parameter periods and graph diagnostics from the
   owning engine and rule packages.

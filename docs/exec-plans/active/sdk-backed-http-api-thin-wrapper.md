@@ -26,7 +26,7 @@ task.
 | --- | --- | --- |
 | SDK-HTTP-001 | complete | Renamed API and SDK public symbols for clearer call graphs; verification passed. |
 | SDK-HTTP-002 | complete | Added SDK Effect full-run helper with descriptor-narrowed response typing; verification passed. |
-| SDK-HTTP-003 | pending | Make HTTP calculate delegate to SDK full-run helper. |
+| SDK-HTTP-003 | complete | HTTP calculate delegates to SDK full-run helper; verification passed. |
 | SDK-HTTP-004 | pending | Document final call graph and downstream evidence. |
 
 ## Validation Log
@@ -104,3 +104,32 @@ task.
   `calculateRunRequest -> PublicCalculatorService.calculate -> descriptor.decodeOutput(response.report) -> typed calculator response`;
   `calculateReportRequest -> calculateRunRequest -> response.report`;
   `calculateReport -> calculateReportRequest`.
+
+### 2026-05-31 - SDK-HTTP-003 HTTP Thin Wrapper Slice
+
+- Updated `CalculatorApiHandlerLive` calculate route to call
+  `@whattax/sdk/effect` `calculateRunRequest` once and return the SDK
+  full-run response directly.
+- Removed calculate-route calls to `PublicCalculatorService.getCalculator`,
+  `PublicCalculatorService.getCalculatorGraph` and local
+  `CalculatorRunResponseData` construction. Metadata, schema and graph routes
+  still use `PublicCalculatorService` directly.
+- Updated HTTP API tests to compare calculate-route success and expected
+  `CalculatorInputDecodeError` behavior against `calculateRunRequest`.
+- Updated the HTTP API package README and
+  `.changeset/clear-api-sdk-names.md` for the thin-wrapper behavior.
+- Focused handler audit passed: the calculate route block contains no
+  `getCalculator`, `getCalculatorGraph` or `CalculatorRunResponseData`
+  references.
+- SDK import-boundary evidence passed through
+  `bun run --filter=@whattax/sdk check-boundaries`; `@whattax/sdk` still does
+  not depend on `@whattax/http-api`.
+- Verification passed:
+  `bun run --filter=@whattax/http-api test`,
+  `bun run --filter=@whattax/http-api check-types`,
+  `bun run --filter=@whattax/http-api build`,
+  `bun run --filter=@whattax/sdk test`,
+  `bun run --filter=@whattax/sdk check-boundaries`,
+  `bun run verification` and `bun run changeset status --verbose`.
+- Implemented call graph:
+  `CalculatorApiHandlerLive -> sdkCalculationFor(params.calculatorId) -> @whattax/sdk/effect calculateRunRequest -> PublicCalculatorService.calculate -> CalculatorRunResponseData -> descriptor output decode -> typed calculator response -> CalculatorApiErrorEnvelope on CalculatorServiceError`.
