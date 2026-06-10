@@ -30,7 +30,9 @@ export type DocsPageFrontmatter = typeof DocsPageFrontmatter.Type;
 
 export const DocsPageType = Schema.Literals([
   "api reference overview",
+  "changelog or release note",
   "concept",
+  "contribution guide",
   "decision page",
   "guide",
   "quickstart",
@@ -43,6 +45,7 @@ export type DocsPageType = typeof DocsPageType.Type;
 export const DocsPrimaryReader = Schema.Literals([
   "API consumer",
   "Application integrator",
+  "Correctness reviewer",
   "Documentation contributor",
   "New contributor",
   "SDK evaluator",
@@ -84,6 +87,14 @@ export const DocsMeta = Schema.Struct({
 });
 export type DocsMeta = typeof DocsMeta.Type;
 
+export const DocsContentPage = Schema.Struct({
+  frontmatter: DocsPageFrontmatter,
+  markdown: Schema.String,
+  path: DocsPagePath,
+  source: DocsSourcePath,
+});
+export type DocsContentPage = typeof DocsContentPage.Type;
+
 export class DocsValidationIssue extends Schema.TaggedClass<DocsValidationIssue>()(
   "DocsValidationIssue",
   {
@@ -91,3 +102,8 @@ export class DocsValidationIssue extends Schema.TaggedClass<DocsValidationIssue>
     path: Schema.Array(Schema.String),
   }
 ) {}
+
+export const DocsValidationResult = Schema.Struct({
+  issues: Schema.Array(DocsValidationIssue),
+});
+export type DocsValidationResult = typeof DocsValidationResult.Type;

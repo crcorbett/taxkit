@@ -25,7 +25,7 @@ next task.
 | Task | Status | Notes |
 | --- | --- | --- |
 | DOCS-RUNTIME-001 | completed | Created private docs content package and Fumadocs source boundary. |
-| DOCS-RUNTIME-002 | pending | Add DocsContentService and validation policy. |
+| DOCS-RUNTIME-002 | completed | Added DocsContentService and package-owned validation policy. |
 | DOCS-RUNTIME-003 | pending | Create docs app runtime and route shell. |
 | DOCS-RUNTIME-004 | pending | Wire reference, examples and OpenAPI validation. |
 | DOCS-RUNTIME-005 | pending | Update architecture docs and root verification wiring. |
@@ -113,3 +113,48 @@ next task.
   - `bun run verification`
   - `bun run changeset status --verbose`
 - Accepted `DOCS-RUNTIME-001` for the parent gate.
+
+### 2026-06-10 - DOCS-RUNTIME-002 implementation
+
+- Added `DocsContentService` with `getPage`, `listPages`, `getNavigation` and
+  `validateContent` operations, plus `DocsContentServiceLive` as the
+  package-owned live layer.
+- Added package-owned validation under `packages/docs-content/src/validation/`
+  and moved the legacy `apps/docs/scripts/validate-content.mjs` implementation
+  to a thin compatibility wrapper that delegates to
+  `bun run --filter=@whattax/docs-content validate`.
+- Preserved current content validation coverage for frontmatter, navigation
+  schema decode, navigation source existence, local links, banned wording,
+  stale public API/SDK names, private downstream product terms and fenced code
+  balance. The stricter schema decode required extending the canonical
+  navigation schema to include current public docs values for contribution
+  pages, changelog/release-note pages and correctness reviewers.
+- Added tests for canonical navigation decode, current corpus validation and
+  `DocsContentServiceLive` page lookup/listing.
+- Added `@whattax/docs-content/server` exports for the service/layer and the
+  generated Fumadocs source boundary. No docs app runtime, route shell or
+  browser consumer was created.
+- Diff audit: validation policy now lives in
+  `packages/docs-content/src/validation/policy.ts`; `apps/docs` retains only a
+  wrapper script and no duplicated validation patterns.
+- Strict Effect audit: primary operations use `Effect.gen` or linear
+  `.pipe(...)` flows, tagged source/lookup/validation errors, canonical
+  Schema-derived docs types, `Context.Service`, `Layer`, `Option`, `Match`,
+  `Array` and schema decode boundaries. No unsafe casts, local DTO mirrors,
+  `Object.values`, `Object.entries`, `switch` statements or app-side
+  validation duplication were found in the touched implementation.
+- Browser/import boundary audit:
+  `rg -n "packages/docs-content/\\.source|@whattax/docs-content/\\.source|\\.source/(server|browser|dynamic)|docs-content/.source" apps/docs -g '*.{ts,tsx,js,jsx,mdx,json,mjs}'`
+  returned no matches.
+- Verification passed:
+  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run --filter=@whattax/docs-content test`
+  - `bun run --filter=@whattax/docs-content check-types`
+  - `bun run --filter=@whattax/docs-content build`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Changeset: `.changeset/docs-content-service-validation.md` records a patch
+  for the private `@whattax/docs-content` package.
+- Call graph status: the slice matches the package-owned service and validation
+  portion of the target graph. `apps/docs` route/runtime consumption remains
+  intentionally unstarted for DOCS-RUNTIME-003.

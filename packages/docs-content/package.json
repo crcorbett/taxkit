@@ -8,9 +8,17 @@
       "source": "./src/errors.ts",
       "default": "./src/errors.ts"
     },
+    "./server": {
+      "source": "./src/server.ts",
+      "default": "./src/server.ts"
+    },
     "./schemas": {
       "source": "./src/schemas.ts",
       "default": "./src/schemas.ts"
+    },
+    "./service": {
+      "source": "./src/service.ts",
+      "default": "./src/service.ts"
     },
     "./source.config": "./source.config.ts"
   },
@@ -18,9 +26,11 @@
     "build": "fumadocs-mdx",
     "check-types": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "validate": "bun run ./src/validate.runtime.ts",
     "clean": "rm -rf .source .turbo *.tsbuildinfo"
   },
   "dependencies": {
+    "@effect/platform-bun": "catalog:",
     "@standard-schema/spec": "^1.1.0",
     "effect": "catalog:",
     "fumadocs-core": "^16.8.3",
@@ -28,8 +38,10 @@
     "remark-mermaidjs": "7.0.0"
   },
   "devDependencies": {
+    "@effect/vitest": "catalog:",
     "@shikijs/core": "4.0.2",
     "@shikijs/transformers": "^4.0.2",
+    "@types/bun": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

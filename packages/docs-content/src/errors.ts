@@ -23,3 +23,10 @@ export class DocsSourceError extends Schema.TaggedErrorClass<DocsSourceError>()(
     source: Schema.optional(DocsSourcePath),
   }
 ) {}
+
+export class DocsValidationFailedError extends Schema.TaggedErrorClass<DocsValidationFailedError>()(
+  "DocsValidationFailedError",
+  {
+    issues: Schema.Array(Schema.String),
+  }
+) {}
