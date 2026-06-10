@@ -8,6 +8,10 @@
       "source": "./src/errors.ts",
       "default": "./src/errors.ts"
     },
+    "./live": {
+      "source": "./src/live.layer.ts",
+      "default": "./src/live.layer.ts"
+    },
     "./server": {
       "source": "./src/server.ts",
       "default": "./src/server.ts"

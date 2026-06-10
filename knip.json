@@ -35,6 +35,21 @@
       "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
       "ignoreDependencies": ["@tanstack/router-plugin", "@whattax/tsconfig"]
     },
+    "apps/docs": {
+      "entry": [
+        "src/router.tsx",
+        "src/server.ts",
+        "src/routes/**/*.{ts,tsx}",
+        "vite.config.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
+      "ignore": [
+        "examples/**/*.ts",
+        "scripts/validate-content.mjs",
+        "src/routeTree.gen.ts"
+      ],
+      "ignoreDependencies": ["@whattax/tsconfig"]
+    },
     "packages/core": {
       "entry": ["src/index.ts", "src/*/index.ts"],
       "project": ["src/**/*.ts"]

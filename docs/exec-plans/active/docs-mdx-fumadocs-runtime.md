@@ -26,7 +26,7 @@ next task.
 | --- | --- | --- |
 | DOCS-RUNTIME-001 | completed | Created private docs content package and Fumadocs source boundary. |
 | DOCS-RUNTIME-002 | completed | Added DocsContentService and package-owned validation policy. |
-| DOCS-RUNTIME-003 | pending | Create docs app runtime and route shell. |
+| DOCS-RUNTIME-003 | in review | Created docs app runtime and route shell; verification in progress. |
 | DOCS-RUNTIME-004 | pending | Wire reference, examples and OpenAPI validation. |
 | DOCS-RUNTIME-005 | pending | Update architecture docs and root verification wiring. |
 | DOCS-RUNTIME-006 | pending | Run final seam, boundary and canonical-reuse audit. |
@@ -190,3 +190,58 @@ next task.
   `rg -n "packages/docs-content/\\.source|@whattax/docs-content/.source|\\.source/server|\\.source/browser" apps packages --glob '!packages/docs-content/.source/**' --glob '!packages/docs-content/README.md' --glob '!packages/docs-content/src/server.ts'`
   returned no matches.
 - Accepted `DOCS-RUNTIME-002` for the parent gate.
+
+### 2026-06-10 - DOCS-RUNTIME-003 implementation
+
+- Added private `docs` TanStack Start app package under `apps/docs` with
+  package-local `dev`, `build`, `check-types` and `clean` scripts, Vite/Nitro
+  config, router entry, server entry, generated route tree, root route, home
+  route and nested docs route shell.
+- Added app runtime wiring with a module-scoped `ManagedRuntime` over
+  `DocsContentServiceLive`. The app imports that live layer through the new
+  narrow `@whattax/docs-content/live` package export so the docs app does not
+  import generated `.source/server` modules while creating the route runtime.
+- Added `apps/docs/src/lib/docs/loaders.ts` route loaders. They use
+  TanStack `createServerFn`, `DocsContentService`, canonical `DocsPagePath`
+  schema decoding, `Effect.gen` and typed service errors to load navigation,
+  page lists and page markdown from `@whattax/docs-content`.
+- Added small app-local MDX renderer components in
+  `apps/docs/src/lib/mdx/components.tsx`. The route shell renders the current
+  MDX corpus from service-provided markdown through this local allowlist; it
+  does not move primitives into `packages/ui` and does not start
+  DOCS-RUNTIME-004 reference/example/OpenAPI validation.
+- Added `.changeset/docs-app-runtime-route-shell.md` for the package-facing
+  `@whattax/docs-content/live` export.
+- Verification passed:
+  - `bun run --filter=docs check-types`
+  - `bun run --filter=docs build`
+  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Browser verification passed on the local docs dev server at
+  `http://127.0.0.1:4527/`: the home route rendered primary navigation and
+  page count, and `/start/quickstart` rendered side navigation, headings,
+  paragraphs, complete code blocks and wrapped list items without overlap.
+- Import-boundary audits passed:
+  - `rg -n "apps/docs/content|navigation\\.json|@whattax/docs-content" apps/docs/src -g '*.{ts,tsx}'`
+    showed docs app route/runtime imports only package-owned
+    `@whattax/docs-content` exports.
+  - `rg -n "@whattax/docs-content/server|packages/docs-content/\\.source|@whattax/docs-content/\\.source|\\.source/server" apps/docs/src -g '*.{ts,tsx}'`
+    returned no matches.
+- Strict Effect audit: route loaders use TanStack `createServerFn`,
+  `DocsContentService`, canonical route-input and `DocsPagePath` schema
+  decoding and linear `Effect.gen` flows. App code uses canonical
+  schema-derived docs types and service tags from `@whattax/docs-content`; no
+  unsafe casts, local docs DTO mirrors, manual `_tag` values, `Object.values`,
+  `Object.entries`, `switch` or raw content/navigation imports were introduced.
+- Parent review follow-up was addressed before final commit: removed app-local
+  loader DTO interfaces in favor of inferred loader return data, replaced raw
+  optional `href` handling in the MDX link component with `Option`, rechecked
+  browser import boundaries and confirmed root `.gitignore` ignores
+  `apps/docs/.vercel`, `node_modules`, `.turbo`, `.tanstack` and `.output`.
+- Call graph status: implementation still follows the target route/service
+  call graph for this slice:
+  `apps/docs route -> docs app loader -> DocsContentService -> apps/docs/content`.
+  Compiled Fumadocs `.source/server` remains behind the package `server`
+  export for later tasks; this route shell intentionally renders from
+  service-owned markdown to preserve browser/server import boundaries.
