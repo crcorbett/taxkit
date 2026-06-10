@@ -1,11 +1,11 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-06-10
 source_of_truth: docs
-confidence: medium
+confidence: high
 ---
 
-# Implementing Specs
+# Implementing specs
 
 Implement specs in small, verifiable slices.
 
@@ -24,6 +24,72 @@ Implement specs in small, verifiable slices.
    exists.
 8. Commit only after the coherent slice passes verification and the Changeset
    decision is reviewed.
+
+## Task list execution protocol
+
+When a spec has a sibling task list, execute it as a sequence of delegated
+tasks. Do not start broad implementation locally.
+
+Before implementation begins:
+
+1. Create or set one comprehensive active goal with the goal tool available in
+   the runtime.
+2. The goal must explicitly say the task list will be implemented one task at a
+   time.
+3. The goal must explicitly say one subagent is used per task, sequentially.
+4. The goal must explicitly say the parent agent owns review, audit,
+   verification and final acceptance for each task before the next task is
+   delegated.
+
+Execution loop:
+
+1. Delegate exactly one task-list task to a subagent.
+2. Give the subagent the task object, the product spec, the task-list path and
+   the relevant architecture docs or files to inspect.
+3. Tell the subagent to edit files directly, run that task's
+   `mandatoryVerification` and report changed files plus verification
+   evidence.
+4. Review the subagent's diff and verification evidence locally.
+5. Run any additional targeted checks needed to trust the slice.
+6. Audit the slice against the task, spec, architecture docs and repo
+   conventions.
+7. If anything is missing or below the bar, send the task back to the same
+   subagent with concrete corrections.
+8. Mark the task complete only when the parent agent is satisfied that the task
+   scope and verification gates are genuinely complete.
+9. Commit the coherent slice when the task list requires `commitAfterPassing`.
+10. Delegate the next task only after the current task is accepted.
+
+Do not run multiple task-list implementation subagents in parallel unless the
+task list explicitly says a task is independent and the write scopes are
+disjoint. The default is strict serial execution.
+
+## Parent review bar
+
+The parent agent is accountable for implementation quality. Subagent
+completion is only a proposal until reviewed.
+
+Every accepted task must pass these audits where relevant:
+
+- no helper sprawl or broad abstractions before a working slice justifies them
+- canonical type, schema, id, error, service and layer reuse
+- Effect-native service/layer wiring instead of passing services through
+  ordinary function props
+- meaningful linear Effect control flow, using pipe-first composition or
+  `Effect.gen` where it best expresses the operation
+- typed errors handled at an owning boundary, usually in `.pipe(...)` with
+  `Effect.catchTag`, `Effect.catchTags` or `Effect.mapError`
+- Effect-native primitives where they fit: `Array`, `Option`, `Chunk`,
+  `HashMap`, `HashSet`, `Match`, `Schema`, tagged errors and services
+- no `Object.values`, `Object.entries`, `switch`, unsafe casts, local DTO
+  mirrors or stringly branching when Effect primitives or schema-owned
+  contracts can express the same logic
+- browser/runtime code consumes browser-safe API/SDK exports instead of
+  importing server-only internals
+- package-local README, architecture docs, specs and task lists stay aligned
+  when ownership moves
+- runtime, API, SDK, frontend and package-boundary call graphs still match the
+  implementation, or the spec/docs were updated with the final graph
 
 ## Guardrails
 
@@ -51,6 +117,28 @@ Implement specs in small, verifiable slices.
 - Runtime, API, SDK, frontend and package-boundary changes must leave the
   relevant spec/architecture call graphs accurate.
 
+## Slice design rules
+
+Each slice should:
+
+- cross the real boundaries of the system
+- leave the repo in a working state
+- prove one risky assumption
+- be small enough to validate quickly
+
+Good early slices:
+
+- one calculator or rule path wired through the public calculator service
+- one SDK helper over one canonical calculator request
+- one HTTP route over the SDK/effect boundary
+- one docs/content path with navigation and validation evidence
+
+Bad early slices:
+
+- broad helper extraction before behaviour exists
+- many partial files with no executable path
+- speculative abstractions for future steps
+
 ## Mandatory Subagent Contract
 
 Use this prompt block when delegating a task-list slice to a subagent:
@@ -74,8 +162,25 @@ Implementation rules:
 
 Verification and handoff:
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
+- Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.
+- Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
 - Report whether the final implementation still matches the spec's call graph.
 - Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.
 ```
+
+## Verification ladder
+
+After each meaningful slice, run the smallest verification set that proves the
+change, then broaden when the blast radius justifies it.
+
+| Change | Minimum verification |
+| --- | --- |
+| docs-only | content/link/path review plus `bun run verification` when docs wiring or task plans changed |
+| narrow type-level/backend change | owning package typecheck plus targeted tests |
+| runtime package change | owning package typecheck, targeted tests and build |
+| cross-package flow | package checks for each touched owner plus one end-to-end proof |
+| user-facing UI or API behaviour | package checks plus browser/runtime/API verification on the actual route |
+
+Do not defer verification until the end of a long rollout.

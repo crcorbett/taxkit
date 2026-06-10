@@ -26,10 +26,18 @@ Read in this order:
 - Prefer one compact canonical spec over a sprawling PRD bundle.
 - Prefer progressive, end-to-end implementation spikes with explicit
   verification gates over package-by-package TODO lists.
-- Include compact call-graph diagrams in specs that describe runtime behavior,
+- Include compact call-graph diagrams in specs that describe runtime behaviour,
   package boundaries, API/SDK flows, frontend data flow or test/runtime wiring.
 - Link to architecture docs instead of restating service, API, frontend or
   package-ownership guidance.
+- For Effect TypeScript work, specs and task lists must require meaningful
+  linear Effect control flow where it clarifies sequencing, typed errors caught
+  in `.pipe(...)`, canonical Schema-derived types, and an audit against
+  `docs/architecture/effect-services.md`.
+- Do not allow one top-level quality reminder to cover implementation style.
+  Each delegated code task must include explicit verification for Effect
+  control flow, schema/type reuse, unsafe casts, wrapper/helper sprawl and
+  browser-safe import boundaries where relevant.
 
 ## Expected Output
 
@@ -52,6 +60,19 @@ implementation spike.
 Specs and task lists that move runtime or package boundaries must include
 current/target call graphs and require implementers to verify the final call
 graph against code.
+For Effect TypeScript tasks, every task's `mandatoryVerification` or
+`completionCriteria` must explicitly check:
+
+- meaningful linear Effect pipelines or `Effect.gen` programs for primary
+  operations;
+- typed error handling in `.pipe(...)` with `Effect.catchTag`,
+  `Effect.catchTags`, `Effect.mapError` or another owning-package error
+  boundary;
+- canonical `Schema` contracts and schema-derived types from owning packages;
+- no unsafe casts, local DTO mirrors, manual object readers or trivial
+  wrappers/helpers;
+- browser/runtime code only imports browser-safe API/SDK exports.
+
 Use `bun run verification` as the default repo-health gate in
 `globalVerification.requiredBeforeFinalPR` and in each task's
 `mandatoryVerification`, then add task-specific smoke tests, browser checks, or
@@ -93,6 +114,8 @@ Implementation rules:
 Verification and handoff:
 
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
+- Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.
+- Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
 - Report whether the final implementation still matches the spec's call graph.
@@ -120,4 +143,7 @@ Verification and handoff:
   architecture audits required before it can be considered complete. Package-facing
   tasks must also name `bun run changeset` or explicitly state why no Changeset
   is required.
+- Repeat code-quality and architecture audits inside each delegated task. Do
+  not rely on a single global reminder for Effect control flow, canonical
+  schemas, unsafe casts, wrapper/helper sprawl or browser-safe imports.
 - Do not generate package-by-package code tutorials unless the user explicitly asks for that depth.

@@ -1,14 +1,34 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-06-10
 source_of_truth: docs
 confidence: high
 ---
 
-# Writing Spec Task Lists
+# Writing spec task lists
 
 Use a sibling task list when a product spec needs ordered implementation spikes
 and explicit verification gates.
+
+The task list is not a work log and it is not a replacement for an active
+execution plan. It answers what implementation slices should happen, in what
+order, and what must pass before each slice is complete.
+
+## When to create one
+
+Create a task list when a spec is large enough that implementation should be
+split into iterative slices with verification gates.
+
+Good candidates:
+
+- new public SDK, API, docs or app surfaces
+- cross-package service, calculator, rule or schema work
+- data model, lifecycle or release-train changes
+- work where browser behaviour, downstream compatibility or packed package
+  behaviour must be proven
+
+Skip the task list for small, single-package changes where the spec or active
+plan already gives enough sequencing.
 
 ## Shape
 
@@ -35,6 +55,36 @@ and explicit verification gates.
 }
 ```
 
+Task objects should use this shape:
+
+```json
+{
+  "id": "TASK-001",
+  "title": "First vertical slice",
+  "type": "foundation",
+  "dependsOn": [],
+  "goal": "Prove the riskiest contract with the smallest working path.",
+  "scope": [],
+  "outputs": [],
+  "implementationPrompt": "Paste the Mandatory Subagent Contract here, followed by task-specific files, outputs and gates.",
+  "mandatoryVerification": [],
+  "browserVerification": [],
+  "completionCriteria": [],
+  "commitAfterPassing": true
+}
+```
+
+Keep field names consistent with existing task lists:
+
+- `globalVerification`
+- `requiredBeforeFinalPR`
+- `evidenceRequired`
+- `dependsOn`
+- `mandatoryVerification`
+- `browserVerification`
+- `completionCriteria`
+- `commitAfterPassing`
+
 Tasks that will be delegated should include an implementation prompt, or an
 equivalent field in the task object, that embeds the mandatory subagent
 contract from `docs/exec-plans/implementing-specs.md` followed by task-specific
@@ -48,7 +98,55 @@ important negative claims, such as "HTTP calculate does not construct the
 calculator response" or "browser entrypoints do not import server-only
 modules."
 
-Example task shape:
+## Sequencing model
+
+Prefer progressive spikes over package-by-package completion.
+
+Start with the smallest slice that proves the riskiest assumption, then expand.
+A common sequence:
+
+1. current-code and architecture audit
+2. canonical schemas, ids, tagged errors and boundary rules
+3. deterministic unit or type-level tests for the owning package
+4. service or calculator vertical slice
+5. SDK, HTTP or app transport wiring
+6. docs, examples and compatibility evidence
+7. browser, API or packed-package proof when relevant
+8. final regression, release impact and architecture audit
+
+Do not save browser proof, API proof, downstream proof or compatibility proof
+for an unbounded final task when a narrower earlier slice can validate it.
+
+## Verification gates
+
+Every task must define gates that match its blast radius. A task is incomplete
+until its `mandatoryVerification` passes and the parent agent has accepted the
+slice.
+
+Use concrete commands where possible:
+
+- `bun run verification`
+- `bun run --filter=<package> test`
+- `bun run --filter=<package> check-types`
+- `bun run --filter=<package> build`
+- `bunx tsc -p <tsconfig> --noEmit`
+
+Also include non-command gates when they are material:
+
+- architecture audit against specific `docs/architecture/*` files
+- schema/type audit for canonical ids and no DTO mirrors
+- Effect audit against `docs/architecture/effect-services.md`, including
+  meaningful linear Effect control flow, typed errors handled in `.pipe(...)`,
+  schema decoding at boundaries, no unsafe casts and no trivial helper sprawl
+- diff audit for forbidden wrappers, unsafe casts or browser/server import
+  leaks
+- OpenAPI, SDK packed-artifact or downstream-consumer evidence
+- browser/runtime verification on the exact local route for user-facing UI
+
+Avoid vague gates such as "tests pass" without naming the package, behaviour or
+evidence.
+
+Example task:
 
 ```json
 {
@@ -63,6 +161,7 @@ Example task shape:
     "Parent agent reviewed the diff against the spec, task and architecture docs.",
     "Parent agent verified the final call graph against the implementation.",
     "Parent agent verified canonical Effect/schema/type/id reuse.",
+    "Parent agent audited Effect control flow, unsafe casts and helper sprawl.",
     "Parent agent verified the Changeset or accepted the no-changeset rationale.",
     "Parent agent accepted the task before the next delegation."
   ],
@@ -84,6 +183,22 @@ Each task should:
 - include architecture audits when boundaries, schemas or runtime ownership move
 - include call-graph review and negative audits when runtime/package flows move
 - include Effect-native and canonical-type prompt guidance when delegated
+- repeat Effect/code-quality audits inside each delegated task rather than
+  relying on a single global reminder
 - require parent review and acceptance before the next delegated task starts
 
 Prefer progressive end-to-end slices over package-by-package TODO lists.
+
+Each task should not:
+
+- be a package-by-package TODO list with no vertical proof
+- defer all tests to the final task
+- rely on live network calls for deterministic correctness tests unless the
+  task explicitly owns live integration evidence
+- permit local DTO mirrors, raw id fields, unsafe casts or wrapper-heavy
+  composition when architecture docs forbid them
+- permit nested or fragmented Effect control flow, one-line wrappers, helper
+  sprawl or manual object readers when a direct Effect/schema-owned approach
+  would express the behaviour clearly
+- claim completion without type, test, build, browser, API, docs or audit
+  evidence appropriate to its blast radius

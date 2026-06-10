@@ -1,26 +1,54 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-06-10
 source_of_truth: docs
 confidence: high
 ---
 
-# Writing Specs
+# Writing specs
 
 Use this guide when creating a new SPEC, PRD or design brief for WhatTax.
 
-## Choose The Right Home
+Do not start by creating a large PRD bundle. Pick the canonical document type
+first.
+
+## Choose the right home
 
 | Need | Canonical Home |
 | --- | --- |
-| current product intent, behavior, scope | `docs/product-specs/` |
+| current product intent, behaviour, scope | `docs/product-specs/` |
 | ordered implementation spikes and verification gates | `docs/product-specs/<topic>.tasks.json` |
 | durable architecture, boundaries, invariants | `docs/architecture/` |
 | design principles and engineering beliefs | `docs/design-docs/` |
 | active implementation sequencing and validation log | `docs/exec-plans/active/` |
 | external or vendor references | `docs/references/` |
 
-## Recommended Spec Shape
+Default rule:
+
+- new current specs go in `docs/product-specs/`
+- substantial specs that need implementation sequencing get a sibling
+  `.tasks.json` file in `docs/product-specs/`
+- new implementation plans go in `docs/exec-plans/active/`
+- reference or vendor material goes in `docs/references/`
+
+## Canonical document set
+
+For most substantial work, create two or three documents:
+
+1. A spec in `docs/product-specs/` that explains the goal, scope,
+   user/system behaviour, constraints and acceptance criteria.
+2. A task list beside the spec when implementation should be sequenced into
+   progressive, verifiable spikes.
+3. An execution plan in `docs/exec-plans/active/` when implementation begins,
+   recording live progress, validation evidence, decisions and follow-on debt.
+
+Do not force all three if the work is tiny. For small changes, a single focused
+spec or plan may be enough.
+
+For task-list structure, verification gates and JSON field conventions, see
+`docs/product-specs/writing-task-lists.md`.
+
+## Recommended spec shape
 
 1. Overview
 2. Problem
@@ -35,9 +63,29 @@ Use this guide when creating a new SPEC, PRD or design brief for WhatTax.
 11. Acceptance criteria
 12. References
 
-## Call Graphs
+## What a spec owns
 
-Specs that describe runtime behavior, service boundaries, package boundaries,
+A good spec should answer:
+
+- what problem is being solved
+- who or what benefits
+- what is in scope and out of scope
+- which packages/apps own the work
+- what constraints or invariants must hold
+- what success looks like
+
+A spec is not:
+
+- a work log
+- a code dump
+- a test transcript
+- a duplicate of package README or architecture docs
+
+Link to canonical architecture docs instead of re-explaining them.
+
+## Call graphs
+
+Specs that describe runtime behaviour, service boundaries, package boundaries,
 public APIs, SDK flows, frontend data loading or test/runtime wiring MUST
 include compact call-graph diagrams. Use fenced `ts` blocks with indentation
 and `->` arrows so the graph can be copied into code review, task prompts and
@@ -101,9 +149,14 @@ confidence: high | medium | low
 - For multi-slice delegated work, acceptance criteria must require parent
   review of each subagent diff against the spec, task list and architecture
   docs before the next task begins.
+- For Effect TypeScript work, require meaningful linear Effect control flow,
+  typed errors handled at owning boundaries, canonical schema-derived types,
+  and an explicit audit against `docs/architecture/effect-services.md`.
+- For implementation task lists, repeat Effect/code-quality audits in each
+  task's verification gates rather than relying on one top-level reminder.
 - Use `bun run verification` as the default repo-level acceptance gate when a
   spec changes code, docs wiring, package metadata or task plans.
 - Package-facing specs must define the expected Changeset impact: affected
   release-train packages, semver bump level, and user-facing changelog theme.
   Specs that do not affect package installation, package exports or package
-  behavior must say that no Changeset is required and why.
+  behaviour must say that no Changeset is required and why.

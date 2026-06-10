@@ -35,6 +35,14 @@ Read in this order:
 - Review the target spec's call-graph diagrams before editing and report
   whether the final implementation still matches them.
 - Prefer compile-time safety, canonical schemas, and canonical typed errors from owning packages.
+- Prefer meaningful linear Effect control flow for primary operations. Use
+  pipe-first composition when it makes data flow clearer, and use
+  `Effect.gen` when step-by-step sequencing is the clearer expression. Keep
+  typed error handling in the following `.pipe(...)` with `Effect.catchTag`,
+  `Effect.catchTags` or `Effect.mapError`.
+- Avoid wrapper/helper sprawl. A helper must be reused, name a real boundary or
+  domain concept, or be materially clearer than inline code; one-line wrappers
+  and tiny property readers are a smell.
 - MUST use Effect-native primitives and platform APIs when they fit:
   `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`,
   `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`,
@@ -73,10 +81,15 @@ Before accepting a task, audit for:
 - no helper sprawl
 - canonical type/schema/id/error reuse
 - strict Effect service/layer patterns
+- meaningful linear Effect control flow with typed errors handled in the
+  following `.pipe(...)`
 - Effect primitives where they fit: `Array`, `Option`, `Chunk`, `HashMap`,
   `HashSet`, `Match`, `Schema`, tagged errors, and services
 - no `Object.values`, `Object.entries`, `switch`, unsafe casts, local DTO
   mirrors, or stringly branching when an Effect/schema-owned approach fits
+- no trivial wrappers/helpers; every new helper is either reused, names a real
+  boundary/domain concept, or is longer than a few meaningful lines because it
+  genuinely clarifies the operation
 - browser code consumes browser-safe API/SDK exports
 - package-local README and architecture docs stay aligned when ownership moves
 - runtime/package call graphs in the spec still match the implementation, or
@@ -108,6 +121,8 @@ Implementation rules:
 Verification and handoff:
 
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
+- Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.
+- Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
 - Report whether the final implementation still matches the spec's call graph.
@@ -116,8 +131,9 @@ Verification and handoff:
 
 ## Verification Baseline
 
-After each task-list slice, run the task's mandatory verification. By default,
-that includes:
+After each task-list slice, run the task's mandatory verification. Choose the
+smallest verification set that proves the change, then broaden when the blast
+radius justifies it. By default, that includes:
 
 1. `bun run verification`
 2. targeted tests or smoke checks named by the task
@@ -127,6 +143,17 @@ that includes:
 5. architecture or import audits when boundaries move
 
 Do not defer verification until the end of the rollout.
+
+Use this verification ladder when a task list does not already define a more
+specific gate:
+
+| Change                           | Minimum verification                                                                        |
+| -------------------------------- | ------------------------------------------------------------------------------------------- |
+| docs-only                        | content/link/path review plus `bun run verification` when docs wiring or task plans changed |
+| narrow type-level/backend change | owning package typecheck plus targeted tests                                                |
+| runtime package change           | owning package typecheck, targeted tests and build                                          |
+| cross-package flow               | package checks for each touched owner plus one end-to-end proof                             |
+| user-facing UI or API behaviour  | package checks plus browser/runtime/API verification on the actual route                    |
 
 ## Common References
 
