@@ -1,5 +1,5 @@
 import { Array as EffectArray, Match, Option } from "effect";
-import type { ComponentPropsWithoutRef } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 const normalizeHref = (href: string | undefined) =>
   Option.fromUndefinedOr(href).pipe(
@@ -37,7 +37,55 @@ const stripFrontmatter = (markdown: string) =>
     Option.getOrElse(() => markdown)
   );
 
-const inline = (value: string) => value.replaceAll(/`([^`]+)`/gu, "$1");
+const markdownLinkPattern = /\[([^\]]+)\]\(([^)]+)\)/gu;
+const inlineCode = (value: string) => value.replaceAll(/`([^`]+)`/gu, "$1");
+
+interface InlineRenderState {
+  readonly cursor: number;
+  readonly nodes: readonly ReactNode[];
+}
+
+const emptyInlineRenderState: InlineRenderState = {
+  cursor: 0,
+  nodes: EffectArray.empty<ReactNode>(),
+};
+
+const renderInline = (value: string): ReactNode => {
+  const state = EffectArray.reduce(
+    EffectArray.fromIterable(value.matchAll(markdownLinkPattern)),
+    emptyInlineRenderState,
+    (renderState, match) =>
+      Option.all({
+        href: Option.fromNullishOr(match[2]),
+        index: Option.fromNullishOr(match.index),
+        text: Option.fromNullishOr(match[1]),
+      }).pipe(
+        Option.match({
+          onNone: () => renderState,
+          onSome: ({ href, index, text }) => {
+            const prefix = value.slice(renderState.cursor, index);
+            const cursor = index + match[0].length;
+
+            return {
+              cursor,
+              nodes: [
+                ...renderState.nodes,
+                inlineCode(prefix),
+                <mdxComponents.a href={href} key={`${href}:${index}`}>
+                  {inlineCode(text)}
+                </mdxComponents.a>,
+              ],
+            };
+          },
+        })
+      )
+  );
+
+  return Match.value(state.nodes.length).pipe(
+    Match.when(0, () => inlineCode(value)),
+    Match.orElse(() => [...state.nodes, inlineCode(value.slice(state.cursor))])
+  );
+};
 
 interface BlockState {
   readonly blocks: readonly string[];
@@ -140,7 +188,7 @@ const renderBlock = (block: string, index: number) =>
       (value) => value.startsWith("# "),
       (value) => (
         <mdxComponents.h1 key={index}>
-          {inline(value.slice(2))}
+          {renderInline(value.slice(2))}
         </mdxComponents.h1>
       )
     ),
@@ -148,7 +196,7 @@ const renderBlock = (block: string, index: number) =>
       (value) => value.startsWith("## "),
       (value) => (
         <mdxComponents.h2 key={index}>
-          {inline(value.slice(3))}
+          {renderInline(value.slice(3))}
         </mdxComponents.h2>
       )
     ),
@@ -156,7 +204,7 @@ const renderBlock = (block: string, index: number) =>
       (value) => value.startsWith("### "),
       (value) => (
         <mdxComponents.h3 key={index}>
-          {inline(value.slice(4))}
+          {renderInline(value.slice(4))}
         </mdxComponents.h3>
       )
     ),
@@ -165,14 +213,14 @@ const renderBlock = (block: string, index: number) =>
       (value) => (
         <mdxComponents.ul key={index}>
           {EffectArray.map(listItems(value), (item) => (
-            <mdxComponents.li key={item}>{inline(item)}</mdxComponents.li>
+            <mdxComponents.li key={item}>{renderInline(item)}</mdxComponents.li>
           ))}
         </mdxComponents.ul>
       )
     ),
     Match.orElse((value) => (
       <mdxComponents.p key={index}>
-        {inline(value.replaceAll("\n", " "))}
+        {renderInline(value.replaceAll("\n", " "))}
       </mdxComponents.p>
     ))
   );

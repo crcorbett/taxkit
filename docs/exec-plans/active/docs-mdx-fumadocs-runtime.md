@@ -245,3 +245,47 @@ next task.
   Compiled Fumadocs `.source/server` remains behind the package `server`
   export for later tasks; this route shell intentionally renders from
   service-owned markdown to preserve browser/server import boundaries.
+
+### 2026-06-10 - DOCS-RUNTIME-003 parent acceptance
+
+- Parent reviewed committed slice `36e7f6c Add docs app runtime route shell`
+  and confirmed the docs app is now a private workspace app with TanStack
+  Start routes, server functions, `ManagedRuntime` service wiring and
+  package-owned docs-content consumption.
+- Parent patched the nested docs route to use `Option` for optional
+  navigation children instead of raw optional JSX branching.
+- Parent patched the app-local renderer to render markdown links as anchors,
+  keeping the current renderer intentionally small while avoiding raw
+  `[label](target)` output in list items.
+- Parent patched the first docs shell CSS after browser review: removed
+  viewport-scaled font sizes, bounded the mobile nav, constrained mobile
+  article/code widths and prevented horizontal overflow in the quickstart
+  page.
+- Browser verification passed on the local docs dev server at
+  `http://127.0.0.1:4072/`:
+  - `/` rendered the docs home, seven primary navigation cards and the
+    61-page count.
+  - `/start/quickstart` rendered side navigation, active route state,
+    headings, paragraphs and code blocks on desktop.
+  - `/start/quickstart` rendered on a 390px-wide Chrome viewport with bounded
+    navigation, wrapped article text and code blocks constrained to the mobile
+    measure.
+- Verification passed:
+  - `bun run --filter=docs check-types`
+  - `bun run --filter=docs build`
+  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Import-boundary audit passed:
+  - `rg -n "@whattax/docs-content/server|\\.source/server|\\.source/browser|apps/docs/content|navigation\\.json|section\\.pages \\?|Object\\.values|Object\\.entries|switch\\s*\\(|as any|as unknown" apps/docs/src --glob '!apps/docs/src/routeTree.gen.ts'`
+    returned no matches.
+  - `rg -n "@whattax/docs-content" apps/docs/src --glob '!apps/docs/src/routeTree.gen.ts'`
+    showed only `@whattax/docs-content/schemas`,
+    `@whattax/docs-content/service` and `@whattax/docs-content/live` imports.
+- Accepted `DOCS-RUNTIME-003` for the parent gate.
+- Residual risk carried forward to DOCS-RUNTIME-006: `DocsContentService`
+  currently reads service-owned markdown and navigation directly rather than
+  using the generated Fumadocs source as its internal page source. The app
+  boundary is correct, but the final seam audit should decide whether to move
+  page lookup behind the Fumadocs source loader or keep generated source only
+  for future compiled MDX rendering.
