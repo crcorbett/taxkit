@@ -57,6 +57,11 @@
       "entry": ["src/index.ts"],
       "project": ["src/**/*.ts"]
     },
+    "packages/docs-content": {
+      "entry": ["source.config.ts", "src/errors.ts", "src/schemas.ts"],
+      "project": ["source.config.ts", "src/**/*.ts"],
+      "ignoreDependencies": ["@shikijs/core", "@whattax/tsconfig", "typescript"]
+    },
     "packages/sdk/typescript": {
       "entry": [
         "src/index.ts",

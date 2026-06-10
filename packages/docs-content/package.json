@@ -1,0 +1,36 @@
+{
+  "name": "@whattax/docs-content",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./errors": {
+      "source": "./src/errors.ts",
+      "default": "./src/errors.ts"
+    },
+    "./schemas": {
+      "source": "./src/schemas.ts",
+      "default": "./src/schemas.ts"
+    },
+    "./source.config": "./source.config.ts"
+  },
+  "scripts": {
+    "build": "fumadocs-mdx",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf .source .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@standard-schema/spec": "^1.1.0",
+    "effect": "catalog:",
+    "fumadocs-core": "^16.8.3",
+    "fumadocs-mdx": "^14.3.1",
+    "remark-mermaidjs": "7.0.0"
+  },
+  "devDependencies": {
+    "@shikijs/core": "4.0.2",
+    "@shikijs/transformers": "^4.0.2",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
