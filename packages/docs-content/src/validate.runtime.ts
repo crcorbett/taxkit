@@ -23,16 +23,14 @@ const program = validateContent.pipe(
       })
     )
   ),
-  Effect.catchTag("DocsSourceError", (error) =>
+  Effect.tapErrorTag("DocsSourceError", (error) =>
     Effect.sync(() => {
       console.error(error.cause);
-      process.exitCode = 1;
     })
   ),
-  Effect.catchTag("DocsValidationFailedError", (error) =>
+  Effect.tapErrorTag("DocsValidationFailedError", (error) =>
     Effect.sync(() => {
       console.error(error.issues.join("\n"));
-      process.exitCode = 1;
     })
   )
 );

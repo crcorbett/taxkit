@@ -1,9 +1,10 @@
-import { access, readFile, readdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
+import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import {
   Array as EffectArray,
   Effect,
+  FileSystem,
   Match,
   Option,
   Order,
@@ -55,19 +56,25 @@ const sourceError = (cause: unknown, source?: DocsSourcePath) =>
   );
 
 const readText = (path: string) =>
-  Effect.tryPromise({
-    catch: (cause) => sourceError(cause),
-    try: () => readFile(path, "utf-8"),
-  });
+  Effect.gen(function* () {
+    const fileSystem = yield* FileSystem.FileSystem;
+
+    return yield* fileSystem.readFileString(path);
+  }).pipe(
+    Effect.provide(NodeFileSystem.layer),
+    Effect.mapError((cause) => sourceError(cause))
+  );
 
 const fileExists = (path: string) =>
-  Effect.tryPromise({
-    catch: (cause) => sourceError(cause),
-    try: () => access(path),
+  Effect.gen(function* () {
+    const fileSystem = yield* FileSystem.FileSystem;
+
+    return yield* fileSystem.exists(path);
   }).pipe(
+    Effect.provide(NodeFileSystem.layer),
     Effect.match({
       onFailure: () => false,
-      onSuccess: () => true,
+      onSuccess: (exists) => exists,
     })
   );
 
@@ -164,7 +171,12 @@ const validateTextPolicy = (source: DocsSourcePath, markdown: string) =>
   );
 
 const validateFenceBalance = (source: DocsSourcePath, markdown: string) =>
-  Match.value((markdown.match(/```/gu) ?? []).length % 2).pipe(
+  Match.value(
+    Option.fromNullishOr(markdown.match(/```/gu)).pipe(
+      Option.map((matches) => matches.length),
+      Option.getOrElse(() => 0)
+    ) % 2
+  ).pipe(
     Match.when(0, () => EffectArray.empty<DocsValidationIssue>()),
     Match.orElse(() =>
       EffectArray.of(
@@ -239,34 +251,18 @@ const validateLocalLinks = (source: DocsSourcePath, absolutePath: string) =>
   );
 
 const collectMdxPaths = (
-  directory: string,
-  prefix = ""
+  directory: string
 ): EffectType.Effect<readonly string[], DocsSourceError> =>
-  Effect.tryPromise({
-    catch: (cause) => sourceError(cause),
-    try: () => readdir(directory, { withFileTypes: true }),
+  Effect.gen(function* () {
+    const fileSystem = yield* FileSystem.FileSystem;
+
+    return yield* fileSystem.readDirectory(directory, { recursive: true });
   }).pipe(
-    Effect.flatMap((entries) =>
-      Effect.forEach(entries, (entry) =>
-        Match.value(entry.isDirectory()).pipe(
-          Match.when(true, () =>
-            collectMdxPaths(
-              join(directory, entry.name),
-              join(prefix, entry.name)
-            )
-          ),
-          Match.orElse(() =>
-            Match.value(entry.name.endsWith(".mdx")).pipe(
-              Match.when(true, () =>
-                Effect.succeed(EffectArray.of(join(prefix, entry.name)))
-              ),
-              Match.orElse(() => Effect.succeed(EffectArray.empty<string>()))
-            )
-          )
-        )
-      )
+    Effect.provide(NodeFileSystem.layer),
+    Effect.map((paths) =>
+      EffectArray.filter(paths, (path) => path.endsWith(".mdx"))
     ),
-    Effect.map(EffectArray.flatten)
+    Effect.mapError((cause) => sourceError(cause))
   );
 
 const listMdxSources: EffectType.Effect<
@@ -289,7 +285,9 @@ export const getNavigation: EffectType.Effect<DocsNavigation, DocsSourceError> =
 const navigationLeaves = (navigation: DocsNavigation) =>
   EffectArray.flatMap(navigation.primaryNavigation, (section) => [
     section,
-    ...(section.pages ?? []),
+    ...Option.fromNullishOr(section.pages).pipe(
+      Option.getOrElse(() => EffectArray.empty<DocsNavigationLeaf>())
+    ),
   ]);
 
 const validateNavigationSources = (

@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-import { DocsPagePath, DocsPageSlug, DocsSourcePath } from "./schemas";
+import { DocsPagePath, DocsPageSlug, DocsSourcePath } from "./schemas.js";
 
 export class DocsPageNotFoundError extends Schema.TaggedErrorClass<DocsPageNotFoundError>()(
   "DocsPageNotFoundError",

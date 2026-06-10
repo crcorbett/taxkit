@@ -158,3 +158,35 @@ next task.
 - Call graph status: the slice matches the package-owned service and validation
   portion of the target graph. `apps/docs` route/runtime consumption remains
   intentionally unstarted for DOCS-RUNTIME-003.
+
+### 2026-06-10 - DOCS-RUNTIME-002 parent acceptance
+
+- Parent reviewed committed slice `ddea2c7 Add docs content service validation`
+  and found the intended package boundary: validation policy is owned by
+  `@whattax/docs-content`, while `apps/docs/scripts/validate-content.mjs`
+  remains a compatibility launcher only.
+- Parent patched the reusable validation policy after review to use the Effect
+  platform `FileSystem` service with the Node platform layer instead of raw
+  `node:fs/promises`, keeping file IO inside typed Effect programs that run in
+  both Vitest and the Bun CLI.
+- Parent patched the executable validation runtime to use `Effect.tapErrorTag`
+  instead of setting `process.exitCode` manually, and added a package
+  `./validate` export for the future docs app runtime.
+- Parent retained the `apps/docs/scripts/validate-content.mjs` launcher for
+  compatibility with the existing `node apps/docs/scripts/validate-content.mjs`
+  check until DOCS-RUNTIME-003 creates a real docs app package that can consume
+  `@whattax/docs-content` directly.
+- Parent confirmed no `apps/docs` runtime or route shell was started in this
+  slice.
+- Verification passed:
+  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run --filter=@whattax/docs-content check-types`
+  - `bun run --filter=@whattax/docs-content test`
+  - `bun run --filter=@whattax/docs-content build`
+  - `node apps/docs/scripts/validate-content.mjs`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Import-boundary audit passed:
+  `rg -n "packages/docs-content/\\.source|@whattax/docs-content/.source|\\.source/server|\\.source/browser" apps packages --glob '!packages/docs-content/.source/**' --glob '!packages/docs-content/README.md' --glob '!packages/docs-content/src/server.ts'`
+  returned no matches.
+- Accepted `DOCS-RUNTIME-002` for the parent gate.
