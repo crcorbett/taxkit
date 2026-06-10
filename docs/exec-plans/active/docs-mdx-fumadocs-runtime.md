@@ -89,3 +89,27 @@ next task.
   the private `@whattax/docs-content` package.
 - Task acceptance: DOCS-RUNTIME-001 is complete. Do not start
   DOCS-RUNTIME-002 until the next explicit implementation slice.
+
+### 2026-06-10 - DOCS-RUNTIME-001 parent acceptance
+
+- Parent reviewed committed slice `a5eb82f Add docs content source boundary`.
+- Confirmed the changed file scope is limited to the new docs-content package,
+  lockfile/dependency wiring, Knip workspace config, the docs-content
+  Changeset and this active execution plan.
+- Confirmed `packages/docs-content/.source/` is generated and ignored rather
+  than committed.
+- Confirmed no runtime/app code imports `packages/docs-content/.source/*` or
+  `@whattax/docs-content/.source`.
+- Audited `packages/docs-content/source.config.ts`, `src/schemas.ts` and
+  `src/errors.ts` for the task's strict Effect bar: canonical Schema-derived
+  types, branded docs paths/slugs/source paths, tagged errors and
+  `Schema.toStandardSchemaV1(...)` are used; no unsafe casts, local DTO
+  mirrors, manual `_tag` literals, `Object.values`, `Object.entries`, `switch`
+  or generated-source imports were found.
+- Verification passed:
+  - `bun run --filter=@whattax/docs-content build`
+  - `bun run --filter=@whattax/docs-content check-types`
+  - `bun run --filter=@whattax/docs-content test`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Accepted `DOCS-RUNTIME-001` for the parent gate.
