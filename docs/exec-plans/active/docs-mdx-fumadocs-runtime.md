@@ -26,8 +26,8 @@ next task.
 | --- | --- | --- |
 | DOCS-RUNTIME-001 | completed | Created private docs content package and Fumadocs source boundary. |
 | DOCS-RUNTIME-002 | completed | Added DocsContentService and package-owned validation policy. |
-| DOCS-RUNTIME-003 | in review | Created docs app runtime and route shell; verification in progress. |
-| DOCS-RUNTIME-004 | pending | Wire reference, examples and OpenAPI validation. |
+| DOCS-RUNTIME-003 | completed | Created docs app runtime and route shell; parent accepted. |
+| DOCS-RUNTIME-004 | completed | Wired reference, examples and OpenAPI validation. |
 | DOCS-RUNTIME-005 | pending | Update architecture docs and root verification wiring. |
 | DOCS-RUNTIME-006 | pending | Run final seam, boundary and canonical-reuse audit. |
 
@@ -289,3 +289,45 @@ next task.
   boundary is correct, but the final seam audit should decide whether to move
   page lookup behind the Fumadocs source loader or keep generated source only
   for future compiled MDX rendering.
+
+### 2026-06-14 - DOCS-RUNTIME-004 implementation and parent acceptance
+
+- Added docs-content validation for the reference/examples page and OpenAPI
+  reference page. The package-owned validation now checks that every checked
+  example file exists, the examples page points to each file, the examples page
+  names `bun run --filter=docs check-examples`, and the OpenAPI page records
+  the accepted static reference smoke.
+- Added `docs` `check-examples` and folded it into `docs` `check-types` so
+  root verification typechecks the checked docs examples.
+- Removed the legacy hand-written `apps/docs/scripts/validate-content.mjs`
+  compatibility launcher. Docs validation now runs through the
+  `@whattax/docs-content` Effect TypeScript runtime.
+- Reworked checked examples to export Effect programs or handlers rather than
+  vanilla async scripts. Examples now use canonical SDK/API/calculator imports,
+  `Config`, `Schema`, `Data.TaggedError`, `Effect`, `Match` and package-owned
+  constructors where they cross unknown input boundaries.
+- Updated the examples reference page to describe typechecked Effect examples
+  instead of standalone scripts.
+- OpenAPI reference decision: accepted static exclusion for this slice. The
+  docs app does not fetch live OpenAPI JSON during static docs builds; the
+  validation smoke requires the page to name `/api/docs/openapi.json`, the
+  calculate path and `CalculatorRunRequest`. A later reference slice can add
+  an offline generated artifact or an explicit live API integration smoke.
+- Strict Effect audit passed:
+  - no stale public SDK/API names in `apps/docs/content` or
+    `apps/docs/examples`;
+  - no `as any`, `as unknown`, `Object.values`, `Object.entries`,
+    `switch`, raw `process.env`, raw `await`, `BunRuntime.runMain`,
+    `runPromise` or `ManagedRuntime.make` in the touched example/policy
+    implementation;
+  - the old `.mjs` implementation file is deleted.
+- Verification passed:
+  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run --filter=@whattax/docs-content test`
+  - `bunx tsc -p apps/docs/tsconfig.examples.json --noEmit`
+  - `bun run --filter=docs build`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Changeset: `.changeset/docs-reference-validation.md` records a patch for the
+  private `@whattax/docs-content` package.
+- Accepted `DOCS-RUNTIME-004` for the parent gate.

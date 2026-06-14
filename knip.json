@@ -43,11 +43,7 @@
         "vite.config.ts"
       ],
       "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
-      "ignore": [
-        "examples/**/*.ts",
-        "scripts/validate-content.mjs",
-        "src/routeTree.gen.ts"
-      ],
+      "ignore": ["examples/**/*.ts", "src/routeTree.gen.ts"],
       "ignoreDependencies": ["@whattax/tsconfig"]
     },
     "packages/core": {

@@ -28,11 +28,13 @@ import type {
 
 const docsRoot = "apps/docs";
 const contentRoot = "apps/docs/content";
+const examplesRoot = "apps/docs/examples";
 const navigationSource = "apps/docs/navigation.json";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
 const absoluteDocsRoot = join(repoRoot, docsRoot);
 const absoluteContentRoot = join(repoRoot, contentRoot);
+const absoluteExamplesRoot = join(repoRoot, examplesRoot);
 const absoluteNavigationPath = join(repoRoot, navigationSource);
 
 const bannedPattern =
@@ -43,6 +45,30 @@ const privateNamePattern =
   /\b(adad|SaaS|paid|simulation|private downstream product|private product strategy)\b/iu;
 const relativeLinkPattern = /\[[^\]]+\]\(([^)]+)\)/gu;
 const frontmatterPattern = /^---\n([\s\S]*?)\n---/u;
+
+const exampleFileNames = [
+  "browser-http.ts",
+  "effect.ts",
+  "error-handling.ts",
+  "node-server.ts",
+] as const;
+
+const exampleReferenceSource = "content/reference/examples.mdx";
+const openApiReferenceSource = "content/api/openapi-reference.mdx";
+
+const openApiReferenceRequiredText = [
+  "/api/docs/openapi.json",
+  "/api/v1/calculators/{calculatorId}/calculate",
+  "Accepted exclusion",
+] as const;
+
+const examplesReferenceRequiredText = [
+  "../../examples/browser-http.ts",
+  "../../examples/effect.ts",
+  "../../examples/error-handling.ts",
+  "../../examples/node-server.ts",
+  "bun run --filter=docs check-examples",
+] as const;
 
 const contentSourcePath = (path: string) =>
   Schema.decodeUnknownEffect(DocsSourcePath)(`content/${path}`);
@@ -186,6 +212,34 @@ const validateFenceBalance = (source: DocsSourcePath, markdown: string) =>
         })
       )
     )
+  );
+
+const missingTextIssue = (
+  source: DocsSourcePath,
+  label: string,
+  text: string
+) =>
+  new DocsValidationIssue({
+    message: `${label} missing required text: ${text}`,
+    path: [source],
+  });
+
+const missingFileIssue = (source: DocsSourcePath, path: string) =>
+  new DocsValidationIssue({
+    message: `referenced file missing: ${path}`,
+    path: [source],
+  });
+
+const validateRequiredText = (
+  source: DocsSourcePath,
+  markdown: string,
+  label: string,
+  requiredText: readonly string[]
+) =>
+  EffectArray.flatMap(requiredText, (text) =>
+    markdown.includes(text)
+      ? EffectArray.empty<DocsValidationIssue>()
+      : EffectArray.of(missingTextIssue(source, label, text))
   );
 
 const validateLocalLinkTarget = (
@@ -343,6 +397,73 @@ const validatePage = (
   );
 };
 
+const validateExamplesReference = (
+  source: DocsSourcePath
+): EffectType.Effect<readonly DocsValidationIssue[], DocsSourceError> =>
+  readText(join(absoluteDocsRoot, source)).pipe(
+    Effect.flatMap((markdown) =>
+      Effect.forEach(exampleFileNames, (fileName) =>
+        fileExists(join(absoluteExamplesRoot, fileName)).pipe(
+          Effect.map((exists) =>
+            Match.value(exists).pipe(
+              Match.when(true, () => EffectArray.empty<DocsValidationIssue>()),
+              Match.orElse(() =>
+                EffectArray.of(
+                  missingFileIssue(source, `${examplesRoot}/${fileName}`)
+                )
+              )
+            )
+          )
+        )
+      ).pipe(
+        Effect.map((fileIssues) =>
+          EffectArray.flatten([
+            ...fileIssues,
+            validateRequiredText(
+              source,
+              markdown,
+              "examples reference",
+              examplesReferenceRequiredText
+            ),
+          ])
+        )
+      )
+    )
+  );
+
+const validateOpenApiReference = (
+  source: DocsSourcePath
+): EffectType.Effect<readonly DocsValidationIssue[], DocsSourceError> =>
+  readText(join(absoluteDocsRoot, source)).pipe(
+    Effect.map((markdown) =>
+      validateRequiredText(
+        source,
+        markdown,
+        "OpenAPI reference",
+        openApiReferenceRequiredText
+      )
+    )
+  );
+
+const validateReferenceIntegration = Effect.Do.pipe(
+  Effect.bind("examplesSource", () =>
+    Schema.decodeUnknownEffect(DocsSourcePath)(exampleReferenceSource)
+  ),
+  Effect.bind("openApiSource", () =>
+    Schema.decodeUnknownEffect(DocsSourcePath)(openApiReferenceSource)
+  ),
+  Effect.bind("exampleIssues", ({ examplesSource }) =>
+    validateExamplesReference(examplesSource)
+  ),
+  Effect.bind("openApiIssues", ({ openApiSource }) =>
+    validateOpenApiReference(openApiSource)
+  ),
+  Effect.map(({ exampleIssues, openApiIssues }) =>
+    EffectArray.flatten([exampleIssues, openApiIssues])
+  ),
+  Effect.mapError((cause) => sourceError(cause))
+);
+
 export const validateContent: EffectType.Effect<
   DocsValidationResult,
   DocsSourceError
@@ -353,9 +474,10 @@ export const validateContent: EffectType.Effect<
   const pageIssues = yield* Effect.forEach(sources, validatePage).pipe(
     Effect.map(EffectArray.flatten)
   );
+  const referenceIssues = yield* validateReferenceIntegration;
 
   return {
-    issues: [...navigationIssues, ...pageIssues],
+    issues: [...navigationIssues, ...pageIssues, ...referenceIssues],
   } satisfies DocsValidationResult;
 });
 

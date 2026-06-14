@@ -39,12 +39,21 @@ payload schema. If a future docs app embeds generated reference pages, the
 embed should consume this generated document rather than copying endpoint
 fields by hand.
 
-## Generated-reference follow-up
+```txt
+/api/v1/calculators/{calculatorId}/calculate
+CalculatorRunRequest
+```
 
-`apps/docs` is currently a content root only. It has no package manifest,
-MDX runtime or generated-reference ingestion pipeline. A later reference slice
-should add a docs-app integration that reads `/api/docs/openapi.json` or an
-equivalent generated artifact and renders endpoint reference pages from it.
+## Accepted exclusion
+
+The docs app does not fetch live OpenAPI JSON during `docs` or
+`@whattax/docs-content` builds. That would make static docs validation depend
+on a running API process. For this slice, the accepted exclusion is a static
+reference smoke in docs-content validation: the page must name
+`/api/docs/openapi.json`, the calculate path and the generated request schema.
+
+A later reference slice can add an offline generated OpenAPI artifact or a
+live integration smoke that starts `apps/api` explicitly.
 
 ## Related pages
 

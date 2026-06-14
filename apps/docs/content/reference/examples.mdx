@@ -6,40 +6,30 @@ status: "draft"
 
 # Examples
 
-Use these examples when you want a short file that exercises one public
-integration path.
+Use these examples when you want a short, typechecked file that exercises one
+public integration path. The files export Effect programs or handlers. Your
+application runtime decides how to run them.
 
 ## Example files
 
-| Example             | Path                                                                       | Covers                                                                  |
-| ------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Node server route   | [`apps/docs/examples/node-server.ts`](../../examples/node-server.ts)       | Calling `au.pay.takeHomePay` from a server route.                       |
-| Browser HTTP caller | [`apps/docs/examples/browser-http.ts`](../../examples/browser-http.ts)     | Posting a `CalculatorRunRequest` JSON payload with `fetch`.             |
-| Effect request      | [`apps/docs/examples/effect.ts`](../../examples/effect.ts)                 | Constructing a `calculateRunRequest` program for an Effect application. |
-| Error handling      | [`apps/docs/examples/error-handling.ts`](../../examples/error-handling.ts) | Reading a `WhatTax.safe.calculate` failure value.                       |
+| Example             | Path                                                                       | Covers                                                                   |
+| ------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Node server route   | [`apps/docs/examples/node-server.ts`](../../examples/node-server.ts)       | Returning an Effect that calls `au.pay.takeHomePay` from a server route. |
+| Browser HTTP caller | [`apps/docs/examples/browser-http.ts`](../../examples/browser-http.ts)     | Returning an Effect that posts a `CalculatorRunRequest` JSON payload.    |
+| Effect request      | [`apps/docs/examples/effect.ts`](../../examples/effect.ts)                 | Constructing a `calculateRunRequest` program for an Effect application.  |
+| Error handling      | [`apps/docs/examples/error-handling.ts`](../../examples/error-handling.ts) | Reading a `WhatTax.safe.calculate` failure value.                        |
 
-## Run SDK examples
+## Typecheck examples
 
-Build the workspace first so package exports resolve through `dist`:
-
-```sh
-bun run build
-bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/node-server.ts
-bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/effect.ts
-bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/error-handling.ts
-```
-
-## Run the browser HTTP example
-
-Start the API app, then run the browser-shaped `fetch` example:
+Typecheck every checked example:
 
 ```sh
-bun run --filter=api --elide-lines=0 start
-bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/browser-http.ts
+bun run --filter=docs check-examples
 ```
 
-The browser example uses only JSON and `fetch`, so the same request body can be
-used from browser code or another runtime.
+The browser HTTP example uses JSON and `fetch` inside an Effect program, so
+the same request body can be used from browser code or another runtime that
+provides an application-owned Effect runner.
 
 ## Related pages
 
