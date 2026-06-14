@@ -1,10 +1,14 @@
-import { Array as EffectArray, Match, Option } from "effect";
+import { docsCollection } from "@whattax/docs-content/client";
+import { Picture, Pre } from "@whattax/docs-fumadocs/render";
+import { Effect, Option } from "effect";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
+
+import { DocsContentPreloadError } from "#/lib/docs/route-boundary";
 
 const normalizeHref = (href: string | undefined) =>
   Option.fromUndefinedOr(href).pipe(
     Option.map((value) => value.replace(/\.mdx(?:#.*)?$/u, "")),
-    Option.getOrElse((): string | undefined => undefined)
+    Option.getOrUndefined
   );
 
 const mdxComponents = {
@@ -13,223 +17,32 @@ const mdxComponents = {
       {children}
     </a>
   ),
-  code: (props: ComponentPropsWithoutRef<"code">) => <code {...props} />,
-  h1: ({ children, ...props }: ComponentPropsWithoutRef<"h1">) => (
-    <h1 {...props}>{children}</h1>
-  ),
-  h2: ({ children, ...props }: ComponentPropsWithoutRef<"h2">) => (
-    <h2 {...props}>{children}</h2>
-  ),
-  h3: ({ children, ...props }: ComponentPropsWithoutRef<"h3">) => (
-    <h3 {...props}>{children}</h3>
-  ),
-  li: (props: ComponentPropsWithoutRef<"li">) => <li {...props} />,
-  ol: (props: ComponentPropsWithoutRef<"ol">) => <ol {...props} />,
-  p: (props: ComponentPropsWithoutRef<"p">) => <p {...props} />,
-  pre: (props: ComponentPropsWithoutRef<"pre">) => <pre {...props} />,
-  strong: (props: ComponentPropsWithoutRef<"strong">) => <strong {...props} />,
-  ul: (props: ComponentPropsWithoutRef<"ul">) => <ul {...props} />,
+  img: Picture,
+  pre: Pre,
 };
 
-const stripFrontmatter = (markdown: string) =>
-  Option.fromNullishOr(/^---\n[\s\S]*?\n---\n/u.exec(markdown)).pipe(
-    Option.map((match) => markdown.slice(match[0].length)),
-    Option.getOrElse(() => markdown)
-  );
-
-const markdownLinkPattern = /\[([^\]]+)\]\(([^)]+)\)/gu;
-const inlineCode = (value: string) => value.replaceAll(/`([^`]+)`/gu, "$1");
-
-interface InlineRenderState {
-  readonly cursor: number;
-  readonly nodes: readonly ReactNode[];
-}
-
-const emptyInlineRenderState: InlineRenderState = {
-  cursor: 0,
-  nodes: EffectArray.empty<ReactNode>(),
-};
-
-const renderInline = (value: string): ReactNode => {
-  const state = EffectArray.reduce(
-    EffectArray.fromIterable(value.matchAll(markdownLinkPattern)),
-    emptyInlineRenderState,
-    (renderState, match) =>
-      Option.all({
-        href: Option.fromNullishOr(match[2]),
-        index: Option.fromNullishOr(match.index),
-        text: Option.fromNullishOr(match[1]),
-      }).pipe(
-        Option.match({
-          onNone: () => renderState,
-          onSome: ({ href, index, text }) => {
-            const prefix = value.slice(renderState.cursor, index);
-            const cursor = index + match[0].length;
-
-            return {
-              cursor,
-              nodes: [
-                ...renderState.nodes,
-                inlineCode(prefix),
-                <mdxComponents.a href={href} key={`${href}:${index}`}>
-                  {inlineCode(text)}
-                </mdxComponents.a>,
-              ],
-            };
-          },
-        })
-      )
-  );
-
-  return Match.value(state.nodes.length).pipe(
-    Match.when(0, () => inlineCode(value)),
-    Match.orElse(() => [...state.nodes, inlineCode(value.slice(state.cursor))])
-  );
-};
-
-interface BlockState {
-  readonly blocks: readonly string[];
-  readonly current: readonly string[];
-  readonly inFence: boolean;
-}
-
-const emptyBlockState: BlockState = {
-  blocks: EffectArray.empty<string>(),
-  current: EffectArray.empty<string>(),
-  inFence: false,
-};
-
-const flushBlock = (state: BlockState): BlockState =>
-  Match.value(state.current.length).pipe(
-    Match.when(0, () => state),
-    Match.orElse(() => ({
-      blocks: [...state.blocks, EffectArray.join(state.current, "\n")],
-      current: EffectArray.empty<string>(),
-      inFence: false,
-    }))
-  );
-
-const appendLine = (state: BlockState, line: string): BlockState => ({
-  ...state,
-  current: [...state.current, line],
+const docsContentLoader = docsCollection.createClientLoader({
+  component({ default: MDX }) {
+    return <MDX components={mdxComponents} />;
+  },
 });
 
-const collectBlocks = (markdown: string) =>
-  flushBlock(
-    EffectArray.reduce(markdown.split("\n"), emptyBlockState, (state, line) =>
-      Match.value(state.inFence).pipe(
-        Match.when(true, () =>
-          Match.value(line.startsWith("```")).pipe(
-            Match.when(true, () => flushBlock(appendLine(state, line))),
-            Match.orElse(() => appendLine(state, line))
-          )
-        ),
-        Match.orElse(() =>
-          Match.value(line).pipe(
-            Match.when("", () => flushBlock(state)),
-            Match.when(
-              (value) => value.startsWith("```"),
-              (value) => ({
-                ...appendLine(state, value),
-                inFence: true,
-              })
-            ),
-            Match.orElse((value) => appendLine(state, value))
-          )
-        )
-      )
-    )
-  ).blocks;
+const docsClientPath = (source: string) => source.replace(/^content\//u, "");
 
-const listItems = (block: string) =>
-  EffectArray.reduce(
-    block.split("\n"),
-    EffectArray.empty<string>(),
-    (items, line) =>
-      Match.value(line.startsWith("- ")).pipe(
-        Match.when(true, () => [...items, line.slice(2)]),
-        Match.orElse(() =>
-          Match.value(items.length).pipe(
-            Match.when(0, () => items),
-            Match.orElse(() => {
-              const previous = items.slice(0, -1);
-              const current = items.at(-1);
-              return Option.fromUndefinedOr(current).pipe(
-                Option.match({
-                  onNone: () => items,
-                  onSome: (value) => [...previous, `${value} ${line.trim()}`],
-                })
-              );
-            })
-          )
-        )
-      )
-  );
+export const preloadDocsContent = (
+  source: string
+): Effect.Effect<void, DocsContentPreloadError> =>
+  Effect.tryPromise({
+    catch: (cause) =>
+      new DocsContentPreloadError({
+        message: String(cause),
+        path: source,
+      }),
+    try: () => docsContentLoader.preload(docsClientPath(source)),
+  }).pipe(Effect.asVoid);
 
-const renderBlock = (block: string, index: number) =>
-  Match.value(block).pipe(
-    Match.when(
-      (value) => value.startsWith("```"),
-      (value) => {
-        const lines = value.split("\n");
-        return (
-          <mdxComponents.pre key={index}>
-            <mdxComponents.code>
-              {EffectArray.join(EffectArray.drop(lines, 1), "\n").replace(
-                /\n```$/u,
-                ""
-              )}
-            </mdxComponents.code>
-          </mdxComponents.pre>
-        );
-      }
-    ),
-    Match.when(
-      (value) => value.startsWith("# "),
-      (value) => (
-        <mdxComponents.h1 key={index}>
-          {renderInline(value.slice(2))}
-        </mdxComponents.h1>
-      )
-    ),
-    Match.when(
-      (value) => value.startsWith("## "),
-      (value) => (
-        <mdxComponents.h2 key={index}>
-          {renderInline(value.slice(3))}
-        </mdxComponents.h2>
-      )
-    ),
-    Match.when(
-      (value) => value.startsWith("### "),
-      (value) => (
-        <mdxComponents.h3 key={index}>
-          {renderInline(value.slice(4))}
-        </mdxComponents.h3>
-      )
-    ),
-    Match.when(
-      (value) => value.startsWith("- "),
-      (value) => (
-        <mdxComponents.ul key={index}>
-          {EffectArray.map(listItems(value), (item) => (
-            <mdxComponents.li key={item}>{renderInline(item)}</mdxComponents.li>
-          ))}
-        </mdxComponents.ul>
-      )
-    ),
-    Match.orElse((value) => (
-      <mdxComponents.p key={index}>
-        {renderInline(value.replaceAll("\n", " "))}
-      </mdxComponents.p>
-    ))
-  );
-
-export const MdxDocument = ({ markdown }: { readonly markdown: string }) => (
-  <>
-    {EffectArray.map(
-      collectBlocks(stripFrontmatter(markdown).trim()),
-      renderBlock
-    )}
-  </>
-);
+export const MdxDocument = ({
+  source,
+}: {
+  readonly source: string;
+}): ReactNode => docsContentLoader.useContent(docsClientPath(source));

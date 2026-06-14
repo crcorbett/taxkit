@@ -211,6 +211,22 @@ a {
   padding: 1rem;
 }
 
+.docs-article table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+.docs-article th,
+.docs-article td {
+  min-width: 8rem;
+  border-bottom: 1px solid #d9e2ec;
+  padding: 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
 .docs-article code {
   border-radius: 5px;
   background: #e7eef7;
@@ -255,11 +271,16 @@ a {
   }
 
   .docs-article > * {
-    max-width: 18rem;
+    max-width: 100%;
   }
 
   .docs-article pre {
-    width: 18rem;
+    width: 100%;
     white-space: pre-wrap;
+  }
+
+  .docs-article table {
+    width: 100%;
+    min-width: 38rem;
   }
 }

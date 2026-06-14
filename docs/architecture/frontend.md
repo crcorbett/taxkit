@@ -27,8 +27,9 @@ define tax calculation rules.
   the `packages/http-api` routes.
 
 `apps/docs`
-: Planned Fumadocs public documentation site for rule references, API docs, SDK
-guides and contributor docs.
+: Fumadocs-backed public documentation site for rule references, API docs, SDK
+  guides and contributor docs. It owns the route runtime, app shell, app-local
+  MDX component map and browser rendering.
 
 `packages/ui`
 : Planned shared UI primitives for WhatTax-owned apps, once repeated UI
@@ -66,6 +67,10 @@ functions.
 - Do not import server-only API exports from browser routes.
 - Do not remount the canonical API inside TanStack Start.
 - Keep frontend docs and component details out of rule packages.
+- Keep browser docs modules on browser-safe exports such as
+  `@whattax/docs-content/client` and `@whattax/docs-fumadocs/render`.
+- Do not import generated `.source/server` files or
+  `@whattax/docs-content/server` from browser modules.
 
 ## Related Docs
 

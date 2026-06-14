@@ -3,7 +3,10 @@ import { DocsPagePath } from "@whattax/docs-content/schemas";
 import { DocsContentService } from "@whattax/docs-content/service";
 import { Effect, Schema } from "effect";
 
+import { preloadDocsContent } from "#/lib/mdx/components";
 import type { RouteLoaderContext } from "#/lib/route-runtime";
+
+import { docsHomeRouteBoundary, docsPageRouteBoundary } from "./route-boundary";
 
 const DocsPageLoaderInput = Schema.Struct({
   splat: Schema.String,
@@ -25,7 +28,7 @@ const loadDocsHomeData = createServerFn({ method: "GET" }).handler(async () => {
         navigation,
         pages,
       };
-    })
+    }).pipe(docsHomeRouteBoundary.encodeExit)
   );
 });
 
@@ -39,15 +42,16 @@ const loadDocsPageData = createServerFn({ method: "GET" })
     return await docsRuntime.runPromise(
       Effect.gen(function* loadDocsPageEffect() {
         const content = yield* DocsContentService;
-        const path = yield* normalizePath(data.splat);
+        const path = yield* normalizePath(data.splat).pipe(Effect.orDie);
         const navigation = yield* content.getNavigation();
-        const page = yield* content.getPage(path);
+        const page = yield* content.getRenderablePage(path);
+        yield* preloadDocsContent(page.source);
 
         return {
           navigation,
           page,
         };
-      })
+      }).pipe(docsPageRouteBoundary.encodeExit)
     );
   });
 

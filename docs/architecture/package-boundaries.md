@@ -85,8 +85,8 @@ packages/
   sdk/
     typescript/
 
-  docs/
-    fumadocs/
+  docs-content/
+  docs-fumadocs/
 
   cli/
 ```
@@ -191,12 +191,23 @@ owns:
 - browser-safe types and schemas
 - SDK examples and compatibility tests
 
-Planned `@whattax/docs-fumadocs` will own:
+Implemented `@whattax/docs-content` owns:
 
-- public documentation site content and configuration
-- rule-pack reference documentation
-- API and SDK guides
-- contributor architecture documentation
+- WhatTax docs frontmatter, meta, navigation and validation schemas
+- navigation and source-text validation policy
+- docs content service tags and live layers
+- server-only generated Fumadocs source wiring for WhatTax docs content
+
+Implemented `@whattax/docs-fumadocs` owns:
+
+- reusable Fumadocs configuration helpers
+- Effect Schema to Standard Schema bridges
+- generic Fumadocs source loader adapters
+- generic page-tree conversion helpers
+- generic browser-safe MDX render primitives
+
+Docs packages must not own rule-pack algorithms, API endpoint business logic
+or SDK calculation facades.
 
 ## Directory Naming
 
@@ -211,7 +222,8 @@ packages/domain/au/dates     -> @whattax/domain-au-dates
 packages/api/http            -> @whattax/api-http
 packages/calculators         -> @whattax/calculators
 packages/sdk/typescript      -> whattax or @whattax/sdk
-packages/docs/fumadocs       -> @whattax/docs-fumadocs
+packages/docs-content        -> @whattax/docs-content
+packages/docs-fumadocs       -> @whattax/docs-fumadocs
 ```
 
 Avoid flat package sprawl such as `packages/au-payg`, `packages/au-super` and `packages/http-api` once the engine packages start growing.

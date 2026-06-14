@@ -9,13 +9,32 @@ import type {
   DocsValidationResult,
 } from "./schemas.js";
 
+export interface DocsRenderablePageData {
+  readonly body: unknown;
+  readonly structuredData: unknown;
+  readonly toc: readonly unknown[];
+}
+
+export type DocsRenderableContentPage = DocsContentPage &
+  DocsRenderablePageData;
+
 export interface DocsContentServiceShape {
   readonly getNavigation: () => Effect.Effect<DocsNavigation, DocsSourceError>;
   readonly getPage: (
     path: DocsPagePath
   ) => Effect.Effect<DocsContentPage, DocsPageNotFoundError | DocsSourceError>;
+  readonly getRenderablePage: (
+    path: DocsPagePath
+  ) => Effect.Effect<
+    DocsRenderableContentPage,
+    DocsPageNotFoundError | DocsSourceError
+  >;
   readonly listPages: () => Effect.Effect<
     readonly DocsContentPage[],
+    DocsSourceError
+  >;
+  readonly listRenderablePages: () => Effect.Effect<
+    readonly DocsRenderableContentPage[],
     DocsSourceError
   >;
   readonly validateContent: () => Effect.Effect<

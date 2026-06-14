@@ -378,13 +378,14 @@ The public docs site should live under:
 apps/docs
 ```
 
-If documentation content or config needs to be shared, it can additionally live under:
+Reusable docs content and Fumadocs integration live under:
 
 ```txt
-packages/docs/fumadocs
+packages/docs-content
+packages/docs-fumadocs
 ```
 
-It should document:
+The docs app should document:
 
 - rule package architecture
 - supported Australian tax years

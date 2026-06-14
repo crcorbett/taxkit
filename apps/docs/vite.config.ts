@@ -1,13 +1,19 @@
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import * as docsConfig from "@whattax/docs-content/source.config";
+import fumadocsMdx from "fumadocs-mdx/vite";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
-export default defineConfig(({ command }) => {
+export default defineConfig(async ({ command }) => {
   const useSourceWorkspacePackages = command !== "build";
 
   return {
     plugins: [
+      await fumadocsMdx(docsConfig, {
+        configPath: "../../packages/docs-content/source.config.ts",
+        outDir: "../../packages/docs-content/.source",
+      }),
       tanstackStart(),
       viteReact(),
       nitro({
@@ -24,6 +30,7 @@ export default defineConfig(({ command }) => {
       tsconfigPaths: true,
     },
     ssr: {
+      noExternal: [/^@whattax\/docs-content/u, /^@whattax\/docs-fumadocs/u],
       resolve: useSourceWorkspacePackages
         ? {
             conditions: ["source", "node"],

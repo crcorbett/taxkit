@@ -35,7 +35,9 @@
         "@tanstack/react-router": "catalog:",
         "@tanstack/react-start": "catalog:",
         "@whattax/docs-content": "workspace:*",
+        "@whattax/docs-fumadocs": "workspace:*",
         "effect": "catalog:",
+        "fumadocs-mdx": "^14.3.1",
         "react": "catalog:",
         "react-dom": "catalog:",
       },
@@ -101,17 +103,34 @@
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node": "4.0.0-beta.60",
+        "@whattax/docs-fumadocs": "workspace:*",
+        "effect": "catalog:",
+        "fumadocs-core": "^16.8.3",
+        "fumadocs-mdx": "^14.3.1",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
+    "packages/docs-fumadocs": {
+      "name": "@whattax/docs-fumadocs",
+      "version": "0.0.1",
+      "dependencies": {
+        "@shikijs/core": "4.0.2",
+        "@shikijs/transformers": "^4.0.2",
         "@standard-schema/spec": "^1.1.0",
         "effect": "catalog:",
         "fumadocs-core": "^16.8.3",
         "fumadocs-mdx": "^14.3.1",
+        "react": "catalog:",
         "remark-mermaidjs": "7.0.0",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
-        "@shikijs/core": "4.0.2",
-        "@shikijs/transformers": "^4.0.2",
-        "@types/bun": "catalog:",
+        "@types/react": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
@@ -831,6 +850,8 @@
     "@whattax/core": ["@whattax/core@workspace:packages/core"],
 
     "@whattax/docs-content": ["@whattax/docs-content@workspace:packages/docs-content"],
+
+    "@whattax/docs-fumadocs": ["@whattax/docs-fumadocs@workspace:packages/docs-fumadocs"],
 
     "@whattax/http-api": ["@whattax/http-api@workspace:packages/http-api"],
 

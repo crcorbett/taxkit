@@ -18,10 +18,8 @@ on the open-source tax engine and avoid downstream private-product specifics.
 ## Main areas
 
 `apps/docs`
-: Planned public documentation site and current public MDX content root. The
-  current implementation owns navigation and draft MDX section indexes, but it
-  does not yet include a docs app package, framework runtime or generated
-  reference pipeline.
+: Public documentation site. It owns the TanStack Start route runtime, app
+  shell, app-specific MDX component composition and browser rendering.
 
 `apps/docs/content`
 : Public MDX content root. It owns the Start, SDK, API, Guides, Concepts,
@@ -32,9 +30,14 @@ on the open-source tax engine and avoid downstream private-product specifics.
   section source files, stable paths and primary reader metadata until a docs
   framework owns a generated or typed navigation API.
 
-`packages/docs/fumadocs`
-: Optional shared docs configuration or content package when app-local docs
-become too large.
+`packages/docs-content`
+: Private source-only package for WhatTax docs frontmatter, meta, navigation,
+  validation policy, tagged docs errors and the content service.
+
+`packages/docs-fumadocs`
+: Private reusable package for generic Fumadocs configuration, Effect Schema to
+  Standard Schema bridging, source loader adapters, page-tree helpers and
+  generic MDX render primitives.
 
 `docs/architecture`
 : Durable implementation architecture.
@@ -47,22 +50,31 @@ become too large.
 ```ts
 Production: public docs request
 
-developer
-  -> docs site navigation
-    -> apps/docs/navigation.json
-      -> apps/docs/content/<section>/index.mdx
-      -> generated API reference when available
-      -> package README or architecture doc for deeper ownership detail
+browser
+  -> apps/docs route
+    -> apps/docs route boundary schema
+    -> DocsContentService
+      -> @whattax/docs-fumadocs source adapter
+        -> packages/docs-content/.source/server
+          -> apps/docs/content/**/*.mdx
+    -> @whattax/docs-content/client
+      -> Fumadocs compiled MDX module
+    -> @whattax/docs-fumadocs/render primitives
+    -> app-local MDX component map
 ```
 
 ```ts
 Tests: docs structure
 
 docs implementation
-  -> navigation audit for required sections
-  -> documentation standards review
+  -> @whattax/docs-content validate
+    -> frontmatter and navigation schema decode
+    -> navigation coverage and local link checks
+    -> MDX component allowlist
+    -> examples and OpenAPI reference checks
+  -> @whattax/docs-fumadocs tests
+  -> apps/docs build and browser screenshots when rendering changes
   -> bun run verification
-  -> docs app build/typecheck once apps/docs has a package manifest
 ```
 
 ## Guardrails
@@ -75,6 +87,9 @@ docs implementation
   related standards suite before writing or reviewing public docs.
 - Keep public MDX pages task-first. Use architecture docs for durable
   ownership and runtime detail.
+- Validate public MDX through `@whattax/docs-content`, which owns Effect Schema
+  frontmatter, navigation coverage, source-text policy, local link, MDX
+  component allowlist, examples and OpenAPI reference checks.
 
 ## Related docs
 

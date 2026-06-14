@@ -87,10 +87,19 @@ export const DocsMeta = Schema.Struct({
 });
 export type DocsMeta = typeof DocsMeta.Type;
 
+export const DocsMdxComponentName = DocsNonEmptyText.pipe(
+  Schema.check(
+    Schema.isPattern(/^[A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)*$/u)
+  ),
+  Schema.brand("whattax/DocsMdxComponentName")
+);
+export type DocsMdxComponentName = typeof DocsMdxComponentName.Type;
+
 export const DocsContentPage = Schema.Struct({
   frontmatter: DocsPageFrontmatter,
   markdown: Schema.String,
   path: DocsPagePath,
+  slugs: Schema.Array(DocsPageSlug),
   source: DocsSourcePath,
 });
 export type DocsContentPage = typeof DocsContentPage.Type;

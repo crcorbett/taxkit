@@ -14,6 +14,7 @@ Specs:
 
 - [Documentation structure and development docs](./documentation-structure-and-development-docs.md)
 - [Documentation improvement roadmap](./documentation-improvement-roadmap.md)
+- [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md)
 - [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md)
 - [Extract API app](./extract-api-app.md)
 - [Extract public calculator service](./extract-public-calculator-service.md)

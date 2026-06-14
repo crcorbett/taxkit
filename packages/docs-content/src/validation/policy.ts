@@ -5,6 +5,7 @@ import {
   Array as EffectArray,
   Effect,
   FileSystem,
+  HashSet,
   Match,
   Option,
   Order,
@@ -15,16 +16,12 @@ import type { Effect as EffectType } from "effect";
 import { DocsSourceError } from "../errors.js";
 import {
   DocsNavigation,
+  DocsMdxComponentName,
   DocsPageFrontmatter,
   DocsSourcePath,
   DocsValidationIssue,
 } from "../schemas.js";
-import type {
-  DocsContentPage,
-  DocsNavigationLeaf,
-  DocsPagePath,
-  DocsValidationResult,
-} from "../schemas.js";
+import type { DocsNavigationLeaf, DocsValidationResult } from "../schemas.js";
 
 const docsRoot = "apps/docs";
 const contentRoot = "apps/docs/content";
@@ -45,6 +42,12 @@ const privateNamePattern =
   /\b(adad|SaaS|paid|simulation|private downstream product|private product strategy)\b/iu;
 const relativeLinkPattern = /\[[^\]]+\]\(([^)]+)\)/gu;
 const frontmatterPattern = /^---\n([\s\S]*?)\n---/u;
+const fencedCodeBlockPattern = /```[\s\S]*?```/gu;
+const inlineCodePattern = /`[^`]*`/gu;
+const mdxComponentPattern =
+  /<\/?([A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)*)\b/gu;
+
+const allowedMdxComponentNames = HashSet.empty<DocsMdxComponentName>();
 
 const exampleFileNames = [
   "browser-http.ts",
@@ -214,6 +217,56 @@ const validateFenceBalance = (source: DocsSourcePath, markdown: string) =>
     )
   );
 
+const markdownWithoutFencedCode = (markdown: string) =>
+  markdown
+    .replaceAll(fencedCodeBlockPattern, "")
+    .replaceAll(inlineCodePattern, "");
+
+export const validateMdxComponentPolicy = (
+  source: DocsSourcePath,
+  markdown: string
+) =>
+  Effect.forEach(
+    EffectArray.fromIterable(
+      markdownWithoutFencedCode(markdown).matchAll(mdxComponentPattern)
+    ),
+    (match) =>
+      Option.fromNullishOr(match[1]).pipe(
+        Option.match({
+          onNone: () =>
+            Effect.succeed(EffectArray.empty<DocsValidationIssue>()),
+          onSome: (name) =>
+            Schema.decodeUnknownEffect(DocsMdxComponentName)(name).pipe(
+              Effect.match({
+                onFailure: (error) =>
+                  EffectArray.of(
+                    new DocsValidationIssue({
+                      message: `invalid MDX component name: ${error.message}`,
+                      path: [source],
+                    })
+                  ),
+                onSuccess: (componentName) =>
+                  Match.value(
+                    HashSet.has(allowedMdxComponentNames, componentName)
+                  ).pipe(
+                    Match.when(true, () =>
+                      EffectArray.empty<DocsValidationIssue>()
+                    ),
+                    Match.orElse(() =>
+                      EffectArray.of(
+                        new DocsValidationIssue({
+                          message: `MDX component not allowed: ${componentName}`,
+                          path: [source],
+                        })
+                      )
+                    )
+                  ),
+              })
+            ),
+        })
+      )
+  ).pipe(Effect.map(EffectArray.flatten));
+
 const missingTextIssue = (
   source: DocsSourcePath,
   label: string,
@@ -344,6 +397,31 @@ const navigationLeaves = (navigation: DocsNavigation) =>
     ),
   ]);
 
+const navigationSourceSet = (navigation: DocsNavigation) =>
+  HashSet.fromIterable(
+    EffectArray.map(navigationLeaves(navigation), (leaf) => leaf.source)
+  );
+
+const missingNavigationIssue = (source: DocsSourcePath) =>
+  new DocsValidationIssue({
+    message: `content source missing from navigation: ${source}`,
+    path: [source],
+  });
+
+const validateNavigationCoversSources = (
+  navigation: DocsNavigation,
+  sources: readonly DocsSourcePath[]
+) =>
+  EffectArray.map(
+    EffectArray.fromIterable(
+      HashSet.difference(
+        HashSet.fromIterable(sources),
+        navigationSourceSet(navigation)
+      )
+    ).toSorted(Order.String),
+    missingNavigationIssue
+  );
+
 const validateNavigationSources = (
   navigation: DocsNavigation
 ): EffectType.Effect<readonly DocsValidationIssue[], DocsSourceError> =>
@@ -375,19 +453,27 @@ const validatePage = (
       decodeFrontmatter(source, markdown).pipe(
         Effect.matchEffect({
           onFailure: (frontmatterIssues) =>
-            validateLocalLinks(source, absolutePath).pipe(
-              Effect.map((linkIssues) => [
+            Effect.all({
+              componentIssues: validateMdxComponentPolicy(source, markdown),
+              linkIssues: validateLocalLinks(source, absolutePath),
+            }).pipe(
+              Effect.map(({ componentIssues, linkIssues }) => [
                 ...frontmatterIssues,
                 ...validateTextPolicy(source, markdown),
                 ...validateFenceBalance(source, markdown),
+                ...componentIssues,
                 ...linkIssues,
               ])
             ),
           onSuccess: () =>
-            validateLocalLinks(source, absolutePath).pipe(
-              Effect.map((linkIssues) => [
+            Effect.all({
+              componentIssues: validateMdxComponentPolicy(source, markdown),
+              linkIssues: validateLocalLinks(source, absolutePath),
+            }).pipe(
+              Effect.map(({ componentIssues, linkIssues }) => [
                 ...validateTextPolicy(source, markdown),
                 ...validateFenceBalance(source, markdown),
+                ...componentIssues,
                 ...linkIssues,
               ])
             ),
@@ -471,64 +557,24 @@ export const validateContent: EffectType.Effect<
   const navigation = yield* getNavigation;
   const sources = yield* listMdxSources;
   const navigationIssues = yield* validateNavigationSources(navigation);
+  const navigationCoverageIssues = validateNavigationCoversSources(
+    navigation,
+    sources
+  );
   const pageIssues = yield* Effect.forEach(sources, validatePage).pipe(
     Effect.map(EffectArray.flatten)
   );
   const referenceIssues = yield* validateReferenceIntegration;
 
   return {
-    issues: [...navigationIssues, ...pageIssues, ...referenceIssues],
+    issues: [
+      ...navigationIssues,
+      ...navigationCoverageIssues,
+      ...pageIssues,
+      ...referenceIssues,
+    ],
   } satisfies DocsValidationResult;
 });
-
-const getPageMarkdown = (source: DocsSourcePath) =>
-  readText(join(absoluteDocsRoot, source));
-
-const pageFromNavigationItem = (
-  item: DocsNavigationLeaf
-): EffectType.Effect<DocsContentPage, DocsSourceError> =>
-  getPageMarkdown(item.source).pipe(
-    Effect.flatMap((markdown) =>
-      decodeFrontmatter(item.source, markdown).pipe(
-        Effect.map(
-          (frontmatter) =>
-            ({
-              frontmatter,
-              markdown,
-              path: item.path,
-              source: item.source,
-            }) satisfies DocsContentPage
-        ),
-        Effect.mapError((cause) => sourceError(cause, item.source))
-      )
-    )
-  );
-
-export const listNavigationPages: EffectType.Effect<
-  readonly DocsContentPage[],
-  DocsSourceError
-> = getNavigation.pipe(
-  Effect.flatMap((navigation) =>
-    Effect.forEach(navigationLeaves(navigation), pageFromNavigationItem)
-  )
-);
-
-export const getPageByPath = (path: DocsPagePath) =>
-  getNavigation.pipe(
-    Effect.map((navigation) =>
-      EffectArray.findFirst(
-        navigationLeaves(navigation),
-        (item) => item.path === path
-      )
-    ),
-    Effect.flatMap(
-      Option.match({
-        onNone: () => Effect.succeed(Option.none<DocsContentPage>()),
-        onSome: (item) =>
-          pageFromNavigationItem(item).pipe(Effect.map(Option.some)),
-      })
-    )
-  );
 
 export const validationSummary = (result: DocsValidationResult) =>
   Match.value(result.issues.length).pipe(

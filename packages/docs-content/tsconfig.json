@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "include": ["./src/**/*.ts", "./.source/**/*.ts", "./source.config.ts"],
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "strictNullChecks": true
   }
 }

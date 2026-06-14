@@ -16,6 +16,10 @@
       "source": "./src/server.ts",
       "default": "./src/server.ts"
     },
+    "./client": {
+      "source": "./src/client.ts",
+      "default": "./src/client.ts"
+    },
     "./schemas": {
       "source": "./src/schemas.ts",
       "default": "./src/schemas.ts"
@@ -40,16 +44,13 @@
   "dependencies": {
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "4.0.0-beta.60",
-    "@standard-schema/spec": "^1.1.0",
+    "@whattax/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
     "fumadocs-core": "^16.8.3",
-    "fumadocs-mdx": "^14.3.1",
-    "remark-mermaidjs": "7.0.0"
+    "fumadocs-mdx": "^14.3.1"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
-    "@shikijs/core": "4.0.2",
-    "@shikijs/transformers": "^4.0.2",
     "@types/bun": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

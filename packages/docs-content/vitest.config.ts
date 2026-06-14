@@ -1,6 +1,15 @@
+import mdx from "fumadocs-mdx/vite";
 import { defineConfig } from "vitest/config";
 
-export default defineConfig({
+import * as sourceConfig from "./source.config";
+
+export default defineConfig(async () => ({
+  plugins: [
+    await mdx(sourceConfig, {
+      configPath: "source.config.ts",
+      outDir: ".source",
+    }),
+  ],
   resolve: {
     conditions: ["source"],
   },
@@ -11,4 +20,4 @@ export default defineConfig({
     include: ["src/**/*.test.ts"],
     passWithNoTests: true,
   },
-});
+}));

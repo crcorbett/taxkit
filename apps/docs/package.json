@@ -16,7 +16,9 @@
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@whattax/docs-content": "workspace:*",
+    "@whattax/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
+    "fumadocs-mdx": "^14.3.1",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
