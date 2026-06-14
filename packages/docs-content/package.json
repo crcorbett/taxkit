@@ -5,30 +5,37 @@
   "type": "module",
   "exports": {
     "./errors": {
+      "types": "./src/errors.ts",
       "source": "./src/errors.ts",
       "default": "./src/errors.ts"
     },
     "./live": {
+      "types": "./src/live.layer.ts",
       "source": "./src/live.layer.ts",
       "default": "./src/live.layer.ts"
     },
     "./server": {
+      "types": "./src/server.ts",
       "source": "./src/server.ts",
       "default": "./src/server.ts"
     },
     "./client": {
+      "types": "./src/client.ts",
       "source": "./src/client.ts",
       "default": "./src/client.ts"
     },
     "./schemas": {
+      "types": "./src/schemas.ts",
       "source": "./src/schemas.ts",
       "default": "./src/schemas.ts"
     },
     "./service": {
+      "types": "./src/service.ts",
       "source": "./src/service.ts",
       "default": "./src/service.ts"
     },
     "./validate": {
+      "types": "./src/validate.runtime.ts",
       "source": "./src/validate.runtime.ts",
       "default": "./src/validate.runtime.ts"
     },
@@ -47,7 +54,8 @@
     "@whattax/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
     "fumadocs-core": "^16.8.3",
-    "fumadocs-mdx": "^14.3.1"
+    "fumadocs-mdx": "^14.3.1",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",

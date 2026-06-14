@@ -37,12 +37,19 @@ describe("docs content validation policy", () => {
       const service = yield* DocsContentService;
       const page = yield* service.getPage(path);
       const renderablePage = yield* service.getRenderablePage(path);
+      const guidePath = Schema.decodeUnknownSync(DocsPagePath)(
+        "/guides/calculate-australian-take-home-pay"
+      );
+      const guidePage = yield* service.getPage(guidePath);
       const pages = yield* service.listPages();
 
       expect(typeof renderablePage.body).toBe("function");
       expect(page.frontmatter.title).toBe("Start");
       expect(page.source).toBe("content/start/index.mdx");
       expect(page.slugs).toEqual(["start"]);
+      expect(guidePage.source).toBe(
+        "content/guides/calculate-australian-take-home-pay.mdx"
+      );
       expect(renderablePage.toc).toEqual(expect.any(Array));
       expect(pages.length).toBeGreaterThan(0);
     }).pipe(Effect.provide(DocsContentServiceLive));

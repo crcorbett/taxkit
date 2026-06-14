@@ -3,7 +3,7 @@ import { DocsPagePath } from "@whattax/docs-content/schemas";
 import { DocsContentService } from "@whattax/docs-content/service";
 import { Effect, Schema } from "effect";
 
-import { preloadDocsContent } from "#/lib/mdx/components";
+import { preloadDocsContent } from "#/lib/mdx/client-loader";
 import type { RouteLoaderContext } from "#/lib/route-runtime";
 
 import { docsHomeRouteBoundary, docsPageRouteBoundary } from "./route-boundary";

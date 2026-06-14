@@ -12,6 +12,7 @@ import {
   Schema,
 } from "effect";
 import type { Effect as EffectType } from "effect";
+import { parse as parseYaml } from "yaml";
 
 import { DocsSourceError } from "../errors.js";
 import {
@@ -110,10 +111,19 @@ const fileExists = (path: string) =>
 const sourceExists = (source: DocsSourcePath) =>
   fileExists(join(absoluteDocsRoot, source.replace(/^content\//u, "content/")));
 
-const parseFrontmatterValue = (body: string, key: string) =>
-  Option.fromNullishOr(
-    new RegExp(`^${key}:\\s*"([^"]+)"`, "mu").exec(body)
-  ).pipe(Option.flatMap((match) => Option.fromNullishOr(match[1])));
+const frontmatterIssue = (source: DocsSourcePath, message: string) =>
+  EffectArray.of(
+    new DocsValidationIssue({
+      message,
+      path: [source, "frontmatter"],
+    })
+  );
+
+const parseFrontmatterBody = (source: DocsSourcePath, body: string) =>
+  Effect.try({
+    catch: (cause) => frontmatterIssue(source, String(cause)),
+    try: () => parseYaml(body),
+  });
 
 const decodeFrontmatter = (
   source: DocsSourcePath,
@@ -143,24 +153,12 @@ const decodeFrontmatter = (
                 )
               ),
             onSome: (body) =>
-              Schema.decodeUnknownEffect(DocsPageFrontmatter)({
-                description: parseFrontmatterValue(body, "description").pipe(
-                  Option.getOrElse(() => "")
-                ),
-                status: parseFrontmatterValue(body, "status").pipe(
-                  Option.getOrElse(() => "")
-                ),
-                title: parseFrontmatterValue(body, "title").pipe(
-                  Option.getOrElse(() => "")
-                ),
-              }).pipe(
+              parseFrontmatterBody(source, body).pipe(
+                Effect.flatMap(Schema.decodeUnknownEffect(DocsPageFrontmatter)),
                 Effect.mapError((error) =>
-                  EffectArray.of(
-                    new DocsValidationIssue({
-                      message: error.message,
-                      path: [source, "frontmatter"],
-                    })
-                  )
+                  globalThis.Array.isArray(error)
+                    ? error
+                    : frontmatterIssue(source, error.message)
                 )
               ),
           })

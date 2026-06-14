@@ -3,18 +3,15 @@ import {
   loadFumadocsPages,
 } from "@whattax/docs-fumadocs/source";
 import type { FumadocsSourceLoader } from "@whattax/docs-fumadocs/source";
-import {
-  Array as EffectArray,
-  Effect,
-  Layer,
-  Match,
-  Option,
-  Schema,
-} from "effect";
+import { Array as EffectArray, Effect, Layer, Option, Schema } from "effect";
 
 import { DocsPageNotFoundError, DocsSourceError } from "./errors.js";
-import { DocsPagePath, DocsPageSlug, DocsSourcePath } from "./schemas.js";
-import type { DocsContentPage } from "./schemas.js";
+import { DocsPagePath, DocsPageSlug } from "./schemas.js";
+import type {
+  DocsContentPage,
+  DocsNavigation,
+  DocsNavigationLeaf,
+} from "./schemas.js";
 import { source } from "./server.js";
 import { DocsContentService } from "./service.js";
 import type { DocsRenderableContentPage } from "./service.js";
@@ -42,38 +39,56 @@ const docsSourceLoader: FumadocsSourceLoader<DocsSourcePage, DocsSourceMeta> = {
 };
 
 const pagePathFromSlugs = (slugs: readonly string[]) =>
-  Schema.decodeUnknownEffect(DocsPagePath)(`/${slugs.join("/")}`);
-
-const sourcePathFromPage = (page: DocsSourcePage) => {
-  const firstSlug = Option.fromUndefinedOr(page.slugs[0]).pipe(
-    Option.getOrThrowWith(() => new Error("Docs source page slugs are empty"))
-  );
-  const sourcePath = Match.value(page.slugs.length).pipe(
-    Match.when(1, () => `content/${firstSlug}/index.mdx`),
-    Match.orElse(() => `content/${page.slugs.join("/")}.mdx`)
+  Schema.decodeUnknownEffect(DocsPagePath)(`/${slugs.join("/")}`).pipe(
+    Effect.mapError((cause) => new DocsSourceError({ cause }))
   );
 
-  return Schema.decodeUnknownEffect(DocsSourcePath)(sourcePath);
-};
+const navigationLeaves = (navigation: DocsNavigation) =>
+  EffectArray.flatMap(navigation.primaryNavigation, (section) => [
+    section,
+    ...Option.fromNullishOr(section.pages).pipe(
+      Option.getOrElse(() => EffectArray.empty<DocsNavigationLeaf>())
+    ),
+  ]);
+
+const sourcePathFromNavigation = (
+  navigation: DocsNavigation,
+  path: DocsPagePath
+) =>
+  EffectArray.findFirst(
+    navigationLeaves(navigation),
+    (leaf) => leaf.path === path
+  ).pipe(
+    Option.match({
+      onNone: () =>
+        Effect.fail(
+          new DocsSourceError({
+            cause: new Error(`Docs navigation source missing for ${path}`),
+          })
+        ),
+      onSome: (leaf) => Effect.succeed(leaf.source),
+    })
+  );
 
 const slugsFromPage = (page: DocsSourcePage) =>
   Effect.forEach(page.slugs, (slug) =>
     Schema.decodeUnknownEffect(DocsPageSlug)(slug)
-  );
+  ).pipe(Effect.mapError((cause) => new DocsSourceError({ cause })));
 
 const slugsFromPath = (path: DocsPagePath) =>
   EffectArray.filter(path.split("/"), (segment) => segment.length > 0);
 
 const contentPageFromSourcePage = (
+  navigation: DocsNavigation,
   page: DocsSourcePage
-): Effect.Effect<DocsContentPage, never> =>
+): Effect.Effect<DocsContentPage, DocsSourceError> =>
   Effect.gen(function* () {
     const markdown = yield* Effect.promise<string>(() =>
       page.data.getText("processed")
     );
-    const path = yield* pagePathFromSlugs(page.slugs).pipe(Effect.orDie);
-    const slugs = yield* slugsFromPage(page).pipe(Effect.orDie);
-    const sourcePath = yield* sourcePathFromPage(page).pipe(Effect.orDie);
+    const path = yield* pagePathFromSlugs(page.slugs);
+    const slugs = yield* slugsFromPage(page);
+    const sourcePath = yield* sourcePathFromNavigation(navigation, path);
 
     return {
       frontmatter: page.data,
@@ -85,10 +100,11 @@ const contentPageFromSourcePage = (
   });
 
 const renderableContentPageFromSourcePage = (
+  navigation: DocsNavigation,
   page: DocsSourcePage
-): Effect.Effect<DocsRenderableContentPage, never> =>
+): Effect.Effect<DocsRenderableContentPage, DocsSourceError> =>
   Effect.gen(function* () {
-    const contentPage = yield* contentPageFromSourcePage(page);
+    const contentPage = yield* contentPageFromSourcePage(navigation, page);
     const body = yield* Effect.promise(() => page.data.load());
 
     return {
@@ -104,8 +120,14 @@ export const DocsContentServiceLive = Layer.succeed(
   DocsContentService.of({
     getNavigation: () => getNavigation,
     getPage: (path) =>
-      loadFumadocsPage(docsSourceLoader, slugsFromPath(path)).pipe(
-        Effect.flatMap(contentPageFromSourcePage),
+      Effect.gen(function* () {
+        const navigation = yield* getNavigation;
+        const page = yield* loadFumadocsPage(
+          docsSourceLoader,
+          slugsFromPath(path)
+        );
+        return yield* contentPageFromSourcePage(navigation, page);
+      }).pipe(
         Effect.catchTag("FumadocsPageNotFoundError", () =>
           Effect.fail(
             new DocsPageNotFoundError({
@@ -118,8 +140,14 @@ export const DocsContentServiceLive = Layer.succeed(
         )
       ),
     getRenderablePage: (path) =>
-      loadFumadocsPage(docsSourceLoader, slugsFromPath(path)).pipe(
-        Effect.flatMap(renderableContentPageFromSourcePage),
+      Effect.gen(function* () {
+        const navigation = yield* getNavigation;
+        const page = yield* loadFumadocsPage(
+          docsSourceLoader,
+          slugsFromPath(path)
+        );
+        return yield* renderableContentPageFromSourcePage(navigation, page);
+      }).pipe(
         Effect.catchTag("FumadocsPageNotFoundError", () =>
           Effect.fail(
             new DocsPageNotFoundError({
@@ -132,18 +160,28 @@ export const DocsContentServiceLive = Layer.succeed(
         )
       ),
     listPages: () =>
-      loadFumadocsPages(docsSourceLoader).pipe(
+      Effect.all({
+        navigation: getNavigation,
+        pages: loadFumadocsPages(docsSourceLoader),
+      }).pipe(
         Effect.flatMap((pages) =>
-          Effect.forEach(pages, contentPageFromSourcePage)
+          Effect.forEach(pages.pages, (page) =>
+            contentPageFromSourcePage(pages.navigation, page)
+          )
         ),
         Effect.catchTag("FumadocsSourceLoaderError", (error) =>
           Effect.fail(new DocsSourceError({ cause: error.cause }))
         )
       ),
     listRenderablePages: () =>
-      loadFumadocsPages(docsSourceLoader).pipe(
+      Effect.all({
+        navigation: getNavigation,
+        pages: loadFumadocsPages(docsSourceLoader),
+      }).pipe(
         Effect.flatMap((pages) =>
-          Effect.forEach(pages, renderableContentPageFromSourcePage)
+          Effect.forEach(pages.pages, (page) =>
+            renderableContentPageFromSourcePage(pages.navigation, page)
+          )
         ),
         Effect.catchTag("FumadocsSourceLoaderError", (error) =>
           Effect.fail(new DocsSourceError({ cause: error.cause }))

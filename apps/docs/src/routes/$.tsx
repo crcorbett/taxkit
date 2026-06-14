@@ -3,7 +3,7 @@ import { Match, Option } from "effect";
 
 import { loadDocsPage } from "#/lib/docs/loaders";
 import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
-import { MdxDocument } from "#/lib/mdx/components";
+import { MdxDocument } from "#/lib/mdx/client-loader";
 
 export const Route = createFileRoute("/$")({
   component() {

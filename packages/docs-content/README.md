@@ -41,6 +41,13 @@ return serialisable content page data for the current app route. The
 `getRenderablePage` and `listRenderablePages` methods expose compiled
 Fumadocs page data for server-side rendering integration.
 
+This package is intentionally private and source-only. It is not a publishable
+runtime package because its server and client exports wrap generated
+Fumadocs/Vite modules for `apps/docs/content`. The package exports include
+`types`, `source` and `default` entries that all point at source files so
+workspace consumers use the same generated-source boundary in development,
+build and type checking.
+
 Validation may read raw MDX source text for source-text policy checks such as
 frontmatter, navigation coverage, local links, allowed MDX component usage,
 examples and OpenAPI references. App routes should consume the service boundary
