@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-10
+last_reviewed: 2026-06-14
 source_of_truth: docs
 confidence: high
 ---
@@ -69,6 +69,13 @@ Task objects should use this shape:
   "implementationPrompt": "Paste the Mandatory Subagent Contract here, followed by task-specific files, outputs and gates.",
   "mandatoryVerification": [],
   "browserVerification": [],
+  "qualityAudits": [],
+  "parentAudit": {
+    "required": true,
+    "maxCorrectionTurns": 3,
+    "returnToSameSubagent": true,
+    "escalateAfterFailedTurn": 3
+  },
   "completionCriteria": [],
   "commitAfterPassing": true
 }
@@ -82,6 +89,8 @@ Keep field names consistent with existing task lists:
 - `dependsOn`
 - `mandatoryVerification`
 - `browserVerification`
+- `qualityAudits`
+- `parentAudit`
 - `completionCriteria`
 - `commitAfterPassing`
 
@@ -97,6 +106,25 @@ implementation still matches them. Boundary-moving tasks should include an
 important negative claims, such as "HTTP calculate does not construct the
 calculator response" or "browser entrypoints do not import server-only
 modules."
+
+Delegated tasks should include `qualityAudits` for repeatable implementation
+review prompts that must run at least three times before the task is accepted.
+Use these audits for Effect shape, canonical schema/type reuse, call-graph
+cleanliness, unsafe casts, helper sprawl, browser-safe imports and docs
+alignment.
+
+Delegated tasks should also include `parentAudit`. The parent audit is the
+review loop owned by the main agent after a subagent reports completion:
+
+- `required` should be `true` for delegated implementation work.
+- `maxCorrectionTurns` should be `3` unless the spec explains a different
+  limit.
+- `returnToSameSubagent` should be `true` so corrections stay with the context
+  that created the slice.
+- `escalateAfterFailedTurn` should be `3`, meaning the parent records the
+  blocker, updates the active plan, and asks for a decision or replans the task
+  after the third failed correction turn instead of silently accepting weak
+  work.
 
 ## Sequencing model
 
@@ -138,6 +166,8 @@ Also include non-command gates when they are material:
 - Effect audit against `docs/architecture/effect-services.md`, including
   meaningful linear Effect control flow, typed errors handled in `.pipe(...)`,
   schema decoding at boundaries, no unsafe casts and no trivial helper sprawl
+- at least three documented improvement audit passes for substantial Effect,
+  API, SDK, app or package-boundary slices
 - diff audit for forbidden wrappers, unsafe casts or browser/server import
   leaks
 - OpenAPI, SDK packed-artifact or downstream-consumer evidence
@@ -157,8 +187,18 @@ Example task:
     "bun run verification",
     "bun run changeset or explicit no-changeset rationale"
   ],
+  "qualityAudits": [
+    "Run the implementation improvement audit at least three times: cleaner call graph, clearer package boundaries, more direct Effect-native control flow, canonical schema/type/id/error reuse, no unsafe casts, no DTO mirrors, no wrapper/helper sprawl, and updated specs/docs when implementation differs."
+  ],
+  "parentAudit": {
+    "required": true,
+    "maxCorrectionTurns": 3,
+    "returnToSameSubagent": true,
+    "escalateAfterFailedTurn": 3
+  },
   "completionCriteria": [
     "Parent agent reviewed the diff against the spec, task and architecture docs.",
+    "Parent agent completed and recorded at least three relevant quality audit passes.",
     "Parent agent verified the final call graph against the implementation.",
     "Parent agent verified canonical Effect/schema/type/id reuse.",
     "Parent agent audited Effect control flow, unsafe casts and helper sprawl.",
@@ -183,8 +223,13 @@ Each task should:
 - include architecture audits when boundaries, schemas or runtime ownership move
 - include call-graph review and negative audits when runtime/package flows move
 - include Effect-native and canonical-type prompt guidance when delegated
+- include at least three documented quality audit passes for substantial code,
+  package-boundary, API, SDK, app or docs-runtime changes
 - repeat Effect/code-quality audits inside each delegated task rather than
   relying on a single global reminder
+- require a parent audit loop that returns incomplete work to the same subagent
+  for up to three correction turns, then escalates instead of accepting an
+  unresolved slice
 - require parent review and acceptance before the next delegated task starts
 
 Prefer progressive end-to-end slices over package-by-package TODO lists.

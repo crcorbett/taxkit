@@ -68,6 +68,11 @@ The task's verification or completion criteria must include parent review for:
 - current SDK/API names
 - canonical schema/type references
 - link and source-of-truth accuracy
+- at least three documented improvement audit passes for substantial
+  docs-runtime, docs-wiring or public MDX structure work
+- the parent audit loop for delegated tasks: return incomplete work to the same
+  subagent, stop after the third failed correction turn, and replan or ask for
+  a decision
 
 ## Output expectations
 

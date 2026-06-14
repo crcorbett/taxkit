@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-10
+last_reviewed: 2026-06-14
 source_of_truth: docs
 confidence: high
 ---
@@ -40,6 +40,8 @@ Before implementation begins:
 4. The goal must explicitly say the parent agent owns review, audit,
    verification and final acceptance for each task before the next task is
    delegated.
+5. The goal must explicitly say repeated parent audit failures stop the rollout
+   for replan or user decision after the third failed correction turn.
 
 Execution loop:
 
@@ -55,10 +57,15 @@ Execution loop:
    conventions.
 7. If anything is missing or below the bar, send the task back to the same
    subagent with concrete corrections.
-8. Mark the task complete only when the parent agent is satisfied that the task
+8. Count that parent review as an audit turn whenever it produces corrections.
+   Return to the same subagent for no more than three failed correction turns
+   before stopping to record the blocker, update the active plan and ask for a
+   decision or re-scope the task.
+9. Mark the task complete only when the parent agent is satisfied that the task
    scope and verification gates are genuinely complete.
-9. Commit the coherent slice when the task list requires `commitAfterPassing`.
-10. Delegate the next task only after the current task is accepted.
+10. Commit the coherent slice when the task list requires
+    `commitAfterPassing`.
+11. Delegate the next task only after the current task is accepted.
 
 Do not run multiple task-list implementation subagents in parallel unless the
 task list explicitly says a task is independent and the write scopes are
@@ -91,6 +98,14 @@ Every accepted task must pass these audits where relevant:
 - runtime, API, SDK, frontend and package-boundary call graphs still match the
   implementation, or the spec/docs were updated with the final graph
 
+Substantial tasks must also include at least three documented improvement audit
+passes before acceptance. The passes should ask what can be improved while the
+implementation still works, then inspect for cleaner call graphs, clearer
+package boundaries, more direct Effect-native control flow, canonical
+schema/type/id/error reuse, fewer unsafe casts, fewer local mirrors and less
+wrapper/helper sprawl. If an audit identifies a real improvement, make the
+change or record the explicit follow-up before accepting the task.
+
 ## Guardrails
 
 - Keep implementation aligned with package ownership docs.
@@ -116,6 +131,8 @@ Every accepted task must pass these audits where relevant:
 - Keep public docs neutral to downstream private products.
 - Runtime, API, SDK, frontend and package-boundary changes must leave the
   relevant spec/architecture call graphs accurate.
+- Do not continue past three failed parent correction turns for the same
+  delegated task. Stop, record the evidence and replan or ask for a decision.
 
 ## Slice design rules
 
@@ -163,6 +180,7 @@ Implementation rules:
 Verification and handoff:
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
 - Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.
+- For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.
 - Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.

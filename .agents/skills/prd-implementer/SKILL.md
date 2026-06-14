@@ -24,7 +24,8 @@ Read in this order:
 - Create or set one comprehensive active goal before task-list execution. The
   goal must state that subagents implement tasks sequentially and that the
   parent agent reviews, audits, verifies, and accepts each task before
-  delegating the next one.
+  delegating the next one. It must also state that the parent stops for replan
+  or user decision after the third failed correction turn for the same task.
 - Start with a tracer bullet before broadening.
 - Verify after each meaningful slice with `bun run verification`, plus targeted
   tests, browser checks, or runtime smoke tests where relevant.
@@ -66,9 +67,12 @@ For each task:
    work against the spec, task, and architecture docs.
 4. Send the task back to the same subagent if the slice is incomplete or below
    the quality bar.
-5. Mark the task complete only after the parent agent is satisfied.
-6. Commit the coherent slice when `commitAfterPassing` requires it.
-7. Delegate the next task only after the current task is accepted.
+5. Count each parent review that sends corrections back as an audit turn.
+6. Stop after the third failed correction turn for the same task, record the
+   blocker and replan or ask for a decision.
+7. Mark the task complete only after the parent agent is satisfied.
+8. Commit the coherent slice when `commitAfterPassing` requires it.
+9. Delegate the next task only after the current task is accepted.
 
 Default to serial delegation. Do not parallelize task-list implementation unless
 the task list explicitly says the tasks are independent and write scopes are
@@ -94,6 +98,8 @@ Before accepting a task, audit for:
 - package-local README and architecture docs stay aligned when ownership moves
 - runtime/package call graphs in the spec still match the implementation, or
   the spec/docs were updated with the final graph
+- at least three documented improvement audit passes for substantial code,
+  API, SDK, app, package-boundary or docs-runtime work
 
 ## Subagent Prompt Block
 
@@ -122,6 +128,7 @@ Verification and handoff:
 
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
 - Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.
+- For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.
 - Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
@@ -170,3 +177,6 @@ specific gate:
 - Use old or imported planning material only as background.
 - Do not turn a spec into a giant one-pass implementation.
 - Record uncertainty and deferred debt explicitly in the active plan.
+- Do not continue after three failed parent audit turns on the same delegated
+  task. Escalate with evidence and either re-scope the task or ask for a
+  decision.

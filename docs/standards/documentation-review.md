@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-31
+last_reviewed: 2026-06-14
 source_of_truth: docs
 confidence: medium
 ---
@@ -138,4 +138,9 @@ Use this checklist for documentation task lists:
 - [ ] Each task includes a link audit or explicit follow-up.
 - [ ] Each task includes example validation or explicit follow-up.
 - [ ] Each task includes a Changeset or no-changeset rationale.
+- [ ] Substantial docs-runtime or docs-wiring tasks require at least three
+      documented improvement audit passes.
+- [ ] Delegated tasks include the parent audit loop: return incomplete work to
+      the same subagent, stop after the third failed correction turn, and
+      replan or ask for a decision.
 - [ ] Each task requires parent review for style, structure and accuracy.

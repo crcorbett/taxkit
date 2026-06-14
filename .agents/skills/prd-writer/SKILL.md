@@ -38,6 +38,15 @@ Read in this order:
   Each delegated code task must include explicit verification for Effect
   control flow, schema/type reuse, unsafe casts, wrapper/helper sprawl and
   browser-safe import boundaries where relevant.
+- Substantial delegated tasks must include at least three documented
+  improvement audit passes before acceptance. These audits should ask what can
+  be improved while keeping the implementation working, then inspect call
+  graphs, package boundaries, Effect-native control flow, canonical schema/type
+  reuse, unsafe casts, local DTO mirrors and helper sprawl.
+- Delegated task lists must include a parent audit loop with up to three failed
+  correction turns. Incomplete work goes back to the same subagent; after the
+  third failed correction turn the parent stops, records the blocker, and
+  replans or asks for a decision instead of accepting the task.
 
 ## Expected Output
 
@@ -72,6 +81,12 @@ For Effect TypeScript tasks, every task's `mandatoryVerification` or
 - no unsafe casts, local DTO mirrors, manual object readers or trivial
   wrappers/helpers;
 - browser/runtime code only imports browser-safe API/SDK exports.
+
+Every substantial delegated task must also include a `qualityAudits` field, or
+equivalent completion criteria, requiring at least three documented improvement
+audit passes before parent acceptance. Every delegated task should include
+`parentAudit` with `maxCorrectionTurns: 3`, `returnToSameSubagent: true` and
+`escalateAfterFailedTurn: 3`.
 
 Use `bun run verification` as the default repo-health gate in
 `globalVerification.requiredBeforeFinalPR` and in each task's
@@ -115,6 +130,7 @@ Verification and handoff:
 
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
 - Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.
+- For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.
 - Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.
@@ -146,4 +162,7 @@ Verification and handoff:
 - Repeat code-quality and architecture audits inside each delegated task. Do
   not rely on a single global reminder for Effect control flow, canonical
   schemas, unsafe casts, wrapper/helper sprawl or browser-safe imports.
+- Require three documented improvement audit passes inside substantial
+  delegated tasks, and define the three-turn parent correction loop in task
+  lists.
 - Do not generate package-by-package code tutorials unless the user explicitly asks for that depth.

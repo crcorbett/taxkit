@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-10
+last_reviewed: 2026-06-14
 source_of_truth: docs
 confidence: high
 ---
@@ -154,6 +154,14 @@ confidence: high | medium | low
   and an explicit audit against `docs/architecture/effect-services.md`.
 - For implementation task lists, repeat Effect/code-quality audits in each
   task's verification gates rather than relying on one top-level reminder.
+- Substantial delegated tasks must require at least three documented
+  improvement audit passes before acceptance. The audits should inspect for a
+  cleaner call graph, clearer package boundaries, more direct Effect-native
+  control flow, canonical schema/type/id/error reuse, unsafe casts, local DTO
+  mirrors and wrapper/helper sprawl.
+- Delegated task lists must define the parent audit loop: the parent reviews
+  the diff and evidence locally, returns incomplete work to the same subagent,
+  and stops for replan or user decision after the third failed correction turn.
 - Use `bun run verification` as the default repo-level acceptance gate when a
   spec changes code, docs wiring, package metadata or task plans.
 - Package-facing specs must define the expected Changeset impact: affected
