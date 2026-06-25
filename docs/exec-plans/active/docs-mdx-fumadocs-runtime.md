@@ -29,7 +29,7 @@ next task.
 | DOCS-RUNTIME-003 | completed | Created docs app runtime and route shell; parent accepted. |
 | DOCS-RUNTIME-004 | completed | Wired reference, examples and OpenAPI validation. |
 | DOCS-RUNTIME-005 | completed | Updated architecture docs, app README and root docs verification scripts. |
-| DOCS-RUNTIME-006 | pending | Run final seam, boundary and canonical-reuse audit. |
+| DOCS-RUNTIME-006 | completed | Final seam, boundary and canonical-reuse audit accepted. |
 
 ## Validation log
 
@@ -391,3 +391,132 @@ next task.
   only. It does not change package runtime exports or user-facing package
   behaviour.
 - Accepted `DOCS-RUNTIME-005` for the parent gate.
+
+### 2026-06-25 - DOCS-RUNTIME-006 implementation audit
+
+- Audited the final docs runtime package seams across `apps/docs`,
+  `@whattax/docs-content`, `@whattax/docs-fumadocs`, generated Fumadocs source
+  and app-local renderer components.
+- Low-risk cleanup implemented: `apps/docs/src/lib/docs/loaders.ts` no longer
+  decodes route splat input with `Effect.orDie`. The route boundary decode now
+  maps `DocsPagePath` schema decode failures inline to the existing canonical
+  `DocsSourceError`, keeping request-boundary failures in the typed error
+  channel and removing the one-use `normalizePath` helper.
+- Final production call graph matches the architecture docs:
+  `browser -> apps/docs route -> apps/docs loader -> DocsContentService ->
+  @whattax/docs-fumadocs source adapter -> packages/docs-content/.source/server
+  -> apps/docs/content/**/*.mdx`, with rendered MDX flowing through
+  `@whattax/docs-content/client`, `@whattax/docs-fumadocs/render` and the
+  app-local MDX component map.
+- Final build call graph matches the architecture docs:
+  `apps/docs/vite.config.ts -> fumadocs-mdx plugin ->
+  packages/docs-content/source.config.ts -> @whattax/docs-fumadocs/config ->
+  packages/docs-content/.source/*`, then `docs build` consumes the generated
+  client/server modules through the package exports.
+- Final test and audit call graphs match the architecture docs:
+  `@whattax/docs-content validate -> frontmatter/navigation schema decode ->
+  source/link/text/component/example/OpenAPI checks`, plus docs build, root
+  verification, browser screenshots and package-boundary `rg` audits.
+- Boundary audit:
+  - `apps/docs/src` imports only package-owned docs exports and app-local
+    runtime modules; it does not import raw `apps/docs/content`,
+    `navigation.json`, `@whattax/docs-content/server` or generated
+    `.source/server` modules.
+  - `packages/docs-content/src/server.ts` and `src/client.ts` are the expected
+    generated-source boundary modules for `.source/server` and
+    `.source/browser`.
+  - `@whattax/docs-content` owns WhatTax frontmatter, navigation,
+    validation issues, source errors, service tags and live layer composition.
+  - `@whattax/docs-fumadocs` owns generic Fumadocs config, source adapters,
+    page-tree helpers and reusable render primitives.
+  - `apps/docs` owns TanStack routes, the docs runtime, Vite plugin wiring,
+    route loaders and app-specific MDX component composition.
+- Canonical reuse audit:
+  - Route loader inputs decode through `DocsPagePath`.
+  - Route success and error exits use `DocsContentPage`, `DocsNavigation`,
+    `DocsPageNotFoundError`, `DocsSourceError` and
+    `DocsContentPreloadError`.
+  - Validation decodes frontmatter through `DocsPageFrontmatter`, navigation
+    through `DocsNavigation`, source paths through `DocsSourcePath` and MDX
+    component names through `DocsMdxComponentName`.
+  - Public docs references use current canonical calculator terms such as
+    `CalculatorRun*`, `CalculatorServiceError`, `calculateRunRequest` and
+    `PublicCalculatorService`; deprecated `PublicCalculation*` names remain
+    absent from public MDX content and banned by validation.
+- Fumadocs dependency/type leakage audit:
+  - Fumadocs generated modules stay behind `@whattax/docs-content` exports.
+  - The docs app directly depends on `fumadocs-mdx` only for
+    `apps/docs/vite.config.ts` plugin execution; WhatTax source config remains
+    package-owned in `@whattax/docs-content`.
+  - Browser render code consumes `@whattax/docs-content/client` and
+    `@whattax/docs-fumadocs/render` rather than generated source paths.
+- Helper/control-flow audit:
+  - The only code change removed a one-use helper and kept one-off error
+    mapping inline at the callsite.
+  - No unsafe casts, local DTO mirrors, `Object.values`, `Object.entries`,
+    `switch` statements or manual object readers were added.
+  - Remaining `Effect.die` occurrences are route-boundary invariant/defect
+    handling and the browser client runtime placeholder, not docs content
+    service expected errors.
+- Browser verification passed against the local docs dev server on port `4498`:
+  - `/` rendered the docs home, seven primary navigation cards and the
+    61-page count. Screenshot: `/tmp/whattax-docs-home.png`.
+  - `/start/quickstart` rendered nested navigation, active route state,
+    headings, content, inline code and code blocks without visible overlap.
+    Screenshot: `/tmp/whattax-docs-quickstart.png`.
+- Verification passed:
+  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run --filter=@whattax/docs-content test`
+  - `bun run --filter=docs build`
+  - `bun run build`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Audit commands passed:
+  - `rg -n "@whattax/docs-content/server|packages/docs-content/\\.source|@whattax/docs-content/\\.source|\\.source/server|\\.source/browser|apps/docs/content|navigation\\.json|node:|@effect/platform-node|FileSystem|process\\.env|Bun\\.|window\\.|document\\." apps/docs/src packages/docs-content/src --glob '*.{ts,tsx}' --glob '!apps/docs/src/routeTree.gen.ts'`
+  - `rg -n "@whattax/docs-fumadocs/(config|source)|fumadocs-mdx/config|fumadocs-core/source|fumadocs-core/page-tree|remark-mermaidjs|@shikijs" apps/docs/src packages/docs-content/src packages/docs-fumadocs/src packages/docs-content/source.config.ts --glob '*.{ts,tsx}' --glob '!apps/docs/src/routeTree.gen.ts'`
+  - `rg -n "as any|as unknown|Object\\.values|Object\\.entries|switch\\s*\\(|\\btypeof\\b|\\bin\\b|=== undefined|!== undefined|\\?\\?|JSON\\.parse|JSON\\.stringify|new Map\\(|new Set\\(|Effect\\.orDie|Effect\\.die\\(" apps/docs/src packages/docs-content/src packages/docs-fumadocs/src --glob '*.{ts,tsx}' --glob '!apps/docs/src/routeTree.gen.ts'`
+  - `rg -n "PublicCalculation|PublicErrorEnvelope|PublicCalculationMetadata|calculateRequest|createEffectClient|adad|Mobius|Tilt|private downstream product|private product strategy|SaaS|paid|simulation" apps/docs/content --glob '*.mdx'`
+- Changeset rationale: no Changeset is required for this slice because the
+  only implementation change is private app route-loader error handling plus
+  execution-plan audit notes. No package export, package runtime contract or
+  public package behaviour changed.
+- Follow-ups recorded:
+  - Owner: `@whattax/docs-content` and `apps/docs`. Decide whether
+    `DocsRenderablePageData` should remain an intentionally opaque Fumadocs
+    render payload or gain a schema-owned app/render contract once more
+    consumers exist. Reason: today it avoids leaking unstable Fumadocs types,
+    but it is still typed as `unknown` fields. Verification needed:
+    `bun run --filter=@whattax/docs-content check-types`,
+    `bun run --filter=docs build` and browser screenshots for at least one
+    nested MDX page.
+  - Owner: `@whattax/docs-fumadocs`. Review page-tree adapter object
+    construction if the tree helpers become active app runtime code. Reason:
+    current optional property composition targets Fumadocs object shapes and is
+    not a response boundary, but it uses repeated small object-spread blocks.
+    Verification needed: package tests, docs build and an import-boundary audit
+    proving no WhatTax navigation schema is duplicated.
+  - Owner: `apps/docs`. Replace the temporary browser client runtime
+    placeholder if client-side Effect programs are introduced. Reason: the
+    current placeholder intentionally defects on use, which is acceptable while
+    the app has no browser runtime service graph but should not survive real
+    client Effects. Verification needed: browser route smoke, route-boundary
+    tests and `rg` proving browser modules use browser-safe exports only.
+- Residual risks:
+  - `bun run build` continues to emit an upstream Rolldown
+    `INVALID_ANNOTATION` warning from Effect during `web:build`, while the
+    build exits successfully.
+  - Browser verification used Playwright CLI screenshots because the Node REPL
+    resolved a different Playwright browser cache. The screenshots were
+    reviewed directly and are available under `/tmp`.
+- Parent review accepted the final audit after reviewing the diff, screenshots
+  and verification evidence. Parent reran:
+  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run --filter=@whattax/docs-content test`
+  - `bun run --filter=docs build`
+  - `bun run build`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Parent screenshot review confirmed `/tmp/whattax-docs-home.png` and
+  `/tmp/whattax-docs-quickstart.png` render the expected docs home and nested
+  quickstart page without visible overlap.
+- Parent accepted `DOCS-RUNTIME-006` for the final gate.

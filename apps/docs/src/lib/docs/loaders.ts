@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { DocsSourceError } from "@whattax/docs-content/errors";
 import { DocsPagePath } from "@whattax/docs-content/schemas";
 import { DocsContentService } from "@whattax/docs-content/service";
 import { Effect, Schema } from "effect";
@@ -11,9 +12,6 @@ import { docsHomeRouteBoundary, docsPageRouteBoundary } from "./route-boundary";
 const DocsPageLoaderInput = Schema.Struct({
   splat: Schema.String,
 });
-
-const normalizePath = (splat: string) =>
-  Schema.decodeUnknownEffect(DocsPagePath)(`/${splat}`);
 
 const loadDocsHomeData = createServerFn({ method: "GET" }).handler(async () => {
   const { docsRuntime } = await import("#/lib/runtime.server");
@@ -42,7 +40,9 @@ const loadDocsPageData = createServerFn({ method: "GET" })
     return await docsRuntime.runPromise(
       Effect.gen(function* loadDocsPageEffect() {
         const content = yield* DocsContentService;
-        const path = yield* normalizePath(data.splat).pipe(Effect.orDie);
+        const path = yield* Schema.decodeUnknownEffect(DocsPagePath)(
+          `/${data.splat}`
+        ).pipe(Effect.mapError((cause) => new DocsSourceError({ cause })));
         const navigation = yield* content.getNavigation();
         const page = yield* content.getRenderablePage(path);
         yield* preloadDocsContent(page.source);
