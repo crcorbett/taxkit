@@ -7,9 +7,9 @@ confidence: medium
 
 # Frontend
 
-The current frontend is a TanStack Start app that exercises the standalone
-Effect HTTP API and runtime split. Future public documentation UI should move
-toward the docs app described in the architecture docs.
+WhatTax currently has two browser-facing TanStack Start apps: `apps/web` for
+API/runtime smoke behaviour and `apps/docs` for public developer
+documentation.
 
 ## Scope
 
@@ -29,7 +29,10 @@ define tax calculation rules.
 `apps/docs`
 : Fumadocs-backed public documentation site for rule references, API docs, SDK
   guides and contributor docs. It owns the route runtime, app shell, app-local
-  MDX component map and browser rendering.
+  MDX component map and browser rendering. Server loaders consume
+  `@whattax/docs-content`; browser modules consume browser-safe
+  `@whattax/docs-content/client`, `@whattax/docs-content/schemas` and
+  `@whattax/docs-fumadocs/render` exports.
 
 `packages/ui`
 : Planned shared UI primitives for WhatTax-owned apps, once repeated UI
@@ -60,6 +63,12 @@ Web SSR and browser runtimes should use module-scoped
 Effect runtimes inside route loaders, React components or request-local helper
 functions.
 
+Docs SSR loaders use the same runtime rule. `apps/docs` keeps a module-scoped
+runtime for `DocsContentServiceLive`, decodes route input before lookup and
+preloads compiled MDX through the browser-safe client loader. App routes should
+not read `apps/docs/content` files, `navigation.json` or generated
+`.source/server` modules directly.
+
 ## Guardrails
 
 - Keep app state conversion outside the deterministic engine.
@@ -71,6 +80,8 @@ functions.
   `@whattax/docs-content/client` and `@whattax/docs-fumadocs/render`.
 - Do not import generated `.source/server` files or
   `@whattax/docs-content/server` from browser modules.
+- Keep Fumadocs generated source access inside `@whattax/docs-content` server
+  exports and reusable adapters in `@whattax/docs-fumadocs/source`.
 
 ## Related Docs
 

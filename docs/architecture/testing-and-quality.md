@@ -34,6 +34,22 @@ The current repo baseline is scaffold-level verification:
 bun run verification
 ```
 
+Root verification includes lint, format, Knip and workspace type checks. For
+docs, that means `apps/docs` type checking also typechecks checked examples,
+and dependent package builds run before type checks through Turbo. Heavier
+docs runtime gates remain explicit package commands so normal local
+verification does not rebuild and validate the whole docs corpus on every
+change:
+
+```bash
+bun run docs:validate
+bun run docs:build
+bun run --filter=@whattax/docs-content test
+```
+
+Run those package-local docs gates whenever MDX content, Fumadocs source
+wiring, docs examples, validation policy or docs rendering changes.
+
 Public API route work should also capture contract evidence from the standalone
 API app:
 
@@ -49,6 +65,8 @@ API app:
 - A rule pack is incomplete without source references and golden tests.
 - Graph validation failures should fail the build.
 - API responses must stay schema-backed.
+- Public docs content must validate through `@whattax/docs-content` before
+  documentation/runtime slices are accepted.
 - Browser-safe exports must not import Node-only modules.
 - Oxlint can enforce restricted APIs, such as banned `Object.*` enumeration
   helpers, but it does not currently provide a safe built-in rule for banning

@@ -19,9 +19,12 @@ contains the proposed package map and dependency direction.
 Current implemented code lives in:
 
 - `apps/api`
+- `apps/docs`
 - `apps/web`
 - `packages/core`
 - `packages/calculators`
+- `packages/docs-content`
+- `packages/docs-fumadocs`
 - `packages/http-api`
 - `packages/sdk/typescript`
 - `packages/rules/au/income-tax`
@@ -91,9 +94,31 @@ reusing calculator-owned `CalculatorRun*` schemas and
 : Current scaffold app. It proves the runtime boundary and health endpoint
 while the public docs/API app structure is being built.
 
+`apps/docs`
+: Implemented public documentation app. It owns TanStack Start routes, the
+  docs app shell, route loaders, search/navigation presentation and app-local
+  MDX component composition. It consumes package-owned content and Fumadocs
+  helpers, but does not own canonical frontmatter, navigation, generated source
+  or reusable Fumadocs integration contracts.
+
 `apps/api`
 : Current standalone Bun API runtime. It owns process config, startup,
 shutdown and platform serving for the implemented API app.
+
+`packages/docs-content`
+: Implemented private source-only content package. It owns WhatTax docs
+  frontmatter, meta, navigation, validation issues, tagged docs errors,
+  `DocsContentService`, the Fumadocs `source.config.ts` for
+  `apps/docs/content` and the generated `.source/*` boundary. It can read raw
+  MDX source text for validation policy, but app routes should use its service
+  and client exports instead of importing source files directly.
+
+`packages/docs-fumadocs`
+: Implemented private reusable package for generic Fumadocs integration. It
+  owns Effect Schema to Standard Schema bridging, shared MDX compile config,
+  source-loader adapters, page-tree helpers and generic browser-safe MDX render
+  primitives. It must not own WhatTax-specific frontmatter, navigation,
+  validation policy, routes or generated content.
 
 ## Runtime Shape
 
@@ -112,6 +137,9 @@ belongs in apps or explicitly server-only package exports.
 - Import from the owner instead of redefining boundary values locally.
 - Add server-only exports for filesystem, HTTP server and Node adapters.
 - Keep React in apps or docs packages only.
+- Keep app-specific MDX components in `apps/docs`; promote only generic,
+  repeated Fumadocs primitives to `packages/docs-fumadocs/render` or repeated
+  WhatTax UI primitives to `packages/ui`.
 - Do not add flat engine packages once nested domain or rule ownership exists.
   `packages/calculators` is allowed because it is a cross-surface
   orchestration package rather than a jurisdiction/domain/rule package.

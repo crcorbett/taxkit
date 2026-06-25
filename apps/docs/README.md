@@ -1,18 +1,20 @@
 ---
 status: draft
-last_reviewed: 2026-05-31
-source_of_truth: docs
-confidence: medium
+last_reviewed: 2026-06-25
+source_of_truth: app-root
+confidence: high
 ---
 
-# Public docs content
+# Docs app
 
-This directory owns the planned public MDX developer documentation content for
-WhatTax.
+This private TanStack Start app renders the public WhatTax developer
+documentation.
 
-The current slice establishes the content root and navigation contract only. It
-does not scaffold a docs app package, framework runtime or generated reference
-pipeline yet.
+It owns routes, the app shell, navigation presentation, app-local MDX component
+composition and browser rendering. It does not own canonical docs schemas,
+validation policy or generated Fumadocs source access; those live in
+`@whattax/docs-content`. Reusable Fumadocs integration lives in
+`@whattax/docs-fumadocs`.
 
 ## Content root
 
@@ -44,7 +46,40 @@ The required top-level sections are:
 - Reference
 
 The navigation file is the source of truth for sidebar order until a docs
-framework owns a generated or typed navigation API.
+runtime owns a generated or typed navigation API. It is decoded and validated
+by `@whattax/docs-content`.
+
+## Runtime graph
+
+```ts
+Production: docs page
+
+browser
+  -> apps/docs route
+    -> apps/docs loader
+      -> DocsContentService
+        -> @whattax/docs-content live layer
+          -> @whattax/docs-fumadocs source adapter
+          -> packages/docs-content/.source/server
+          -> apps/docs/navigation.json
+    -> @whattax/docs-content/client
+      -> Fumadocs compiled MDX module
+    -> @whattax/docs-fumadocs/render
+    -> app-local MDX component map
+```
+
+## Commands
+
+```txt
+bun run --filter=docs dev
+bun run --filter=docs check-types
+bun run --filter=docs build
+bun run --filter=docs check-examples
+bun run docs:validate
+```
+
+`check-types` includes `check-examples`, so public examples stay connected to
+current SDK/API/calculator exports.
 
 ## Authoring rules
 
@@ -61,21 +96,29 @@ Use the matching template and user journey for each page. If a repeated page
 shape does not have a template, add the template before writing more pages in
 that shape.
 
-## Planned app graph
+## Validation graph
 
 ```ts
-Production: public docs request
+Tests: docs runtime
 
-developer
-  -> docs site navigation
-    -> apps/docs/navigation.json
-      -> apps/docs/content/<section>/index.mdx
-      -> generated API reference when available
-      -> package README or architecture doc for deeper ownership detail
+docs change
+  -> @whattax/docs-content validate
+    -> frontmatter and navigation schemas
+    -> local links and allowed MDX components
+    -> example and OpenAPI reference checks
+  -> docs check-examples
+    -> TypeScript example compilation
+  -> docs build
+    -> TanStack Start and Fumadocs rendering
 ```
 
-## Current status
+## Guardrails
 
-This directory is a content-root tracer bullet. There is no `apps/docs`
-package manifest yet, so there is no docs-app build or typecheck command for
-this slice.
+- Do not import raw `apps/docs/content` files from route loaders.
+- Do not import `@whattax/docs-content/server` or generated `.source/server`
+  modules from browser code.
+- Keep app-specific MDX components in `src/lib/mdx/components.tsx`.
+- Put generic Fumadocs primitives in `@whattax/docs-fumadocs` only when they
+  are reusable outside this app.
+- Use [Documentation style](../../docs/standards/documentation-style.md) and
+  the related standards suite before writing or reviewing public docs.

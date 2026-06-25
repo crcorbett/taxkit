@@ -26,13 +26,15 @@ on the open-source tax engine and avoid downstream private-product specifics.
   Contributing and Reference section directories.
 
 `apps/docs/navigation.json`
-: Draft public docs navigation contract. It owns top-level section order,
-  section source files, stable paths and primary reader metadata until a docs
-  framework owns a generated or typed navigation API.
+: Public docs navigation contract. It owns top-level section order, section
+  source files, stable paths and primary reader metadata. The file remains
+  authored in the app so contributors can review route structure beside the
+  content, but it is decoded and enforced by `@whattax/docs-content`.
 
 `packages/docs-content`
 : Private source-only package for WhatTax docs frontmatter, meta, navigation,
-  validation policy, tagged docs errors and the content service.
+  validation policy, tagged docs errors, generated Fumadocs source access and
+  the content service.
 
 `packages/docs-fumadocs`
 : Private reusable package for generic Fumadocs configuration, Effect Schema to
@@ -57,6 +59,7 @@ browser
       -> @whattax/docs-fumadocs source adapter
         -> packages/docs-content/.source/server
           -> apps/docs/content/**/*.mdx
+      -> apps/docs/navigation.json
     -> @whattax/docs-content/client
       -> Fumadocs compiled MDX module
     -> @whattax/docs-fumadocs/render primitives
@@ -90,6 +93,9 @@ docs implementation
 - Validate public MDX through `@whattax/docs-content`, which owns Effect Schema
   frontmatter, navigation coverage, source-text policy, local link, MDX
   component allowlist, examples and OpenAPI reference checks.
+- Keep reusable Fumadocs code in `@whattax/docs-fumadocs`; keep WhatTax
+  content contracts in `@whattax/docs-content`; keep route composition and
+  app-specific rendering in `apps/docs`.
 
 ## Related docs
 

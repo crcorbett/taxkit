@@ -28,7 +28,7 @@ next task.
 | DOCS-RUNTIME-002 | completed | Added DocsContentService and package-owned validation policy. |
 | DOCS-RUNTIME-003 | completed | Created docs app runtime and route shell; parent accepted. |
 | DOCS-RUNTIME-004 | completed | Wired reference, examples and OpenAPI validation. |
-| DOCS-RUNTIME-005 | pending | Update architecture docs and root verification wiring. |
+| DOCS-RUNTIME-005 | completed | Updated architecture docs, app README and root docs verification scripts. |
 | DOCS-RUNTIME-006 | pending | Run final seam, boundary and canonical-reuse audit. |
 
 ## Validation log
@@ -331,3 +331,63 @@ next task.
 - Changeset: `.changeset/docs-reference-validation.md` records a patch for the
   private `@whattax/docs-content` package.
 - Accepted `DOCS-RUNTIME-004` for the parent gate.
+
+### 2026-06-25 - DOCS-RUNTIME-005 implementation and parent acceptance
+
+- Updated durable architecture docs for the implemented docs runtime:
+  - `docs/architecture/content-and-posts.md` now describes
+    `apps/docs/navigation.json` as an authored app contract decoded and
+    enforced by `@whattax/docs-content`, and records the current
+    `apps/docs -> DocsContentService -> @whattax/docs-fumadocs source adapter
+    -> packages/docs-content/.source/server -> apps/docs/content/**/*.mdx`
+    call graph.
+  - `docs/architecture/frontend.md` now treats `apps/docs` as an implemented
+    browser-facing app, documents its module-scoped docs runtime and reinforces
+    the browser-safe docs imports.
+  - `docs/architecture/package-ownership.md` now includes `apps/docs`,
+    `packages/docs-content` and `packages/docs-fumadocs` in implemented
+    ownership and records their separate route, content and Fumadocs
+    responsibilities.
+  - `docs/architecture/testing-and-quality.md` now documents docs validation
+    and build gates, and explains why they stay explicit rather than part of
+    the default root `bun run verification` path.
+- Replaced the stale `apps/docs/README.md` content-only tracer-bullet guidance
+  with the implemented app runtime, validation and guardrail guidance.
+- Added stable root convenience scripts:
+  - `bun run docs:validate`
+  - `bun run docs:build`
+- Root verification cost/noise assessment: the default `bun run verification`
+  keeps lint, format, Knip and workspace type checking. Docs examples are
+  included through `docs:check-types`, while full docs validation/build remain
+  explicit because Fumadocs/Mermaid rendering needs Playwright browser
+  availability and can be slower/noisier than normal type verification.
+- Architecture/import audits passed:
+  - `rg -n '@whattax/docs-content/server|packages/docs-content/\\.source|@whattax/docs-content/\\.source|\\.source/server|\\.source/browser' apps/docs/src packages/docs-fumadocs/src --glob '*.{ts,tsx}'`
+    returned no matches.
+  - `rg -n 'apps/docs/content|navigation\\.json' apps/docs/src --glob '*.{ts,tsx}'`
+    returned no matches.
+  - `rg -n '@whattax/docs-content|@whattax/docs-fumadocs' apps/docs/src packages/docs-content/src packages/docs-fumadocs/src --glob '*.{ts,tsx}'`
+    showed the expected app imports from `@whattax/docs-content/client`,
+    `errors`, `schemas`, `service`, `live` and `@whattax/docs-fumadocs/render`,
+    plus the expected content package adapter import from
+    `@whattax/docs-fumadocs/source`.
+- Strict Effect audit: this slice touched docs and root package scripts only,
+  so no Effect implementation code required correction. The documented
+  boundaries continue to require package-owned schemas, tagged errors,
+  `DocsContentService` and browser-safe exports.
+- Verification passed:
+  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run --filter=docs build`
+  - `bun run docs:validate`
+  - `bun run docs:build`
+  - `bun run verification`
+  - `bun run changeset status --verbose`
+- Environment note: the first `docs build` attempt failed because the local
+  Playwright Chromium/headless-shell cache was missing for Mermaid rendering.
+  `bunx playwright install chromium` installed the required browser binaries,
+  after which the docs build passed.
+- Changeset rationale: no Changeset is required for this slice because it
+  updates durable docs, the app README and private root convenience scripts
+  only. It does not change package runtime exports or user-facing package
+  behaviour.
+- Accepted `DOCS-RUNTIME-005` for the parent gate.

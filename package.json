@@ -35,6 +35,8 @@
     "check-types": "turbo run check-types",
     "clean": "turbo run clean",
     "dev": "portless proxy start --https && turbo run dev --filter=api --filter=web",
+    "docs:build": "bun run --filter=docs build",
+    "docs:validate": "bun run --filter=@whattax/docs-content validate",
     "fix": "ultracite fix --type-aware",
     "format": "oxfmt -c oxfmt.config.ts --write . --no-error-on-unmatched-pattern",
     "format:check": "oxfmt -c oxfmt.config.ts --check . --no-error-on-unmatched-pattern",
