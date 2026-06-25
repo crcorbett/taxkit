@@ -1,11 +1,11 @@
 ---
-status: draft
-last_reviewed: 2026-05-24
+status: implemented
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# TypeScript SDK And Publishing
+# TypeScript SDK and publishing
 
 ## Overview
 
@@ -31,6 +31,24 @@ the primary facade as `@whattax/sdk-typescript`.
 The first downstream consumer should validate the SDK through a real external
 workspace before npm publication. Public WhatTax docs should describe this as
 downstream consumer validation and must not name private products or repos.
+
+## Implementation status
+
+Implemented in the current repo:
+
+- `packages/sdk/typescript` exists as private `@whattax/sdk`.
+- Plain, safe-result, Effect, AU, schema and testing entrypoints exist.
+- SDK execution reuses `@whattax/calculators` and does not depend on
+  `@whattax/http-api`.
+- HTTP calculate consumes the SDK Effect facade as an in-process consumer.
+- Type tests, runtime parity tests, import-boundary checks and packed-artifact
+  smoke checks exist.
+- Downstream validation evidence is recorded in
+  [the completed execution plan](../exec-plans/completed/typescript-sdk-and-publishing.md).
+
+Npm publication remains gated. Do not remove `private: true`, run
+`bun run version-repo` or publish the package without explicit release approval
+and a fresh package-name check.
 
 ## Problem
 
@@ -70,7 +88,7 @@ and runtime capabilities.
 - Prepare Changesets, package metadata and release docs for eventual public
   npm publication.
 
-## Non-Goals
+## Non-goals
 
 - Do not build a second calculator catalog or execution engine in the SDK.
 - Do not expose `Effect.Effect`, `Layer`, `Context.Tag`, `Cause` or service
@@ -87,7 +105,7 @@ and runtime capabilities.
   implementation slices. Publishing readiness is a deliberate release-prep
   slice.
 
-## Ownership And Boundaries
+## Ownership and boundaries
 
 `packages/core` owns branded primitives, fact descriptors, rule descriptors,
 graph metadata, trace, ledgers, common tagged errors and `CalculationEngine`.
@@ -104,7 +122,7 @@ service errors.
 
 `@whattax/http-api` owns HTTP transport contracts, OpenAPI annotations, HTTP
 status envelopes, typed HTTP clients and route handlers. It should import SDK
-facades and schemas for calculation behavior rather than being imported by the
+facades and schemas for calculation behaviour rather than being imported by the
 SDK.
 
 The SDK owns:
@@ -137,9 +155,9 @@ runtime modules from any export path. HTTP clients and OpenAPI transport helpers
 stay in `@whattax/http-api` or a future transport package that depends on the
 SDK, not the other way around.
 
-## Proposed Approach
+## Proposed approach
 
-### Package Shape
+### Package shape
 
 Create:
 
@@ -204,7 +222,7 @@ packed and source-condition consumers are explicitly supported. The current SDK
 contract excludes `source` conditions and validates packed entrypoints with the
 package artifact smoke check.
 
-### Strict Typed Descriptor Model
+### Strict typed descriptor model
 
 The SDK should define typed descriptors rather than loose runtime registries.
 The minimal public type model should preserve:
@@ -256,7 +274,7 @@ narrowed to the calculations those modules provide. Calling an unsupported
 calculation, passing facts for another calculation, or mixing incompatible tax
 years should fail through TypeScript before runtime.
 
-### Runtime Execution
+### Runtime execution
 
 The SDK runtime should execute through `PublicCalculatorService`:
 
@@ -272,11 +290,11 @@ typed SDK descriptor
 
 The SDK should not manually traverse calculator catalog maps or run rule-pack
 layers directly when a `PublicCalculatorService` method already owns the
-behavior. Direct Effect-layer helpers are allowed in `./effect` and
+behaviour. Direct Effect-layer helpers are allowed in `./effect` and
 `./au/effect` only when they preserve the same service-owned semantics and are
 covered by parity tests.
 
-### Plain TypeScript Facade
+### Plain TypeScript facade
 
 Root usage should prefer:
 
@@ -316,7 +334,7 @@ if (result.ok) {
 The `safe` result shape must be schema-owned or Data-owned and must not be a
 hand-rolled ad hoc object union.
 
-### Effect-Native Facade
+### Effect-native facade
 
 `whattax/effect` should expose Effect-native calculation methods and layer
 composition for package consumers that want typed failures, interruption,
@@ -326,7 +344,7 @@ Effect-native methods should return `Effect.Effect<Success, Failure, Requires>`
 and should keep expected SDK, calculator and domain failures in the typed error
 channel. One-off error mapping should stay inline at callsites.
 
-### AU Subpath
+### AU subpath
 
 `whattax/au` should provide the first jurisdiction-specific module surface:
 
@@ -340,7 +358,7 @@ channel. One-off error mapping should stay inline at callsites.
 The root `whattax` entrypoint must not import AU rule packages unless a caller
 imports `whattax/au`.
 
-### Type-Level Test Contract
+### Type-level test contract
 
 The first implementation must include type tests as the primary proof of SDK
 value. They must prove these fail:
@@ -357,9 +375,9 @@ value. They must prove these fail:
 Use `@ts-expect-error` tests or a focused type-test package/script wired into
 `bun run verification`.
 
-### Runtime Parity Test Contract
+### Runtime parity test contract
 
-The SDK must prove that its runtime behavior is the same calculation behavior
+The SDK must prove that its runtime behaviour is the same calculation behaviour
 owned by `@whattax/calculators`. For each supported v1 calculator, tests should
 compare:
 
@@ -381,7 +399,7 @@ Runtime parity tests may compare full encoded report values where stable. When
 diagnostics or transport envelopes differ by boundary, tests should compare the
 canonical report, calculator id and tagged public error payload.
 
-### Import Boundary Test Contract
+### Import boundary test contract
 
 The SDK package must have automated import-boundary checks. They must fail if:
 
@@ -395,7 +413,7 @@ These checks can be implemented as focused tests, package-boundary scripts,
 Oxlint rules or a combination. They must run during `bun run verification`
 before the SDK is accepted.
 
-### Downstream Consumer Validation
+### Downstream consumer validation
 
 Before npm publication, validate the SDK from a downstream workspace that
 imports WhatTax through its normal package/submodule boundary. The validation
@@ -413,7 +431,7 @@ must prove:
 Keep this evidence in the active exec plan or release-prep notes. Do not name
 private downstream products in public WhatTax docs.
 
-### Publishing Readiness
+### Publishing readiness
 
 Publishing should be a final release-prep slice after implementation and
 downstream validation pass.
@@ -429,10 +447,10 @@ Release-prep must:
 - run `bun run version-repo` only when intentionally applying release-train
   versions and changelogs
 - update package READMEs and root release notes
-- verify installed package behavior from a packed artifact or clean downstream
+- verify installed package behaviour from a packed artifact or clean downstream
   install path before `npm publish`
 
-## Risks And Tradeoffs
+## Risks and tradeoffs
 
 - Route-level calculator schemas cannot be dependent on path params, so the SDK
   must preserve calculator/input/output relationships above the generic
@@ -447,7 +465,7 @@ Release-prep must:
 - Downstream validation is required, but public WhatTax docs must stay neutral
   about private downstream product details.
 
-## Versioning And Changelog Impact
+## Versioning and changelog impact
 
 Implementation is package-facing.
 
@@ -460,16 +478,16 @@ Expected Changeset impact:
 - `@whattax/http-api`: patch or minor if handlers shift to consume SDK-owned
   facades
 - rule packages: patch or minor if they add public SDK-oriented exports without
-  changing calculation behavior
+  changing calculation behaviour
 
 Each coherent package-facing slice should add or update a Changeset with
 `bun run changeset`. Do not batch all Changesets into the final publishing
 slice unless explicitly requested.
 
-## Acceptance Criteria
+## Acceptance criteria
 
-- `docs/specs/sdk-facade.md` and architecture docs agree with the implemented
-  SDK boundary over `@whattax/calculators`.
+- This spec, the SDK public naming spec and architecture docs agree with the
+  implemented SDK boundary over `@whattax/calculators`.
 - `packages/sdk/typescript` exists with explicit browser-safe and Effect-native
   export paths.
 - The root SDK facade exposes `WhatTax.create(...)`, calculation resource
@@ -498,7 +516,7 @@ slice unless explicitly requested.
 
 ## References
 
-- [SDK facade export](../specs/sdk-facade.md)
+- [SDK public naming and export contract](./sdk-public-naming-and-export-contract.md)
 - [API and SDK](../architecture/api-and-sdk.md)
 - [Calculators](../architecture/calculators.md)
 - [Package ownership](../architecture/package-ownership.md)

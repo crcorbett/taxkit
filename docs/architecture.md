@@ -1,4 +1,4 @@
-# WhatTax Documentation Atlas
+# WhatTax documentation atlas
 
 This atlas is the fastest path through the WhatTax docs.
 
@@ -22,13 +22,16 @@ This atlas is the fastest path through the WhatTax docs.
 - [Testing and validation](./architecture/testing-and-validation.md): current
   validation approach and expected quality gates.
 
-## Implementation Specs
+## Implementation specs
 
-- [SDK facade export](./specs/sdk-facade.md): public `WhatTax.{method}`
-  facade, plain TypeScript export, `/effect` export, HTTP handler usage and
-  package export boundaries.
+- [TypeScript SDK and publishing](./product-specs/typescript-sdk-and-publishing.md):
+  public SDK facade, plain TypeScript export, Effect export, HTTP handler usage
+  and release-prep boundary.
+- [SDK public naming and export contract](./product-specs/sdk-public-naming-and-export-contract.md):
+  current public SDK names, calculator run contracts and package export
+  boundaries.
 
-## Productionization Records
+## Productionization records
 
 - [Core calculation productionization](./productionization-core-calculations.md):
   original spike-to-production checklist and change record.
@@ -36,7 +39,7 @@ This atlas is the fastest path through the WhatTax docs.
   typed descriptors, date intervals, source artifacts, BigDecimal arithmetic,
   engine service, and test hygiene follow-up checklist.
 
-## Engineering Standards
+## Engineering standards
 
 - [Code patterns](./standards/code-patterns.md): Effect collections, Schema,
   Layers, descriptors, explicit exports, and Match exhaustiveness.

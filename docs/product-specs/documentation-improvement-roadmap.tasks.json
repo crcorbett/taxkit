@@ -2,8 +2,8 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/documentation-improvement-roadmap.md",
   "title": "Documentation Improvement Roadmap Tasks",
-  "status": "draft",
-  "last_reviewed": "2026-05-23",
+  "status": "implemented",
+  "last_reviewed": "2026-06-25",
   "principles": [
     "Make current implementation distinct from planned architecture.",
     "Keep root AGENTS.md short and route deeper instead of duplicating docs.",
@@ -27,6 +27,7 @@
   "tasks": [
     {
       "id": "DOC-IMPROVE-001",
+      "status": "complete",
       "title": "Fill README coverage for existing packages",
       "type": "docs",
       "dependsOn": [],
@@ -55,6 +56,7 @@
     },
     {
       "id": "DOC-IMPROVE-002",
+      "status": "complete",
       "title": "Refresh the root README",
       "type": "docs",
       "dependsOn": [
@@ -85,6 +87,7 @@
     },
     {
       "id": "DOC-IMPROVE-003",
+      "status": "complete",
       "title": "Clarify current versus planned architecture docs",
       "type": "docs",
       "dependsOn": [
@@ -117,6 +120,7 @@
     },
     {
       "id": "DOC-IMPROVE-004",
+      "status": "complete",
       "title": "Add docs maintenance guidance and final audit",
       "type": "audit",
       "dependsOn": [

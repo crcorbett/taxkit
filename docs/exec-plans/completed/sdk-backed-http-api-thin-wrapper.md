@@ -1,6 +1,6 @@
 ---
-status: active
-last_reviewed: 2026-05-31
+status: completed
+last_reviewed: 2026-06-25
 source_of_truth: execution-plan
 confidence: medium
 ---
@@ -152,5 +152,5 @@ task.
   The downstream app uses the SDK plain facade and HTTP client without
   adopting any deprecated names.
 - Documentation audit target:
-  `rg -n 'Production: HTTP calculate|Tests: HTTP over SDK|calculateRunRequest|CalculatorApiHandlerLive|CalculatorApiGroup' docs/architecture packages/*/README.md docs/exec-plans/active/sdk-backed-http-api-thin-wrapper.md`
+  `rg -n 'Production: HTTP calculate|Tests: HTTP over SDK|calculateRunRequest|CalculatorApiHandlerLive|CalculatorApiGroup' docs/architecture packages/*/README.md docs/exec-plans/completed/sdk-backed-http-api-thin-wrapper.md`
   confirms the final public names and call graphs are present in durable docs.

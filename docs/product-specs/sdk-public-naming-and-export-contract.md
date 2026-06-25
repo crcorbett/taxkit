@@ -1,11 +1,11 @@
 ---
-status: draft
-last_reviewed: 2026-05-25
+status: implemented
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# SDK Public Naming And Export Contract
+# SDK public naming and export contract
 
 ## Overview
 
@@ -21,9 +21,28 @@ service, SDK, HTTP adapter and downstream in-process consumers.
 This spec defines the public naming direction, export-map contract and
 verification expectations for a pre-publication cleanup slice.
 
+## Implementation status
+
+Implemented in the current repo:
+
+- reusable calculator execution schemas use `CalculatorRun*` and
+  `CalculatorServiceError`
+- SDK and HTTP API import the canonical calculator-owned run contracts
+- SDK schemas re-export canonical calculator-owned contracts without local
+  schema mirrors
+- SDK publish exports are dist-only and validated by packed-artifact smoke
+  checks
+- public docs and package READMEs use the final SDK/API names
+- final validation evidence is tracked in
+  [the completed execution plan](../exec-plans/completed/sdk-public-naming-and-export-contract.md)
+
+This spec did not approve npm publication. `@whattax/sdk` remains private until
+the release-prep gate explicitly removes `private: true`, runs the release
+train and publishes.
+
 ## Problem
 
-`PublicCalculation*` names describe exposure level rather than domain behavior.
+`PublicCalculation*` names describe exposure level rather than domain behaviour.
 As the SDK becomes the primary developer entrypoint, names should describe what
 the value does:
 
@@ -46,8 +65,8 @@ workspace development but not for a clean public npm contract.
 - Preserve canonical schema ownership and avoid mirrored DTOs.
 - Preserve compile-time safety for SDK descriptors, plain facade, Effect facade
   and downstream consumers.
-- Keep runtime behavior equivalent to the current calculator service, SDK and
-  HTTP API behavior.
+- Keep runtime behaviour equivalent to the current calculator service, SDK and
+  HTTP API behaviour.
 - Lock the published SDK export map so every exported path resolves to packed
   files.
 - Keep browser-safe entrypoints free from server-only modules.
@@ -55,9 +74,9 @@ workspace development but not for a clean public npm contract.
   import-boundary checks, packed artifact smoke tests and downstream workspace
   validation.
 
-## Non-Goals
+## Non-goals
 
-- Do not add new calculator behavior or rule packs.
+- Do not add new calculator behaviour or rule packs.
 - Do not change public HTTP route paths.
 - Do not make the SDK depend on `@whattax/http-api`.
 - Do not publish, remove `private: true` or run `bun run version-repo` as part
@@ -68,7 +87,7 @@ workspace development but not for a clean public npm contract.
 - Do not rename lower-level `packages/core` engine types such as
   `CalculationRequest`; those are different internal engine concepts.
 
-## Ownership And Boundaries
+## Ownership and boundaries
 
 `@whattax/calculators` owns reusable calculator execution schemas, request
 context schemas, report unions, diagnostics-bearing response schemas,
@@ -88,9 +107,9 @@ Downstream workspaces should consume the SDK through public package entrypoints
 instead of direct rule-package or calculator-service internals for application
 flows.
 
-## Proposed Approach
+## Proposed approach
 
-### Canonical Calculator Runtime Names
+### Canonical calculator runtime names
 
 Use `CalculatorRun*` for reusable calculator execution values owned by
 `@whattax/calculators`:
@@ -110,7 +129,7 @@ those names describe HTTP exposure and status encoding. The reusable
 calculator package should not use `Public*` for values that SDK and in-process
 consumers also use.
 
-### Transitional Aliases
+### Transitional aliases
 
 During implementation, compatibility aliases may be kept inside
 `@whattax/calculators` if they reduce migration risk across existing packages:
@@ -125,7 +144,7 @@ be advertised in SDK README examples, architecture docs or future public docs.
 If implementation can update all internal consumers in one slice without
 churn, prefer removing the old aliases before publication.
 
-### SDK Export Contract
+### SDK export contract
 
 The first publishable SDK package remains `@whattax/sdk` unless a later
 release-prep decision switches to the unscoped `whattax` package name.
@@ -165,7 +184,7 @@ Do not publish a `source` export condition unless source files are included in
 the packed artifact and the team intentionally supports source-condition
 consumers. The release-prep preference is a dist-only artifact.
 
-### SDK Schema Exports
+### SDK schema exports
 
 `@whattax/sdk/schemas` should re-export SDK-owned error/result schemas and the
 canonical calculator-run schemas that SDK consumers reasonably need:
@@ -183,7 +202,7 @@ canonical calculator-run schemas that SDK consumers reasonably need:
 These exports must be re-exports of owning schemas, not mirrored local
 definitions.
 
-### Descriptor And Facade Names
+### Descriptor and facade names
 
 Keep SDK-specific descriptor names unless implementation uncovers a concrete
 problem:
@@ -198,7 +217,7 @@ problem:
 These names describe SDK composition rather than HTTP/API exposure. Renaming
 them is not required for publication.
 
-### Runtime And Type Safety
+### Runtime and type safety
 
 The rename must not weaken:
 
@@ -214,7 +233,7 @@ cannot statically narrow facts by `calculatorId`. It must continue to validate
 with the selected calculator's canonical `inputSchema` inside
 `@whattax/calculators`.
 
-## Risks And Tradeoffs
+## Risks and tradeoffs
 
 - Renaming exported schemas is a package-facing change. It should happen before
   npm publication to avoid a public breaking change later.
@@ -228,7 +247,7 @@ with the selected calculator's canonical `inputSchema` inside
   leaves room for future non-run metadata names such as `CalculatorCatalogItem`
   and `CalculatorGraphResponse`.
 
-## Versioning And Changelog Impact
+## Versioning and changelog impact
 
 This is package-facing work. Expected Changesets:
 
@@ -241,7 +260,7 @@ This is package-facing work. Expected Changesets:
 Do not run `bun run version-repo` unless the user explicitly approves a
 release-prep/versioning slice.
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - Canonical reusable calculator execution names are `CalculatorRun*` and
   `CalculatorServiceError`, not `PublicCalculation*` or `PublicApiError`.

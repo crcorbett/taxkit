@@ -1,6 +1,6 @@
 ---
-status: active
-last_reviewed: 2026-05-24
+status: completed
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---

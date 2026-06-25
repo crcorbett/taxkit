@@ -1,6 +1,6 @@
 ---
-status: draft
-last_reviewed: 2026-06-10
+status: implemented
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: high
 ---
@@ -27,13 +27,32 @@ The goal is a composable docs system:
 This spec follows the public MDX docs work in
 [Public MDX developer documentation](./public-mdx-developer-docs.md).
 
+## Implementation status
+
+Implemented in the current repo:
+
+- `packages/docs-content` owns docs frontmatter, navigation, validation,
+  generated Fumadocs source access and `DocsContentService`.
+- `apps/docs` owns the TanStack Start docs runtime, route loaders, app shell,
+  navigation presentation and app-local MDX component composition.
+- `packages/docs-fumadocs` owns reusable generic Fumadocs configuration, source
+  adapters, page-tree helpers and MDX render primitives.
+- Final validation evidence is tracked in
+  [the completed execution plan](../exec-plans/completed/docs-mdx-fumadocs-runtime.md).
+
+Follow-on cleanup is tracked in the completed execution plan: decide whether
+`DocsRenderablePageData` should remain opaque or become a schema-owned render
+contract, review the page-tree adapter if it becomes active runtime code, and
+replace the temporary browser runtime placeholder if real client-side Effect
+programmes are introduced.
+
 ## Problem
 
-The repository now has public docs content under `apps/docs/content`, example
-files, a navigation contract and a content validation script. It does not yet
-have a docs app package, a generated MDX source, typed page data, server/client
-rendering boundaries, search/navigation runtime, or framework-level build
-proof.
+Before implementation, the repository had public docs content under
+`apps/docs/content`, example files, a navigation contract and a content
+validation script. It did not yet have a docs app package, generated MDX
+source, typed page data, server/client rendering boundaries,
+search/navigation runtime or framework-level build proof.
 
 The next implementation must avoid two failure modes:
 

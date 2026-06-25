@@ -2,8 +2,8 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/extract-api-app.md",
   "title": "Extract API App Tasks",
-  "status": "draft",
-  "last_reviewed": "2026-05-23",
+  "status": "implemented",
+  "last_reviewed": "2026-06-25",
   "principles": [
     "Keep apps/api thin and process-focused.",
     "Create exactly one ManagedRuntime for the Bun API process.",
@@ -31,6 +31,7 @@
   "tasks": [
     {
       "id": "API-001",
+      "status": "complete",
       "title": "Add the standalone Bun API app",
       "type": "foundation",
       "dependsOn": [],
@@ -76,6 +77,7 @@
     },
     {
       "id": "API-002",
+      "status": "complete",
       "title": "Rewire the web app to the external API",
       "type": "integration",
       "dependsOn": [
@@ -115,6 +117,7 @@
     },
     {
       "id": "API-003",
+      "status": "complete",
       "title": "Remove TanStack-mounted API routes",
       "type": "cleanup",
       "dependsOn": [
@@ -151,6 +154,7 @@
     },
     {
       "id": "API-004",
+      "status": "complete",
       "title": "Update repo docs and final verification",
       "type": "docs",
       "dependsOn": [

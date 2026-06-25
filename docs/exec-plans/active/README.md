@@ -1,11 +1,11 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Active Exec Plans
+# Active exec plans
 
 Live implementation plans belong here while work is in progress.
 

@@ -1,50 +1,58 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-06-25
 source_of_truth: docs
-confidence: low
+confidence: medium
 ---
 
 # Deployment
 
 The repo currently has a standalone Bun API app, a buildable TanStack Start
-scaffold and a health-only HTTP API package. The long-term deployment shape is
-still early and should stay thin until calculation endpoints, the docs site and
-SDK surfaces exist.
+web scaffold, a buildable TanStack Start docs app, an HTTP API package with
+public calculation routes and a private TypeScript SDK package. The long-term
+deployment shape is still early and should stay thin until a real hosting
+target exists.
 
 ## Scope
 
 This doc records deployment boundaries and known runtime targets. It should be
-updated when `apps/docs`, package publishing or a real hosting target becomes
-real.
+updated when package publishing or a real hosting target becomes real.
 
-## Current Runtime Shape
+## Current runtime shape
 
 - `apps/api` runs as a Bun HTTP server and serves `/api/*`.
 - `apps/web` builds through Vite/TanStack Start and calls `apps/api` over HTTP.
-- `@whattax/http-api` builds as a package and exposes the health API contract.
-- Production calculation endpoints are not implemented yet.
+- `apps/docs` builds through TanStack Start and renders public MDX docs through
+  `@whattax/docs-content` and `@whattax/docs-fumadocs`.
+- `@whattax/http-api` builds as a package and exposes health, generated docs,
+  OpenAPI JSON, metadata and public calculation route contracts.
+- `@whattax/sdk` builds as a private package for local and downstream
+  validation. It has not been published to npm.
 
-## Planned Runtime Shape
+## Planned runtime shape
 
-- `apps/docs` should host the public docs site.
-- `packages/sdk/typescript` should publish browser-safe and server-safe SDK
-  entrypoints.
+- `apps/api` should remain the standalone public API runtime.
+- `apps/docs` should host the public docs site once a deployment target is
+  chosen.
+- `packages/sdk/typescript` should publish browser-safe, Effect-native, schema,
+  testing and jurisdiction subpath entrypoints after explicit release approval.
 
-## Local Runtime Shape
+## Local runtime shape
 
-Run the API and web app as separate local processes:
+Run the API, web app and docs app as separate local processes:
 
 ```sh
 bun run --filter=api dev
 bun run --filter=web dev
+bun run --filter=docs dev
 ```
 
 `apps/api` dev runs through portless as `https://api.whattax.localhost`.
 `apps/web` dev injects that URL into `WHATTAX_API_BASE_URL` and
 `VITE_WHATTAX_API_BASE_URL` before serving through portless as
-`https://whattax.localhost`. Production deployment should provide equivalent
-API base URL environment values explicitly.
+`https://whattax.localhost`. `apps/docs` serves through portless as
+`https://docs.whattax.localhost`. Production deployment should provide
+equivalent API base URL environment values explicitly.
 
 ## Guardrails
 
@@ -53,7 +61,7 @@ API base URL environment values explicitly.
 - Verify `bun run verification` before deployment changes.
 - Add deployment-specific checks only when a real deploy target exists.
 
-## Related Docs
+## Related docs
 
 - [API and SDK](./api-and-sdk.md)
 - [Frontend](./frontend.md)

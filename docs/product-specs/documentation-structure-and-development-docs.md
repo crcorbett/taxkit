@@ -1,11 +1,11 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Documentation Structure And Development Docs
+# Documentation structure and development docs
 
 ## Overview
 
@@ -15,6 +15,12 @@ spec surface, design-doc bucket, exec-plan bucket, references bucket, package
 README coverage or short root atlas.
 
 This spec defines the first documentation migration slice.
+
+## Implementation status
+
+Implemented in the current repo. The sibling task list is marked implemented,
+and the resulting docs buckets, local skills, metadata, README coverage and
+documentation audit remain the baseline structure for future specs.
 
 ## Problem
 
@@ -44,7 +50,7 @@ future work is implementation debt, spec debt or stale planning.
 - Add private downstream product content.
 - Bulk-copy Mobius docs that mention Mobius-specific package families.
 
-## Ownership And Boundaries
+## Ownership and boundaries
 
 - Root `AGENTS.md` owns agent routing only.
 - `docs/architecture/*` owns durable architecture and package boundaries.
@@ -55,7 +61,7 @@ future work is implementation debt, spec debt or stale planning.
 - App and package root `README.md` files own local scope, runtime shape,
   guardrails and related docs.
 
-## Proposed Approach
+## Proposed approach
 
 1. Copy the Mobius PRD skills into `.agents/skills/` and adapt their references
    to WhatTax.
@@ -69,7 +75,7 @@ future work is implementation debt, spec debt or stale planning.
    at files that exist.
 7. Add a documentation audit as the reviewable baseline for follow-up work.
 
-## Risks And Tradeoffs
+## Risks and tradeoffs
 
 - New docs can become aspirational if they point at packages that do not exist.
   The root atlas should only link to existing files.
@@ -79,7 +85,7 @@ future work is implementation debt, spec debt or stale planning.
 - Creating too many docs at once can reduce navigability. Each new doc should
   have a narrow role and link back to the index.
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - `.agents/skills/prd-writer` and `.agents/skills/prd-implementer` exist and
   route to WhatTax docs.

@@ -1,6 +1,6 @@
 ---
-status: active
-last_reviewed: 2026-06-14
+status: completed
+last_reviewed: 2026-06-25
 source_of_truth: execution-plan
 confidence: high
 ---
@@ -174,21 +174,21 @@ same task fails parent audit three times, stop for replan or user decision.
     returned no matches.
 - Audit pass 4, desktop/mobile screenshots:
   - Home:
-    `docs/exec-plans/active/docs-fumadocs-package-separation/screenshots/home-desktop-1440x1000.png`
+    `docs/exec-plans/completed/docs-fumadocs-package-separation/screenshots/home-desktop-1440x1000.png`
     and
-    `docs/exec-plans/active/docs-fumadocs-package-separation/screenshots/home-mobile-390x844.png`.
+    `docs/exec-plans/completed/docs-fumadocs-package-separation/screenshots/home-mobile-390x844.png`.
   - Nested guide:
-    `docs/exec-plans/active/docs-fumadocs-package-separation/screenshots/nested-guide-desktop-1440x1000.png`
+    `docs/exec-plans/completed/docs-fumadocs-package-separation/screenshots/nested-guide-desktop-1440x1000.png`
     and
-    `docs/exec-plans/active/docs-fumadocs-package-separation/screenshots/nested-guide-mobile-390x844.png`.
+    `docs/exec-plans/completed/docs-fumadocs-package-separation/screenshots/nested-guide-mobile-390x844.png`.
   - Code block page:
-    `docs/exec-plans/active/docs-fumadocs-package-separation/screenshots/code-block-desktop-1440x1000.png`
+    `docs/exec-plans/completed/docs-fumadocs-package-separation/screenshots/code-block-desktop-1440x1000.png`
     and
-    `docs/exec-plans/active/docs-fumadocs-package-separation/screenshots/code-block-mobile-390x844.png`.
+    `docs/exec-plans/completed/docs-fumadocs-package-separation/screenshots/code-block-mobile-390x844.png`.
   - Flowchart page:
-    `docs/exec-plans/active/docs-fumadocs-package-separation/screenshots/mermaid-flowchart-desktop-1440x1000.png`
+    `docs/exec-plans/completed/docs-fumadocs-package-separation/screenshots/mermaid-flowchart-desktop-1440x1000.png`
     and
-    `docs/exec-plans/active/docs-fumadocs-package-separation/screenshots/mermaid-flowchart-mobile-390x844.png`.
+    `docs/exec-plans/completed/docs-fumadocs-package-separation/screenshots/mermaid-flowchart-mobile-390x844.png`.
   - Browser capture checked HTTP success, forbidden error-page text, console
     errors/warnings and page errors. The final pass had no console messages and
     no page errors.

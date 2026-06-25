@@ -1,13 +1,28 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Completed Exec Plans
+# Completed exec plans
 
 Completed implementation plans can be preserved here when their validation
 evidence remains useful.
 
-No completed exec plans yet.
+Completed plans:
+
+- [Documentation improvement roadmap](./documentation-improvement-roadmap.md)
+- [Extract API app](./extract-api-app.md)
+- [Public calculation API routes](./public-calculation-api-routes.md)
+- [Extract public calculator service](./extract-public-calculator-service.md)
+- [TypeScript SDK and publishing](./typescript-sdk-and-publishing.md)
+- [SDK public naming and export contract](./sdk-public-naming-and-export-contract.md)
+- [SDK-backed HTTP API thin wrapper](./sdk-backed-http-api-thin-wrapper.md)
+- [Public MDX developer docs](./public-mdx-developer-docs.md)
+- [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md)
+- [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md)
+
+Deferred follow-up remains in the completed plan bodies when useful. For
+example, SDK npm publication is still gated by explicit release approval, and
+docs runtime seam follow-ups remain recorded in the docs runtime plan.

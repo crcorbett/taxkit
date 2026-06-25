@@ -1,11 +1,11 @@
 ---
 status: implemented
-last_reviewed: 2026-05-24
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Public Calculation API Routes
+# Public calculation API routes
 
 ## Overview
 
@@ -28,7 +28,7 @@ packages:
 The route model must remain ready for future jurisdictions without adding a new
 route family per country.
 
-## Implementation Status
+## Implementation status
 
 Implemented in the current API package and app:
 
@@ -51,13 +51,12 @@ Still future work beyond this spec:
 
 - richer `help=schema`, `help=examples` and `help=sources` payloads
 - STSL and salary-sacrifice calculator variants in the public catalog
-- SDK package consumption of these schemas and routes
 
 ## Problem
 
-WhatTax has deterministic rule packages, fact descriptors, calculator programs,
-traces, ledgers and graph validation, but the public API still only exposes
-health and generated docs.
+Before implementation, WhatTax had deterministic rule packages, fact
+descriptors, calculator programs, traces, ledgers and graph validation, but the
+public API only exposed health and generated docs.
 
 The first route draft grouped routes under `/api/v1/au/*`. That cuts against
 the repository goal: WhatTax is a rules and calculation engine, not an
@@ -70,9 +69,9 @@ or malformed request, the API should return Effect Schema decode issues plus
 calculator help: required facts, field paths, examples and links to the
 calculator schema. Clients should not have to infer required fields from prose.
 
-## User Journeys
+## User journeys
 
-### Guided Calculator Builder
+### Guided calculator builder
 
 A developer wants to build a form for a calculator without hardcoding fields.
 They list calculators, select one, then request its schema and help metadata.
@@ -88,7 +87,7 @@ GET /api/v1/calculators/:calculatorId?jurisdiction=AU&taxYear=2025-26&help=full
 GET /api/v1/calculators/:calculatorId/schema?jurisdiction=AU&taxYear=2025-26&help=full
 ```
 
-### Schema-Guided Error Recovery
+### Schema-guided error recovery
 
 A client submits only `grossPay.amount` for a take-home-pay calculator. The API
 rejects the request with schema-backed issues and help metadata showing that
@@ -104,7 +103,7 @@ POST /api/v1/calculators/:calculatorId/calculate?help=errors
 The error response should be machine-readable enough for clients to highlight
 fields and offer next steps.
 
-### Employee Take-Home Pay Check
+### Employee take-home pay check
 
 An employee wants to know what will land in their account for the next pay.
 They provide facts for gross pay, tax-free threshold, and optionally salary
@@ -120,7 +119,7 @@ POST /api/v1/calculators/au.pay.take-home/calculate
 The result includes net pay, taxable pay, withholding totals, individual ledger
 components, diagnostics and trace evidence.
 
-### Payroll Withholding Preview
+### Payroll withholding preview
 
 A payroll integrator wants withholdings without treating net pay as the primary
 output. They use a withholding-oriented calculator that can share underlying
@@ -135,7 +134,7 @@ POST /api/v1/calculators/au.pay.withholdings/calculate
 The response exposes PAYG, STSL and total withholding ledger components with
 active, disabled or zeroed statuses.
 
-### Tax Agent Annual Liability Estimate
+### Tax agent annual liability estimate
 
 A tax agent or calculator UI submits annual taxable income for a selected tax
 year and receives annual tax, offsets, Medicare levy, raw liability, final
@@ -147,7 +146,7 @@ Route:
 POST /api/v1/calculators/au.income-tax.annual/calculate
 ```
 
-### Auditor Explanation Review
+### Auditor explanation review
 
 An auditor wants to inspect why a calculator produced a number. Calculation
 responses include trace and diagnostics by default. Metadata routes expose
@@ -176,7 +175,7 @@ GET /api/v1/facts?calculator=au.pay.take-home&jurisdiction=AU&taxYear=2025-26
 - Keep `apps/api` thin: runtime, process config, serving and changelog only.
 - Preserve browser-safe client exports for future SDK/web consumption.
 
-## Non-Goals
+## Non-goals
 
 - Add non-Australian rule packages in the first implementation.
 - Add lodged-return workflows, identity, accounts, persistence or saved
@@ -185,7 +184,7 @@ GET /api/v1/facts?calculator=au.pay.take-home&jurisdiction=AU&taxYear=2025-26
 - Add a public TypeScript SDK package in this spec.
 - Encode legal advice or personalized tax planning guidance in route output.
 
-## Ownership And Boundaries
+## Ownership and boundaries
 
 - `packages/http-api` owns public HTTP API groups, route schemas, handlers,
   OpenAPI annotations and typed HTTP client exports.
@@ -204,9 +203,9 @@ Calculation fact payloads reuse canonical calculator input schemas from the
 owning rule packages. The public API must not publish `facts: unknown` as the
 calculate contract.
 
-## Proposed Approach
+## Proposed approach
 
-### Architecture Alignment
+### Architecture alignment
 
 This route design follows the existing architecture docs:
 
@@ -225,10 +224,11 @@ This route design follows the existing architecture docs:
   metadata supports missing question planning and validation, while trace and
   ledger output are part of the public calculation contract.
 - [API and SDK](../architecture/api-and-sdk.md) and
-  [SDK facade](../specs/sdk-facade.md): HTTP handlers should be a transport
-  over the same calculator/fact/rule/schema facade that SDK users consume.
+  [TypeScript SDK and publishing](./typescript-sdk-and-publishing.md): HTTP
+  handlers should be a transport over the same calculator/fact/rule/schema
+  facade that SDK users consume.
 
-### Route Shape
+### Route shape
 
 Use stable calculator and metadata routes:
 
@@ -249,7 +249,7 @@ Do not create top-level jurisdiction-specific route families such as
 IDs and metadata values, for example `au.pay.take-home`, but the route
 structure remains the same for every future jurisdiction.
 
-### Calculator Context
+### Calculator context
 
 Calculator requests should carry context explicitly. Context is not a loose
 metadata bag; it must be schema-backed and should become branded where reused
@@ -269,7 +269,7 @@ implemented first, the context schema should move to that owning package and
 `packages/http-api` should import it. Jurisdiction and tax-year values should
 use branded schemas once reused outside one module.
 
-### Calculation Facts
+### Calculation facts
 
 The calculate route remains generic:
 
@@ -329,7 +329,7 @@ au.income-tax.annual
 These IDs are metadata keys for discovery. They should not force the route
 shape to be Australia-specific.
 
-### Help Query Parameter
+### Help query parameter
 
 Metadata, schema and calculation routes should accept a `help` query parameter:
 
@@ -359,7 +359,7 @@ Help output should be generated from canonical descriptors and schemas. Do not
 write calculator-specific prose blobs when the owning fact/rule descriptors can
 provide the same information.
 
-### Schema Error Shape
+### Schema error shape
 
 Schema decode failures should return an error envelope with:
 
@@ -382,7 +382,7 @@ request missing `grossPay.period` should identify the exact missing path,
 include the `GrossPayDescriptor` and the `PayPeriod` schema metadata when
 `help=schema` or `help=full`, and link back to the calculator schema route.
 
-### Route Catalog
+### Route catalog
 
 #### `GET /api/v1/jurisdictions`
 
@@ -464,7 +464,7 @@ provides
 requires
 ```
 
-### Initial Calculator Mappings
+### Initial calculator mappings
 
 `au.pay.take-home` should map to the implemented pay and STSL packages:
 
@@ -483,7 +483,7 @@ second withholding engine.
 - `AnnualTaxableIncome`
 - `AnnualTaxReport`
 
-## Risks And Tradeoffs
+## Risks and tradeoffs
 
 - Calculator IDs include jurisdiction prefixes even though routes are
   jurisdiction-neutral. That is acceptable because IDs identify concrete
@@ -494,7 +494,7 @@ second withholding engine.
   becomes shared by SDKs it should move to the owning SDK or calculation
   package and remain schema-backed.
 
-## Versioning And Changelog Impact
+## Versioning and changelog impact
 
 This documentation/spec change is versioned. It should add a patch Changeset
 because it changes public API design guidance and generated docs expectations.
@@ -512,7 +512,7 @@ The implementation should also update:
 - package changelogs through `bun run version-repo` when a version release is
   intentionally prepared
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - The spec is linked from `docs/product-specs/index.md`.
 - The sibling task list is tracked at
@@ -521,7 +521,7 @@ The implementation should also update:
   jurisdiction-route driven.
 - The spec keeps jurisdiction and tax year as calculator context.
 - The spec requires schema-backed errors that guide missing and invalid fields.
-- The spec defines `help` query behavior for richer schema, example, source and
+- The spec defines `help` query behaviour for richer schema, example, source and
   error guidance.
 - The spec states that route schemas must reuse canonical Effect Schema values
   and schema-derived types from owning packages.

@@ -1,16 +1,16 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-06-25
 source_of_truth: root-docs
 confidence: medium
 ---
 
 # WhatTax
 
-Root map and behavior contract. Keep this file short. Route into deeper docs
+Root map and behaviour contract. Keep this file short. Route into deeper docs
 fast.
 
-## Working Rules
+## Working rules
 
 - Read the relevant docs and current files before editing.
 - Prefer the smallest correct change that matches repo boundaries.
@@ -69,14 +69,18 @@ fast.
 | external references | `docs/references/README.md` |
 | documentation audit | `docs/documentation-audit/README.md` |
 
-## Repo Map
+## Repo map
 
 | Path | Owns |
 | --- | --- |
-| `apps/api` | standalone Bun API runtime and health/docs endpoints |
+| `apps/api` | standalone Bun API runtime and health/docs/calculation endpoints |
+| `apps/docs` | public TanStack Start docs app and app-local MDX rendering |
 | `apps/web` | current TanStack Start scaffold and health-check UI |
-| `packages/http-api` | current Effect HTTP API package |
-| `packages/sdk/typescript` | scaffolded private TypeScript SDK package |
+| `packages/http-api` | current Effect HTTP API package and transport contracts |
+| `packages/calculators` | reusable calculator catalogue, graph, calculation and error orchestration |
+| `packages/sdk/typescript` | implemented private TypeScript SDK package |
+| `packages/docs-content` | private docs contracts, navigation, validation and content service |
+| `packages/docs-fumadocs` | reusable Fumadocs configuration, source adapters and render primitives |
 | `packages/tsconfig` | shared TypeScript config |
 | `packages/core` | implemented deterministic engine primitives, descriptors, graph, trace, ledgers and calculation engine |
 | `packages/rules/au/pay` | implemented Australian take-home pay and PAYG withholding rule pack |
@@ -87,11 +91,11 @@ fast.
 | `packages/ui` | planned shared UI primitives |
 | `docs/architecture` | durable architecture and boundaries |
 | `docs/product-specs` | current specs and task lists |
-| `docs/exec-plans` | active implementation plans and validation logs |
+| `docs/exec-plans` | active and completed implementation plans and validation logs |
 | `docs/design-docs` | durable engineering and documentation beliefs |
 | `docs/references` | external/vendor references |
 
-## Routing By Task Type
+## Routing by task type
 
 | Task | Route |
 | --- | --- |
@@ -101,8 +105,8 @@ fast.
 | package-local guidance | update the package root `README.md` |
 | docs routing or repo shape change | update `README.md`, `AGENTS.md`, the documentation audit and the status snapshot when needed |
 | public docs/content direction | start at `docs/architecture/content-and-posts.md` |
-| browser/app behavior | start at `apps/web/README.md` and `docs/architecture/frontend.md` |
-| API behavior | start at `docs/architecture/api-and-sdk.md` |
+| browser/app behaviour | start at `apps/web/README.md` and `docs/architecture/frontend.md` |
+| API behaviour | start at `docs/architecture/api-and-sdk.md` |
 | validation or CI quality | start at `docs/architecture/testing-and-quality.md` |
 
 ## Guardrails

@@ -1,11 +1,11 @@
 ---
-status: draft
-last_reviewed: 2026-05-23
+status: implemented
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Extract API App
+# Extract API app
 
 ## Overview
 
@@ -19,7 +19,7 @@ a standalone service. Longer-term package naming or placement changes should
 follow [API and SDK](../architecture/api-and-sdk.md) and
 [Package ownership](../architecture/package-ownership.md).
 
-## Implementation Status
+## Implementation status
 
 Implemented on 2026-05-23:
 
@@ -27,7 +27,7 @@ Implemented on 2026-05-23:
 - `apps/web` calls the API over HTTP for SSR and browser navigation.
 - The TanStack-mounted `/api/$` route and in-process API handler were removed.
 - Final verification evidence is tracked in
-  [the active execution plan](../exec-plans/active/extract-api-app.md).
+  [the completed execution plan](../exec-plans/completed/extract-api-app.md).
 
 ## Problem
 
@@ -43,7 +43,7 @@ handler wiring that should belong to a dedicated API app.
 ## Goals
 
 - Add a standalone Bun API app under `apps/api`.
-- Keep API behavior owned by `packages/http-api`.
+- Keep API behaviour owned by `packages/http-api`.
 - Run the API server through the existing Effect HTTP `WhatTaxServerLayer`.
 - Run the Bun API entrypoint as an Effect program through
   `@effect/platform-bun/BunRuntime.runMain` so signals, exit codes and root
@@ -66,7 +66,7 @@ handler wiring that should belong to a dedicated API app.
   deployment expectations.
 - Keep an in-process TanStack Start fallback after the API app is canonical.
 
-## Ownership And Boundaries
+## Ownership and boundaries
 
 - `apps/api` owns Bun process startup, listening port, host binding, request
   dispatch to the Effect HTTP handler and graceful shutdown.
@@ -79,7 +79,7 @@ handler wiring that should belong to a dedicated API app.
   port and host config; the web app should own the API base URL it needs to
   reach `apps/api`.
 
-## Proposed Approach
+## Proposed approach
 
 1. Add `apps/api` with a Bun entrypoint that builds an app layer containing the
    API handler, Bun server resource and config.
@@ -90,8 +90,8 @@ handler wiring that should belong to a dedicated API app.
 4. Run an entrypoint Effect with `BunRuntime.runMain`, start the server
    through the provided app layer and release it through scoped layer
    finalizers on root fiber interruption.
-5. Update `packages/http-api` only where needed to make the server handler easy
-   to reuse without importing TanStack-specific code.
+5. Update `packages/http-api` only where needed so the server handler can be
+   reused without importing TanStack-specific code.
 6. Update `apps/web` so both server-rendered loaders and browser transitions
    use the HTTP client layer against the configured API base URL.
 7. Remove `apps/web/src/routes/(machine)/api/$.ts`,
@@ -99,7 +99,7 @@ handler wiring that should belong to a dedicated API app.
    context wiring once no route depends on them.
 8. Update docs and scripts so local development can run web and API together.
 
-## Process Lifecycle
+## Process lifecycle
 
 The Bun API app should follow the Effect v4 process lifecycle:
 
@@ -122,7 +122,7 @@ Requirements:
   including the Bun server stop path.
 - Request handling must not create a new runtime per request.
 
-## Runtime Shape
+## Runtime shape
 
 Local development should have two processes:
 
@@ -143,7 +143,7 @@ The web app should call the API using a configurable base URL. Local dev scripts
 inject the API URL from portless; deployed environments should provide explicit
 API base URL values.
 
-## Risks And Tradeoffs
+## Risks and tradeoffs
 
 - Running two local processes is slightly more complex than the current
   embedded API route. The tradeoff is a cleaner deployment and ownership model.
@@ -154,9 +154,9 @@ API base URL values.
   should no longer have any reason to import server-only API exports.
 - CORS may become necessary once web and API run on different local or deployed
   origins. The first implementation should configure it deliberately rather
-  than relying on same-origin behavior from the TanStack machine route.
+  than relying on same-origin behaviour from the TanStack machine route.
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - `apps/api` exists and runs a Bun server for `WhatTaxServerLayer`.
 - `apps/api` runs its entrypoint through `BunRuntime.runMain`.

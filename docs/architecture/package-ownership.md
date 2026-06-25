@@ -1,11 +1,11 @@
 ---
 status: canonical
-last_reviewed: 2026-05-24
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Package Ownership
+# Package ownership
 
 Package ownership defines where new WhatTax code should belong as the repo
 grows and which package will be allowed to define canonical contracts. It does
@@ -43,7 +43,7 @@ The placeholder directories contain README guidance only. Do not route runtime
 imports, source ownership or build expectations to them until package manifests
 and source exports exist.
 
-## Main Areas
+## Main areas
 
 `packages/core`
 : Implemented shared primitives, fact descriptors, rule descriptors, graph
@@ -81,18 +81,18 @@ them. It depends on `packages/core` and rule packages, but it must not depend
 on HTTP handlers, SDK clients, CLI commands or app runtime modules.
 
 `packages/sdk/typescript`
-: Scaffolded private TypeScript SDK package for the planned public SDK facade.
-It owns browser-safe schemas, typed calculation facades, Effect-native subpaths,
-jurisdiction modules, examples and compatibility tests. It must not depend on
-`@whattax/http-api`; HTTP transports consume the SDK rather than the reverse.
-Its Effect entrypoint owns request-preserving calculator helpers such as
-`calculateRunRequest`, `calculateReportRequest` and `calculateReport`, while
-reusing calculator-owned `CalculatorRun*` schemas and
-`CalculatorServiceError`.
+: Implemented private TypeScript SDK package for a future public SDK
+publication. It owns browser-safe schemas, typed calculation facades,
+Effect-native subpaths, jurisdiction modules, examples, compatibility tests and
+packed-artifact checks. It must not depend on `@whattax/http-api`; HTTP
+transports consume the SDK rather than the reverse. Its Effect entrypoint owns
+request-preserving calculator helpers such as `calculateRunRequest`,
+`calculateReportRequest` and `calculateReport`, while reusing
+calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
 
 `apps/web`
 : Current scaffold app. It proves the runtime boundary and health endpoint
-while the public docs/API app structure is being built.
+while a future product workflow is still unscoped.
 
 `apps/docs`
 : Implemented public documentation app. It owns TanStack Start routes, the
@@ -120,7 +120,7 @@ shutdown and platform serving for the implemented API app.
   primitives. It must not own WhatTax-specific frontmatter, navigation,
   validation policy, routes or generated content.
 
-## Runtime Shape
+## Runtime shape
 
 Engine packages should be deterministic and reusable. Runtime-specific code
 belongs in apps or explicitly server-only package exports.
@@ -151,7 +151,7 @@ belongs in apps or explicitly server-only package exports.
   the route calculator id, calls `@whattax/sdk/effect` `calculateRunRequest`
   once, and maps only transport envelopes.
 
-## Related Docs
+## Related docs
 
 - [Package boundaries](./package-boundaries.md)
 - [Effect services](./effect-services.md)

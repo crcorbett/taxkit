@@ -1,28 +1,30 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Product Specs
+# Product specs
 
 Current specs live here. Each spec should be compact, current, and linked to
 the architecture docs that own durable boundaries.
 
 Specs:
 
-- [Documentation structure and development docs](./documentation-structure-and-development-docs.md)
-- [Documentation improvement roadmap](./documentation-improvement-roadmap.md)
-- [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md)
-- [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md)
-- [Extract API app](./extract-api-app.md)
-- [Extract public calculator service](./extract-public-calculator-service.md)
-- [Public calculation API routes](./public-calculation-api-routes.md)
-- [Public MDX developer documentation](./public-mdx-developer-docs.md)
-- [SDK-backed HTTP API thin wrapper](./sdk-backed-http-api-thin-wrapper.md)
-- [SDK public naming and export contract](./sdk-public-naming-and-export-contract.md)
-- [TypeScript SDK and publishing](./typescript-sdk-and-publishing.md)
+| Spec | Status | Notes |
+| --- | --- | --- |
+| [Documentation structure and development docs](./documentation-structure-and-development-docs.md) | Canonical | Baseline docs structure and local skill routing. |
+| [Documentation improvement roadmap](./documentation-improvement-roadmap.md) | Implemented | README coverage, root routing and maintenance conventions are in place. |
+| [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md) | Implemented | Generic Fumadocs code, WhatTax docs contracts and app rendering are split. |
+| [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md) | Implemented | Docs content package, docs app runtime and validation path exist. |
+| [Extract API app](./extract-api-app.md) | Implemented | `apps/api` owns the standalone Bun API runtime. |
+| [Extract public calculator service](./extract-public-calculator-service.md) | Implemented | `@whattax/calculators` owns reusable calculator orchestration. |
+| [Public calculation API routes](./public-calculation-api-routes.md) | Implemented | Public metadata, graph and calculate routes exist. |
+| [Public MDX developer documentation](./public-mdx-developer-docs.md) | Implemented | Public MDX docs content and navigation are in place. |
+| [SDK-backed HTTP API thin wrapper](./sdk-backed-http-api-thin-wrapper.md) | Implemented | HTTP calculate delegates execution through the SDK Effect facade. |
+| [SDK public naming and export contract](./sdk-public-naming-and-export-contract.md) | Implemented | Public SDK names and packed export contract are stabilised. |
+| [TypeScript SDK and publishing](./typescript-sdk-and-publishing.md) | Implemented through release prep | SDK implementation and release-prep checks exist; npm publication remains gated. |
 
 Authoring guides:
 

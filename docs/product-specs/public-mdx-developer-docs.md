@@ -1,11 +1,11 @@
 ---
-status: draft
-last_reviewed: 2026-05-31
+status: implemented
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Public MDX Developer Documentation
+# Public MDX developer documentation
 
 ## Overview
 
@@ -35,6 +35,20 @@ suite:
 - [Documentation review](../standards/documentation-review.md)
 - [Documentation architecture](../standards/documentation-architecture.md)
 - [Documentation user journeys](../standards/documentation-user-journeys.md)
+
+## Implementation status
+
+Implemented in the current repo:
+
+- public MDX content under `apps/docs/content`
+- navigation metadata in `apps/docs/navigation.json`
+- Start, SDK, API, Guides, Concepts, Contributing and Reference sections
+- contribution pages for facts, rules, calculators, tax years, incorrect
+  results, source citations, naming, Effect services, compatibility,
+  Changesets and PR evidence
+- docs content validation through `@whattax/docs-content`
+- final validation evidence in
+  [the completed execution plan](../exec-plans/completed/public-mdx-developer-docs.md)
 
 ## Problem
 
@@ -510,7 +524,7 @@ If implementation adds a published docs package or changes SDK/API package
 README content in a package-facing way, add a Changeset for the affected
 package with a user-facing summary.
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - A public MDX docs structure exists with Start, SDK, API, Guides, Concepts,
   Contributing and Reference sections.

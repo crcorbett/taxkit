@@ -1,11 +1,11 @@
 ---
 status: implemented
-last_reviewed: 2026-05-24
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Extract Public Calculator Service
+# Extract public calculator service
 
 ## Overview
 
@@ -26,6 +26,13 @@ Target package name:
 @whattax/calculators
 ```
 
+## Implementation status
+
+Implemented in the current repo. `@whattax/calculators` owns reusable
+calculator catalog, metadata, graph, calculation and expected-error logic.
+Final verification evidence is tracked in
+[the completed execution plan](../exec-plans/completed/extract-public-calculator-service.md).
+
 ## Problem
 
 Before this extraction started,
@@ -36,8 +43,8 @@ metadata transformation logic also lived in
 `packages/http-api/src/groups/calculators.ts`.
 
 That makes `@whattax/http-api` more than a transport package. It also makes
-the future SDK and CLI likely to duplicate calculator behavior or import HTTP
-internals. The public calculator behavior should be reusable without depending
+the future SDK and CLI likely to duplicate calculator behaviour or import HTTP
+internals. The public calculator behaviour should be reusable without depending
 on HTTP handlers, OpenAPI generation or app runtime modules.
 
 ## Goals
@@ -58,7 +65,7 @@ on HTTP handlers, OpenAPI generation or app runtime modules.
 - Reuse canonical schemas, descriptors, tagged errors, services, scenario
   layers, rule-pack layers and report schemas from owning packages.
 
-## Non-Goals
+## Non-goals
 
 - Add new calculator coverage.
 - Rename `@whattax/http-api` to `@whattax/api-http`.
@@ -66,7 +73,7 @@ on HTTP handlers, OpenAPI generation or app runtime modules.
 - Change public route paths.
 - Add persistence, auth, accounts or saved scenarios.
 
-## Ownership And Boundaries
+## Ownership and boundaries
 
 `packages/core` owns primitives, fact descriptors, rule descriptors, graph
 diagnostics, trace, ledgers, common tagged errors and `CalculationEngine`.
@@ -119,9 +126,9 @@ packages/core
 `@whattax/calculators` must not import from `@whattax/http-api`,
 `apps/api`, `apps/web` or browser/runtime modules.
 
-## Proposed Approach
+## Proposed approach
 
-### Package Shape
+### Package shape
 
 Implemented shape:
 
@@ -144,7 +151,7 @@ packages/calculators/
 Reusable schemas must stay in an owning public schema module, not inline with
 handler logic.
 
-### Service Shape
+### Service shape
 
 Expose a package-owned Effect service:
 
@@ -186,7 +193,7 @@ Expected failures should be tagged errors or schema-backed error envelopes from
 the service package. HTTP-specific status decoration belongs in
 `@whattax/http-api`.
 
-### Public Calculation Facts Schema
+### Public calculation facts schema
 
 The public calculate route remains:
 
@@ -297,7 +304,7 @@ Service implementation rules:
   `Schema.encode`, `Schema.encodeJson`, explicit canonical request/config
   values, or Effect `Clock`/`Random` dependencies at boundaries.
 
-### HTTP Handler Shape
+### HTTP handler shape
 
 After extraction, handlers should be transport adapters:
 
@@ -324,7 +331,7 @@ Handlers should also avoid local `Option.match` branches when the branch is
 calculator business policy. The handler should pass route input to the service;
 the service owns the lookup, validation and expected error result.
 
-### Layer Composition
+### Layer composition
 
 `@whattax/calculators` should export a live layer that requires
 `CalculationEngine` if the service implementation calls `CalculationEngine`
@@ -333,7 +340,7 @@ compose that service layer with `CalculationEngineLive`.
 
 Do not create request-local runtimes. Do not import app runtime modules.
 
-## Risks And Tradeoffs
+## Risks and tradeoffs
 
 - Creating `packages/calculators` requires package docs, explicit exports and
   verification. The current Bun workspace glob already includes
@@ -347,7 +354,7 @@ Do not create request-local runtimes. Do not import app runtime modules.
   service must preserve wire compatibility where valid requests omit optional
   context, but it must not report invented context in errors.
 
-## Versioning And Changelog Impact
+## Versioning and changelog impact
 
 This is package-facing. Expected Changeset impact is patch for:
 
@@ -357,7 +364,7 @@ This is package-facing. Expected Changeset impact is patch for:
 
 If public exports move out of `@whattax/http-api`, keep compatibility exports
 or document the breaking impact before choosing a non-patch bump. The intended
-first implementation should preserve public behavior and route contracts.
+first implementation should preserve public behaviour and route contracts.
 
 Update:
 
@@ -366,7 +373,7 @@ Update:
 - new `packages/calculators/README.md`
 - architecture docs if implementation discovers a different ownership split
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - Architecture docs describe `packages/calculators` as the reusable
   calculator orchestration and service layer.
@@ -390,7 +397,7 @@ Update:
   module, not by HTTP handlers.
 - `@whattax/calculators` owns the public calculator catalog and reusable
   response/error construction.
-- Public route behavior remains compatible for metadata, calculation success
+- Public route behaviour remains compatible for metadata, calculation success
   and schema-guided error responses.
 - `CalculatorRunRequest.facts` reuses canonical rule-owned calculator input
   schemas through a union instead of `Schema.Unknown`.

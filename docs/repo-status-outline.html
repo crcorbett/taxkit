@@ -225,27 +225,27 @@
   <body>
     <main>
       <header>
-        <h1>WhatTax Repo Status Outline</h1>
+        <h1>WhatTax repo status outline</h1>
         <p class="lede">
           High-level view of how the repository currently works, what has been
           completed, and what remains to be built. This is a manually refreshed
-          local snapshot reviewed on <code>2026-05-23</code>, not the canonical
+          local snapshot reviewed on <code>2026-06-25</code>, not the canonical
           source of truth.
         </p>
         <div class="meta">
           <span class="pill">Repo: WhatTax</span>
           <span class="pill">Branch: main</span>
-          <span class="pill">Last reviewed: 2026-05-23</span>
+          <span class="pill">Last reviewed: 2026-06-25</span>
           <span class="pill">Snapshot: manual</span>
         </div>
       </header>
 
       <section>
-        <h2>Current Shape</h2>
+        <h2>Current shape</h2>
         <div class="grid">
           <div class="item">
             <span class="status done">Completed</span>
-            <h3>Monorepo Scaffold</h3>
+            <h3>Monorepo scaffold</h3>
             <p>
               Root package uses Bun and Turbo. Current scripts include
               <code>dev</code>, <code>check-types</code>, <code>build</code>,
@@ -254,7 +254,7 @@
           </div>
           <div class="item">
             <span class="status done">Completed</span>
-            <h3>Web Runtime Proof</h3>
+            <h3>Web runtime proof</h3>
             <p>
               <code>apps/web</code> is a TanStack Start app with separate
               server and client managed runtimes that call the standalone API
@@ -262,23 +262,23 @@
             </p>
           </div>
           <div class="item">
-            <span class="status partial">Partial</span>
+            <span class="status done">Completed</span>
             <h3>HTTP API</h3>
             <p>
               <code>apps/api</code> runs the Bun API process, while
-              <code>@whattax/http-api</code> exists with Effect HTTP API
-              boundaries and a health endpoint at <code>/api/health</code>.
-              Calculation endpoints are not implemented yet.
+              <code>@whattax/http-api</code> owns Effect HTTP API contracts,
+              generated docs, OpenAPI JSON, metadata routes and public
+              calculation endpoints.
             </p>
           </div>
         </div>
       </section>
 
       <section>
-        <h2>How The Repo Works Today</h2>
+        <h2>How the repo works today</h2>
         <div class="grid two">
           <div class="item">
-            <h3>Runtime Flow</h3>
+            <h3>Runtime flow</h3>
             <ul>
               <li>The root route in <code>apps/web</code> loads health data.</li>
               <li>
@@ -295,16 +295,21 @@
             </ul>
           </div>
           <div class="item">
-            <h3>Package Boundaries</h3>
+            <h3>Package boundaries</h3>
             <ul>
               <li><code>apps/api</code> owns the current API runtime.</li>
+              <li><code>apps/docs</code> owns the public docs runtime.</li>
               <li><code>apps/web</code> owns the current app shell.</li>
               <li><code>packages/http-api</code> owns the current API contract.</li>
+              <li><code>packages/calculators</code> owns calculator orchestration.</li>
+              <li><code>packages/sdk/typescript</code> owns the private SDK package.</li>
+              <li><code>packages/docs-content</code> owns WhatTax docs contracts.</li>
+              <li><code>packages/docs-fumadocs</code> owns reusable Fumadocs wiring.</li>
               <li><code>packages/tsconfig</code> owns shared TypeScript config.</li>
               <li>
-                <code>packages/core</code>, <code>packages/scripts</code>, and
-                <code>packages/ui</code> currently have README coverage but no
-                implemented package manifests.
+                <code>packages/scripts</code> and <code>packages/ui</code>
+                currently have README coverage but no implemented package
+                manifests.
               </li>
             </ul>
           </div>
@@ -312,7 +317,7 @@
       </section>
 
       <section>
-        <h2>Completed Work</h2>
+        <h2>Completed work</h2>
         <table>
           <thead>
             <tr>
@@ -325,17 +330,27 @@
             <tr>
               <td>Repo scaffold</td>
               <td>Done</td>
-              <td>Bun workspace, Turbo tasks, TypeScript config, API app, web app and API package are present.</td>
+              <td>Bun workspace, Turbo tasks, TypeScript config, API app, docs app, web app and package roots are present.</td>
             </tr>
             <tr>
-              <td>Health API</td>
+              <td>Public API</td>
               <td>Done</td>
-              <td><code>apps/api</code> serves the Effect HTTP API at <code>GET /api/health</code>, returning <code>{ status: "ok", service: "whattax" }</code>.</td>
+              <td><code>apps/api</code> serves health, generated docs, OpenAPI JSON, metadata, graph and public calculation routes through <code>@whattax/http-api</code>.</td>
             </tr>
             <tr>
               <td>Web integration</td>
               <td>Done</td>
               <td>The root page calls the standalone API through the route runtime and displays health status.</td>
+            </tr>
+            <tr>
+              <td>Docs runtime</td>
+              <td>Done</td>
+              <td><code>apps/docs</code> renders public MDX content through <code>@whattax/docs-content</code> and <code>@whattax/docs-fumadocs</code>.</td>
+            </tr>
+            <tr>
+              <td>SDK package</td>
+              <td>Private</td>
+              <td><code>@whattax/sdk</code> has plain, safe-result, Effect, AU, schema and testing entrypoints. Npm publication remains gated.</td>
             </tr>
             <tr>
               <td>Architecture docs</td>
@@ -357,76 +372,77 @@
       </section>
 
       <section>
-        <h2>Not Completed Yet</h2>
+        <h2>Not completed yet</h2>
         <div class="grid">
           <div class="item">
-            <span class="status not-started">Not started</span>
-            <h3>Tax Engine</h3>
+            <span class="status partial">Partial</span>
+            <h3>Tax engine coverage</h3>
             <p>
-              No core primitives, facts, rule descriptors, parameter services,
-              rule packs, calculators, traces or ledgers have been implemented.
-            </p>
-          </div>
-          <div class="item">
-            <span class="status not-started">Not started</span>
-            <h3>Calculation API</h3>
-            <p>
-              Planned endpoints such as take-home pay, PAYG withholding, annual
-              tax estimate, rule metadata and graph output do not exist yet.
-              The health-only API already exposes docs at <code>/api/docs</code>
-              and OpenAPI JSON at <code>/api/docs/openapi.json</code>.
-            </p>
-          </div>
-          <div class="item">
-            <span class="status not-started">Not started</span>
-            <h3>SDK</h3>
-            <p>
-              <code>@whattax/sdk-typescript</code> is designed in docs but has
-              not been scaffolded or implemented.
-            </p>
-          </div>
-          <div class="item">
-            <span class="status not-started">Not started</span>
-            <h3>Docs Site</h3>
-            <p>
-              <code>apps/docs</code> and any Fumadocs package are planned but
-              not present.
+              Core engine primitives and the first AU pay, income-tax and STSL
+              rule packages exist. Further jurisdictions, tax years and rule
+              packs still need specs and implementation.
             </p>
           </div>
           <div class="item">
             <span class="status partial">Partial</span>
-            <h3>README Coverage</h3>
+            <h3>Release train</h3>
             <p>
-              Existing package roots now have README coverage. Planned roots
-              such as <code>packages/core</code>, <code>packages/scripts</code>,
-              and <code>packages/ui</code> are documented as planned ownership
-              areas, not implemented packages.
+              Changesets are pending and package versions have not been
+              consumed with <code>bun run version-repo</code>. The SDK has not
+              been published.
             </p>
           </div>
           <div class="item">
-            <span class="status not-started">Not started</span>
-            <h3>Validation Harness</h3>
+            <span class="status partial">Partial</span>
+            <h3>Product app</h3>
             <p>
-              Golden tests, graph validation, trace snapshots, package export
-              checks and API/SDK parity tests are planned but not implemented.
+              <code>apps/web</code> proves the API runtime boundary, but it is
+              not yet a finished end-user product app.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status partial">Partial</span>
+            <h3>Deployment</h3>
+            <p>
+              Local dev surfaces exist. A real hosting target, deployment
+              checks, SEO metadata and docs-app production routing still need
+              a future decision.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status partial">Partial</span>
+            <h3>Placeholder packages</h3>
+            <p>
+              <code>packages/scripts</code>, <code>packages/ui</code> and the
+              long-term <code>packages/api/http</code> home are still planned
+              ownership areas.
+            </p>
+          </div>
+          <div class="item">
+            <span class="status partial">Partial</span>
+            <h3>Docs polish</h3>
+            <p>
+              The docs app builds and validates. Search/navigation polish,
+              deployment, SEO metadata and repeatable screenshot automation
+              remain productisation work.
             </p>
           </div>
         </div>
       </section>
 
       <section>
-        <h2>Current Development Priority</h2>
+        <h2>Current development priority</h2>
         <ol>
-          <li>Keep root and package docs clear about current versus planned surfaces.</li>
-          <li>Build the first engine slice under <code>packages/core</code>.</li>
-          <li>Define schema-backed primitives, fact descriptors and Effect service helpers.</li>
-          <li>Implement one vertical calculator path before broad package expansion.</li>
-          <li>Add tests and graph/trace validation with the first real rule package.</li>
+          <li>Keep specs, task lists and execution-plan locations aligned after each implementation slice.</li>
+          <li>Decide when to consume pending Changesets and start the SDK release train.</li>
+          <li>Choose whether the next product slice is docs productisation or a real app workflow.</li>
+          <li>Keep planned package placeholders labelled as planned until manifests and exports exist.</li>
+          <li>Add new rule, calculator or jurisdiction work through focused specs with source and test evidence.</li>
         </ol>
       </section>
 
       <section>
-        <h2>Useful Local Entry Points</h2>
+        <h2>Useful local entry points</h2>
         <table>
           <thead>
             <tr>
@@ -444,8 +460,8 @@
               <td><a href="architecture/README.md">docs/architecture/README.md</a></td>
             </tr>
             <tr>
-              <td>Current documentation spec</td>
-              <td><a href="product-specs/documentation-structure-and-development-docs.md">docs/product-specs/documentation-structure-and-development-docs.md</a></td>
+              <td>Product specs index</td>
+              <td><a href="product-specs/index.md">docs/product-specs/index.md</a></td>
             </tr>
             <tr>
               <td>Documentation audit</td>
@@ -454,6 +470,14 @@
             <tr>
               <td>API app docs</td>
               <td><a href="../apps/api/README.md">apps/api/README.md</a></td>
+            </tr>
+            <tr>
+              <td>Docs app docs</td>
+              <td><a href="../apps/docs/README.md">apps/docs/README.md</a></td>
+            </tr>
+            <tr>
+              <td>SDK package docs</td>
+              <td><a href="../packages/sdk/typescript/README.md">packages/sdk/typescript/README.md</a></td>
             </tr>
             <tr>
               <td>Web app docs</td>

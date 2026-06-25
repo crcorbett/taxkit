@@ -3,7 +3,7 @@
   "spec": "docs/product-specs/public-calculation-api-routes.md",
   "title": "Public Calculation API Route Tasks",
   "status": "implemented",
-  "last_reviewed": "2026-05-24",
+  "last_reviewed": "2026-06-25",
   "principles": [
     "Keep public API routes calculator, fact, rule and graph driven.",
     "Keep jurisdiction, tax year and rule-pack options as schema-backed calculator context.",
@@ -37,6 +37,7 @@
   "tasks": [
     {
       "id": "PUBLIC-API-001",
+      "status": "complete",
       "title": "Create the calculator catalog and shared API schemas",
       "type": "foundation",
       "dependsOn": [],
@@ -80,6 +81,7 @@
     },
     {
       "id": "PUBLIC-API-002",
+      "status": "complete",
       "title": "Implement metadata, schema, facts, rules and graph routes",
       "type": "api-contract",
       "dependsOn": [
@@ -127,6 +129,7 @@
     },
     {
       "id": "PUBLIC-API-003",
+      "status": "complete",
       "title": "Implement schema-guided calculation execution",
       "type": "api-runtime",
       "dependsOn": [
@@ -175,6 +178,7 @@
     },
     {
       "id": "PUBLIC-API-004",
+      "status": "complete",
       "title": "Document, test and version the public calculation API",
       "type": "docs-and-release",
       "dependsOn": [

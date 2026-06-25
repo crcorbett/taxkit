@@ -1,11 +1,11 @@
 ---
 status: canonical
-last_reviewed: 2026-05-24
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: high
 ---
 
-# API And SDK
+# API and SDK
 
 WhatTax should publish a reusable API app server and TypeScript SDK around the
 open-source calculation engine.
@@ -13,11 +13,12 @@ open-source calculation engine.
 The API and SDK are part of this repository because they expose reusable tax
 calculation capabilities through stable, documented boundaries.
 
-## Current API Runtime
+## Current API runtime
 
-See [SDK facade export](../specs/sdk-facade.md) for the implementation spec for
-the public `WhatTax.{method}` facade, the plain TypeScript entrypoint and the
-`/effect` entrypoint.
+See [TypeScript SDK and publishing](../product-specs/typescript-sdk-and-publishing.md)
+and [SDK public naming and export contract](../product-specs/sdk-public-naming-and-export-contract.md)
+for the SDK facade, plain TypeScript entrypoint, Effect entrypoint and export
+contract specs.
 
 `apps/api` is the current API runtime owner. It is a standalone Bun process
 that owns host/port config, process startup through
@@ -53,7 +54,7 @@ and reusable route layers. Apps should provide a platform `HttpServer` and
 serve the package route layer. Packages must not call `Bun.serve`, read
 process env or own process signal handling.
 
-## Current API Package
+## Current API package
 
 The current API package lives under:
 
@@ -173,7 +174,7 @@ HTTP API tests
   -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
 ```
 
-## Current Calculator Package
+## Current calculator package
 
 The reusable calculator orchestration package lives under:
 
@@ -203,7 +204,7 @@ It owns:
 HTTP, SDK, CLI and in-process callers should consume this service instead of
 implementing calculator business logic locally.
 
-## Planned API Package
+## Planned API package
 
 Longer term, the HTTP API package may move toward:
 
@@ -225,7 +226,7 @@ It owns:
 - OpenAPI generation
 - HTTP status annotations and generated HTTP client helpers
 
-## Planned API App Scope
+## Planned API app scope
 
 The reusable API app server lives under:
 
@@ -237,7 +238,7 @@ It is a reusable server for open-source and integration use. Applications may
 run their own API servers that import WhatTax packages or call this API, but
 the app remains a thin transport over the calculation engine.
 
-## Endpoint Shape
+## Endpoint shape
 
 Calculation endpoints are calculator, fact, rule and graph oriented rather
 than jurisdiction-route oriented. Jurisdiction, tax year, rule-pack options and
@@ -291,39 +292,49 @@ client guidance. Help output should be generated from canonical schemas, fact
 descriptors, rule descriptors, graph diagnostics and source references instead
 of hand-written route-specific DTOs.
 
-## TypeScript SDK Facade
+## TypeScript SDK facade
 
-The primary SDK package should live under:
+The current private SDK package lives under:
 
 ```txt
 packages/sdk/typescript
 ```
 
-Preferred public package name:
+Current package name:
+
+```txt
+@whattax/sdk
+```
+
+Preferred public package name at release time:
 
 ```txt
 whattax
 ```
 
-If the unscoped package name is unavailable at first publish, use `@whattax/sdk` with the same export contract.
+If the unscoped package name is unavailable at first publish, continue with
+`@whattax/sdk` and keep the same export contract.
 
 It owns:
 
 - direct in-process calculation facade
-- plain TypeScript `WhatTax.create(...)` client factory and `WhatTax.{method}` generic helpers
-- Effect-native `whattax/effect` entrypoint
-- jurisdiction-specific opt-in subpaths such as `whattax/au`
+- plain TypeScript `WhatTax.create(...)` client factory and
+  `WhatTax.{method}` generic helpers
+- Effect-native `./effect` entrypoint
+- jurisdiction-specific opt-in subpaths such as `./au`
 - Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
 - typed declarations, provider Layers and bindings shared by plain and Effect entrypoints
-- browser-safe API client helpers where needed
-- server-side client helpers
 - exported input and output schemas
 - typed calculator request builders
 - examples for Node and browser usage
 
-The SDK must not import server handlers or Node-only modules from browser-safe entrypoints. It also must not expose Effect runtime types from the plain TypeScript entrypoint.
+The SDK must not import `@whattax/http-api`, server handlers or Node-only
+modules from browser-safe entrypoints. It also must not expose Effect runtime
+types from the plain TypeScript entrypoint. HTTP clients and OpenAPI transport
+helpers stay in `@whattax/http-api` or a future transport package that depends
+on the SDK.
 
-## Export Boundaries
+## Export boundaries
 
 The SDK package should publish a dist-only export map. Workspace-local source
 conditions are useful during early scaffolding, but they must not appear in the
@@ -368,11 +379,11 @@ Layer-backed modules, calculation descriptors and thin convenience clients
 without making the root bundle import those rules. `./schemas` must be
 browser-safe and re-export calculator-owned `CalculatorRun*` schemas and
 `CalculatorServiceError` without duplicating them. `./testing` may expose
-test-only descriptors and helpers for consumers validating type behavior.
+test-only descriptors and helpers for consumers validating type behaviour.
 
-## Fumadocs Site
+## Fumadocs site
 
-The public docs site should live under:
+The public docs site lives under:
 
 ```txt
 apps/docs

@@ -1,40 +1,44 @@
 ---
-status: draft
-last_reviewed: 2026-05-23
+status: implemented
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# Documentation Improvement Roadmap
+# Documentation improvement roadmap
 
 ## Overview
 
-WhatTax now has the first layer of Mobius-style documentation structure:
-architecture docs, product specs, exec-plan buckets, design docs, references,
-agent routing, PRD skills and a documentation audit.
+This roadmap captured the first documentation-improvement pass after the
+baseline docs structure landed. It is now implemented.
 
-The next documentation pass should make that structure more useful for actual
-development. The goal is to turn the current docs from a baseline map into a
-working development guide that clearly separates current implementation,
-planned architecture and next build steps.
+The completed work made the docs more useful for development by separating
+current implementation, planned architecture and next build steps.
+
+## Implementation status
+
+Implemented in the current repo:
+
+- package README coverage for implemented package roots
+- root README routing for current implementation, commands and docs entrypoints
+- architecture wording that separates implemented packages from planned
+  placeholders
+- documentation maintenance guidance and audit conventions
+- completed execution evidence in
+  [the completed execution plan](../exec-plans/completed/documentation-improvement-roadmap.md)
 
 ## Problem
 
-The repo is still early. It has a working standalone API app, web scaffold,
-health-only Effect HTTP API package, core engine package and first Australian
-rule packages, while public calculation HTTP endpoints, SDK and docs app remain
-planned. That creates a documentation risk: planned package families can read
-like current code, and developers or agents can lose time following
-aspirational paths.
+At the time of this roadmap, planned package families could read like current
+code, and developers or agents could lose time following aspirational paths.
 
-The current documentation audit already identifies the first gaps:
+The documentation audit identified the first gaps:
 
 - package README coverage must stay aligned as new package roots gain
   manifests, source exports and verification
 - root `README.md` is still a minimal landing page rather than a useful
   human-facing repo overview
 - the architecture docs describe future packages that are not yet present
-- no active exec-plan examples exist
 - the standalone repo status HTML page exists but is not yet documented as a
   generated or snapshot artifact
 
@@ -53,12 +57,12 @@ The current documentation audit already identifies the first gaps:
 ## Non-goals
 
 - Implement additional tax engine packages.
-- Scaffold `apps/api`, `apps/docs` or `@whattax/sdk-typescript`.
+- Scaffold runtime, docs or SDK packages as part of this documentation pass.
 - Create a full documentation website.
 - Replace architecture docs with a generated status page.
 - Add private downstream product strategy to public WhatTax docs.
 
-## Ownership And Boundaries
+## Ownership and boundaries
 
 - `README.md` owns the human-facing repo overview and quick-start.
 - `AGENTS.md` owns agent routing and task-type routing.
@@ -72,7 +76,7 @@ The current documentation audit already identifies the first gaps:
 - `docs/repo-status-outline.html` is a manually refreshed status snapshot, not
   a canonical source of truth.
 
-## Proposed Approach
+## Proposed approach
 
 1. Add package READMEs for `packages/http-api` and `packages/tsconfig` using the
    compact pattern: scope, main areas, runtime shape, guardrails and related
@@ -90,7 +94,7 @@ The current documentation audit already identifies the first gaps:
 6. Add an active exec-plan template or example only if implementation begins;
    otherwise keep `docs/exec-plans/active/README.md` as the empty landing page.
 
-## Risks And Tradeoffs
+## Risks and tradeoffs
 
 - Over-documenting a small repo could make the docs feel heavier than the code.
   Keep each README compact and route deeper only when needed.
@@ -102,7 +106,7 @@ The current documentation audit already identifies the first gaps:
   meaningful ownership changes, new package roots, new runtime boundaries and
   new public surfaces.
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - `packages/http-api/README.md` exists and documents the current health API,
   export paths, server/browser boundary and commands.

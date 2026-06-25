@@ -2,8 +2,8 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/docs-mdx-fumadocs-runtime.md",
   "title": "Docs MDX Fumadocs Runtime Tasks",
-  "status": "draft",
-  "last_reviewed": "2026-06-10",
+  "status": "implemented",
+  "last_reviewed": "2026-06-25",
   "principles": [
     "Use MDX as the authoring format and Fumadocs MDX as a thin source/compile layer.",
     "Keep WhatTax-owned schemas, navigation, validation and service contracts in package-owned Effect code.",
@@ -47,6 +47,7 @@
   "tasks": [
     {
       "id": "DOCS-RUNTIME-001",
+      "status": "complete",
       "title": "Create docs content package and Fumadocs source boundary",
       "type": "content-package-foundation",
       "dependsOn": [],
@@ -89,9 +90,12 @@
     },
     {
       "id": "DOCS-RUNTIME-002",
+      "status": "complete",
       "title": "Add DocsContentService and validation policy",
       "type": "effect-service-validation",
-      "dependsOn": ["DOCS-RUNTIME-001"],
+      "dependsOn": [
+        "DOCS-RUNTIME-001"
+      ],
       "goal": "Expose docs content through an Effect service and move validation policy into package-owned code.",
       "scope": [
         "Add DocsContentService contract, live layer and tagged errors",
@@ -130,9 +134,12 @@
     },
     {
       "id": "DOCS-RUNTIME-003",
+      "status": "complete",
       "title": "Create docs app runtime and route shell",
       "type": "docs-app-runtime",
-      "dependsOn": ["DOCS-RUNTIME-002"],
+      "dependsOn": [
+        "DOCS-RUNTIME-002"
+      ],
       "goal": "Create a working docs app that consumes the docs content service and renders MDX pages.",
       "scope": [
         "Add private apps/docs package manifest and Vite/TanStack Start setup",
@@ -177,9 +184,12 @@
     },
     {
       "id": "DOCS-RUNTIME-004",
+      "status": "complete",
       "title": "Wire reference, examples and OpenAPI validation",
       "type": "reference-validation",
-      "dependsOn": ["DOCS-RUNTIME-003"],
+      "dependsOn": [
+        "DOCS-RUNTIME-003"
+      ],
       "goal": "Prove that generated/reference-like content and examples stay validated through the docs runtime.",
       "scope": [
         "Integrate existing docs examples into validation",
@@ -218,9 +228,12 @@
     },
     {
       "id": "DOCS-RUNTIME-005",
+      "status": "complete",
       "title": "Update architecture docs and root verification wiring",
       "type": "architecture-and-root-gates",
-      "dependsOn": ["DOCS-RUNTIME-004"],
+      "dependsOn": [
+        "DOCS-RUNTIME-004"
+      ],
       "goal": "Make the docs runtime durable in architecture docs and root verification without overloading the repo workflow.",
       "scope": [
         "Update docs architecture for docs-content, Fumadocs source and docs app runtime",
@@ -257,9 +270,12 @@
     },
     {
       "id": "DOCS-RUNTIME-006",
+      "status": "complete",
       "title": "Run final seam, boundary and canonical-reuse audit",
       "type": "final-architecture-audit",
-      "dependsOn": ["DOCS-RUNTIME-005"],
+      "dependsOn": [
+        "DOCS-RUNTIME-005"
+      ],
       "goal": "Audit the completed implementation and record follow-ups for seams, boundaries and canonical reuse.",
       "scope": [
         "Audit package boundaries between apps/docs, packages/docs-content, Fumadocs generated source and renderer components",

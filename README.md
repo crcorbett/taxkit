@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-24
+last_reviewed: 2026-06-25
 source_of_truth: root-docs
 confidence: medium
 ---
@@ -10,18 +10,24 @@ confidence: medium
 WhatTax is the public monorepo for the open-source tax engine, API, SDK and
 documentation site.
 
-The repo is early. The implemented surface is a standalone Bun API app, a
-TanStack Start web scaffold that calls that API, an Effect HTTP API package
-with health, metadata and public calculation endpoints, a reusable calculator
-orchestration package, deterministic core engine primitives, Australian pay,
-income-tax and STSL rule packages, shared testing helpers and shared TypeScript
-config, and a scaffolded private TypeScript SDK package. The SDK facade and
-docs site are planned but not implemented yet.
+The repo is early, but the main public integration surfaces now exist. The
+implemented surface is a standalone Bun API app, a TanStack Start web scaffold
+that calls that API, a Fumadocs-backed docs app, an Effect HTTP API package
+with health, generated docs, metadata and public calculation endpoints, a
+reusable calculator orchestration package, deterministic core engine
+primitives, Australian pay, income-tax and STSL rule packages, a private
+TypeScript SDK package, private `@whattax/docs-content` and
+`@whattax/docs-fumadocs` packages, shared testing helpers and shared TypeScript
+config. The SDK is implemented for local and downstream validation, but it is
+not published yet.
 
-## What Exists Today
+## What exists today
 
 - [apps/api](./apps/api/README.md): standalone Bun process that owns API
   startup, listening config and Effect runtime teardown for `/api/*`.
+- [apps/docs](./apps/docs/README.md): TanStack Start public documentation app
+  that renders MDX through package-owned docs content and reusable Fumadocs
+  helpers.
 - [apps/web](./apps/web/README.md): TanStack Start app that loads health data
   from `apps/api` through server/client runtime boundaries.
 - [packages/http-api](./packages/http-api/README.md): Effect HTTP API contract,
@@ -30,8 +36,14 @@ docs site are planned but not implemented yet.
 - [packages/calculators](./packages/calculators/README.md): reusable public
   calculator orchestration package for catalog metadata, graph construction,
   calculation dispatch and schema-guided expected error shaping.
-- [packages/sdk/typescript](./packages/sdk/typescript/README.md): scaffolded
-  private TypeScript SDK package for the planned public SDK facade.
+- [packages/sdk/typescript](./packages/sdk/typescript/README.md): private
+  TypeScript SDK package with plain, safe-result, Effect and AU entrypoints.
+- [packages/docs-content](./packages/docs-content/README.md): private
+  source-only content package for docs frontmatter, navigation, validation,
+  generated source access and the docs content service.
+- [packages/docs-fumadocs](./packages/docs-fumadocs/README.md): private
+  reusable package for generic Fumadocs configuration, source adapters and
+  MDX render primitives.
 - [packages/core](./packages/core/README.md): deterministic engine primitives,
   schema-backed facts, rule descriptors, graph validation, trace and ledger
   contracts and calculation engine service.
@@ -46,7 +58,7 @@ docs site are planned but not implemented yet.
   [packages/ui](./packages/ui/README.md): documented planned ownership areas
   without package manifests or runtime code yet.
 
-## Planned Package Families
+## Planned package families
 
 The architecture docs describe the intended package families for the tax engine:
 core primitives and facts, domain models, rule packs, API clients, SDKs, docs
@@ -66,6 +78,7 @@ Start with:
 bun install
 bun run --filter=api dev
 bun run --filter=web dev
+bun run --filter=docs dev
 bun run verification
 bun run changeset
 bun run version-repo
@@ -74,16 +87,17 @@ bun run version-repo
 `bun run --filter=api dev` serves the API through portless at
 `https://api.whattax.localhost`. `bun run --filter=web dev` injects that
 portless URL into `WHATTAX_API_BASE_URL` and `VITE_WHATTAX_API_BASE_URL` before
-serving the web app at `https://whattax.localhost`. `bun run verification` is
-the baseline verification command for documentation, package wiring and
-scaffold changes.
+serving the web app at `https://whattax.localhost`. `bun run --filter=docs dev`
+serves the public docs app at `https://docs.whattax.localhost`. `bun run
+verification` is the baseline verification command for documentation, package
+wiring and scaffold changes.
 
 Package-facing changes must include a Changeset. Use `bun run changeset` during
 implementation to record the user-facing package impact, and use
 `bun run version-repo` only when intentionally consuming pending Changesets into
 fixed release-train package versions and changelogs.
 
-## Documentation Entry Points
+## Documentation entry points
 
 - [AGENTS.md](./AGENTS.md): short atlas for agents and task routing.
 - [CLAUDE.md](./CLAUDE.md): Claude-compatible pointer to the canonical root
@@ -104,7 +118,7 @@ fixed release-train package versions and changelogs.
 - [References](./docs/references/README.md): external or imported reference
   material.
 
-## Status Snapshot
+## Status snapshot
 
 [docs/repo-status-outline.html](./docs/repo-status-outline.html) is a local,
 static status snapshot for a quick visual overview. It is useful for review in a
@@ -117,11 +131,14 @@ Open it directly at:
 file:///Users/cooper/Projects/whattax/docs/repo-status-outline.html
 ```
 
-## Runtime Boundary
+## Runtime boundary
 
 - `apps/api` is the API runtime owner. It creates one process-lifetime
   `ManagedRuntime`, serves `packages/http-api` through Bun and disposes scoped
   resources on shutdown.
+- `apps/docs` is the docs runtime owner. It consumes `@whattax/docs-content`
+  and `@whattax/docs-fumadocs` rather than owning canonical frontmatter,
+  navigation or reusable Fumadocs internals.
 - `apps/web/src/lib/runtime.server.ts` and
   `apps/web/src/lib/runtime.client.ts` own the web SSR and browser client
   runtimes. They call the standalone API over HTTP.

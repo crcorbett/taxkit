@@ -1,11 +1,11 @@
 ---
-status: draft
-last_reviewed: 2026-05-31
+status: implemented
+last_reviewed: 2026-06-25
 source_of_truth: docs
 confidence: medium
 ---
 
-# SDK-Backed HTTP API Thin Wrapper
+# SDK-backed HTTP API thin wrapper
 
 ## Overview
 
@@ -27,12 +27,25 @@ call graphs. Names should describe the runtime boundary they represent:
 calculator API transport, calculator run execution or typed report-only
 convenience.
 
+## Implementation status
+
+Implemented in the current repo:
+
+- reusable calculator run contracts use `CalculatorRun*` names
+- HTTP calculator transport names use `CalculatorApi*`
+- `@whattax/sdk/effect` exposes `calculateRunRequest`,
+  `calculateReportRequest` and `calculateReport`
+- HTTP calculate delegates full-run execution through the SDK Effect facade and
+  maps only transport-owned envelopes
+- final verification evidence is tracked in
+  [the completed execution plan](../exec-plans/completed/sdk-backed-http-api-thin-wrapper.md)
+
 ## Problem
 
-The current calculate call graph is split:
+Before implementation, the calculate call graph was split:
 
 ```ts
-Production: current HTTP calculate
+Production: previous HTTP calculate
 
 apps/api Bun process
   -> WhatTaxServerLayer
@@ -76,9 +89,9 @@ This proves the SDK boundary but leaves two issues:
   `CalculatorServiceError`, catalog lookup, selected input-schema decode,
   graph diagnostics and calculation execution.
 - Preserve strict compile-time descriptor safety for SDK consumers.
-- Preserve HTTP runtime behavior, response shape and typed error semantics.
+- Preserve HTTP runtime behaviour, response shape and typed error semantics.
 
-## Non-Goals
+## Non-goals
 
 - Do not make the SDK depend on HTTP routes, statuses, clients or envelopes.
 - Do not move route schemas or OpenAPI annotations into the SDK.
@@ -90,7 +103,7 @@ This proves the SDK boundary but leaves two issues:
 - Do not preserve old names indefinitely. Transitional aliases may exist during
   migration, but docs and call graphs should advertise only the final names.
 
-## Ownership And Boundaries
+## Ownership and boundaries
 
 `@whattax/sdk/effect` should own reusable in-process calculation facades:
 
@@ -114,9 +127,9 @@ This proves the SDK boundary but leaves two issues:
 - `CalculatorServiceError`
 - graph diagnostics and selected calculator input-schema decode
 
-## Proposed Approach
+## Proposed approach
 
-### Naming Contract
+### Naming contract
 
 Rename API and SDK symbols before simplifying the call graph so implementation
 and docs are easier to audit.
@@ -154,7 +167,7 @@ Transitional aliases may be retained inside the SDK and HTTP API during the
 repo migration, but they must be marked deprecated and omitted from README
 examples, architecture docs and call graphs before publication.
 
-### Target Production Call Graph
+### Target production call graph
 
 ```ts
 Production: target HTTP calculate
@@ -180,7 +193,7 @@ The HTTP handler should not call `getCalculator`, `getCalculatorGraph` or
 construct `CalculatorRunResponseData` inside the calculate route. Those details
 are below the transport boundary once the SDK exposes a full-run helper.
 
-### Target SDK Call Graph
+### Target SDK call graph
 
 ```ts
 Production: SDK Effect full run
@@ -219,7 +232,7 @@ reuse the `CalculatorRunResponse` value returned by `PublicCalculatorService`
 and replace only the statically narrowed `report` value after descriptor
 output decode.
 
-### Plain SDK Follow-Up
+### Plain SDK follow-up
 
 The plain SDK can optionally expose a safe full-run helper after the Effect
 helper exists:
@@ -238,7 +251,7 @@ This is not required before making HTTP thinner. The critical path is the
 Effect facade because HTTP handlers should stay in the typed Effect error
 channel.
 
-### Error Handling
+### Error handling
 
 `calculateRunRequest` should fail with:
 
@@ -251,11 +264,11 @@ CalculatorServiceError | Schema.SchemaError
 
 `Schema.SchemaError` from descriptor output decode is outside the declared
 HTTP calculator-service failure contract. The current handler dies on this
-case. The implementation may preserve that behavior or, if a canonical SDK
+case. The implementation may preserve that behaviour or, if a canonical SDK
 schema-decode error is already suitable, document the change explicitly and
 cover it with tests before routing it through the HTTP envelope.
 
-### Metadata Routes
+### Metadata routes
 
 Metadata/list/schema/graph routes may continue to call `PublicCalculatorService`
 directly in this slice:
@@ -271,7 +284,7 @@ HTTP handlers
 A later uniform SDK catalog facade can move those routes through the SDK too.
 Do not block the calculate-route cleanup on that broader catalog facade.
 
-## Tests And Verification
+## Tests and verification
 
 ```ts
 Tests: SDK full-run helper
@@ -322,7 +335,7 @@ Required verification:
 - `bun run changeset`
 - `bun run changeset status --verbose`
 
-## Risks And Tradeoffs
+## Risks and tradeoffs
 
 - A full-run SDK helper adds another public SDK function. It is worth doing
   before publication because it prevents HTTP-only response assembly from
@@ -335,20 +348,20 @@ Required verification:
   later catalog facade exists. That keeps this slice focused and avoids
   designing a larger SDK catalog API prematurely.
 
-## Versioning And Changelog Impact
+## Versioning and changelog impact
 
 Package-facing impact:
 
 - `@whattax/sdk`: patch for clearer Effect helper/type names, a new Effect
   full-run helper and exported response type.
-- `@whattax/http-api`: patch for handler behavior moving behind the SDK
+- `@whattax/http-api`: patch for handler behaviour moving behind the SDK
   facade and clearer calculator API group/envelope names while preserving
-  route behavior.
+  route behaviour.
 
 No `@whattax/calculators` Changeset is expected unless implementation changes
-calculator-owned schemas, service contracts or runtime behavior.
+calculator-owned schemas, service contracts or runtime behaviour.
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - `@whattax/sdk/effect` exports a full-run helper that returns the canonical
   calculator response shape with descriptor-narrowed `report` typing.
@@ -365,7 +378,7 @@ calculator-owned schemas, service contracts or runtime behavior.
 - HTTP route schemas, status annotations, OpenAPI metadata and
   `CalculatorApiErrorEnvelope` remain in `@whattax/http-api`.
 - SDK import-boundary checks still prove no dependency on `@whattax/http-api`.
-- Runtime parity tests prove HTTP success/error behavior still matches the SDK
+- Runtime parity tests prove HTTP success/error behaviour still matches the SDK
   and calculator service.
 - Type tests prove descriptor input/output narrowing is preserved.
 - The spec, task list and relevant docs include current and target call graphs.

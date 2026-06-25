@@ -2,8 +2,8 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/documentation-structure-and-development-docs.md",
   "title": "Documentation Structure And Development Docs Tasks",
-  "status": "draft",
-  "last_reviewed": "2026-05-23",
+  "status": "implemented",
+  "last_reviewed": "2026-06-25",
   "principles": [
     "Keep root AGENTS.md as a short routing atlas.",
     "Add canonical docs only when they have a clear owner.",
@@ -26,6 +26,7 @@
   "tasks": [
     {
       "id": "DOCS-001",
+      "status": "complete",
       "title": "Import and adapt PRD skills",
       "type": "foundation",
       "dependsOn": [],
@@ -51,6 +52,7 @@
     },
     {
       "id": "DOCS-002",
+      "status": "complete",
       "title": "Create canonical docs buckets and metadata",
       "type": "docs",
       "dependsOn": [
@@ -83,6 +85,7 @@
     },
     {
       "id": "DOCS-003",
+      "status": "complete",
       "title": "Normalize app and package README coverage",
       "type": "docs",
       "dependsOn": [
@@ -110,6 +113,7 @@
     },
     {
       "id": "DOCS-004",
+      "status": "complete",
       "title": "Add documentation audit and final verification",
       "type": "audit",
       "dependsOn": [
