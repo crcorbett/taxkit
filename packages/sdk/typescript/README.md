@@ -22,7 +22,7 @@ public calculator catalog. The descriptor and facade generics consume
 calculator-owned `CalculatorRunFacts`, `CalculatorRunReport` and
 `CalculatorServiceError` contracts rather than HTTP transport aliases.
 The HTTP API consumes the SDK like an in-process downstream consumer, while the
-SDK remains independent from `@whattax/http-api`.
+SDK remains independent from `@whattax/api-http`.
 
 Effect-native report helpers are named for the report-only boundary:
 `calculateReport` accepts descriptor-typed facts and `calculateReportRequest`
@@ -158,14 +158,14 @@ package without an explicit release-prep approval.
 
 ## Guardrails
 
-- Keep this package independent from `@whattax/http-api`.
+- Keep this package independent from `@whattax/api-http`.
 - Do not import AU rule packages from the root entrypoint.
 - Reuse canonical schemas, branded ids, service contracts, tagged errors and
   constructors from owning packages when implementation starts.
 - Use `@whattax/calculators` as the calculator execution boundary instead of
   duplicating catalog lookup or calculation dispatch.
 - Keep transport-owned HTTP clients and OpenAPI helpers in
-  `@whattax/http-api` or future transport packages.
+  `@whattax/api-http`.
 
 ## Commands
 

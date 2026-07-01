@@ -98,7 +98,7 @@ Prefer fenced call graphs for runtime and package ownership:
 Production: HTTP calculate
 
 HTTP caller
-  -> @whattax/http-api route contract
+  -> @whattax/api-http route contract
     -> @whattax/sdk/effect calculateRunRequest
       -> PublicCalculatorService.calculate
 ```

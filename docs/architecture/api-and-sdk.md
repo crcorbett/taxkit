@@ -24,7 +24,7 @@ contract specs.
 that owns host/port config, process startup through
 `@effect/platform-bun/BunRuntime.runMain`, Bun request serving and graceful
 shutdown through Effect interruption and scoped layer finalizers. It delegates
-API contracts, handlers, schemas and generated docs to `packages/http-api`.
+API contracts, handlers, schemas and generated docs to `packages/api/http`.
 
 The current implemented API surface is:
 
@@ -44,7 +44,7 @@ GET /api/v1/rules
 ```
 
 `apps/web` consumes this API over HTTP. It must not mount the canonical API or
-import server-only `@whattax/http-api` exports.
+import server-only `@whattax/api-http` exports.
 
 API process entrypoints should be Effect programs run with
 `@effect/platform-bun/BunRuntime.runMain(...)`. The app owns process config,
@@ -59,20 +59,20 @@ process env or own process signal handling.
 The current API package lives under:
 
 ```txt
-packages/http-api
+packages/api/http
 ```
 
 Package name:
 
 ```txt
-@whattax/http-api
+@whattax/api-http
 ```
 
 It owns the current Effect HTTP API definitions, health endpoint schema,
 server route layer, OpenAPI metadata, typed client helpers and reusable client
 config schema.
 
-`@whattax/http-api` owns transport contracts, HTTP status annotations, OpenAPI
+`@whattax/api-http` owns transport contracts, HTTP status annotations, OpenAPI
 generation, typed HTTP clients, server route layers and thin handler adapters.
 Reusable calculator catalog entries, metadata transformations, graph assembly
 and schema-error shaping live in `@whattax/calculators`. The calculate route
@@ -80,7 +80,7 @@ executes through the request-preserving `@whattax/sdk/effect`
 `calculateRunRequest` helper as a normal in-process consumer, proving the
 public SDK boundary without making the SDK depend on HTTP transport code.
 
-`@whattax/http-api/config` exports the package-owned HTTP API client config
+`@whattax/api-http/config` exports the package-owned HTTP API client config
 schema, type and keyed config fragment. Apps compose that fragment into their
 own runtime config modules and provide runtime-specific values, such as server
 process env or Vite client env, through `ConfigProvider` composition instead of
@@ -97,7 +97,7 @@ export it from the same module as a schema-derived type. Do not hand-write DTO
 interfaces or duplicate response shapes in handlers, clients or apps.
 
 Route-only HTTP envelopes, query schemas and status annotations stay in
-`@whattax/http-api`. HTTP-facing names such as
+`@whattax/api-http`. HTTP-facing names such as
 `CalculatorApiErrorEnvelope` stay in the transport package because they
 describe calculator API status encoding. Rule-owned calculator IDs and
 supported context literals are composed by `@whattax/calculators`; reusable
@@ -204,29 +204,14 @@ It owns:
 HTTP, SDK, CLI and in-process callers should consume this service instead of
 implementing calculator business logic locally.
 
-## Planned API package
+## HTTP API package topology
 
-Longer term, the HTTP API package may move toward:
+The implemented HTTP API package lives at `packages/api/http` and is named
+`@whattax/api-http`. It owns Effect HTTP API definitions, calculation endpoint
+schemas, thin server handlers that delegate to `@whattax/calculators`, OpenAPI
+generation, HTTP status annotations and generated HTTP client helpers.
 
-```txt
-packages/api/http
-```
-
-Package name:
-
-```txt
-@whattax/api-http
-```
-
-It owns:
-
-- Effect HTTP API definitions
-- calculation endpoint schemas
-- thin server handlers that delegate to `@whattax/calculators`
-- OpenAPI generation
-- HTTP status annotations and generated HTTP client helpers
-
-## Planned API app scope
+## API app scope
 
 The reusable API app server lives under:
 
@@ -328,11 +313,11 @@ It owns:
 - typed calculator request builders
 - examples for Node and browser usage
 
-The SDK must not import `@whattax/http-api`, server handlers or Node-only
+The SDK must not import `@whattax/api-http`, server handlers or Node-only
 modules from browser-safe entrypoints. It also must not expose Effect runtime
 types from the plain TypeScript entrypoint. HTTP clients and OpenAPI transport
-helpers stay in `@whattax/http-api` or a future transport package that depends
-on the SDK.
+helpers stay in `@whattax/api-http`, which depends on the SDK rather than the
+reverse.
 
 ## Export boundaries
 

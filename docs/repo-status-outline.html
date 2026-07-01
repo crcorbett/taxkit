@@ -266,7 +266,7 @@
             <h3>HTTP API</h3>
             <p>
               <code>apps/api</code> runs the Bun API process, while
-              <code>@whattax/http-api</code> owns Effect HTTP API contracts,
+              <code>@whattax/api-http</code> owns Effect HTTP API contracts,
               generated docs, OpenAPI JSON, metadata routes and public
               calculation endpoints.
             </p>
@@ -300,7 +300,7 @@
               <li><code>apps/api</code> owns the current API runtime.</li>
               <li><code>apps/docs</code> owns the public docs runtime.</li>
               <li><code>apps/web</code> owns the current app shell.</li>
-              <li><code>packages/http-api</code> owns the current API contract.</li>
+              <li><code>packages/api/http</code> owns the current API contract.</li>
               <li><code>packages/calculators</code> owns calculator orchestration.</li>
               <li><code>packages/sdk/typescript</code> owns the private SDK package.</li>
               <li><code>packages/docs-content</code> owns WhatTax docs contracts.</li>
@@ -335,7 +335,7 @@
             <tr>
               <td>Public API</td>
               <td>Done</td>
-              <td><code>apps/api</code> serves health, generated docs, OpenAPI JSON, metadata, graph and public calculation routes through <code>@whattax/http-api</code>.</td>
+              <td><code>apps/api</code> serves health, generated docs, OpenAPI JSON, metadata, graph and public calculation routes through <code>@whattax/api-http</code>.</td>
             </tr>
             <tr>
               <td>Web integration</td>
@@ -413,9 +413,8 @@
             <span class="status partial">Partial</span>
             <h3>Placeholder packages</h3>
             <p>
-              <code>packages/scripts</code>, <code>packages/ui</code> and the
-              long-term <code>packages/api/http</code> home are still planned
-              ownership areas.
+              <code>packages/scripts</code> and <code>packages/ui</code> are
+              still planned ownership areas.
             </p>
           </div>
           <div class="item">

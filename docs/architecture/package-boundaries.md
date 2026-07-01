@@ -22,7 +22,7 @@ Implemented packages and apps:
 - `apps/web`
 - `packages/calculators`
 - `packages/core`
-- `packages/http-api`
+- `packages/api/http`
 - `packages/sdk/typescript`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
@@ -91,7 +91,7 @@ packages/
   cli/
 ```
 
-Current packages such as `@whattax/http-api` and the TanStack Start app sit
+Current packages such as `@whattax/api-http` and the TanStack Start app sit
 outside the calculation engine. As the repo matures, the app layer should
 settle into a public Fumadocs documentation site and reusable API server. They
 will expose and consume engine capabilities once those capabilities exist, but
@@ -168,7 +168,7 @@ boundary for:
 It must not own OpenAPI annotations, HTTP status mapping, Bun serving, process
 config, app runtime lifecycle, SDK client transport or CLI command parsing.
 
-Planned `@whattax/api-http` will own:
+Implemented `@whattax/api-http` owns:
 
 - Effect HTTP API groups for public calculation endpoints
 - thin server handlers that call package-owned API services
@@ -226,7 +226,8 @@ packages/docs-content        -> @whattax/docs-content
 packages/docs-fumadocs       -> @whattax/docs-fumadocs
 ```
 
-Avoid flat package sprawl such as `packages/au-payg`, `packages/au-super` and `packages/http-api` once the engine packages start growing.
+Avoid flat package sprawl such as `packages/au-payg`, `packages/au-super` and
+flat transport package names once the engine packages start growing.
 `packages/calculators` is the exception for cross-surface calculator
 orchestration because it is intentionally shared by HTTP, SDK, CLI and
 in-process callers.

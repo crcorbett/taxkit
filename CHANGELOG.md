@@ -28,7 +28,7 @@
 - [`@whattax/core`](./packages/core/CHANGELOG.md)
 - `@whattax/calculators`: pending first package changelog generation through
   the release-train Changeset workflow.
-- [`@whattax/http-api`](./packages/http-api/CHANGELOG.md)
+- [`@whattax/api-http`](./packages/api/http/CHANGELOG.md)
 - [`@whattax/rules-au-income-tax`](./packages/rules/au/income-tax/CHANGELOG.md)
 - [`@whattax/rules-au-pay`](./packages/rules/au/pay/CHANGELOG.md)
 - [`@whattax/rules-au-stsl`](./packages/rules/au/stsl/CHANGELOG.md)

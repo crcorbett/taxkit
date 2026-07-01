@@ -30,7 +30,7 @@ not published yet.
   helpers.
 - [apps/web](./apps/web/README.md): TanStack Start app that loads health data
   from `apps/api` through server/client runtime boundaries.
-- [packages/http-api](./packages/http-api/README.md): Effect HTTP API contract,
+- [packages/api/http](./packages/api/http/README.md): Effect HTTP API contract,
   generated docs, public calculator routes, thin handler adapters, server
   handler exports and browser-safe client exports.
 - [packages/calculators](./packages/calculators/README.md): reusable public
@@ -134,7 +134,7 @@ file:///Users/cooper/Projects/whattax/docs/repo-status-outline.html
 ## Runtime boundary
 
 - `apps/api` is the API runtime owner. It creates one process-lifetime
-  `ManagedRuntime`, serves `packages/http-api` through Bun and disposes scoped
+  `ManagedRuntime`, serves `packages/api/http` through Bun and disposes scoped
   resources on shutdown.
 - `apps/docs` is the docs runtime owner. It consumes `@whattax/docs-content`
   and `@whattax/docs-fumadocs` rather than owning canonical frontmatter,
@@ -142,7 +142,7 @@ file:///Users/cooper/Projects/whattax/docs/repo-status-outline.html
 - `apps/web/src/lib/runtime.server.ts` and
   `apps/web/src/lib/runtime.client.ts` own the web SSR and browser client
   runtimes. They call the standalone API over HTTP.
-- `@whattax/http-api/client` and `@whattax/http-api/client/live` are
+- `@whattax/api-http/client` and `@whattax/api-http/client/live` are
   browser-safe.
-- `@whattax/http-api/client/server`, `@whattax/http-api/server` and handler
+- `@whattax/api-http/client/server`, `@whattax/api-http/server` and handler
   exports are server-only and should stay out of `apps/web`.

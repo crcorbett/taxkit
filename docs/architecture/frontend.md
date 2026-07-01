@@ -24,7 +24,7 @@ define tax calculation rules.
 
 `apps/api`
 : Current standalone Bun API runtime. It owns API process startup and serves
-  the `packages/http-api` routes.
+  the `packages/api/http` routes.
 
 `apps/docs`
 : Fumadocs-backed public documentation site for rule references, API docs, SDK
@@ -51,7 +51,7 @@ The web runtime reads:
 - `VITE_WHATTAX_API_BASE_URL` for browser navigation
 
 Both runtime-specific values are mapped into the package-owned
-`@whattax/http-api/config` schema by `apps/web/src/lib/config.server.ts` and
+`@whattax/api-http/config` schema by `apps/web/src/lib/config.server.ts` and
 `apps/web/src/lib/config.client.ts`. Those modules compose package config
 fragments that use `Config.nested(...)`, then provide runtime env sources with
 `ConfigProvider.fromEnv(...)` and `ConfigProvider.constantCase`. Local dev

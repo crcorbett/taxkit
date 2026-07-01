@@ -36,7 +36,7 @@ The calculator service uses `CalculatorServiceError` for expected failures.
 ## HTTP errors
 
 The HTTP API wraps expected calculator service failures in
-`CalculatorApiErrorEnvelope`. The envelope is owned by `@whattax/http-api`
+`CalculatorApiErrorEnvelope`. The envelope is owned by `@whattax/api-http`
 because it describes transport status encoding.
 
 ```json
@@ -68,7 +68,7 @@ Caller
 
 - SDK errors: [`packages/sdk/typescript/src/errors.ts`](../../../../packages/sdk/typescript/src/errors.ts)
 - Calculator service errors: [`packages/calculators/src/schemas.ts`](../../../../packages/calculators/src/schemas.ts)
-- HTTP API error envelope: [`packages/http-api/src/groups/calculators.ts`](../../../../packages/http-api/src/groups/calculators.ts)
+- HTTP API error envelope: [`packages/api/http/src/groups/calculators.ts`](../../../../packages/api/http/src/groups/calculators.ts)
 
 ## Used by
 

@@ -11,7 +11,7 @@ changelog for humans reading the repository as one product.
 All `@whattax/*` packages are in one fixed version group:
 
 - `@whattax/core`
-- `@whattax/http-api`
+- `@whattax/api-http`
 - `@whattax/rules-au-income-tax`
 - `@whattax/rules-au-pay`
 - `@whattax/rules-au-stsl`

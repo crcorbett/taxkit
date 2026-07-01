@@ -13,7 +13,7 @@ exists today.
 
 WhatTax is the open-source engine repository. Today it contains a standalone
 Bun API app, a TanStack Start web scaffold, a Fumadocs-backed docs app, the
-`@whattax/http-api` package with health, generated docs, metadata and public
+`@whattax/api-http` package with health, generated docs, metadata and public
 calculation endpoints, the `@whattax/calculators` service package,
 deterministic core engine primitives, Australian pay, income-tax and STSL rule
 packages, a private TypeScript SDK package, private `@whattax/docs-content`
@@ -28,7 +28,7 @@ Implemented surfaces:
 - `apps/docs`: TanStack Start public docs runtime over MDX content,
   `@whattax/docs-content` and `@whattax/docs-fumadocs`.
 - `apps/web`: TanStack Start scaffold that loads the health endpoint.
-- `packages/http-api`: Effect HTTP API package for health, generated docs,
+- `packages/api/http`: Effect HTTP API package for health, generated docs,
   OpenAPI JSON, public calculator metadata and public calculation routes.
 - `packages/calculators`: reusable calculator catalog, metadata, graph,
   calculation and expected-error orchestration package.

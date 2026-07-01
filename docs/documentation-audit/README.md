@@ -25,7 +25,7 @@ Current tracked documentation entrypoints:
 - `packages/core/README.md`
 - `packages/docs-content/README.md`
 - `packages/docs-fumadocs/README.md`
-- `packages/http-api/README.md`
+- `packages/api/http/README.md`
 - `packages/rules/au/income-tax/README.md`
 - `packages/rules/au/pay/README.md`
 - `packages/rules/au/stsl/README.md`
@@ -50,7 +50,7 @@ Current app/package roots with package manifests:
 - `packages/core`: covered by `packages/core/README.md`
 - `packages/docs-content`: covered by `packages/docs-content/README.md`
 - `packages/docs-fumadocs`: covered by `packages/docs-fumadocs/README.md`
-- `packages/http-api`: covered by `packages/http-api/README.md`
+- `packages/api/http`: covered by `packages/api/http/README.md`
 - `packages/sdk/typescript`: covered by `packages/sdk/typescript/README.md`
 - `packages/rules/au/income-tax`: covered by
   `packages/rules/au/income-tax/README.md`
@@ -76,8 +76,6 @@ packages until package manifests, source exports and verification exist.
   root README, but it can drift and must be refreshed after material repo-shape
   or implemented-surface changes.
 - `packages/scripts` and `packages/ui` remain planned ownership placeholders.
-- The long-term `packages/api/http` location remains planned. The implemented
-  HTTP package is still `packages/http-api`.
 - `packages/domain/au/*` remains planned for Australian date dimensions and
   domain facts that are not owned by a single rule pack.
 - `apps/web` is still a scaffold and health-check consumer, not a finished

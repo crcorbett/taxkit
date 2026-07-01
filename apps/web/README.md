@@ -26,7 +26,7 @@ request handling.
 
 ## Runtime Shape
 
-The root route loads `@whattax/http-api/client` through the route runtime and
+The root route loads `@whattax/api-http/client` through the route runtime and
 renders API health status from the standalone API service over HTTP.
 Server-only API exports must stay out of browser code.
 
@@ -44,7 +44,7 @@ API client owns route prefixes.
 
 - Keep tax rules, facts and calculators in engine packages.
 - Use browser-safe API client exports from routes.
-- Do not import `@whattax/http-api/server` from browser code.
+- Do not import `@whattax/api-http/server` from browser code.
 - Keep the app README local; route durable architecture to `docs/architecture`.
 
 ## Commands

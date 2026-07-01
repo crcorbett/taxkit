@@ -11,7 +11,7 @@ reference source.
 
 ## Generated reference
 
-The endpoint contract is generated from `@whattax/http-api`.
+The endpoint contract is generated from `@whattax/api-http`.
 
 ```txt
 GET /api/docs
@@ -44,7 +44,7 @@ The calculate route is a thin HTTP transport over the SDK Effect helper.
 Production: HTTP calculate
 
 HTTP caller
-  -> @whattax/http-api route contract
+  -> @whattax/api-http route contract
     -> CalculatorApiHandlerLive
       -> @whattax/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
@@ -54,8 +54,8 @@ HTTP caller
 
 ## Owning sources
 
-- API definition: [`packages/http-api/src/api.ts`](../../../../packages/http-api/src/api.ts)
-- Calculator group: [`packages/http-api/src/groups/calculators.ts`](../../../../packages/http-api/src/groups/calculators.ts)
+- API definition: [`packages/api/http/src/api.ts`](../../../../packages/api/http/src/api.ts)
+- Calculator group: [`packages/api/http/src/groups/calculators.ts`](../../../../packages/api/http/src/groups/calculators.ts)
 - API runtime: [`apps/api/src/server.ts`](../../../../apps/api/src/server.ts)
 
 ## Used by

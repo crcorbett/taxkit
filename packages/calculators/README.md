@@ -50,7 +50,7 @@ This package must not own:
 - HTTP endpoints, OpenAPI annotations or HTTP status mapping
 - Bun serving, app runtime lifecycle or process config
 - SDK client transport or CLI command parsing
-- imports from `@whattax/http-api`, `apps/api`, `apps/web` or runtime modules
+- imports from `@whattax/api-http`, `apps/api`, `apps/web` or runtime modules
 
 ## Guardrails
 

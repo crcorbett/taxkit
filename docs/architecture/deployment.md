@@ -24,7 +24,7 @@ updated when package publishing or a real hosting target becomes real.
 - `apps/web` builds through Vite/TanStack Start and calls `apps/api` over HTTP.
 - `apps/docs` builds through TanStack Start and renders public MDX docs through
   `@whattax/docs-content` and `@whattax/docs-fumadocs`.
-- `@whattax/http-api` builds as a package and exposes health, generated docs,
+- `@whattax/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
 - `@whattax/sdk` builds as a private package for local and downstream
   validation. It has not been published to npm.

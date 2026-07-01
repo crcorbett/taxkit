@@ -25,7 +25,7 @@ Current implemented code lives in:
 - `packages/calculators`
 - `packages/docs-content`
 - `packages/docs-fumadocs`
-- `packages/http-api`
+- `packages/api/http`
 - `packages/sdk/typescript`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
@@ -35,7 +35,6 @@ Current implemented code lives in:
 
 Current planned ownership placeholders:
 
-- `packages/api/http`
 - `packages/scripts`
 - `packages/ui`
 
@@ -64,9 +63,9 @@ golden tests. Current implemented packages are `pay`, `income-tax` and `stsl`.
 for production-only runtime helpers.
 
 `packages/api/http`
-: Planned long-term home for Effect HTTP API definitions, boundary schemas,
-thin server handlers, OpenAPI and HTTP status/transport annotations. The
-implemented API package is currently `packages/http-api`.
+: Implemented HTTP API package. It owns Effect HTTP API definitions, boundary
+schemas, thin server handlers, OpenAPI, typed HTTP clients and HTTP
+status/transport annotations.
 
 `packages/calculators`
 : Implemented reusable calculator orchestration package. It owns calculator
@@ -75,7 +74,7 @@ graph response construction, schema-guided error shaping and
 rule-pack/scenario composition used by HTTP, SDK, CLI and in-process callers.
 It also owns the canonical reusable calculator run schemas named
 `CalculatorRun*` and the `CalculatorServiceError` union. HTTP-only public
-envelopes and status annotations stay in `packages/http-api`; SDK schema
+envelopes and status annotations stay in `packages/api/http`; SDK schema
 exports may re-export calculator-owned run contracts but must not duplicate
 them. It depends on `packages/core` and rule packages, but it must not depend
 on HTTP handlers, SDK clients, CLI commands or app runtime modules.
@@ -84,7 +83,7 @@ on HTTP handlers, SDK clients, CLI commands or app runtime modules.
 : Implemented private TypeScript SDK package for a future public SDK
 publication. It owns browser-safe schemas, typed calculation facades,
 Effect-native subpaths, jurisdiction modules, examples, compatibility tests and
-packed-artifact checks. It must not depend on `@whattax/http-api`; HTTP
+packed-artifact checks. It must not depend on `@whattax/api-http`; HTTP
 transports consume the SDK rather than the reverse. Its Effect entrypoint owns
 request-preserving calculator helpers such as `calculateRunRequest`,
 `calculateReportRequest` and `calculateReport`, while reusing

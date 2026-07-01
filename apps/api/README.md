@@ -12,8 +12,8 @@ Standalone Bun process for the WhatTax Effect HTTP API.
 ## Scope
 
 `apps/api` owns process config, Bun server startup, request dispatch to
-`@whattax/http-api/server` and graceful shutdown. API contracts, handlers,
-schemas, generated OpenAPI and docs routes stay in `packages/http-api`.
+`@whattax/api-http/server` and graceful shutdown. API contracts, handlers,
+schemas, generated OpenAPI and docs routes stay in `packages/api/http`.
 
 ## Runtime Shape
 
@@ -65,7 +65,7 @@ instead of being treated as a valid take-home request.
 
 Public API contract and deployment-facing changes are tracked in
 [CHANGELOG.md](./CHANGELOG.md). Package-level API contract changes are also
-tracked in [`@whattax/http-api`](../../packages/http-api/CHANGELOG.md) through
+tracked in [`@whattax/api-http`](../../packages/api/http/CHANGELOG.md) through
 Changesets.
 
 ## Commands

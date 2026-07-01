@@ -10,13 +10,14 @@ confidence: high
 ## Overview
 
 Stabilize the implemented HTTP API package before more public API, SDK and app
-work builds on its current flat package path.
+work builds on the old flat package path.
 
-The current package lives at `packages/http-api` and is named
-`@whattax/http-api`. Existing architecture docs already identify the long-term
-shape as `packages/api/http` with package name `@whattax/api-http`. This spec
-turns that planned placeholder into the implemented package without changing
-runtime behaviour, endpoint paths, calculator semantics or the API app role.
+At the start of this spec, the implemented package lived at
+`packages/http-api` and was named `@whattax/http-api`. Existing architecture
+docs already identified the long-term shape as `packages/api/http` with
+package name `@whattax/api-http`. This spec turns that planned placeholder
+into the implemented package without changing runtime behaviour, endpoint
+paths, calculator semantics or the API app role.
 
 The nearest reference implementation for this work is the API split used in
 the local reference repos: runtime apps own deployment and process lifecycle,
@@ -25,12 +26,12 @@ server adapters and explicit browser/server subpaths.
 
 ## Problem
 
-The repo currently has two truths:
+At spec start, the repo had two truths:
 
-- current implementation: `packages/http-api` / `@whattax/http-api`
+- original implementation: `packages/http-api` / `@whattax/http-api`
 - planned architecture: `packages/api/http` / `@whattax/api-http`
 
-That mismatch is still cheap to fix because `@whattax/http-api` is private and
+That mismatch was still cheap to fix because `@whattax/http-api` is private and
 the public API is not published. It will get more expensive after the docs,
 SDK, app runtime and downstream consumers grow around the old package name.
 
@@ -41,7 +42,7 @@ or redesign API/client behaviour.
 ## Call graphs
 
 ```ts
-Production: current
+Production: original before API-HTTP-001
 
 apps/api Bun process
   -> @whattax/http-api/server

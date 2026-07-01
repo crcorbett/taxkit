@@ -76,7 +76,7 @@ fast.
 | `apps/api` | standalone Bun API runtime and health/docs/calculation endpoints |
 | `apps/docs` | public TanStack Start docs app and app-local MDX rendering |
 | `apps/web` | current TanStack Start scaffold and health-check UI |
-| `packages/http-api` | current Effect HTTP API package and transport contracts |
+| `packages/api/http` | current Effect HTTP API package and transport contracts |
 | `packages/calculators` | reusable calculator catalogue, graph, calculation and error orchestration |
 | `packages/sdk/typescript` | implemented private TypeScript SDK package |
 | `packages/docs-content` | private docs contracts, navigation, validation and content service |
