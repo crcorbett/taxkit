@@ -1,5 +1,14 @@
 # @whattax/rules-au-stsl
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [d1d84c3]
+- Updated dependencies [b632995]
+  - @whattax/core@0.0.2
+  - @whattax/rules-au-pay@0.0.2
+
 ## 0.0.1
 
 ### Patch Changes

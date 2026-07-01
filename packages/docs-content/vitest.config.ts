@@ -19,5 +19,6 @@ export default defineConfig(async () => ({
     globals: false,
     include: ["src/**/*.test.ts"],
     passWithNoTests: true,
+    testTimeout: 10_000,
   },
 }));

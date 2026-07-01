@@ -1,5 +1,11 @@
 # @whattax/testing
 
+## 0.0.2
+
+### Patch Changes
+
+- Versioned with the fixed WhatTax package release train.
+
 ## 0.0.1
 
 ### Patch Changes

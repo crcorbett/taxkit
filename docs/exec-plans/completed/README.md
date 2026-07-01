@@ -12,6 +12,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Release readiness 2026-07-01](./release-readiness-2026-07-01.md)
 - [Documentation improvement roadmap](./documentation-improvement-roadmap.md)
 - [Extract API app](./extract-api-app.md)
 - [Public calculation API routes](./public-calculation-api-routes.md)

@@ -113,7 +113,13 @@ import * as testing from "@whattax/sdk/testing";
 
 const checks = [
   ["root", typeof WhatTax.calculate === "function"],
-  ["effect", typeof effect.calculate === "function"],
+  [
+    "effect",
+    typeof effect.calculateRunRequest === "function" &&
+      typeof effect.calculateReportRequest === "function" &&
+      typeof effect.calculateReport === "function" &&
+      typeof effect.createClient === "function",
+  ],
   ["au", typeof au.pay.takeHomePay === "function"],
   ["au/effect", typeof auEffect.createClient === "function"],
   ["schemas", Boolean(schemas.CalculatorRunRequest && schemas.CalculatorServiceError && schemas.WhatTaxCalculationError)],

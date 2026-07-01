@@ -1,5 +1,16 @@
 # @whattax/core
 
+## 0.0.2
+
+### Patch Changes
+
+- d1d84c3: Add canonical `CalculatorId` and `Jurisdiction` brands, move AU public
+  calculator IDs and supported jurisdiction/tax-year schemas into the owning AU
+  rule packages, then compose those canonical exports in `@whattax/calculators`.
+  The calculator service no longer mirrors request context or revalidates context
+  fields already narrowed by schemas. Public calculator input decode errors now
+  use calculator-specific names.
+
 ## 0.0.1
 
 ### Patch Changes
