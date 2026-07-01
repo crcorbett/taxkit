@@ -90,9 +90,12 @@ incompatible calculator/facts combinations.
 - `src/groups/calculators.ts`: public calculation HTTP route schemas, bad
   request envelope, OpenAPI annotations and compatibility exports from
   `@whattax/calculators`.
+- `src/openapi.ts`: package-owned OpenAPI generation, structured
+  normalization and snapshot formatting for compatibility checks.
 - `src/handlers/`: server-side thin handler adapters and handler layers.
 - `src/server/live.layer.ts`: server route layer, CORS middleware, Scalar docs
-  route, OpenAPI JSON route and calculator service layer composition.
+  route, OpenAPI JSON route using the package-owned OpenAPI source and
+  calculator service layer composition.
 - `src/server.ts`: server export boundary for `WhatTaxServerLayer`.
 - `src/config.ts`: package-owned client config schema and neutral `httpApi`
   config source.
@@ -159,6 +162,9 @@ From the package root:
 bun run build
 bun run check-types
 bun run clean
+bun run test
+bun run test:openapi
+bun run update-openapi-snapshot
 ```
 
 From the repo root:
@@ -166,7 +172,52 @@ From the repo root:
 ```sh
 bun run --filter=@whattax/api-http build
 bun run --filter=@whattax/api-http check-types
+bun run --filter=@whattax/api-http test
+bun run --filter=@whattax/api-http test:openapi
+bun run --filter=@whattax/api-http update-openapi-snapshot
 ```
+
+## OpenAPI Compatibility
+
+`src/openapi.ts` is the single source for generated OpenAPI. The live
+`/api/docs/openapi.json` route and the compatibility test both import that
+module, so a route, method, status envelope or schema-reference change flows
+through the same `OpenApi.fromApi(WhatTaxApi)` call graph.
+
+The committed normalized snapshot lives at:
+
+```txt
+packages/api/http/__snapshots__/openapi.json
+```
+
+Use the focused check before and after API contract work:
+
+```sh
+bun run --filter=@whattax/api-http test:openapi
+```
+
+For an intentional OpenAPI contract change:
+
+1. Update the owning API group schema, route annotation or handler boundary.
+2. Refresh the normalized snapshot:
+
+   ```sh
+   bun run --filter=@whattax/api-http update-openapi-snapshot
+   ```
+
+3. Review the snapshot diff for route paths, methods, status responses,
+   schema references and generated calculator fact shapes.
+4. Run the package gates:
+
+   ```sh
+   bun run --filter=@whattax/api-http test
+   bun run --filter=@whattax/api-http check-types
+   bun run --filter=@whattax/api-http build
+   ```
+
+5. Add a Changeset when the OpenAPI change reflects package-facing API
+   behaviour or documented package usage. Internal test-only snapshot refreshes
+   can record an explicit no-Changeset rationale instead.
 
 ## Guardrails
 

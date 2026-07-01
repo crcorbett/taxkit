@@ -4,15 +4,12 @@ import { Effect, Layer } from "effect";
 import * as HttpRouter from "effect/unstable/http/HttpRouter";
 import * as HttpServer from "effect/unstable/http/HttpServer";
 import * as HttpServerResponse from "effect/unstable/http/HttpServerResponse";
-import {
-  HttpApiBuilder,
-  HttpApiScalar,
-  OpenApi,
-} from "effect/unstable/httpapi";
+import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
 
 import { WhatTaxApi } from "../api.js";
 import { CalculatorApiHandlerLive } from "../handlers/calculators.js";
 import { HealthHandlerLive } from "../handlers/health.js";
+import { whatTaxOpenApiSpec } from "../openapi.js";
 
 const ApiRoutes = HttpApiBuilder.layer(WhatTaxApi).pipe(
   Layer.provide(CalculatorApiHandlerLive),
@@ -22,8 +19,6 @@ const ApiRoutes = HttpApiBuilder.layer(WhatTaxApi).pipe(
   )
 );
 
-const openApiSpec = OpenApi.fromApi(WhatTaxApi);
-
 const DocsRouteLayer = HttpApiScalar.layer(WhatTaxApi, {
   path: "/api/docs",
 });
@@ -31,7 +26,7 @@ const DocsRouteLayer = HttpApiScalar.layer(WhatTaxApi, {
 const OpenApiRouteLayer = HttpRouter.add(
   "GET",
   "/api/docs/openapi.json",
-  Effect.succeed(HttpServerResponse.jsonUnsafe(openApiSpec))
+  Effect.succeed(HttpServerResponse.jsonUnsafe(whatTaxOpenApiSpec))
 );
 
 export const ApiRoutesLive = Layer.mergeAll(

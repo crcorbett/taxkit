@@ -1,0 +1,321 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/api-compatibility-harness.md",
+  "title": "API Compatibility Harness Implementation Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-07-01",
+  "principles": [
+    "Pin the public HTTP API contract before adding broader API, SDK or app surface area.",
+    "Generate compatibility evidence from the same @whattax/api-http contracts that serve production routes.",
+    "Keep apps/api as the process and live smoke owner; keep packages/api/http as the HTTP contract, OpenAPI and route fixture owner.",
+    "Reuse calculator-owned schemas, SDK facades and tagged errors instead of mirroring DTOs in tests or smoke code.",
+    "Prefer deterministic structured snapshots and focused fixtures over brittle full-response churn.",
+    "Require parent review, final call-graph verification and three documented improvement audit passes before accepting each implementation slice."
+  ],
+  "beforeImplementation": [
+    "Create an active execution plan under docs/exec-plans/active/ before editing runtime, package scripts or package docs.",
+    "Record the current OpenAPI generation path, current route tests and current app smoke commands before changing files.",
+    "Implement one task at a time with parent review before starting the next task.",
+    "Do not run bun run version-repo unless the user explicitly asks for release versioning."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit after each coherent implementation slice passes mandatory verification, Changeset review or no-Changeset rationale, and parent audit.",
+    "requiredBeforeFinalPR": [
+      "bun run --filter=@whattax/api-http test",
+      "bun run --filter=@whattax/api-http check-types",
+      "bun run --filter=@whattax/api-http build",
+      "bun run --filter=api check-types",
+      "bun run --filter=api build",
+      "bun run --filter=api smoke:public-routes",
+      "bun run --filter=@whattax/sdk check-boundaries",
+      "bun run docs:validate",
+      "bun run test",
+      "bun run build",
+      "bun run verification",
+      "bun run changeset status --verbose when a Changeset exists, or explicit no-Changeset rationale for internal test/script/docs-only slices"
+    ],
+    "evidenceRequired": [
+      "Current and final call graph summary for OpenAPI generation, in-process route fixture tests and live apps/api smoke coverage",
+      "OpenAPI snapshot path and update command",
+      "Route fixture coverage matrix for health, metadata, calculate success and schema-guided input error behaviour",
+      "SDK parity evidence for calculate success and expected input errors",
+      "Live API app smoke command output",
+      "Changeset path and release-train impact, or explicit no-Changeset rationale",
+      "Parent audit outcome for each task, including up to three correction turns when needed"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "API-COMPAT-001",
+      "status": "completed",
+      "title": "Add the OpenAPI snapshot harness",
+      "type": "compatibility-foundation",
+      "dependsOn": [],
+      "goal": "Make OpenAPI drift visible by generating a deterministic snapshot from the same @whattax/api-http contract used by /api/docs/openapi.json.",
+      "scope": [
+        "Inspect packages/api/http/src/server/live.layer.ts, packages/api/http/src/api.ts and route groups before editing.",
+        "Extract the current OpenApi.fromApi(WhatTaxApi) path into a package-owned OpenAPI source, such as packages/api/http/src/openapi.ts.",
+        "Make /api/docs/openapi.json import the same OpenAPI source used by compatibility tests.",
+        "Add a deterministic OpenAPI normalizer that uses structured JSON values and stable ordering rather than string rewriting.",
+        "Commit a normalized OpenAPI snapshot under packages/api/http, for example packages/api/http/__snapshots__/openapi.json.",
+        "Add a package test or focused package command that compares the generated current OpenAPI document to the committed snapshot.",
+        "Add a documented snapshot update workflow for intentional contract changes."
+      ],
+      "outputs": [
+        "packages/api/http/src/openapi.ts or equivalent package-owned OpenAPI source",
+        "packages/api/http/src/server/live.layer.ts",
+        "packages/api/http/__snapshots__/openapi.json",
+        "packages/api/http/__tests__/**/*.test.ts",
+        "packages/api/http/package.json if a focused compatibility or update script is added",
+        "packages/api/http/README.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "taskSpecificScope": [
+          "Do not handwrite OpenAPI JSON as the contract source.",
+          "Do not duplicate OpenAPI generation between the docs route and snapshot test.",
+          "Do not redesign routes, status envelopes or calculator schemas.",
+          "Keep snapshot normalization deterministic and structured."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/api-http test",
+        "bun run --filter=@whattax/api-http check-types",
+        "bun run --filter=@whattax/api-http build",
+        "OpenAPI snapshot drift audit: prove the test compares current generated OpenAPI to the committed snapshot and would fail on an unapproved route, method or status-schema change.",
+        "rg audit proving /api/docs/openapi.json and the snapshot harness share the same package-owned OpenAPI source.",
+        "bun run verification",
+        "bun run changeset or explicit no-Changeset rationale for internal test/snapshot/docs-only work"
+      ],
+      "browserVerification": [
+        "No browser-visible UI behaviour is expected to change.",
+        "No browser bundle should import server-only OpenAPI or handler modules."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: OpenAPI generation call graph is single-source and still matches the spec.",
+        "Audit pass 2: snapshot normalization uses structured data, stable ordering and no local DTO mirrors or handwritten route shapes.",
+        "Audit pass 3: Effect/schema conventions, canonical API contracts, no unsafe casts, no helper sprawl and no browser/server import leaks."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "The OpenAPI snapshot is committed under packages/api/http.",
+        "The docs route and snapshot harness share one package-owned OpenAPI generation path.",
+        "The package test fails on unapproved OpenAPI drift.",
+        "The update workflow for intentional OpenAPI changes is documented.",
+        "Parent agent reviewed the diff, snapshot, verification evidence, Changeset decision and final call graph before accepting the task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "API-COMPAT-002",
+      "status": "pending",
+      "title": "Add route fixtures and SDK parity coverage",
+      "type": "contract-fixtures",
+      "dependsOn": [
+        "API-COMPAT-001"
+      ],
+      "goal": "Pin representative public route responses and keep calculate behaviour aligned with the SDK and calculator-owned errors.",
+      "scope": [
+        "Inspect the existing packages/api/http/__tests__/public-calculation-api.test.ts before editing.",
+        "Add route fixture coverage for GET /api/health.",
+        "Add route fixture coverage for at least one metadata route, preferably GET /api/v1/calculators.",
+        "Add calculate success fixture coverage for POST /api/v1/calculators/au.pay.take-home/calculate.",
+        "Add schema-guided input error fixture coverage for a mismatched or missing take-home input fact.",
+        "Keep or strengthen the existing HTTP response equals SDK full-run response assertion.",
+        "Compare expected input errors with SDK/calculator-owned tagged errors rather than duplicating local error DTOs.",
+        "Use canonical schemas, branded IDs, tagged values and rule-owned constructors in fixtures where the test boundary permits it."
+      ],
+      "outputs": [
+        "packages/api/http/__tests__/**/*.test.ts",
+        "packages/api/http/__fixtures__/**/*.json or focused fixture assertions in test files",
+        "packages/api/http/README.md if fixture/update workflow is documented there",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "taskSpecificScope": [
+          "Do not create local DTO mirrors for calculator catalog, run responses or error envelopes.",
+          "Do not snapshot huge unstable traces if focused fixture assertions provide stronger compatibility evidence.",
+          "Do not change public route behaviour to make tests easier.",
+          "Keep calculate success aligned with @whattax/sdk/effect calculateRunRequest."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/api-http test",
+        "bun run --filter=@whattax/api-http check-types",
+        "bun run --filter=@whattax/api-http build",
+        "bun run --filter=@whattax/sdk check-boundaries",
+        "Route fixture coverage audit documenting health, metadata, calculate success and schema-guided input error coverage.",
+        "SDK parity audit proving calculate success and expected input error evidence still flows through canonical SDK/calculator contracts.",
+        "bun run verification",
+        "bun run changeset or explicit no-Changeset rationale for internal test/fixture/docs-only work"
+      ],
+      "browserVerification": [
+        "No browser-visible UI behaviour is expected to change.",
+        "If browser-safe API client exports are touched, audit apps/web imports and run bun run --filter=web check-types."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: fixture call graph still proves HTTP over SDK and calculator-owned errors.",
+        "Audit pass 2: fixtures reuse canonical schemas, branded IDs, tagged constructors and service errors with no local DTO mirrors.",
+        "Audit pass 3: Effect test flow, inline error handling, no unsafe casts beyond documented external-input boundary tests, no helper sprawl and no browser/server import leaks."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Route fixtures cover health, metadata, calculate success and schema-guided input error behaviour.",
+        "Calculate success still compares HTTP output to the SDK full-run response.",
+        "Expected input error evidence remains aligned with SDK and calculator-owned tagged errors.",
+        "No fixture or test file introduces duplicated canonical response DTOs.",
+        "Parent agent reviewed the diff, fixture coverage matrix, verification evidence, Changeset decision and final call graph before accepting the task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "API-COMPAT-003",
+      "status": "pending",
+      "title": "Add live API app smoke and documentation",
+      "type": "runtime-smoke-and-docs",
+      "dependsOn": [
+        "API-COMPAT-001",
+        "API-COMPAT-002"
+      ],
+      "goal": "Prove the standalone apps/api process serves the pinned public routes and document the compatibility workflow.",
+      "scope": [
+        "Inspect apps/api/src/index.ts, apps/api/src/server.ts, apps/api/src/config.ts and apps/api/README.md before editing.",
+        "Add an app-owned smoke command, such as bun run --filter=api smoke:public-routes.",
+        "The smoke command should start apps/api with a deterministic host and port, wait for /api/health, call /api/v1/calculators, call /api/v1/calculators/au.pay.take-home/calculate, call /api/docs/openapi.json and stop the process cleanly.",
+        "Use Effect platform/runtime primitives for command execution, timing, cleanup and expected errors where they fit.",
+        "Keep smoke code app-owned. Do not move process lifecycle into @whattax/api-http.",
+        "Update apps/api/README.md with the smoke command and public route coverage.",
+        "Update packages/api/http/README.md with OpenAPI snapshot, route fixture and intentional contract-change workflow.",
+        "Record final compatibility evidence and release-train impact."
+      ],
+      "outputs": [
+        "apps/api/scripts/smoke-public-routes.ts or equivalent app-owned smoke script",
+        "apps/api/package.json",
+        "apps/api/README.md",
+        "packages/api/http/README.md",
+        "Any docs/product-specs status updates made after implementation",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "taskSpecificScope": [
+          "Do not duplicate apps/api runtime ownership inside packages/api/http.",
+          "Do not leave child processes running after smoke failures.",
+          "Do not use a live network dependency outside the local API process.",
+          "Do not broaden documentation into generated docs inventory work."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run --filter=api smoke:public-routes",
+        "bun run --filter=api check-types",
+        "bun run --filter=api build",
+        "bun run --filter=@whattax/api-http test",
+        "bun run --filter=@whattax/api-http check-types",
+        "bun run --filter=@whattax/api-http build",
+        "bun run docs:validate",
+        "bun run test",
+        "bun run build",
+        "bun run verification",
+        "Live smoke cleanup audit proving the command stops apps/api on success and failure.",
+        "README audit proving compatibility commands and intentional contract-change workflow are documented.",
+        "bun run changeset status --verbose when a Changeset exists, or explicit no-Changeset rationale for app-internal/docs-only smoke tooling"
+      ],
+      "browserVerification": [
+        "No browser-visible UI behaviour is expected to change.",
+        "No browser check is required unless implementation touches apps/web, apps/docs routes or browser-safe API client exports."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: live smoke call graph keeps apps/api as runtime owner and @whattax/api-http as route contract owner.",
+        "Audit pass 2: smoke process lifecycle uses Effect platform/runtime primitives where they fit and always cleans up.",
+        "Audit pass 3: docs are compact, current and linked to architecture docs; no local DTO mirrors, unsafe casts, helper sprawl or package-boundary leaks are introduced."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "apps/api exposes and passes a live public-route smoke command.",
+        "The smoke command calls health, metadata, calculate and OpenAPI routes against a real local apps/api process.",
+        "The smoke command cleans up the local API process on success and failure.",
+        "apps/api and packages/api/http READMEs document compatibility commands and intentional contract-change workflow.",
+        "Final package, app, docs and repo verification gates pass.",
+        "Parent agent reviewed the diff, smoke output, README updates, release impact and final call graph before accepting the task."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}

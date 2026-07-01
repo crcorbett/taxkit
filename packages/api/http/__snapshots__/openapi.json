@@ -1,0 +1,2906 @@
+{
+  "components": {
+    "schemas": {
+      "AnnualTaxLedger": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["AnnualTaxLedger"],
+            "type": "string"
+          },
+          "components": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "_tag": {
+                  "enum": ["LedgerComponent"],
+                  "type": "string"
+                },
+                "amount": {
+                  "$ref": "#/components/schemas/Money"
+                },
+                "effect": {
+                  "enum": ["additive", "subtractive", "informational"],
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": ["active", "disabled", "zeroed"],
+                  "type": "string"
+                },
+                "trace": {
+                  "$ref": "#/components/schemas/Objects_"
+                }
+              },
+              "required": [
+                "_tag",
+                "amount",
+                "effect",
+                "id",
+                "label",
+                "status",
+                "trace"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "rawLiability": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "trace": {
+            "$ref": "#/components/schemas/Objects_"
+          }
+        },
+        "required": ["_tag", "components", "rawLiability", "trace"],
+        "type": "object"
+      },
+      "AnnualTaxReport": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["AnnualTaxReport"],
+            "type": "string"
+          },
+          "ledger": {
+            "$ref": "#/components/schemas/AnnualTaxLedger"
+          },
+          "liability": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "rawLiability": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "rulePackVersion": {
+            "type": "string"
+          },
+          "taxableIncome": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "trace": {
+            "$ref": "#/components/schemas/Objects_"
+          }
+        },
+        "required": [
+          "_tag",
+          "ledger",
+          "liability",
+          "rawLiability",
+          "rulePackVersion",
+          "taxableIncome",
+          "trace"
+        ],
+        "type": "object"
+      },
+      "CalculationDiagnostics": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculationDiagnostics"],
+            "type": "string"
+          },
+          "graphIssues": {
+            "items": {
+              "$ref": "#/components/schemas/GraphValidationIssue"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["_tag", "graphIssues"],
+        "type": "object"
+      },
+      "CalculationError": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculationError"],
+            "type": "string"
+          },
+          "cause": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "message"],
+        "type": "object"
+      },
+      "CalculatorInputDecodeError": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorInputDecodeError"],
+            "type": "string"
+          },
+          "calculatorId": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                    "type": "string"
+                  },
+                  {
+                    "anyOf": [
+                      {
+                        "enum": ["au.income-tax.annual"],
+                        "type": "string"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "help": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "factId": {
+                      "type": "string"
+                    },
+                    "question": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/FactQuestion"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["factId", "title"],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/CalculatorInputIssue"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "issues", "message"],
+        "type": "object"
+      },
+      "CalculatorInputIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorInputIssue"],
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "path": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["_tag", "message", "path"],
+        "type": "object"
+      },
+      "FactQuestion": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["FactQuestion"],
+            "type": "string"
+          },
+          "helpText": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "inputKind": {
+            "enum": ["money", "boolean", "selection"],
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "id", "inputKind", "prompt"],
+        "type": "object"
+      },
+      "GraphValidationIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["GraphValidationIssue"],
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "duplicate-provider",
+              "missing-provider",
+              "missing-source",
+              "parameter-overlap",
+              "parameter-source-mismatch",
+              "cycle"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "kind", "message"],
+        "type": "object"
+      },
+      "GrossPay": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["GrossPay"],
+            "type": "string"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "period": {
+            "enum": ["weekly", "fortnightly", "monthly"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "amount", "period"],
+        "type": "object"
+      },
+      "Money": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["Money"],
+            "type": "string"
+          },
+          "cents": {
+            "type": "integer"
+          },
+          "currency": {
+            "enum": ["AUD"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "cents", "currency"],
+        "type": "object"
+      },
+      "Objects_": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["TraceNode"],
+            "type": "string"
+          },
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/Objects_"
+            },
+            "type": "array"
+          },
+          "formula": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inputs": {
+            "type": "object"
+          },
+          "result": {},
+          "rounding": {
+            "anyOf": [
+              {
+                "enum": [
+                  "none",
+                  "round-to-nearest-cent",
+                  "floor-cent",
+                  "ceil-cent",
+                  "floor-dollar",
+                  "ceil-dollar",
+                  "ato-withholding-rounding"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ruleId": {
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "_tag": {
+                  "enum": ["SourceRef"],
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "ato-publication",
+                    "legislation",
+                    "regulation",
+                    "internal-validation"
+                  ],
+                  "type": "string"
+                },
+                "reference": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": ["_tag", "kind", "reference", "title"],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_tag",
+          "children",
+          "inputs",
+          "result",
+          "ruleId",
+          "sources",
+          "title"
+        ],
+        "type": "object"
+      },
+      "PayWithholdingsLedger": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["PayWithholdingsLedger"],
+            "type": "string"
+          },
+          "components": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "_tag": {
+                  "enum": ["LedgerComponent"],
+                  "type": "string"
+                },
+                "amount": {
+                  "$ref": "#/components/schemas/Money"
+                },
+                "effect": {
+                  "enum": ["additive", "subtractive", "informational"],
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": ["active", "disabled", "zeroed"],
+                  "type": "string"
+                },
+                "trace": {
+                  "$ref": "#/components/schemas/Objects_"
+                }
+              },
+              "required": [
+                "_tag",
+                "amount",
+                "effect",
+                "id",
+                "label",
+                "status",
+                "trace"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "period": {
+            "enum": ["weekly", "fortnightly", "monthly"],
+            "type": "string"
+          },
+          "total": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "trace": {
+            "$ref": "#/components/schemas/Objects_"
+          }
+        },
+        "required": ["_tag", "components", "period", "total", "trace"],
+        "type": "object"
+      },
+      "TakeHomePayReport": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["TakeHomePayReport"],
+            "type": "string"
+          },
+          "grossPay": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "netPay": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "period": {
+            "enum": ["weekly", "fortnightly", "monthly"],
+            "type": "string"
+          },
+          "rulePackVersion": {
+            "type": "string"
+          },
+          "taxablePay": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "trace": {
+            "$ref": "#/components/schemas/Objects_"
+          },
+          "withholdings": {
+            "$ref": "#/components/schemas/PayWithholdingsLedger"
+          },
+          "withholdingsTotal": {
+            "$ref": "#/components/schemas/Money"
+          }
+        },
+        "required": [
+          "_tag",
+          "grossPay",
+          "netPay",
+          "period",
+          "rulePackVersion",
+          "taxablePay",
+          "trace",
+          "withholdings",
+          "withholdingsTotal"
+        ],
+        "type": "object"
+      },
+      "UnsupportedCalculatorContextError": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["UnsupportedCalculatorContextError"],
+            "type": "string"
+          },
+          "context": {
+            "additionalProperties": false,
+            "properties": {
+              "jurisdiction": {
+                "anyOf": [
+                  {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "enum": ["AU"],
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      {
+                        "anyOf": [
+                          {
+                            "enum": ["AU"],
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taxYear": {
+                "anyOf": [
+                  {
+                    "enum": ["2025-26", "2025-26"],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "requestedCalculator": {
+            "anyOf": [
+              {
+                "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                "type": "string"
+              },
+              {
+                "anyOf": [
+                  {
+                    "enum": ["au.income-tax.annual"],
+                    "type": "string"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "required": ["_tag", "context", "message", "requestedCalculator"],
+        "type": "object"
+      },
+      "UnsupportedCalculatorError": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["UnsupportedCalculatorError"],
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "requestedCalculator": {
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "message", "requestedCalculator"],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {}
+  },
+  "info": {
+    "description": "HTTP API for WhatTax health checks, public calculator metadata and public calculator execution.",
+    "title": "WhatTax API",
+    "version": "0.0.1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/health": {
+      "get": {
+        "description": "Return API health.",
+        "operationId": "health.getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "service": {
+                      "enum": ["whattax"],
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": ["ok"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["service", "status"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [],
+        "tags": ["Health"]
+      }
+    },
+    "/api/v1/calculators": {
+      "get": {
+        "description": "List public calculator catalog entries.",
+        "operationId": "calculatorApi.listCalculators",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26", "2025-26"],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "calculators": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "calculatorId": {
+                            "anyOf": [
+                              {
+                                "enum": [
+                                  "au.pay.take-home",
+                                  "au.pay.withholdings"
+                                ],
+                                "type": "string"
+                              },
+                              {
+                                "anyOf": [
+                                  {
+                                    "enum": ["au.income-tax.annual"],
+                                    "type": "string"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "context": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "jurisdiction": {
+                                "anyOf": [
+                                  {
+                                    "anyOf": [
+                                      {
+                                        "enum": ["AU"],
+                                        "type": "string"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "anyOf": [
+                                      {
+                                        "enum": ["AU"],
+                                        "type": "string"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              "taxYear": {
+                                "enum": ["2025-26", "2025-26"],
+                                "type": "string"
+                              }
+                            },
+                            "required": ["jurisdiction", "taxYear"],
+                            "type": "object"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "inputFactIds": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "outputFactIds": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "reportSchemaName": {
+                            "type": "string"
+                          },
+                          "ruleIds": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "supportedHelpModes": {
+                            "items": {
+                              "enum": [
+                                "none",
+                                "errors",
+                                "schema",
+                                "examples",
+                                "sources",
+                                "full"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "calculatorId",
+                          "context",
+                          "description",
+                          "inputFactIds",
+                          "outputFactIds",
+                          "reportSchemaName",
+                          "ruleIds",
+                          "supportedHelpModes",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["calculators"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/calculators/{calculatorId}": {
+      "get": {
+        "description": "Return one public calculator catalog entry.",
+        "operationId": "calculatorApi.getCalculator",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "calculatorId",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                  "type": "string"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "enum": ["au.income-tax.annual"],
+                      "type": "string"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "help",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "none",
+                    "errors",
+                    "schema",
+                    "examples",
+                    "sources",
+                    "full"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26", "2025-26"],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "calculatorId": {
+                      "anyOf": [
+                        {
+                          "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                          "type": "string"
+                        },
+                        {
+                          "anyOf": [
+                            {
+                              "enum": ["au.income-tax.annual"],
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "context": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "jurisdiction": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "enum": ["AU"],
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "enum": ["AU"],
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "taxYear": {
+                          "enum": ["2025-26", "2025-26"],
+                          "type": "string"
+                        }
+                      },
+                      "required": ["jurisdiction", "taxYear"],
+                      "type": "object"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "inputFactIds": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "outputFactIds": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "reportSchemaName": {
+                      "type": "string"
+                    },
+                    "ruleIds": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "supportedHelpModes": {
+                      "items": {
+                        "enum": [
+                          "none",
+                          "errors",
+                          "schema",
+                          "examples",
+                          "sources",
+                          "full"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "calculatorId",
+                    "context",
+                    "description",
+                    "inputFactIds",
+                    "outputFactIds",
+                    "reportSchemaName",
+                    "ruleIds",
+                    "supportedHelpModes",
+                    "title"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/CalculationError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/CalculatorInputDecodeError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/UnsupportedCalculatorError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/UnsupportedCalculatorContextError"
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/calculators/{calculatorId}/calculate": {
+      "post": {
+        "description": "Run one public calculator using canonical scenario decoding and rule-pack layers.",
+        "operationId": "calculatorApi.calculate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "calculatorId",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                  "type": "string"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "enum": ["au.income-tax.annual"],
+                      "type": "string"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "help",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "none",
+                    "errors",
+                    "schema",
+                    "examples",
+                    "sources",
+                    "full"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "facts": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "grossPay": {
+                            "$ref": "#/components/schemas/GrossPay"
+                          },
+                          "taxFreeThresholdClaimed": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": ["grossPay", "taxFreeThresholdClaimed"],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "taxableIncome": {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        },
+                        "required": ["taxableIncome"],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "jurisdiction": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "anyOf": [
+                              {
+                                "enum": ["AU"],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          {
+                            "anyOf": [
+                              {
+                                "enum": ["AU"],
+                                "type": "string"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "taxYear": {
+                    "anyOf": [
+                      {
+                        "enum": ["2025-26", "2025-26"],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": ["facts"],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "calculator": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "calculatorId": {
+                          "anyOf": [
+                            {
+                              "enum": [
+                                "au.pay.take-home",
+                                "au.pay.withholdings"
+                              ],
+                              "type": "string"
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "enum": ["au.income-tax.annual"],
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "context": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "jurisdiction": {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "enum": ["AU"],
+                                      "type": "string"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "anyOf": [
+                                    {
+                                      "enum": ["AU"],
+                                      "type": "string"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "taxYear": {
+                              "enum": ["2025-26", "2025-26"],
+                              "type": "string"
+                            }
+                          },
+                          "required": ["jurisdiction", "taxYear"],
+                          "type": "object"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "inputFactIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "outputFactIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "reportSchemaName": {
+                          "type": "string"
+                        },
+                        "ruleIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "supportedHelpModes": {
+                          "items": {
+                            "enum": [
+                              "none",
+                              "errors",
+                              "schema",
+                              "examples",
+                              "sources",
+                              "full"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "calculatorId",
+                        "context",
+                        "description",
+                        "inputFactIds",
+                        "outputFactIds",
+                        "reportSchemaName",
+                        "ruleIds",
+                        "supportedHelpModes",
+                        "title"
+                      ],
+                      "type": "object"
+                    },
+                    "diagnostics": {
+                      "$ref": "#/components/schemas/CalculationDiagnostics"
+                    },
+                    "report": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/TakeHomePayReport"
+                        },
+                        {
+                          "$ref": "#/components/schemas/PayWithholdingsLedger"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AnnualTaxReport"
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["calculator", "diagnostics", "report"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/CalculationError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/CalculatorInputDecodeError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/UnsupportedCalculatorError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/UnsupportedCalculatorContextError"
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/calculators/{calculatorId}/graph": {
+      "get": {
+        "description": "Return graph edges and canonical graph validation diagnostics for one calculator.",
+        "operationId": "calculatorApi.getCalculatorGraph",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "calculatorId",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                  "type": "string"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "enum": ["au.income-tax.annual"],
+                      "type": "string"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26", "2025-26"],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "calculator": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "calculatorId": {
+                          "anyOf": [
+                            {
+                              "enum": [
+                                "au.pay.take-home",
+                                "au.pay.withholdings"
+                              ],
+                              "type": "string"
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "enum": ["au.income-tax.annual"],
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "context": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "jurisdiction": {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "enum": ["AU"],
+                                      "type": "string"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "anyOf": [
+                                    {
+                                      "enum": ["AU"],
+                                      "type": "string"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "taxYear": {
+                              "enum": ["2025-26", "2025-26"],
+                              "type": "string"
+                            }
+                          },
+                          "required": ["jurisdiction", "taxYear"],
+                          "type": "object"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "inputFactIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "outputFactIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "reportSchemaName": {
+                          "type": "string"
+                        },
+                        "ruleIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "supportedHelpModes": {
+                          "items": {
+                            "enum": [
+                              "none",
+                              "errors",
+                              "schema",
+                              "examples",
+                              "sources",
+                              "full"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "calculatorId",
+                        "context",
+                        "description",
+                        "inputFactIds",
+                        "outputFactIds",
+                        "reportSchemaName",
+                        "ruleIds",
+                        "supportedHelpModes",
+                        "title"
+                      ],
+                      "type": "object"
+                    },
+                    "edges": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "from": {
+                            "type": "string"
+                          },
+                          "ruleId": {
+                            "type": "string"
+                          },
+                          "to": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["from", "ruleId", "to"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "facts": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "authority": {
+                            "enum": ["input", "derived", "parameter"],
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "question": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/FactQuestion"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "schemaTag": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["authority", "id", "schemaTag", "title"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "rules": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "allowDuplicateProvides": {
+                            "anyOf": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "parameters": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "effectivePeriod": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "from": {
+                                      "type": "string"
+                                    },
+                                    "toExclusive": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": ["from"],
+                                  "type": "object"
+                                },
+                                "id": {
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "_tag": {
+                                      "enum": ["SourceRef"],
+                                      "type": "string"
+                                    },
+                                    "kind": {
+                                      "enum": [
+                                        "ato-publication",
+                                        "legislation",
+                                        "regulation",
+                                        "internal-validation"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "reference": {
+                                      "type": "string"
+                                    },
+                                    "title": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "_tag",
+                                    "kind",
+                                    "reference",
+                                    "title"
+                                  ],
+                                  "type": "object"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "effectivePeriod",
+                                "id",
+                                "source",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "provides": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "requires": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "sourcePolicy": {
+                            "enum": ["not-required", "required"],
+                            "type": "string"
+                          },
+                          "sources": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "_tag": {
+                                  "enum": ["SourceRef"],
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "ato-publication",
+                                    "legislation",
+                                    "regulation",
+                                    "internal-validation"
+                                  ],
+                                  "type": "string"
+                                },
+                                "reference": {
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "_tag",
+                                "kind",
+                                "reference",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "parameters",
+                          "provides",
+                          "requires",
+                          "sourcePolicy",
+                          "sources",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "validationIssues": {
+                      "items": {
+                        "$ref": "#/components/schemas/GraphValidationIssue"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "calculator",
+                    "edges",
+                    "facts",
+                    "rules",
+                    "validationIssues"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/CalculationError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/CalculatorInputDecodeError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/UnsupportedCalculatorError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/UnsupportedCalculatorContextError"
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/calculators/{calculatorId}/schema": {
+      "get": {
+        "description": "Return fact, rule and report schema metadata for one calculator.",
+        "operationId": "calculatorApi.getCalculatorSchema",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "calculatorId",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                  "type": "string"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "enum": ["au.income-tax.annual"],
+                      "type": "string"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "help",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "none",
+                    "errors",
+                    "schema",
+                    "examples",
+                    "sources",
+                    "full"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26", "2025-26"],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "calculator": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "calculatorId": {
+                          "anyOf": [
+                            {
+                              "enum": [
+                                "au.pay.take-home",
+                                "au.pay.withholdings"
+                              ],
+                              "type": "string"
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "enum": ["au.income-tax.annual"],
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "context": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "jurisdiction": {
+                              "anyOf": [
+                                {
+                                  "anyOf": [
+                                    {
+                                      "enum": ["AU"],
+                                      "type": "string"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "anyOf": [
+                                    {
+                                      "enum": ["AU"],
+                                      "type": "string"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "taxYear": {
+                              "enum": ["2025-26", "2025-26"],
+                              "type": "string"
+                            }
+                          },
+                          "required": ["jurisdiction", "taxYear"],
+                          "type": "object"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "inputFactIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "outputFactIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "reportSchemaName": {
+                          "type": "string"
+                        },
+                        "ruleIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "supportedHelpModes": {
+                          "items": {
+                            "enum": [
+                              "none",
+                              "errors",
+                              "schema",
+                              "examples",
+                              "sources",
+                              "full"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "calculatorId",
+                        "context",
+                        "description",
+                        "inputFactIds",
+                        "outputFactIds",
+                        "reportSchemaName",
+                        "ruleIds",
+                        "supportedHelpModes",
+                        "title"
+                      ],
+                      "type": "object"
+                    },
+                    "inputFacts": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "authority": {
+                            "enum": ["input", "derived", "parameter"],
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "question": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/FactQuestion"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "schemaTag": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["authority", "id", "schemaTag", "title"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "outputFacts": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "authority": {
+                            "enum": ["input", "derived", "parameter"],
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "question": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/FactQuestion"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "schemaTag": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["authority", "id", "schemaTag", "title"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "reportSchemaName": {
+                      "type": "string"
+                    },
+                    "rules": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "allowDuplicateProvides": {
+                            "anyOf": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "parameters": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "effectivePeriod": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "from": {
+                                      "type": "string"
+                                    },
+                                    "toExclusive": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": ["from"],
+                                  "type": "object"
+                                },
+                                "id": {
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "_tag": {
+                                      "enum": ["SourceRef"],
+                                      "type": "string"
+                                    },
+                                    "kind": {
+                                      "enum": [
+                                        "ato-publication",
+                                        "legislation",
+                                        "regulation",
+                                        "internal-validation"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "reference": {
+                                      "type": "string"
+                                    },
+                                    "title": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "_tag",
+                                    "kind",
+                                    "reference",
+                                    "title"
+                                  ],
+                                  "type": "object"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "effectivePeriod",
+                                "id",
+                                "source",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "provides": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "requires": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "sourcePolicy": {
+                            "enum": ["not-required", "required"],
+                            "type": "string"
+                          },
+                          "sources": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "_tag": {
+                                  "enum": ["SourceRef"],
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "ato-publication",
+                                    "legislation",
+                                    "regulation",
+                                    "internal-validation"
+                                  ],
+                                  "type": "string"
+                                },
+                                "reference": {
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "_tag",
+                                "kind",
+                                "reference",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "parameters",
+                          "provides",
+                          "requires",
+                          "sourcePolicy",
+                          "sources",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "calculator",
+                    "inputFacts",
+                    "outputFacts",
+                    "reportSchemaName",
+                    "rules"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/CalculationError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/CalculatorInputDecodeError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/UnsupportedCalculatorError"
+                        },
+                        {
+                          "$ref": "#/components/schemas/UnsupportedCalculatorContextError"
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/facts": {
+      "get": {
+        "description": "List canonical fact descriptors, optionally filtered by calculator context.",
+        "operationId": "calculatorApi.listFacts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "calculator",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                      "type": "string"
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["au.income-tax.annual"],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26", "2025-26"],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "facts": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "authority": {
+                            "enum": ["input", "derived", "parameter"],
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "question": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/FactQuestion"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "schemaTag": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["authority", "id", "schemaTag", "title"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["facts"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/jurisdictions": {
+      "get": {
+        "description": "List supported public API jurisdictions.",
+        "operationId": "calculatorApi.getJurisdictions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "jurisdictions": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "code": {
+                            "anyOf": [
+                              {
+                                "anyOf": [
+                                  {
+                                    "enum": ["AU"],
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              {
+                                "anyOf": [
+                                  {
+                                    "enum": ["AU"],
+                                    "type": "string"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["code", "title"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["jurisdictions"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/rules": {
+      "get": {
+        "description": "List canonical rule descriptors, optionally filtered by calculator context.",
+        "operationId": "calculatorApi.listRules",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "calculator",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                      "type": "string"
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["au.income-tax.annual"],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26", "2025-26"],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "rules": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "allowDuplicateProvides": {
+                            "anyOf": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "parameters": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "effectivePeriod": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "from": {
+                                      "type": "string"
+                                    },
+                                    "toExclusive": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": ["from"],
+                                  "type": "object"
+                                },
+                                "id": {
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "_tag": {
+                                      "enum": ["SourceRef"],
+                                      "type": "string"
+                                    },
+                                    "kind": {
+                                      "enum": [
+                                        "ato-publication",
+                                        "legislation",
+                                        "regulation",
+                                        "internal-validation"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "reference": {
+                                      "type": "string"
+                                    },
+                                    "title": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "_tag",
+                                    "kind",
+                                    "reference",
+                                    "title"
+                                  ],
+                                  "type": "object"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "effectivePeriod",
+                                "id",
+                                "source",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "provides": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "requires": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "sourcePolicy": {
+                            "enum": ["not-required", "required"],
+                            "type": "string"
+                          },
+                          "sources": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "_tag": {
+                                  "enum": ["SourceRef"],
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "ato-publication",
+                                    "legislation",
+                                    "regulation",
+                                    "internal-validation"
+                                  ],
+                                  "type": "string"
+                                },
+                                "reference": {
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "_tag",
+                                "kind",
+                                "reference",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "parameters",
+                          "provides",
+                          "requires",
+                          "sourcePolicy",
+                          "sources",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["rules"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/tax-years": {
+      "get": {
+        "description": "List supported tax years for a jurisdiction.",
+        "operationId": "calculatorApi.getTaxYears",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "enum": ["AU"],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26", "2025-26"],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "taxYears": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "jurisdiction": {
+                            "anyOf": [
+                              {
+                                "anyOf": [
+                                  {
+                                    "enum": ["AU"],
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              {
+                                "anyOf": [
+                                  {
+                                    "enum": ["AU"],
+                                    "type": "string"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "taxYear": {
+                            "enum": ["2025-26", "2025-26"],
+                            "type": "string"
+                          }
+                        },
+                        "required": ["jurisdiction", "taxYear"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["taxYears"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    }
+  },
+  "security": [],
+  "tags": [
+    {
+      "name": "Health"
+    },
+    {
+      "name": "Calculator API"
+    }
+  ]
+}
