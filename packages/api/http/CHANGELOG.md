@@ -1,5 +1,15 @@
 # @whattax/api-http
 
+## 0.0.4
+
+### Patch Changes
+
+- 190d238: Add OpenAPI snapshot checks, route fixture coverage and the live API smoke
+  workflow for the API HTTP package.
+  - @whattax/core@0.0.4
+  - @whattax/sdk@0.0.4
+  - @whattax/calculators@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes
