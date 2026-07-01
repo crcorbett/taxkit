@@ -1,5 +1,12 @@
 # @whattax/tsconfig
 
+## 0.0.3
+
+### Patch Changes
+
+- Fixed release-train version alignment for the API HTTP package topology
+  release. No package-local runtime changes.
+
 ## 0.0.2
 
 ### Patch Changes

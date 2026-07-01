@@ -1,5 +1,13 @@
 # @whattax/calculators
 
+## 0.0.3
+
+### Patch Changes
+
+- @whattax/core@0.0.3
+- @whattax/rules-au-income-tax@0.0.3
+- @whattax/rules-au-pay@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes
