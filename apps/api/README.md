@@ -73,6 +73,7 @@ Changesets.
 ```sh
 bun run --filter=api dev
 bun run --filter=api start
+bun run --filter=api smoke:public-routes
 bun run --filter=api check-types
 bun run --filter=api build
 bun run --filter=api clean
@@ -89,6 +90,29 @@ bun run --filter=web dev
 `https://api.whattax.localhost`. `bun run --filter=web dev` injects that URL
 into `WHATTAX_API_BASE_URL` for SSR and `VITE_WHATTAX_API_BASE_URL` for browser
 navigation.
+
+## Public-route smoke
+
+Use the app-owned smoke command when you need proof that the standalone Bun
+process serves the current public API contract:
+
+```sh
+bun run --filter=api smoke:public-routes
+```
+
+The command starts `apps/api` at `http://127.0.0.1:4173`, waits for
+`GET /api/health`, calls the public calculator metadata route, posts one
+take-home-pay calculation and reads the generated OpenAPI document:
+
+- `GET /api/health`
+- `GET /api/v1/calculators`
+- `POST /api/v1/calculators/au.pay.take-home/calculate`
+- `GET /api/docs/openapi.json`
+
+The smoke script owns process lifecycle only. It validates response bodies with
+schemas exported by `@whattax/api-http` where those schemas are public, and it
+lets the app process stop through Effect-scoped child process cleanup on
+success or failure.
 
 Use the portless URL for local API smoke checks:
 

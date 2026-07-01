@@ -2,4 +2,5 @@
 "@whattax/api-http": patch
 ---
 
-Add OpenAPI snapshot compatibility checks for the API HTTP package.
+Add OpenAPI snapshot checks, route fixture coverage and the live API smoke
+workflow for the API HTTP package.

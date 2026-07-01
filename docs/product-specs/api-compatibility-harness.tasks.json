@@ -2,7 +2,7 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/api-compatibility-harness.md",
   "title": "API Compatibility Harness Implementation Tasks",
-  "status": "draft",
+  "status": "implemented",
   "last_reviewed": "2026-07-01",
   "principles": [
     "Pin the public HTTP API contract before adding broader API, SDK or app surface area.",
@@ -222,7 +222,7 @@
     },
     {
       "id": "API-COMPAT-003",
-      "status": "pending",
+      "status": "completed",
       "title": "Add live API app smoke and documentation",
       "type": "runtime-smoke-and-docs",
       "dependsOn": [

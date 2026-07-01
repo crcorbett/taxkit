@@ -14,7 +14,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [API compatibility harness](./api-compatibility-harness.md) | Draft | Proposed OpenAPI snapshot, route fixtures and live API app smoke coverage for public API drift. |
+| [API compatibility harness](./api-compatibility-harness.md) | Implemented | OpenAPI snapshot, route fixtures and live API app smoke coverage are in place. |
 | [API HTTP package topology](./api-http-package-topology.md) | Implemented | The implemented HTTP API package now lives at `packages/api/http` as `@whattax/api-http`. |
 | [Documentation structure and development docs](./documentation-structure-and-development-docs.md) | Canonical | Baseline docs structure and local skill routing. |
 | [Documentation improvement roadmap](./documentation-improvement-roadmap.md) | Implemented | README coverage, root routing and maintenance conventions are in place. |

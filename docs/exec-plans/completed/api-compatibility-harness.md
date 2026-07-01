@@ -1,5 +1,5 @@
 ---
-status: active
+status: completed
 last_reviewed: 2026-07-01
 source_of_truth: execution-plan
 confidence: high
@@ -21,13 +21,15 @@ and commits each coherent slice before delegating the next task. After the
 third failed parent correction turn for the same task, the rollout stops for
 replan or user decision.
 
+Completed on 2026-07-01.
+
 ## Status
 
 | Task | Status | Notes |
 | --- | --- | --- |
 | API-COMPAT-001 | completed | Package-owned OpenAPI source, normalized snapshot, focused test/scripts, README workflow and Changeset are in place. |
 | API-COMPAT-002 | completed | Route fixtures and SDK/error parity coverage added in the in-process API HTTP test. |
-| API-COMPAT-003 | pending | Add live API app smoke and documentation after API-COMPAT-001 and API-COMPAT-002 are accepted. |
+| API-COMPAT-003 | completed | Live API app smoke, README workflow docs and cleanup audits are in place. |
 
 ## Validation Log
 
@@ -159,6 +161,76 @@ replan or user decision.
   `bun run --filter=@whattax/sdk check-boundaries` and
   `bun run verification`.
 
+### 2026-07-01 - API-COMPAT-003 validation
+
+- Added app-owned live smoke runtime
+  `apps/api/scripts/smoke-public-routes.runtime.ts` and command
+  `bun run --filter=api smoke:public-routes`.
+- Smoke call graph:
+  `ChildProcess.make("bun", ["src/index.ts"])` from `apps/api` with
+  deterministic `API_HOST=127.0.0.1` and `API_PORT=4173` ->
+  `apps/api/src/index.ts` -> `ApiAppLayer` -> `WhatTaxServerLayer` ->
+  public routes owned by `@whattax/api-http`.
+- Smoke route coverage:
+  `GET /api/health`, `GET /api/v1/calculators`,
+  `POST /api/v1/calculators/au.pay.take-home/calculate` and
+  `GET /api/docs/openapi.json`.
+- The smoke payload uses rule/core-owned constructors
+  `new GrossPay({ amount: aud(346_200), period: "fortnightly" })`, decodes and
+  encodes through `CalculatorRunRequest`, decodes catalog and calculate
+  responses through `CalculatorCatalogResponse` and `CalculatorRunResponse`,
+  and treats OpenAPI JSON as `Schema.Json`.
+- Process lifecycle is Effect-owned: the smoke entrypoint runs with
+  `BunRuntime.runMain`, starts the child through `effect/unstable/process`
+  `ChildProcess` with `BunServices.layer`, uses `BunHttpClient.layer` for
+  route calls, retries health with `Schedule`, and lets `Effect.scoped` kill
+  the child with `SIGTERM` and `forceKillAfter: "2 seconds"` on success or
+  failure.
+- Success cleanup audit passed:
+  `bun run --filter=api smoke:public-routes` printed all four route pass lines,
+  `WhatTax API stopped` and `apps/api smoke process stopped`; follow-up
+  `ps -axo pid,command | rg 'bun .*src/index\\.ts|apps/api/src/index\\.ts' | rg -v 'rg|smoke-public-routes'`
+  and `lsof -nP -iTCP:4173 -sTCP:LISTEN` returned no matches.
+- Failure cleanup audit passed by occupying `127.0.0.1:4173` with a temporary
+  local Bun server and rerunning `bun run --filter=api smoke:public-routes`.
+  The API child failed to bind, the smoke failed with typed `SmokeRouteError:
+  Timed out waiting for http://127.0.0.1:4173/api/health`, and follow-up `ps`
+  plus `lsof` checks returned no `apps/api` process or listener after the
+  temporary occupier was stopped.
+- Updated `apps/api/README.md` with the smoke command, deterministic local
+  address, public route coverage and process-lifecycle ownership.
+- Updated `packages/api/http/README.md` with the OpenAPI snapshot command,
+  route fixture coverage, live smoke handoff to `apps/api` and intentional
+  contract-change workflow.
+- Updated `.changeset/openapi-snapshot-harness.md` to cover OpenAPI snapshot
+  checks, route fixture coverage and live API smoke workflow docs for the
+  existing `@whattax/api-http` patch entry. No separate Changeset was added for
+  the app-owned smoke command because `apps/api` is private app-internal
+  tooling and this slice did not change public route behaviour.
+- Changeset status evidence:
+  `bun run changeset status --verbose` reports the fixed release group would
+  patch `@whattax/api-http` to `0.0.4` when applied, along with the existing
+  fixed-group workspace package patches.
+- Mandatory verification passed:
+  `bun run --filter=api smoke:public-routes`,
+  `bun run --filter=api check-types`,
+  `bun run --filter=api build`,
+  `bun run --filter=@whattax/api-http test` (2 files, 5 tests),
+  `bun run --filter=@whattax/api-http check-types`,
+  `bun run --filter=@whattax/api-http build`, `bun run docs:validate`,
+  `bun run test`, `bun run build` and `bun run verification`.
+- `bun run build` passed with the existing Rolldown
+  `INVALID_ANNOTATION` warning from Effect's generated
+  `HttpRouter.js`; Turbo completed successfully.
+- Parent reran `bun run --filter=api smoke:public-routes`,
+  `bun run --filter=api check-types`, `bun run --filter=api build`,
+  `bun run --filter=@whattax/api-http test`,
+  `bun run --filter=@whattax/api-http check-types`,
+  `bun run --filter=@whattax/api-http build`, `bun run docs:validate`,
+  `bun run test`, `bun run build`, `bun run verification`,
+  `bun run changeset status --verbose`, `git diff --check`, success cleanup
+  checks and the occupied-port failure cleanup audit; all passed.
+
 ## Parent Audit Log
 
 ### API-COMPAT-001
@@ -202,9 +274,22 @@ replan or user decision.
 
 ### API-COMPAT-003
 
-- Pending.
+- Accepted after local review. Correction turns: 0.
+- Audit pass 1: final call graph matches the spec target and keeps runtime
+  ownership split correctly. `apps/api` starts and stops the Bun process; the
+  live smoke only calls public HTTP routes; `@whattax/api-http` remains the
+  route contract, OpenAPI, schema and fixture owner.
+- Audit pass 2: smoke lifecycle uses Effect platform/runtime primitives where
+  they fit. Command execution uses `ChildProcess` with `BunServices.layer`,
+  route calls use `BunHttpClient.layer`, health polling uses `Schedule`,
+  expected smoke failures use `Data.TaggedError`, and `Effect.scoped` performs
+  cleanup on success and failure.
+- Audit pass 3: docs and boundaries are compact and current. The app README
+  owns live smoke usage; the API HTTP README owns snapshot, route fixture and
+  intentional contract-change workflow; the smoke script reuses canonical
+  schemas and constructors with no local DTO mirrors, unsafe casts, manual
+  `_tag` literals, browser/server import leaks or helper sprawl.
 
 ## Residual Risks
 
-- None for API-COMPAT-001 or API-COMPAT-002. API-COMPAT-003 live app smoke
-  remains pending and was not started.
+- None known for API-COMPAT-001, API-COMPAT-002 or API-COMPAT-003.

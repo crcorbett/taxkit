@@ -25,6 +25,8 @@
       "devDependencies": {
         "@types/bun": "catalog:",
         "@types/node": "catalog:",
+        "@whattax/core": "workspace:*",
+        "@whattax/rules-au-pay": "workspace:*",
         "@whattax/tsconfig": "workspace:*",
         "typescript": "catalog:",
       },
@@ -73,7 +75,7 @@
     },
     "packages/api/http": {
       "name": "@whattax/api-http",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "dependencies": {
         "@whattax/calculators": "workspace:*",
         "@whattax/core": "workspace:*",
@@ -91,7 +93,7 @@
     },
     "packages/calculators": {
       "name": "@whattax/calculators",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "dependencies": {
         "@whattax/core": "workspace:*",
         "@whattax/rules-au-income-tax": "workspace:*",
@@ -107,7 +109,7 @@
     },
     "packages/core": {
       "name": "@whattax/core",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -156,7 +158,7 @@
     },
     "packages/rules/au/income-tax": {
       "name": "@whattax/rules-au-income-tax",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "dependencies": {
         "@whattax/core": "workspace:*",
         "effect": "catalog:",
@@ -171,7 +173,7 @@
     },
     "packages/rules/au/pay": {
       "name": "@whattax/rules-au-pay",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "dependencies": {
         "@whattax/core": "workspace:*",
         "effect": "catalog:",
@@ -186,7 +188,7 @@
     },
     "packages/rules/au/stsl": {
       "name": "@whattax/rules-au-stsl",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "dependencies": {
         "@whattax/core": "workspace:*",
         "@whattax/rules-au-pay": "workspace:*",
@@ -202,7 +204,7 @@
     },
     "packages/sdk/typescript": {
       "name": "@whattax/sdk",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "dependencies": {
         "@whattax/calculators": "workspace:*",
         "@whattax/rules-au-income-tax": "workspace:*",
@@ -220,7 +222,7 @@
     },
     "packages/testing": {
       "name": "@whattax/testing",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
@@ -228,7 +230,7 @@
     },
     "packages/tsconfig": {
       "name": "@whattax/tsconfig",
-      "version": "0.0.2",
+      "version": "0.0.3",
     },
   },
   "catalog": {

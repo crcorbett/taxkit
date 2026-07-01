@@ -12,6 +12,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [API compatibility harness](./api-compatibility-harness.md)
 - [API HTTP package topology](./api-http-package-topology.md)
 - [Release readiness 2026-07-01](./release-readiness-2026-07-01.md)
 - [Documentation improvement roadmap](./documentation-improvement-roadmap.md)

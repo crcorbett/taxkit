@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implemented
 last_reviewed: 2026-07-01
 source_of_truth: docs
 confidence: high
@@ -14,9 +14,8 @@ surface area.
 
 The API app and HTTP API package now sit in the intended topology:
 `apps/api` owns the standalone Bun runtime, and `packages/api/http` owns
-`@whattax/api-http`. The next foundation layer is a deterministic
-compatibility harness that makes public route and OpenAPI drift visible during
-normal development.
+`@whattax/api-http`. This spec added a deterministic compatibility harness
+that makes public route and OpenAPI drift visible during normal development.
 
 This spec adds three pieces of proof:
 
@@ -26,6 +25,13 @@ This spec adds three pieces of proof:
   schema-guided error responses
 - a live API app smoke command that starts `apps/api`, calls public routes and
   shuts the process down cleanly
+
+## Implementation status
+
+Implemented on 2026-07-01. The HTTP API package now owns a normalized OpenAPI
+snapshot, route fixture tests and compatibility update workflow. The API app
+now owns `bun run --filter=api smoke:public-routes` for live process smoke
+coverage.
 
 ## Problem
 

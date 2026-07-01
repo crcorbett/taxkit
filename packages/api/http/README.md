@@ -175,6 +175,7 @@ bun run --filter=@whattax/api-http check-types
 bun run --filter=@whattax/api-http test
 bun run --filter=@whattax/api-http test:openapi
 bun run --filter=@whattax/api-http update-openapi-snapshot
+bun run --filter=api smoke:public-routes
 ```
 
 ## OpenAPI Compatibility
@@ -218,6 +219,62 @@ For an intentional OpenAPI contract change:
 5. Add a Changeset when the OpenAPI change reflects package-facing API
    behaviour or documented package usage. Internal test-only snapshot refreshes
    can record an explicit no-Changeset rationale instead.
+
+## Route fixtures and live smoke
+
+The package test suite owns route contract fixtures for the current public
+surface. `__tests__/public-calculation-api.test.ts` covers:
+
+- `GET /api/health`
+- `GET /api/v1/calculators`
+- successful `POST /api/v1/calculators/au.pay.take-home/calculate`
+- schema-guided calculator input errors through `CalculatorApiErrorEnvelope`
+
+The calculate success fixture compares the HTTP response with
+`@whattax/sdk/effect` `calculateRunRequest`. The expected input-error fixture
+decodes the transport envelope and checks that the underlying
+`CalculatorServiceError` matches the SDK and calculator service failures.
+
+`apps/api` owns the live process smoke:
+
+```sh
+bun run --filter=api smoke:public-routes
+```
+
+Use it after package fixture changes when you need proof that the standalone
+API app serves the same contract through Bun. Do not move process startup,
+host/port config or child-process cleanup into this package.
+
+## Intentional contract changes
+
+For an intentional public API contract change:
+
+1. Update the owning schema, API group annotation, handler boundary or
+   calculator-owned contract.
+2. Refresh the OpenAPI snapshot when generated route, status or schema
+   references change:
+
+   ```sh
+   bun run --filter=@whattax/api-http update-openapi-snapshot
+   ```
+
+3. Update route fixture assertions for the changed health, metadata,
+   calculate or error-envelope behaviour.
+4. Update package or app READMEs when commands, routes or public workflow
+   expectations change.
+5. Run the compatibility gates:
+
+   ```sh
+   bun run --filter=@whattax/api-http test
+   bun run --filter=@whattax/api-http check-types
+   bun run --filter=@whattax/api-http build
+   bun run --filter=api smoke:public-routes
+   ```
+
+6. Add a Changeset when package-facing API behaviour, exported package usage
+   or documented package promises change. Record a no-Changeset rationale for
+   internal fixtures, snapshots or app-owned smoke tooling that do not affect
+   package consumers.
 
 ## Guardrails
 

@@ -11,4 +11,4 @@ Live implementation plans belong here while work is in progress.
 
 Active plans:
 
-- [API compatibility harness](./api-compatibility-harness.md)
+- No active execution plans.
