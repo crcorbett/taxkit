@@ -1,0 +1,421 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/downstream-consumer-validation.md",
+  "title": "Downstream Consumer Validation Implementation Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-07-01",
+  "principles": [
+    "Prove consumer behaviour from outside the monorepo before publication.",
+    "Keep SDK downstream validation owned by packages/sdk/typescript while packages/scripts remains planned.",
+    "Keep apps/api as the live process owner and @whattax/api-http as the HTTP contract and client owner.",
+    "Treat unresolved workspace protocol dependencies in packed manifests as release-blocker evidence, not as a reason to weaken validation.",
+    "Reuse canonical schemas, descriptors, tagged errors and SDK/API exports instead of writing local DTO mirrors in the downstream workspace.",
+    "Require parent review, final call-graph verification and three documented improvement audit passes before accepting each implementation slice."
+  ],
+  "beforeImplementation": [
+    "Create an active execution plan under docs/exec-plans/active/ before editing runtime, package scripts or package docs.",
+    "Set one comprehensive goal stating that tasks are implemented sequentially, one subagent per task, with parent review before the next task begins.",
+    "Record current SDK packed-artifact behaviour, SDK package manifest dependency protocols and API smoke commands before changing files.",
+    "Do not run bun run version-repo, remove private: true or publish unless the user explicitly asks for a release-prep/versioning slice."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit after each coherent implementation slice passes mandatory verification, Changeset review or no-Changeset rationale, and parent audit.",
+    "requiredBeforeFinalPR": [
+      "bun run --filter=@whattax/sdk check-packed-artifact",
+      "bun run --filter=@whattax/sdk validate:downstream",
+      "bun run --filter=@whattax/sdk check-boundaries",
+      "bun run --filter=@whattax/sdk test-types",
+      "bun run --filter=@whattax/sdk test",
+      "bun run --filter=@whattax/sdk build",
+      "bun run --filter=@whattax/api-http test",
+      "bun run --filter=api smoke:public-routes",
+      "bun run docs:validate",
+      "bun run test",
+      "bun run build",
+      "bun run verification",
+      "bun run changeset status --verbose when a Changeset exists, or explicit no-Changeset rationale for docs-only or app-internal slices"
+    ],
+    "evidenceRequired": [
+      "Current and final call graph summary for packed SDK validation, downstream workspace validation and live API smoke coverage.",
+      "Temp workspace path policy, cleanup policy and retained debug evidence policy.",
+      "Packed artifact and dependency install strategy, including unresolved workspace protocol findings.",
+      "Downstream typecheck evidence for valid examples and @ts-expect-error misuse.",
+      "Downstream runtime evidence for plain SDK and Effect SDK calculations.",
+      "Downstream browser-safe bundle evidence for root, AU and schemas entrypoints.",
+      "Live API smoke evidence for health, metadata, calculate and OpenAPI routes.",
+      "Changeset path and release-train impact, or explicit no-Changeset rationale.",
+      "Parent audit outcome for each task, including up to three correction turns when needed."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "DOWNSTREAM-001",
+      "status": "pending",
+      "title": "Audit current validation and design the downstream harness",
+      "type": "foundation-audit",
+      "dependsOn": [],
+      "goal": "Confirm the current packed-artifact, package manifest and API smoke behaviour before adding a consumer workspace harness.",
+      "scope": [
+        "Inspect packages/sdk/typescript/scripts/check-packed-artifact.ts, packages/sdk/typescript/package.json, packages/sdk/typescript/README.md and SDK type/runtime tests.",
+        "Inspect packages/api/http/package.json, packages/api/http README/tests and apps/api/scripts/smoke-public-routes.runtime.ts.",
+        "Record which package manifests still contain workspace:* dependency protocols and which packed artifacts are needed for an external install.",
+        "Decide whether the first implementation should install a packed dependency closure or fail with explicit workspace-protocol blocker diagnostics.",
+        "Create or update the active execution plan with current validation surfaces, chosen harness shape and verification gates.",
+        "Do not add runtime code in this task unless the audit proves a tiny script/package metadata change is required to make the next task reviewable."
+      ],
+      "outputs": [
+        "docs/exec-plans/active/downstream-consumer-validation.md",
+        "Optional updates to docs/product-specs/downstream-consumer-validation.md if the audit discovers a different target call graph.",
+        "Optional updates to docs/product-specs/downstream-consumer-validation.tasks.json if implementation sequencing changes.",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "taskSpecificScope": [
+          "Keep the audit grounded in current files and current package manifests.",
+          "Do not route runtime ownership to packages/scripts while it remains a placeholder.",
+          "Do not publish, version, remove private: true or run live package-name checks.",
+          "Do not name private downstream products in committed docs or evidence."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/sdk check-packed-artifact",
+        "bun run --filter=api smoke:public-routes",
+        "bun run docs:validate",
+        "bun run verification",
+        "Manifest audit documenting unresolved workspace:* dependencies and the chosen downstream install strategy.",
+        "Call-graph audit documenting whether the spec's target graphs still match the implementation plan.",
+        "bun run changeset or explicit no-Changeset rationale for docs/plan-only audit work"
+      ],
+      "browserVerification": [
+        "No browser-visible UI behaviour is expected to change.",
+        "Record the intended browser-safe downstream bundle entrypoints for later tasks."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: current validation call graphs are factual and package-owned.",
+        "Audit pass 2: planned harness ownership follows API/SDK, package-ownership and Effect-services docs.",
+        "Audit pass 3: planned verification gates cover packed install, typecheck, runtime SDK, browser-safe bundle and API smoke evidence without helper sprawl or private downstream names."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "The active execution plan records the current validation surfaces and downstream harness design.",
+        "Workspace protocol dependency findings are recorded as either release blockers or dependency-closure requirements.",
+        "The spec call graphs and task list still match the chosen implementation plan.",
+        "No package-facing code changed without a Changeset decision.",
+        "Parent agent reviewed the audit evidence, final call graph and no-Changeset or Changeset decision before accepting the task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DOWNSTREAM-002",
+      "status": "pending",
+      "title": "Add SDK external workspace validation",
+      "type": "sdk-downstream-harness",
+      "dependsOn": [
+        "DOWNSTREAM-001"
+      ],
+      "goal": "Create the first deterministic downstream workspace proof for SDK package imports, typechecking, runtime calculations and browser-safe entrypoints.",
+      "scope": [
+        "Add an SDK-owned downstream validation script under packages/sdk/typescript/scripts.",
+        "Add a package command, such as bun run --filter=@whattax/sdk validate:downstream.",
+        "Create a temp consumer workspace outside the repo and write package.json, tsconfig.json and example source files.",
+        "Use packed SDK artifacts and either a packed dependency closure or explicit release-blocker diagnostics for workspace:* dependency protocols.",
+        "Typecheck valid imports from @whattax/sdk, @whattax/sdk/effect, @whattax/sdk/au, @whattax/sdk/au/effect, @whattax/sdk/schemas and @whattax/sdk/testing.",
+        "Include at least one @ts-expect-error misuse that proves downstream compile-time rejection.",
+        "Run at least one plain SDK calculation and one Effect SDK calculation through public entrypoints.",
+        "Run a minimal browser-safe bundling or equivalent build check for root, AU and schemas entrypoints.",
+        "Print a compact evidence summary and clean up the temp workspace on success."
+      ],
+      "outputs": [
+        "packages/sdk/typescript/scripts/validate-downstream-consumer.ts",
+        "packages/sdk/typescript/package.json",
+        "packages/sdk/typescript/README.md",
+        "docs/exec-plans/active/downstream-consumer-validation.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "taskSpecificScope": [
+          "Keep the script SDK-owned and focused; do not create a generic packages/scripts runtime.",
+          "Use Effect/platform primitives for command execution, temp workspace lifecycle, cleanup and expected errors where they fit.",
+          "Do not mirror calculator DTOs in the downstream examples.",
+          "Do not silently ignore workspace:* dependency protocols in packed manifests."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/sdk validate:downstream",
+        "bun run --filter=@whattax/sdk check-packed-artifact",
+        "bun run --filter=@whattax/sdk check-boundaries",
+        "bun run --filter=@whattax/sdk test-types",
+        "bun run --filter=@whattax/sdk test",
+        "bun run --filter=@whattax/sdk build",
+        "Downstream evidence audit documenting temp workspace location policy, install strategy, typecheck result, runtime SDK result, browser-safe bundle result and cleanup result.",
+        "rg audit proving browser-safe downstream examples do not import @whattax/api-http, app modules or server-only modules.",
+        "bun run verification",
+        "bun run changeset for package-facing script/README changes, or explicit no-Changeset rationale if the implementation is internal validation-only"
+      ],
+      "browserVerification": [
+        "Downstream browser-safe bundle or equivalent build check for @whattax/sdk, @whattax/sdk/au and @whattax/sdk/schemas.",
+        "No browser route check is required unless implementation touches apps/web or apps/docs UI routes."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: downstream SDK call graph uses public SDK entrypoints and no workspace source aliases.",
+        "Audit pass 2: Effect script flow is linear, uses platform primitives where they fit, keeps one-off error handling inline and avoids helper sprawl.",
+        "Audit pass 3: examples reuse canonical schemas/descriptors/errors, contain no local DTO mirrors or unsafe casts, and browser-safe imports do not leak server-only modules."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "The SDK package exposes a downstream validation command.",
+        "The command creates and validates a temp workspace outside the monorepo.",
+        "The command proves package import resolution, downstream typecheck, runtime SDK calculations and browser-safe bundling.",
+        "The command reports unresolved workspace:* protocols as release blockers or validates the packed dependency closure.",
+        "The temp workspace cleanup policy is deterministic and documented by command output.",
+        "Parent agent reviewed the diff, evidence output, Changeset decision and final call graph before accepting the task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DOWNSTREAM-003",
+      "status": "pending",
+      "title": "Add downstream HTTP and API validation",
+      "type": "api-downstream-harness",
+      "dependsOn": [
+        "DOWNSTREAM-002"
+      ],
+      "goal": "Extend downstream proof to a real local apps/api process and public HTTP/API consumption without moving runtime ownership.",
+      "scope": [
+        "Extend the downstream validation command or add a focused companion mode for HTTP/API validation.",
+        "Start apps/api with deterministic host/port config from the validation command or reuse the app-owned smoke command as the process owner.",
+        "Wait for /api/health, then call public metadata, calculate and OpenAPI routes from the external consumer workspace.",
+        "If @whattax/api-http client exports are validated downstream, use client/live or browser-safe client exports only; do not import server handlers or app modules.",
+        "Compare public response evidence against canonical SDK/API expectations without local DTO mirrors.",
+        "Stop the API process cleanly on success and failure.",
+        "Record route coverage, response checks, process cleanup and any unresolved release blockers in the active execution plan."
+      ],
+      "outputs": [
+        "packages/sdk/typescript/scripts/validate-downstream-consumer.ts or focused companion script",
+        "packages/sdk/typescript/package.json if command flags or scripts change",
+        "apps/api/README.md if the downstream/API smoke relationship is documented",
+        "packages/api/http/README.md if client downstream validation is documented",
+        "docs/exec-plans/active/downstream-consumer-validation.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "taskSpecificScope": [
+          "Keep apps/api as the process lifecycle owner.",
+          "Keep @whattax/api-http as the contract/client owner.",
+          "Do not make @whattax/sdk depend on @whattax/api-http.",
+          "Do not leave API child processes running after validation failures."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/sdk validate:downstream",
+        "bun run --filter=api smoke:public-routes",
+        "bun run --filter=api check-types",
+        "bun run --filter=api build",
+        "bun run --filter=@whattax/api-http test",
+        "bun run --filter=@whattax/api-http check-types",
+        "bun run --filter=@whattax/api-http build",
+        "bun run --filter=@whattax/sdk check-boundaries",
+        "Live API cleanup audit proving downstream validation stops apps/api on success and failure.",
+        "HTTP route coverage audit documenting health, metadata, calculate and OpenAPI calls from the external workspace.",
+        "bun run docs:validate",
+        "bun run test",
+        "bun run build",
+        "bun run verification",
+        "bun run changeset for package-facing command/client/README changes, or explicit no-Changeset rationale for app-internal/docs-only work"
+      ],
+      "browserVerification": [
+        "If @whattax/api-http browser-safe client exports are validated, run the downstream browser-safe bundle check against those exports.",
+        "No browser route check is required unless implementation touches apps/web or apps/docs UI routes."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: downstream HTTP call graph keeps apps/api runtime lifecycle, @whattax/api-http contract/client ownership and SDK dependency direction intact.",
+        "Audit pass 2: process lifecycle and cleanup use Effect/platform primitives where they fit and expected errors remain typed or explicitly bounded.",
+        "Audit pass 3: HTTP examples use public routes/client exports only, contain no local DTO mirrors or unsafe casts, and do not leak server-only imports into browser-safe code."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Downstream validation proves public HTTP/API consumption against a real local apps/api process.",
+        "Health, metadata, calculate and OpenAPI routes are called from the external workspace.",
+        "The API process cleanup path works on success and failure.",
+        "The SDK still has no dependency on @whattax/api-http.",
+        "Parent agent reviewed the diff, API evidence, Changeset decision and final call graph before accepting the task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DOWNSTREAM-004",
+      "status": "pending",
+      "title": "Finalize release gate docs and evidence",
+      "type": "release-gate-docs",
+      "dependsOn": [
+        "DOWNSTREAM-002",
+        "DOWNSTREAM-003"
+      ],
+      "goal": "Make downstream validation part of the pre-publication release gate without publishing or versioning.",
+      "scope": [
+        "Update package READMEs and public docs references that describe local release-readiness validation commands.",
+        "Update this spec and task list status if implementation is complete.",
+        "Update the active execution plan with final validation evidence and move it to completed if implementation is accepted.",
+        "Run the full validation story in the order a future release-prep operator should use.",
+        "Document any remaining blockers, especially workspace protocol dependency issues or live package-name checks that must wait for publication.",
+        "Do not run bun run version-repo, publish or remove private: true."
+      ],
+      "outputs": [
+        "packages/sdk/typescript/README.md",
+        "apps/api/README.md if release-gate command relationship changes",
+        "packages/api/http/README.md if HTTP client validation command relationship changes",
+        "docs/product-specs/downstream-consumer-validation.md",
+        "docs/product-specs/downstream-consumer-validation.tasks.json",
+        "docs/exec-plans/completed/downstream-consumer-validation.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "taskSpecificScope": [
+          "Keep public docs neutral and do not name private downstream products.",
+          "Do not broaden into generated docs inventory or package relocation work.",
+          "Do not publish, version or remove private: true.",
+          "Record package-name availability as a future live release-prep check, not as current static truth."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/sdk validate:downstream",
+        "bun run --filter=@whattax/sdk check-packed-artifact",
+        "bun run --filter=@whattax/sdk check-boundaries",
+        "bun run --filter=@whattax/sdk test-types",
+        "bun run --filter=@whattax/sdk test",
+        "bun run --filter=@whattax/sdk build",
+        "bun run --filter=@whattax/api-http test",
+        "bun run --filter=api smoke:public-routes",
+        "bun run docs:validate",
+        "bun run test",
+        "bun run build",
+        "bun run verification",
+        "bun run changeset status --verbose when a Changeset exists, or explicit no-Changeset rationale for docs-only/app-internal updates",
+        "Release gate audit proving private: true remains in place and bun run version-repo/npm publish were not run."
+      ],
+      "browserVerification": [
+        "Downstream browser-safe bundle evidence remains current after docs and command updates.",
+        "No browser route check is required unless implementation touches apps/web or apps/docs UI routes."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: final spec, task list, READMEs and execution plan agree on the downstream validation call graph and release gate order.",
+        "Audit pass 2: final validation evidence covers packed install, typecheck, runtime SDK, browser-safe bundle, live API smoke, cleanup and blockers.",
+        "Audit pass 3: public docs are neutral, package boundaries remain intact, Changeset decisions are correct and no publish/version/private flag changes slipped in."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Downstream validation is documented as a pre-publication release gate.",
+        "Final evidence is recorded in the completed execution plan.",
+        "Remaining blockers and future live package-name checks are explicit.",
+        "No public docs mention private downstream products.",
+        "private: true remains in package manifests and no publication/versioning action was taken.",
+        "Parent agent reviewed final docs, evidence, Changeset status and release gate integrity before accepting the task."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}

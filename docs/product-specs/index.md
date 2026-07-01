@@ -18,6 +18,7 @@ Specs:
 | [API HTTP package topology](./api-http-package-topology.md) | Implemented | The implemented HTTP API package now lives at `packages/api/http` as `@whattax/api-http`. |
 | [Documentation structure and development docs](./documentation-structure-and-development-docs.md) | Canonical | Baseline docs structure and local skill routing. |
 | [Documentation improvement roadmap](./documentation-improvement-roadmap.md) | Implemented | README coverage, root routing and maintenance conventions are in place. |
+| [Downstream consumer validation](./downstream-consumer-validation.md) | Draft | Pre-publication external workspace validation for SDK/API/docs consumption without npm publish. |
 | [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md) | Implemented | Generic Fumadocs code, WhatTax docs contracts and app rendering are split. |
 | [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md) | Implemented | Docs content package, docs app runtime and validation path exist. |
 | [Extract API app](./extract-api-app.md) | Implemented | `apps/api` owns the standalone Bun API runtime. |
