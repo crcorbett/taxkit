@@ -1,11 +1,11 @@
 ---
-status: active
+status: completed
 last_reviewed: 2026-07-01
 source_of_truth: execution-plan
-confidence: medium
+confidence: high
 ---
 
-# API HTTP Package Topology Execution Plan
+# API HTTP package topology execution plan
 
 Spec:
 [API HTTP package topology](../../product-specs/api-http-package-topology.md)
@@ -25,9 +25,9 @@ replan or user decision.
 
 | Task | Status | Notes |
 | --- | --- | --- |
-| API-HTTP-001 | accepted | Relocated `packages/http-api` to `packages/api/http`, renamed the package to `@whattax/api-http`, updated runtime imports/config and passed mandatory gates. |
-| API-HTTP-002 | accepted | Refreshed current docs and public references to `packages/api/http` and `@whattax/api-http`; no new Changeset required beyond the existing rename Changeset. |
-| API-HTTP-003 | accepted | Final package, app, docs, SDK-boundary, API smoke and release-train validation passed. |
+| API-HTTP-001 | completed | Relocated `packages/http-api` to `packages/api/http`, renamed the package to `@whattax/api-http`, updated runtime imports/config and passed mandatory gates. |
+| API-HTTP-002 | completed | Refreshed current docs and public references to `packages/api/http` and `@whattax/api-http`; no new Changeset required beyond the existing rename Changeset. |
+| API-HTTP-003 | completed | Final package, app, docs, SDK-boundary, API smoke and release-train validation passed. |
 
 ## Validation Log
 

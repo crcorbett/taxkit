@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-25
+last_reviewed: 2026-07-01
 source_of_truth: docs
 confidence: medium
 ---
@@ -14,7 +14,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [API HTTP package topology](./api-http-package-topology.md) | Draft | Move the implemented HTTP API package to `packages/api/http` as `@whattax/api-http` without changing runtime behaviour. |
+| [API HTTP package topology](./api-http-package-topology.md) | Implemented | The implemented HTTP API package now lives at `packages/api/http` as `@whattax/api-http`. |
 | [Documentation structure and development docs](./documentation-structure-and-development-docs.md) | Canonical | Baseline docs structure and local skill routing. |
 | [Documentation improvement roadmap](./documentation-improvement-roadmap.md) | Implemented | README coverage, root routing and maintenance conventions are in place. |
 | [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md) | Implemented | Generic Fumadocs code, WhatTax docs contracts and app rendering are split. |

@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implemented
 last_reviewed: 2026-07-01
 source_of_truth: docs
 confidence: high
@@ -15,7 +15,7 @@ work builds on the old flat package path.
 At the start of this spec, the implemented package lived at
 `packages/http-api` and was named `@whattax/http-api`. Existing architecture
 docs already identified the long-term shape as `packages/api/http` with
-package name `@whattax/api-http`. This spec turns that planned placeholder
+package name `@whattax/api-http`. This spec moved that planned placeholder
 into the implemented package without changing runtime behaviour, endpoint
 paths, calculator semantics or the API app role.
 
@@ -23,6 +23,12 @@ The nearest reference implementation for this work is the API split used in
 the local reference repos: runtime apps own deployment and process lifecycle,
 while nested HTTP API packages own transport contracts, handlers, clients,
 server adapters and explicit browser/server subpaths.
+
+## Implementation status
+
+Implemented on 2026-07-01. The HTTP API package now lives at
+`packages/api/http` and is named `@whattax/api-http`; `apps/api` remains the
+Bun runtime owner and `apps/web` remains an HTTP client.
 
 ## Problem
 

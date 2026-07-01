@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-25
+last_reviewed: 2026-07-01
 source_of_truth: docs
 confidence: medium
 ---
@@ -12,6 +12,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [API HTTP package topology](./api-http-package-topology.md)
 - [Release readiness 2026-07-01](./release-readiness-2026-07-01.md)
 - [Documentation improvement roadmap](./documentation-improvement-roadmap.md)
 - [Extract API app](./extract-api-app.md)

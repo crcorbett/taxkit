@@ -2,7 +2,7 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/api-http-package-topology.md",
   "title": "API HTTP Package Topology Implementation Tasks",
-  "status": "draft",
+  "status": "implemented",
   "last_reviewed": "2026-07-01",
   "principles": [
     "Preserve HTTP API runtime behaviour while moving the implemented package to the long-term topology.",
@@ -46,7 +46,7 @@
   "tasks": [
     {
       "id": "API-HTTP-001",
-      "status": "pending",
+      "status": "completed",
       "title": "Relocate the HTTP API package and update runtime imports",
       "type": "package-topology",
       "dependsOn": [],
@@ -144,7 +144,7 @@
     },
     {
       "id": "API-HTTP-002",
-      "status": "pending",
+      "status": "completed",
       "title": "Refresh current docs and public references",
       "type": "docs-and-reference-alignment",
       "dependsOn": [
@@ -236,7 +236,7 @@
     },
     {
       "id": "API-HTTP-003",
-      "status": "pending",
+      "status": "completed",
       "title": "Complete compatibility, API smoke and release-train audit",
       "type": "final-validation",
       "dependsOn": [
