@@ -27,7 +27,7 @@ replan or user decision.
 | --- | --- | --- |
 | API-HTTP-001 | accepted | Relocated `packages/http-api` to `packages/api/http`, renamed the package to `@whattax/api-http`, updated runtime imports/config and passed mandatory gates. |
 | API-HTTP-002 | accepted | Refreshed current docs and public references to `packages/api/http` and `@whattax/api-http`; no new Changeset required beyond the existing rename Changeset. |
-| API-HTTP-003 | pending | Complete compatibility, API smoke and release-train audit. |
+| API-HTTP-003 | accepted | Final package, app, docs, SDK-boundary, API smoke and release-train validation passed. |
 
 ## Validation Log
 
@@ -122,6 +122,88 @@ replan or user decision.
   lists, completed execution plans, changelog/Changeset history, active
   API-HTTP-001 history or the intentional SDK stale-import guardrail.
 
+### 2026-07-01 - API-HTTP-003 accepted
+
+- Re-read `AGENTS.md`, the target spec, API-HTTP-003, this active plan,
+  `docs/exec-plans/implementing-specs.md`, the relevant architecture docs and
+  documentation evidence standards before validation.
+- Verified `packages/api/http/package.json` names `@whattax/api-http`, keeps
+  `private: true`, and exposes the target subpaths:
+  `.`, `./api`, `./client`, `./client/live`, `./client/server`, `./config`,
+  `./server`, `./handlers` and `./handlers/live`.
+- Verified root workspace metadata includes `packages/api/*`, `bun.lock`
+  resolves `@whattax/api-http` to `workspace:packages/api/http`, Knip points
+  at `packages/api/http`, and `.changeset/config.json` names
+  `@whattax/api-http`.
+- Verified no implemented package remains at `packages/http-api`.
+- Verified current app/package source imports:
+  `apps/api/src/server.ts` imports `@whattax/api-http/server`; `apps/web`
+  source imports only `@whattax/api-http/client`,
+  `@whattax/api-http/client/live` and `@whattax/api-http/config`; SDK source
+  and package metadata have no `@whattax/api-http` or `@whattax/http-api`
+  dependency.
+- Verified the SDK boundary guard still rejects both `@whattax/api-http` and
+  stale `@whattax/http-api` SDK imports while requiring the HTTP API package
+  to depend on `@whattax/sdk`.
+- `bun run --filter=@whattax/api-http test` passed with 1 file and 2 tests.
+- `bun run --filter=@whattax/api-http check-types` passed.
+- `bun run --filter=@whattax/api-http build` passed.
+- `bun run --filter=api check-types` passed.
+- `bun run --filter=api build` passed.
+- `bun run --filter=web check-types` passed.
+- `bun run --filter=@whattax/sdk check-boundaries` passed with
+  `SDK import boundaries passed.`
+- `bun run docs:validate` passed with 0 issue(s).
+- `bun run test` passed with 17 successful Turbo tasks across the workspace.
+- `bun run build` passed with 13 successful Turbo tasks. The build still emits
+  a non-fatal Rolldown `INVALID_ANNOTATION` warning from Effect's bundled
+  `HttpRouter.js`; this did not fail the build.
+- `bun run verification` passed: lint, format check, Knip and workspace
+  typecheck completed successfully.
+- `bun run changeset status --verbose` passed. It reports
+  `.changeset/api-http-package-topology.md` as the patch Changeset for
+  `@whattax/api-http` to `0.0.3`; because this repo uses a fixed release
+  group, the status also reports patch bumps for `@whattax/core`,
+  `@whattax/rules-au-income-tax`, `@whattax/rules-au-pay`,
+  `@whattax/rules-au-stsl`, `@whattax/sdk`, `@whattax/testing`,
+  `@whattax/tsconfig` and `@whattax/calculators`. No minor or major release
+  impact is reported.
+- Started the local API app with
+  `API_HOST=127.0.0.1 API_PORT=4027 bun run --filter=api start`.
+- API smoke: `GET /api/health` returned `200` with
+  `{ "service": "whattax", "status": "ok" }`.
+- API smoke: `GET /api/v1/calculators` returned `200` with 3 calculator ids:
+  `au.pay.take-home`, `au.pay.withholdings` and `au.income-tax.annual`.
+- API smoke:
+  `POST /api/v1/calculators/au.pay.take-home/calculate` with canonical tagged
+  `GrossPay` and `Money` values returned `200`,
+  `calculator.calculatorId = "au.pay.take-home"`,
+  `report._tag = "TakeHomePayReport"`,
+  `report.withholdingsTotal.cents = 30400`,
+  `report.netPay.cents = 119600` and 0 graph issues.
+- API smoke: `GET /api/docs/openapi.json` returned `200`,
+  `info.title = "WhatTax API"`, 10 paths and confirmed entries for
+  `/api/health`, `/api/v1/calculators` and
+  `/api/v1/calculators/{calculatorId}/calculate`.
+- Broad old-name source/package audit found no current implemented app or
+  package source, package metadata, workspace metadata, lockfile, Knip or
+  Turbo references to the old package, except intentional historical changelog
+  text and the SDK boundary-check stale-import rejection list.
+- Remaining old-name documentation references are classified as historical
+  implemented specs/task lists, completed execution plans, changelog/Changeset
+  history, active API-HTTP-001/API-HTTP-002 history, the target spec's
+  pre-rename context or the SDK stale-import guardrail.
+- No package metadata, source, Changeset or docs corrections were required
+  beyond this final evidence update.
+- Parent acceptance reran `bun run --filter=@whattax/api-http test`,
+  `bun run --filter=@whattax/sdk check-boundaries`, `bun run docs:validate`,
+  `bun run verification`, `bun run changeset status --verbose`,
+  `git diff --check` and a fresh local API smoke on `127.0.0.1:4028`; all
+  passed. The parent smoke confirmed the calculate response values recorded
+  above.
+- The validation worker left final evidence unstaged per the delegated handoff;
+  the parent agent accepted and commits this slice after review.
+
 ## Parent Audit Log
 
 ### API-HTTP-001
@@ -154,3 +236,38 @@ replan or user decision.
   `apps/api` serves `@whattax/api-http/server`, public API docs describe the
   route contract as `@whattax/api-http`, and `apps/web` guidance stays on
   browser-safe `@whattax/api-http/client` exports.
+
+### API-HTTP-003
+
+- Audit pass 1: full source/import graph matches the target production and
+  test call graphs. `apps/api` owns Bun startup and serves
+  `@whattax/api-http/server`; `ApiRoutesLive` owns API routes, generated docs
+  and OpenAPI JSON; `CalculatorApiHandlerLive` calls
+  `@whattax/sdk/effect` `calculateRunRequest`; HTTP API tests use
+  `@whattax/api-http/client/server` over `WhatTaxServerLayer`; `apps/web`
+  stays on browser-safe client/config exports.
+- Audit pass 2: package metadata, workspaces, lockfile, filters, Changeset and
+  changelog naming are coherent. The implemented package is
+  `packages/api/http` / `@whattax/api-http`; `packages/http-api` is absent;
+  `.changeset/api-http-package-topology.md` targets `@whattax/api-http` only;
+  fixed release-train patch bumps are reported by Changesets but no
+  `@whattax/http-api` package bump exists.
+- Audit pass 3: no residual old-name current guidance, browser/server import
+  leaks, SDK HTTP API dependency, unsafe casts, DTO mirrors or new helper
+  sprawl were introduced. Existing generated route-tree casts and `as const`
+  literals are outside this final validation correction scope.
+
+## Residual risks
+
+- Product specs and task lists with `status: implemented` still contain
+  historical `@whattax/http-api` and `packages/http-api` wording from their
+  original implementation context. API-HTTP-002 deliberately left these as
+  historical source material rather than rewriting old specs as current
+  guidance.
+- Changelog and Changeset history still mention `@whattax/http-api` to explain
+  earlier package ownership and the rename. This is expected release history.
+- The build continues to print a non-fatal Rolldown
+  `INVALID_ANNOTATION` warning from Effect's bundled `HttpRouter.js`. The
+  warning did not fail `bun run build`.
+- Final plan evidence is committed as the API-HTTP-003 validation slice after
+  parent review.
