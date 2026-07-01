@@ -1,4 +1,4 @@
-import type { WhatTaxHttpApiService } from "@whattax/http-api/client";
+import type { WhatTaxHttpApiService } from "@whattax/api-http/client";
 import type { Effect, Exit } from "effect";
 
 import type { WhatTaxWebConfigError } from "./config";

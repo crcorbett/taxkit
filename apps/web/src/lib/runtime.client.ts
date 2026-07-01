@@ -1,4 +1,4 @@
-import { makeWhatTaxApiClientLayer } from "@whattax/http-api/client/live";
+import { makeWhatTaxApiClientLayer } from "@whattax/api-http/client/live";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 

@@ -1,4 +1,4 @@
-# @whattax/http-api
+# @whattax/api-http
 
 ## 0.0.2
 

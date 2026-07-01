@@ -1,5 +1,5 @@
 {
-  "name": "@whattax/http-api",
+  "name": "@whattax/api-http",
   "version": "0.0.2",
   "private": true,
   "type": "module",

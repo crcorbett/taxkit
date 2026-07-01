@@ -5,6 +5,7 @@
     "packages": [
       "apps/*",
       "packages/*",
+      "packages/api/*",
       "packages/sdk/*",
       "packages/rules/au/*"
     ],

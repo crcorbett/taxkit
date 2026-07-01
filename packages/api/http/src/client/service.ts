@@ -5,7 +5,7 @@ import type { WhatTaxApiClient } from "./index.js";
 export class WhatTaxHttpApiService extends Context.Service<
   WhatTaxHttpApiService,
   WhatTaxApiClient
->()("@whattax/http-api/Client") {}
+>()("@whattax/api-http/Client") {}
 
 export const getWhatTaxHttpApiClient = WhatTaxHttpApiService;
 

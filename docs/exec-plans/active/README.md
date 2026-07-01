@@ -9,4 +9,6 @@ confidence: medium
 
 Live implementation plans belong here while work is in progress.
 
-No active exec plans yet.
+Active plans:
+
+- [API HTTP package topology](./api-http-package-topology.md)

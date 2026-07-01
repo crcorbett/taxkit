@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",
-    "@whattax/http-api": "workspace:*",
+    "@whattax/api-http": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

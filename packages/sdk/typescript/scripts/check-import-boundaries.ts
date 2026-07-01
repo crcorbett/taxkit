@@ -8,13 +8,17 @@ interface PackageManifest {
 const sdkRoot = new URL("..", import.meta.url);
 const sourceRoot = new URL("src", sdkRoot);
 const packageJsonUrl = new URL("package.json", sdkRoot);
-const httpApiPackageJsonUrl = new URL("../../http-api/package.json", sdkRoot);
+const httpApiPackageJsonUrl = new URL("../../api/http/package.json", sdkRoot);
 const rootEntrypoint = new URL("src/index.ts", sdkRoot);
 const browserEntrypoints = [
   rootEntrypoint,
   new URL("src/au.ts", sdkRoot),
   new URL("src/schemas/index.ts", sdkRoot),
 ] satisfies URL[];
+const blockedHttpApiPackageNames = [
+  "@whattax/api-http",
+  "@whattax/http-api",
+] as const;
 
 const packageManifest: PackageManifest = await Bun.file(packageJsonUrl).json();
 const httpApiPackageManifest: PackageManifest = await Bun.file(
@@ -35,12 +39,14 @@ const httpApiDependencySections = [
 
 const failures: string[] = [];
 
-if (
-  dependencySections.some(
-    (dependencies) => dependencies?.["@whattax/http-api"] !== undefined
-  )
-) {
-  failures.push("SDK package metadata must not depend on @whattax/http-api.");
+for (const packageName of blockedHttpApiPackageNames) {
+  if (
+    dependencySections.some(
+      (dependencies) => dependencies?.[packageName] !== undefined
+    )
+  ) {
+    failures.push(`SDK package metadata must not depend on ${packageName}.`);
+  }
 }
 
 if (
@@ -53,15 +59,17 @@ if (
   );
 }
 
-const httpApiImports =
-  await Bun.$`rg -n --fixed-strings "@whattax/http-api" ${sourceRoot}`
-    .quiet()
-    .nothrow();
+for (const packageName of blockedHttpApiPackageNames) {
+  const httpApiImports =
+    await Bun.$`rg -n --fixed-strings ${packageName} ${sourceRoot}`
+      .quiet()
+      .nothrow();
 
-if (httpApiImports.exitCode === 0) {
-  failures.push(
-    `SDK source must not import @whattax/http-api:\n${httpApiImports.stdout.toString()}`
-  );
+  if (httpApiImports.exitCode === 0) {
+    failures.push(
+      `SDK source must not import ${packageName}:\n${httpApiImports.stdout.toString()}`
+    );
+  }
 }
 
 const rootSource = await Bun.file(rootEntrypoint).text();

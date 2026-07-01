@@ -1,5 +1,5 @@
 import "@tanstack/react-start/server-only";
-import { WhatTaxHttpApiServerEnvConfig } from "@whattax/http-api/config";
+import { WhatTaxHttpApiServerEnvConfig } from "@whattax/api-http/config";
 import { Config, ConfigProvider } from "effect";
 
 export const WhatTaxWebServerConfig = Config.all({

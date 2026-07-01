@@ -4,9 +4,9 @@
   "ignoreDependencies": ["@whattax/tsconfig"],
   "ignoreIssues": {
     "apps/web/src/lib/route-runtime.ts": ["types"],
-    "packages/http-api/src/client/in-process.layer.ts": ["exports"],
-    "packages/http-api/src/client/service.ts": ["duplicates"],
-    "packages/http-api/src/groups/health.ts": ["exports", "types"]
+    "packages/api/http/src/client/in-process.layer.ts": ["exports"],
+    "packages/api/http/src/client/service.ts": ["duplicates"],
+    "packages/api/http/src/groups/health.ts": ["exports", "types"]
   },
   "ignoreBinaries": ["oxlint", "oxfmt"],
   "workspaces": {
@@ -50,7 +50,7 @@
       "entry": ["src/index.ts", "src/*/index.ts"],
       "project": ["src/**/*.ts"]
     },
-    "packages/http-api": {
+    "packages/api/http": {
       "entry": [
         "src/index.ts",
         "src/api.ts",

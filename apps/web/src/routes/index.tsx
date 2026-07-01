@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { WhatTaxHttpApiService } from "@whattax/http-api/client";
+import { WhatTaxHttpApiService } from "@whattax/api-http/client";
 import { Effect } from "effect";
 
 import { getRouteRuntime } from "#/lib/route-runtime";

@@ -8,7 +8,7 @@
   "fixed": [
     [
       "@whattax/core",
-      "@whattax/http-api",
+      "@whattax/api-http",
       "@whattax/rules-au-income-tax",
       "@whattax/rules-au-pay",
       "@whattax/rules-au-stsl",

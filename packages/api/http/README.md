@@ -12,7 +12,7 @@ calculation endpoints, generated docs and API server route wiring.
 
 ## Scope
 
-`@whattax/http-api` owns the current HTTP API contract, generated OpenAPI
+`@whattax/api-http` owns the current HTTP API contract, generated OpenAPI
 metadata, health and public calculation routes, HTTP status envelopes, thin
 handler adapters and typed client helpers used by WhatTax apps. Reusable
 calculator schemas, catalog entries, metadata projections, graph construction,
@@ -100,15 +100,15 @@ incompatible calculator/facts combinations.
 
 Export paths:
 
-- `@whattax/http-api`
-- `@whattax/http-api/api`
-- `@whattax/http-api/client`
-- `@whattax/http-api/client/live`
-- `@whattax/http-api/client/server`
-- `@whattax/http-api/config`
-- `@whattax/http-api/server`
-- `@whattax/http-api/handlers`
-- `@whattax/http-api/handlers/live`
+- `@whattax/api-http`
+- `@whattax/api-http/api`
+- `@whattax/api-http/client`
+- `@whattax/api-http/client/live`
+- `@whattax/api-http/client/server`
+- `@whattax/api-http/config`
+- `@whattax/api-http/server`
+- `@whattax/api-http/handlers`
+- `@whattax/api-http/handlers/live`
 
 Reusable calculator exports:
 
@@ -124,8 +124,8 @@ Reusable calculator exports:
 
 The package is built as ESM TypeScript. Runtime exports are split by boundary:
 
-- browser-safe consumers should use `@whattax/http-api/client`
-- server runtimes may use `@whattax/http-api/server`
+- browser-safe consumers should use `@whattax/api-http/client`
+- server runtimes may use `@whattax/api-http/server`
 - app or test code that needs in-process wiring can use the client layers
 - handler exports are server-side and should not be imported from browser code
 
@@ -133,7 +133,7 @@ The package is built as ESM TypeScript. Runtime exports are split by boundary:
 App packages should provide a platform HTTP server and process config, not
 duplicate API route middleware.
 
-`@whattax/http-api/config` owns the reusable client config schema, type and
+`@whattax/api-http/config` owns the reusable client config schema, type and
 keyed config fragment. Apps should compose that fragment into runtime-specific
 config modules, then provide server or client environment values through Effect
 `ConfigProvider` composition. The package owns its env namespaces, including
@@ -164,8 +164,8 @@ bun run clean
 From the repo root:
 
 ```sh
-bun run --filter=@whattax/http-api build
-bun run --filter=@whattax/http-api check-types
+bun run --filter=@whattax/api-http build
+bun run --filter=@whattax/api-http check-types
 ```
 
 ## Guardrails

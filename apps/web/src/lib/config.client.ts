@@ -1,4 +1,4 @@
-import { WhatTaxHttpApiViteEnvConfig } from "@whattax/http-api/config";
+import { WhatTaxHttpApiViteEnvConfig } from "@whattax/api-http/config";
 import { Config, ConfigProvider } from "effect";
 
 export const WhatTaxWebClientConfig = Config.all({
