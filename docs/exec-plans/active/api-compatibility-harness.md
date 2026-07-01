@@ -26,7 +26,7 @@ replan or user decision.
 | Task | Status | Notes |
 | --- | --- | --- |
 | API-COMPAT-001 | completed | Package-owned OpenAPI source, normalized snapshot, focused test/scripts, README workflow and Changeset are in place. |
-| API-COMPAT-002 | pending | Add route fixtures and SDK parity coverage after API-COMPAT-001 is accepted. |
+| API-COMPAT-002 | completed | Route fixtures and SDK/error parity coverage added in the in-process API HTTP test. |
 | API-COMPAT-003 | pending | Add live API app smoke and documentation after API-COMPAT-001 and API-COMPAT-002 are accepted. |
 
 ## Validation Log
@@ -107,6 +107,58 @@ replan or user decision.
   drift audit, shared-source rg audits, browser/server import leak audits,
   `bun run verification` and `bun run changeset status --verbose`; all passed.
 
+### 2026-07-01 - API-COMPAT-002 validation
+
+- Baseline before edits:
+  `packages/api/http/__tests__/public-calculation-api.test.ts` covered one
+  calculate success path and one typed input-error path through
+  `WhatTaxApiInProcessClientLive`; it did not cover `GET /api/health` or a
+  metadata route fixture.
+- Added focused route fixture assertions in
+  `packages/api/http/__tests__/public-calculation-api.test.ts`:
+  `GET /api/health` now calls `client.health.getHealth()` and decodes with
+  `HealthResponse`; `GET /api/v1/calculators` now calls
+  `client.calculatorApi.listCalculators`, decodes with
+  `CalculatorCatalogResponse`, compares to
+  `PublicCalculatorService.listCalculators` and asserts the take-home catalog
+  item with `AuPayCalculatorId`, `GrossPayDescriptor` and
+  `TaxFreeThresholdClaimedDescriptor`.
+- Calculate success fixture coverage now decodes the HTTP result with
+  `CalculatorRunResponse`, asserts the route output equals
+  `@whattax/sdk/effect` `calculateRunRequest(AuPayTakeHomeCalculation, ...)`,
+  and keeps the stable take-home report assertions for withholdings, net pay
+  and graph diagnostics.
+- Schema-guided input-error fixture coverage uses annual-tax-shaped
+  `taxableIncome` facts against `au.pay.take-home`. The HTTP failure decodes
+  through `CalculatorApiErrorEnvelope`, the inner error decodes through
+  `CalculatorServiceError`, and that canonical tagged error equals both the SDK
+  failure and the `PublicCalculatorService.calculate` failure. The fixture also
+  asserts the `grossPay` issue path and descriptor-backed
+  `GrossPayDescriptor.id` help evidence.
+- Route fixture coverage matrix:
+  health route covered by `getHealth`; metadata route covered by
+  `listCalculators`; calculate success covered by
+  `calculate` for `au.pay.take-home`; schema-guided input error covered by the
+  mismatched annual-tax facts fixture for the take-home route.
+- SDK parity audit:
+  calculate success still proves
+  `HTTP -> WhatTaxApiInProcessClientLive -> CalculatorApiHandlerLive ->
+  calculateRunRequest -> PublicCalculatorService -> CalculationEngine` by
+  comparing the full HTTP response to the SDK full-run response; expected
+  input errors now compare the HTTP error envelope to SDK and calculator
+  service failures without local error DTOs.
+- No Changeset rationale:
+  API-COMPAT-002 changed internal tests plus this execution plan and task-list
+  status only. It did not change exported package API, route behaviour,
+  OpenAPI contracts, runtime behaviour or documented package usage. The
+  existing API-COMPAT-001 Changeset remains unchanged.
+- Verification passed after a lint/format correction on the edited test file:
+  `bun run --filter=@whattax/api-http test` (2 files, 5 tests),
+  `bun run --filter=@whattax/api-http check-types`,
+  `bun run --filter=@whattax/api-http build`,
+  `bun run --filter=@whattax/sdk check-boundaries` and
+  `bun run verification`.
+
 ## Parent Audit Log
 
 ### API-COMPAT-001
@@ -127,7 +179,26 @@ replan or user decision.
 
 ### API-COMPAT-002
 
-- Pending.
+- Accepted after local review. Correction turns: 0.
+- Audit pass 1: final fixture call graph still matches the spec target:
+  route fixtures use `WhatTaxApiInProcessClientLive`; calculate success reaches
+  `CalculatorApiHandlerLive -> @whattax/sdk/effect calculateRunRequest ->
+  PublicCalculatorServiceLive -> CalculationEngineLive`; the input-error
+  fixture proves the route envelope wraps the same calculator-owned tagged
+  error returned by the SDK and service.
+- Audit pass 2: fixtures reuse canonical schemas, branded ids, tagged
+  constructors and service errors. Health decodes through `HealthResponse`;
+  metadata decodes through `CalculatorCatalogResponse`; calculate decodes
+  through `CalculatorRunResponse`; errors decode through
+  `CalculatorApiErrorEnvelope` and `CalculatorServiceError`; facts and catalog
+  assertions use `GrossPay`, `aud`, `AuPayCalculatorId` and rule-owned
+  descriptors. No local DTO mirrors or JSON fixtures were added.
+- Audit pass 3: the test flow stays Effect-native and inline. It uses
+  `Effect.gen`, `Schema.decodeUnknownEffect`, `Array.filter`,
+  `Option.match` and `Exit.match`; the only unsafe typed-boundary bypass is
+  the documented `@ts-expect-error` external-input parity fixture; no helper
+  sprawl, browser/server import leak or public route behaviour change was
+  introduced.
 
 ### API-COMPAT-003
 
@@ -135,5 +206,5 @@ replan or user decision.
 
 ## Residual Risks
 
-- None for API-COMPAT-001. API-COMPAT-002 route fixtures and API-COMPAT-003
-  live app smoke remain pending and were not started.
+- None for API-COMPAT-001 or API-COMPAT-002. API-COMPAT-003 live app smoke
+  remains pending and was not started.

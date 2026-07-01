@@ -134,7 +134,7 @@
     },
     {
       "id": "API-COMPAT-002",
-      "status": "pending",
+      "status": "completed",
       "title": "Add route fixtures and SDK parity coverage",
       "type": "contract-fixtures",
       "dependsOn": [
