@@ -102,7 +102,10 @@ bun run --filter=api smoke:public-routes
 
 The command starts `apps/api` at `http://127.0.0.1:4173`, waits for
 `GET /api/health`, calls the public calculator metadata route, posts one
-take-home-pay calculation and reads the generated OpenAPI document:
+take-home-pay calculation and reads the generated OpenAPI document. It then
+creates a temp consumer workspace outside the repo, writes a dependency-free
+`fetch` consumer and runs that consumer from the temp workspace against the
+same public HTTP routes:
 
 - `GET /api/health`
 - `GET /api/v1/calculators`
@@ -112,7 +115,19 @@ take-home-pay calculation and reads the generated OpenAPI document:
 The smoke script owns process lifecycle only. It validates response bodies with
 schemas exported by `@whattax/api-http` where those schemas are public, and it
 lets the app process stop through Effect-scoped child process cleanup on
-success or failure.
+success or failure. The external consumer checks minimal public JSON evidence;
+canonical route schema validation stays in this repo-owned smoke script. The
+temp workspace is removed on success and failure.
+
+Use the failure simulation when you need deterministic cleanup evidence for a
+downstream consumer failure:
+
+```sh
+bun run --filter=api smoke:public-routes -- --simulate-downstream-failure
+```
+
+The simulation exits nonzero after the external consumer has covered the
+public routes, then removes the temp workspace and stops the API process.
 
 Use the portless URL for local API smoke checks:
 

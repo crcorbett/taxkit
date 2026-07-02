@@ -20,7 +20,10 @@ import {
   Option,
   Schedule,
   Schema,
+  Stream,
 } from "effect";
+import * as FileSystem from "effect/FileSystem";
+import * as Path from "effect/Path";
 import * as HttpBody from "effect/unstable/http/HttpBody";
 import * as HttpClient from "effect/unstable/http/HttpClient";
 import type * as HttpClientResponse from "effect/unstable/http/HttpClientResponse";
@@ -30,7 +33,22 @@ const smokeHost = "127.0.0.1";
 const smokePort = 4173;
 const smokeOrigin = `http://${smokeHost}:${smokePort}`;
 const takeHomeCalculatorId = "au.pay.take-home";
-const appRoot = fileURLToPath(new URL("..", import.meta.url));
+const appRootUrl = new URL("..", import.meta.url);
+const repoRootUrl = new URL("../..", appRootUrl);
+const appRoot = fileURLToPath(appRootUrl);
+const repoRoot = fileURLToPath(repoRootUrl);
+const simulateDownstreamFailure = Array.contains(
+  process.argv,
+  "--simulate-downstream-failure"
+);
+
+interface DownstreamConsumerCommandResult {
+  readonly commandLine: string;
+  readonly cwd: string;
+  readonly exitCode: number;
+  readonly stderr: string;
+  readonly stdout: string;
+}
 
 class SmokeRouteError extends Data.TaggedError("SmokeRouteError")<{
   readonly cause?: unknown;
@@ -39,7 +57,229 @@ class SmokeRouteError extends Data.TaggedError("SmokeRouteError")<{
   readonly status?: number;
 }> {}
 
+class DownstreamConsumerError extends Data.TaggedError(
+  "DownstreamConsumerError"
+)<{
+  readonly message: string;
+  readonly result?: DownstreamConsumerCommandResult;
+}> {}
+
 const routeUrl = (path: string) => new URL(path, smokeOrigin).toString();
+
+const externalConsumerScript = (
+  simulateFailure: boolean
+) => `const origin = ${JSON.stringify(smokeOrigin)};
+const takeHomeCalculatorId = ${JSON.stringify(takeHomeCalculatorId)};
+const simulateFailure = ${JSON.stringify(simulateFailure)};
+
+const routeEvidence = [];
+
+const assert = (condition, message) => {
+  if (!condition) {
+    throw new Error(message);
+  }
+};
+
+const readJson = async (method, path, init = {}) => {
+  const response = await fetch(new URL(path, origin), {
+    method,
+    headers: init.headers,
+    body: init.body,
+  });
+
+  if (!response.ok) {
+    throw new Error(\`\${method} \${path} returned \${response.status}\`);
+  }
+
+  routeEvidence.push(\`\${method} \${path}\`);
+  return await response.json();
+};
+
+const health = await readJson("GET", "/api/health");
+assert(health.status === "ok", "Health route did not return ok status.");
+
+const catalog = await readJson("GET", "/api/v1/calculators");
+assert(
+  Array.isArray(catalog.calculators) &&
+    catalog.calculators.some(
+      (calculator) => calculator.calculatorId === takeHomeCalculatorId
+    ),
+  \`Calculator catalog did not include \${takeHomeCalculatorId}.\`
+);
+
+const calculation = await readJson(
+  "POST",
+  \`/api/v1/calculators/\${takeHomeCalculatorId}/calculate\`,
+  {
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      facts: {
+        grossPay: {
+          _tag: "GrossPay",
+          amount: {
+            _tag: "Money",
+            cents: 346_200,
+            currency: "AUD",
+          },
+          period: "fortnightly",
+        },
+        taxFreeThresholdClaimed: true,
+      },
+      jurisdiction: "AU",
+      taxYear: "2025-26",
+    }),
+  }
+);
+assert(
+  calculation.calculator?.calculatorId === takeHomeCalculatorId,
+  "Calculate route returned the wrong calculator id."
+);
+assert(
+  calculation.report?._tag === "TakeHomePayReport",
+  "Calculate route returned the wrong report tag."
+);
+
+const openApi = await readJson("GET", "/api/docs/openapi.json");
+assert(openApi.openapi, "OpenAPI route did not return an OpenAPI document.");
+assert(
+  openApi.paths?.["/api/v1/calculators/{calculatorId}/calculate"],
+  "OpenAPI document did not include the calculate route."
+);
+
+console.log(
+  JSON.stringify(
+    {
+      origin,
+      routeEvidence,
+    },
+    null,
+    2
+  )
+);
+
+if (simulateFailure) {
+  console.error("Intentional downstream consumer failure after route coverage.");
+  process.exitCode = 1;
+}
+`;
+
+const writeExternalConsumerWorkspace = (
+  fs: FileSystem.FileSystem,
+  path: Path.Path,
+  workspacePath: string,
+  simulateFailure: boolean
+) =>
+  Effect.all(
+    [
+      fs.writeFileString(
+        path.join(workspacePath, "package.json"),
+        `${JSON.stringify(
+          {
+            name: "whattax-api-downstream-consumer",
+            private: true,
+            scripts: {
+              smoke: "bun consumer.mjs",
+            },
+            type: "module",
+          },
+          null,
+          2
+        )}\n`
+      ),
+      fs.writeFileString(
+        path.join(workspacePath, "consumer.mjs"),
+        externalConsumerScript(simulateFailure)
+      ),
+    ],
+    { concurrency: "unbounded" }
+  );
+
+const validateWorkspaceLocation = (
+  path: Path.Path,
+  repoRootPath: string,
+  workspacePath: string
+) => {
+  const relativeToRepo = path.relative(repoRootPath, workspacePath);
+
+  return Match.value(
+    !relativeToRepo.startsWith("..") && !path.isAbsolute(relativeToRepo)
+  ).pipe(
+    Match.when(true, () =>
+      Effect.fail(
+        new DownstreamConsumerError({
+          message: `Temp workspace must be outside the repo: ${workspacePath}`,
+        })
+      )
+    ),
+    Match.orElse(() => Effect.succeed(workspacePath))
+  );
+};
+
+const runExternalConsumer = (workspacePath: string) =>
+  Effect.gen(function* runExternalConsumerCommand() {
+    const command = "bun";
+    const args = ["run", "smoke"] as const;
+    const commandLine = Array.prepend(args, command).join(" ");
+
+    yield* Console.info(`$ ${commandLine}`);
+
+    const result = yield* Effect.gen(function* runChildProcess() {
+      const handle = yield* ChildProcess.make(command, args, {
+        cwd: workspacePath,
+        extendEnv: true,
+        forceKillAfter: "2 seconds",
+        stderr: "pipe",
+        stdin: "ignore",
+        stdout: "pipe",
+      });
+      const [stdout, stderr, exitCode] = yield* Effect.all(
+        [
+          Stream.mkString(Stream.decodeText(handle.stdout)),
+          Stream.mkString(Stream.decodeText(handle.stderr)),
+          handle.exitCode,
+        ],
+        { concurrency: "unbounded" }
+      );
+
+      return {
+        commandLine,
+        cwd: workspacePath,
+        exitCode: Number(exitCode),
+        stderr,
+        stdout,
+      } satisfies DownstreamConsumerCommandResult;
+    }).pipe(
+      Effect.mapError(
+        (cause) =>
+          new DownstreamConsumerError({
+            message: `Failed to run external temp-workspace HTTP consumer: ${String(cause)}`,
+          })
+      )
+    );
+
+    return yield* Match.value(result.exitCode).pipe(
+      Match.when(0, () =>
+        Effect.gen(function* externalConsumerPassed() {
+          const output = result.stdout.trim();
+          yield* Match.value(output.length).pipe(
+            Match.when(0, () => Effect.void),
+            Match.orElse(() => Console.info(output))
+          );
+          yield* Console.info("External temp-workspace HTTP consumer passed");
+
+          return result;
+        })
+      ),
+      Match.orElse(() =>
+        Effect.fail(
+          new DownstreamConsumerError({
+            message: "External temp-workspace HTTP consumer failed.",
+            result,
+          })
+        )
+      )
+    );
+  });
 
 const requireOkResponse = (
   route: string,
@@ -198,6 +438,8 @@ const ApiProcess = ChildProcess.make("bun", ["src/index.ts"], {
 });
 
 const SmokeProgram = Effect.gen(function* smokePublicRoutes() {
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
   const apiProcess = yield* ApiProcess;
 
   yield* Console.info(
@@ -252,9 +494,62 @@ const SmokeProgram = Effect.gen(function* smokePublicRoutes() {
 
   yield* getRouteJson("/api/docs/openapi.json", Schema.Json);
   yield* Console.info("GET /api/docs/openapi.json passed");
+
+  const workspacePath = yield* Effect.acquireRelease(
+    fs.makeTempDirectory({
+      prefix: "whattax-api-downstream-",
+    }),
+    (tempPath) =>
+      fs.remove(tempPath, { force: true, recursive: true }).pipe(
+        Effect.tap(() => Console.info(`Cleanup result: removed ${tempPath}`)),
+        Effect.catchCause((cause) =>
+          Console.error(
+            `Cleanup result: failed to remove ${tempPath}: ${String(cause)}`
+          )
+        )
+      )
+  );
+
+  yield* validateWorkspaceLocation(path, repoRoot, workspacePath);
+  yield* Console.info(
+    `Created external temp HTTP consumer workspace at ${workspacePath}`
+  );
+  yield* writeExternalConsumerWorkspace(
+    fs,
+    path,
+    workspacePath,
+    simulateDownstreamFailure
+  );
+  yield* runExternalConsumer(workspacePath);
 }).pipe(
   Effect.scoped,
-  Effect.tap(() => Console.info("apps/api smoke process stopped"))
+  Effect.ensuring(Console.info("apps/api smoke process stopped")),
+  Effect.catchTag("DownstreamConsumerError", (error) =>
+    Console.error(
+      [
+        error.message,
+        Option.fromNullishOr(error.result).pipe(
+          Option.match({
+            onNone: () => "",
+            onSome: (result) =>
+              [
+                `Command failed: ${result.commandLine}`,
+                `cwd: ${result.cwd}`,
+                `exitCode: ${result.exitCode}`,
+                result.stdout,
+                result.stderr,
+              ].join("\n"),
+          })
+        ),
+      ].join("\n")
+    ).pipe(
+      Effect.flatMap(() =>
+        Effect.sync(() => {
+          process.exitCode = 1;
+        })
+      )
+    )
+  )
 );
 
 BunRuntime.runMain(

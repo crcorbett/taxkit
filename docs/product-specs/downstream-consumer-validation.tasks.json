@@ -230,7 +230,7 @@
     },
     {
       "id": "DOWNSTREAM-003",
-      "status": "pending",
+      "status": "completed",
       "title": "Add downstream HTTP and API validation",
       "type": "api-downstream-harness",
       "dependsOn": [
