@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-01
+last_reviewed: 2026-07-02
 source_of_truth: docs
 confidence: medium
 ---
@@ -11,4 +11,4 @@ Live implementation plans belong here while work is in progress.
 
 Active plans:
 
-- No active execution plans.
+- [Downstream consumer validation](./downstream-consumer-validation.md)
