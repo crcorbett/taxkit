@@ -1,6 +1,6 @@
 ---
-status: draft
-last_reviewed: 2026-07-01
+status: implemented-incomplete-gate
+last_reviewed: 2026-07-02
 source_of_truth: docs
 confidence: high
 ---
@@ -9,19 +9,24 @@ confidence: high
 
 ## Overview
 
-Build a deterministic downstream-consumer validation gate before any public npm
-publication.
+Downstream-consumer validation now exists as a diagnostic and API foundation
+for future publication readiness, but the strict final SDK downstream release
+gate is still incomplete.
 
-The current repo already verifies package builds, SDK import boundaries, SDK
-packed export targets, API route fixtures, OpenAPI snapshots and live
-`apps/api` public-route smoke coverage. The remaining release-readiness gap is
-a disposable workspace outside the monorepo that consumes WhatTax through
-package entrypoints and HTTP boundaries the way an external application would.
+The implemented commands verify package builds, SDK import boundaries, SDK
+packed export targets, exact packed manifest blockers, API route fixtures,
+OpenAPI snapshots and live `apps/api` public-route smoke coverage from a temp
+consumer workspace. The strict SDK downstream command still exits nonzero
+because packed runtime manifests contain 13 unresolved `workspace:*` or
+`catalog:` protocol ranges. That is a release blocker, not a completed
+downstream install proof.
 
 This work does not publish packages, remove `private: true`, claim an npm name
 or move package directories. It creates repeatable evidence that the current
-SDK, API HTTP contracts and docs examples are usable outside workspace-local
-source resolution before a later publication decision.
+SDK package metadata is not yet ready for clean external install, while the
+API app can be consumed through public HTTP routes from outside the workspace.
+Final downstream consumer validation must not be claimed complete until
+`bun run --filter=@whattax/sdk validate:downstream` exits zero.
 
 ## Problem
 
@@ -35,10 +40,13 @@ workspace:
 - HTTP client examples that rely on app internals instead of public routes
 - docs quickstarts that typecheck in isolation but fail in a real project
 
-The existing SDK packed-artifact check proves that exported files are present
-and importable from a copied package directory. It does not yet prove package
-manager install, dependency resolution, browser build compatibility or
-end-to-end HTTP consumption from a clean external project.
+The SDK packed-artifact check proves that exported files are present and
+importable from a copied package directory. The strict downstream validator now
+proves the next blocker: clean package-manager install cannot begin while
+packed manifests retain unresolved runtime dependency protocols. API smoke now
+proves end-to-end HTTP consumption from a generated temp workspace, but SDK
+typecheck, runtime and browser-bundle execution remain skipped by the strict
+manifest blockers.
 
 ## Call graphs
 
@@ -70,51 +78,66 @@ bun run --filter=api smoke:public-routes
 ```
 
 ```ts
-Tests: target downstream SDK validation
+Tests: implemented downstream SDK validation
 
-downstream validation command
+bun run --filter=@whattax/sdk validate:downstream
   -> build required WhatTax packages
   -> pack SDK and required package dependency closure
   -> create a temp workspace outside the repo
-  -> install packed artifacts or fail with release-blocker diagnostics
-  -> run TypeScript typecheck over valid imports and @ts-expect-error misuse
-  -> run a plain SDK calculation through public entrypoints
-  -> run an Effect SDK calculation through public entrypoints
-  -> run a browser-safe bundling check for root, AU and schemas entrypoints
-  -> write validation evidence and clean up
+  -> write TypeScript typecheck, runtime and browser bundle fixtures
+  -> extract exact packed package.json manifests
+  -> fail with release-blocker diagnostics while packed runtime manifests
+     contain workspace:* or catalog: ranges
+  -> skip install, typecheck, runtime and browser checks while blockers remain
+  -> write evidence and clean up
+  -> after blockers are resolved, install packed artifacts and run typecheck,
+     runtime SDK and browser-safe bundle checks
+
+bun run --filter=@whattax/sdk validate:downstream:audit
+  -> run the same graph
+  -> allow the current release-blocker result for diagnostic evidence
+  -> exit zero only because diagnostic mode was requested
 ```
 
 ```ts
-Tests: target downstream HTTP/API validation
+Tests: implemented downstream HTTP/API validation
 
-downstream validation command
+bun run --filter=api smoke:public-routes
   -> start apps/api with deterministic local config
-  -> external consumer fetches public health, metadata and calculate routes
-  -> optional @whattax/api-http client/live consumer uses public client exports
-  -> compare response shape with canonical SDK/API expectations
+  -> repo-side smoke validates public routes with API-owned schemas
+  -> create a temp workspace outside the repo
+  -> dependency-free external consumer fetches health, metadata, calculate
+     and OpenAPI routes
+  -> external consumer checks minimal public JSON evidence
   -> stop apps/api cleanly and record smoke evidence
 ```
 
-## Goals
+## Implemented outcomes and remaining gate
 
-- Add a repeatable downstream consumer validation command that creates a fresh
-  temp workspace outside the repo.
-- Validate SDK package consumption through public package entrypoints rather
-  than workspace source imports.
-- Validate package-manager install or produce explicit release-blocker
-  diagnostics for unresolved `workspace:*` dependencies in packed manifests.
-- Prove root SDK, Effect SDK, AU, AU Effect, schemas and testing entrypoints
-  resolve from the downstream workspace.
-- Prove downstream typechecking catches at least one intentional misuse with
-  `@ts-expect-error`.
-- Prove at least one successful runtime calculation through the plain SDK and
-  one through the Effect SDK.
-- Prove browser-safe SDK entrypoints can be bundled from the downstream
-  workspace without server-only imports.
-- Prove HTTP consumption against a real local `apps/api` process using public
-  routes, not app internals.
-- Keep validation evidence neutral and public. Do not name private downstream
-  products or repos in committed WhatTax docs.
+Implemented:
+
+- `@whattax/sdk` owns a strict downstream command that creates a temp workspace
+  outside the repo, builds and packs the runtime package closure, writes
+  downstream fixtures, audits exact packed manifests and cleans up.
+- `@whattax/sdk` owns `validate:downstream:audit`, a diagnostic command that
+  runs the same graph and exits zero while preserving the current blocker
+  evidence.
+- `apps/api` owns live public-route smoke that starts the standalone API
+  process, creates an external temp workspace and proves dependency-free HTTP
+  consumption of health, metadata, calculate and OpenAPI routes.
+- `@whattax/api-http` tests still own route fixtures, OpenAPI snapshots,
+  schema-backed response validation and SDK/API parity assertions.
+- Evidence stays neutral and does not name private downstream products.
+
+Still blocked:
+
+- `bun run --filter=@whattax/sdk validate:downstream` exits nonzero with 13
+  packed runtime manifest blockers.
+- Clean downstream SDK package-manager install has not run.
+- Downstream SDK typecheck, plain runtime, Effect runtime and browser-safe
+  bundle checks are written but currently skipped by the strict manifest
+  blockers.
+- Live package-name availability remains a future release-prep check.
 
 ## Non-goals
 
@@ -156,33 +179,29 @@ Docs remain source-of-truth for public examples and release gate explanations.
 Package READMEs may describe local validation commands, but private downstream
 product names must stay out of public WhatTax docs.
 
-## Proposed approach
+## Implemented approach
 
 ### External workspace harness
 
-Add a focused SDK-owned command, for example:
+The focused SDK-owned commands are:
 
 ```bash
 bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@whattax/sdk validate:downstream:audit
 ```
 
-The command should create a temp directory outside the current repo root and
-outside any workspace package path. It should write a minimal consumer package
-with `package.json`, `tsconfig.json`, valid SDK examples, type-level misuse
-examples and a browser bundle entry.
-
-The implementation should use Effect and platform primitives where they fit:
-`Effect.gen`, `Command`, `Bun`, `Config`, `Schema`, `Data`, `Array`, `Option`,
-`Match` and tagged expected errors. One-off error handling should stay inline
-at the callsite.
+The command creates a temp directory outside the current repo root and outside
+workspace package paths. It writes a consumer package with `package.json`,
+`tsconfig.json`, valid SDK examples, type-level misuse examples and a browser
+bundle entry. The runtime is an Effect/Bun script under
+`packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`.
 
 ### Packed dependency strategy
 
-The first implementation must audit packed manifests for unresolved
-`workspace:*` dependencies. If a clean install cannot work because package
-manifests still contain workspace protocols, the validation command should fail
-with explicit release-blocker diagnostics or install a packed dependency
-closure through local `file:` references while recording the manifest blocker.
+The implemented validator audits exact packed manifests before attempting
+external install. If a runtime dependency range remains `workspace:*` or
+`catalog:`, strict validation fails with release-blocker diagnostics that name
+the package, dependency section, dependency name and unresolved protocol.
 
 This is intentionally stricter than the current packed-artifact smoke. A copied
 `node_modules/@whattax/sdk` directory is useful, but it is not enough proof for
@@ -190,7 +209,7 @@ publication readiness.
 
 ### SDK examples
 
-The downstream workspace should include:
+The downstream workspace currently writes fixtures for:
 
 - root SDK plain calculation import from `@whattax/sdk`
 - AU convenience import from `@whattax/sdk/au`
@@ -200,30 +219,34 @@ The downstream workspace should include:
 - at least one `@ts-expect-error` misuse that proves unsupported facts or
   calculations fail during downstream typecheck
 
-Examples must use canonical constructors, schemas and calculator descriptors
-from owning package exports. They must not mirror DTOs locally.
+These fixtures do not run while strict packed manifest blockers remain. Their
+presence records the intended clean-install proof without hiding the current
+release blocker.
 
 ### Browser-safe build proof
 
-Add a small downstream browser build check for browser-safe SDK entrypoints.
-The check may use a minimal bundler already in the repo dependency graph or a
-TypeScript/bundler command chosen during implementation. The point is to prove
-the root, AU and schemas entrypoints do not pull server-only code when consumed
-by browser code.
+The SDK validator writes a downstream browser-safe bundle check for root, AU
+and schemas entrypoints. It is skipped while strict manifest diagnostics stop
+before install. No final browser bundle proof should be claimed until strict
+validation exits zero and that step runs.
 
 ### HTTP/API proof
 
-Extend the downstream command or add a focused companion command that starts
-`apps/api` with deterministic local config, waits for `/api/health`, then calls
-public metadata and calculate routes from the external consumer workspace.
+`apps/api` now owns this proof through:
 
-If the task validates `@whattax/api-http` client exports from the downstream
-workspace, it must use client/browser-safe exports only and keep server route
-layers out of browser/runtime examples.
+```bash
+bun run --filter=api smoke:public-routes
+```
+
+The smoke starts `apps/api` with deterministic local config, waits for
+`/api/health`, validates public routes repo-side with API-owned schemas, then
+runs a dependency-free external consumer from a temp workspace against the same
+public HTTP routes. It does not install or import `@whattax/api-http` from the
+temp workspace.
 
 ### Evidence and cleanup
 
-The command should print and, when useful, write a compact evidence summary:
+The commands print compact evidence for:
 
 - temp workspace path
 - package artifacts used
@@ -234,17 +257,18 @@ The command should print and, when useful, write a compact evidence summary:
 - API smoke command and routes called
 - cleanup result
 
-The default command should clean up temp workspaces on success. Failed runs may
-retain the workspace only when the command prints the path and an explicit
-debug flag or failure policy owns that behaviour.
+The default behaviour cleans up temp workspaces on success and expected
+release-blocker failure. Retained debug workspaces must be owned by an explicit
+debug flag or future failure policy.
 
 ## Tests and verification
 
-Implementation should add the narrowest useful command first, then broaden:
+Use this release-gate order before future publication work:
 
 ```bash
 bun run --filter=@whattax/sdk check-packed-artifact
-bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@whattax/sdk validate:downstream # strict final gate only after blockers are resolved
+bun run --filter=@whattax/sdk validate:downstream:audit # diagnostic evidence while blockers remain
 bun run --filter=@whattax/sdk check-boundaries
 bun run --filter=@whattax/sdk test-types
 bun run --filter=@whattax/sdk test
@@ -255,10 +279,18 @@ bun run docs:validate
 bun run test
 bun run build
 bun run verification
+bun run changeset status --verbose
 ```
 
+While the 13 packed runtime manifest blockers remain, record
+`validate:downstream` as the expected nonzero strict release-gate failure and
+use `validate:downstream:audit` as passing diagnostic evidence only.
+`check-packed-artifact`, SDK package gates, `@whattax/api-http` tests and
+`apps/api` smoke remain supporting evidence. They do not replace the strict
+SDK downstream install gate.
+
 Use `bun run changeset` for package-facing command, export, README or runtime
-changes. Spec-only edits do not need a Changeset.
+changes. Spec-only and execution-plan evidence updates do not need a Changeset.
 
 ## Risks and tradeoffs
 
@@ -277,13 +309,15 @@ changes. Spec-only edits do not need a Changeset.
 
 ## Versioning and changelog impact
 
-This spec is docs-only and requires no Changeset.
+This DOWNSTREAM-004 finalisation is docs and evidence work. It does not change
+package exports, package manifests or package runtime behaviour. The existing
+SDK patch Changeset from the command implementation remains sufficient for the
+package-facing SDK validation commands and SDK README semantics.
 
-Implementation is likely package-facing if it adds SDK package scripts, changes
-packed artifact behaviour, updates package READMEs, changes export metadata or
-adds public validation commands. Those slices should add a patch Changeset for
-`@whattax/sdk`, and for `@whattax/api-http` only if HTTP client/package
-behaviour changes.
+Future package-facing slices that resolve packed manifest blockers, change SDK
+commands, change export metadata or change documented package behaviour should
+add or update a Changeset for the owning package. Add one for
+`@whattax/api-http` only if HTTP client or package behaviour changes.
 
 App-internal `apps/api` smoke wiring and public docs-only notes may use an
 explicit no-Changeset rationale when no package installation, export or runtime
@@ -292,26 +326,31 @@ package behaviour changes.
 Do not run `bun run version-repo`, publish or remove `private: true` unless a
 later release-prep request explicitly asks for that action.
 
-## Acceptance criteria
+## Current release-gate state
 
-- A downstream validation command creates a temp workspace outside the monorepo.
-- The command validates SDK entrypoints through public package imports, not
-  workspace source aliases.
-- The command either installs packed artifacts successfully or reports
-  unresolved `workspace:*` dependency protocols as explicit release blockers.
-- Downstream typecheck passes valid examples and enforces at least one
-  intentional misuse with `@ts-expect-error`.
-- Downstream runtime examples prove plain SDK and Effect SDK calculations.
-- Browser-safe SDK entrypoints pass a downstream browser build or equivalent
-  bundling check.
-- Downstream HTTP validation calls a real local `apps/api` process through
-  public health, metadata, calculate and OpenAPI routes.
-- Validation output records artifacts, commands, route coverage, cleanup and
-  residual release blockers.
+Complete for this diagnostic/API foundation:
+
+- The SDK downstream validator creates a temp workspace outside the monorepo.
+- The SDK validator records exact packed manifest blockers before external
+  install.
+- The diagnostic SDK audit command exits zero while preserving strict blocker
+  evidence.
+- The API smoke starts a real local `apps/api` process and calls public health,
+  metadata, calculate and OpenAPI routes from an external temp workspace.
+- Validation output records artifacts, route coverage, cleanup and residual
+  release blockers.
 - Public WhatTax docs and evidence do not name private downstream products.
-- Package-facing implementation slices include Changesets or explicit
-  no-Changeset rationale.
-- `bun run verification` passes before final acceptance.
+- The existing SDK Changeset covers the package-facing SDK command slice.
+
+Incomplete strict release gate:
+
+- `bun run --filter=@whattax/sdk validate:downstream` still exits nonzero with
+  13 packed runtime manifest blockers.
+- Clean downstream SDK install, downstream typecheck, plain SDK runtime, Effect
+  SDK runtime and browser-safe bundle execution are not complete until the
+  strict command exits zero.
+- Package-name availability must be rechecked live during a later release-prep
+  slice.
 
 ## References
 

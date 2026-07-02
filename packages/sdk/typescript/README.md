@@ -147,10 +147,9 @@ It also exports SDK-owned safe-result and error schemas such as
 ## Publication Readiness
 
 The package remains `private: true` until an explicit release approval removes
-that flag. The first release-prep pass verified on 2026-05-24 that both
-`whattax` and `@whattax/sdk` returned npm registry 404 responses, so neither
-name had a visible public package at that point. Recheck package-name
-availability immediately before any publication decision.
+that flag. Package-name availability is time-sensitive; recheck it live during
+a future release-prep slice instead of treating earlier registry results as
+current truth.
 
 Packed artifacts should include only `dist`, `README.md` and package metadata.
 Do not run `bun run version-repo`, remove `private: true` or publish from this
@@ -181,6 +180,23 @@ bun run --filter=@whattax/sdk validate:downstream:audit
 The audit command runs the same build, pack, temp workspace and manifest
 diagnostics, but exits zero after reporting the expected release blockers. It
 does not claim clean external install readiness.
+
+Use this SDK release-gate order before any future publication work:
+
+```sh
+bun run --filter=@whattax/sdk check-packed-artifact
+bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@whattax/sdk validate:downstream:audit
+bun run --filter=@whattax/sdk check-boundaries
+bun run --filter=@whattax/sdk test-types
+bun run --filter=@whattax/sdk test
+bun run --filter=@whattax/sdk build
+```
+
+`validate:downstream` is the strict final SDK downstream gate only after the
+packed manifest blockers are resolved. Until then, record its nonzero result
+as the release blocker and use `validate:downstream:audit` only as passing
+diagnostic evidence.
 
 ## Guardrails
 

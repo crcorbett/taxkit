@@ -11,4 +11,4 @@ Live implementation plans belong here while work is in progress.
 
 Active plans:
 
-- [Downstream consumer validation](./downstream-consumer-validation.md)
+- None.

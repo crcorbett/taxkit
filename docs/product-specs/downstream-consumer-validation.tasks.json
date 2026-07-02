@@ -327,7 +327,7 @@
     },
     {
       "id": "DOWNSTREAM-004",
-      "status": "pending",
+      "status": "completed",
       "title": "Finalize release gate docs and evidence",
       "type": "release-gate-docs",
       "dependsOn": [

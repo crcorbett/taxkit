@@ -1,5 +1,5 @@
 ---
-status: active
+status: completed
 last_reviewed: 2026-07-02
 source_of_truth: execution-plan
 confidence: medium
@@ -14,7 +14,7 @@ Task list:
 [`downstream-consumer-validation.tasks.json`](../../product-specs/downstream-consumer-validation.tasks.json)
 
 Current task:
-`DOWNSTREAM-004` - finalize release-gate documentation and evidence.
+Complete - all downstream consumer validation foundation tasks are accepted.
 
 Goal:
 Finalize the downstream consumer validation release-gate documentation and
@@ -42,6 +42,10 @@ name private downstream products or move runtime ownership to `packages/scripts`
 | HTTP cleanup proof | implemented | Normal smoke and the expected-failure simulation both remove the temp workspace and stop the API process. |
 | DOWNSTREAM-003 verification | complete | Mandatory app, API, SDK diagnostic, docs, repo and diff gates were run; strict SDK downstream validation remains the expected nonzero blocker result. |
 | DOWNSTREAM-003 Changeset decision | complete | No Changeset because this slice changes app-owned smoke tooling and docs only, with no package exports, package manifests or package runtime behaviour changed. |
+| DOWNSTREAM-004 docs finalisation | complete | Spec, product-spec index, SDK README and this plan now record the implemented diagnostic/API foundation and the incomplete strict SDK downstream gate. |
+| DOWNSTREAM-004 verification | complete with blocker | Required gates were run. `validate:downstream` remains the expected nonzero strict release blocker; diagnostic/API/supporting gates passed. |
+| DOWNSTREAM-004 no-publish audit | complete | Package manifests still have `private: true`; no package manifest, changelog or Changeset diff was introduced; no `version-repo`, npm publish or package-name availability check was run. |
+| DOWNSTREAM-004 Changeset decision | complete | No new Changeset. The existing SDK Changeset remains sufficient for the SDK commands and SDK README semantics added in `DOWNSTREAM-002`; this slice is docs/evidence finalisation. |
 
 ## Task status
 
@@ -50,7 +54,7 @@ name private downstream products or move runtime ownership to `packages/scripts`
 | DOWNSTREAM-001 | completed | Current validation, manifest blockers and strict downstream install strategy are recorded. |
 | DOWNSTREAM-002 | completed | SDK-owned external workspace validation command added with strict blocker diagnostics and audit mode. |
 | DOWNSTREAM-003 | completed | App-owned smoke now proves public HTTP/API consumption from an external temp workspace. |
-| DOWNSTREAM-004 | pending | Finalize release-gate docs and completed execution evidence. |
+| DOWNSTREAM-004 | completed | Release-gate docs and evidence are accepted; strict SDK downstream install remains an explicit release blocker until packed manifest protocols are resolved. |
 
 ## Current validation surfaces
 
@@ -145,7 +149,7 @@ bun run --filter=api smoke:public-routes
   -> stop apps/api through Effect scoped child-process cleanup
 ```
 
-That graph now matches the spec's target downstream HTTP/API validation
+That graph now matches the spec's implemented downstream HTTP/API validation
 diagram for this slice. The repo-side smoke still owns canonical
 `@whattax/api-http` schema validation. The generated external consumer stays
 dependency-free and uses public HTTP JSON only.
@@ -302,19 +306,21 @@ Remaining rollout command semantics:
 - Final downstream consumer validation must not be claimed complete while the
   strict release gate still exits nonzero.
 
-Planned HTTP proof should remain app/API owned at the runtime boundary:
+Implemented HTTP proof remains app/API owned at the runtime boundary:
 
 ```ts
-downstream HTTP validation
+bun run --filter=api smoke:public-routes
   -> start apps/api with deterministic local config
+  -> repo-side smoke validates public routes with API-owned schemas
+  -> create a temp workspace outside the repo
   -> external consumer fetches health, metadata, calculate and OpenAPI routes
-  -> optional @whattax/api-http client validation uses client-safe exports
-  -> compare response shape with canonical API/SDK expectations
+  -> external consumer checks minimal public JSON evidence
   -> stop apps/api cleanly and record route evidence
 ```
 
-These target graphs still match the spec. No spec or task-list update is
-needed from this audit.
+These graphs now match the spec's implemented diagnostic/API foundation. The
+strict SDK graph remains incomplete until packed runtime manifest blockers are
+resolved and `validate:downstream` exits zero.
 
 ## Verification gates for implementation slices
 
@@ -431,6 +437,13 @@ dev dependency for the runtime script. Changeset:
 Changeset status reports a patch bump for `@whattax/sdk` and dependent patch
 release impacts for workspace packages that depend on the SDK release train.
 
+`DOWNSTREAM-004` does not need a new Changeset. This slice updates specs,
+execution evidence and the SDK README release-gate wording only. It does not
+change package exports, package manifests, runtime code or package behaviour.
+The existing SDK Changeset remains sufficient because it already records the
+package-facing downstream validation commands and SDK README semantics from
+`DOWNSTREAM-002`.
+
 ## Validation log
 
 ### 2026-07-02 - Audit plan opened
@@ -526,8 +539,8 @@ Owning package audit:
 
 Call-graph audit:
 
-- The implementation still matches the spec's target downstream SDK graph, with
-  the strict blocker branch made explicit.
+- The implementation still matches the spec's implemented downstream SDK
+  graph, with the strict blocker branch made explicit.
 - The command builds the runtime closure, packs the SDK and required packages,
   creates a temp workspace outside the repo, writes downstream consumer files,
   extracts exact packed manifests, audits unresolved protocols, records
@@ -746,7 +759,7 @@ Changeset decision:
 
 Call-graph status:
 
-- The final implementation still matches the spec's target downstream
+- The final implementation still matches the spec's implemented downstream
   HTTP/API validation graph.
 - Runtime ownership did not move out of `apps/api`.
 - Contract ownership did not move out of `@whattax/api-http`.
@@ -869,6 +882,266 @@ Call-graph status:
   not package exports, package manifests or package-facing API behaviour.
 - Parent accepted `DOWNSTREAM-003` and will not delegate `DOWNSTREAM-004`
   until this coherent slice is committed.
+
+### 2026-07-02 - DOWNSTREAM-004 implementation
+
+- Updated
+  `docs/product-specs/downstream-consumer-validation.md` from draft/spec
+  language to implemented diagnostic/API foundation language.
+- The spec now states that final downstream consumer validation remains
+  incomplete while
+  `bun run --filter=@whattax/sdk validate:downstream` exits nonzero.
+- The spec records the implemented command split:
+  - `check-packed-artifact` proves packed SDK export targets and copied-package
+    import smoke.
+  - `validate:downstream` is the strict final SDK downstream gate after packed
+    manifest blockers are resolved.
+  - `validate:downstream:audit` is passing diagnostic evidence while blockers
+    remain.
+  - SDK boundaries, types, tests and build are supporting package evidence.
+  - `@whattax/api-http` tests and `apps/api` public-route smoke are HTTP/API
+    downstream evidence.
+- Updated `docs/product-specs/index.md` to describe the spec as an implemented
+  foundation with the strict SDK downstream install still blocked by packed
+  manifest protocols.
+- Updated `packages/sdk/typescript/README.md` to:
+  - record package-name availability as a future live release-prep check
+  - document the SDK release-gate order
+  - keep `validate:downstream` as the strict gate and
+    `validate:downstream:audit` as diagnostic-only evidence.
+- Reviewed `apps/api/README.md` and `packages/api/http/README.md`.
+  - No update was needed; the app README already documents the external
+    temp-workspace HTTP consumer and cleanup policy.
+  - The API HTTP README already documents package tests and the app-owned live
+    smoke relationship without moving process lifecycle into the package.
+- Did not update
+  `docs/product-specs/downstream-consumer-validation.tasks.json`; `DOWNSTREAM-004`
+  remains pending for parent review.
+- Did not move this plan to completed and did not update active/completed plan
+  indexes.
+
+DOWNSTREAM-004 release-gate order recorded:
+
+```sh
+bun run --filter=@whattax/sdk check-packed-artifact
+bun run --filter=@whattax/sdk validate:downstream # strict final gate after blockers are resolved; currently expected nonzero
+bun run --filter=@whattax/sdk validate:downstream:audit # diagnostic evidence while blockers remain
+bun run --filter=@whattax/sdk check-boundaries
+bun run --filter=@whattax/sdk test-types
+bun run --filter=@whattax/sdk test
+bun run --filter=@whattax/sdk build
+bun run --filter=@whattax/api-http test
+bun run --filter=api smoke:public-routes
+bun run docs:validate
+bun run test
+bun run build
+bun run verification
+bun run changeset status --verbose
+```
+
+DOWNSTREAM-004 improvement audit passes:
+
+- Audit pass 1 - docs and command agreement:
+  - The final spec, task-list global verification semantics, SDK README and
+    this execution plan agree that `check-packed-artifact` comes before strict
+    downstream validation.
+  - They agree that `validate:downstream` is not a passing final gate while
+    packed runtime manifest blockers remain.
+  - They agree that `validate:downstream:audit` is diagnostic-only passing
+    evidence.
+  - They agree that API downstream evidence is app/API-owned through
+    `@whattax/api-http` tests and `apps/api` public-route smoke.
+  - Improvement made: the product-spec index no longer lists this spec as a
+    draft, but its status still names the blocked strict SDK install.
+- Audit pass 2 - evidence completeness:
+  - Final evidence covers packed install blockers: the strict SDK validator
+    reports 13 packed runtime manifest protocol blockers.
+  - Final evidence records skipped SDK typecheck, plain runtime, Effect
+    runtime and browser bundle checks because strict diagnostics stop before
+    install.
+  - Final evidence covers live API smoke and the external temp-workspace HTTP
+    consumer across health, metadata, calculate and OpenAPI routes.
+  - Final evidence records cleanup for SDK and API temp workspaces.
+  - Improvement made: the spec's current release-gate state separates
+    diagnostic/API foundation completion from incomplete clean SDK install
+    proof.
+- Audit pass 3 - boundaries, neutrality and release safety:
+  - Public docs remain neutral and do not name private downstream products.
+  - SDK ownership remains in `packages/sdk/typescript`.
+  - API process lifecycle remains in `apps/api`.
+  - HTTP contracts remain in `@whattax/api-http`.
+  - `@whattax/sdk` still does not depend on `@whattax/api-http`.
+  - No package manifest, package version, changelog or publish-state file was
+    changed.
+  - Improvement made: the SDK README now treats package-name availability as a
+    future live release-prep check instead of current static truth.
+
+Changeset decision:
+
+- No new Changeset for `DOWNSTREAM-004`.
+- The existing `.changeset/sdk-downstream-validation.md` remains sufficient
+  for the SDK-owned package commands and SDK README semantics added in
+  `DOWNSTREAM-002`.
+- This slice changes specs, active execution evidence, the product-spec index
+  and SDK README release-gate wording only. It does not change package
+  manifests, package exports, runtime code or package behaviour.
+
+No-publish/private flag audit:
+
+- All package manifests with a `private` field still report `private=true`:
+  root, `apps/api`, `apps/docs`, `apps/web`, `@whattax/api-http`,
+  `@whattax/calculators`, `@whattax/core`, `@whattax/docs-content`,
+  `@whattax/docs-fumadocs`, `@whattax/rules-au-income-tax`,
+  `@whattax/rules-au-pay`, `@whattax/rules-au-stsl`, `@whattax/sdk`,
+  `@whattax/testing` and `@whattax/tsconfig`.
+- `git diff -- package.json '**/package.json' '**/CHANGELOG.md' '.changeset/*'`
+  produced no output.
+- `git diff --name-only` before this plan update listed only:
+  - `docs/product-specs/downstream-consumer-validation.md`
+  - `docs/product-specs/index.md`
+  - `packages/sdk/typescript/README.md`
+- This task did not run `bun run version-repo`, npm publish, package-name
+  availability checks or any command that removes `private: true`.
+
+Call-graph status:
+
+- The final implementation still matches the spec's implemented downstream SDK
+  call graph, including the strict blocker branch and diagnostic audit branch.
+- The final implementation still matches the spec's implemented downstream
+  HTTP/API call graph.
+- The final release-gate call graph is intentionally incomplete at the strict
+  SDK external install boundary until packed runtime manifest protocols are
+  publication-ready.
+
+### 2026-07-02 - DOWNSTREAM-004 verification
+
+- `bun run --filter=@whattax/sdk check-packed-artifact`
+  - Passed.
+  - Confirmed packed SDK import smoke and packed SDK artifact checks.
+- `bun run --filter=@whattax/sdk validate:downstream`
+  - Expected failure, exit code 1.
+  - Created temp workspace
+    `/var/folders/.../T/whattax-sdk-downstream-NlS6cF`.
+  - Built the SDK runtime package closure.
+  - Packed and inspected exact manifests for `@whattax/core`,
+    `@whattax/rules-au-income-tax`, `@whattax/rules-au-pay`,
+    `@whattax/calculators` and `@whattax/sdk`.
+  - Reported 13 packed runtime manifest protocol blockers:
+    - `@whattax/core dependencies.effect = catalog:`
+    - `@whattax/rules-au-income-tax dependencies.@whattax/core = workspace:*`
+    - `@whattax/rules-au-income-tax dependencies.effect = catalog:`
+    - `@whattax/rules-au-pay dependencies.@whattax/core = workspace:*`
+    - `@whattax/rules-au-pay dependencies.effect = catalog:`
+    - `@whattax/calculators dependencies.@whattax/core = workspace:*`
+    - `@whattax/calculators dependencies.@whattax/rules-au-income-tax = workspace:*`
+    - `@whattax/calculators dependencies.@whattax/rules-au-pay = workspace:*`
+    - `@whattax/calculators dependencies.effect = catalog:`
+    - `@whattax/sdk dependencies.@whattax/calculators = workspace:*`
+    - `@whattax/sdk dependencies.@whattax/rules-au-income-tax = workspace:*`
+    - `@whattax/sdk dependencies.@whattax/rules-au-pay = workspace:*`
+    - `@whattax/sdk dependencies.effect = catalog:`
+  - Skipped install, typecheck, runtime SDK and browser bundle checks because
+    release blockers were found before install.
+  - Removed the temp workspace.
+- `bun run --filter=@whattax/sdk validate:downstream:audit`
+  - Passed.
+  - Created temp workspace
+    `/var/folders/.../T/whattax-sdk-downstream-azFCtm`.
+  - Reported the same 13 packed runtime manifest blockers.
+  - Skipped install, typecheck, runtime SDK and browser bundle checks for the
+    same blocker reason.
+  - Removed the temp workspace and exited zero in diagnostic mode.
+- `bun run --filter=@whattax/sdk check-boundaries`
+  - Passed.
+- `bun run --filter=@whattax/sdk test-types`
+  - Passed.
+- `bun run --filter=@whattax/sdk test`
+  - Passed: 3 files, 11 tests.
+- `bun run --filter=@whattax/sdk build`
+  - Passed.
+- `bun run --filter=@whattax/api-http test`
+  - Passed: 2 files, 5 tests.
+- `bun run --filter=api smoke:public-routes`
+  - Passed.
+  - Started `apps/api` at `http://127.0.0.1:4173`.
+  - Repo-side smoke covered and schema-validated `GET /api/health`,
+    `GET /api/v1/calculators`,
+    `POST /api/v1/calculators/au.pay.take-home/calculate` and
+    `GET /api/docs/openapi.json`.
+  - External temp-workspace HTTP consumer covered the same four routes.
+  - Temp workspace:
+    `/var/folders/.../T/whattax-api-downstream-ba35Zq`.
+  - Removed the temp workspace and stopped the API process.
+- `bun run docs:validate`
+  - Passed with 0 docs content issues.
+- `bun run test`
+  - Passed: Turbo reported 17 successful tasks.
+- `bun run build`
+  - Passed: Turbo reported 13 successful tasks.
+  - Build emitted the existing Rolldown `INVALID_ANNOTATION` warning from
+    Effect's `HttpRouter.js`; it did not fail the build.
+- `bun run changeset status --verbose`
+  - Passed.
+  - Reports the direct patch Changeset
+    `.changeset/sdk-downstream-validation.md` for `@whattax/sdk`.
+  - Reports dependent patch release-train impacts for the current private
+    workspace packages.
+- `bun run verification`
+  - Passed after this evidence update.
+  - Ran lint, format check, Knip and workspace type checks.
+- `git diff --check`
+  - Passed after this evidence update.
+
+### 2026-07-02 - DOWNSTREAM-004 parent review and acceptance
+
+- Parent reviewed the final spec, product-spec index, SDK README release-gate
+  wording, active execution evidence, no-Changeset rationale and release-safety
+  audit.
+- Parent accepted the final documentation shape:
+  - downstream consumer validation is implemented as a diagnostic/API
+    foundation
+  - final strict SDK downstream validation is not complete while
+    `validate:downstream` exits nonzero
+  - `validate:downstream:audit` is passing diagnostic evidence only
+  - `apps/api` public-route smoke is the accepted HTTP/API downstream proof
+  - package-name availability remains a future live release-prep check
+- Parent reran the SDK release-gate sequence:
+  - `bun run --filter=@whattax/sdk check-packed-artifact` passed.
+  - `bun run --filter=@whattax/sdk validate:downstream` produced the expected
+    nonzero strict result with 13 packed runtime manifest blockers and removed
+    the temp workspace.
+  - `bun run --filter=@whattax/sdk validate:downstream:audit` passed with the
+    same blocker evidence and removed the temp workspace.
+  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run --filter=@whattax/sdk test-types` passed.
+  - `bun run --filter=@whattax/sdk test` passed: 3 files, 11 tests.
+  - `bun run --filter=@whattax/sdk build` passed.
+- Parent reran API and repo gates:
+  - `bun run --filter=@whattax/api-http test` passed: 2 files, 5 tests.
+  - `bun run --filter=api smoke:public-routes` passed, including the external
+    temp-workspace HTTP consumer and cleanup.
+  - `bun run docs:validate` passed.
+  - `bun run test` passed: 17 Turbo tasks.
+  - `bun run build` passed: 13 Turbo tasks, with the existing Rolldown
+    `INVALID_ANNOTATION` warning from Effect's `HttpRouter.js`.
+  - `bun run verification` passed.
+  - `bun run changeset status --verbose` passed and still reports the SDK
+    patch Changeset.
+  - `jq empty docs/product-specs/downstream-consumer-validation.tasks.json`
+    passed.
+  - `git diff --check` passed.
+- Parent reran the release-safety audit:
+  - every package manifest with a `private` field still reports
+    `private=true`
+  - package manifests, changelogs and Changesets have no new diff from this
+    final docs/evidence slice
+  - no `bun run version-repo`, npm publish, package-name availability check or
+    private-flag removal was run
+- Parent accepted the no-new-Changeset decision. The existing SDK Changeset
+  covers the package-facing command and README semantics; this final slice is
+  documentation, release-gate evidence and plan finalisation.
+- Parent marked `DOWNSTREAM-004` completed and moved this execution plan from
+  active to completed.
 
 ## Residual risks
 
