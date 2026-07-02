@@ -14,14 +14,15 @@ Task list:
 [`downstream-consumer-validation.tasks.json`](../../product-specs/downstream-consumer-validation.tasks.json)
 
 Current task:
-`DOWNSTREAM-002` - add SDK external workspace validation.
+`DOWNSTREAM-003` - add downstream HTTP and API validation.
 
 Goal:
-Confirm the current packed-artifact, package manifest and API smoke behaviour
-before adding a consumer workspace harness. This task is audit and planning
-only. It does not publish packages, remove `private: true`, run package-name
-availability checks, name private downstream products or move runtime ownership
-to `packages/scripts`.
+Extend downstream validation to live HTTP/API consumption without moving runtime
+ownership. `apps/api` must remain the process owner, `@whattax/api-http` must
+remain the HTTP contract/client owner, and the SDK downstream release gate must
+stay honest about unresolved packed manifest blockers. This task does not
+publish packages, remove `private: true`, run package-name availability checks,
+name private downstream products or move runtime ownership to `packages/scripts`.
 
 ## Status
 
@@ -33,15 +34,17 @@ to `packages/scripts`.
 | Current API validation audit | complete | Current checks cover OpenAPI snapshot, in-process route fixtures, SDK parity and a live `apps/api` public-route smoke. |
 | Manifest audit | complete | Runtime package manifests still contain unresolved `workspace:*`; packed manifests also retain `catalog:` ranges for external packages. |
 | Harness design | complete | First implementation should fail fast with explicit manifest blocker diagnostics before attempting clean external install. |
-| Verification | complete | Required SDK packed-artifact, API smoke, docs validation and repo verification commands passed. |
-| Changeset decision | complete | No Changeset because this task only adds docs/exec-plan evidence and the active-plan index. |
+| SDK downstream command | complete | Added `packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts` and package commands `validate:downstream` and `validate:downstream:audit`. |
+| Command semantics | complete | `validate:downstream` is the strict release gate and currently exits nonzero with release-blocker diagnostics; `validate:downstream:audit` runs the same diagnostics and exits zero for implementation evidence. |
+| Verification | complete | Required SDK gates and repo verification passed; strict downstream validation produced the expected blocker failure and diagnostic mode passed. |
+| Changeset decision | complete | Added a patch Changeset for `@whattax/sdk` because this task adds package-facing commands, script behaviour and README semantics. |
 
 ## Task status
 
 | Task | Status | Notes |
 | --- | --- | --- |
 | DOWNSTREAM-001 | completed | Current validation, manifest blockers and strict downstream install strategy are recorded. |
-| DOWNSTREAM-002 | pending | Add the SDK-owned external workspace validation command. |
+| DOWNSTREAM-002 | completed | SDK-owned external workspace validation command added with strict blocker diagnostics and audit mode. |
 | DOWNSTREAM-003 | pending | Extend downstream proof to HTTP/API validation against `apps/api`. |
 | DOWNSTREAM-004 | pending | Finalize release-gate docs and completed execution evidence. |
 
@@ -233,34 +236,60 @@ original manifest findings.
 
 ## Target harness shape
 
-The SDK-owned command should eventually be:
+The SDK-owned commands are:
 
 ```sh
 bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@whattax/sdk validate:downstream:audit
 ```
 
-The planned command remains SDK-owned because `@whattax/sdk` owns downstream
-SDK examples, package import boundaries and packed-artifact checks. It may
-orchestrate package builds, package packing and a temp workspace, but it must
-not become a generic repo automation runtime while `packages/scripts` is only a
-planned placeholder.
+The runtime entrypoint lives at
+`packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`. The
+`.runtime.ts` suffix is intentional: repo lint rules require scripts that run
+Effects through `BunRuntime.runMain` to be runtime entrypoints. The command
+remains SDK-owned because `@whattax/sdk` owns downstream SDK examples, package
+import boundaries and packed-artifact checks. It may orchestrate package
+builds, package packing and a temp workspace, but it must not become a generic
+repo automation runtime while `packages/scripts` is only a planned placeholder.
 
-Planned target call graph:
+Implemented target call graph:
 
 ```ts
 bun run --filter=@whattax/sdk validate:downstream
   -> build required WhatTax packages
   -> pack @whattax/sdk and the minimum runtime dependency closure
+  -> create a temp workspace outside the repo
+  -> write downstream package.json, tsconfig, typecheck, runtime and browser files
+  -> extract exact package.json manifests from packed tarballs
   -> audit packed manifests for workspace:* and catalog: blockers
+  -> write evidence and clean up
   -> fail with release-blocker diagnostics while blockers remain
-  -> otherwise create a temp workspace outside the repo
-  -> install packed artifacts through package-manager install
+  -> otherwise install packed artifacts through package-manager install
   -> run downstream typecheck over valid imports and @ts-expect-error misuse
   -> run plain SDK calculation through public entrypoints
   -> run Effect SDK calculation through public entrypoints
   -> run browser-safe bundle check for root, AU and schemas entrypoints
-  -> write evidence and clean up
+  -> write success evidence and clean up
 ```
+
+`validate:downstream:audit` follows the same graph, but allows the
+release-blocker result and exits zero after printing the original blocker
+diagnostics. It is diagnostic-only and does not claim clean external install
+readiness.
+
+Remaining rollout command semantics:
+
+- `validate:downstream` is the strict release gate. It is expected to exit
+  nonzero while packed runtime manifests contain `workspace:*` or `catalog:`
+  blockers.
+- `validate:downstream:audit` is the passing diagnostic command for
+  implementation evidence while those blockers remain. It must still report
+  the original blockers.
+- Later tasks must either resolve the packed manifest blockers before requiring
+  `validate:downstream` to pass, or record the expected strict failure plus
+  `validate:downstream:audit` as the passing diagnostic evidence.
+- Final downstream consumer validation must not be claimed complete while the
+  strict release gate still exits nonzero.
 
 Planned HTTP proof should remain app/API owned at the runtime boundary:
 
@@ -291,7 +320,8 @@ For the later harness implementation slice, add the narrowest new command first
 and then broaden:
 
 ```sh
-bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@whattax/sdk validate:downstream # expected nonzero while blockers remain
+bun run --filter=@whattax/sdk validate:downstream:audit
 bun run --filter=@whattax/sdk check-boundaries
 bun run --filter=@whattax/sdk test-types
 bun run --filter=@whattax/sdk test
@@ -335,6 +365,45 @@ Audit pass 3 - verification and install strategy:
 - Improvement recorded: defaulting to strict blocker diagnostics avoids a
   patched local install that could be mistaken for publication readiness.
 
+### DOWNSTREAM-002 improvement audit passes
+
+Audit pass 1 - runtime boundary and cleanup:
+
+- Initial implementation ran as a package script with
+  `BunRuntime.runMain(...)`; repo lint requires runtime-executing scripts to be
+  runtime entrypoints.
+- Improvement made: renamed the script to
+  `validate-downstream-consumer.runtime.ts` and updated package/task
+  references.
+- Initial cleanup only printed cleanup intent.
+- Improvement made: changed temp workspace lifecycle to
+  `Effect.acquireRelease(...)` with `FileSystem.remove(..., { recursive: true,
+  force: true })`, so both strict blocker failures and successful diagnostic
+  runs remove the temp workspace.
+
+Audit pass 2 - Effect API compatibility and command evidence:
+
+- Initial implementation used unavailable Effect APIs for this repo version:
+  `Option.fromNullable` and `Effect.catchAll`.
+- Improvement made: replaced them with `Option.fromNullishOr` and
+  `Effect.catchCause`, then reran the downstream audit command successfully.
+- Initial command-error mapping risked losing command stdout/stderr for nonzero
+  child commands.
+- Improvement made: command execution now maps platform failures separately
+  and preserves captured command output when a command exits nonzero.
+
+Audit pass 3 - honest release-gate semantics and import boundaries:
+
+- The task wording implied `validate:downstream` must complete install,
+  typecheck, runtime and browser checks even while manifest blockers remain.
+- Improvement made: updated `DOWNSTREAM-002` task wording to record that the
+  strict command currently exits nonzero and that
+  `validate:downstream:audit` is the passing diagnostic mode.
+- The downstream browser entry generated by the script imports only
+  `@whattax/sdk`, `@whattax/sdk/au` and `@whattax/sdk/schemas`.
+- `rg` found no `@whattax/api-http`, app-module, server-only, `node:` or
+  `bun:` imports in the downstream validator script.
+
 ## Changeset decision
 
 No Changeset is expected for `DOWNSTREAM-001` because this task adds an active
@@ -342,6 +411,14 @@ exec plan and updates the active-plan index only. It does not change package
 code, package manifests, package README promises, package exports, runtime
 behaviour or public package documentation. A later package-facing command,
 README or manifest change should add a patch Changeset for the owning package.
+
+`DOWNSTREAM-002` is package-facing. It adds SDK package commands, SDK-owned
+runtime script behaviour, a package README release-gate explanation and an SDK
+dev dependency for the runtime script. Changeset:
+`.changeset/sdk-downstream-validation.md`.
+
+Changeset status reports a patch bump for `@whattax/sdk` and dependent patch
+release impacts for workspace packages that depend on the SDK release train.
 
 ## Validation log
 
@@ -408,11 +485,164 @@ behaviour changed.
 - Parent accepted `DOWNSTREAM-001` and will not delegate `DOWNSTREAM-002`
   until this coherent slice is committed.
 
+### 2026-07-02 - DOWNSTREAM-002 implementation
+
+- Added SDK-owned runtime script
+  `packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`.
+- Added package commands:
+  - `bun run --filter=@whattax/sdk validate:downstream`
+  - `bun run --filter=@whattax/sdk validate:downstream:audit`
+- Added `@effect/platform-bun` as an SDK dev dependency because the validator
+  is an Effect/Bun runtime script.
+- Updated the SDK README with strict release-blocker semantics and the
+  diagnostic command.
+- Updated `DOWNSTREAM-002` task wording because the default release gate is
+  expected to fail while packed runtime manifests still contain
+  `workspace:*` or `catalog:` protocols.
+- Added patch Changeset `.changeset/sdk-downstream-validation.md`.
+
+Owning package audit:
+
+| Contract touched | Owner | Notes |
+| --- | --- | --- |
+| Downstream validator schemas for npm pack output, packed manifests and root catalog shape | `@whattax/sdk` script-local validation boundary | New schemas describe script input/output formats, not reusable tax-domain DTOs. |
+| `DownstreamCommandError`, `DownstreamReleaseBlockerError`, `DownstreamValidationError` | `@whattax/sdk` script-local validation boundary | Tagged errors are `Data.TaggedError` values local to the command boundary. |
+| SDK public entrypoints and typed clients | `@whattax/sdk` | Downstream type/runtime/browser examples import package entrypoints, not workspace source aliases. |
+| `CalculatorRun*` schemas and `CalculatorServiceError` re-exported through SDK schemas | `@whattax/calculators`, re-exported by `@whattax/sdk/schemas` | Examples consume the SDK schema subpath. |
+| `PublicCalculatorServiceLive` | `@whattax/calculators` | Used only in the downstream Effect runtime example to provide the SDK Effect facade. |
+| `GrossPay` and AU pay facts | `@whattax/rules-au-pay` | Used as canonical fact constructors because the current SDK does not own fact constructors. |
+| `aud` and `CalculationEngineLive` | `@whattax/core` | Used as canonical money constructor and engine layer in downstream runtime example. |
+
+Call-graph audit:
+
+- The implementation still matches the spec's target downstream SDK graph, with
+  the strict blocker branch made explicit.
+- The command builds the runtime closure, packs the SDK and required packages,
+  creates a temp workspace outside the repo, writes downstream consumer files,
+  extracts exact packed manifests, audits unresolved protocols, records
+  evidence and cleans up.
+- While blockers remain, install, typecheck, runtime SDK and browser bundle
+  checks are skipped and recorded as blocker-skipped. The audit command follows
+  the same graph but exits zero for implementation evidence.
+- The SDK still does not import or depend on `@whattax/api-http`.
+
+### 2026-07-02 - DOWNSTREAM-002 verification
+
+- `bun run --filter=@whattax/sdk validate:downstream`
+  - Expected failure, exit code 1.
+  - Parent correction turn 2 rerun confirmed the strict blocker path prints the
+    packed-manifest evidence and concise release-blocker message without an
+    Effect stack trace.
+  - Built `@whattax/core`, `@whattax/rules-au-income-tax`,
+    `@whattax/rules-au-pay`, `@whattax/calculators` and `@whattax/sdk`.
+  - Created temp workspace under `/var/folders/.../T/whattax-sdk-downstream-*`,
+    outside the repo.
+  - Packed and inspected exact manifests for the SDK runtime closure.
+  - Skipped install, typecheck, runtime SDK and browser bundle checks because
+    release blockers remain.
+  - Removed the temp workspace through the scoped cleanup finalizer.
+- `bun run --filter=@whattax/sdk validate:downstream:audit`
+  - Passed.
+  - Parent correction turn 2 rerun confirmed the audit path still exits zero
+    after printing the same blocker evidence and diagnostic-mode message.
+  - Ran the same build, pack, manifest extraction, blocker diagnostics and
+    cleanup path, then allowed the release-blocker result for diagnostic
+    evidence.
+- Runtime release blockers found in packed manifests:
+  - `@whattax/core dependencies.effect = catalog:`
+  - `@whattax/rules-au-income-tax dependencies.@whattax/core = workspace:*`
+  - `@whattax/rules-au-income-tax dependencies.effect = catalog:`
+  - `@whattax/rules-au-pay dependencies.@whattax/core = workspace:*`
+  - `@whattax/rules-au-pay dependencies.effect = catalog:`
+  - `@whattax/calculators dependencies.@whattax/core = workspace:*`
+  - `@whattax/calculators dependencies.@whattax/rules-au-income-tax = workspace:*`
+  - `@whattax/calculators dependencies.@whattax/rules-au-pay = workspace:*`
+  - `@whattax/calculators dependencies.effect = catalog:`
+  - `@whattax/sdk dependencies.@whattax/calculators = workspace:*`
+  - `@whattax/sdk dependencies.@whattax/rules-au-income-tax = workspace:*`
+  - `@whattax/sdk dependencies.@whattax/rules-au-pay = workspace:*`
+  - `@whattax/sdk dependencies.effect = catalog:`
+- `bun run --filter=@whattax/sdk check-packed-artifact`
+  - Passed.
+- `bun run --filter=@whattax/sdk check-boundaries`
+  - Passed.
+- `bun run --filter=@whattax/sdk test-types`
+  - Passed.
+- `bun run --filter=@whattax/sdk test`
+  - Passed: 3 files, 11 tests.
+- `bun run --filter=@whattax/sdk build`
+  - Passed.
+- Browser-safe downstream import audit:
+  - `rg -n "@whattax/api-http|apps/|server-only|@whattax/.*/server|from ['\"]node:|from ['\"]bun:|\\.\\.\\/src" packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`
+  - Passed with no matches.
+- `bun run verification`
+  - Passed.
+  - Ran lint, format check, Knip and workspace type checks.
+  - Turbo reported 22 successful check/build tasks.
+- `bun run changeset status --verbose`
+  - Passed.
+  - Reports patch bump for `@whattax/sdk` from
+    `.changeset/sdk-downstream-validation.md` and dependent patch release
+    impacts across the current private workspace release train.
+
+### 2026-07-02 - DOWNSTREAM-002 parent review and acceptance
+
+- Parent reviewed the validator script, SDK package manifest, SDK README,
+  task-list semantics, active-plan evidence and Changeset.
+- Parent accepted the strict/audit split after two correction turns:
+  - Correction turn 1 made the task list and global gates explicit that the
+    strict release gate is expected to fail while packed runtime manifest
+    blockers remain, and added `validate:downstream:audit` as the passing
+    diagnostic command.
+  - Correction turn 2 removed the Effect stack trace from the expected strict
+    release-blocker result.
+- Parent reran `bun run --filter=@whattax/sdk validate:downstream`.
+  - Expected nonzero result: exit code 1.
+  - Evidence reported 13 packed runtime manifest blockers and removed the temp
+    workspace.
+  - Output ended with the concise release-blocker message and no stack trace.
+- Parent reran `bun run --filter=@whattax/sdk validate:downstream:audit`.
+  - Passed.
+  - Reported the same blocker evidence and diagnostic-mode allowance.
+- Parent reran SDK gates:
+  - `bun run --filter=@whattax/sdk check-packed-artifact` passed.
+  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run --filter=@whattax/sdk test-types` passed.
+  - `bun run --filter=@whattax/sdk test` passed: 3 files, 11 tests.
+  - `bun run --filter=@whattax/sdk build` passed.
+- Parent reran repo and metadata gates:
+  - `jq empty docs/product-specs/downstream-consumer-validation.tasks.json`
+    passed.
+  - `git diff --check` passed.
+  - `bun run docs:validate` passed.
+  - `bun run verification` passed.
+  - `bun run changeset status --verbose` passed and reports the SDK patch
+    Changeset.
+- Parent reran the browser-safe import audit:
+  - `rg -n "@whattax/api-http|apps/|server-only|@whattax/.*/server|from ['\"]node:|from ['\"]bun:|\\.\\.\\/src" packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`
+    produced no matches.
+- Parent accepted the residual risk that clean downstream install, downstream
+  typecheck, runtime SDK execution and browser bundle execution remain blocked
+  until packed `workspace:*` and `catalog:` runtime dependency ranges are made
+  publication-ready.
+- Parent accepted `DOWNSTREAM-002` and will not delegate `DOWNSTREAM-003`
+  until this coherent slice is committed.
+
 ## Residual risks
 
-- Clean external package-manager install is currently expected to fail until
+- Clean external package-manager install is currently blocked until
   `workspace:*` and `catalog:` dependency ranges are replaced or otherwise
-  made publication-ready in packed manifests.
+  made publication-ready in packed manifests. The strict release gate now exits
+  nonzero before install and records typecheck/runtime/browser checks as
+  skipped by release blockers.
+- The generated downstream type/runtime examples currently include lower-level
+  package imports for canonical constructors and service layers, including
+  `@whattax/core`, `@whattax/rules-au-pay` and
+  `@whattax/calculators/live`. The browser-safe SDK entrypoint proof is
+  narrower: it covers only `@whattax/sdk`, `@whattax/sdk/au` and
+  `@whattax/sdk/schemas`. Full SDK-only application proof remains blocked
+  until package metadata is publication-ready and SDK constructor/facade gaps
+  are resolved.
 - `@whattax/api-http` still has source export conditions. That does not block
   this SDK harness audit, but optional downstream API client package validation
   should audit API HTTP packed exports separately.

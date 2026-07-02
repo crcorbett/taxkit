@@ -156,6 +156,32 @@ Packed artifacts should include only `dist`, `README.md` and package metadata.
 Do not run `bun run version-repo`, remove `private: true` or publish from this
 package without an explicit release-prep approval.
 
+### Downstream validation
+
+The SDK owns the first downstream consumer validation gate:
+
+```sh
+bun run --filter=@whattax/sdk validate:downstream
+```
+
+The command builds and packs the SDK runtime package closure, creates a temp
+consumer workspace outside the repo, writes SDK typecheck/runtime/browser-safe
+examples, extracts exact packed manifests, and audits unresolved dependency
+protocols before attempting install. It is strict by default: while runtime
+packed manifests still contain `workspace:*` or `catalog:` ranges, the command
+exits nonzero with release-blocker diagnostics and skips install, typecheck,
+runtime and browser bundle execution.
+
+For implementation evidence while those blockers remain, use:
+
+```sh
+bun run --filter=@whattax/sdk validate:downstream:audit
+```
+
+The audit command runs the same build, pack, temp workspace and manifest
+diagnostics, but exits zero after reporting the expected release blockers. It
+does not claim clean external install readiness.
+
 ## Guardrails
 
 - Keep this package independent from `@whattax/api-http`.
@@ -176,6 +202,8 @@ bun run --filter=@whattax/sdk build
 bun run --filter=@whattax/sdk test-types
 bun run --filter=@whattax/sdk check-boundaries
 bun run --filter=@whattax/sdk check-packed-artifact
+bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@whattax/sdk validate:downstream:audit
 ```
 
 ## Related Docs

@@ -44,6 +44,8 @@
     "build": "tsc -p tsconfig.build.json",
     "check-boundaries": "bun run scripts/check-import-boundaries.ts",
     "check-packed-artifact": "bun run scripts/check-packed-artifact.ts",
+    "validate:downstream": "bun run scripts/validate-downstream-consumer.runtime.ts",
+    "validate:downstream:audit": "bun run scripts/validate-downstream-consumer.runtime.ts --allow-release-blockers",
     "check-types": "tsc --noEmit",
     "test": "vitest run",
     "test-types": "tsc -p tsconfig.type-tests.json --noEmit",
@@ -56,6 +58,7 @@
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@effect/platform-bun": "catalog:",
     "@effect/vitest": "catalog:",
     "@types/bun": "catalog:",
     "@whattax/core": "workspace:*",
