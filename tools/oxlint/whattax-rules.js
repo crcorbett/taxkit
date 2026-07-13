@@ -652,6 +652,217 @@ const noAmbientTimeOrRandom = {
   },
 };
 
+const effectSchemaRuntimeDecoderNames = new Set([
+  "decodeEffect",
+  "decodeExit",
+  "decodeOption",
+  "decodePromise",
+  "decodeResult",
+  "decodeSync",
+  "decodeUnknownEffect",
+  "decodeUnknownExit",
+  "decodeUnknownOption",
+  "decodeUnknownPromise",
+  "decodeUnknownResult",
+  "decodeUnknownSync",
+]);
+
+const isDecoderCallName = (name) =>
+  name === "decode" || /^decode[A-Z]/u.test(name ?? "");
+
+const importName = (node) => {
+  if (node?.type === "Identifier") {
+    return node.name;
+  }
+
+  if (node?.type === "Literal") {
+    return String(node.value);
+  }
+
+  return null;
+};
+
+const localBindingName = (node) =>
+  node?.type === "Identifier" ? node.name : null;
+
+const isEffectSchemaMember = (node, schemaBindings) =>
+  node?.type === "MemberExpression" &&
+  node.object?.type === "Identifier" &&
+  schemaBindings.has(node.object.name) &&
+  effectSchemaRuntimeDecoderNames.has(propertyName(node.property));
+
+const trackSchemaAlias = (node, schemaBindings) => {
+  const bindingName = localBindingName(node.id);
+
+  if (
+    bindingName !== null &&
+    node.init?.type === "Identifier" &&
+    schemaBindings.has(node.init.name)
+  ) {
+    schemaBindings.add(bindingName);
+  }
+};
+
+const trackStaticDecoderAlias = (
+  node,
+  schemaBindings,
+  decoderBindings,
+  report
+) => {
+  const bindingName = localBindingName(node.id);
+
+  if (bindingName === null) {
+    return;
+  }
+
+  if (isEffectSchemaMember(node.init, schemaBindings)) {
+    decoderBindings.add(bindingName);
+    report(node.init);
+    return;
+  }
+
+  if (node.init?.type === "Identifier" && decoderBindings.has(node.init.name)) {
+    decoderBindings.add(bindingName);
+    report(node.init);
+  }
+};
+
+const trackDestructuredDecoderAliases = (
+  node,
+  schemaBindings,
+  decoderBindings,
+  report
+) => {
+  if (
+    node.id?.type !== "ObjectPattern" ||
+    node.init?.type !== "Identifier" ||
+    !schemaBindings.has(node.init.name)
+  ) {
+    return;
+  }
+
+  for (const property of node.id.properties ?? []) {
+    if (property.type !== "Property") {
+      continue;
+    }
+
+    const decoderName = propertyName(property.key);
+    const extractedName = localBindingName(property.value);
+
+    if (
+      extractedName !== null &&
+      effectSchemaRuntimeDecoderNames.has(decoderName)
+    ) {
+      decoderBindings.add(extractedName);
+      report(property);
+    }
+  }
+};
+
+const noDecodingOutsideBoundaries = {
+  create(context) {
+    const schemaBindings = new Set();
+    const decoderBindings = new Set();
+
+    const report = (node) =>
+      context.report({
+        messageId: "noDecodingOutsideBoundaries",
+        node,
+      });
+
+    return {
+      CallExpression(node) {
+        if (node.callee?.type === "Identifier") {
+          if (
+            decoderBindings.has(node.callee.name) ||
+            isDecoderCallName(node.callee.name)
+          ) {
+            report(node.callee);
+          }
+
+          return;
+        }
+
+        if (node.callee?.type !== "MemberExpression") {
+          return;
+        }
+
+        const memberName = propertyName(node.callee.property);
+
+        if (
+          memberName === "decodeTo" &&
+          node.callee.object?.type === "Identifier" &&
+          schemaBindings.has(node.callee.object.name)
+        ) {
+          return;
+        }
+
+        if (
+          isEffectSchemaMember(node.callee, schemaBindings) ||
+          isDecoderCallName(memberName)
+        ) {
+          report(node.callee.property);
+        }
+      },
+      ImportDeclaration(node) {
+        const source = importName(node.source);
+
+        for (const specifier of node.specifiers ?? []) {
+          const localName = localBindingName(specifier.local);
+
+          if (localName === null) {
+            continue;
+          }
+
+          if (
+            source === "effect" &&
+            specifier.type === "ImportSpecifier" &&
+            importName(specifier.imported) === "Schema"
+          ) {
+            schemaBindings.add(localName);
+          }
+
+          if (source === "effect/Schema") {
+            if (specifier.type === "ImportNamespaceSpecifier") {
+              schemaBindings.add(localName);
+            }
+
+            if (
+              specifier.type === "ImportSpecifier" &&
+              effectSchemaRuntimeDecoderNames.has(
+                importName(specifier.imported)
+              )
+            ) {
+              decoderBindings.add(localName);
+            }
+          }
+        }
+      },
+      VariableDeclarator(node) {
+        trackSchemaAlias(node, schemaBindings);
+        trackStaticDecoderAlias(node, schemaBindings, decoderBindings, report);
+        trackDestructuredDecoderAliases(
+          node,
+          schemaBindings,
+          decoderBindings,
+          report
+        );
+      },
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Restrict executable decoders to reviewed trust and type-erasure boundary files.",
+    },
+    messages: {
+      noDecodingOutsideBoundaries:
+        "Executable decoding belongs only at an explicit trust or type-erasure boundary. Move this operation to the owning boundary module or add that exact reviewed file to decodingBoundaryFiles in oxlint.config.ts. See docs/architecture/effect-services.md.",
+    },
+    type: "problem",
+  },
+};
+
 export default {
   meta: {
     name: "whattax",
@@ -661,6 +872,7 @@ export default {
     "no-async-await-promise": noAsyncAwaitPromise,
     "no-conditional-object-spread": noConditionalObjectSpread,
     "no-context-nullish-default": noContextNullishDefault,
+    "no-decoding-outside-boundaries": noDecodingOutsideBoundaries,
     "no-in-operator": noInOperator,
     "no-instanceof": noInstanceof,
     "no-json-parse-stringify": noJsonParseStringify,

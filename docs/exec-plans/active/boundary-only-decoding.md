@@ -26,7 +26,7 @@ decision.
 | Task | Status | Evidence |
 | --- | --- | --- |
 | DECODE-001 | accepted | Decoder inventory and durable architecture contract are recorded below. No lint or runtime code changed. |
-| DECODE-002 | pending | Add the global Oxlint rule and exact allowlist after DECODE-001 acceptance. |
+| DECODE-002 | accepted | Repository-wide decoder placement rule, exact transitional allowlist and CLI integration suite are complete. |
 | DECODE-003 | pending | Remove repeated calculator decoding and isolate SDK report narrowing. |
 | DECODE-004 | pending | Move docs route decoding before React composition. |
 | DECODE-005 | pending | Complete the repository audit and documentation close-out. |
@@ -259,3 +259,131 @@ DECODE-001 was accepted after one correction turn.
 The parent reran `bun run docs:validate`, `bun run verification`, JSON
 validation and `git diff --check`. No Changeset is required because this slice
 changes repository guidance and execution evidence only.
+
+## DECODE-002 implementation
+
+### Rule and exemption contract
+
+`whattax/no-decoding-outside-boundaries` is enabled repository-wide through
+`tools/oxlint/whattax-rules.js`. It uses Oxlint AST bindings to report:
+
+- all supported Effect Schema runtime decoder families, including Effect,
+  Exit, Option, Result, Promise and Sync forms
+- direct decoder helpers and static member calls named `decode` or beginning
+  `decode` followed by an uppercase letter, including platform operations such
+  as `Stream.decodeText`
+- renamed `Schema` imports from `effect`, namespace and named imports from
+  `effect/Schema`, statically computed members, decoder factory extraction,
+  destructuring and static local aliases
+
+It deliberately permits encoding, schema declaration fields and declarative
+`Schema.decodeTo`. Dynamic property keys and aliases that cannot be resolved
+from the local AST remain a syntax-level residual risk; they require review.
+
+`oxlint.config.ts` owns one named `decodingBoundaryFiles` list, grouped into
+application/configuration, docs, public API/test, focused lint-test, dynamic
+dispatch and SDK/process categories. The override disables only this new rule
+for exact paths. It does not use `ignorePatterns`, package-wide globs,
+runtime-name globs, test globs or nested configuration. The two repeated rule
+scenario files remain explicitly transitional entries for DECODE-003; the
+mixed docs route boundary remains an explicit transitional entry for
+DECODE-004.
+
+The canonical `lint` command now passes `--disable-nested-config` to both
+Oxlint invocations. Its first pass runs the rule as allowed with
+`--report-unused-disable-directives-severity=error`; this causes parsed
+`eslint-disable` and `oxlint-disable` directives naming the rule to fail as
+unused. Exact configuration overrides are therefore the only exemption
+mechanism.
+
+### Test coverage
+
+`tools/oxlint/no-decoding-outside-boundaries.test.ts` runs the real Oxlint CLI
+with the repository config and `--disable-nested-config`. It proves:
+
+- fourteen Effect Schema family/direct-helper diagnostics
+- seven distinct renamed, namespace, static-computed, factory, alias,
+  destructuring and platform-member diagnostics
+- TSX component and hook decoder calls are rejected outside the allowlist
+- encoding and `Schema.decodeTo` are not false positives
+- a decoder in the exact `apps/api/src/config.ts` override passes
+- file, next-line and line `eslint-disable` and `oxlint-disable` forms fail
+  through comment tokens, while identical string-literal text does not
+
+The focused suite is part of the root `bun run test` command.
+
+### Changeset decision
+
+No Changeset is required. This is repository-internal lint configuration,
+test wiring and execution evidence; it changes no package export, package
+contract, release artifact or public user-facing behaviour. Do not run
+`bun run version-repo`.
+
+### Quality audits
+
+#### Audit pass 1: AST matching and false positives
+
+- Reviewed the plugin's import, member and local-binding tracking against all
+  required Effect Schema decoder families and generic `decode*` members.
+- Confirmed the dedicated tests assert the expected diagnostic counts, rather
+  than merely proving that an unrelated decoder in the same fixture fails.
+- Confirmed `Schema.decodeTo`, encoding and schema declaration fields remain
+  outside the executable-decoder match.
+
+#### Audit pass 2: exact configuration boundary
+
+- Reviewed `decodingBoundaryFiles`: every entry is an exact source path from
+  the DECODE-001 inventory or the focused CLI test's process-output boundary.
+- Confirmed the sole override disables only
+  `whattax/no-decoding-outside-boundaries`; no boundary source was added to
+  `ignorePatterns` and the only remaining file glob is the pre-existing
+  calculator policy override.
+- Confirmed both root lint passes use `--disable-nested-config`.
+
+#### Audit pass 3: test and maintenance fit
+
+- Confirmed the focused test uses the real bundled Oxlint binary and root
+  configuration, not visitor-callback stubs.
+- Confirmed temporary fixture cleanup, deterministic report-count assertions
+  and the parsed-comment suppression audit without raw source-text searches.
+- Reviewed new alias-tracking helpers as specific reusable matching policy;
+  no DTOs, unsafe casts, runtime wrappers or Effect helper abstractions were
+  introduced.
+
+### Validation log
+
+Completed DECODE-002 gates:
+
+```bash
+# 7 focused real-CLI tests passed.
+bun run test:oxlint
+
+# Root test path passed, including the focused Oxlint suite.
+bun run test
+
+# Root lint passed with the comment-token pass and nested configs disabled.
+bun run lint
+
+# Formatting, Knip and workspace type checks passed.
+bun run verification
+
+# Valid JSON and no whitespace errors.
+jq empty docs/product-specs/boundary-only-decoding.tasks.json
+git diff --check
+```
+
+No browser-visible behaviour changed. Normal root lint covers browser app and
+browser-safe SDK source without broad exemptions.
+
+## Parent acceptance
+
+DECODE-002 was accepted without a correction turn after local recovery from a
+non-producing subagent attempt.
+
+- Audit pass 1: parent inspected the AST rule and verified required decoder,
+  alias, TSX, false-positive and comment-token cases through the real CLI.
+- Audit pass 2: parent inspected the exact categorised allowlist, confirmed
+  the rule is globally enabled and checked that no broad exemption or
+  `ignorePatterns` entry was introduced.
+- Audit pass 3: parent verified root test wiring, temporary fixture cleanup,
+  deterministic diagnostic-count assertions and the no-Changeset rationale.

@@ -3,6 +3,42 @@ import core from "ultracite/oxlint/core";
 import react from "ultracite/oxlint/react";
 import remix from "ultracite/oxlint/remix";
 
+const decodingBoundaryFiles = [
+  // Application configuration, executable smoke checks and checked examples.
+  "apps/api/src/config.ts",
+  "apps/api/scripts/smoke-public-routes.runtime.ts",
+  "apps/docs/examples/browser-http.ts",
+  "apps/docs/examples/node-server.ts",
+  "apps/docs/src/lib/docs/loaders.ts",
+  "apps/docs/src/lib/docs/route-boundary.ts",
+
+  // Docs content and rendering-library representation boundaries.
+  "packages/docs-content/src/live.layer.ts",
+  "packages/docs-content/src/validation/policy.runtime.test.ts",
+  "packages/docs-content/src/validation/policy.ts",
+  "packages/docs-fumadocs/src/config.ts",
+
+  // Public API normalisation and focused API contract tests.
+  "packages/api/http/src/openapi.ts",
+  "packages/api/http/__tests__/openapi-snapshot.test.ts",
+  "packages/api/http/__tests__/public-calculation-api.test.ts",
+
+  // Focused lint integration test: CLI output is decoded at the process boundary.
+  "tools/oxlint/no-decoding-outside-boundaries.test.ts",
+
+  // Dynamic dispatch and its transitional repeated scenario decodes.
+  "packages/calculators/src/errors.ts",
+  "packages/calculators/src/live.layer.ts",
+  "packages/rules/au/income-tax/src/calculator/annual-tax.ts",
+  "packages/rules/au/pay/src/calculator/take-home-pay.ts",
+
+  // SDK type-erasure dispatch and downstream process boundaries.
+  "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+  "packages/sdk/typescript/src/effect.ts",
+  "packages/sdk/typescript/src/index.ts",
+  "packages/sdk/typescript/src/types.ts",
+];
+
 export default defineConfig({
   extends: [core, react, remix],
   ignorePatterns: [
@@ -35,6 +71,12 @@ export default defineConfig({
         "whattax/no-throw": "error",
         "whattax/no-typeof": "error",
         "whattax/no-undefined-comparison": "error",
+      },
+    },
+    {
+      files: decodingBoundaryFiles,
+      rules: {
+        "whattax/no-decoding-outside-boundaries": "off",
       },
     },
   ],
@@ -85,6 +127,7 @@ export default defineConfig({
     // this Unicorn rule misreads that second argument as a native Array thisArg.
     "unicorn/no-array-method-this-argument": "off",
     "whattax-no-switch/no-switch": "error",
+    "whattax/no-decoding-outside-boundaries": "error",
     "whattax/no-layer-exports-in-service-files": "error",
     "whattax/no-manual-tag": "error",
     "whattax/no-runtime-execution-outside-boundaries": "error",
