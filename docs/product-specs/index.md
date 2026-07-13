@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-01
+last_reviewed: 2026-07-13
 source_of_truth: docs
 confidence: medium
 ---
@@ -16,6 +16,7 @@ Specs:
 | --- | --- | --- |
 | [API compatibility harness](./api-compatibility-harness.md) | Implemented | OpenAPI snapshot, route fixtures and live API app smoke coverage are in place. |
 | [API HTTP package topology](./api-http-package-topology.md) | Implemented | The implemented HTTP API package now lives at `packages/api/http` as `@whattax/api-http`. |
+| [Boundary-only decoding](./boundary-only-decoding.md) | Draft | Restrict executable decoding to exact reviewed trust and type-erasure boundary files. |
 | [Documentation structure and development docs](./documentation-structure-and-development-docs.md) | Canonical | Baseline docs structure and local skill routing. |
 | [Documentation improvement roadmap](./documentation-improvement-roadmap.md) | Implemented | README coverage, root routing and maintenance conventions are in place. |
 | [Downstream consumer validation](./downstream-consumer-validation.md) | Implemented foundation; strict gate blocked | SDK diagnostic manifest audit and API temp-workspace smoke exist; strict SDK downstream install remains blocked by packed manifest protocols. |

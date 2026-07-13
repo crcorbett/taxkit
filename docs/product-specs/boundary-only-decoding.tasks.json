@@ -1,0 +1,652 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/boundary-only-decoding.md",
+  "title": "Boundary-only decoding implementation tasks",
+  "status": "draft",
+  "last_reviewed": "2026-07-13",
+  "principles": [
+    "Decode unknown or representation-level values only at explicit trust or type-erasure boundaries.",
+    "After canonical decoding, pass schema-derived typed values inward without defensive or repeated decoding.",
+    "Enable one global lint rule and exempt exact reviewed files by disabling only that rule.",
+    "Do not use broad package, runtime, boundary-name or test globs as decoder exemptions.",
+    "Keep dynamic calculator and SDK descriptor decoding colocated with the typed continuation and do not recover erased types with unsafe casts.",
+    "Close each selected schema and its typed continuation inside a policy-owning generic constructor before heterogeneous catalogue or descriptor storage erases the concrete type.",
+    "Use canonical schemas, schema-derived types, tagged errors and Effect-native control flow at every boundary.",
+    "Keep boundary Effects as one meaningful linear pipe or Effect.gen program with inline typed error handling and no one-use decoder or mapper helpers.",
+    "Keep React decoding in route loaders, actions or dedicated adapters; route composition receives typed results and leaf components remain pure typed renderers.",
+    "Require parent review, final call-graph verification and three documented improvement audit passes before accepting each implementation slice."
+  ],
+  "beforeImplementation": [
+    "Create an active execution plan under docs/exec-plans/active/ before editing lint rules, runtime code, package code or package docs.",
+    "Record the current decoder callsite inventory and classify each call as external trust boundary, public unknown-input boundary, type-erasure boundary, boundary test or internal/repeated decode.",
+    "Implement one task at a time with one sequential subagent per task and parent review before starting the next task.",
+    "Do not run bun run version-repo or publish packages."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit after each coherent implementation slice passes mandatory verification, Changeset review or no-Changeset rationale, three documented quality audit passes and parent acceptance.",
+    "requiredBeforeFinalPR": [
+      "bun run lint",
+      "bun run test",
+      "bun run --filter=@whattax/calculators test",
+      "bun run --filter=@whattax/calculators check-types",
+      "bun run --filter=@whattax/sdk test",
+      "bun run --filter=@whattax/sdk test-types",
+      "bun run --filter=@whattax/sdk check-boundaries",
+      "bun run --filter=@whattax/sdk build",
+      "bun run --filter=@whattax/api-http test",
+      "bun run --filter=@whattax/api-http check-types",
+      "bun run --filter=api smoke:public-routes",
+      "bun run --filter=web check-types",
+      "bun run --filter=docs check-types",
+      "bun run --filter=docs build",
+      "bun run docs:validate",
+      "bun run verification",
+      "jq empty docs/product-specs/boundary-only-decoding.tasks.json",
+      "bun run changeset status --verbose when a Changeset exists, or an explicit no-Changeset rationale for repository-internal lint/docs/test slices"
+    ],
+    "evidenceRequired": [
+      "Current and final calculator input, SDK report-narrowing, docs frontend boundary, static-analysis and test call graphs.",
+      "Complete repository-owned executable decoder inventory and classification.",
+      "Exact decoding boundary allowlist grouped by boundary category in oxlint.config.ts.",
+      "Positive and negative custom-rule test evidence, including proof that declarative Schema.decodeTo and encoding are not false positives.",
+      "Real Oxlint CLI fixture evidence for a prohibited source file, an exact allowlisted file and comment-token inline-disable enforcement.",
+      "Evidence that the calculator retains required route-union and selected-entry decodes but removes the repeated scenario-layer decode.",
+      "Evidence that typed continuations use canonical schema-derived types without unsafe casts, DTO mirrors or decoder-renaming evasions.",
+      "Effect control-flow evidence showing decode, inline typed error mapping and typed continuation in one readable pipe or Effect.gen program without helper sprawl or nested runtime execution.",
+      "Compile-time evidence that catalogue construction rejects a selected schema paired with the wrong typed continuation without unsafe casts.",
+      "Frontend composition evidence showing no executable decoding, Effect service acquisition or runtime execution in React render functions, leaf components or ordinary hooks.",
+      "Changeset path and release-train impact, or explicit no-Changeset rationale.",
+      "Parent audit outcome for each task, including up to three correction turns when needed."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "DECODE-001",
+      "status": "pending",
+      "title": "Audit decoder callsites and establish the architecture contract",
+      "type": "foundation-audit",
+      "dependsOn": [],
+      "goal": "Make the boundary definition and current decoder inventory explicit before enforcement changes code.",
+      "scope": [
+        "Create docs/exec-plans/active/boundary-only-decoding.md and add it to the active plan index.",
+        "Audit executable decode calls in repository-owned apps, packages and tools while excluding generated output, build output and dependencies.",
+        "Classify every call as an external trust boundary, public unknown-input boundary, external-library normalisation boundary, dynamic type-erasure boundary, focused boundary test or internal/repeated decode.",
+        "Update AGENTS.md with the short mandatory rule and route deeper detail to docs/architecture/effect-services.md.",
+        "Update docs/architecture/effect-services.md with the boundary-only decoding contract, allowed and prohibited categories, typed error handling and no-repeat rule.",
+        "Update docs/architecture/testing-and-quality.md with the global lint, exact allowlist and custom-rule test expectations.",
+        "Update docs/architecture/frontend.md so route loaders, actions and dedicated adapters own decoding while React route/container composition and leaf components consume schema-derived typed values without runtime or service ownership.",
+        "Confirm the current and target call graphs in the spec remain accurate; revise them if the audit discovers a different implementation boundary.",
+        "Document that the catalogue must close over each input schema and InputSchema[\"Type\"] continuation before heterogeneous storage erases the concrete generic.",
+        "Do not add the lint rule or refactor runtime code in this task."
+      ],
+      "outputs": [
+        "docs/exec-plans/active/boundary-only-decoding.md",
+        "docs/exec-plans/active/README.md",
+        "AGENTS.md",
+        "docs/architecture/effect-services.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/architecture/frontend.md",
+        "docs/product-specs/boundary-only-decoding.md if audit findings change the target",
+        "docs/product-specs/boundary-only-decoding.tasks.json if sequencing changes",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "documentationRequirements": [
+          "Read and follow docs/standards/documentation-style.md, documentation-writing.md, documentation-templates.md, documentation-templates/reference.md, documentation-review.md, documentation-architecture.md, documentation-user-journeys.md and documentation-user-journeys/new-contributor.md before editing docs.",
+          "Treat architecture pages as durable maintainer reference and the exec plan as implementation evidence; do not invent a public MDX page template for either.",
+          "Review reader fit, Australian spelling, sentence-case headings, banned marketing language, canonical names, schema/type references, links and source-of-truth ownership."
+        ],
+        "taskSpecificScope": [
+          "Keep the root AGENTS.md rule short and route detail into architecture docs.",
+          "Do not duplicate the exact path allowlist in architecture docs; oxlint.config.ts will own paths.",
+          "Record repeated/internal decodes as implementation work instead of declaring them boundaries.",
+          "Document one cohesive Effect boundary flow and prohibit one-use decoder/error helpers, nested runtime execution and unsafe casts.",
+          "Document that arbitrary helper reuse/size remains a three-pass audit and parent-review concern rather than a brittle minimum-function-size lint rule.",
+          "Document that mixed route/component TSX files should not be allowlisted when decoding can move to a loader or boundary module."
+        ]
+      },
+      "mandatoryVerification": [
+        "Decoder inventory command excludes node_modules, dist, generated route trees and build output and records every repository-owned source hit.",
+        "Call-graph audit confirms the route-union, selected-calculator, scenario-layer, SDK descriptor and docs render-time decode locations.",
+        "bun run docs:validate",
+        "bun run verification",
+        "jq empty docs/product-specs/boundary-only-decoding.tasks.json",
+        "git diff --check",
+        "Explicit no-Changeset rationale because this slice changes repository rules, architecture docs and implementation planning only"
+      ],
+      "browserVerification": [
+        "No browser-visible UI behaviour is expected to change.",
+        "Confirm the proposed rule will apply to browser source without exempting apps or browser-safe SDK entrypoints broadly.",
+        "Confirm the frontend target graph keeps executable decoding and runtime/service ownership outside React render functions, leaf components and ordinary hooks."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: every current decoder call is classified from the actual code path and the current call graphs are factual.",
+        "Audit pass 2: the architecture contract distinguishes external trust boundaries, dynamic type-erasure boundaries and prohibited repeated/internal decoding, defines one linear Effect shape, preserves schema-to-continuation coupling before erasure and forbids helper sprawl without duplicating the allowlist.",
+        "Audit pass 3: docs satisfy reader fit, second-person voice where instructional, Australian spelling, sentence-case headings, no marketing language, canonical names, correct links and source-of-truth ownership."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "The active plan records the current decoder inventory, classifications and implementation risks.",
+        "Root and architecture docs define one consistent boundary-only decoding rule.",
+        "Frontend architecture routes decoding through loaders or dedicated adapters and keeps leaf components typed and render-only.",
+        "The spec call graphs still match the audited current and target paths.",
+        "Parent agent reviewed documentation against the standards suite and accepted the decoder classifications before lint implementation begins.",
+        "Parent agent recorded all three quality audits and accepted the no-Changeset rationale."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DECODE-002",
+      "status": "pending",
+      "title": "Add the global Oxlint rule and exact boundary allowlist",
+      "type": "lint-enforcement",
+      "dependsOn": [
+        "DECODE-001"
+      ],
+      "goal": "Reject new executable decoder calls outside reviewed boundary files and prove the rule's syntax contract.",
+      "scope": [
+        "Add whattax/no-decoding-outside-boundaries to tools/oxlint/whattax-rules.js.",
+        "Detect executable Effect Schema runtime decoders, direct decode helpers, member decode calls, statically named computed decode members, decoder factory creation, renamed Schema imports, effect/Schema namespace and named imports, and statically traceable local aliases.",
+        "Resolve Effect Schema forms from import and local binding syntax instead of treating every identifier named Schema as Effect Schema; report decoder factory creation before an unrelated variable name can hide it.",
+        "Detect calls whose static identifier or member name is decode or begins with decode followed by an uppercase letter, including decodeJson, decodeOutput, Stream.decodeText and platform decoders, while documenting unsupported dynamic property/alias forms as residual risk.",
+        "Do not report Schema.decodeTo, encoding, schema declaration fields or other declarative schema construction.",
+        "Add deterministic comment-token verification that rejects both oxlint-disable and eslint-disable directives naming this rule, including file, next-line and line forms; exact configuration overrides are the only decoder exemption mechanism, and raw text search over docs or string literals is not acceptable.",
+        "Add focused positive and negative tests under tools/oxlint, including an integration fixture that invokes the real Oxlint CLI with the repository plugin/config and proves an exact allowlisted file passes.",
+        "Enable the rule globally in oxlint.config.ts.",
+        "Update the canonical root lint command and real-CLI fixtures to use --disable-nested-config so nested configuration cannot weaken the exact allowlist.",
+        "Define a named exact decodingBoundaryFiles list in oxlint.config.ts, grouped by reviewed boundary category.",
+        "Disable only this rule for exact allowlisted files; do not add them to ignorePatterns or use package-wide, runtime-wide, boundary-name or test globs.",
+        "Use the DECODE-001 inventory as the starting allowlist so the repository passes before semantic refactoring, but mark internal/repeated decode files for removal in later tasks.",
+        "Record rule diagnostics, test coverage and current transitional allowlist in the active execution plan."
+      ],
+      "outputs": [
+        "tools/oxlint/whattax-rules.js",
+        "tools/oxlint/**/*.test.ts or equivalent focused rule tests",
+        "oxlint.config.ts",
+        "package.json for strict root lint flags and any focused lint-rule test command",
+        "docs/exec-plans/active/boundary-only-decoding.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "documentationRequirements": [
+          "Read and follow docs/standards/documentation-style.md, documentation-writing.md, documentation-templates.md, documentation-templates/reference.md, documentation-review.md, documentation-architecture.md, documentation-user-journeys.md and documentation-user-journeys/new-contributor.md before updating the active plan or contributor-facing diagnostics.",
+          "Use concise diagnostic wording and keep canonical Effect Schema names current.",
+          "Review links, source-of-truth ownership and absence of marketing language."
+        ],
+        "taskSpecificScope": [
+          "Implement AST checks deterministically without type assertions or a hand-rolled parser.",
+          "Do not match every property containing the word decode if that rejects declarative Schema APIs.",
+          "Prove the rule fails on a representative non-boundary decoder fixture and permits the same syntax only through the exact config override.",
+          "Cover renamed Schema imports, effect/Schema namespace and named imports, member extraction, destructuring, decoder factory assignment and static aliases where the plugin can resolve them without type information; document unsupported dynamic property or alias forms as residual risk.",
+          "Inspect comment tokens for inline-disable enforcement; do not use repository-wide raw text matching that would reject docs, diagnostics or fixture strings.",
+          "Run at least one rule test through the actual Oxlint CLI and config instead of testing visitor callbacks only.",
+          "Keep oxlint.config.ts as the only rule authority by using --disable-nested-config in canonical lint/fixture commands; do not add a nested config escape hatch.",
+          "Do not create generic AST wrapper helpers unless they express reused matching policy across several rule cases."
+        ]
+      },
+      "mandatoryVerification": [
+        "Focused custom Oxlint rule tests cover unknown and typed Effect Schema decoder families (Effect, Exit, Option, Result, Promise and Sync), renamed Schema imports, effect/Schema namespace and named imports, direct helper calls, member calls, computed static members, decoder factory creation, member extraction, destructuring, static aliases, encoding and Schema.decodeTo.",
+        "A TSX fixture proves decoder calls in a React component or ordinary hook are reported when the file is not exactly allowlisted.",
+        "Real Oxlint CLI fixture proof covers one prohibited non-boundary file and one permitted exact-override file using the repository plugin/config.",
+        "Root lint and real-CLI fixture commands use --disable-nested-config, and repository-authored decoder source is not hidden by ignorePatterns.",
+        "Comment-token audit proof rejects oxlint-disable and eslint-disable comments naming whattax/no-decoding-outside-boundaries, including file, next-line and line forms, without treating docs or string literals as comments.",
+        "Integration proof shows a representative decoder call fails in a non-boundary file and passes only when its exact file is included in the decoding boundary override.",
+        "rg audit proves decoding boundary files are not added to ignorePatterns and no broad package, runtime, boundary-name or test glob disables the rule.",
+        "Rule implementation audit proves matching uses the Oxlint AST directly, has no unsafe assertions or ad hoc parser, and contains no one-use visitor/helper sprawl.",
+        "bun run lint",
+        "bun run test",
+        "bun run verification",
+        "git diff --check",
+        "Explicit no-Changeset rationale because the lint plugin, root test wiring and config are repository-internal tooling"
+      ],
+      "browserVerification": [
+        "No browser-visible UI behaviour is expected to change.",
+        "Lint the browser app and browser-safe SDK source through the normal repository command without broad exemptions."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: AST matching covers required executable and alias forms, rejects inline-disable bypasses and does not report declarative schema construction or encoding.",
+        "Audit pass 2: config uses one exact, categorised allowlist and disables only the new rule for each boundary file.",
+        "Audit pass 3: tests are deterministic, wired into the root test path, avoid helper sprawl and brittle function-size linting, and prove both enforcement and false-positive boundaries."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "The repository-wide rule is enabled and current source passes through explicit file overrides only.",
+        "The rule diagnostic explains the boundary or allowlist correction path.",
+        "The exact config allowlist is the only supported exemption; inline disables and statically resolvable aliases do not bypass enforcement.",
+        "Rule tests fail if required decoder syntax stops being reported or allowed declarative syntax becomes a false positive.",
+        "Parent agent inspected the plugin AST logic, test cases, exact allowlist and integration proof before accepting the task.",
+        "Parent agent recorded all three quality audits and accepted the no-Changeset rationale."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DECODE-003",
+      "status": "pending",
+      "title": "Remove repeated calculator decoding and isolate SDK narrowing",
+      "type": "typed-boundary-refactor",
+      "dependsOn": [
+        "DECODE-002"
+      ],
+      "goal": "Enter typed calculator and SDK continuations immediately after required dynamic schema selection, without repeated decoding or unsafe casts.",
+      "scope": [
+        "Introduce or refine one generic, policy-owning catalogue-entry constructor that closes over the selected canonical input schema and a callback accepting exactly InputSchema[\"Type\"] before heterogeneous catalogue storage erases the concrete generic.",
+        "Keep the erased stored entry's representation-level calculate boundary linear: selected schema decode, then the constructor-closed typed calculator continuation, with no service-layer decode passed through an unknown callback.",
+        "Preserve the route-level CalculatorRunFacts union decode and the selected calculator inputSchema decode as distinct required boundaries.",
+        "Add or expose typed scenario Layer constructors for TakeHomeScenarioInput and AnnualTaxScenarioInput while preserving existing public unknown-input boundary adapters.",
+        "Make calculator catalogue execution use typed scenario Layer constructors so selected facts are not decoded again.",
+        "If public unknown-accepting TakeHomeScenarioLive or AnnualTaxScenarioLive constructors remain, isolate them as exact boundary adapters and preserve their expected Schema error behaviour.",
+        "Do not use unsafe casts, mirrored calculator request/report DTOs or renamed decode operations to bypass lint.",
+        "Keep Schema errors typed and map only Schema.SchemaError inline to CalculatorInputDecodeError at the owning catalogue/service boundary; do not remap CalculationError through a broad mapError or catchAll.",
+        "Express decode, inline error mapping and the typed calculator continuation as one readable pipe or Effect.gen program; do not fragment it into decoder, mapper or runtime helpers.",
+        "Isolate SDK descriptor output decoder creation and invocation in exact boundary modules while preserving plain and Effect SDK output types.",
+        "Simplify defineSdkCalculation to use the direct Schema.decodeUnknownEffect output decoder unless a focused test proves an intermediate Exit representation is required; do not decode to Exit and immediately lift it back into Effect.",
+        "Narrow the decodingBoundaryFiles list as mixed or repeated decoder locations are removed.",
+        "Update calculator, rule-package and SDK tests plus the active execution plan with the implemented call graphs."
+      ],
+      "outputs": [
+        "packages/calculators/src/**/*.ts",
+        "packages/calculators/__tests__/**/*.test.ts",
+        "packages/rules/au/pay/src/**/*.ts",
+        "packages/rules/au/pay/test/**/*.test.ts",
+        "packages/rules/au/income-tax/src/**/*.ts",
+        "packages/rules/au/income-tax/test/**/*.test.ts",
+        "packages/sdk/typescript/src/**/*.ts",
+        "packages/sdk/typescript/src/**/*.test.ts",
+        "packages/sdk/typescript/type-tests/**/*.ts",
+        "oxlint.config.ts",
+        "docs/architecture/api-and-sdk.md if the final call graph changes",
+        "docs/exec-plans/active/boundary-only-decoding.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "documentationRequirements": [
+          "Read and follow docs/standards/documentation-style.md, documentation-writing.md, documentation-templates.md, documentation-templates/reference.md, documentation-review.md, documentation-architecture.md, documentation-user-journeys.md and documentation-user-journeys/new-contributor.md before updating architecture docs, package docs or the active plan.",
+          "Keep call graphs factual, package-owned and aligned with current SDK/API names and canonical schemas.",
+          "Review reader fit, Australian spelling, sentence-case headings, banned marketing language, links and source-of-truth ownership."
+        ],
+        "taskSpecificScope": [
+          "Use one generic policy-owning catalogue-entry constructor that couples InputSchema to a callback accepting InputSchema[\"Type\"] before the entry is erased for heterogeneous storage.",
+          "Add a compile-time negative fixture proving a catalogue schema cannot be paired with another calculator's input continuation.",
+          "Do not create tiny boundary wrappers unless they own the full representation-to-type transition.",
+          "Do not add decodePayload, mapDecodeError, runDecoder, withDecodedInput, toBoundaryError or generic decodeOrFail helpers for one-use flow fragments.",
+          "Do not use async/await, raw Promise, nested Effect.runPromise, request-local ManagedRuntime, broad Effect.catchAll, Effect.orDie or unsafe casts inside decoder/service pipelines; existing app loaders and the plain SDK facade may execute the completed Effect once through their module-scoped runtime at the outer edge.",
+          "Treat defineSdkCalculation as the justified generic schema/output-continuation abstraction and remove any decode-to-Exit-to-Effect round trip that has no caller-owned contract.",
+          "Do not narrow or remove the existing public unknown-input scenario constructors; additive typed constructor exports require a reviewed Changeset at the semver level required by the final public diff."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run --filter=@whattax/calculators test",
+        "bun run --filter=@whattax/calculators check-types",
+        "bun run --filter=@whattax/calculators build",
+        "bun run --filter=@whattax/rules-au-pay test",
+        "bun run --filter=@whattax/rules-au-pay check-types",
+        "bun run --filter=@whattax/rules-au-income-tax test",
+        "bun run --filter=@whattax/rules-au-income-tax check-types",
+        "bun run --filter=@whattax/sdk test",
+        "bun run --filter=@whattax/sdk test-types",
+        "bun run --filter=@whattax/sdk check-boundaries",
+        "bun run --filter=@whattax/sdk build",
+        "bun run --filter=@whattax/api-http test",
+        "bun run --filter=api smoke:public-routes",
+        "rg audit proves calculator catalogue execution does not invoke rule scenario boundary decoders after selected inputSchema decoding.",
+        "Typecheck fixture proves the catalogue-entry constructor rejects a schema paired with the wrong calculator input continuation and requires no unsafe cast to store heterogeneous entries.",
+        "rg and type audit prove no unsafe casts, local DTO mirrors or decode-renaming evasions were introduced.",
+        "Effect control-flow audit proves decode, inline typed Schema error mapping and calculator/SDK continuation form one meaningful linear pipe or Effect.gen program with no nested runtime execution, broad catch-all conversion or one-use helper sprawl.",
+        "SDK audit proves defineSdkCalculation uses the direct Effect decoder or records focused test evidence for any required intermediate representation.",
+        "Canonical contract audit proves all input/output types are derived from owning schemas and no manual readers, duplicate schemas or DTO mirrors were introduced.",
+        "bun run lint",
+        "bun run test",
+        "bun run verification",
+        "bun run changeset for changed public exports, accepted inputs or package-facing docs, with semver justified from the final public diff, or explicit no-Changeset rationale when public contracts and behaviour remain unchanged"
+      ],
+      "browserVerification": [
+        "Run the SDK browser-safe boundary check through bun run --filter=@whattax/sdk check-boundaries.",
+        "No browser-visible route change is expected; confirm browser-safe SDK entrypoints do not import server-only API or boundary modules.",
+        "Confirm no React render function, leaf component or ordinary hook gains decoding, Effect service acquisition or runtime execution."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: the generic catalogue-entry constructor preserves schema-to-continuation coupling before heterogeneous erasure, calculator and SDK call graphs enter typed continuations directly after selected schema decoding, and no repeated internal decode remains.",
+        "Audit pass 2: Effect control flow is one readable pipe or Effect.gen program, Schema errors remain typed and inline error mapping occurs at the owning boundary without async/Promise, nested runtimes, catch-all conversion or wrapper sprawl.",
+        "Audit pass 3: canonical schemas/types/ids/errors are reused, there are no unsafe casts or DTO mirrors, public exports remain intentional and browser-safe imports remain intact."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "The selected calculator input is decoded at catalogue dispatch and passed into a calculator-specific typed continuation.",
+        "Catalogue construction rejects a mismatched schema and typed continuation at compile time without unsafe casts.",
+        "Rule scenario layers used by calculator execution do not decode the selected facts again.",
+        "Existing public unknown-input scenario constructors remain explicit tested boundary adapters; additive typed constructors are used for internal calculator composition.",
+        "SDK report narrowing remains schema-backed and isolated at the dynamic descriptor boundary.",
+        "Boundary Effects are linear and composable, with owning typed errors and no one-use decoder/error helpers or nested runtime execution.",
+        "No unsafe casts, mirrored DTOs, decoder aliases or server-only browser imports were introduced.",
+        "Parent agent reviewed package tests, API smoke, final call graphs, allowlist reduction and Changeset decision before accepting the task.",
+        "Parent agent recorded all three quality audits."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DECODE-004",
+      "status": "pending",
+      "title": "Move docs decoding ahead of React composition",
+      "type": "frontend-boundary-refactor",
+      "dependsOn": [
+        "DECODE-003"
+      ],
+      "goal": "Restore typed docs loader results before React render so route and leaf components compose typed values without hidden decoding, service acquisition or runtime ownership.",
+      "scope": [
+        "Inspect apps/docs/src/lib/docs/route-boundary.ts, apps/docs/src/lib/docs/loaders.ts, apps/docs/src/routes/index.tsx and apps/docs/src/routes/$.tsx before editing.",
+        "Record the current server-function encode, route loader, route-boundary match and component render call graph in the active execution plan.",
+        "Move docsHomeRouteBoundary and docsPageRouteBoundary decoding out of React component render and into the route loader or a dedicated boundary adapter that completes before typed route composition.",
+        "Prefer normalising each decoded transport Exit to Result.Result<Success, Failure> in the loader adapter so Cause traversal and impossible-defect policy execute once outside React, then compose the typed result with Result.match or Match in the route/container.",
+        "Preserve the existing transport codec, typed DocsContent errors and success values unless a smaller canonical schema is required and documented; malformed transport data must remain distinguishable from an expected content failure.",
+        "Keep loader/runtime execution at the app boundary through the existing module-scoped runtime; do not create a ManagedRuntime in a route, component, hook or request-local helper.",
+        "Make route/container components compose typed success, absence and error branches with focused readonly props, Option and Match where they fit.",
+        "Keep leaf components render-only: focused values derived from decoded data, children, UI-only presentation props, callbacks and local interaction state are valid, but representation-level unknown props, decoder calls, Effect service acquisition, runtime execution, environment/storage reads and self-owned boundary fetches are not.",
+        "Do not extract wrapper hooks, providers or components merely to relocate decoding; add a component abstraction only when it owns reusable UI policy or removes meaningful repetition.",
+        "Do not change visual design, navigation content or user-facing copy except where a typed error branch requires an accuracy fix.",
+        "Update docs/architecture/frontend.md and the active execution plan if the final boundary call graph differs from the documented target."
+      ],
+      "outputs": [
+        "apps/docs/src/lib/docs/route-boundary.ts",
+        "apps/docs/src/lib/docs/loaders.ts",
+        "apps/docs/src/lib/docs/**/*.test.ts or an equivalent focused boundary test",
+        "apps/docs/src/routes/index.tsx if typed route composition changes",
+        "apps/docs/src/routes/$.tsx if typed route composition changes",
+        "docs/architecture/frontend.md if the final call graph changes",
+        "docs/exec-plans/active/boundary-only-decoding.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "documentationRequirements": [
+          "Read and follow docs/standards/documentation-style.md, documentation-writing.md, documentation-templates.md, documentation-templates/reference.md, documentation-review.md, documentation-architecture.md, documentation-user-journeys.md and documentation-user-journeys/new-contributor.md before updating frontend architecture or the active plan.",
+          "Keep frontend call graphs factual and separate durable architecture from implementation evidence.",
+          "Review reader fit, Australian spelling, sentence-case headings, banned marketing language, current API/SDK names, canonical schema/type references, links and source-of-truth ownership."
+        ],
+        "taskSpecificScope": [
+          "Decode transported docs route values before React composition; do not hide the same render-time decode behind a renamed matcher, hook, provider or component.",
+          "Keep Cause traversal and defect policy in the loader adapter; prefer a typed Effect Result for route composition instead of exposing another generic match(encoded, handlers) or matchExit callback wrapper to React.",
+          "Use one readable Effect pipe or Effect.gen flow with typed errors and inline transformations where the loader/adapter remains Effect-native.",
+          "Use the existing module-scoped docs runtime only at the loader/app edge and never create or run a runtime from a React component or ordinary hook.",
+          "Prefer focused readonly props, callbacks and children composition; do not add boolean mode props, representation-level unknown props, mirrored transport DTOs or component-owned data fetching to move boundary policy into the component tree.",
+          "Do not introduce unsafe casts, local route DTO mirrors, duplicate schemas, manual object readers or one-use decoder/error helpers."
+        ]
+      },
+      "mandatoryVerification": [
+        "Focused boundary tests prove encoded docs home/page success and each typed error variant are decoded before React render composition.",
+        "Focused route-result tests prove decoded Exit success/failure values become typed Result branches before React composition and impossible defects do not become expected content errors.",
+        "Focused malformed-transport test proves schema decode failure is not presented as a DocsSourceError, DocsPageNotFoundError or other expected content failure.",
+        "Call-graph audit proves docs route components no longer call docsHomeRouteBoundary.match(encoded) or docsPageRouteBoundary.match(encoded), directly or through a render-time wrapper.",
+        "Frontend source audit proves React render functions, leaf components and ordinary hooks contain no executable decoding, Effect service acquisition, runtime creation/execution, environment/storage reads or boundary fetches.",
+        "Effect audit proves loader/adapter flow is linear and composable, uses canonical schemas and typed errors, keeps one-off transformations inline and contains no async/Promise interleaving inside the decoder pipeline, nested runtime, broad catch-all conversion, unsafe cast, DTO mirror, manual reader or helper sprawl.",
+        "Browser-safe import audit proves route/components do not import @whattax/docs-content/server, generated .source/server modules or other server-only exports.",
+        "bun run --filter=docs check-types",
+        "bun run --filter=docs build",
+        "bun run --filter=@whattax/docs-content test",
+        "bun run docs:validate",
+        "bun run test",
+        "bun run verification",
+        "git diff --check",
+        "Explicit no-Changeset rationale for app-internal boundary composition, unless package-facing exports, behaviour or package docs change"
+      ],
+      "browserVerification": [
+        "Start the docs app through the repo's named local development path and verify the docs home plus one content route render without console/runtime errors.",
+        "Verify success and attributable error presentation remain visually and semantically unchanged after decoding moves ahead of render.",
+        "Confirm no loader transition or hydration path performs a decoder call from a React render function or ordinary hook."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: the final frontend call graph restores a typed Result or equally canonical tagged route result before React composition, keeps Cause/defect policy outside render and preserves transport/error semantics.",
+        "Audit pass 2: loader/adapter Effect flow is linear, errors remain typed and inline, the module-scoped runtime boundary is intact, and no unsafe casts, DTO mirrors or helper sprawl remain.",
+        "Audit pass 3: route/container composition uses focused typed values, leaf components remain render-only, browser-safe imports remain intact and no unrelated visual/component refactor was introduced."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Docs route decoding completes before React render composition on server, client navigation and hydration paths.",
+        "Cause traversal and impossible-defect policy complete in the loader adapter; React composes a typed Result or equally canonical tagged route result without a generic decode/match wrapper.",
+        "Route/container components receive typed success/error values and leaf components receive focused readonly values, callbacks or children without mirrored transport DTOs.",
+        "No React render function, leaf component or ordinary hook decodes, acquires services, creates/runs a runtime or reads external representations.",
+        "No wrapper hook, provider, matcher or component merely hides the previous render-time decode.",
+        "Docs typecheck, build, content tests, browser verification and repository verification pass.",
+        "Parent agent reviewed final frontend call graphs, Effect flow, component composition, browser evidence and no-Changeset or Changeset decision before accepting the task.",
+        "Parent agent recorded all three quality audits."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "DECODE-005",
+      "status": "pending",
+      "title": "Finalise the repository boundary inventory and enforcement docs",
+      "type": "final-boundary-audit",
+      "dependsOn": [
+        "DECODE-004"
+      ],
+      "goal": "Leave every executable decoder in an exact justified boundary file and make the final verification story durable.",
+      "scope": [
+        "Re-run the repository-owned decoder inventory across apps, packages and tools while excluding dependencies, generated files and build output.",
+        "Review API config, API smoke, docs loaders, docs content validation, Fumadocs adapters, OpenAPI normalisation, SDK downstream validation and focused boundary tests against the architecture categories.",
+        "Re-run the real Oxlint CLI fixtures and comment-token inline-disable audit so plugin/config integration and suppression policy are proved, not inferred from visitor unit tests.",
+        "Audit React route modules, components and hooks so decoding remains in loaders/actions or dedicated boundary adapters and typed results flow through route/container composition into pure leaf components.",
+        "Re-check that docsHomeRouteBoundary.match(...) and docsPageRouteBoundary.match(...) no longer decode transported values from React render, directly or through a renamed matcher, hook, provider or component.",
+        "Split mixed modules only when the split owns a complete representation transition or materially narrows the decoder exemption.",
+        "Remove obsolete or transitional entries from decodingBoundaryFiles.",
+        "Prove every remaining allowlisted file receives unknown or representation-level input, uses an owning schema or decoder and passes a typed value inward.",
+        "Update docs/architecture/api-and-sdk.md, docs/architecture/frontend.md and package READMEs only where implemented call graphs or public boundary behaviour changed.",
+        "Update the spec and task list status after all acceptance criteria pass.",
+        "Record final evidence in the active execution plan and move it to docs/exec-plans/completed/ with index updates.",
+        "Do not run bun run version-repo, publish packages or weaken package private flags."
+      ],
+      "outputs": [
+        "oxlint.config.ts",
+        "Targeted boundary module splits and tests where the final audit proves they are required",
+        "AGENTS.md and docs/architecture/*.md if final implementation differs from the documented contract",
+        "Relevant package README.md files only when package-facing boundary behaviour changes",
+        "docs/product-specs/boundary-only-decoding.md",
+        "docs/product-specs/boundary-only-decoding.tasks.json",
+        "docs/product-specs/index.md",
+        "docs/exec-plans/completed/boundary-only-decoding.md",
+        "docs/exec-plans/active/README.md",
+        "docs/exec-plans/completed/README.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task's mandatory verification gates, including bun run verification unless the task explicitly documents a narrower gate.",
+          "Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.",
+          "For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.",
+          "Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.",
+          "Report the Changeset path and release-train impact, or report why no Changeset was required.",
+          "Report changed files, verification commands, outcomes and residual risks.",
+          "Report whether the final implementation still matches the spec's call graph.",
+          "Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins."
+        ],
+        "documentationRequirements": [
+          "Read and follow docs/standards/documentation-style.md, documentation-writing.md, documentation-templates.md, documentation-templates/reference.md, documentation-review.md, documentation-architecture.md, documentation-user-journeys.md and documentation-user-journeys/new-contributor.md before editing final docs.",
+          "Treat architecture and package docs as reference material, the product spec as current intent/status and the completed exec plan as implementation evidence.",
+          "Review reader fit, Australian spelling, sentence-case headings, banned marketing language, current API/SDK names, canonical schema/type references, diagrams, links and source-of-truth ownership."
+        ],
+        "taskSpecificScope": [
+          "Do not preserve an allowlist entry merely because it existed during DECODE-002.",
+          "Do not split a cohesive boundary module into tiny wrappers that only suppress lint.",
+          "Do not allowlist a mixed React TSX route/component file when executable decoding can live in a loader or dedicated boundary module.",
+          "Audit Effect boundaries for one linear pipe or Effect.gen flow, inline typed errors, canonical schemas, no nested runtime execution and no decoder/error helper sprawl.",
+          "Do not claim completion unless the decoder inventory and exact allowlist match."
+        ]
+      },
+      "mandatoryVerification": [
+        "Final decoder inventory covers repository-owned apps, packages and tools and excludes dependencies, generated files and build output.",
+        "Exact allowlist audit documents the receiving representation, owning decoder/schema, typed output and downstream continuation for every file.",
+        "Real Oxlint CLI fixture audit proves a non-boundary decode fails, the same syntax passes only through an exact config override, and comment-token checks reject inline disabling without false positives from docs or strings.",
+        "Typecheck fixture proves heterogeneous calculator catalogue storage preserves schema-to-continuation coupling and rejects a mismatched continuation without unsafe casts.",
+        "rg/config audit proves no broad package, runtime, boundary-name or test glob disables whattax/no-decoding-outside-boundaries, repository-authored decoder source is not in ignorePatterns, and canonical lint commands use --disable-nested-config.",
+        "Effect audit proves every changed decoder/service pipeline uses meaningful linear pipe-first composition or Effect.gen, inline owning typed error handling, canonical schema-derived types and no async/Promise, nested runtime, catch-all conversion, unsafe cast, manual reader or one-use helper sprawl; app loaders and the plain SDK facade may execute the completed Effect once through an existing module-scoped runtime at the outer edge.",
+        "Frontend audit proves React render functions, leaf components and ordinary hooks do not decode, acquire Effect services, create/run runtimes or read external representations, and that route/container composition passes focused readonly values, UI callbacks or children without mirrored transport DTOs.",
+        "Docs call-graph audit proves docsHomeRouteBoundary.match(...) and docsPageRouteBoundary.match(...) no longer decode from React render, directly or through a renamed render-time wrapper.",
+        "Docs route-result audit proves Cause traversal and defect policy execute before React composition and components match a typed Result or equally canonical tagged route result.",
+        "bun run lint",
+        "bun run test",
+        "bun run --filter=@whattax/calculators test",
+        "bun run --filter=@whattax/calculators check-types",
+        "bun run --filter=@whattax/sdk test",
+        "bun run --filter=@whattax/sdk test-types",
+        "bun run --filter=@whattax/sdk check-boundaries",
+        "bun run --filter=@whattax/sdk build",
+        "bun run --filter=@whattax/api-http test",
+        "bun run --filter=@whattax/api-http check-types",
+        "bun run --filter=api smoke:public-routes",
+        "bun run --filter=web check-types",
+        "bun run --filter=docs check-types",
+        "bun run --filter=docs build",
+        "bun run docs:validate",
+        "bun run verification",
+        "jq empty docs/product-specs/boundary-only-decoding.tasks.json",
+        "git diff --check",
+        "bun run changeset status --verbose when a Changeset exists, or explicit no-Changeset rationale for final docs/internal enforcement changes",
+        "Release-safety audit proving bun run version-repo, package publication and private flag removal were not performed"
+      ],
+      "browserVerification": [
+        "No browser-visible UI behaviour is expected to change.",
+        "Confirm browser-safe SDK checks pass and browser source remains linted without broad decoding exemptions.",
+        "Confirm mixed TSX route/component files are not allowlisted for decoding and leaf components remain pure typed renderers."
+      ],
+      "qualityAudits": [
+        "Audit pass 1: every remaining decoder is a real trust, external-library, type-erasure or focused test boundary and every obsolete exemption is removed.",
+        "Audit pass 2: final call graphs are direct, Effect control flow is linear and typed errors remain owner-correct, React leaves remain pure, and no unsafe casts, DTO mirrors, decoder aliases, nested runtimes or wrapper sprawl remain.",
+        "Audit pass 3: final spec, task list, architecture docs, package docs, allowlist and completed plan agree and satisfy the documentation standards suite."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Every repository-owned executable decoder call is in an exact reviewed allowlisted file or has been removed.",
+        "The allowlist contains no broad globs and disables only the decoding rule.",
+        "Calculator scenario facts are not decoded again after selected catalogue input decoding.",
+        "Catalogue construction couples each selected schema to its exact typed continuation before heterogeneous erasure and rejects mismatches at compile time.",
+        "SDK descriptor report narrowing remains explicit and schema-backed at its type-erasure boundary.",
+        "Every changed boundary uses a clean composable Effect flow with inline typed errors, canonical schemas and no helper sprawl or nested runtime execution.",
+        "React boundary data is decoded before render composition and leaf components consume focused readonly values, UI callbacks or children without mirrored transport DTOs.",
+        "The docs home and page routes do not invoke a decode-and-match API during React render, directly or through a renamed wrapper.",
+        "Custom-rule tests, package tests, API smoke, docs validation and repository verification pass.",
+        "Final docs and completed execution evidence match the implementation and pass the documentation review checks.",
+        "Parent agent reviewed and accepted final call graphs, allowlist evidence, Changeset status and release-safety evidence.",
+        "Parent agent recorded all three quality audits before marking the rollout complete."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}
