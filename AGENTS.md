@@ -37,6 +37,9 @@ fast.
 - MUST keep one-off Effect error handling and transformations inline at the
   callsite; do not extract tiny wrapper or mapper helpers. See
   `docs/architecture/effect-services.md`.
+- MUST decode representation-level or unknown values only at explicit trust or
+  type-erasure boundaries. Pass schema-derived values inward without repeated
+  defensive decoding. See `docs/architecture/effect-services.md`.
 - Verify with `bun run verification` when docs, package wiring or code changes
   can affect the repo.
 - For package-facing work, add or update a Changeset before committing. Use

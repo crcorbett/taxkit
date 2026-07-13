@@ -62,7 +62,7 @@
   "tasks": [
     {
       "id": "DECODE-001",
-      "status": "pending",
+      "status": "completed",
       "title": "Audit decoder callsites and establish the architecture contract",
       "type": "foundation-audit",
       "dependsOn": [],

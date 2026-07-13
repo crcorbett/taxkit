@@ -5,7 +5,7 @@ source_of_truth: docs
 confidence: medium
 ---
 
-# Testing And Quality
+# Testing and quality
 
 WhatTax quality depends on deterministic calculation tests, package boundary
 tests, graph validation, trace snapshots, API/SDK parity and build/type health.
@@ -15,7 +15,7 @@ tests, graph validation, trace snapshots, API/SDK parity and build/type health.
 This doc owns cross-cutting quality expectations. Detailed rule-package test
 requirements live in [Testing and validation](./testing-and-validation.md).
 
-## Main Areas
+## Main areas
 
 - rule-builder unit tests
 - ATO golden tests and known scenarios
@@ -26,7 +26,7 @@ requirements live in [Testing and validation](./testing-and-validation.md).
 - package export and browser-safety tests
 - API and SDK parity tests
 
-## Current Baseline
+## Current baseline
 
 The current repo baseline is scaffold-level verification:
 
@@ -89,6 +89,27 @@ API app:
   services use pipe-first composition, Effect `Array`, `Chunk`, `HashMap`,
   `HashSet`, `Effect`, `Layer`, `Clock`, `Random` and schema codecs instead of
   vanilla JavaScript/TypeScript escape hatches.
+- The boundary-only decoding rollout will add
+  `whattax/no-decoding-outside-boundaries` as a repository-wide custom rule.
+  The rule must report executable Effect Schema decoders, direct decoder
+  helpers, decoder members, statically named computed members, decoder factory
+  creation and statically traceable aliases. It must not report encoding,
+  schema declarations or declarative APIs such as `Schema.decodeTo`.
+- `oxlint.config.ts` owns one named, exact `decodingBoundaryFiles` allowlist.
+  An override may disable only `whattax/no-decoding-outside-boundaries` for an
+  exact reviewed file; it must not use `ignorePatterns`, package-wide globs,
+  filename-pattern exemptions, broad test exemptions or nested configuration.
+  Inline `oxlint-disable` and `eslint-disable` comments naming the rule are
+  forbidden and must be checked from comment tokens, not raw repository text.
+- Custom-rule tests must cover prohibited and allowed Effect decoder families,
+  imports and aliases, descriptor/member decoders, static computed members,
+  factory creation and extraction. They must also cover a TSX decoder attempt,
+  negative cases for encoding and `Schema.decodeTo`, and real Oxlint CLI
+  fixtures for both a prohibited file and an exact allowlisted file. Run those
+  fixture commands with `--disable-nested-config`.
+- The lint rule cannot determine whether a helper owns meaningful repeated
+  policy. Use the boundary contract, compile-time tests, three documented
+  audit passes and parent review to reject one-use decoder/error wrappers.
 - Verification evidence should be recorded in specs, task lists or exec plans
   when work spans multiple packages.
 

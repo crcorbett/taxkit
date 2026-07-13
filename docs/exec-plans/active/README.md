@@ -11,4 +11,6 @@ Live implementation plans belong here while work is in progress.
 
 Active plans:
 
-- None.
+- [Boundary-only decoding](./boundary-only-decoding.md) - DECODE-001 audit and
+  architecture-contract evidence is ready for parent acceptance; enforcement
+  and runtime refactors remain pending.

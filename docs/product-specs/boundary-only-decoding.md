@@ -66,7 +66,7 @@ HTTP request body
   -> @whattax/api-http CalculatorRunRequest decode
     -> PublicCalculatorService.calculate
       -> CalculatorCatalogEntry.inputSchema decode
-        -> entry.calculate(facts as unknown)
+        -> erased entry.calculate(facts, validationIssues) continuation
           -> TakeHomeScenarioLive / AnnualTaxScenarioLive
             -> rule-owned scenario schema decode again
               -> typed scenario Layer
