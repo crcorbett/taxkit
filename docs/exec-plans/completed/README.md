@@ -12,6 +12,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Boundary-only decoding](./boundary-only-decoding.md)
 - [Downstream consumer validation](./downstream-consumer-validation.md)
 - [API compatibility harness](./api-compatibility-harness.md)
 - [API HTTP package topology](./api-http-package-topology.md)

@@ -2,7 +2,7 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/boundary-only-decoding.md",
   "title": "Boundary-only decoding implementation tasks",
-  "status": "draft",
+  "status": "completed",
   "last_reviewed": "2026-07-13",
   "principles": [
     "Decode unknown or representation-level values only at explicit trust or type-erasure boundaries.",
@@ -516,7 +516,7 @@
     },
     {
       "id": "DECODE-005",
-      "status": "pending",
+      "status": "completed",
       "title": "Finalise the repository boundary inventory and enforcement docs",
       "type": "final-boundary-audit",
       "dependsOn": [

@@ -57,8 +57,12 @@ const exampleFileNames = [
   "node-server.ts",
 ] as const;
 
-const exampleReferenceSource = "content/reference/examples.mdx";
-const openApiReferenceSource = "content/api/openapi-reference.mdx";
+const exampleReferenceSource = DocsSourcePath.make(
+  "content/reference/examples.mdx"
+);
+const openApiReferenceSource = DocsSourcePath.make(
+  "content/api/openapi-reference.mdx"
+);
 
 const openApiReferenceRequiredText = [
   "/api/docs/openapi.json",
@@ -529,19 +533,10 @@ const validateOpenApiReference = (
     )
   );
 
-const validateReferenceIntegration = Effect.Do.pipe(
-  Effect.bind("examplesSource", () =>
-    Schema.decodeUnknownEffect(DocsSourcePath)(exampleReferenceSource)
-  ),
-  Effect.bind("openApiSource", () =>
-    Schema.decodeUnknownEffect(DocsSourcePath)(openApiReferenceSource)
-  ),
-  Effect.bind("exampleIssues", ({ examplesSource }) =>
-    validateExamplesReference(examplesSource)
-  ),
-  Effect.bind("openApiIssues", ({ openApiSource }) =>
-    validateOpenApiReference(openApiSource)
-  ),
+const validateReferenceIntegration = Effect.all({
+  exampleIssues: validateExamplesReference(exampleReferenceSource),
+  openApiIssues: validateOpenApiReference(openApiReferenceSource),
+}).pipe(
   Effect.map(({ exampleIssues, openApiIssues }) =>
     EffectArray.flatten([exampleIssues, openApiIssues])
   ),

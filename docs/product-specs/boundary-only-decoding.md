@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implemented
 last_reviewed: 2026-07-13
 source_of_truth: docs
 confidence: high
@@ -14,10 +14,10 @@ cross an explicit trust or type-erasure boundary. After a value has been
 decoded with its owning Effect Schema, internal code should pass the resulting
 schema-derived type without decoding it again.
 
-This work adds a durable architecture rule, a custom Oxlint rule enabled across
-the repository, an exact boundary-file allowlist and focused rule tests. It
-also removes the current repeated calculator scenario decode while preserving
-the selected-calculator decode required by dynamic catalogue dispatch.
+This work added a durable architecture rule, a custom Oxlint rule enabled
+across the repository, an exact boundary-file allowlist and focused rule tests.
+It removed the former repeated calculator scenario decode while preserving the
+selected-calculator decode required by dynamic catalogue dispatch.
 
 The lint rule controls where executable decoding may occur. Architecture,
 module placement and tests control whether each allowed decode is a real
@@ -25,6 +25,16 @@ boundary and whether the resulting typed value remains trusted downstream.
 For frontend code, route loaders or dedicated adapters own the boundary;
 React components and hooks receive schema-derived values and remain free of
 decoding, Effect runtime execution and service acquisition.
+
+## Outcome
+
+Implemented on 2026-07-13. The repository now enforces exact reviewed decoder
+placement with `whattax/no-decoding-outside-boundaries`; calculator catalogue
+dispatch enters typed rule scenario continuations without re-decoding facts;
+SDK descriptor narrowing uses a direct Effect decoder; and docs route loaders
+normalise transport data to typed `Result` values before React composition.
+See the completed [execution plan](../exec-plans/completed/boundary-only-decoding.md)
+for inventory, verification and release evidence.
 
 ## Problem
 
@@ -38,29 +48,27 @@ That weakens package contracts:
 - tests may decode fixtures instead of constructing canonical typed values
 - a new decoder call may appear without an explicit ownership decision
 
-The current calculator flow demonstrates the risk. The HTTP contract decodes
-the public request union, `@whattax/calculators` decodes the selected
-calculator's input schema, and the rule-owned scenario layer decodes the same
-facts again. The selected-calculator decode is required because the route
-schema cannot depend on `calculatorId`; the later scenario-layer decode is not.
+Before implementation, the calculator flow demonstrated the risk. The HTTP
+contract decoded the public request union, `@whattax/calculators` decoded the
+selected calculator's input schema, and the rule-owned scenario layer decoded
+the same facts again. The selected-calculator decode remains required because
+the route schema cannot depend on `calculatorId`; the later scenario-layer
+decode was removed.
 
 The SDK has a separate legitimate type-erasure boundary. A generic calculator
 response carries the public report union, so the selected SDK descriptor must
 decode that report with its concrete output schema before returning the
 narrowed type. That decoder should remain explicit and isolated.
 
-The docs frontend has a related placement issue. Its server function encodes a
-typed `Exit`, but route components currently call
-`docsHomeRouteBoundary.match(...)` or `docsPageRouteBoundary.match(...)`, which
-decodes the loader value during React render. The decoder is hidden inside an
-allowlisted boundary module, so file-based linting alone cannot identify the
-render-time execution. The loader or a dedicated adapter must restore the
-typed route result before React composition begins.
+The docs frontend had a related placement issue. Its server function encoded a
+typed `Exit`, but route components called `docsHomeRouteBoundary.match(...)` or
+`docsPageRouteBoundary.match(...)`, decoding the loader value during React
+render. Loaders now restore a typed `Result` before React composition begins.
 
 ## Call graphs
 
 ```ts
-Production: current calculator input
+Historical: calculator input before DECODE-003
 
 HTTP request body
   -> @whattax/api-http CalculatorRunRequest decode
@@ -74,7 +82,7 @@ HTTP request body
 ```
 
 ```ts
-Production: target calculator input
+Production: calculator input after DECODE-003
 
 HTTP request body
   -> @whattax/api-http CalculatorRunRequest decode boundary
@@ -88,7 +96,7 @@ HTTP request body
 ```
 
 ```ts
-Production: target SDK report narrowing
+Production: SDK report narrowing after DECODE-003
 
 PublicCalculatorService.calculate
   -> CalculatorRunResponse with CalculatorRunReport union
@@ -99,7 +107,7 @@ PublicCalculatorService.calculate
 ```
 
 ```ts
-Production: current docs frontend boundary
+Historical: docs frontend boundary before DECODE-004
 
 docs server function
   -> encode typed Exit for transport
@@ -110,7 +118,7 @@ docs server function
 ```
 
 ```ts
-Production: target frontend boundary
+Production: docs frontend boundary after DECODE-004
 
 URL, HTTP, storage or server-function representation
   -> route loader, action or dedicated boundary adapter

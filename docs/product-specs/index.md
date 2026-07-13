@@ -16,7 +16,7 @@ Specs:
 | --- | --- | --- |
 | [API compatibility harness](./api-compatibility-harness.md) | Implemented | OpenAPI snapshot, route fixtures and live API app smoke coverage are in place. |
 | [API HTTP package topology](./api-http-package-topology.md) | Implemented | The implemented HTTP API package now lives at `packages/api/http` as `@whattax/api-http`. |
-| [Boundary-only decoding](./boundary-only-decoding.md) | Draft | Restrict executable decoding to exact reviewed trust and type-erasure boundary files. |
+| [Boundary-only decoding](./boundary-only-decoding.md) | Implemented | Exact decoder placement enforcement, typed calculator continuations and pre-render docs route decoding are in place. |
 | [Documentation structure and development docs](./documentation-structure-and-development-docs.md) | Canonical | Baseline docs structure and local skill routing. |
 | [Documentation improvement roadmap](./documentation-improvement-roadmap.md) | Implemented | README coverage, root routing and maintenance conventions are in place. |
 | [Downstream consumer validation](./downstream-consumer-validation.md) | Implemented foundation; strict gate blocked | SDK diagnostic manifest audit and API temp-workspace smoke exist; strict SDK downstream install remains blocked by packed manifest protocols. |

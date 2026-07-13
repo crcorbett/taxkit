@@ -1,5 +1,5 @@
 ---
-status: active
+status: completed
 last_reviewed: 2026-07-13
 source_of_truth: execution-plan
 confidence: high
@@ -29,7 +29,7 @@ decision.
 | DECODE-002 | accepted | Repository-wide decoder placement rule, exact transitional allowlist and CLI integration suite are complete. |
 | DECODE-003 | accepted | Catalogue dispatch now owns the selected decode and enters typed scenario continuations directly; SDK descriptor decoding is direct. |
 | DECODE-004 | accepted | Docs route loaders decode transport into typed Results before route composition. |
-| DECODE-005 | pending | Complete the repository audit and documentation close-out. |
+| DECODE-005 | accepted | Final inventory, exact allowlist, call graphs, release evidence and completed-plan move are recorded below. |
 
 ## DECODE-001 inventory
 
@@ -464,3 +464,83 @@ decode or external representation read was added to routes or leaf components.
 No Changeset is required. DECODE-004 changes only app-internal docs loader
 composition, focused test wiring and execution evidence; it changes no package
 export or package-facing public contract.
+
+## DECODE-005 final audit and acceptance
+
+The final repository-owned scan covers apps, packages and tools while excluding
+dependencies, generated source, build output and coverage. It found executable
+decoder operations only in exact `decodingBoundaryFiles` entries or the
+focused Oxlint fixture source strings. The latter are test data, not
+repository-executed decoders. Diagnostic strings in the custom rule are also
+excluded from the executable count.
+
+Every exact allowlist entry is a reviewed application/configuration,
+HTTP/process, docs-content/filesystem, external-library, dynamic type-erasure
+or focused boundary-test location. The docs-content static reference paths now
+use `DocsSourcePath.make` at declaration, so validation composition no longer
+re-decodes known repository literals. No broad package, runtime, boundary or
+test glob disables the rule, and no decoder source was added to
+`ignorePatterns`.
+
+Final call graphs match the architecture contract: the selected catalogue
+schema decodes once into its constructor-closed typed continuation; SDK output
+narrowing remains at the descriptor boundary; and docs route transport becomes
+a typed `Result` in the loader before React renders focused success or failure
+values. Route modules contain no decode-and-match boundary API, service lookup,
+runtime execution or external representation read.
+
+### Quality audits
+
+- Audit pass 1: reran the owned decoder inventory, exact allowlist comparison,
+  real Oxlint CLI fixture suite and inline-disable comment-token pass.
+- Audit pass 2: reviewed calculator, SDK, docs loader and React call graphs for
+  repeated decodes, unsafe casts, DTO mirrors, nested runtimes, broad catches
+  and one-use decoder/error helpers.
+- Audit pass 3: reconciled the spec, task list, architecture references,
+  product-spec index, allowlist and this completed plan against documentation
+  standards and current package names.
+
+### Final validation
+
+```bash
+bun run lint
+bun run test
+bun run --filter=@whattax/calculators test
+bun run --filter=@whattax/calculators check-types
+bun run --filter=@whattax/sdk test
+bun run --filter=@whattax/sdk test-types
+bun run --filter=@whattax/sdk check-boundaries
+bun run --filter=@whattax/sdk build
+bun run --filter=@whattax/api-http test
+bun run --filter=@whattax/api-http check-types
+bun run --filter=api smoke:public-routes
+bun run --filter=web check-types
+bun run --filter=docs check-types
+bun run --filter=docs build
+bun run docs:validate
+bun run verification
+git diff --check
+jq empty docs/product-specs/boundary-only-decoding.tasks.json
+bun run changeset status --verbose
+```
+
+All completed successfully. `bun run version-repo`, package publication and
+private-flag removal were not performed. The existing
+`.changeset/boundary-only-decoding.md` records the DECODE-003 additive
+package changes; DECODE-005 itself adds no release entry.
+
+## Parent acceptance
+
+DECODE-005 was accepted after local recovery from a non-producing subagent
+attempt.
+
+- Audit pass 1: parent reran the owned decoder scan and reconciled every
+  executable decoder against the exact configured boundary list and focused
+  test source.
+- Audit pass 2: parent checked the final calculator, SDK and docs call graphs,
+  including the static docs-content path cleanup, for repeated decoding,
+  runtime ownership in React and type-erasure recovery outside the named
+  boundary.
+- Audit pass 3: parent reconciled the completed plan, implemented spec, task
+  list, architecture documentation and product-spec index, then reran the
+  complete release-readiness command set.
