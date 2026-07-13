@@ -1,6 +1,6 @@
 import { Money } from "@whattax/core/primitives";
 import { TraceNode } from "@whattax/core/trace";
-import { Context, Effect, Layer, Schema } from "effect";
+import { Effect, Layer, Schema } from "effect";
 
 import {
   GrossPay,
@@ -94,25 +94,18 @@ export const TakeHomeScenarioInputSchema = Schema.Struct({
 export type TakeHomeScenarioInput = typeof TakeHomeScenarioInputSchema.Type;
 
 /**
- * Builds the scenario layer for gross pay and tax-free-threshold status.
+ * Builds the typed scenario layer for gross pay and tax-free-threshold status.
  *
- * @param input - Unknown input decoded by `TakeHomeScenarioInputSchema`.
- * @returns A layer providing `GrossPayFact` and `TaxFreeThresholdClaimedFact`.
+ * Use this after an owning boundary has decoded `TakeHomeScenarioInput`.
+ *
  * @since 0.1.0
  */
-export const TakeHomeScenarioLive = (input: unknown) =>
-  Layer.effectContext(
-    Schema.decodeUnknownEffect(TakeHomeScenarioInputSchema)(input).pipe(
-      Effect.map((scenario) =>
-        Context.mergeAll(
-          Context.make(GrossPayFact, scenario.grossPay),
-          Context.make(
-            TaxFreeThresholdClaimedFact,
-            new TaxFreeThresholdClaimed({
-              value: scenario.taxFreeThresholdClaimed,
-            })
-          )
-        )
-      )
+export const TakeHomeScenarioLiveFromInput = (input: TakeHomeScenarioInput) =>
+  Layer.mergeAll(
+    Layer.succeed(GrossPayFact)(input.grossPay),
+    Layer.succeed(TaxFreeThresholdClaimedFact)(
+      new TaxFreeThresholdClaimed({
+        value: input.taxFreeThresholdClaimed,
+      })
     )
   );

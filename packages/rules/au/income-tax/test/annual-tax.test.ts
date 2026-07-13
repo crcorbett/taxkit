@@ -4,6 +4,7 @@ import { aud, audDollars, moneyEquals } from "@whattax/core/primitives";
 import {
   AnnualTaxLedgerRuleId,
   AnnualTaxScenarioLive,
+  AnnualTaxScenarioLiveFromInput,
   AuAnnualTax2025_26_Live,
   CalculateAnnualTax,
   IncomeTaxComponentId,
@@ -23,7 +24,9 @@ const runScenario = (incomeDollars: number) =>
       calculation: CalculateAnnualTax,
       layer: AuAnnualTax2025_26_Live.pipe(
         Layer.provideMerge(
-          AnnualTaxScenarioLive({ taxableIncome: audDollars(incomeDollars) })
+          AnnualTaxScenarioLiveFromInput({
+            taxableIncome: audDollars(incomeDollars),
+          })
         )
       ),
     });

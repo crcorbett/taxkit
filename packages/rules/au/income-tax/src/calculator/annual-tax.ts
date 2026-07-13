@@ -1,6 +1,6 @@
 import { Money, aud } from "@whattax/core/primitives";
 import { TraceNode } from "@whattax/core/trace";
-import { Context, Effect, Layer, Schema } from "effect";
+import { Effect, Layer, Schema } from "effect";
 
 import {
   AnnualTaxableIncome,
@@ -68,20 +68,13 @@ export const AnnualTaxScenarioInputSchema = Schema.Struct({
 export type AnnualTaxScenarioInput = typeof AnnualTaxScenarioInputSchema.Type;
 
 /**
- * Builds the scenario layer for annual taxable income.
+ * Builds the typed scenario layer for annual taxable income.
  *
- * @param input - Unknown input decoded by `AnnualTaxScenarioInputSchema`.
- * @returns A layer providing `AnnualTaxableIncomeFact`.
+ * Use this after an owning boundary has decoded `AnnualTaxScenarioInput`.
+ *
  * @since 0.1.0
  */
-export const AnnualTaxScenarioLive = (input: unknown) =>
-  Layer.effectContext(
-    Schema.decodeUnknownEffect(AnnualTaxScenarioInputSchema)(input).pipe(
-      Effect.map((scenario) =>
-        Context.make(
-          AnnualTaxableIncomeFact,
-          new AnnualTaxableIncome({ income: scenario.taxableIncome })
-        )
-      )
-    )
+export const AnnualTaxScenarioLiveFromInput = (input: AnnualTaxScenarioInput) =>
+  Layer.succeed(AnnualTaxableIncomeFact)(
+    new AnnualTaxableIncome({ income: input.taxableIncome })
   );

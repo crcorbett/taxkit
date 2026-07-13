@@ -273,7 +273,7 @@
     },
     {
       "id": "DECODE-003",
-      "status": "pending",
+      "status": "completed",
       "title": "Remove repeated calculator decoding and isolate SDK narrowing",
       "type": "typed-boundary-refactor",
       "dependsOn": [

@@ -7,13 +7,13 @@ import type {
   GraphValidationIssue,
 } from "@whattax/core";
 import {
-  AnnualTaxScenarioLive,
   AnnualTaxLedgerDescriptor,
   AnnualTaxReport,
   AuAnnualTaxCalculatorId,
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
   AnnualTaxScenarioInputSchema,
+  AnnualTaxScenarioLiveFromInput,
   AnnualTaxableIncomeDescriptor,
   AuAnnualTax2025_26_Live,
   AuAnnualTaxRuleDescriptors,
@@ -36,14 +36,14 @@ import {
   PaygWithholdingComponentDescriptor,
   PaygWithholdingRuleDescriptor,
   TakeHomePayReport,
-  TakeHomeScenarioLive,
   TaxablePayDescriptor,
   TaxablePayRuleDescriptor,
   TaxFreeThresholdClaimedDescriptor,
   TakeHomeScenarioInputSchema,
+  TakeHomeScenarioLiveFromInput,
 } from "@whattax/rules-au-pay";
-import type { Option, Schema } from "effect";
-import { Array, Data, Effect, HashMap, Layer } from "effect";
+import type { Option } from "effect";
+import { Array, Data, Effect, HashMap, Layer, Schema } from "effect";
 
 import type {
   CalculatorContext,
@@ -67,6 +67,15 @@ type CalculatorInputSchema =
   | typeof AnnualTaxScenarioInputSchema
   | typeof TakeHomeScenarioInputSchema;
 
+type TypedCalculatorExecution<InputSchema extends CalculatorInputSchema> = (
+  facts: InputSchema["Type"],
+  validationIssues: readonly GraphValidationIssue[]
+) => Effect.Effect<
+  CalculationResult<CalculatorRunReport>,
+  CalculationError,
+  CalculationEngine
+>;
+
 export interface CalculatorCatalogEntry {
   readonly calculate: CalculatorExecution;
   readonly calculatorId: CalculatorId;
@@ -88,6 +97,30 @@ class CalculatorContextData extends Data.Class<CalculatorContext> {}
 
 class CalculatorCatalogEntryData extends Data.Class<CalculatorCatalogEntry> {}
 
+export interface CalculatorCatalogEntryDefinition<
+  InputSchema extends CalculatorInputSchema,
+> extends Omit<CalculatorCatalogEntry, "calculate" | "inputSchema"> {
+  readonly calculate: TypedCalculatorExecution<InputSchema>;
+  readonly inputSchema: InputSchema;
+}
+
+/**
+ * Couples a selected input schema with its typed calculator continuation
+ * before heterogeneous catalogue storage erases the concrete input type.
+ */
+export const defineCalculatorCatalogEntry = <
+  InputSchema extends CalculatorInputSchema,
+>(
+  definition: CalculatorCatalogEntryDefinition<InputSchema>
+): CalculatorCatalogEntry =>
+  new CalculatorCatalogEntryData({
+    ...definition,
+    calculate: (input, validationIssues) =>
+      Schema.decodeUnknownEffect(definition.inputSchema)(input).pipe(
+        Effect.flatMap((facts) => definition.calculate(facts, validationIssues))
+      ),
+  });
+
 const PayContextAu2025_26 = new CalculatorContextData({
   jurisdiction: AuPayJurisdiction.make("AU"),
   taxYear: AuPayTaxYear.make("2025-26"),
@@ -108,14 +141,14 @@ const SupportedHelpModes: readonly HelpMode[] = [
 ];
 
 const CatalogEntries: readonly CalculatorCatalogEntry[] = [
-  new CalculatorCatalogEntryData({
+  defineCalculatorCatalogEntry({
     calculate: (facts, validationIssues) =>
       Effect.gen(function* () {
         const engine = yield* CalculationEngine;
         return yield* engine.run({
           calculation: CalculateTakeHomePay,
           layer: AuTakeHomePay2025_26_Live.pipe(
-            Layer.provideMerge(TakeHomeScenarioLive(facts))
+            Layer.provideMerge(TakeHomeScenarioLiveFromInput(facts))
           ),
           validationIssues,
         });
@@ -140,14 +173,14 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     supportedHelpModes: SupportedHelpModes,
     title: "AU take-home pay",
   }),
-  new CalculatorCatalogEntryData({
+  defineCalculatorCatalogEntry({
     calculate: (facts, validationIssues) =>
       Effect.gen(function* () {
         const engine = yield* CalculationEngine;
         return yield* engine.run({
           calculation: CalculatePayWithholdings,
           layer: AuPayWithholdings2025_26_Live.pipe(
-            Layer.provideMerge(TakeHomeScenarioLive(facts))
+            Layer.provideMerge(TakeHomeScenarioLiveFromInput(facts))
           ),
           validationIssues,
         });
@@ -174,14 +207,14 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     supportedHelpModes: SupportedHelpModes,
     title: "AU pay withholdings",
   }),
-  new CalculatorCatalogEntryData({
+  defineCalculatorCatalogEntry({
     calculate: (facts, validationIssues) =>
       Effect.gen(function* () {
         const engine = yield* CalculationEngine;
         return yield* engine.run({
           calculation: CalculateAnnualTax,
           layer: AuAnnualTax2025_26_Live.pipe(
-            Layer.provideMerge(AnnualTaxScenarioLive(facts))
+            Layer.provideMerge(AnnualTaxScenarioLiveFromInput(facts))
           ),
           validationIssues,
         });

@@ -5,7 +5,8 @@ import type {
   CalculatorRunFacts,
   CalculatorRunReport,
 } from "@whattax/calculators/schemas";
-import { Effect, Exit, Schema } from "effect";
+import { Schema } from "effect";
+import type { Effect } from "effect";
 
 export interface SdkCalculation<
   Id extends CalculatorId,
@@ -96,13 +97,7 @@ export const defineSdkCalculation = <
   >
 ): SdkCalculation<Id, Jurisdiction, TaxYear, InputSchema, OutputSchema> => ({
   ...calculation,
-  decodeOutput: (output) =>
-    Schema.decodeUnknownExit(calculation.outputSchema)(output).pipe(
-      Exit.match({
-        onFailure: (cause) => Effect.failCause(cause),
-        onSuccess: Effect.succeed,
-      })
-    ),
+  decodeOutput: Schema.decodeUnknownEffect(calculation.outputSchema),
 });
 
 export const defineWhatTaxModule = <

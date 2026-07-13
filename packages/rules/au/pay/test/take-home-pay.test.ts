@@ -11,6 +11,7 @@ import {
   PaygWithholdingRuleId,
   PayWithholdingsLedgerRuleId,
   TakeHomeScenarioLive,
+  TakeHomeScenarioLiveFromInput,
   TaxablePayRuleId,
 } from "@whattax/rules-au-pay";
 import type { TakeHomeScenarioInput } from "@whattax/rules-au-pay";
@@ -25,7 +26,9 @@ const runScenario = (
     const engine = yield* CalculationEngine;
     const result = yield* engine.run({
       calculation: CalculateTakeHomePay,
-      layer: pack.pipe(Layer.provideMerge(TakeHomeScenarioLive(input))),
+      layer: pack.pipe(
+        Layer.provideMerge(TakeHomeScenarioLiveFromInput(input))
+      ),
     });
 
     return result.report;

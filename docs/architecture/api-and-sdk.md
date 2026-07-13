@@ -115,7 +115,8 @@ apps/api Bun process
       -> sdkCalculationFor(params.calculatorId)
       -> @whattax/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
-          -> CalculatorCatalogEntry.inputSchema decode
+          -> selected CalculatorCatalogEntry.inputSchema decode
+          -> constructor-closed typed scenario continuation
           -> CalculationEngine
             -> rule package scenario layer
             -> official rule pack layer

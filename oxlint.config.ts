@@ -27,10 +27,10 @@ const decodingBoundaryFiles = [
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
 
   // Dynamic dispatch and its transitional repeated scenario decodes.
+  "packages/calculators/src/catalog.ts",
   "packages/calculators/src/errors.ts",
-  "packages/calculators/src/live.layer.ts",
-  "packages/rules/au/income-tax/src/calculator/annual-tax.ts",
-  "packages/rules/au/pay/src/calculator/take-home-pay.ts",
+  "packages/rules/au/income-tax/src/calculator/annual-tax.boundary.ts",
+  "packages/rules/au/pay/src/calculator/take-home-pay.boundary.ts",
 
   // SDK type-erasure dispatch and downstream process boundaries.
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",

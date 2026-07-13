@@ -27,7 +27,7 @@ decision.
 | --- | --- | --- |
 | DECODE-001 | accepted | Decoder inventory and durable architecture contract are recorded below. No lint or runtime code changed. |
 | DECODE-002 | accepted | Repository-wide decoder placement rule, exact transitional allowlist and CLI integration suite are complete. |
-| DECODE-003 | pending | Remove repeated calculator decoding and isolate SDK report narrowing. |
+| DECODE-003 | accepted | Catalogue dispatch now owns the selected decode and enters typed scenario continuations directly; SDK descriptor decoding is direct. |
 | DECODE-004 | pending | Move docs route decoding before React composition. |
 | DECODE-005 | pending | Complete the repository audit and documentation close-out. |
 
@@ -387,3 +387,48 @@ non-producing subagent attempt.
   `ignorePatterns` entry was introduced.
 - Audit pass 3: parent verified root test wiring, temporary fixture cleanup,
   deterministic diagnostic-count assertions and the no-Changeset rationale.
+
+## DECODE-003 implementation and acceptance
+
+The calculator catalogue now uses `defineCalculatorCatalogEntry` to close each
+canonical `InputSchema` over a continuation accepting exactly
+`InputSchema["Type"]` before storing an erased catalogue entry. Its stored
+boundary is one linear pipe: selected schema decode, then the constructor-closed
+typed continuation. `PublicCalculatorServiceLive` maps only the resulting
+`Schema.SchemaError` inline to `CalculatorInputDecodeError`; calculation errors
+remain typed and unchanged.
+
+Rule packages expose `TakeHomeScenarioLiveFromInput` and
+`AnnualTaxScenarioLiveFromInput` for internal typed composition. Their existing
+unknown-input constructors remain explicit, tested boundary adapters in their
+own `*.boundary.ts` modules. The catalogue uses only the typed constructors, so
+selected facts are not decoded a second time. The exact lint allowlist now
+contains the catalogue constructor and those boundary modules, and no longer
+contains the former mixed scenario files or calculator live layer.
+
+`defineSdkCalculation` now uses `Schema.decodeUnknownEffect` directly. The
+descriptor boundary remains schema-backed, but no longer decodes to `Exit` only
+to immediately lift it back into `Effect`.
+
+The calculator type-test program proves a take-home schema cannot be paired
+with an annual-tax continuation. It is checked by the new calculator
+`test-types` command and is intentionally outside Vitest's runtime test file
+pattern.
+
+### Quality audits
+
+- Audit pass 1: verified selected schema decode flows into the constructor-closed
+  typed continuation, with no catalogue execution call to a rule boundary
+  decoder.
+- Audit pass 2: verified the calculator boundary maps only `Schema.SchemaError`
+  inline and preserves `CalculationError`; no unsafe casts, broad catches or
+  runtime wrappers were added.
+- Audit pass 3: verified canonical schemas/types and package exports, direct SDK
+  decoder use, browser-safe SDK import checks and the compile-time mismatch
+  fixture.
+
+### Changeset decision
+
+`.changeset/boundary-only-decoding.md` records minor releases for the additive
+calculator and rule-package typed scenario exports and a patch for the SDK
+decoder simplification.

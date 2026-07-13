@@ -42,20 +42,8 @@ const calculateWithEntry = (
       inputFacts: entry.inputFacts,
       rules: entry.ruleDescriptors,
     });
-    const facts = yield* Schema.decodeUnknownEffect(entry.inputSchema)(
-      request.payload.facts
-    ).pipe(
-      Effect.mapError((error) =>
-        toCalculatorInputDecodeError({
-          calculatorId: request.calculatorId,
-          entry,
-          help: Option.fromNullishOr(request.help),
-          issue: error.issue,
-        })
-      )
-    );
     const result = yield* entry
-      .calculate(facts, validationIssues)
+      .calculate(request.payload.facts, validationIssues)
       .pipe(
         Effect.catchIf(Schema.isSchemaError, (error) =>
           Effect.fail(
