@@ -403,7 +403,7 @@
     },
     {
       "id": "DECODE-004",
-      "status": "pending",
+      "status": "completed",
       "title": "Move docs decoding ahead of React composition",
       "type": "frontend-boundary-refactor",
       "dependsOn": [

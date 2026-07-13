@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Result } from "effect";
 
 import { loadDocsHome } from "#/lib/docs/loaders";
-import { docsHomeRouteBoundary } from "#/lib/docs/route-boundary";
 
 export const Route = createFileRoute("/")({
   component() {
     const loaderData = Route.useLoaderData();
 
-    return docsHomeRouteBoundary.match(loaderData, {
+    return Result.match(loaderData, {
       onFailure: () => (
         <section className="docs-error" data-testid="loader-error">
           <h1>Docs are unavailable</h1>

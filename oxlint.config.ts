@@ -11,6 +11,7 @@ const decodingBoundaryFiles = [
   "apps/docs/examples/node-server.ts",
   "apps/docs/src/lib/docs/loaders.ts",
   "apps/docs/src/lib/docs/route-boundary.ts",
+  "apps/docs/src/lib/docs/route-boundary.test.js",
 
   // Docs content and rendering-library representation boundaries.
   "packages/docs-content/src/live.layer.ts",

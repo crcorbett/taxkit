@@ -55,7 +55,8 @@ const loadDocsPageData = createServerFn({ method: "GET" })
     );
   });
 
-export const loadDocsHome = async () => await loadDocsHomeData();
+export const loadDocsHome = async () =>
+  docsHomeRouteBoundary.decodeToResult(await loadDocsHomeData());
 
 export const loadDocsPage = async (
   loaderContext: RouteLoaderContext & {
@@ -64,8 +65,10 @@ export const loadDocsPage = async (
     };
   }
 ) =>
-  await loadDocsPageData({
-    data: {
-      splat: loaderContext.params._splat,
-    },
-  });
+  docsPageRouteBoundary.decodeToResult(
+    await loadDocsPageData({
+      data: {
+        splat: loaderContext.params._splat,
+      },
+    })
+  );

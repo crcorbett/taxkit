@@ -3,7 +3,16 @@ import {
   DocsSourceError,
 } from "@whattax/docs-content/errors";
 import { DocsContentPage, DocsNavigation } from "@whattax/docs-content/schemas";
-import { Cause, Effect, Exit, Match, Option, Result, Schema } from "effect";
+import {
+  Cause,
+  Effect,
+  Exit,
+  Match,
+  Option,
+  Result,
+  Schema,
+  SchemaIssue,
+} from "effect";
 
 type SyncSchema = Schema.Top & {
   readonly DecodingServices: never;
@@ -18,18 +27,10 @@ type RouteBoundarySchemas<
   success: Success;
 }>;
 
-type RouteBoundaryHandlers<Success, Failure, OnSuccess, OnFailure> = Readonly<{
-  onFailure: (error: Failure) => OnFailure;
-  onSuccess: (value: Success) => OnSuccess;
-}>;
-
-const matchRouteBoundaryExit = <Success, Failure, OnSuccess, OnFailure>(
-  exit: Exit.Exit<Success, Failure>,
-  handlers: RouteBoundaryHandlers<Success, Failure, OnSuccess, OnFailure>
-) =>
+const toRouteResult = <Success, Failure>(exit: Exit.Exit<Success, Failure>) =>
   Match.value(exit).pipe(
     Match.when(Exit.isSuccess, (successExit) =>
-      handlers.onSuccess(successExit.value)
+      Result.succeed(successExit.value)
     ),
     Match.orElse((failureExit) =>
       Cause.findErrorOption(failureExit.cause).pipe(
@@ -37,7 +38,7 @@ const matchRouteBoundaryExit = <Success, Failure, OnSuccess, OnFailure>(
           onNone: () => {
             throw new Error("docs route boundary error invariant violated");
           },
-          onSome: handlers.onFailure,
+          onSome: Result.fail,
         })
       )
     )
@@ -48,6 +49,13 @@ export class DocsContentPreloadError extends Schema.TaggedErrorClass<DocsContent
   {
     message: Schema.String,
     path: Schema.String,
+  }
+) {}
+
+class DocsRouteTransportError extends Schema.TaggedErrorClass<DocsRouteTransportError>()(
+  "DocsRouteTransportError",
+  {
+    message: Schema.String,
   }
 ) {}
 
@@ -76,12 +84,20 @@ const createRouteBoundary = <
   const codec = Schema.toCodecJson(
     Schema.Exit(schemas.success, schemas.error, Schema.Defect)
   );
-  const decode = Schema.decodeUnknownSync(codec);
   const encode = Schema.encodeSync(codec);
 
   return {
     codec,
-    decode,
+    decodeToResult: (encoded: unknown) =>
+      Schema.decodeUnknownResult(codec)(encoded).pipe(
+        Result.mapError(
+          (error) =>
+            new DocsRouteTransportError({
+              message: SchemaIssue.makeFormatterDefault()(error),
+            })
+        ),
+        Result.flatMap(toRouteResult)
+      ),
     encodeExit: <R>(
       program: Effect.Effect<Success["Type"], Failure["Type"], R>
     ) =>
@@ -107,16 +123,6 @@ const createRouteBoundary = <
           )
         )
       ),
-    match: <OnSuccess, OnFailure>(
-      encoded: unknown,
-      handlers: RouteBoundaryHandlers<
-        Success["Type"],
-        Failure["Type"],
-        OnSuccess,
-        OnFailure
-      >
-    ) => matchRouteBoundaryExit(decode(encoded), handlers),
-    matchExit: matchRouteBoundaryExit,
   };
 };
 

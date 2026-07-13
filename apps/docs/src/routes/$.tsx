@@ -1,15 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Match, Option } from "effect";
+import { Match, Option, Result } from "effect";
 
 import { loadDocsPage } from "#/lib/docs/loaders";
-import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 import { MdxDocument } from "#/lib/mdx/client-loader";
 
 export const Route = createFileRoute("/$")({
   component() {
     const loaderData = Route.useLoaderData();
 
-    return docsPageRouteBoundary.match(loaderData, {
+    return Result.match(loaderData, {
       onFailure: (error) =>
         Match.value(error).pipe(
           Match.tags({
@@ -23,6 +22,12 @@ export const Route = createFileRoute("/$")({
               <section className="docs-error" data-testid="loader-error">
                 <h1>Docs page not found</h1>
                 <p>The requested documentation page does not exist.</p>
+              </section>
+            ),
+            DocsRouteTransportError: () => (
+              <section className="docs-error" data-testid="loader-error">
+                <h1>Docs page is unavailable</h1>
+                <p>The documentation route data could not be read.</p>
               </section>
             ),
             DocsSourceError: () => (

@@ -28,7 +28,7 @@ decision.
 | DECODE-001 | accepted | Decoder inventory and durable architecture contract are recorded below. No lint or runtime code changed. |
 | DECODE-002 | accepted | Repository-wide decoder placement rule, exact transitional allowlist and CLI integration suite are complete. |
 | DECODE-003 | accepted | Catalogue dispatch now owns the selected decode and enters typed scenario continuations directly; SDK descriptor decoding is direct. |
-| DECODE-004 | pending | Move docs route decoding before React composition. |
+| DECODE-004 | accepted | Docs route loaders decode transport into typed Results before route composition. |
 | DECODE-005 | pending | Complete the repository audit and documentation close-out. |
 
 ## DECODE-001 inventory
@@ -432,3 +432,35 @@ pattern.
 `.changeset/boundary-only-decoding.md` records minor releases for the additive
 calculator and rule-package typed scenario exports and a patch for the SDK
 decoder simplification.
+
+## DECODE-004 implementation and acceptance
+
+Docs server functions still encode the canonical `Schema.Exit` transport
+codec, but `loadDocsHome` and `loadDocsPage` now call the route boundary's
+`decodeToResult` adapter before returning loader data. That adapter performs
+Schema decode, maps malformed transport to `DocsRouteTransportError`, converts
+expected typed failures into `Result.fail`, and preserves the existing defect
+policy outside React. Route components use `Result.match` on typed loader data;
+they no longer import a decoding matcher or execute a decoder during render.
+
+The route-boundary test covers encoded success, `DocsContentPreloadError`,
+`DocsPageNotFoundError`, `DocsSourceError`, and malformed transport. It is
+wired into root `bun run test`. No runtime, service acquisition, transport
+decode or external representation read was added to routes or leaf components.
+
+### Quality audits
+
+- Audit pass 1: confirmed loader data is a typed `Result` before React
+  composition and malformed transport has its own tagged failure.
+- Audit pass 2: confirmed Cause traversal and defect policy remain in the
+  boundary adapter, while the existing module-scoped server runtime remains the
+  only loader runtime owner.
+- Audit pass 3: confirmed route components use focused typed result branches,
+  no generic decode/match wrapper remains in render, and no visual or navigation
+  content was changed apart from accurate malformed-transport presentation.
+
+### Changeset decision
+
+No Changeset is required. DECODE-004 changes only app-internal docs loader
+composition, focused test wiring and execution evidence; it changes no package
+export or package-facing public contract.
