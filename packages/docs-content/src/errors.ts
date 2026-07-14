@@ -19,7 +19,7 @@ export class DocsSlugNotFoundError extends Schema.TaggedErrorClass<DocsSlugNotFo
 export class DocsSourceError extends Schema.TaggedErrorClass<DocsSourceError>()(
   "DocsSourceError",
   {
-    cause: Schema.Defect,
+    cause: Schema.Defect(),
     source: Schema.optional(DocsSourcePath),
   }
 ) {}

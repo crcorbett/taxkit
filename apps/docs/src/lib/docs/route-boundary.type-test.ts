@@ -11,6 +11,7 @@ void docsHomeRouteBoundary.encodeExit(
 );
 
 void docsHomeRouteBoundary.encodeExit(
+  // @effect-diagnostics-next-line effect/missingEffectError:off
   // @ts-expect-error The boundary error channel must match its canonical schema.
   incompatibleFailure
 );

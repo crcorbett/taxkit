@@ -90,7 +90,7 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
         phaseOutRate: BigDecimal.format(bracket.phaseOutRate),
         tableYear: table.year,
       },
-      result: offsetAmount,
+      result: offsetAmount.cents,
       rounding: "round-to-nearest-cent",
       ruleId: LitoRuleId,
       sources: [table.source],

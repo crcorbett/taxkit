@@ -81,7 +81,7 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
         rate: BigDecimal.format(bracket.rate),
         tableYear: table.year,
       },
-      result: taxAmount,
+      result: taxAmount.cents,
       rounding: "round-to-nearest-cent",
       ruleId: IncomeTaxRuleId,
       sources: [table.source],

@@ -44,7 +44,7 @@ export const AnnualTaxLedgerLive = Layer.effect(AnnualTaxLedgerFact)(
         litoCents: lito.amount.cents,
         medicareLevyCents: medicareLevy.amount.cents,
       },
-      result: rawLiability,
+      result: rawLiability.cents,
       ruleId: AnnualTaxLedgerRuleId,
       sources: [],
       title: "Annual tax ledger (income tax + LITO + Medicare Levy)",

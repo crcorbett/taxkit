@@ -117,7 +117,7 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
         weeklyFormulaCents,
         weeklyWithholdingCentsRaw,
       },
-      result: periodWithholding,
+      result: periodWithholding.cents,
       rounding: "ato-withholding-rounding",
       ruleId: PaygWithholdingRuleId,
       sources: [table.source],

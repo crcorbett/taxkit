@@ -31,11 +31,9 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
     const sacrifice = yield* SalarySacrificeFact;
 
     if (gross.period !== sacrifice.period) {
-      return yield* Effect.fail(
-        new CalculationError({
-          message: `whattax/rules-au-pay: salary sacrifice period (${sacrifice.period}) must match gross pay period (${gross.period})`,
-        })
-      );
+      return yield* new CalculationError({
+        message: `whattax/rules-au-pay: salary sacrifice period (${sacrifice.period}) must match gross pay period (${gross.period})`,
+      });
     }
 
     const taxableAmount = moneySub(gross.amount, sacrifice.amount);
@@ -48,7 +46,7 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
         period: gross.period,
         sacrificeCents: sacrifice.amount.cents,
       },
-      result: taxableAmount,
+      result: taxableAmount.cents,
       ruleId: TaxablePayWithSacrificeRuleId,
       sources: [],
       title: "Taxable pay with pre-tax salary sacrifice",

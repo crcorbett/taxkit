@@ -26,6 +26,7 @@ Specs:
 | [Extract public calculator service](./extract-public-calculator-service.md) | Implemented | `@whattax/calculators` owns reusable calculator orchestration. |
 | [Public calculation API routes](./public-calculation-api-routes.md) | Implemented | Public metadata, graph and calculate routes exist. |
 | [Public MDX developer documentation](./public-mdx-developer-docs.md) | Implemented | Public MDX docs content and navigation are in place. |
+| [Repository foundation hardening](./repository-foundation-hardening.md) | Active | Effect beta, CI, package artifacts, portable linting and release-readiness foundations are being hardened. |
 | [SDK-backed HTTP API thin wrapper](./sdk-backed-http-api-thin-wrapper.md) | Implemented | HTTP calculate delegates execution through the SDK Effect facade. |
 | [SDK public naming and export contract](./sdk-public-naming-and-export-contract.md) | Implemented | Public SDK names and packed export contract are stabilised. |
 | [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md) | Implemented | Schema-encoded Effect outcomes survive initial SSR and client navigation before direct route-root restoration. |

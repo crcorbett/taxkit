@@ -29,7 +29,9 @@ const expectedErrors = [
 
 const encodeHomeExit = Schema.encodeSync(docsHomeRouteBoundary.codec);
 const encodeUntrustedDefectExit = Schema.encodeSync(
-  Schema.toCodecJson(Schema.Exit(Schema.Unknown, Schema.Unknown, Schema.Defect))
+  Schema.toCodecJson(
+    Schema.Exit(Schema.Unknown, Schema.Unknown, Schema.Defect())
+  )
 );
 
 const expectTransportFailure = (result) => {

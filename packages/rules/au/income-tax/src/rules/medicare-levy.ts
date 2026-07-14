@@ -73,7 +73,7 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
         tableYear: table.year,
         thresholdCents: table.thresholdCents,
       },
-      result: levyAmount,
+      result: levyAmount.cents,
       rounding: "round-to-nearest-cent",
       ruleId: MedicareLevyRuleId,
       sources: [table.source],

@@ -11,7 +11,7 @@ const ApiMain = Effect.gen(function* apiMain() {
     `WhatTax API listening on http://${config.address.hostname}:${config.address.port}`
   );
 
-  yield* Effect.never;
+  return yield* Effect.never;
 }).pipe(
   Effect.ensuring(Console.info("WhatTax API stopped")),
   Effect.provide(ApiAppLayer)

@@ -12,7 +12,7 @@ import {
   TaxablePayFact,
   scaleWeeklyWithholdingToPayPeriodDollars,
 } from "@whattax/rules-au-pay/facts";
-import { Array, Effect, Layer, Option } from "effect";
+import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import { StslComponentFact, StslDebtFact } from "../facts/stsl.js";
 import { AtoStslTable } from "../parameters/stsl-table.js";
@@ -83,7 +83,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         children: [taxable.trace],
         formula: "stsl = 0 (opted out)",
         inputs: baseTraceInputs,
-        result: aud(0),
+        result: 0,
         ruleId: StslComponentRuleId,
         sources: [table.source],
         title: "STSL withholding (opt-out - component disabled)",
@@ -119,12 +119,12 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         formula: "stsl = 0 (Schedule 8 component rounds to zero)",
         inputs: {
           ...baseTraceInputs,
-          a: row.a,
-          bDollars: row.bDollars,
+          a: BigDecimal.format(row.a),
+          bDollars: BigDecimal.format(row.bDollars),
           weeklyEquivalentCents: weeklyCents,
           weeklyFormulaCents,
         },
-        result: aud(0),
+        result: 0,
         rounding: "ato-withholding-rounding",
         ruleId: StslComponentRuleId,
         sources: [table.source],
@@ -154,13 +154,13 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period",
       inputs: {
         ...baseTraceInputs,
-        a: row.a,
-        bDollars: row.bDollars,
+        a: BigDecimal.format(row.a),
+        bDollars: BigDecimal.format(row.bDollars),
         weeklyEquivalentCents: weeklyCents,
         weeklyFormulaCents,
         weeklyWithholdingCentsRaw,
       },
-      result: periodWithholding,
+      result: periodWithholding.cents,
       rounding: "ato-withholding-rounding",
       ruleId: StslComponentRuleId,
       sources: [table.source],

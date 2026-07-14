@@ -9,4 +9,6 @@ confidence: medium
 
 Live implementation plans belong here while work is in progress.
 
-No active execution plans.
+Active execution plans:
+
+- [Repository foundation hardening](./repository-foundation-hardening.md)

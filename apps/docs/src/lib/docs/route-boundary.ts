@@ -111,9 +111,9 @@ const createRouteBoundary = <
     restore: (encoded: unknown) =>
       Schema.decodeUnknownResult(codec)(encoded).pipe(
         Result.mapError(
-          (issue) =>
+          (error) =>
             new DocsRouteTransportError({
-              message: formatSchemaIssue(issue),
+              message: formatSchemaIssue(error.issue),
             })
         ),
         Result.flatMap((exit) =>

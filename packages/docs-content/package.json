@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",
-    "@effect/platform-node": "4.0.0-beta.60",
+    "@effect/platform-node": "catalog:",
     "@whattax/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
     "fumadocs-core": "^16.8.3",

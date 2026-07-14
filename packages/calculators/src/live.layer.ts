@@ -54,9 +54,9 @@ const calculateWithEntry = (
               issue: error.issue,
             })
           )
-        )
-      )
-      .pipe(Effect.provideService(CalculationEngine, engine));
+        ),
+        Effect.provideService(CalculationEngine, engine)
+      );
 
     return new CalculatorRunResponseData({
       calculator: toCalculatorCatalogItem(entry),

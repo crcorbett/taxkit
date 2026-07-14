@@ -72,9 +72,7 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
  *
  * @since 0.1.0
  */
-export const CalculatePayWithholdings = Effect.gen(function* () {
-  return yield* PayWithholdingsLedgerFact;
-});
+export const CalculatePayWithholdings = PayWithholdingsLedgerFact;
 
 /**
  * Input schema for the standard take-home-pay scenario helper.

@@ -31,7 +31,7 @@ export const NetPayLive = Layer.effect(NetPayFact)(
         grossCents: gross.amount.cents,
         withholdingsTotalCents: ledger.total.cents,
       },
-      result: netAmount,
+      result: netAmount.cents,
       ruleId: NetPayRuleId,
       sources: [],
       title: "Net pay = gross - withholdings ledger total",

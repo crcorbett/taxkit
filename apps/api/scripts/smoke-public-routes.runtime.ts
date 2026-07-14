@@ -411,7 +411,7 @@ const calculateRequestBody = Schema.decodeUnknownEffect(CalculatorRunRequest)({
 
 const waitForHealth = getRouteJson("/api/health", Schema.Json).pipe(
   Effect.retry(
-    Schedule.spaced("250 millis").pipe(Schedule.both(Schedule.recurs(40)))
+    Schedule.max([Schedule.spaced("250 millis"), Schedule.recurs(40)])
   ),
   Effect.mapError(
     (cause) =>

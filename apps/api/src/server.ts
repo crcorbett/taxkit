@@ -26,7 +26,7 @@ const BunHttpServerLive = Layer.effect(
               port: config.address.port,
             });
           }),
-          (server) => Effect.sync(() => server.stop(true))
+          (server) => Effect.promise(() => server.stop(true))
         ).pipe(Effect.asVoid),
     });
   })

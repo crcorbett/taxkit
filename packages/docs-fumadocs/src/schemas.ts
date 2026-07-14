@@ -133,6 +133,6 @@ export class FumadocsPageNotFoundError extends Schema.TaggedErrorClass<FumadocsP
 export class FumadocsSourceLoaderError extends Schema.TaggedErrorClass<FumadocsSourceLoaderError>()(
   "FumadocsSourceLoaderError",
   {
-    cause: Schema.Defect,
+    cause: Schema.Defect(),
   }
 ) {}

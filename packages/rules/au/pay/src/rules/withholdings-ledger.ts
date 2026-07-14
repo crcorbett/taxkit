@@ -49,7 +49,7 @@ export const buildPayWithholdingsLedger = (
         .map((c) => c.id),
       componentIds: components.map((c) => c.id),
     },
-    result: total,
+    result: total.cents,
     ruleId: PayWithholdingsLedgerRuleId,
     sources: [],
     title: "Pay-withholdings ledger (sum of active components)",

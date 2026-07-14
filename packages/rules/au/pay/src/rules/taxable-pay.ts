@@ -28,8 +28,11 @@ export const TaxablePayLive = Layer.effect(TaxablePayFact)(
     const trace = TraceNode.make({
       children: [],
       formula: "taxable = gross",
-      inputs: { grossPay: gross },
-      result: gross.amount,
+      inputs: {
+        grossCents: gross.amount.cents,
+        period: gross.period,
+      },
+      result: gross.amount.cents,
       ruleId: TaxablePayRuleId,
       sources: [],
       title: "Taxable pay (no salary sacrifice in the current implementation)",
