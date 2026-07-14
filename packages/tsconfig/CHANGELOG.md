@@ -1,5 +1,14 @@
 # @whattax/tsconfig
 
+## 0.1.0
+
+### Patch Changes
+
+- 2dc693a: Make package builds and release artifacts deterministic with clean compilation,
+  dist-only publication exports, concrete packed dependency ranges, and
+  Effect-native scoped validators for focused SDK artifacts and strict clean
+  consumers across the complete WhatTax release package graph.
+
 ## 0.0.4
 
 ## 0.0.3

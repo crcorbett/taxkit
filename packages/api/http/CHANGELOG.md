@@ -1,5 +1,21 @@
 # @whattax/api-http
 
+## 0.1.0
+
+### Patch Changes
+
+- 2dc693a: Make package builds and release artifacts deterministic with clean compilation,
+  dist-only publication exports, concrete packed dependency ranges, and
+  Effect-native scoped validators for focused SDK artifacts and strict clean
+  consumers across the complete WhatTax release package graph.
+- Updated dependencies [a3a39e7]
+- Updated dependencies [2dc693a]
+- Updated dependencies [6b307e3]
+- Updated dependencies [9814598]
+  - @whattax/calculators@0.1.0
+  - @whattax/sdk@0.1.0
+  - @whattax/core@0.1.0
+
 ## 0.0.4
 
 ### Patch Changes

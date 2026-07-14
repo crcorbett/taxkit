@@ -1,5 +1,28 @@
 # @whattax/calculators
 
+## 0.1.0
+
+### Minor Changes
+
+- a3a39e7: Expose typed scenario-layer constructors for calculator composition, couple
+  catalogue schemas to typed continuations, and simplify SDK report decoding.
+
+### Patch Changes
+
+- 2dc693a: Make package builds and release artifacts deterministic with clean compilation,
+  dist-only publication exports, concrete packed dependency ranges, and
+  Effect-native scoped validators for focused SDK artifacts and strict clean
+  consumers across the complete WhatTax release package graph.
+- 6b307e3: Upgrade the workspace package runtime and test contracts to the compatible
+  Effect 4 beta.98 family and current schema, schedule, and runtime APIs while
+  keeping calculation traces JSON-compatible at HTTP boundaries.
+- Updated dependencies [a3a39e7]
+- Updated dependencies [2dc693a]
+- Updated dependencies [6b307e3]
+  - @whattax/rules-au-income-tax@0.1.0
+  - @whattax/rules-au-pay@0.1.0
+  - @whattax/core@0.1.0
+
 ## 0.0.4
 
 ### Patch Changes

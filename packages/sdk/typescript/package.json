@@ -1,6 +1,6 @@
 {
   "name": "@whattax/sdk",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "private": true,
   "description": "TypeScript SDK for in-process WhatTax calculations.",
   "files": [

@@ -1,5 +1,16 @@
 # @whattax/docs-content
 
+## 0.0.3
+
+### Patch Changes
+
+- 6b307e3: Upgrade the workspace package runtime and test contracts to the compatible
+  Effect 4 beta.98 family and current schema, schedule, and runtime APIs while
+  keeping calculation traces JSON-compatible at HTTP boundaries.
+- Updated dependencies [2dc693a]
+- Updated dependencies [6b307e3]
+  - @whattax/docs-fumadocs@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes
