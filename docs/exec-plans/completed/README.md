@@ -1,8 +1,8 @@
 ---
 status: canonical
-last_reviewed: 2026-07-01
+last_reviewed: 2026-07-14
 source_of_truth: docs
-confidence: medium
+confidence: high
 ---
 
 # Completed exec plans
@@ -12,6 +12,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Repository foundation hardening](./repository-foundation-hardening.md)
 - [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md)
 - [Boundary-only decoding](./boundary-only-decoding.md)
 - [Downstream consumer validation](./downstream-consumer-validation.md)

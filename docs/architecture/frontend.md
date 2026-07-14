@@ -2,7 +2,7 @@
 status: canonical
 last_reviewed: 2026-07-14
 source_of_truth: docs
-confidence: medium
+confidence: high
 ---
 
 # Frontend
@@ -121,6 +121,40 @@ Effect service, create or run a runtime, read storage or environment directly,
 or fetch their own boundary data. Pass commands from the loader, action or
 owning container instead.
 
+## Visible composition and leaf ownership
+
+Keep the visible composition route-high. The route root owns restoration and
+top-level outcome matching, then renders the page shell and major semantic
+landmarks such as `header`, `nav`, `main`, `aside` and `footer`. A section
+container may arrange one coherent feature, but it must not hide the page's
+primary hierarchy behind a generic provider, hook or wrapper. Use one `main`
+landmark per page and keep landmark labels and heading order meaningful when
+sections are rendered independently.
+
+Place loading, empty, unavailable and recoverable error UI at the smallest
+composition boundary that owns the failed data. Preserve the surrounding shell
+and unrelated landmarks. A constrained panel, table, chart or control keeps a
+stable footprint while its fallback is shown so dynamic states do not shift or
+overlap adjacent content. Use a route-wide fallback only when the route cannot
+establish the page composition at all.
+
+Leaf props are focused and `readonly`: pass the canonical scalar, value object,
+small schema-derived view or callback the leaf renders, not a transport DTO,
+whole route result, service or broad page model. Leaves may own complete local
+UI commands such as disclosure, focus, copy or dialog state. A command that
+crosses a trust boundary, mutates domain state or invokes a remote operation is
+owned by the route action or nearest policy-owning container and reaches the
+leaf as a focused callback. The leaf may bind that callback to an event; it
+must not construct another runtime, service or transport client to execute it.
+
+```ts
+route loader/action or server function
+  -> direct route-root restore and Result match
+    -> page shell and semantic landmarks
+      -> section container and smallest owning fallback
+        -> leaf with readonly values and focused commands
+```
+
 Do not add a hook, provider or wrapper component only to relocate a decoder or
 silence lint. Extract React composition when it owns reusable UI policy or
 removes meaningful repetition. App-specific composition remains app-owned;
@@ -150,6 +184,9 @@ before a second application needs it.
   `@whattax/docs-content/server` from browser modules.
 - Keep Fumadocs generated source access inside `@whattax/docs-content` server
   exports and reusable adapters in `@whattax/docs-fumadocs/source`.
+- Apply the [abstraction admission
+  contract](../design-docs/abstraction-admission.md) before sharing a hook,
+  provider, component family or UI package.
 
 ## Related Docs
 

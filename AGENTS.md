@@ -37,6 +37,10 @@ fast.
 - MUST keep one-off Effect error handling and transformations inline at the
   callsite; do not extract tiny wrapper or mapper helpers. See
   `docs/architecture/effect-services.md`.
+- MUST admit shared helpers, hooks, providers, services and packages only when
+  they have a clear owner, semantic weight, a second consumer or real
+  substitution point, a simpler call graph and focused tests. See
+  `docs/design-docs/abstraction-admission.md`.
 - MUST decode representation-level or unknown values only at explicit trust or
   type-erasure boundaries. Pass schema-derived values inward without repeated
   defensive decoding. See `docs/architecture/effect-services.md`.
@@ -68,6 +72,7 @@ fast.
 | spec authoring | `docs/product-specs/writing-specs.md` |
 | implementation plans | `docs/exec-plans/README.md` |
 | design docs | `docs/design-docs/index.md` |
+| abstraction admission | `docs/design-docs/abstraction-admission.md` |
 | docs maintenance | `docs/design-docs/agent-first-documentation.md` |
 | external references | `docs/references/README.md` |
 | documentation audit | `docs/documentation-audit/README.md` |

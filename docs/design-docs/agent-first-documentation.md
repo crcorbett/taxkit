@@ -1,8 +1,8 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-07-14
 source_of_truth: docs
-confidence: medium
+confidence: high
 ---
 
 # Agent-First Documentation
@@ -60,3 +60,9 @@ public surfaces, implementation intent or development workflow.
 Do not add atlas links, package routes or status claims for missing
 implementation. Planned ownership areas should say they are planned until a
 package manifest, source exports and verification exist.
+
+The documentation audit and status outline remain manually maintained. Add a
+generated inventory only after repeated manual drift demonstrates the need and
+the proposal identifies an owner, canonical input model, deterministic output,
+focused tests and a simpler maintenance graph. Do not create a package or
+generator merely because a future repository may be larger.

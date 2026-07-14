@@ -39,6 +39,9 @@ Current architecture docs cover facts, rules, calculators, graph/trace/ledgers,
 API/SDK, package boundaries, package ownership, Effect services, frontend,
 content/posts, deployment and testing quality.
 
+Current design docs cover agent-first documentation maintenance and the
+repository-wide abstraction-admission contract.
+
 ## Package README coverage
 
 Current app/package roots with package manifests:
@@ -72,9 +75,11 @@ package until a package manifest, source exports and verification exist.
 - Completed execution plans have been moved to `docs/exec-plans/completed/`.
   `docs/exec-plans/active/` is available for the next live implementation
   plan.
-- `docs/repo-status-outline.html` is a manual snapshot. It is linked from the
-  root README, but it can drift and must be refreshed after material repo-shape
-  or implemented-surface changes.
+- `docs/repo-status-outline.html` is a manual snapshot. It was refreshed on
+  2026-07-14 for Effect beta.98, deterministic packed surfaces, portable lint
+  contracts and the implemented `@whattax/scripts` release-readiness command.
+  It can still drift and must be refreshed after material repo-shape or
+  implemented-surface changes.
 - `packages/ui` remains a planned ownership placeholder.
 - `packages/domain/au/*` remains planned for Australian date dimensions and
   domain facts that are not owned by a single rule pack.
@@ -83,8 +88,10 @@ package until a package manifest, source exports and verification exist.
 - `@whattax/sdk` is implemented as a private package but has not been
   published. Publication remains gated behind explicit release approval,
   package-name confirmation, `bun run version-repo` and publish verification.
-- No generated documentation inventory exists yet; this audit is maintained by
-  hand.
+- No generated documentation inventory exists. This audit is deliberately
+  maintained by hand until repeated drift justifies an owner, canonical input
+  model, deterministic generator and focused tests under the abstraction
+  admission contract.
 
 ## Docs maintenance convention
 
@@ -111,10 +118,10 @@ At audit time, check that:
    aligned after each implementation slice.
 2. Refresh `docs/repo-status-outline.html` whenever repo shape or implemented
    surfaces materially change.
-3. Decide whether the manual status snapshot should become generated once repo
-   status changes frequently enough to justify automation.
-4. Add a generated docs inventory only if manual audit drift becomes a
-   recurring source of mistakes.
+3. Keep the status snapshot and documentation inventory manual until recurring
+   drift satisfies the abstraction-admission bar for automation.
+4. Reject generated inventory or package proposals that have no implemented
+   owner, consumer, simpler maintenance graph and focused proof.
 5. Keep planned package families labelled as planned until package manifests,
    source exports and verification exist.
 6. Keep this audit updated when new package roots, docs buckets or public

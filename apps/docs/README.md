@@ -1,6 +1,6 @@
 ---
-status: draft
-last_reviewed: 2026-06-25
+status: canonical
+last_reviewed: 2026-07-14
 source_of_truth: app-root
 confidence: high
 ---
@@ -134,7 +134,17 @@ docs change
 - Use TanStack `Link` for internal docs routes so navigation runs the client
   loader and server-function RPC. Use ordinary anchors for external URLs.
 - Keep browser boundary tests programmatic. Do not add production test routes.
+- Keep direct loader restoration and top-level `Result` matching in the route
+  root. Compose semantic page landmarks route-high, and pass focused readonly
+  values and callbacks to section and leaf components.
+- Keep local presentation commands in leaves. Remote or domain commands remain
+  with the route action or nearest policy-owning container.
+- Put loading, empty and recoverable error UI at the smallest owning boundary
+  and preserve constrained component footprints.
 - Put generic Fumadocs primitives in `@whattax/docs-fumadocs` only when they
   are reusable outside this app.
 - Use [Documentation style](../../docs/standards/documentation-style.md) and
   the related standards suite before writing or reviewing public docs.
+- Apply [Abstraction
+  admission](../../docs/design-docs/abstraction-admission.md) before adding a
+  shared hook, provider, component family or package.

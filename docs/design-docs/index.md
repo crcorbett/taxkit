@@ -1,8 +1,8 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-07-14
 source_of_truth: docs
-confidence: medium
+confidence: high
 ---
 
 # Design Docs
@@ -12,4 +12,5 @@ are broader than one implementation spec.
 
 Current entries:
 
+- [Abstraction admission](./abstraction-admission.md)
 - [Agent-first documentation](./agent-first-documentation.md)

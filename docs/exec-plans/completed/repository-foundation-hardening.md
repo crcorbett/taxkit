@@ -1,5 +1,5 @@
 ---
-status: active
+status: completed
 last_reviewed: 2026-07-14
 source_of_truth: execution-plan
 confidence: high
@@ -29,7 +29,7 @@ stop the rollout and record a blocker for replan or user decision.
 | FND-002 | complete | Accepted after correction turn 2 and independent focused, strict downstream and repository verification. |
 | FND-003 | complete | Parent accepted correction turn 3 after the final Bun non-host false positive was removed and all gates passed. |
 | FND-004 | complete | Parent accepted the corrected Effect-native release-readiness command and Changeset after all mandatory gates passed. |
-| FND-005 | pending | Architecture/process reconciliation and final audit. |
+| FND-005 | complete | Parent accepted the durable docs, status reconciliation and complete final release evidence. |
 
 ## Validation Log
 
@@ -514,6 +514,74 @@ stop the rollout and record a blocker for replan or user decision.
   `git diff --check` and Changeset status passed. The implementer's fresh full
   `verification` and nine-command `release:check` evidence is accepted.
 
+### 2026-07-14 - FND-005 ready for parent review
+
+- Added `docs/design-docs/abstraction-admission.md` as the single owner of the
+  repository admission ledger. A shared helper, hook, provider, service, layer,
+  component family or package now requires an owner, semantic weight, a second
+  consumer or real substitution point, a simpler before/after call graph and
+  focused proof. The contract rejects speculative reuse and one-use Effect,
+  React and package wrappers.
+- Applied that contract to Effect service/layer composition, test review and
+  the implemented `@whattax/scripts` workflow without adding a code
+  abstraction. Strengthened frontend ownership around direct route-root
+  restoration, route-high shell and semantic landmarks, smallest-owner stable
+  fallbacks, focused readonly leaf props, leaf-local presentation commands and
+  route/container-owned remote or domain commands.
+- Reconciled root/app/package routing, the documentation audit and the manual
+  status snapshot. `packages/scripts` and its nine-gate release command are
+  implemented; `packages/ui`, generated inventories, deployment, publication,
+  SEO, RPC and broader product work remain explicitly unimplemented.
+- Mandatory verification passed independently: `bun run verification` with 23
+  Turbo prerequisites; `bun run test` with 6 route-boundary tests, 32 Oxlint
+  tests/71 assertions and 18 Turbo tasks; and `bun run build` with 14 tasks.
+  The full `bun run release:check` also passed all 9 ordered checks.
+- Focused acceptance gates passed independently: the 9-package strict
+  downstream tarball/install/type/runtime/public-import/browser proof reported
+  no runtime blockers; docs browser passed 7 tests; API smoke passed health,
+  catalogue, calculation and OpenAPI routes plus an external consumer;
+  Changeset status, docs validation, task JSON, link/path, package-claim,
+  symlink, stale-reference, formatting and diff audits passed.
+- Audit pass 1 compared final graphs and owners. CI remains `.bun-version ->
+  frozen install -> verification/test/build`; packed validation remains clean
+  package builds and dist-only manifests -> actual tarballs -> clean consumer;
+  lint remains exact config -> portable/WhatTax rules -> real Oxlint fixtures;
+  release remains root command -> scripts runtime/runner -> canonical commands;
+  frontend remains encoded transport -> direct restore/Result match -> visible
+  composition -> focused leaves.
+- Audit pass 2 inspected Effect, Schema, errors and abstraction quality. The
+  workspace has one beta.98 family, current APIs, schema-backed outcomes,
+  tagged expected failures, host-neutral service contracts, separate live/test
+  Layers and linear primary Effects. No compatibility shim, unsafe cast, DTO
+  mirror, unknown service error, repeated decoder, helper-per-command layer or
+  new hook/provider/package sprawl was introduced.
+- Audit pass 3 inspected complete evidence and freshness. All 9 packed closure
+  packages declare files and dist-only publication exports; compiled release
+  packages clean `dist`; current package maps, status claims and links resolve;
+  the boundary lint contracts remain enabled; and all local release evidence
+  passed both through the orchestrator and through the task's named standalone
+  gates.
+- No FND-005 Changeset is required because the slice changes developer docs,
+  README guidance, task evidence and a manual status snapshot only. Pending
+  status remains 3 patch releases and 9 minor releases, with no major. No
+  version, changelog application or publication was performed.
+- Residual risks are limited to Effect beta/process API drift and its current
+  non-failing Rolldown PURE warning; deliberate maintenance of exact lint and
+  release-command lists; buffered successful command output; local-only API
+  smoke; and browser-harness evidence that does not independently prove built
+  SSR/hydration.
+
+### 2026-07-14 - FND-005 parent acceptance
+
+- Accepted the abstraction-admission contract, Effect and React composition
+  guidance, package/status reconciliation, manual snapshot and archived plan.
+  The final content preserves boundary-only decoding and direct route-root
+  restoration while rejecting speculative helper, hook, provider and package
+  abstractions.
+- Parent review found no production-behaviour change and accepted the
+  no-Changeset decision. The canonical final `bun run release:check` passed all
+  nine ordered gates on the accepted state before commit.
+
 ## Decisions
 
 - Preserve WhatTax's exact decoder allowlist and direct route-consumer restore
@@ -525,8 +593,14 @@ stop the rollout and record a blocker for replan or user decision.
 
 ## Open Risks
 
-- Effect beta.98 may require API migrations beyond dependency metadata.
-- Packed publication exports must be tested from actual tarballs to avoid
-  workspace-only success.
-- New lint rules will remain review-only where an exact AST signal cannot be
-  enforced without broad suppressions.
+- Effect and its process APIs remain beta. Future upgrades may require direct
+  source migrations, and current web builds retain a non-failing upstream PURE
+  annotation warning.
+- Exact lint boundary lists, codec names and release command definitions need
+  deliberate owner updates. Dynamic or interprocedural aliases and abstraction
+  semantic weight remain review-only.
+- API smoke remains local rather than deployed evidence. The docs browser gate
+  remains a client route harness rather than independent built-app SSR and
+  hydration proof.
+- Pending Changesets are validated but unconsumed. Versioning, changelog
+  application, publication and deployment require explicit approval.

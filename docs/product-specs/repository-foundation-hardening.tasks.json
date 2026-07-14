@@ -2,7 +2,7 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/repository-foundation-hardening.md",
   "title": "Repository Foundation Hardening Implementation Tasks",
-  "status": "active",
+  "status": "implemented",
   "last_reviewed": "2026-07-14",
   "principles": [
     "Preserve WhatTax's stricter trust-boundary and route-consumer contracts while adopting portable reference patterns.",
@@ -449,7 +449,7 @@
     },
     {
       "id": "FND-005",
-      "status": "pending",
+      "status": "complete",
       "title": "Reconcile durable architecture, process and status documentation",
       "type": "architecture-and-final-audit",
       "dependsOn": ["FND-004"],
@@ -498,6 +498,44 @@
         "No conditional or rejected reference pattern was implemented prematurely.",
         "Parent accepted the final rollout and Changeset status."
       ],
+      "implementationEvidence": {
+        "state": "Complete and parent accepted. All mandatory gates, three final audit passes, durable documentation reconciliation and rollout evidence pass.",
+        "changedFiles": [
+          "AGENTS.md and docs/design-docs/abstraction-admission.md",
+          "docs/architecture/effect-services.md, frontend.md and testing-and-quality.md",
+          "docs/design-docs/index.md and agent-first-documentation.md",
+          "apps/web/README.md, apps/docs/README.md and packages/scripts/README.md",
+          "docs/documentation-audit/README.md and docs/repo-status-outline.html",
+          "this task list, the product-spec index and the completed repository-foundation-hardening execution plan indexes"
+        ],
+        "verification": [
+          "bun run verification passed with 23 successful Turbo type/build prerequisites after language-service, boundary lint, full lint, formatting and Knip",
+          "bun run test passed the 6 route-boundary tests, 32 Oxlint tests with 71 assertions and 18 Turbo test tasks",
+          "bun run build passed 14 of 14 workspace build tasks; the known upstream Effect PURE-annotation and web chunk-size warnings remain non-failing",
+          "bun run release:check passed all 9 ordered canonical checks",
+          "bun run --filter=@whattax/sdk validate:downstream independently packed the 9-package closure and passed clean install, typecheck, SDK runtime, every public entrypoint and browser bundle with no runtime blockers",
+          "bun run changeset status --verbose passed with 3 patch releases, 9 minor releases and no major release",
+          "bun run --filter=docs test:browser passed 1 file and 7 tests",
+          "bun run --filter=api smoke passed health, calculator catalogue, calculation and OpenAPI routes plus the external temporary consumer",
+          "docs content validation reported 0 issues; changed Markdown and status HTML local links, direct documentation paths, package claims and CLAUDE.md symlink checks passed",
+          "task-list JSON parsing, full rollout diff integrity, formatting and git diff --check passed"
+        ],
+        "qualityAudits": [
+          "Pass 1, graphs and ownership: compared the complete FND-001 through FND-005 diff with the spec. CI reads .bun-version and invokes root verification/test/build; nine dist-only packed packages remain owned by the SDK validator; oxlint.config.ts routes portable effect, bun and mdx plugins plus WhatTax boundary rules to real CLI fixtures; root release:check delegates to @whattax/scripts and then canonical owning commands; route transport still flows from schema encoding through TanStack transport to one direct route-root restore, Result match, route-high landmarks, smallest-owner fallbacks and focused leaves.",
+          "Pass 2, Effect and abstraction quality: confirmed one beta.98 family, schema-backed release checks/outcomes/reports, tagged expected errors, host-neutral services, separate live/test Layers, runtime-only Bun ownership and linear Effect programs. No stale beta.60 API, compatibility shim, unsafe cast, local DTO mirror, unknown service error, decoder relocation or helper-per-command layer was introduced. Existing validator helpers name substantial pack, manifest, consumer or evidence boundaries. The new admission ledger requires owner, semantic weight, second consumer or substitution, a simpler graph and focused tests, and explicitly rejects one-use Effect, hook, provider, component and package sprawl.",
+          "Pass 3, evidence and freshness: independently reran CI-equivalent verification/tests/builds, the nine-gate release command, strict tarball consumer, browser and API evidence, Changeset status, task JSON, link/path, symlink, package-status, stale-reference and diff audits. All nine packed release-closure manifests declare files and publishConfig exports, all compiled release packages clean dist, packages/scripts is implemented, packages/ui remains planned, and no generated inventory, publication, deployment, SEO, RPC or shared UI surface was claimed or added."
+        ],
+        "changeset": "No new Changeset is required for FND-005 because it changes developer architecture/process documentation, app/package README guidance, task evidence and the manual status snapshot only; no package export, runtime, endpoint or SDK behavior changes.",
+        "releaseTrainImpact": "Pending status is unchanged: @whattax/scripts, @whattax/docs-fumadocs and @whattax/docs-content are patch releases; @whattax/calculators, @whattax/core, @whattax/api-http, @whattax/sdk, @whattax/testing, @whattax/tsconfig and the three AU rule packages are minor releases; no major release is pending. version-repo and publication were not run.",
+        "callGraphAlignment": "All spec graphs remain accurate. Quality is GitHub Actions -> .bun-version -> frozen install -> verification/test/build. Release readiness is root command -> @whattax/scripts Bun runtime -> host-neutral runner -> canonical commands -> schema-backed outcomes. Packed validation is clean builds -> final dist-only tarballs -> clean consumer proofs. Lint is exact config -> portable/WhatTax plugins -> real binary fixtures. Frontend transport is server Effect -> encoded Exit -> TanStack transport -> direct route-root restore/Result match -> visible composition -> focused readonly leaves.",
+        "residualRisks": [
+          "Effect 4 and its process APIs remain beta; builds still emit a non-failing upstream PURE-annotation warning.",
+          "Exact lint boundary lists, codec-family names and release command definitions require deliberate maintenance as owners evolve; dynamic and interprocedural aliases remain review-only.",
+          "Successful release-command output is retained until the report completes, so unusually large future gate output could increase memory use.",
+          "API smoke proves a local process and external temporary consumer, not deployment; the docs browser gate proves the current client route harness, not independent built-app SSR or hydration.",
+          "The release train is only ready for an explicit versioning decision; no version, changelog application, publication or deployment occurred in FND-005."
+        ]
+      },
       "commitAfterPassing": true
     }
   ]

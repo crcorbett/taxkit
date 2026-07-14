@@ -88,6 +88,9 @@ fail-fast behavior and success/failure rendering.
 ## Guardrails
 
 - Add orchestration only when a workflow genuinely crosses package owners.
+- Record the abstraction-admission evidence for each new cross-owner workflow:
+  owner, semantic policy, consumers or substitution, simpler graph and focused
+  tests.
 - Invoke canonical commands; do not copy their validation logic into this
   package.
 - Keep one primary linear Effect program and one runtime execution boundary.
@@ -101,4 +104,5 @@ fail-fast behavior and success/failure rendering.
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/effect-services.md`
 - `docs/architecture/testing-and-quality.md`
+- `docs/design-docs/abstraction-admission.md`
 - `docs/standards/versioning.md`

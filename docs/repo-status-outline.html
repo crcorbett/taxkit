@@ -229,13 +229,13 @@
         <p class="lede">
           High-level view of how the repository currently works, what has been
           completed, and what remains to be built. This is a manually refreshed
-          local snapshot reviewed on <code>2026-06-25</code>, not the canonical
+          local snapshot reviewed on <code>2026-07-14</code>, not the canonical
           source of truth.
         </p>
         <div class="meta">
           <span class="pill">Repo: WhatTax</span>
           <span class="pill">Branch: main</span>
-          <span class="pill">Last reviewed: 2026-06-25</span>
+          <span class="pill">Last reviewed: 2026-07-14</span>
           <span class="pill">Snapshot: manual</span>
         </div>
       </header>
@@ -249,7 +249,8 @@
             <p>
               Root package uses Bun and Turbo. Current scripts include
               <code>dev</code>, <code>check-types</code>, <code>build</code>,
-              <code>verification</code>, and <code>clean</code>.
+              <code>verification</code>, <code>release:check</code>, and
+              <code>clean</code>.
             </p>
           </div>
           <div class="item">
@@ -307,10 +308,10 @@
               <li><code>packages/docs-fumadocs</code> owns reusable Fumadocs wiring.</li>
               <li><code>packages/tsconfig</code> owns shared TypeScript config.</li>
               <li>
-                <code>packages/scripts</code> and <code>packages/ui</code>
-                currently have README coverage but no implemented package
-                manifests.
+                <code>packages/scripts</code> owns Effect-native release gate
+                orchestration.
               </li>
+              <li><code>packages/ui</code> remains a planned README-only area.</li>
             </ul>
           </div>
         </div>
@@ -350,7 +351,22 @@
             <tr>
               <td>SDK package</td>
               <td>Private</td>
-              <td><code>@whattax/sdk</code> has plain, safe-result, Effect, AU, schema and testing entrypoints. Npm publication remains gated.</td>
+              <td><code>@whattax/sdk</code> has plain, safe-result, Effect, AU, schema and testing entrypoints. Its packed nine-package closure passes clean install, public-import, runtime, type and browser checks. Npm publication remains gated.</td>
+            </tr>
+            <tr>
+              <td>Repository foundation</td>
+              <td>Done</td>
+              <td>The workspace uses the Effect 4 beta.98 family and Effect language service. CI reads <code>.bun-version</code>, <code>CLAUDE.md</code> resolves to <code>AGENTS.md</code>, package builds clean output, and publication manifests expose dist-only exports.</td>
+            </tr>
+            <tr>
+              <td>Static architecture rules</td>
+              <td>Done for current contracts</td>
+              <td>Portable <code>effect/*</code>, <code>bun/*</code> and <code>mdx/*</code> rules have real Oxlint binary fixtures. WhatTax rules enforce boundary-only decoding and direct route-consumer restoration.</td>
+            </tr>
+            <tr>
+              <td>Release readiness</td>
+              <td>Implemented</td>
+              <td><code>@whattax/scripts</code> runs nine canonical verification, build, package, API, browser and Changeset gates as one ordered Effect program. It does not version or publish packages.</td>
             </tr>
             <tr>
               <td>Architecture docs</td>
@@ -365,7 +381,7 @@
             <tr>
               <td>Agent routing</td>
               <td>Done</td>
-              <td><code>AGENTS.md</code> is a short atlas and PRD writer/implementer skills are present.</td>
+              <td><code>AGENTS.md</code> is the canonical short atlas, <code>CLAUDE.md</code> is its symlink, and durable abstraction-admission and documentation-maintenance contracts are routed from it.</td>
             </tr>
           </tbody>
         </table>
@@ -411,10 +427,11 @@
           </div>
           <div class="item">
             <span class="status partial">Partial</span>
-            <h3>Placeholder packages</h3>
+            <h3>Shared UI package</h3>
             <p>
-              <code>packages/scripts</code> and <code>packages/ui</code> are
-              still planned ownership areas.
+              <code>packages/ui</code> remains a planned ownership area until
+              repeated app-owned primitives justify a manifest, exports,
+              consumers and verification.
             </p>
           </div>
           <div class="item">
@@ -432,10 +449,10 @@
       <section>
         <h2>Current development priority</h2>
         <ol>
-          <li>Keep specs, task lists and execution-plan locations aligned after each implementation slice.</li>
-          <li>Decide when to consume pending Changesets and start the SDK release train.</li>
-          <li>Choose whether the next product slice is docs productisation or a real app workflow.</li>
-          <li>Keep planned package placeholders labelled as planned until manifests and exports exist.</li>
+          <li>Review pending Changesets, then explicitly decide when to run <code>bun run version-repo</code> and begin the release train.</li>
+          <li>Choose the next user-facing slice: docs productisation or a real calculation workflow in <code>apps/web</code>.</li>
+          <li>Keep <code>packages/ui</code> planned until real consumers satisfy the abstraction-admission contract.</li>
+          <li>Keep specs, task lists, completed execution plans and this manual snapshot aligned after material changes.</li>
           <li>Add new rule, calculator or jurisdiction work through focused specs with source and test evidence.</li>
         </ol>
       </section>

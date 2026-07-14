@@ -1,8 +1,8 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-07-14
 source_of_truth: package-readme
-confidence: medium
+confidence: high
 ---
 
 # Web App
@@ -45,6 +45,13 @@ API client owns route prefixes.
 - Keep tax rules, facts and calculators in engine packages.
 - Use browser-safe API client exports from routes.
 - Do not import `@whattax/api-http/server` from browser code.
+- Keep route data acquisition and trust-boundary conversion route-high. Render
+  the page shell and semantic landmarks before passing focused readonly values
+  and callbacks to leaves.
+- Keep local UI commands in leaves; keep remote or domain commands in the route
+  action or nearest policy-owning container.
+- Put loading, empty and recoverable error UI at the smallest owning boundary
+  while preserving a stable footprint and the surrounding page shell.
 - Keep the app README local; route durable architecture to `docs/architecture`.
 
 ## Commands
@@ -70,3 +77,4 @@ Use the portless URLs for local browser and app-to-app checks:
 - `docs/architecture/frontend.md`
 - `docs/architecture/api-and-sdk.md`
 - `docs/architecture/deployment.md`
+- `docs/design-docs/abstraction-admission.md`

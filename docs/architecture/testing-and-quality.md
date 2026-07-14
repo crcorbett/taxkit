@@ -2,7 +2,7 @@
 status: canonical
 last_reviewed: 2026-07-14
 source_of_truth: docs
-confidence: medium
+confidence: high
 ---
 
 # Testing and quality
@@ -28,7 +28,7 @@ requirements live in [Testing and validation](./testing-and-validation.md).
 
 ## Current baseline
 
-The current repo baseline is scaffold-level verification:
+The current repository baseline is canonical root verification:
 
 ```bash
 bun run verification
@@ -102,6 +102,36 @@ implementations remain in their current packages and apps. The live runner
 depends on `ChildProcessSpawner`; only the Bun runtime entrypoint provides
 `BunServices.layer`, and that same runtime resolves the workspace root through
 Effect `Path.fromFileUrl`.
+
+```text
+root release:check
+  -> @whattax/scripts runtime
+  -> ReleaseCommandRunner
+  -> canonical root, app and package commands
+  -> schema-backed ordered outcomes or one tagged failure
+```
+
+`release:check` is the complete local release-evidence graph, not publication
+approval. Versioning, changelog application and publishing remain explicit
+operations after a human reviews pending Changesets and the release impact.
+
+## Review evidence
+
+Substantial code, package-boundary, API, SDK, app-runtime or documentation
+rollouts record three audit passes in their task evidence or execution plan:
+
+1. Compare the final code and command graphs with their owning architecture and
+   spec.
+2. Inspect Effect flow, schemas, tagged errors, unsafe casts, DTO mirrors and
+   helper or abstraction sprawl.
+3. Inspect CI, lint, packed-consumer, browser/API, documentation and Changeset
+   evidence appropriate to the changed surface.
+
+New shared abstractions must satisfy the
+[abstraction admission contract](../design-docs/abstraction-admission.md).
+Focused tests must prove the claimed policy or substitution point; coverage
+that only calls through a wrapper is not admission evidence. Static lint is a
+supporting gate and cannot replace semantic ownership or call-graph review.
 
 ## Guardrails
 

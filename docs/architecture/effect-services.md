@@ -108,6 +108,21 @@ Do not extract one-off helpers such as `mapConfigError`, `toBoundaryError` or
 when the helper is reused across boundaries, owns a real policy, or materially
 reduces complex duplication.
 
+## Abstraction admission
+
+Effect abstractions follow the repository-wide
+[abstraction admission contract](../design-docs/abstraction-admission.md).
+Before adding a shared service, layer, runtime wrapper, codec helper or program
+fragment, record its owner, semantic policy, second consumer or real
+substitution point, simpler before/after call graph and focused tests.
+
+A live/test Layer pair is a real substitution point when both implement one
+host-neutral service contract and tests exercise the production policy through
+that contract. Splitting every operation into its own service, mapper or layer
+does not qualify. Keep one-use decoding, encoding, tagged-error mapping and
+runtime execution inline at their owning boundary, and keep a primary
+operation as one readable `pipe` or `Effect.gen` program.
+
 ## Boundary-only decoding
 
 Decode a value only when it crosses an explicit trust or type-erasure boundary.
