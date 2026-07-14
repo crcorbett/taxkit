@@ -26,6 +26,7 @@ const decodingBoundaryFiles = [
 
   // Focused lint integration test: CLI output is decoded at the process boundary.
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
+  "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
 
   // Dynamic dispatch and its transitional repeated scenario decodes.
   "packages/calculators/src/catalog.ts",
@@ -38,6 +39,15 @@ const decodingBoundaryFiles = [
   "packages/sdk/typescript/src/effect.ts",
   "packages/sdk/typescript/src/index.ts",
   "packages/sdk/typescript/src/types.ts",
+];
+
+const routeTransportBoundaryModules = ["#/lib/docs/route-boundary"];
+
+const routeTransportConsumerFiles = [
+  "apps/docs/src/routes/$.tsx",
+  "apps/docs/src/routes/index.tsx",
+  "tools/oxlint/fixtures/route-transport-allowed.tsx",
+  "tools/oxlint/fixtures/.generated-route-transport-consumer.tsx",
 ];
 
 export default defineConfig({
@@ -137,6 +147,13 @@ export default defineConfig({
     "whattax/no-decoding-outside-boundaries": "error",
     "whattax/no-layer-exports-in-service-files": "error",
     "whattax/no-manual-tag": "error",
+    "whattax/no-route-transport-restore-outside-consumers": [
+      "error",
+      {
+        routeTransportBoundaryModules,
+        routeTransportConsumerFiles,
+      },
+    ],
     "whattax/no-runtime-execution-outside-boundaries": "error",
   },
 });

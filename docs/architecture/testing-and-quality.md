@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-07-14
 source_of_truth: docs
 confidence: medium
 ---
@@ -89,9 +89,8 @@ API app:
   services use pipe-first composition, Effect `Array`, `Chunk`, `HashMap`,
   `HashSet`, `Effect`, `Layer`, `Clock`, `Random` and schema codecs instead of
   vanilla JavaScript/TypeScript escape hatches.
-- The boundary-only decoding rollout will add
-  `whattax/no-decoding-outside-boundaries` as a repository-wide custom rule.
-  The rule must report executable Effect Schema decoders, direct decoder
+- `whattax/no-decoding-outside-boundaries` is enabled repository-wide. The
+  rule reports executable Effect Schema decoders, direct decoder
   helpers, decoder members, statically named computed members, decoder factory
   creation and statically traceable aliases. It must not report encoding,
   schema declarations or declarative APIs such as `Schema.decodeTo`.
@@ -107,6 +106,35 @@ API app:
   negative cases for encoding and `Schema.decodeTo`, and real Oxlint CLI
   fixtures for both a prohibited file and an exact allowlisted file. Run those
   fixture commands with `--disable-nested-config`.
+- `whattax/no-route-transport-restore-outside-consumers` governs the separate
+  post-hydration restore operation. It tracks scope-resolved direct, unaliased
+  named imports from canonical route-boundary modules and permits a restore
+  only in an inline or statically resolved same-file `createFileRoute`
+  `component` or `head` consumer. Namespace, default, aliased, dynamic and
+  CommonJS boundary imports fail closed.
+- A route component may restore a direct `Route.useLoaderData()` result or one
+  immutable local binding initialised from that call. A route-owned `head` may
+  restore its `loaderData` input directly, or an immutable value normalised
+  with Effect `Option` when the input is optional. The consumer must restore
+  once, match the `Result` itself and pass focused canonical values into React
+  composition. Encoded loader data and the whole restored `Result` must not be
+  forwarded to children.
+- The restore rule rejects unresolved route or consumer bindings, ordinary
+  components, leaves, hooks, helpers, callbacks and providers. It also rejects
+  `getRouteApi`, prop, context and closure sources, mutable or aliased loader
+  bindings, member extraction, destructuring, computed or optional access,
+  whole-boundary assignment, storage or argument forwarding, callback passing
+  and `call`/`apply`/`bind` indirection. Lexically shadowed and unrelated
+  methods named `restore` remain outside the rule.
+- `oxlint.config.ts` owns the exact route-boundary module and consumer-file
+  lists. These lists must not use route globs, filename inference, nested
+  configuration or `ignorePatterns` exemptions. Route TSX files remain under
+  `whattax/no-decoding-outside-boundaries`; the specialised restore rule does
+  not make them decoder boundaries.
+- The root boundary-directive pass rejects `eslint-disable` and
+  `oxlint-disable` comment tokens naming either boundary rule. Real Oxlint CLI
+  fixtures must run with `--disable-nested-config` and cover every allowed and
+  rejected consumer, import, member, data-source and forwarding category.
 - The lint rule cannot determine whether a helper owns meaningful repeated
   policy. Use the boundary contract, compile-time tests, three documented
   audit passes and parent review to reject one-use decoder/error wrappers.

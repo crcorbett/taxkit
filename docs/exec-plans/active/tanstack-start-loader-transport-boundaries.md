@@ -25,7 +25,7 @@ correction turns for one task, stop and replan or request a user decision.
 | Task | Status | Evidence |
 | --- | --- | --- |
 | TSLB-001 | accepted | Encoded loader transport, canonical app errors, route-root restoration, focused tests and architecture corrections pass all task gates and parent review. |
-| TSLB-002 | pending | Exact Oxlint restoration-placement rule and CLI fixtures. |
+| TSLB-002 | accepted | Exact Oxlint restoration-placement rule, direct consumer provenance checks and real CLI fixtures pass the task gates and parent review. |
 | TSLB-003 | pending | Browser proof, final inventory, documentation and rollout close-out. |
 
 ## Current call graph
@@ -188,3 +188,116 @@ checks, helper/unsafe-pattern audits, JSON validation and `git diff --check`.
 The implementation matches the spec's target SSR and client-navigation graphs,
 keeps one-off output-specific Cause policy inline, and leaves no TSLB-001 work
 for a later task.
+
+### TSLB-002 implementation evidence
+
+Status:
+: Implemented and awaiting parent review. The task-list status remains
+`pending`, and no parent acceptance is recorded. TSLB-003 has not started.
+
+Implemented enforcement flow:
+
+```ts
+exact canonical boundary-module import
+  -> direct unaliased named boundary binding
+    -> exact configured route-consumer file
+      -> direct TanStack createFileRoute component or head binding
+        -> direct Route.useLoaderData or owned head loaderData provenance
+          -> one direct restore call
+            -> same-consumer Result.match
+              -> focused canonical values reach JSX composition
+```
+
+The lint flow matches the spec's production call graph. It governs only the
+post-hydration restore call; the existing decoder rule remains global and the
+actual Schema decoder remains in the exact route-boundary module.
+
+Diagnostic coverage:
+
+- Allowed real CLI fixtures cover direct component input, one immutable loader
+  binding, a statically resolved same-file named component, direct route
+  `head` input and an Option-normalised route `head` input.
+- Rejected ownership and source fixtures cover unrelated files, ordinary
+  components, leaves, hooks, helpers, callbacks, providers, unresolved route
+  and component bindings, reassignment, `getRouteApi`, props, context and
+  closure capture. Scope-resolved cases cover closure-sourced loader data,
+  shadowed route bindings and canonical-name shadowing without false reports.
+- Rejected import and member fixtures cover namespace, default, aliased,
+  dynamic and CommonJS imports, boundary aliases, destructuring, member
+  extraction, computed or optional access, callback passing and
+  `call`/`apply`/`bind`. Whole-boundary assignment, object and array storage,
+  function arguments and callback capture are rejected before alias dataflow
+  can obscure the canonical import binding.
+- Rejected composition fixtures cover multiple restores, unmatched results,
+  encoded loader forwarding and restored `Result` forwarding. Unrelated
+  methods named `restore` remain valid.
+- The route fixture proves direct Schema decoding is still rejected. Comment-
+  token fixtures cover file, next-line and line forms for both `eslint` and
+  `oxlint` directives naming either boundary rule.
+
+Quality audit passes:
+
+1. AST coverage and diagnostics: replaced identifier-name matching with
+   Oxlint scope-variable identity for imports, routes, loader data, Option and
+   Result. Added direct head, closure-source, shadowing, optional-member,
+   alias-forwarding, unresolved-route and all directive-spelling cases. The
+   correction audit now rejects every whole-boundary runtime reference except
+   the object of canonical `.restore`, while retaining shadowed-local and
+   unrelated-restore negative proof without duplicate member diagnostics.
+2. Configuration narrowness: audited one exact boundary module and exact
+   production/fixture consumer files, with no globs, filename inference,
+   route decoder exemption, nested config or boundary `ignorePatterns`
+   exemption. The root directive pass names both boundary rules.
+3. Maintainability: split the rule into policy-owned import, consumer,
+   provenance, result and forwarding phases so repository complexity lint
+   passes. Confirmed one visitor, no duplicated matcher visitor, source-text
+   parsing, unsafe cast or speculative generic AST utility, and deterministic
+   diagnostic counts across the real CLI suite.
+
+Correction turns:
+
+- Parent correction turn 1: a canonical boundary assigned into an existing
+  alias could evade restore-member tracking. Replaced declarator-only alias
+  checks with scope-resolved runtime-reference validation. Added configured
+  assignment-alias and whole-boundary argument/storage CLI regressions, and
+  removed the outer canonical reference from the shadowed-local negative.
+  Preserved type-only `TSTypeQuery` use and pinned it in the allowed fixture.
+
+Verification evidence:
+
+| Gate | Outcome |
+| --- | --- |
+| `bun run test:oxlint` | Passed 26 real CLI tests and 41 assertions across both boundary rules. |
+| `bun run lint` | Passed the comment-token boundary-directive pass and repository-wide Oxlint run with nested config disabled. |
+| `bun run test` | Passed 6 docs-boundary tests, 26 Oxlint tests and all 17 Turbo package test tasks. |
+| `bun run verification` | Passed lint, format, Knip and all 22 workspace type/build checks. |
+| Positive production/fixture CLI run | Passed both production docs routes and the exact allowed route fixture with `--disable-nested-config`. |
+| Negative CLI categories | Passed ownership, import, member, provenance, multiplicity, matching, forwarding, decoder and directive-token diagnostics through the focused suite. |
+| Config audit | Passed exact module/file entries, no route globs, no route decoder exemption, no boundary ignore and one root config only. |
+| Helper audit | Passed one-visitor review with no source-text parsing, unsafe casts, duplicated visitor policy or generic AST utility. |
+| Documentation review | Passed reader fit, Australian spelling, sentence-case headings, banned-language review, canonical names and source-of-truth ownership; `bun run docs:validate` reported 0 issues. |
+| `bun run changeset status --verbose` | Passed. Existing pending minor Changesets remain unchanged and no package receives a patch from this slice. |
+| Task-status audit | `TSLB-002` remains `pending` in the task list while this plan records implementation awaiting parent review. |
+| `git diff --check` | Passed. |
+
+Changeset decision:
+: No Changeset was added. TSLB-002 changes repository lint tooling, exact CLI
+fixtures, root script wiring and maintainer documentation. It does not change
+package exports, installation behaviour or a package-facing contract. Existing
+pending Changesets were not consumed or modified.
+
+Residual risk:
+: The rule intentionally rejects unsupported static shapes instead of
+performing arbitrary interprocedural or type-aware analysis. Runtime browser
+SSR/hydration and client-navigation proof remains TSLB-003 scope and has not
+started. The spec call graph remains accurate.
+
+Parent acceptance:
+: Accepted after correction turn 1. The parent reproduced the boundary-object
+assignment bypass with an exact configured CLI fixture, verified the correction
+and new assignment/storage/argument regressions, and reran all 26 Oxlint tests,
+repository lint, full tests, full verification, docs validation, exact-config
+and source-text/helper audits, Changeset status, JSON validation and
+`git diff --check`. The rule now fails closed for every specified import,
+ownership, member, provenance, matching and forwarding category without
+reporting shadowed locals or unrelated `restore` methods.

@@ -170,7 +170,7 @@
     },
     {
       "id": "TSLB-002",
-      "status": "pending",
+      "status": "completed",
       "title": "Enforce direct route-root transport restoration",
       "type": "static-analysis",
       "dependsOn": [

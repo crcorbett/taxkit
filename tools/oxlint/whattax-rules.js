@@ -1,3 +1,5 @@
+import { resolve } from "node:path";
+
 const noManualTag = {
   create(context) {
     return {
@@ -863,6 +865,1088 @@ const noDecodingOutsideBoundaries = {
   },
 };
 
+const routeConsumerFunctionTypes = new Set([
+  "ArrowFunctionExpression",
+  "FunctionDeclaration",
+  "FunctionExpression",
+]);
+
+const routeTransportDeclaredVariable = (sourceCode, node, name) =>
+  sourceCode
+    .getDeclaredVariables(node)
+    .find((variable) => variable.name === name) ?? null;
+
+const isRouteTransportReference = (variable, identifier) =>
+  variable !== null &&
+  identifier?.type === "Identifier" &&
+  variable.references.some((reference) => reference.identifier === identifier);
+
+const isReassignedRouteTransportVariable = (variable) =>
+  variable.references.some((reference) => reference.isWrite?.());
+
+const referencesRouteTransportVariable = (variables, identifier) =>
+  variables.some((variable) => isRouteTransportReference(variable, identifier));
+
+const routeConsumerFunction = (node) => {
+  let current = node?.parent;
+
+  while (current !== undefined && current !== null) {
+    if (routeConsumerFunctionTypes.has(current.type)) {
+      return current;
+    }
+
+    current = current.parent;
+  }
+
+  return null;
+};
+
+const isTopLevelRouteConsumerDeclaration = (node) => {
+  const declaration =
+    node.parent?.type === "VariableDeclaration" ? node.parent : node;
+  const owner = declaration.parent;
+
+  return (
+    owner?.type === "Program" ||
+    (owner?.type === "ExportNamedDeclaration" &&
+      owner.parent?.type === "Program")
+  );
+};
+
+const routeDefinitionOptions = (node, canonicalImports) => {
+  const createFileRouteVariable = canonicalImports.get("createFileRoute");
+
+  if (
+    createFileRouteVariable === undefined ||
+    node.init?.type !== "CallExpression" ||
+    node.init.callee?.type !== "CallExpression" ||
+    node.init.callee.callee?.type !== "Identifier" ||
+    !isRouteTransportReference(createFileRouteVariable, node.init.callee.callee)
+  ) {
+    return null;
+  }
+
+  const [options] = node.init.arguments;
+  return options?.type === "ObjectExpression" ? options : null;
+};
+
+const routeConsumerCanonicalImports = (importDeclarations, sourceCode) => {
+  const canonicalImports = new Map();
+
+  for (const declaration of importDeclarations) {
+    const source = importName(declaration.source);
+
+    for (const specifier of declaration.specifiers ?? []) {
+      if (
+        declaration.importKind === "type" ||
+        specifier.type !== "ImportSpecifier" ||
+        specifier.importKind === "type"
+      ) {
+        continue;
+      }
+
+      const importedName = importName(specifier.imported);
+      const localName = localBindingName(specifier.local);
+
+      if (
+        importedName === localName &&
+        ((source === "@tanstack/react-router" &&
+          importedName === "createFileRoute") ||
+          (source === "effect" &&
+            (importedName === "Option" || importedName === "Result")))
+      ) {
+        const variable = routeTransportDeclaredVariable(
+          sourceCode,
+          specifier,
+          localName
+        );
+
+        if (variable !== null) {
+          canonicalImports.set(importedName, variable);
+        }
+      }
+    }
+  }
+
+  return canonicalImports;
+};
+
+const isRouteUseLoaderDataCall = (node, routeVariable) =>
+  node?.type === "CallExpression" &&
+  node.arguments.length === 0 &&
+  node.callee?.type === "MemberExpression" &&
+  !node.callee.computed &&
+  node.callee.object?.type === "Identifier" &&
+  isRouteTransportReference(routeVariable, node.callee.object) &&
+  propertyName(node.callee.property) === "useLoaderData";
+
+const headLoaderDataBinding = (functionNode, sourceCode) => {
+  const [parameter] = functionNode.params ?? [];
+
+  if (parameter?.type !== "ObjectPattern") {
+    return null;
+  }
+
+  for (const property of parameter.properties ?? []) {
+    if (
+      property.type === "Property" &&
+      propertyName(property.key) === "loaderData" &&
+      property.value?.type === "Identifier" &&
+      property.value.name === "loaderData"
+    ) {
+      const variable = routeTransportDeclaredVariable(
+        sourceCode,
+        functionNode,
+        property.value.name
+      );
+
+      return variable === null
+        ? null
+        : { identifier: property.value, variable };
+    }
+  }
+
+  return null;
+};
+
+const isOptionFromUndefinedOrCall = (
+  node,
+  loaderDataVariable,
+  optionVariable
+) =>
+  node?.type === "CallExpression" &&
+  node.callee?.type === "MemberExpression" &&
+  !node.callee.computed &&
+  node.callee.object?.type === "Identifier" &&
+  isRouteTransportReference(optionVariable, node.callee.object) &&
+  propertyName(node.callee.property) === "fromUndefinedOr" &&
+  node.arguments.length === 1 &&
+  node.arguments[0]?.type === "Identifier" &&
+  isRouteTransportReference(loaderDataVariable, node.arguments[0]);
+
+const isOptionGetOrElseCall = (node, optionVariable) =>
+  node?.type === "CallExpression" &&
+  node.callee?.type === "MemberExpression" &&
+  !node.callee.computed &&
+  node.callee.object?.type === "Identifier" &&
+  isRouteTransportReference(optionVariable, node.callee.object) &&
+  propertyName(node.callee.property) === "getOrElse" &&
+  node.arguments.length === 1;
+
+const isNormalisedHeadLoaderData = (
+  node,
+  loaderDataVariable,
+  canonicalImports
+) => {
+  const optionVariable = canonicalImports.get("Option");
+
+  return (
+    optionVariable !== undefined &&
+    node?.type === "CallExpression" &&
+    node.callee?.type === "MemberExpression" &&
+    !node.callee.computed &&
+    propertyName(node.callee.property) === "pipe" &&
+    isOptionFromUndefinedOrCall(
+      node.callee.object,
+      loaderDataVariable,
+      optionVariable
+    ) &&
+    node.arguments.length === 1 &&
+    isOptionGetOrElseCall(node.arguments[0], optionVariable)
+  );
+};
+
+const routeConsumerLocalDeclarator = (
+  identifier,
+  functionNode,
+  sourceCode,
+  variableDeclarators
+) => {
+  const matches = variableDeclarators.filter(
+    (declarator) =>
+      declarator.id?.type === "Identifier" &&
+      routeConsumerFunction(declarator) === functionNode &&
+      isRouteTransportReference(
+        routeTransportDeclaredVariable(
+          sourceCode,
+          declarator,
+          declarator.id.name
+        ),
+        identifier
+      )
+  );
+
+  return matches.length === 1 ? matches[0] : null;
+};
+
+const isResultMatchCallee = (node, resultVariable) =>
+  node?.type === "MemberExpression" &&
+  !node.computed &&
+  node.object?.type === "Identifier" &&
+  isRouteTransportReference(resultVariable, node.object) &&
+  propertyName(node.property) === "match";
+
+const isResultMatchFor = (node, resultValue, resultBinding, resultVariable) =>
+  node?.type === "CallExpression" &&
+  isResultMatchCallee(node.callee, resultVariable) &&
+  (node.arguments[0] === resultValue ||
+    (resultValue?.type === "Identifier" &&
+      node.arguments[0]?.type === "Identifier" &&
+      isRouteTransportReference(resultBinding, node.arguments[0])));
+
+const isInsideJsxExpression = (node, functionNode) => {
+  let current = node.parent;
+
+  while (
+    current !== undefined &&
+    current !== null &&
+    current !== functionNode
+  ) {
+    if (current.type === "JSXExpressionContainer") {
+      return true;
+    }
+
+    current = current.parent;
+  }
+
+  return false;
+};
+
+const directRouteBoundaryBinding = (specifier, sourceCode) => {
+  if (specifier.type !== "ImportSpecifier") {
+    return null;
+  }
+
+  const localName = localBindingName(specifier.local);
+  return importName(specifier.imported) === localName
+    ? routeTransportDeclaredVariable(sourceCode, specifier, localName)
+    : null;
+};
+
+const routeTransportBoundaryBindings = ({
+  boundaryModules,
+  callExpressions,
+  importDeclarations,
+  importExpressions,
+  report,
+  sourceCode,
+}) => {
+  const boundaryBindings = new Set();
+
+  for (const declaration of importDeclarations) {
+    if (!boundaryModules.has(importName(declaration.source))) {
+      continue;
+    }
+
+    for (const specifier of declaration.specifiers ?? []) {
+      if (
+        declaration.importKind === "type" ||
+        specifier.importKind === "type"
+      ) {
+        continue;
+      }
+
+      const boundaryBinding = directRouteBoundaryBinding(specifier, sourceCode);
+
+      if (boundaryBinding === null) {
+        report("unsupportedBoundaryImport", specifier);
+      } else {
+        boundaryBindings.add(boundaryBinding);
+      }
+    }
+  }
+
+  for (const expression of importExpressions) {
+    if (boundaryModules.has(importName(expression.source))) {
+      report("unsupportedBoundaryImport", expression);
+    }
+  }
+
+  for (const call of callExpressions) {
+    const importsBoundary =
+      call.callee?.type === "Import" &&
+      boundaryModules.has(importName(call.arguments[0]));
+    const requiresBoundary =
+      call.callee?.type === "Identifier" &&
+      call.callee.name === "require" &&
+      boundaryModules.has(importName(call.arguments[0]));
+
+    if (importsBoundary || requiresBoundary) {
+      report("unsupportedBoundaryImport", call);
+    }
+  }
+
+  return boundaryBindings;
+};
+
+const isCanonicalRestoreMemberObject = (identifier) =>
+  identifier.parent?.type === "MemberExpression" &&
+  identifier.parent.object === identifier &&
+  propertyName(identifier.parent.property) === "restore";
+
+const isRouteBoundaryTypeQuery = (identifier) => {
+  let current = identifier.parent;
+
+  while (current !== undefined && current !== null) {
+    if (current.type === "TSTypeQuery") {
+      return true;
+    }
+
+    if (
+      current.type === "Program" ||
+      current.type.endsWith("Statement") ||
+      routeConsumerFunctionTypes.has(current.type)
+    ) {
+      return false;
+    }
+
+    current = current.parent;
+  }
+
+  return false;
+};
+
+const reportUnsupportedRouteBoundaryReferences = ({
+  boundaryBindings,
+  report,
+}) => {
+  for (const binding of boundaryBindings) {
+    for (const reference of binding.references) {
+      if (
+        !isRouteBoundaryTypeQuery(reference.identifier) &&
+        !isCanonicalRestoreMemberObject(reference.identifier)
+      ) {
+        report("indirectRestoreReference", reference.identifier);
+      }
+    }
+  }
+};
+
+const sameFileRouteConsumerFunctions = ({
+  functionDeclarations,
+  sourceCode,
+  variableDeclarators,
+}) => {
+  const namedFunctions = [];
+
+  for (const declaration of functionDeclarations) {
+    if (
+      declaration.id?.type === "Identifier" &&
+      isTopLevelRouteConsumerDeclaration(declaration)
+    ) {
+      const variable = routeTransportDeclaredVariable(
+        sourceCode,
+        declaration,
+        declaration.id.name
+      );
+
+      if (variable !== null) {
+        namedFunctions.push({ functionNode: declaration, variable });
+      }
+    }
+  }
+
+  for (const declarator of variableDeclarators) {
+    if (
+      declarator.id?.type === "Identifier" &&
+      routeConsumerFunctionTypes.has(declarator.init?.type) &&
+      isTopLevelRouteConsumerDeclaration(declarator)
+    ) {
+      const variable = routeTransportDeclaredVariable(
+        sourceCode,
+        declarator,
+        declarator.id.name
+      );
+
+      if (variable !== null) {
+        namedFunctions.push({ functionNode: declarator.init, variable });
+      }
+    }
+  }
+
+  return namedFunctions;
+};
+
+const routeConsumerPropertyFunction = (property, namedFunctions) => {
+  if (routeConsumerFunctionTypes.has(property.value?.type)) {
+    return property.value;
+  }
+
+  if (property.value?.type === "Identifier") {
+    return (
+      namedFunctions.find(({ variable }) =>
+        isRouteTransportReference(variable, property.value)
+      )?.functionNode ?? null
+    );
+  }
+
+  return null;
+};
+
+const configuredRouteConsumers = ({
+  canonicalImports,
+  isConfiguredConsumerFile,
+  namedFunctions,
+  report,
+  sourceCode,
+  variableDeclarators,
+}) => {
+  const routeConsumers = [];
+  let routeDefinitionCount = 0;
+
+  if (!isConfiguredConsumerFile) {
+    return { routeConsumers, routeDefinitionCount };
+  }
+
+  for (const declarator of variableDeclarators) {
+    const optionsNode = routeDefinitionOptions(declarator, canonicalImports);
+
+    if (optionsNode === null) {
+      continue;
+    }
+
+    routeDefinitionCount += 1;
+
+    if (declarator.id?.type !== "Identifier") {
+      report("unresolvedRouteConsumer", declarator.id);
+      continue;
+    }
+
+    const routeVariable = routeTransportDeclaredVariable(
+      sourceCode,
+      declarator,
+      declarator.id.name
+    );
+
+    if (routeVariable === null) {
+      report("unresolvedRouteConsumer", declarator.id);
+      continue;
+    }
+
+    for (const property of optionsNode.properties ?? []) {
+      if (property.type !== "Property") {
+        continue;
+      }
+
+      const kind = propertyName(property.key);
+      if (kind !== "component" && kind !== "head") {
+        continue;
+      }
+
+      const functionNode = routeConsumerPropertyFunction(
+        property,
+        namedFunctions
+      );
+
+      if (functionNode === null) {
+        report("unresolvedRouteConsumer", property.value);
+        continue;
+      }
+
+      routeConsumers.push({
+        functionNode,
+        kind,
+        routeVariable,
+      });
+    }
+  }
+
+  return { routeConsumers, routeDefinitionCount };
+};
+
+const canonicalRouteRestoreCalls = ({
+  boundaryBindings,
+  memberExpressions,
+  report,
+}) => {
+  const directRestoreCalls = [];
+
+  for (const member of memberExpressions) {
+    if (
+      member.object?.type !== "Identifier" ||
+      !referencesRouteTransportVariable([...boundaryBindings], member.object) ||
+      propertyName(member.property) !== "restore"
+    ) {
+      continue;
+    }
+
+    if (
+      member.computed ||
+      member.optional ||
+      member.parent?.type !== "CallExpression" ||
+      member.parent.optional ||
+      member.parent.callee !== member
+    ) {
+      report("indirectRestoreReference", member);
+      continue;
+    }
+
+    directRestoreCalls.push(member.parent);
+  }
+
+  return directRestoreCalls;
+};
+
+const componentRestoreInput = ({
+  consumer,
+  restoreCall,
+  sourceCode,
+  variableDeclarators,
+}) => {
+  const [restoreInput] = restoreCall.arguments;
+
+  if (
+    restoreCall.arguments.length === 1 &&
+    isRouteUseLoaderDataCall(restoreInput, consumer.routeVariable)
+  ) {
+    return { loaderVariable: null, valid: true };
+  }
+
+  if (
+    restoreCall.arguments.length !== 1 ||
+    restoreInput?.type !== "Identifier"
+  ) {
+    return { loaderVariable: null, valid: false };
+  }
+
+  const loaderDeclarator = routeConsumerLocalDeclarator(
+    restoreInput,
+    consumer.functionNode,
+    sourceCode,
+    variableDeclarators
+  );
+  const valid =
+    loaderDeclarator?.parent?.kind === "const" &&
+    isRouteUseLoaderDataCall(loaderDeclarator.init, consumer.routeVariable);
+
+  const loaderVariable = valid
+    ? routeTransportDeclaredVariable(
+        sourceCode,
+        loaderDeclarator,
+        loaderDeclarator.id.name
+      )
+    : null;
+
+  return {
+    loaderVariable,
+    valid,
+  };
+};
+
+const headRestoreInput = ({
+  canonicalImports,
+  consumer,
+  restoreCall,
+  sourceCode,
+  variableDeclarators,
+}) => {
+  const [restoreInput] = restoreCall.arguments;
+  const headLoaderData = headLoaderDataBinding(
+    consumer.functionNode,
+    sourceCode
+  );
+
+  if (
+    restoreCall.arguments.length !== 1 ||
+    restoreInput?.type !== "Identifier" ||
+    headLoaderData === null
+  ) {
+    return {
+      headLoaderDataVariable: headLoaderData?.variable ?? null,
+      loaderVariable: null,
+      valid: false,
+    };
+  }
+
+  if (
+    isRouteTransportReference(headLoaderData.variable, restoreInput) &&
+    !isReassignedRouteTransportVariable(headLoaderData.variable)
+  ) {
+    return {
+      headLoaderDataVariable: headLoaderData.variable,
+      loaderVariable: headLoaderData.variable,
+      valid: true,
+    };
+  }
+
+  const loaderDeclarator = routeConsumerLocalDeclarator(
+    restoreInput,
+    consumer.functionNode,
+    sourceCode,
+    variableDeclarators
+  );
+  const valid =
+    loaderDeclarator?.parent?.kind === "const" &&
+    !isReassignedRouteTransportVariable(headLoaderData.variable) &&
+    isNormalisedHeadLoaderData(
+      loaderDeclarator.init,
+      headLoaderData.variable,
+      canonicalImports
+    );
+
+  const loaderVariable = valid
+    ? routeTransportDeclaredVariable(
+        sourceCode,
+        loaderDeclarator,
+        loaderDeclarator.id.name
+      )
+    : null;
+
+  return {
+    headLoaderDataVariable: headLoaderData.variable,
+    loaderVariable,
+    valid,
+  };
+};
+
+const restoreResultDeclarator = ({
+  consumer,
+  restoreCall,
+  variableDeclarators,
+}) =>
+  variableDeclarators.find(
+    (declarator) =>
+      declarator.init === restoreCall &&
+      declarator.id?.type === "Identifier" &&
+      routeConsumerFunction(declarator) === consumer.functionNode
+  );
+
+const isRestoreResultMatched = ({
+  callExpressions,
+  canonicalImports,
+  consumer,
+  restoreCall,
+  resultVariable,
+  resultDeclarator,
+}) => {
+  const resultImportVariable = canonicalImports.get("Result");
+
+  if (resultImportVariable === undefined) {
+    return false;
+  }
+
+  const resultValue = resultDeclarator?.id ?? restoreCall;
+
+  return callExpressions.some(
+    (call) =>
+      routeConsumerFunction(call) === consumer.functionNode &&
+      isResultMatchFor(call, resultValue, resultVariable, resultImportVariable)
+  );
+};
+
+const isRouteValueAliasOrAssignment = (identifier) =>
+  (identifier.parent?.type === "VariableDeclarator" &&
+    identifier.parent.init === identifier) ||
+  (identifier.parent?.type === "AssignmentExpression" &&
+    identifier.parent.right === identifier);
+
+const isRouteResultCallArgument = (identifier, functionNode) => {
+  let current = identifier;
+
+  while (current.parent !== undefined && current.parent !== functionNode) {
+    const { parent } = current;
+
+    if (
+      parent.type === "CallExpression" &&
+      parent.arguments.includes(current)
+    ) {
+      return { argument: current, call: parent };
+    }
+
+    current = parent;
+  }
+
+  return null;
+};
+
+const routeValueForwardingMessage = ({
+  canonicalImports,
+  consumer,
+  forwardingBindings,
+  identifier,
+  restoreCall,
+  resultDeclarator,
+  resultVariable,
+}) => {
+  const forwardingBinding = forwardingBindings.find(({ variable }) =>
+    isRouteTransportReference(variable, identifier)
+  );
+
+  if (forwardingBinding === undefined) {
+    return null;
+  }
+
+  const resultCallArgument =
+    forwardingBinding.messageId === "forwardedRouteResult"
+      ? isRouteResultCallArgument(identifier, consumer.functionNode)
+      : null;
+  const resultImportVariable = canonicalImports.get("Result");
+  const isAllowedResultMatch =
+    resultCallArgument !== null &&
+    resultCallArgument.argument === identifier &&
+    resultImportVariable !== undefined &&
+    isResultMatchFor(
+      resultCallArgument.call,
+      resultDeclarator?.id ?? restoreCall,
+      resultVariable,
+      resultImportVariable
+    );
+
+  if (isAllowedResultMatch) {
+    return null;
+  }
+
+  return isInsideJsxExpression(identifier, consumer.functionNode) ||
+    isRouteValueAliasOrAssignment(identifier) ||
+    resultCallArgument !== null
+    ? forwardingBinding.messageId
+    : null;
+};
+
+const reportRouteValueForwarding = ({
+  callExpressions,
+  canonicalImports,
+  consumer,
+  headLoaderDataVariable,
+  identifiers,
+  loaderVariable,
+  report,
+  reportedForwardingNodes,
+  restoreCall,
+  resultDeclarator,
+  resultVariable,
+}) => {
+  const forwardingBindings = [];
+
+  if (loaderVariable !== null) {
+    forwardingBindings.push({
+      messageId: "forwardedLoaderTransport",
+      variable: loaderVariable,
+    });
+  }
+
+  if (
+    headLoaderDataVariable !== null &&
+    headLoaderDataVariable !== loaderVariable
+  ) {
+    forwardingBindings.push({
+      messageId: "forwardedLoaderTransport",
+      variable: headLoaderDataVariable,
+    });
+  }
+
+  if (resultVariable !== null) {
+    forwardingBindings.push({
+      messageId: "forwardedRouteResult",
+      variable: resultVariable,
+    });
+  }
+
+  for (const identifier of identifiers) {
+    const messageId = routeValueForwardingMessage({
+      canonicalImports,
+      consumer,
+      forwardingBindings,
+      identifier,
+      restoreCall,
+      resultDeclarator,
+      resultVariable,
+    });
+
+    if (messageId !== null && !reportedForwardingNodes.has(identifier)) {
+      reportedForwardingNodes.add(identifier);
+      report(messageId, identifier);
+    }
+  }
+
+  for (const call of callExpressions) {
+    if (
+      isRouteUseLoaderDataCall(call, consumer.routeVariable) &&
+      restoreCall.arguments[0] !== call &&
+      isInsideJsxExpression(call, consumer.functionNode) &&
+      !reportedForwardingNodes.has(call)
+    ) {
+      reportedForwardingNodes.add(call);
+      report("forwardedLoaderTransport", call);
+    }
+  }
+};
+
+const validateDirectRouteRestores = ({
+  callExpressions,
+  canonicalImports,
+  directRestoreCalls,
+  identifiers,
+  isConfiguredConsumerFile,
+  report,
+  routeConsumers,
+  routeDefinitionCount,
+  sourceCode,
+  variableDeclarators,
+}) => {
+  const callsByConsumer = new Map();
+  const reportedForwardingNodes = new Set();
+
+  for (const restoreCall of directRestoreCalls) {
+    const functionNode = routeConsumerFunction(restoreCall);
+    const matchingConsumers = routeConsumers.filter(
+      (consumer) => consumer.functionNode === functionNode
+    );
+
+    if (!isConfiguredConsumerFile) {
+      report("restoreOutsideConsumer", restoreCall);
+      continue;
+    }
+
+    if (routeDefinitionCount === 0) {
+      report("unresolvedRouteConsumer", restoreCall);
+      continue;
+    }
+
+    if (matchingConsumers.length === 0) {
+      report("restoreOutsideConsumer", restoreCall);
+      continue;
+    }
+
+    if (matchingConsumers.length !== 1) {
+      report("unresolvedRouteConsumer", restoreCall);
+      continue;
+    }
+
+    const [consumer] = matchingConsumers;
+    const existingCalls = callsByConsumer.get(consumer) ?? [];
+    existingCalls.push(restoreCall);
+    callsByConsumer.set(consumer, existingCalls);
+
+    const restoreInput =
+      consumer.kind === "component"
+        ? componentRestoreInput({
+            consumer,
+            restoreCall,
+            sourceCode,
+            variableDeclarators,
+          })
+        : headRestoreInput({
+            canonicalImports,
+            consumer,
+            restoreCall,
+            sourceCode,
+            variableDeclarators,
+          });
+
+    if (!restoreInput.valid) {
+      report(
+        consumer.kind === "component"
+          ? "invalidComponentLoaderInput"
+          : "invalidHeadLoaderInput",
+        restoreCall
+      );
+    }
+
+    const resultDeclarator = restoreResultDeclarator({
+      consumer,
+      restoreCall,
+      variableDeclarators,
+    });
+    const resultVariable =
+      resultDeclarator?.id?.type === "Identifier"
+        ? routeTransportDeclaredVariable(
+            sourceCode,
+            resultDeclarator,
+            resultDeclarator.id.name
+          )
+        : null;
+
+    if (
+      !isRestoreResultMatched({
+        callExpressions,
+        canonicalImports,
+        consumer,
+        restoreCall,
+        resultDeclarator,
+        resultVariable,
+      })
+    ) {
+      report("restoreResultNotMatched", restoreCall);
+    }
+
+    reportRouteValueForwarding({
+      callExpressions,
+      canonicalImports,
+      consumer,
+      headLoaderDataVariable: restoreInput.headLoaderDataVariable ?? null,
+      identifiers,
+      loaderVariable: restoreInput.loaderVariable,
+      report,
+      reportedForwardingNodes,
+      restoreCall,
+      resultDeclarator,
+      resultVariable,
+    });
+  }
+
+  for (const restoreCalls of callsByConsumer.values()) {
+    for (const duplicateRestore of restoreCalls.slice(1)) {
+      report("multipleRestores", duplicateRestore);
+    }
+  }
+};
+
+const noRouteTransportRestoreOutsideConsumers = {
+  create(context) {
+    const [options] = context.options;
+    const { sourceCode } = context;
+    const boundaryModules = new Set(options.routeTransportBoundaryModules);
+    const consumerFiles = new Set(
+      options.routeTransportConsumerFiles.map((fileName) => resolve(fileName))
+    );
+    const isConfiguredConsumerFile = consumerFiles.has(
+      resolve(sourceFileName(context))
+    );
+    const importDeclarations = [];
+    const importExpressions = [];
+    const callExpressions = [];
+    const functionDeclarations = [];
+    const identifiers = [];
+    const memberExpressions = [];
+    const variableDeclarators = [];
+
+    const report = (messageId, node) =>
+      context.report({
+        messageId,
+        node,
+      });
+
+    return {
+      CallExpression(node) {
+        callExpressions.push(node);
+      },
+      FunctionDeclaration(node) {
+        functionDeclarations.push(node);
+      },
+      Identifier(node) {
+        identifiers.push(node);
+      },
+      ImportDeclaration(node) {
+        importDeclarations.push(node);
+      },
+      ImportExpression(node) {
+        importExpressions.push(node);
+      },
+      MemberExpression(node) {
+        memberExpressions.push(node);
+      },
+      "Program:exit"() {
+        const canonicalImports = routeConsumerCanonicalImports(
+          importDeclarations,
+          sourceCode
+        );
+        const boundaryBindings = routeTransportBoundaryBindings({
+          boundaryModules,
+          callExpressions,
+          importDeclarations,
+          importExpressions,
+          report,
+          sourceCode,
+        });
+        reportUnsupportedRouteBoundaryReferences({
+          boundaryBindings,
+          report,
+        });
+
+        const namedFunctions = sameFileRouteConsumerFunctions({
+          functionDeclarations,
+          sourceCode,
+          variableDeclarators,
+        });
+        const { routeConsumers, routeDefinitionCount } =
+          configuredRouteConsumers({
+            canonicalImports,
+            isConfiguredConsumerFile,
+            namedFunctions,
+            report,
+            sourceCode,
+            variableDeclarators,
+          });
+        const directRestoreCalls = canonicalRouteRestoreCalls({
+          boundaryBindings,
+          memberExpressions,
+          report,
+        });
+
+        validateDirectRouteRestores({
+          callExpressions,
+          canonicalImports,
+          directRestoreCalls,
+          identifiers,
+          isConfiguredConsumerFile,
+          report,
+          routeConsumers,
+          routeDefinitionCount,
+          sourceCode,
+          variableDeclarators,
+        });
+      },
+      VariableDeclarator(node) {
+        variableDeclarators.push(node);
+      },
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Restrict canonical loader transport restoration to direct route consumers.",
+    },
+    messages: {
+      forwardedLoaderTransport:
+        "Do not forward encoded loader transport into JSX composition. Restore it in this direct route consumer, match the Result, and pass only focused canonical values to children.",
+      forwardedRouteResult:
+        "Do not forward the restored route Result into JSX composition. Match it in this direct route consumer and pass only focused canonical values to children.",
+      indirectRestoreReference:
+        "Canonical route transport restore must be a direct non-computed member call. Do not alias, destructure, extract, compute, pass as a callback, or invoke it through call, apply, or bind.",
+      invalidComponentLoaderInput:
+        "A route component restore must consume its Route.useLoaderData() call directly or one const local binding initialised directly from that call. getRouteApi, props, context, aliases, reassignment, closures, and forwarded values are not route transport inputs.",
+      invalidHeadLoaderInput:
+        "A route head restore must consume its loaderData parameter directly or one const local binding normalised from it with Effect Option.fromUndefinedOr and Option.getOrElse.",
+      multipleRestores:
+        "Restore loader transport once per direct route consumer invocation. Remove this additional canonical restore call.",
+      restoreOutsideConsumer:
+        "Canonical route transport restore is allowed only in the exact inline or statically referenced same-file createFileRoute component or head consumer. Ordinary components, leaves, hooks, helpers, callbacks, and providers must receive canonical values.",
+      restoreResultNotMatched:
+        "Match the restored Result in this direct route consumer with Result.match before composing children. Do not return or forward the whole route Result.",
+      unresolvedRouteConsumer:
+        "The createFileRoute route or component/head binding could not be resolved statically. Use an inline consumer or a direct same-file named function binding.",
+      unsupportedBoundaryImport:
+        "Import canonical route boundaries with direct, unaliased named imports. Namespace, default, aliased, dynamic, and CommonJS forms fail closed.",
+    },
+    schema: [
+      {
+        additionalProperties: false,
+        properties: {
+          routeTransportBoundaryModules: {
+            items: { type: "string" },
+            minItems: 1,
+            type: "array",
+            uniqueItems: true,
+          },
+          routeTransportConsumerFiles: {
+            items: { type: "string" },
+            minItems: 1,
+            type: "array",
+            uniqueItems: true,
+          },
+        },
+        required: [
+          "routeTransportBoundaryModules",
+          "routeTransportConsumerFiles",
+        ],
+        type: "object",
+      },
+    ],
+    type: "problem",
+  },
+};
+
 export default {
   meta: {
     name: "whattax",
@@ -882,6 +1966,8 @@ export default {
     "no-native-collections": noNativeCollections,
     "no-nested-wrapper-calls": noNestedWrapperCalls,
     "no-nullish-comparison": noNullishComparison,
+    "no-route-transport-restore-outside-consumers":
+      noRouteTransportRestoreOutsideConsumers,
     "no-runtime-execution-outside-boundaries":
       noRuntimeExecutionOutsideBoundaries,
     "no-throw": noThrow,
