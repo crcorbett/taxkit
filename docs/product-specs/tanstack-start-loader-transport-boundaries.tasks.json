@@ -1,0 +1,394 @@
+{
+  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/tanstack-start-loader-transport-boundaries.md",
+  "title": "TanStack Start loader transport boundary implementation tasks",
+  "status": "draft",
+  "last_reviewed": "2026-07-14",
+  "principles": [
+    "Keep schema-encoded Effect outcomes intact through SSR loader dehydration/hydration and client-navigation server-function RPC serialization.",
+    "Treat route-root restoration as a narrow transport boundary, not permission for defensive decoding in React.",
+    "Encode success or exactly one expected failure with Schema.Exit and Schema.Never; preserve defects and interruptions as failed causes and reject invalid failure cardinality.",
+    "Use canonical schemas, schema-derived types, tagged errors, Result, Exit, Cause, Match and linear Effect pipelines.",
+    "Keep route loaders on encoded representations and leaf components on focused canonical values.",
+    "Forbid route-specific decoder hooks, wrapper components, mirrored transport DTOs and one-use mapper/helper sprawl.",
+    "Enforce decoder implementation placement and route-root restoration placement with distinct tested Oxlint policy.",
+    "Implement one task at a time with three documented improvement audits and parent acceptance before the next task."
+  ],
+  "beforeImplementation": [
+    "Create docs/exec-plans/active/tanstack-start-loader-transport-boundaries.md and add it to the active plan index before runtime or lint edits.",
+    "Revalidate the current WhatTax docs route flow and the reference files under ~/Projects/site/apps/web/src/lib/loader before editing.",
+    "Review the separate SSR and client-navigation call graphs; recheck bun.lock and installed TanStack Start, TanStack Router and Effect source, then record any API differences before editing.",
+    "Use exactly one sequential subagent per task; the parent reviews, audits, verifies and accepts each slice before delegating the next.",
+    "Do not run bun run version-repo, publish packages or consume existing Changesets."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit each coherent implementation slice only after mandatory verification, three documented improvement audits, Changeset review or no-Changeset rationale and parent acceptance.",
+    "requiredBeforeFinalPR": [
+      "bun run lint",
+      "bun run test",
+      "bun run test:oxlint",
+      "bun run test:docs-boundaries",
+      "bun run --filter=docs test:browser",
+      "bun run --filter=docs check-types",
+      "bun run --filter=docs build",
+      "bun run docs:validate",
+      "bun run verification",
+      "jq empty docs/product-specs/tanstack-start-loader-transport-boundaries.tasks.json",
+      "git diff --check",
+      "bun run changeset status --verbose and explicit no-Changeset rationale"
+    ],
+    "evidenceRequired": [
+      "Current and final SSR, client-navigation, failure-policy and test call graphs reconciled separately against code.",
+      "Proof that TanStack loaders return the encoded Schema.Exit representation unchanged.",
+      "Proof that Schema.Never plus encodeExit policy prevents defects, interruptions, empty causes and multiple typed failures from becoming recoverable loader data.",
+      "Proof that each direct route-root consumer restores once and ordinary components, leaves and hooks do not restore or decode.",
+      "Positive and negative real Oxlint CLI evidence for decoder placement, route-root restoration, aliases and inline-disable rejection.",
+      "Unit evidence for success, every current tagged expected failure, malformed transport, defect, interruption, composite causes, empty causes and multiple typed failures.",
+      "Compile-time evidence that a route boundary rejects programs with mismatched success or error channels.",
+      "Vitest Browser Mode evidence for client-side route success, recoverable failure, malformed transport and framework error boundaries without claiming SSR coverage.",
+      "Real docs evidence separating initial SSR/hydration from client navigation and its server-function RPC, on the home route and one content route with a clean browser console.",
+      "Effect audit showing one linear encode pipeline, Effect.failCause for defects/interruption, Effect.orDie only for canonical codec-encoding invariants, inline typed error mapping, canonical schemas and no unsafe casts, DTO mirrors, broad catches or nested runtime execution.",
+      "Helper audit showing the one generic route-boundary constructor owns repeated policy, the current one-use toRouteResult helper is removed and no route-specific decoder hooks or wrappers were added.",
+      "Browser-safe import audit proving the route-boundary module reaches only the app-local error owner, Effect and browser-safe docs-content schema/error exports.",
+      "Changeset status and explicit app-internal/tooling/docs no-Changeset rationale.",
+      "Parent acceptance record for every task, including correction turns when required."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "TSLB-001",
+      "status": "completed",
+      "title": "Move docs loader outcomes to the real TanStack transport boundary",
+      "type": "runtime-boundary",
+      "dependsOn": [],
+      "goal": "Return schema-encoded Effect outcomes from both docs loaders and restore them only at their direct route roots.",
+      "scope": [
+        "Refactor apps/docs/src/lib/docs/route-boundary.ts around Schema.toCodecJson(Schema.Exit(success, error, Schema.Never)).",
+        "Move DocsContentPreloadError and DocsRouteTransportError into one canonical browser-safe apps/docs/src/lib/docs/errors.ts module so MDX and route code no longer depend on each other for error ownership.",
+        "Keep one policy-owning generic constructor for the home and page contracts; do not extract a package or add per-route wrappers.",
+        "Implement encodeExit as one linear Effect pipeline using Effect Array, Match, Exit and Cause: encode success or exactly one expected failure, preserve any defect/interruption with Effect.failCause and convert empty/multiple typed failure causes into explicit invariant defects.",
+        "Expose one synchronous restore operation that maps malformed input and decoded defect/interruption/empty/multiple-failure invariants to DocsRouteTransportError, while flattening exactly one expected Exit failure to a typed Result failure without throwing.",
+        "Remove the current one-use toRouteResult helper and keep Exit flattening inline in restore; retain only schema-generated operation bindings and helpers that own repeated policy.",
+        "Keep Effect.orDie limited to encoding values already constrained by the canonical success/error schemas; expected application errors remain typed and use mapError/catchTag/catchTags only where policy requires refinement.",
+        "Change loadDocsHome and loadDocsPage so their return value to TanStack is the encoded representation from the server function, unchanged.",
+        "Keep createServerFn strict TypeScript input/output serialisability checks enabled; do not use strict: false, output opt-outs or casts, and leave runtime serializer proof to the browser slice.",
+        "Restore one immutable Route.useLoaderData binding exactly once per direct route-component invocation, then match Result in that component before passing focused canonical values to composition or leaves.",
+        "Keep current expected-failure presentation, navigation and MDX behaviour unchanged.",
+        "Keep extracted leaves or containers free of Route.useLoaderData, route-boundary imports, unknown, decoders, Effect services and runtime execution.",
+        "Update focused route-boundary tests for canonical success, every current expected docs failure, malformed transport, standalone and composite defect/interruption causes, empty causes and multiple typed failures.",
+        "Add a compile-time fixture proving a boundary rejects programs whose success or error channel does not match its canonical schemas.",
+        "Update docs/architecture/effect-services.md and docs/architecture/frontend.md with the corrected TanStack transport lifecycle when the code lands.",
+        "Add a correction/follow-up note to docs/product-specs/boundary-only-decoding.md without rewriting its historical implementation evidence."
+      ],
+      "outputs": [
+        "apps/docs/src/lib/docs/route-boundary.ts",
+        "apps/docs/src/lib/docs/errors.ts",
+        "apps/docs/src/lib/docs/loaders.ts",
+        "apps/docs/src/lib/mdx/client-loader.tsx",
+        "apps/docs/src/routes/index.tsx",
+        "apps/docs/src/routes/$.tsx",
+        "apps/docs/src/lib/docs/route-boundary.test.js or a typed replacement",
+        "apps/docs/src/lib/docs/route-boundary.type-test.ts",
+        "docs/architecture/effect-services.md",
+        "docs/architecture/frontend.md",
+        "docs/product-specs/boundary-only-decoding.md",
+        "docs/exec-plans/active/tanstack-start-loader-transport-boundaries.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe exports instead of importing server-only internals; the route-boundary import graph may use the app-local error owner, Effect and browser-safe docs-content schemas/errors but no MDX client loader, service, runtime, server, filesystem, environment or generated-source module.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task mandatory verification gates, including bun run verification.",
+          "Run and document at least three implementation improvement audit passes before handoff.",
+          "Audit helper sprawl, canonical type/schema/error reuse, unsafe casts, DTO mirrors, stringly branching and browser-safe imports.",
+          "Report changed files, commands, outcomes, residual risks, Changeset impact and whether the final call graph matches the spec.",
+          "Do not start or delegate another task. The parent must review and accept this task first."
+        ],
+        "documentationRequirements": [
+          "Read and follow docs/standards/documentation-style.md, documentation-writing.md, documentation-templates.md, documentation-templates/reference.md, documentation-review.md, documentation-architecture.md, documentation-user-journeys.md and documentation-user-journeys/new-contributor.md before editing docs.",
+          "Use docs/product-specs/writing-specs.md for product-spec structure and the reference template for durable architecture pages.",
+          "Use Australian spelling, sentence-case headings, direct technical prose, canonical names and accurate source-of-truth links.",
+          "Keep architecture pages durable and the active exec plan focused on implementation evidence."
+        ],
+        "taskSpecificScope": [
+          "Implement the target production and failure-policy call graphs for both current docs routes.",
+          "Use Schema.Never, Effect.failCause for defect/interruption, Effect Array for exact failure cardinality and typed Result for restored expected/transport states.",
+          "Use Effect.orDie only for canonical codec-encoding invariant failures; preserve expected application errors with typed mapError/catchTag/catchTags policy and never broad catch them.",
+          "Remove toRouteResult and keep one-off Schema error mapping and Exit flattening inline in restore.",
+          "Keep the route boundary component thin: one immutable loader binding, one restore binding, an exhaustive Result match, meaningful composition components and focused pure leaves. Do not forward encoded data or the whole Result to children.",
+          "Do not add route-specific hooks, providers, HOCs, memoisation wrappers or duplicate schemas.",
+          "Do not change visible docs content or navigation."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run test:docs-boundaries",
+        "bun run --filter=docs check-types",
+        "compile-time mismatch fixture fails if an incompatible success or error program becomes accepted",
+        "bun run --filter=docs build",
+        "bun run docs:validate",
+        "bun run verification",
+        "rg audit proving loadDocsHome/loadDocsPage return encoded server-function output without restore/decode",
+        "rg/AST audit proving each current docs route root uses one immutable Route.useLoaderData binding, restores once per invocation, matches Result locally and passes neither encoded data nor whole Result to children",
+        "Effect audit against docs/architecture/effect-services.md for linear encode flow, exact one-failure cardinality with Effect Array, Effect.failCause for any defect/interruption, Effect.orDie only at canonical codec encoding, typed failures, canonical schemas, no unsafe casts, no broad catches and no nested runtime",
+        "helper audit proving the generic constructor owns repeated policy, toRouteResult was removed, no one-use decoder/error wrappers were added and producer/consumer cardinality policy was not unified through unknown, unsafe casts or polymorphic callbacks",
+        "import-graph rg audit proving route-boundary.ts imports the neutral app-local error owner rather than the MDX client loader, and imports no docs-content service/runtime/server export, filesystem/environment adapter or generated server source",
+        "parent documentation review for reader fit, Australian spelling, sentence-case headings, banned language, template fit, useful diagrams, canonical names/types and link/source-of-truth accuracy",
+        "bun run changeset status --verbose and explicit app-internal no-Changeset rationale",
+        "git diff --check"
+      ],
+      "browserVerification": [],
+      "qualityAudits": [
+        "Pass 1: compare implementation separately to the SSR and client-navigation call graphs; remove early restoration, repeated decoding and any route value that bypasses the codec.",
+        "Pass 2: improve Effect control flow and error ownership; require the neutral error module, Schema.Never, exact Cause cardinality with Effect Array, Effect.failCause for defect/interruption, inline typed mapping and no unsafe casts or broad catches.",
+        "Pass 3: improve React composition and helper shape; keep one immutable loader binding and one restore at route roots, match Result locally, keep leaves focused and pure, and reject wrappers or abstractions that only shorten files, erase output-specific cardinality policy or silence lint."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Both docs loaders return the schema-encoded representation unchanged to TanStack.",
+        "Both server functions retain strict TypeScript input/output serialisability checks without casts or opt-outs.",
+        "Both direct route roots use one immutable loader binding, restore once per invocation and match Result before child composition.",
+        "Expected errors, malformed transport, standalone/composite defects and interruptions, empty causes and multiple typed failures follow the target policy.",
+        "No leaf, ordinary hook or runtime helper owns decoding/restoration, encoded data or the whole route Result.",
+        "Parent recorded three audit passes, verified the call graph and accepted the slice before TSLB-002."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "TSLB-002",
+      "status": "pending",
+      "title": "Enforce direct route-root transport restoration",
+      "type": "static-analysis",
+      "dependsOn": [
+        "TSLB-001"
+      ],
+      "goal": "Make the route-root exception statically narrow without weakening repository-wide decoder placement.",
+      "scope": [
+        "Keep whattax/no-decoding-outside-boundaries globally enabled and keep actual Schema decoder implementation in the exact route-boundary file.",
+        "Add whattax/no-route-transport-restore-outside-consumers for canonical route-boundary restore calls.",
+        "Configure exact routeTransportBoundaryModules and routeTransportConsumerFiles entries; reject route globs, filename inference and non-canonical import specifiers.",
+        "Allow canonical restore only from direct named imports and only in inline or same-file named createFileRoute component/head consumers receiving that route loader representation.",
+        "Fail closed with a specific diagnostic for unresolved route/component bindings and namespace, default, dynamic or CommonJS import shapes that reference canonical restoration.",
+        "Reject restore in ordinary components, leaves, hooks, callbacks, helpers, providers and unrelated files, including when colocated in a route file.",
+        "Reject every canonical restore-member reference that is not the direct callee of an allowed invocation, including alias/destructuring, computed member, callback passing and call/apply/bind indirection.",
+        "Require component restore to consume the direct Route.useLoaderData call or one immutable local binding from it, and require head restore to consume its loaderData input; reject reassignment, multiple restore, getRouteApi, prop, context, closure-capture and child-callback cases.",
+        "Reject forwarding the encoded loader value or restored Result to JSX children; the direct consumer must match Result and pass focused canonical values.",
+        "Prove that direct Schema decoders in route TSX remain prohibited by the existing rule.",
+        "Extend the root boundary-directive lint pass so inline eslint-disable and oxlint-disable comments naming either boundary rule fail.",
+        "Use real Oxlint CLI fixtures with --disable-nested-config for allowed and rejected route shapes.",
+        "Update docs/architecture/testing-and-quality.md with durable rule behaviour while keeping exact paths only in oxlint.config.ts."
+      ],
+      "outputs": [
+        "tools/oxlint/whattax-rules.js",
+        "tools/oxlint/no-decoding-outside-boundaries.test.ts or a focused sibling route-restoration test",
+        "oxlint.config.ts",
+        "package.json",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/tanstack-start-loader-transport-boundaries.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task mandatory verification gates, including bun run verification.",
+          "Run and document at least three implementation improvement audit passes before handoff.",
+          "Audit helper sprawl, canonical type/schema/error reuse, unsafe casts, DTO mirrors, stringly branching and browser-safe imports.",
+          "Report changed files, commands, outcomes, residual risks, Changeset impact and whether the final call graph matches the spec.",
+          "Do not start or delegate another task. The parent must review and accept this task first."
+        ],
+        "documentationRequirements": [
+          "Read and follow docs/standards/documentation-style.md, documentation-writing.md, documentation-templates.md, documentation-templates/reference.md, documentation-review.md, documentation-architecture.md, documentation-user-journeys.md and documentation-user-journeys/new-contributor.md before editing docs.",
+          "Use docs/product-specs/writing-specs.md for product-spec structure and the reference template for durable architecture pages.",
+          "Document durable rule semantics, not exact path inventory or implementation logs."
+        ],
+        "taskSpecificScope": [
+          "Implement and document whattax/no-route-transport-restore-outside-consumers, enforcing the semantic difference between an actual Schema decoder implementation and a canonical post-hydration restore call.",
+          "Do not broad-allowlist route TSX files for all decoder operations.",
+          "Do not add route TSX to decodingBoundaryFiles; restoration is governed by the specialised consumer rule while direct Schema decoding stays prohibited.",
+          "Read exact boundary-module and consumer-file rule options from oxlint.config.ts; resolve supported inline and same-file named route consumers statically and fail closed on unsupported import or binding shapes.",
+          "Treat any canonical restore member reference as invalid unless it is the direct callee of an allowed invocation; do not build speculative arbitrary interprocedural alias analysis.",
+          "Do not rely on raw source-text searches for directives or identifiers when AST/comment-token APIs fit.",
+          "Keep rule helpers policy-specific and reject speculative generic AST utility extraction."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run test:oxlint",
+        "bun run lint",
+        "bun run test",
+        "bun run verification",
+        "real Oxlint CLI fixtures for allowed direct-call and single-immutable-binding route component restoration",
+        "real Oxlint CLI fixture for one allowed statically traceable named route component restore and one rejected unresolved binding",
+        "real Oxlint CLI fixture for one allowed route head restore",
+        "real Oxlint CLI fixtures rejecting leaf, hook, helper, callback, namespace/default import, alias, destructuring, computed-member, call/apply/bind, reassignment, multiple-restore, getRouteApi, prop, context, closure-capture and Result-to-child cases",
+        "real Oxlint CLI fixture proving direct Schema decode in the route file is still rejected",
+        "comment-token evidence proving inline disable directives for both boundary rules fail",
+        "config audit proving exact routeTransportBoundaryModules/routeTransportConsumerFiles entries and no broad route/package/test glob or ignorePatterns exemption",
+        "helper audit for AST utilities, unsafe casts, source-text parsing and duplicated matcher policy",
+        "parent documentation review for reader fit, Australian spelling, sentence-case headings, banned language, template fit, useful diagrams, canonical names/types and link/source-of-truth accuracy",
+        "bun run changeset status --verbose and explicit repository-tooling no-Changeset rationale",
+        "git diff --check"
+      ],
+      "browserVerification": [],
+      "qualityAudits": [
+        "Pass 1: improve AST coverage and diagnostics; test direct, immutable binding, named, unresolved, import-shape, alias, destructured, computed, callback, call/apply/bind, hook, leaf, component, head and Result-forwarding forms without false positives for unrelated restore methods.",
+        "Pass 2: improve configuration narrowness; preserve the global decoder rule, reject whole-route decoder exemptions and prove exact boundary-directive handling through the real CLI.",
+        "Pass 3: improve maintainability; remove duplicated visitor logic and speculative helpers while retaining explicit policy ownership and deterministic diagnostic counts."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "whattax/no-route-transport-restore-outside-consumers allows only exact configured modules/files and the documented direct route-root and head restoration shapes.",
+        "Ordinary React components and hooks cannot use route-boundary restoration.",
+        "Encoded loader data and restored Result values cannot be forwarded into child composition.",
+        "Direct Schema decoding remains prohibited in route TSX.",
+        "No broad exemption, nested config or inline-disable loophole exists.",
+        "Parent recorded three audit passes and accepted the slice before TSLB-003."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "TSLB-003",
+      "status": "pending",
+      "title": "Prove browser behaviour and complete the boundary documentation",
+      "type": "browser-and-final-audit",
+      "dependsOn": [
+        "TSLB-002"
+      ],
+      "goal": "Prove the serialisable loader contract in a real browser lifecycle and leave every canonical document aligned with the final code.",
+      "scope": [
+        "Add app-scoped Vitest Browser Mode and Playwright configuration following the validated ~/Projects/site shape without importing site code.",
+        "Keep browser tooling in docs devDependencies and add explicit docs test:browser wiring; do not add production dependencies or production test routes.",
+        "Build a programmatic client-side TanStack route harness that consumes encoded loader representations through Route.useLoaderData and the canonical restore operation; do not present this harness as SSR or hydration proof.",
+        "Cover success, typed expected failure, malformed transport, defect and interruption; assert expected route UI versus TanStack errorComponent and a clean console.",
+        "Run the actual built docs app and verify initial SSR content before interaction, browser hydration without mismatch and client navigation that observes a successful server-function RPC before rendering destination MDX.",
+        "Review route composition for pure leaves and remove only abstractions that are unnecessary or exist to satisfy lint; do not perform an unrelated visual refactor.",
+        "Re-run the complete decoder and route-restoration inventories and reconcile final call graphs.",
+        "Update apps/docs/README.md when local commands or route-boundary guardrails change.",
+        "Mark this spec and task list implemented/completed, update the product-spec index and move the execution plan to docs/exec-plans/completed after all gates pass.",
+        "Record release status and confirm no package versioning or publication occurred."
+      ],
+      "outputs": [
+        "apps/docs/package.json",
+        "apps/docs/vitest.browser.config.ts",
+        "apps/docs/src/**/*.browser.test.tsx",
+        "bun.lock",
+        "apps/docs/README.md when required",
+        "docs/architecture/effect-services.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/tanstack-start-loader-transport-boundaries.md",
+        "docs/product-specs/tanstack-start-loader-transport-boundaries.tasks.json",
+        "docs/product-specs/index.md",
+        "docs/exec-plans/completed/tanstack-start-loader-transport-boundaries.md",
+        ".changeset/* or explicit no-Changeset rationale"
+      ],
+      "implementationPrompt": {
+        "mandatorySubagentContract": [
+          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
+          "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
+          "Review the spec call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
+          "MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime.",
+          "Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, switch, Object.values, Object.entries, ad hoc _tag objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.",
+          "Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.",
+          "Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.",
+          "Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use Effect.mapError, Effect.catchTag, Effect.catchAll or Effect.catchAllDefect.",
+          "Browser/runtime code must consume browser-safe exports instead of importing server-only internals.",
+          "Package-facing changes MUST add or update a Changeset with bun run changeset. If the task is not package-facing, state that explicitly in the handoff.",
+          "Run this task mandatory verification gates, including bun run verification.",
+          "Run and document at least three implementation improvement audit passes before handoff.",
+          "Audit helper sprawl, canonical type/schema/error reuse, unsafe casts, DTO mirrors, stringly branching and browser-safe imports.",
+          "Report changed files, commands, outcomes, residual risks, Changeset impact and whether the final call graph matches the spec.",
+          "Do not start or delegate another task. The parent must review and accept this task first."
+        ],
+        "documentationRequirements": [
+          "Read and follow docs/standards/documentation-style.md, documentation-writing.md, documentation-templates.md, documentation-templates/reference.md, documentation-review.md, documentation-architecture.md, documentation-user-journeys.md and documentation-user-journeys/new-contributor.md before editing docs.",
+          "Use docs/product-specs/writing-specs.md for product-spec structure and the reference template for durable architecture pages.",
+          "Review reader fit, Australian spelling, sentence-case headings, banned language, canonical names, useful diagrams, links and source-of-truth ownership.",
+          "Keep browser and validation evidence in the completed exec plan rather than durable architecture pages."
+        ],
+        "taskSpecificScope": [
+          "Use programmatic test routes; do not add hidden or public production test routes.",
+          "Use Effect.acquireUseRelease or another Effect-native scoped pattern for browser DOM/router lifecycle cleanup when it clarifies resource ownership.",
+          "Keep client-route harness claims separate from built-app SSR/hydration claims; assert behaviour and console cleanliness without brittle full-page snapshots, internal hydration-payload snapshots or browser-specific error wording.",
+          "Do not extract shared UI or a shared route package from this final proof task."
+        ]
+      },
+      "mandatoryVerification": [
+        "bun run --filter=docs test:browser",
+        "bun run test:docs-boundaries",
+        "bun run test:oxlint",
+        "bun run lint",
+        "bun run test",
+        "bun run --filter=docs check-types",
+        "bun run --filter=docs build",
+        "bun run docs:validate",
+        "bun run verification",
+        "complete repository-owned decoder and route-restoration rg/AST inventory reconciled against lint configuration",
+        "final Effect audit for linear pipelines, exact failure cardinality, typed errors, canonical schemas, no unsafe casts, no DTO mirrors, no broad catches and no nested runtime",
+        "final React audit proving one immutable loader binding and direct route-root restore, local Result matching, meaningful composition components and focused pure leaves without loader/route-boundary imports",
+        "final helper audit proving no route-specific decoder hook, provider, HOC, mapper family or premature package extraction",
+        "documentation review against the full standards suite and final call graphs",
+        "parent documentation review for reader fit, Australian spelling, sentence-case headings, banned language, template fit, useful diagrams, canonical names/types and link/source-of-truth accuracy",
+        "jq empty docs/product-specs/tanstack-start-loader-transport-boundaries.tasks.json",
+        "bun run changeset status --verbose and explicit app-internal/tooling/docs no-Changeset rationale",
+        "git diff --check"
+      ],
+      "browserVerification": [
+        "Run the client-side Vitest Browser Mode route harness in Chromium and prove success, expected failure, malformed transport, defect and interruption behaviour without claiming SSR coverage.",
+        "Start the built docs app through its portless docs.whattax URL, prove server-rendered home content before interaction and then verify hydration retains it.",
+        "Navigate in the browser to one real content route, observe a successful server-function request and verify the encoded client-navigation result renders expected MDX content.",
+        "Verify there are no hydration mismatch messages, uncaught exceptions or unexpected console warnings/errors.",
+        "Capture reviewable browser evidence in the completed execution plan without committing generated screenshots unless repository policy requires them."
+      ],
+      "qualityAudits": [
+        "Pass 1: improve behavioural proof; cover all outcome categories through deterministic codec and client-route evidence, then prove initial SSR/hydration and client-navigation RPC separately in the built app without production test routes or brittle assertions.",
+        "Pass 2: improve final architecture and component shape; reconcile call graphs, remove early/duplicate restoration, keep leaves pure and reject abstractions that only satisfy lint.",
+        "Pass 3: improve documentation and release readiness; reconcile every canonical doc/index/status, verify links and names, confirm no package-facing change and record all final gates."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "The client-side browser harness proves direct route-root restoration and framework error-boundary behaviour without overstating SSR coverage.",
+        "The actual built docs app separately proves initial SSR, hydration and client-navigation server-function RPC on real routes with a clean console.",
+        "No production test route, unnecessary helper or shared-package extraction remains.",
+        "All final code, docs, JSON, build, lint, test, browser and Changeset gates pass.",
+        "The spec, task list, indexes and completed execution plan describe the final implementation and release impact accurately.",
+        "Parent recorded three final audit passes and accepted the rollout."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-07-14
 source_of_truth: docs
 confidence: medium
 ---
@@ -154,11 +154,36 @@ catalogue constructor that preserves schema-to-continuation coupling. Review
 helper reuse and ownership in the required three audit passes rather than
 adding a brittle function-size rule.
 
-`whattax/no-decoding-outside-boundaries` will enforce decoder placement once
-the boundary-only decoding rollout reaches its lint slice. Its exact file
-allowlist belongs only in `oxlint.config.ts`; this architecture page owns the
-categories and review contract, not a duplicate path list. Until that rollout
-lands, use the active decoder inventory and this contract during review.
+`whattax/no-decoding-outside-boundaries` enforces decoder placement across the
+repository. Its exact file allowlist belongs only in `oxlint.config.ts`; this
+architecture page owns the categories and review contract, not a duplicate
+path list. Use the active decoder inventory and this contract during review.
+
+### TanStack loader transport
+
+Treat a TanStack Start server-function call and TanStack Router loader-state
+transport as separate representation crossings. When a server function
+produces route data, keep the schema-encoded representation intact through the
+route loader. On initial SSR, Router dehydrates and hydrates that encoded
+loader state. On client navigation, the server-function RPC serialiser and the
+route loader carry the same encoded value.
+
+Use a browser-safe boundary adapter built around
+`Schema.Exit(success, expectedError, Schema.Never)` when a route needs to
+transport an Effect outcome. The producer must capture `Effect.exit` once,
+encode a success or exactly one typed expected failure, and preserve any Cause
+containing a defect or interruption with `Effect.failCause`. An empty or
+multi-failure producer Cause is an invariant defect. Use `Effect.orDie` only
+when canonical schema encoding fails after the program has already satisfied
+the declared success and error contracts.
+
+The direct route component or route-owned `head` consumer may restore the
+encoded loader value when it first reads `Route.useLoaderData` or callback
+loader data. Restore once per consumer invocation, map malformed or
+semantically invalid transport to a schema-owned tagged transport error, and
+match the resulting `Result` before passing canonical values into React
+composition. Ordinary hooks, containers and leaf components must not receive
+encoded loader data, call the restore operation or run Effect runtimes.
 
 ## Guardrails
 

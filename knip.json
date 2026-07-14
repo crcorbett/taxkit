@@ -37,6 +37,7 @@
     },
     "apps/docs": {
       "entry": [
+        "src/lib/docs/route-boundary.type-test.ts",
         "src/router.tsx",
         "src/server.ts",
         "src/routes/**/*.{ts,tsx}",

@@ -1,6 +1,6 @@
 ---
 status: implemented
-last_reviewed: 2026-07-13
+last_reviewed: 2026-07-14
 source_of_truth: docs
 confidence: high
 ---
@@ -35,6 +35,22 @@ SDK descriptor narrowing uses a direct Effect decoder; and docs route loaders
 normalise transport data to typed `Result` values before React composition.
 See the completed [execution plan](../exec-plans/completed/boundary-only-decoding.md)
 for inventory, verification and release evidence.
+
+## Follow-up correction
+
+The DECODE-004 outcome above records the implementation at the end of that
+rollout. A later transport audit found that restoring the server-function
+response inside a route loader still put a decoded Effect `Result` through
+TanStack Router's independent loader-state serialisation boundary.
+
+The corrected docs flow keeps the schema-encoded `Exit` representation intact
+through the server-function response and route loader. The direct route root
+then restores the loader value once, matches the typed `Result` and passes only
+canonical values into composition and leaf components. This narrow route-root
+operation remains subject to the boundary-only decoding rule; it does not
+permit decoding in ordinary components or hooks. See
+[TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md)
+for the follow-up contract and task evidence.
 
 ## Problem
 

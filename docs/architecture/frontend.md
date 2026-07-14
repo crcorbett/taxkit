@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-07-14
 source_of_truth: docs
 confidence: medium
 ---
@@ -69,19 +69,44 @@ preloads compiled MDX through the browser-safe client loader. App routes should
 not read `apps/docs/content` files, `navigation.json` or generated
 `.source/server` modules directly.
 
+Docs server functions encode route outcomes with a browser-safe Effect Schema
+boundary. Route loaders return that representation unchanged. On an initial
+request, TanStack Router dehydrates and hydrates the encoded loader state. On
+client navigation, the server-function RPC serialiser carries the encoded
+response before the route loader returns it. In both paths, the direct route
+root restores the value once and matches the typed `Result` before composing
+the page.
+
+```ts
+DocsContentService Effect
+  -> browser-safe Schema.Exit JSON encoding
+    -> createServerFn and route loader return encoded data unchanged
+      -> SSR hydration or client-navigation transport
+        -> direct route-root restore
+          -> Result match
+            -> canonical values reach composition and leaves
+```
+
 ## Decoding and composition boundaries
 
 Route loaders, actions and dedicated boundary adapters own executable decoding
-of URL state, server-function payloads, browser storage, external HTTP
-responses and other transport representations. Prefer extracting a focused
-boundary module when a TanStack route file also renders React; do not
-allowlist a mixed `.tsx` route merely because its loader needs a decoder.
+of URL state, browser storage, external HTTP responses and other transport
+representations. Prefer extracting a focused boundary module when a TanStack
+route file also renders React; do not allowlist a mixed `.tsx` route merely
+because its loader needs a decoder.
 
-The boundary adapter returns schema-derived success or typed expected failure,
-normally as `Result.Result<Success, Failure>` when transported `Exit` data is
-normalised. Route and container components compose those already-typed states
-with `Result`, `Option` or `Match`. They do not decode a loader value or call a
-decode-and-match callback during render.
+For encoded TanStack loader state, the browser-safe boundary adapter owns the
+Schema decoder and exposes a synchronous restore operation. The direct route
+component or route-owned `head` callback may call that operation when it is the
+first consumer of loader data. This is an explicit transport boundary, not a
+general render-time decoder exception. The consumer uses one immutable loader
+data binding, restores once per invocation and matches the resulting
+`Result.Result<Success, ExpectedFailure | TransportFailure>` itself.
+
+Route composition then uses `Result`, `Option` or `Match` over schema-derived
+values. It must not forward the encoded value or whole route `Result` to a
+child, and it must not hide restoration in a hook, provider, higher-order
+component, callback or one-use wrapper.
 
 Leaf components receive focused readonly values, callbacks or `children` from
 their typed container and render only. They may own local interaction state,
@@ -105,6 +130,8 @@ removes meaningful repetition. App-specific composition remains app-owned;
 - Keep frontend docs and component details out of rule packages.
 - Keep browser docs modules on browser-safe exports such as
   `@whattax/docs-content/client` and `@whattax/docs-fumadocs/render`.
+- Keep docs loader outcomes encoded until a direct route-root consumer restores
+  them through the browser-safe route boundary.
 - Do not import generated `.source/server` files or
   `@whattax/docs-content/server` from browser modules.
 - Keep Fumadocs generated source access inside `@whattax/docs-content` server

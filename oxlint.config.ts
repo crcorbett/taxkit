@@ -80,6 +80,12 @@ export default defineConfig({
         "whattax/no-decoding-outside-boundaries": "off",
       },
     },
+    {
+      files: ["apps/docs/src/lib/docs/route-boundary.test.js"],
+      rules: {
+        "whattax/no-runtime-execution-outside-boundaries": "off",
+      },
+    },
   ],
   rules: {
     "func-name-matching": "off",

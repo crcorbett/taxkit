@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-02
+last_reviewed: 2026-07-14
 source_of_truth: docs
 confidence: medium
 ---
@@ -9,4 +9,4 @@ confidence: medium
 
 Live implementation plans belong here while work is in progress.
 
-There are currently no active execution plans.
+- [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md)
