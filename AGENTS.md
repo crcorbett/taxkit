@@ -1,8 +1,8 @@
 ---
 status: canonical
-last_reviewed: 2026-06-25
+last_reviewed: 2026-07-14
 source_of_truth: root-docs
-confidence: medium
+confidence: high
 ---
 
 # WhatTax
@@ -90,7 +90,7 @@ fast.
 | `packages/rules/au/income-tax` | implemented Australian annual income tax rule pack |
 | `packages/rules/au/stsl` | implemented Australian STSL withholding rule pack |
 | `packages/testing` | shared test helpers for workspace packages |
-| `packages/scripts` | planned repo automation and validation scripts |
+| `packages/scripts` | implemented Effect-native release-readiness orchestration |
 | `packages/ui` | planned shared UI primitives |
 | `docs/architecture` | durable architecture and boundaries |
 | `docs/product-specs` | current specs and task lists |

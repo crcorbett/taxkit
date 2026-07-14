@@ -36,6 +36,9 @@ const decodingBoundaryFiles = [
   "packages/rules/au/income-tax/src/calculator/annual-tax.boundary.ts",
   "packages/rules/au/pay/src/calculator/take-home-pay.boundary.ts",
 
+  // Cross-process command output restored by the release-readiness live layer.
+  "packages/scripts/src/release-readiness/live.layer.ts",
+
   // SDK type-erasure dispatch and downstream process boundaries.
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
@@ -101,6 +104,7 @@ const runtimeBoundaryFiles = [
   "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/runtime.server.ts",
   "packages/docs-content/src/validate.runtime.ts",
+  "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/src/index.ts",
@@ -136,6 +140,7 @@ const bunRuntimeEntrypointFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
   "packages/docs-content/src/validate.runtime.ts",
+  "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",

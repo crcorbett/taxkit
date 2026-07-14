@@ -48,6 +48,7 @@
     "lint": "bun run lint:boundary-directives && oxlint -c oxlint.config.ts . --disable-nested-config --no-error-on-unmatched-pattern",
     "lint:boundary-directives": "oxlint -c oxlint.config.ts . --allow=whattax/no-decoding-outside-boundaries --allow=whattax/no-route-transport-restore-outside-consumers --report-unused-disable-directives-severity=error --disable-nested-config --no-error-on-unmatched-pattern",
     "prepare": "effect-language-service patch",
+    "release:check": "bun run --filter=@whattax/scripts release:check",
     "test": "bun run test:docs-boundaries && bun run test:oxlint && turbo run test",
     "test:docs-boundaries": "bun test apps/docs/src/lib/docs/route-boundary.test.js",
     "test:oxlint": "bun test tools/oxlint",

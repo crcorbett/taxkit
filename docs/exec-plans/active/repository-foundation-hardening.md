@@ -28,7 +28,7 @@ stop the rollout and record a blocker for replan or user decision.
 | FND-001 | complete | Beta.98 migration accepted after correction turn 2 and independent parent verification. |
 | FND-002 | complete | Accepted after correction turn 2 and independent focused, strict downstream and repository verification. |
 | FND-003 | complete | Parent accepted correction turn 3 after the final Bun non-host false positive was removed and all gates passed. |
-| FND-004 | pending | Effect-native release-readiness command. |
+| FND-004 | complete | Parent accepted the corrected Effect-native release-readiness command and Changeset after all mandatory gates passed. |
 | FND-005 | pending | Architecture/process reconciliation and final audit. |
 
 ## Validation Log
@@ -395,6 +395,124 @@ stop the rollout and record a blocker for replan or user decision.
 - Independent `bun run test:oxlint`, `bun run lint`, `git diff --check` and
   `bun run changeset status --verbose` passed. The no-Changeset decision is
   accepted because no published package, endpoint or SDK contract changed.
+
+### 2026-07-14 - FND-004 ready for parent review
+
+- Implemented the private `@whattax/scripts` workspace package with
+  schema-backed `ReleaseCheck`, `ReleaseCommandOutcome` and
+  `ReleaseReadinessReport` contracts; `ReleaseCommandExecutionError`,
+  `ReleaseCheckFailedError` and `ReleaseWorkspacePathError` tagged errors; and
+  the `ReleaseCommandRunner` service contract.
+- The primary `runReleaseReadiness` program runs nine exact checks with
+  `Effect.forEach(..., { concurrency: 1 })`. It owns non-zero exit
+  classification and fail-fast policy. The live and deterministic layers only
+  execute commands, so tests exercise the production policy rather than a
+  duplicate mock implementation.
+- The live layer builds beta.98 Effect Platform `ChildProcess` commands and
+  requires only `ChildProcessSpawner`. It captures stdout, stderr and exit code
+  concurrently, maps platform failures inline to the tagged execution error,
+  and records every result in the canonical outcome. The Bun runtime
+  entrypoint resolves the workspace root with `Path.fromFileUrl`, composes
+  `BunServices.layer` with `Layer.provideMerge`, and owns the only
+  `BunRuntime.runMain` call.
+- The deterministic test layer uses `HashMap`, `Ref`, `Option`, `Match` and
+  `Data.TaggedClass` results. Four tests prove the complete command order,
+  exact executable/arguments/cwd, ordered outcomes, non-zero failure policy,
+  process execution failure, short-circuit behavior and useful success/failure
+  rendering, including typed workspace-path failures.
+- Root `bun run release:check` delegates to the package entrypoint. The live
+  run passed root verification, tests and builds, docs validation, focused SDK
+  artifact proof, strict downstream validation, API smoke, docs browser proof
+  and Changeset status in that order. Existing validator implementations and
+  ownership did not move.
+- Audit pass 1, command ownership and flow: compared each plan entry with its
+  current root, SDK, API or docs package script. The package contains only
+  command definitions and orchestration; no pack, consumer, API, browser,
+  Changeset, build, test or verification logic was copied. One linear Effect
+  program owns sequence, non-zero classification and fail-fast behavior.
+- Audit pass 2, Effect boundaries and abstractions: confirmed Schema tagged
+  classes own checks/outcomes/reports, Data tagged errors own expected
+  failures, the Context service is host-neutral, live/test Layers are separate,
+  process text decoding is exact-boundary allowlisted, `Path.fromFileUrl` owns
+  file-URL restoration, and the runtime is the sole Bun service provider and
+  execution boundary. No unsafe cast, `unknown` error/cause, DTO mirror, manual
+  env/process lifecycle, raw Bun API, `async`/`await`, `switch`, native mutable
+  collection or one-helper-per-command abstraction was added.
+- Audit pass 3, tests, rendering and integration: the deterministic layer
+  proves all required behavior without spawning a process; report/error
+  renderers include check ids, exact commands, cwd, exit and captured output
+  where relevant; package ownership and testing docs match the implementation;
+  root integration, Knip, Oxlint exact boundaries and the actual nine-step live
+  command all pass.
+- Mandatory verification passed:
+  `bun run --filter=@whattax/scripts test` (1 file, 4 tests),
+  `bun run --filter=@whattax/scripts check-types`,
+  `bun run --filter=@whattax/scripts build`, `bun run verification` (23 Turbo
+  type/build prerequisite tasks), `bun run release:check` (9 ordered checks),
+  `bun run changeset status --verbose`, full lint, Knip, formatting and
+  `git diff --check`.
+- Changeset `.changeset/curvy-flies-rhyme.md` records a patch for the new
+  private `@whattax/scripts` package, producing pending version `0.0.1` without
+  consuming or altering the fixed release-train Changesets.
+- The final call graph matches the spec:
+  `root release:check -> package release:check -> BunRuntime entrypoint ->
+  BunServices.layer -> Path.fromFileUrl + ReleaseCommandRunnerLive ->
+  ChildProcessSpawner -> runReleaseReadiness -> ReleaseCommandRunner ->
+  ChildProcess command -> canonical owning commands`.
+- Residual risks: Effect process APIs remain unstable while Effect 4 is beta;
+  successful command output is retained in memory until the final report;
+  exact command definitions require deliberate updates when owners rename
+  scripts; API smoke is local rather than deployed evidence; and the docs
+  browser gate remains the current client route harness rather than independent
+  built-app SSR/hydration proof.
+
+### 2026-07-14 - FND-004 parent correction turn 1
+
+- Removed manual `URL.pathname` workspace derivation. The runtime now obtains
+  `Path.Path` from the platform layer and maps `Path.fromFileUrl` failure to
+  `ReleaseWorkspacePathError`, with deterministic rendering coverage.
+- Removed `BunServices.layer` provision from `ReleaseCommandRunnerLive`. The
+  live layer remains expressed against `ChildProcessSpawner`; the Bun runtime
+  entrypoint composes it with `BunServices.layer` through
+  `Layer.provideMerge`, retaining `Path` and the runner in one provided graph.
+- Reconciled current canonical package maps in `AGENTS.md`, root `README.md`,
+  `docs/architecture/README.md`, `docs/architecture/package-boundaries.md` and
+  `docs/documentation-audit/README.md` so `packages/scripts` is implemented and
+  `packages/ui` remains the only planned placeholder. Historical plans/specs
+  and the manual repo-status HTML snapshot were intentionally unchanged.
+- Correction audit pass 1 confirmed host ownership: only the runtime imports
+  Bun services or calls `BunRuntime.runMain`; only the runtime resolves the
+  file URL; the live layer imports and requires `ChildProcessSpawner` without
+  choosing a host.
+- Correction audit pass 2 confirmed current documentation and path accuracy:
+  no current canonical source describes `packages/scripts` as planned,
+  placeholder or documentation-only; all local Markdown links in the five
+  edited canonical Markdown docs resolve; package manifest/source paths and the
+  `CLAUDE.md -> AGENTS.md` symlink exist; the manual HTML snapshot has no diff.
+- Correction audit pass 3 confirmed Effect and abstraction quality: Schema
+  contracts, Data tagged errors, Context service, separate Layers, one linear
+  fail-fast program and one runtime boundary remain intact. No unsafe cast,
+  unknown error/cause, helper-per-command layer, manual path/process/env code,
+  raw Bun API, `async`/`await`, `switch` or mutable collection was added.
+- Fresh mandatory verification passed after correction:
+  `bun run --filter=@whattax/scripts test` (1 file, 4 tests), package
+  check-types and build, `bun run verification` (23 successful Turbo
+  prerequisites), the full `bun run release:check` (all 9 ordered live gates),
+  Changeset status, task JSON parse, canonical Markdown path audit, stale
+  current-reference scan, HTML no-diff check and `git diff --check`.
+- Changeset and release impact remain unchanged:
+  `.changeset/curvy-flies-rhyme.md` produces the independent private-package
+  patch `@whattax/scripts@0.0.1`; no Changeset was consumed and FND-005 was not
+  started.
+
+### 2026-07-14 - FND-004 parent acceptance
+
+- Accepted the corrected service and layer graph, runtime-only Bun ownership,
+  Effect Path restoration, deterministic substitution tests and canonical
+  package-status reconciliation.
+- Independent package tests, typecheck, build, task JSON parsing,
+  `git diff --check` and Changeset status passed. The implementer's fresh full
+  `verification` and nine-command `release:check` evidence is accepted.
 
 ## Decisions
 

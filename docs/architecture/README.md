@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-25
+last_reviewed: 2026-07-14
 source_of_truth: docs
 confidence: high
 ---
@@ -18,7 +18,8 @@ calculation endpoints, the `@whattax/calculators` service package,
 deterministic core engine primitives, Australian pay, income-tax and STSL rule
 packages, a private TypeScript SDK package, private `@whattax/docs-content`
 and `@whattax/docs-fumadocs` packages, shared testing helpers, shared
-TypeScript config and documentation.
+TypeScript config, private Effect-native release orchestration and
+documentation.
 
 ## Current implementation
 
@@ -45,13 +46,15 @@ Implemented surfaces:
 - `packages/rules/au/income-tax`: Australian annual income-tax rule pack.
 - `packages/rules/au/stsl`: Australian STSL withholding rule pack.
 - `packages/testing`: shared test helpers for workspace packages.
+- `packages/scripts`: Effect-native release-readiness command orchestration
+  over canonical root and package-owned validators.
 - `packages/tsconfig`: shared TypeScript configuration presets.
 - `docs/**`: architecture, product specs, execution plans, standards,
   references and documentation audits.
 
-Planned ownership directories such as `packages/scripts` and `packages/ui`
-currently contain README guidance only. They are not runtime packages until a
-package manifest, source exports and verification are added.
+`packages/ui` remains a planned ownership directory with README guidance only.
+It is not a runtime package until a package manifest, source exports and
+verification are added.
 
 ## Core model
 

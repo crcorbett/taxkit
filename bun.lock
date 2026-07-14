@@ -207,6 +207,20 @@
         "vitest": "catalog:",
       },
     },
+    "packages/scripts": {
+      "name": "@whattax/scripts",
+      "version": "0.0.0",
+      "dependencies": {
+        "@effect/platform-bun": "catalog:",
+        "effect": "catalog:",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/sdk/typescript": {
       "name": "@whattax/sdk",
       "version": "0.0.4",
@@ -885,6 +899,8 @@
     "@whattax/rules-au-pay": ["@whattax/rules-au-pay@workspace:packages/rules/au/pay"],
 
     "@whattax/rules-au-stsl": ["@whattax/rules-au-stsl@workspace:packages/rules/au/stsl"],
+
+    "@whattax/scripts": ["@whattax/scripts@workspace:packages/scripts"],
 
     "@whattax/sdk": ["@whattax/sdk@workspace:packages/sdk/typescript"],
 

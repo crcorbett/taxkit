@@ -1,8 +1,8 @@
 ---
 status: canonical
-last_reviewed: 2026-06-25
+last_reviewed: 2026-07-14
 source_of_truth: documentation-audit
-confidence: medium
+confidence: high
 ---
 
 # Documentation audit
@@ -56,16 +56,16 @@ Current app/package roots with package manifests:
   `packages/rules/au/income-tax/README.md`
 - `packages/rules/au/pay`: covered by `packages/rules/au/pay/README.md`
 - `packages/rules/au/stsl`: covered by `packages/rules/au/stsl/README.md`
+- `packages/scripts`: covered by `packages/scripts/README.md`
 - `packages/testing`: covered by `packages/testing/README.md`
 - `packages/tsconfig`: covered by `packages/tsconfig/README.md`
 
-Current planned ownership placeholders:
+Current planned ownership placeholder:
 
-- `packages/scripts`: covered by `packages/scripts/README.md`
 - `packages/ui`: covered by `packages/ui/README.md`
 
-These placeholder directories have README guidance only. They are not runtime
-packages until package manifests, source exports and verification exist.
+This placeholder directory has README guidance only. It is not a runtime
+package until a package manifest, source exports and verification exist.
 
 ## Missing or stale docs
 
@@ -75,7 +75,7 @@ packages until package manifests, source exports and verification exist.
 - `docs/repo-status-outline.html` is a manual snapshot. It is linked from the
   root README, but it can drift and must be refreshed after material repo-shape
   or implemented-surface changes.
-- `packages/scripts` and `packages/ui` remain planned ownership placeholders.
+- `packages/ui` remains a planned ownership placeholder.
 - `packages/domain/au/*` remains planned for Australian date dimensions and
   domain facts that are not owned by a single rule pack.
 - `apps/web` is still a scaffold and health-check consumer, not a finished

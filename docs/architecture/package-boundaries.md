@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-24
+last_reviewed: 2026-07-14
 source_of_truth: docs
 confidence: high
 ---
@@ -27,17 +27,17 @@ Implemented packages and apps:
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
+- `packages/scripts`
 - `packages/testing`
 - `packages/tsconfig`
 
-Planned ownership directories with README guidance but no package manifest or
+Planned ownership directory with README guidance but no package manifest or
 runtime source yet:
 
-- `packages/scripts`
 - `packages/ui`
 
 The proposed package map below should guide new work, but callers should not
-import from planned packages until the corresponding package exists with
+import from a planned package until the corresponding package exists with
 exports and verification.
 
 ## Proposed Package Map
@@ -87,6 +87,7 @@ packages/
 
   docs-content/
   docs-fumadocs/
+  scripts/
 
   cli/
 ```
@@ -167,6 +168,11 @@ boundary for:
 
 It must not own OpenAPI annotations, HTTP status mapping, Bun serving, process
 config, app runtime lifecycle, SDK client transport or CLI command parsing.
+
+Implemented `@whattax/scripts` owns cross-package repository command
+orchestration. Its release-readiness program invokes canonical root and
+package-owned commands through an Effect child-process service. It must not
+copy validator logic out of the SDK, API, docs app or other owning packages.
 
 Implemented `@whattax/api-http` owns:
 

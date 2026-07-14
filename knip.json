@@ -88,6 +88,13 @@
       "project": ["src/**/*.ts", "scripts/**/*.ts"],
       "ignoreDependencies": ["@types/bun"]
     },
+    "packages/scripts": {
+      "entry": [
+        "src/index.ts",
+        "src/release-readiness/release-readiness.runtime.ts"
+      ],
+      "project": ["src/**/*.ts", "vitest.config.ts"]
+    },
     "packages/rules/au/income-tax": {
       "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]

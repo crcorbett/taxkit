@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["src/**/*.test.ts", "src/**/test.layer.ts"],
+  "compilerOptions": {
+    "noEmit": false,
+    "strictNullChecks": true
+  }
+}

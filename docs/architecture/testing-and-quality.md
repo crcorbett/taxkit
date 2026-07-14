@@ -85,6 +85,24 @@ API app:
   help
 - Changeset status evidence for package-facing changes
 
+The implemented release-readiness command composes the complete local release
+evidence without taking ownership of those validators:
+
+```bash
+bun run release:check
+```
+
+`@whattax/scripts` runs root verification, workspace tests and builds, docs
+content validation, the focused SDK artifact check, strict downstream package
+validation, API smoke, docs browser proof and Changeset status in that order.
+The command uses the Effect Platform child-process `Command` model through a
+`ReleaseCommandRunner` service, records schema-backed outcomes, and fails fast
+with tagged execution or non-zero-exit errors. Package-owned command
+implementations remain in their current packages and apps. The live runner
+depends on `ChildProcessSpawner`; only the Bun runtime entrypoint provides
+`BunServices.layer`, and that same runtime resolves the workspace root through
+Effect `Path.fromFileUrl`.
+
 ## Guardrails
 
 - A rule pack is incomplete without source references and golden tests.
@@ -197,6 +215,9 @@ API app:
   text-search rules.
 - Verification evidence should be recorded in specs, task lists or exec plans
   when work spans multiple packages.
+- Keep `bun run release:check` as orchestration over canonical commands. A new
+  release gate must first have an owning package command and focused tests; do
+  not implement its validation policy inside `@whattax/scripts`.
 
 ## Related Docs
 

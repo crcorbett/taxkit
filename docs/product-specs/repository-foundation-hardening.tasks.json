@@ -361,7 +361,7 @@
     },
     {
       "id": "FND-004",
-      "status": "pending",
+      "status": "complete",
       "title": "Implement the Effect-native release-readiness command",
       "type": "cross-cutting-automation",
       "dependsOn": ["FND-003"],
@@ -411,6 +411,40 @@
         "No package-owned validation logic moved into the scripts package.",
         "Parent accepted three audit passes, call-graph alignment and the Changeset."
       ],
+      "implementationEvidence": {
+        "state": "Complete and parent accepted after correction turn 1. Runtime Path and Bun capability ownership, current canonical package maps and every FND-004 mandatory gate pass.",
+        "changedFiles": [
+          "packages/scripts/package.json, tsconfig.json, tsconfig.build.json and vitest.config.ts",
+          "packages/scripts/src/index.ts and release-readiness schemas, errors, service, program, live layer, deterministic test layer, tests and runtime entrypoint",
+          "package.json root release:check integration, bun.lock workspace registration, knip.json and exact oxlint.config.ts process/runtime boundaries",
+          "packages/scripts/README.md, AGENTS.md, README.md, docs/architecture/README.md, package-boundaries.md, package-ownership.md, testing-and-quality.md and docs/documentation-audit/README.md",
+          ".changeset/curvy-flies-rhyme.md and this active execution evidence"
+        ],
+        "verification": [
+          "bun run --filter=@whattax/scripts test passed after correction: 1 file and 4 tests",
+          "bun run --filter=@whattax/scripts check-types passed",
+          "bun run --filter=@whattax/scripts build passed",
+          "bun run verification passed, including Effect language-service checks, lint, formatting, Knip and 23 Turbo type/build prerequisite tasks",
+          "bun run release:check passed all 9 ordered live checks: verification, test, build, docs validation, focused SDK pack, strict downstream consumer, API smoke, docs browser and Changeset status",
+          "bun run changeset status --verbose passed and reports @whattax/scripts 0.0.1 as a patch",
+          "Full lint, Knip, formatting and git diff --check passed"
+        ],
+        "qualityAudits": [
+          "Pass 1, command ownership and linear flow: every command and exact argument list was compared with its canonical root, SDK, API or docs package script. @whattax/scripts defines orchestration only. runReleaseReadiness is the single sequential Effect program and owns non-zero classification plus fail-fast behavior; live and deterministic layers do not duplicate that policy.",
+          "Pass 2, contracts and boundaries: ReleaseCheck, ReleaseCommandOutcome and ReleaseReadinessReport are Schema tagged classes; expected failures including workspace-path restoration are Data tagged errors; ReleaseCommandRunner is a host-neutral Context service; separate live/test Layers use beta.98 ChildProcessSpawner or HashMap/Ref. The live layer requires the capability without choosing Bun. The runtime alone composes BunServices.layer, resolves Path.fromFileUrl and calls BunRuntime.runMain. The audit found no unsafe cast, unknown error/cause, local DTO mirror, manual path/environment/process lifecycle, raw Bun host API, mutable collection, async/await, switch or helper-per-command sprawl.",
+          "Pass 3, deterministic evidence and integration: tests prove ordering, exact executable/args/cwd, ordered outcomes, non-zero and execution failures, short-circuit behavior and useful report, command-error and workspace-path-error rendering. The actual root command passed SDK pack/downstream, API smoke and docs browser owners without copying their implementations. Current canonical AGENTS/root/architecture/package-boundary/audit maps describe scripts as implemented, local Markdown paths resolve, the manual HTML snapshot is unchanged, and package ownership, testing docs, Knip and exact Oxlint boundary registration match the final implementation."
+        ],
+        "changeset": ".changeset/curvy-flies-rhyme.md patches the new private @whattax/scripts package with a user-facing summary of the typed release-readiness workflow.",
+        "releaseTrainImpact": "Changesets reports @whattax/scripts 0.0.1 as an independent private-package patch. Existing fixed release-train and docs-package pending versions are unchanged; version-repo was not run.",
+        "callGraphAlignment": "Matches the spec after correction: root release:check -> @whattax/scripts release:check -> BunRuntime entrypoint -> BunServices.layer -> Path.fromFileUrl plus ReleaseCommandRunnerLive -> ChildProcessSpawner -> runReleaseReadiness -> ReleaseCommandRunner -> beta.98 ChildProcess Command -> canonical root/package-owned commands. Tests replace only the runner Layer and exercise the same primary program.",
+        "correctionTurn1": "Replaced URL.pathname with typed Effect Path.fromFileUrl in the runtime; moved BunServices.layer composition out of ReleaseCommandRunnerLive and into the Bun entrypoint with Layer.provideMerge; added ReleaseWorkspacePathError rendering coverage; reconciled current AGENTS, root README, architecture overview, package boundaries and documentation audit package status; then reran four focused tests, type/build, verification, all nine live release gates, Changeset status, JSON/path/stale-reference/HTML/diff audits and three correction audit passes.",
+        "residualRisks": [
+          "Effect 4 process APIs remain under effect/unstable/process while the repository uses beta.98.",
+          "Successful stdout and stderr are retained in schema-backed outcomes until the final report, so unusually large future command output could increase memory use.",
+          "The explicit command plan must be updated deliberately when an owning script is renamed or a new release gate is admitted.",
+          "API smoke is local process/consumer evidence, and the docs browser command remains the current client route harness rather than independent built-app SSR or hydration proof."
+        ]
+      },
       "commitAfterPassing": true
     },
     {

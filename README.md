@@ -1,8 +1,8 @@
 ---
 status: canonical
-last_reviewed: 2026-06-25
+last_reviewed: 2026-07-14
 source_of_truth: root-docs
-confidence: medium
+confidence: high
 ---
 
 # WhatTax
@@ -18,8 +18,9 @@ reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, a private
 TypeScript SDK package, private `@whattax/docs-content` and
 `@whattax/docs-fumadocs` packages, shared testing helpers and shared TypeScript
-config. The SDK is implemented for local and downstream validation, but it is
-not published yet.
+config, plus private Effect-native repository release orchestration in
+`@whattax/scripts`. The SDK is implemented for local and downstream
+validation, but it is not published yet.
 
 ## What exists today
 
@@ -54,9 +55,10 @@ not published yet.
   workspace packages.
 - [packages/tsconfig](./packages/tsconfig/README.md): shared TypeScript config
   presets.
-- [packages/scripts](./packages/scripts/README.md) and
-  [packages/ui](./packages/ui/README.md): documented planned ownership areas
-  without package manifests or runtime code yet.
+- [packages/scripts](./packages/scripts/README.md): private Effect-native
+  orchestration package for the complete local release-readiness command.
+- [packages/ui](./packages/ui/README.md): documented planned shared UI
+  ownership without a package manifest or runtime code yet.
 
 ## Planned package families
 
@@ -80,6 +82,7 @@ bun run --filter=api dev
 bun run --filter=web dev
 bun run --filter=docs dev
 bun run verification
+bun run release:check
 bun run changeset
 bun run version-repo
 ```
@@ -90,7 +93,9 @@ portless URL into `WHATTAX_API_BASE_URL` and `VITE_WHATTAX_API_BASE_URL` before
 serving the web app at `https://whattax.localhost`. `bun run --filter=docs dev`
 serves the public docs app at `https://docs.whattax.localhost`. `bun run
 verification` is the baseline verification command for documentation, package
-wiring and scaffold changes.
+wiring and scaffold changes. `bun run release:check` runs the complete ordered
+release evidence, including tests, builds, package artifacts, API smoke, docs
+browser proof and Changeset status.
 
 Package-facing changes must include a Changeset. Use `bun run changeset` during
 implementation to record the user-facing package impact, and use

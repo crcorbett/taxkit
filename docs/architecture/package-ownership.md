@@ -1,8 +1,8 @@
 ---
 status: canonical
-last_reviewed: 2026-06-25
+last_reviewed: 2026-07-14
 source_of_truth: docs
-confidence: medium
+confidence: high
 ---
 
 # Package ownership
@@ -30,12 +30,12 @@ Current implemented code lives in:
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
+- `packages/scripts`
 - `packages/testing`
 - `packages/tsconfig`
 
-Current planned ownership placeholders:
+Current planned ownership placeholder:
 
-- `packages/scripts`
 - `packages/ui`
 
 The placeholder directories contain README guidance only. Do not route runtime
@@ -61,6 +61,13 @@ golden tests. Current implemented packages are `pay`, `income-tax` and `stsl`.
 `packages/testing`
 : Shared test helpers for workspace packages. It must not become a back door
 for production-only runtime helpers.
+
+`packages/scripts`
+: Implemented private repository-automation package. It owns schema-backed,
+  Effect-native orchestration that crosses package owners, including the
+  release-readiness command, its command-runner service, live process layer,
+  deterministic test layer and runtime entrypoint. It invokes canonical root
+  and package commands without moving or duplicating their validator logic.
 
 `packages/api/http`
 : Implemented HTTP API package. It owns Effect HTTP API definitions, boundary
@@ -139,6 +146,8 @@ belongs in apps or explicitly server-only package exports.
 - Import from the owner instead of redefining boundary values locally.
 - Add server-only exports for filesystem, HTTP server and Node adapters.
 - Keep React in apps or docs packages only.
+- Keep cross-package command orchestration in `packages/scripts`, but keep each
+  validator and its domain policy with the package or app it validates.
 - Keep app-specific MDX components in `apps/docs`; promote only generic,
   repeated Fumadocs primitives to `packages/docs-fumadocs/render` or repeated
   WhatTax UI primitives to `packages/ui`.
