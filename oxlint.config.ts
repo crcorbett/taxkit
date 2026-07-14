@@ -10,6 +10,7 @@ const decodingBoundaryFiles = [
   "apps/docs/examples/browser-http.ts",
   "apps/docs/examples/node-server.ts",
   "apps/docs/src/lib/docs/loaders.ts",
+  "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/src/lib/docs/route-boundary.test.js",
 
@@ -91,9 +92,20 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/docs/src/lib/docs/route-boundary.test.js"],
+      files: [
+        "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
+        "apps/docs/src/lib/docs/route-boundary.test.js",
+      ],
       rules: {
         "whattax/no-runtime-execution-outside-boundaries": "off",
+      },
+    },
+    {
+      // The browser harness uses programmatic routes to prove the production
+      // boundary without adding a production file route.
+      files: ["apps/docs/src/lib/docs/route-boundary.browser.test.tsx"],
+      rules: {
+        "whattax/no-route-transport-restore-outside-consumers": "off",
       },
     },
   ],

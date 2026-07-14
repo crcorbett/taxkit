@@ -14,6 +14,7 @@ import {
 import type { Effect as EffectType } from "effect";
 import { parse as parseYaml } from "yaml";
 
+import navigationRepresentation from "../../../../apps/docs/navigation.json";
 import { DocsSourceError } from "../errors.js";
 import {
   DocsNavigation,
@@ -33,7 +34,6 @@ const repoRoot = resolve(import.meta.dirname, "../../../..");
 const absoluteDocsRoot = join(repoRoot, docsRoot);
 const absoluteContentRoot = join(repoRoot, contentRoot);
 const absoluteExamplesRoot = join(repoRoot, examplesRoot);
-const absoluteNavigationPath = join(repoRoot, navigationSource);
 
 const bannedPattern =
   /\b(easy|simple|simply|just|seamless|seamlessly|powerful|effortless|beautiful|magical|unlock|leverage|utilise|streamline)\b/iu;
@@ -384,10 +384,7 @@ const listMdxSources: EffectType.Effect<
 );
 
 export const getNavigation: EffectType.Effect<DocsNavigation, DocsSourceError> =
-  readText(absoluteNavigationPath).pipe(
-    Effect.flatMap(
-      Schema.decodeUnknownEffect(Schema.fromJsonString(DocsNavigation))
-    ),
+  Schema.decodeUnknownEffect(DocsNavigation)(navigationRepresentation).pipe(
     Effect.mapError((cause) => sourceError(cause))
   );
 

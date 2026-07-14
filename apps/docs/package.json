@@ -10,7 +10,9 @@
     "build": "vite build",
     "check-examples": "tsc -p tsconfig.examples.json --noEmit",
     "check-types": "tsc --noEmit && bun run check-examples",
-    "clean": "rm -rf .output .tanstack .turbo node_modules/.vite"
+    "clean": "rm -rf .output .tanstack .turbo node_modules/.vite",
+    "preview": "portless run --name docs.whattax vite preview",
+    "test:browser": "vitest run --config vitest.browser.config.ts"
   },
   "dependencies": {
     "@tanstack/react-router": "catalog:",
@@ -27,8 +29,11 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
+    "@vitest/browser-playwright": "4.1.7",
     "nitro": "catalog:",
+    "playwright": "^1.60.0",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }

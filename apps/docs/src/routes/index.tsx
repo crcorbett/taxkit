@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import type {
   DocsContentPage,
   DocsNavigation,
@@ -35,14 +35,15 @@ const DocsHomeContent = ({
       {pipe(
         navigation.primaryNavigation,
         Array.map((section) => (
-          <a
+          <Link
             className="docs-section-card"
-            href={section.path}
             key={section.path}
+            params={{ _splat: section.path.slice(1) }}
+            to="/$"
           >
             <span>{section.title}</span>
             <small>{section.primaryReader}</small>
-          </a>
+          </Link>
         ))
       )}
     </nav>

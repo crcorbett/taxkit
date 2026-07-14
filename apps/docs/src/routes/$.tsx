@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import type {
   DocsContentPage,
   DocsNavigation as DocsNavigationValue,
@@ -52,16 +52,20 @@ const DocsNavigation = ({
   navigation: DocsNavigationValue;
 }>) => (
   <aside className="docs-nav">
-    <a className="docs-nav__home" href="/">
+    <Link className="docs-nav__home" to="/">
       WhatTax Docs
-    </a>
+    </Link>
     {pipe(
       navigation.primaryNavigation,
       Array.map((section) => (
         <section className="docs-nav__section" key={section.path}>
-          <a className="docs-nav__section-link" href={section.path}>
+          <Link
+            className="docs-nav__section-link"
+            params={{ _splat: section.path.slice(1) }}
+            to="/$"
+          >
             {section.title}
-          </a>
+          </Link>
           {Option.fromUndefinedOr(section.pages).pipe(
             Option.match({
               onNone: () => null,
@@ -70,14 +74,15 @@ const DocsNavigation = ({
                   {pipe(
                     items,
                     Array.map((item) => (
-                      <a
+                      <Link
                         className="docs-nav__link"
                         data-active={item.path === currentPath}
-                        href={item.path}
                         key={item.path}
+                        params={{ _splat: item.path.slice(1) }}
+                        to="/$"
                       >
                         {item.title}
-                      </a>
+                      </Link>
                     ))
                   )}
                 </div>

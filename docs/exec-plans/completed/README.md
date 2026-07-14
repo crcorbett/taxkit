@@ -12,6 +12,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md)
 - [Boundary-only decoding](./boundary-only-decoding.md)
 - [Downstream consumer validation](./downstream-consumer-validation.md)
 - [API compatibility harness](./api-compatibility-harness.md)

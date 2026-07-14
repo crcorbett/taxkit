@@ -1,5 +1,5 @@
 ---
-status: active
+status: completed
 last_reviewed: 2026-07-14
 source_of_truth: execution-plan
 confidence: high
@@ -26,7 +26,7 @@ correction turns for one task, stop and replan or request a user decision.
 | --- | --- | --- |
 | TSLB-001 | accepted | Encoded loader transport, canonical app errors, route-root restoration, focused tests and architecture corrections pass all task gates and parent review. |
 | TSLB-002 | accepted | Exact Oxlint restoration-placement rule, direct consumer provenance checks and real CLI fixtures pass the task gates and parent review. |
-| TSLB-003 | pending | Browser proof, final inventory, documentation and rollout close-out. |
+| TSLB-003 | accepted | Client harness, built SSR/hydration/client-navigation proof, final inventories and documentation close-out pass all task gates and parent review. |
 
 ## Current call graph
 
@@ -87,8 +87,7 @@ on framework or Effect API syntax.
 ### TSLB-001 implementation evidence
 
 Status:
-: Implemented and awaiting parent review. The task-list status remains
-`pending`, and no parent acceptance is recorded.
+: Accepted by the parent and committed. The task-list status is `completed`.
 
 Implemented call graph:
 
@@ -178,7 +177,7 @@ Residual risk:
 : TSLB-001 proves deterministic codec, failure and production-build behaviour.
 The specialised restoration-placement lint rule belongs to TSLB-002, and
 browser SSR/hydration plus client-navigation runtime proof belongs to TSLB-003.
-Neither follow-on task has started.
+Both follow-on slices are recorded below.
 
 Parent acceptance:
 : Accepted after correction turn 1. The parent reran the focused boundary
@@ -192,8 +191,7 @@ for a later task.
 ### TSLB-002 implementation evidence
 
 Status:
-: Implemented and awaiting parent review. The task-list status remains
-`pending`, and no parent acceptance is recorded. TSLB-003 has not started.
+: Accepted by the parent and committed. The task-list status is `completed`.
 
 Implemented enforcement flow:
 
@@ -277,7 +275,7 @@ Verification evidence:
 | Helper audit | Passed one-visitor review with no source-text parsing, unsafe casts, duplicated visitor policy or generic AST utility. |
 | Documentation review | Passed reader fit, Australian spelling, sentence-case headings, banned-language review, canonical names and source-of-truth ownership; `bun run docs:validate` reported 0 issues. |
 | `bun run changeset status --verbose` | Passed. Existing pending minor Changesets remain unchanged and no package receives a patch from this slice. |
-| Task-status audit | `TSLB-002` remains `pending` in the task list while this plan records implementation awaiting parent review. |
+| Task-status audit | `TSLB-002` is `completed` in the task list and accepted by the parent. |
 | `git diff --check` | Passed. |
 
 Changeset decision:
@@ -289,8 +287,8 @@ pending Changesets were not consumed or modified.
 Residual risk:
 : The rule intentionally rejects unsupported static shapes instead of
 performing arbitrary interprocedural or type-aware analysis. Runtime browser
-SSR/hydration and client-navigation proof remains TSLB-003 scope and has not
-started. The spec call graph remains accurate.
+SSR/hydration and client-navigation proof remained TSLB-003 scope and is
+recorded below. The spec call graph remains accurate.
 
 Parent acceptance:
 : Accepted after correction turn 1. The parent reproduced the boundary-object
@@ -301,3 +299,158 @@ and source-text/helper audits, Changeset status, JSON validation and
 `git diff --check`. The rule now fails closed for every specified import,
 ownership, member, provenance, matching and forwarding category without
 reporting shadowed locals or unrelated `restore` methods.
+
+### TSLB-003 implementation evidence
+
+Status:
+: Accepted by the parent. The task-list status is `completed`.
+
+Final production call graph:
+
+```ts
+apps/docs/navigation.json build-time representation
+  -> canonical DocsNavigation schema decode
+    -> DocsContentService Effect
+      -> Effect.exit once
+        -> Schema.Exit(success, error, Schema.Never) JSON encoding
+          -> createServerFn and route loader return encoded data unchanged
+            -> TanStack SSR hydration or client-navigation transport
+              -> direct route-root restore
+                -> local Result match
+                  -> focused canonical values reach React composition and leaves
+```
+
+Internal docs links now use TanStack `Link`, so a hydrated navigation runs the
+destination route loader and server-function RPC without requesting a new
+document. The built runtime bundles the app-authored navigation representation
+before decoding it through `DocsNavigation`; this removes the invalid
+source-relative filesystem lookup discovered in the first Vercel preview.
+
+Browser harness:
+
+- `apps/docs/vitest.browser.config.ts` runs Vitest Browser Mode with the
+  Playwright provider and one headless Chromium instance. It builds the harness
+  with production React/TanStack branches so handled route defects do not emit
+  development-only framework warnings; the tests still assert zero console
+  warnings and errors.
+- The programmatic `/$scenario` route uses `Route.useLoaderData`, the canonical
+  `docsHomeRouteBoundary.restore` operation and a local `Result.match`.
+- Seven Chromium tests prove success, all three canonical expected failure
+  categories, malformed transport, defect and interruption. Expected and
+  malformed states render route UI; defect and interruption reach the route
+  `errorComponent`.
+- `Effect.acquireUseRelease` owns DOM, React root, router history and console
+  spy cleanup. No production route, hook, provider, HOC, DTO mirror or cast was
+  added.
+- This is client-route evidence only. It does not prove SSR or hydration.
+
+Built browser evidence:
+
+- Built `apps/docs` with the Vercel Nitro preset and served the output through
+  `https://docs.whattax.localhost` using portless.
+- A Chromium context with JavaScript disabled received HTTP 200 and found the
+  server-rendered home heading `Open-source tax engine, API and SDK
+  documentation` plus `61 documentation pages loaded.` before interaction.
+- A JavaScript-enabled context retained the same heading and page count after
+  hydration, with no console warnings, console errors or uncaught page errors.
+- After waiting for the hydrated TanStack link handler, clicking `/start`
+  produced a successful GET fetch to
+  `/_serverFn/c8c6dd06eff1c0e65f1a26f5f19875cdffdd3fa5ecbc071662ff68412ee81193`,
+  loaded the destination MDX chunk and rendered the `Start` heading. The
+  transition made zero document requests.
+- Review screenshot: `/tmp/whattax-tslb-003-start.png`. It is intentionally not
+  committed.
+
+Dependency changes:
+
+- Added docs-app dev dependencies `@vitest/browser-playwright@4.1.7`,
+  `playwright@^1.60.0` and the existing workspace-catalogued `vitest`.
+- The lock resolves Vitest and its browser provider to `4.1.7` and Playwright to
+  `1.61.1`. No production dependency changed.
+- Added explicit docs `test:browser` and portless `preview` commands.
+
+Final inventories:
+
+- The repository-owned decoder scan found 42 executable operations after
+  excluding helper declarations/references, custom-rule diagnostic strings,
+  generated output and source strings used only as Oxlint fixtures. The three
+  new operations decode canonical browser-test fixtures in the exact
+  allowlisted browser harness. Every executable decoder remains in an exact
+  `decodingBoundaryFiles` entry.
+- Production restoration remains exactly two calls: one in each direct route
+  root, each consuming one immutable `Route.useLoaderData` binding and followed
+  by local `Result.match`. The browser harness contains one canonical restore
+  under an exact programmatic-test override. Unit tests contain four focused
+  codec restore calls. Remaining matches are tested Oxlint fixture source.
+- `routeTransportConsumerFiles` remains an exact production/CLI-fixture list
+  with no route glob. The browser harness has an exact-file override because a
+  programmatic `createRoute` must not be admitted as a production
+  `createFileRoute` consumer.
+- The route boundary import graph contains only browser-safe canonical docs
+  schemas/errors, Effect modules and the neutral app-local error owner.
+
+Quality audit passes:
+
+1. Behavioural proof: expanded the client harness across every required
+   outcome category, kept strict clean-console assertions and separately proved
+   server HTML, hydration and one real client-navigation RPC in the built app.
+   The first built probe exposed the relocated navigation filesystem path;
+   bundling and schema-decoding the authored representation corrected it.
+2. Architecture and component shape: reconciled the final call graph, retained
+   one immutable loader and restore binding per production route, converted
+   internal navigation to TanStack `Link`, and confirmed focused leaves have no
+   loader, boundary, service or runtime imports. No route-specific abstraction
+   family or shared package was introduced.
+3. Documentation and release readiness: reconciled app/package READMEs,
+   frontend/content/testing architecture, spec and indexes against the full
+   documentation standards suite. Confirmed current names, sentence-case
+   headings, Australian spelling, source-of-truth links, no generated evidence
+   in git and no package publication/versioning action.
+
+Verification evidence:
+
+| Gate | Outcome |
+| --- | --- |
+| `bun run --filter=docs test:browser` | Passed 7 Chromium tests covering success, three expected failures, malformed transport, defect and interruption with clean console assertions. |
+| `bun run test:docs-boundaries` | Passed 6 tests and 32 assertions. |
+| `bun run test:oxlint` | Passed 26 real CLI tests and 41 assertions. |
+| `bun run lint` | Passed the boundary-directive pass and repository-wide Oxlint run. An earlier concurrent lint run observed the Oxlint suite's temporary fixture; the required sequential rerun passed. |
+| `bun run test` | Passed docs boundary tests, Oxlint tests and all 17 Turbo package test tasks. |
+| `bun run --filter=docs check-types` | Passed app and checked-example TypeScript checks. |
+| `bun run --filter=docs build` | Passed client, SSR and Nitro/Vercel production builds. |
+| `bun run docs:validate` | Passed with 0 documentation issues. |
+| `bun run verification` | Passed lint, formatting, Knip and all 22 workspace checks. |
+| Built browser proof | Passed server-rendered home, clean hydration, 200 server-function fetch, zero-document client transition and rendered `/start` MDX checks. |
+| Decoder/restore inventories | Reconciled 42 executable decoder operations, two production restores, one programmatic harness restore, four focused unit restores and exact lint configuration. |
+| Effect/React/helper audits | Passed exact failure cardinality, typed errors, canonical schemas, linear pipelines, no broad catches, no nested runtime, no casts/DTO mirrors and no wrapper family. |
+| Documentation review | Passed reader fit, Australian spelling, sentence-case headings, banned-language, template, diagram, canonical-name and source-of-truth review. |
+| `jq empty docs/product-specs/tanstack-start-loader-transport-boundaries.tasks.json` | Passed; every task is `completed`. |
+| `bun run changeset status --verbose` | Passed. Existing pending minor Changesets are unchanged and this slice adds no package release. |
+| Changeset diff audit | Passed; `.changeset/*` has no diff. |
+| `git diff --check` | Passed. |
+
+Changeset and release decision:
+: No Changeset was added. The browser tooling is private docs-app development
+tooling; the route, navigation and docs-content changes support the private docs
+runtime; documentation changes are maintainer-facing. No public package export,
+installation contract or published behaviour changed. Existing pending
+Changesets were neither modified nor consumed. No versioning or publication
+command ran.
+
+Residual risk:
+: The client harness intentionally does not prove SSR. The built proof covers a
+local Nitro/Vercel preview through portless, not a deployed Vercel environment.
+The custom restoration rule remains static analysis and the browser harness
+uses an exact test-only override for programmatic routes.
+
+Parent acceptance:
+: Accepted with no subagent correction turn. The parent independently reran the
+seven-test Chromium harness, six codec tests with 32 assertions, all 26 Oxlint
+CLI tests with 41 assertions, package tests, repository lint, full tests, docs
+type checking, the Vercel/Nitro build, docs validation and Changesets status.
+The parent then proved raw SSR content, clean hydration and a real `/start`
+client transition with successful server-function responses, no document
+request, the expected MDX heading and no console or page errors. Three parent
+audit passes reconciled behavioural proof, Effect/React/helper ownership and
+documentation/release status. The parent corrected definition-list indentation
+in the content architecture page before final verification.

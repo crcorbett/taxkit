@@ -17,7 +17,7 @@ Reusable Fumadocs internals come from `@whattax/docs-fumadocs`.
 This package does not own routes, layout, MDX renderer components or search UI.
 Those belong in the `apps/docs` runtime.
 
-## Main Areas
+## Main areas
 
 - `source.config.ts`: WhatTax collection declaration for `apps/docs/content`
   using reusable `@whattax/docs-fumadocs/config` helpers.
@@ -31,7 +31,7 @@ Those belong in the `apps/docs` runtime.
 - `.source/`: generated Fumadocs output. Regenerate it instead of editing it by
   hand.
 
-## Runtime Shape
+## Runtime shape
 
 `fumadocs-mdx` compiles `source.config.ts` into `.source/`. Server-only package
 code adapts that generated collection through `fumadocs-core/source` and the
@@ -40,6 +40,11 @@ through `DocsContentService`. The existing `getPage` and `listPages` methods
 return serialisable content page data for the current app route. The
 `getRenderablePage` and `listRenderablePages` methods expose compiled
 Fumadocs page data for server-side rendering integration.
+
+The authored `apps/docs/navigation.json` representation is bundled with the
+source-only package and decoded through `DocsNavigation`. This keeps the built
+server independent of source-relative filesystem paths while preserving the
+app-owned navigation file and package-owned schema contract.
 
 This package is intentionally private and source-only. It is not a publishable
 runtime package because its server and client exports wrap generated
@@ -54,7 +59,7 @@ examples and OpenAPI references. App routes should consume the service boundary
 instead of importing `.source/*` files directly. Browser modules must not
 import `@whattax/docs-content/server`.
 
-## Frontmatter Contract
+## Frontmatter contract
 
 Every authored MDX page under `apps/docs/content` must provide:
 
@@ -67,7 +72,7 @@ Fumadocs receives that schema through `Schema.toStandardSchemaV1(...)`, so the
 Effect Schema contract remains canonical while Fumadocs performs frontmatter
 validation.
 
-## Validation Policy
+## Validation policy
 
 `bun run --filter=@whattax/docs-content validate` checks:
 
@@ -102,7 +107,7 @@ implementation in `apps/docs` or reusable primitives in
 - Keep docs identifiers, frontmatter, meta, navigation and tagged source errors
   schema-owned in this package.
 
-## Related Docs
+## Related docs
 
 - `docs/product-specs/docs-mdx-fumadocs-runtime.md`
 - `docs/architecture/content-and-posts.md`

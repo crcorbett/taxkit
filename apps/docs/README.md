@@ -55,31 +55,44 @@ by `@whattax/docs-content`.
 Production: docs page
 
 browser
-  -> apps/docs route
-    -> apps/docs loader
+  -> TanStack route loader
+    -> createServerFn
       -> DocsContentService
         -> @whattax/docs-content live layer
           -> @whattax/docs-fumadocs source adapter
           -> packages/docs-content/.source/server
-          -> apps/docs/navigation.json
-    -> @whattax/docs-content/client
-      -> Fumadocs compiled MDX module
-    -> @whattax/docs-fumadocs/render
-    -> app-local MDX component map
+          -> schema-decoded apps/docs/navigation.json representation
+      -> schema-encoded Exit representation
+    -> TanStack SSR hydration or client-navigation transport
+      -> direct route-root restore and Result match
+        -> @whattax/docs-content/client
+          -> Fumadocs compiled MDX module
+        -> @whattax/docs-fumadocs/render
+        -> app-local MDX component map
 ```
 
 ## Commands
 
 ```txt
 bun run --filter=docs dev
+bun run --filter=docs test:browser
 bun run --filter=docs check-types
 bun run --filter=docs build
+bun run --filter=docs preview
 bun run --filter=docs check-examples
 bun run docs:validate
 ```
 
 `check-types` includes `check-examples`, so public examples stay connected to
 current SDK/API/calculator exports.
+
+Run `build` before `preview`. Both `dev` and `preview` expose the app through
+`https://docs.whattax.localhost` with portless.
+
+`test:browser` runs the programmatic TanStack client-route harness in Chromium.
+It proves success, expected failures, malformed transport and framework error
+boundaries after `Route.useLoaderData`; it does not prove SSR or hydration. Use
+the built app for initial SSR, hydration and real client-navigation proof.
 
 ## Authoring rules
 
@@ -118,6 +131,9 @@ docs change
 - Do not import `@whattax/docs-content/server` or generated `.source/server`
   modules from browser code.
 - Keep app-specific MDX components in `src/lib/mdx/components.tsx`.
+- Use TanStack `Link` for internal docs routes so navigation runs the client
+  loader and server-function RPC. Use ordinary anchors for external URLs.
+- Keep browser boundary tests programmatic. Do not add production test routes.
 - Put generic Fumadocs primitives in `@whattax/docs-fumadocs` only when they
   are reusable outside this app.
 - Use [Documentation style](../../docs/standards/documentation-style.md) and

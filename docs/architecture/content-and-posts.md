@@ -34,7 +34,9 @@ on the open-source tax engine and avoid downstream private-product specifics.
 `packages/docs-content`
 : Private source-only package for WhatTax docs frontmatter, meta, navigation,
   validation policy, tagged docs errors, generated Fumadocs source access and
-  the content service.
+  the content service. It bundles the app-authored navigation representation
+  for built runtimes and decodes it through the package-owned navigation
+  schema.
 
 `packages/docs-fumadocs`
 : Private reusable package for generic Fumadocs configuration, Effect Schema to

@@ -2,7 +2,7 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/tanstack-start-loader-transport-boundaries.md",
   "title": "TanStack Start loader transport boundary implementation tasks",
-  "status": "draft",
+  "status": "implemented",
   "last_reviewed": "2026-07-14",
   "principles": [
     "Keep schema-encoded Effect outcomes intact through SSR loader dehydration/hydration and client-navigation server-function RPC serialization.",
@@ -276,7 +276,7 @@
     },
     {
       "id": "TSLB-003",
-      "status": "pending",
+      "status": "completed",
       "title": "Prove browser behaviour and complete the boundary documentation",
       "type": "browser-and-final-audit",
       "dependsOn": [

@@ -44,11 +44,20 @@ change:
 ```bash
 bun run docs:validate
 bun run docs:build
+bun run --filter=docs test:browser
 bun run --filter=@whattax/docs-content test
 ```
 
 Run those package-local docs gates whenever MDX content, Fumadocs source
 wiring, docs examples, validation policy or docs rendering changes.
+
+The docs browser command runs a programmatic client-side TanStack route harness
+in Chromium. It may prove direct `Route.useLoaderData` restoration, recoverable
+route UI, framework error boundaries and console cleanliness, but it does not
+prove SSR or hydration. Prove initial SSR, hydration and client navigation
+separately against the built app on `https://docs.whattax.localhost`, including
+a successful server-function response and no document request during the client
+transition.
 
 Public API route work should also capture contract evidence from the standalone
 API app:
@@ -67,6 +76,8 @@ API app:
 - API responses must stay schema-backed.
 - Public docs content must validate through `@whattax/docs-content` before
   documentation/runtime slices are accepted.
+- Keep browser tooling in app dev dependencies and browser harness routes out
+  of production route trees.
 - Browser-safe exports must not import Node-only modules.
 - Oxlint can enforce restricted APIs, such as banned `Object.*` enumeration
   helpers, but it does not currently provide a safe built-in rule for banning

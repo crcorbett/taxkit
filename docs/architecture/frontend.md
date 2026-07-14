@@ -67,7 +67,9 @@ Docs SSR loaders use the same runtime rule. `apps/docs` keeps a module-scoped
 runtime for `DocsContentServiceLive`, decodes route input before lookup and
 preloads compiled MDX through the browser-safe client loader. App routes should
 not read `apps/docs/content` files, `navigation.json` or generated
-`.source/server` modules directly.
+`.source/server` modules directly. `@whattax/docs-content` bundles the authored
+navigation representation and decodes it with the canonical navigation schema,
+so built server functions do not depend on a source-relative filesystem path.
 
 Docs server functions encode route outcomes with a browser-safe Effect Schema
 boundary. Route loaders return that representation unchanged. On an initial
@@ -75,7 +77,9 @@ request, TanStack Router dehydrates and hydrates the encoded loader state. On
 client navigation, the server-function RPC serialiser carries the encoded
 response before the route loader returns it. In both paths, the direct route
 root restores the value once and matches the typed `Result` before composing
-the page.
+the page. Internal docs navigation uses TanStack `Link`; a browser click then
+runs the destination route loader and server-function RPC without a new
+document request.
 
 ```ts
 DocsContentService Effect
@@ -132,6 +136,8 @@ removes meaningful repetition. App-specific composition remains app-owned;
   `@whattax/docs-content/client` and `@whattax/docs-fumadocs/render`.
 - Keep docs loader outcomes encoded until a direct route-root consumer restores
   them through the browser-safe route boundary.
+- Use TanStack router links for internal docs routes so client navigation runs
+  the route loader. Keep ordinary anchors for external destinations.
 - Do not import generated `.source/server` files or
   `@whattax/docs-content/server` from browser modules.
 - Keep Fumadocs generated source access inside `@whattax/docs-content` server

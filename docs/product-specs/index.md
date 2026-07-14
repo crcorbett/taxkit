@@ -28,7 +28,7 @@ Specs:
 | [Public MDX developer documentation](./public-mdx-developer-docs.md) | Implemented | Public MDX docs content and navigation are in place. |
 | [SDK-backed HTTP API thin wrapper](./sdk-backed-http-api-thin-wrapper.md) | Implemented | HTTP calculate delegates execution through the SDK Effect facade. |
 | [SDK public naming and export contract](./sdk-public-naming-and-export-contract.md) | Implemented | Public SDK names and packed export contract are stabilised. |
-| [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md) | Draft | Keep schema-encoded Effect outcomes intact through TanStack transport and restore them only at direct route roots. |
+| [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md) | Implemented | Schema-encoded Effect outcomes survive initial SSR and client navigation before direct route-root restoration. |
 | [TypeScript SDK and publishing](./typescript-sdk-and-publishing.md) | Implemented through release prep | SDK implementation and release-prep checks exist; npm publication remains gated. |
 
 Authoring guides:

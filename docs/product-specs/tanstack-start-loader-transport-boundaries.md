@@ -1,5 +1,5 @@
 ---
-status: draft
+status: implemented
 last_reviewed: 2026-07-14
 source_of_truth: docs
 confidence: high
@@ -15,6 +15,11 @@ Primary reader:
 Primary need:
 : Place Effect Schema encoding and restoration at TanStack Start's actual
 loader transport boundary without weakening React or decoding rules.
+
+Implementation status:
+: Implemented and accepted. See the
+[completed execution plan](../exec-plans/completed/tanstack-start-loader-transport-boundaries.md)
+for runtime evidence and residual risk.
 
 WhatTax should keep Effect-owned route outcomes schema-encoded until the route
 root consumes them. On initial SSR, the encoded loader value must survive
