@@ -1,0 +1,70 @@
+import { readFile } from "node:fs/promises";
+
+import { BunRuntime as Runtime } from "@effect/platform-bun";
+import { describe } from "@effect/vitest";
+import { expect } from "vitest";
+import * as EffectRoot from "effect";
+import {
+  Data as EffectData,
+  Effect as Fx,
+  ManagedRuntime as RuntimeManager,
+  Schema as S,
+} from "effect";
+
+const TaggedSchemaError = S.TaggedErrorClass;
+const { Unknown: UnknownCause } = S;
+
+export class UntypedError extends TaggedSchemaError<UntypedError>()(
+  "UntypedError",
+  { cause: UnknownCause }
+) {}
+
+const { TaggedError: TaggedDataError } = EffectData;
+
+export class UntypedDataError extends TaggedDataError("UntypedDataError")<{
+  readonly cause: unknown;
+}>() {}
+
+const RuntimeLayer = Fx.succeed("live");
+export { RuntimeLayer as DemoLive };
+export { ExternalLive as ExternalLayer } from "./external.layer";
+
+export const rejectedService = (
+  input: unknown
+): Fx.Effect<string, unknown> => Fx.succeed(String(input));
+
+export const rejectedTag = { _tag: "Rejected", readFile };
+
+export const rejectedBranch = (value: string) => {
+  switch (value) {
+    case "first":
+      return 1;
+    default:
+      return 2;
+  }
+};
+
+const {
+  decodeUnknownSync: decodeInput,
+  encodeUnknownEffect: encodeOutput,
+} = S;
+export const rejectedEncoding = encodeOutput(S.String);
+export const rejectedCodec = decodeInput(S.String);
+
+const execute = Fx.runPromise;
+const executeSync = EffectRoot.Effect.runSync;
+const { make: makeRuntime } = RuntimeManager;
+const executeMain = Runtime.runMain;
+export const rejectedRuntime = execute(Fx.succeed("rejected"));
+export const rejectedSyncRuntime = executeSync(Fx.succeed("rejected"));
+export const rejectedManagedRuntime = makeRuntime(Fx.succeed("rejected"));
+executeMain(Fx.void);
+
+const { argv: rejectedArguments } = process;
+const { log: writeLog } = console;
+const { error: forwardedConsoleError } = console;
+export { rejectedArguments };
+export { forwardedConsoleError };
+export const rejectedTestApis = { describe, expect };
+
+writeLog("portable Effect rule fixture rejected");

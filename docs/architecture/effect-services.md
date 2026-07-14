@@ -159,6 +159,43 @@ repository. Its exact file allowlist belongs only in `oxlint.config.ts`; this
 architecture page owns the categories and review contract, not a duplicate
 path list. Use the active decoder inventory and this contract during review.
 
+## Encoding and contract boundaries
+
+Encoding is the inverse trust operation. Execute an owning Schema encoder only
+where a canonical value leaves the system as HTTP or route transport, provider
+input, persisted representation or command output. Do not encode between
+services, as a defensive copy, or inside ordinary React composition.
+`effect/no-schema-encoder-outside-egress` is enabled repository-wide and exact
+egress files are disabled only in `oxlint.config.ts`.
+
+Production code must not use throwing `Schema.*Sync` codecs. Prefer
+`Schema.decodeUnknownEffect` or `Schema.encodeUnknownEffect` at an Effect
+boundary and keep `Schema.SchemaError` in the typed channel. A synchronous
+consumer may use `Result`, `Exit` or `Option` codecs and must handle failure
+explicitly. Exact legacy test fixtures that intentionally prove throwing
+behaviour are listed in `oxlint.config.ts`; runtime filenames are not an
+implicit exception.
+
+Service methods accept schema-derived inputs and expose closed tagged errors.
+Do not annotate service parameters or Effect error channels as `unknown`.
+Tagged errors must not expose `Schema.Unknown` or a TypeScript `unknown` cause;
+reuse the owning error, preserve a true adapter defect with `Schema.Defect()`,
+or retain schema-safe diagnostic fields. Static lint cannot decide whether a
+`Schema.Defect()` cause should instead be a known provider or domain error, so
+that distinction remains a three-pass review requirement.
+
+Runtime execution, `console`, `process`, Bun host APIs and host-specific imports
+belong to exact adapters configured in `oxlint.config.ts`. Service, schema,
+error and config contracts depend on Effect Platform services or a
+`Context.Service`; their live layers choose Bun or another host. Provider SDK
+imports also require review because package names alone cannot reliably
+distinguish a portable contract from a legitimate adapter. Lint follows
+scope-resolved canonical Effect and platform imports, global host references,
+renamed bindings, aliases and statically known destructuring. Local values that
+merely reuse names such as `Effect`, `Schema`, `console`, `process`, `Bun` or
+`BunRuntime` are not host/runtime references. Dynamic and interprocedural value
+flow remains a review concern rather than a reason for broad suppressions.
+
 ### TanStack loader transport
 
 Treat a TanStack Start server-function call and TanStack Router loader-state

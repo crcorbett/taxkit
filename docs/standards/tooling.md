@@ -78,21 +78,55 @@ Current WhatTax-specific overrides are narrow:
 - `unicorn/no-array-method-this-argument`: Effect `Array` helpers are not native
   JavaScript array method `thisArg` usage.
 
-Current WhatTax-specific custom rules:
+Portable custom rules live under `effect/*`, `bun/*` and `mdx/*`; tax,
+calculator, decoder and route-transport policy remains under `whattax/*`.
+Important portable rules include:
 
-- `whattax/no-manual-tag`: bans manual `_tag` object literals. Use
+- `effect/no-manual-tag`: bans manual `_tag` object literals. Use
   `Data.TaggedClass`, `Data.TaggedError`, `Schema.TaggedClass`, or an owning
   package constructor.
-- `whattax/no-layer-exports-in-service-files`: bans `Live`, `Mock` and `Test`
-  layer exports from `service.ts`/`services.ts` files. Service files own
-  `Context.Service` contracts and canonical schemas; production wiring belongs
-  in `live.layer.ts`, test wiring belongs in `test.layer.ts` or test helpers.
-- `whattax/no-runtime-execution-outside-boundaries`: bans direct Effect runtime
-  execution outside app/runtime boundary files. Package and service logic must
-  return `Effect` values and layers; app entrypoints and runtime modules own
-  `BunRuntime.runMain`, `ManagedRuntime.make` and runtime disposal.
-- `whattax-no-switch/no-switch`: bans `switch`. Use Effect `Match` with
+- `effect/no-layer-exports-in-service-files`: bans `Live`, `Mock` and `Test`
+  layer exports from `service.ts`/`services.ts` files, including named export
+  specifiers and named re-exports. Service files own `Context.Service`
+  contracts and canonical schemas; production wiring belongs in
+  `live.layer.ts`, test wiring belongs in `test.layer.ts` or test helpers.
+- `effect/no-runtime-execution-outside-boundaries`,
+  `effect/no-console-outside-runtime` and
+  `effect/no-process-outside-boundaries`: keep execution and host lifecycle in
+  exact files owned by `oxlint.config.ts`. Package and service logic returns
+  `Effect` values and tagged failures. The rules resolve canonical imports,
+  renamed bindings, aliases and statically known destructuring; lexically
+  shadowed same-named locals are not host or runtime APIs.
+- `effect/no-schema-encoder-outside-egress` and
+  `effect/no-throwing-schema-sync-codec`: encode once at exact egress and use
+  Effect or non-throwing Result/Exit/Option codecs. Canonical `Schema`
+  imports, namespace imports, renamed bindings and statically known method
+  aliases are all enforced.
+- `effect/no-unknown-service-contract` and
+  `effect/no-unknown-tagged-error-cause`: keep service inputs schema-derived and
+  expected errors closed and tagged. Scope-resolved aliases of `Effect.Effect`,
+  `Schema.Unknown`, `Schema.TaggedErrorClass` and `Data.TaggedError` remain
+  subject to the same contract.
+- `effect/no-effect-test-global-mix`: rejects a file that splits unaliased
+  `describe`, `expect`, `it` or `test` imports between `@effect/vitest` and
+  `vitest`. Shared globals must have one owner. Vitest-only utilities such as
+  `vi` and hooks may still come from `vitest`; an explicitly aliased secondary
+  shared API is also valid.
+- `effect/no-switch`: bans `switch`. Use Effect `Match` with
   exhaustive handling.
+- `bun/no-host-api-outside-adapters` and
+  `bun/no-runtime-outside-entrypoints`: keep Bun file/process/server APIs and
+  `BunRuntime.runMain` in exact live/runtime/script boundaries. Global Bun
+  methods and canonical platform runtime imports remain enforced through
+  aliases and statically known destructuring without treating local objects
+  named `Bun` or `BunRuntime` as host APIs. Non-host global Bun members such as
+  `Bun.version` remain outside this rule, including direct and destructured
+  access.
+- `mdx/no-route-local-component-registry`: keeps the MDX registry app-owned and
+  route components composition-only.
+
+Current WhatTax-specific custom rules include:
+
 - `whattax/no-typeof`, `whattax/no-instanceof` and
   `whattax/no-in-operator`: scoped to `packages/calculators/src`. Calculator
   service code must decode with Schema and branch with `Option`, `Result`,

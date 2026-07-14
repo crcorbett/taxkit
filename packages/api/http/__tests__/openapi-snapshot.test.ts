@@ -21,9 +21,12 @@ const readOpenApiSnapshot = Effect.promise(() =>
   Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(Schema.Json)))
 );
 
-const writeOpenApiSnapshot = Effect.promise(() =>
-  writeFile(snapshotUrl, formatOpenApiSnapshot(whatTaxOpenApiSpec))
-).pipe(Effect.asVoid);
+const writeOpenApiSnapshot = formatOpenApiSnapshot(whatTaxOpenApiSpec).pipe(
+  Effect.flatMap((snapshot) =>
+    Effect.promise(() => writeFile(snapshotUrl, snapshot))
+  ),
+  Effect.asVoid
+);
 
 describe("WhatTax OpenAPI snapshot", () => {
   it.effect("matches the committed normalized OpenAPI contract snapshot", () =>
@@ -35,9 +38,12 @@ describe("WhatTax OpenAPI snapshot", () => {
       yield* Match.value(shouldUpdate).pipe(
         Match.when(true, () => writeOpenApiSnapshot),
         Match.orElse(() =>
-          readOpenApiSnapshot.pipe(
-            Effect.map((snapshot) =>
-              expect(normalizedWhatTaxOpenApiSpec).toEqual(snapshot)
+          Effect.all({
+            normalized: normalizedWhatTaxOpenApiSpec,
+            snapshot: readOpenApiSnapshot,
+          }).pipe(
+            Effect.map(({ normalized, snapshot }) =>
+              expect(normalized).toEqual(snapshot)
             )
           )
         )

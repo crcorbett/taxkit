@@ -31,27 +31,31 @@ const loadDocsHomeData = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 const loadDocsPageData = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
-    Schema.decodeUnknownSync(DocsPageLoaderInput)(input)
-  )
+  .inputValidator((input: unknown) => input)
   .handler(async ({ data }) => {
     const { docsRuntime } = await import("#/lib/runtime.server");
 
     return await docsRuntime.runPromise(
-      Effect.gen(function* loadDocsPageEffect() {
-        const content = yield* DocsContentService;
-        const path = yield* Schema.decodeUnknownEffect(DocsPagePath)(
-          `/${data.splat}`
-        ).pipe(Effect.mapError((cause) => new DocsSourceError({ cause })));
-        const navigation = yield* content.getNavigation();
-        const page = yield* content.getRenderablePage(path);
-        yield* preloadDocsContent(page.source);
+      Schema.decodeUnknownEffect(DocsPageLoaderInput)(data).pipe(
+        Effect.mapError((cause) => new DocsSourceError({ cause })),
+        Effect.flatMap(({ splat }) =>
+          Effect.gen(function* loadDocsPageEffect() {
+            const content = yield* DocsContentService;
+            const path = yield* Schema.decodeUnknownEffect(DocsPagePath)(
+              `/${splat}`
+            ).pipe(Effect.mapError((cause) => new DocsSourceError({ cause })));
+            const navigation = yield* content.getNavigation();
+            const page = yield* content.getRenderablePage(path);
+            yield* preloadDocsContent(page.source);
 
-        return {
-          navigation,
-          page,
-        };
-      }).pipe(docsPageRouteBoundary.encodeExit)
+            return {
+              navigation,
+              page,
+            };
+          })
+        ),
+        docsPageRouteBoundary.encodeExit
+      )
     );
   });
 

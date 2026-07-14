@@ -1,36 +1,5 @@
 import { resolve } from "node:path";
 
-const noManualTag = {
-  create(context) {
-    return {
-      Property(node) {
-        const { key } = node;
-
-        if (
-          node.parent?.type === "ObjectExpression" &&
-          ((key.type === "Identifier" && key.name === "_tag") ||
-            (key.type === "Literal" && key.value === "_tag"))
-        ) {
-          context.report({
-            messageId: "noManualTag",
-            node: key,
-          });
-        }
-      },
-    };
-  },
-  meta: {
-    docs: {
-      description: "Disallow manual Effect _tag object literals.",
-    },
-    messages: {
-      noManualTag:
-        'Manual _tag object literals are not allowed. Define the tag at the canonical boundary with Data.TaggedClass, Data.TaggedError, or Schema.TaggedClass, then construct that type: class MissingFact extends Data.TaggedError("MissingFact")<{ readonly factId: FactId }>() {}. Do not write { _tag: "MissingFact", ... } at callsites.',
-    },
-    type: "problem",
-  },
-};
-
 const noTypeof = {
   create(context) {
     return {
@@ -399,52 +368,6 @@ const noNativeCollections = {
   },
 };
 
-const serviceFileNamePattern = /(^|[/\\])(service|services)\.ts$/u;
-const layerExportNamePattern = /(Live|Mock|Test|TestLive)$/u;
-
-const noLayerExportsInServiceFiles = {
-  create(context) {
-    const fileName = sourceFileName(context);
-
-    if (!serviceFileNamePattern.test(fileName)) {
-      return {};
-    }
-
-    return {
-      ExportNamedDeclaration(node) {
-        const { declaration } = node;
-
-        if (declaration?.type !== "VariableDeclaration") {
-          return;
-        }
-
-        for (const declarator of declaration.declarations) {
-          if (
-            declarator.id?.type === "Identifier" &&
-            layerExportNamePattern.test(declarator.id.name)
-          ) {
-            context.report({
-              messageId: "noLayerExportsInServiceFiles",
-              node: declarator.id,
-            });
-          }
-        }
-      },
-    };
-  },
-  meta: {
-    docs: {
-      description:
-        "Disallow Live/Mock/Test layer exports from service definition files.",
-    },
-    messages: {
-      noLayerExportsInServiceFiles:
-        "Do not export Live, Mock, or Test layers from service definition files. service.ts owns the Context.Service contract and canonical request/error schemas. Put production wiring in live.layer.ts, test wiring in test.layer.ts or test helpers, then compose layers at package/app boundaries.",
-    },
-    type: "problem",
-  },
-};
-
 const noThrow = {
   create(context) {
     return {
@@ -463,57 +386,6 @@ const noThrow = {
     messages: {
       noThrow:
         'Do not throw from calculator services. Model failures as tagged errors and return them through Effect: class MissingFact extends Data.TaggedError("MissingFact")<{ readonly factId: FactId }>() {}; return Effect.fail(new MissingFact({ factId })). At boundaries, use Effect.try/Effect.tryPromise with catch mapping to tagged errors.',
-    },
-    type: "problem",
-  },
-};
-
-const runtimeBoundaryPattern =
-  /(^|[/\\])(index|main|server|runtime(\.(client|server))?|.*\.runtime|.*\.layer)\.ts$/u;
-
-const isRuntimeExecutionCall = (node) =>
-  node?.type === "CallExpression" &&
-  node.callee?.type === "MemberExpression" &&
-  node.callee.object?.type === "Identifier" &&
-  ((node.callee.object.name === "Effect" &&
-    [
-      "runFork",
-      "runPromise",
-      "runPromiseExit",
-      "runSync",
-      "runSyncExit",
-    ].includes(propertyName(node.callee.property))) ||
-    (node.callee.object.name === "ManagedRuntime" &&
-      propertyName(node.callee.property) === "make") ||
-    (node.callee.object.name === "BunRuntime" &&
-      propertyName(node.callee.property) === "runMain"));
-
-const noRuntimeExecutionOutsideBoundaries = {
-  create(context) {
-    const fileName = sourceFileName(context);
-
-    return {
-      CallExpression(node) {
-        if (
-          isRuntimeExecutionCall(node) &&
-          !runtimeBoundaryPattern.test(fileName)
-        ) {
-          context.report({
-            messageId: "noRuntimeExecutionOutsideBoundaries",
-            node: node.callee,
-          });
-        }
-      },
-    };
-  },
-  meta: {
-    docs: {
-      description:
-        "Restrict Effect runtime execution to app/runtime boundary files.",
-    },
-    messages: {
-      noRuntimeExecutionOutsideBoundaries:
-        "Do not execute Effects or create ManagedRuntime inside package/service logic. Runtime execution belongs in app entrypoints, runtime files, server files, or layer boundary modules. Services should return Effect values and expose Layers; apps run them with BunRuntime.runMain or a module-scoped ManagedRuntime that is disposed by the owning runtime lifecycle.",
     },
     type: "problem",
   },
@@ -1960,16 +1832,12 @@ export default {
     "no-in-operator": noInOperator,
     "no-instanceof": noInstanceof,
     "no-json-parse-stringify": noJsonParseStringify,
-    "no-layer-exports-in-service-files": noLayerExportsInServiceFiles,
-    "no-manual-tag": noManualTag,
     "no-native-array-methods": noNativeArrayMethods,
     "no-native-collections": noNativeCollections,
     "no-nested-wrapper-calls": noNestedWrapperCalls,
     "no-nullish-comparison": noNullishComparison,
     "no-route-transport-restore-outside-consumers":
       noRouteTransportRestoreOutsideConsumers,
-    "no-runtime-execution-outside-boundaries":
-      noRuntimeExecutionOutsideBoundaries,
     "no-throw": noThrow,
     "no-typeof": noTypeof,
     "no-undefined-comparison": noUndefinedComparison,

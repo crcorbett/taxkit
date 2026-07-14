@@ -1,0 +1,9 @@
+import type { ComponentType } from "react";
+
+const MDX: ComponentType<{
+  readonly components: Readonly<Record<string, ComponentType>>;
+}> = () => null;
+
+const components = { h1: (() => null) as ComponentType };
+
+export const RejectedMdxRoute = () => <MDX components={components} />;

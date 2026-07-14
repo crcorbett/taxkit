@@ -230,7 +230,7 @@
     },
     {
       "id": "FND-003",
-      "status": "pending",
+      "status": "complete",
       "title": "Separate and strengthen portable lint contracts",
       "type": "static-enforcement",
       "dependsOn": ["FND-002"],
@@ -280,6 +280,83 @@
         "Decoder and direct route-consumer contracts remain at least as strict as before.",
         "Parent accepted three audit passes and the Changeset decision."
       ],
+      "implementationEvidence": {
+        "state": "Complete and parent accepted after correction turn 3. Bun destructuring reports only the five rule-owned host methods while retaining full binding tracking; real-binary accepted and rejected evidence and all mandatory gates pass.",
+        "changedFiles": [
+          "tools/oxlint/binding-tracker.js plus effect-rules.js, bun-rules.js and mdx-rules.js; removed the superseded no-switch-plugin.js and reduced whattax-rules.js",
+          "oxlint.config.ts exact contract scopes plus encoder, runtime, process, console, Bun and test-only sync-codec boundary lists",
+          "tools/oxlint/portable-rules.test.ts and accepted/rejected Effect, Bun and MDX fixtures, including unallowlisted unrelated-local controls",
+          "apps/docs/src/lib/docs/loaders.ts",
+          "packages/api/http/src/openapi.ts and __tests__/openapi-snapshot.test.ts",
+          "docs/architecture/effect-services.md, testing-and-quality.md and frontend.md plus docs/standards/tooling.md"
+        ],
+        "enabledRules": {
+          "effectGlobal": [
+            "effect/no-console-outside-runtime",
+            "effect/no-manual-tag",
+            "effect/no-process-outside-boundaries",
+            "effect/no-runtime-execution-outside-boundaries",
+            "effect/no-schema-encoder-outside-egress",
+            "effect/no-switch",
+            "effect/no-throwing-schema-sync-codec"
+          ],
+          "effectScoped": [
+            "effect/no-effect-test-global-mix for test files and exact fixtures",
+            "effect/no-host-imports-in-contracts for service/schema/error/config contracts",
+            "effect/no-layer-exports-in-service-files and effect/no-unknown-service-contract for service contracts",
+            "effect/no-unknown-tagged-error-cause for error/schema owners"
+          ],
+          "bunGlobal": [
+            "bun/no-host-api-outside-adapters",
+            "bun/no-runtime-outside-entrypoints"
+          ],
+          "mdxScoped": [
+            "mdx/no-route-local-component-registry for docs routes and exact fixtures"
+          ],
+          "retainedWhatTax": [
+            "whattax/no-decoding-outside-boundaries remains globally enabled with its existing exact boundary model",
+            "whattax/no-route-transport-restore-outside-consumers retains its direct route-consumer configuration",
+            "calculator transformation, optionality and runtime-policy rules remain whattax-owned and calculator-scoped"
+          ]
+        },
+        "reviewOnly": [
+          "Whether Schema.Defect() should be replaced by an owning provider or domain error requires semantic knowledge that AST syntax cannot supply; lint rejects Schema.Unknown and TypeScript unknown tagged-error causes instead.",
+          "Arbitrary provider SDK import placement remains review-only because package names cannot reliably distinguish a portable contract from a legitimate adapter; reliable Node, Bun and Effect platform imports are enforced.",
+          "Helper and abstraction semantic weight, second-consumer evidence and ownership remain review-only because line counts and text search cannot distinguish a useful policy abstraction from helper sprawl.",
+          "Dynamic property values, aliases returned from arbitrary functions and cross-module value flow remain review-only because reliable enforcement would require interprocedural type analysis; statically resolvable imports, aliases, namespace members, globals and destructuring are enforced."
+        ],
+        "verification": [
+          "bun run test:oxlint passed: 32 tests and 71 assertions, including real installed-Oxlint accepted/rejected alias, destructuring, namespace, global Bun non-host and unrelated-local fixtures with --disable-nested-config",
+          "bun run lint:boundary-directives passed",
+          "bun run lint passed",
+          "bun run verification passed, including Effect language-service compatibility, formatting, Knip and 22 type/build prerequisite tasks",
+          "bun run test passed: docs boundary tests, all Oxlint tests and all 17 Turbo package test tasks",
+          "bun run --filter=docs check-types passed",
+          "bun run test:docs-boundaries passed with 6 tests",
+          "bun run --filter=docs test:browser passed with 1 file and 7 tests",
+          "bun run --filter=@whattax/api-http check-types passed",
+          "bun run --filter=@whattax/api-http test:openapi passed with 1 test",
+          "bun run changeset status --verbose passed",
+          "Task JSON parsing and git diff --check passed"
+        ],
+        "qualityAudits": [
+          "Pass 1, portability and precision: re-inventoried encoder, throwing codec, Effect runtime, ManagedRuntime, BunRuntime, console, process, Bun host, Vitest and MDX registry callsites. The shared two-consumer binding tracker follows canonical named and namespace imports, renamed bindings, alias chains, static computed members, destructuring and reassignment while clearing stale provenance. Unallowlisted controls prove local same-named Effect, Schema, console, process, Bun and BunRuntime values do not report.",
+          "Pass 2, messages and boundary strength: every message still names a canonical Effect Schema, Match, Config, Context/Layer or Platform alternative. Layer enforcement now covers declarations, default/named export specifiers and named re-exports. The test rule rejects only split unaliased describe/expect/it/test ownership and permits Vitest-only utilities or explicit aliases. Exact production boundary lists, decoder strictness and direct route-consumer restoration are unchanged; only exact fixture scopes were added.",
+          "Pass 3, executable evidence and abstractions: each of the 12 Effect, 2 Bun and 1 MDX rules has accepted and rejected evidence through the installed Oxlint binary. Rejected fixtures exercise runtime, Schema, tagged-error, host and layer export evasions; accepted unallowlisted fixtures exercise unrelated locals and valid @effect/vitest plus Vitest-only utility use. One shared binding tracker has two plugin consumers, with no rule-specific wrapper layer, visitor-only acceptance path, broad suppression or duplicate provenance framework. Docs and config names match the final implementation."
+        ],
+        "correctionTurn1": "Completed the previously interrupted full test run, corrected tagged-error guidance to the beta.98 Schema.Defect() API, reran every mandatory and focused gate, and recorded exact enabled/review-only policy, audits, call-graph status, residual risks and Changeset rationale.",
+        "correctionTurn2": "Replaced direct-name runtime and host matching with scope-resolved binding provenance for canonical Effect, Schema and platform imports, namespace members, renamed aliases, static destructuring and globals; added layer export-specifier coverage, corrected @effect/vitest shared-global semantics, added real-binary evasion and false-positive controls, consolidated provenance in one two-consumer helper, and reran every mandatory and focused gate.",
+        "correctionTurn3": "Filtered Bun object-pattern declarations and assignments by statically selected bunHostMethods while continuing to track every destructured binding. Added unallowlisted real-global acceptance for direct, declaration-destructured and assignment-destructured Bun.version access and retained rejected declaration/assignment destructuring for file, spawn and write. Reran every mandatory gate with no scope, Changeset or package-contract change.",
+        "changeset": "No new Changeset. This slice changes root lint tooling, executable lint fixtures, documentation and app-internal boundaries. The API OpenAPI normalizer is not in the package export map and now returns a typed Effect only to its internal snapshot test; the docs loader is app-owned. No published package export, runtime endpoint contract or SDK surface changes.",
+        "releaseTrainImpact": "None from FND-003. Existing pending Changesets from earlier accepted slices remain unchanged.",
+        "callGraphAlignment": "Matches the spec. oxlint.config.ts owns exact scopes and routes portable syntax to effect, bun and mdx plugins while whattax retains decoder, route and calculator policy. Effect and Bun rules share one lexical binding-provenance module; accepted and generated rejected fixtures then execute those plugins through the installed Oxlint binary. The required codec migrations remain linear: unknown docs server input -> Schema.decodeUnknownEffect -> DocsSourceError -> DocsContentService -> route-boundary encoding, and generated OpenAPI -> Schema.decodeUnknownEffect(Schema.Json) -> deterministic normalization -> snapshot Effect.",
+        "residualRisks": [
+          "Dynamic property values, aliases returned through arbitrary functions and cross-module value flow are not resolved; these remain explicit review-only cases because enforcing them would require interprocedural type analysis.",
+          "Exact boundary lists require deliberate maintenance when new runtime, egress or adapter files are introduced; unlisted direct calls fail lint by design.",
+          "Schema codec method families can change in future Effect betas, so real fixtures and the repository inventory must be revisited during upgrades.",
+          "The docs browser gate proves the Vitest client route harness, not independent built-app SSR or hydration; FND-003 changes no production route rendering contract."
+        ]
+      },
       "commitAfterPassing": true
     },
     {

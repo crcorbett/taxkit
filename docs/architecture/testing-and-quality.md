@@ -99,12 +99,26 @@ API app:
   helpers, but it does not currently provide a safe built-in rule for banning
   functions below a minimum line count. Prefer review and architecture guidance
   for tiny one-off wrapper or mapper helpers.
-- `bun run lint` includes custom Oxlint rules for repo-specific Effect
-  conventions, including the ban on manual `_tag` object literals. Use
-  `Data.TaggedClass`, `Data.TaggedError`, or `Schema.TaggedClass` instead.
-- `bun run lint` also enforces service/runtime boundaries: `service.ts` files
-  must not export `Live`, `Mock` or `Test` layers, and runtime execution must
-  stay in app entrypoints, runtime files, server files or layer boundary files.
+- `tools/oxlint/effect-rules.js`, `bun-rules.js` and `mdx-rules.js` own
+  domain-neutral contracts. `whattax-rules.js` owns tax/calculator policy plus
+  decoder and route-transport rules. Do not put package names or tax defaults
+  into a portable rule message.
+- Portable Effect rules ban manual `_tag` literals and `switch`, keep live/test
+  Layers out of service contracts, restrict encoder execution, reject throwing
+  Schema sync codecs, preserve typed service errors and tagged-error causes,
+  and keep runtime, console, process and host imports at configured boundaries.
+  Use `Data`/`Schema` tagged classes, `Match`, Effect Platform services and
+  exact live/runtime adapters instead. Binding-sensitive rules resolve
+  canonical and namespace imports, renamed bindings, aliases and statically
+  known destructuring. Accepted real-binary fixtures prove that unrelated
+  shadowed locals with the same names do not report.
+- Bun rules keep `Bun.file`, `Bun.write`, `Bun.spawn`, `Bun.serve` and
+  `BunRuntime.runMain` in exact adapter/entrypoint files. The MDX rule keeps
+  route-local component registries out of route composition. The test-global
+  rule rejects split ownership of unaliased `describe`, `expect`, `it` or
+  `test` between `@effect/vitest` and `vitest`. Vitest-only utilities such as
+  `vi` or hooks may be imported beside `@effect/vitest`; an explicitly aliased
+  secondary shared API is also valid.
 - Calculator service code under `packages/calculators/src` has stricter custom
   Oxlint rules that ban raw `typeof`, `instanceof`, `in`, `=== undefined`,
   conditional object-spread shaping and jurisdiction/tax-year `??` defaults.
@@ -133,6 +147,17 @@ API app:
   negative cases for encoding and `Schema.decodeTo`, and real Oxlint CLI
   fixtures for both a prohibited file and an exact allowlisted file. Run those
   fixture commands with `--disable-nested-config`.
+- Every enabled portable custom rule must also have accepted and rejected
+  fixtures executed through the installed Oxlint binary with
+  `--disable-nested-config`. Direct visitor-unit tests alone are not acceptance
+  evidence. Fixture-only rejected source stays non-executable and is copied to
+  an exact generated path for the binary run.
+- Portable binding rules require rejected real-binary cases for renamed or
+  destructured canonical bindings and accepted unallowlisted cases for
+  unrelated same-named locals. Dynamic property values, aliases returned from
+  arbitrary functions and cross-module value flow remain review-only because
+  Oxlint cannot resolve them without interprocedural type analysis; do not add
+  broad suppressions to simulate that analysis.
 - `whattax/no-route-transport-restore-outside-consumers` governs the separate
   post-hydration restore operation. It tracks scope-resolved direct, unaliased
   named imports from canonical route-boundary modules and permits a restore
@@ -165,6 +190,11 @@ API app:
 - The lint rule cannot determine whether a helper owns meaningful repeated
   policy. Use the boundary contract, compile-time tests, three documented
   audit passes and parent review to reject one-use decoder/error wrappers.
+- Static lint also cannot infer whether `Schema.Defect()` should be replaced by
+  an owning provider/domain error, whether an arbitrary provider SDK import is
+  a true adapter, or whether a new abstraction has semantic weight. Keep those
+  checks review-only rather than adding broad filename exemptions or brittle
+  text-search rules.
 - Verification evidence should be recorded in specs, task lists or exec plans
   when work spans multiple packages.
 

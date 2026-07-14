@@ -1,5 +1,6 @@
 import {
   Array as EffectArray,
+  Effect,
   Order,
   Option,
   Record as EffectRecord,
@@ -44,11 +45,15 @@ const normalizeJsonValue = (value: Schema.Json): Schema.Json => {
 export const whatTaxOpenApiSpec: OpenApi.OpenAPISpec =
   OpenApi.fromApi(WhatTaxApi);
 
-const normalizeOpenApiSpec = (spec: OpenApi.OpenAPISpec): Schema.Json =>
-  pipe(Schema.decodeUnknownSync(Schema.Json)(spec), normalizeJsonValue);
+const normalizeOpenApiSpec = (spec: OpenApi.OpenAPISpec) =>
+  Schema.decodeUnknownEffect(Schema.Json)(spec).pipe(
+    Effect.map(normalizeJsonValue)
+  );
 
 export const normalizedWhatTaxOpenApiSpec =
   normalizeOpenApiSpec(whatTaxOpenApiSpec);
 
-export const formatOpenApiSnapshot = (spec: OpenApi.OpenAPISpec): string =>
-  `${JSON.stringify(normalizeOpenApiSpec(spec), null, 2)}\n`;
+export const formatOpenApiSnapshot = (spec: OpenApi.OpenAPISpec) =>
+  normalizeOpenApiSpec(spec).pipe(
+    Effect.map((normalized) => `${JSON.stringify(normalized, null, 2)}\n`)
+  );

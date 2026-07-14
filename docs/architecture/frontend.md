@@ -29,7 +29,9 @@ define tax calculation rules.
 `apps/docs`
 : Fumadocs-backed public documentation site for rule references, API docs, SDK
   guides and contributor docs. It owns the route runtime, app shell, app-local
-  MDX component map and browser rendering. Server loaders consume
+  MDX component map and browser rendering. Route files import that shared map;
+  they do not define local `mdxComponents` objects or inline MDX registries.
+  Server loaders consume
   `@whattax/docs-content`; browser modules consume browser-safe
   `@whattax/docs-content/client`, `@whattax/docs-content/schemas` and
   `@whattax/docs-fumadocs/render` exports.
@@ -123,6 +125,12 @@ Do not add a hook, provider or wrapper component only to relocate a decoder or
 silence lint. Extract React composition when it owns reusable UI policy or
 removes meaningful repetition. App-specific composition remains app-owned;
 `packages/ui` remains planned.
+
+MDX component registries follow the same composition rule. The docs app owns
+one registry under its MDX adapter, while routes and leaves import focused
+render primitives or the app-owned registry. `mdx/no-route-local-component-registry`
+enforces route placement; it does not move the registry into a shared package
+before a second application needs it.
 
 ## Guardrails
 

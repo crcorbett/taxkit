@@ -27,7 +27,7 @@ stop the rollout and record a blocker for replan or user decision.
 | --- | --- | --- |
 | FND-001 | complete | Beta.98 migration accepted after correction turn 2 and independent parent verification. |
 | FND-002 | complete | Accepted after correction turn 2 and independent focused, strict downstream and repository verification. |
-| FND-003 | pending | Portable Effect/Bun/MDX lint contracts. |
+| FND-003 | complete | Parent accepted correction turn 3 after the final Bun non-host false positive was removed and all gates passed. |
 | FND-004 | pending | Effect-native release-readiness command. |
 | FND-005 | pending | Architecture/process reconciliation and final audit. |
 
@@ -265,6 +265,136 @@ stop the rollout and record a blocker for replan or user decision.
 - Final implementation contains no audit-only bypass, raw Bun shell runtime,
   manual process lifecycle, unsafe cast, mirrored boundary DTO, or cross-package
   validator relocation.
+
+### 2026-07-14 - FND-003 correction turn 1 ready for parent review
+
+- Split portable contracts into `effect/*`, `bun/*` and `mdx/*`; retained
+  decoder placement, direct route restoration and calculator/domain policy
+  under `whattax/*`. Removed the superseded switch plugin and reduced the
+  WhatTax plugin without weakening either boundary rule.
+- Enabled seven repository-wide Effect rules, four semantically scoped Effect
+  contract/test rules, two repository-wide Bun rules and one docs-route MDX
+  rule. `oxlint.config.ts` owns all exact egress, runtime, process, console, Bun
+  and test-only throwing-codec boundaries.
+- Migrated the two production throwing codec sites. The docs server-function
+  path now decodes unknown input inside one linear Effect and maps failure to
+  `DocsSourceError`; OpenAPI normalization now keeps `Schema.SchemaError` in an
+  Effect consumed by the package-owned snapshot test.
+- Review-only decisions are explicit: semantic ownership of `Schema.Defect()`,
+  arbitrary provider-SDK placement and abstraction/helper value cannot be
+  inferred reliably from syntax. No broad suppression, line-count rule or
+  brittle text search was added.
+- Audit pass 1 confirmed current encoder, codec, runtime, host, test-global and
+  MDX callsites align with exact config scopes. Portable messages contain no
+  WhatTax package or tax policy, while calculator rules remain scoped to their
+  existing package owner.
+- Audit pass 2 confirmed messages name current canonical Schema, Match, Config,
+  Context/Layer and Effect Platform alternatives. The only decoder-list change
+  is the exact real-Oxlint process-boundary test; route consumer files and rule
+  semantics are unchanged.
+- Audit pass 3 confirmed all 12 Effect, 2 Bun and 1 MDX rules have accepted and
+  rejected evidence through the installed Oxlint binary. Shared plugin helpers
+  represent reusable AST concepts; no visitor-only acceptance path, helper
+  layer or duplicate rule framework was added.
+- Mandatory verification passed: `bun run test:oxlint` (32 tests, 65
+  assertions), `bun run lint:boundary-directives`, `bun run lint`,
+  `bun run verification`, `bun run test` (17 Turbo tasks), focused docs type,
+  boundary and browser gates, focused API type and OpenAPI gates, Changeset
+  status, task JSON parsing and `git diff --check`.
+- No Changeset is required. The slice is root tooling, executable fixtures,
+  docs and app-internal boundary work. `packages/api/http/src/openapi.ts` is not
+  in the package export map and only its internal snapshot test consumes the
+  new Effect result; no public package, endpoint or SDK contract changes.
+- Call graph matches the spec:
+  `oxlint.config.ts -> effect|bun|mdx|whattax plugin -> real CLI fixtures`.
+  Codec migrations remain
+  `unknown docs input -> Schema decoder -> typed docs service -> route encoder`
+  and `generated OpenAPI -> Schema decoder -> normalizer -> snapshot Effect`.
+- Residual risks: direct Bun/runtime/console/process aliases are not yet
+  scope-resolved like decoder aliases; exact boundary lists need maintenance;
+  future Effect betas can add codec names; docs browser evidence remains a
+  client harness rather than independent built-app SSR/hydration proof.
+
+### 2026-07-14 - FND-003 parent audit correction turn 2
+
+- Replaced direct-name matching with one shared lexical binding tracker used by
+  the Effect and Bun plugins. It follows canonical named and namespace imports,
+  renamed bindings, alias chains, statically known members and destructuring,
+  handles reassignment without retaining stale provenance, and recognises
+  `console`, `process` and `Bun` only when they are unresolved globals.
+- Runtime enforcement now follows Effect execution methods,
+  `ManagedRuntime.make` and `BunRuntime.runMain`; Schema enforcement follows
+  codec methods, `Schema.Unknown`, `Schema.TaggedErrorClass`,
+  `Data.TaggedError` and `Effect.Effect` type references through aliases.
+  Unallowlisted accepted fixtures prove unrelated same-named locals remain
+  valid.
+- Service-layer enforcement covers declarations, default/named export
+  specifiers and named re-exports. The test-import rule treats unaliased
+  `describe`, `expect`, `it` and `test` as one shared API: splitting ownership
+  between `@effect/vitest` and `vitest` is invalid, while Vitest-only utilities
+  and explicitly aliased secondary shared APIs are valid.
+- Audit pass 1 confirmed the current encoder, codec, runtime, console, process,
+  Bun, test-import and MDX inventories align with exact scopes. Binding
+  provenance is cleared on unrelated reassignment and dynamic computed keys
+  are not guessed, preventing stale or speculative reports.
+- Audit pass 2 confirmed all messages retain canonical Effect/Schema/Platform
+  alternatives, no production boundary list was broadened, and decoder and
+  direct route-consumer restoration remain unchanged. Only exact fixture scopes
+  were added.
+- Audit pass 3 confirmed all 12 Effect, 2 Bun and 1 MDX rules execute accepted
+  and rejected evidence through the installed Oxlint binary. Alias,
+  destructuring, namespace, layer re-export and same-named-local controls are
+  represented. One provenance helper has two real plugin consumers; there is
+  no duplicate tracker, one-use wrapper layer, broad suppression or text-based
+  enforcement.
+- Mandatory verification passed: `bun run test:oxlint` (32 tests, 69
+  assertions), `bun run lint:boundary-directives`, `bun run lint`,
+  `bun run verification` (22 type/build prerequisites) and `bun run test` (17
+  Turbo tasks). Focused docs type, boundary and browser gates and focused API
+  type/OpenAPI gates also passed. The first verification attempt found one
+  formatter-only issue in `effect-rules.js`; formatting was applied and the
+  canonical command then passed.
+- Call graph remains
+  `oxlint.config.ts -> effect|bun plugin -> binding tracker -> real CLI fixture`
+  alongside the unchanged `mdx|whattax` plugin paths. Codec migrations remain
+  linear and typed. Dynamic or interprocedural alias flow is review-only;
+  exact boundary lists and future Effect codec-family changes still require
+  maintenance.
+- No Changeset is required. Correction turn 2 changes root tooling, executable
+  fixtures and developer documentation only; it does not change a published
+  package export, endpoint contract or SDK surface. FND-003 is ready for parent
+  review, not complete, and no commit has been created.
+
+### 2026-07-14 - FND-003 parent audit correction turn 3
+
+- Narrowed `bun/no-host-api-outside-adapters` object-pattern reporting to the
+  rule-owned `file`, `serve`, `spawn`, `spawnSync` and `write` properties.
+  Declaration and assignment patterns still flow through the shared binding
+  tracker before reporting, so later accesses retain their provenance.
+- Added an unallowlisted real-global fixture proving direct `Bun.version`,
+  declaration destructuring and assignment destructuring are accepted. The
+  rejected fixture retains declaration destructuring of `file`, `spawn` and
+  `write` and adds assignment destructuring of `spawn` through the installed
+  Oxlint binary.
+- The narrow audit confirmed no configuration scope, allowlist, decoder rule,
+  route-consumer rule or other plugin behavior changed. Dynamic keys remain
+  review-only; statically selected host and non-host keys are distinguished.
+- Mandatory verification passed with `bun run test:oxlint` at 32 tests and 71
+  assertions, boundary-directive lint, full lint, canonical verification, full
+  tests, Changeset status, task JSON parsing and `git diff --check`.
+- No Changeset is required because this is a root lint false-positive fix plus
+  executable fixture and developer-documentation evidence. No public package
+  contract changed. FND-003 remains ready for parent review, not complete; no
+  commit was created and FND-004 remains pending.
+
+### 2026-07-14 - FND-003 parent acceptance
+
+- Accepted all three audit passes after correction turn 3. Independent parent
+  review confirmed scope-resolved alias and shadowing behaviour, exact boundary
+  ownership, service re-export coverage and real installed-Oxlint evidence.
+- Independent `bun run test:oxlint`, `bun run lint`, `git diff --check` and
+  `bun run changeset status --verbose` passed. The no-Changeset decision is
+  accepted because no published package, endpoint or SDK contract changed.
 
 ## Decisions
 

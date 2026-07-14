@@ -1,0 +1,18 @@
+import { BunRuntime as Runtime } from "@effect/platform-bun";
+import * as PlatformBun from "@effect/platform-bun";
+import { Effect } from "effect";
+
+const Host = Bun;
+const { file: openFile, spawn: spawnProcess } = Host;
+const { write: forwardedWrite } = Host;
+let assignedSpawn;
+({ spawn: assignedSpawn } = Host);
+const executeMain = Runtime.runMain;
+const executeNamespacedMain = PlatformBun.BunRuntime.runMain;
+
+export const rejectedBunFile = openFile("package.json");
+export const rejectedProcess = spawnProcess(["bun", "--version"]);
+export { assignedSpawn, forwardedWrite };
+
+executeMain(Effect.void);
+executeNamespacedMain(Effect.void);
