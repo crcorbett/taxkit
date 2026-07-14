@@ -28,3 +28,11 @@ safe indexed assertions without non-null assertions.
 bun run --filter=@whattax/testing check-types
 bun run --filter=@whattax/testing build
 ```
+
+## Packaging
+
+The build removes `dist` before compiling, and the tarball contains only
+`dist`, this README and package metadata. `@effect/vitest`, `effect` and
+`vitest` are runtime dependencies because the exported `expectAt` helper loads
+the Effect Vitest assertion adapter. The strict downstream gate imports the
+packed entrypoint without relying on monorepo hoisting.

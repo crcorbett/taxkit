@@ -38,14 +38,39 @@
     }
   },
   "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./effect": {
+        "types": "./dist/effect.d.ts",
+        "default": "./dist/effect.js"
+      },
+      "./au": {
+        "types": "./dist/au.d.ts",
+        "default": "./dist/au.js"
+      },
+      "./au/effect": {
+        "types": "./dist/au-effect.d.ts",
+        "default": "./dist/au-effect.js"
+      },
+      "./schemas": {
+        "types": "./dist/schemas/index.d.ts",
+        "default": "./dist/schemas/index.js"
+      },
+      "./testing": {
+        "types": "./dist/testing/index.d.ts",
+        "default": "./dist/testing/index.js"
+      }
+    },
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-boundaries": "bun run scripts/check-import-boundaries.ts",
-    "check-packed-artifact": "bun run scripts/check-packed-artifact.ts",
+    "check-packed-artifact": "bun run scripts/check-packed-artifact.runtime.ts",
     "validate:downstream": "bun run scripts/validate-downstream-consumer.runtime.ts",
-    "validate:downstream:audit": "bun run scripts/validate-downstream-consumer.runtime.ts --allow-release-blockers",
     "check-types": "tsc --noEmit",
     "test": "vitest run",
     "test-types": "tsc -p tsconfig.type-tests.json --noEmit",

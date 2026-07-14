@@ -127,7 +127,9 @@ The root, AU and schema entrypoints are intended to remain browser-safe. Effect
 entrypoints expose Effect-native types for consumers that want service/layer
 composition. The publish manifest is dist-only and does not expose `source`
 conditions; `bun run --filter=@whattax/sdk check-packed-artifact` validates
-that every public export resolves to packed files.
+that every public export resolves to packed files. The focused checker is an
+Effect-native Bun runtime with typed command and validation failures and a
+scope-managed temporary import workspace.
 
 `@whattax/sdk/schemas` re-exports calculator-owned run contracts for consumer
 convenience:
@@ -163,40 +165,31 @@ The SDK owns the first downstream consumer validation gate:
 bun run --filter=@whattax/sdk validate:downstream
 ```
 
-The command builds and packs the SDK runtime package closure, creates a temp
-consumer workspace outside the repo, writes SDK typecheck/runtime/browser-safe
-examples, extracts exact packed manifests, and audits unresolved dependency
-protocols before attempting install. It is strict by default: while runtime
-packed manifests still contain `workspace:*` or `catalog:` ranges, the command
-exits nonzero with release-blocker diagnostics and skips install, typecheck,
-runtime and browser bundle execution.
+The command builds and Bun-packs the nine-package release closure, materializes
+each package's dist-only `publishConfig.exports` in a staged tarball, and
+rejects source files, missing export targets or unresolved `workspace:*` and
+`catalog:` ranges. It installs all unpublished tarballs into a temporary
+consumer outside the repo, typechecks and runs SDK examples, imports every
+JavaScript public entrypoint and bundles the browser-safe SDK surface.
 
-For implementation evidence while those blockers remain, use:
-
-```sh
-bun run --filter=@whattax/sdk validate:downstream:audit
-```
-
-The audit command runs the same build, pack, temp workspace and manifest
-diagnostics, but exits zero after reporting the expected release blockers. It
-does not claim clean external install readiness.
+The command is always strict. Consumer-only file overrides connect unpublished
+internal tarballs without changing their concrete registry-ready dependency
+ranges. Any manifest or consumer regression prints evidence and exits nonzero;
+there is no audit-only success mode.
 
 Use this SDK release-gate order before any future publication work:
 
 ```sh
 bun run --filter=@whattax/sdk check-packed-artifact
 bun run --filter=@whattax/sdk validate:downstream
-bun run --filter=@whattax/sdk validate:downstream:audit
 bun run --filter=@whattax/sdk check-boundaries
 bun run --filter=@whattax/sdk test-types
 bun run --filter=@whattax/sdk test
 bun run --filter=@whattax/sdk build
 ```
 
-`validate:downstream` is the strict final SDK downstream gate only after the
-packed manifest blockers are resolved. Until then, record its nonzero result
-as the release blocker and use `validate:downstream:audit` only as passing
-diagnostic evidence.
+`validate:downstream` is the strict final package-installation gate. Supporting
+workspace tests and the focused SDK tarball check do not replace it.
 
 ## Guardrails
 
@@ -219,7 +212,6 @@ bun run --filter=@whattax/sdk test-types
 bun run --filter=@whattax/sdk check-boundaries
 bun run --filter=@whattax/sdk check-packed-artifact
 bun run --filter=@whattax/sdk validate:downstream
-bun run --filter=@whattax/sdk validate:downstream:audit
 ```
 
 ## Related Docs

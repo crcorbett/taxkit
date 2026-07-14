@@ -2,6 +2,10 @@
   "name": "@whattax/testing",
   "version": "0.0.4",
   "private": true,
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,13 +16,26 @@
       "default": "./dist/index.js"
     }
   },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
-  "devDependencies": {
+  "dependencies": {
     "@effect/vitest": "catalog:",
+    "effect": "catalog:",
+    "vitest": "catalog:"
+  },
+  "devDependencies": {
     "typescript": "catalog:"
   }
 }

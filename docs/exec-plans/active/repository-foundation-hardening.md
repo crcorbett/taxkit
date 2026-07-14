@@ -26,7 +26,7 @@ stop the rollout and record a blocker for replan or user decision.
 | Task | Status | Notes |
 | --- | --- | --- |
 | FND-001 | complete | Beta.98 migration accepted after correction turn 2 and independent parent verification. |
-| FND-002 | pending | CI, agent docs, clean builds and packed surfaces. |
+| FND-002 | complete | Accepted after correction turn 2 and independent focused, strict downstream and repository verification. |
 | FND-003 | pending | Portable Effect/Bun/MDX lint contracts. |
 | FND-004 | pending | Effect-native release-readiness command. |
 | FND-005 | pending | Architecture/process reconciliation and final audit. |
@@ -151,6 +151,120 @@ stop the rollout and record a blocker for replan or user decision.
 - Accepted residual warning: Vite/Rolldown reports an upstream Effect
   PURE-annotation placement warning, but both web client and server builds
   complete successfully.
+
+### 2026-07-14 - FND-002 correction turn 1 submitted for parent review
+
+- CI now reads `.bun-version`, installs with the frozen lockfile, and invokes
+  the canonical root verification, test and build commands. `CLAUDE.md` is a
+  relative symlink to `AGENTS.md`.
+- Eight TypeScript release packages clean `dist` before `tsc`; all nine
+  release-closure manifests declare explicit files and dist-only publication
+  exports. Workspace exports may retain source conditions for local tooling.
+- Actual Bun 1.3.14 pack output resolves workspace and catalogue dependency
+  protocols but does not apply `publishConfig.exports`. The SDK-owned strict
+  validator therefore unpacks each raw Bun tarball, materializes that declared
+  publication export map with schema-decoded structured manifests, and
+  Bun-packs the staged package for final inspection and clean-consumer use.
+- Final tarball manifest audit passed with no source conditions, `src` files,
+  missing export targets, or unresolved dependency protocols. Artifact counts
+  were core 90, income-tax 86, pay 94, STSL 50, calculators 30, SDK 38,
+  API HTTP 70, testing 6 and tsconfig 3 files.
+- Strict downstream proof passed a clean tarball-only install, valid and
+  negative type tests, plain and Effect SDK runtime calculations, every
+  JavaScript public entrypoint import, and root/AU/schemas browser bundles.
+  Runtime release blockers and dev manifest diagnostics were both empty; the
+  scope-managed temp workspace was removed.
+- Audit pass 1, CI and agent contract: `.bun-version` is the sole workflow Bun
+  version input; local and CI root commands match; workflow failures remain
+  visible; and the agent-doc link resolves to the canonical root contract.
+- Audit pass 2, publication contract: clean builds, workspace/publication
+  export separation, concrete packed dependency ranges, declared files and
+  every final tarball target were inspected from actual artifacts rather than
+  workspace imports or dry-run output.
+- Audit pass 3 identified a parent-review correction: the strict validator was
+  Effect-native, but the focused checker still used top-level Bun APIs and
+  shell lifecycle commands. Correction turn 2 replaces that runtime without
+  moving or duplicating closure validation. The obsolete audit-only command
+  and success mode remain removed; strict failure diagnostics remain for real
+  future manifest regressions.
+- Mandatory verification passed: `bun run verification`, `bun run test`,
+  `bun run build`, `bun run --filter=@whattax/sdk check-packed-artifact`,
+  `bun run --filter=@whattax/sdk validate:downstream`, the integrated final
+  tarball manifest audit, and `bun run changeset status --verbose`.
+- Changeset: `.changeset/deterministic-release-artifacts.md` records the
+  package-facing build, publication and validation changes. Existing pending
+  Changesets aggregate core, API HTTP, calculators, all three rules packages,
+  SDK, testing and tsconfig to minor releases; docs-fumadocs remains patch.
+- Call-graph status: the final path is
+  `workspace clean build -> raw Bun pack -> Schema decode -> publication export
+  materialization -> final Bun pack -> manifest/file audit -> clean consumer
+  install -> typecheck/runtime/public imports/browser bundle`. Package
+  manifests remain owned by their packages and no validator moved to the
+  planned scripts package.
+- Residual risks: Bun pack semantics can change; internal tarballs use
+  consumer-only local overrides until registry publication exists; Effect
+  remains beta; and web builds retain the non-failing upstream Effect PURE
+  annotation and chunk-size warnings.
+
+### 2026-07-14 - FND-002 parent audit correction turn 2
+
+- Renamed the focused checker to
+  `packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts` and
+  updated the package command, exact decoder-boundary allowlist, package docs,
+  architecture guidance and current task evidence. Completed historical plans
+  retain their original filenames as historical evidence.
+- Replaced top-level Bun and shell operations with one linear `Effect.gen`
+  program run by `BunRuntime.runMain` with `BunServices.layer`. Effect Platform
+  FileSystem, Path and ChildProcess own files, paths, command execution and
+  lifecycle; Effect Console owns output.
+- The packed `package.json` is decoded through a Schema-derived external
+  boundary. Command and artifact failures use `PackedArtifactCommandError` and
+  `PackedArtifactValidationError`; no raw throw, process mutation, global
+  console, top-level await, `Bun.$`, `Bun.file`, `Bun.write`, or shell cleanup
+  remains.
+- The scoped temp directory intentionally lives under the SDK root so the
+  focused packed SDK import can resolve existing workspace-installed
+  dependencies. This preserves the old SDK-only proof without copying or
+  packing the dependency closure; strict closure ownership remains solely in
+  `validate-downstream-consumer.runtime.ts`.
+- Audit pass 1, runtime contract: confirmed BunRuntime/BunServices provision,
+  Effect Platform command/filesystem/path use, Schema-derived manifest types,
+  typed errors, Effect Console and scope-managed cleanup.
+- Audit pass 2, linearity and abstraction: the primary operation is one linear
+  Effect program. The only extracted operation is the command boundary reused
+  for pack, list, extract and smoke; no one-use mapper, lifecycle wrapper,
+  manifest helper layer or runtime abstraction was added.
+- Audit pass 3, ownership and regression safety: the checker remains focused
+  on one SDK tarball and six SDK entrypoints, while the strict validator still
+  exclusively builds and validates the nine-package closure. No live reference
+  targets the old filename and the scoped workspace is removed on success and
+  typed failure.
+- Focused evidence: `whattax-sdk-0.0.4.tgz` contained 38 files, all export
+  targets resolved, dependency ranges were concrete, source/tests were absent,
+  six SDK entrypoint groups imported, and cleanup completed.
+- Mandatory verification passed after the rewrite:
+  `bun run --filter=@whattax/sdk check-packed-artifact`,
+  `bun run --filter=@whattax/sdk validate:downstream`,
+  `bun run verification`, `bun run test`, `bun run build`,
+  `bun run changeset status --verbose`, JSON parsing and `git diff --check`.
+- FND-002 remains ready for parent review rather than complete. FND-003 remains
+  pending and untouched.
+
+### 2026-07-14 - FND-002 parent acceptance
+
+- Parent review accepted CI parity, the canonical agent-doc symlink, clean
+  builds, package-owned workspace/publication export separation, the staged
+  Bun release-artifact graph, and both Effect-native SDK validator runtimes.
+- The parent independently reran the focused SDK tarball check, strict
+  nine-package downstream validation, `bun run verification`,
+  `bun run test`, `bun run build`, and Changeset status; all passed.
+- Final audit confirmed actual tarball manifests contain no source condition,
+  source file, missing target, `workspace:*`, or `catalog:` dependency; the
+  clean consumer imported every JavaScript public entrypoint and bundled the
+  browser-safe SDK surface.
+- Final implementation contains no audit-only bypass, raw Bun shell runtime,
+  manual process lifecycle, unsafe cast, mirrored boundary DTO, or cross-package
+  validator relocation.
 
 ## Decisions
 

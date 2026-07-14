@@ -51,6 +51,22 @@ bun run --filter=@whattax/docs-content test
 Run those package-local docs gates whenever MDX content, Fumadocs source
 wiring, docs examples, validation policy or docs rendering changes.
 
+Release-facing package work must also prove actual tarballs rather than
+workspace imports or dry-run file lists:
+
+```bash
+bun run --filter=@whattax/sdk check-packed-artifact
+bun run --filter=@whattax/sdk validate:downstream
+```
+
+The focused command uses an Effect-native, scope-managed Bun runtime to pack,
+inspect and import the SDK artifact. The strict command builds the nine-package
+release closure, materializes each declared dist-only
+`publishConfig.exports` view, Bun-packs it, rejects source/protocol leakage,
+installs all tarballs in a clean external workspace, typechecks and runs SDK
+examples, imports every JavaScript public entrypoint and browser-bundles the
+browser-safe SDK surface. It has no audit-only success mode.
+
 The docs browser command runs a programmatic client-side TanStack route harness
 in Chromium. It may prove direct `Route.useLoaderData` restoration, recoverable
 route UI, framework error boundaries and console cleanliness, but it does not

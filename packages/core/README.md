@@ -51,6 +51,13 @@ bun run --filter=@whattax/core check-types
 bun run --filter=@whattax/core build
 ```
 
+## Packaging
+
+The build removes `dist` before compiling. Workspace exports retain `source`
+conditions, while `publishConfig.exports` and `files` define a dist-only
+tarball. The SDK-owned strict downstream gate validates the actual Bun-packed
+artifact and its concrete dependency ranges.
+
 ## Related Docs
 
 - `docs/architecture/package-ownership.md`

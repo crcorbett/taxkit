@@ -229,8 +229,12 @@
     "packages/testing": {
       "name": "@whattax/testing",
       "version": "0.0.4",
-      "devDependencies": {
+      "dependencies": {
         "@effect/vitest": "catalog:",
+        "effect": "catalog:",
+        "vitest": "catalog:",
+      },
+      "devDependencies": {
         "typescript": "catalog:",
       },
     },

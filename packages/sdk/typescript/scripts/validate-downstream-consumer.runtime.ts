@@ -5,6 +5,7 @@ import {
   Console,
   Data,
   Effect,
+  HashSet,
   Match,
   Option,
   Record as EffectRecord,
@@ -16,6 +17,7 @@ import * as Path from "effect/Path";
 import { ChildProcess } from "effect/unstable/process";
 
 interface PackageClosureItem {
+  readonly build: boolean;
   readonly packageName: string;
   readonly relativeRoot: string;
 }
@@ -32,6 +34,7 @@ interface PackedPackageEvidence {
   readonly manifest: PackedPackageManifest;
   readonly packageName: string;
   readonly packedFileCount: number;
+  readonly publicEntrypoints: readonly string[];
   readonly rootPath: string;
   readonly tarballFile: string;
   readonly tarballPath: string;
@@ -52,6 +55,7 @@ interface DownstreamValidationEvidence {
   readonly devDiagnostics: readonly ManifestProtocolFinding[];
   readonly installResult: string;
   readonly installStrategy: string;
+  readonly packedArtifacts: readonly string[];
   readonly releaseBlockers: readonly ManifestProtocolFinding[];
   readonly runtimeSdkResult: string;
   readonly tempWorkspacePath: string;
@@ -84,29 +88,36 @@ class DownstreamValidationError extends Data.TaggedError(
 
 const DependencyRecord = Schema.Record(Schema.String, Schema.String);
 
+const ConditionalPackageExportTarget = Schema.Struct({
+  default: Schema.optional(Schema.String),
+  source: Schema.optional(Schema.String),
+  types: Schema.optional(Schema.String),
+});
+
+const PackageExportTarget = Schema.Union([
+  Schema.String,
+  ConditionalPackageExportTarget,
+]);
+
+const PackageExports = Schema.Record(Schema.String, PackageExportTarget);
+
+const PackageJsonRecord = Schema.Record(Schema.String, Schema.Unknown);
+
 const PackedPackageManifest = Schema.Struct({
   dependencies: Schema.optional(DependencyRecord),
   devDependencies: Schema.optional(DependencyRecord),
+  exports: PackageExports,
+  files: Schema.Array(Schema.String),
   name: Schema.String,
   optionalDependencies: Schema.optional(DependencyRecord),
   peerDependencies: Schema.optional(DependencyRecord),
+  publishConfig: Schema.Struct({
+    exports: PackageExports,
+  }),
   version: Schema.String,
 });
 
 type PackedPackageManifest = typeof PackedPackageManifest.Type;
-
-const PackResult = Schema.Struct({
-  filename: Schema.String,
-  files: Schema.Array(
-    Schema.Struct({
-      path: Schema.String,
-    })
-  ),
-  name: Schema.String,
-  version: Schema.String,
-});
-
-const PackResults = Schema.Array(PackResult);
 
 const RootPackageManifest = Schema.Struct({
   workspaces: Schema.Struct({
@@ -116,24 +127,49 @@ const RootPackageManifest = Schema.Struct({
 
 const packageClosure = [
   {
+    build: true,
     packageName: "@whattax/core",
     relativeRoot: "packages/core",
   },
   {
+    build: true,
     packageName: "@whattax/rules-au-income-tax",
     relativeRoot: "packages/rules/au/income-tax",
   },
   {
+    build: true,
     packageName: "@whattax/rules-au-pay",
     relativeRoot: "packages/rules/au/pay",
   },
   {
+    build: true,
+    packageName: "@whattax/rules-au-stsl",
+    relativeRoot: "packages/rules/au/stsl",
+  },
+  {
+    build: true,
     packageName: "@whattax/calculators",
     relativeRoot: "packages/calculators",
   },
   {
+    build: true,
     packageName: "@whattax/sdk",
     relativeRoot: "packages/sdk/typescript",
+  },
+  {
+    build: true,
+    packageName: "@whattax/api-http",
+    relativeRoot: "packages/api/http",
+  },
+  {
+    build: true,
+    packageName: "@whattax/testing",
+    relativeRoot: "packages/testing",
+  },
+  {
+    build: false,
+    packageName: "@whattax/tsconfig",
+    relativeRoot: "packages/tsconfig",
   },
 ] satisfies readonly PackageClosureItem[];
 
@@ -149,10 +185,6 @@ const devDependencySections = [
 
 const sdkRootUrl = new URL("..", import.meta.url);
 const repoRootUrl = new URL("../../..", sdkRootUrl);
-
-const allowReleaseBlockers =
-  EffectArray.contains(process.argv, "--allow-release-blockers") ||
-  EffectArray.contains(process.argv, "--diagnostic");
 
 const commandLine = (command: string, args: readonly string[]) =>
   EffectArray.prepend(args, command).join(" ");
@@ -232,22 +264,105 @@ const decodeJson = <A, I, R>(
     )
   );
 
-const singlePackResult = (packageName: string, output: string) =>
-  decodeJson(`${packageName} npm pack output`, PackResults, output).pipe(
-    Effect.flatMap((results) =>
-      EffectArray.head(results).pipe(
-        Option.match({
-          onNone: () =>
-            Effect.fail(
-              new DownstreamValidationError({
-                message: `npm pack returned no results for ${packageName}.`,
-              })
-            ),
-          onSome: Effect.succeed,
+const tarballPathFromPackOutput = (packageName: string, output: string) =>
+  Schema.decodeUnknownEffect(Schema.NonEmptyString)(output.trim()).pipe(
+    Effect.mapError(
+      () =>
+        new DownstreamValidationError({
+          message: `bun pm pack returned no tarball path for ${packageName}.`,
         })
-      )
     )
   );
+
+const publicEntrypointsFromManifest = (manifest: PackedPackageManifest) =>
+  EffectArray.flatMap(
+    EffectRecord.toEntries(manifest.exports),
+    ([subpath, target]) =>
+      Schema.is(Schema.String)(target)
+        ? []
+        : Option.fromNullishOr(target.default).pipe(
+            Option.filter((defaultTarget) => defaultTarget.endsWith(".js")),
+            Option.match({
+              onNone: () => [],
+              onSome: () => [
+                subpath === "."
+                  ? manifest.name
+                  : `${manifest.name}${subpath.slice(1)}`,
+              ],
+            })
+          )
+  );
+
+const packedSurfaceFailures = (
+  manifest: PackedPackageManifest,
+  packedFiles: readonly string[]
+) => {
+  const packedFileSet = HashSet.fromIterable(packedFiles);
+  const exportFailures = EffectArray.flatMap(
+    EffectRecord.toEntries(manifest.exports),
+    ([subpath, target]) => {
+      const targetFailures = Match.value(target).pipe(
+        Match.when(Schema.is(Schema.String), (targetValue) =>
+          HashSet.has(
+            packedFileSet,
+            `package/${targetValue.replace(/^\.\//u, "")}`
+          )
+            ? []
+            : [
+                `${manifest.name} ${subpath} default target ${targetValue} is absent from the tarball.`,
+              ]
+        ),
+        Match.orElse((targetValue) =>
+          EffectArray.flatMap(["types", "default"] as const, (condition) =>
+            Option.fromNullishOr(targetValue[condition]).pipe(
+              Option.match({
+                onNone: () => [
+                  `${manifest.name} ${subpath} is missing its ${condition} publication target.`,
+                ],
+                onSome: (value) =>
+                  HashSet.has(
+                    packedFileSet,
+                    `package/${value.replace(/^\.\//u, "")}`
+                  )
+                    ? []
+                    : [
+                        `${manifest.name} ${subpath} ${condition} target ${value} is absent from the tarball.`,
+                      ],
+              })
+            )
+          )
+        )
+      );
+      const sourceFailures = Schema.is(Schema.String)(target)
+        ? []
+        : Option.fromNullishOr(target.source).pipe(
+            Option.match({
+              onNone: () => [],
+              onSome: (source) => [
+                `${manifest.name} ${subpath} exposes source condition ${source} in the packed manifest.`,
+              ],
+            })
+          );
+
+      return EffectArray.appendAll(sourceFailures, targetFailures);
+    }
+  );
+  const sourceFileFailures = EffectArray.flatMap(packedFiles, (packedFile) =>
+    packedFile.startsWith("package/src/")
+      ? [`${manifest.name} packed source file ${packedFile}.`]
+      : []
+  );
+  const declaredFileFailures = EffectArray.flatMap(manifest.files, (file) =>
+    file === "src" || file.startsWith("src/")
+      ? [`${manifest.name} files includes source path ${file}.`]
+      : []
+  );
+
+  return EffectArray.appendAll(
+    EffectArray.appendAll(exportFailures, sourceFileFailures),
+    declaredFileFailures
+  );
+};
 
 const unsupportedProtocol = (range: string) =>
   Match.value(range).pipe(
@@ -328,6 +443,7 @@ const writeConsumerFiles = (
         `${JSON.stringify(
           {
             compilerOptions: {
+              lib: ["DOM", "ES2022", "ESNext.Disposable"],
               module: "NodeNext",
               moduleResolution: "NodeNext",
               noEmit: true,
@@ -447,6 +563,31 @@ export const browserSafeEntrypoints = {
     { concurrency: "unbounded" }
   );
 
+const writePublicEntrypointSmoke = (
+  fs: FileSystem.FileSystem,
+  path: Path.Path,
+  workspacePath: string,
+  packedPackages: readonly PackedPackageEvidence[]
+) =>
+  fs.writeFileString(
+    path.join(workspacePath, "src/public-entrypoints.ts"),
+    `const publicEntrypoints = ${JSON.stringify(
+      EffectArray.flatMap(
+        packedPackages,
+        (packedPackage) => packedPackage.publicEntrypoints
+      ),
+      null,
+      2
+    )} as const;
+
+for (const publicEntrypoint of publicEntrypoints) {
+  await import(publicEntrypoint);
+}
+
+console.log(\`Imported \${publicEntrypoints.length} packed public entrypoints.\`);
+`
+  );
+
 const writeConsumerPackageManifest = (
   fs: FileSystem.FileSystem,
   path: Path.Path,
@@ -479,11 +620,13 @@ const writeConsumerPackageManifest = (
             typescript: typescriptVersion,
           },
           name: "whattax-sdk-downstream-consumer",
+          overrides: whattaxDependencies,
           private: true,
           scripts: {
             "bundle:browser":
               "bun build src/browser-entry.ts --target=browser --format=esm --outdir=dist-browser",
             runtime: "bun src/runtime.ts",
+            "runtime:exports": "bun src/public-entrypoints.ts",
             typecheck: "tsc -p tsconfig.json --noEmit",
           },
           type: "module",
@@ -498,21 +641,79 @@ const packPackage = (
   path: Path.Path,
   artifactPath: string,
   repoRootPath: string,
+  stagingRootPath: string,
   packageItem: PackageClosureItem
 ) =>
   Effect.gen(function* packPackageManifest() {
+    const fs = yield* FileSystem.FileSystem;
     const rootPath = path.join(repoRootPath, packageItem.relativeRoot);
-    const packResult = yield* runCommand(
-      `pack ${packageItem.packageName}`,
-      "npm",
-      ["pack", "--json", "--pack-destination", artifactPath, "."],
-      rootPath
-    ).pipe(
-      Effect.flatMap((result) =>
-        singlePackResult(packageItem.packageName, result.stdout)
-      )
+    const packageStagingPath = path.join(
+      stagingRootPath,
+      packageItem.packageName.replaceAll("@", "").replaceAll("/", "-")
     );
-    const tarballPath = path.join(artifactPath, packResult.filename);
+    const rawArtifactPath = path.join(packageStagingPath, "raw-artifact");
+    const unpackedPath = path.join(packageStagingPath, "unpacked");
+    yield* fs.makeDirectory(rawArtifactPath, { recursive: true });
+    yield* fs.makeDirectory(unpackedPath, { recursive: true });
+
+    const rawPackOutput = yield* runCommand(
+      `pack workspace manifest for ${packageItem.packageName}`,
+      "bun",
+      ["pm", "pack", "--destination", rawArtifactPath, "--quiet"],
+      rootPath
+    );
+    const rawTarballPath = yield* tarballPathFromPackOutput(
+      packageItem.packageName,
+      rawPackOutput.stdout
+    );
+    yield* runCommand(
+      `extract workspace tarball for ${packageItem.packageName}`,
+      "tar",
+      ["-xzf", rawTarballPath, "-C", unpackedPath],
+      packageStagingPath
+    );
+    const stagedRootPath = path.join(unpackedPath, "package");
+    const stagedManifestPath = path.join(stagedRootPath, "package.json");
+    const stagedManifestJson = yield* fs.readFileString(stagedManifestPath);
+    const [workspacePackedManifest, packageJsonRecord] = yield* Effect.all(
+      [
+        decodeJson(
+          `${packageItem.packageName} workspace packed package.json`,
+          PackedPackageManifest,
+          stagedManifestJson
+        ),
+        decodeJson(
+          `${packageItem.packageName} structured package.json`,
+          PackageJsonRecord,
+          stagedManifestJson
+        ),
+      ],
+      { concurrency: "unbounded" }
+    );
+    yield* fs.writeFileString(
+      stagedManifestPath,
+      `${JSON.stringify(
+        EffectRecord.set(
+          packageJsonRecord,
+          "exports",
+          workspacePackedManifest.publishConfig.exports
+        ),
+        null,
+        2
+      )}\n`
+    );
+
+    const releasePackOutput = yield* runCommand(
+      `pack publication manifest for ${packageItem.packageName}`,
+      "bun",
+      ["pm", "pack", "--destination", artifactPath, "--quiet"],
+      stagedRootPath
+    );
+    const tarballPath = yield* tarballPathFromPackOutput(
+      packageItem.packageName,
+      releasePackOutput.stdout
+    );
+    const tarballFile = path.basename(tarballPath);
     const manifest = yield* runCommand(
       `extract packed manifest for ${packageItem.packageName}`,
       "tar",
@@ -527,13 +728,38 @@ const packPackage = (
         )
       )
     );
+    const packedFiles = yield* runCommand(
+      `list packed files for ${packageItem.packageName}`,
+      "tar",
+      ["-tzf", tarballPath],
+      artifactPath
+    ).pipe(
+      Effect.map((result) =>
+        EffectArray.filter(
+          result.stdout.split("\n"),
+          (packedFile) => packedFile.length > 0
+        )
+      )
+    );
+    const surfaceFailures = packedSurfaceFailures(manifest, packedFiles);
+    yield* Match.value(surfaceFailures.length).pipe(
+      Match.when(0, () => Effect.void),
+      Match.orElse(() =>
+        Effect.fail(
+          new DownstreamValidationError({
+            message: surfaceFailures.join("\n"),
+          })
+        )
+      )
+    );
 
     return {
       manifest,
       packageName: packageItem.packageName,
-      packedFileCount: packResult.files.length,
+      packedFileCount: packedFiles.length,
+      publicEntrypoints: publicEntrypointsFromManifest(manifest),
       rootPath,
-      tarballFile: packResult.filename,
+      tarballFile,
       tarballPath,
     } satisfies PackedPackageEvidence;
   });
@@ -561,6 +787,12 @@ const printEvidence = (evidence: DownstreamValidationEvidence) =>
       Console.info("\nDownstream SDK validation evidence"),
       Console.info(`Temp workspace: ${evidence.tempWorkspacePath}`),
       Console.info(`Artifacts: ${evidence.artifactsPath}`),
+      Console.info(
+        `Packed artifacts:\n${EffectArray.map(
+          evidence.packedArtifacts,
+          (artifact) => `- ${artifact}`
+        ).join("\n")}`
+      ),
       Console.info(`Install strategy: ${evidence.installStrategy}`),
       Console.info(`Install result: ${evidence.installResult}`),
       Console.info(`Typecheck result: ${evidence.typecheckResult}`),
@@ -609,7 +841,7 @@ const DownstreamProgram = Effect.gen(function* validateDownstreamConsumer() {
 
   yield* Console.info("Building SDK downstream runtime package closure.");
   yield* Effect.forEach(
-    packageClosure,
+    EffectArray.filter(packageClosure, (packageItem) => packageItem.build),
     (packageItem) =>
       runCommand(
         `build ${packageItem.packageName}`,
@@ -636,16 +868,26 @@ const DownstreamProgram = Effect.gen(function* validateDownstreamConsumer() {
   );
   yield* validateWorkspaceLocation(path, repoRootPath, workspacePath);
   const artifactPath = path.join(workspacePath, "artifacts");
+  const stagingRootPath = path.join(workspacePath, "pack-staging");
 
   yield* Console.info(`Created temp downstream workspace at ${workspacePath}`);
   yield* fs.makeDirectory(artifactPath, { recursive: true });
+  yield* fs.makeDirectory(stagingRootPath, { recursive: true });
   yield* writeConsumerFiles(fs, path, workspacePath);
 
   const packedPackages = yield* Effect.forEach(
     packageClosure,
-    (packageItem) => packPackage(path, artifactPath, repoRootPath, packageItem),
+    (packageItem) =>
+      packPackage(
+        path,
+        artifactPath,
+        repoRootPath,
+        stagingRootPath,
+        packageItem
+      ),
     { concurrency: 1 }
   );
+  yield* writePublicEntrypointSmoke(fs, path, workspacePath, packedPackages);
   yield* writeConsumerPackageManifest(
     fs,
     path,
@@ -676,6 +918,11 @@ const DownstreamProgram = Effect.gen(function* validateDownstreamConsumer() {
     installResult: "skipped: packed manifests contain unresolved protocols",
     installStrategy:
       "strict manifest-diagnostic mode; packed dependency closure uses local file: references only after manifests are clean",
+    packedArtifacts: EffectArray.map(
+      packedPackages,
+      (packedPackage) =>
+        `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
+    ),
     releaseBlockers,
     runtimeSdkResult: "skipped: release blockers found before install",
     tempWorkspacePath: workspacePath,
@@ -715,6 +962,12 @@ const DownstreamProgram = Effect.gen(function* validateDownstreamConsumer() {
     ["run", "runtime"],
     workspacePath
   );
+  const publicExports = yield* runCommand(
+    "import packed public entrypoints",
+    "bun",
+    ["run", "runtime:exports"],
+    workspacePath
+  );
   const browser = yield* runCommand(
     "bundle downstream browser-safe SDK entrypoints",
     "bun",
@@ -729,8 +982,13 @@ const DownstreamProgram = Effect.gen(function* validateDownstreamConsumer() {
     installResult: "passed: bun install",
     installStrategy:
       "packed dependency closure installed through local file: references",
+    packedArtifacts: EffectArray.map(
+      packedPackages,
+      (packedPackage) =>
+        `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
+    ),
     releaseBlockers,
-    runtimeSdkResult: `passed: ${runtime.commandLine}`,
+    runtimeSdkResult: `passed: ${runtime.commandLine}; ${publicExports.commandLine}`,
     tempWorkspacePath: workspacePath,
     typecheckResult: `passed: ${typecheck.commandLine}`,
   } satisfies DownstreamValidationEvidence;
@@ -739,27 +997,12 @@ const DownstreamProgram = Effect.gen(function* validateDownstreamConsumer() {
   yield* Console.info(`SDK root validated from ${sdkRootPath}`);
 }).pipe(
   Effect.scoped,
-  Effect.catchTag("DownstreamReleaseBlockerError", (error) =>
-    Match.value(allowReleaseBlockers).pipe(
-      Match.when(true, () =>
-        Console.info(
-          "Diagnostic mode: release blockers were reported and allowed for this run."
-        )
-      ),
-      Match.orElse(() =>
-        Console.error(
-          [
-            `Release blockers found: ${error.evidence.releaseBlockers.length} packed runtime manifest protocol blocker(s).`,
-            "Strict downstream validation remains failed until workspace:* and catalog: runtime dependency ranges are resolved.",
-          ].join("\n")
-        ).pipe(
-          Effect.flatMap(() =>
-            Effect.sync(() => {
-              process.exitCode = 1;
-            })
-          )
-        )
-      )
+  Effect.tapErrorTag("DownstreamReleaseBlockerError", (error) =>
+    Console.error(
+      [
+        `Release blockers found: ${error.evidence.releaseBlockers.length} packed runtime manifest protocol blocker(s).`,
+        "Strict downstream validation failed because packed manifests contain workspace:* or catalog: runtime dependency ranges.",
+      ].join("\n")
     )
   ),
   Effect.tapErrorTag("DownstreamCommandError", (error) =>

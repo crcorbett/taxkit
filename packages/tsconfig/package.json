@@ -2,9 +2,20 @@
   "name": "@whattax/tsconfig",
   "version": "0.0.4",
   "private": true,
+  "files": [
+    "base.json",
+    "README.md"
+  ],
   "type": "module",
   "exports": {
     "./base": "./base.json",
     "./package": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      "./base": "./base.json",
+      "./package": "./package.json"
+    },
+    "access": "public"
   }
 }

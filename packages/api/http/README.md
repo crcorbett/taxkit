@@ -276,6 +276,13 @@ For an intentional public API contract change:
    internal fixtures, snapshots or app-owned smoke tooling that do not affect
    package consumers.
 
+## Packaging
+
+The TypeScript build removes `dist` before compiling. Workspace exports retain
+`source` conditions, while `publishConfig.exports` and `files` define the
+dist-only package surface. The SDK-owned strict downstream gate installs the
+actual API tarball and imports all JavaScript public entrypoints.
+
 ## Guardrails
 
 - Keep browser consumers on client exports; do not import server handlers into

@@ -127,7 +127,7 @@
     },
     {
       "id": "FND-002",
-      "status": "pending",
+      "status": "complete",
       "title": "Unify CI, agent instructions, clean builds and packed package surfaces",
       "type": "quality-and-publication-contract",
       "dependsOn": ["FND-001"],
@@ -176,6 +176,56 @@
         "Strict packed downstream install and entrypoint imports pass with no protocol blockers.",
         "Parent accepted three audit passes, call-graph alignment and the Changeset."
       ],
+      "implementationEvidence": {
+        "state": "Complete and parent accepted after correction turn 2 and independent focused, strict downstream, repository, test and build verification.",
+        "changedFiles": [
+          ".github/workflows/quality.yml, CLAUDE.md and bun.lock",
+          "release-closure package manifests and READMEs under packages/api/http, packages/calculators, packages/core, packages/rules/au, packages/sdk/typescript, packages/testing and packages/tsconfig",
+          "packages/docs-fumadocs/package.json and README.md",
+          "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts and validate-downstream-consumer.runtime.ts",
+          "oxlint.config.ts",
+          "docs/architecture/api-and-sdk.md, package-ownership.md and testing-and-quality.md",
+          "docs/product-specs/downstream-consumer-validation.md and downstream-consumer-validation.tasks.json",
+          ".changeset/deterministic-release-artifacts.md"
+        ],
+        "verification": [
+          "bun run verification passed",
+          "bun run test passed",
+          "bun run build passed with 13 of 13 tasks successful",
+          "bun run --filter=@whattax/sdk check-packed-artifact passed against whattax-sdk-0.0.4.tgz",
+          "bun run --filter=@whattax/sdk validate:downstream passed clean install, typecheck, SDK runtime, all public-entrypoint imports and browser bundling",
+          "The integrated final tarball audit found no source conditions, source files, missing export targets, workspace protocols or catalogue protocols",
+          "bun run changeset status --verbose passed"
+        ],
+        "tarballEvidence": [
+          "@whattax/core: whattax-core-0.0.4.tgz, 90 files",
+          "@whattax/rules-au-income-tax: whattax-rules-au-income-tax-0.0.4.tgz, 86 files",
+          "@whattax/rules-au-pay: whattax-rules-au-pay-0.0.4.tgz, 94 files",
+          "@whattax/rules-au-stsl: whattax-rules-au-stsl-0.0.4.tgz, 50 files",
+          "@whattax/calculators: whattax-calculators-0.0.4.tgz, 30 files",
+          "@whattax/sdk: whattax-sdk-0.0.4.tgz, 38 files",
+          "@whattax/api-http: whattax-api-http-0.0.4.tgz, 70 files",
+          "@whattax/testing: whattax-testing-0.0.4.tgz, 6 files",
+          "@whattax/tsconfig: whattax-tsconfig-0.0.4.tgz, 3 files"
+        ],
+        "qualityAudits": [
+          "Pass 1 confirmed .bun-version ownership, canonical local/CI commands, the relative CLAUDE.md symlink, and BunRuntime/BunServices plus Effect Platform ownership in both SDK validator runtimes.",
+          "Pass 2 confirmed clean builds, source-capable workspace exports, dist-only publication exports, concrete final dependency ranges, Schema-derived external manifests and complete targets in actual tarballs.",
+          "Pass 3 confirmed one linear Effect program and one reused command boundary in the focused checker, scoped cleanup, typed failures, no forbidden Bun/shell/global runtime APIs, no duplicate closure validator or helper layer, current live references and no audit-only success mode."
+        ],
+        "correctionTurn2": {
+          "change": "Renamed the focused checker to check-packed-artifact.runtime.ts and rewrote it as an SDK-only program with BunRuntime, BunServices, Effect Platform FileSystem/Path/ChildProcess, Schema-derived manifest decoding, typed tagged errors, Effect Console and scoped cleanup.",
+          "scope": "The focused checker still validates one SDK tarball and its six entrypoint groups. validate-downstream-consumer.runtime.ts remains the sole owner of the nine-package closure.",
+          "verification": "Focused checker passed with whattax-sdk-0.0.4.tgz and 38 files; strict downstream, repository verification, tests, build, Changeset status, JSON parse and diff check all passed."
+        },
+        "changeset": ".changeset/deterministic-release-artifacts.md patches the ten directly affected packages. Existing pending Changesets aggregate nine fixed-train or standalone packages to minor and docs-fumadocs to patch.",
+        "callGraphAlignment": "Matches the canonical graph: clean package builds feed raw Bun tarballs; schema-decoded staged manifests receive package-owned publishConfig exports; final Bun tarballs feed manifest and file audits, clean consumer install, typecheck, runtime/public-entrypoint imports and browser bundles.",
+        "residualRisks": [
+          "Future Bun versions may change pack or publishConfig semantics, so actual final tarball inspection remains mandatory.",
+          "Consumer-only local overrides stand in for unpublished internal registry versions without changing final packed manifests.",
+          "Effect remains beta and web builds emit non-failing upstream PURE-annotation and chunk-size warnings."
+        ]
+      },
       "commitAfterPassing": true
     },
     {

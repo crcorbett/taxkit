@@ -72,6 +72,10 @@ bun run --filter=@whattax/docs-fumadocs test
 Run `bun run verification` when package exports, README guidance or shared
 runtime behaviour changes.
 
+The build removes `dist` before TypeScript compilation so stale output cannot
+survive a successful build. This private docs package is not part of the
+nine-package release tarball closure.
+
 ## Related docs
 
 - `docs/product-specs/docs-fumadocs-package-separation.md`

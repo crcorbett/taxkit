@@ -83,7 +83,10 @@ on HTTP handlers, SDK clients, CLI commands or app runtime modules.
 : Implemented private TypeScript SDK package for a future public SDK
 publication. It owns browser-safe schemas, typed calculation facades,
 Effect-native subpaths, jurisdiction modules, examples, compatibility tests and
-packed-artifact checks. It must not depend on `@whattax/api-http`; HTTP
+packed-artifact checks. Its strict downstream validator may orchestrate the
+nine-package release closure and materialize package-declared publication
+exports in temporary tarballs, but package manifests and exports remain owned
+by their packages. It must not depend on `@whattax/api-http`; HTTP
 transports consume the SDK rather than the reverse. Its Effect entrypoint owns
 request-preserving calculator helpers such as `calculateRunRequest`,
 `calculateReportRequest` and `calculateReport`, while reusing

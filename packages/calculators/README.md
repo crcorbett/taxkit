@@ -85,6 +85,13 @@ bun run --filter=@whattax/calculators check-types
 bun run --filter=@whattax/calculators build
 ```
 
+## Packaging
+
+The build removes `dist` before compiling. Workspace exports retain `source`
+conditions, while `publishConfig.exports` and `files` define a dist-only
+tarball. The SDK-owned strict downstream gate validates the actual Bun-packed
+artifact, public entrypoints and concrete dependency ranges.
+
 ## Public Exports
 
 - `@whattax/calculators`

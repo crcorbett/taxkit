@@ -37,6 +37,7 @@ const decodingBoundaryFiles = [
 
   // SDK type-erasure dispatch and downstream process boundaries.
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+  "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/src/effect.ts",
   "packages/sdk/typescript/src/index.ts",
   "packages/sdk/typescript/src/types.ts",

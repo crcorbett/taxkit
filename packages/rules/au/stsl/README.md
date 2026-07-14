@@ -33,6 +33,12 @@ bun run --filter=@whattax/rules-au-stsl check-types
 bun run --filter=@whattax/rules-au-stsl test
 ```
 
+## Packaging
+
+The build removes `dist` before compiling. Workspace exports retain `source`
+conditions, while `publishConfig.exports` and `files` define a dist-only
+tarball validated by the SDK-owned strict downstream gate.
+
 ## Related Docs
 
 - `docs/architecture/rules-and-parameters.md`

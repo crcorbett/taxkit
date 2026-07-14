@@ -45,6 +45,13 @@ consumers through the repo-level commands:
 bun run verification
 ```
 
+## Packaging
+
+The tarball contains `base.json`, this README and package metadata. Workspace
+and publication exports both expose `./base` and `./package`; the SDK-owned
+strict downstream gate validates the actual Bun tarball with the rest of the
+release closure.
+
 ## Guardrails
 
 - Keep this package limited to shared TypeScript configuration.

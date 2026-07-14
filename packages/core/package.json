@@ -2,6 +2,10 @@
   "name": "@whattax/core",
   "version": "0.0.4",
   "private": true,
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -57,8 +61,53 @@
       "default": "./dist/ledger/index.js"
     }
   },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./primitives": {
+        "types": "./dist/primitives/index.d.ts",
+        "default": "./dist/primitives/index.js"
+      },
+      "./facts": {
+        "types": "./dist/facts/index.d.ts",
+        "default": "./dist/facts/index.js"
+      },
+      "./parameters": {
+        "types": "./dist/parameters/index.d.ts",
+        "default": "./dist/parameters/index.js"
+      },
+      "./errors": {
+        "types": "./dist/errors/index.d.ts",
+        "default": "./dist/errors/index.js"
+      },
+      "./engine": {
+        "types": "./dist/engine/index.d.ts",
+        "default": "./dist/engine/index.js"
+      },
+      "./rules": {
+        "types": "./dist/rules/index.d.ts",
+        "default": "./dist/rules/index.js"
+      },
+      "./graph": {
+        "types": "./dist/graph/index.d.ts",
+        "default": "./dist/graph/index.js"
+      },
+      "./trace": {
+        "types": "./dist/trace/index.d.ts",
+        "default": "./dist/trace/index.js"
+      },
+      "./ledger": {
+        "types": "./dist/ledger/index.d.ts",
+        "default": "./dist/ledger/index.js"
+      }
+    },
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },

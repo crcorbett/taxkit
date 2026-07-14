@@ -2,13 +2,13 @@
   "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/downstream-consumer-validation.md",
   "title": "Downstream Consumer Validation Implementation Tasks",
-  "status": "draft",
-  "last_reviewed": "2026-07-01",
+  "status": "completed",
+  "last_reviewed": "2026-07-14",
   "principles": [
     "Prove consumer behaviour from outside the monorepo before publication.",
     "Keep SDK downstream validation owned by packages/sdk/typescript while packages/scripts remains planned.",
     "Keep apps/api as the live process owner and @whattax/api-http as the HTTP contract and client owner.",
-    "Treat unresolved workspace protocol dependencies in packed manifests as release-blocker evidence, not as a reason to weaken validation.",
+    "Treat source, export or dependency-protocol leakage in final tarballs as a strict release blocker, not as a reason to weaken validation.",
     "Reuse canonical schemas, descriptors, tagged errors and SDK/API exports instead of writing local DTO mirrors in the downstream workspace.",
     "Require parent review, final call-graph verification and three documented improvement audit passes before accepting each implementation slice."
   ],
@@ -22,8 +22,7 @@
     "commitPolicy": "Commit after each coherent implementation slice passes mandatory verification, Changeset review or no-Changeset rationale, and parent audit.",
     "requiredBeforeFinalPR": [
       "bun run --filter=@whattax/sdk check-packed-artifact",
-      "bun run --filter=@whattax/sdk validate:downstream only as a passing final gate after packed runtime manifest blockers are resolved; while blockers remain, record the expected nonzero strict failure and do not claim final downstream consumer validation is complete",
-      "bun run --filter=@whattax/sdk validate:downstream:audit as the passing diagnostic command while packed runtime manifest blockers remain",
+      "bun run --filter=@whattax/sdk validate:downstream as the required strict clean-install gate",
       "bun run --filter=@whattax/sdk check-boundaries",
       "bun run --filter=@whattax/sdk test-types",
       "bun run --filter=@whattax/sdk test",
@@ -40,9 +39,9 @@
       "Current and final call graph summary for packed SDK validation, downstream workspace validation and live API smoke coverage.",
       "Temp workspace path policy, cleanup policy and retained debug evidence policy.",
       "Packed artifact and dependency install strategy, including unresolved workspace protocol findings.",
-      "Downstream typecheck evidence for valid examples and @ts-expect-error misuse, or explicit skip/blocker evidence when strict manifest diagnostics stop before install.",
-      "Downstream runtime evidence for plain SDK and Effect SDK calculations, or explicit skip/blocker evidence when strict manifest diagnostics stop before runtime execution.",
-      "Downstream browser-safe bundle evidence for root, AU and schemas entrypoints, or explicit skip/blocker evidence when strict manifest diagnostics stop before bundling.",
+      "Downstream typecheck evidence for valid examples and an @ts-expect-error misuse.",
+      "Downstream runtime evidence for plain SDK and Effect SDK calculations plus all JavaScript public entrypoints.",
+      "Downstream browser-safe bundle evidence for root, AU and schemas entrypoints.",
       "Live API smoke evidence for health, metadata, calculate and OpenAPI routes.",
       "Changeset path and release-train impact, or explicit no-Changeset rationale.",
       "Parent audit outcome for each task, including up to three correction turns when needed."
@@ -57,7 +56,7 @@
       "dependsOn": [],
       "goal": "Confirm the current packed-artifact, package manifest and API smoke behaviour before adding a consumer workspace harness.",
       "scope": [
-        "Inspect packages/sdk/typescript/scripts/check-packed-artifact.ts, packages/sdk/typescript/package.json, packages/sdk/typescript/README.md and SDK type/runtime tests.",
+        "Inspect packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts, packages/sdk/typescript/package.json, packages/sdk/typescript/README.md and SDK type/runtime tests.",
         "Inspect packages/api/http/package.json, packages/api/http README/tests and apps/api/scripts/smoke-public-routes.runtime.ts.",
         "Record which package manifests still contain workspace:* dependency protocols and which packed artifacts are needed for an external install.",
         "Decide whether the first implementation should install a packed dependency closure or fail with explicit workspace-protocol blocker diagnostics.",
@@ -145,7 +144,7 @@
         "Add an SDK-owned downstream validation script under packages/sdk/typescript/scripts.",
         "Add a package command, such as bun run --filter=@whattax/sdk validate:downstream.",
         "Create a temp consumer workspace outside the repo and write package.json, tsconfig.json and example source files.",
-        "Use packed SDK artifacts and either a packed dependency closure or explicit release-blocker diagnostics for workspace:* dependency protocols.",
+        "Build and inspect the nine-package packed dependency closure, failing strictly on source leakage, unresolved dependency protocols or invalid publication exports.",
         "Typecheck valid imports from @whattax/sdk, @whattax/sdk/effect, @whattax/sdk/au, @whattax/sdk/au/effect, @whattax/sdk/schemas and @whattax/sdk/testing.",
         "Include at least one @ts-expect-error misuse that proves downstream compile-time rejection.",
         "Run at least one plain SDK calculation and one Effect SDK calculation through public entrypoints.",
@@ -189,14 +188,13 @@
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/sdk validate:downstream (expected to exit nonzero while packed runtime manifests still contain workspace:* or catalog: blockers)",
-        "bun run --filter=@whattax/sdk validate:downstream:audit for a passing diagnostic run that still reports the original release blockers",
+        "bun run --filter=@whattax/sdk validate:downstream as the required strict clean-install gate",
         "bun run --filter=@whattax/sdk check-packed-artifact",
         "bun run --filter=@whattax/sdk check-boundaries",
         "bun run --filter=@whattax/sdk test-types",
         "bun run --filter=@whattax/sdk test",
         "bun run --filter=@whattax/sdk build",
-        "Downstream evidence audit documenting temp workspace location policy, install strategy, typecheck result or skip/blocker result, runtime SDK result or skip/blocker result, browser-safe bundle result or skip/blocker result and cleanup result.",
+        "Downstream evidence audit documenting temp workspace location policy, tarball install strategy, typecheck result, runtime SDK result, public-entrypoint result, browser-safe bundle result and cleanup result.",
         "rg audit proving browser-safe downstream examples do not import @whattax/api-http, app modules or server-only modules.",
         "bun run verification",
         "bun run changeset for package-facing script/README changes, or explicit no-Changeset rationale if the implementation is internal validation-only"
@@ -219,10 +217,9 @@
       "completionCriteria": [
         "The SDK package exposes a downstream validation command.",
         "The command creates a temp workspace outside the monorepo and writes the downstream package manifest, typecheck, runtime and browser-safe example files.",
-        "While packed runtime manifests still contain workspace:* or catalog: blockers, the release-gate command exits nonzero before install and records typecheck, runtime SDK and browser-safe bundle checks as skipped by release blockers.",
-        "The diagnostic command exits zero for implementation evidence while still reporting the original release blockers.",
-        "Once packed manifest blockers are resolved, the same command path installs the packed dependency closure and runs downstream typecheck, runtime SDK calculations and browser-safe bundling.",
-        "The command reports unresolved workspace:* protocols as release blockers or validates the packed dependency closure.",
+        "The release-gate command exits nonzero with explicit diagnostics when a final tarball leaks source, misses an export target or retains an unresolved dependency protocol.",
+        "The command installs the clean nine-package tarball closure and runs downstream typecheck, runtime SDK calculations, all public JavaScript entrypoint imports and browser-safe bundling.",
+        "There is no audit-only success command or blocker bypass.",
         "The temp workspace cleanup policy is deterministic and documented by command output.",
         "Parent agent reviewed the diff, evidence output, Changeset decision and final call graph before accepting the task."
       ],
@@ -244,7 +241,7 @@
         "If @whattax/api-http client exports are validated downstream, use client/live or browser-safe client exports only; do not import server handlers or app modules.",
         "Compare public response evidence against canonical SDK/API expectations without local DTO mirrors.",
         "Stop the API process cleanly on success and failure.",
-        "Record route coverage, response checks, process cleanup and any unresolved release blockers in the active execution plan."
+        "Record route coverage, response checks, process cleanup and package-validation status in the active execution plan."
       ],
       "outputs": [
         "packages/sdk/typescript/scripts/validate-downstream-consumer.ts or focused companion script",
@@ -284,8 +281,7 @@
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/sdk validate:downstream if DOWNSTREAM-003 resolves packed runtime manifest blockers; otherwise record the expected nonzero strict failure",
-        "bun run --filter=@whattax/sdk validate:downstream:audit as the passing diagnostic command while packed runtime manifest blockers remain",
+        "bun run --filter=@whattax/sdk validate:downstream as the required strict clean-install gate",
         "bun run --filter=api smoke:public-routes",
         "bun run --filter=api check-types",
         "bun run --filter=api build",
@@ -340,7 +336,7 @@
         "Update this spec and task list status if implementation is complete.",
         "Update the active execution plan with final validation evidence and move it to completed if implementation is accepted.",
         "Run the full validation story in the order a future release-prep operator should use.",
-        "Document any remaining blockers, especially workspace protocol dependency issues or live package-name checks that must wait for publication.",
+        "Document any remaining risks, especially live package-name checks that must wait for publication.",
         "Do not run bun run version-repo, publish or remove private: true."
       ],
       "outputs": [
@@ -382,8 +378,7 @@
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/sdk validate:downstream as a passing gate only if packed runtime manifest blockers have been resolved; otherwise record the expected nonzero strict failure and leave final downstream consumer validation incomplete",
-        "bun run --filter=@whattax/sdk validate:downstream:audit as the passing diagnostic command while packed runtime manifest blockers remain",
+        "bun run --filter=@whattax/sdk validate:downstream as the required strict clean-install gate",
         "bun run --filter=@whattax/sdk check-packed-artifact",
         "bun run --filter=@whattax/sdk check-boundaries",
         "bun run --filter=@whattax/sdk test-types",
@@ -404,7 +399,7 @@
       ],
       "qualityAudits": [
         "Audit pass 1: final spec, task list, READMEs and execution plan agree on the downstream validation call graph and release gate order.",
-        "Audit pass 2: final validation evidence covers packed install, typecheck, runtime SDK, browser-safe bundle, live API smoke, cleanup and blockers.",
+        "Audit pass 2: final validation evidence covers packed install, typecheck, runtime SDK, public entrypoints, browser-safe bundle, live API smoke, cleanup and strict blocker diagnostics.",
         "Audit pass 3: public docs are neutral, package boundaries remain intact, Changeset decisions are correct and no publish/version/private flag changes slipped in."
       ],
       "parentAudit": {
@@ -415,9 +410,9 @@
       },
       "completionCriteria": [
         "Downstream validation is documented as a pre-publication release gate.",
-        "Final downstream consumer validation is claimed complete only when bun run --filter=@whattax/sdk validate:downstream exits zero; if packed runtime manifest blockers remain, record the strict failure and diagnostic audit evidence as an incomplete release gate.",
+        "Final downstream consumer validation is complete only when bun run --filter=@whattax/sdk validate:downstream exits zero after tarball audit, clean install, typecheck, runtime, public-entrypoint and browser-bundle checks.",
         "Final evidence is recorded in the completed execution plan.",
-        "Remaining blockers and future live package-name checks are explicit.",
+        "Residual risks and future live package-name checks are explicit.",
         "No public docs mention private downstream products.",
         "private: true remains in package manifests and no publication/versioning action was taken.",
         "Parent agent reviewed final docs, evidence, Changeset status and release gate integrity before accepting the task."
