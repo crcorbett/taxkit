@@ -7,7 +7,7 @@ confidence: high
 
 # Package Boundaries
 
-WhatTax should grow as a package-oriented monorepo for the open-source tax
+TaxKit should grow as a package-oriented monorepo for the open-source tax
 engine, docs, API server and TypeScript SDK. Package dependencies must point
 from foundational packages toward rule packages, API packages and apps. Engine
 packages must stay deterministic and reusable.
@@ -92,7 +92,7 @@ packages/
   cli/
 ```
 
-Current packages such as `@whattax/api-http` and the TanStack Start app sit
+Current packages such as `@taxkit/api-http` and the TanStack Start app sit
 outside the calculation engine. As the repo matures, the app layer should
 settle into a public Fumadocs documentation site and reusable API server. They
 will expose and consume engine capabilities once those capabilities exist, but
@@ -108,11 +108,11 @@ packages/core/**
   <- packages/api/** / packages/sdk/** / packages/cli/** / apps/**
 ```
 
-WhatTax packages must not depend on application-layer code. React is allowed only inside app/docs packages that explicitly need it.
+TaxKit packages must not depend on application-layer code. React is allowed only inside app/docs packages that explicitly need it.
 
 ## Package Responsibilities
 
-Implemented `@whattax/core` owns:
+Implemented `@taxkit/core` owns:
 
 - branded primitives such as money, dates, percentages and ids
 - fact descriptor helpers
@@ -123,13 +123,13 @@ Implemented `@whattax/core` owns:
 - Effect `Context.Tag` / `Layer` helpers
 - calculation engine orchestration
 
-Planned `@whattax/domain-au-*` packages will own:
+Planned `@taxkit/domain-au-*` packages will own:
 
 - Australian income years, FBT years and local date helpers
 - pay periods and date dimensions
 - Australian tax-domain facts that are not specific to one rule pack
 
-Implemented `@whattax/rules-au-pay` owns:
+Implemented `@taxkit/rules-au-pay` owns:
 
 - gross pay, taxable pay, net pay and pay event facts
 - pay-period conversions
@@ -137,24 +137,24 @@ Implemented `@whattax/rules-au-pay` owns:
 - payslip reconciliation target facts, but not payslip parsing
 
 Current PAYG withholding behavior is implemented inside
-`@whattax/rules-au-pay`. A later split to `@whattax/rules-au-payg` should keep
+`@taxkit/rules-au-pay`. A later split to `@taxkit/rules-au-payg` should keep
 canonical schemas, ids and parameter services with the owning package.
 
-Planned `@whattax/rules-au-payg` may own:
+Planned `@taxkit/rules-au-payg` may own:
 
 - ATO withholding schedule schemas
 - PAYG withholding algorithms
 - PAYG parameter table services
 - PAYG withholding traces and golden tests
 
-Implemented `@whattax/rules-au-stsl` and
-`@whattax/rules-au-income-tax` own their corresponding facts, algorithms,
-parameter tables and official rule packs. Planned `@whattax/rules-au-super`,
-`@whattax/rules-au-medicare`, `@whattax/rules-au-fbt`,
-`@whattax/rules-au-mortgage` and `@whattax/rules-au-deductions` will own their
+Implemented `@taxkit/rules-au-stsl` and
+`@taxkit/rules-au-income-tax` own their corresponding facts, algorithms,
+parameter tables and official rule packs. Planned `@taxkit/rules-au-super`,
+`@taxkit/rules-au-medicare`, `@taxkit/rules-au-fbt`,
+`@taxkit/rules-au-mortgage` and `@taxkit/rules-au-deductions` will own their
 corresponding facts, algorithms, parameter tables and official rule packs.
 
-Implemented `@whattax/calculators` owns the reusable calculator orchestration
+Implemented `@taxkit/calculators` owns the reusable calculator orchestration
 boundary for:
 
 - reusable calculator catalog schemas and entries
@@ -169,12 +169,12 @@ boundary for:
 It must not own OpenAPI annotations, HTTP status mapping, Bun serving, process
 config, app runtime lifecycle, SDK client transport or CLI command parsing.
 
-Implemented `@whattax/scripts` owns cross-package repository command
+Implemented `@taxkit/scripts` owns cross-package repository command
 orchestration. Its release-readiness program invokes canonical root and
 package-owned commands through an Effect child-process service. It must not
 copy validator logic out of the SDK, API, docs app or other owning packages.
 
-Implemented `@whattax/api-http` owns:
+Implemented `@taxkit/api-http` owns:
 
 - Effect HTTP API groups for public calculation endpoints
 - thin server handlers that call package-owned API services
@@ -184,27 +184,27 @@ Implemented `@whattax/api-http` owns:
 HTTP API packages should not own calculator catalog transformations or
 calculation business logic when a reusable API service package exists.
 
-Scaffolded `@whattax/sdk`, published later as `whattax` or `@whattax/sdk`,
+Scaffolded `@taxkit/sdk`, published later as `taxkit` or `@taxkit/sdk`,
 owns:
 
 - direct in-process calculation facade
-- plain TypeScript `WhatTax.create(...)` client factory and `WhatTax.{method}` generic helpers
-- Effect-native `whattax/effect` entrypoint
-- jurisdiction-specific opt-in subpaths such as `whattax/au`
+- plain TypeScript `TaxKit.create(...)` client factory and `TaxKit.{method}` generic helpers
+- Effect-native `taxkit/effect` entrypoint
+- jurisdiction-specific opt-in subpaths such as `taxkit/au`
 - Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
 - typed declarations, provider Layers and bindings shared by plain and Effect entrypoints
 - typed client functions for the public API where needed
 - browser-safe types and schemas
 - SDK examples and compatibility tests
 
-Implemented `@whattax/docs-content` owns:
+Implemented `@taxkit/docs-content` owns:
 
-- WhatTax docs frontmatter, meta, navigation and validation schemas
+- TaxKit docs frontmatter, meta, navigation and validation schemas
 - navigation and source-text validation policy
 - docs content service tags and live layers
-- server-only generated Fumadocs source wiring for WhatTax docs content
+- server-only generated Fumadocs source wiring for TaxKit docs content
 
-Implemented `@whattax/docs-fumadocs` owns:
+Implemented `@taxkit/docs-fumadocs` owns:
 
 - reusable Fumadocs configuration helpers
 - Effect Schema to Standard Schema bridges
@@ -222,14 +222,14 @@ Directory paths should group packages by purpose first. Package names may use th
 Examples:
 
 ```txt
-packages/rules/au/payg       -> @whattax/rules-au-payg
-packages/rules/au/super      -> @whattax/rules-au-super
-packages/domain/au/dates     -> @whattax/domain-au-dates
-packages/api/http            -> @whattax/api-http
-packages/calculators         -> @whattax/calculators
-packages/sdk/typescript      -> whattax or @whattax/sdk
-packages/docs-content        -> @whattax/docs-content
-packages/docs-fumadocs       -> @whattax/docs-fumadocs
+packages/rules/au/payg       -> @taxkit/rules-au-payg
+packages/rules/au/super      -> @taxkit/rules-au-super
+packages/domain/au/dates     -> @taxkit/domain-au-dates
+packages/api/http            -> @taxkit/api-http
+packages/calculators         -> @taxkit/calculators
+packages/sdk/typescript      -> taxkit or @taxkit/sdk
+packages/docs-content        -> @taxkit/docs-content
+packages/docs-fumadocs       -> @taxkit/docs-fumadocs
 ```
 
 Avoid flat package sprawl such as `packages/au-payg`, `packages/au-super` and

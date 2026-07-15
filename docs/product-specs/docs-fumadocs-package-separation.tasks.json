@@ -4,7 +4,7 @@
   "status": "implemented",
   "lastReviewed": "2026-06-14",
   "principles": [
-    "Keep authored MDX content, WhatTax content contracts, reusable Fumadocs internals and app rendering in separate ownership layers.",
+    "Keep authored MDX content, TaxKit content contracts, reusable Fumadocs internals and app rendering in separate ownership layers.",
     "Use Effect Schema as the canonical source for frontmatter, meta, navigation, loader and validation contracts.",
     "Use Fumadocs for MDX validation and rendering instead of hand-written markdown rendering.",
     "Keep browser/runtime imports behind explicit browser-safe and server-only package exports.",
@@ -12,35 +12,35 @@
   ],
   "globalVerification": {
     "requiredBeforeFinalPR": [
-      "bun run --filter=@whattax/docs-fumadocs build",
-      "bun run --filter=@whattax/docs-fumadocs check-types",
-      "bun run --filter=@whattax/docs-fumadocs test",
-      "bun run --filter=@whattax/docs-content build",
-      "bun run --filter=@whattax/docs-content check-types",
-      "bun run --filter=@whattax/docs-content test",
-      "bun run --filter=@whattax/docs-content validate",
+      "bun run --filter=@taxkit/docs-fumadocs build",
+      "bun run --filter=@taxkit/docs-fumadocs check-types",
+      "bun run --filter=@taxkit/docs-fumadocs test",
+      "bun run --filter=@taxkit/docs-content build",
+      "bun run --filter=@taxkit/docs-content check-types",
+      "bun run --filter=@taxkit/docs-content test",
+      "bun run --filter=@taxkit/docs-content validate",
       "bun run --filter=docs check-types",
       "bun run --filter=docs build",
       "browser screenshot verification for docs home, one nested guide page, one code block page and one Mermaid or flowchart page when present at 1440x1000 and 390x844",
       "bun run verification"
     ],
     "audits": [
-      "rg audit proving apps/docs browser modules do not import @whattax/docs-content/server or generated .source/server files",
+      "rg audit proving apps/docs browser modules do not import @taxkit/docs-content/server or generated .source/server files",
       "rg audit proving packages/docs-content has no React route, layout or renderer ownership",
-      "rg audit proving packages/docs-fumadocs does not import @whattax/docs-content or WhatTax content policy",
+      "rg audit proving packages/docs-fumadocs does not import @taxkit/docs-content or TaxKit content policy",
       "rg audit for unsafe casts, local DTO mirrors, trivial wrappers, switch statements, Object.values and Object.entries in touched docs runtime code"
     ],
     "changeset": "Package-facing tasks must add or update a Changeset with bun run changeset. Docs-only architecture/spec updates may state an explicit no-changeset rationale.",
     "browserEvidence": "App-rendering tasks must start the docs app, capture screenshots at 1440x1000 and 390x844, save them under the active exec plan evidence directory, and link those screenshots in the handoff for parent review."
   },
-  "delegationPrompt": "You are implementing exactly one task from the WhatTax spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Read and thoroughly follow the documentation standards suite for docs-writing tasks: `docs/standards/documentation-style.md`, `docs/standards/documentation-writing.md`, `docs/standards/documentation-templates.md`, the relevant template file, `docs/standards/documentation-review.md`, `docs/standards/documentation-architecture.md`, `docs/standards/documentation-user-journeys.md`, and the relevant user journey file.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n- Review the spec's call-graph diagrams before editing, and update/report them if implementation discovers a different final graph.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK/docs exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.\n- For app-rendering tasks, start the docs app and capture reviewable screenshots at desktop and mobile widths. Save them under the active exec plan evidence directory and link them in the handoff.\n- For substantial code, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.\n- Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Report whether the final implementation still matches the spec's call graph.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.",
+  "delegationPrompt": "You are implementing exactly one task from the TaxKit spec/task list.\n\nBefore editing:\n\n- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.\n- Read and thoroughly follow the documentation standards suite for docs-writing tasks: `docs/standards/documentation-style.md`, `docs/standards/documentation-writing.md`, `docs/standards/documentation-templates.md`, the relevant template file, `docs/standards/documentation-review.md`, `docs/standards/documentation-architecture.md`, `docs/standards/documentation-user-journeys.md`, and the relevant user journey file.\n- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.\n- Review the spec's call-graph diagrams before editing, and update/report them if implementation discovers a different final graph.\n\nImplementation rules:\n\n- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.\n- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.\n- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.\n- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.\n- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.\n- Browser/runtime code must consume browser-safe API/SDK/docs exports instead of importing server-only internals.\n- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.\n\nVerification and handoff:\n\n- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.\n- Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.\n- For app-rendering tasks, start the docs app and capture reviewable screenshots at desktop and mobile widths. Save them under the active exec plan evidence directory and link them in the handoff.\n- For substantial code, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.\n- Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.\n- Report the Changeset path and release-train impact, or report why no Changeset was required.\n- Report changed files, verification commands, outcomes and residual risks.\n- Report whether the final implementation still matches the spec's call graph.\n- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.",
   "tasks": [
     {
       "id": "DOCS-FUMA-001",
       "title": "Create reusable docs Fumadocs package",
       "status": "completed",
       "scope": [
-        "Create `packages/docs-fumadocs` with package name `@whattax/docs-fumadocs`.",
+        "Create `packages/docs-fumadocs` with package name `@taxkit/docs-fumadocs`.",
         "Port reusable ideas from `Projects/site/packages/posts/source.config.ts` and `Projects/mobius/packages/docs/core/src/fumadocs.ts` without copying app-specific or non-Effect patterns blindly.",
         "Expose generic Effect Schema to Standard Schema bridge helpers, generic meta schema, shared MDX options, code block metadata transformer, Fumadocs source loader helpers and page tree helpers.",
         "Add focused tests for schema bridging, page tree conversion and any source loader adapter contracts.",
@@ -56,11 +56,11 @@
         "packages/docs-fumadocs/README.md"
       ],
       "mandatoryVerification": [
-        "bun run --filter=@whattax/docs-fumadocs build",
-        "bun run --filter=@whattax/docs-fumadocs check-types",
-        "bun run --filter=@whattax/docs-fumadocs test",
+        "bun run --filter=@taxkit/docs-fumadocs build",
+        "bun run --filter=@taxkit/docs-fumadocs check-types",
+        "bun run --filter=@taxkit/docs-fumadocs test",
         "bun run verification",
-        "rg audit proving @whattax/docs-fumadocs does not import @whattax/docs-content",
+        "rg audit proving @taxkit/docs-fumadocs does not import @taxkit/docs-content",
         "rg audit for unsafe casts, local DTO mirrors, switch statements, Object.values and Object.entries in packages/docs-fumadocs"
       ],
       "qualityAudits": [
@@ -80,8 +80,8 @@
       "title": "Refactor docs content onto reusable Fumadocs internals",
       "status": "completed",
       "scope": [
-        "Update `packages/docs-content/source.config.ts` to use `@whattax/docs-fumadocs/config` helpers.",
-        "Keep WhatTax-specific frontmatter, navigation, page path and validation schemas in `@whattax/docs-content`.",
+        "Update `packages/docs-content/source.config.ts` to use `@taxkit/docs-fumadocs/config` helpers.",
+        "Keep TaxKit-specific frontmatter, navigation, page path and validation schemas in `@taxkit/docs-content`.",
         "Refactor `DocsContentServiceLive` so page lookup and renderable page data come from the Fumadocs generated source through a reusable source adapter.",
         "Keep raw file reads only for validation rules that need source text.",
         "Update docs-content tests and README to describe the new boundary."
@@ -94,10 +94,10 @@
         "packages/docs-content/README.md"
       ],
       "mandatoryVerification": [
-        "bun run --filter=@whattax/docs-content build",
-        "bun run --filter=@whattax/docs-content check-types",
-        "bun run --filter=@whattax/docs-content test",
-        "bun run --filter=@whattax/docs-content validate",
+        "bun run --filter=@taxkit/docs-content build",
+        "bun run --filter=@taxkit/docs-content check-types",
+        "bun run --filter=@taxkit/docs-content test",
+        "bun run --filter=@taxkit/docs-content validate",
         "bun run verification",
         "rg audit proving packages/docs-content has no React route, layout or app renderer ownership",
         "rg audit proving package code reuses canonical DocsPageFrontmatter, DocsNavigation and tagged docs errors"
@@ -105,14 +105,14 @@
       "qualityAudits": [
         "Pass 1: audit current and target call graphs against actual imports.",
         "Pass 2: audit frontmatter/meta/navigation decode paths for Effect Schema ownership.",
-        "Pass 3: audit validation policy for generic Fumadocs logic that should move to @whattax/docs-fumadocs."
+        "Pass 3: audit validation policy for generic Fumadocs logic that should move to @taxkit/docs-fumadocs."
       ],
       "parentAudit": {
         "maxCorrectionTurns": 3,
         "returnToSameSubagent": true,
         "escalateAfterFailedTurn": 3
       },
-      "changeset": "Required because `@whattax/docs-content` package behaviour changes."
+      "changeset": "Required because `@taxkit/docs-content` package behaviour changes."
     },
     {
       "id": "DOCS-FUMA-003",
@@ -121,7 +121,7 @@
       "scope": [
         "Replace the app-local hand-written markdown renderer with compiled MDX rendering from Fumadocs generated source.",
         "Create app-local route boundary schemas for docs loader success and failure data.",
-        "Compose reusable MDX primitives from `@whattax/docs-fumadocs/render` with WhatTax-specific components in `apps/docs/src/lib`.",
+        "Compose reusable MDX primitives from `@taxkit/docs-fumadocs/render` with TaxKit-specific components in `apps/docs/src/lib`.",
         "Use `Effect.Match` for loader result and closed rendering branches where appropriate.",
         "Add browser smoke coverage for docs home, a nested page, a page with a code block and a Mermaid or flowchart page when present.",
         "Capture reviewable screenshots for desktop and mobile widths and link them in the handoff."
@@ -136,13 +136,13 @@
       "mandatoryVerification": [
         "bun run --filter=docs check-types",
         "bun run --filter=docs build",
-        "bun run --filter=@whattax/docs-content validate",
+        "bun run --filter=@taxkit/docs-content validate",
         "bun run verification",
         "inspect browser console output and treat hydration errors, missing navigation, clipped text, overlapping UI, unstyled code blocks, broken links and unrendered MDX components as failures",
         "save screenshots under the active exec plan evidence directory and link them in the handoff for parent review",
         "browser screenshot verification for docs home, one nested guide page, one code block page and one Mermaid or flowchart page when present at 1440x1000 and 390x844",
         "start the docs app with `bun run --filter=docs dev` or the repo-approved portless docs command",
-        "rg audit proving apps/docs browser modules do not import @whattax/docs-content/server or generated .source/server files"
+        "rg audit proving apps/docs browser modules do not import @taxkit/docs-content/server or generated .source/server files"
       ],
       "qualityAudits": [
         "Pass 1: audit app route loader schemas and serialisation boundaries.",
@@ -163,7 +163,7 @@
       "status": "completed",
       "scope": [
         "Add or refine validation that proves frontmatter, meta, navigation and MDX component usage match canonical schemas and the allowed component map.",
-        "Keep examples and OpenAPI reference smoke checks in `@whattax/docs-content`.",
+        "Keep examples and OpenAPI reference smoke checks in `@taxkit/docs-content`.",
         "Ensure validation can be run independently of the docs app route renderer.",
         "Document the validation policy in package README or architecture docs."
       ],
@@ -174,9 +174,9 @@
         "docs/architecture/content-and-posts.md"
       ],
       "mandatoryVerification": [
-        "bun run --filter=@whattax/docs-content validate",
-        "bun run --filter=@whattax/docs-content test",
-        "bun run --filter=@whattax/docs-content check-types",
+        "bun run --filter=@taxkit/docs-content validate",
+        "bun run --filter=@taxkit/docs-content test",
+        "bun run --filter=@taxkit/docs-content check-types",
         "bun run verification",
         "manual audit that validation uses Effect Schema and does not mirror public SDK/API DTOs"
       ],
@@ -231,8 +231,8 @@
   ],
   "completionCriteria": [
     "The final implementation matches the target call graph or the spec is updated with the actual graph.",
-    "`@whattax/docs-fumadocs` owns reusable Fumadocs internals and does not import WhatTax content policy.",
-    "`@whattax/docs-content` owns WhatTax content schemas, service and validation only.",
+    "`@taxkit/docs-fumadocs` owns reusable Fumadocs internals and does not import TaxKit content policy.",
+    "`@taxkit/docs-content` owns TaxKit content schemas, service and validation only.",
     "`apps/docs` renders compiled Fumadocs MDX modules through an app-local component map.",
     "All mandatory verification and import graph audits pass.",
     "Browser screenshots for the final docs app routes are linked in the implementation handoff and reviewed by the parent before acceptance.",

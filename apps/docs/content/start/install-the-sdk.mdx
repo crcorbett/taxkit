@@ -6,7 +6,7 @@ status: "draft"
 
 # Install the SDK
 
-Install the TypeScript SDK when your application can run WhatTax in-process.
+Install the TypeScript SDK when your application can run TaxKit in-process.
 Use the HTTP API instead when the caller cannot import TypeScript packages.
 
 ## Current package status
@@ -17,30 +17,30 @@ target public install shape and match the current workspace package names.
 ## Install packages
 
 ```sh
-bun add @whattax/sdk @whattax/core
+bun add @taxkit/sdk @taxkit/core
 ```
 
-Use `@whattax/core` for canonical branded values such as `aud`. Use
-`@whattax/sdk` for calculation descriptors, the plain facade, safe facade,
+Use `@taxkit/core` for canonical branded values such as `aud`. Use
+`@taxkit/sdk` for calculation descriptors, the plain facade, safe facade,
 Effect facade and schema re-exports.
 
 ## Choose an entrypoint
 
-| Entrypoint             | Use when                                                               |
-| ---------------------- | ---------------------------------------------------------------------- |
-| `@whattax/sdk`         | You want `WhatTax.calculate` or `WhatTax.safe.calculate`.              |
-| `@whattax/sdk/au`      | You want Australian helper methods such as `au.incomeTax.annual`.      |
-| `@whattax/sdk/effect`  | You want Effect programs, service requirements and full run responses. |
-| `@whattax/sdk/schemas` | You want canonical calculator run schemas and SDK error schemas.       |
+| Entrypoint            | Use when                                                               |
+| --------------------- | ---------------------------------------------------------------------- |
+| `@taxkit/sdk`         | You want `TaxKit.calculate` or `TaxKit.safe.calculate`.                |
+| `@taxkit/sdk/au`      | You want Australian helper methods such as `au.incomeTax.annual`.      |
+| `@taxkit/sdk/effect`  | You want Effect programs, service requirements and full run responses. |
+| `@taxkit/sdk/schemas` | You want canonical calculator run schemas and SDK error schemas.       |
 
 ## Verify an import
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
 
-const report = await WhatTax.calculate(au.calculations.annualIncomeTax, {
+const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(9_000_000),
 });
 

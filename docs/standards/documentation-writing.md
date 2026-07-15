@@ -7,13 +7,13 @@ confidence: medium
 
 # Documentation writing
 
-Use this guide for writing and editing WhatTax documentation prose.
+Use this guide for writing and editing TaxKit documentation prose.
 
 ## Reader stance
 
 Write to a capable developer who wants to complete a task. Assume they can
 read TypeScript, understand package managers and follow a short command
-sequence. Do not assume they know WhatTax package ownership, Effect conventions
+sequence. Do not assume they know TaxKit package ownership, Effect conventions
 or Australian tax terminology.
 
 Write in second person:
@@ -138,8 +138,8 @@ Code snippets should be useful, short and current.
 Include imports when the snippet is meant to be copied:
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { au } from "@taxkit/sdk/au";
 ```
 
 Use canonical schema-owned values and branded constructors where required.

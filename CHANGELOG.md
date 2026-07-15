@@ -1,4 +1,4 @@
-# WhatTax
+# TaxKit
 
 ## 0.0.1
 
@@ -8,7 +8,7 @@
   calculator catalog: take-home pay, PAYG withholdings and annual income tax.
   The public route model is calculator, fact, rule and graph driven rather than
   jurisdiction-route driven.
-- Extracted reusable calculator orchestration into `@whattax/calculators`, with
+- Extracted reusable calculator orchestration into `@taxkit/calculators`, with
   HTTP handlers acting as thin transport adapters over the public calculator
   service.
 - Hardened the calculation engine with typed rule descriptor builders,
@@ -17,20 +17,20 @@
   `CalculationEngine` service.
 - Added the standalone Bun API runtime and initial public health/docs routes.
 - Introduced the fixed release-train versioning workflow so implemented
-  `@whattax/*` packages can be installed as one compatible version set.
+  `@taxkit/*` packages can be installed as one compatible version set.
 
 ### App Changelogs
 
-- [WhatTax API](./apps/api/CHANGELOG.md)
+- [TaxKit API](./apps/api/CHANGELOG.md)
 
 ### Package Changelogs
 
-- [`@whattax/core`](./packages/core/CHANGELOG.md)
-- `@whattax/calculators`: pending first package changelog generation through
+- [`@taxkit/core`](./packages/core/CHANGELOG.md)
+- `@taxkit/calculators`: pending first package changelog generation through
   the release-train Changeset workflow.
-- [`@whattax/api-http`](./packages/api/http/CHANGELOG.md)
-- [`@whattax/rules-au-income-tax`](./packages/rules/au/income-tax/CHANGELOG.md)
-- [`@whattax/rules-au-pay`](./packages/rules/au/pay/CHANGELOG.md)
-- [`@whattax/rules-au-stsl`](./packages/rules/au/stsl/CHANGELOG.md)
-- [`@whattax/testing`](./packages/testing/CHANGELOG.md)
-- [`@whattax/tsconfig`](./packages/tsconfig/CHANGELOG.md)
+- [`@taxkit/api-http`](./packages/api/http/CHANGELOG.md)
+- [`@taxkit/rules-au-income-tax`](./packages/rules/au/income-tax/CHANGELOG.md)
+- [`@taxkit/rules-au-pay`](./packages/rules/au/pay/CHANGELOG.md)
+- [`@taxkit/rules-au-stsl`](./packages/rules/au/stsl/CHANGELOG.md)
+- [`@taxkit/testing`](./packages/testing/CHANGELOG.md)
+- [`@taxkit/tsconfig`](./packages/tsconfig/CHANGELOG.md)

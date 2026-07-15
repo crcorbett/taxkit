@@ -9,7 +9,7 @@ confidence: medium
 
 ## Overview
 
-WhatTax needs a Mobius-style documentation structure before deeper engine work
+TaxKit needs a Mobius-style documentation structure before deeper engine work
 accelerates. The repo currently has useful architecture docs, but no product
 spec surface, design-doc bucket, exec-plan bucket, references bucket, package
 README coverage or short root atlas.
@@ -33,7 +33,7 @@ future work is implementation debt, spec debt or stale planning.
 
 - Add the canonical docs buckets: `docs/architecture/`, `docs/design-docs/`,
   `docs/exec-plans/`, `docs/product-specs/` and `docs/references/`.
-- Add WhatTax-adapted `prd-writer` and `prd-implementer` skills.
+- Add TaxKit-adapted `prd-writer` and `prd-implementer` skills.
 - Add freshness metadata to canonical docs.
 - Split deeper architecture topics into focused docs for Effect services,
   package ownership, frontend, content/posts, deployment and testing quality.
@@ -64,7 +64,7 @@ future work is implementation debt, spec debt or stale planning.
 ## Proposed approach
 
 1. Copy the Mobius PRD skills into `.agents/skills/` and adapt their references
-   to WhatTax.
+   to TaxKit.
 2. Create the docs buckets and authoring guides needed by those skills.
 3. Add metadata to existing architecture docs.
 4. Add focused architecture docs for the deeper topics now visible in the
@@ -80,7 +80,7 @@ future work is implementation debt, spec debt or stale planning.
 - New docs can become aspirational if they point at packages that do not exist.
   The root atlas should only link to existing files.
 - Copying Mobius wording too directly can leak unrelated product assumptions.
-  WhatTax docs should stay focused on open-source tax rules, calculators, API,
+  TaxKit docs should stay focused on open-source tax rules, calculators, API,
   SDK and docs.
 - Creating too many docs at once can reduce navigability. Each new doc should
   have a narrow role and link back to the index.
@@ -88,7 +88,7 @@ future work is implementation debt, spec debt or stale planning.
 ## Acceptance criteria
 
 - `.agents/skills/prd-writer` and `.agents/skills/prd-implementer` exist and
-  route to WhatTax docs.
+  route to TaxKit docs.
 - `docs/design-docs/`, `docs/exec-plans/`, `docs/product-specs/` and
   `docs/references/` have canonical entrypoints.
 - Existing canonical architecture docs include freshness metadata.

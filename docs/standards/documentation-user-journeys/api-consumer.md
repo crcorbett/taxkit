@@ -8,7 +8,7 @@ confidence: medium
 # API consumer journey
 
 Reader:
-: A developer calling WhatTax from a browser, backend in another language or
+: A developer calling TaxKit from a browser, backend in another language or
   service that cannot import TypeScript packages.
 
 Need:

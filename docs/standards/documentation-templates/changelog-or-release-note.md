@@ -12,7 +12,7 @@ Use for public release summaries.
 ```md
 ---
 title: "Version 0.0.2"
-description: "Changes in WhatTax version 0.0.2."
+description: "Changes in TaxKit version 0.0.2."
 ---
 
 # Version 0.0.2

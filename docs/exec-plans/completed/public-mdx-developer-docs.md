@@ -112,11 +112,11 @@ task.
   `PublicCalculationMetadata` and `PublicErrorEnvelope`; no matches were
   found.
 - Verified current public SDK names appear across the Start and SDK docs:
-  `WhatTax.calculate`, `WhatTax.safe.calculate`, `calculateRunRequest`,
+  `TaxKit.calculate`, `TaxKit.safe.calculate`, `calculateRunRequest`,
   `calculateReportRequest`, `calculateReport`, `CalculatorRunRequest`,
   `CalculatorRunResponse` and `CalculatorServiceError`.
 - Verification passed:
-  - `bun run --filter=@whattax/sdk test-types`
+  - `bun run --filter=@taxkit/sdk test-types`
   - `bun run verification`
   - `bun run changeset status --verbose`
 - Accepted `DOCS-MDX-002` for the parent gate.
@@ -164,7 +164,7 @@ task.
   does not change package exports, package README behaviour or runtime
   behaviour.
 - Final call graph still matches the spec: HTTP calculate routes through
-  `CalculatorApiHandlerLive` to `@whattax/sdk/effect` `calculateRunRequest`,
+  `CalculatorApiHandlerLive` to `@taxkit/sdk/effect` `calculateRunRequest`,
   then to `PublicCalculatorService.calculate` and `CalculationEngine`, with
   `CalculatorApiErrorEnvelope` for expected service errors.
 
@@ -185,7 +185,7 @@ task.
 - Audited API, Guides and Concepts pages for banned marketing wording, private
   downstream product names and stale SDK/API names; no matches were found.
 - Verified current public API/SDK names appear across the slice:
-  `WhatTax.calculate`, `WhatTax.safe.calculate`, `au.incomeTax.annual`,
+  `TaxKit.calculate`, `TaxKit.safe.calculate`, `au.incomeTax.annual`,
   `calculateRunRequest`, `calculateReportRequest`, `calculateReport`,
   `CalculatorRunRequest`, `CalculatorRunResponse` and
   `CalculatorServiceError`.
@@ -267,7 +267,7 @@ task.
 - Final call graph still matches the spec. Contributor learning still routes
   from Contributing / What are you changing? into fact, rule, calculator,
   tax-year and incorrect-result guides, then into PR evidence. Public HTTP and
-  SDK docs still route calculation behaviour through `@whattax/sdk/effect`
+  SDK docs still route calculation behaviour through `@taxkit/sdk/effect`
   `calculateRunRequest`, `PublicCalculatorService.calculate` and
   `CalculationEngine` rather than putting tax logic in transport or SDK
   adapters.
@@ -287,7 +287,7 @@ task.
   - Node/server SDK route usage
   - browser HTTP `fetch` usage
   - Effect `calculateRunRequest` construction
-  - `WhatTax.safe.calculate` error handling
+  - `TaxKit.safe.calculate` error handling
 - Added `apps/docs/scripts/validate-content.mjs` for MDX content-root
   validation of frontmatter, balanced fences, navigation sources, local links,
   banned marketing language, stale public names and private downstream product
@@ -320,7 +320,7 @@ task.
     - `bun --tsconfig-override apps/docs/tsconfig.examples.json apps/docs/examples/browser-http.ts`
   - OpenAPI/reference generation smoke check:
     - `curl -fsS http://127.0.0.1:4000/api/docs/openapi.json` confirmed
-      title `WhatTax API` and 10 paths including the calculate route.
+      title `TaxKit API` and 10 paths including the calculate route.
   - Documentation standards audit scans:
     - banned marketing language: no matches in `apps/docs/content` or
       `apps/docs/examples`
@@ -330,7 +330,7 @@ task.
     - private downstream product terms: no matches for `adad`, `SaaS`,
       `paid`, `simulation`, `AI`, `private downstream` or `private product`
     - current public names verified across Reference docs and examples:
-      `WhatTax.calculate`, `WhatTax.safe.calculate`, `au.incomeTax.annual`,
+      `TaxKit.calculate`, `TaxKit.safe.calculate`, `au.incomeTax.annual`,
       `calculateRunRequest`, `calculateReportRequest`, `calculateReport`,
       `CalculatorRunRequest`, `CalculatorRunResponse` and
       `CalculatorServiceError`
@@ -343,7 +343,7 @@ task.
 - Final call graph still matches the spec. Public docs requests route through
   `apps/docs/navigation.json` into MDX pages and examples. HTTP calculate
   documentation still routes through `CalculatorApiHandlerLive` to
-  `@whattax/sdk/effect` `calculateRunRequest`,
+  `@taxkit/sdk/effect` `calculateRunRequest`,
   `PublicCalculatorService.calculate` and `CalculationEngine`, with
   `CalculatorApiErrorEnvelope` for expected service errors.
 
@@ -369,7 +369,7 @@ task.
 - Ran the browser HTTP example against a local API app; it exited 0 and
   returned calculator JSON. The API server was stopped after the smoke check.
 - Ran the OpenAPI smoke against `GET /api/docs/openapi.json`; it returned
-  `WhatTax API` with 10 paths including
+  `TaxKit API` with 10 paths including
   `/api/v1/calculators/{calculatorId}/calculate`.
 - Ran `bun run changeset status --verbose`; existing pending package
   Changesets are unchanged.

@@ -7,12 +7,12 @@ confidence: medium
 
 # Content and posts
 
-WhatTax public content should explain the open-source engine, supported rule
+TaxKit public content should explain the open-source engine, supported rule
 packs, calculator behaviour, API usage and SDK usage.
 
 ## Scope
 
-This doc owns public docs/content direction for WhatTax. It should stay focused
+This doc owns public docs/content direction for TaxKit. It should stay focused
 on the open-source tax engine and avoid downstream private-product specifics.
 
 ## Main areas
@@ -29,10 +29,10 @@ on the open-source tax engine and avoid downstream private-product specifics.
 : Public docs navigation contract. It owns top-level section order, section
   source files, stable paths and primary reader metadata. The file remains
   authored in the app so contributors can review route structure beside the
-  content, but it is decoded and enforced by `@whattax/docs-content`.
+  content, but it is decoded and enforced by `@taxkit/docs-content`.
 
 `packages/docs-content`
-: Private source-only package for WhatTax docs frontmatter, meta, navigation,
+: Private source-only package for TaxKit docs frontmatter, meta, navigation,
   validation policy, tagged docs errors, generated Fumadocs source access and
   the content service. It bundles the app-authored navigation representation
   for built runtimes and decodes it through the package-owned navigation
@@ -58,13 +58,13 @@ browser
   -> apps/docs route
     -> apps/docs route boundary schema
     -> DocsContentService
-      -> @whattax/docs-fumadocs source adapter
+      -> @taxkit/docs-fumadocs source adapter
         -> packages/docs-content/.source/server
           -> apps/docs/content/**/*.mdx
       -> apps/docs/navigation.json
-    -> @whattax/docs-content/client
+    -> @taxkit/docs-content/client
       -> Fumadocs compiled MDX module
-    -> @whattax/docs-fumadocs/render primitives
+    -> @taxkit/docs-fumadocs/render primitives
     -> app-local MDX component map
 ```
 
@@ -72,12 +72,12 @@ browser
 Tests: docs structure
 
 docs implementation
-  -> @whattax/docs-content validate
+  -> @taxkit/docs-content validate
     -> frontmatter and navigation schema decode
     -> navigation coverage and local link checks
     -> MDX component allowlist
     -> examples and OpenAPI reference checks
-  -> @whattax/docs-fumadocs tests
+  -> @taxkit/docs-fumadocs tests
   -> apps/docs build and browser screenshots when rendering changes
   -> bun run verification
 ```
@@ -92,11 +92,11 @@ docs implementation
   related standards suite before writing or reviewing public docs.
 - Keep public MDX pages task-first. Use architecture docs for durable
   ownership and runtime detail.
-- Validate public MDX through `@whattax/docs-content`, which owns Effect Schema
+- Validate public MDX through `@taxkit/docs-content`, which owns Effect Schema
   frontmatter, navigation coverage, source-text policy, local link, MDX
   component allowlist, examples and OpenAPI reference checks.
-- Keep reusable Fumadocs code in `@whattax/docs-fumadocs`; keep WhatTax
-  content contracts in `@whattax/docs-content`; keep route composition and
+- Keep reusable Fumadocs code in `@taxkit/docs-fumadocs`; keep TaxKit
+  content contracts in `@taxkit/docs-content`; keep route composition and
   app-specific rendering in `apps/docs`.
 
 ## Related docs

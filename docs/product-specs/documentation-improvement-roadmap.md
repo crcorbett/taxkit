@@ -51,7 +51,7 @@ The documentation audit identified the first gaps:
 - Give the repo status HTML snapshot an explicit owner and refresh workflow.
 - Add a small docs-maintenance convention so future package or architecture
   changes update the right docs.
-- Keep public WhatTax docs focused on the open-source tax engine, API, SDK and
+- Keep public TaxKit docs focused on the open-source tax engine, API, SDK and
   documentation site.
 
 ## Non-goals
@@ -60,7 +60,7 @@ The documentation audit identified the first gaps:
 - Scaffold runtime, docs or SDK packages as part of this documentation pass.
 - Create a full documentation website.
 - Replace architecture docs with a generated status page.
-- Add private downstream product strategy to public WhatTax docs.
+- Add private downstream product strategy to public TaxKit docs.
 
 ## Ownership and boundaries
 

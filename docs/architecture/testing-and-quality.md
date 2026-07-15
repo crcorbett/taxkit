@@ -7,7 +7,7 @@ confidence: high
 
 # Testing and quality
 
-WhatTax quality depends on deterministic calculation tests, package boundary
+TaxKit quality depends on deterministic calculation tests, package boundary
 tests, graph validation, trace snapshots, API/SDK parity and build/type health.
 
 ## Scope
@@ -45,7 +45,7 @@ change:
 bun run docs:validate
 bun run docs:build
 bun run --filter=docs test:browser
-bun run --filter=@whattax/docs-content test
+bun run --filter=@taxkit/docs-content test
 ```
 
 Run those package-local docs gates whenever MDX content, Fumadocs source
@@ -55,8 +55,8 @@ Release-facing package work must also prove actual tarballs rather than
 workspace imports or dry-run file lists:
 
 ```bash
-bun run --filter=@whattax/sdk check-packed-artifact
-bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@taxkit/sdk check-packed-artifact
+bun run --filter=@taxkit/sdk validate:downstream
 ```
 
 The focused command uses an Effect-native, scope-managed Bun runtime to pack,
@@ -71,7 +71,7 @@ The docs browser command runs a programmatic client-side TanStack route harness
 in Chromium. It may prove direct `Route.useLoaderData` restoration, recoverable
 route UI, framework error boundaries and console cleanliness, but it does not
 prove SSR or hydration. Prove initial SSR, hydration and client navigation
-separately against the built app on `https://docs.whattax.localhost`, including
+separately against the built app on `https://docs.taxkit.localhost`, including
 a successful server-function response and no document request during the client
 transition.
 
@@ -92,7 +92,7 @@ evidence without taking ownership of those validators:
 bun run release:check
 ```
 
-`@whattax/scripts` runs root verification, workspace tests and builds, docs
+`@taxkit/scripts` runs root verification, workspace tests and builds, docs
 content validation, the focused SDK artifact check, strict downstream package
 validation, API smoke, docs browser proof and Changeset status in that order.
 The command uses the Effect Platform child-process `Command` model through a
@@ -105,7 +105,7 @@ Effect `Path.fromFileUrl`.
 
 ```text
 root release:check
-  -> @whattax/scripts runtime
+  -> @taxkit/scripts runtime
   -> ReleaseCommandRunner
   -> canonical root, app and package commands
   -> schema-backed ordered outcomes or one tagged failure
@@ -138,7 +138,7 @@ supporting gate and cannot replace semantic ownership or call-graph review.
 - A rule pack is incomplete without source references and golden tests.
 - Graph validation failures should fail the build.
 - API responses must stay schema-backed.
-- Public docs content must validate through `@whattax/docs-content` before
+- Public docs content must validate through `@taxkit/docs-content` before
   documentation/runtime slices are accepted.
 - Keep browser tooling in app dev dependencies and browser harness routes out
   of production route trees.
@@ -148,7 +148,7 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   functions below a minimum line count. Prefer review and architecture guidance
   for tiny one-off wrapper or mapper helpers.
 - `tools/oxlint/effect-rules.js`, `bun-rules.js` and `mdx-rules.js` own
-  domain-neutral contracts. `whattax-rules.js` owns tax/calculator policy plus
+  domain-neutral contracts. `taxkit-rules.js` owns tax/calculator policy plus
   decoder and route-transport rules. Do not put package names or tax defaults
   into a portable rule message.
 - Portable Effect rules ban manual `_tag` literals and `switch`, keep live/test
@@ -178,13 +178,13 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   services use pipe-first composition, Effect `Array`, `Chunk`, `HashMap`,
   `HashSet`, `Effect`, `Layer`, `Clock`, `Random` and schema codecs instead of
   vanilla JavaScript/TypeScript escape hatches.
-- `whattax/no-decoding-outside-boundaries` is enabled repository-wide. The
+- `taxkit/no-decoding-outside-boundaries` is enabled repository-wide. The
   rule reports executable Effect Schema decoders, direct decoder
   helpers, decoder members, statically named computed members, decoder factory
   creation and statically traceable aliases. It must not report encoding,
   schema declarations or declarative APIs such as `Schema.decodeTo`.
 - `oxlint.config.ts` owns one named, exact `decodingBoundaryFiles` allowlist.
-  An override may disable only `whattax/no-decoding-outside-boundaries` for an
+  An override may disable only `taxkit/no-decoding-outside-boundaries` for an
   exact reviewed file; it must not use `ignorePatterns`, package-wide globs,
   filename-pattern exemptions, broad test exemptions or nested configuration.
   Inline `oxlint-disable` and `eslint-disable` comments naming the rule are
@@ -206,7 +206,7 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   arbitrary functions and cross-module value flow remain review-only because
   Oxlint cannot resolve them without interprocedural type analysis; do not add
   broad suppressions to simulate that analysis.
-- `whattax/no-route-transport-restore-outside-consumers` governs the separate
+- `taxkit/no-route-transport-restore-outside-consumers` governs the separate
   post-hydration restore operation. It tracks scope-resolved direct, unaliased
   named imports from canonical route-boundary modules and permits a restore
   only in an inline or statically resolved same-file `createFileRoute`
@@ -229,7 +229,7 @@ supporting gate and cannot replace semantic ownership or call-graph review.
 - `oxlint.config.ts` owns the exact route-boundary module and consumer-file
   lists. These lists must not use route globs, filename inference, nested
   configuration or `ignorePatterns` exemptions. Route TSX files remain under
-  `whattax/no-decoding-outside-boundaries`; the specialised restore rule does
+  `taxkit/no-decoding-outside-boundaries`; the specialised restore rule does
   not make them decoder boundaries.
 - The root boundary-directive pass rejects `eslint-disable` and
   `oxlint-disable` comment tokens naming either boundary rule. Real Oxlint CLI
@@ -247,7 +247,7 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   when work spans multiple packages.
 - Keep `bun run release:check` as orchestration over canonical commands. A new
   release gate must first have an owning package command and focused tests; do
-  not implement its validation policy inside `@whattax/scripts`.
+  not implement its validation policy inside `@taxkit/scripts`.
 
 ## Related Docs
 

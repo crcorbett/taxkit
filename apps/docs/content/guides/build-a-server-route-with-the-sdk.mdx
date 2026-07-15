@@ -1,13 +1,13 @@
 ---
 title: "Build a server route with the SDK"
-description: "Call WhatTax from your own TypeScript server route without HTTP transport."
+description: "Call TaxKit from your own TypeScript server route without HTTP transport."
 status: "draft"
 ---
 
 # Build a server route with the SDK
 
 Use this guide when your application owns the HTTP route and only needs
-WhatTax for the calculation.
+TaxKit for the calculation.
 
 ## Before you start
 
@@ -18,16 +18,16 @@ WhatTax for the calculation.
 ## Steps
 
 1. Parse your application request.
-2. Convert accepted fields into canonical WhatTax facts.
+2. Convert accepted fields into canonical TaxKit facts.
 3. Call the SDK helper.
 4. Return the report fields your application needs.
 
 ## Example
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
+import { au } from "@taxkit/sdk/au";
 
 export const handlePayPreview = async (request: Request): Promise<Response> => {
   const body = (await request.json()) as {
@@ -71,7 +71,7 @@ Expected response:
 
 ## Handle errors
 
-Use `WhatTax.safe.calculate` if your route should return expected failures
+Use `TaxKit.safe.calculate` if your route should return expected failures
 without a thrown Promise rejection. Map the safe failure to your application's
 HTTP status and response shape.
 

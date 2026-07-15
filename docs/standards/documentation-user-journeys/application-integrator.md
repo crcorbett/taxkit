@@ -8,7 +8,7 @@ confidence: medium
 # Application integrator journey
 
 Reader:
-: A developer adding WhatTax to an existing app or service.
+: A developer adding TaxKit to an existing app or service.
 
 Need:
 : Choose between plain SDK, Effect SDK and HTTP API, then wire the selected

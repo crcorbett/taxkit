@@ -161,7 +161,7 @@ Bad early slices:
 Use this prompt block when delegating a task-list slice to a subagent:
 
 ```md
-You are implementing exactly one task from the WhatTax spec/task list.
+You are implementing exactly one task from the TaxKit spec/task list.
 
 Before editing:
 - Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.

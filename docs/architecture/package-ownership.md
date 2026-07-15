@@ -7,7 +7,7 @@ confidence: high
 
 # Package ownership
 
-Package ownership defines where new WhatTax code should belong as the repo
+Package ownership defines where new TaxKit code should belong as the repo
 grows and which package will be allowed to define canonical contracts. It does
 not imply that every named package exists today.
 
@@ -93,7 +93,7 @@ Effect-native subpaths, jurisdiction modules, examples, compatibility tests and
 packed-artifact checks. Its strict downstream validator may orchestrate the
 nine-package release closure and materialize package-declared publication
 exports in temporary tarballs, but package manifests and exports remain owned
-by their packages. It must not depend on `@whattax/api-http`; HTTP
+by their packages. It must not depend on `@taxkit/api-http`; HTTP
 transports consume the SDK rather than the reverse. Its Effect entrypoint owns
 request-preserving calculator helpers such as `calculateRunRequest`,
 `calculateReportRequest` and `calculateReport`, while reusing
@@ -115,7 +115,7 @@ while a future product workflow is still unscoped.
 shutdown and platform serving for the implemented API app.
 
 `packages/docs-content`
-: Implemented private source-only content package. It owns WhatTax docs
+: Implemented private source-only content package. It owns TaxKit docs
   frontmatter, meta, navigation, validation issues, tagged docs errors,
   `DocsContentService`, the Fumadocs `source.config.ts` for
   `apps/docs/content` and the generated `.source/*` boundary. It can read raw
@@ -126,7 +126,7 @@ shutdown and platform serving for the implemented API app.
 : Implemented private reusable package for generic Fumadocs integration. It
   owns Effect Schema to Standard Schema bridging, shared MDX compile config,
   source-loader adapters, page-tree helpers and generic browser-safe MDX render
-  primitives. It must not own WhatTax-specific frontmatter, navigation,
+  primitives. It must not own TaxKit-specific frontmatter, navigation,
   validation policy, routes or generated content.
 
 ## Runtime shape
@@ -150,7 +150,7 @@ belongs in apps or explicitly server-only package exports.
   validator and its domain policy with the package or app it validates.
 - Keep app-specific MDX components in `apps/docs`; promote only generic,
   repeated Fumadocs primitives to `packages/docs-fumadocs/render` or repeated
-  WhatTax UI primitives to `packages/ui`.
+  TaxKit UI primitives to `packages/ui`.
 - Do not add flat engine packages once nested domain or rule ownership exists.
   `packages/calculators` is allowed because it is a cross-surface
   orchestration package rather than a jurisdiction/domain/rule package.
@@ -159,7 +159,7 @@ belongs in apps or explicitly server-only package exports.
   transformation, graph assembly, calculation dispatch and expected error
   shaping belong in service packages such as `packages/calculators`. The
   current calculate handler is thinner still: it selects the SDK descriptor for
-  the route calculator id, calls `@whattax/sdk/effect` `calculateRunRequest`
+  the route calculator id, calls `@taxkit/sdk/effect` `calculateRunRequest`
   once, and maps only transport envelopes.
 
 ## Related docs

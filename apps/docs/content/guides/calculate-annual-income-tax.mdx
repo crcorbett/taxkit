@@ -25,8 +25,8 @@ from TypeScript.
 ## Example
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(9_000_000),
@@ -55,18 +55,18 @@ The liability value is cents. `1958800` means $19,588.00.
 
 ## Handle errors
 
-Use `WhatTax.safe.calculate` when you need a result value:
+Use `TaxKit.safe.calculate` when you need a result value:
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
 
-const result = await WhatTax.safe.calculate(au.calculations.annualIncomeTax, {
+const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(9_000_000),
 });
 
-if (result._tag === "WhatTaxFailure") {
+if (result._tag === "TaxKitFailure") {
   console.error(result.error.message);
 }
 ```

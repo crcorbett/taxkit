@@ -1,4 +1,4 @@
-# @whattax/testing
+# @taxkit/testing
 
 ## 0.1.0
 
@@ -7,7 +7,7 @@
 - 2dc693a: Make package builds and release artifacts deterministic with clean compilation,
   dist-only publication exports, concrete packed dependency ranges, and
   Effect-native scoped validators for focused SDK artifacts and strict clean
-  consumers across the complete WhatTax release package graph.
+  consumers across the complete TaxKit release package graph.
 
 ## 0.0.4
 
@@ -22,7 +22,7 @@
 
 ### Patch Changes
 
-- Versioned with the fixed WhatTax package release train.
+- Versioned with the fixed TaxKit package release train.
 
 ## 0.0.1
 

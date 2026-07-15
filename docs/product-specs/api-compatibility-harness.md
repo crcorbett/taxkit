@@ -14,12 +14,12 @@ surface area.
 
 The API app and HTTP API package now sit in the intended topology:
 `apps/api` owns the standalone Bun runtime, and `packages/api/http` owns
-`@whattax/api-http`. This spec added a deterministic compatibility harness
+`@taxkit/api-http`. This spec added a deterministic compatibility harness
 that makes public route and OpenAPI drift visible during normal development.
 
 This spec adds three pieces of proof:
 
-- a package-owned OpenAPI snapshot generated from the same `WhatTaxApi`
+- a package-owned OpenAPI snapshot generated from the same `TaxKitApi`
   contract that serves `/api/docs/openapi.json`
 - focused route fixtures for health, metadata, calculate success and
   schema-guided error responses
@@ -57,24 +57,24 @@ That leaves several compatibility gaps:
 Production: current HTTP API
 
 apps/api Bun process
-  -> WhatTaxServerLayer
+  -> TaxKitServerLayer
     -> ApiRoutesLive
-      -> WhatTaxApi
+      -> TaxKitApi
       -> HealthHandlerLive
       -> CalculatorApiHandlerLive
-        -> @whattax/sdk/effect calculateRunRequest
+        -> @taxkit/sdk/effect calculateRunRequest
           -> PublicCalculatorService.calculate
             -> CalculationEngine
-      -> /api/docs/openapi.json returns OpenApi.fromApi(WhatTaxApi)
+      -> /api/docs/openapi.json returns OpenApi.fromApi(TaxKitApi)
 ```
 
 ```ts
 Tests: current
 
 HTTP API tests
-  -> WhatTaxApiInProcessClientLive
+  -> TaxKitApiInProcessClientLive
     -> CalculatorApiHandlerLive
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorServiceLive
           -> CalculationEngineLive
   -> selected calculate success assertion
@@ -85,14 +85,14 @@ HTTP API tests
 Tests: target OpenAPI compatibility
 
 OpenAPI compatibility test
-  -> package-owned WhatTax OpenAPI spec builder
-    -> OpenApi.fromApi(WhatTaxApi)
+  -> package-owned TaxKit OpenAPI spec builder
+    -> OpenApi.fromApi(TaxKitApi)
     -> deterministic OpenAPI normalizer
   -> committed OpenAPI snapshot
   -> route path, method, status envelope and schema-reference comparison
 
 /api/docs/openapi.json
-  -> same package-owned WhatTax OpenAPI spec builder
+  -> same package-owned TaxKit OpenAPI spec builder
   -> HttpServerResponse.jsonUnsafe
 ```
 
@@ -100,7 +100,7 @@ OpenAPI compatibility test
 Tests: target route fixtures
 
 Route fixture tests
-  -> WhatTaxApiInProcessClientLive or route web handler
+  -> TaxKitApiInProcessClientLive or route web handler
     -> health route
     -> metadata routes
     -> calculate route
@@ -162,12 +162,12 @@ tests, typed clients and in-process client layers.
 `apps/api` owns the standalone Bun process, process config, host/port defaults,
 platform server startup, graceful shutdown and live app smoke command.
 
-`@whattax/calculators` owns calculator catalog schemas, reusable run schemas,
+`@taxkit/calculators` owns calculator catalog schemas, reusable run schemas,
 metadata projections, graph responses and expected calculator service errors.
 
-`@whattax/sdk` owns SDK calculation facades. The HTTP API package may use
-`@whattax/sdk/effect` for calculate parity, but the SDK must not depend on
-`@whattax/api-http`.
+`@taxkit/sdk` owns SDK calculation facades. The HTTP API package may use
+`@taxkit/sdk/effect` for calculate parity, but the SDK must not depend on
+`@taxkit/api-http`.
 
 OpenAPI snapshots and route fixtures must consume owning schemas and API
 contracts. They must not define local DTO mirrors, duplicate canonical IDs or
@@ -175,7 +175,7 @@ handwrite route response shapes.
 
 ## Proposed approach
 
-1. Extract the current `OpenApi.fromApi(WhatTaxApi)` call into a package-owned
+1. Extract the current `OpenApi.fromApi(TaxKitApi)` call into a package-owned
    OpenAPI module, such as `packages/api/http/src/openapi.ts`.
 2. Make `/api/docs/openapi.json` import that same OpenAPI value or builder.
 3. Add a deterministic OpenAPI normalizer for snapshot comparison. It should
@@ -204,13 +204,13 @@ handwrite route response shapes.
 
 Implementation must run focused package, app and repo gates:
 
-- `bun run --filter=@whattax/api-http test`
-- `bun run --filter=@whattax/api-http check-types`
-- `bun run --filter=@whattax/api-http build`
+- `bun run --filter=@taxkit/api-http test`
+- `bun run --filter=@taxkit/api-http check-types`
+- `bun run --filter=@taxkit/api-http build`
 - `bun run --filter=api check-types`
 - `bun run --filter=api build`
 - `bun run --filter=api smoke:public-routes`
-- `bun run --filter=@whattax/sdk check-boundaries`
+- `bun run --filter=@taxkit/sdk check-boundaries`
 - `bun run docs:validate`
 - `bun run test`
 - `bun run build`
@@ -262,7 +262,7 @@ explicitly asks for release versioning.
 
 ## Acceptance criteria
 
-- `@whattax/api-http` exposes or owns a single OpenAPI generation source used
+- `@taxkit/api-http` exposes or owns a single OpenAPI generation source used
   by both `/api/docs/openapi.json` and compatibility tests.
 - A committed normalized OpenAPI snapshot exists under `packages/api/http`.
 - Package tests fail on unapproved route, method, status envelope or schema

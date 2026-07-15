@@ -23,7 +23,7 @@ same task fails parent audit three times, stop for replan or user decision.
 
 | Task | Status | Notes |
 | --- | --- | --- |
-| DOCS-FUMA-001 | completed | Created reusable `@whattax/docs-fumadocs` package and parent accepted after audits. |
+| DOCS-FUMA-001 | completed | Created reusable `@taxkit/docs-fumadocs` package and parent accepted after audits. |
 | DOCS-FUMA-002 | completed | Refactored docs-content onto reusable Fumadocs config/source internals and parent accepted after audits. |
 | DOCS-FUMA-003 | completed | Rendered docs pages through Fumadocs compiled MDX and parent accepted after browser evidence/audits. |
 | DOCS-FUMA-004 | completed | Strengthened MDX validation, component policy and package docs; parent accepted after audits. |
@@ -49,7 +49,7 @@ same task fails parent audit three times, stop for replan or user decision.
 
 ### 2026-06-14 - DOCS-FUMA-001 implementation and parent acceptance
 
-- Delegated the reusable `@whattax/docs-fumadocs` package creation task to a
+- Delegated the reusable `@taxkit/docs-fumadocs` package creation task to a
   worker.
 - Added `packages/docs-fumadocs` with generic Fumadocs configuration helpers,
   Effect Schema to Standard Schema bridging, reusable meta/code-block schemas,
@@ -63,11 +63,11 @@ same task fails parent audit three times, stop for replan or user decision.
   - Reworked the page-tree adapter to remove repeated one-field optional
     helpers while preserving exact optional Fumadocs `PageTree` types.
 - Audit pass 1, package exports and import graph:
-  - `@whattax/docs-fumadocs` exposes root, `./config`, `./source`, `./tree`,
+  - `@taxkit/docs-fumadocs` exposes root, `./config`, `./source`, `./tree`,
     `./render` and `./schemas`.
   - Browser-safe exports are separated from build-time and server/source
     helpers by explicit subpaths.
-  - `rg -n "@whattax/docs-content" packages/docs-fumadocs` returned no
+  - `rg -n "@taxkit/docs-content" packages/docs-fumadocs` returned no
     matches.
 - Audit pass 2, Effect-native control flow and canonical schemas:
   - Generic schemas and tagged source errors are owned in
@@ -80,25 +80,25 @@ same task fails parent audit three times, stop for replan or user decision.
     separator and folder adapters.
   - Remaining helpers name reusable Fumadocs integration boundaries.
 - Verification passed:
-  - `bun run --filter=@whattax/docs-fumadocs build`
-  - `bun run --filter=@whattax/docs-fumadocs check-types`
-  - `bun run --filter=@whattax/docs-fumadocs test`
+  - `bun run --filter=@taxkit/docs-fumadocs build`
+  - `bun run --filter=@taxkit/docs-fumadocs check-types`
+  - `bun run --filter=@taxkit/docs-fumadocs test`
   - `bun run verification`
-  - `rg -n "@whattax/docs-content" packages/docs-fumadocs`
+  - `rg -n "@taxkit/docs-content" packages/docs-fumadocs`
   - `rg -n "switch \\(|Object\\.values|Object\\.entries| as " packages/docs-fumadocs`
 - Call graph status: this slice matches the target Fumadocs package portion of
-  the spec. `@whattax/docs-content` still has not been refactored onto the new
+  the spec. `@taxkit/docs-content` still has not been refactored onto the new
   package; that is `DOCS-FUMA-002`.
 
 ### 2026-06-14 - DOCS-FUMA-002 implementation and parent acceptance
 
 - Refactored `packages/docs-content/source.config.ts` to use
-  `@whattax/docs-fumadocs/config` helpers for Effect Schema to Standard Schema
+  `@taxkit/docs-fumadocs/config` helpers for Effect Schema to Standard Schema
   bridging and shared MDX options.
 - Added a server-only generated Fumadocs source loader in
   `packages/docs-content/src/server.ts`.
 - Refactored `DocsContentServiceLive` so page lookup/listing uses
-  `@whattax/docs-fumadocs/source` over the generated Fumadocs source instead of
+  `@taxkit/docs-fumadocs/source` over the generated Fumadocs source instead of
   validation-policy navigation pages.
 - Kept existing `getPage` and `listPages` serialisable for the current docs app
   route, and added `getRenderablePage` and `listRenderablePages` for compiled
@@ -107,26 +107,26 @@ same task fails parent audit three times, stop for replan or user decision.
   raw source-text reads for frontmatter, local links, examples and OpenAPI
   reference checks.
 - Added `.changeset/docs-content-fumadocs-source.md` for the
-  `@whattax/docs-content` behaviour change.
+  `@taxkit/docs-content` behaviour change.
 - Audit pass 1, current and target call graphs against actual imports:
-  - Source config now calls `@whattax/docs-fumadocs/config`.
-  - Service page lookup/listing now calls `@whattax/docs-fumadocs/source` over
+  - Source config now calls `@taxkit/docs-fumadocs/config`.
+  - Service page lookup/listing now calls `@taxkit/docs-fumadocs/source` over
     `fumadocs-core/source` and `.source/server`.
   - `apps/docs` rendering was not modified; DOCS-FUMA-003 remains pending.
 - Audit pass 2, schema decode ownership:
   - `DocsPageFrontmatter`, `DocsNavigation`, `DocsPagePath`, `DocsPageSlug`,
     `DocsSourcePath`, `DocsValidationIssue`, `DocsPageNotFoundError` and
-    `DocsSourceError` remain owned and reused from `@whattax/docs-content`.
+    `DocsSourceError` remain owned and reused from `@taxkit/docs-content`.
   - Frontmatter and navigation decode still use Effect Schema-owned contracts.
 - Audit pass 3, validation policy:
   - No generic Shiki, Mermaid or Standard Schema bridge logic remains in
-    `@whattax/docs-content`.
+    `@taxkit/docs-content`.
   - Raw file reads remain in validation policy for source-text checks.
 - Verification passed:
-  - `bun run --filter=@whattax/docs-content build`
-  - `bun run --filter=@whattax/docs-content check-types`
-  - `bun run --filter=@whattax/docs-content test`
-  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run --filter=@taxkit/docs-content build`
+  - `bun run --filter=@taxkit/docs-content check-types`
+  - `bun run --filter=@taxkit/docs-content test`
+  - `bun run --filter=@taxkit/docs-content validate`
   - `bun run verification`
   - `rg -n "from [\\\"']react|\\.tsx|createFileRoute|route|layout|renderer|MdxDocument|@tanstack/react-router|@tanstack/react-start" packages/docs-content --glob '!README.md' || true`
     returned no matches.
@@ -141,7 +141,7 @@ same task fails parent audit three times, stop for replan or user decision.
 - Delegated the app rendering task to a worker and reviewed the resulting
   route, loader and renderer changes as parent.
 - Replaced the app-local hand-written markdown renderer with Fumadocs compiled
-  MDX through the browser-safe `@whattax/docs-content/client` collection.
+  MDX through the browser-safe `@taxkit/docs-content/client` collection.
 - Added app-local route boundary schemas in
   `apps/docs/src/lib/docs/route-boundary.ts` for home/page loader successes,
   serialised `Exit` values and typed preload failures.
@@ -164,13 +164,13 @@ same task fails parent audit three times, stop for replan or user decision.
     rendering.
 - Audit pass 2, renderer ownership:
   - Reusable `Picture` and `Pre` primitives come from
-    `@whattax/docs-fumadocs/render`.
-  - WhatTax-specific anchor normalisation and route preload errors stay in
+    `@taxkit/docs-fumadocs/render`.
+  - TaxKit-specific anchor normalisation and route preload errors stay in
     `apps/docs/src/lib`.
 - Audit pass 3, browser-safe imports:
   - `apps/docs/src/lib/mdx/components.tsx` imports the browser-safe
-    `@whattax/docs-content/client` export.
-  - `rg -n "@whattax/docs-content/server|\\.source/server" apps/docs/src || true`
+    `@taxkit/docs-content/client` export.
+  - `rg -n "@taxkit/docs-content/server|\\.source/server" apps/docs/src || true`
     returned no matches.
 - Audit pass 4, desktop/mobile screenshots:
   - Home:
@@ -195,17 +195,17 @@ same task fails parent audit three times, stop for replan or user decision.
 - Verification passed:
   - `bun run --filter=docs check-types`
   - `bun run --filter=docs build`
-  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run --filter=@taxkit/docs-content validate`
   - `bun run verification`
   - Browser screenshot verification for `/`,
     `/guides/calculate-australian-take-home-pay`, `/start/quickstart` and
     `/start/choose-sdk-or-api` at `1440x1000` and `390x844`.
-  - `rg -n "@whattax/docs-content/server|\\.source/server" apps/docs/src || true`
+  - `rg -n "@taxkit/docs-content/server|\\.source/server" apps/docs/src || true`
   - `rg -n "switch \\(|Object\\.values|Object\\.entries| as " apps/docs/src/lib apps/docs/src/routes packages/docs-content/src/live.layer.ts packages/docs-content/src/client.ts || true`
     only reported import aliases, not casts or local DTO mirrors.
 - Changeset status: no new Changeset was required for this app-internal slice;
   package-facing export/dependency changes are already covered by the
-  `@whattax/docs-fumadocs` and `@whattax/docs-content` Changesets from
+  `@taxkit/docs-fumadocs` and `@taxkit/docs-content` Changesets from
   DOCS-FUMA-001 and DOCS-FUMA-002.
 - Call graph status: this slice matches the app-rendering portion of the
   target graph. The docs app now renders compiled MDX through a browser-safe
@@ -213,7 +213,7 @@ same task fails parent audit three times, stop for replan or user decision.
 
 ### 2026-06-14 - DOCS-FUMA-004 implementation and parent acceptance
 
-- Strengthened `@whattax/docs-content` validation while keeping validation
+- Strengthened `@taxkit/docs-content` validation while keeping validation
   independent of the docs app route renderer.
 - Added canonical `DocsMdxComponentName` schema ownership in
   `packages/docs-content/src/schemas.ts`.
@@ -236,7 +236,7 @@ same task fails parent audit three times, stop for replan or user decision.
     the owning source.
 - Audit pass 2, canonical schema/type reuse:
   - Frontmatter, navigation, source path, validation issue and MDX component
-    names are all schema-owned in `@whattax/docs-content`.
+    names are all schema-owned in `@taxkit/docs-content`.
   - `rg -n "CalculatorRunResponse|SdkCalculatorRunResponse|Public|DTO|interface .*Request|interface .*Response|type .*Request|type .*Response" packages/docs-content/src packages/docs-content/source.config.ts || true`
     only found the stale-name validation regex and a test string used to prove
     inline code is ignored.
@@ -245,12 +245,12 @@ same task fails parent audit three times, stop for replan or user decision.
     navigation coverage, component policy and source-text stripping.
   - One-off error conversion remains inline in validation callsites.
 - Verification passed:
-  - `bun run --filter=@whattax/docs-content validate`
-  - `bun run --filter=@whattax/docs-content test`
-  - `bun run --filter=@whattax/docs-content check-types`
+  - `bun run --filter=@taxkit/docs-content validate`
+  - `bun run --filter=@taxkit/docs-content test`
+  - `bun run --filter=@taxkit/docs-content check-types`
   - `bun run verification`
 - Call graph status: this slice matches the validation-policy portion of the
-  target graph. Validation still lives in `@whattax/docs-content` and does not
+  target graph. Validation still lives in `@taxkit/docs-content` and does not
   depend on `apps/docs` route rendering.
 
 ### 2026-06-14 - DOCS-FUMA-005 implementation and parent acceptance
@@ -263,7 +263,7 @@ same task fails parent audit three times, stop for replan or user decision.
   final graphs for current architecture.
 - Updated durable architecture docs:
   - `docs/architecture/content-and-posts.md` now describes `apps/docs`,
-    `@whattax/docs-content` and `@whattax/docs-fumadocs` as implemented
+    `@taxkit/docs-content` and `@taxkit/docs-fumadocs` as implemented
     ownership layers.
   - `docs/architecture/frontend.md` now names the docs app browser-safe import
     guardrails.
@@ -287,14 +287,14 @@ same task fails parent audit three times, stop for replan or user decision.
   - Import graph audits returned no inappropriate browser/server or package
     boundary imports.
 - Verification passed:
-  - `bun run --filter=@whattax/docs-content validate`
+  - `bun run --filter=@taxkit/docs-content validate`
   - `bun run verification`
   - Import graph audit:
-    `rg -n "@whattax/docs-content/server|\\.source/server" apps/docs/src || true`
+    `rg -n "@taxkit/docs-content/server|\\.source/server" apps/docs/src || true`
   - Import graph audit:
     `rg -n "from [\\\"']react|\\.tsx|createFileRoute|@tanstack/react-router|@tanstack/react-start" packages/docs-content --glob '!README.md' || true`
   - Import graph audit:
-    `rg -n "@whattax/docs-content|@whattax/sdk|@whattax/http-api|@whattax/calculators" packages/docs-fumadocs || true`
+    `rg -n "@taxkit/docs-content|@taxkit/sdk|@taxkit/http-api|@taxkit/calculators" packages/docs-fumadocs || true`
 - Changeset status: no new Changeset was required for this docs-only
   architecture/spec update. Package-facing README and validation behaviour are
   already covered by `.changeset/docs-content-fumadocs-source.md`.

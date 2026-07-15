@@ -37,7 +37,7 @@ name private downstream products or move runtime ownership to `packages/scripts`
 | SDK downstream command | complete | Added `packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts` and package commands `validate:downstream` and `validate:downstream:audit`. |
 | Command semantics | complete | `validate:downstream` is the strict release gate and currently exits nonzero with release-blocker diagnostics; `validate:downstream:audit` runs the same diagnostics and exits zero for implementation evidence. |
 | Verification | complete | Required SDK gates and repo verification passed; strict downstream validation produced the expected blocker failure and diagnostic mode passed. |
-| Changeset decision | complete | Added a patch Changeset for `@whattax/sdk` because this task adds package-facing commands, script behaviour and README semantics. |
+| Changeset decision | complete | Added a patch Changeset for `@taxkit/sdk` because this task adds package-facing commands, script behaviour and README semantics. |
 | HTTP downstream smoke | implemented | `apps/api` smoke now writes and runs a dependency-free temp-workspace HTTP consumer against the live app process. |
 | HTTP cleanup proof | implemented | Normal smoke and the expected-failure simulation both remove the temp workspace and stop the API process. |
 | DOWNSTREAM-003 verification | complete | Mandatory app, API, SDK diagnostic, docs, repo and diff gates were run; strict SDK downstream validation remains the expected nonzero blocker result. |
@@ -60,7 +60,7 @@ name private downstream products or move runtime ownership to `packages/scripts`
 
 ### SDK package
 
-`@whattax/sdk` currently owns package-consumer validation under
+`@taxkit/sdk` currently owns package-consumer validation under
 `packages/sdk/typescript`.
 
 Current package scripts:
@@ -75,13 +75,13 @@ Current package scripts:
 Current packed-artifact call graph:
 
 ```ts
-bun run --filter=@whattax/sdk check-packed-artifact
+bun run --filter=@taxkit/sdk check-packed-artifact
   -> npm pack --dry-run --json .
   -> compare package exports with dry-run packed files
   -> reject source export conditions and missing types/default targets
   -> reject source and test files in the packed file list
   -> copy packed files into packages/sdk/typescript/.pack-smoke/node_modules
-  -> bun smoke.mjs imports @whattax/sdk, /effect, /au, /au/effect, /schemas and /testing
+  -> bun smoke.mjs imports @taxkit/sdk, /effect, /au, /au/effect, /schemas and /testing
   -> remove .pack-smoke
 ```
 
@@ -93,8 +93,8 @@ browser bundling.
 
 Current SDK tests prove:
 
-- the plain `WhatTax` facade runs current AU calculations and returns SDK-owned
-  `WhatTaxSuccess` and `WhatTaxFailure` result values for safe calls
+- the plain `TaxKit` facade runs current AU calculations and returns SDK-owned
+  `TaxKitSuccess` and `TaxKitFailure` result values for safe calls
 - the Effect facade matches `PublicCalculatorService` for successful runs and
   preserves calculator-owned guided input errors
 - AU subpath helpers stay thin over generic descriptors
@@ -105,25 +105,25 @@ surfaces. They are not downstream install tests.
 
 ### HTTP API package
 
-`@whattax/api-http` currently owns HTTP API contracts, generated OpenAPI,
+`@taxkit/api-http` currently owns HTTP API contracts, generated OpenAPI,
 route fixtures, typed clients, server route layers and HTTP status envelopes.
 
 Current package tests:
 
 ```ts
-bun run --filter=@whattax/api-http test
-  -> OpenAPI snapshot from WhatTaxApi
+bun run --filter=@taxkit/api-http test
+  -> OpenAPI snapshot from TaxKitApi
   -> in-process health, metadata, calculate and input-error fixtures
-  -> calculate success equals @whattax/sdk/effect calculateRunRequest
+  -> calculate success equals @taxkit/sdk/effect calculateRunRequest
   -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
 ```
 
 That graph still matches the spec's current API compatibility diagram.
 
-`@whattax/api-http` has public client export paths, but its package export map
+`@taxkit/api-http` has public client export paths, but its package export map
 still includes workspace-local `source` conditions. The downstream SDK harness
 should not import API server handlers or route layers. If a later slice packs
-and installs `@whattax/api-http` for public client validation, it should audit
+and installs `@taxkit/api-http` for public client validation, it should audit
 the API package's packed manifest and export conditions separately instead of
 making the SDK package depend on HTTP transport code.
 
@@ -151,7 +151,7 @@ bun run --filter=api smoke:public-routes
 
 That graph now matches the spec's implemented downstream HTTP/API validation
 diagram for this slice. The repo-side smoke still owns canonical
-`@whattax/api-http` schema validation. The generated external consumer stays
+`@taxkit/api-http` schema validation. The generated external consumer stays
 dependency-free and uses public HTTP JSON only.
 
 ## Ownership audit
@@ -161,13 +161,13 @@ task. The plan relies on these existing owners:
 
 | Contract | Owner | Notes |
 | --- | --- | --- |
-| `CalculatorRun*` schemas and `CalculatorServiceError` | `@whattax/calculators` | SDK schema exports and API route schemas must reuse these contracts. |
-| `PublicCalculatorService`, `PublicCalculatorServiceLive` | `@whattax/calculators` | SDK and API tests consume the service instead of duplicating calculation dispatch. |
-| `CalculationEngineLive`, `aud`, `Money` and core tagged primitives | `@whattax/core` | Rule packages and smoke fixtures use core primitives. |
-| `GrossPay`, `AuPayCalculatorId`, AU pay jurisdiction/tax year ids, pay descriptors and pay report schemas | `@whattax/rules-au-pay` | Current downstream examples should use these through SDK exports where possible, not local DTO mirrors. |
-| Annual income tax calculator ids, input schema and report schema | `@whattax/rules-au-income-tax` | AU SDK descriptors compose these rule-owned contracts. |
-| `WhatTax`, SDK calculation/module types, `calculateRunRequest`, `WhatTaxCalculationError`, `WhatTaxSuccess`, `WhatTaxFailure` | `@whattax/sdk` | The downstream SDK harness belongs here. |
-| `WhatTaxApi`, health/calculator HTTP schemas, `CalculatorApiErrorEnvelope`, API client exports and config schema | `@whattax/api-http` | HTTP client validation should use browser/client-safe exports only. |
+| `CalculatorRun*` schemas and `CalculatorServiceError` | `@taxkit/calculators` | SDK schema exports and API route schemas must reuse these contracts. |
+| `PublicCalculatorService`, `PublicCalculatorServiceLive` | `@taxkit/calculators` | SDK and API tests consume the service instead of duplicating calculation dispatch. |
+| `CalculationEngineLive`, `aud`, `Money` and core tagged primitives | `@taxkit/core` | Rule packages and smoke fixtures use core primitives. |
+| `GrossPay`, `AuPayCalculatorId`, AU pay jurisdiction/tax year ids, pay descriptors and pay report schemas | `@taxkit/rules-au-pay` | Current downstream examples should use these through SDK exports where possible, not local DTO mirrors. |
+| Annual income tax calculator ids, input schema and report schema | `@taxkit/rules-au-income-tax` | AU SDK descriptors compose these rule-owned contracts. |
+| `TaxKit`, SDK calculation/module types, `calculateRunRequest`, `TaxKitCalculationError`, `TaxKitSuccess`, `TaxKitFailure` | `@taxkit/sdk` | The downstream SDK harness belongs here. |
+| `TaxKitApi`, health/calculator HTTP schemas, `CalculatorApiErrorEnvelope`, API client exports and config schema | `@taxkit/api-http` | HTTP client validation should use browser/client-safe exports only. |
 | API host/port config, Bun process lifecycle and public-route smoke | `apps/api` | The harness may start the app, but runtime lifecycle stays app-owned. |
 | Generic repo automation package | `packages/scripts` | Planned placeholder only. It must not own this runtime harness yet. |
 
@@ -181,29 +181,29 @@ Runtime `workspace:*` dependencies in the downstream SDK closure:
 
 | Package | Runtime unresolved workspace dependencies |
 | --- | --- |
-| `@whattax/sdk` | `@whattax/calculators`, `@whattax/rules-au-income-tax`, `@whattax/rules-au-pay` |
-| `@whattax/calculators` | `@whattax/core`, `@whattax/rules-au-income-tax`, `@whattax/rules-au-pay` |
-| `@whattax/rules-au-income-tax` | `@whattax/core` |
-| `@whattax/rules-au-pay` | `@whattax/core` |
+| `@taxkit/sdk` | `@taxkit/calculators`, `@taxkit/rules-au-income-tax`, `@taxkit/rules-au-pay` |
+| `@taxkit/calculators` | `@taxkit/core`, `@taxkit/rules-au-income-tax`, `@taxkit/rules-au-pay` |
+| `@taxkit/rules-au-income-tax` | `@taxkit/core` |
+| `@taxkit/rules-au-pay` | `@taxkit/core` |
 
 Runtime `workspace:*` dependencies for optional downstream HTTP client/app
 coverage:
 
 | Package | Runtime unresolved workspace dependencies |
 | --- | --- |
-| `@whattax/api-http` | `@whattax/calculators`, `@whattax/core`, `@whattax/sdk` |
-| `api` app | `@whattax/api-http` |
+| `@taxkit/api-http` | `@taxkit/calculators`, `@taxkit/core`, `@taxkit/sdk` |
+| `api` app | `@taxkit/api-http` |
 
 Dev-only `workspace:*` dependencies seen during the audit:
 
 | Package | Dev-only unresolved workspace dependencies |
 | --- | --- |
-| `@whattax/sdk` | `@whattax/core`, `@whattax/testing` |
-| `@whattax/api-http` | `@whattax/rules-au-pay`, `@whattax/testing` |
-| `@whattax/calculators` | `@whattax/testing` |
-| `@whattax/rules-au-income-tax` | `@whattax/testing` |
-| `@whattax/rules-au-pay` | `@whattax/testing` |
-| `api` app | `@whattax/core`, `@whattax/rules-au-pay`, `@whattax/tsconfig` |
+| `@taxkit/sdk` | `@taxkit/core`, `@taxkit/testing` |
+| `@taxkit/api-http` | `@taxkit/rules-au-pay`, `@taxkit/testing` |
+| `@taxkit/calculators` | `@taxkit/testing` |
+| `@taxkit/rules-au-income-tax` | `@taxkit/testing` |
+| `@taxkit/rules-au-pay` | `@taxkit/testing` |
+| `api` app | `@taxkit/core`, `@taxkit/rules-au-pay`, `@taxkit/tsconfig` |
 
 Additional external install blocker:
 
@@ -215,15 +215,15 @@ Additional external install blocker:
 
 Minimum packed runtime dependency closure for SDK validation:
 
-- `@whattax/sdk`
-- `@whattax/calculators`
-- `@whattax/core`
-- `@whattax/rules-au-income-tax`
-- `@whattax/rules-au-pay`
+- `@taxkit/sdk`
+- `@taxkit/calculators`
+- `@taxkit/core`
+- `@taxkit/rules-au-income-tax`
+- `@taxkit/rules-au-pay`
 
 Optional packed dependency for downstream HTTP client validation:
 
-- `@whattax/api-http`
+- `@taxkit/api-http`
 
 `apps/api` should be started from the repo for live HTTP smoke. It is an app,
 not a package intended for downstream install.
@@ -254,15 +254,15 @@ original manifest findings.
 The SDK-owned commands are:
 
 ```sh
-bun run --filter=@whattax/sdk validate:downstream
-bun run --filter=@whattax/sdk validate:downstream:audit
+bun run --filter=@taxkit/sdk validate:downstream
+bun run --filter=@taxkit/sdk validate:downstream:audit
 ```
 
 The runtime entrypoint lives at
 `packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`. The
 `.runtime.ts` suffix is intentional: repo lint rules require scripts that run
 Effects through `BunRuntime.runMain` to be runtime entrypoints. The command
-remains SDK-owned because `@whattax/sdk` owns downstream SDK examples, package
+remains SDK-owned because `@taxkit/sdk` owns downstream SDK examples, package
 import boundaries and packed-artifact checks. It may orchestrate package
 builds, package packing and a temp workspace, but it must not become a generic
 repo automation runtime while `packages/scripts` is only a planned placeholder.
@@ -270,9 +270,9 @@ repo automation runtime while `packages/scripts` is only a planned placeholder.
 Implemented target call graph:
 
 ```ts
-bun run --filter=@whattax/sdk validate:downstream
-  -> build required WhatTax packages
-  -> pack @whattax/sdk and the minimum runtime dependency closure
+bun run --filter=@taxkit/sdk validate:downstream
+  -> build required TaxKit packages
+  -> pack @taxkit/sdk and the minimum runtime dependency closure
   -> create a temp workspace outside the repo
   -> write downstream package.json, tsconfig, typecheck, runtime and browser files
   -> extract exact package.json manifests from packed tarballs
@@ -327,7 +327,7 @@ resolved and `validate:downstream` exits zero.
 For this audit task:
 
 ```sh
-bun run --filter=@whattax/sdk check-packed-artifact
+bun run --filter=@taxkit/sdk check-packed-artifact
 bun run --filter=api smoke:public-routes
 bun run docs:validate
 bun run verification
@@ -337,13 +337,13 @@ For the later harness implementation slice, add the narrowest new command first
 and then broaden:
 
 ```sh
-bun run --filter=@whattax/sdk validate:downstream # expected nonzero while blockers remain
-bun run --filter=@whattax/sdk validate:downstream:audit
-bun run --filter=@whattax/sdk check-boundaries
-bun run --filter=@whattax/sdk test-types
-bun run --filter=@whattax/sdk test
-bun run --filter=@whattax/sdk build
-bun run --filter=@whattax/api-http test
+bun run --filter=@taxkit/sdk validate:downstream # expected nonzero while blockers remain
+bun run --filter=@taxkit/sdk validate:downstream:audit
+bun run --filter=@taxkit/sdk check-boundaries
+bun run --filter=@taxkit/sdk test-types
+bun run --filter=@taxkit/sdk test
+bun run --filter=@taxkit/sdk build
+bun run --filter=@taxkit/api-http test
 ```
 
 `bun run verification` remains the broad repo gate.
@@ -354,7 +354,7 @@ Audit pass 1 - current call graphs:
 
 - The SDK packed-artifact graph in the spec still matches
   `scripts/check-packed-artifact.ts`.
-- The API compatibility graph still matches `@whattax/api-http` tests.
+- The API compatibility graph still matches `@taxkit/api-http` tests.
 - The live API smoke graph still matches
   `apps/api/scripts/smoke-public-routes.runtime.ts`.
 - Improvement recorded: the plan distinguishes copied-package import smoke
@@ -364,7 +364,7 @@ Audit pass 2 - package ownership:
 
 - SDK package owns the downstream SDK harness.
 - `apps/api` keeps Bun process lifecycle and smoke process ownership.
-- `@whattax/api-http` keeps HTTP contracts, client exports, route schemas and
+- `@taxkit/api-http` keeps HTTP contracts, client exports, route schemas and
   server route layers.
 - `packages/scripts` remains out of runtime ownership because it has no package
   manifest or source exports.
@@ -417,8 +417,8 @@ Audit pass 3 - honest release-gate semantics and import boundaries:
   strict command currently exits nonzero and that
   `validate:downstream:audit` is the passing diagnostic mode.
 - The downstream browser entry generated by the script imports only
-  `@whattax/sdk`, `@whattax/sdk/au` and `@whattax/sdk/schemas`.
-- `rg` found no `@whattax/api-http`, app-module, server-only, `node:` or
+  `@taxkit/sdk`, `@taxkit/sdk/au` and `@taxkit/sdk/schemas`.
+- `rg` found no `@taxkit/api-http`, app-module, server-only, `node:` or
   `bun:` imports in the downstream validator script.
 
 ## Changeset decision
@@ -434,7 +434,7 @@ runtime script behaviour, a package README release-gate explanation and an SDK
 dev dependency for the runtime script. Changeset:
 `.changeset/sdk-downstream-validation.md`.
 
-Changeset status reports a patch bump for `@whattax/sdk` and dependent patch
+Changeset status reports a patch bump for `@taxkit/sdk` and dependent patch
 release impacts for workspace packages that depend on the SDK release train.
 
 `DOWNSTREAM-004` does not need a new Changeset. This slice updates specs,
@@ -458,7 +458,7 @@ package-facing downstream validation commands and SDK README semantics from
 
 ### 2026-07-02 - Required verification
 
-- `bun run --filter=@whattax/sdk check-packed-artifact`
+- `bun run --filter=@taxkit/sdk check-packed-artifact`
   - Passed.
   - Confirmed packed SDK import smoke and packed artifact checks.
 - `bun run --filter=api smoke:public-routes`
@@ -495,7 +495,7 @@ behaviour changed.
   `docs/product-specs/downstream-consumer-validation.tasks.json` to mark
   `DOWNSTREAM-001` as completed and advanced this active plan's current task
   marker to `DOWNSTREAM-002`.
-- Parent reran `bun run --filter=@whattax/sdk check-packed-artifact`; it
+- Parent reran `bun run --filter=@taxkit/sdk check-packed-artifact`; it
   passed with packed SDK import smoke and packed artifact checks.
 - Parent reran `bun run --filter=api smoke:public-routes`; it passed and
   covered `GET /api/health`, `GET /api/v1/calculators`,
@@ -514,8 +514,8 @@ behaviour changed.
 - Added SDK-owned runtime script
   `packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`.
 - Added package commands:
-  - `bun run --filter=@whattax/sdk validate:downstream`
-  - `bun run --filter=@whattax/sdk validate:downstream:audit`
+  - `bun run --filter=@taxkit/sdk validate:downstream`
+  - `bun run --filter=@taxkit/sdk validate:downstream:audit`
 - Added `@effect/platform-bun` as an SDK dev dependency because the validator
   is an Effect/Bun runtime script.
 - Updated the SDK README with strict release-blocker semantics and the
@@ -529,13 +529,13 @@ Owning package audit:
 
 | Contract touched | Owner | Notes |
 | --- | --- | --- |
-| Downstream validator schemas for npm pack output, packed manifests and root catalog shape | `@whattax/sdk` script-local validation boundary | New schemas describe script input/output formats, not reusable tax-domain DTOs. |
-| `DownstreamCommandError`, `DownstreamReleaseBlockerError`, `DownstreamValidationError` | `@whattax/sdk` script-local validation boundary | Tagged errors are `Data.TaggedError` values local to the command boundary. |
-| SDK public entrypoints and typed clients | `@whattax/sdk` | Downstream type/runtime/browser examples import package entrypoints, not workspace source aliases. |
-| `CalculatorRun*` schemas and `CalculatorServiceError` re-exported through SDK schemas | `@whattax/calculators`, re-exported by `@whattax/sdk/schemas` | Examples consume the SDK schema subpath. |
-| `PublicCalculatorServiceLive` | `@whattax/calculators` | Used only in the downstream Effect runtime example to provide the SDK Effect facade. |
-| `GrossPay` and AU pay facts | `@whattax/rules-au-pay` | Used as canonical fact constructors because the current SDK does not own fact constructors. |
-| `aud` and `CalculationEngineLive` | `@whattax/core` | Used as canonical money constructor and engine layer in downstream runtime example. |
+| Downstream validator schemas for npm pack output, packed manifests and root catalog shape | `@taxkit/sdk` script-local validation boundary | New schemas describe script input/output formats, not reusable tax-domain DTOs. |
+| `DownstreamCommandError`, `DownstreamReleaseBlockerError`, `DownstreamValidationError` | `@taxkit/sdk` script-local validation boundary | Tagged errors are `Data.TaggedError` values local to the command boundary. |
+| SDK public entrypoints and typed clients | `@taxkit/sdk` | Downstream type/runtime/browser examples import package entrypoints, not workspace source aliases. |
+| `CalculatorRun*` schemas and `CalculatorServiceError` re-exported through SDK schemas | `@taxkit/calculators`, re-exported by `@taxkit/sdk/schemas` | Examples consume the SDK schema subpath. |
+| `PublicCalculatorServiceLive` | `@taxkit/calculators` | Used only in the downstream Effect runtime example to provide the SDK Effect facade. |
+| `GrossPay` and AU pay facts | `@taxkit/rules-au-pay` | Used as canonical fact constructors because the current SDK does not own fact constructors. |
+| `aud` and `CalculationEngineLive` | `@taxkit/core` | Used as canonical money constructor and engine layer in downstream runtime example. |
 
 Call-graph audit:
 
@@ -548,24 +548,24 @@ Call-graph audit:
 - While blockers remain, install, typecheck, runtime SDK and browser bundle
   checks are skipped and recorded as blocker-skipped. The audit command follows
   the same graph but exits zero for implementation evidence.
-- The SDK still does not import or depend on `@whattax/api-http`.
+- The SDK still does not import or depend on `@taxkit/api-http`.
 
 ### 2026-07-02 - DOWNSTREAM-002 verification
 
-- `bun run --filter=@whattax/sdk validate:downstream`
+- `bun run --filter=@taxkit/sdk validate:downstream`
   - Expected failure, exit code 1.
   - Parent correction turn 2 rerun confirmed the strict blocker path prints the
     packed-manifest evidence and concise release-blocker message without an
     Effect stack trace.
-  - Built `@whattax/core`, `@whattax/rules-au-income-tax`,
-    `@whattax/rules-au-pay`, `@whattax/calculators` and `@whattax/sdk`.
-  - Created temp workspace under `/var/folders/.../T/whattax-sdk-downstream-*`,
+  - Built `@taxkit/core`, `@taxkit/rules-au-income-tax`,
+    `@taxkit/rules-au-pay`, `@taxkit/calculators` and `@taxkit/sdk`.
+  - Created temp workspace under `/var/folders/.../T/taxkit-sdk-downstream-*`,
     outside the repo.
   - Packed and inspected exact manifests for the SDK runtime closure.
   - Skipped install, typecheck, runtime SDK and browser bundle checks because
     release blockers remain.
   - Removed the temp workspace through the scoped cleanup finalizer.
-- `bun run --filter=@whattax/sdk validate:downstream:audit`
+- `bun run --filter=@taxkit/sdk validate:downstream:audit`
   - Passed.
   - Parent correction turn 2 rerun confirmed the audit path still exits zero
     after printing the same blocker evidence and diagnostic-mode message.
@@ -573,31 +573,31 @@ Call-graph audit:
     cleanup path, then allowed the release-blocker result for diagnostic
     evidence.
 - Runtime release blockers found in packed manifests:
-  - `@whattax/core dependencies.effect = catalog:`
-  - `@whattax/rules-au-income-tax dependencies.@whattax/core = workspace:*`
-  - `@whattax/rules-au-income-tax dependencies.effect = catalog:`
-  - `@whattax/rules-au-pay dependencies.@whattax/core = workspace:*`
-  - `@whattax/rules-au-pay dependencies.effect = catalog:`
-  - `@whattax/calculators dependencies.@whattax/core = workspace:*`
-  - `@whattax/calculators dependencies.@whattax/rules-au-income-tax = workspace:*`
-  - `@whattax/calculators dependencies.@whattax/rules-au-pay = workspace:*`
-  - `@whattax/calculators dependencies.effect = catalog:`
-  - `@whattax/sdk dependencies.@whattax/calculators = workspace:*`
-  - `@whattax/sdk dependencies.@whattax/rules-au-income-tax = workspace:*`
-  - `@whattax/sdk dependencies.@whattax/rules-au-pay = workspace:*`
-  - `@whattax/sdk dependencies.effect = catalog:`
-- `bun run --filter=@whattax/sdk check-packed-artifact`
+  - `@taxkit/core dependencies.effect = catalog:`
+  - `@taxkit/rules-au-income-tax dependencies.@taxkit/core = workspace:*`
+  - `@taxkit/rules-au-income-tax dependencies.effect = catalog:`
+  - `@taxkit/rules-au-pay dependencies.@taxkit/core = workspace:*`
+  - `@taxkit/rules-au-pay dependencies.effect = catalog:`
+  - `@taxkit/calculators dependencies.@taxkit/core = workspace:*`
+  - `@taxkit/calculators dependencies.@taxkit/rules-au-income-tax = workspace:*`
+  - `@taxkit/calculators dependencies.@taxkit/rules-au-pay = workspace:*`
+  - `@taxkit/calculators dependencies.effect = catalog:`
+  - `@taxkit/sdk dependencies.@taxkit/calculators = workspace:*`
+  - `@taxkit/sdk dependencies.@taxkit/rules-au-income-tax = workspace:*`
+  - `@taxkit/sdk dependencies.@taxkit/rules-au-pay = workspace:*`
+  - `@taxkit/sdk dependencies.effect = catalog:`
+- `bun run --filter=@taxkit/sdk check-packed-artifact`
   - Passed.
-- `bun run --filter=@whattax/sdk check-boundaries`
+- `bun run --filter=@taxkit/sdk check-boundaries`
   - Passed.
-- `bun run --filter=@whattax/sdk test-types`
+- `bun run --filter=@taxkit/sdk test-types`
   - Passed.
-- `bun run --filter=@whattax/sdk test`
+- `bun run --filter=@taxkit/sdk test`
   - Passed: 3 files, 11 tests.
-- `bun run --filter=@whattax/sdk build`
+- `bun run --filter=@taxkit/sdk build`
   - Passed.
 - Browser-safe downstream import audit:
-  - `rg -n "@whattax/api-http|apps/|server-only|@whattax/.*/server|from ['\"]node:|from ['\"]bun:|\\.\\.\\/src" packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`
+  - `rg -n "@taxkit/api-http|apps/|server-only|@taxkit/.*/server|from ['\"]node:|from ['\"]bun:|\\.\\.\\/src" packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`
   - Passed with no matches.
 - `bun run verification`
   - Passed.
@@ -605,7 +605,7 @@ Call-graph audit:
   - Turbo reported 22 successful check/build tasks.
 - `bun run changeset status --verbose`
   - Passed.
-  - Reports patch bump for `@whattax/sdk` from
+  - Reports patch bump for `@taxkit/sdk` from
     `.changeset/sdk-downstream-validation.md` and dependent patch release
     impacts across the current private workspace release train.
 
@@ -620,20 +620,20 @@ Call-graph audit:
     diagnostic command.
   - Correction turn 2 removed the Effect stack trace from the expected strict
     release-blocker result.
-- Parent reran `bun run --filter=@whattax/sdk validate:downstream`.
+- Parent reran `bun run --filter=@taxkit/sdk validate:downstream`.
   - Expected nonzero result: exit code 1.
   - Evidence reported 13 packed runtime manifest blockers and removed the temp
     workspace.
   - Output ended with the concise release-blocker message and no stack trace.
-- Parent reran `bun run --filter=@whattax/sdk validate:downstream:audit`.
+- Parent reran `bun run --filter=@taxkit/sdk validate:downstream:audit`.
   - Passed.
   - Reported the same blocker evidence and diagnostic-mode allowance.
 - Parent reran SDK gates:
-  - `bun run --filter=@whattax/sdk check-packed-artifact` passed.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
-  - `bun run --filter=@whattax/sdk test-types` passed.
-  - `bun run --filter=@whattax/sdk test` passed: 3 files, 11 tests.
-  - `bun run --filter=@whattax/sdk build` passed.
+  - `bun run --filter=@taxkit/sdk check-packed-artifact` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk test-types` passed.
+  - `bun run --filter=@taxkit/sdk test` passed: 3 files, 11 tests.
+  - `bun run --filter=@taxkit/sdk build` passed.
 - Parent reran repo and metadata gates:
   - `jq empty docs/product-specs/downstream-consumer-validation.tasks.json`
     passed.
@@ -643,7 +643,7 @@ Call-graph audit:
   - `bun run changeset status --verbose` passed and reports the SDK patch
     Changeset.
 - Parent reran the browser-safe import audit:
-  - `rg -n "@whattax/api-http|apps/|server-only|@whattax/.*/server|from ['\"]node:|from ['\"]bun:|\\.\\.\\/src" packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`
+  - `rg -n "@taxkit/api-http|apps/|server-only|@taxkit/.*/server|from ['\"]node:|from ['\"]bun:|\\.\\.\\/src" packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts`
     produced no matches.
 - Parent accepted the residual risk that clean downstream install, downstream
   typecheck, runtime SDK execution and browser bundle execution remain blocked
@@ -657,16 +657,16 @@ Call-graph audit:
 - Extended `apps/api/scripts/smoke-public-routes.runtime.ts`, keeping
   `apps/api` as the process and smoke lifecycle owner.
 - The app-owned smoke now creates a temp workspace under the operating-system
-  temp directory with the `whattax-api-downstream-*` prefix.
+  temp directory with the `taxkit-api-downstream-*` prefix.
 - The temp workspace is validated to be outside the repo before consumer files
   are written.
 - The generated workspace contains a dependency-free `package.json` and
   `consumer.mjs`.
 - The generated consumer uses `fetch` against `http://127.0.0.1:4173` and does
-  not import app modules, server handlers, `@whattax/api-http` or
-  `@whattax/sdk`.
+  not import app modules, server handlers, `@taxkit/api-http` or
+  `@taxkit/sdk`.
 - Repo-side canonical validation remains in the smoke script through
-  `@whattax/api-http` schemas for calculator catalog and calculate responses.
+  `@taxkit/api-http` schemas for calculator catalog and calculate responses.
   The generated consumer checks only minimal public JSON evidence.
 - Added `--simulate-downstream-failure` for deterministic cleanup proof after
   the external consumer has covered the public routes.
@@ -707,15 +707,15 @@ Response checks from the external consumer:
 Cleanup evidence gathered during implementation:
 
 - Normal smoke passed and logged temp workspace removal for
-  `/var/folders/.../T/whattax-api-downstream-cYFA2F`.
-- Normal smoke logged `WhatTax API stopped` and
+  `/var/folders/.../T/taxkit-api-downstream-cYFA2F`.
+- Normal smoke logged `TaxKit API stopped` and
   `apps/api smoke process stopped`.
 - Expected-failure cleanup proof:
   `bun run --filter=api smoke:public-routes -- --simulate-downstream-failure`
   exited 1 after the external consumer covered all four public routes.
 - The expected-failure run logged temp workspace removal for
-  `/var/folders/.../T/whattax-api-downstream-e0DPL3`.
-- The expected-failure run logged `WhatTax API stopped` and
+  `/var/folders/.../T/taxkit-api-downstream-e0DPL3`.
+- The expected-failure run logged `TaxKit API stopped` and
   `apps/api smoke process stopped`.
 
 DOWNSTREAM-003 improvement audit passes:
@@ -723,9 +723,9 @@ DOWNSTREAM-003 improvement audit passes:
 - Audit pass 1 - ownership and call graph:
   - `apps/api` still owns API process startup, port selection, child-process
     lifecycle and smoke orchestration.
-  - `@whattax/api-http` still owns canonical route schemas and repo-side
+  - `@taxkit/api-http` still owns canonical route schemas and repo-side
     response validation.
-  - The SDK still does not import or depend on `@whattax/api-http`.
+  - The SDK still does not import or depend on `@taxkit/api-http`.
   - Improvement made: API client package validation was not added in this
     slice because dependency-free public HTTP JSON satisfies the task without
     introducing API package install blockers.
@@ -739,7 +739,7 @@ DOWNSTREAM-003 improvement audit passes:
     `Effect.ensuring(...)`, so failure simulations report API shutdown rather
     than only success shutdown.
 - Audit pass 3 - public consumer boundary:
-  - The generated consumer imports no server handlers, app modules or WhatTax
+  - The generated consumer imports no server handlers, app modules or TaxKit
     packages.
   - The generated consumer checks minimal public evidence instead of declaring
     local DTOs or reusable schemas.
@@ -754,7 +754,7 @@ Changeset decision:
 - This slice changes app-owned smoke tooling, app README guidance and active
   execution evidence only.
 - It does not change package exports, package manifests, package install
-  behaviour, `@whattax/api-http` client behaviour or `@whattax/sdk` package
+  behaviour, `@taxkit/api-http` client behaviour or `@taxkit/sdk` package
   behaviour.
 
 Call-graph status:
@@ -762,8 +762,8 @@ Call-graph status:
 - The final implementation still matches the spec's implemented downstream
   HTTP/API validation graph.
 - Runtime ownership did not move out of `apps/api`.
-- Contract ownership did not move out of `@whattax/api-http`.
-- `@whattax/sdk` still has no dependency on `@whattax/api-http`.
+- Contract ownership did not move out of `@taxkit/api-http`.
+- `@taxkit/sdk` still has no dependency on `@taxkit/api-http`.
 
 ### 2026-07-02 - DOWNSTREAM-003 verification
 
@@ -776,40 +776,40 @@ Call-graph status:
     `GET /api/docs/openapi.json`.
   - External temp-workspace consumer covered the same four public routes.
   - Final temp workspace path:
-    `/var/folders/.../T/whattax-api-downstream-JJpROH`.
+    `/var/folders/.../T/taxkit-api-downstream-JJpROH`.
   - Removed the temp workspace and stopped the API process.
 - `bun run --filter=api smoke:public-routes -- --simulate-downstream-failure`
   - Expected failure, exit code 1.
   - External temp-workspace consumer covered all four public routes before the
     deterministic failure.
   - Final temp workspace path:
-    `/var/folders/.../T/whattax-api-downstream-XX7QlD`.
+    `/var/folders/.../T/taxkit-api-downstream-XX7QlD`.
   - Removed the temp workspace and stopped the API process after the failure.
 - `bun run --filter=api check-types`
   - Passed.
 - `bun run --filter=api build`
   - Passed.
-- `bun run --filter=@whattax/api-http test`
+- `bun run --filter=@taxkit/api-http test`
   - Passed: 2 test files, 5 tests.
-- `bun run --filter=@whattax/api-http check-types`
+- `bun run --filter=@taxkit/api-http check-types`
   - Passed.
-- `bun run --filter=@whattax/api-http build`
+- `bun run --filter=@taxkit/api-http build`
   - Passed.
-- `bun run --filter=@whattax/sdk validate:downstream`
+- `bun run --filter=@taxkit/sdk validate:downstream`
   - Expected failure, exit code 1.
   - Reported the same 13 packed runtime manifest protocol blockers from
     `DOWNSTREAM-002`.
   - Skipped install, typecheck, runtime SDK and browser bundle checks because
     packed manifest blockers remain.
   - Removed the temp workspace
-    `/var/folders/.../T/whattax-sdk-downstream-boVLBz`.
-- `bun run --filter=@whattax/sdk validate:downstream:audit`
+    `/var/folders/.../T/taxkit-sdk-downstream-boVLBz`.
+- `bun run --filter=@taxkit/sdk validate:downstream:audit`
   - Passed.
   - Reported the same 13 packed runtime manifest protocol blockers and allowed
     them for diagnostic evidence.
   - Removed the temp workspace
-    `/var/folders/.../T/whattax-sdk-downstream-9WpzAU`.
-- `bun run --filter=@whattax/sdk check-boundaries`
+    `/var/folders/.../T/taxkit-sdk-downstream-9WpzAU`.
+- `bun run --filter=@taxkit/sdk check-boundaries`
   - Passed.
   - Confirmed SDK import boundaries still pass.
 - `bun run docs:validate`
@@ -836,10 +836,10 @@ Call-graph status:
   app README update, active-plan evidence and no-Changeset rationale.
 - Parent accepted the implementation shape:
   - `apps/api` remains the process lifecycle and smoke orchestration owner.
-  - `@whattax/api-http` remains the repo-side contract/schema validation owner.
+  - `@taxkit/api-http` remains the repo-side contract/schema validation owner.
   - The generated external consumer imports no app modules, server handlers,
-    `@whattax/api-http` or `@whattax/sdk`.
-  - The SDK still has no dependency on `@whattax/api-http`.
+    `@taxkit/api-http` or `@taxkit/sdk`.
+  - The SDK still has no dependency on `@taxkit/api-http`.
 - Parent reran `bun run --filter=api smoke:public-routes`.
   - Passed.
   - Repo-side smoke schema-validated health, metadata, calculate and OpenAPI
@@ -858,16 +858,16 @@ Call-graph status:
 - Parent reran app and API package gates:
   - `bun run --filter=api check-types` passed.
   - `bun run --filter=api build` passed.
-  - `bun run --filter=@whattax/api-http test` passed: 2 files, 5 tests.
-  - `bun run --filter=@whattax/api-http check-types` passed.
-  - `bun run --filter=@whattax/api-http build` passed.
+  - `bun run --filter=@taxkit/api-http test` passed: 2 files, 5 tests.
+  - `bun run --filter=@taxkit/api-http check-types` passed.
+  - `bun run --filter=@taxkit/api-http build` passed.
 - Parent reran SDK downstream gates:
-  - `bun run --filter=@whattax/sdk validate:downstream` produced the expected
+  - `bun run --filter=@taxkit/sdk validate:downstream` produced the expected
     nonzero strict release-blocker result with the same 13 packed runtime
     manifest blockers.
-  - `bun run --filter=@whattax/sdk validate:downstream:audit` passed with the
+  - `bun run --filter=@taxkit/sdk validate:downstream:audit` passed with the
     same blocker evidence in diagnostic mode.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
 - Parent reran repo gates:
   - `git diff --check` passed.
   - `bun run docs:validate` passed.
@@ -890,7 +890,7 @@ Call-graph status:
   language to implemented diagnostic/API foundation language.
 - The spec now states that final downstream consumer validation remains
   incomplete while
-  `bun run --filter=@whattax/sdk validate:downstream` exits nonzero.
+  `bun run --filter=@taxkit/sdk validate:downstream` exits nonzero.
 - The spec records the implemented command split:
   - `check-packed-artifact` proves packed SDK export targets and copied-package
     import smoke.
@@ -899,7 +899,7 @@ Call-graph status:
   - `validate:downstream:audit` is passing diagnostic evidence while blockers
     remain.
   - SDK boundaries, types, tests and build are supporting package evidence.
-  - `@whattax/api-http` tests and `apps/api` public-route smoke are HTTP/API
+  - `@taxkit/api-http` tests and `apps/api` public-route smoke are HTTP/API
     downstream evidence.
 - Updated `docs/product-specs/index.md` to describe the spec as an implemented
   foundation with the strict SDK downstream install still blocked by packed
@@ -923,14 +923,14 @@ Call-graph status:
 DOWNSTREAM-004 release-gate order recorded:
 
 ```sh
-bun run --filter=@whattax/sdk check-packed-artifact
-bun run --filter=@whattax/sdk validate:downstream # strict final gate after blockers are resolved; currently expected nonzero
-bun run --filter=@whattax/sdk validate:downstream:audit # diagnostic evidence while blockers remain
-bun run --filter=@whattax/sdk check-boundaries
-bun run --filter=@whattax/sdk test-types
-bun run --filter=@whattax/sdk test
-bun run --filter=@whattax/sdk build
-bun run --filter=@whattax/api-http test
+bun run --filter=@taxkit/sdk check-packed-artifact
+bun run --filter=@taxkit/sdk validate:downstream # strict final gate after blockers are resolved; currently expected nonzero
+bun run --filter=@taxkit/sdk validate:downstream:audit # diagnostic evidence while blockers remain
+bun run --filter=@taxkit/sdk check-boundaries
+bun run --filter=@taxkit/sdk test-types
+bun run --filter=@taxkit/sdk test
+bun run --filter=@taxkit/sdk build
+bun run --filter=@taxkit/api-http test
 bun run --filter=api smoke:public-routes
 bun run docs:validate
 bun run test
@@ -950,7 +950,7 @@ DOWNSTREAM-004 improvement audit passes:
   - They agree that `validate:downstream:audit` is diagnostic-only passing
     evidence.
   - They agree that API downstream evidence is app/API-owned through
-    `@whattax/api-http` tests and `apps/api` public-route smoke.
+    `@taxkit/api-http` tests and `apps/api` public-route smoke.
   - Improvement made: the product-spec index no longer lists this spec as a
     draft, but its status still names the blocked strict SDK install.
 - Audit pass 2 - evidence completeness:
@@ -969,8 +969,8 @@ DOWNSTREAM-004 improvement audit passes:
   - Public docs remain neutral and do not name private downstream products.
   - SDK ownership remains in `packages/sdk/typescript`.
   - API process lifecycle remains in `apps/api`.
-  - HTTP contracts remain in `@whattax/api-http`.
-  - `@whattax/sdk` still does not depend on `@whattax/api-http`.
+  - HTTP contracts remain in `@taxkit/api-http`.
+  - `@taxkit/sdk` still does not depend on `@taxkit/api-http`.
   - No package manifest, package version, changelog or publish-state file was
     changed.
   - Improvement made: the SDK README now treats package-name availability as a
@@ -989,11 +989,11 @@ Changeset decision:
 No-publish/private flag audit:
 
 - All package manifests with a `private` field still report `private=true`:
-  root, `apps/api`, `apps/docs`, `apps/web`, `@whattax/api-http`,
-  `@whattax/calculators`, `@whattax/core`, `@whattax/docs-content`,
-  `@whattax/docs-fumadocs`, `@whattax/rules-au-income-tax`,
-  `@whattax/rules-au-pay`, `@whattax/rules-au-stsl`, `@whattax/sdk`,
-  `@whattax/testing` and `@whattax/tsconfig`.
+  root, `apps/api`, `apps/docs`, `apps/web`, `@taxkit/api-http`,
+  `@taxkit/calculators`, `@taxkit/core`, `@taxkit/docs-content`,
+  `@taxkit/docs-fumadocs`, `@taxkit/rules-au-income-tax`,
+  `@taxkit/rules-au-pay`, `@taxkit/rules-au-stsl`, `@taxkit/sdk`,
+  `@taxkit/testing` and `@taxkit/tsconfig`.
 - `git diff -- package.json '**/package.json' '**/CHANGELOG.md' '.changeset/*'`
   produced no output.
 - `git diff --name-only` before this plan update listed only:
@@ -1015,51 +1015,51 @@ Call-graph status:
 
 ### 2026-07-02 - DOWNSTREAM-004 verification
 
-- `bun run --filter=@whattax/sdk check-packed-artifact`
+- `bun run --filter=@taxkit/sdk check-packed-artifact`
   - Passed.
   - Confirmed packed SDK import smoke and packed SDK artifact checks.
-- `bun run --filter=@whattax/sdk validate:downstream`
+- `bun run --filter=@taxkit/sdk validate:downstream`
   - Expected failure, exit code 1.
   - Created temp workspace
-    `/var/folders/.../T/whattax-sdk-downstream-NlS6cF`.
+    `/var/folders/.../T/taxkit-sdk-downstream-NlS6cF`.
   - Built the SDK runtime package closure.
-  - Packed and inspected exact manifests for `@whattax/core`,
-    `@whattax/rules-au-income-tax`, `@whattax/rules-au-pay`,
-    `@whattax/calculators` and `@whattax/sdk`.
+  - Packed and inspected exact manifests for `@taxkit/core`,
+    `@taxkit/rules-au-income-tax`, `@taxkit/rules-au-pay`,
+    `@taxkit/calculators` and `@taxkit/sdk`.
   - Reported 13 packed runtime manifest protocol blockers:
-    - `@whattax/core dependencies.effect = catalog:`
-    - `@whattax/rules-au-income-tax dependencies.@whattax/core = workspace:*`
-    - `@whattax/rules-au-income-tax dependencies.effect = catalog:`
-    - `@whattax/rules-au-pay dependencies.@whattax/core = workspace:*`
-    - `@whattax/rules-au-pay dependencies.effect = catalog:`
-    - `@whattax/calculators dependencies.@whattax/core = workspace:*`
-    - `@whattax/calculators dependencies.@whattax/rules-au-income-tax = workspace:*`
-    - `@whattax/calculators dependencies.@whattax/rules-au-pay = workspace:*`
-    - `@whattax/calculators dependencies.effect = catalog:`
-    - `@whattax/sdk dependencies.@whattax/calculators = workspace:*`
-    - `@whattax/sdk dependencies.@whattax/rules-au-income-tax = workspace:*`
-    - `@whattax/sdk dependencies.@whattax/rules-au-pay = workspace:*`
-    - `@whattax/sdk dependencies.effect = catalog:`
+    - `@taxkit/core dependencies.effect = catalog:`
+    - `@taxkit/rules-au-income-tax dependencies.@taxkit/core = workspace:*`
+    - `@taxkit/rules-au-income-tax dependencies.effect = catalog:`
+    - `@taxkit/rules-au-pay dependencies.@taxkit/core = workspace:*`
+    - `@taxkit/rules-au-pay dependencies.effect = catalog:`
+    - `@taxkit/calculators dependencies.@taxkit/core = workspace:*`
+    - `@taxkit/calculators dependencies.@taxkit/rules-au-income-tax = workspace:*`
+    - `@taxkit/calculators dependencies.@taxkit/rules-au-pay = workspace:*`
+    - `@taxkit/calculators dependencies.effect = catalog:`
+    - `@taxkit/sdk dependencies.@taxkit/calculators = workspace:*`
+    - `@taxkit/sdk dependencies.@taxkit/rules-au-income-tax = workspace:*`
+    - `@taxkit/sdk dependencies.@taxkit/rules-au-pay = workspace:*`
+    - `@taxkit/sdk dependencies.effect = catalog:`
   - Skipped install, typecheck, runtime SDK and browser bundle checks because
     release blockers were found before install.
   - Removed the temp workspace.
-- `bun run --filter=@whattax/sdk validate:downstream:audit`
+- `bun run --filter=@taxkit/sdk validate:downstream:audit`
   - Passed.
   - Created temp workspace
-    `/var/folders/.../T/whattax-sdk-downstream-azFCtm`.
+    `/var/folders/.../T/taxkit-sdk-downstream-azFCtm`.
   - Reported the same 13 packed runtime manifest blockers.
   - Skipped install, typecheck, runtime SDK and browser bundle checks for the
     same blocker reason.
   - Removed the temp workspace and exited zero in diagnostic mode.
-- `bun run --filter=@whattax/sdk check-boundaries`
+- `bun run --filter=@taxkit/sdk check-boundaries`
   - Passed.
-- `bun run --filter=@whattax/sdk test-types`
+- `bun run --filter=@taxkit/sdk test-types`
   - Passed.
-- `bun run --filter=@whattax/sdk test`
+- `bun run --filter=@taxkit/sdk test`
   - Passed: 3 files, 11 tests.
-- `bun run --filter=@whattax/sdk build`
+- `bun run --filter=@taxkit/sdk build`
   - Passed.
-- `bun run --filter=@whattax/api-http test`
+- `bun run --filter=@taxkit/api-http test`
   - Passed: 2 files, 5 tests.
 - `bun run --filter=api smoke:public-routes`
   - Passed.
@@ -1070,7 +1070,7 @@ Call-graph status:
     `GET /api/docs/openapi.json`.
   - External temp-workspace HTTP consumer covered the same four routes.
   - Temp workspace:
-    `/var/folders/.../T/whattax-api-downstream-ba35Zq`.
+    `/var/folders/.../T/taxkit-api-downstream-ba35Zq`.
   - Removed the temp workspace and stopped the API process.
 - `bun run docs:validate`
   - Passed with 0 docs content issues.
@@ -1083,7 +1083,7 @@ Call-graph status:
 - `bun run changeset status --verbose`
   - Passed.
   - Reports the direct patch Changeset
-    `.changeset/sdk-downstream-validation.md` for `@whattax/sdk`.
+    `.changeset/sdk-downstream-validation.md` for `@taxkit/sdk`.
   - Reports dependent patch release-train impacts for the current private
     workspace packages.
 - `bun run verification`
@@ -1106,18 +1106,18 @@ Call-graph status:
   - `apps/api` public-route smoke is the accepted HTTP/API downstream proof
   - package-name availability remains a future live release-prep check
 - Parent reran the SDK release-gate sequence:
-  - `bun run --filter=@whattax/sdk check-packed-artifact` passed.
-  - `bun run --filter=@whattax/sdk validate:downstream` produced the expected
+  - `bun run --filter=@taxkit/sdk check-packed-artifact` passed.
+  - `bun run --filter=@taxkit/sdk validate:downstream` produced the expected
     nonzero strict result with 13 packed runtime manifest blockers and removed
     the temp workspace.
-  - `bun run --filter=@whattax/sdk validate:downstream:audit` passed with the
+  - `bun run --filter=@taxkit/sdk validate:downstream:audit` passed with the
     same blocker evidence and removed the temp workspace.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
-  - `bun run --filter=@whattax/sdk test-types` passed.
-  - `bun run --filter=@whattax/sdk test` passed: 3 files, 11 tests.
-  - `bun run --filter=@whattax/sdk build` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk test-types` passed.
+  - `bun run --filter=@taxkit/sdk test` passed: 3 files, 11 tests.
+  - `bun run --filter=@taxkit/sdk build` passed.
 - Parent reran API and repo gates:
-  - `bun run --filter=@whattax/api-http test` passed: 2 files, 5 tests.
+  - `bun run --filter=@taxkit/api-http test` passed: 2 files, 5 tests.
   - `bun run --filter=api smoke:public-routes` passed, including the external
     temp-workspace HTTP consumer and cleanup.
   - `bun run docs:validate` passed.
@@ -1152,13 +1152,13 @@ Call-graph status:
   skipped by release blockers.
 - The generated downstream type/runtime examples currently include lower-level
   package imports for canonical constructors and service layers, including
-  `@whattax/core`, `@whattax/rules-au-pay` and
-  `@whattax/calculators/live`. The browser-safe SDK entrypoint proof is
-  narrower: it covers only `@whattax/sdk`, `@whattax/sdk/au` and
-  `@whattax/sdk/schemas`. Full SDK-only application proof remains blocked
+  `@taxkit/core`, `@taxkit/rules-au-pay` and
+  `@taxkit/calculators/live`. The browser-safe SDK entrypoint proof is
+  narrower: it covers only `@taxkit/sdk`, `@taxkit/sdk/au` and
+  `@taxkit/sdk/schemas`. Full SDK-only application proof remains blocked
   until package metadata is publication-ready and SDK constructor/facade gaps
   are resolved.
-- `@whattax/api-http` still has source export conditions. That does not block
+- `@taxkit/api-http` still has source export conditions. That does not block
   this SDK harness audit, but optional downstream API client package validation
   should audit API HTTP packed exports separately.
 - The first strict downstream command may fail before running typecheck,

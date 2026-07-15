@@ -8,7 +8,7 @@ confidence: medium
 # Documentation templates
 
 Use this index to choose the right page template before writing or reviewing a
-WhatTax documentation page. Each template lives in its own file so agents can
+TaxKit documentation page. Each template lives in its own file so agents can
 load only the structure they need.
 
 Every public MDX page should include frontmatter:

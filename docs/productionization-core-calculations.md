@@ -1,10 +1,10 @@
 # Core Calculation Productionization
 
-This file is the working checklist and change record for productionizing the current WhatTax calculation-engine spikes. It is intentionally detailed so work can resume from this document without relying on chat history.
+This file is the working checklist and change record for productionizing the current TaxKit calculation-engine spikes. It is intentionally detailed so work can resume from this document without relying on chat history.
 
 ## Goal
 
-Productionize WhatTax's core calculation engine from the recent spike branch into reviewable, production-named, type-safe Effect-native packages.
+Productionize TaxKit's core calculation engine from the recent spike branch into reviewable, production-named, type-safe Effect-native packages.
 
 The work is scoped to core calculation functionality only: facts, parameters, rules, rule packs, calculators, traces, ledgers, graph metadata, validation, and deterministic tests. It does not include private downstream applications, UI workflows, hosted APIs, SDK ergonomics, docs-site polish, or consumer application behavior except where package boundaries need to protect the calculation engine.
 
@@ -47,11 +47,11 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 
 - [x] Rename `packages/spike-au-pay` to production package path/name.
   - Target package names should align with `docs/architecture/package-boundaries.md`.
-  - Likely split: pay facts/calculator in `@whattax/rules-au-pay`, PAYG withholding tables/rules in `@whattax/rules-au-payg`.
-- [x] Rename `packages/spike-au-stsl` to `@whattax/rules-au-stsl`.
-- [x] Rename `packages/spike-au-income-tax` to `@whattax/rules-au-income-tax`.
-- [x] Decide whether Medicare remains in the first annual-tax rule pack or moves to `@whattax/rules-au-medicare`.
-  - Decision: keep the initial non-SAPTO Medicare levy rule in `@whattax/rules-au-income-tax` while it is only used as one annual-liability component. Split to `@whattax/rules-au-medicare` when Medicare-family/SAPTO/private-health variants need their own independently swappable pack.
+  - Likely split: pay facts/calculator in `@taxkit/rules-au-pay`, PAYG withholding tables/rules in `@taxkit/rules-au-payg`.
+- [x] Rename `packages/spike-au-stsl` to `@taxkit/rules-au-stsl`.
+- [x] Rename `packages/spike-au-income-tax` to `@taxkit/rules-au-income-tax`.
+- [x] Decide whether Medicare remains in the first annual-tax rule pack or moves to `@taxkit/rules-au-medicare`.
+  - Decision: keep the initial non-SAPTO Medicare levy rule in `@taxkit/rules-au-income-tax` while it is only used as one annual-liability component. Split to `@taxkit/rules-au-medicare` when Medicare-family/SAPTO/private-health variants need their own independently swappable pack.
 - [x] Replace package imports, package names, lockfile entries, tests, and TS project references after renaming.
 - [x] Replace all runtime IDs containing `spike-*`.
   - Fact IDs.
@@ -62,7 +62,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
   - Error messages.
   - Test descriptions.
 - [x] Remove `internal-spike` / `spike-fixture` source references from production rules.
-- [x] Refresh the WhatTax workspace lockfile so new Bun workspaces are present and Turbo no longer warns about missing packages.
+- [x] Refresh the TaxKit workspace lockfile so new Bun workspaces are present and Turbo no longer warns about missing packages.
 
 ## Type And Schema Productionization Plan
 
@@ -106,7 +106,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - [x] Run repo-wide typecheck if workspace dependency state allows it.
 - [x] Run repo-wide tests if workspace dependency state allows it.
 - [x] Record any environment blockers clearly in this file and in the final response.
-  - No environment blockers remain for the verified WhatTax checks.
+  - No environment blockers remain for the verified TaxKit checks.
 
 ## Checklist
 
@@ -124,13 +124,13 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 
 ### 2026-05-11
 
-- Created `codex/productionize-core-calculations` branch from the current WhatTax spike branch.
+- Created `codex/productionize-core-calculations` branch from the current TaxKit spike branch.
 - Created this checklist and change record as the working source of truth.
 - Moved the three calculation spike packages under production rule-package paths:
-  - `packages/rules/au/pay` as `@whattax/rules-au-pay`.
-  - `packages/rules/au/stsl` as `@whattax/rules-au-stsl`.
-  - `packages/rules/au/income-tax` as `@whattax/rules-au-income-tax`.
-- Added `packages/rules/au/*` to the WhatTax workspace and refreshed the workspace lockfile so all three rule packages are first-class packages.
+  - `packages/rules/au/pay` as `@taxkit/rules-au-pay`.
+  - `packages/rules/au/stsl` as `@taxkit/rules-au-stsl`.
+  - `packages/rules/au/income-tax` as `@taxkit/rules-au-income-tax`.
+- Added `packages/rules/au/*` to the TaxKit workspace and refreshed the workspace lockfile so all three rule packages are first-class packages.
 - Updated the TypeScript base config away from rule-package/core `ES2022` overrides.
 - Verification: focused engine `check-types` passes.
 - Removed remaining `spike`/`spike-fixture` names from runtime packages and tests; the first productionization commit temporarily kept validation-only parameter source refs before the official-source data slice replaced them.
@@ -144,7 +144,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Refactored graph validation to use Effect `HashMap`, `HashSet`, `Array`, `Option`, and the built-in `Graph.directed` / `Graph.isAcyclic` APIs instead of JavaScript `Map`, `Set`, and hand-rolled DFS.
 - Updated annual income-tax parameters to official 2025-26 resident brackets, LITO, and Medicare levy threshold/shade-in source refs; refreshed annual-tax expected values to match those official tables.
 - Verification after annual-tax/source and graph-refactor work: focused engine `check-types` passes, and focused rule-package tests pass with 23 tests across 6 files.
-- Commit `55eb808` records the first verified productionization slice in the WhatTax submodule; a private downstream workspace recorded the matching submodule pointer.
+- Commit `55eb808` records the first verified productionization slice in the TaxKit submodule; a private downstream workspace recorded the matching submodule pointer.
 - Replaced PAYG Schedule 1 validation coefficients with the official ATO Scale 2 coefficient rows and the ATO `whole weekly dollars + 99 cents` formula input.
 - Replaced the STSL single-bracket validation shortcut with the official ATO Schedule 8 STSL component rows that apply from 24 September 2025 to 30 June 2026.
 - Exported official source refs from PAYG, STSL, annual tax, LITO, and Medicare parameter modules and marked the corresponding calculation rule descriptors as `sourcePolicy: "required"`.
@@ -161,7 +161,7 @@ The current spike branch proves the broad shape: `Layer`-provided facts, paramet
 - Expanded STSL tests for monthly PAYG+STSL rounding and the highest official Schedule 8 row.
 - Expanded annual-tax tests for income-tax threshold, LITO phase-out boundaries, Medicare levy threshold/shade-in/full-rate boundaries, and liability floor behavior.
 - Verification after coverage expansion: focused engine check-types pass, and rule-package tests pass with 31 tests across 6 files.
-- Kept the first Medicare levy implementation in `@whattax/rules-au-income-tax` until independent Medicare-family/SAPTO/private-health variants justify a separate `@whattax/rules-au-medicare` rule pack.
+- Kept the first Medicare levy implementation in `@taxkit/rules-au-income-tax` until independent Medicare-family/SAPTO/private-health variants justify a separate `@taxkit/rules-au-medicare` rule pack.
 - Added schema-backed question metadata for caller-collected input facts: gross pay, tax-free-threshold claimed, salary sacrifice, STSL debt, and annual taxable income.
 - Added core parameter descriptors and parameter metadata for PAYG Schedule 1, STSL Schedule 8, income-tax rates, LITO, and Medicare levy tables.
 - Extended rule descriptors with parameter descriptors and graph validation for parameter-source drift.

@@ -1,12 +1,12 @@
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/api-compatibility-harness.md",
   "title": "API Compatibility Harness Implementation Tasks",
   "status": "implemented",
   "last_reviewed": "2026-07-01",
   "principles": [
     "Pin the public HTTP API contract before adding broader API, SDK or app surface area.",
-    "Generate compatibility evidence from the same @whattax/api-http contracts that serve production routes.",
+    "Generate compatibility evidence from the same @taxkit/api-http contracts that serve production routes.",
     "Keep apps/api as the process and live smoke owner; keep packages/api/http as the HTTP contract, OpenAPI and route fixture owner.",
     "Reuse calculator-owned schemas, SDK facades and tagged errors instead of mirroring DTOs in tests or smoke code.",
     "Prefer deterministic structured snapshots and focused fixtures over brittle full-response churn.",
@@ -21,13 +21,13 @@
   "globalVerification": {
     "commitPolicy": "Commit after each coherent implementation slice passes mandatory verification, Changeset review or no-Changeset rationale, and parent audit.",
     "requiredBeforeFinalPR": [
-      "bun run --filter=@whattax/api-http test",
-      "bun run --filter=@whattax/api-http check-types",
-      "bun run --filter=@whattax/api-http build",
+      "bun run --filter=@taxkit/api-http test",
+      "bun run --filter=@taxkit/api-http check-types",
+      "bun run --filter=@taxkit/api-http build",
       "bun run --filter=api check-types",
       "bun run --filter=api build",
       "bun run --filter=api smoke:public-routes",
-      "bun run --filter=@whattax/sdk check-boundaries",
+      "bun run --filter=@taxkit/sdk check-boundaries",
       "bun run docs:validate",
       "bun run test",
       "bun run build",
@@ -51,10 +51,10 @@
       "title": "Add the OpenAPI snapshot harness",
       "type": "compatibility-foundation",
       "dependsOn": [],
-      "goal": "Make OpenAPI drift visible by generating a deterministic snapshot from the same @whattax/api-http contract used by /api/docs/openapi.json.",
+      "goal": "Make OpenAPI drift visible by generating a deterministic snapshot from the same @taxkit/api-http contract used by /api/docs/openapi.json.",
       "scope": [
         "Inspect packages/api/http/src/server/live.layer.ts, packages/api/http/src/api.ts and route groups before editing.",
-        "Extract the current OpenApi.fromApi(WhatTaxApi) path into a package-owned OpenAPI source, such as packages/api/http/src/openapi.ts.",
+        "Extract the current OpenApi.fromApi(TaxKitApi) path into a package-owned OpenAPI source, such as packages/api/http/src/openapi.ts.",
         "Make /api/docs/openapi.json import the same OpenAPI source used by compatibility tests.",
         "Add a deterministic OpenAPI normalizer that uses structured JSON values and stable ordering rather than string rewriting.",
         "Commit a normalized OpenAPI snapshot under packages/api/http, for example packages/api/http/__snapshots__/openapi.json.",
@@ -72,7 +72,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -100,9 +100,9 @@
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/api-http test",
-        "bun run --filter=@whattax/api-http check-types",
-        "bun run --filter=@whattax/api-http build",
+        "bun run --filter=@taxkit/api-http test",
+        "bun run --filter=@taxkit/api-http check-types",
+        "bun run --filter=@taxkit/api-http build",
         "OpenAPI snapshot drift audit: prove the test compares current generated OpenAPI to the committed snapshot and would fail on an unapproved route, method or status-schema change.",
         "rg audit proving /api/docs/openapi.json and the snapshot harness share the same package-owned OpenAPI source.",
         "bun run verification",
@@ -159,7 +159,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -183,14 +183,14 @@
           "Do not create local DTO mirrors for calculator catalog, run responses or error envelopes.",
           "Do not snapshot huge unstable traces if focused fixture assertions provide stronger compatibility evidence.",
           "Do not change public route behaviour to make tests easier.",
-          "Keep calculate success aligned with @whattax/sdk/effect calculateRunRequest."
+          "Keep calculate success aligned with @taxkit/sdk/effect calculateRunRequest."
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/api-http test",
-        "bun run --filter=@whattax/api-http check-types",
-        "bun run --filter=@whattax/api-http build",
-        "bun run --filter=@whattax/sdk check-boundaries",
+        "bun run --filter=@taxkit/api-http test",
+        "bun run --filter=@taxkit/api-http check-types",
+        "bun run --filter=@taxkit/api-http build",
+        "bun run --filter=@taxkit/sdk check-boundaries",
         "Route fixture coverage audit documenting health, metadata, calculate success and schema-guided input error coverage.",
         "SDK parity audit proving calculate success and expected input error evidence still flows through canonical SDK/calculator contracts.",
         "bun run verification",
@@ -235,7 +235,7 @@
         "Add an app-owned smoke command, such as bun run --filter=api smoke:public-routes.",
         "The smoke command should start apps/api with a deterministic host and port, wait for /api/health, call /api/v1/calculators, call /api/v1/calculators/au.pay.take-home/calculate, call /api/docs/openapi.json and stop the process cleanly.",
         "Use Effect platform/runtime primitives for command execution, timing, cleanup and expected errors where they fit.",
-        "Keep smoke code app-owned. Do not move process lifecycle into @whattax/api-http.",
+        "Keep smoke code app-owned. Do not move process lifecycle into @taxkit/api-http.",
         "Update apps/api/README.md with the smoke command and public route coverage.",
         "Update packages/api/http/README.md with OpenAPI snapshot, route fixture and intentional contract-change workflow.",
         "Record final compatibility evidence and release-train impact."
@@ -250,7 +250,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -281,9 +281,9 @@
         "bun run --filter=api smoke:public-routes",
         "bun run --filter=api check-types",
         "bun run --filter=api build",
-        "bun run --filter=@whattax/api-http test",
-        "bun run --filter=@whattax/api-http check-types",
-        "bun run --filter=@whattax/api-http build",
+        "bun run --filter=@taxkit/api-http test",
+        "bun run --filter=@taxkit/api-http check-types",
+        "bun run --filter=@taxkit/api-http build",
         "bun run docs:validate",
         "bun run test",
         "bun run build",
@@ -297,7 +297,7 @@
         "No browser check is required unless implementation touches apps/web, apps/docs routes or browser-safe API client exports."
       ],
       "qualityAudits": [
-        "Audit pass 1: live smoke call graph keeps apps/api as runtime owner and @whattax/api-http as route contract owner.",
+        "Audit pass 1: live smoke call graph keeps apps/api as runtime owner and @taxkit/api-http as route contract owner.",
         "Audit pass 2: smoke process lifecycle uses Effect platform/runtime primitives where they fit and always cleans up.",
         "Audit pass 3: docs are compact, current and linked to architecture docs; no local DTO mirrors, unsafe casts, helper sprawl or package-boundary leaks are introduced."
       ],

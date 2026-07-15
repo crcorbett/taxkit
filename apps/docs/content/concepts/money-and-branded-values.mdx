@@ -6,7 +6,7 @@ status: "draft"
 
 # Money and branded values
 
-WhatTax uses branded and schema-backed values for tax-significant data. Money
+TaxKit uses branded and schema-backed values for tax-significant data. Money
 uses integer cents and a currency, not floating-point dollars.
 
 ## When this matters
@@ -18,7 +18,7 @@ application-specific DTOs.
 ## How it works
 
 ```ts
-import { aud } from "@whattax/core/primitives";
+import { aud } from "@taxkit/core/primitives";
 
 const taxableIncome = aud(9_000_000);
 ```

@@ -13,7 +13,7 @@ reference.
 ## Current assumptions
 
 The current API runtime is `apps/api`. It serves the reusable HTTP contract
-from `@whattax/api-http` and exposes local defaults on `127.0.0.1:4000`.
+from `@taxkit/api-http` and exposes local defaults on `127.0.0.1:4000`.
 
 There is no public authentication contract in this documentation slice. Treat
 authentication, tenant routing and public hosting as application-owned until a
@@ -34,7 +34,7 @@ If you run through portless, use:
 
 ```sh
 bun run --filter=api dev
-curl https://api.whattax.localhost/api/health
+curl https://api.taxkit.localhost/api/health
 ```
 
 ## Caller responsibilities

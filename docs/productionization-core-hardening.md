@@ -5,7 +5,7 @@ the working checklist for the slice after the initial spike-to-production pass.
 
 ## Goal
 
-Productionize the WhatTax core calculation engine further by tightening
+Productionize the TaxKit core calculation engine further by tightening
 compile-time rule metadata, effective-period modelling, source artifact
 auditability, numeric precision, engine orchestration, and repository hygiene.
 
@@ -43,7 +43,7 @@ consumer workflows.
 - [x] Route representative calculator tests through `CalculationEngineLive`.
 - [x] Prefer package public exports in tests that are not white-box tests.
 - [x] Keep build output ignored and untracked.
-- [x] Reduce Knip overrides by removing unused `@whattax/tsconfig`
+- [x] Reduce Knip overrides by removing unused `@taxkit/tsconfig`
       dependencies instead of suppressing them.
 - [x] Add a changeset for the core hardening work.
 - [x] Run full verification: `bun run check`, `bun run knip`,
@@ -67,7 +67,7 @@ consumer workflows.
   calculation programs with selected Layers and diagnostics.
 - Updated representative calculator tests to run through the engine service and
   moved black-box tests toward package public import paths.
-- Removed unused package-level `@whattax/tsconfig` dev dependencies so Knip can
+- Removed unused package-level `@taxkit/tsconfig` dev dependencies so Knip can
   pass without dependency ignore overrides.
 - Verification passed with `bun run check`, `bun run knip`,
   `bun run check-types`, and `bun run test`.

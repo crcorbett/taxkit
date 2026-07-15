@@ -1,4 +1,4 @@
-# @whattax/api-http
+# @taxkit/api-http
 
 ## 0.1.0
 
@@ -7,14 +7,14 @@
 - 2dc693a: Make package builds and release artifacts deterministic with clean compilation,
   dist-only publication exports, concrete packed dependency ranges, and
   Effect-native scoped validators for focused SDK artifacts and strict clean
-  consumers across the complete WhatTax release package graph.
+  consumers across the complete TaxKit release package graph.
 - Updated dependencies [a3a39e7]
 - Updated dependencies [2dc693a]
 - Updated dependencies [6b307e3]
 - Updated dependencies [9814598]
-  - @whattax/calculators@0.1.0
-  - @whattax/sdk@0.1.0
-  - @whattax/core@0.1.0
+  - @taxkit/calculators@0.1.0
+  - @taxkit/sdk@0.1.0
+  - @taxkit/core@0.1.0
 
 ## 0.0.4
 
@@ -22,20 +22,20 @@
 
 - 190d238: Add OpenAPI snapshot checks, route fixture coverage and the live API smoke
   workflow for the API HTTP package.
-  - @whattax/core@0.0.4
-  - @whattax/sdk@0.0.4
-  - @whattax/calculators@0.0.4
+  - @taxkit/core@0.0.4
+  - @taxkit/sdk@0.0.4
+  - @taxkit/calculators@0.0.4
 
 ## 0.0.3
 
 ### Patch Changes
 
 - 96632e7: Relocate the HTTP API transport package to `packages/api/http` and rename it
-  from `@whattax/http-api` to `@whattax/api-http` while preserving the existing
+  from `@taxkit/http-api` to `@taxkit/api-http` while preserving the existing
   runtime, client and handler export paths under the new package name.
-  - @whattax/core@0.0.3
-  - @whattax/sdk@0.0.3
-  - @whattax/calculators@0.0.3
+  - @taxkit/core@0.0.3
+  - @taxkit/sdk@0.0.3
+  - @taxkit/calculators@0.0.3
 
 ## 0.0.2
 
@@ -49,12 +49,12 @@
 - 0bb699b: Add the initial calculators workspace package shell with explicit exports,
   package docs and build/typecheck wiring for the upcoming reusable calculator
   service extraction. Move reusable public calculator schemas, catalog entries
-  and metadata projection helpers from `@whattax/http-api` into
-  `@whattax/calculators`, leaving HTTP route definitions and handler behavior
+  and metadata projection helpers from `@taxkit/http-api` into
+  `@taxkit/calculators`, leaving HTTP route definitions and handler behavior
   compatible.
 - d1d84c3: Add canonical `CalculatorId` and `Jurisdiction` brands, move AU public
   calculator IDs and supported jurisdiction/tax-year schemas into the owning AU
-  rule packages, then compose those canonical exports in `@whattax/calculators`.
+  rule packages, then compose those canonical exports in `@taxkit/calculators`.
   The calculator service no longer mirrors request context or revalidates context
   fields already narrowed by schemas. Public calculator input decode errors now
   use calculator-specific names.
@@ -83,11 +83,11 @@
   when requested.
 
   Document the follow-up extraction of reusable calculator orchestration into a
-  new `@whattax/calculators` package so HTTP handlers can become thin transport
+  new `@taxkit/calculators` package so HTTP handlers can become thin transport
   adapters over package-owned Effect services.
 
 - d95715b: Move public calculator execution, graph validation and schema-guided expected
-  error shaping into the reusable `@whattax/calculators` service. HTTP handlers
+  error shaping into the reusable `@taxkit/calculators` service. HTTP handlers
   now delegate to `PublicCalculatorService`, and the HTTP route layer composes
   the calculator service with the core calculation engine once instead of inside
   requests.
@@ -108,9 +108,9 @@
 - Updated dependencies [8bd7c21]
 - Updated dependencies [877adc1]
 - Updated dependencies [c3e6497]
-  - @whattax/sdk@0.0.2
-  - @whattax/calculators@0.0.2
-  - @whattax/core@0.0.2
+  - @taxkit/sdk@0.0.2
+  - @taxkit/calculators@0.0.2
+  - @taxkit/core@0.0.2
 
 ## 0.0.1
 

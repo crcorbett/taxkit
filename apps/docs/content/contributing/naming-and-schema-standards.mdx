@@ -11,14 +11,14 @@ calculators, HTTP requests or SDK helpers.
 
 ## Use canonical owners
 
-| Contract                                                                     | Owner                                |
-| ---------------------------------------------------------------------------- | ------------------------------------ |
-| `FactId`, fact descriptors and shared fact contracts                         | `@whattax/core`                      |
-| `RuleId`, rule descriptors, traces and source refs                           | `@whattax/core`                      |
-| Rule-specific facts, parameter services, rule IDs and calculator literals    | Owning `@whattax/rules-au-*` package |
-| `CalculatorRunRequest`, `CalculatorRunResponse` and `CalculatorServiceError` | `@whattax/calculators`               |
-| HTTP route status envelopes and OpenAPI annotations                          | `@whattax/api-http`                  |
-| `WhatTax.calculate`, `WhatTax.safe.calculate` and SDK helper descriptors     | `@whattax/sdk`                       |
+| Contract                                                                     | Owner                               |
+| ---------------------------------------------------------------------------- | ----------------------------------- |
+| `FactId`, fact descriptors and shared fact contracts                         | `@taxkit/core`                      |
+| `RuleId`, rule descriptors, traces and source refs                           | `@taxkit/core`                      |
+| Rule-specific facts, parameter services, rule IDs and calculator literals    | Owning `@taxkit/rules-au-*` package |
+| `CalculatorRunRequest`, `CalculatorRunResponse` and `CalculatorServiceError` | `@taxkit/calculators`               |
+| HTTP route status envelopes and OpenAPI annotations                          | `@taxkit/api-http`                  |
+| `TaxKit.calculate`, `TaxKit.safe.calculate` and SDK helper descriptors       | `@taxkit/sdk`                       |
 
 Import the owning schema, type, branded constructor, descriptor or service tag.
 Do not redeclare canonical fields such as `id: string`, `ruleId: string`,
@@ -28,8 +28,8 @@ Do not redeclare canonical fields such as `id: string`, `ruleId: string`,
 
 Use these names in public docs and package-facing code:
 
-- `WhatTax.calculate`
-- `WhatTax.safe.calculate`
+- `TaxKit.calculate`
+- `TaxKit.safe.calculate`
 - `au.incomeTax.annual`
 - `calculateRunRequest`
 - `calculateReportRequest`

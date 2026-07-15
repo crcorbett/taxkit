@@ -1,6 +1,6 @@
 ---
 name: prd-implementer
-description: "Thin router for implementing specs and plans in WhatTax. Use when executing a SPEC or plan so work follows the canonical iterative rollout and verification flow."
+description: "Thin router for implementing specs and plans in TaxKit. Use when executing a SPEC or plan so work follows the canonical iterative rollout and verification flow."
 ---
 
 # PRD Implementer
@@ -106,7 +106,7 @@ Before accepting a task, audit for:
 Use this block when delegating each task-list slice:
 
 ```md
-You are implementing exactly one task from the WhatTax spec/task list.
+You are implementing exactly one task from the TaxKit spec/task list.
 
 Before editing:
 

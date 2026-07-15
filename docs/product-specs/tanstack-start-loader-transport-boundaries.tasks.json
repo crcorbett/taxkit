@@ -1,5 +1,5 @@
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/tanstack-start-loader-transport-boundaries.md",
   "title": "TanStack Start loader transport boundary implementation tasks",
   "status": "implemented",
@@ -16,7 +16,7 @@
   ],
   "beforeImplementation": [
     "Create docs/exec-plans/active/tanstack-start-loader-transport-boundaries.md and add it to the active plan index before runtime or lint edits.",
-    "Revalidate the current WhatTax docs route flow and the reference files under ~/Projects/site/apps/web/src/lib/loader before editing.",
+    "Revalidate the current TaxKit docs route flow and the reference files under ~/Projects/site/apps/web/src/lib/loader before editing.",
     "Review the separate SSR and client-navigation call graphs; recheck bun.lock and installed TanStack Start, TanStack Router and Effect source, then record any API differences before editing.",
     "Use exactly one sequential subagent per task; the parent reviews, audits, verifies and accepts each slice before delegating the next.",
     "Do not run bun run version-repo, publish packages or consume existing Changesets."
@@ -97,7 +97,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -178,8 +178,8 @@
       ],
       "goal": "Make the route-root exception statically narrow without weakening repository-wide decoder placement.",
       "scope": [
-        "Keep whattax/no-decoding-outside-boundaries globally enabled and keep actual Schema decoder implementation in the exact route-boundary file.",
-        "Add whattax/no-route-transport-restore-outside-consumers for canonical route-boundary restore calls.",
+        "Keep taxkit/no-decoding-outside-boundaries globally enabled and keep actual Schema decoder implementation in the exact route-boundary file.",
+        "Add taxkit/no-route-transport-restore-outside-consumers for canonical route-boundary restore calls.",
         "Configure exact routeTransportBoundaryModules and routeTransportConsumerFiles entries; reject route globs, filename inference and non-canonical import specifiers.",
         "Allow canonical restore only from direct named imports and only in inline or same-file named createFileRoute component/head consumers receiving that route loader representation.",
         "Fail closed with a specific diagnostic for unresolved route/component bindings and namespace, default, dynamic or CommonJS import shapes that reference canonical restoration.",
@@ -193,7 +193,7 @@
         "Update docs/architecture/testing-and-quality.md with durable rule behaviour while keeping exact paths only in oxlint.config.ts."
       ],
       "outputs": [
-        "tools/oxlint/whattax-rules.js",
+        "tools/oxlint/taxkit-rules.js",
         "tools/oxlint/no-decoding-outside-boundaries.test.ts or a focused sibling route-restoration test",
         "oxlint.config.ts",
         "package.json",
@@ -203,7 +203,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -226,7 +226,7 @@
           "Document durable rule semantics, not exact path inventory or implementation logs."
         ],
         "taskSpecificScope": [
-          "Implement and document whattax/no-route-transport-restore-outside-consumers, enforcing the semantic difference between an actual Schema decoder implementation and a canonical post-hydration restore call.",
+          "Implement and document taxkit/no-route-transport-restore-outside-consumers, enforcing the semantic difference between an actual Schema decoder implementation and a canonical post-hydration restore call.",
           "Do not broad-allowlist route TSX files for all decoder operations.",
           "Do not add route TSX to decodingBoundaryFiles; restoration is governed by the specialised consumer rule while direct Schema decoding stays prohibited.",
           "Read exact boundary-module and consumer-file rule options from oxlint.config.ts; resolve supported inline and same-file named route consumers statically and fail closed on unsupported import or binding shapes.",
@@ -265,7 +265,7 @@
         "escalateAfterFailedTurn": 3
       },
       "completionCriteria": [
-        "whattax/no-route-transport-restore-outside-consumers allows only exact configured modules/files and the documented direct route-root and head restoration shapes.",
+        "taxkit/no-route-transport-restore-outside-consumers allows only exact configured modules/files and the documented direct route-root and head restoration shapes.",
         "Ordinary React components and hooks cannot use route-boundary restoration.",
         "Encoded loader data and restored Result values cannot be forwarded into child composition.",
         "Direct Schema decoding remains prohibited in route TSX.",
@@ -312,7 +312,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -364,7 +364,7 @@
       ],
       "browserVerification": [
         "Run the client-side Vitest Browser Mode route harness in Chromium and prove success, expected failure, malformed transport, defect and interruption behaviour without claiming SSR coverage.",
-        "Start the built docs app through its portless docs.whattax URL, prove server-rendered home content before interaction and then verify hydration retains it.",
+        "Start the built docs app through its portless docs.taxkit URL, prove server-rendered home content before interaction and then verify hydration retains it.",
         "Navigate in the browser to one real content route, observe a successful server-function request and verify the encoded client-navigation result renders expected MDX content.",
         "Verify there are no hydration mismatch messages, uncaught exceptions or unexpected console warnings/errors.",
         "Capture reviewable browser evidence in the completed execution plan without committing generated screenshots unless repository policy requires them."

@@ -27,7 +27,7 @@ export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
   period: PayPeriod,
 }) {}
 
-export class GrossPayFact extends Context.Tag("whattax/fact/GrossPay")<
+export class GrossPayFact extends Context.Tag("taxkit/fact/GrossPay")<
   GrossPayFact,
   GrossPay
 >() {}
@@ -52,20 +52,20 @@ export interface FactDescriptor<A, I, R, Tag> {
 
 ## Authority Levels
 
-Authority must be explicit. WhatTax defines the typed input facts that calculators accept. Callers are responsible for deciding which values to provide to the engine.
+Authority must be explicit. TaxKit defines the typed input facts that calculators accept. Callers are responsible for deciding which values to provide to the engine.
 
 ```txt
 Input fact
-  Explicit typed input accepted by a WhatTax calculator.
+  Explicit typed input accepted by a TaxKit calculator.
 
 Derived fact
-  Produced by a WhatTax rule layer from other facts or parameter services.
+  Produced by a TaxKit rule layer from other facts or parameter services.
 
 Parameter fact/service
   Provides tax-year tables, rates and constants.
 ```
 
-Callers must convert the selected application values into WhatTax input facts before invoking the engine.
+Callers must convert the selected application values into TaxKit input facts before invoking the engine.
 
 ## Date Dimensions
 

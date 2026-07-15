@@ -9,7 +9,7 @@ confidence: medium
 
 ## Overview
 
-Move the WhatTax HTTP API out of the TanStack Start web app and into a
+Move the TaxKit HTTP API out of the TanStack Start web app and into a
 separate Bun server app at `apps/api`. The web app should become a browser/UI
 consumer of the API instead of also mounting the API transport.
 
@@ -44,7 +44,7 @@ handler wiring that should belong to a dedicated API app.
 
 - Add a standalone Bun API app under `apps/api`.
 - Keep API behaviour owned by `packages/http-api`.
-- Run the API server through the existing Effect HTTP `WhatTaxServerLayer`.
+- Run the API server through the existing Effect HTTP `TaxKitServerLayer`.
 - Run the Bun API entrypoint as an Effect program through
   `@effect/platform-bun/BunRuntime.runMain` so signals, exit codes and root
   fiber interruption are owned by Effect.
@@ -73,8 +73,8 @@ handler wiring that should belong to a dedicated API app.
 - `packages/http-api` owns HTTP API definitions, handlers, schemas, OpenAPI and
   server layers.
 - `apps/web` owns React routes and frontend runtime selection only. It should
-  consume `@whattax/http-api/client` and `@whattax/http-api/client/live`, not
-  `@whattax/http-api/server` or `@whattax/http-api/client/server`.
+  consume `@taxkit/http-api/client` and `@taxkit/http-api/client/live`, not
+  `@taxkit/http-api/server` or `@taxkit/http-api/client/server`.
 - Runtime config belongs at the app boundary. The API app should own its server
   port and host config; the web app should own the API base URL it needs to
   reach `apps/api`.
@@ -158,12 +158,12 @@ API base URL values.
 
 ## Acceptance criteria
 
-- `apps/api` exists and runs a Bun server for `WhatTaxServerLayer`.
+- `apps/api` exists and runs a Bun server for `TaxKitServerLayer`.
 - `apps/api` runs its entrypoint through `BunRuntime.runMain`.
 - `SIGINT` and `SIGTERM` interrupt the root fiber and release scoped resources.
 - `apps/api` serves `/api/health`, `/api/docs` and `/api/docs/openapi.json`.
-- `apps/web` no longer imports `@whattax/http-api/server` or
-  `@whattax/http-api/client/server`.
+- `apps/web` no longer imports `@taxkit/http-api/server` or
+  `@taxkit/http-api/client/server`.
 - `apps/web` no longer mounts an API catch-all route.
 - The web health route renders from the standalone API service.
 - Local scripts document how to run API and web together.

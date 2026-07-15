@@ -13,7 +13,7 @@ work and how the API relates to the SDK.
 ## Generated source
 
 The current API package generates the OpenAPI document from
-`@whattax/api-http` route definitions. The API app serves it at:
+`@taxkit/api-http` route definitions. The API app serves it at:
 
 ```txt
 GET /api/docs/openapi.json
@@ -47,7 +47,7 @@ CalculatorRunRequest
 ## Accepted exclusion
 
 The docs app does not fetch live OpenAPI JSON during `docs` or
-`@whattax/docs-content` builds. That would make static docs validation depend
+`@taxkit/docs-content` builds. That would make static docs validation depend
 on a running API process. For this slice, the accepted exclusion is a static
 reference smoke in docs-content validation: the page must name
 `/api/docs/openapi.json`, the calculate path and the generated request schema.

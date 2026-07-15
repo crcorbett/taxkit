@@ -7,7 +7,7 @@ confidence: medium
 
 # Configuration
 
-WhatTax configuration uses Effect `Config`, `ConfigProvider` and Schema.
+TaxKit configuration uses Effect `Config`, `ConfigProvider` and Schema.
 Package-owned runtime contracts define reusable schemas. Apps compose those
 schemas into runtime-specific configs and provide values from their own
 environment sources.

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/downstream-consumer-validation.md",
   "title": "Downstream Consumer Validation Implementation Tasks",
   "status": "completed",
@@ -7,7 +7,7 @@
   "principles": [
     "Prove consumer behaviour from outside the monorepo before publication.",
     "Keep SDK downstream validation owned by packages/sdk/typescript while packages/scripts remains planned.",
-    "Keep apps/api as the live process owner and @whattax/api-http as the HTTP contract and client owner.",
+    "Keep apps/api as the live process owner and @taxkit/api-http as the HTTP contract and client owner.",
     "Treat source, export or dependency-protocol leakage in final tarballs as a strict release blocker, not as a reason to weaken validation.",
     "Reuse canonical schemas, descriptors, tagged errors and SDK/API exports instead of writing local DTO mirrors in the downstream workspace.",
     "Require parent review, final call-graph verification and three documented improvement audit passes before accepting each implementation slice."
@@ -21,13 +21,13 @@
   "globalVerification": {
     "commitPolicy": "Commit after each coherent implementation slice passes mandatory verification, Changeset review or no-Changeset rationale, and parent audit.",
     "requiredBeforeFinalPR": [
-      "bun run --filter=@whattax/sdk check-packed-artifact",
-      "bun run --filter=@whattax/sdk validate:downstream as the required strict clean-install gate",
-      "bun run --filter=@whattax/sdk check-boundaries",
-      "bun run --filter=@whattax/sdk test-types",
-      "bun run --filter=@whattax/sdk test",
-      "bun run --filter=@whattax/sdk build",
-      "bun run --filter=@whattax/api-http test",
+      "bun run --filter=@taxkit/sdk check-packed-artifact",
+      "bun run --filter=@taxkit/sdk validate:downstream as the required strict clean-install gate",
+      "bun run --filter=@taxkit/sdk check-boundaries",
+      "bun run --filter=@taxkit/sdk test-types",
+      "bun run --filter=@taxkit/sdk test",
+      "bun run --filter=@taxkit/sdk build",
+      "bun run --filter=@taxkit/api-http test",
       "bun run --filter=api smoke:public-routes",
       "bun run docs:validate",
       "bun run test",
@@ -71,7 +71,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -99,7 +99,7 @@
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/sdk check-packed-artifact",
+        "bun run --filter=@taxkit/sdk check-packed-artifact",
         "bun run --filter=api smoke:public-routes",
         "bun run docs:validate",
         "bun run verification",
@@ -142,10 +142,10 @@
       "goal": "Create the first deterministic downstream workspace proof for SDK package imports, typechecking, runtime calculations and browser-safe entrypoints.",
       "scope": [
         "Add an SDK-owned downstream validation script under packages/sdk/typescript/scripts.",
-        "Add a package command, such as bun run --filter=@whattax/sdk validate:downstream.",
+        "Add a package command, such as bun run --filter=@taxkit/sdk validate:downstream.",
         "Create a temp consumer workspace outside the repo and write package.json, tsconfig.json and example source files.",
         "Build and inspect the nine-package packed dependency closure, failing strictly on source leakage, unresolved dependency protocols or invalid publication exports.",
-        "Typecheck valid imports from @whattax/sdk, @whattax/sdk/effect, @whattax/sdk/au, @whattax/sdk/au/effect, @whattax/sdk/schemas and @whattax/sdk/testing.",
+        "Typecheck valid imports from @taxkit/sdk, @taxkit/sdk/effect, @taxkit/sdk/au, @taxkit/sdk/au/effect, @taxkit/sdk/schemas and @taxkit/sdk/testing.",
         "Include at least one @ts-expect-error misuse that proves downstream compile-time rejection.",
         "Run at least one plain SDK calculation and one Effect SDK calculation through public entrypoints.",
         "Run a minimal browser-safe bundling or equivalent build check for root, AU and schemas entrypoints.",
@@ -160,7 +160,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -188,19 +188,19 @@
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/sdk validate:downstream as the required strict clean-install gate",
-        "bun run --filter=@whattax/sdk check-packed-artifact",
-        "bun run --filter=@whattax/sdk check-boundaries",
-        "bun run --filter=@whattax/sdk test-types",
-        "bun run --filter=@whattax/sdk test",
-        "bun run --filter=@whattax/sdk build",
+        "bun run --filter=@taxkit/sdk validate:downstream as the required strict clean-install gate",
+        "bun run --filter=@taxkit/sdk check-packed-artifact",
+        "bun run --filter=@taxkit/sdk check-boundaries",
+        "bun run --filter=@taxkit/sdk test-types",
+        "bun run --filter=@taxkit/sdk test",
+        "bun run --filter=@taxkit/sdk build",
         "Downstream evidence audit documenting temp workspace location policy, tarball install strategy, typecheck result, runtime SDK result, public-entrypoint result, browser-safe bundle result and cleanup result.",
-        "rg audit proving browser-safe downstream examples do not import @whattax/api-http, app modules or server-only modules.",
+        "rg audit proving browser-safe downstream examples do not import @taxkit/api-http, app modules or server-only modules.",
         "bun run verification",
         "bun run changeset for package-facing script/README changes, or explicit no-Changeset rationale if the implementation is internal validation-only"
       ],
       "browserVerification": [
-        "Downstream browser-safe bundle or equivalent build check for @whattax/sdk, @whattax/sdk/au and @whattax/sdk/schemas.",
+        "Downstream browser-safe bundle or equivalent build check for @taxkit/sdk, @taxkit/sdk/au and @taxkit/sdk/schemas.",
         "No browser route check is required unless implementation touches apps/web or apps/docs UI routes."
       ],
       "qualityAudits": [
@@ -238,7 +238,7 @@
         "Extend the downstream validation command or add a focused companion mode for HTTP/API validation.",
         "Start apps/api with deterministic host/port config from the validation command or reuse the app-owned smoke command as the process owner.",
         "Wait for /api/health, then call public metadata, calculate and OpenAPI routes from the external consumer workspace.",
-        "If @whattax/api-http client exports are validated downstream, use client/live or browser-safe client exports only; do not import server handlers or app modules.",
+        "If @taxkit/api-http client exports are validated downstream, use client/live or browser-safe client exports only; do not import server handlers or app modules.",
         "Compare public response evidence against canonical SDK/API expectations without local DTO mirrors.",
         "Stop the API process cleanly on success and failure.",
         "Record route coverage, response checks, process cleanup and package-validation status in the active execution plan."
@@ -253,7 +253,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -275,20 +275,20 @@
         ],
         "taskSpecificScope": [
           "Keep apps/api as the process lifecycle owner.",
-          "Keep @whattax/api-http as the contract/client owner.",
-          "Do not make @whattax/sdk depend on @whattax/api-http.",
+          "Keep @taxkit/api-http as the contract/client owner.",
+          "Do not make @taxkit/sdk depend on @taxkit/api-http.",
           "Do not leave API child processes running after validation failures."
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/sdk validate:downstream as the required strict clean-install gate",
+        "bun run --filter=@taxkit/sdk validate:downstream as the required strict clean-install gate",
         "bun run --filter=api smoke:public-routes",
         "bun run --filter=api check-types",
         "bun run --filter=api build",
-        "bun run --filter=@whattax/api-http test",
-        "bun run --filter=@whattax/api-http check-types",
-        "bun run --filter=@whattax/api-http build",
-        "bun run --filter=@whattax/sdk check-boundaries",
+        "bun run --filter=@taxkit/api-http test",
+        "bun run --filter=@taxkit/api-http check-types",
+        "bun run --filter=@taxkit/api-http build",
+        "bun run --filter=@taxkit/sdk check-boundaries",
         "Live API cleanup audit proving downstream validation stops apps/api on success and failure.",
         "HTTP route coverage audit documenting health, metadata, calculate and OpenAPI calls from the external workspace.",
         "bun run docs:validate",
@@ -298,11 +298,11 @@
         "bun run changeset for package-facing command/client/README changes, or explicit no-Changeset rationale for app-internal/docs-only work"
       ],
       "browserVerification": [
-        "If @whattax/api-http browser-safe client exports are validated, run the downstream browser-safe bundle check against those exports.",
+        "If @taxkit/api-http browser-safe client exports are validated, run the downstream browser-safe bundle check against those exports.",
         "No browser route check is required unless implementation touches apps/web or apps/docs UI routes."
       ],
       "qualityAudits": [
-        "Audit pass 1: downstream HTTP call graph keeps apps/api runtime lifecycle, @whattax/api-http contract/client ownership and SDK dependency direction intact.",
+        "Audit pass 1: downstream HTTP call graph keeps apps/api runtime lifecycle, @taxkit/api-http contract/client ownership and SDK dependency direction intact.",
         "Audit pass 2: process lifecycle and cleanup use Effect/platform primitives where they fit and expected errors remain typed or explicitly bounded.",
         "Audit pass 3: HTTP examples use public routes/client exports only, contain no local DTO mirrors or unsafe casts, and do not leak server-only imports into browser-safe code."
       ],
@@ -316,7 +316,7 @@
         "Downstream validation proves public HTTP/API consumption against a real local apps/api process.",
         "Health, metadata, calculate and OpenAPI routes are called from the external workspace.",
         "The API process cleanup path works on success and failure.",
-        "The SDK still has no dependency on @whattax/api-http.",
+        "The SDK still has no dependency on @taxkit/api-http.",
         "Parent agent reviewed the diff, API evidence, Changeset decision and final call graph before accepting the task."
       ],
       "commitAfterPassing": true
@@ -350,7 +350,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -378,13 +378,13 @@
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/sdk validate:downstream as the required strict clean-install gate",
-        "bun run --filter=@whattax/sdk check-packed-artifact",
-        "bun run --filter=@whattax/sdk check-boundaries",
-        "bun run --filter=@whattax/sdk test-types",
-        "bun run --filter=@whattax/sdk test",
-        "bun run --filter=@whattax/sdk build",
-        "bun run --filter=@whattax/api-http test",
+        "bun run --filter=@taxkit/sdk validate:downstream as the required strict clean-install gate",
+        "bun run --filter=@taxkit/sdk check-packed-artifact",
+        "bun run --filter=@taxkit/sdk check-boundaries",
+        "bun run --filter=@taxkit/sdk test-types",
+        "bun run --filter=@taxkit/sdk test",
+        "bun run --filter=@taxkit/sdk build",
+        "bun run --filter=@taxkit/api-http test",
         "bun run --filter=api smoke:public-routes",
         "bun run docs:validate",
         "bun run test",
@@ -410,7 +410,7 @@
       },
       "completionCriteria": [
         "Downstream validation is documented as a pre-publication release gate.",
-        "Final downstream consumer validation is complete only when bun run --filter=@whattax/sdk validate:downstream exits zero after tarball audit, clean install, typecheck, runtime, public-entrypoint and browser-bundle checks.",
+        "Final downstream consumer validation is complete only when bun run --filter=@taxkit/sdk validate:downstream exits zero after tarball audit, clean install, typecheck, runtime, public-entrypoint and browser-bundle checks.",
         "Final evidence is recorded in the completed execution plan.",
         "Residual risks and future live package-name checks are explicit.",
         "No public docs mention private downstream products.",

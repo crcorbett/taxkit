@@ -54,13 +54,13 @@ review pass.
 - Kept `PublicCalculation*`, `PublicApiError` and `PublicCalculatorError` as
   deprecated transitional aliases for later migration slices.
 - Added Changeset `.changeset/kind-eggs-work.md` for
-  `@whattax/calculators` patch impact.
+  `@taxkit/calculators` patch impact.
 - Parent verification:
-  - `bun run --filter=@whattax/calculators test` passed.
-  - `bun run --filter=@whattax/calculators check-types` passed.
-  - `bun run --filter=@whattax/calculators build` passed.
+  - `bun run --filter=@taxkit/calculators test` passed.
+  - `bun run --filter=@taxkit/calculators check-types` passed.
+  - `bun run --filter=@taxkit/calculators build` passed.
   - `rg` audit confirmed canonical `CalculatorRun*` and
-    `CalculatorServiceError` exports/usages in `@whattax/calculators`.
+    `CalculatorServiceError` exports/usages in `@taxkit/calculators`.
   - `bun run verification` passed.
   - `bun run changeset status --verbose` passed and includes
     `.changeset/kind-eggs-work.md`.
@@ -77,17 +77,17 @@ review pass.
 - Preserved HTTP-owned route and envelope names such as
   `PublicCalculationMetadataGroup`, `PublicCalculationMetadataHandlerLive` and
   `PublicErrorEnvelope`.
-- Added Changeset `.changeset/bright-run-names.md` for `@whattax/sdk` and
-  `@whattax/http-api` patch impact.
+- Added Changeset `.changeset/bright-run-names.md` for `@taxkit/sdk` and
+  `@taxkit/http-api` patch impact.
 - Parent verification:
-  - `bun run --filter=@whattax/sdk test` passed.
-  - `bun run --filter=@whattax/sdk test-types` passed.
-  - `bun run --filter=@whattax/sdk check-types` passed.
-  - `bun run --filter=@whattax/sdk build` passed.
-  - `bun run --filter=@whattax/http-api test` passed.
-  - `bun run --filter=@whattax/http-api check-types` passed.
-  - `bun run --filter=@whattax/http-api build` passed.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk test` passed.
+  - `bun run --filter=@taxkit/sdk test-types` passed.
+  - `bun run --filter=@taxkit/sdk check-types` passed.
+  - `bun run --filter=@taxkit/sdk build` passed.
+  - `bun run --filter=@taxkit/http-api test` passed.
+  - `bun run --filter=@taxkit/http-api check-types` passed.
+  - `bun run --filter=@taxkit/http-api build` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
   - `rg` audit found no SDK source/README references to
     `PublicCalculation*`, `PublicApiError` or `PublicCalculatorError`.
   - `bun run verification` passed.
@@ -97,25 +97,25 @@ review pass.
 ### 2026-05-25 - SDK-NAME-003 export contract
 
 - Accepted commit `793ad00` after parent review.
-- Removed `source` conditions from `@whattax/sdk` export map; public exports
+- Removed `source` conditions from `@taxkit/sdk` export map; public exports
   now resolve to `dist` files only.
-- Updated `@whattax/sdk/schemas` to re-export calculator-owned
+- Updated `@taxkit/sdk/schemas` to re-export calculator-owned
   `CalculatorRun*` contracts and `CalculatorServiceError` plus SDK-owned safe
   result/error schemas.
-- Added `bun run --filter=@whattax/sdk check-packed-artifact` to audit the
+- Added `bun run --filter=@taxkit/sdk check-packed-artifact` to audit the
   publish manifest and run import smoke checks against a copied packed package
   layout for root, Effect, AU, AU Effect, schemas and testing entrypoints.
 - Updated SDK README and API/SDK architecture docs for the dist-only export
   map and schema export ownership.
-- Added Changeset `.changeset/locked-sdk-exports.md` for `@whattax/sdk`
+- Added Changeset `.changeset/locked-sdk-exports.md` for `@taxkit/sdk`
   patch impact.
 - Parent verification:
-  - `bun run --filter=@whattax/sdk test` passed.
-  - `bun run --filter=@whattax/sdk check-types` passed.
-  - `bun run --filter=@whattax/sdk build` passed.
-  - `bun run --filter=@whattax/sdk test-types` passed.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
-  - `bun run --filter=@whattax/sdk check-packed-artifact` passed.
+  - `bun run --filter=@taxkit/sdk test` passed.
+  - `bun run --filter=@taxkit/sdk check-types` passed.
+  - `bun run --filter=@taxkit/sdk build` passed.
+  - `bun run --filter=@taxkit/sdk test-types` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk check-packed-artifact` passed.
   - `npm pack --dry-run --json packages/sdk/typescript` reported 38 packed
     files: `README.md`, `package.json` and `dist/**` only.
   - `bun run verification` passed.
@@ -124,7 +124,7 @@ review pass.
 
 ### 2026-05-25 - SDK-NAME-004 docs and downstream validation
 
-- Accepted WhatTax commit `8bd7c21` and downstream commit `fb9c305` after
+- Accepted TaxKit commit `8bd7c21` and downstream commit `fb9c305` after
   parent review, then added parent follow-up docs cleanup for old historical
   spec wording.
 - Updated public architecture docs, package READMEs and SDK publishing spec to
@@ -133,17 +133,17 @@ review pass.
 - Updated older product-spec wording so historical specs do not advertise
   `PublicCalculation*` as preferred calculator/SDK vocabulary.
 - Kept HTTP-only names such as `PublicCalculationMetadataGroup` and
-  `PublicErrorEnvelope` scoped to `@whattax/http-api`; kept deprecated alias
-  mentions scoped to `@whattax/calculators` transitional compatibility docs
+  `PublicErrorEnvelope` scoped to `@taxkit/http-api`; kept deprecated alias
+  mentions scoped to `@taxkit/calculators` transitional compatibility docs
   and code.
 - Added Changeset `.changeset/sdk-public-contract-docs.md` for
-  `@whattax/sdk`, `@whattax/http-api` and `@whattax/calculators` patch
+  `@taxkit/sdk`, `@taxkit/http-api` and `@taxkit/calculators` patch
   impact.
-- Downstream validation advanced the vendored WhatTax dependency and added
-  type-level coverage for `@whattax/sdk/schemas` exports:
+- Downstream validation advanced the vendored TaxKit dependency and added
+  type-level coverage for `@taxkit/sdk/schemas` exports:
   `CalculatorRunRequest`, `CalculatorRunFacts` and `CalculatorServiceError`.
 - Parent verification:
-  - `bun run verification` passed in WhatTax.
+  - `bun run verification` passed in TaxKit.
   - `bun run changeset status --verbose` passed and includes
     `.changeset/sdk-public-contract-docs.md`.
   - `pnpm check-types` passed in the downstream workspace.

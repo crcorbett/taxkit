@@ -58,16 +58,16 @@ Completed on 2026-07-01.
 ### 2026-07-01 - API-COMPAT-001 validation
 
 - Baseline before edits: `packages/api/http/src/server/live.layer.ts` built
-  `/api/docs/openapi.json` from a local `OpenApi.fromApi(WhatTaxApi)` value;
+  `/api/docs/openapi.json` from a local `OpenApi.fromApi(TaxKitApi)` value;
   the package test surface was
   `packages/api/http/__tests__/public-calculation-api.test.ts`; live
   `apps/api` smoke coverage remains API-COMPAT-003 scope.
 - Added `packages/api/http/src/openapi.ts` as the package-owned OpenAPI source.
-  It calls `OpenApi.fromApi(WhatTaxApi)` once, decodes to `Schema.Json`,
+  It calls `OpenApi.fromApi(TaxKitApi)` once, decodes to `Schema.Json`,
   recursively normalizes structured JSON through `Schema`, `Option`,
   `Array`, `Record` and `Order`, and formats the normalized snapshot.
 - Updated `packages/api/http/src/server/live.layer.ts` so
-  `/api/docs/openapi.json` serves `whatTaxOpenApiSpec` from the shared
+  `/api/docs/openapi.json` serves `taxKitOpenApiSpec` from the shared
   OpenAPI module.
 - Added `packages/api/http/__tests__/openapi-snapshot.test.ts`,
   `packages/api/http/__snapshots__/openapi.json`,
@@ -78,19 +78,19 @@ Completed on 2026-07-01.
   `packages/api/http/__snapshots__/openapi.json` with 2,906 lines after
   formatting.
 - Update command:
-  `bun run --filter=@whattax/api-http update-openapi-snapshot`.
+  `bun run --filter=@taxkit/api-http update-openapi-snapshot`.
 - Targeted package verification passed:
-  `bun run --filter=@whattax/api-http test` (2 files, 3 tests),
-  `bun run --filter=@whattax/api-http check-types`,
-  `bun run --filter=@whattax/api-http build` and
-  `bun run --filter=@whattax/api-http test:openapi`.
+  `bun run --filter=@taxkit/api-http test` (2 files, 3 tests),
+  `bun run --filter=@taxkit/api-http check-types`,
+  `bun run --filter=@taxkit/api-http build` and
+  `bun run --filter=@taxkit/api-http test:openapi`.
 - Drift audit passed with an in-memory mutation script: route rename, method
   rename and calculate 400 response schema-reference changes all differed from
   the committed normalized snapshot.
 - Shared-source rg audit passed:
   `rg -n "OpenApi\\.fromApi" packages/api/http/src packages/api/http/__tests__`
   reports the only generation call in `packages/api/http/src/openapi.ts`, and
-  rg over `whatTaxOpenApiSpec` shows only the docs route and snapshot test
+  rg over `taxKitOpenApiSpec` shows only the docs route and snapshot test
   consuming the package-owned source.
 - Boundary/leak audit passed: rg over apps/packages shows no browser app
   imports of the OpenAPI module; only `packages/api/http/src/server/live.layer.ts`
@@ -100,12 +100,12 @@ Completed on 2026-07-01.
   undefined branching or spread response shaping.
 - Changeset evidence passed:
   `.changeset/openapi-snapshot-harness.md` records a patch for
-  `@whattax/api-http`; `bun run changeset status --verbose` reports the fixed
+  `@taxkit/api-http`; `bun run changeset status --verbose` reports the fixed
   release group would patch to `0.0.4` when applied.
-- Parent reran `bun run --filter=@whattax/api-http test`,
-  `bun run --filter=@whattax/api-http check-types`,
-  `bun run --filter=@whattax/api-http build`,
-  `bun run --filter=@whattax/api-http test:openapi`, the in-memory OpenAPI
+- Parent reran `bun run --filter=@taxkit/api-http test`,
+  `bun run --filter=@taxkit/api-http check-types`,
+  `bun run --filter=@taxkit/api-http build`,
+  `bun run --filter=@taxkit/api-http test:openapi`, the in-memory OpenAPI
   drift audit, shared-source rg audits, browser/server import leak audits,
   `bun run verification` and `bun run changeset status --verbose`; all passed.
 
@@ -114,7 +114,7 @@ Completed on 2026-07-01.
 - Baseline before edits:
   `packages/api/http/__tests__/public-calculation-api.test.ts` covered one
   calculate success path and one typed input-error path through
-  `WhatTaxApiInProcessClientLive`; it did not cover `GET /api/health` or a
+  `TaxKitApiInProcessClientLive`; it did not cover `GET /api/health` or a
   metadata route fixture.
 - Added focused route fixture assertions in
   `packages/api/http/__tests__/public-calculation-api.test.ts`:
@@ -127,7 +127,7 @@ Completed on 2026-07-01.
   `TaxFreeThresholdClaimedDescriptor`.
 - Calculate success fixture coverage now decodes the HTTP result with
   `CalculatorRunResponse`, asserts the route output equals
-  `@whattax/sdk/effect` `calculateRunRequest(AuPayTakeHomeCalculation, ...)`,
+  `@taxkit/sdk/effect` `calculateRunRequest(AuPayTakeHomeCalculation, ...)`,
   and keeps the stable take-home report assertions for withholdings, net pay
   and graph diagnostics.
 - Schema-guided input-error fixture coverage uses annual-tax-shaped
@@ -144,7 +144,7 @@ Completed on 2026-07-01.
   mismatched annual-tax facts fixture for the take-home route.
 - SDK parity audit:
   calculate success still proves
-  `HTTP -> WhatTaxApiInProcessClientLive -> CalculatorApiHandlerLive ->
+  `HTTP -> TaxKitApiInProcessClientLive -> CalculatorApiHandlerLive ->
   calculateRunRequest -> PublicCalculatorService -> CalculationEngine` by
   comparing the full HTTP response to the SDK full-run response; expected
   input errors now compare the HTTP error envelope to SDK and calculator
@@ -155,10 +155,10 @@ Completed on 2026-07-01.
   OpenAPI contracts, runtime behaviour or documented package usage. The
   existing API-COMPAT-001 Changeset remains unchanged.
 - Verification passed after a lint/format correction on the edited test file:
-  `bun run --filter=@whattax/api-http test` (2 files, 5 tests),
-  `bun run --filter=@whattax/api-http check-types`,
-  `bun run --filter=@whattax/api-http build`,
-  `bun run --filter=@whattax/sdk check-boundaries` and
+  `bun run --filter=@taxkit/api-http test` (2 files, 5 tests),
+  `bun run --filter=@taxkit/api-http check-types`,
+  `bun run --filter=@taxkit/api-http build`,
+  `bun run --filter=@taxkit/sdk check-boundaries` and
   `bun run verification`.
 
 ### 2026-07-01 - API-COMPAT-003 validation
@@ -169,8 +169,8 @@ Completed on 2026-07-01.
 - Smoke call graph:
   `ChildProcess.make("bun", ["src/index.ts"])` from `apps/api` with
   deterministic `API_HOST=127.0.0.1` and `API_PORT=4173` ->
-  `apps/api/src/index.ts` -> `ApiAppLayer` -> `WhatTaxServerLayer` ->
-  public routes owned by `@whattax/api-http`.
+  `apps/api/src/index.ts` -> `ApiAppLayer` -> `TaxKitServerLayer` ->
+  public routes owned by `@taxkit/api-http`.
 - Smoke route coverage:
   `GET /api/health`, `GET /api/v1/calculators`,
   `POST /api/v1/calculators/au.pay.take-home/calculate` and
@@ -188,7 +188,7 @@ Completed on 2026-07-01.
   failure.
 - Success cleanup audit passed:
   `bun run --filter=api smoke:public-routes` printed all four route pass lines,
-  `WhatTax API stopped` and `apps/api smoke process stopped`; follow-up
+  `TaxKit API stopped` and `apps/api smoke process stopped`; follow-up
   `ps -axo pid,command | rg 'bun .*src/index\\.ts|apps/api/src/index\\.ts' | rg -v 'rg|smoke-public-routes'`
   and `lsof -nP -iTCP:4173 -sTCP:LISTEN` returned no matches.
 - Failure cleanup audit passed by occupying `127.0.0.1:4173` with a temporary
@@ -204,29 +204,29 @@ Completed on 2026-07-01.
   contract-change workflow.
 - Updated `.changeset/openapi-snapshot-harness.md` to cover OpenAPI snapshot
   checks, route fixture coverage and live API smoke workflow docs for the
-  existing `@whattax/api-http` patch entry. No separate Changeset was added for
+  existing `@taxkit/api-http` patch entry. No separate Changeset was added for
   the app-owned smoke command because `apps/api` is private app-internal
   tooling and this slice did not change public route behaviour.
 - Changeset status evidence:
   `bun run changeset status --verbose` reports the fixed release group would
-  patch `@whattax/api-http` to `0.0.4` when applied, along with the existing
+  patch `@taxkit/api-http` to `0.0.4` when applied, along with the existing
   fixed-group workspace package patches.
 - Mandatory verification passed:
   `bun run --filter=api smoke:public-routes`,
   `bun run --filter=api check-types`,
   `bun run --filter=api build`,
-  `bun run --filter=@whattax/api-http test` (2 files, 5 tests),
-  `bun run --filter=@whattax/api-http check-types`,
-  `bun run --filter=@whattax/api-http build`, `bun run docs:validate`,
+  `bun run --filter=@taxkit/api-http test` (2 files, 5 tests),
+  `bun run --filter=@taxkit/api-http check-types`,
+  `bun run --filter=@taxkit/api-http build`, `bun run docs:validate`,
   `bun run test`, `bun run build` and `bun run verification`.
 - `bun run build` passed with the existing Rolldown
   `INVALID_ANNOTATION` warning from Effect's generated
   `HttpRouter.js`; Turbo completed successfully.
 - Parent reran `bun run --filter=api smoke:public-routes`,
   `bun run --filter=api check-types`, `bun run --filter=api build`,
-  `bun run --filter=@whattax/api-http test`,
-  `bun run --filter=@whattax/api-http check-types`,
-  `bun run --filter=@whattax/api-http build`, `bun run docs:validate`,
+  `bun run --filter=@taxkit/api-http test`,
+  `bun run --filter=@taxkit/api-http check-types`,
+  `bun run --filter=@taxkit/api-http build`, `bun run docs:validate`,
   `bun run test`, `bun run build`, `bun run verification`,
   `bun run changeset status --verbose`, `git diff --check`, success cleanup
   checks and the occupied-port failure cleanup audit; all passed.
@@ -237,15 +237,15 @@ Completed on 2026-07-01.
 
 - Accepted after local review. Correction turns: 0.
 - Audit pass 1: final call graph matches the spec target:
-  `/api/docs/openapi.json -> whatTaxOpenApiSpec -> OpenApi.fromApi(WhatTaxApi)`;
-  snapshot test -> `normalizedWhatTaxOpenApiSpec` from the same module ->
+  `/api/docs/openapi.json -> taxKitOpenApiSpec -> OpenApi.fromApi(TaxKitApi)`;
+  snapshot test -> `normalizedTaxKitOpenApiSpec` from the same module ->
   committed normalized snapshot.
 - Audit pass 2: normalization is structured and deterministic. It decodes the
   generated spec to `Schema.Json`, orders JSON object keys with Effect
   `Record`/`Array`/`Order`, recurses over arrays and objects, and does not
   mirror route DTOs or handwrite OpenAPI route shapes.
 - Audit pass 3: Effect/schema conventions and package boundaries hold. The
-  slice reuses `WhatTaxApi` and Effect OpenAPI types, keeps the docs route in
+  slice reuses `TaxKitApi` and Effect OpenAPI types, keeps the docs route in
   the server layer, avoids unsafe casts and helper sprawl, and introduces no
   browser/server import leak.
 
@@ -253,8 +253,8 @@ Completed on 2026-07-01.
 
 - Accepted after local review. Correction turns: 0.
 - Audit pass 1: final fixture call graph still matches the spec target:
-  route fixtures use `WhatTaxApiInProcessClientLive`; calculate success reaches
-  `CalculatorApiHandlerLive -> @whattax/sdk/effect calculateRunRequest ->
+  route fixtures use `TaxKitApiInProcessClientLive`; calculate success reaches
+  `CalculatorApiHandlerLive -> @taxkit/sdk/effect calculateRunRequest ->
   PublicCalculatorServiceLive -> CalculationEngineLive`; the input-error
   fixture proves the route envelope wraps the same calculator-owned tagged
   error returned by the SDK and service.
@@ -277,7 +277,7 @@ Completed on 2026-07-01.
 - Accepted after local review. Correction turns: 0.
 - Audit pass 1: final call graph matches the spec target and keeps runtime
   ownership split correctly. `apps/api` starts and stops the Bun process; the
-  live smoke only calls public HTTP routes; `@whattax/api-http` remains the
+  live smoke only calls public HTTP routes; `@taxkit/api-http` remains the
   route contract, OpenAPI, schema and fixture owner.
 - Audit pass 2: smoke lifecycle uses Effect platform/runtime primitives where
   they fit. Command execution uses `ChildProcess` with `BunServices.layer`,

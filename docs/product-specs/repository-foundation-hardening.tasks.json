@@ -1,11 +1,11 @@
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/repository-foundation-hardening.md",
   "title": "Repository Foundation Hardening Implementation Tasks",
   "status": "implemented",
   "last_reviewed": "2026-07-14",
   "principles": [
-    "Preserve WhatTax's stricter trust-boundary and route-consumer contracts while adopting portable reference patterns.",
+    "Preserve TaxKit's stricter trust-boundary and route-consumer contracts while adopting portable reference patterns.",
     "Use one compatible Effect beta family and migrate directly to current APIs without compatibility-helper sprawl.",
     "Keep package-owned validators in their packages; cross-cutting scripts may orchestrate but not duplicate them.",
     "Require real packed-consumer and Oxlint CLI evidence for publication and lint contracts.",
@@ -18,7 +18,7 @@
       "bun run test",
       "bun run build",
       "bun run release:check",
-      "bun run --filter=@whattax/sdk validate:downstream",
+      "bun run --filter=@taxkit/sdk validate:downstream",
       "bun run changeset status --verbose"
     ],
     "evidenceRequired": [
@@ -52,7 +52,7 @@
         "Effect migration edits and tests",
         ".changeset/*"
       ],
-      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read the spec, this task, current files, and relevant architecture docs; identify every owning schema, type, service, layer and tagged error; review the call graphs. MUST use Effect-native primitives and current beta.98 APIs where they fit. Reuse canonical schema-derived types and tagged errors. Do not add local DTO mirrors, unsafe casts, manual object readers, runtime wrappers, compatibility shims, or one-use mapper helpers. Keep primary operations linear with pipe or Effect.gen and handle typed errors at the owning boundary. Package-facing work must include a user-facing Changeset. Run all mandatory verification and at least three documented improvement audit passes. Report changed files, verification, Changeset impact, residual risks and call-graph alignment. Do not start another task; parent review and acceptance are required first. Task-specific: upgrade all Effect-family dependencies to beta.98, add @effect/language-service@0.87.0 with prepare patching and a deterministic compatibility check, and resolve every resulting code/test/build failure without weakening contracts.",
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list. Before editing, read the spec, this task, current files, and relevant architecture docs; identify every owning schema, type, service, layer and tagged error; review the call graphs. MUST use Effect-native primitives and current beta.98 APIs where they fit. Reuse canonical schema-derived types and tagged errors. Do not add local DTO mirrors, unsafe casts, manual object readers, runtime wrappers, compatibility shims, or one-use mapper helpers. Keep primary operations linear with pipe or Effect.gen and handle typed errors at the owning boundary. Package-facing work must include a user-facing Changeset. Run all mandatory verification and at least three documented improvement audit passes. Report changed files, verification, Changeset impact, residual risks and call-graph alignment. Do not start another task; parent review and acceptance are required first. Task-specific: upgrade all Effect-family dependencies to beta.98, add @effect/language-service@0.87.0 with prepare patching and a deterministic compatibility check, and resolve every resulting code/test/build failure without weakening contracts.",
       "mandatoryVerification": [
         "bun install",
         "language-service patch and compatibility check",
@@ -114,7 +114,7 @@
           "Correction turn 2 pinned the local installed language-service schema, declared the fixture's direct Effect dependency, separated prepare patching from check verification, added the compatibility check to canonical verification, registered the fixture with Knip, and added the API package's canonical smoke alias."
         ],
         "changeset": ".changeset/effect-beta-98.md",
-        "releaseTrainImpact": "This Changeset requests patches for @whattax/calculators, @whattax/docs-content, @whattax/docs-fumadocs and @whattax/rules-au-pay. Fixed-group propagation covers the touched income-tax and STSL packages; existing pending Changesets currently make the aggregate fixed-train and calculators release minor rather than patch.",
+        "releaseTrainImpact": "This Changeset requests patches for @taxkit/calculators, @taxkit/docs-content, @taxkit/docs-fumadocs and @taxkit/rules-au-pay. Fixed-group propagation covers the touched income-tax and STSL packages; existing pending Changesets currently make the aggregate fixed-train and calculators release minor rather than patch.",
         "callGraphAlignment": "The spec call graphs remain accurate. Dependency resolution is root catalog to bun.lock to workspace packages; install runs prepare patching, the registered plugin participates in the focused tsc project, and runtime migrations stay at their existing app, route, calculator and rule owners.",
         "residualRisks": [
           "Effect remains a beta dependency and future beta upgrades can introduce further API drift.",
@@ -147,13 +147,13 @@
         "package README and architecture updates",
         ".changeset/*"
       ],
-      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read the spec, this task, current manifests/validators, and package ownership/testing/versioning docs; review the call graphs. MUST use structured manifest parsing and Effect-native platform APIs in runtime validators. Reuse canonical contracts, keep one-off error handling inline, and do not create a second pack system or broad manifest helper layer. Preserve workspace source conditions while defining a dist-only publication surface. Run all mandatory verification and at least three documented improvement audit passes. Report changed files, verification, Changeset impact, residual risks and call-graph alignment. Do not start another task; parent review and acceptance are required first. Task-specific: make CI read .bun-version and invoke canonical scripts, symlink CLAUDE.md to AGENTS.md, clean dist before TypeScript builds, add explicit files/publishConfig exports to release-train packages, and make strict packed clean-install/public-export validation pass with concrete dependency ranges.",
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list. Before editing, read the spec, this task, current manifests/validators, and package ownership/testing/versioning docs; review the call graphs. MUST use structured manifest parsing and Effect-native platform APIs in runtime validators. Reuse canonical contracts, keep one-off error handling inline, and do not create a second pack system or broad manifest helper layer. Preserve workspace source conditions while defining a dist-only publication surface. Run all mandatory verification and at least three documented improvement audit passes. Report changed files, verification, Changeset impact, residual risks and call-graph alignment. Do not start another task; parent review and acceptance are required first. Task-specific: make CI read .bun-version and invoke canonical scripts, symlink CLAUDE.md to AGENTS.md, clean dist before TypeScript builds, add explicit files/publishConfig exports to release-train packages, and make strict packed clean-install/public-export validation pass with concrete dependency ranges.",
       "mandatoryVerification": [
         "bun run verification",
         "bun run test",
         "bun run build",
-        "bun run --filter=@whattax/sdk check-packed-artifact",
-        "bun run --filter=@whattax/sdk validate:downstream",
+        "bun run --filter=@taxkit/sdk check-packed-artifact",
+        "bun run --filter=@taxkit/sdk validate:downstream",
         "tarball manifest audit for source conditions and workspace/catalog protocols",
         "bun run changeset status --verbose"
       ],
@@ -192,21 +192,21 @@
           "bun run verification passed",
           "bun run test passed",
           "bun run build passed with 13 of 13 tasks successful",
-          "bun run --filter=@whattax/sdk check-packed-artifact passed against whattax-sdk-0.0.4.tgz",
-          "bun run --filter=@whattax/sdk validate:downstream passed clean install, typecheck, SDK runtime, all public-entrypoint imports and browser bundling",
+          "bun run --filter=@taxkit/sdk check-packed-artifact passed against taxkit-sdk-0.0.4.tgz",
+          "bun run --filter=@taxkit/sdk validate:downstream passed clean install, typecheck, SDK runtime, all public-entrypoint imports and browser bundling",
           "The integrated final tarball audit found no source conditions, source files, missing export targets, workspace protocols or catalogue protocols",
           "bun run changeset status --verbose passed"
         ],
         "tarballEvidence": [
-          "@whattax/core: whattax-core-0.0.4.tgz, 90 files",
-          "@whattax/rules-au-income-tax: whattax-rules-au-income-tax-0.0.4.tgz, 86 files",
-          "@whattax/rules-au-pay: whattax-rules-au-pay-0.0.4.tgz, 94 files",
-          "@whattax/rules-au-stsl: whattax-rules-au-stsl-0.0.4.tgz, 50 files",
-          "@whattax/calculators: whattax-calculators-0.0.4.tgz, 30 files",
-          "@whattax/sdk: whattax-sdk-0.0.4.tgz, 38 files",
-          "@whattax/api-http: whattax-api-http-0.0.4.tgz, 70 files",
-          "@whattax/testing: whattax-testing-0.0.4.tgz, 6 files",
-          "@whattax/tsconfig: whattax-tsconfig-0.0.4.tgz, 3 files"
+          "@taxkit/core: taxkit-core-0.0.4.tgz, 90 files",
+          "@taxkit/rules-au-income-tax: taxkit-rules-au-income-tax-0.0.4.tgz, 86 files",
+          "@taxkit/rules-au-pay: taxkit-rules-au-pay-0.0.4.tgz, 94 files",
+          "@taxkit/rules-au-stsl: taxkit-rules-au-stsl-0.0.4.tgz, 50 files",
+          "@taxkit/calculators: taxkit-calculators-0.0.4.tgz, 30 files",
+          "@taxkit/sdk: taxkit-sdk-0.0.4.tgz, 38 files",
+          "@taxkit/api-http: taxkit-api-http-0.0.4.tgz, 70 files",
+          "@taxkit/testing: taxkit-testing-0.0.4.tgz, 6 files",
+          "@taxkit/tsconfig: taxkit-tsconfig-0.0.4.tgz, 3 files"
         ],
         "qualityAudits": [
           "Pass 1 confirmed .bun-version ownership, canonical local/CI commands, the relative CLAUDE.md symlink, and BunRuntime/BunServices plus Effect Platform ownership in both SDK validator runtimes.",
@@ -216,7 +216,7 @@
         "correctionTurn2": {
           "change": "Renamed the focused checker to check-packed-artifact.runtime.ts and rewrote it as an SDK-only program with BunRuntime, BunServices, Effect Platform FileSystem/Path/ChildProcess, Schema-derived manifest decoding, typed tagged errors, Effect Console and scoped cleanup.",
           "scope": "The focused checker still validates one SDK tarball and its six entrypoint groups. validate-downstream-consumer.runtime.ts remains the sole owner of the nine-package closure.",
-          "verification": "Focused checker passed with whattax-sdk-0.0.4.tgz and 38 files; strict downstream, repository verification, tests, build, Changeset status, JSON parse and diff check all passed."
+          "verification": "Focused checker passed with taxkit-sdk-0.0.4.tgz and 38 files; strict downstream, repository verification, tests, build, Changeset status, JSON parse and diff check all passed."
         },
         "changeset": ".changeset/deterministic-release-artifacts.md patches the ten directly affected packages. Existing pending Changesets aggregate nine fixed-train or standalone packages to minor and docs-fumadocs to patch.",
         "callGraphAlignment": "Matches the canonical graph: clean package builds feed raw Bun tarballs; schema-decoded staged manifests receive package-owned publishConfig exports; final Bun tarballs feed manifest and file audits, clean consumer install, typecheck, runtime/public-entrypoint imports and browser bundles.",
@@ -236,7 +236,7 @@
       "dependsOn": ["FND-002"],
       "goal": "Turn reliable Effect, Bun and MDX architecture contracts into narrowly scoped portable Oxlint rules with executable binary evidence.",
       "scope": [
-        "effect, bun, mdx and whattax plugin namespaces",
+        "effect, bun, mdx and taxkit plugin namespaces",
         "encoder egress and throwing schema codec rules",
         "typed service error/cause rules",
         "runtime, host, console and Bun adapter placement",
@@ -247,12 +247,12 @@
         "tools/oxlint/effect-rules.js",
         "tools/oxlint/bun-rules.js",
         "tools/oxlint/mdx-rules.js",
-        "reduced tools/oxlint/whattax-rules.js",
+        "reduced tools/oxlint/taxkit-rules.js",
         "oxlint.config.ts exact scopes and allowlists",
         "real CLI fixtures/tests",
         "testing/effect/frontend docs updates"
       ],
-      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read the spec, this task, current lint plugins/config/tests, and effect/testing/frontend docs; inventory actual encoder, codec, runtime, console, process, Bun, test-global and MDX-registry callsites. Keep portable rules domain-neutral and exact scopes in oxlint.config.ts; retain decoder and route-transport policy under whattax. Rules must be AST-based and invoke the real Oxlint binary against allowed and rejected fixtures. Do not add a rule whose signal requires broad suppressions; document review-only guidance instead. Avoid plugin helper sprawl and preserve actionable messages with canonical Effect alternatives. Run all mandatory verification and three documented improvement audit passes. Report changed files, verification, no-changeset rationale unless package behavior changed, residual risks and call-graph alignment. Do not start another task; parent review and acceptance are required first.",
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list. Before editing, read the spec, this task, current lint plugins/config/tests, and effect/testing/frontend docs; inventory actual encoder, codec, runtime, console, process, Bun, test-global and MDX-registry callsites. Keep portable rules domain-neutral and exact scopes in oxlint.config.ts; retain decoder and route-transport policy under taxkit. Rules must be AST-based and invoke the real Oxlint binary against allowed and rejected fixtures. Do not add a rule whose signal requires broad suppressions; document review-only guidance instead. Avoid plugin helper sprawl and preserve actionable messages with canonical Effect alternatives. Run all mandatory verification and three documented improvement audit passes. Report changed files, verification, no-changeset rationale unless package behavior changed, residual risks and call-graph alignment. Do not start another task; parent review and acceptance are required first.",
       "mandatoryVerification": [
         "bun run test:oxlint",
         "bun run lint:boundary-directives",
@@ -274,7 +274,7 @@
         "escalateAfterFailedTurn": 3
       },
       "completionCriteria": [
-        "Portable rules use effect, bun and mdx namespaces; tax/route rules remain whattax-owned.",
+        "Portable rules use effect, bun and mdx namespaces; tax/route rules remain taxkit-owned.",
         "Every enabled new rule has real Oxlint CLI accepted and rejected evidence.",
         "Exact scopes pass on the repository without broad file suppressions.",
         "Decoder and direct route-consumer contracts remain at least as strict as before.",
@@ -283,7 +283,7 @@
       "implementationEvidence": {
         "state": "Complete and parent accepted after correction turn 3. Bun destructuring reports only the five rule-owned host methods while retaining full binding tracking; real-binary accepted and rejected evidence and all mandatory gates pass.",
         "changedFiles": [
-          "tools/oxlint/binding-tracker.js plus effect-rules.js, bun-rules.js and mdx-rules.js; removed the superseded no-switch-plugin.js and reduced whattax-rules.js",
+          "tools/oxlint/binding-tracker.js plus effect-rules.js, bun-rules.js and mdx-rules.js; removed the superseded no-switch-plugin.js and reduced taxkit-rules.js",
           "oxlint.config.ts exact contract scopes plus encoder, runtime, process, console, Bun and test-only sync-codec boundary lists",
           "tools/oxlint/portable-rules.test.ts and accepted/rejected Effect, Bun and MDX fixtures, including unallowlisted unrelated-local controls",
           "apps/docs/src/lib/docs/loaders.ts",
@@ -313,10 +313,10 @@
           "mdxScoped": [
             "mdx/no-route-local-component-registry for docs routes and exact fixtures"
           ],
-          "retainedWhatTax": [
-            "whattax/no-decoding-outside-boundaries remains globally enabled with its existing exact boundary model",
-            "whattax/no-route-transport-restore-outside-consumers retains its direct route-consumer configuration",
-            "calculator transformation, optionality and runtime-policy rules remain whattax-owned and calculator-scoped"
+          "retainedTaxKit": [
+            "taxkit/no-decoding-outside-boundaries remains globally enabled with its existing exact boundary model",
+            "taxkit/no-route-transport-restore-outside-consumers retains its direct route-consumer configuration",
+            "calculator transformation, optionality and runtime-policy rules remain taxkit-owned and calculator-scoped"
           ]
         },
         "reviewOnly": [
@@ -334,8 +334,8 @@
           "bun run --filter=docs check-types passed",
           "bun run test:docs-boundaries passed with 6 tests",
           "bun run --filter=docs test:browser passed with 1 file and 7 tests",
-          "bun run --filter=@whattax/api-http check-types passed",
-          "bun run --filter=@whattax/api-http test:openapi passed with 1 test",
+          "bun run --filter=@taxkit/api-http check-types passed",
+          "bun run --filter=@taxkit/api-http test:openapi passed with 1 test",
           "bun run changeset status --verbose passed",
           "Task JSON parsing and git diff --check passed"
         ],
@@ -349,7 +349,7 @@
         "correctionTurn3": "Filtered Bun object-pattern declarations and assignments by statically selected bunHostMethods while continuing to track every destructured binding. Added unallowlisted real-global acceptance for direct, declaration-destructured and assignment-destructured Bun.version access and retained rejected declaration/assignment destructuring for file, spawn and write. Reran every mandatory gate with no scope, Changeset or package-contract change.",
         "changeset": "No new Changeset. This slice changes root lint tooling, executable lint fixtures, documentation and app-internal boundaries. The API OpenAPI normalizer is not in the package export map and now returns a typed Effect only to its internal snapshot test; the docs loader is app-owned. No published package export, runtime endpoint contract or SDK surface changes.",
         "releaseTrainImpact": "None from FND-003. Existing pending Changesets from earlier accepted slices remain unchanged.",
-        "callGraphAlignment": "Matches the spec. oxlint.config.ts owns exact scopes and routes portable syntax to effect, bun and mdx plugins while whattax retains decoder, route and calculator policy. Effect and Bun rules share one lexical binding-provenance module; accepted and generated rejected fixtures then execute those plugins through the installed Oxlint binary. The required codec migrations remain linear: unknown docs server input -> Schema.decodeUnknownEffect -> DocsSourceError -> DocsContentService -> route-boundary encoding, and generated OpenAPI -> Schema.decodeUnknownEffect(Schema.Json) -> deterministic normalization -> snapshot Effect.",
+        "callGraphAlignment": "Matches the spec. oxlint.config.ts owns exact scopes and routes portable syntax to effect, bun and mdx plugins while taxkit retains decoder, route and calculator policy. Effect and Bun rules share one lexical binding-provenance module; accepted and generated rejected fixtures then execute those plugins through the installed Oxlint binary. The required codec migrations remain linear: unknown docs server input -> Schema.decodeUnknownEffect -> DocsSourceError -> DocsContentService -> route-boundary encoding, and generated OpenAPI -> Schema.decodeUnknownEffect(Schema.Json) -> deterministic normalization -> snapshot Effect.",
         "residualRisks": [
           "Dynamic property values, aliases returned through arbitrary functions and cross-module value flow are not resolved; these remain explicit review-only cases because enforcing them would require interprocedural type analysis.",
           "Exact boundary lists require deliberate maintenance when new runtime, egress or adapter files are introduced; unlisted direct calls fail lint by design.",
@@ -367,7 +367,7 @@
       "dependsOn": ["FND-003"],
       "goal": "Create one typed, testable orchestration path for complete release evidence without moving package-owned validator logic.",
       "scope": [
-        "@whattax/scripts package scaffold",
+        "@taxkit/scripts package scaffold",
         "schema-backed release check definitions and outcomes",
         "Effect Platform Command live service and deterministic test layer",
         "root release:check script",
@@ -381,11 +381,11 @@
         "packages/scripts/README.md and architecture docs",
         ".changeset/*"
       ],
-      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read the spec, this task, package ownership/effect/testing/versioning docs, and every command to be orchestrated. Implement one primary linear Effect program using Schema/Data contracts, a service tag, live and deterministic test layers, Effect Platform Command and typed tagged errors. Keep one-off mapping inline and avoid a helper per command. The command may invoke but must not reimplement or relocate root, SDK, docs or API validators. Do not manually manage processes or build a custom runtime wrapper; run the completed program at the runtime entrypoint only. Add a Changeset because release tooling is package-facing. Run all mandatory verification and three documented improvement audit passes. Report changed files, verification, Changeset impact, residual risks and call-graph alignment. Do not start another task; parent review and acceptance are required first.",
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list. Before editing, read the spec, this task, package ownership/effect/testing/versioning docs, and every command to be orchestrated. Implement one primary linear Effect program using Schema/Data contracts, a service tag, live and deterministic test layers, Effect Platform Command and typed tagged errors. Keep one-off mapping inline and avoid a helper per command. The command may invoke but must not reimplement or relocate root, SDK, docs or API validators. Do not manually manage processes or build a custom runtime wrapper; run the completed program at the runtime entrypoint only. Add a Changeset because release tooling is package-facing. Run all mandatory verification and three documented improvement audit passes. Report changed files, verification, Changeset impact, residual risks and call-graph alignment. Do not start another task; parent review and acceptance are required first.",
       "mandatoryVerification": [
-        "bun run --filter=@whattax/scripts test",
-        "bun run --filter=@whattax/scripts check-types",
-        "bun run --filter=@whattax/scripts build",
+        "bun run --filter=@taxkit/scripts test",
+        "bun run --filter=@taxkit/scripts check-types",
+        "bun run --filter=@taxkit/scripts build",
         "bun run verification",
         "bun run release:check",
         "bun run changeset status --verbose"
@@ -405,7 +405,7 @@
         "escalateAfterFailedTurn": 3
       },
       "completionCriteria": [
-        "@whattax/scripts is implemented and no longer documented as planned.",
+        "@taxkit/scripts is implemented and no longer documented as planned.",
         "release:check composes canonical commands through Effect Platform Command.",
         "Tests prove ordering and typed failure behavior with a deterministic layer.",
         "No package-owned validation logic moved into the scripts package.",
@@ -421,22 +421,22 @@
           ".changeset/curvy-flies-rhyme.md and this active execution evidence"
         ],
         "verification": [
-          "bun run --filter=@whattax/scripts test passed after correction: 1 file and 4 tests",
-          "bun run --filter=@whattax/scripts check-types passed",
-          "bun run --filter=@whattax/scripts build passed",
+          "bun run --filter=@taxkit/scripts test passed after correction: 1 file and 4 tests",
+          "bun run --filter=@taxkit/scripts check-types passed",
+          "bun run --filter=@taxkit/scripts build passed",
           "bun run verification passed, including Effect language-service checks, lint, formatting, Knip and 23 Turbo type/build prerequisite tasks",
           "bun run release:check passed all 9 ordered live checks: verification, test, build, docs validation, focused SDK pack, strict downstream consumer, API smoke, docs browser and Changeset status",
-          "bun run changeset status --verbose passed and reports @whattax/scripts 0.0.1 as a patch",
+          "bun run changeset status --verbose passed and reports @taxkit/scripts 0.0.1 as a patch",
           "Full lint, Knip, formatting and git diff --check passed"
         ],
         "qualityAudits": [
-          "Pass 1, command ownership and linear flow: every command and exact argument list was compared with its canonical root, SDK, API or docs package script. @whattax/scripts defines orchestration only. runReleaseReadiness is the single sequential Effect program and owns non-zero classification plus fail-fast behavior; live and deterministic layers do not duplicate that policy.",
+          "Pass 1, command ownership and linear flow: every command and exact argument list was compared with its canonical root, SDK, API or docs package script. @taxkit/scripts defines orchestration only. runReleaseReadiness is the single sequential Effect program and owns non-zero classification plus fail-fast behavior; live and deterministic layers do not duplicate that policy.",
           "Pass 2, contracts and boundaries: ReleaseCheck, ReleaseCommandOutcome and ReleaseReadinessReport are Schema tagged classes; expected failures including workspace-path restoration are Data tagged errors; ReleaseCommandRunner is a host-neutral Context service; separate live/test Layers use beta.98 ChildProcessSpawner or HashMap/Ref. The live layer requires the capability without choosing Bun. The runtime alone composes BunServices.layer, resolves Path.fromFileUrl and calls BunRuntime.runMain. The audit found no unsafe cast, unknown error/cause, local DTO mirror, manual path/environment/process lifecycle, raw Bun host API, mutable collection, async/await, switch or helper-per-command sprawl.",
           "Pass 3, deterministic evidence and integration: tests prove ordering, exact executable/args/cwd, ordered outcomes, non-zero and execution failures, short-circuit behavior and useful report, command-error and workspace-path-error rendering. The actual root command passed SDK pack/downstream, API smoke and docs browser owners without copying their implementations. Current canonical AGENTS/root/architecture/package-boundary/audit maps describe scripts as implemented, local Markdown paths resolve, the manual HTML snapshot is unchanged, and package ownership, testing docs, Knip and exact Oxlint boundary registration match the final implementation."
         ],
-        "changeset": ".changeset/curvy-flies-rhyme.md patches the new private @whattax/scripts package with a user-facing summary of the typed release-readiness workflow.",
-        "releaseTrainImpact": "Changesets reports @whattax/scripts 0.0.1 as an independent private-package patch. Existing fixed release-train and docs-package pending versions are unchanged; version-repo was not run.",
-        "callGraphAlignment": "Matches the spec after correction: root release:check -> @whattax/scripts release:check -> BunRuntime entrypoint -> BunServices.layer -> Path.fromFileUrl plus ReleaseCommandRunnerLive -> ChildProcessSpawner -> runReleaseReadiness -> ReleaseCommandRunner -> beta.98 ChildProcess Command -> canonical root/package-owned commands. Tests replace only the runner Layer and exercise the same primary program.",
+        "changeset": ".changeset/curvy-flies-rhyme.md patches the new private @taxkit/scripts package with a user-facing summary of the typed release-readiness workflow.",
+        "releaseTrainImpact": "Changesets reports @taxkit/scripts 0.0.1 as an independent private-package patch. Existing fixed release-train and docs-package pending versions are unchanged; version-repo was not run.",
+        "callGraphAlignment": "Matches the spec after correction: root release:check -> @taxkit/scripts release:check -> BunRuntime entrypoint -> BunServices.layer -> Path.fromFileUrl plus ReleaseCommandRunnerLive -> ChildProcessSpawner -> runReleaseReadiness -> ReleaseCommandRunner -> beta.98 ChildProcess Command -> canonical root/package-owned commands. Tests replace only the runner Layer and exercise the same primary program.",
         "correctionTurn1": "Replaced URL.pathname with typed Effect Path.fromFileUrl in the runtime; moved BunServices.layer composition out of ReleaseCommandRunnerLive and into the Bun entrypoint with Layer.provideMerge; added ReleaseWorkspacePathError rendering coverage; reconciled current AGENTS, root README, architecture overview, package boundaries and documentation audit package status; then reran four focused tests, type/build, verification, all nine live release gates, Changeset status, JSON/path/stale-reference/HTML/diff audits and three correction audit passes.",
         "residualRisks": [
           "Effect 4 process APIs remain under effect/unstable/process while the repository uses beta.98.",
@@ -466,13 +466,13 @@
         "documentation audit and repo status snapshot reconciliation",
         "completed task list and execution plan with validation log"
       ],
-      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read the spec, this task, implemented diff, architecture docs, documentation audit and status snapshot. Document only implemented behavior. Add a compact abstraction admission contract requiring owner, semantic weight, second consumer/substitution, simpler call graph and focused test. Strengthen route-high visible composition, semantic landmarks, constrained-footprint fallbacks and leaf-local command rules while preserving direct route-root restoration and boundary-only decoding. Reconcile package/agent/status docs and run the complete final gates. Do not create generated inventories or new abstractions just to document them. Run three documented improvement audit passes and report changed files, verification, final Changeset status, residual risks and call-graph alignment. Do not start another task; parent review and acceptance finalize the rollout.",
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list. Before editing, read the spec, this task, implemented diff, architecture docs, documentation audit and status snapshot. Document only implemented behavior. Add a compact abstraction admission contract requiring owner, semantic weight, second consumer/substitution, simpler call graph and focused test. Strengthen route-high visible composition, semantic landmarks, constrained-footprint fallbacks and leaf-local command rules while preserving direct route-root restoration and boundary-only decoding. Reconcile package/agent/status docs and run the complete final gates. Do not create generated inventories or new abstractions just to document them. Run three documented improvement audit passes and report changed files, verification, final Changeset status, residual risks and call-graph alignment. Do not start another task; parent review and acceptance finalize the rollout.",
       "mandatoryVerification": [
         "bun run verification",
         "bun run test",
         "bun run build",
         "bun run release:check",
-        "bun run --filter=@whattax/sdk validate:downstream",
+        "bun run --filter=@taxkit/sdk validate:downstream",
         "bun run changeset status --verbose",
         "task-list JSON parse and docs link/path audit"
       ],
@@ -513,7 +513,7 @@
           "bun run test passed the 6 route-boundary tests, 32 Oxlint tests with 71 assertions and 18 Turbo test tasks",
           "bun run build passed 14 of 14 workspace build tasks; the known upstream Effect PURE-annotation and web chunk-size warnings remain non-failing",
           "bun run release:check passed all 9 ordered canonical checks",
-          "bun run --filter=@whattax/sdk validate:downstream independently packed the 9-package closure and passed clean install, typecheck, SDK runtime, every public entrypoint and browser bundle with no runtime blockers",
+          "bun run --filter=@taxkit/sdk validate:downstream independently packed the 9-package closure and passed clean install, typecheck, SDK runtime, every public entrypoint and browser bundle with no runtime blockers",
           "bun run changeset status --verbose passed with 3 patch releases, 9 minor releases and no major release",
           "bun run --filter=docs test:browser passed 1 file and 7 tests",
           "bun run --filter=api smoke passed health, calculator catalogue, calculation and OpenAPI routes plus the external temporary consumer",
@@ -521,13 +521,13 @@
           "task-list JSON parsing, full rollout diff integrity, formatting and git diff --check passed"
         ],
         "qualityAudits": [
-          "Pass 1, graphs and ownership: compared the complete FND-001 through FND-005 diff with the spec. CI reads .bun-version and invokes root verification/test/build; nine dist-only packed packages remain owned by the SDK validator; oxlint.config.ts routes portable effect, bun and mdx plugins plus WhatTax boundary rules to real CLI fixtures; root release:check delegates to @whattax/scripts and then canonical owning commands; route transport still flows from schema encoding through TanStack transport to one direct route-root restore, Result match, route-high landmarks, smallest-owner fallbacks and focused leaves.",
+          "Pass 1, graphs and ownership: compared the complete FND-001 through FND-005 diff with the spec. CI reads .bun-version and invokes root verification/test/build; nine dist-only packed packages remain owned by the SDK validator; oxlint.config.ts routes portable effect, bun and mdx plugins plus TaxKit boundary rules to real CLI fixtures; root release:check delegates to @taxkit/scripts and then canonical owning commands; route transport still flows from schema encoding through TanStack transport to one direct route-root restore, Result match, route-high landmarks, smallest-owner fallbacks and focused leaves.",
           "Pass 2, Effect and abstraction quality: confirmed one beta.98 family, schema-backed release checks/outcomes/reports, tagged expected errors, host-neutral services, separate live/test Layers, runtime-only Bun ownership and linear Effect programs. No stale beta.60 API, compatibility shim, unsafe cast, local DTO mirror, unknown service error, decoder relocation or helper-per-command layer was introduced. Existing validator helpers name substantial pack, manifest, consumer or evidence boundaries. The new admission ledger requires owner, semantic weight, second consumer or substitution, a simpler graph and focused tests, and explicitly rejects one-use Effect, hook, provider, component and package sprawl.",
           "Pass 3, evidence and freshness: independently reran CI-equivalent verification/tests/builds, the nine-gate release command, strict tarball consumer, browser and API evidence, Changeset status, task JSON, link/path, symlink, package-status, stale-reference and diff audits. All nine packed release-closure manifests declare files and publishConfig exports, all compiled release packages clean dist, packages/scripts is implemented, packages/ui remains planned, and no generated inventory, publication, deployment, SEO, RPC or shared UI surface was claimed or added."
         ],
         "changeset": "No new Changeset is required for FND-005 because it changes developer architecture/process documentation, app/package README guidance, task evidence and the manual status snapshot only; no package export, runtime, endpoint or SDK behavior changes.",
-        "releaseTrainImpact": "Pending status is unchanged: @whattax/scripts, @whattax/docs-fumadocs and @whattax/docs-content are patch releases; @whattax/calculators, @whattax/core, @whattax/api-http, @whattax/sdk, @whattax/testing, @whattax/tsconfig and the three AU rule packages are minor releases; no major release is pending. version-repo and publication were not run.",
-        "callGraphAlignment": "All spec graphs remain accurate. Quality is GitHub Actions -> .bun-version -> frozen install -> verification/test/build. Release readiness is root command -> @whattax/scripts Bun runtime -> host-neutral runner -> canonical commands -> schema-backed outcomes. Packed validation is clean builds -> final dist-only tarballs -> clean consumer proofs. Lint is exact config -> portable/WhatTax plugins -> real binary fixtures. Frontend transport is server Effect -> encoded Exit -> TanStack transport -> direct route-root restore/Result match -> visible composition -> focused readonly leaves.",
+        "releaseTrainImpact": "Pending status is unchanged: @taxkit/scripts, @taxkit/docs-fumadocs and @taxkit/docs-content are patch releases; @taxkit/calculators, @taxkit/core, @taxkit/api-http, @taxkit/sdk, @taxkit/testing, @taxkit/tsconfig and the three AU rule packages are minor releases; no major release is pending. version-repo and publication were not run.",
+        "callGraphAlignment": "All spec graphs remain accurate. Quality is GitHub Actions -> .bun-version -> frozen install -> verification/test/build. Release readiness is root command -> @taxkit/scripts Bun runtime -> host-neutral runner -> canonical commands -> schema-backed outcomes. Packed validation is clean builds -> final dist-only tarballs -> clean consumer proofs. Lint is exact config -> portable/TaxKit plugins -> real binary fixtures. Frontend transport is server Effect -> encoded Exit -> TanStack transport -> direct route-root restore/Result match -> visible composition -> focused readonly leaves.",
         "residualRisks": [
           "Effect 4 and its process APIs remain beta; builds still emit a non-failing upstream PURE-annotation warning.",
           "Exact lint boundary lists, codec-family names and release command definitions require deliberate maintenance as owners evolve; dynamic and interprocedural aliases remain review-only.",

@@ -8,7 +8,7 @@ confidence: medium
 # Release readiness 2026-07-01
 
 Goal:
-Validate and version the current WhatTax release train, record package and
+Validate and version the current TaxKit release train, record package and
 documentation evidence, and identify the remaining publication gates without
 publishing packages.
 
@@ -35,7 +35,7 @@ any package.
 | Root verification | complete | `bun run verification` passed after the release-readiness fixes. |
 | Workspace tests | complete | `bun run test` passed after setting an explicit docs-content test timeout. |
 | Workspace builds | complete | `bun run build` passed. |
-| Docs gates | complete | `bun run docs:validate`, `bun run docs:build` and `bun run --filter=@whattax/docs-content test` passed. |
+| Docs gates | complete | `bun run docs:validate`, `bun run docs:build` and `bun run --filter=@taxkit/docs-content test` passed. |
 | SDK gates | complete | SDK tests, type tests, import-boundary checks, build and packed-artifact smoke checks passed. |
 | Changeset audit | complete | Pending Changesets produce patch bumps only. |
 | Versioning | complete | `bun run version-repo` consumed pending Changesets and generated `0.0.2` package versions and changelogs. |
@@ -54,13 +54,13 @@ any package.
 
 - `bun run changeset status --verbose` passed and reported patch bumps only.
 - `bun run verification` passed.
-- `bun run test` initially failed in `@whattax/docs-content` because
+- `bun run test` initially failed in `@taxkit/docs-content` because
   `serves pages through DocsContentServiceLive` exceeded Vitest's default
   5000 ms test timeout.
 - Reran the docs-content policy test with a 20000 ms timeout; it passed in
   6.82 s.
 - Updated `packages/docs-content/vitest.config.ts` with `testTimeout: 10_000`.
-- `bun run --filter=@whattax/docs-content test` passed after the timeout
+- `bun run --filter=@taxkit/docs-content test` passed after the timeout
   change.
 - `bun run test` then passed for all workspace test tasks.
 
@@ -75,11 +75,11 @@ any package.
 
 ### 2026-07-01 - SDK release checks
 
-- `bun run --filter=@whattax/sdk test` passed.
-- `bun run --filter=@whattax/sdk build` passed.
-- `bun run --filter=@whattax/sdk test-types` passed.
-- `bun run --filter=@whattax/sdk check-boundaries` passed.
-- `bun run --filter=@whattax/sdk check-packed-artifact` initially failed
+- `bun run --filter=@taxkit/sdk test` passed.
+- `bun run --filter=@taxkit/sdk build` passed.
+- `bun run --filter=@taxkit/sdk test-types` passed.
+- `bun run --filter=@taxkit/sdk check-boundaries` passed.
+- `bun run --filter=@taxkit/sdk check-packed-artifact` initially failed
   because the smoke script checked the stale `effect.calculate` export name.
 - Audited current SDK exports and docs. The current Effect entrypoint exports
   `calculateRunRequest`, `calculateReportRequest`, `calculateReport` and
@@ -87,16 +87,16 @@ any package.
 - Updated
   `packages/sdk/typescript/scripts/check-packed-artifact.ts` to smoke the
   current Effect API names.
-- `bun run --filter=@whattax/sdk check-packed-artifact` then passed with
+- `bun run --filter=@taxkit/sdk check-packed-artifact` then passed with
   packed import smoke and packed artifact checks.
 
 ### 2026-07-01 - Package-name check
 
 Fresh npm registry checks returned 404 for:
 
-- `whattax`
-- `@whattax/sdk`
-- `@whattax/core`
+- `taxkit`
+- `@taxkit/sdk`
+- `@taxkit/core`
 
 Treat this as availability evidence from 2026-07-01, not a reservation. Recheck
 immediately before any publication action.
@@ -114,12 +114,12 @@ immediately before any publication action.
 - Pending Changeset files were consumed.
 - Package versions and package changelogs were updated for the `0.0.2` patch
   release train.
-- Added explicit changelog notes for fixed-release-only `@whattax/testing` and
-  `@whattax/tsconfig` version bumps.
+- Added explicit changelog notes for fixed-release-only `@taxkit/testing` and
+  `@taxkit/tsconfig` version bumps.
 - Post-version `bun run verification` passed.
 - Post-version `bun run test` passed.
 - Post-version `bun run build` passed.
-- Post-version `bun run --filter=@whattax/sdk check-packed-artifact` passed.
+- Post-version `bun run --filter=@taxkit/sdk check-packed-artifact` passed.
 - Post-version `bun run changeset status --verbose` returned the expected
   release-commit failure because package files changed and the Changeset files
   had been consumed. Do not add a replacement Changeset for the version commit.
@@ -128,17 +128,17 @@ immediately before any publication action.
 
 The versioned release train is patch-only:
 
-- `@whattax/sdk` -> `0.0.2`
-- `@whattax/http-api` -> `0.0.2`
-- `@whattax/calculators` -> `0.0.2`
-- `@whattax/core` -> `0.0.2`
-- `@whattax/rules-au-income-tax` -> `0.0.2`
-- `@whattax/rules-au-pay` -> `0.0.2`
-- `@whattax/docs-content` -> `0.0.2`
-- `@whattax/docs-fumadocs` -> `0.0.2`
-- `@whattax/rules-au-stsl` -> `0.0.2`
-- `@whattax/testing` -> `0.0.2`
-- `@whattax/tsconfig` -> `0.0.2`
+- `@taxkit/sdk` -> `0.0.2`
+- `@taxkit/http-api` -> `0.0.2`
+- `@taxkit/calculators` -> `0.0.2`
+- `@taxkit/core` -> `0.0.2`
+- `@taxkit/rules-au-income-tax` -> `0.0.2`
+- `@taxkit/rules-au-pay` -> `0.0.2`
+- `@taxkit/docs-content` -> `0.0.2`
+- `@taxkit/docs-fumadocs` -> `0.0.2`
+- `@taxkit/rules-au-stsl` -> `0.0.2`
+- `@taxkit/testing` -> `0.0.2`
+- `@taxkit/tsconfig` -> `0.0.2`
 
 The release contains no minor or major bumps.
 
@@ -156,8 +156,8 @@ The release contains no minor or major bumps.
 
 - Package names remain unreserved until publication. Recheck npm immediately
   before publishing.
-- Publication still requires explicit approval to choose `whattax` versus
-  `@whattax/sdk`, remove `private: true` and publish.
+- Publication still requires explicit approval to choose `taxkit` versus
+  `@taxkit/sdk`, remove `private: true` and publish.
 - Build warnings from upstream Effect/Rolldown pure annotations remain
   warning-level. They should be monitored, but they are not a release blocker
   for this validation pass.

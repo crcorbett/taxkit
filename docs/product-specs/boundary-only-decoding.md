@@ -9,7 +9,7 @@ confidence: high
 
 ## Overview
 
-WhatTax should decode unknown or representation-level values only where they
+TaxKit should decode unknown or representation-level values only where they
 cross an explicit trust or type-erasure boundary. After a value has been
 decoded with its owning Effect Schema, internal code should pass the resulting
 schema-derived type without decoding it again.
@@ -29,7 +29,7 @@ decoding, Effect runtime execution and service acquisition.
 ## Outcome
 
 Implemented on 2026-07-13. The repository now enforces exact reviewed decoder
-placement with `whattax/no-decoding-outside-boundaries`; calculator catalogue
+placement with `taxkit/no-decoding-outside-boundaries`; calculator catalogue
 dispatch enters typed rule scenario continuations without re-decoding facts;
 SDK descriptor narrowing uses a direct Effect decoder; and docs route loaders
 normalise transport data to typed `Result` values before React composition.
@@ -65,7 +65,7 @@ That weakens package contracts:
 - a new decoder call may appear without an explicit ownership decision
 
 Before implementation, the calculator flow demonstrated the risk. The HTTP
-contract decoded the public request union, `@whattax/calculators` decoded the
+contract decoded the public request union, `@taxkit/calculators` decoded the
 selected calculator's input schema, and the rule-owned scenario layer decoded
 the same facts again. The selected-calculator decode remains required because
 the route schema cannot depend on `calculatorId`; the later scenario-layer
@@ -87,7 +87,7 @@ render. Loaders now restore a typed `Result` before React composition begins.
 Historical: calculator input before DECODE-003
 
 HTTP request body
-  -> @whattax/api-http CalculatorRunRequest decode
+  -> @taxkit/api-http CalculatorRunRequest decode
     -> PublicCalculatorService.calculate
       -> CalculatorCatalogEntry.inputSchema decode
         -> erased entry.calculate(facts, validationIssues) continuation
@@ -101,7 +101,7 @@ HTTP request body
 Production: calculator input after DECODE-003
 
 HTTP request body
-  -> @whattax/api-http CalculatorRunRequest decode boundary
+  -> @taxkit/api-http CalculatorRunRequest decode boundary
     -> PublicCalculatorService.calculate
       -> calculator catalogue dispatch boundary
         -> policy-owning generic catalogue entry
@@ -150,7 +150,7 @@ Static analysis: target
 
 non-boundary source file
   -> executable decode call
-    -> whattax/no-decoding-outside-boundaries error
+    -> taxkit/no-decoding-outside-boundaries error
 
 exact allowlisted boundary file
   -> only the boundary-decoding rule is disabled
@@ -221,7 +221,7 @@ owns the selected-calculator and SDK descriptor call graphs.
 [Frontend](../architecture/frontend.md) owns loader/runtime placement and
 React component composition boundaries.
 
-`tools/oxlint/whattax-rules.js` owns the repository-specific AST rule.
+`tools/oxlint/taxkit-rules.js` owns the repository-specific AST rule.
 `oxlint.config.ts` owns the exact file allowlist and is the source of truth for
 which files may execute decoders. Architecture docs should define categories
 and review requirements rather than duplicate a path inventory that can drift.
@@ -240,7 +240,7 @@ Executable decoding is allowed only when one of these conditions is true:
 - an exported API intentionally accepts `unknown` and owns validation of that
   public input
 - an external library exposes representation-level or unknown data that must
-  be normalised into a canonical WhatTax type
+  be normalised into a canonical TaxKit type
 - dynamic catalogue or descriptor selection has erased the concrete schema
   type and the selected schema must restore it before a typed continuation
 - a focused boundary test proves one of these contracts
@@ -283,7 +283,7 @@ exact file is allowlisted.
 
 ### Add the Oxlint rule
 
-Add `whattax/no-decoding-outside-boundaries` to the existing WhatTax plugin and
+Add `taxkit/no-decoding-outside-boundaries` to the existing TaxKit plugin and
 enable it globally. The rule should report executable decoder use, including:
 
 - Effect Schema runtime decoder calls such as `Schema.decodeUnknownEffect`,
@@ -334,7 +334,7 @@ registration and configuration are tested with the AST logic.
 
 Define a named `decodingBoundaryFiles` list in `oxlint.config.ts`. Apply an
 override that turns off only
-`whattax/no-decoding-outside-boundaries` for those paths.
+`taxkit/no-decoding-outside-boundaries` for those paths.
 
 Do not add these files to `ignorePatterns`. Do not use package-wide globs,
 `**/*.test.ts`, `**/*.runtime.ts` or `**/*.boundary.ts` as automatic
@@ -585,11 +585,11 @@ Required final gates:
 ```bash
 bun run lint
 bun run test
-bun run --filter=@whattax/calculators test
-bun run --filter=@whattax/sdk test
-bun run --filter=@whattax/sdk test-types
-bun run --filter=@whattax/sdk check-boundaries
-bun run --filter=@whattax/api-http test
+bun run --filter=@taxkit/calculators test
+bun run --filter=@taxkit/sdk test
+bun run --filter=@taxkit/sdk test-types
+bun run --filter=@taxkit/sdk check-boundaries
+bun run --filter=@taxkit/api-http test
 bun run --filter=api smoke:public-routes
 bun run --filter=web check-types
 bun run --filter=docs check-types
@@ -641,7 +641,7 @@ implementation.
 
 - Canonical docs state that executable decoding belongs only at explicit trust
   or type-erasure boundaries.
-- `whattax/no-decoding-outside-boundaries` is enabled globally.
+- `taxkit/no-decoding-outside-boundaries` is enabled globally.
 - `oxlint.config.ts` contains an exact, reviewed boundary-file allowlist and
   disables only this rule for those files.
 - Broad package, runtime, boundary-name and test globs are not used as

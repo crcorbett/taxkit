@@ -1,25 +1,25 @@
 ---
 title: "Overview"
-description: "Learn where to start with the WhatTax SDK and HTTP API."
+description: "Learn where to start with the TaxKit SDK and HTTP API."
 status: "draft"
 ---
 
 # Overview
 
-Use WhatTax when you need source-backed tax calculations from TypeScript or
+Use TaxKit when you need source-backed tax calculations from TypeScript or
 over HTTP. Start with the TypeScript SDK when your application can import
-WhatTax packages. Use the HTTP API when the caller is a browser, another
+TaxKit packages. Use the HTTP API when the caller is a browser, another
 language or a service boundary that should not run the SDK in-process.
 
 ## Choose your first path
 
-| You need to                                           | Start with                                        |
-| ----------------------------------------------------- | ------------------------------------------------- |
-| Run one calculation from TypeScript                   | [Quickstart](./quickstart.mdx)                    |
-| Add WhatTax to a server application                   | [Plain SDK](../sdk/plain-sdk.mdx)                 |
-| Return typed success or failure values                | [Safe SDK](../sdk/safe-sdk.mdx)                   |
-| Compose WhatTax inside an Effect application          | [Effect SDK](../sdk/effect-sdk.mdx)               |
-| Call WhatTax from a browser or non-TypeScript service | [Choose SDK or HTTP API](./choose-sdk-or-api.mdx) |
+| You need to                                          | Start with                                        |
+| ---------------------------------------------------- | ------------------------------------------------- |
+| Run one calculation from TypeScript                  | [Quickstart](./quickstart.mdx)                    |
+| Add TaxKit to a server application                   | [Plain SDK](../sdk/plain-sdk.mdx)                 |
+| Return typed success or failure values               | [Safe SDK](../sdk/safe-sdk.mdx)                   |
+| Compose TaxKit inside an Effect application          | [Effect SDK](../sdk/effect-sdk.mdx)               |
+| Call TaxKit from a browser or non-TypeScript service | [Choose SDK or HTTP API](./choose-sdk-or-api.mdx) |
 
 ## How the public surfaces fit
 
@@ -27,16 +27,16 @@ language or a service boundary that should not run the SDK in-process.
 Production: public integration surfaces
 
 TypeScript application
-  -> @whattax/sdk plain facade
+  -> @taxkit/sdk plain facade
     -> calculator service
 
 Effect application or in-process transport
-  -> @whattax/sdk/effect
+  -> @taxkit/sdk/effect
     -> calculator service
 
 Browser or non-TypeScript caller
   -> HTTP API
-    -> @whattax/sdk/effect
+    -> @taxkit/sdk/effect
       -> calculator service
 ```
 

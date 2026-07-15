@@ -6,7 +6,7 @@ status: "draft"
 
 # Calculators
 
-A calculator is the public unit you ask WhatTax to run. It accepts canonical
+A calculator is the public unit you ask TaxKit to run. It accepts canonical
 facts, composes the matching rules and returns a schema-backed report.
 
 ## When this matters
@@ -26,7 +26,7 @@ CalculatorRunRequest
 ```
 
 For most TypeScript callers, use `au.incomeTax.annual` or
-`WhatTax.calculate`. For HTTP callers, pass the calculator ID in the route and
+`TaxKit.calculate`. For HTTP callers, pass the calculator ID in the route and
 the facts in the `CalculatorRunRequest` body.
 
 ## Related concepts

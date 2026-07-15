@@ -18,7 +18,7 @@ question prompt for a calculator.
 - Check whether an existing fact descriptor already covers the tax behaviour.
 
 Shared primitives, `FactId` and common descriptor contracts live in
-`@whattax/core`. Rule-specific facts should live in the rule package that owns
+`@taxkit/core`. Rule-specific facts should live in the rule package that owns
 the rule, parameter table and golden tests.
 
 ## Proposal
@@ -46,7 +46,7 @@ export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
   period: PayPeriod,
 }) {}
 
-export class GrossPayFact extends Context.Tag("whattax/fact/GrossPay")<
+export class GrossPayFact extends Context.Tag("taxkit/fact/GrossPay")<
   GrossPayFact,
   GrossPay
 >() {}

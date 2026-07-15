@@ -18,7 +18,7 @@ description: "Use the TypeScript SDK from plain TypeScript or Effect application
 
 # SDK
 
-Use this section when you want to call WhatTax from TypeScript and keep
+Use this section when you want to call TaxKit from TypeScript and keep
 calculator inputs, reports and expected errors typed.
 
 ## Planned pages

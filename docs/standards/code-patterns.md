@@ -1,6 +1,6 @@
 # Code Patterns
 
-WhatTax is an Effect-native TypeScript library. Code should make invalid
+TaxKit is an Effect-native TypeScript library. Code should make invalid
 calculation states difficult to represent, keep official rule data separate
 from algorithms, and expose enough metadata for graph validation, traces, and
 documentation.
@@ -25,7 +25,7 @@ Effect-native primitives are mandatory where they fit. Use `Data`, `Schema`,
   package boundary or appears in traces, ledgers, reports, or descriptors.
 
 ```ts
-export const TaxYear = Schema.String.pipe(Schema.brand("whattax/TaxYear"));
+export const TaxYear = Schema.String.pipe(Schema.brand("taxkit/TaxYear"));
 export type TaxYear = typeof TaxYear.Type;
 
 export const taxYear = (value: string): TaxYear => TaxYear.make(value);
@@ -262,7 +262,7 @@ the calculation program, rule-pack layer, and scenario layer; the engine provide
 the environment and returns the report with diagnostics.
 
 ```ts
-import { CalculationEngine, CalculationEngineLive } from "@whattax/core/engine";
+import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
 import { Effect, Layer } from "effect";
 
 const program = Effect.gen(function* () {

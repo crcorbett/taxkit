@@ -71,8 +71,8 @@ stop the rollout and record a blocker for replan or user decision.
   schemas, the calculator live layer, affected AU rule trace producers, and
   `.changeset/effect-beta-98.md`.
 - Changeset: `.changeset/effect-beta-98.md` patches
-  `@whattax/calculators`, `@whattax/docs-content`,
-  `@whattax/docs-fumadocs`, and `@whattax/rules-au-pay`. The fixed-group rule
+  `@taxkit/calculators`, `@taxkit/docs-content`,
+  `@taxkit/docs-fumadocs`, and `@taxkit/rules-au-pay`. The fixed-group rule
   propagates the rules-pay patch across the fixed release train, including the
   touched income-tax and STSL packages. Existing pending Changesets currently
   make the aggregate fixed-train and calculators release minor; docs-content
@@ -188,8 +188,8 @@ stop the rollout and record a blocker for replan or user decision.
   and success mode remain removed; strict failure diagnostics remain for real
   future manifest regressions.
 - Mandatory verification passed: `bun run verification`, `bun run test`,
-  `bun run build`, `bun run --filter=@whattax/sdk check-packed-artifact`,
-  `bun run --filter=@whattax/sdk validate:downstream`, the integrated final
+  `bun run build`, `bun run --filter=@taxkit/sdk check-packed-artifact`,
+  `bun run --filter=@taxkit/sdk validate:downstream`, the integrated final
   tarball manifest audit, and `bun run changeset status --verbose`.
 - Changeset: `.changeset/deterministic-release-artifacts.md` records the
   package-facing build, publication and validation changes. Existing pending
@@ -239,12 +239,12 @@ stop the rollout and record a blocker for replan or user decision.
   exclusively builds and validates the nine-package closure. No live reference
   targets the old filename and the scoped workspace is removed on success and
   typed failure.
-- Focused evidence: `whattax-sdk-0.0.4.tgz` contained 38 files, all export
+- Focused evidence: `taxkit-sdk-0.0.4.tgz` contained 38 files, all export
   targets resolved, dependency ranges were concrete, source/tests were absent,
   six SDK entrypoint groups imported, and cleanup completed.
 - Mandatory verification passed after the rewrite:
-  `bun run --filter=@whattax/sdk check-packed-artifact`,
-  `bun run --filter=@whattax/sdk validate:downstream`,
+  `bun run --filter=@taxkit/sdk check-packed-artifact`,
+  `bun run --filter=@taxkit/sdk validate:downstream`,
   `bun run verification`, `bun run test`, `bun run build`,
   `bun run changeset status --verbose`, JSON parsing and `git diff --check`.
 - FND-002 remains ready for parent review rather than complete. FND-003 remains
@@ -270,8 +270,8 @@ stop the rollout and record a blocker for replan or user decision.
 
 - Split portable contracts into `effect/*`, `bun/*` and `mdx/*`; retained
   decoder placement, direct route restoration and calculator/domain policy
-  under `whattax/*`. Removed the superseded switch plugin and reduced the
-  WhatTax plugin without weakening either boundary rule.
+  under `taxkit/*`. Removed the superseded switch plugin and reduced the
+  TaxKit plugin without weakening either boundary rule.
 - Enabled seven repository-wide Effect rules, four semantically scoped Effect
   contract/test rules, two repository-wide Bun rules and one docs-route MDX
   rule. `oxlint.config.ts` owns all exact egress, runtime, process, console, Bun
@@ -286,7 +286,7 @@ stop the rollout and record a blocker for replan or user decision.
   brittle text search was added.
 - Audit pass 1 confirmed current encoder, codec, runtime, host, test-global and
   MDX callsites align with exact config scopes. Portable messages contain no
-  WhatTax package or tax policy, while calculator rules remain scoped to their
+  TaxKit package or tax policy, while calculator rules remain scoped to their
   existing package owner.
 - Audit pass 2 confirmed messages name current canonical Schema, Match, Config,
   Context/Layer and Effect Platform alternatives. The only decoder-list change
@@ -306,7 +306,7 @@ stop the rollout and record a blocker for replan or user decision.
   in the package export map and only its internal snapshot test consumes the
   new Effect result; no public package, endpoint or SDK contract changes.
 - Call graph matches the spec:
-  `oxlint.config.ts -> effect|bun|mdx|whattax plugin -> real CLI fixtures`.
+  `oxlint.config.ts -> effect|bun|mdx|taxkit plugin -> real CLI fixtures`.
   Codec migrations remain
   `unknown docs input -> Schema decoder -> typed docs service -> route encoder`
   and `generated OpenAPI -> Schema decoder -> normalizer -> snapshot Effect`.
@@ -356,7 +356,7 @@ stop the rollout and record a blocker for replan or user decision.
   canonical command then passed.
 - Call graph remains
   `oxlint.config.ts -> effect|bun plugin -> binding tracker -> real CLI fixture`
-  alongside the unchanged `mdx|whattax` plugin paths. Codec migrations remain
+  alongside the unchanged `mdx|taxkit` plugin paths. Codec migrations remain
   linear and typed. Dynamic or interprocedural alias flow is review-only;
   exact boundary lists and future Effect codec-family changes still require
   maintenance.
@@ -398,7 +398,7 @@ stop the rollout and record a blocker for replan or user decision.
 
 ### 2026-07-14 - FND-004 ready for parent review
 
-- Implemented the private `@whattax/scripts` workspace package with
+- Implemented the private `@taxkit/scripts` workspace package with
   schema-backed `ReleaseCheck`, `ReleaseCommandOutcome` and
   `ReleaseReadinessReport` contracts; `ReleaseCommandExecutionError`,
   `ReleaseCheckFailedError` and `ReleaseWorkspacePathError` tagged errors; and
@@ -445,14 +445,14 @@ stop the rollout and record a blocker for replan or user decision.
   root integration, Knip, Oxlint exact boundaries and the actual nine-step live
   command all pass.
 - Mandatory verification passed:
-  `bun run --filter=@whattax/scripts test` (1 file, 4 tests),
-  `bun run --filter=@whattax/scripts check-types`,
-  `bun run --filter=@whattax/scripts build`, `bun run verification` (23 Turbo
+  `bun run --filter=@taxkit/scripts test` (1 file, 4 tests),
+  `bun run --filter=@taxkit/scripts check-types`,
+  `bun run --filter=@taxkit/scripts build`, `bun run verification` (23 Turbo
   type/build prerequisite tasks), `bun run release:check` (9 ordered checks),
   `bun run changeset status --verbose`, full lint, Knip, formatting and
   `git diff --check`.
 - Changeset `.changeset/curvy-flies-rhyme.md` records a patch for the new
-  private `@whattax/scripts` package, producing pending version `0.0.1` without
+  private `@taxkit/scripts` package, producing pending version `0.0.1` without
   consuming or altering the fixed release-train Changesets.
 - The final call graph matches the spec:
   `root release:check -> package release:check -> BunRuntime entrypoint ->
@@ -495,14 +495,14 @@ stop the rollout and record a blocker for replan or user decision.
   unknown error/cause, helper-per-command layer, manual path/process/env code,
   raw Bun API, `async`/`await`, `switch` or mutable collection was added.
 - Fresh mandatory verification passed after correction:
-  `bun run --filter=@whattax/scripts test` (1 file, 4 tests), package
+  `bun run --filter=@taxkit/scripts test` (1 file, 4 tests), package
   check-types and build, `bun run verification` (23 successful Turbo
   prerequisites), the full `bun run release:check` (all 9 ordered live gates),
   Changeset status, task JSON parse, canonical Markdown path audit, stale
   current-reference scan, HTML no-diff check and `git diff --check`.
 - Changeset and release impact remain unchanged:
   `.changeset/curvy-flies-rhyme.md` produces the independent private-package
-  patch `@whattax/scripts@0.0.1`; no Changeset was consumed and FND-005 was not
+  patch `@taxkit/scripts@0.0.1`; no Changeset was consumed and FND-005 was not
   started.
 
 ### 2026-07-14 - FND-004 parent acceptance
@@ -523,7 +523,7 @@ stop the rollout and record a blocker for replan or user decision.
   focused proof. The contract rejects speculative reuse and one-use Effect,
   React and package wrappers.
 - Applied that contract to Effect service/layer composition, test review and
-  the implemented `@whattax/scripts` workflow without adding a code
+  the implemented `@taxkit/scripts` workflow without adding a code
   abstraction. Strengthened frontend ownership around direct route-root
   restoration, route-high shell and semantic landmarks, smallest-owner stable
   fallbacks, focused readonly leaf props, leaf-local presentation commands and
@@ -545,7 +545,7 @@ stop the rollout and record a blocker for replan or user decision.
 - Audit pass 1 compared final graphs and owners. CI remains `.bun-version ->
   frozen install -> verification/test/build`; packed validation remains clean
   package builds and dist-only manifests -> actual tarballs -> clean consumer;
-  lint remains exact config -> portable/WhatTax rules -> real Oxlint fixtures;
+  lint remains exact config -> portable/TaxKit rules -> real Oxlint fixtures;
   release remains root command -> scripts runtime/runner -> canonical commands;
   frontend remains encoded transport -> direct restore/Result match -> visible
   composition -> focused leaves.
@@ -584,11 +584,11 @@ stop the rollout and record a blocker for replan or user decision.
 
 ## Decisions
 
-- Preserve WhatTax's exact decoder allowlist and direct route-consumer restore
+- Preserve TaxKit's exact decoder allowlist and direct route-consumer restore
   model; the `site` repository is a reference, not a source of weaker policy.
 - Implement only actionable portable patterns. Deployment, release PR, SEO,
   RPC, shared UI, URL-state and generated-inventory work stays out of scope.
-- Keep package-owned validation in place. `@whattax/scripts` orchestrates the
+- Keep package-owned validation in place. `@taxkit/scripts` orchestrates the
   release graph but does not absorb validator implementations.
 
 ## Open Risks

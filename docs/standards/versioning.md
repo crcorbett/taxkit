@@ -1,6 +1,6 @@
 # Versioning And Changesets
 
-WhatTax uses Changesets to manage package versions and package changelogs.
+TaxKit uses Changesets to manage package versions and package changelogs.
 Public apps can also maintain curated app-level changelogs for public
 contracts, deployments and operational changes that are meaningful outside npm
 package installation. The root `CHANGELOG.md` is the curated release-train
@@ -8,16 +8,16 @@ changelog for humans reading the repository as one product.
 
 ## Release Train Policy
 
-All `@whattax/*` packages are in one fixed version group:
+All `@taxkit/*` packages are in one fixed version group:
 
-- `@whattax/core`
-- `@whattax/api-http`
-- `@whattax/rules-au-income-tax`
-- `@whattax/rules-au-pay`
-- `@whattax/rules-au-stsl`
-- `@whattax/sdk`
-- `@whattax/testing`
-- `@whattax/tsconfig`
+- `@taxkit/core`
+- `@taxkit/api-http`
+- `@taxkit/rules-au-income-tax`
+- `@taxkit/rules-au-pay`
+- `@taxkit/rules-au-stsl`
+- `@taxkit/sdk`
+- `@taxkit/testing`
+- `@taxkit/tsconfig`
 
 When any package in this group is released, every package in the group receives
 the same version. This follows the Effect-style release train model: packages
@@ -34,7 +34,7 @@ The repository config lives in `.changeset/config.json`.
 
 Important settings:
 
-- `fixed`: keeps all `@whattax/*` packages on the same version.
+- `fixed`: keeps all `@taxkit/*` packages on the same version.
 - `privatePackages.version: true`: package versions are managed even while
   packages remain `private: true`.
 - `privatePackages.tag: true`: release tags can still be created for private

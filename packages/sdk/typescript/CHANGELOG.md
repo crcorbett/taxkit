@@ -1,4 +1,4 @@
-# @whattax/sdk
+# @taxkit/sdk
 
 ## 0.1.0
 
@@ -9,30 +9,30 @@
 - 2dc693a: Make package builds and release artifacts deterministic with clean compilation,
   dist-only publication exports, concrete packed dependency ranges, and
   Effect-native scoped validators for focused SDK artifacts and strict clean
-  consumers across the complete WhatTax release package graph.
+  consumers across the complete TaxKit release package graph.
 - 9814598: Add an SDK-owned downstream consumer validation command that builds and packs the SDK runtime closure, creates an external temp workspace, and reports release-blocking packed manifest protocols before claiming clean install readiness.
 - Updated dependencies [a3a39e7]
 - Updated dependencies [2dc693a]
 - Updated dependencies [6b307e3]
-  - @whattax/calculators@0.1.0
-  - @whattax/rules-au-income-tax@0.1.0
-  - @whattax/rules-au-pay@0.1.0
+  - @taxkit/calculators@0.1.0
+  - @taxkit/rules-au-income-tax@0.1.0
+  - @taxkit/rules-au-pay@0.1.0
 
 ## 0.0.4
 
 ### Patch Changes
 
-- @whattax/rules-au-income-tax@0.0.4
-- @whattax/rules-au-pay@0.0.4
-- @whattax/calculators@0.0.4
+- @taxkit/rules-au-income-tax@0.0.4
+- @taxkit/rules-au-pay@0.0.4
+- @taxkit/calculators@0.0.4
 
 ## 0.0.3
 
 ### Patch Changes
 
-- @whattax/rules-au-income-tax@0.0.3
-- @whattax/rules-au-pay@0.0.3
-- @whattax/calculators@0.0.3
+- @taxkit/rules-au-income-tax@0.0.3
+- @taxkit/rules-au-pay@0.0.3
+- @taxkit/calculators@0.0.3
 
 ## 0.0.2
 
@@ -62,6 +62,6 @@
 - Updated dependencies [b632995]
 - Updated dependencies [d95715b]
 - Updated dependencies [8bd7c21]
-  - @whattax/calculators@0.0.2
-  - @whattax/rules-au-income-tax@0.0.2
-  - @whattax/rules-au-pay@0.0.2
+  - @taxkit/calculators@0.0.2
+  - @taxkit/rules-au-income-tax@0.0.2
+  - @taxkit/rules-au-pay@0.0.2

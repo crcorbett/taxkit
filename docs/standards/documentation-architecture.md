@@ -12,7 +12,7 @@ new documentation ownership.
 
 ## Source-of-truth layers
 
-WhatTax uses different docs layers for different readers:
+TaxKit uses different docs layers for different readers:
 
 | Layer | Reader | Owns |
 | --- | --- | --- |
@@ -98,8 +98,8 @@ Prefer fenced call graphs for runtime and package ownership:
 Production: HTTP calculate
 
 HTTP caller
-  -> @whattax/api-http route contract
-    -> @whattax/sdk/effect calculateRunRequest
+  -> @taxkit/api-http route contract
+    -> @taxkit/sdk/effect calculateRunRequest
       -> PublicCalculatorService.calculate
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: prd-writer
-description: "Thin router for WhatTax spec authoring. Use when writing a SPEC, PRD, or feature proposal so the work follows canonical docs instead of inventing a new PRD bundle."
+description: "Thin router for TaxKit spec authoring. Use when writing a SPEC, PRD, or feature proposal so the work follows canonical docs instead of inventing a new PRD bundle."
 ---
 
 # PRD Writer
@@ -108,7 +108,7 @@ and parent review before the next task begins.
 Use this block in generated task-list delegation prompts:
 
 ```md
-You are implementing exactly one task from the WhatTax spec/task list.
+You are implementing exactly one task from the TaxKit spec/task list.
 
 Before editing:
 

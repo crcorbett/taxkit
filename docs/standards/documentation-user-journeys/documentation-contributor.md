@@ -11,7 +11,7 @@ Reader:
 : A contributor writing or updating docs.
 
 Need:
-: Follow the WhatTax documentation style, page templates and review process.
+: Follow the TaxKit documentation style, page templates and review process.
 
 Likely pages:
 

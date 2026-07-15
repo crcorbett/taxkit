@@ -23,10 +23,10 @@ updated when package publishing or a real hosting target becomes real.
 - `apps/api` runs as a Bun HTTP server and serves `/api/*`.
 - `apps/web` builds through Vite/TanStack Start and calls `apps/api` over HTTP.
 - `apps/docs` builds through TanStack Start and renders public MDX docs through
-  `@whattax/docs-content` and `@whattax/docs-fumadocs`.
-- `@whattax/api-http` builds as a package and exposes health, generated docs,
+  `@taxkit/docs-content` and `@taxkit/docs-fumadocs`.
+- `@taxkit/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
-- `@whattax/sdk` builds as a private package for local and downstream
+- `@taxkit/sdk` builds as a private package for local and downstream
   validation. It has not been published to npm.
 
 ## Planned runtime shape
@@ -47,11 +47,11 @@ bun run --filter=web dev
 bun run --filter=docs dev
 ```
 
-`apps/api` dev runs through portless as `https://api.whattax.localhost`.
-`apps/web` dev injects that URL into `WHATTAX_API_BASE_URL` and
-`VITE_WHATTAX_API_BASE_URL` before serving through portless as
-`https://whattax.localhost`. `apps/docs` serves through portless as
-`https://docs.whattax.localhost`. Production deployment should provide
+`apps/api` dev runs through portless as `https://api.taxkit.localhost`.
+`apps/web` dev injects that URL into `TAXKIT_API_BASE_URL` and
+`VITE_TAXKIT_API_BASE_URL` before serving through portless as
+`https://taxkit.localhost`. `apps/docs` serves through portless as
+`https://docs.taxkit.localhost`. Production deployment should provide
 equivalent API base URL environment values explicitly.
 
 ## Guardrails

@@ -5,7 +5,7 @@ source_of_truth: root-docs
 confidence: high
 ---
 
-# WhatTax
+# TaxKit
 
 Root map and behaviour contract. Keep this file short. Route into deeper docs
 fast.
@@ -14,7 +14,7 @@ fast.
 
 - Read the relevant docs and current files before editing.
 - Prefer the smallest correct change that matches repo boundaries.
-- Keep public WhatTax docs focused on the open-source engine, API, SDK and docs
+- Keep public TaxKit docs focused on the open-source engine, API, SDK and docs
   site.
 - MUST use Effect-native primitives and platform APIs when they fit:
   `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`,

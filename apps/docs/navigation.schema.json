@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "WhatTax docs navigation",
+  "title": "TaxKit docs navigation",
   "type": "object",
   "required": ["status", "contentRoot", "primaryNavigation"],
   "properties": {

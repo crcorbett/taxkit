@@ -7,7 +7,7 @@ confidence: high
 
 # Writing specs
 
-Use this guide when creating a new SPEC, PRD or design brief for WhatTax.
+Use this guide when creating a new SPEC, PRD or design brief for TaxKit.
 
 Do not start by creating a large PRD bundle. Pick the canonical document type
 first.

@@ -1,4 +1,4 @@
-# @whattax/core
+# @taxkit/core
 
 ## 0.1.0
 
@@ -7,7 +7,7 @@
 - 2dc693a: Make package builds and release artifacts deterministic with clean compilation,
   dist-only publication exports, concrete packed dependency ranges, and
   Effect-native scoped validators for focused SDK artifacts and strict clean
-  consumers across the complete WhatTax release package graph.
+  consumers across the complete TaxKit release package graph.
 
 ## 0.0.4
 
@@ -24,7 +24,7 @@
 
 - d1d84c3: Add canonical `CalculatorId` and `Jurisdiction` brands, move AU public
   calculator IDs and supported jurisdiction/tax-year schemas into the owning AU
-  rule packages, then compose those canonical exports in `@whattax/calculators`.
+  rule packages, then compose those canonical exports in `@taxkit/calculators`.
   The calculator service no longer mirrors request context or revalidates context
   fields already narrowed by schemas. Public calculator input decode errors now
   use calculator-specific names.

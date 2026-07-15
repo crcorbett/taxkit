@@ -9,7 +9,7 @@ confidence: medium
 
 ## Overview
 
-WhatTax needs public developer documentation for engineers who consume the
+TaxKit needs public developer documentation for engineers who consume the
 TypeScript SDK, call the HTTP API, or contribute new facts, rules,
 calculators and tax-year support. The documentation should be authored in MDX
 so code examples, generated API reference, callouts, interactive examples and
@@ -46,7 +46,7 @@ Implemented in the current repo:
 - contribution pages for facts, rules, calculators, tax years, incorrect
   results, source citations, naming, Effect services, compatibility,
   Changesets and PR evidence
-- docs content validation through `@whattax/docs-content`
+- docs content validation through `@taxkit/docs-content`
 - final validation evidence in
   [the completed execution plan](../exec-plans/completed/public-mdx-developer-docs.md)
 
@@ -86,7 +86,7 @@ Production: SDK consumer learning path
 developer
   -> Start / Quickstart
     -> Install SDK
-    -> Run first calculation with @whattax/sdk/au
+    -> Run first calculation with @taxkit/sdk/au
     -> Handle result or safe result
     -> Type safety concept page
     -> SDK reference
@@ -125,8 +125,8 @@ docs implementation
   repo history first.
 - Keep durable architecture in `docs/architecture/*` and public docs focused
   on developer tasks.
-- Preserve current package boundaries: `@whattax/sdk` for developer-facing
-  SDK use, `@whattax/http-api` for HTTP transport and `@whattax/calculators`
+- Preserve current package boundaries: `@taxkit/sdk` for developer-facing
+  SDK use, `@taxkit/http-api` for HTTP transport and `@taxkit/calculators`
   for calculator-owned run schemas and service contracts.
 - Require examples and docs to use canonical schemas, branded values and
   schema-derived types.
@@ -169,7 +169,7 @@ should link to this README only for package-local details.
 : Owns local HTTP API package guardrails. Public API docs should consume
 OpenAPI output and link here only for package-local details.
 
-`@whattax/calculators`
+`@taxkit/calculators`
 : Owns canonical `CalculatorRun*` schemas, `CalculatorServiceError`,
 calculator catalog entries, metadata transformations and calculation
 execution.
@@ -230,8 +230,8 @@ The quickstart should let a TypeScript developer calculate something useful in
 five minutes. It should use the plain SDK first:
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(90_000_00),
@@ -245,7 +245,7 @@ The SDK-vs-API page should include a decision table:
 | Use | Choose |
 | --- | --- |
 | server-side TypeScript app | plain SDK |
-| Effect app or in-process transport | `@whattax/sdk/effect` |
+| Effect app or in-process transport | `@taxkit/sdk/effect` |
 | browser or non-TypeScript client | HTTP API |
 | generated endpoint contract | OpenAPI |
 | contribution work | repo packages and contribution guides |
@@ -256,8 +256,8 @@ The SDK-vs-API page should include a decision table:
 SDK
   TypeScript SDK
   Plain SDK
-    WhatTax.calculate
-    WhatTax.safe.calculate
+    TaxKit.calculate
+    TaxKit.safe.calculate
     AU helpers
   Effect SDK
     calculateRunRequest
@@ -306,9 +306,9 @@ calculator service:
 Production: HTTP calculate
 
 HTTP caller
-  -> @whattax/http-api route contract
+  -> @taxkit/http-api route contract
     -> CalculatorApiHandlerLive
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
           -> CalculationEngine
       -> CalculatorApiErrorEnvelope for expected service errors
@@ -473,10 +473,10 @@ Public MDX pages should:
 
 Code examples should use current public names:
 
-- `WhatTax.calculate`
-- `WhatTax.safe.calculate`
+- `TaxKit.calculate`
+- `TaxKit.safe.calculate`
 - `au.incomeTax.annual`
-- `@whattax/sdk/effect` `calculateRunRequest`
+- `@taxkit/sdk/effect` `calculateRunRequest`
 - `calculateReportRequest`
 - `calculateReport`
 - `CalculatorRunRequest`

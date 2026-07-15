@@ -34,7 +34,7 @@ plan already gives enough sequencing.
 
 ```json
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/example.md",
   "title": "Example Implementation Tasks",
   "status": "draft",

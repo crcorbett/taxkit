@@ -9,7 +9,7 @@ confidence: high
 
 ## Overview
 
-WhatTax has a strict SDK-owned downstream release gate that proves actual
+TaxKit has a strict SDK-owned downstream release gate that proves actual
 package tarballs from outside the monorepo. The gate builds and packs the nine
 packages in the release closure, audits their final manifests and file lists,
 installs the unpublished tarballs into a clean temporary consumer, typechecks
@@ -24,8 +24,8 @@ availability and registry publication remain later release-preparation work.
 ```ts
 Focused SDK artifact
 
-bun run --filter=@whattax/sdk check-packed-artifact
-  -> bun pm pack @whattax/sdk
+bun run --filter=@taxkit/sdk check-packed-artifact
+  -> bun pm pack @taxkit/sdk
   -> extract the actual tarball
   -> Schema-decode package/package.json
   -> require concrete dependency ranges
@@ -37,7 +37,7 @@ bun run --filter=@whattax/sdk check-packed-artifact
 ```ts
 Strict release closure
 
-bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@taxkit/sdk validate:downstream
   -> build core, income-tax, pay, STSL, calculators, SDK, API HTTP and testing
   -> bun pm pack each package from its workspace manifest
      -> Bun resolves workspace:* and catalog: to concrete versions
@@ -64,15 +64,15 @@ bun run --filter=@whattax/sdk validate:downstream
 
 The release closure is:
 
-- `@whattax/core`
-- `@whattax/rules-au-income-tax`
-- `@whattax/rules-au-pay`
-- `@whattax/rules-au-stsl`
-- `@whattax/calculators`
-- `@whattax/sdk`
-- `@whattax/api-http`
-- `@whattax/testing`
-- `@whattax/tsconfig`
+- `@taxkit/core`
+- `@taxkit/rules-au-income-tax`
+- `@taxkit/rules-au-pay`
+- `@taxkit/rules-au-stsl`
+- `@taxkit/calculators`
+- `@taxkit/sdk`
+- `@taxkit/api-http`
+- `@taxkit/testing`
+- `@taxkit/tsconfig`
 
 ## Publication surface
 
@@ -112,11 +112,11 @@ complementary and does not replace package installation evidence.
 ## Verification
 
 ```bash
-bun run --filter=@whattax/sdk check-packed-artifact
-bun run --filter=@whattax/sdk validate:downstream
-bun run --filter=@whattax/sdk check-boundaries
-bun run --filter=@whattax/sdk test-types
-bun run --filter=@whattax/sdk test
+bun run --filter=@taxkit/sdk check-packed-artifact
+bun run --filter=@taxkit/sdk validate:downstream
+bun run --filter=@taxkit/sdk check-boundaries
+bun run --filter=@taxkit/sdk test-types
+bun run --filter=@taxkit/sdk test
 bun run verification
 bun run test
 bun run build
@@ -132,7 +132,7 @@ claimed. Supporting package tests or copied-directory imports never replace it.
 - removing `private: true`
 - applying Changeset versions with `bun run version-repo`
 - moving package or app ownership
-- making the SDK depend on `@whattax/api-http`
+- making the SDK depend on `@taxkit/api-http`
 - live network calls other than package installation from the configured npm
   registry for external dependencies
 

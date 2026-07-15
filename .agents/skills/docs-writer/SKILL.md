@@ -1,11 +1,11 @@
 ---
 name: docs-writer
-description: "Use when writing or editing WhatTax developer documentation, MDX pages, package READMEs, contribution guides, docs specs, or documentation task lists so the work follows the canonical documentation style and templates."
+description: "Use when writing or editing TaxKit developer documentation, MDX pages, package READMEs, contribution guides, docs specs, or documentation task lists so the work follows the canonical documentation style and templates."
 ---
 
 # Docs writer
 
-Use this skill for WhatTax documentation work.
+Use this skill for TaxKit documentation work.
 
 ## Start here
 

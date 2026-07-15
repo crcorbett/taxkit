@@ -7,7 +7,7 @@ confidence: high
 
 # API and SDK
 
-WhatTax should publish a reusable API app server and TypeScript SDK around the
+TaxKit should publish a reusable API app server and TypeScript SDK around the
 open-source calculation engine.
 
 The API and SDK are part of this repository because they expose reusable tax
@@ -44,7 +44,7 @@ GET /api/v1/rules
 ```
 
 `apps/web` consumes this API over HTTP. It must not mount the canonical API or
-import server-only `@whattax/api-http` exports.
+import server-only `@taxkit/api-http` exports.
 
 API process entrypoints should be Effect programs run with
 `@effect/platform-bun/BunRuntime.runMain(...)`. The app owns process config,
@@ -65,22 +65,22 @@ packages/api/http
 Package name:
 
 ```txt
-@whattax/api-http
+@taxkit/api-http
 ```
 
 It owns the current Effect HTTP API definitions, health endpoint schema,
 server route layer, OpenAPI metadata, typed client helpers and reusable client
 config schema.
 
-`@whattax/api-http` owns transport contracts, HTTP status annotations, OpenAPI
+`@taxkit/api-http` owns transport contracts, HTTP status annotations, OpenAPI
 generation, typed HTTP clients, server route layers and thin handler adapters.
 Reusable calculator catalog entries, metadata transformations, graph assembly
-and schema-error shaping live in `@whattax/calculators`. The calculate route
-executes through the request-preserving `@whattax/sdk/effect`
+and schema-error shaping live in `@taxkit/calculators`. The calculate route
+executes through the request-preserving `@taxkit/sdk/effect`
 `calculateRunRequest` helper as a normal in-process consumer, proving the
 public SDK boundary without making the SDK depend on HTTP transport code.
 
-`@whattax/api-http/config` exports the package-owned HTTP API client config
+`@taxkit/api-http/config` exports the package-owned HTTP API client config
 schema, type and keyed config fragment. Apps compose that fragment into their
 own runtime config modules and provide runtime-specific values, such as server
 process env or Vite client env, through `ConfigProvider` composition instead of
@@ -97,12 +97,12 @@ export it from the same module as a schema-derived type. Do not hand-write DTO
 interfaces or duplicate response shapes in handlers, clients or apps.
 
 Route-only HTTP envelopes, query schemas and status annotations stay in
-`@whattax/api-http`. HTTP-facing names such as
+`@taxkit/api-http`. HTTP-facing names such as
 `CalculatorApiErrorEnvelope` stay in the transport package because they
 describe calculator API status encoding. Rule-owned calculator IDs and
-supported context literals are composed by `@whattax/calculators`; reusable
+supported context literals are composed by `@taxkit/calculators`; reusable
 help modes, calculator run payloads and calculator service errors live in
-`@whattax/calculators`.
+`@taxkit/calculators`.
 
 The final calculate-route production graph is:
 
@@ -110,10 +110,10 @@ The final calculate-route production graph is:
 Production: HTTP calculate
 
 apps/api Bun process
-  -> WhatTaxServerLayer
+  -> TaxKitServerLayer
     -> CalculatorApiHandlerLive
       -> sdkCalculationFor(params.calculatorId)
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
           -> selected CalculatorCatalogEntry.inputSchema decode
           -> constructor-closed typed scenario continuation
@@ -145,7 +145,7 @@ The SDK Effect full-run graph is:
 Production: SDK Effect full run
 
 Effect consumer
-  -> @whattax/sdk/effect calculateRunRequest(descriptor, request)
+  -> @taxkit/sdk/effect calculateRunRequest(descriptor, request)
     -> PublicCalculatorService.calculate({ calculatorId, ...request })
       -> CalculatorRunServiceRequest
       -> CalculatorRunResponse
@@ -166,9 +166,9 @@ The matching test graph is:
 Tests: HTTP over SDK
 
 HTTP API tests
-  -> WhatTaxApiInProcessClientLive
+  -> TaxKitApiInProcessClientLive
     -> CalculatorApiHandlerLive
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorServiceLive
           -> CalculationEngineLive
   -> success response equals SDK full-run response
@@ -186,7 +186,7 @@ packages/calculators
 Package name:
 
 ```txt
-@whattax/calculators
+@taxkit/calculators
 ```
 
 It owns:
@@ -208,8 +208,8 @@ implementing calculator business logic locally.
 ## HTTP API package topology
 
 The implemented HTTP API package lives at `packages/api/http` and is named
-`@whattax/api-http`. It owns Effect HTTP API definitions, calculation endpoint
-schemas, thin server handlers that delegate to `@whattax/calculators`, OpenAPI
+`@taxkit/api-http`. It owns Effect HTTP API definitions, calculation endpoint
+schemas, thin server handlers that delegate to `@taxkit/calculators`, OpenAPI
 generation, HTTP status annotations and generated HTTP client helpers.
 
 ## API app scope
@@ -221,7 +221,7 @@ apps/api
 ```
 
 It is a reusable server for open-source and integration use. Applications may
-run their own API servers that import WhatTax packages or call this API, but
+run their own API servers that import TaxKit packages or call this API, but
 the app remains a thin transport over the calculation engine.
 
 ## Endpoint shape
@@ -260,7 +260,7 @@ rule-owned calculator input schemas, not `Schema.Unknown`. OpenAPI should show
 the supported fact shapes under `facts.anyOf`; current public shapes include
 take-home/pay-withholdings input facts and annual-tax input facts. Because
 Effect HTTP route schemas are not dependent on the `calculatorId` path
-parameter, `@whattax/calculators` must decode `payload.facts` again with the
+parameter, `@taxkit/calculators` must decode `payload.facts` again with the
 selected catalog entry's canonical `inputSchema` before execution. A payload
 that is valid for a different calculator must fail as
 `CalculatorInputDecodeError` with descriptor-backed help for the selected
@@ -289,23 +289,23 @@ packages/sdk/typescript
 Current package name:
 
 ```txt
-@whattax/sdk
+@taxkit/sdk
 ```
 
 Preferred public package name at release time:
 
 ```txt
-whattax
+taxkit
 ```
 
 If the unscoped package name is unavailable at first publish, continue with
-`@whattax/sdk` and keep the same export contract.
+`@taxkit/sdk` and keep the same export contract.
 
 It owns:
 
 - direct in-process calculation facade
-- plain TypeScript `WhatTax.create(...)` client factory and
-  `WhatTax.{method}` generic helpers
+- plain TypeScript `TaxKit.create(...)` client factory and
+  `TaxKit.{method}` generic helpers
 - Effect-native `./effect` entrypoint
 - jurisdiction-specific opt-in subpaths such as `./au`
 - Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
@@ -314,10 +314,10 @@ It owns:
 - typed calculator request builders
 - examples for Node and browser usage
 
-The SDK must not import `@whattax/api-http`, server handlers or Node-only
+The SDK must not import `@taxkit/api-http`, server handlers or Node-only
 modules from browser-safe entrypoints. It also must not expose Effect runtime
 types from the plain TypeScript entrypoint. HTTP clients and OpenAPI transport
-helpers stay in `@whattax/api-http`, which depends on the SDK rather than the
+helpers stay in `@taxkit/api-http`, which depends on the SDK rather than the
 reverse.
 
 ## Export boundaries
@@ -366,8 +366,8 @@ tarball manifest, clean installation and public-entrypoint imports.
 }
 ```
 
-`.` should expose the plain, jurisdiction-neutral `WhatTax` facade. `./effect`
-should expose the Effect-native `WhatTax` facade used by HTTP handlers.
+`.` should expose the plain, jurisdiction-neutral `TaxKit` facade. `./effect`
+should expose the Effect-native `TaxKit` facade used by HTTP handlers.
 Jurisdiction subpaths such as `./au` and `./au/effect` should expose local
 Layer-backed modules, calculation descriptors and thin convenience clients
 without making the root bundle import those rules. `./schemas` must be

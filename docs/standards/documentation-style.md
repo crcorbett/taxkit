@@ -7,11 +7,11 @@ confidence: medium
 
 # Documentation style
 
-Use this standard when writing, reviewing or editing public WhatTax docs,
+Use this standard when writing, reviewing or editing public TaxKit docs,
 package READMEs, contributor guides, API/SDK guides, MDX pages, product specs
 and documentation task lists.
 
-WhatTax documentation is developer documentation. It should help a capable
+TaxKit documentation is developer documentation. It should help a capable
 engineer understand the right concept, run the right code and make the right
 change without marketing language or internal history.
 
@@ -69,8 +69,8 @@ connect". Show the integration with a short example instead.
 
 Use current public names in new docs:
 
-- `WhatTax.calculate`
-- `WhatTax.safe.calculate`
+- `TaxKit.calculate`
+- `TaxKit.safe.calculate`
 - `au.incomeTax.annual`
 - `calculateRunRequest`
 - `calculateReportRequest`

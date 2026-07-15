@@ -20,7 +20,7 @@ turns stops for replan or user decision.
 | Task | Status | Evidence |
 | --- | --- | --- |
 | TAXKIT-001 | accepted | Workspace, source, configuration, lint namespace and local domains migrated; parent review and verification accepted. |
-| TAXKIT-002 | blocked by TAXKIT-001 | Not started. |
+| TAXKIT-002 | accepted | Documentation, release metadata and full release-readiness evidence accepted by parent review. |
 | TAXKIT-003 | blocked by TAXKIT-002 | Not started. |
 
 ## Preflight inventory
@@ -60,3 +60,33 @@ turns stops for replan or user decision.
   compatibility alias or fallback config was added.
 - Parent audit pass 3: route consumers remain leaf restorers; the renamed
   Oxlint plugin preserves exact decoder-boundary enforcement and its tests.
+
+### TAXKIT-002
+
+- `bun run verification` passed after canonical formatting.
+- `bun run docs:validate` passed with 0 documentation-content issues.
+- `bun run release:check` passed all nine ordered checks: repository
+  verification, workspace tests and builds, docs validation, packed SDK
+  artifact proof, strict downstream consumer proof, API smoke, docs browser
+  evidence and Changeset status.
+- `bun run changeset status --verbose` reports one pending major cutover
+  Changeset for `@taxkit/api-http`, `@taxkit/calculators`, `@taxkit/core`,
+  `@taxkit/rules-au-income-tax`, `@taxkit/rules-au-pay`,
+  `@taxkit/rules-au-stsl`, `@taxkit/sdk`, `@taxkit/testing` and
+  `@taxkit/tsconfig`.
+- Tracked-tree identity audit passed with no retired identity token in tracked
+  file contents or paths.
+- Improvement audit pass 1: documentation and release command graphs retain
+  the existing app and package owners. The release orchestration remains in
+  `@taxkit/scripts`; no validator wrapper or package-ownership change was
+  introduced.
+- Improvement audit pass 2: packed-artifact and downstream validation prove
+  the canonical nine-package closure from tarballs and a clean consumer, with
+  no workspace/source leakage or stale package identity.
+- Improvement audit pass 3: the Changeset, curated changelogs, package
+  changelogs, architecture docs, product specs, completed plans, docs app
+  content and local-domain guidance use only the TaxKit identity. No alias,
+  redirect or fallback language remains.
+- The target npm scope remains unauthenticated on this machine. No versioning
+  or publication was attempted; scope ownership must be proven during the
+  separately approved release operation.

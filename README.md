@@ -5,9 +5,9 @@ source_of_truth: root-docs
 confidence: high
 ---
 
-# WhatTax
+# TaxKit
 
-WhatTax is the public monorepo for the open-source tax engine, API, SDK and
+TaxKit is the public monorepo for the open-source tax engine, API, SDK and
 documentation site.
 
 The repo is early, but the main public integration surfaces now exist. The
@@ -16,10 +16,10 @@ that calls that API, a Fumadocs-backed docs app, an Effect HTTP API package
 with health, generated docs, metadata and public calculation endpoints, a
 reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, a private
-TypeScript SDK package, private `@whattax/docs-content` and
-`@whattax/docs-fumadocs` packages, shared testing helpers and shared TypeScript
+TypeScript SDK package, private `@taxkit/docs-content` and
+`@taxkit/docs-fumadocs` packages, shared testing helpers and shared TypeScript
 config, plus private Effect-native repository release orchestration in
-`@whattax/scripts`. The SDK is implemented for local and downstream
+`@taxkit/scripts`. The SDK is implemented for local and downstream
 validation, but it is not published yet.
 
 ## What exists today
@@ -88,10 +88,10 @@ bun run version-repo
 ```
 
 `bun run --filter=api dev` serves the API through portless at
-`https://api.whattax.localhost`. `bun run --filter=web dev` injects that
-portless URL into `WHATTAX_API_BASE_URL` and `VITE_WHATTAX_API_BASE_URL` before
-serving the web app at `https://whattax.localhost`. `bun run --filter=docs dev`
-serves the public docs app at `https://docs.whattax.localhost`. `bun run
+`https://api.taxkit.localhost`. `bun run --filter=web dev` injects that
+portless URL into `TAXKIT_API_BASE_URL` and `VITE_TAXKIT_API_BASE_URL` before
+serving the web app at `https://taxkit.localhost`. `bun run --filter=docs dev`
+serves the public docs app at `https://docs.taxkit.localhost`. `bun run
 verification` is the baseline verification command for documentation, package
 wiring and scaffold changes. `bun run release:check` runs the complete ordered
 release evidence, including tests, builds, package artifacts, API smoke, docs
@@ -133,7 +133,7 @@ surfaces materially change.
 Open it directly at:
 
 ```text
-file:///Users/cooper/Projects/whattax/docs/repo-status-outline.html
+file:///Users/cooper/Projects/taxkit/docs/repo-status-outline.html
 ```
 
 ## Runtime boundary
@@ -141,13 +141,13 @@ file:///Users/cooper/Projects/whattax/docs/repo-status-outline.html
 - `apps/api` is the API runtime owner. It creates one process-lifetime
   `ManagedRuntime`, serves `packages/api/http` through Bun and disposes scoped
   resources on shutdown.
-- `apps/docs` is the docs runtime owner. It consumes `@whattax/docs-content`
-  and `@whattax/docs-fumadocs` rather than owning canonical frontmatter,
+- `apps/docs` is the docs runtime owner. It consumes `@taxkit/docs-content`
+  and `@taxkit/docs-fumadocs` rather than owning canonical frontmatter,
   navigation or reusable Fumadocs internals.
 - `apps/web/src/lib/runtime.server.ts` and
   `apps/web/src/lib/runtime.client.ts` own the web SSR and browser client
   runtimes. They call the standalone API over HTTP.
-- `@whattax/api-http/client` and `@whattax/api-http/client/live` are
+- `@taxkit/api-http/client` and `@taxkit/api-http/client/live` are
   browser-safe.
-- `@whattax/api-http/client/server`, `@whattax/api-http/server` and handler
+- `@taxkit/api-http/client/server`, `@taxkit/api-http/server` and handler
   exports are server-only and should stay out of `apps/web`.

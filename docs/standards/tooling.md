@@ -1,7 +1,7 @@
 # Formatting, Linting, And Dependency Hygiene
 
-WhatTax uses Bun workspaces and Ultracite with the Oxlint/Oxfmt provider. The
-tooling is intentionally strict because WhatTax is intended to become a public
+TaxKit uses Bun workspaces and Ultracite with the Oxlint/Oxfmt provider. The
+tooling is intentionally strict because TaxKit is intended to become a public
 library with stable package boundaries and predictable bundle behavior.
 
 ## Configured Tools
@@ -67,7 +67,7 @@ Important enabled rules:
   of `export *`, improving API review, bundling, and code splitting.
 - `jsdoc/check-tag-names`: docstrings use only linter-recognized tags.
 
-Current WhatTax-specific overrides are narrow:
+Current TaxKit-specific overrides are narrow:
 
 - `func-names`: `Effect.gen(function* () { ... })` is idiomatic and should not
   need artificial local names.
@@ -79,7 +79,7 @@ Current WhatTax-specific overrides are narrow:
   JavaScript array method `thisArg` usage.
 
 Portable custom rules live under `effect/*`, `bun/*` and `mdx/*`; tax,
-calculator, decoder and route-transport policy remains under `whattax/*`.
+calculator, decoder and route-transport policy remains under `taxkit/*`.
 Important portable rules include:
 
 - `effect/no-manual-tag`: bans manual `_tag` object literals. Use
@@ -125,49 +125,49 @@ Important portable rules include:
 - `mdx/no-route-local-component-registry`: keeps the MDX registry app-owned and
   route components composition-only.
 
-Current WhatTax-specific custom rules include:
+Current TaxKit-specific custom rules include:
 
-- `whattax/no-typeof`, `whattax/no-instanceof` and
-  `whattax/no-in-operator`: scoped to `packages/calculators/src`. Calculator
+- `taxkit/no-typeof`, `taxkit/no-instanceof` and
+  `taxkit/no-in-operator`: scoped to `packages/calculators/src`. Calculator
   service code must decode with Schema and branch with `Option`, `Result`,
   `Exit` or `Match` instead of ad hoc runtime type probes.
-- `whattax/no-undefined-comparison`: scoped to `packages/calculators/src`.
+- `taxkit/no-undefined-comparison`: scoped to `packages/calculators/src`.
   Optional request policy must use `Schema.optional` plus `Option`, not
   `=== undefined` or `!== undefined`.
-- `whattax/no-nullish-comparison`: scoped to `packages/calculators/src`.
+- `taxkit/no-nullish-comparison`: scoped to `packages/calculators/src`.
   Nullable request policy must use `Schema.NullOr` or schema transforms plus
   `Option.fromNullable`, not raw `null` comparison.
-- `whattax/no-conditional-object-spread`: scoped to
+- `taxkit/no-conditional-object-spread`: scoped to
   `packages/calculators/src`. Optional response fields must be schema-owned,
   not built with conditional object spreads.
-- `whattax/no-context-nullish-default`: scoped to
+- `taxkit/no-context-nullish-default`: scoped to
   `packages/calculators/src`. Calculator context must not invent jurisdiction
   or tax-year defaults with `??`; missing context must remain absent or fail
   through an owning schema/tagged error.
-- `whattax/no-nested-wrapper-calls`: scoped to `packages/calculators/src`.
+- `taxkit/no-nested-wrapper-calls`: scoped to `packages/calculators/src`.
   Sequential calculator transformations must use pipe-first data flow such as
   `query.pipe(filterEntries, toResponse)` or `pipe(query, filterEntries,
   toResponse)`, not nested wrappers such as `toResponse(filterEntries(query))`.
-- `whattax/no-native-array-methods`: scoped to `packages/calculators/src`.
+- `taxkit/no-native-array-methods`: scoped to `packages/calculators/src`.
   Calculator services must use Effect `Array` or `Chunk` helpers such as
   `Array.filter(items, predicate)`, `Array.findFirst(...)` and `Chunk.map(...)`
   instead of native `items.filter(...)`, `items.find(...)` or
   `items.reduce(...)`.
-- `whattax/no-native-collections`: scoped to `packages/calculators/src`.
+- `taxkit/no-native-collections`: scoped to `packages/calculators/src`.
   Calculator services must use `HashMap` and `HashSet`, with `Option`-based
   lookups, instead of native `Map` and `Set` constructors.
-- `whattax/no-throw`: scoped to `packages/calculators/src`. Calculator
+- `taxkit/no-throw`: scoped to `packages/calculators/src`. Calculator
   failures must be typed tagged errors returned through `Effect.fail`,
   `Effect.try` or `Effect.tryPromise`, not thrown exceptions.
-- `whattax/no-async-await-promise`: scoped to `packages/calculators/src`.
+- `taxkit/no-async-await-promise`: scoped to `packages/calculators/src`.
   Calculator services must return `Effect` values and compose them with
   `Effect.gen`, `Effect.flatMap`, `Effect.all`, `Layer` and service
   dependencies instead of `async`, `await` or `new Promise`.
-- `whattax/no-json-parse-stringify`: scoped to `packages/calculators/src`.
+- `taxkit/no-json-parse-stringify`: scoped to `packages/calculators/src`.
   Calculator boundary values must be decoded and encoded by owning schemas, for
   example `Schema.decodeUnknown`, `Schema.decodeJson`, `Schema.encode` or
   `Schema.encodeJson`, not ad hoc `JSON.parse` or `JSON.stringify`.
-- `whattax/no-ambient-time-or-random`: scoped to `packages/calculators/src`.
+- `taxkit/no-ambient-time-or-random`: scoped to `packages/calculators/src`.
   Calculator logic must receive time/randomness as explicit canonical input or
   through Effect boundary services such as `Clock` and `Random`; deterministic
   calculator services must not hide `Date.now`, `new Date` or `Math.random`.
@@ -183,7 +183,7 @@ Current WhatTax-specific custom rules include:
 
 ## Knip Rules
 
-Knip is configured at the root because WhatTax is a monorepo. Keep this config
+Knip is configured at the root because TaxKit is a monorepo. Keep this config
 lean: remove unused package dependencies or expose intentional public exports
 through entrypoints before adding ignores. Knip is part of the required quality
 gate alongside `check`, `check-types`, and `test`.

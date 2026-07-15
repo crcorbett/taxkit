@@ -11,7 +11,7 @@ reference source.
 
 ## Generated reference
 
-The endpoint contract is generated from `@whattax/api-http`.
+The endpoint contract is generated from `@taxkit/api-http`.
 
 ```txt
 GET /api/docs
@@ -44,9 +44,9 @@ The calculate route is a thin HTTP transport over the SDK Effect helper.
 Production: HTTP calculate
 
 HTTP caller
-  -> @whattax/api-http route contract
+  -> @taxkit/api-http route contract
     -> CalculatorApiHandlerLive
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
           -> CalculationEngine
       -> CalculatorApiErrorEnvelope for CalculatorServiceError

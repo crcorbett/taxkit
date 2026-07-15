@@ -18,7 +18,7 @@ import {
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
   CalculatorServiceError,
-} from "@whattax/sdk/schemas";
+} from "@taxkit/sdk/schemas";
 ```
 
 These names are re-exported from the calculator package for consumer
@@ -41,14 +41,14 @@ The SDK also exports safe-result and error schemas:
 
 ```ts
 import {
-  WhatTaxFailure,
-  WhatTaxSchemaDecodeError,
-  WhatTaxSuccess,
-} from "@whattax/sdk/schemas";
+  TaxKitFailure,
+  TaxKitSchemaDecodeError,
+  TaxKitSuccess,
+} from "@taxkit/sdk/schemas";
 ```
 
 Use these when you persist, inspect or validate results returned by
-`WhatTax.safe.calculate`.
+`TaxKit.safe.calculate`.
 
 ## Related pages
 

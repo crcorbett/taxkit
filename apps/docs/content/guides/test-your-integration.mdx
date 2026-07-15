@@ -7,7 +7,7 @@ status: "draft"
 # Test your integration
 
 Use this guide when you need evidence that your application still calls
-WhatTax with the expected facts and handles expected failures.
+TaxKit with the expected facts and handles expected failures.
 
 ## Before you start
 
@@ -20,16 +20,16 @@ WhatTax with the expected facts and handles expected failures.
 
 1. Add a success test for the calculator you call.
 2. Add a validation failure test.
-3. Run your app tests and the relevant WhatTax package test when working in
+3. Run your app tests and the relevant TaxKit package test when working in
    this repo.
 
 ## Example
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
-import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
+import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
 import { expect, test } from "vitest";
 
 test("calculates weekly take-home pay", async () => {
@@ -46,11 +46,11 @@ test("calculates weekly take-home pay", async () => {
 });
 
 test("returns a typed validation failure", async () => {
-  const result = await WhatTax.safe.calculate(au.calculations.takeHomePay, {
+  const result = await TaxKit.safe.calculate(au.calculations.takeHomePay, {
     taxableIncome: aud(9_000_000),
   } as never);
 
-  expect(result._tag).toBe("WhatTaxFailure");
+  expect(result._tag).toBe("TaxKitFailure");
 });
 ```
 
@@ -60,8 +60,8 @@ Run your application's test command. Inside this repository, the SDK type and
 unit tests are:
 
 ```sh
-bun run --filter=@whattax/sdk test
-bun run --filter=@whattax/sdk test-types
+bun run --filter=@taxkit/sdk test
+bun run --filter=@taxkit/sdk test-types
 ```
 
 ## Handle errors

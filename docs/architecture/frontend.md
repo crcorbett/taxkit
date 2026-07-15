@@ -7,7 +7,7 @@ confidence: high
 
 # Frontend
 
-WhatTax currently has two browser-facing TanStack Start apps: `apps/web` for
+TaxKit currently has two browser-facing TanStack Start apps: `apps/web` for
 API/runtime smoke behaviour and `apps/docs` for public developer
 documentation.
 
@@ -32,12 +32,12 @@ define tax calculation rules.
   MDX component map and browser rendering. Route files import that shared map;
   they do not define local `mdxComponents` objects or inline MDX registries.
   Server loaders consume
-  `@whattax/docs-content`; browser modules consume browser-safe
-  `@whattax/docs-content/client`, `@whattax/docs-content/schemas` and
-  `@whattax/docs-fumadocs/render` exports.
+  `@taxkit/docs-content`; browser modules consume browser-safe
+  `@taxkit/docs-content/client`, `@taxkit/docs-content/schemas` and
+  `@taxkit/docs-fumadocs/render` exports.
 
 `packages/ui`
-: Planned shared UI primitives for WhatTax-owned apps, once repeated UI
+: Planned shared UI primitives for TaxKit-owned apps, once repeated UI
 patterns justify a package.
 
 ## Runtime shape
@@ -49,15 +49,15 @@ and Node adapters must stay behind explicit server exports and out of
 
 The web runtime reads:
 
-- `WHATTAX_API_BASE_URL` for server-rendered loaders
-- `VITE_WHATTAX_API_BASE_URL` for browser navigation
+- `TAXKIT_API_BASE_URL` for server-rendered loaders
+- `VITE_TAXKIT_API_BASE_URL` for browser navigation
 
 Both runtime-specific values are mapped into the package-owned
-`@whattax/api-http/config` schema by `apps/web/src/lib/config.server.ts` and
+`@taxkit/api-http/config` schema by `apps/web/src/lib/config.server.ts` and
 `apps/web/src/lib/config.client.ts`. Those modules compose package config
 fragments that use `Config.nested(...)`, then provide runtime env sources with
 `ConfigProvider.fromEnv(...)` and `ConfigProvider.constantCase`. Local dev
-scripts inject them from `portless get api.whattax`; deployed environments
+scripts inject them from `portless get api.taxkit`; deployed environments
 should set them explicitly.
 
 Web SSR and browser runtimes should use module-scoped
@@ -69,7 +69,7 @@ Docs SSR loaders use the same runtime rule. `apps/docs` keeps a module-scoped
 runtime for `DocsContentServiceLive`, decodes route input before lookup and
 preloads compiled MDX through the browser-safe client loader. App routes should
 not read `apps/docs/content` files, `navigation.json` or generated
-`.source/server` modules directly. `@whattax/docs-content` bundles the authored
+`.source/server` modules directly. `@taxkit/docs-content` bundles the authored
 navigation representation and decodes it with the canonical navigation schema,
 so built server functions do not depend on a source-relative filesystem path.
 
@@ -175,15 +175,15 @@ before a second application needs it.
 - Do not remount the canonical API inside TanStack Start.
 - Keep frontend docs and component details out of rule packages.
 - Keep browser docs modules on browser-safe exports such as
-  `@whattax/docs-content/client` and `@whattax/docs-fumadocs/render`.
+  `@taxkit/docs-content/client` and `@taxkit/docs-fumadocs/render`.
 - Keep docs loader outcomes encoded until a direct route-root consumer restores
   them through the browser-safe route boundary.
 - Use TanStack router links for internal docs routes so client navigation runs
   the route loader. Keep ordinary anchors for external destinations.
 - Do not import generated `.source/server` files or
-  `@whattax/docs-content/server` from browser modules.
-- Keep Fumadocs generated source access inside `@whattax/docs-content` server
-  exports and reusable adapters in `@whattax/docs-fumadocs/source`.
+  `@taxkit/docs-content/server` from browser modules.
+- Keep Fumadocs generated source access inside `@taxkit/docs-content` server
+  exports and reusable adapters in `@taxkit/docs-fumadocs/source`.
 - Apply the [abstraction admission
   contract](../design-docs/abstraction-admission.md) before sharing a hook,
   provider, component family or UI package.

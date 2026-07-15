@@ -9,34 +9,34 @@ status: "draft"
 Use the safe SDK when expected failures should be returned as values instead of
 rejected Promises.
 
-## Call `WhatTax.safe.calculate`
+## Call `TaxKit.safe.calculate`
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
 
-const result = await WhatTax.safe.calculate(au.calculations.annualIncomeTax, {
+const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(9_000_000),
 });
 
-if (result._tag === "WhatTaxSuccess") {
+if (result._tag === "TaxKitSuccess") {
   console.log(result.value.liability.cents);
 }
 
-if (result._tag === "WhatTaxFailure") {
+if (result._tag === "TaxKitFailure") {
   console.error(result.error._tag);
 }
 ```
 
-The result is either `WhatTaxSuccess` with the calculator report or
-`WhatTaxFailure` with an SDK-owned error value.
+The result is either `TaxKitSuccess` with the calculator report or
+`TaxKitFailure` with an SDK-owned error value.
 
 ## Call AU safe helpers
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { au } from "@taxkit/sdk/au";
 
 const result = await au.incomeTax.safe.annual({
   taxableIncome: aud(9_000_000),
@@ -49,7 +49,7 @@ Use the safe facade when your application already models expected failures as
 data, or when you want to handle schema decode errors in the same branch as
 calculation failures.
 
-Use `WhatTax.calculate` when rejected Promises fit your existing control flow.
+Use `TaxKit.calculate` when rejected Promises fit your existing control flow.
 
 ## Related pages
 

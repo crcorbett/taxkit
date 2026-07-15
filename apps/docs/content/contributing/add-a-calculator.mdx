@@ -14,10 +14,10 @@ a new withholding, annual tax or repayment calculation.
 - Read [Calculators](../../../../docs/architecture/calculators.md).
 - Read the public boundary in
   [API and SDK](../../../../docs/architecture/api-and-sdk.md).
-- Inspect the calculator catalogue in `@whattax/calculators`.
+- Inspect the calculator catalogue in `@taxkit/calculators`.
 
 The rule package owns the calculator program, report schema and rule-pack
-layer. `@whattax/calculators` owns reusable catalogue entries,
+layer. `@taxkit/calculators` owns reusable catalogue entries,
 `CalculatorRunRequest`, `CalculatorRunResponse`, `CalculatorServiceError`,
 metadata projections, graph construction and service execution.
 
@@ -45,7 +45,7 @@ accepted input facts
   -> schema-backed report
 ```
 
-Do not place calculator business logic in `@whattax/api-http` handlers, SDK
+Do not place calculator business logic in `@taxkit/api-http` handlers, SDK
 helpers or docs-only examples. HTTP and SDK layers must call the canonical
 calculator boundary and preserve `CalculatorRun*` contracts.
 
@@ -58,7 +58,7 @@ Your evidence should include:
 - schema decode tests for calculator input and report schemas
 - type tests for SDK descriptor inference
 - API compatibility tests for `POST /api/v1/calculators/:calculatorId/calculate`
-- SDK compatibility tests for `WhatTax.calculate`, `WhatTax.safe.calculate`
+- SDK compatibility tests for `TaxKit.calculate`, `TaxKit.safe.calculate`
   and any jurisdiction helper such as `au.incomeTax.annual`
 
 ## Pull request evidence

@@ -52,7 +52,7 @@ rg -n \
 ```
 
 It found 42 repository-owned executable decoder operations. The command also
-finds three diagnostic strings in `tools/oxlint/whattax-rules.js`; they are not
+finds three diagnostic strings in `tools/oxlint/taxkit-rules.js`; they are not
 calls and are excluded from the count. Calls to local helpers such as
 `decodeRouteJson`, `decodeJson` and `decodeFrontmatter` are not counted again:
 their decoder-owning bodies are listed at the actual Schema callsite.
@@ -264,8 +264,8 @@ changes repository guidance and execution evidence only.
 
 ### Rule and exemption contract
 
-`whattax/no-decoding-outside-boundaries` is enabled repository-wide through
-`tools/oxlint/whattax-rules.js`. It uses Oxlint AST bindings to report:
+`taxkit/no-decoding-outside-boundaries` is enabled repository-wide through
+`tools/oxlint/taxkit-rules.js`. It uses Oxlint AST bindings to report:
 
 - all supported Effect Schema runtime decoder families, including Effect,
   Exit, Option, Result, Promise and Sync forms
@@ -335,7 +335,7 @@ contract, release artifact or public user-facing behaviour. Do not run
 - Reviewed `decodingBoundaryFiles`: every entry is an exact source path from
   the DECODE-001 inventory or the focused CLI test's process-output boundary.
 - Confirmed the sole override disables only
-  `whattax/no-decoding-outside-boundaries`; no boundary source was added to
+  `taxkit/no-decoding-outside-boundaries`; no boundary source was added to
   `ignorePatterns` and the only remaining file glob is the pre-existing
   calculator policy override.
 - Confirmed both root lint passes use `--disable-nested-config`.
@@ -505,14 +505,14 @@ runtime execution or external representation read.
 ```bash
 bun run lint
 bun run test
-bun run --filter=@whattax/calculators test
-bun run --filter=@whattax/calculators check-types
-bun run --filter=@whattax/sdk test
-bun run --filter=@whattax/sdk test-types
-bun run --filter=@whattax/sdk check-boundaries
-bun run --filter=@whattax/sdk build
-bun run --filter=@whattax/api-http test
-bun run --filter=@whattax/api-http check-types
+bun run --filter=@taxkit/calculators test
+bun run --filter=@taxkit/calculators check-types
+bun run --filter=@taxkit/sdk test
+bun run --filter=@taxkit/sdk test-types
+bun run --filter=@taxkit/sdk check-boundaries
+bun run --filter=@taxkit/sdk build
+bun run --filter=@taxkit/api-http test
+bun run --filter=@taxkit/api-http check-types
 bun run --filter=api smoke:public-routes
 bun run --filter=web check-types
 bun run --filter=docs check-types

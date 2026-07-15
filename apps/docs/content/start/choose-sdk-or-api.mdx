@@ -1,6 +1,6 @@
 ---
 title: "Choose SDK or HTTP API"
-description: "Choose the right WhatTax integration surface for your application."
+description: "Choose the right TaxKit integration surface for your application."
 status: "draft"
 ---
 
@@ -15,7 +15,7 @@ non-TypeScript integration.
 | Environment                                      | Choose     | Why                                                                                                             |
 | ------------------------------------------------ | ---------- | --------------------------------------------------------------------------------------------------------------- |
 | Server-side TypeScript application               | Plain SDK  | You get typed calculator inputs and reports without HTTP transport.                                             |
-| TypeScript application that wants typed failures | Safe SDK   | You get `WhatTax.safe.calculate` result values.                                                                 |
+| TypeScript application that wants typed failures | Safe SDK   | You get `TaxKit.safe.calculate` result values.                                                                  |
 | Effect application                               | Effect SDK | You can compose `calculateRunRequest`, `calculateReportRequest` and `calculateReport` with services and layers. |
 | Browser application                              | HTTP API   | You avoid importing server-side calculation packages into the browser.                                          |
 | Non-TypeScript backend                           | HTTP API   | You can use JSON and generated OpenAPI reference.                                                               |

@@ -7,7 +7,7 @@ confidence: medium
 
 # Effect services
 
-WhatTax uses Effect services, layers, schemas and tagged errors as the default
+TaxKit uses Effect services, layers, schemas and tagged errors as the default
 shape for deterministic tax calculation boundaries.
 
 ## Scope
@@ -39,7 +39,7 @@ schema-backed value or tagged error envelope.
 
 ## Effect-native primitives
 
-WhatTax code MUST use Effect-native primitives and platform APIs when they fit
+TaxKit code MUST use Effect-native primitives and platform APIs when they fit
 the problem. This is a consistency and reliability rule, not a style
 preference.
 
@@ -169,7 +169,7 @@ catalogue constructor that preserves schema-to-continuation coupling. Review
 helper reuse and ownership in the required three audit passes rather than
 adding a brittle function-size rule.
 
-`whattax/no-decoding-outside-boundaries` enforces decoder placement across the
+`taxkit/no-decoding-outside-boundaries` enforces decoder placement across the
 repository. Its exact file allowlist belongs only in `oxlint.config.ts`; this
 architecture page owns the categories and review contract, not a duplicate
 path list. Use the active decoder inventory and this contract during review.

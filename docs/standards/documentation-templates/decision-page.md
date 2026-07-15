@@ -13,7 +13,7 @@ contribution path.
 ```md
 ---
 title: "Choose SDK or HTTP API"
-description: "Choose the right WhatTax integration surface for your application."
+description: "Choose the right TaxKit integration surface for your application."
 ---
 
 # Choose SDK or HTTP API

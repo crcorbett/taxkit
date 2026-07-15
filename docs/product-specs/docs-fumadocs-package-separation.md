@@ -9,17 +9,17 @@ confidence: high
 
 ## Overview
 
-WhatTax should keep MDX authoring, Fumadocs internals and app rendering in
+TaxKit should keep MDX authoring, Fumadocs internals and app rendering in
 separate ownership layers. The current docs runtime proved the first
 Fumadocs-based path, but it still puts generic Fumadocs configuration inside
-`@whattax/docs-content` and renders page markdown through an app-local
+`@taxkit/docs-content` and renders page markdown through an app-local
 hand-written markdown renderer.
 
 This spec updates [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md)
 with the package split we want before expanding public developer docs:
 
 - `apps/docs/content` owns authored MDX content.
-- `packages/docs-content` owns WhatTax docs schemas, navigation, validation
+- `packages/docs-content` owns TaxKit docs schemas, navigation, validation
   policy and the content service.
 - `packages/docs-fumadocs` owns reusable Fumadocs integration, source loader
   adapters, shared MDX options and reusable renderer helpers.
@@ -34,7 +34,7 @@ results or supported custom MDX items.
 
 ## Research and audit findings
 
-### Current WhatTax state
+### Current TaxKit state
 
 Current files inspected:
 
@@ -50,7 +50,7 @@ Current files inspected:
 
 Findings:
 
-- `@whattax/docs-content` currently owns both content contracts and generic
+- `@taxkit/docs-content` currently owns both content contracts and generic
   Fumadocs configuration, including Shiki transformers, Mermaid configuration
   and `Schema.toStandardSchemaV1(...)` bridging.
 - `apps/docs/src/lib/mdx/components.tsx` currently implements a markdown
@@ -61,14 +61,14 @@ Findings:
   rather than a Fumadocs loader-backed source. This keeps validation working,
   but the rendered app is not consuming the same compiled MDX source that
   Fumadocs validates.
-- The package architecture already names planned `@whattax/docs-fumadocs`, but
+- The package architecture already names planned `@taxkit/docs-fumadocs`, but
   the implemented workspace only includes `packages/*`, `packages/sdk/*` and
   `packages/rules/au/*`. The implementation should therefore create
   `packages/docs-fumadocs` unless the workspace globs are intentionally
   changed.
 - Current validation is Effect-native and valuable. It should move only when a
-  rule is generic Fumadocs wiring; WhatTax content policy should remain in
-  `@whattax/docs-content`.
+  rule is generic Fumadocs wiring; TaxKit content policy should remain in
+  `@taxkit/docs-content`.
 
 ### `Projects/site` reference
 
@@ -95,9 +95,9 @@ Findings to copy:
 - App runtime composes services with `ManagedRuntime`; routes consume services
   through app-local loaders.
 
-Findings to improve for WhatTax:
+Findings to improve for TaxKit:
 
-- WhatTax should avoid copying raw TypeScript branches, mutable arrays, broad
+- TaxKit should avoid copying raw TypeScript branches, mutable arrays, broad
   casts and one-off helpers from the reference implementation where an Effect
   primitive or schema-owned contract fits.
 - The reusable Fumadocs package should make the Standard Schema bridge, meta
@@ -128,12 +128,12 @@ Findings to copy:
 - App-local docs components own product-specific rendering and navigation
   behaviour.
 
-Findings to improve for WhatTax:
+Findings to improve for TaxKit:
 
-- WhatTax uses MDX content rather than Notion-backed docs, so Fumadocs MDX
+- TaxKit uses MDX content rather than Notion-backed docs, so Fumadocs MDX
   source generation and MDX component allowlist validation are first-class
   requirements.
-- WhatTax should keep renderer helpers reusable only when they are generic.
+- TaxKit should keep renderer helpers reusable only when they are generic.
   Domain-specific examples, SDK/API widgets and app shell components belong in
   `apps/docs/src/lib`.
 
@@ -141,7 +141,7 @@ Findings to improve for WhatTax:
 
 The current package split is too coarse for the next documentation phase:
 
-- `@whattax/docs-content` owns generic Fumadocs internals that future docs
+- `@taxkit/docs-content` owns generic Fumadocs internals that future docs
   packages would otherwise duplicate.
 - The docs app is not rendering compiled MDX modules from Fumadocs.
 - The current renderer parses markdown manually, so it cannot reliably support
@@ -154,20 +154,20 @@ The current package split is too coarse for the next documentation phase:
 
 ## Goals
 
-- Create a reusable private `@whattax/docs-fumadocs` package at
+- Create a reusable private `@taxkit/docs-fumadocs` package at
   `packages/docs-fumadocs`.
 - Keep authored public docs content in `apps/docs/content`.
-- Keep WhatTax content schemas and validation policy in
-  `@whattax/docs-content`.
+- Keep TaxKit content schemas and validation policy in
+  `@taxkit/docs-content`.
 - Move generic Fumadocs MDX configuration, Standard Schema bridging, source
-  loader helpers and reusable renderer primitives into `@whattax/docs-fumadocs`.
+  loader helpers and reusable renderer primitives into `@taxkit/docs-fumadocs`.
 - Render docs pages through Fumadocs compiled MDX modules, not hand-parsed
   markdown.
 - Use Effect Schema for frontmatter, meta, navigation, route loader and
   validation contracts.
 - Use `Effect.Match` for closed rendering branches where it clarifies supported
   cases.
-- Keep app-specific docs layout, search, route loaders and custom WhatTax MDX
+- Keep app-specific docs layout, search, route loaders and custom TaxKit MDX
   components in `apps/docs/src/lib`.
 - Add package-boundary audits that prove browser code does not import
   server-only generated source.
@@ -194,7 +194,7 @@ The implemented package split uses the flat workspace path
 Implemented ownership:
 
 - `apps/docs/content` owns authored public MDX.
-- `packages/docs-content` owns WhatTax docs schemas, navigation, validation,
+- `packages/docs-content` owns TaxKit docs schemas, navigation, validation,
   tagged errors, generated source wiring and the `DocsContentService`.
 - `packages/docs-fumadocs` owns reusable Fumadocs helpers, Standard Schema
   bridging, source adapters, page-tree conversion and generic MDX primitives.
@@ -202,7 +202,7 @@ Implemented ownership:
   shell CSS and app-specific MDX component composition.
 
 The docs app now renders compiled Fumadocs MDX modules through
-`@whattax/docs-content/client`, not hand-parsed markdown.
+`@taxkit/docs-content/client`, not hand-parsed markdown.
 
 ## Pre-implementation call graphs
 
@@ -226,7 +226,7 @@ browser
 ```ts
 Build: current Fumadocs source
 
-bun run --filter=@whattax/docs-content build
+bun run --filter=@taxkit/docs-content build
   -> fumadocs-mdx
     -> packages/docs-content/source.config.ts
       -> DocsPageFrontmatter via Schema.toStandardSchemaV1
@@ -237,7 +237,7 @@ bun run --filter=@whattax/docs-content build
 ```ts
 Tests: current validation
 
-bun run --filter=@whattax/docs-content validate
+bun run --filter=@taxkit/docs-content validate
   -> packages/docs-content/src/validate.runtime.ts
     -> validation policy
       -> frontmatter decode through DocsPageFrontmatter
@@ -255,14 +255,14 @@ browser
     -> apps/docs/src/lib/docs/route-boundary.ts
     -> apps/docs/src/lib/docs/loaders.ts
       -> DocsContentService
-        -> @whattax/docs-fumadocs source adapter
+        -> @taxkit/docs-fumadocs source adapter
           -> packages/docs-content/.source/server
             -> apps/docs/content/**/*.mdx
       -> serialisable Exit encoded/decoded with Effect Schema
-      -> preload @whattax/docs-content/client entry
+      -> preload @taxkit/docs-content/client entry
     -> apps/docs/src/lib/mdx/components.tsx
-      -> @whattax/docs-content/client createClientLoader
-      -> @whattax/docs-fumadocs/render primitives
+      -> @taxkit/docs-content/client createClientLoader
+      -> @taxkit/docs-fumadocs/render primitives
       -> app-local MDX component map
       -> compiled Fumadocs MDX component
 ```
@@ -270,10 +270,10 @@ browser
 ```ts
 Build: target Fumadocs source
 
-bun run --filter=@whattax/docs-content build
+bun run --filter=@taxkit/docs-content build
   -> fumadocs-mdx
     -> packages/docs-content/source.config.ts
-      -> @whattax/docs-fumadocs source config helpers
+      -> @taxkit/docs-fumadocs source config helpers
         -> Effect Schema to Standard Schema bridge
         -> generic DocsMeta schema
         -> shared Shiki and Mermaid MDX options
@@ -284,11 +284,11 @@ bun run --filter=@whattax/docs-content build
 Tests: final validation
 
 docs verification
-  -> @whattax/docs-fumadocs tests
+  -> @taxkit/docs-fumadocs tests
     -> Standard Schema bridge
     -> page tree adapter
     -> renderer helper contracts
-  -> @whattax/docs-content validation
+  -> @taxkit/docs-content validation
     -> Fumadocs generated source
     -> Effect Schema frontmatter and navigation decode
     -> navigation coverage audit
@@ -307,8 +307,8 @@ Audit: final package boundary
 parent reviewer
   -> import graph audit
     -> apps/docs content only under apps/docs/content
-    -> @whattax/docs-content has no React route or layout ownership
-    -> @whattax/docs-fumadocs has no WhatTax content policy ownership
+    -> @taxkit/docs-content has no React route or layout ownership
+    -> @taxkit/docs-fumadocs has no TaxKit content policy ownership
     -> apps/docs imports no generated .source/server files directly
     -> browser modules import no server-only docs exports
 ```
@@ -323,10 +323,10 @@ policy.
 
 ### `packages/docs-content`
 
-Owns WhatTax-specific docs content contracts:
+Owns TaxKit-specific docs content contracts:
 
 - `DocsPageFrontmatter`
-- `DocsMeta` only if WhatTax extends the generic meta contract
+- `DocsMeta` only if TaxKit extends the generic meta contract
 - `DocsNavigation`
 - `DocsPagePath`
 - `DocsPageSlug`
@@ -338,7 +338,7 @@ Owns WhatTax-specific docs content contracts:
 - tagged source and lookup errors
 - generated source export wiring for this content collection
 
-It may call `@whattax/docs-fumadocs` helpers. It must not own reusable Shiki
+It may call `@taxkit/docs-fumadocs` helpers. It must not own reusable Shiki
 transformers, generic Fumadocs page tree conversion, app routes, React layout
 or app-specific MDX components.
 
@@ -352,10 +352,10 @@ Owns reusable Fumadocs integration:
 - code block metadata transformer
 - Fumadocs source loader adapter
 - Fumadocs `PageTree` conversion helpers
-- reusable renderer primitives that are not WhatTax-domain-specific
+- reusable renderer primitives that are not TaxKit-domain-specific
 - browser-safe and server-only export separation
 
-It must not import `@whattax/docs-content`, SDK, API or calculator packages
+It must not import `@taxkit/docs-content`, SDK, API or calculator packages
 unless a specific reusable renderer primitive requires a browser-safe public
 contract and the architecture docs approve that dependency.
 
@@ -368,12 +368,12 @@ Owns app-specific composition:
 - Fumadocs layout shell
 - search/navigation presentation
 - app-local MDX component map
-- WhatTax-specific docs components, such as SDK/API examples and generated
+- TaxKit-specific docs components, such as SDK/API examples and generated
   reference embeds
 - browser smoke tests and app route tests
 
-It may import browser-safe helpers from `@whattax/docs-fumadocs` and
-server-only content service exports from `@whattax/docs-content` only inside
+It may import browser-safe helpers from `@taxkit/docs-fumadocs` and
+server-only content service exports from `@taxkit/docs-content` only inside
 server-only route loader/runtime modules.
 
 ## Implementation requirements
@@ -381,7 +381,7 @@ server-only route loader/runtime modules.
 ### Reusable Fumadocs package
 
 Create `packages/docs-fumadocs` with package name
-`@whattax/docs-fumadocs`.
+`@taxkit/docs-fumadocs`.
 
 Recommended exports:
 
@@ -433,9 +433,9 @@ Fumadocs source with typed errors.
 Refactor `packages/docs-content/source.config.ts` so it mainly declares:
 
 - the content directory
-- the WhatTax frontmatter schema
-- optional WhatTax meta extensions
-- calls into `@whattax/docs-fumadocs/config`
+- the TaxKit frontmatter schema
+- optional TaxKit meta extensions
+- calls into `@taxkit/docs-fumadocs/config`
 
 `packages/docs-content` should use the generated Fumadocs source for page
 lookup and rendering data. Validation may still read raw files where file
@@ -448,8 +448,8 @@ Replace the hand-written markdown renderer in
 `apps/docs/src/lib/mdx/components.tsx` with Fumadocs compiled MDX rendering.
 The app should keep a small component map that combines:
 
-- reusable primitives from `@whattax/docs-fumadocs/render`
-- app-specific WhatTax components in `apps/docs/src/lib`
+- reusable primitives from `@taxkit/docs-fumadocs/render`
+- app-specific TaxKit components in `apps/docs/src/lib`
 - default HTML element overrides where useful
 
 Route loader data should use Effect Schema-owned serialisable contracts. If the
@@ -498,13 +498,13 @@ Docs changes must follow:
 Required verification:
 
 ```txt
-bun run --filter=@whattax/docs-fumadocs build
-bun run --filter=@whattax/docs-fumadocs check-types
-bun run --filter=@whattax/docs-fumadocs test
-bun run --filter=@whattax/docs-content build
-bun run --filter=@whattax/docs-content check-types
-bun run --filter=@whattax/docs-content test
-bun run --filter=@whattax/docs-content validate
+bun run --filter=@taxkit/docs-fumadocs build
+bun run --filter=@taxkit/docs-fumadocs check-types
+bun run --filter=@taxkit/docs-fumadocs test
+bun run --filter=@taxkit/docs-content build
+bun run --filter=@taxkit/docs-content check-types
+bun run --filter=@taxkit/docs-content test
+bun run --filter=@taxkit/docs-content validate
 bun run --filter=docs check-types
 bun run --filter=docs build
 bun run verification
@@ -537,9 +537,9 @@ rendering task. Build/typecheck success alone is not enough for this spec.
 Audit commands should prove:
 
 ```txt
-rg "@whattax/docs-content/server|\\.source/server" apps/docs/src
+rg "@taxkit/docs-content/server|\\.source/server" apps/docs/src
 rg "from [\"']react|\\.tsx" packages/docs-content
-rg "@whattax/docs-content" packages/docs-fumadocs
+rg "@taxkit/docs-content" packages/docs-fumadocs
 rg "switch \\(|Object\\.values|Object\\.entries| as " packages/docs-fumadocs packages/docs-content apps/docs/src/lib
 ```
 
@@ -550,18 +550,18 @@ The fourth should be reviewed manually for justified exceptions.
 
 - Fumadocs generated source may rely on bundler assumptions. Keep generated
   source behind package exports and test the docs app build.
-- Renderer primitives can become too app-specific. Keep WhatTax-specific items
+- Renderer primitives can become too app-specific. Keep TaxKit-specific items
   in `apps/docs/src/lib` until repetition proves they should move.
 - Frontmatter validation can drift from public docs standards. Keep
   `DocsPageFrontmatter` schema-owned and validate public MDX pages in
-  `@whattax/docs-content`.
+  `@taxkit/docs-content`.
 - Browser-safe imports can regress silently. Add `rg` audits and route tests
   that fail when browser code imports server-only source.
 
 ## Acceptance criteria
 
-- `@whattax/docs-fumadocs` exists and owns reusable Fumadocs integration.
-- `@whattax/docs-content` owns WhatTax docs content contracts and validation,
+- `@taxkit/docs-fumadocs` exists and owns reusable Fumadocs integration.
+- `@taxkit/docs-content` owns TaxKit docs content contracts and validation,
   not generic renderer or route behaviour.
 - `apps/docs` renders compiled Fumadocs MDX modules with an app-local component
   map.

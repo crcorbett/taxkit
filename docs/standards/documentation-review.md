@@ -7,7 +7,7 @@ confidence: medium
 
 # Documentation review
 
-Use this guide when reviewing, editing or auditing WhatTax documentation.
+Use this guide when reviewing, editing or auditing TaxKit documentation.
 
 Review docs in passes. Do not try to catch voice, structure, accuracy and
 links in one read.

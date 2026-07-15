@@ -7,7 +7,7 @@ confidence: high
 
 # Testing And Validation
 
-WhatTax calculations need deterministic tests, graph validation, API tests, SDK tests and package-boundary tests.
+TaxKit calculations need deterministic tests, graph validation, API tests, SDK tests and package-boundary tests.
 
 ## Deterministic Calculation Tests
 
@@ -97,8 +97,8 @@ only `src/**/*.ts` without special test excludes.
 Use package public imports for black-box tests:
 
 ```ts
-import { AuTakeHomePay2025_26_Live } from "@whattax/rules-au-pay";
-import { AtoSchedule1TableDescriptor } from "@whattax/rules-au-pay/parameters";
+import { AuTakeHomePay2025_26_Live } from "@taxkit/rules-au-pay";
+import { AtoSchedule1TableDescriptor } from "@taxkit/rules-au-pay/parameters";
 ```
 
 Use relative `../src/...` imports only for deliberate white-box tests of private

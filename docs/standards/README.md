@@ -1,6 +1,6 @@
-# WhatTax Engineering Standards
+# TaxKit Engineering Standards
 
-This directory records standards that apply across WhatTax packages. These
+This directory records standards that apply across TaxKit packages. These
 documents are part of the public engine contract: they explain how contributors
 should structure code, use Effect, document public APIs, and run repository
 quality tools.

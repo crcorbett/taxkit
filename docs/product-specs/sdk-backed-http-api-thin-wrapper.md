@@ -9,10 +9,10 @@ confidence: medium
 
 ## Overview
 
-Make `@whattax/http-api` a thinner transport wrapper around the TypeScript SDK
+Make `@taxkit/http-api` a thinner transport wrapper around the TypeScript SDK
 for calculation execution.
 
-The HTTP API already consumes `@whattax/sdk/effect` for the calculator report,
+The HTTP API already consumes `@taxkit/sdk/effect` for the calculator report,
 but the calculate handler still re-enters `PublicCalculatorService` to fetch
 calculator metadata and graph diagnostics before constructing
 `CalculatorRunResponseData`. That means the HTTP handler still knows too much
@@ -20,7 +20,7 @@ about reusable calculation response assembly.
 
 This spec moves full calculator-run response assembly behind the SDK Effect
 facade while keeping HTTP route schemas, status annotations, OpenAPI metadata
-and HTTP error envelopes in `@whattax/http-api`.
+and HTTP error envelopes in `@taxkit/http-api`.
 
 It also renames the confusing API and SDK public symbols that now show up in
 call graphs. Names should describe the runtime boundary they represent:
@@ -33,7 +33,7 @@ Implemented in the current repo:
 
 - reusable calculator run contracts use `CalculatorRun*` names
 - HTTP calculator transport names use `CalculatorApi*`
-- `@whattax/sdk/effect` exposes `calculateRunRequest`,
+- `@taxkit/sdk/effect` exposes `calculateRunRequest`,
   `calculateReportRequest` and `calculateReport`
 - HTTP calculate delegates full-run execution through the SDK Effect facade and
   maps only transport-owned envelopes
@@ -48,10 +48,10 @@ Before implementation, the calculate call graph was split:
 Production: previous HTTP calculate
 
 apps/api Bun process
-  -> WhatTaxServerLayer
+  -> TaxKitServerLayer
     -> PublicCalculationMetadataHandlerLive
       -> sdkCalculationFor(params.calculatorId)
-      -> @whattax/sdk/effect calculateRequest
+      -> @taxkit/sdk/effect calculateRequest
         -> PublicCalculatorService.calculate
           -> CalculatorCatalogEntry.inputSchema decode
           -> CalculationEngine
@@ -82,10 +82,10 @@ This proves the SDK boundary but leaves two issues:
   HTTP transport errors/envelopes.
 - Rename API and SDK public symbols so call graphs read as calculator API
   transport delegating to calculator-run SDK helpers.
-- Keep `@whattax/sdk` independent of `@whattax/http-api`.
-- Keep `@whattax/http-api` as the owner of route paths, params, query schemas,
+- Keep `@taxkit/sdk` independent of `@taxkit/http-api`.
+- Keep `@taxkit/http-api` as the owner of route paths, params, query schemas,
   status annotations, OpenAPI metadata and HTTP error envelopes.
-- Keep `@whattax/calculators` as the owner of `CalculatorRun*`,
+- Keep `@taxkit/calculators` as the owner of `CalculatorRun*`,
   `CalculatorServiceError`, catalog lookup, selected input-schema decode,
   graph diagnostics and calculation execution.
 - Preserve strict compile-time descriptor safety for SDK consumers.
@@ -105,13 +105,13 @@ This proves the SDK boundary but leaves two issues:
 
 ## Ownership and boundaries
 
-`@whattax/sdk/effect` should own reusable in-process calculation facades:
+`@taxkit/sdk/effect` should own reusable in-process calculation facades:
 
 - typed report-only helpers for app consumers
 - typed full-run helpers for transport adapters and advanced consumers
 - descriptor-to-input/output compile-time narrowing
 
-`@whattax/http-api` should own only transport concerns:
+`@taxkit/http-api` should own only transport concerns:
 
 - `HttpApiGroup` and `HttpApiEndpoint` definitions
 - path params, query schemas and payload/status annotations
@@ -119,7 +119,7 @@ This proves the SDK boundary but leaves two issues:
 - `CalculatorApiErrorEnvelope`
 - mapping typed SDK/calculator failures to HTTP error envelopes
 
-`@whattax/calculators` remains the reusable calculation service owner:
+`@taxkit/calculators` remains the reusable calculation service owner:
 
 - `PublicCalculatorService`
 - `CalculatorRunRequest`, `CalculatorRunServiceRequest`,
@@ -159,9 +159,9 @@ Plain SDK names:
 
 | Current name | Target name | Notes |
 | --- | --- | --- |
-| `WhatTax.calculate` | keep | The plain facade is intentionally ergonomic and report-only. |
-| `WhatTax.safe.calculate` | keep | Safe report-only plain facade. |
-| optional new helper | `WhatTax.calculateRun` | Plain full-run helper may be added later, but is not required for the HTTP cleanup. |
+| `TaxKit.calculate` | keep | The plain facade is intentionally ergonomic and report-only. |
+| `TaxKit.safe.calculate` | keep | Safe report-only plain facade. |
+| optional new helper | `TaxKit.calculateRun` | Plain full-run helper may be added later, but is not required for the HTTP cleanup. |
 
 Transitional aliases may be retained inside the SDK and HTTP API during the
 repo migration, but they must be marked deprecated and omitted from README
@@ -173,10 +173,10 @@ examples, architecture docs and call graphs before publication.
 Production: target HTTP calculate
 
 apps/api Bun process
-  -> WhatTaxServerLayer
+  -> TaxKitServerLayer
     -> CalculatorApiHandlerLive
       -> sdkCalculationFor(params.calculatorId)
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
           -> CalculatorCatalogEntry.inputSchema decode
           -> CalculationEngine
@@ -199,7 +199,7 @@ are below the transport boundary once the SDK exposes a full-run helper.
 Production: SDK Effect full run
 
 Effect consumer
-  -> @whattax/sdk/effect calculateRunRequest(descriptor, request)
+  -> @taxkit/sdk/effect calculateRunRequest(descriptor, request)
     -> PublicCalculatorService.calculate({ calculatorId, ...request })
       -> CalculatorRunServiceRequest
       -> CalculatorRunResponse
@@ -241,9 +241,9 @@ helper exists:
 Production: optional plain full run
 
 consumer app
-  -> WhatTax.calculateRun(...)
+  -> TaxKit.calculateRun(...)
     -> ManagedRuntime over PublicCalculatorServiceLive
-      -> @whattax/sdk/effect calculateRunRequest policy
+      -> @taxkit/sdk/effect calculateRunRequest policy
     -> Promise<SdkCalculatorRunResponse<TypedReport>>
 ```
 
@@ -260,7 +260,7 @@ CalculatorServiceError | Schema.SchemaError
 ```
 
 `CalculatorServiceError` should map to `CalculatorApiErrorEnvelope` in
-`@whattax/http-api`.
+`@taxkit/http-api`.
 
 `Schema.SchemaError` from descriptor output decode is outside the declared
 HTTP calculator-service failure contract. The current handler dies on this
@@ -301,9 +301,9 @@ SDK Effect tests
 Tests: HTTP calculate thin wrapper
 
 HTTP API tests
-  -> WhatTaxServerLayer
+  -> TaxKitServerLayer
     -> CalculatorApiHandlerLive
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorServiceLive
   -> success response matches SDK full-run response
   -> CalculatorInputDecodeError still maps to CalculatorApiErrorEnvelope
@@ -313,7 +313,7 @@ HTTP API tests
 Tests: import boundaries
 
 SDK boundary check
-  -> @whattax/sdk has no @whattax/http-api dependency
+  -> @taxkit/sdk has no @taxkit/http-api dependency
   -> browser-safe entrypoints still avoid server-only modules
 
 HTTP handler audit
@@ -323,14 +323,14 @@ HTTP handler audit
 
 Required verification:
 
-- `bun run --filter=@whattax/sdk test`
-- `bun run --filter=@whattax/sdk test-types`
-- `bun run --filter=@whattax/sdk check-types`
-- `bun run --filter=@whattax/sdk build`
-- `bun run --filter=@whattax/http-api test`
-- `bun run --filter=@whattax/http-api check-types`
-- `bun run --filter=@whattax/http-api build`
-- `bun run --filter=@whattax/sdk check-boundaries`
+- `bun run --filter=@taxkit/sdk test`
+- `bun run --filter=@taxkit/sdk test-types`
+- `bun run --filter=@taxkit/sdk check-types`
+- `bun run --filter=@taxkit/sdk build`
+- `bun run --filter=@taxkit/http-api test`
+- `bun run --filter=@taxkit/http-api check-types`
+- `bun run --filter=@taxkit/http-api build`
+- `bun run --filter=@taxkit/sdk check-boundaries`
 - `bun run verification`
 - `bun run changeset`
 - `bun run changeset status --verbose`
@@ -352,18 +352,18 @@ Required verification:
 
 Package-facing impact:
 
-- `@whattax/sdk`: patch for clearer Effect helper/type names, a new Effect
+- `@taxkit/sdk`: patch for clearer Effect helper/type names, a new Effect
   full-run helper and exported response type.
-- `@whattax/http-api`: patch for handler behaviour moving behind the SDK
+- `@taxkit/http-api`: patch for handler behaviour moving behind the SDK
   facade and clearer calculator API group/envelope names while preserving
   route behaviour.
 
-No `@whattax/calculators` Changeset is expected unless implementation changes
+No `@taxkit/calculators` Changeset is expected unless implementation changes
 calculator-owned schemas, service contracts or runtime behaviour.
 
 ## Acceptance criteria
 
-- `@whattax/sdk/effect` exports a full-run helper that returns the canonical
+- `@taxkit/sdk/effect` exports a full-run helper that returns the canonical
   calculator response shape with descriptor-narrowed `report` typing.
 - SDK Effect report-only helpers are named `calculateReportRequest` and
   `calculateReport`, and delegate through the full-run helper instead of
@@ -376,8 +376,8 @@ calculator-owned schemas, service contracts or runtime behaviour.
   `CalculatorApiHandlerLive`, `CalculatorApiErrorEnvelope` and
   `CalculatorApiErrorEnvelopeData`.
 - HTTP route schemas, status annotations, OpenAPI metadata and
-  `CalculatorApiErrorEnvelope` remain in `@whattax/http-api`.
-- SDK import-boundary checks still prove no dependency on `@whattax/http-api`.
+  `CalculatorApiErrorEnvelope` remain in `@taxkit/http-api`.
+- SDK import-boundary checks still prove no dependency on `@taxkit/http-api`.
 - Runtime parity tests prove HTTP success/error behaviour still matches the SDK
   and calculator service.
 - Type tests prove descriptor input/output narrowing is preserved.

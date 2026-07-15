@@ -57,7 +57,7 @@ Parameter tables are services, not imported globals. Algorithms depend on parame
 
 ```ts
 export class AtoSchedule1Table extends Context.Tag(
-  "whattax/au/payg/AtoSchedule1Table"
+  "taxkit/au/payg/AtoSchedule1Table"
 )<AtoSchedule1Table, Schedule1Table>() {}
 
 export const AtoSchedule1_2025_26_Live = Layer.succeed(

@@ -1,6 +1,6 @@
 ---
 title: "Error reference"
-description: "Handle expected WhatTax SDK, calculator service and HTTP API errors."
+description: "Handle expected TaxKit SDK, calculator service and HTTP API errors."
 status: "draft"
 ---
 
@@ -11,14 +11,14 @@ responses.
 
 ## SDK errors
 
-`WhatTax.safe.calculate` returns a tagged success or failure value.
+`TaxKit.safe.calculate` returns a tagged success or failure value.
 
-| Result           | Meaning                                                |
-| ---------------- | ------------------------------------------------------ |
-| `WhatTaxSuccess` | The calculation returned a descriptor-decoded report.  |
-| `WhatTaxFailure` | The calculation failed with `WhatTaxCalculationError`. |
+| Result          | Meaning                                               |
+| --------------- | ----------------------------------------------------- |
+| `TaxKitSuccess` | The calculation returned a descriptor-decoded report. |
+| `TaxKitFailure` | The calculation failed with `TaxKitCalculationError`. |
 
-`WhatTaxCalculationError.error` can contain a `CalculatorServiceError`, a
+`TaxKitCalculationError.error` can contain a `CalculatorServiceError`, a
 schema decode error from descriptor output decoding or an unexpected defect
 wrapper.
 
@@ -36,7 +36,7 @@ The calculator service uses `CalculatorServiceError` for expected failures.
 ## HTTP errors
 
 The HTTP API wraps expected calculator service failures in
-`CalculatorApiErrorEnvelope`. The envelope is owned by `@whattax/api-http`
+`CalculatorApiErrorEnvelope`. The envelope is owned by `@taxkit/api-http`
 because it describes transport status encoding.
 
 ```json
@@ -58,10 +58,10 @@ facts.
 Production: expected calculator failure
 
 Caller
-  -> WhatTax.safe.calculate or HTTP calculate
+  -> TaxKit.safe.calculate or HTTP calculate
     -> PublicCalculatorService.calculate
       -> CalculatorServiceError
-    -> WhatTaxFailure or CalculatorApiErrorEnvelope
+    -> TaxKitFailure or CalculatorApiErrorEnvelope
 ```
 
 ## Owning sources

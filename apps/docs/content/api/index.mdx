@@ -1,6 +1,6 @@
 ---
 title: "API"
-description: "Call WhatTax over HTTP when the caller cannot import the SDK."
+description: "Call TaxKit over HTTP when the caller cannot import the SDK."
 status: "draft"
 ---
 
@@ -23,9 +23,9 @@ contracts or OpenAPI reference material.
 Production: HTTP calculate
 
 HTTP caller
-  -> @whattax/api-http route contract
+  -> @taxkit/api-http route contract
     -> CalculatorApiHandlerLive
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
           -> CalculationEngine
 ```

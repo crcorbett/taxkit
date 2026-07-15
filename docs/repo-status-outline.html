@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>WhatTax Repo Status Outline</title>
+    <title>TaxKit Repo Status Outline</title>
     <style>
       :root {
         color-scheme: light;
@@ -225,7 +225,7 @@
   <body>
     <main>
       <header>
-        <h1>WhatTax repo status outline</h1>
+        <h1>TaxKit repo status outline</h1>
         <p class="lede">
           High-level view of how the repository currently works, what has been
           completed, and what remains to be built. This is a manually refreshed
@@ -233,7 +233,7 @@
           source of truth.
         </p>
         <div class="meta">
-          <span class="pill">Repo: WhatTax</span>
+          <span class="pill">Repo: TaxKit</span>
           <span class="pill">Branch: main</span>
           <span class="pill">Last reviewed: 2026-07-14</span>
           <span class="pill">Snapshot: manual</span>
@@ -267,7 +267,7 @@
             <h3>HTTP API</h3>
             <p>
               <code>apps/api</code> runs the Bun API process, while
-              <code>@whattax/api-http</code> owns Effect HTTP API contracts,
+              <code>@taxkit/api-http</code> owns Effect HTTP API contracts,
               generated docs, OpenAPI JSON, metadata routes and public
               calculation endpoints.
             </p>
@@ -284,7 +284,7 @@
               <li>The root route in <code>apps/web</code> loads health data.</li>
               <li>
                 It resolves the route runtime and yields
-                <code>WhatTaxHttpApiService</code>.
+                <code>TaxKitHttpApiService</code>.
               </li>
               <li>
                 The service calls <code>api.health.getHealth()</code> through
@@ -304,7 +304,7 @@
               <li><code>packages/api/http</code> owns the current API contract.</li>
               <li><code>packages/calculators</code> owns calculator orchestration.</li>
               <li><code>packages/sdk/typescript</code> owns the private SDK package.</li>
-              <li><code>packages/docs-content</code> owns WhatTax docs contracts.</li>
+              <li><code>packages/docs-content</code> owns TaxKit docs contracts.</li>
               <li><code>packages/docs-fumadocs</code> owns reusable Fumadocs wiring.</li>
               <li><code>packages/tsconfig</code> owns shared TypeScript config.</li>
               <li>
@@ -336,7 +336,7 @@
             <tr>
               <td>Public API</td>
               <td>Done</td>
-              <td><code>apps/api</code> serves health, generated docs, OpenAPI JSON, metadata, graph and public calculation routes through <code>@whattax/api-http</code>.</td>
+              <td><code>apps/api</code> serves health, generated docs, OpenAPI JSON, metadata, graph and public calculation routes through <code>@taxkit/api-http</code>.</td>
             </tr>
             <tr>
               <td>Web integration</td>
@@ -346,12 +346,12 @@
             <tr>
               <td>Docs runtime</td>
               <td>Done</td>
-              <td><code>apps/docs</code> renders public MDX content through <code>@whattax/docs-content</code> and <code>@whattax/docs-fumadocs</code>.</td>
+              <td><code>apps/docs</code> renders public MDX content through <code>@taxkit/docs-content</code> and <code>@taxkit/docs-fumadocs</code>.</td>
             </tr>
             <tr>
               <td>SDK package</td>
               <td>Private</td>
-              <td><code>@whattax/sdk</code> has plain, safe-result, Effect, AU, schema and testing entrypoints. Its packed nine-package closure passes clean install, public-import, runtime, type and browser checks. Npm publication remains gated.</td>
+              <td><code>@taxkit/sdk</code> has plain, safe-result, Effect, AU, schema and testing entrypoints. Its packed nine-package closure passes clean install, public-import, runtime, type and browser checks. Npm publication remains gated.</td>
             </tr>
             <tr>
               <td>Repository foundation</td>
@@ -361,12 +361,12 @@
             <tr>
               <td>Static architecture rules</td>
               <td>Done for current contracts</td>
-              <td>Portable <code>effect/*</code>, <code>bun/*</code> and <code>mdx/*</code> rules have real Oxlint binary fixtures. WhatTax rules enforce boundary-only decoding and direct route-consumer restoration.</td>
+              <td>Portable <code>effect/*</code>, <code>bun/*</code> and <code>mdx/*</code> rules have real Oxlint binary fixtures. TaxKit rules enforce boundary-only decoding and direct route-consumer restoration.</td>
             </tr>
             <tr>
               <td>Release readiness</td>
               <td>Implemented</td>
-              <td><code>@whattax/scripts</code> runs nine canonical verification, build, package, API, browser and Changeset gates as one ordered Effect program. It does not version or publish packages.</td>
+              <td><code>@taxkit/scripts</code> runs nine canonical verification, build, package, API, browser and Changeset gates as one ordered Effect program. It does not version or publish packages.</td>
             </tr>
             <tr>
               <td>Architecture docs</td>

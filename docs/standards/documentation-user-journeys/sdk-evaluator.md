@@ -8,7 +8,7 @@ confidence: medium
 # SDK evaluator journey
 
 Reader:
-: A TypeScript developer evaluating whether WhatTax can run the calculation
+: A TypeScript developer evaluating whether TaxKit can run the calculation
   they need.
 
 Need:

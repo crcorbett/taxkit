@@ -1,5 +1,5 @@
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/documentation-structure-and-development-docs.md",
   "title": "Documentation Structure And Development Docs Tasks",
   "status": "implemented",
@@ -8,7 +8,7 @@
     "Keep root AGENTS.md as a short routing atlas.",
     "Add canonical docs only when they have a clear owner.",
     "Do not link to aspirational files from the root atlas.",
-    "Keep public WhatTax docs focused on the open-source engine."
+    "Keep public TaxKit docs focused on the open-source engine."
   ],
   "globalVerification": {
     "commitPolicy": "Commit only after the documentation slice and verification pass.",
@@ -36,8 +36,8 @@
         ".agents/skills/prd-implementer/SKILL.md"
       ],
       "outputs": [
-        "WhatTax-adapted PRD writer skill",
-        "WhatTax-adapted PRD implementer skill"
+        "TaxKit-adapted PRD writer skill",
+        "TaxKit-adapted PRD implementer skill"
       ],
       "mandatoryVerification": [
         "bun run verification",

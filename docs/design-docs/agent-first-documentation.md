@@ -7,7 +7,7 @@ confidence: high
 
 # Agent-First Documentation
 
-WhatTax docs should help humans and agents route quickly to the current source
+TaxKit docs should help humans and agents route quickly to the current source
 of truth.
 
 ## Principles
@@ -23,7 +23,7 @@ of truth.
 
 - Prefer one canonical doc per topic.
 - Link to the owning doc instead of duplicating content.
-- Keep public WhatTax docs focused on the open-source engine, API, SDK and docs
+- Keep public TaxKit docs focused on the open-source engine, API, SDK and docs
   site.
 - Add freshness metadata to canonical docs.
 - Include compact call-graph diagrams in docs that describe runtime behavior,

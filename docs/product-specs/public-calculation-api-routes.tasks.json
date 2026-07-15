@@ -1,5 +1,5 @@
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/public-calculation-api-routes.md",
   "title": "Public Calculation API Route Tasks",
   "status": "implemented",
@@ -42,7 +42,7 @@
       "type": "foundation",
       "dependsOn": [],
       "goal": "Add the schema-backed catalog and API boundary types needed for calculator, fact, rule and graph routes without implementing public calculation execution yet.",
-      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
       "scope": [
         "packages/http-api/src/groups",
         "packages/http-api/src/handlers",
@@ -64,7 +64,7 @@
       ],
       "mandatoryVerification": [
         "bun run verification",
-        "bun run --filter=@whattax/http-api check-types",
+        "bun run --filter=@taxkit/http-api check-types",
         "Search changed files for mirrored canonical fields such as local id: string definitions where an owning branded ID/schema exists",
         "Search changed files for Object.entries, Object.values, manual _tag objects, unsafe casts and non-null assertions",
         "bun run changeset"
@@ -75,7 +75,7 @@
         "Canonical descriptors and report schemas are imported from owning packages",
         "No calculation route is exposed yet unless its handler is complete",
         "Parent agent verified canonical schema/type/id reuse",
-        "Changeset covers @whattax/http-api and any package whose public exports changed"
+        "Changeset covers @taxkit/http-api and any package whose public exports changed"
       ],
       "commitAfterPassing": true
     },
@@ -88,7 +88,7 @@
         "PUBLIC-API-001"
       ],
       "goal": "Expose calculator discovery and graph/question-planning metadata before calculation execution.",
-      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
       "scope": [
         "packages/http-api/src/api.ts",
         "packages/http-api/src/groups",
@@ -111,7 +111,7 @@
       ],
       "mandatoryVerification": [
         "bun run verification",
-        "bun run --filter=@whattax/http-api check-types",
+        "bun run --filter=@taxkit/http-api check-types",
         "Run apps/api locally and request /api/docs/openapi.json",
         "Smoke check at least /api/v1/calculators, /api/v1/calculators/au.pay.take-home/schema?help=full, /api/v1/facts?calculator=au.pay.take-home and /api/v1/rules?calculator=au.pay.take-home",
         "Confirm metadata routes expose canonical fact descriptors and rule descriptors rather than copied DTO fields",
@@ -136,7 +136,7 @@
         "PUBLIC-API-002"
       ],
       "goal": "Expose POST /api/v1/calculators/:calculatorId/calculate with canonical scenario decoding, rule-pack Layer selection, CalculationEngine execution and schema-guided errors.",
-      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
       "scope": [
         "packages/http-api/src/groups",
         "packages/http-api/src/handlers",
@@ -158,7 +158,7 @@
       ],
       "mandatoryVerification": [
         "bun run verification",
-        "bun run --filter=@whattax/http-api check-types",
+        "bun run --filter=@taxkit/http-api check-types",
         "Run apps/api locally and smoke check successful au.pay.take-home calculation",
         "Run apps/api locally and smoke check successful au.income-tax.annual calculation",
         "Run apps/api locally and smoke check a schema error for missing grossPay.period with help=errors",
@@ -185,7 +185,7 @@
         "PUBLIC-API-003"
       ],
       "goal": "Make the public calculation API discoverable, tested, versioned and aligned with the architecture docs.",
-      "implementationPrompt": "You are implementing exactly one task from the WhatTax spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list. Before editing, read docs/product-specs/public-calculation-api-routes.md, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owning package for every schema, type, ID, service, layer and tagged error you touch. MUST use Effect-native primitives when they fit: Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun, Platform, Command and ManagedRuntime. Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package. Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists. Keep one-off Effect error handling and transformations inline at the callsite. Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals. Package-facing changes MUST add or update a Changeset with bun run changeset using a user-facing changelog summary. Run mandatory verification gates, report the Changeset path and release-train impact or no-Changeset rationale, report changed files and residual risks, and stop after this task for parent review.",
       "scope": [
         "README.md",
         "CHANGELOG.md",

@@ -10,7 +10,7 @@ confidence: medium
 ## Overview
 
 Move reusable public calculator catalog, metadata, graph, calculation and
-expected-error logic out of `@whattax/http-api` into a reusable calculator
+expected-error logic out of `@taxkit/http-api` into a reusable calculator
 orchestration package. HTTP handlers should become thin wrappers around Effect
 service methods.
 
@@ -23,12 +23,12 @@ packages/calculators
 Target package name:
 
 ```txt
-@whattax/calculators
+@taxkit/calculators
 ```
 
 ## Implementation status
 
-Implemented in the current repo. `@whattax/calculators` owns reusable
+Implemented in the current repo. `@taxkit/calculators` owns reusable
 calculator catalog, metadata, graph, calculation and expected-error logic.
 Final verification evidence is tracked in
 [the completed execution plan](../exec-plans/completed/extract-public-calculator-service.md).
@@ -42,22 +42,22 @@ decode error formatting and response construction. Some reusable catalog and
 metadata transformation logic also lived in
 `packages/http-api/src/groups/calculators.ts`.
 
-That makes `@whattax/http-api` more than a transport package. It also makes
+That makes `@taxkit/http-api` more than a transport package. It also makes
 the future SDK and CLI likely to duplicate calculator behaviour or import HTTP
 internals. The public calculator behaviour should be reusable without depending
 on HTTP handlers, OpenAPI generation or app runtime modules.
 
 ## Goals
 
-- Create `@whattax/calculators` as the reusable calculator orchestration
+- Create `@taxkit/calculators` as the reusable calculator orchestration
   package.
-- Move public calculator catalog ownership out of `@whattax/http-api`.
+- Move public calculator catalog ownership out of `@taxkit/http-api`.
 - Move metadata projection, graph assembly, calculation dispatch and expected
   error shaping into service methods.
 - Replace handler-local undefined branching, context defaults, conditional
   object-spread shaping and ad hoc schema-issue formatting with
   Effect-native service policies.
-- Keep `@whattax/http-api` responsible for route schemas, OpenAPI/status
+- Keep `@taxkit/http-api` responsible for route schemas, OpenAPI/status
   annotations, typed HTTP clients and thin handler adapters.
 - Keep `apps/api` as a runtime-only Bun app.
 - Preserve the implemented public route paths while improving the generated
@@ -68,7 +68,7 @@ on HTTP handlers, OpenAPI generation or app runtime modules.
 ## Non-goals
 
 - Add new calculator coverage.
-- Rename `@whattax/http-api` to `@whattax/api-http`.
+- Rename `@taxkit/http-api` to `@taxkit/api-http`.
 - Build the TypeScript SDK package.
 - Change public route paths.
 - Add persistence, auth, accounts or saved scenarios.
@@ -85,7 +85,7 @@ brands such as calculator id, jurisdiction and tax year belong in
 `packages/core`; rule packages narrow those brands to the concrete values they
 support.
 
-`@whattax/calculators` owns:
+`@taxkit/calculators` owns:
 
 - composed public calculator schemas that reuse rule-owned calculator ids,
   jurisdictions, tax years, facts, reports and descriptors
@@ -105,13 +105,13 @@ support.
   object-spread construction
 - schema issue path formatting through reusable service/error policy
 
-`@whattax/http-api` should own:
+`@taxkit/http-api` should own:
 
 - Effect HTTP API groups and endpoints
 - OpenAPI annotations
 - HTTP status annotations such as bad-request envelopes
 - typed HTTP client helpers
-- thin handler layers that call `@whattax/calculators`
+- thin handler layers that call `@taxkit/calculators`
 
 The dependency direction must be:
 
@@ -123,7 +123,7 @@ packages/core
   <- apps/api
 ```
 
-`@whattax/calculators` must not import from `@whattax/http-api`,
+`@taxkit/calculators` must not import from `@taxkit/http-api`,
 `apps/api`, `apps/web` or browser/runtime modules.
 
 ## Proposed approach
@@ -185,13 +185,13 @@ export class PublicCalculatorService extends Context.Service<
       request: CalculatorRunServiceRequest
     ) => Effect.Effect<CalculatorRunResponse, CalculatorServiceError>;
   }
->()("@whattax/calculators/PublicCalculatorService") {}
+>()("@taxkit/calculators/PublicCalculatorService") {}
 ```
 
 The implementation should use Effect-native collection and error primitives.
 Expected failures should be tagged errors or schema-backed error envelopes from
 the service package. HTTP-specific status decoration belongs in
-`@whattax/http-api`.
+`@taxkit/http-api`.
 
 ### Public calculation facts schema
 
@@ -202,7 +202,7 @@ POST /api/v1/calculators/:calculatorId/calculate
 ```
 
 The route payload MUST NOT use `facts: Schema.Unknown` as the public contract.
-`@whattax/calculators` exports a composed `CalculatorRunFacts` schema that
+`@taxkit/calculators` exports a composed `CalculatorRunFacts` schema that
 is a union of the canonical calculator input schemas from the owning rule
 packages:
 
@@ -295,7 +295,7 @@ Service implementation rules:
   schemas only. Do not export `Live`, `Mock` or `Test` layers from `service.ts`;
   put production wiring in `live.layer.ts` and test wiring in `test.layer.ts` or
   test helpers.
-- Runtime execution MUST stay outside `@whattax/calculators`. Calculator code
+- Runtime execution MUST stay outside `@taxkit/calculators`. Calculator code
   returns `Effect` programs and layers; app/runtime files own
   `BunRuntime.runMain`, module-scoped `ManagedRuntime.make` and disposal.
 - JSON, time and randomness MUST be schema/boundary owned. Do not use
@@ -333,7 +333,7 @@ the service owns the lookup, validation and expected error result.
 
 ### Layer composition
 
-`@whattax/calculators` should export a live layer that requires
+`@taxkit/calculators` should export a live layer that requires
 `CalculationEngine` if the service implementation calls `CalculationEngine`
 through the environment. The HTTP API route layer or server package should
 compose that service layer with `CalculationEngineLive`.
@@ -358,11 +358,11 @@ Do not create request-local runtimes. Do not import app runtime modules.
 
 This is package-facing. Expected Changeset impact is patch for:
 
-- `@whattax/calculators` when created
-- `@whattax/http-api` because its public exports and handler dependencies
+- `@taxkit/calculators` when created
+- `@taxkit/http-api` because its public exports and handler dependencies
   change
 
-If public exports move out of `@whattax/http-api`, keep compatibility exports
+If public exports move out of `@taxkit/http-api`, keep compatibility exports
 or document the breaking impact before choosing a non-patch bump. The intended
 first implementation should preserve public behaviour and route contracts.
 
@@ -377,16 +377,16 @@ Update:
 
 - Architecture docs describe `packages/calculators` as the reusable
   calculator orchestration and service layer.
-- `@whattax/http-api` handlers for public calculation routes delegate to
+- `@taxkit/http-api` handlers for public calculation routes delegate to
   service methods and contain no calculator lookup, graph assembly,
   calculation dispatch, descriptor transformations or schema-error formatting.
-- `@whattax/calculators` MUST use `Option`/`Match` or equivalent Effect
+- `@taxkit/calculators` MUST use `Option`/`Match` or equivalent Effect
   primitives for optional context and lookup policy, without raw undefined
   branching, raw null comparison or jurisdiction-specific defaults.
-- `@whattax/calculators` MUST use pipe-first composition for sequential service
+- `@taxkit/calculators` MUST use pipe-first composition for sequential service
   transformations and MUST NOT use nested wrapper calls for readable data-flow
   pipelines.
-- `@whattax/calculators` MUST use Effect `Array`, `Chunk`, `HashMap`,
+- `@taxkit/calculators` MUST use Effect `Array`, `Chunk`, `HashMap`,
   `HashSet`, `Effect`, schema codecs and boundary-owned `Clock`/`Random`
   dependencies instead of native array pipelines, native `Map`/`Set`, thrown
   exceptions, `async`/`await`/`new Promise`, ad hoc JSON parsing or hidden
@@ -395,7 +395,7 @@ Update:
   conditional object spreads.
 - Schema issue path formatting is owned by the calculators service/error
   module, not by HTTP handlers.
-- `@whattax/calculators` owns the public calculator catalog and reusable
+- `@taxkit/calculators` owns the public calculator catalog and reusable
   response/error construction.
 - Public route behaviour remains compatible for metadata, calculation success
   and schema-guided error responses.

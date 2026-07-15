@@ -36,7 +36,7 @@ Implemented in the current repo:
 - final validation evidence is tracked in
   [the completed execution plan](../exec-plans/completed/sdk-public-naming-and-export-contract.md)
 
-This spec did not approve npm publication. `@whattax/sdk` remains private until
+This spec did not approve npm publication. `@taxkit/sdk` remains private until
 the release-prep gate explicitly removes `private: true`, runs the release
 train and publishes.
 
@@ -61,7 +61,7 @@ workspace development but not for a clean public npm contract.
 
 - Replace reusable calculator execution names with stable domain/runtime names
   before publication.
-- Keep HTTP-only transport names in `@whattax/http-api`.
+- Keep HTTP-only transport names in `@taxkit/http-api`.
 - Preserve canonical schema ownership and avoid mirrored DTOs.
 - Preserve compile-time safety for SDK descriptors, plain facade, Effect facade
   and downstream consumers.
@@ -78,7 +78,7 @@ workspace development but not for a clean public npm contract.
 
 - Do not add new calculator behaviour or rule packs.
 - Do not change public HTTP route paths.
-- Do not make the SDK depend on `@whattax/http-api`.
+- Do not make the SDK depend on `@taxkit/http-api`.
 - Do not publish, remove `private: true` or run `bun run version-repo` as part
   of this cleanup unless explicitly approved later.
 - Do not preserve old public aliases indefinitely. Compatibility aliases may be
@@ -89,16 +89,16 @@ workspace development but not for a clean public npm contract.
 
 ## Ownership and boundaries
 
-`@whattax/calculators` owns reusable calculator execution schemas, request
+`@taxkit/calculators` owns reusable calculator execution schemas, request
 context schemas, report unions, diagnostics-bearing response schemas,
 calculator-service errors and `PublicCalculatorService`.
 
-`@whattax/sdk` owns developer-facing descriptors, module composition, plain
+`@taxkit/sdk` owns developer-facing descriptors, module composition, plain
 Promise facade, Effect facade, SDK safe-result errors and SDK export paths. It
-may re-export calculator-owned schemas from `@whattax/sdk/schemas` for
+may re-export calculator-owned schemas from `@taxkit/sdk/schemas` for
 consumer convenience, but it must not duplicate those schemas.
 
-`@whattax/http-api` owns HTTP route schemas, path/query/status annotations,
+`@taxkit/http-api` owns HTTP route schemas, path/query/status annotations,
 OpenAPI metadata, HTTP error envelopes and typed HTTP clients. It may import
 calculator or SDK schemas, but transport-only names must remain in the HTTP API
 package.
@@ -112,7 +112,7 @@ flows.
 ### Canonical calculator runtime names
 
 Use `CalculatorRun*` for reusable calculator execution values owned by
-`@whattax/calculators`:
+`@taxkit/calculators`:
 
 | Current name | New canonical name | Notes |
 | --- | --- | --- |
@@ -132,7 +132,7 @@ consumers also use.
 ### Transitional aliases
 
 During implementation, compatibility aliases may be kept inside
-`@whattax/calculators` if they reduce migration risk across existing packages:
+`@taxkit/calculators` if they reduce migration risk across existing packages:
 
 ```ts
 export const PublicCalculationRequest = CalculatorRunRequest;
@@ -146,8 +146,8 @@ churn, prefer removing the old aliases before publication.
 
 ### SDK export contract
 
-The first publishable SDK package remains `@whattax/sdk` unless a later
-release-prep decision switches to the unscoped `whattax` package name.
+The first publishable SDK package remains `@taxkit/sdk` unless a later
+release-prep decision switches to the unscoped `taxkit` package name.
 
 The public export map should be:
 
@@ -186,7 +186,7 @@ consumers. The release-prep preference is a dist-only artifact.
 
 ### SDK schema exports
 
-`@whattax/sdk/schemas` should re-export SDK-owned error/result schemas and the
+`@taxkit/sdk/schemas` should re-export SDK-owned error/result schemas and the
 canonical calculator-run schemas that SDK consumers reasonably need:
 
 - `CalculatorRunFacts`
@@ -194,10 +194,10 @@ canonical calculator-run schemas that SDK consumers reasonably need:
 - `CalculatorRunResponse`
 - `CalculatorRunReport`
 - `CalculatorServiceError`
-- `WhatTaxCalculationError`
-- `WhatTaxCalculationErrorDetail`
-- `WhatTaxSchemaDecodeError`
-- `WhatTaxUnexpectedError`
+- `TaxKitCalculationError`
+- `TaxKitCalculationErrorDetail`
+- `TaxKitSchemaDecodeError`
+- `TaxKitUnexpectedError`
 
 These exports must be re-exports of owning schemas, not mirrored local
 definitions.
@@ -209,7 +209,7 @@ problem:
 
 - `SdkCalculation`
 - `SdkCalculationDefinition`
-- `WhatTaxModule`
+- `TaxKitModule`
 - `CalculationInput`
 - `CalculationOutput`
 - `ModuleCalculation`
@@ -231,7 +231,7 @@ The rename must not weaken:
 The generic HTTP route remains dynamically selected by path parameter, so it
 cannot statically narrow facts by `calculatorId`. It must continue to validate
 with the selected calculator's canonical `inputSchema` inside
-`@whattax/calculators`.
+`@taxkit/calculators`.
 
 ## Risks and tradeoffs
 
@@ -251,10 +251,10 @@ with the selected calculator's canonical `inputSchema` inside
 
 This is package-facing work. Expected Changesets:
 
-- `@whattax/calculators`: patch before publication, because the package is
+- `@taxkit/calculators`: patch before publication, because the package is
   still private but exported names change.
-- `@whattax/sdk`: patch for schema/export contract changes.
-- `@whattax/http-api`: patch if imports, route docs or generated client types
+- `@taxkit/sdk`: patch for schema/export contract changes.
+- `@taxkit/http-api`: patch if imports, route docs or generated client types
   change.
 
 Do not run `bun run version-repo` unless the user explicitly approves a
@@ -264,10 +264,10 @@ release-prep/versioning slice.
 
 - Canonical reusable calculator execution names are `CalculatorRun*` and
   `CalculatorServiceError`, not `PublicCalculation*` or `PublicApiError`.
-- HTTP-only public/transport names remain scoped to `@whattax/http-api`.
+- HTTP-only public/transport names remain scoped to `@taxkit/http-api`.
 - SDK code and docs use canonical calculator-run names.
 - SDK export map has no packed-missing `source` condition.
-- `@whattax/sdk/schemas` re-exports canonical calculator-run schemas and
+- `@taxkit/sdk/schemas` re-exports canonical calculator-run schemas and
   SDK-owned error schemas without local duplication.
 - Type tests prove SDK descriptor and request typing still reject mismatched
   facts and unsupported module capabilities.

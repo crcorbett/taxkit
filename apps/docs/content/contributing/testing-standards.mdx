@@ -31,8 +31,8 @@ API compatibility tests should prove `CalculatorRunRequest`,
 `CalculatorRunResponse` and route-owned error envelopes still match public
 HTTP expectations.
 
-SDK compatibility tests should prove `WhatTax.calculate`,
-`WhatTax.safe.calculate`, `calculateRunRequest`, `calculateReportRequest`,
+SDK compatibility tests should prove `TaxKit.calculate`,
+`TaxKit.safe.calculate`, `calculateRunRequest`, `calculateReportRequest`,
 `calculateReport` and jurisdiction helpers still infer the expected input,
 report and error types.
 
@@ -41,12 +41,12 @@ report and error types.
 Use package-specific commands when your change is local:
 
 ```sh
-bun run --filter=@whattax/rules-au-pay test
-bun run --filter=@whattax/rules-au-income-tax test
-bun run --filter=@whattax/rules-au-stsl test
-bun run --filter=@whattax/calculators test
-bun run --filter=@whattax/api-http test
-bun run --filter=@whattax/sdk test-types
+bun run --filter=@taxkit/rules-au-pay test
+bun run --filter=@taxkit/rules-au-income-tax test
+bun run --filter=@taxkit/rules-au-stsl test
+bun run --filter=@taxkit/calculators test
+bun run --filter=@taxkit/api-http test
+bun run --filter=@taxkit/sdk test-types
 ```
 
 Before handoff, run the repository gate:

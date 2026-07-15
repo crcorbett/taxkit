@@ -81,7 +81,7 @@ domain failures such as `CalculationError` should propagate as failures. Do not
 use `Effect.die` for recoverable calculator, schema or domain errors.
 
 Public calculator orchestration must keep request facts tied to canonical
-scenario schemas. `@whattax/calculators` composes the generic public calculate
+scenario schemas. `@taxkit/calculators` composes the generic public calculate
 contract as a union of rule-owned scenario input schemas so API docs and
 clients can see concrete fact shapes, then decodes again with the selected
 catalog entry's `inputSchema` before running the calculator. Do not replace

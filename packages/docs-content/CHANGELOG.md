@@ -1,4 +1,4 @@
-# @whattax/docs-content
+# @taxkit/docs-content
 
 ## 0.0.3
 
@@ -9,7 +9,7 @@
   keeping calculation traces JSON-compatible at HTTP boundaries.
 - Updated dependencies [2dc693a]
 - Updated dependencies [6b307e3]
-  - @whattax/docs-fumadocs@0.0.3
+  - @taxkit/docs-fumadocs@0.0.3
 
 ## 0.0.2
 
@@ -34,4 +34,4 @@
   public docs content root.
 - 98bba1d: Validate docs example references and the OpenAPI reference exclusion through the docs-content validation policy.
 - Updated dependencies [25f381d]
-  - @whattax/docs-fumadocs@0.0.2
+  - @taxkit/docs-fumadocs@0.0.2

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/api-http-package-topology.md",
   "title": "API HTTP Package Topology Implementation Tasks",
   "status": "implemented",
@@ -8,13 +8,13 @@
     "Preserve HTTP API runtime behaviour while moving the implemented package to the long-term topology.",
     "Keep apps/api as the only standalone API process/runtime owner.",
     "Keep packages/api/http focused on HTTP transport contracts, route layers, handler adapters, OpenAPI and typed HTTP clients.",
-    "Keep calculator behaviour in @whattax/calculators and SDK facades in @whattax/sdk.",
-    "Prefer direct import/package updates over compatibility aliases because @whattax/http-api is still private.",
+    "Keep calculator behaviour in @taxkit/calculators and SDK facades in @taxkit/sdk.",
+    "Prefer direct import/package updates over compatibility aliases because @taxkit/http-api is still private.",
     "Verify final call graphs against source imports, package metadata and docs before acceptance."
   ],
   "beforeImplementation": [
     "Create an active execution plan under docs/exec-plans/active/ before editing runtime or package metadata.",
-    "Record current references to @whattax/http-api and packages/http-api before moving files.",
+    "Record current references to @taxkit/http-api and packages/http-api before moving files.",
     "Implement one task at a time with parent review before starting the next task.",
     "Do not run bun run version-repo unless the user explicitly asks for release versioning."
   ],
@@ -22,23 +22,23 @@
     "commitPolicy": "Commit after each coherent implementation slice passes mandatory verification, Changeset review and parent audit.",
     "requiredBeforeFinalPR": [
       "bun run verification",
-      "bun run --filter=@whattax/api-http test",
-      "bun run --filter=@whattax/api-http check-types",
-      "bun run --filter=@whattax/api-http build",
+      "bun run --filter=@taxkit/api-http test",
+      "bun run --filter=@taxkit/api-http check-types",
+      "bun run --filter=@taxkit/api-http build",
       "bun run --filter=api check-types",
       "bun run --filter=api build",
       "bun run --filter=web check-types",
-      "bun run --filter=@whattax/sdk check-boundaries",
+      "bun run --filter=@taxkit/sdk check-boundaries",
       "bun run docs:validate",
       "bun run changeset status --verbose",
       "bun run changeset or explicit no-changeset rationale for docs-only slices"
     ],
     "evidenceRequired": [
-      "Current and final call graph summary for apps/api, apps/web, @whattax/api-http and @whattax/sdk",
+      "Current and final call graph summary for apps/api, apps/web, @taxkit/api-http and @taxkit/sdk",
       "Package path/name migration summary",
       "Old-reference audit with documented historical exceptions",
       "Browser-safe import audit for apps/web and docs/browser modules",
-      "SDK independence audit proving no @whattax/api-http dependency in @whattax/sdk",
+      "SDK independence audit proving no @taxkit/api-http dependency in @taxkit/sdk",
       "Changeset path and release-train impact, or explicit no-changeset rationale",
       "Verification command outcomes and residual risks"
     ]
@@ -50,10 +50,10 @@
       "title": "Relocate the HTTP API package and update runtime imports",
       "type": "package-topology",
       "dependsOn": [],
-      "goal": "Make packages/api/http and @whattax/api-http the implemented HTTP API package without changing route behaviour.",
+      "goal": "Make packages/api/http and @taxkit/api-http the implemented HTTP API package without changing route behaviour.",
       "scope": [
         "Move packages/http-api to packages/api/http.",
-        "Rename the package from @whattax/http-api to @whattax/api-http.",
+        "Rename the package from @taxkit/http-api to @taxkit/api-http.",
         "Add the nested workspace glob needed for packages/api/http.",
         "Update dependency declarations, source imports, test imports, Knip/Turbo/package config and the lockfile.",
         "Preserve the current export map shape under the new package name.",
@@ -73,7 +73,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -95,33 +95,33 @@
         ],
         "taskSpecificScope": [
           "Relocate the implemented package only. Do not redesign handlers, route schemas, calculator logic, SDK facades or API endpoint paths.",
-          "Update current runtime/source imports from @whattax/http-api to @whattax/api-http.",
+          "Update current runtime/source imports from @taxkit/http-api to @taxkit/api-http.",
           "Preserve browser-safe imports in apps/web and server-only imports in apps/api and HTTP API tests.",
           "Do not leave a compatibility package at packages/http-api unless a concrete blocker is documented and accepted by the parent."
         ]
       },
       "mandatoryVerification": [
         "bun install --lockfile-only or equivalent lockfile refresh if workspace metadata changes the lockfile",
-        "bun run --filter=@whattax/api-http test",
-        "bun run --filter=@whattax/api-http check-types",
-        "bun run --filter=@whattax/api-http build",
+        "bun run --filter=@taxkit/api-http test",
+        "bun run --filter=@taxkit/api-http check-types",
+        "bun run --filter=@taxkit/api-http build",
         "bun run --filter=api check-types",
         "bun run --filter=api build",
         "bun run --filter=web check-types",
-        "bun run --filter=@whattax/sdk check-boundaries",
-        "rg audit over apps packages package.json knip.json turbo.json proving current runtime/source/config imports no longer use @whattax/http-api or packages/http-api",
+        "bun run --filter=@taxkit/sdk check-boundaries",
+        "rg audit over apps packages package.json knip.json turbo.json proving current runtime/source/config imports no longer use @taxkit/http-api or packages/http-api",
         "bun run verification",
         "bun run changeset",
         "bun run changeset status --verbose"
       ],
       "browserVerification": [
         "No browser-visible route behaviour is expected to change.",
-        "Audit apps/web imports so browser/runtime code uses @whattax/api-http/client or @whattax/api-http/client/live only.",
+        "Audit apps/web imports so browser/runtime code uses @taxkit/api-http/client or @taxkit/api-http/client/live only.",
         "If a browser route or rendered UI changes unexpectedly, run the focused browser or route smoke check before handoff."
       ],
       "qualityAudits": [
         "Audit pass 1: final production and test call graphs still match the spec after the package move.",
-        "Audit pass 2: package boundaries remain intact: apps/api owns runtime startup, @whattax/api-http owns transport, @whattax/calculators owns calculator orchestration and @whattax/sdk has no HTTP API dependency.",
+        "Audit pass 2: package boundaries remain intact: apps/api owns runtime startup, @taxkit/api-http owns transport, @taxkit/calculators owns calculator orchestration and @taxkit/sdk has no HTTP API dependency.",
         "Audit pass 3: Effect-native control flow, canonical schema/type/error reuse, no unsafe casts, no local DTO mirrors, no helper sprawl and no browser/server import leaks."
       ],
       "parentAudit": {
@@ -131,11 +131,11 @@
         "escalateAfterFailedTurn": 3
       },
       "completionCriteria": [
-        "packages/api/http/package.json exists and names @whattax/api-http.",
+        "packages/api/http/package.json exists and names @taxkit/api-http.",
         "packages/http-api no longer contains the implemented package.",
-        "apps/api imports @whattax/api-http/server and still owns Bun process startup.",
-        "apps/web imports only browser-safe @whattax/api-http client exports.",
-        "@whattax/sdk source and package metadata do not depend on @whattax/api-http.",
+        "apps/api imports @taxkit/api-http/server and still owns Bun process startup.",
+        "apps/web imports only browser-safe @taxkit/api-http client exports.",
+        "@taxkit/sdk source and package metadata do not depend on @taxkit/api-http.",
         "The package-local test, typecheck and build gates pass under the new package name.",
         "A Changeset exists for the package-facing rename and relocation.",
         "Parent agent reviewed the diff, verification evidence, Changeset and final call graph before accepting the task."
@@ -150,11 +150,11 @@
       "dependsOn": [
         "API-HTTP-001"
       ],
-      "goal": "Make current documentation, public docs and package READMEs describe @whattax/api-http as the implemented package while preserving historical context.",
+      "goal": "Make current documentation, public docs and package READMEs describe @taxkit/api-http as the implemented package while preserving historical context.",
       "scope": [
         "Update root maps, architecture docs, package/app READMEs and public MDX docs that describe the current HTTP API package.",
         "Update docs validation or navigation references affected by the moved path.",
-        "Preserve old @whattax/http-api mentions only in historical specs, completed execution plans and changelogs where the context is explicitly historical.",
+        "Preserve old @taxkit/http-api mentions only in historical specs, completed execution plans and changelogs where the context is explicitly historical.",
         "Update the active execution plan with docs/reference audit evidence when implementation begins."
       ],
       "outputs": [
@@ -174,7 +174,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -205,8 +205,8 @@
         "bun run docs:build",
         "bun run --filter=docs check-types",
         "bun run verification",
-        "rg audit proving current docs and public MDX use @whattax/api-http and packages/api/http for the implemented package",
-        "rg audit listing any remaining @whattax/http-api or packages/http-api mentions and classifying them as historical, changelog or completed-plan context",
+        "rg audit proving current docs and public MDX use @taxkit/api-http and packages/api/http for the implemented package",
+        "rg audit listing any remaining @taxkit/http-api or packages/http-api mentions and classifying them as historical, changelog or completed-plan context",
         "bun run changeset status --verbose",
         "bun run changeset or explicit no-new-changeset rationale tied to the package-facing Changeset from API-HTTP-001"
       ],
@@ -216,8 +216,8 @@
       ],
       "qualityAudits": [
         "Audit pass 1: docs describe current ownership accurately and link to architecture docs instead of duplicating package manuals.",
-        "Audit pass 2: public docs stay focused on open-source WhatTax API, SDK and docs surfaces and do not import private reference-repo details.",
-        "Audit pass 3: historical mentions of @whattax/http-api remain only where useful and are not presented as current package guidance."
+        "Audit pass 2: public docs stay focused on open-source TaxKit API, SDK and docs surfaces and do not import private reference-repo details.",
+        "Audit pass 3: historical mentions of @taxkit/http-api remain only where useful and are not presented as current package guidance."
       ],
       "parentAudit": {
         "required": true,
@@ -226,9 +226,9 @@
         "escalateAfterFailedTurn": 3
       },
       "completionCriteria": [
-        "Current root, architecture, app, package and public docs point to packages/api/http and @whattax/api-http.",
+        "Current root, architecture, app, package and public docs point to packages/api/http and @taxkit/api-http.",
         "The documentation audit no longer lists packages/api/http as planned while the package is implemented.",
-        "Historical references to packages/http-api or @whattax/http-api are either updated or explicitly historical.",
+        "Historical references to packages/http-api or @taxkit/http-api are either updated or explicitly historical.",
         "Docs validation gates pass.",
         "Parent agent reviewed docs diffs against the spec and architecture docs before accepting the task."
       ],
@@ -259,7 +259,7 @@
       ],
       "implementationPrompt": {
         "mandatorySubagentContract": [
-          "You are implementing exactly one task from the WhatTax spec/task list.",
+          "You are implementing exactly one task from the TaxKit spec/task list.",
           "Before editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*.",
           "Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.",
           "Review the spec's call-graph diagrams before editing, and update or report them if implementation discovers a different final graph.",
@@ -286,13 +286,13 @@
         ]
       },
       "mandatoryVerification": [
-        "bun run --filter=@whattax/api-http test",
-        "bun run --filter=@whattax/api-http check-types",
-        "bun run --filter=@whattax/api-http build",
+        "bun run --filter=@taxkit/api-http test",
+        "bun run --filter=@taxkit/api-http check-types",
+        "bun run --filter=@taxkit/api-http build",
         "bun run --filter=api check-types",
         "bun run --filter=api build",
         "bun run --filter=web check-types",
-        "bun run --filter=@whattax/sdk check-boundaries",
+        "bun run --filter=@taxkit/sdk check-boundaries",
         "bun run docs:validate",
         "bun run test",
         "bun run build",
@@ -302,7 +302,7 @@
       ],
       "browserVerification": [
         "Run a focused apps/web smoke check if route runtime imports changed beyond package-name updates.",
-        "Browser/runtime code must not import @whattax/api-http/server, @whattax/api-http/client/server or handler subpaths."
+        "Browser/runtime code must not import @taxkit/api-http/server, @taxkit/api-http/client/server or handler subpaths."
       ],
       "qualityAudits": [
         "Audit pass 1: full source/import graph matches the target production and test call graphs.",

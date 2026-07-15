@@ -6,7 +6,7 @@ status: "draft"
 
 # Type safety
 
-WhatTax uses TypeScript types and runtime schemas together. TypeScript checks
+TaxKit uses TypeScript types and runtime schemas together. TypeScript checks
 the calculator descriptor and facts you pass at compile time. Runtime schema
 decoding still validates untrusted values before calculation.
 
@@ -15,11 +15,11 @@ decoding still validates untrusted values before calculation.
 The selected descriptor controls the accepted facts and the returned report:
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
 
-const report = await WhatTax.calculate(au.calculations.annualIncomeTax, {
+const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(9_000_000),
 });
 
@@ -29,11 +29,11 @@ report.liability.cents;
 If you pass facts for another calculator, the call should fail type checking:
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
 
-await WhatTax.calculate(au.calculations.annualIncomeTax, {
+await TaxKit.calculate(au.calculations.annualIncomeTax, {
   grossPay: aud(165_400),
   taxFreeThresholdClaimed: true,
 });
@@ -41,10 +41,10 @@ await WhatTax.calculate(au.calculations.annualIncomeTax, {
 
 ## Branded values
 
-Money values use canonical branded constructors from `@whattax/core`:
+Money values use canonical branded constructors from `@taxkit/core`:
 
 ```ts
-import { aud } from "@whattax/core/primitives";
+import { aud } from "@taxkit/core/primitives";
 
 const taxableIncome = aud(9_000_000);
 ```
@@ -61,14 +61,14 @@ This illustrative block shows a value runtime decoding rejects. It is not
 intended to typecheck, because TypeScript also catches the wrong input shape.
 
 ```ts
-import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
+import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
 
-const result = await WhatTax.safe.calculate(au.calculations.annualIncomeTax, {
+const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: "90000",
 });
 
-if (result._tag === "WhatTaxFailure") {
+if (result._tag === "TaxKitFailure") {
   console.error(result.error._tag);
 }
 ```
@@ -82,8 +82,8 @@ Effect consumers can preserve the full `CalculatorRunResponse` shape while
 narrowing `report` to the selected descriptor output:
 
 ```ts
-import type { SdkCalculatorRunResponse } from "@whattax/sdk/effect";
-import type { CalculatorRunResponse } from "@whattax/sdk/schemas";
+import type { SdkCalculatorRunResponse } from "@taxkit/sdk/effect";
+import type { CalculatorRunResponse } from "@taxkit/sdk/schemas";
 ```
 
 `SdkCalculatorRunResponse<Report>` keeps the canonical response shape and

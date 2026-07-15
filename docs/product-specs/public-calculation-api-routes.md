@@ -9,7 +9,7 @@ confidence: medium
 
 ## Overview
 
-Expose WhatTax through public HTTP routes that are facts, rules and calculator
+Expose TaxKit through public HTTP routes that are facts, rules and calculator
 driven. Jurisdiction, tax year and rule-pack selection are calculator context,
 not the primary route shape.
 
@@ -21,9 +21,9 @@ results.
 Initial public calculator coverage should use the implemented Australian
 packages:
 
-- `@whattax/rules-au-pay`
-- `@whattax/rules-au-income-tax`
-- `@whattax/rules-au-stsl`
+- `@taxkit/rules-au-pay`
+- `@taxkit/rules-au-income-tax`
+- `@taxkit/rules-au-stsl`
 
 The route model must remain ready for future jurisdictions without adding a new
 route family per country.
@@ -40,7 +40,7 @@ Implemented in the current API package and app:
 - public calculate facts exposed as an OpenAPI `anyOf` union of canonical
   rule-owned input schemas, currently take-home/pay-withholdings facts and
   annual-tax facts
-- selected-calculator fact validation in `@whattax/calculators`, so a payload
+- selected-calculator fact validation in `@taxkit/calculators`, so a payload
   that is valid for one calculator but incompatible with the selected
   calculator returns calculator-specific help
 - schema-guided decode errors with field paths and descriptor-backed help for
@@ -54,12 +54,12 @@ Still future work beyond this spec:
 
 ## Problem
 
-Before implementation, WhatTax had deterministic rule packages, fact
+Before implementation, TaxKit had deterministic rule packages, fact
 descriptors, calculator programs, traces, ledgers and graph validation, but the
 public API only exposed health and generated docs.
 
 The first route draft grouped routes under `/api/v1/au/*`. That cuts against
-the repository goal: WhatTax is a rules and calculation engine, not an
+the repository goal: TaxKit is a rules and calculation engine, not an
 Australia-only API shape. Australia is the first implemented jurisdiction, but
 the API contract should be driven by canonical calculators and their required
 facts.
@@ -171,7 +171,7 @@ GET /api/v1/facts?calculator=au.pay.take-home&jurisdiction=AU&taxYear=2025-26
   invalid fields.
 - Add `help` query support so clients can request richer guidance on metadata,
   schemas and errors.
-- Add OpenAPI documentation for every new route through `@whattax/http-api`.
+- Add OpenAPI documentation for every new route through `@taxkit/http-api`.
 - Keep `apps/api` thin: runtime, process config, serving and changelog only.
 - Preserve browser-safe client exports for future SDK/web consumption.
 
@@ -502,7 +502,7 @@ because it changes public API design guidance and generated docs expectations.
 Implementing the routes will also be package-facing and public API-facing. The
 implementation should add a patch Changeset covering:
 
-- `@whattax/http-api`
+- `@taxkit/http-api`
 - every rule/core package whose public exports change
 
 The implementation should also update:
@@ -537,8 +537,8 @@ The implementation should also update:
 - [Effect services](../architecture/effect-services.md)
 - [Package ownership](../architecture/package-ownership.md)
 - [Code patterns](../standards/code-patterns.md)
-- [`@whattax/core`](../../packages/core/README.md)
-- [`@whattax/http-api`](../../packages/http-api/README.md)
-- [`@whattax/rules-au-pay`](../../packages/rules/au/pay/README.md)
-- [`@whattax/rules-au-income-tax`](../../packages/rules/au/income-tax/README.md)
-- [`@whattax/rules-au-stsl`](../../packages/rules/au/stsl/README.md)
+- [`@taxkit/core`](../../packages/core/README.md)
+- [`@taxkit/http-api`](../../packages/http-api/README.md)
+- [`@taxkit/rules-au-pay`](../../packages/rules/au/pay/README.md)
+- [`@taxkit/rules-au-income-tax`](../../packages/rules/au/income-tax/README.md)
+- [`@taxkit/rules-au-stsl`](../../packages/rules/au/stsl/README.md)

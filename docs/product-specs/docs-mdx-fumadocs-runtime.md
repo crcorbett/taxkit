@@ -9,7 +9,7 @@ confidence: high
 
 ## Overview
 
-WhatTax should turn the existing public MDX documentation into a working docs
+TaxKit should turn the existing public MDX documentation into a working docs
 runtime without surrendering content ownership to a framework shell. The first
 implementation should use MDX, a thin Fumadocs MDX source layer, and an
 Effect-native docs content service.
@@ -59,10 +59,10 @@ The next implementation must avoid two failure modes:
 - a monolithic docs app where content, routing, validation, rendering and
   generated reference wiring are tangled together
 - a bespoke renderer/source stack that spends effort recreating MDX compile and
-  route primitives before WhatTax has a public docs runtime
+  route primitives before TaxKit has a public docs runtime
 
 MDX plus Fumadocs MDX is the shortest path to a working docs site. The
-architecture must still keep WhatTax-owned schemas, services and validation in
+architecture must still keep TaxKit-owned schemas, services and validation in
 canonical packages.
 
 ## Call graphs
@@ -94,7 +94,7 @@ developer
 ```ts
 Build: target
 
-bun run --filter=@whattax/docs-content build
+bun run --filter=@taxkit/docs-content build
   -> fumadocs-mdx
     -> packages/docs-content/source.config.ts
       -> Effect Schema frontmatter and meta contracts
@@ -166,7 +166,7 @@ parent reviewer
 `apps/docs`
 : New private docs app package. Owns the public docs runtime, routes, layout,
   app shell, search UI, navigation presentation and app-local MDX renderer
-  component map. It consumes `@whattax/docs-content` and public SDK/API
+  component map. It consumes `@taxkit/docs-content` and public SDK/API
   contracts. It must not own canonical docs content schemas.
 
 `apps/docs/content`
@@ -183,7 +183,7 @@ parent reviewer
 
 `packages/ui`
 : Still planned for shared UI primitives. Renderer components should stay in
-  `apps/docs` until repeated WhatTax-owned components justify promotion.
+  `apps/docs` until repeated TaxKit-owned components justify promotion.
 
 `packages/sdk/typescript`, `packages/calculators`, `packages/http-api`
 : Continue to own public SDK/API/calculator contracts. Docs packages consume
@@ -246,7 +246,7 @@ mirrors of page/frontmatter/navigation shapes.
 Create `apps/docs` as a private Vite/TanStack Start app unless implementation
 discovers a better fit inside the current workspace. It should:
 
-- consume `@whattax/docs-content/server` from server loaders
+- consume `@taxkit/docs-content/server` from server loaders
 - keep MDX renderer components in `apps/docs/src/lib/mdx/components.tsx`
 - expose typed routes for docs pages
 - render the current navigation contract from `DocsContentService`
@@ -255,7 +255,7 @@ discovers a better fit inside the current workspace. It should:
 - include a browser proof for the docs home page and one nested MDX page
 
 Fumadocs UI may be used for low-level docs layout/navigation pieces if it keeps
-the implementation smaller. The app must still preserve WhatTax-owned
+the implementation smaller. The app must still preserve TaxKit-owned
 navigation/data contracts and must not make Fumadocs UI configuration the only
 source of truth.
 
@@ -278,7 +278,7 @@ record them as a follow-up before moving anything into `packages/ui`.
 Replace the current app-local validation script with package-owned validation
 that can be called from:
 
-- `bun run --filter=@whattax/docs-content validate`
+- `bun run --filter=@taxkit/docs-content validate`
 - `bun run --filter=docs build`
 - root verification if appropriate after the first stable pass
 
@@ -315,10 +315,10 @@ Minimum final gates:
 
 - `bun run verification`
 - `bun run build`
-- `bun run --filter=@whattax/docs-content build`
-- `bun run --filter=@whattax/docs-content check-types`
-- `bun run --filter=@whattax/docs-content test`
-- `bun run --filter=@whattax/docs-content validate`
+- `bun run --filter=@taxkit/docs-content build`
+- `bun run --filter=@taxkit/docs-content check-types`
+- `bun run --filter=@taxkit/docs-content test`
+- `bun run --filter=@taxkit/docs-content validate`
 - `bun run --filter=docs build`
 - `bun run --filter=docs check-types`
 - browser verification for docs home and one nested docs page
@@ -344,7 +344,7 @@ Every implementation task must include a strict Effect audit:
 ## Risks and tradeoffs
 
 - Fumadocs can become the architecture instead of a content source. Mitigation:
-  keep WhatTax schemas/services as the contract and Fumadocs behind
+  keep TaxKit schemas/services as the contract and Fumadocs behind
   `packages/docs-content`.
 - MDX can import arbitrary components. Mitigation: renderer allowlist and
   validation.
@@ -362,11 +362,11 @@ Every implementation task must include a strict Effect audit:
 Expected package changes:
 
 - New private `docs` app package.
-- New private `@whattax/docs-content` package.
+- New private `@taxkit/docs-content` package.
 - New Fumadocs-related dependencies.
 - No public npm package release is expected for docs runtime work unless
-  implementation changes `@whattax/sdk`, `@whattax/http-api`,
-  `@whattax/calculators` or other release-train packages.
+  implementation changes `@taxkit/sdk`, `@taxkit/http-api`,
+  `@taxkit/calculators` or other release-train packages.
 
 Each task must run `bun run changeset status --verbose`. Package-facing public
 runtime changes need a Changeset. Private docs app/content package changes may
@@ -382,7 +382,7 @@ installation, exports or behaviour.
 - `apps/docs` consumes the docs content service and renders MDX through an
   app-owned renderer component map.
 - Fumadocs MDX is present as a thin source/compile layer, not as the owner of
-  WhatTax docs contracts.
+  TaxKit docs contracts.
 - Public docs content remains in MDX.
 - Validation catches frontmatter, navigation, link, banned-term, stale-name,
   private-product and MDX component allowlist failures.

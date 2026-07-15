@@ -1,5 +1,5 @@
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/documentation-improvement-roadmap.md",
   "title": "Documentation Improvement Roadmap Tasks",
   "status": "implemented",
@@ -38,8 +38,8 @@
         "docs/documentation-audit/README.md"
       ],
       "outputs": [
-        "README for @whattax/http-api",
-        "README for @whattax/tsconfig",
+        "README for @taxkit/http-api",
+        "README for @taxkit/tsconfig",
         "Updated README coverage in documentation audit"
       ],
       "mandatoryVerification": [

@@ -20,7 +20,7 @@ but can import the SDK directly.
 
 1. Replace the fetch request with an SDK helper.
 2. Replace JSON tagged values with constructors such as `aud` and `GrossPay`.
-3. Replace HTTP error envelope handling with `WhatTax.safe.calculate` where
+3. Replace HTTP error envelope handling with `TaxKit.safe.calculate` where
    you need result values.
 4. Keep integration tests for the same input and expected cents.
 
@@ -50,8 +50,8 @@ const body = await response.json();
 After:
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(9_000_000),
@@ -66,14 +66,14 @@ income of $90,000.00.
 ## Handle errors
 
 Raw HTTP returns `CalculatorApiErrorEnvelope`. The SDK safe facade returns
-`WhatTaxFailure`:
+`TaxKitFailure`:
 
 ```ts
 const result = await au.incomeTax.safe.annual({
   taxableIncome: aud(9_000_000),
 });
 
-if (result._tag === "WhatTaxFailure") {
+if (result._tag === "TaxKitFailure") {
   console.error(result.error.message);
 }
 ```

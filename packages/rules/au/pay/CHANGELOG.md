@@ -1,4 +1,4 @@
-# @whattax/rules-au-pay
+# @taxkit/rules-au-pay
 
 ## 0.1.0
 
@@ -12,24 +12,24 @@
 - 2dc693a: Make package builds and release artifacts deterministic with clean compilation,
   dist-only publication exports, concrete packed dependency ranges, and
   Effect-native scoped validators for focused SDK artifacts and strict clean
-  consumers across the complete WhatTax release package graph.
+  consumers across the complete TaxKit release package graph.
 - 6b307e3: Upgrade the workspace package runtime and test contracts to the compatible
   Effect 4 beta.98 family and current schema, schedule, and runtime APIs while
   keeping calculation traces JSON-compatible at HTTP boundaries.
 - Updated dependencies [2dc693a]
-  - @whattax/core@0.1.0
+  - @taxkit/core@0.1.0
 
 ## 0.0.4
 
 ### Patch Changes
 
-- @whattax/core@0.0.4
+- @taxkit/core@0.0.4
 
 ## 0.0.3
 
 ### Patch Changes
 
-- @whattax/core@0.0.3
+- @taxkit/core@0.0.3
 
 ## 0.0.2
 
@@ -37,7 +37,7 @@
 
 - d1d84c3: Add canonical `CalculatorId` and `Jurisdiction` brands, move AU public
   calculator IDs and supported jurisdiction/tax-year schemas into the owning AU
-  rule packages, then compose those canonical exports in `@whattax/calculators`.
+  rule packages, then compose those canonical exports in `@taxkit/calculators`.
   The calculator service no longer mirrors request context or revalidates context
   fields already narrowed by schemas. Public calculator input decode errors now
   use calculator-specific names.
@@ -62,11 +62,11 @@
   when requested.
 
   Document the follow-up extraction of reusable calculator orchestration into a
-  new `@whattax/calculators` package so HTTP handlers can become thin transport
+  new `@taxkit/calculators` package so HTTP handlers can become thin transport
   adapters over package-owned Effect services.
 
 - Updated dependencies [d1d84c3]
-  - @whattax/core@0.0.2
+  - @taxkit/core@0.0.2
 
 ## 0.0.1
 
@@ -77,4 +77,4 @@
   tax rates and coefficients, a reusable CalculationEngine service, and fixed
   release-train versioning.
 - Updated dependencies [bba9102]
-  - @whattax/core@0.0.1
+  - @taxkit/core@0.0.1

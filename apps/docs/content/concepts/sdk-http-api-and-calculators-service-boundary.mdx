@@ -6,7 +6,7 @@ status: "draft"
 
 # SDK, HTTP API and calculators service boundary
 
-WhatTax has one calculator boundary with multiple caller surfaces. The SDK is
+TaxKit has one calculator boundary with multiple caller surfaces. The SDK is
 the primary in-process surface. HTTP is a transport over that same calculator
 path.
 
@@ -21,16 +21,16 @@ rules and calculators, not in HTTP handlers, browser clients or docs examples.
 Production: SDK and HTTP boundary
 
 Plain TypeScript caller
-  -> WhatTax.calculate / WhatTax.safe.calculate / au.incomeTax.annual
-    -> @whattax/sdk/effect calculateReportRequest
-      -> @whattax/sdk/effect calculateRunRequest
+  -> TaxKit.calculate / TaxKit.safe.calculate / au.incomeTax.annual
+    -> @taxkit/sdk/effect calculateReportRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
           -> CalculationEngine
 
 HTTP caller
-  -> @whattax/api-http route contract
+  -> @taxkit/api-http route contract
     -> CalculatorApiHandlerLive
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
           -> CalculationEngine
 ```

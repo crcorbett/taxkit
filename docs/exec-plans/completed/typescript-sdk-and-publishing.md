@@ -23,7 +23,7 @@ passes its required gates and Changeset decision.
 
 | Task | Status | Notes |
 | --- | --- | --- |
-| SDK-001 | complete | Scaffolded `@whattax/sdk` package, export map and import-boundary check. |
+| SDK-001 | complete | Scaffolded `@taxkit/sdk` package, export map and import-boundary check. |
 | SDK-002 | complete | Strict typed descriptors and Effect facade over calculators implemented and verified. |
 | SDK-003 | complete | Plain Promise facade, Data-owned safe results and AU module subpath implemented and verified. |
 | SDK-004 | complete | HTTP API calculate handler consumes the SDK Effect facade and preserves HTTP envelopes. |
@@ -43,31 +43,31 @@ passes its required gates and Changeset decision.
 
 ### 2026-05-24 - SDK-001 scaffold
 
-- Added `packages/sdk/typescript` as private package `@whattax/sdk`; the
-  preferred unscoped `whattax` package name remains a release-prep decision
-  because the monorepo root package currently uses `whattax`.
+- Added `packages/sdk/typescript` as private package `@taxkit/sdk`; the
+  preferred unscoped `taxkit` package name remains a release-prep decision
+  because the monorepo root package currently uses `taxkit`.
 - Added explicit export paths for `.`, `./effect`, `./au`, `./au/effect`,
   `./schemas` and `./testing` with placeholder source entrypoints only.
 - Added `packages/sdk/*` to Bun workspace globs and a Knip workspace entry for
   the SDK package.
 - Added `packages/sdk/typescript/scripts/check-import-boundaries.ts` proving
-  SDK package metadata and source do not import `@whattax/http-api`, the root
+  SDK package metadata and source do not import `@taxkit/http-api`, the root
   entrypoint does not import AU rule packages and browser-safe entrypoints do
   not import `node:` or `bun:` modules.
 - Added Changeset `.changeset/sdk-typescript-scaffold.md` for
-  `@whattax/sdk`.
+  `@taxkit/sdk`.
 - Verification:
-  - `bun run --filter=@whattax/sdk check-types` passed.
-  - `bun run --filter=@whattax/sdk build` passed.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk check-types` passed.
+  - `bun run --filter=@taxkit/sdk build` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
   - `bun run changeset status --verbose` passed and includes
-    `@whattax/sdk` patch release impact from
+    `@taxkit/sdk` patch release impact from
     `.changeset/sdk-typescript-scaffold.md`.
   - `bun run verification` passed.
 - Parent review accepted SDK-001 after aligning the SDK tsconfig with existing
   package patterns and rerunning the targeted SDK gates plus repo verification
   locally.
-- Parent review also aligned the new private `@whattax/sdk` package with the
+- Parent review also aligned the new private `@taxkit/sdk` package with the
   Changesets fixed group and current package-state docs in `README.md`,
   `AGENTS.md`, `docs/architecture/*` and `docs/standards/versioning.md`.
 
@@ -75,7 +75,7 @@ passes its required gates and Changeset decision.
 
 - Added schema-backed typed SDK calculation and module descriptors in
   `packages/sdk/typescript/src/types.ts`.
-- Added `@whattax/sdk/effect` calculation execution through
+- Added `@taxkit/sdk/effect` calculation execution through
   `PublicCalculatorService`; the facade preserves descriptor-specific input and
   output types while keeping calculator/domain failures in the Effect error
   channel.
@@ -85,62 +85,62 @@ passes its required gates and Changeset decision.
   packages.
 - Added focused type-level coverage for unsupported calculations, mismatched
   input facts and unsupported tax-year literals through
-  `bun run --filter=@whattax/sdk test-types`.
+  `bun run --filter=@taxkit/sdk test-types`.
 - Added runtime parity coverage proving SDK Effect facade success parity with
   `PublicCalculatorService`, guided input error parity and annual-tax descriptor
   executability.
-- Added Changeset `.changeset/sdk-effect-descriptors.md` for `@whattax/sdk`
+- Added Changeset `.changeset/sdk-effect-descriptors.md` for `@taxkit/sdk`
   patch impact.
 - Verification:
-  - `bun run --filter=@whattax/sdk check-types` passed.
-  - `bun run --filter=@whattax/sdk test-types` passed.
-  - `bun run --filter=@whattax/sdk test` passed.
-  - `bun run --filter=@whattax/sdk build` passed.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk check-types` passed.
+  - `bun run --filter=@taxkit/sdk test-types` passed.
+  - `bun run --filter=@taxkit/sdk test` passed.
+  - `bun run --filter=@taxkit/sdk build` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
   - `bun run verification` passed.
   - `bun run changeset status --verbose` passed and includes
-    `@whattax/sdk` patch release impact from
+    `@taxkit/sdk` patch release impact from
     `.changeset/sdk-effect-descriptors.md` and
     `.changeset/sdk-typescript-scaffold.md`.
 
 ### 2026-05-24 - SDK-003 plain facade, safe results and AU subpath
 
-- Added the browser-safe plain `WhatTax` facade in
+- Added the browser-safe plain `TaxKit` facade in
   `packages/sdk/typescript/src/index.ts` with Promise-returning `calculate`,
   `safe.calculate` and module-scoped `createClient` methods over the existing
   generic SDK descriptor model.
 - Added SDK-owned error and safe-result values in
   `packages/sdk/typescript/src/errors.ts`; safe methods return Data-owned
-  `WhatTaxSuccess` or `WhatTaxFailure` values and failures wrap the canonical
+  `TaxKitSuccess` or `TaxKitFailure` values and failures wrap the canonical
   calculator/schema failure cause without mirroring calculator DTOs.
-- Added `@whattax/sdk/au` typed current AU module exports and thin convenience
+- Added `@taxkit/sdk/au` typed current AU module exports and thin convenience
   helpers for take-home pay, PAYG withholdings and annual income tax.
-- Added `@whattax/sdk/au/effect` AU Effect client wiring for the same module
+- Added `@taxkit/sdk/au/effect` AU Effect client wiring for the same module
   descriptors.
 - Added plain facade and AU runtime tests plus type-level misuse coverage for
   wrong module/calculation pairings and incompatible fact inputs.
-- Added Changeset `.changeset/sdk-plain-facade.md` for `@whattax/sdk` patch
+- Added Changeset `.changeset/sdk-plain-facade.md` for `@taxkit/sdk` patch
   impact.
 - Verification:
-  - `bun run --filter=@whattax/sdk test` passed.
-  - `bun run --filter=@whattax/sdk check-types` passed.
-  - `bun run --filter=@whattax/sdk build` passed.
-  - `bun run --filter=@whattax/sdk test-types` passed.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk test` passed.
+  - `bun run --filter=@taxkit/sdk check-types` passed.
+  - `bun run --filter=@taxkit/sdk build` passed.
+  - `bun run --filter=@taxkit/sdk test-types` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
   - `bun run verification` passed.
   - `bun run changeset status --verbose` passed and includes
-    `@whattax/sdk` patch release impact from
+    `@taxkit/sdk` patch release impact from
     `.changeset/sdk-plain-facade.md`,
     `.changeset/sdk-effect-descriptors.md` and
     `.changeset/sdk-typescript-scaffold.md`.
 
 ### 2026-05-24 - SDK-004 HTTP API SDK consumer integration
 
-- Added `@whattax/sdk` as a dependency of `@whattax/http-api`; the SDK package
-  still has no dependency on `@whattax/http-api`.
+- Added `@taxkit/sdk` as a dependency of `@taxkit/http-api`; the SDK package
+  still has no dependency on `@taxkit/http-api`.
 - Updated the public calculate handler so HTTP remains the owner of route
   schemas, status annotations and error envelopes while calculation execution
-  goes through request-preserving `@whattax/sdk/effect` descriptors.
+  goes through request-preserving `@taxkit/sdk/effect` descriptors.
 - Preserved the existing HTTP calculation response shape by assembling
   calculator metadata and graph diagnostics from `PublicCalculatorService`
   around the SDK-produced typed report.
@@ -151,45 +151,45 @@ passes its required gates and Changeset decision.
 - Extended the SDK import-boundary check so it proves SDK-to-HTTP isolation and
   the intended HTTP-API-to-SDK dependency direction.
 - Added Changeset `.changeset/sdk-http-api-consumer.md` for
-  `@whattax/http-api` and `@whattax/sdk` patch impact.
+  `@taxkit/http-api` and `@taxkit/sdk` patch impact.
 - Verification:
-  - `bun run --filter=@whattax/sdk test` passed.
-  - `bun run --filter=@whattax/http-api test` passed.
-  - `bun run --filter=@whattax/sdk check-types` passed.
-  - `bun run --filter=@whattax/http-api check-types` passed.
-  - `bun run --filter=@whattax/sdk build` passed.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk test` passed.
+  - `bun run --filter=@taxkit/http-api test` passed.
+  - `bun run --filter=@taxkit/sdk check-types` passed.
+  - `bun run --filter=@taxkit/http-api check-types` passed.
+  - `bun run --filter=@taxkit/sdk build` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
   - `bun run verification` passed.
   - `bun run changeset status --verbose` passed and includes
     `.changeset/sdk-http-api-consumer.md`.
 
 ### 2026-05-24 - SDK-005 downstream consumer validation
 
-- Advanced the downstream workspace's vendored WhatTax boundary to the accepted
+- Advanced the downstream workspace's vendored TaxKit boundary to the accepted
   SDK-004 commit and included the current SDK workspace path in downstream
   package resolution.
-- Added a real downstream browser-app flow that imports `@whattax/sdk/au` and
+- Added a real downstream browser-app flow that imports `@taxkit/sdk/au` and
   calls the plain AU annual-income-tax helper while preserving the existing
   HTTP API health flow.
 - Added a downstream type-only misuse assertion proving annual income tax
   rejects a raw numeric taxable income and requires canonical Money input.
-- No WhatTax package-facing code changed in this slice, so no new Changeset was
+- No TaxKit package-facing code changed in this slice, so no new Changeset was
   required. Existing pending SDK Changesets still cover SDK-001 through
   SDK-004 package changes.
 - Verification:
   - Downstream `pnpm check-types` passed.
   - Downstream `pnpm --filter web build` passed.
-  - `bun run verification` passed in WhatTax.
-  - `bun run changeset status --verbose` passed in WhatTax.
+  - `bun run verification` passed in TaxKit.
+  - `bun run changeset status --verbose` passed in TaxKit.
 
 ### 2026-05-24 - SDK-006 publication release prep
 
 - Checked npm registry package names live on 2026-05-24:
-  - `npm view whattax name version --json` returned 404.
-  - `npm view @whattax/sdk name version --json` returned 404.
-  - `npm view @whattax/core name version --json` returned 404.
-- Kept the SDK package name as `@whattax/sdk` for this release-prep slice.
-  The unscoped `whattax` name remains a future explicit release decision
+  - `npm view taxkit name version --json` returned 404.
+  - `npm view @taxkit/sdk name version --json` returned 404.
+  - `npm view @taxkit/core name version --json` returned 404.
+- Kept the SDK package name as `@taxkit/sdk` for this release-prep slice.
+  The unscoped `taxkit` name remains a future explicit release decision
   because the monorepo root currently owns that package name locally.
 - Added SDK package metadata for publication readiness while keeping
   `private: true`: description, public publish config, side-effect metadata
@@ -203,13 +203,13 @@ passes its required gates and Changeset decision.
   SDK tarball and local file dependencies for current private internal packages:
   root, AU, Effect, AU Effect, schemas and testing entrypoints all imported.
 - Did not remove `private: true`, run `bun run version-repo` or publish.
-- Added Changeset `.changeset/sdk-release-prep.md` for `@whattax/sdk` patch
+- Added Changeset `.changeset/sdk-release-prep.md` for `@taxkit/sdk` patch
   impact.
 - Verification:
   - `bun run build` passed.
-  - `bun run --filter=@whattax/sdk check-types` passed.
-  - `bun run --filter=@whattax/sdk test-types` passed.
-  - `bun run --filter=@whattax/sdk check-boundaries` passed.
+  - `bun run --filter=@taxkit/sdk check-types` passed.
+  - `bun run --filter=@taxkit/sdk test-types` passed.
+  - `bun run --filter=@taxkit/sdk check-boundaries` passed.
   - Packed install/import smoke passed from the generated tarball.
 
 ## Open Risks

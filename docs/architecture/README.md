@@ -5,19 +5,19 @@ source_of_truth: docs
 confidence: high
 ---
 
-# WhatTax architecture
+# TaxKit architecture
 
-This directory is the implementation reference for the WhatTax tax calculator
+This directory is the implementation reference for the TaxKit tax calculator
 architecture. It is also the routing guide for the implemented surface that
 exists today.
 
-WhatTax is the open-source engine repository. Today it contains a standalone
+TaxKit is the open-source engine repository. Today it contains a standalone
 Bun API app, a TanStack Start web scaffold, a Fumadocs-backed docs app, the
-`@whattax/api-http` package with health, generated docs, metadata and public
-calculation endpoints, the `@whattax/calculators` service package,
+`@taxkit/api-http` package with health, generated docs, metadata and public
+calculation endpoints, the `@taxkit/calculators` service package,
 deterministic core engine primitives, Australian pay, income-tax and STSL rule
-packages, a private TypeScript SDK package, private `@whattax/docs-content`
-and `@whattax/docs-fumadocs` packages, shared testing helpers, shared
+packages, a private TypeScript SDK package, private `@taxkit/docs-content`
+and `@taxkit/docs-fumadocs` packages, shared testing helpers, shared
 TypeScript config, private Effect-native release orchestration and
 documentation.
 
@@ -27,7 +27,7 @@ Implemented surfaces:
 
 - `apps/api`: standalone Bun API runtime for the current API surface.
 - `apps/docs`: TanStack Start public docs runtime over MDX content,
-  `@whattax/docs-content` and `@whattax/docs-fumadocs`.
+  `@taxkit/docs-content` and `@taxkit/docs-fumadocs`.
 - `apps/web`: TanStack Start scaffold that loads the health endpoint.
 - `packages/api/http`: Effect HTTP API package for health, generated docs,
   OpenAPI JSON, public calculator metadata and public calculation routes.
@@ -74,12 +74,12 @@ and trace.
 
 ## Authority boundary
 
-Official calculations consume explicit input facts. Callers convert their application state into WhatTax-compatible input facts before invoking the engine.
+Official calculations consume explicit input facts. Callers convert their application state into TaxKit-compatible input facts before invoking the engine.
 
 ```txt
-explicit WhatTax input facts
-  -> WhatTax rule layers
-  -> WhatTax calculators
+explicit TaxKit input facts
+  -> TaxKit rule layers
+  -> TaxKit calculators
   -> reports, graph metadata and traces
 ```
 
@@ -116,4 +116,4 @@ explicit WhatTax input facts
 5. Keep engine input facts separate from application state.
 6. Keep yearly parameters separate from algorithms.
 7. Make traces and graph validation part of the first implementation, not a later add-on.
-8. Keep WhatTax engine packages independent of application packages.
+8. Keep TaxKit engine packages independent of application packages.

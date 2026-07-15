@@ -1,6 +1,6 @@
-# WhatTax documentation atlas
+# TaxKit documentation atlas
 
-This atlas is the fastest path through the WhatTax docs.
+This atlas is the fastest path through the TaxKit docs.
 
 ## Architecture
 

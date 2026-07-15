@@ -37,9 +37,9 @@ confidence: medium
   - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
     Turbo typecheck.
   - Ran `API_PORT=4012 bun run --filter=api start`; `GET /api/health`
-    returned `200 {"service":"whattax","status":"ok"}`.
+    returned `200 {"service":"taxkit","status":"ok"}`.
   - Ran `GET /api/docs/openapi.json`; response parsed as OpenAPI `3.1.0`
-    with title `WhatTax API` and `/api/health` present.
+    with title `TaxKit API` and `/api/health` present.
   - Ran `API_PORT=4013 bun apps/api/src/index.ts`, sent `SIGTERM` to the Bun
     entrypoint process, and observed graceful shutdown with exit code `0`.
   - Audited `apps/api/src/server.ts` and `apps/api/src/index.ts`: the app runs
@@ -52,18 +52,18 @@ confidence: medium
   - `bun run --filter=web check-types` passed.
   - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
     Turbo typecheck.
-  - Ran `bun run --filter=api dev` on `https://api.whattax.localhost` and
-    `bun run --filter=web dev` on `https://whattax.localhost`.
-  - `GET https://api.whattax.localhost/api/health` returned
-    `200 {"service":"whattax","status":"ok"}`.
-  - `GET https://whattax.localhost/` returned `200` and contained
+  - Ran `bun run --filter=api dev` on `https://api.taxkit.localhost` and
+    `bun run --filter=web dev` on `https://taxkit.localhost`.
+  - `GET https://api.taxkit.localhost/api/health` returned
+    `200 {"service":"taxkit","status":"ok"}`.
+  - `GET https://taxkit.localhost/` returned `200` and contained
     `API status: <strong>ok</strong>`.
   - With `apps/api` stopped and `apps/web` still running,
-    `GET https://whattax.localhost/` returned `500` containing an attributable
+    `GET https://taxkit.localhost/` returned `500` containing an attributable
     API transport error.
   - Import audit: `apps/web` has no
-    `@whattax/http-api/client/server` imports. The only
-    `@whattax/http-api/server` source import remains in
+    `@taxkit/http-api/client/server` imports. The only
+    `@taxkit/http-api/server` source import remains in
     `apps/web/src/lib/server/api-handler.server.ts`, intentionally pending
     API-003 removal.
 - 2026-05-23 API-003:
@@ -73,32 +73,32 @@ confidence: medium
     `unstable/http/HttpRouter.js`, but exited `0`.
   - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
     Turbo typecheck.
-  - Ran `bun run --filter=api dev` on `https://api.whattax.localhost` and
-    `bun run --filter=web dev` on `https://whattax.localhost`.
-  - `GET https://api.whattax.localhost/api/health` returned
-    `200 {"service":"whattax","status":"ok"}`.
-  - `GET https://whattax.localhost/` returned `200` and contained
+  - Ran `bun run --filter=api dev` on `https://api.taxkit.localhost` and
+    `bun run --filter=web dev` on `https://taxkit.localhost`.
+  - `GET https://api.taxkit.localhost/api/health` returned
+    `200 {"service":"taxkit","status":"ok"}`.
+  - `GET https://taxkit.localhost/` returned `200` and contained
     `API status: <strong>ok</strong>`.
-  - `GET https://whattax.localhost/api/health` returned a web `404` HTML page,
+  - `GET https://taxkit.localhost/api/health` returned a web `404` HTML page,
     confirming `apps/web` no longer serves the API route.
   - Import audit: `apps/web/src` has no remaining
-    `@whattax/http-api/server`, `@whattax/http-api/client/server`,
+    `@taxkit/http-api/server`, `@taxkit/http-api/client/server`,
     `handleApiRequest`, `api-handler` or `serverContext` matches.
 - 2026-05-23 API-004:
   - Updated root, app and architecture docs so `apps/api` is the API runtime
     owner and `apps/web` is only an HTTP client of that API.
   - `bun run verification` passed, including Oxlint, Oxfmt check, Knip and
     Turbo typecheck.
-  - Ran `bun run --filter=api dev` on `https://api.whattax.localhost`.
-  - Ran `bun run --filter=web dev` on `https://whattax.localhost`, with the
-    web dev script injecting `portless get api.whattax` into both API base URL
+  - Ran `bun run --filter=api dev` on `https://api.taxkit.localhost`.
+  - Ran `bun run --filter=web dev` on `https://taxkit.localhost`, with the
+    web dev script injecting `portless get api.taxkit` into both API base URL
     environment variables.
-  - `GET https://api.whattax.localhost/api/health` returned
-    `200 {"service":"whattax","status":"ok"}`.
-  - `GET https://whattax.localhost/` returned `200` and contained
+  - `GET https://api.taxkit.localhost/api/health` returned
+    `200 {"service":"taxkit","status":"ok"}`.
+  - `GET https://taxkit.localhost/` returned `200` and contained
     `API status: <strong>ok</strong>`.
   - Browser verification used headless system Chrome against
-    `https://whattax.localhost/`; the rendered DOM contained
+    `https://taxkit.localhost/`; the rendered DOM contained
     `API status: <strong>ok</strong>`.
   - Audited root atlas and app/package README links/path references; checked
     107 references and found no missing files.
@@ -117,11 +117,11 @@ confidence: medium
     typecheck all passed after the ownership and config refactor.
   - Re-ran smoke checks with `bun run --filter=api dev` and
     `bun run --filter=web dev` through portless.
-  - `GET https://api.whattax.localhost/api/health` returned
-    `200 {"service":"whattax","status":"ok"}`.
-  - `GET https://api.whattax.localhost/api/docs/openapi.json` parsed as OpenAPI
-    `3.1.0` with title `WhatTax API` and `/api/health` present.
-  - `GET https://whattax.localhost/` returned `200` and contained
+  - `GET https://api.taxkit.localhost/api/health` returned
+    `200 {"service":"taxkit","status":"ok"}`.
+  - `GET https://api.taxkit.localhost/api/docs/openapi.json` parsed as OpenAPI
+    `3.1.0` with title `TaxKit API` and `/api/health` present.
+  - `GET https://taxkit.localhost/` returned `200` and contained
     `API status: <strong>ok</strong>`.
-  - `GET https://whattax.localhost/api/health` returned a web `404` HTML page,
+  - `GET https://taxkit.localhost/api/health` returned a web `404` HTML page,
     confirming `apps/web` still does not serve the API route.

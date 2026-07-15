@@ -53,14 +53,14 @@ task.
   locally. The full-run SDK helper remains SDK-HTTP-002.
 - Added package Changeset `.changeset/clear-api-sdk-names.md`.
 - Verification passed:
-  `bun run --filter=@whattax/sdk test`,
-  `bun run --filter=@whattax/sdk test-types`,
-  `bun run --filter=@whattax/sdk check-types`,
-  `bun run --filter=@whattax/sdk build`,
-  `bun run --filter=@whattax/http-api test`,
-  `bun run --filter=@whattax/http-api check-types`,
-  `bun run --filter=@whattax/http-api build`,
-  `bun run --filter=@whattax/sdk check-boundaries`,
+  `bun run --filter=@taxkit/sdk test`,
+  `bun run --filter=@taxkit/sdk test-types`,
+  `bun run --filter=@taxkit/sdk check-types`,
+  `bun run --filter=@taxkit/sdk build`,
+  `bun run --filter=@taxkit/http-api test`,
+  `bun run --filter=@taxkit/http-api check-types`,
+  `bun run --filter=@taxkit/http-api build`,
+  `bun run --filter=@taxkit/sdk check-boundaries`,
   `bun run format:check`, `bun run verification` and
   `bun run changeset status --verbose`.
 - Naming audit passed for preferred source/docs:
@@ -75,7 +75,7 @@ task.
 
 ### 2026-05-31 - SDK-HTTP-002 SDK Full-Run Helper Slice
 
-- Added `calculateRunRequest` to `@whattax/sdk/effect`. The helper calls
+- Added `calculateRunRequest` to `@taxkit/sdk/effect`. The helper calls
   `PublicCalculatorService.calculate`, decodes the descriptor output report and
   returns the canonical calculator run response shape with the report narrowed
   to `OutputSchema["Type"]`.
@@ -93,11 +93,11 @@ task.
 - Updated `.changeset/clear-api-sdk-names.md` to include the SDK Effect
   full-run helper in the existing patch release note.
 - Verification passed:
-  `bun run --filter=@whattax/sdk test`,
-  `bun run --filter=@whattax/sdk test-types`,
-  `bun run --filter=@whattax/sdk check-types`,
-  `bun run --filter=@whattax/sdk build`,
-  `bun run --filter=@whattax/sdk check-boundaries`,
+  `bun run --filter=@taxkit/sdk test`,
+  `bun run --filter=@taxkit/sdk test-types`,
+  `bun run --filter=@taxkit/sdk check-types`,
+  `bun run --filter=@taxkit/sdk build`,
+  `bun run --filter=@taxkit/sdk check-boundaries`,
   `rg -n 'calculateRunRequest|calculateReportRequest' packages/sdk/typescript/src packages/sdk/typescript/type-tests packages/sdk/typescript/README.md docs/product-specs/sdk-backed-http-api-thin-wrapper.md`,
   `bun run verification` and `bun run changeset status --verbose`.
 - The implemented SDK call graph matches the spec:
@@ -108,7 +108,7 @@ task.
 ### 2026-05-31 - SDK-HTTP-003 HTTP Thin Wrapper Slice
 
 - Updated `CalculatorApiHandlerLive` calculate route to call
-  `@whattax/sdk/effect` `calculateRunRequest` once and return the SDK
+  `@taxkit/sdk/effect` `calculateRunRequest` once and return the SDK
   full-run response directly.
 - Removed calculate-route calls to `PublicCalculatorService.getCalculator`,
   `PublicCalculatorService.getCalculatorGraph` and local
@@ -122,32 +122,32 @@ task.
   `getCalculator`, `getCalculatorGraph` or `CalculatorRunResponseData`
   references.
 - SDK import-boundary evidence passed through
-  `bun run --filter=@whattax/sdk check-boundaries`; `@whattax/sdk` still does
-  not depend on `@whattax/http-api`.
+  `bun run --filter=@taxkit/sdk check-boundaries`; `@taxkit/sdk` still does
+  not depend on `@taxkit/http-api`.
 - Verification passed:
-  `bun run --filter=@whattax/http-api test`,
-  `bun run --filter=@whattax/http-api check-types`,
-  `bun run --filter=@whattax/http-api build`,
-  `bun run --filter=@whattax/sdk test`,
-  `bun run --filter=@whattax/sdk check-boundaries`,
+  `bun run --filter=@taxkit/http-api test`,
+  `bun run --filter=@taxkit/http-api check-types`,
+  `bun run --filter=@taxkit/http-api build`,
+  `bun run --filter=@taxkit/sdk test`,
+  `bun run --filter=@taxkit/sdk check-boundaries`,
   `bun run verification` and `bun run changeset status --verbose`.
 - Implemented call graph:
-  `CalculatorApiHandlerLive -> sdkCalculationFor(params.calculatorId) -> @whattax/sdk/effect calculateRunRequest -> PublicCalculatorService.calculate -> CalculatorRunResponseData -> descriptor output decode -> typed calculator response -> CalculatorApiErrorEnvelope on CalculatorServiceError`.
+  `CalculatorApiHandlerLive -> sdkCalculationFor(params.calculatorId) -> @taxkit/sdk/effect calculateRunRequest -> PublicCalculatorService.calculate -> CalculatorRunResponseData -> descriptor output decode -> typed calculator response -> CalculatorApiErrorEnvelope on CalculatorServiceError`.
 
 ### 2026-05-31 - SDK-HTTP-004 Docs And Downstream Evidence Slice
 
 - Updated durable architecture docs and package READMEs with final production
   and test call graphs for HTTP calculate over the SDK full-run helper.
-- Updated package ownership guidance to make `@whattax/sdk/effect`
+- Updated package ownership guidance to make `@taxkit/sdk/effect`
   `calculateRunRequest`, `calculateReportRequest` and `calculateReport`
   ownership explicit, while keeping `CalculatorRun*` schemas and
-  `CalculatorServiceError` in `@whattax/calculators`.
+  `CalculatorServiceError` in `@taxkit/calculators`.
 - No additional Changeset was required for this slice because it is docs-only;
   the package-facing rename, SDK helper and HTTP thin-wrapper behavior are
   already covered by `.changeset/clear-api-sdk-names.md`.
 - Downstream validation evidence:
-  `/Users/cooper/Projects/adad/vendor/whattax` was checked out to the final
-  committed WhatTax implementation for this spec, and
+  `/Users/cooper/Projects/adad/vendor/taxkit` was checked out to the final
+  committed TaxKit implementation for this spec, and
   `/Users/cooper/Projects/adad` passed `pnpm check-types` and `pnpm build`.
   The downstream app uses the SDK plain facade and HTTP client without
   adopting any deprecated names.

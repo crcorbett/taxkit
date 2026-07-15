@@ -48,7 +48,7 @@ tax year are schema-backed calculator context, not route-family structure.
 - Parent review:
   - Catalog entries reuse canonical fact descriptors, rule descriptors, report
     schemas and rule-pack layers.
-  - `@whattax/http-api` dependencies on implemented rule packages are aligned
+  - `@taxkit/http-api` dependencies on implemented rule packages are aligned
     with the API package owning calculator metadata and future handlers.
   - No public calculation execution routes were added in this slice.
 
@@ -56,7 +56,7 @@ tax year are schema-backed calculator context, not route-family structure.
 
 - Verification:
   - `bun run verification` passed.
-  - `bun run --filter=@whattax/http-api check-types` passed.
+  - `bun run --filter=@taxkit/http-api check-types` passed.
   - `bun changeset status --verbose` previews a fixed release-train patch bump
     to `0.0.2`.
 - API smoke checks:
@@ -80,7 +80,7 @@ tax year are schema-backed calculator context, not route-family structure.
 
 - Verification:
   - `bun run verification` passed.
-  - `bun run --filter=@whattax/http-api check-types` passed.
+  - `bun run --filter=@taxkit/http-api check-types` passed.
   - `bun changeset status --verbose` previews a fixed release-train patch bump
     to `0.0.2`.
   - Changed-file audit found no `Object.entries`, `Object.values`, manual

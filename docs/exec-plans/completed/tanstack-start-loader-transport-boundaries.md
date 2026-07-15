@@ -347,7 +347,7 @@ Browser harness:
 Built browser evidence:
 
 - Built `apps/docs` with the Vercel Nitro preset and served the output through
-  `https://docs.whattax.localhost` using portless.
+  `https://docs.taxkit.localhost` using portless.
 - A Chromium context with JavaScript disabled received HTTP 200 and found the
   server-rendered home heading `Open-source tax engine, API and SDK
   documentation` plus `61 documentation pages loaded.` before interaction.
@@ -358,7 +358,7 @@ Built browser evidence:
   `/_serverFn/c8c6dd06eff1c0e65f1a26f5f19875cdffdd3fa5ecbc071662ff68412ee81193`,
   loaded the destination MDX chunk and rendered the `Start` heading. The
   transition made zero document requests.
-- Review screenshot: `/tmp/whattax-tslb-003-start.png`. It is intentionally not
+- Review screenshot: `/tmp/taxkit-tslb-003-start.png`. It is intentionally not
   committed.
 
 Dependency changes:

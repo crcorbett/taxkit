@@ -9,8 +9,8 @@ confidence: high
 
 ## Overview
 
-Harden WhatTax's repository contract using the proven, portable parts of the
-`site` reference implementation while preserving WhatTax's stricter trust
+Harden TaxKit's repository contract using the proven, portable parts of the
+`site` reference implementation while preserving TaxKit's stricter trust
 boundaries and package ownership. This work upgrades the workspace to the
 latest compatible Effect 4 beta family, makes CI execute the canonical local
 quality contract, makes package builds and packed artifacts deterministic,
@@ -29,7 +29,7 @@ still drift:
 - most package builds do not clean `dist` first, and most release-train package
   manifests expose workspace-only source conditions without a separate packed
   publication surface.
-- portable Effect, Bun and MDX rules are mixed into the `whattax` lint
+- portable Effect, Bun and MDX rules are mixed into the `taxkit` lint
   namespace or remain review-only.
 - `packages/scripts` is still planned, so the complete release gate remains a
   collection of commands rather than one typed, testable orchestration path.
@@ -70,7 +70,7 @@ GitHub Actions
 Release readiness: target
 
 root release:check
-  -> @whattax/scripts release-readiness command
+  -> @taxkit/scripts release-readiness command
   -> Platform Command service
   -> canonical verification, test, build and package-owned release gates
   -> schema-backed command evidence and typed failures
@@ -95,7 +95,7 @@ oxlint.config.ts exact scopes and allowlists
   -> effect/* portable Effect rules
   -> bun/* host and Bun runtime rules
   -> mdx/* docs registry rules
-  -> whattax/* tax/domain and route-transport rules
+  -> taxkit/* tax/domain and route-transport rules
   -> real Oxlint CLI fixtures for allowed and rejected cases
 ```
 
@@ -128,13 +128,13 @@ temporary packed consumer
   source imports.
 - Make strict packed install and public-entrypoint smoke validation pass; do not
   hide release blockers behind audit-only success.
-- Separate portable `effect`, `bun`, and `mdx` rules from WhatTax-specific
+- Separate portable `effect`, `bun`, and `mdx` rules from TaxKit-specific
   domain and route rules, with exact scopes and real Oxlint binary fixtures.
 - Enforce encoder egress, non-throwing schema codecs, typed service errors,
   runtime/host adapter placement, Bun live/runtime placement, consistent test
   globals, and app-owned MDX registries where those contracts are statically
   reliable.
-- Implement `@whattax/scripts` with one Effect-native release-readiness command
+- Implement `@taxkit/scripts` with one Effect-native release-readiness command
   that composes existing package-owned commands rather than moving their
   implementation ownership.
 - Document an abstraction admission ledger and route-high/leaf-local React
@@ -150,7 +150,7 @@ temporary packed consumer
   require explicit user approval.
 - SEO/AEO/OG systems, URL-state abstractions, a shared UI package, generated
   docs inventories, or broad leaf-component data fetching.
-- Weakening `whattax/no-decoding-outside-boundaries` or allowing ordinary React
+- Weakening `taxkit/no-decoding-outside-boundaries` or allowing ordinary React
   leaves to decode, fetch, acquire services or run Effect runtimes.
 
 ## Ownership And Boundaries
@@ -198,8 +198,8 @@ prove a clean consumer can install and import public entrypoints.
 
 ### Lint namespaces
 
-Portable rules must not carry WhatTax package names or tax policy. The
-`whattax` namespace retains decoder allowlisting, route transport restoration
+Portable rules must not carry TaxKit package names or tax policy. The
+`taxkit` namespace retains decoder allowlisting, route transport restoration
 and tax-specific service rules. Rules must be AST-based, narrowly scoped and
 tested by invoking the real Oxlint binary against accepted and rejected
 fixtures. A rule is not added when its static signal cannot distinguish policy
@@ -214,7 +214,7 @@ runtime execution and Bun host APIs stay in app/runtime/layer/script adapters.
 
 ### Release-readiness command
 
-`@whattax/scripts` provides one command entrypoint and one primary Effect
+`@taxkit/scripts` provides one command entrypoint and one primary Effect
 program. It invokes existing root and package-owned gates through Effect
 Platform `Command`, records ordered schema-backed outcomes and fails with typed
 command errors. Tests provide a memory layer and assert ordering, arguments,
@@ -279,9 +279,9 @@ compatibility and deterministic package artifacts. Do not run
 - `CLAUDE.md` resolves to `AGENTS.md`.
 - clean builds, packed manifests, clean install and public export imports pass
   for the release train; no unresolved workspace/catalog protocols remain.
-- portable lint namespaces and their real CLI fixtures pass; exact WhatTax
+- portable lint namespaces and their real CLI fixtures pass; exact TaxKit
   decoder and route-consumer policies remain enforced.
-- `@whattax/scripts` executes the release-readiness graph through Effect
+- `@taxkit/scripts` executes the release-readiness graph through Effect
   Platform Command and has deterministic layer-based tests.
 - durable docs contain the abstraction-admission and React composition rules,
   and package/status/audit docs accurately describe implemented ownership.

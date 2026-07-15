@@ -15,7 +15,7 @@ through the ordered task list at
 [extract-public-calculator-service.tasks.json](../../product-specs/extract-public-calculator-service.tasks.json).
 
 The rollout MUST keep calculator behavior reusable outside HTTP. HTTP handlers
-must become thin transport adapters over `@whattax/calculators` service methods.
+must become thin transport adapters over `@taxkit/calculators` service methods.
 
 ## Operating Rules
 
@@ -31,8 +31,8 @@ must become thin transport adapters over `@whattax/calculators` service methods.
 
 | Task | Status | Notes |
 | --- | --- | --- |
-| CALC-SVC-001 | complete | Added `@whattax/calculators` package shell. Parent verification passed. Commit `0bb699b`. |
-| CALC-SVC-002 | complete | Moved reusable schemas, catalog and metadata projections into `@whattax/calculators`. Parent verification passed. |
+| CALC-SVC-001 | complete | Added `@taxkit/calculators` package shell. Parent verification passed. Commit `0bb699b`. |
+| CALC-SVC-002 | complete | Moved reusable schemas, catalog and metadata projections into `@taxkit/calculators`. Parent verification passed. |
 | CALC-SVC-003 | complete | Moved calculation execution and expected error shaping into `PublicCalculatorService`. Parent verification and API smoke passed. |
 | CALC-SVC-004 | complete | Final docs, changelog and smoke evidence. |
 | CALC-SVC-005 | complete | Tightened public calculate facts to canonical rule-owned schema unions with selected-calculator input decoding. Parent verification, tests and portless API smoke passed. Commit `984ced5`. |
@@ -43,10 +43,10 @@ must become thin transport adapters over `@whattax/calculators` service methods.
 
 - Commit: `0bb699b Add calculators package shell`
 - Verification:
-  - `bun run --filter=@whattax/calculators check-types` passed.
-  - `bun run --filter=@whattax/calculators build` passed.
+  - `bun run --filter=@taxkit/calculators check-types` passed.
+  - `bun run --filter=@taxkit/calculators build` passed.
   - `bun changeset status --verbose` previews a patch bump for
-    `@whattax/calculators`.
+    `@taxkit/calculators`.
   - `bun run verification` passed.
 - Parent review:
   - Package exports expose only `src/index.ts`.
@@ -55,22 +55,22 @@ must become thin transport adapters over `@whattax/calculators` service methods.
   - `knip.json` includes the new workspace package.
   - Architecture docs list `packages/calculators` as an implemented shell while
     clearly noting runtime behavior has not moved yet.
-  - Import audit found no source imports from `@whattax/http-api`, `apps/api`,
+  - Import audit found no source imports from `@taxkit/http-api`, `apps/api`,
     `apps/web`, `runtime.server` or `runtime.client`; matches were README
     guardrail text only.
 
 ### CALC-SVC-002
 
 - Verification:
-  - `bun run --filter=@whattax/calculators check-types` passed.
-  - `bun run --filter=@whattax/calculators build` passed.
-  - `bun run --filter=@whattax/http-api check-types` passed.
+  - `bun run --filter=@taxkit/calculators check-types` passed.
+  - `bun run --filter=@taxkit/calculators build` passed.
+  - `bun run --filter=@taxkit/http-api check-types` passed.
   - `bun changeset status --verbose` previews patch bumps for
-    `@whattax/calculators` and `@whattax/http-api`.
+    `@taxkit/calculators` and `@taxkit/http-api`.
   - `bun run verification` passed.
 - Lint coverage:
   - Temporary `packages/calculators/src/__oxlint-scope-check.ts` intentionally
-    failed with WhatTax scoped lint rules for raw `typeof`, `null`,
+    failed with TaxKit scoped lint rules for raw `typeof`, `null`,
     `in`, thrown errors, native array methods, native `Map`, ad hoc JSON,
     hidden time and nested wrapper calls.
   - The temporary fixture was removed before verification.
@@ -84,9 +84,9 @@ must become thin transport adapters over `@whattax/calculators` service methods.
   - `packages/http-api/src/groups/calculators.ts` now owns route-only HTTP
     schemas, the bad-request envelope, OpenAPI annotations and compatibility
     exports.
-  - `@whattax/http-api` now depends on `@whattax/calculators` instead of
+  - `@taxkit/http-api` now depends on `@taxkit/calculators` instead of
     importing AU rule packages directly.
-  - `@whattax/calculators` source has no imports from `@whattax/http-api`,
+  - `@taxkit/calculators` source has no imports from `@taxkit/http-api`,
     `apps/api`, `apps/web`, `runtime.server` or `runtime.client`.
   - Audits found no `Object.entries`, `Object.values`, manual `_tag` object
     literals, unsafe casts or non-null assertions in changed source files.
@@ -96,11 +96,11 @@ must become thin transport adapters over `@whattax/calculators` service methods.
 ### CALC-SVC-003
 
 - Verification:
-  - `bun run --filter=@whattax/calculators check-types` passed.
-  - `bun run --filter=@whattax/http-api check-types` passed.
+  - `bun run --filter=@taxkit/calculators check-types` passed.
+  - `bun run --filter=@taxkit/http-api check-types` passed.
   - `bun run verification` passed.
   - `bun changeset status --verbose` previews patch bumps for
-    `@whattax/calculators` and `@whattax/http-api`.
+    `@taxkit/calculators` and `@taxkit/http-api`.
 - API smoke:
   - Started `apps/api` with `API_HOST=127.0.0.1 API_PORT=4027`.
   - `/api/docs/openapi.json` includes all public `/api/v1` calculator,
@@ -115,7 +115,7 @@ must become thin transport adapters over `@whattax/calculators` service methods.
     with issue path `["grossPay", "period"]` and descriptor-backed help.
 - Lint coverage:
   - Temporary `packages/calculators/src/__oxlint-scope-check.ts`
-    intentionally failed with WhatTax scoped lint rules for raw `typeof`,
+    intentionally failed with TaxKit scoped lint rules for raw `typeof`,
     `in`, undefined comparison, conditional object spread, context `??`
     defaulting, thrown errors, native array methods, native `Map`,
     ad hoc JSON and `await new Promise`.
@@ -135,7 +135,7 @@ must become thin transport adapters over `@whattax/calculators` service methods.
     `PublicCalculatorServiceLive` with `CalculationEngineLive` through
     `HttpRouter.provideRequest(...)` so request handlers see the service at
     runtime.
-  - Audits found no `@whattax/http-api` or app imports in
+  - Audits found no `@taxkit/http-api` or app imports in
     `packages/calculators/src`.
   - Audits found no `validateRuleGraph`, `SchemaIssue`,
     `CalculationEngineLive`, rule-pack layer composition, raw undefined
@@ -148,8 +148,8 @@ must become thin transport adapters over `@whattax/calculators` service methods.
 - Verification:
   - `bun run verification` passed.
   - `bun changeset status --verbose` passed and previews fixed release-train
-    patch bumps, including `@whattax/calculators 0.0.2` and
-    `@whattax/http-api 0.0.2`.
+    patch bumps, including `@taxkit/calculators 0.0.2` and
+    `@taxkit/http-api 0.0.2`.
 - API smoke:
   - Started `apps/api` with `API_HOST=127.0.0.1 API_PORT=4027`.
   - `/api/docs/openapi.json` includes all public `/api/v1` calculator,
@@ -164,9 +164,9 @@ must become thin transport adapters over `@whattax/calculators` service methods.
     with `_tag = CalculatorInputDecodeError`, issue path
     `["grossPay", "period"]` and two descriptor-backed help entries.
 - Docs and release audit:
-  - Root docs and package READMEs now describe `@whattax/calculators` as the
+  - Root docs and package READMEs now describe `@taxkit/calculators` as the
     reusable calculator orchestration package.
-  - `@whattax/http-api` docs now describe thin transport handlers over
+  - `@taxkit/http-api` docs now describe thin transport handlers over
     `PublicCalculatorService`.
   - Package ownership docs describe `packages/calculators` as implemented, not
     a planned placeholder or package shell.
@@ -181,11 +181,11 @@ must become thin transport adapters over `@whattax/calculators` service methods.
 - Verification:
   - `bun run verification` passed.
   - `bun run test` passed.
-  - `bun run --filter=@whattax/calculators test` passed.
-  - `bun run --filter=@whattax/http-api test` passed.
+  - `bun run --filter=@taxkit/calculators test` passed.
+  - `bun run --filter=@taxkit/http-api test` passed.
 - API smoke:
   - Started `apps/api` through portless at
-    `https://api.whattax.localhost`.
+    `https://api.taxkit.localhost`.
   - `/api/docs/openapi.json` shows
     `POST /api/v1/calculators/{calculatorId}/calculate` request facts as
     `facts.anyOf`, including take-home/pay-withholdings facts and annual-tax

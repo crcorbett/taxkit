@@ -7,14 +7,14 @@
   "commit": false,
   "fixed": [
     [
-      "@whattax/core",
-      "@whattax/api-http",
-      "@whattax/rules-au-income-tax",
-      "@whattax/rules-au-pay",
-      "@whattax/rules-au-stsl",
-      "@whattax/sdk",
-      "@whattax/testing",
-      "@whattax/tsconfig"
+      "@taxkit/core",
+      "@taxkit/api-http",
+      "@taxkit/rules-au-income-tax",
+      "@taxkit/rules-au-pay",
+      "@taxkit/rules-au-stsl",
+      "@taxkit/sdk",
+      "@taxkit/testing",
+      "@taxkit/tsconfig"
     ]
   ],
   "ignore": [],

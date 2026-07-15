@@ -6,7 +6,7 @@ that is already obvious from names and types.
 
 ## Lint Contract
 
-WhatTax follows Ultracite's JSDoc lint rules. Do not fight the linter: if
+TaxKit follows Ultracite's JSDoc lint rules. Do not fight the linter: if
 `jsdoc/check-tag-names` rejects a tag, the tag is not part of this repository's
 docstring vocabulary.
 
@@ -65,7 +65,7 @@ examples executable-looking and minimal.
  *
  * @example
  * ```ts
- * import { aud } from "@whattax/core/primitives";
+ * import { aud } from "@taxkit/core/primitives";
  *
  * const amount = aud(12_345);
  * ```
@@ -98,7 +98,7 @@ export const scaleWeeklyWithholdingToPayPeriodDollars = (...)
 - Name the rounding or threshold convention when it matters to the result.
 - Explain why a public abstraction exists when it is not obvious.
 - Keep examples small and import from public package paths.
-- Do not include UI, SaaS, or downstream product context in WhatTax docs.
+- Do not include UI, SaaS, or downstream product context in TaxKit docs.
 - Do not duplicate implementation line-by-line.
 
 ## Source References

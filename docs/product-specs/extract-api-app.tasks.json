@@ -1,5 +1,5 @@
 {
-  "$schema": "https://whattax.local/schemas/product-spec-task-plan.v1.json",
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/extract-api-app.md",
   "title": "Extract API App Tasks",
   "status": "implemented",
@@ -103,7 +103,7 @@
         "bun run --filter=web check-types",
         "Run apps/api and apps/web together",
         "Verify the root web route renders health data from apps/api",
-        "Search apps/web for @whattax/http-api/server and @whattax/http-api/client/server imports"
+        "Search apps/web for @taxkit/http-api/server and @taxkit/http-api/client/server imports"
       ],
       "browserVerification": [
         "Open the local web app and confirm the health UI renders while apps/api is running",

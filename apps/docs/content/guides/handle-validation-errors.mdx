@@ -18,7 +18,7 @@ untyped source.
 ## Steps
 
 1. Prefer typed SDK helpers for trusted TypeScript data.
-2. Use `WhatTax.safe.calculate` when expected failures should be values.
+2. Use `TaxKit.safe.calculate` when expected failures should be values.
 3. Use `?help=errors` with HTTP calls when you want field guidance.
 4. Display issue paths from the calculator error rather than maintaining a
    separate list of fields.
@@ -26,17 +26,17 @@ untyped source.
 ## Example
 
 ```ts
-import { aud } from "@whattax/core/primitives";
-import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
 
-const result = await WhatTax.safe.calculate(
+const result = await TaxKit.safe.calculate(
   au.calculations.takeHomePay,
   // External input can bypass compile-time checks before it reaches this call.
   { taxableIncome: aud(9_000_000) } as never
 );
 
-if (result._tag === "WhatTaxFailure") {
+if (result._tag === "TaxKitFailure") {
   const error = result.error.error;
   console.log(error._tag);
   console.log(result.error.message);

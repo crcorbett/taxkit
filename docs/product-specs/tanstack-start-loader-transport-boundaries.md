@@ -10,7 +10,7 @@ confidence: high
 ## Overview
 
 Primary reader:
-: A WhatTax maintainer implementing or reviewing the docs route runtime.
+: A TaxKit maintainer implementing or reviewing the docs route runtime.
 
 Primary need:
 : Place Effect Schema encoding and restoration at TanStack Start's actual
@@ -21,7 +21,7 @@ Implementation status:
 [completed execution plan](../exec-plans/completed/tanstack-start-loader-transport-boundaries.md)
 for runtime evidence and residual risk.
 
-WhatTax should keep Effect-owned route outcomes schema-encoded until the route
+TaxKit should keep Effect-owned route outcomes schema-encoded until the route
 root consumes them. On initial SSR, the encoded loader value must survive
 TanStack Router dehydration and browser hydration. On client navigation, the
 same value must survive the server-function RPC serializer. The route root then
@@ -36,7 +36,7 @@ server-function call is one network boundary; it is not a reason to decode
 before the independent route-loader dehydration boundary.
 
 The implementation should follow the serialisable-loader pattern validated in
-`~/Projects/site`, adapted to WhatTax's stricter Effect, lint and component
+`~/Projects/site`, adapted to TaxKit's stricter Effect, lint and component
 composition rules. A route-root transport restore is an explicit boundary
 operation. It is not permission to decode in ordinary components or hooks.
 
@@ -213,7 +213,7 @@ built docs runtime: client navigation
 - Do not permit arbitrary Schema decoding in React components or hooks.
 - Do not create route-specific decoder hooks, providers, wrapper components or
   mirrored transport DTOs to move code around lint.
-- Do not change docs content contracts owned by `@whattax/docs-content`.
+- Do not change docs content contracts owned by `@taxkit/docs-content`.
 - Do not run `bun run version-repo` or publish packages.
 
 ## Ownership and boundaries
@@ -244,7 +244,7 @@ repeated policy, not wrappers around a single callsite.
 The route-boundary module is imported by browser-rendered route roots. Its
 runtime imports must remain limited to the app-local error schemas,
 browser-safe Effect modules, and browser-safe
-`@whattax/docs-content/errors`/`@whattax/docs-content/schemas` exports. It must
+`@taxkit/docs-content/errors`/`@taxkit/docs-content/schemas` exports. It must
 not import the docs content service, MDX client loader, runtime, server exports,
 filesystem adapters, environment access or generated server source.
 
@@ -260,7 +260,7 @@ The boundary component must match the `Result` itself; it must not pass the
 encoded value or whole `Result` to a child. Any child component receives only
 focused readonly canonical values, callbacks or children.
 
-`tools/oxlint/whattax-rules.js` and `oxlint.config.ts` own static enforcement.
+`tools/oxlint/taxkit-rules.js` and `oxlint.config.ts` own static enforcement.
 Architecture documentation owns the durable categories and invariants; it must
 not duplicate exact file allowlists.
 
@@ -516,11 +516,11 @@ route boundary or receive the encoded representation.
 
 ### Enforce the narrow exception
 
-Keep `whattax/no-decoding-outside-boundaries` globally enabled. The actual
+Keep `taxkit/no-decoding-outside-boundaries` globally enabled. The actual
 Schema decoder stays in the exact route-boundary module; route files do not
 receive a broad decoder exemption.
 
-Add `whattax/no-route-transport-restore-outside-consumers`. It should track
+Add `taxkit/no-route-transport-restore-outside-consumers`. It should track
 direct named imports from configured canonical route-boundary module specifiers
 and report restoration outside direct `createFileRoute` `component` or `head`
 consumers. Configuration must use exact `routeTransportBoundaryModules` and
@@ -565,7 +565,7 @@ Real Oxlint CLI tests must prove:
   `Result` to a child are rejected
 - unrelated methods named `restore` do not produce false positives
 - direct Schema decoding in the route file remains rejected by
-  `whattax/no-decoding-outside-boundaries`
+  `taxkit/no-decoding-outside-boundaries`
 - inline disable directives for either boundary rule fail
 - encoding and declarative `Schema.decodeTo` remain valid
 
@@ -639,7 +639,7 @@ git diff --check
   requirement. Keep it app-scoped and do not turn it into a production
   dependency.
 - The site reference uses `if` branches and a nested `Result<Exit>` consumer.
-  WhatTax should retain the proven transport lifecycle while using `Match`, a
+  TaxKit should retain the proven transport lifecycle while using `Match`, a
   flattened typed `Result` and the existing error-presentation contract.
 - The currently installed versions are `@tanstack/react-start@1.167.65`,
   `@tanstack/react-router@1.169.2` and `effect@4.0.0-beta.60`. Implementation
@@ -677,8 +677,8 @@ the no-Changeset rationale. Do not consume existing pending Changesets.
 - The direct route boundary component matches the restored `Result`; children
   receive focused canonical values rather than encoded data, route state or
   mirrored prop DTOs.
-- `whattax/no-decoding-outside-boundaries` and
-  `whattax/no-route-transport-restore-outside-consumers` pass positive,
+- `taxkit/no-decoding-outside-boundaries` and
+  `taxkit/no-route-transport-restore-outside-consumers` pass positive,
   negative, named-component, alias and inline-disable CLI tests.
 - Effect code is a clean linear pipeline with canonical schemas, typed errors,
   no unsafe casts, no mirrored DTOs, no broad catches and no nested runtime.
