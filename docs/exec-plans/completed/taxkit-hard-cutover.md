@@ -1,5 +1,5 @@
 ---
-status: active
+status: completed
 last_reviewed: 2026-07-15
 source_of_truth: docs
 confidence: high
@@ -21,7 +21,7 @@ turns stops for replan or user decision.
 | --- | --- | --- |
 | TAXKIT-001 | accepted | Workspace, source, configuration, lint namespace and local domains migrated; parent review and verification accepted. |
 | TAXKIT-002 | accepted | Documentation, release metadata and full release-readiness evidence accepted by parent review. |
-| TAXKIT-003 | blocked by TAXKIT-002 | Not started. |
+| TAXKIT-003 | accepted | GitHub repository, origin, pushed branch and local directory cut over and verified. |
 
 ## Preflight inventory
 
@@ -90,3 +90,20 @@ turns stops for replan or user decision.
 - The target npm scope remains unauthenticated on this machine. No versioning
   or publication was attempted; scope ownership must be proven during the
   separately approved release operation.
+
+### TAXKIT-003
+
+- GitHub repository renamed to `crcorbett/taxkit`; the canonical public URL is
+  `https://github.com/crcorbett/taxkit` and `main` remains the default branch.
+- Local `origin` fetch and push URLs now use the canonical TaxKit repository;
+  both accepted source commits were pushed successfully.
+- The checkout moved to `/Users/cooper/Projects/taxkit`.
+- `bun run verification` passed from the renamed checkout.
+- Final tracked-file content and path audits found no retired identity token.
+- Parent audit pass 1: GitHub repository, remote and branch identity are
+  canonical.
+- Parent audit pass 2: the renamed checkout has no stale repository path,
+  configuration, package, lint or lockfile identity reference.
+- Parent audit pass 3: the checkout is clean and the full release-readiness
+  evidence plus pending major Changeset remain intact. Registry authentication
+  is the only remaining prerequisite for a later publication operation.
