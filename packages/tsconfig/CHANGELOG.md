@@ -1,5 +1,13 @@
 # @taxkit/tsconfig
 
+## 1.0.0
+
+### Major Changes
+
+- e409856: Introduce the TaxKit package namespace as a breaking identity cutover. Update
+  consumer imports and runtime configuration to the TaxKit package and
+  environment names; no compatibility package aliases are provided.
+
 ## 0.1.0
 
 ### Patch Changes

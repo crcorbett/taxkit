@@ -1,5 +1,14 @@
 # TaxKit API
 
+## 1.0.0
+
+### Major Changes
+
+- Renamed API runtime configuration to the `TAXKIT_` environment prefix and
+  the local development endpoint to `https://api.taxkit.localhost` as part of
+  the TaxKit identity cutover. Public HTTP route paths, request schemas and
+  response schemas are unchanged.
+
 ## 0.0.1
 
 ### Patch Changes

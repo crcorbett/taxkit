@@ -1,5 +1,34 @@
 # TaxKit
 
+## 1.0.0
+
+### Major Changes
+
+- Completed the breaking TaxKit identity cutover across package names,
+  consumer imports, runtime configuration, local development domains and
+  repository tooling. Current package consumers must use `@taxkit/*` and
+  runtime configuration must use the `TAXKIT_` prefix; no compatibility aliases
+  or legacy configuration fallbacks are provided.
+- Preserved the existing engine, calculator, SDK and HTTP API behaviour while
+  establishing the `1.0.0` TaxKit release train. Packages remain private and
+  unpublished pending a separate publication approach.
+
+### App Changelogs
+
+- [TaxKit API](./apps/api/CHANGELOG.md)
+
+### Package Changelogs
+
+- [`@taxkit/core`](./packages/core/CHANGELOG.md)
+- [`@taxkit/calculators`](./packages/calculators/CHANGELOG.md)
+- [`@taxkit/api-http`](./packages/api/http/CHANGELOG.md)
+- [`@taxkit/rules-au-income-tax`](./packages/rules/au/income-tax/CHANGELOG.md)
+- [`@taxkit/rules-au-pay`](./packages/rules/au/pay/CHANGELOG.md)
+- [`@taxkit/rules-au-stsl`](./packages/rules/au/stsl/CHANGELOG.md)
+- [`@taxkit/sdk`](./packages/sdk/typescript/CHANGELOG.md)
+- [`@taxkit/testing`](./packages/testing/CHANGELOG.md)
+- [`@taxkit/tsconfig`](./packages/tsconfig/CHANGELOG.md)
+
 ## 0.0.1
 
 ### Patch Changes
