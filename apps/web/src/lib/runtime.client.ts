@@ -1,29 +1,29 @@
-import { makeWhatTaxApiClientLayer } from "@whattax/api-http/client/live";
+import { makeTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
-import { WhatTaxWebConfigError } from "./config";
+import { TaxKitWebConfigError } from "./config";
 import {
-  WhatTaxWebClientConfig,
-  WhatTaxWebClientConfigProviderLive,
+  TaxKitWebClientConfig,
+  TaxKitWebClientConfigProviderLive,
 } from "./config.client";
 
-const WhatTaxApiClientLive = Layer.unwrap(
-  Effect.gen(function* makeWhatTaxApiClientLive() {
-    const config = yield* WhatTaxWebClientConfig;
-    return makeWhatTaxApiClientLayer({ baseUrl: config.httpApi.baseUrl });
+const TaxKitApiClientLive = Layer.unwrap(
+  Effect.gen(function* makeTaxKitApiClientLive() {
+    const config = yield* TaxKitWebClientConfig;
+    return makeTaxKitApiClientLayer({ baseUrl: config.httpApi.baseUrl });
   }).pipe(
     Effect.mapError(
       (cause) =>
-        new WhatTaxWebConfigError({
+        new TaxKitWebConfigError({
           cause,
-          message: `Invalid WhatTax web client config: ${cause.message}`,
+          message: `Invalid TaxKit web client config: ${cause.message}`,
         })
     )
   )
 ).pipe(
   Layer.provide(FetchHttpClient.layer),
-  Layer.provide(WhatTaxWebClientConfigProviderLive)
+  Layer.provide(TaxKitWebClientConfigProviderLive)
 );
 
-export const appRuntime = ManagedRuntime.make(WhatTaxApiClientLive);
+export const appRuntime = ManagedRuntime.make(TaxKitApiClientLive);

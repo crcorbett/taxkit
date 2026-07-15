@@ -7,7 +7,7 @@ confidence: high
 
 # Scripts
 
-`@whattax/scripts` owns cross-cutting repository command orchestration. Its
+`@taxkit/scripts` owns cross-cutting repository command orchestration. Its
 implemented release-readiness command runs the existing verification and
 package-owned release gates as one ordered, typed Effect program.
 
@@ -41,8 +41,8 @@ failure:
 2. `bun run test`
 3. `bun run build`
 4. `bun run docs:validate`
-5. `bun run --filter=@whattax/sdk check-packed-artifact`
-6. `bun run --filter=@whattax/sdk validate:downstream`
+5. `bun run --filter=@taxkit/sdk check-packed-artifact`
+6. `bun run --filter=@taxkit/sdk validate:downstream`
 7. `bun run --filter=api smoke`
 8. `bun run --filter=docs test:browser`
 9. `bun run changeset status --verbose`
@@ -75,9 +75,9 @@ provides the host implementation or executes the completed Effect.
 ## Testing
 
 ```sh
-bun run --filter=@whattax/scripts test
-bun run --filter=@whattax/scripts check-types
-bun run --filter=@whattax/scripts build
+bun run --filter=@taxkit/scripts test
+bun run --filter=@taxkit/scripts check-types
+bun run --filter=@taxkit/scripts build
 ```
 
 The deterministic layer uses `HashMap` and `Ref` to record invocations without

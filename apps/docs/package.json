@@ -6,19 +6,19 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "portless run --name docs.whattax vite dev",
+    "dev": "portless run --name docs.taxkit vite dev",
     "build": "vite build",
     "check-examples": "tsc -p tsconfig.examples.json --noEmit",
     "check-types": "tsc --noEmit && bun run check-examples",
     "clean": "rm -rf .output .tanstack .turbo node_modules/.vite",
-    "preview": "portless run --name docs.whattax vite preview",
+    "preview": "portless run --name docs.taxkit vite preview",
     "test:browser": "vitest run --config vitest.browser.config.ts"
   },
   "dependencies": {
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
-    "@whattax/docs-content": "workspace:*",
-    "@whattax/docs-fumadocs": "workspace:*",
+    "@taxkit/docs-content": "workspace:*",
+    "@taxkit/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
     "fumadocs-mdx": "^14.3.1",
     "react": "catalog:",

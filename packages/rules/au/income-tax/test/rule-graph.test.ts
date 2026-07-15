@@ -1,8 +1,8 @@
 import { describe, expect, it } from "@effect/vitest";
-import { validateRuleGraph } from "@whattax/core/graph";
-import type { AnyRuleDescriptor } from "@whattax/core/rules";
-import { AnnualTaxableIncomeDescriptor } from "@whattax/rules-au-income-tax/facts";
-import { AuAnnualTaxRuleDescriptors } from "@whattax/rules-au-income-tax/rule-pack";
+import { validateRuleGraph } from "@taxkit/core/graph";
+import type { AnyRuleDescriptor } from "@taxkit/core/rules";
+import { AnnualTaxableIncomeDescriptor } from "@taxkit/rules-au-income-tax/facts";
+import { AuAnnualTaxRuleDescriptors } from "@taxkit/rules-au-income-tax/rule-pack";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
   rules.map((rule) => ({
@@ -42,14 +42,14 @@ describe("AU annual tax rule graph", () => {
     expect(rulePackSnapshot(AuAnnualTaxRuleDescriptors)).toMatchInlineSnapshot(`
       [
         {
-          "id": "whattax/rules-au-income-tax/rule/IncomeTax",
+          "id": "taxkit/rules-au-income-tax/rule/IncomeTax",
           "parameters": [
             {
               "effectivePeriod": {
                 "from": "2025-07-01",
                 "toExclusive": "2026-07-01",
               },
-              "id": "whattax/rules-au-income-tax/parameter/AtoIncomeTaxTable",
+              "id": "taxkit/rules-au-income-tax/parameter/AtoIncomeTaxTable",
               "source": "ato-publication",
               "sourceArtifact": {
                 "checksum": "sha256:7cc3b3d6e7823ff7a9b8f145c2809db0e5f8c8cf19d01c56dbd511f52ff33e63",
@@ -59,24 +59,24 @@ describe("AU annual tax rule graph", () => {
             },
           ],
           "provides": [
-            "whattax/rules-au-income-tax/fact/IncomeTaxComponent",
+            "taxkit/rules-au-income-tax/fact/IncomeTaxComponent",
           ],
           "requires": [
-            "whattax/rules-au-income-tax/fact/AnnualTaxableIncome",
+            "taxkit/rules-au-income-tax/fact/AnnualTaxableIncome",
           ],
           "sources": [
             "ato-publication",
           ],
         },
         {
-          "id": "whattax/rules-au-income-tax/rule/Lito",
+          "id": "taxkit/rules-au-income-tax/rule/Lito",
           "parameters": [
             {
               "effectivePeriod": {
                 "from": "2025-07-01",
                 "toExclusive": "2026-07-01",
               },
-              "id": "whattax/rules-au-income-tax/parameter/AtoLitoTable",
+              "id": "taxkit/rules-au-income-tax/parameter/AtoLitoTable",
               "source": "ato-publication",
               "sourceArtifact": {
                 "checksum": "sha256:c31c69c4417f08f7bc9dced2c3a95d80e19885b7ee5e16b8931fe6ea0c761d9f",
@@ -86,24 +86,24 @@ describe("AU annual tax rule graph", () => {
             },
           ],
           "provides": [
-            "whattax/rules-au-income-tax/fact/LitoComponent",
+            "taxkit/rules-au-income-tax/fact/LitoComponent",
           ],
           "requires": [
-            "whattax/rules-au-income-tax/fact/AnnualTaxableIncome",
+            "taxkit/rules-au-income-tax/fact/AnnualTaxableIncome",
           ],
           "sources": [
             "ato-publication",
           ],
         },
         {
-          "id": "whattax/rules-au-income-tax/rule/MedicareLevy",
+          "id": "taxkit/rules-au-income-tax/rule/MedicareLevy",
           "parameters": [
             {
               "effectivePeriod": {
                 "from": "2025-07-01",
                 "toExclusive": "2026-07-01",
               },
-              "id": "whattax/rules-au-income-tax/parameter/AtoMedicareLevyTable",
+              "id": "taxkit/rules-au-income-tax/parameter/AtoMedicareLevyTable",
               "source": "ato-publication",
               "sourceArtifact": {
                 "checksum": "sha256:d3b8ab27d44a3b0dc9d84b81c09a5f1af0cfa197f9f96deab47d19362195c987",
@@ -113,25 +113,25 @@ describe("AU annual tax rule graph", () => {
             },
           ],
           "provides": [
-            "whattax/rules-au-income-tax/fact/MedicareLevyComponent",
+            "taxkit/rules-au-income-tax/fact/MedicareLevyComponent",
           ],
           "requires": [
-            "whattax/rules-au-income-tax/fact/AnnualTaxableIncome",
+            "taxkit/rules-au-income-tax/fact/AnnualTaxableIncome",
           ],
           "sources": [
             "ato-publication",
           ],
         },
         {
-          "id": "whattax/rules-au-income-tax/rule/AnnualTaxLedger",
+          "id": "taxkit/rules-au-income-tax/rule/AnnualTaxLedger",
           "parameters": [],
           "provides": [
-            "whattax/rules-au-income-tax/fact/AnnualTaxLedger",
+            "taxkit/rules-au-income-tax/fact/AnnualTaxLedger",
           ],
           "requires": [
-            "whattax/rules-au-income-tax/fact/IncomeTaxComponent",
-            "whattax/rules-au-income-tax/fact/LitoComponent",
-            "whattax/rules-au-income-tax/fact/MedicareLevyComponent",
+            "taxkit/rules-au-income-tax/fact/IncomeTaxComponent",
+            "taxkit/rules-au-income-tax/fact/LitoComponent",
+            "taxkit/rules-au-income-tax/fact/MedicareLevyComponent",
           ],
           "sources": [],
         },

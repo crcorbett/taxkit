@@ -1,19 +1,19 @@
 import { describe, expect, it } from "@effect/vitest";
-import { validateRuleGraph } from "@whattax/core/graph";
-import { isoDate } from "@whattax/core/primitives";
-import type { AnyRuleDescriptor } from "@whattax/core/rules";
-import { SourceRef } from "@whattax/core/trace";
+import { validateRuleGraph } from "@taxkit/core/graph";
+import { isoDate } from "@taxkit/core/primitives";
+import type { AnyRuleDescriptor } from "@taxkit/core/rules";
+import { SourceRef } from "@taxkit/core/trace";
 import {
   GrossPayDescriptor,
   SalarySacrificeDescriptor,
   TaxFreeThresholdClaimedDescriptor,
-} from "@whattax/rules-au-pay/facts";
-import { AtoSchedule1TableDescriptor } from "@whattax/rules-au-pay/parameters";
+} from "@taxkit/rules-au-pay/facts";
+import { AtoSchedule1TableDescriptor } from "@taxkit/rules-au-pay/parameters";
 import {
   AuTakeHomePayRuleDescriptors,
   AuTakeHomePayWithSacrificeRuleDescriptors,
   PaygWithholdingRuleDescriptor,
-} from "@whattax/rules-au-pay/rule-pack";
+} from "@taxkit/rules-au-pay/rule-pack";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
   rules.map((rule) => ({
@@ -68,25 +68,25 @@ describe("AU take-home pay rule graph", () => {
       {
         "base": [
           {
-            "id": "whattax/rules-au-pay/rule/TaxablePay",
+            "id": "taxkit/rules-au-pay/rule/TaxablePay",
             "parameters": [],
             "provides": [
-              "whattax/rules-au-pay/fact/TaxablePay",
+              "taxkit/rules-au-pay/fact/TaxablePay",
             ],
             "requires": [
-              "whattax/rules-au-pay/fact/GrossPay",
+              "taxkit/rules-au-pay/fact/GrossPay",
             ],
             "sources": [],
           },
           {
-            "id": "whattax/rules-au-pay/rule/PaygWithholding",
+            "id": "taxkit/rules-au-pay/rule/PaygWithholding",
             "parameters": [
               {
                 "effectivePeriod": {
                   "from": "2025-07-01",
                   "toExclusive": "2026-07-01",
                 },
-                "id": "whattax/rules-au-pay/parameter/AtoSchedule1Table",
+                "id": "taxkit/rules-au-pay/parameter/AtoSchedule1Table",
                 "source": "ato-publication",
                 "sourceArtifact": {
                   "checksum": "sha256:4e65d8a6b04f94b2f7fb7d2f4b219c4ad05fb8a4a9938d7b8fc36c012594c9f5",
@@ -96,63 +96,63 @@ describe("AU take-home pay rule graph", () => {
               },
             ],
             "provides": [
-              "whattax/rules-au-pay/fact/PaygWithholdingComponent",
+              "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
             ],
             "requires": [
-              "whattax/rules-au-pay/fact/TaxablePay",
-              "whattax/rules-au-pay/fact/TaxFreeThresholdClaimed",
+              "taxkit/rules-au-pay/fact/TaxablePay",
+              "taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed",
             ],
             "sources": [
               "ato-publication",
             ],
           },
           {
-            "id": "whattax/rules-au-pay/rule/PayWithholdingsLedger",
+            "id": "taxkit/rules-au-pay/rule/PayWithholdingsLedger",
             "parameters": [],
             "provides": [
-              "whattax/rules-au-pay/fact/PayWithholdingsLedger",
+              "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
             ],
             "requires": [
-              "whattax/rules-au-pay/fact/GrossPay",
-              "whattax/rules-au-pay/fact/PaygWithholdingComponent",
+              "taxkit/rules-au-pay/fact/GrossPay",
+              "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
             ],
             "sources": [],
           },
           {
-            "id": "whattax/rules-au-pay/rule/NetPay",
+            "id": "taxkit/rules-au-pay/rule/NetPay",
             "parameters": [],
             "provides": [
-              "whattax/rules-au-pay/fact/NetPay",
+              "taxkit/rules-au-pay/fact/NetPay",
             ],
             "requires": [
-              "whattax/rules-au-pay/fact/GrossPay",
-              "whattax/rules-au-pay/fact/PayWithholdingsLedger",
+              "taxkit/rules-au-pay/fact/GrossPay",
+              "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
             ],
             "sources": [],
           },
         ],
         "withSacrifice": [
           {
-            "id": "whattax/rules-au-pay/rule/TaxablePayWithSacrifice",
+            "id": "taxkit/rules-au-pay/rule/TaxablePayWithSacrifice",
             "parameters": [],
             "provides": [
-              "whattax/rules-au-pay/fact/TaxablePay",
+              "taxkit/rules-au-pay/fact/TaxablePay",
             ],
             "requires": [
-              "whattax/rules-au-pay/fact/GrossPay",
-              "whattax/rules-au-pay/fact/SalarySacrifice",
+              "taxkit/rules-au-pay/fact/GrossPay",
+              "taxkit/rules-au-pay/fact/SalarySacrifice",
             ],
             "sources": [],
           },
           {
-            "id": "whattax/rules-au-pay/rule/PaygWithholding",
+            "id": "taxkit/rules-au-pay/rule/PaygWithholding",
             "parameters": [
               {
                 "effectivePeriod": {
                   "from": "2025-07-01",
                   "toExclusive": "2026-07-01",
                 },
-                "id": "whattax/rules-au-pay/parameter/AtoSchedule1Table",
+                "id": "taxkit/rules-au-pay/parameter/AtoSchedule1Table",
                 "source": "ato-publication",
                 "sourceArtifact": {
                   "checksum": "sha256:4e65d8a6b04f94b2f7fb7d2f4b219c4ad05fb8a4a9938d7b8fc36c012594c9f5",
@@ -162,37 +162,37 @@ describe("AU take-home pay rule graph", () => {
               },
             ],
             "provides": [
-              "whattax/rules-au-pay/fact/PaygWithholdingComponent",
+              "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
             ],
             "requires": [
-              "whattax/rules-au-pay/fact/TaxablePay",
-              "whattax/rules-au-pay/fact/TaxFreeThresholdClaimed",
+              "taxkit/rules-au-pay/fact/TaxablePay",
+              "taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed",
             ],
             "sources": [
               "ato-publication",
             ],
           },
           {
-            "id": "whattax/rules-au-pay/rule/PayWithholdingsLedger",
+            "id": "taxkit/rules-au-pay/rule/PayWithholdingsLedger",
             "parameters": [],
             "provides": [
-              "whattax/rules-au-pay/fact/PayWithholdingsLedger",
+              "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
             ],
             "requires": [
-              "whattax/rules-au-pay/fact/GrossPay",
-              "whattax/rules-au-pay/fact/PaygWithholdingComponent",
+              "taxkit/rules-au-pay/fact/GrossPay",
+              "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
             ],
             "sources": [],
           },
           {
-            "id": "whattax/rules-au-pay/rule/NetPay",
+            "id": "taxkit/rules-au-pay/rule/NetPay",
             "parameters": [],
             "provides": [
-              "whattax/rules-au-pay/fact/NetPay",
+              "taxkit/rules-au-pay/fact/NetPay",
             ],
             "requires": [
-              "whattax/rules-au-pay/fact/GrossPay",
-              "whattax/rules-au-pay/fact/PayWithholdingsLedger",
+              "taxkit/rules-au-pay/fact/GrossPay",
+              "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
             ],
             "sources": [],
           },

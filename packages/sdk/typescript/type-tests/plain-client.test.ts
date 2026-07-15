@@ -1,8 +1,8 @@
-import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
 
 import { au } from "../src/au.js";
-import { WhatTax } from "../src/index.js";
+import { TaxKit } from "../src/index.js";
 
 const takeHomeFacts = {
   grossPay: new GrossPay({
@@ -12,11 +12,11 @@ const takeHomeFacts = {
   taxFreeThresholdClaimed: true,
 };
 
-const payClient = WhatTax.createClient(au.modules.pay2025_26);
+const payClient = TaxKit.createClient(au.modules.pay2025_26);
 const auClient = au.createClient();
 
-WhatTax.calculate(au.calculations.takeHomePay, takeHomeFacts);
-WhatTax.safe.calculate(au.calculations.takeHomePay, takeHomeFacts);
+TaxKit.calculate(au.calculations.takeHomePay, takeHomeFacts);
+TaxKit.safe.calculate(au.calculations.takeHomePay, takeHomeFacts);
 payClient.calculations.calculate(au.calculations.takeHomePay, takeHomeFacts);
 auClient.calculations.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(9_000_000),
@@ -30,7 +30,7 @@ payClient.calculations.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(9_000_000),
 });
 
-WhatTax.calculate(au.calculations.annualIncomeTax, {
+TaxKit.calculate(au.calculations.annualIncomeTax, {
   // @ts-expect-error take-home facts cannot be submitted to annual income tax.
   grossPay: new GrossPay({
     amount: aud(165_400),

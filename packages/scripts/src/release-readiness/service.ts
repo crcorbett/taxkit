@@ -11,4 +11,4 @@ export class ReleaseCommandRunner extends Context.Service<
       check: ReleaseCheck
     ) => Effect.Effect<ReleaseCommandOutcome, ReleaseCommandExecutionError>;
   }
->()("@whattax/scripts/ReleaseCommandRunner") {}
+>()("@taxkit/scripts/ReleaseCommandRunner") {}

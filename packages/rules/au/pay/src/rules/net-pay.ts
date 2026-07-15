@@ -1,5 +1,5 @@
-import { moneySub } from "@whattax/core/primitives";
-import { RuleId, TraceNode } from "@whattax/core/trace";
+import { moneySub } from "@taxkit/core/primitives";
+import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Effect, Layer } from "effect";
 
 import { GrossPayFact, NetPay, NetPayFact } from "../facts/pay.js";
@@ -10,7 +10,7 @@ import { PayWithholdingsLedgerFact } from "../facts/withholdings.js";
  *
  * @since 0.1.0
  */
-export const NetPayRuleId = RuleId.make("whattax/rules-au-pay/rule/NetPay");
+export const NetPayRuleId = RuleId.make("taxkit/rules-au-pay/rule/NetPay");
 
 /**
  * Derives net pay as gross pay less the aggregated withholding ledger total.

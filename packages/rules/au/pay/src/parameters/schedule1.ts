@@ -1,4 +1,4 @@
-import { makeParameterDescriptor } from "@whattax/core/parameters";
+import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
   Cents,
   CentsOrInfinity,
@@ -8,13 +8,13 @@ import {
   decimalCoefficient,
   isoDate,
   taxYear,
-} from "@whattax/core/primitives";
+} from "@taxkit/core/primitives";
 import {
   SourceArtifact,
   SourceExtract,
   SourceRef,
   sourceChecksum,
-} from "@whattax/core/trace";
+} from "@taxkit/core/trace";
 import { Context, Layer, Schema } from "effect";
 
 /**
@@ -74,7 +74,7 @@ export class Schedule1Table extends Schema.TaggedClass<Schedule1Table>()(
 export class AtoSchedule1Table extends Context.Service<
   AtoSchedule1Table,
   Schedule1Table
->()("whattax/rules-au-pay/parameter/AtoSchedule1Table") {}
+>()("taxkit/rules-au-pay/parameter/AtoSchedule1Table") {}
 
 /**
  * Source reference for ATO Schedule 1 PAYG withholding formulas for 2025-26.
@@ -116,7 +116,7 @@ export const Schedule1Artifact2025_26 = new SourceArtifact({
  */
 export const AtoSchedule1TableDescriptor = makeParameterDescriptor({
   effectivePeriod: australianTaxYearInterval("2025-26"),
-  id: "whattax/rules-au-pay/parameter/AtoSchedule1Table",
+  id: "taxkit/rules-au-pay/parameter/AtoSchedule1Table",
   schema: Schedule1Table,
   source: Schedule1Source2025_26,
   sourceArtifact: Schedule1Artifact2025_26,

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { DocsSourceError } from "@whattax/docs-content/errors";
-import { DocsPagePath } from "@whattax/docs-content/schemas";
-import { DocsContentService } from "@whattax/docs-content/service";
+import { DocsSourceError } from "@taxkit/docs-content/errors";
+import { DocsPagePath } from "@taxkit/docs-content/schemas";
+import { DocsContentService } from "@taxkit/docs-content/service";
 import { Effect, Schema } from "effect";
 
 import { preloadDocsContent } from "#/lib/mdx/client-loader";

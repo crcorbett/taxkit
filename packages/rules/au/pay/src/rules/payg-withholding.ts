@@ -1,12 +1,12 @@
-import { CalculationError } from "@whattax/core/errors";
-import { ComponentId, LedgerComponent } from "@whattax/core/ledger";
+import { CalculationError } from "@taxkit/core/errors";
+import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
   aud,
   decimalDollarsToCents,
   multiplyCentsByDecimal,
   roundCentsToDollar,
-} from "@whattax/core/primitives";
-import { RuleId, TraceNode } from "@whattax/core/trace";
+} from "@taxkit/core/primitives";
+import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import {
@@ -29,7 +29,7 @@ import type {
  * @since 0.1.0
  */
 export const PaygWithholdingRuleId = RuleId.make(
-  "whattax/rules-au-pay/rule/PaygWithholding"
+  "taxkit/rules-au-pay/rule/PaygWithholding"
 );
 
 /**
@@ -38,7 +38,7 @@ export const PaygWithholdingRuleId = RuleId.make(
  * @since 0.1.0
  */
 export const PaygWithholdingComponentId = ComponentId.make(
-  "whattax/rules-au-pay/component/Payg"
+  "taxkit/rules-au-pay/component/Payg"
 );
 
 const findRow = (
@@ -59,7 +59,7 @@ const findRow = (
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `whattax/rules-au-pay: no Schedule1 ${scale} row covers weekly formula cents=${weeklyFormulaCents}`,
+          message: `taxkit/rules-au-pay: no Schedule1 ${scale} row covers weekly formula cents=${weeklyFormulaCents}`,
         })
       ),
     onSome: Effect.succeed,

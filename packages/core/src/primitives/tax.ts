@@ -8,7 +8,7 @@ import { Cents } from "./money.js";
  * @since 0.1.0
  */
 export const CalculatorId = Schema.String.pipe(
-  Schema.brand("whattax/CalculatorId")
+  Schema.brand("taxkit/CalculatorId")
 );
 
 /**
@@ -24,7 +24,7 @@ export type CalculatorId = typeof CalculatorId.Type;
  * @since 0.1.0
  */
 export const Jurisdiction = Schema.String.pipe(
-  Schema.brand("whattax/Jurisdiction")
+  Schema.brand("taxkit/Jurisdiction")
 );
 
 /**
@@ -39,7 +39,7 @@ export type Jurisdiction = typeof Jurisdiction.Type;
  *
  * @since 0.1.0
  */
-export const TaxYear = Schema.String.pipe(Schema.brand("whattax/TaxYear"));
+export const TaxYear = Schema.String.pipe(Schema.brand("taxkit/TaxYear"));
 
 /**
  * A stable tax year identifier such as `2025-26`.
@@ -54,7 +54,7 @@ export type TaxYear = typeof TaxYear.Type;
  *
  * @since 0.1.0
  */
-export const TaxRate = Schema.BigDecimal.pipe(Schema.brand("whattax/TaxRate"));
+export const TaxRate = Schema.BigDecimal.pipe(Schema.brand("taxkit/TaxRate"));
 
 /**
  * A tax rate stored as an exact decimal fraction, for example `0.325` for
@@ -70,7 +70,7 @@ export type TaxRate = typeof TaxRate.Type;
  * @since 0.1.0
  */
 export const DecimalCoefficient = Schema.BigDecimal.pipe(
-  Schema.brand("whattax/DecimalCoefficient")
+  Schema.brand("taxkit/DecimalCoefficient")
 );
 
 /**

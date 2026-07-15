@@ -1,5 +1,5 @@
-import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
 import { Config, ConfigProvider, Data, Effect, Match, Schema } from "effect";
 
 class BrowserHttpExampleError extends Data.TaggedError(
@@ -15,7 +15,7 @@ const CalculatorRunHttpResponse = Schema.Struct({
   report: Schema.Unknown,
 });
 
-const apiBaseUrl = Config.string("WHATTAX_API_BASE_URL").pipe(
+const apiBaseUrl = Config.string("TAXKIT_API_BASE_URL").pipe(
   Config.withDefault("http://127.0.0.1:4000")
 );
 

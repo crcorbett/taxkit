@@ -7,9 +7,9 @@ import {
   CalculatorCatalogResponse,
   CalculatorRunRequest,
   CalculatorRunResponse,
-} from "@whattax/api-http";
-import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
+} from "@taxkit/api-http";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
 import {
   Array,
   Console,
@@ -175,7 +175,7 @@ const writeExternalConsumerWorkspace = (
         path.join(workspacePath, "package.json"),
         `${JSON.stringify(
           {
-            name: "whattax-api-downstream-consumer",
+            name: "taxkit-api-downstream-consumer",
             private: true,
             scripts: {
               smoke: "bun consumer.mjs",
@@ -497,7 +497,7 @@ const SmokeProgram = Effect.gen(function* smokePublicRoutes() {
 
   const workspacePath = yield* Effect.acquireRelease(
     fs.makeTempDirectory({
-      prefix: "whattax-api-downstream-",
+      prefix: "taxkit-api-downstream-",
     }),
     (tempPath) =>
       fs.remove(tempPath, { force: true, recursive: true }).pipe(

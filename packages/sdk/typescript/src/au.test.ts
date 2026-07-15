@@ -1,5 +1,5 @@
-import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
 import { describe, expect, it } from "vitest";
 
 import { au } from "./au.js";
@@ -38,6 +38,6 @@ describe("AU SDK subpath", () => {
       { taxableIncome: aud(9_000_000) }
     );
 
-    expect(result._tag).toBe("WhatTaxFailure");
+    expect(result._tag).toBe("TaxKitFailure");
   });
 });

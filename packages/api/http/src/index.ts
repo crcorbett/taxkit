@@ -1,4 +1,4 @@
-export { WhatTaxApi } from "./api.js";
+export { TaxKitApi } from "./api.js";
 export {
   CalculatorCatalog,
   CalculatorCatalogItem,

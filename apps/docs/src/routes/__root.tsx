@@ -42,9 +42,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: "width=device-width, initial-scale=1",
         name: "viewport",
       },
-      { title: "WhatTax Docs" },
+      { title: "TaxKit Docs" },
       {
-        content: "Public WhatTax engine, API and SDK documentation.",
+        content: "Public TaxKit engine, API and SDK documentation.",
         name: "description",
       },
     ],

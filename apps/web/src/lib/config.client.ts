@@ -1,11 +1,11 @@
-import { WhatTaxHttpApiViteEnvConfig } from "@whattax/api-http/config";
+import { TaxKitHttpApiViteEnvConfig } from "@taxkit/api-http/config";
 import { Config, ConfigProvider } from "effect";
 
-export const WhatTaxWebClientConfig = Config.all({
-  ...WhatTaxHttpApiViteEnvConfig,
+export const TaxKitWebClientConfig = Config.all({
+  ...TaxKitHttpApiViteEnvConfig,
 });
 
-export const WhatTaxWebClientConfigProviderLive = ConfigProvider.layer(
+export const TaxKitWebClientConfigProviderLive = ConfigProvider.layer(
   ConfigProvider.fromEnv({ env: import.meta.env }).pipe(
     ConfigProvider.constantCase
   )

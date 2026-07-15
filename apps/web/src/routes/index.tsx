@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { WhatTaxHttpApiService } from "@whattax/api-http/client";
+import { TaxKitHttpApiService } from "@taxkit/api-http/client";
 import { Effect } from "effect";
 
 import { getRouteRuntime } from "#/lib/route-runtime";
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
 
     return (
       <section className="home">
-        <h1>WhatTax</h1>
+        <h1>TaxKit</h1>
         <p>
           TanStack Start app with server and client runtimes calling the
           standalone Effect HTTP API service.
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/")({
     const runtime = getRouteRuntime(loaderContext);
     const health = await runtime.runPromise(
       Effect.gen(function* loadHealth() {
-        const api = yield* WhatTaxHttpApiService;
+        const api = yield* TaxKitHttpApiService;
         return yield* api.health.getHealth();
       })
     );

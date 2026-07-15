@@ -1,6 +1,6 @@
-import { CalculationError } from "@whattax/core/errors";
-import { moneySub } from "@whattax/core/primitives";
-import { RuleId, TraceNode } from "@whattax/core/trace";
+import { CalculationError } from "@taxkit/core/errors";
+import { moneySub } from "@taxkit/core/primitives";
+import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Effect, Layer } from "effect";
 
 import { GrossPayFact, TaxablePay, TaxablePayFact } from "../facts/pay.js";
@@ -12,7 +12,7 @@ import { SalarySacrificeFact } from "../facts/sacrifice.js";
  * @since 0.1.0
  */
 export const TaxablePayWithSacrificeRuleId = RuleId.make(
-  "whattax/rules-au-pay/rule/TaxablePayWithSacrifice"
+  "taxkit/rules-au-pay/rule/TaxablePayWithSacrifice"
 );
 
 /**
@@ -32,7 +32,7 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
 
     if (gross.period !== sacrifice.period) {
       return yield* new CalculationError({
-        message: `whattax/rules-au-pay: salary sacrifice period (${sacrifice.period}) must match gross pay period (${gross.period})`,
+        message: `taxkit/rules-au-pay: salary sacrifice period (${sacrifice.period}) must match gross pay period (${gross.period})`,
       });
     }
 

@@ -30,7 +30,7 @@ export type RoundingMode = typeof RoundingMode.Type;
  *
  * @example
  * ```ts
- * import { roundCentsToDollar } from "@whattax/core";
+ * import { roundCentsToDollar } from "@taxkit/core";
  *
  * const rounded = roundCentsToDollar(12_345, "ato-withholding-rounding");
  * ```

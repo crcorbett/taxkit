@@ -1,4 +1,4 @@
-import { makeParameterDescriptor } from "@whattax/core/parameters";
+import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
   Cents,
   TaxRate,
@@ -7,13 +7,13 @@ import {
   isoDate,
   taxRate,
   taxYear,
-} from "@whattax/core/primitives";
+} from "@taxkit/core/primitives";
 import {
   SourceArtifact,
   SourceExtract,
   SourceRef,
   sourceChecksum,
-} from "@whattax/core/trace";
+} from "@taxkit/core/trace";
 import { Context, Layer, Schema } from "effect";
 
 /**
@@ -44,7 +44,7 @@ export class MedicareLevyTable extends Schema.TaggedClass<MedicareLevyTable>()(
 export class AtoMedicareLevyTable extends Context.Service<
   AtoMedicareLevyTable,
   MedicareLevyTable
->()("whattax/rules-au-income-tax/parameter/AtoMedicareLevyTable") {}
+>()("taxkit/rules-au-income-tax/parameter/AtoMedicareLevyTable") {}
 
 /**
  * Source reference for ATO Medicare Levy low-income reduction thresholds.
@@ -83,7 +83,7 @@ export const MedicareLevyArtifact2025_26 = new SourceArtifact({
  */
 export const AtoMedicareLevyTableDescriptor = makeParameterDescriptor({
   effectivePeriod: australianTaxYearInterval("2025-26"),
-  id: "whattax/rules-au-income-tax/parameter/AtoMedicareLevyTable",
+  id: "taxkit/rules-au-income-tax/parameter/AtoMedicareLevyTable",
   schema: MedicareLevyTable,
   source: MedicareLevySource2025_26,
   sourceArtifact: MedicareLevyArtifact2025_26,

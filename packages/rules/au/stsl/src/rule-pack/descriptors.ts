@@ -1,10 +1,10 @@
-import { makeRuleDescriptor } from "@whattax/core/rules";
+import { makeRuleDescriptor } from "@taxkit/core/rules";
 import {
   GrossPayDescriptor,
   PayWithholdingsLedgerDescriptor,
   PaygWithholdingComponentDescriptor,
   TaxablePayDescriptor,
-} from "@whattax/rules-au-pay/facts";
+} from "@taxkit/rules-au-pay/facts";
 
 import { StslComponentDescriptor, StslDebtDescriptor } from "../facts/stsl.js";
 import {

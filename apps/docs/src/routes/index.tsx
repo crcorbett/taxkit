@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type {
   DocsContentPage,
   DocsNavigation,
-} from "@whattax/docs-content/schemas";
+} from "@taxkit/docs-content/schemas";
 import { Array, Result, pipe } from "effect";
 
 import { loadDocsHome } from "#/lib/docs/loaders";
@@ -24,7 +24,7 @@ const DocsHomeContent = ({
 }>) => (
   <section className="docs-home">
     <div className="docs-home__intro">
-      <p className="docs-kicker">WhatTax docs</p>
+      <p className="docs-kicker">TaxKit docs</p>
       <h1>Open-source tax engine, API and SDK documentation</h1>
       <p>
         Start with the integration path, then move through SDK, API, guides,

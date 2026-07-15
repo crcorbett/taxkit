@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
-import { CalculationEngine, CalculationEngineLive } from "@whattax/core/engine";
-import { aud, audDollars, moneyEquals } from "@whattax/core/primitives";
+import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
+import { aud, audDollars, moneyEquals } from "@taxkit/core/primitives";
 import {
   AnnualTaxLedgerRuleId,
   AnnualTaxScenarioLive,
@@ -13,8 +13,8 @@ import {
   LitoRuleId,
   MedicareLevyComponentId,
   MedicareLevyRuleId,
-} from "@whattax/rules-au-income-tax";
-import { expectAt } from "@whattax/testing";
+} from "@taxkit/rules-au-income-tax";
+import { expectAt } from "@taxkit/testing";
 import { Effect, Exit, Layer } from "effect";
 
 const runScenario = (incomeDollars: number) =>

@@ -6,28 +6,28 @@
     "moduleResolution": "nodenext",
     "noEmit": true,
     "paths": {
-      "@whattax/calculators": ["../../packages/calculators/src/index.ts"],
-      "@whattax/calculators/live": [
+      "@taxkit/calculators": ["../../packages/calculators/src/index.ts"],
+      "@taxkit/calculators/live": [
         "../../packages/calculators/src/live.layer.ts"
       ],
-      "@whattax/calculators/*": ["../../packages/calculators/src/*.ts"],
-      "@whattax/core": ["../../packages/core/src/index.ts"],
-      "@whattax/core/*": ["../../packages/core/src/*/index.ts"],
-      "@whattax/rules-au-income-tax": [
+      "@taxkit/calculators/*": ["../../packages/calculators/src/*.ts"],
+      "@taxkit/core": ["../../packages/core/src/index.ts"],
+      "@taxkit/core/*": ["../../packages/core/src/*/index.ts"],
+      "@taxkit/rules-au-income-tax": [
         "../../packages/rules/au/income-tax/src/index.ts"
       ],
-      "@whattax/rules-au-income-tax/*": [
+      "@taxkit/rules-au-income-tax/*": [
         "../../packages/rules/au/income-tax/src/*/index.ts"
       ],
-      "@whattax/rules-au-pay": ["../../packages/rules/au/pay/src/index.ts"],
-      "@whattax/rules-au-pay/*": ["../../packages/rules/au/pay/src/*/index.ts"],
-      "@whattax/sdk": ["../../packages/sdk/typescript/src/index.ts"],
-      "@whattax/sdk/au": ["../../packages/sdk/typescript/src/au.ts"],
-      "@whattax/sdk/au/effect": [
+      "@taxkit/rules-au-pay": ["../../packages/rules/au/pay/src/index.ts"],
+      "@taxkit/rules-au-pay/*": ["../../packages/rules/au/pay/src/*/index.ts"],
+      "@taxkit/sdk": ["../../packages/sdk/typescript/src/index.ts"],
+      "@taxkit/sdk/au": ["../../packages/sdk/typescript/src/au.ts"],
+      "@taxkit/sdk/au/effect": [
         "../../packages/sdk/typescript/src/au-effect.ts"
       ],
-      "@whattax/sdk/effect": ["../../packages/sdk/typescript/src/effect.ts"],
-      "@whattax/sdk/schemas": [
+      "@taxkit/sdk/effect": ["../../packages/sdk/typescript/src/effect.ts"],
+      "@taxkit/sdk/schemas": [
         "../../packages/sdk/typescript/src/schemas/index.ts"
       ]
     },

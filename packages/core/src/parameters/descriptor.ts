@@ -10,7 +10,7 @@ import type { SourceArtifact, SourceRef } from "../trace/node.js";
  * @since 0.1.0
  */
 export const ParameterId = Schema.String.pipe(
-  Schema.brand("whattax/ParameterId")
+  Schema.brand("taxkit/ParameterId")
 );
 
 /**

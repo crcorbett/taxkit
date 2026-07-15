@@ -4,17 +4,17 @@ export const DocsNonEmptyText = Schema.Trimmed.check(Schema.isMinLength(1));
 export type DocsNonEmptyText = typeof DocsNonEmptyText.Type;
 
 export const DocsPagePath = DocsNonEmptyText.pipe(
-  Schema.brand("whattax/DocsPagePath")
+  Schema.brand("taxkit/DocsPagePath")
 );
 export type DocsPagePath = typeof DocsPagePath.Type;
 
 export const DocsPageSlug = DocsNonEmptyText.pipe(
-  Schema.brand("whattax/DocsPageSlug")
+  Schema.brand("taxkit/DocsPageSlug")
 );
 export type DocsPageSlug = typeof DocsPageSlug.Type;
 
 export const DocsSourcePath = DocsNonEmptyText.pipe(
-  Schema.brand("whattax/DocsSourcePath")
+  Schema.brand("taxkit/DocsSourcePath")
 );
 export type DocsSourcePath = typeof DocsSourcePath.Type;
 
@@ -91,7 +91,7 @@ export const DocsMdxComponentName = DocsNonEmptyText.pipe(
   Schema.check(
     Schema.isPattern(/^[A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)*$/u)
   ),
-  Schema.brand("whattax/DocsMdxComponentName")
+  Schema.brand("taxkit/DocsMdxComponentName")
 );
 export type DocsMdxComponentName = typeof DocsMdxComponentName.Type;
 

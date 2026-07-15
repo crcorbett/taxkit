@@ -7,17 +7,17 @@ confidence: medium
 
 # HTTP API
 
-Effect HTTP API package for the current WhatTax health endpoint, public
+Effect HTTP API package for the current TaxKit health endpoint, public
 calculation endpoints, generated docs and API server route wiring.
 
 ## Scope
 
-`@whattax/api-http` owns the current HTTP API contract, generated OpenAPI
+`@taxkit/api-http` owns the current HTTP API contract, generated OpenAPI
 metadata, health and public calculation routes, HTTP status envelopes, thin
-handler adapters and typed client helpers used by WhatTax apps. Reusable
+handler adapters and typed client helpers used by TaxKit apps. Reusable
 calculator schemas, catalog entries, metadata projections, graph construction,
 calculation dispatch and schema-guided expected error shaping live in
-`@whattax/calculators`.
+`@taxkit/calculators`.
 
 The implemented API surface is:
 
@@ -36,19 +36,19 @@ The implemented API surface is:
 
 The public calculation API routes expose the reusable calculator catalog,
 canonical fact descriptors, canonical rule descriptors and graph validation
-diagnostics from `@whattax/calculators`. Metadata handlers pass route params
+diagnostics from `@taxkit/calculators`. Metadata handlers pass route params
 and query values to `PublicCalculatorService`. The calculate handler delegates
-one full run to `@whattax/sdk/effect` `calculateRunRequest`, then maps tagged
+one full run to `@taxkit/sdk/effect` `calculateRunRequest`, then maps tagged
 service failures into route-owned HTTP error envelopes.
 
 ```ts
 Production: HTTP calculate
 
 apps/api Bun process
-  -> WhatTaxServerLayer
+  -> TaxKitServerLayer
     -> CalculatorApiHandlerLive
       -> sdkCalculationFor(params.calculatorId)
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorService.calculate
           -> CalculatorCatalogEntry.inputSchema decode
           -> CalculationEngine
@@ -62,9 +62,9 @@ apps/api Bun process
 Tests: in-process HTTP client
 
 HTTP API tests
-  -> WhatTaxApiInProcessClientLive
+  -> TaxKitApiInProcessClientLive
     -> CalculatorApiHandlerLive
-      -> @whattax/sdk/effect calculateRunRequest
+      -> @taxkit/sdk/effect calculateRunRequest
         -> PublicCalculatorServiceLive
           -> CalculationEngineLive
   -> success response equals SDK full-run response
@@ -72,7 +72,7 @@ HTTP API tests
 ```
 
 The calculate route imports reusable `CalculatorRun*` schemas and
-`CalculatorServiceError` from `@whattax/calculators`. `CalculatorRunRequest`
+`CalculatorServiceError` from `@taxkit/calculators`. `CalculatorRunRequest`
 has a `facts` field that is a union of canonical rule-owned input schemas, so
 generated OpenAPI exposes concrete supported fact shapes under `facts.anyOf`
 instead of `Schema.Unknown`. HTTP-only names such as
@@ -85,50 +85,50 @@ incompatible calculator/facts combinations.
 
 ## Main Areas
 
-- `src/api.ts`: `WhatTaxApi` definition and OpenAPI annotations.
+- `src/api.ts`: `TaxKitApi` definition and OpenAPI annotations.
 - `src/groups/health.ts`: health endpoint schema and route group.
 - `src/groups/calculators.ts`: public calculation HTTP route schemas, bad
   request envelope, OpenAPI annotations and compatibility exports from
-  `@whattax/calculators`.
+  `@taxkit/calculators`.
 - `src/openapi.ts`: package-owned OpenAPI generation, structured
   normalization and snapshot formatting for compatibility checks.
 - `src/handlers/`: server-side thin handler adapters and handler layers.
 - `src/server/live.layer.ts`: server route layer, CORS middleware, Scalar docs
   route, OpenAPI JSON route using the package-owned OpenAPI source and
   calculator service layer composition.
-- `src/server.ts`: server export boundary for `WhatTaxServerLayer`.
+- `src/server.ts`: server export boundary for `TaxKitServerLayer`.
 - `src/config.ts`: package-owned client config schema and neutral `httpApi`
   config source.
 - `src/client/`: typed Effect HTTP API client helpers and layers.
 
 Export paths:
 
-- `@whattax/api-http`
-- `@whattax/api-http/api`
-- `@whattax/api-http/client`
-- `@whattax/api-http/client/live`
-- `@whattax/api-http/client/server`
-- `@whattax/api-http/config`
-- `@whattax/api-http/server`
-- `@whattax/api-http/handlers`
-- `@whattax/api-http/handlers/live`
+- `@taxkit/api-http`
+- `@taxkit/api-http/api`
+- `@taxkit/api-http/client`
+- `@taxkit/api-http/client/live`
+- `@taxkit/api-http/client/server`
+- `@taxkit/api-http/config`
+- `@taxkit/api-http/server`
+- `@taxkit/api-http/handlers`
+- `@taxkit/api-http/handlers/live`
 
 Reusable calculator exports:
 
-- `@whattax/calculators`
-- `@whattax/calculators/catalog`
-- `@whattax/calculators/errors`
-- `@whattax/calculators/live`
-- `@whattax/calculators/metadata`
-- `@whattax/calculators/service`
-- `@whattax/calculators/schemas`
+- `@taxkit/calculators`
+- `@taxkit/calculators/catalog`
+- `@taxkit/calculators/errors`
+- `@taxkit/calculators/live`
+- `@taxkit/calculators/metadata`
+- `@taxkit/calculators/service`
+- `@taxkit/calculators/schemas`
 
 ## Runtime Shape
 
 The package is built as ESM TypeScript. Runtime exports are split by boundary:
 
-- browser-safe consumers should use `@whattax/api-http/client`
-- server runtimes may use `@whattax/api-http/server`
+- browser-safe consumers should use `@taxkit/api-http/client`
+- server runtimes may use `@taxkit/api-http/server`
 - app or test code that needs in-process wiring can use the client layers
 - handler exports are server-side and should not be imported from browser code
 
@@ -136,21 +136,21 @@ The package is built as ESM TypeScript. Runtime exports are split by boundary:
 App packages should provide a platform HTTP server and process config, not
 duplicate API route middleware.
 
-`@whattax/api-http/config` owns the reusable client config schema, type and
+`@taxkit/api-http/config` owns the reusable client config schema, type and
 keyed config fragment. Apps should compose that fragment into runtime-specific
 config modules, then provide server or client environment values through Effect
 `ConfigProvider` composition. The package owns its env namespaces, including
-`WHATTAX_API_*` and `VITE_WHATTAX_API_*`. See
+`TAXKIT_API_*` and `VITE_TAXKIT_API_*`. See
 `docs/architecture/configuration.md`.
 
 Current responses are schema-backed with Effect Schema. Calculator response
-schemas are imported from `@whattax/calculators`; route-only HTTP envelopes and
+schemas are imported from `@taxkit/calculators`; route-only HTTP envelopes and
 status annotations stay in this package. The health response is:
 
 ```ts
 {
   status: "ok";
-  service: "whattax";
+  service: "taxkit";
 }
 ```
 
@@ -170,11 +170,11 @@ bun run update-openapi-snapshot
 From the repo root:
 
 ```sh
-bun run --filter=@whattax/api-http build
-bun run --filter=@whattax/api-http check-types
-bun run --filter=@whattax/api-http test
-bun run --filter=@whattax/api-http test:openapi
-bun run --filter=@whattax/api-http update-openapi-snapshot
+bun run --filter=@taxkit/api-http build
+bun run --filter=@taxkit/api-http check-types
+bun run --filter=@taxkit/api-http test
+bun run --filter=@taxkit/api-http test:openapi
+bun run --filter=@taxkit/api-http update-openapi-snapshot
 bun run --filter=api smoke:public-routes
 ```
 
@@ -183,7 +183,7 @@ bun run --filter=api smoke:public-routes
 `src/openapi.ts` is the single source for generated OpenAPI. The live
 `/api/docs/openapi.json` route and the compatibility test both import that
 module, so a route, method, status envelope or schema-reference change flows
-through the same `OpenApi.fromApi(WhatTaxApi)` call graph.
+through the same `OpenApi.fromApi(TaxKitApi)` call graph.
 
 The committed normalized snapshot lives at:
 
@@ -194,7 +194,7 @@ packages/api/http/__snapshots__/openapi.json
 Use the focused check before and after API contract work:
 
 ```sh
-bun run --filter=@whattax/api-http test:openapi
+bun run --filter=@taxkit/api-http test:openapi
 ```
 
 For an intentional OpenAPI contract change:
@@ -203,7 +203,7 @@ For an intentional OpenAPI contract change:
 2. Refresh the normalized snapshot:
 
    ```sh
-   bun run --filter=@whattax/api-http update-openapi-snapshot
+   bun run --filter=@taxkit/api-http update-openapi-snapshot
    ```
 
 3. Review the snapshot diff for route paths, methods, status responses,
@@ -211,9 +211,9 @@ For an intentional OpenAPI contract change:
 4. Run the package gates:
 
    ```sh
-   bun run --filter=@whattax/api-http test
-   bun run --filter=@whattax/api-http check-types
-   bun run --filter=@whattax/api-http build
+   bun run --filter=@taxkit/api-http test
+   bun run --filter=@taxkit/api-http check-types
+   bun run --filter=@taxkit/api-http build
    ```
 
 5. Add a Changeset when the OpenAPI change reflects package-facing API
@@ -231,7 +231,7 @@ surface. `__tests__/public-calculation-api.test.ts` covers:
 - schema-guided calculator input errors through `CalculatorApiErrorEnvelope`
 
 The calculate success fixture compares the HTTP response with
-`@whattax/sdk/effect` `calculateRunRequest`. The expected input-error fixture
+`@taxkit/sdk/effect` `calculateRunRequest`. The expected input-error fixture
 decodes the transport envelope and checks that the underlying
 `CalculatorServiceError` matches the SDK and calculator service failures.
 
@@ -255,7 +255,7 @@ For an intentional public API contract change:
    references change:
 
    ```sh
-   bun run --filter=@whattax/api-http update-openapi-snapshot
+   bun run --filter=@taxkit/api-http update-openapi-snapshot
    ```
 
 3. Update route fixture assertions for the changed health, metadata,
@@ -265,9 +265,9 @@ For an intentional public API contract change:
 5. Run the compatibility gates:
 
    ```sh
-   bun run --filter=@whattax/api-http test
-   bun run --filter=@whattax/api-http check-types
-   bun run --filter=@whattax/api-http build
+   bun run --filter=@taxkit/api-http test
+   bun run --filter=@taxkit/api-http check-types
+   bun run --filter=@taxkit/api-http build
    bun run --filter=api smoke:public-routes
    ```
 
@@ -289,10 +289,10 @@ actual API tarball and imports all JavaScript public entrypoints.
   browser code.
 - Keep endpoint request and response shapes schema-owned; route-only HTTP
   envelopes stay here and reusable `CalculatorRun*` payload schemas live in
-  `@whattax/calculators`.
-- Keep calculate facts imported from `@whattax/calculators` so OpenAPI and
+  `@taxkit/calculators`.
+- Keep calculate facts imported from `@taxkit/calculators` so OpenAPI and
   typed clients reflect canonical rule-owned fact shapes.
-- Keep calculation execution delegated through `@whattax/sdk/effect`
+- Keep calculation execution delegated through `@taxkit/sdk/effect`
   `calculateRunRequest`, which uses `PublicCalculatorService` for the
   catalog-driven, scenario-schema decoded and `CalculationEngine` based run.
 - Keep metadata responses derived from canonical fact descriptors, rule
@@ -301,7 +301,7 @@ actual API tarball and imports all JavaScript public entrypoints.
 - Keep handlers thin. They may extract route input and translate tagged
   service errors to HTTP status envelopes; reusable calculator lookup,
   metadata transformation, graph assembly, calculation dispatch and expected
-  error shaping stay in `@whattax/calculators`.
+  error shaping stay in `@taxkit/calculators`.
 - Add OpenAPI annotations with new API groups so docs stay generated from the
   contract.
 - Add tests or focused verification when new endpoints, handlers or client

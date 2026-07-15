@@ -1,16 +1,16 @@
-import { PublicCalculatorService } from "@whattax/calculators";
-import type { CalculatorId } from "@whattax/calculators";
+import { PublicCalculatorService } from "@taxkit/calculators";
+import type { CalculatorId } from "@taxkit/calculators";
 import {
   AuAnnualIncomeTaxCalculation,
   AuPayTakeHomeCalculation,
   AuPayWithholdingsCalculation,
-} from "@whattax/sdk/au/effect";
-import { calculateRunRequest as calculateSdkRunRequest } from "@whattax/sdk/effect";
-import type { AnySdkCalculation } from "@whattax/sdk/effect";
+} from "@taxkit/sdk/au/effect";
+import { calculateRunRequest as calculateSdkRunRequest } from "@taxkit/sdk/effect";
+import type { AnySdkCalculation } from "@taxkit/sdk/effect";
 import { Array, Effect, HashMap, Option, Schema } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
-import { WhatTaxApi } from "../api.js";
+import { TaxKitApi } from "../api.js";
 import { CalculatorApiErrorEnvelopeData } from "../groups/calculators.js";
 
 const SdkCalculations = [
@@ -38,7 +38,7 @@ const sdkCalculationFor = (calculatorId: CalculatorId): AnySdkCalculation =>
   );
 
 export const CalculatorApiHandlerLive = HttpApiBuilder.group(
-  WhatTaxApi,
+  TaxKitApi,
   "calculatorApi",
   (handlers) =>
     Effect.succeed(

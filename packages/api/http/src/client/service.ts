@@ -1,18 +1,18 @@
 import { Context, Effect } from "effect";
 
-import type { WhatTaxApiClient } from "./index.js";
+import type { TaxKitApiClient } from "./index.js";
 
-export class WhatTaxHttpApiService extends Context.Service<
-  WhatTaxHttpApiService,
-  WhatTaxApiClient
->()("@whattax/api-http/Client") {}
+export class TaxKitHttpApiService extends Context.Service<
+  TaxKitHttpApiService,
+  TaxKitApiClient
+>()("@taxkit/api-http/Client") {}
 
-export const getWhatTaxHttpApiClient = WhatTaxHttpApiService;
+export const getTaxKitHttpApiClient = TaxKitHttpApiService;
 
-export const withWhatTaxHttpApiClient = <A, E, R>(
-  fn: (client: WhatTaxApiClient) => Effect.Effect<A, E, R>
-): Effect.Effect<A, E, R | WhatTaxHttpApiService> =>
+export const withTaxKitHttpApiClient = <A, E, R>(
+  fn: (client: TaxKitApiClient) => Effect.Effect<A, E, R>
+): Effect.Effect<A, E, R | TaxKitHttpApiService> =>
   Effect.gen(function* () {
-    const client = yield* WhatTaxHttpApiService;
+    const client = yield* TaxKitHttpApiService;
     return yield* fn(client);
   });

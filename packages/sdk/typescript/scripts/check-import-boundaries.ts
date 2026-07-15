@@ -16,8 +16,8 @@ const browserEntrypoints = [
   new URL("src/schemas/index.ts", sdkRoot),
 ] satisfies URL[];
 const blockedHttpApiPackageNames = [
-  "@whattax/api-http",
-  "@whattax/http-api",
+  "@taxkit/api-http",
+  "@taxkit/http-api",
 ] as const;
 
 const packageManifest: PackageManifest = await Bun.file(packageJsonUrl).json();
@@ -51,11 +51,11 @@ for (const packageName of blockedHttpApiPackageNames) {
 
 if (
   !httpApiDependencySections.some(
-    (dependencies) => dependencies?.["@whattax/sdk"] !== undefined
+    (dependencies) => dependencies?.["@taxkit/sdk"] !== undefined
   )
 ) {
   failures.push(
-    "HTTP API package metadata must depend on @whattax/sdk for the transport integration direction."
+    "HTTP API package metadata must depend on @taxkit/sdk for the transport integration direction."
   );
 }
 
@@ -74,7 +74,7 @@ for (const packageName of blockedHttpApiPackageNames) {
 
 const rootSource = await Bun.file(rootEntrypoint).text();
 
-if (rootSource.includes("@whattax/rules-au-") || rootSource.includes("./au")) {
+if (rootSource.includes("@taxkit/rules-au-") || rootSource.includes("./au")) {
   failures.push("Root SDK entrypoint must not import AU packages or subpaths.");
 }
 

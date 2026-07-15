@@ -1,9 +1,5 @@
-import {
-  FactQuestion,
-  FactQuestionId,
-  makeFactDescriptor,
-} from "@whattax/core";
-import { LedgerComponent } from "@whattax/core/ledger";
+import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@taxkit/core";
+import { LedgerComponent } from "@taxkit/core/ledger";
 import { Context, Schema } from "effect";
 
 /**
@@ -16,7 +12,7 @@ import { Context, Schema } from "effect";
  *
  * @example
  * ```ts
- * import { StslDebt } from "@whattax/rules-au-stsl/facts"
+ * import { StslDebt } from "@taxkit/rules-au-stsl/facts"
  *
  * const stsl = new StslDebt({ enabled: true })
  * ```
@@ -31,7 +27,7 @@ export class StslDebt extends Schema.TaggedClass<StslDebt>()("StslDebt", {
  * @since 0.1.0
  */
 export class StslDebtFact extends Context.Service<StslDebtFact, StslDebt>()(
-  "whattax/rules-au-stsl/fact/StslDebt"
+  "taxkit/rules-au-stsl/fact/StslDebt"
 ) {}
 
 /**
@@ -41,9 +37,9 @@ export class StslDebtFact extends Context.Service<StslDebtFact, StslDebt>()(
  */
 export const StslDebtDescriptor = makeFactDescriptor({
   authority: "input",
-  id: "whattax/rules-au-stsl/fact/StslDebt",
+  id: "taxkit/rules-au-stsl/fact/StslDebt",
   question: new FactQuestion({
-    id: FactQuestionId.make("whattax/rules-au-stsl/question/StslDebt"),
+    id: FactQuestionId.make("taxkit/rules-au-stsl/question/StslDebt"),
     inputKind: "boolean",
     prompt: "Study and training support loan debt",
   }),
@@ -60,7 +56,7 @@ export const StslDebtDescriptor = makeFactDescriptor({
 export class StslComponentFact extends Context.Service<
   StslComponentFact,
   LedgerComponent
->()("whattax/rules-au-stsl/fact/StslComponent") {}
+>()("taxkit/rules-au-stsl/fact/StslComponent") {}
 
 /**
  * Fact descriptor for the STSL withholding component.
@@ -69,7 +65,7 @@ export class StslComponentFact extends Context.Service<
  */
 export const StslComponentDescriptor = makeFactDescriptor({
   authority: "derived",
-  id: "whattax/rules-au-stsl/fact/StslComponent",
+  id: "taxkit/rules-au-stsl/fact/StslComponent",
   schema: LedgerComponent,
   tag: StslComponentFact,
   title: "STSL withholding ledger component for a single pay period",

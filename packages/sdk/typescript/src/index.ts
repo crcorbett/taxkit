@@ -1,70 +1,70 @@
-import { PublicCalculatorServiceLive } from "@whattax/calculators/live";
+import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import type {
   CalculatorId,
   CalculatorJurisdiction,
   CalculatorTaxYear,
   CalculatorRunFacts,
   CalculatorRunReport,
-} from "@whattax/calculators/schemas";
-import { PublicCalculatorService } from "@whattax/calculators/service";
-import type { PublicCalculatorServiceShape } from "@whattax/calculators/service";
-import { CalculationEngineLive } from "@whattax/core";
+} from "@taxkit/calculators/schemas";
+import { PublicCalculatorService } from "@taxkit/calculators/service";
+import type { PublicCalculatorServiceShape } from "@taxkit/calculators/service";
+import { CalculationEngineLive } from "@taxkit/core";
 import { Effect, Exit, Layer, ManagedRuntime } from "effect";
 import type { Context, Schema } from "effect";
 import { pipe } from "effect/Function";
 
 import {
-  toWhatTaxCalculationError,
-  WhatTaxFailure,
-  WhatTaxSuccess,
+  toTaxKitCalculationError,
+  TaxKitFailure,
+  TaxKitSuccess,
 } from "./errors.js";
-import type { WhatTaxSafeResult } from "./errors.js";
+import type { TaxKitSafeResult } from "./errors.js";
 import type {
-  AnyWhatTaxModule,
+  AnyTaxKitModule,
   ModuleCalculation,
   SdkCalculation,
 } from "./types.js";
 
 export type {
   AnySdkCalculation,
-  AnyWhatTaxModule,
+  AnyTaxKitModule,
   CalculationInput,
   CalculationOutput,
   ModuleCalculation,
   SdkCalculation,
   SdkCalculationDefinition,
-  WhatTaxModule,
+  TaxKitModule,
 } from "./types.js";
 export {
-  WhatTaxCalculationError,
-  WhatTaxFailure,
-  WhatTaxSchemaDecodeError,
-  WhatTaxSuccess,
-  WhatTaxUnexpectedError,
+  TaxKitCalculationError,
+  TaxKitFailure,
+  TaxKitSchemaDecodeError,
+  TaxKitSuccess,
+  TaxKitUnexpectedError,
 } from "./errors.js";
 export type {
-  WhatTaxCalculationErrorDetail,
-  WhatTaxError,
-  WhatTaxSafeResult,
+  TaxKitCalculationErrorDetail,
+  TaxKitError,
+  TaxKitSafeResult,
 } from "./errors.js";
 
-const WhatTaxLayer = PublicCalculatorServiceLive.pipe(
+const TaxKitLayer = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
 
-const WhatTaxRuntime = ManagedRuntime.make(WhatTaxLayer);
+const TaxKitRuntime = ManagedRuntime.make(TaxKitLayer);
 
-type WhatTaxRequirements = Context.Service.Identifier<
+type TaxKitRequirements = Context.Service.Identifier<
   typeof PublicCalculatorService
 >;
 
 const publicCalculatorService: Effect.Effect<
   PublicCalculatorServiceShape,
   never,
-  WhatTaxRequirements
+  TaxKitRequirements
 > = Effect.service(PublicCalculatorService);
 
-export interface WhatTaxClient<Modules extends readonly AnyWhatTaxModule[]> {
+export interface TaxKitClient<Modules extends readonly AnyTaxKitModule[]> {
   readonly calculations: {
     readonly calculate: <
       const Id extends CalculatorId,
@@ -90,7 +90,7 @@ export interface WhatTaxClient<Modules extends readonly AnyWhatTaxModule[]> {
       >(
         calculation: Calculation,
         input: InputSchema["Type"]
-      ) => Promise<WhatTaxSafeResult<OutputSchema["Type"]>>;
+      ) => Promise<TaxKitSafeResult<OutputSchema["Type"]>>;
     };
   };
 }
@@ -110,8 +110,8 @@ export const calculateSafe = async <
     OutputSchema
   >,
   input: InputSchema["Type"]
-): Promise<WhatTaxSafeResult<OutputSchema["Type"]>> => {
-  const exit = await WhatTaxRuntime.runPromise(
+): Promise<TaxKitSafeResult<OutputSchema["Type"]>> => {
+  const exit = await TaxKitRuntime.runPromise(
     publicCalculatorService.pipe(
       Effect.flatMap((service) => {
         const { calculatorId, jurisdiction, taxYear } = calculation;
@@ -139,11 +139,11 @@ export const calculateSafe = async <
     exit,
     Exit.match({
       onFailure: (cause) =>
-        new WhatTaxFailure({
-          error: toWhatTaxCalculationError(cause),
+        new TaxKitFailure({
+          error: toTaxKitCalculationError(cause),
         }),
       onSuccess: (value) =>
-        new WhatTaxSuccess({
+        new TaxKitSuccess({
           value,
         }),
     })
@@ -168,14 +168,14 @@ export const calculate = async <
 ): Promise<OutputSchema["Type"]> => {
   const result = await calculateSafe(calculation, input);
 
-  return result._tag === "WhatTaxSuccess"
+  return result._tag === "TaxKitSuccess"
     ? result.value
     : Promise.reject(result.error);
 };
 
-export const createClient = <const Modules extends readonly AnyWhatTaxModule[]>(
+export const createClient = <const Modules extends readonly AnyTaxKitModule[]>(
   ..._modules: Modules
-): WhatTaxClient<Modules> => ({
+): TaxKitClient<Modules> => ({
   calculations: {
     calculate: (calculation, input) => calculate(calculation, input),
     safe: {
@@ -184,7 +184,7 @@ export const createClient = <const Modules extends readonly AnyWhatTaxModule[]>(
   },
 });
 
-export const WhatTax = {
+export const TaxKit = {
   calculate,
   createClient,
   safe: {

@@ -18,7 +18,7 @@ import {
 } from "./test.layer.js";
 import type { TestCommandResult } from "./test.layer.js";
 
-const workspaceRoot = "/workspace/whattax";
+const workspaceRoot = "/workspace/taxkit";
 const checks = makeReleaseReadinessPlan(workspaceRoot);
 
 const successfulResults = Array.reduce(
@@ -62,13 +62,13 @@ describe("release readiness", () => {
           [
             "packed-artifact",
             "bun",
-            ["run", "--filter=@whattax/sdk", "check-packed-artifact"],
+            ["run", "--filter=@taxkit/sdk", "check-packed-artifact"],
             workspaceRoot,
           ],
           [
             "downstream-consumer",
             "bun",
-            ["run", "--filter=@whattax/sdk", "validate:downstream"],
+            ["run", "--filter=@taxkit/sdk", "validate:downstream"],
             workspaceRoot,
           ],
           ["api-smoke", "bun", ["run", "--filter=api", "smoke"], workspaceRoot],
@@ -170,14 +170,14 @@ describe("release readiness", () => {
   it("renders typed workspace path failures with their URL", () => {
     const error = new ReleaseWorkspacePathError({
       message: "file URL could not be converted",
-      url: "file:///workspace/whattax",
+      url: "file:///workspace/taxkit",
     });
 
     expect(formatReleaseReadinessError(error)).toContain(
       "FAIL [workspace-path] Resolve repository root"
     );
     expect(formatReleaseReadinessError(error)).toContain(
-      "url: file:///workspace/whattax"
+      "url: file:///workspace/taxkit"
     );
   });
 });

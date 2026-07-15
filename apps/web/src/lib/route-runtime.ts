@@ -1,19 +1,19 @@
-import type { WhatTaxHttpApiService } from "@whattax/api-http/client";
+import type { TaxKitHttpApiService } from "@taxkit/api-http/client";
 import type { Effect, Exit } from "effect";
 
-import type { WhatTaxWebConfigError } from "./config";
+import type { TaxKitWebConfigError } from "./config";
 
-export interface WhatTaxRouteRuntime {
+export interface TaxKitRouteRuntime {
   readonly runPromise: <A, E>(
-    effect: Effect.Effect<A, E, WhatTaxHttpApiService>
+    effect: Effect.Effect<A, E, TaxKitHttpApiService>
   ) => Promise<A>;
   readonly runPromiseExit: <A, E>(
-    effect: Effect.Effect<A, E, WhatTaxHttpApiService>
-  ) => Promise<Exit.Exit<A, E | WhatTaxWebConfigError>>;
+    effect: Effect.Effect<A, E, TaxKitHttpApiService>
+  ) => Promise<Exit.Exit<A, E | TaxKitWebConfigError>>;
 }
 
 export interface RouterContext {
-  readonly api: WhatTaxRouteRuntime;
+  readonly api: TaxKitRouteRuntime;
 }
 
 export interface RouteLoaderContext {

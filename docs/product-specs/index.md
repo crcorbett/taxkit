@@ -30,6 +30,7 @@ Specs:
 | [SDK-backed HTTP API thin wrapper](./sdk-backed-http-api-thin-wrapper.md) | Implemented | HTTP calculate delegates execution through the SDK Effect facade. |
 | [SDK public naming and export contract](./sdk-public-naming-and-export-contract.md) | Implemented | Public SDK names and packed export contract are stabilised. |
 | [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md) | Implemented | Schema-encoded Effect outcomes survive initial SSR and client navigation before direct route-root restoration. |
+| [TaxKit hard cutover](./taxkit-hard-cutover.md) | Active | Breaking repository, package, configuration, GitHub and local-checkout identity cutover. |
 | [TypeScript SDK and publishing](./typescript-sdk-and-publishing.md) | Implemented through release prep | SDK implementation and release-prep checks exist; npm publication remains gated. |
 
 Authoring guides:

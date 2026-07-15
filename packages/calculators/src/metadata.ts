@@ -3,8 +3,8 @@ import type {
   AnyRuleDescriptor,
   FactId,
   RuleId,
-} from "@whattax/core";
-import { AuPayJurisdiction, AuPayTaxYear } from "@whattax/rules-au-pay";
+} from "@taxkit/core";
+import { AuPayJurisdiction, AuPayTaxYear } from "@taxkit/rules-au-pay";
 import { Array, Data, HashMap, Option } from "effect";
 import type { Schema } from "effect";
 

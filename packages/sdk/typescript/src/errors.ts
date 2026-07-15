@@ -1,62 +1,62 @@
-import { CalculatorServiceError } from "@whattax/calculators/schemas";
-import type { CalculatorServiceError as CalculatorServiceErrorType } from "@whattax/calculators/schemas";
+import { CalculatorServiceError } from "@taxkit/calculators/schemas";
+import type { CalculatorServiceError as CalculatorServiceErrorType } from "@taxkit/calculators/schemas";
 import { Array, Cause, Data, Option, Schema } from "effect";
 
-export class WhatTaxSchemaDecodeError extends Schema.TaggedErrorClass<WhatTaxSchemaDecodeError>()(
-  "WhatTaxSchemaDecodeError",
+export class TaxKitSchemaDecodeError extends Schema.TaggedErrorClass<TaxKitSchemaDecodeError>()(
+  "TaxKitSchemaDecodeError",
   {
     message: Schema.String,
   }
 ) {}
 
-export class WhatTaxUnexpectedError extends Schema.TaggedErrorClass<WhatTaxUnexpectedError>()(
-  "WhatTaxUnexpectedError",
+export class TaxKitUnexpectedError extends Schema.TaggedErrorClass<TaxKitUnexpectedError>()(
+  "TaxKitUnexpectedError",
   {
     message: Schema.String,
   }
 ) {}
 
-export const WhatTaxCalculationErrorDetail = Schema.Union([
+export const TaxKitCalculationErrorDetail = Schema.Union([
   CalculatorServiceError,
-  WhatTaxSchemaDecodeError,
-  WhatTaxUnexpectedError,
+  TaxKitSchemaDecodeError,
+  TaxKitUnexpectedError,
 ]);
 
-export type WhatTaxCalculationErrorDetail =
-  typeof WhatTaxCalculationErrorDetail.Type;
+export type TaxKitCalculationErrorDetail =
+  typeof TaxKitCalculationErrorDetail.Type;
 
-export class WhatTaxCalculationError extends Schema.TaggedErrorClass<WhatTaxCalculationError>()(
-  "WhatTaxCalculationError",
+export class TaxKitCalculationError extends Schema.TaggedErrorClass<TaxKitCalculationError>()(
+  "TaxKitCalculationError",
   {
-    error: WhatTaxCalculationErrorDetail,
+    error: TaxKitCalculationErrorDetail,
     message: Schema.String,
   }
 ) {}
 
-export type WhatTaxError = WhatTaxCalculationError;
+export type TaxKitError = TaxKitCalculationError;
 
-export class WhatTaxSuccess<Value> extends Data.TaggedClass("WhatTaxSuccess")<{
+export class TaxKitSuccess<Value> extends Data.TaggedClass("TaxKitSuccess")<{
   readonly value: Value;
 }> {}
 
-export class WhatTaxFailure extends Data.TaggedClass("WhatTaxFailure")<{
-  readonly error: WhatTaxError;
+export class TaxKitFailure extends Data.TaggedClass("TaxKitFailure")<{
+  readonly error: TaxKitError;
 }> {}
 
-export type WhatTaxSafeResult<Value> = WhatTaxFailure | WhatTaxSuccess<Value>;
+export type TaxKitSafeResult<Value> = TaxKitFailure | TaxKitSuccess<Value>;
 
-export const toWhatTaxCalculationError = (
+export const toTaxKitCalculationError = (
   cause: Cause.Cause<CalculatorServiceErrorType | Schema.SchemaError>
-): WhatTaxCalculationError => {
+): TaxKitCalculationError => {
   const message = Cause.pretty(cause);
 
-  return new WhatTaxCalculationError({
+  return new TaxKitCalculationError({
     error: Array.findFirst(cause.reasons, Cause.isFailReason).pipe(
       Option.match({
-        onNone: () => new WhatTaxUnexpectedError({ message }),
+        onNone: () => new TaxKitUnexpectedError({ message }),
         onSome: (failure) =>
           Schema.isSchemaError(failure.error)
-            ? new WhatTaxSchemaDecodeError({ message })
+            ? new TaxKitSchemaDecodeError({ message })
             : failure.error,
       })
     ),

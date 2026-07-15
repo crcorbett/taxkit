@@ -1,21 +1,21 @@
 import { describe, expect, it } from "@effect/vitest";
-import { PublicCalculatorServiceLive } from "@whattax/calculators/live";
-import { PublicCalculatorService } from "@whattax/calculators/service";
-import { CalculationEngineLive } from "@whattax/core";
-import { aud } from "@whattax/core/primitives";
+import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { PublicCalculatorService } from "@taxkit/calculators/service";
+import { CalculationEngineLive } from "@taxkit/core";
+import { aud } from "@taxkit/core/primitives";
 import {
   AuPayCalculatorId,
   GrossPay,
   GrossPayDescriptor,
   TaxFreeThresholdClaimedDescriptor,
-} from "@whattax/rules-au-pay";
-import { AuPayTakeHomeCalculation } from "@whattax/sdk/au/effect";
-import { calculateRunRequest as calculateSdkRunRequest } from "@whattax/sdk/effect";
-import { expectAt } from "@whattax/testing";
+} from "@taxkit/rules-au-pay";
+import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import { calculateRunRequest as calculateSdkRunRequest } from "@taxkit/sdk/effect";
+import { expectAt } from "@taxkit/testing";
 import { Array, Cause, Effect, Exit, Layer, Option, Schema } from "effect";
 
-import { WhatTaxApiInProcessClientLive } from "../src/client/server.layer.js";
-import { WhatTaxHttpApiService } from "../src/client/service.js";
+import { TaxKitApiInProcessClientLive } from "../src/client/server.layer.js";
+import { TaxKitHttpApiService } from "../src/client/service.js";
 import {
   CalculatorApiErrorEnvelope,
   CalculatorCatalogResponse,
@@ -29,7 +29,7 @@ const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive.pipe(
 );
 
 const TestLive = Layer.mergeAll(
-  WhatTaxApiInProcessClientLive,
+  TaxKitApiInProcessClientLive,
   PublicCalculatorServiceTestLive
 );
 
@@ -44,16 +44,16 @@ const grossPayFacts = (
   taxFreeThresholdClaimed,
 });
 
-describe("WhatTax public calculation HTTP API", () => {
+describe("TaxKit public calculation HTTP API", () => {
   it.effect("pins the health route fixture", () =>
     Effect.gen(function* () {
-      const client = yield* WhatTaxHttpApiService;
+      const client = yield* TaxKitHttpApiService;
       const response = yield* client.health.getHealth();
       const decoded =
         yield* Schema.decodeUnknownEffect(HealthResponse)(response);
 
       expect(decoded).toEqual({
-        service: "whattax",
+        service: "taxkit",
         status: "ok",
       });
     }).pipe(Effect.provide(TestLive))
@@ -63,7 +63,7 @@ describe("WhatTax public calculation HTTP API", () => {
     "pins calculator metadata against the calculator service contract",
     () =>
       Effect.gen(function* () {
-        const client = yield* WhatTaxHttpApiService;
+        const client = yield* TaxKitHttpApiService;
         const service = yield* PublicCalculatorService;
         const query = {
           jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
@@ -97,7 +97,7 @@ describe("WhatTax public calculation HTTP API", () => {
 
   it.effect("pins calculate success through SDK full-run parity", () =>
     Effect.gen(function* () {
-      const client = yield* WhatTaxHttpApiService;
+      const client = yield* TaxKitHttpApiService;
       const facts = grossPayFacts(346_200, "fortnightly", true);
       const response = yield* client.calculatorApi.calculate({
         params: {
@@ -140,7 +140,7 @@ describe("WhatTax public calculation HTTP API", () => {
     "returns typed calculator input errors through the HTTP client",
     () =>
       Effect.gen(function* () {
-        const client = yield* WhatTaxHttpApiService;
+        const client = yield* TaxKitHttpApiService;
         const service = yield* PublicCalculatorService;
         const invalidFacts = {
           taxableIncome: aud(9_000_000),

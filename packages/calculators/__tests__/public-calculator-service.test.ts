@@ -1,12 +1,12 @@
 import { describe, expect, it } from "@effect/vitest";
-import { CalculationEngineLive } from "@whattax/core";
-import { aud } from "@whattax/core/primitives";
-import { AuAnnualTaxCalculatorId } from "@whattax/rules-au-income-tax";
+import { CalculationEngineLive } from "@taxkit/core";
+import { aud } from "@taxkit/core/primitives";
+import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax";
 import {
   AuPayCalculatorId as PayCalculatorId,
   GrossPay,
-} from "@whattax/rules-au-pay";
-import { expectAt } from "@whattax/testing";
+} from "@taxkit/rules-au-pay";
+import { expectAt } from "@taxkit/testing";
 import { Cause, Effect, Exit, Layer } from "effect";
 
 import { PublicCalculatorServiceLive } from "../src/live.layer.js";

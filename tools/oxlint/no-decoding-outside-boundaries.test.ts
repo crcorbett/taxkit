@@ -34,7 +34,7 @@ const runOxlint = (
 const writeFixture = async (source: string, extension = "ts") => {
   const path = join(
     "/tmp",
-    `whattax-decoding-${crypto.randomUUID()}.${extension}`
+    `taxkit-decoding-${crypto.randomUUID()}.${extension}`
   );
 
   temporaryFiles.push(path);
@@ -59,11 +59,11 @@ const expectReported = async (
 
   expect(result.exitCode).toBe(1);
   expect(
-    result.output.match(/whattax\(no-decoding-outside-boundaries\)/gu)
+    result.output.match(/taxkit\(no-decoding-outside-boundaries\)/gu)
   ).toHaveLength(expectedDiagnostics);
 };
 
-describe("whattax/no-decoding-outside-boundaries", () => {
+describe("taxkit/no-decoding-outside-boundaries", () => {
   test("reports Effect Schema decoder families and direct decoder helpers", async () => {
     await expectReported(
       `
@@ -139,7 +139,7 @@ describe("whattax/no-decoding-outside-boundaries", () => {
     const result = runOxlint([fixture]);
 
     expect(result.output).not.toContain(
-      "whattax(no-decoding-outside-boundaries)"
+      "taxkit(no-decoding-outside-boundaries)"
     );
   });
 
@@ -148,26 +148,26 @@ describe("whattax/no-decoding-outside-boundaries", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.output).not.toContain(
-      "whattax(no-decoding-outside-boundaries)"
+      "taxkit(no-decoding-outside-boundaries)"
     );
   });
 
   test("rejects every inline disable spelling through Oxlint comment tokens", async () => {
     const fixture = await writeFixture(`
-      /* eslint-disable whattax/no-decoding-outside-boundaries */
-      /* oxlint-disable whattax/no-decoding-outside-boundaries */
-      // eslint-disable-next-line whattax/no-decoding-outside-boundaries
+      /* eslint-disable taxkit/no-decoding-outside-boundaries */
+      /* oxlint-disable taxkit/no-decoding-outside-boundaries */
+      // eslint-disable-next-line taxkit/no-decoding-outside-boundaries
       const first = 1;
-      // oxlint-disable-next-line whattax/no-decoding-outside-boundaries
+      // oxlint-disable-next-line taxkit/no-decoding-outside-boundaries
       const second = 2;
-      const third = 3; // eslint-disable-line whattax/no-decoding-outside-boundaries
-      const fourth = 4; // oxlint-disable-line whattax/no-decoding-outside-boundaries
+      const third = 3; // eslint-disable-line taxkit/no-decoding-outside-boundaries
+      const fourth = 4; // oxlint-disable-line taxkit/no-decoding-outside-boundaries
       void [first, second, third, fourth];
     `);
     const result = runOxlint(
       [fixture],
       [
-        "--allow=whattax/no-decoding-outside-boundaries",
+        "--allow=taxkit/no-decoding-outside-boundaries",
         "--report-unused-disable-directives-severity=error",
       ]
     );
@@ -179,13 +179,13 @@ describe("whattax/no-decoding-outside-boundaries", () => {
 
   test("does not interpret directive text in a string literal as a comment", async () => {
     const fixture = await writeFixture(`
-      const directiveText = "eslint-disable whattax/no-decoding-outside-boundaries";
+      const directiveText = "eslint-disable taxkit/no-decoding-outside-boundaries";
       void directiveText;
     `);
     const result = runOxlint(
       [fixture],
       [
-        "--allow=whattax/no-decoding-outside-boundaries",
+        "--allow=taxkit/no-decoding-outside-boundaries",
         "--report-unused-disable-directives-severity=error",
       ]
     );

@@ -1,4 +1,4 @@
-import { makeParameterDescriptor } from "@whattax/core/parameters";
+import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
   Cents,
   CentsOrInfinity,
@@ -8,13 +8,13 @@ import {
   decimalCoefficient,
   isoDate,
   taxYear,
-} from "@whattax/core/primitives";
+} from "@taxkit/core/primitives";
 import {
   SourceArtifact,
   SourceExtract,
   SourceRef,
   sourceChecksum,
-} from "@whattax/core/trace";
+} from "@taxkit/core/trace";
 import { Context, Layer, Schema } from "effect";
 
 /**
@@ -49,7 +49,7 @@ export class StslTable extends Schema.TaggedClass<StslTable>()("StslTable", {
  * @since 0.1.0
  */
 export class AtoStslTable extends Context.Service<AtoStslTable, StslTable>()(
-  "whattax/rules-au-stsl/parameter/AtoStslTable"
+  "taxkit/rules-au-stsl/parameter/AtoStslTable"
 ) {}
 
 /**
@@ -93,7 +93,7 @@ export const AtoStslTableDescriptor = makeParameterDescriptor({
     from: "2025-09-24",
     toExclusive: "2026-07-01",
   }),
-  id: "whattax/rules-au-stsl/parameter/AtoStslTable",
+  id: "taxkit/rules-au-stsl/parameter/AtoStslTable",
   schema: StslTable,
   source: StslSource2025_26,
   sourceArtifact: StslArtifact2025_26,

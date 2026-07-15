@@ -1,7 +1,7 @@
-import { makeFactDescriptor } from "@whattax/core";
-import { LedgerComponent } from "@whattax/core/ledger";
-import { Money } from "@whattax/core/primitives";
-import { TraceNode } from "@whattax/core/trace";
+import { makeFactDescriptor } from "@taxkit/core";
+import { LedgerComponent } from "@taxkit/core/ledger";
+import { Money } from "@taxkit/core/primitives";
+import { TraceNode } from "@taxkit/core/trace";
 import { Context, Schema } from "effect";
 
 /**
@@ -29,7 +29,7 @@ export class AnnualTaxLedger extends Schema.TaggedClass<AnnualTaxLedger>()(
 export class AnnualTaxLedgerFact extends Context.Service<
   AnnualTaxLedgerFact,
   AnnualTaxLedger
->()("whattax/rules-au-income-tax/fact/AnnualTaxLedger") {}
+>()("taxkit/rules-au-income-tax/fact/AnnualTaxLedger") {}
 
 /**
  * Fact descriptor for the aggregated annual tax ledger.
@@ -38,7 +38,7 @@ export class AnnualTaxLedgerFact extends Context.Service<
  */
 export const AnnualTaxLedgerDescriptor = makeFactDescriptor({
   authority: "derived",
-  id: "whattax/rules-au-income-tax/fact/AnnualTaxLedger",
+  id: "taxkit/rules-au-income-tax/fact/AnnualTaxLedger",
   schema: AnnualTaxLedger,
   tag: AnnualTaxLedgerFact,
   title: "Aggregated annual tax ledger",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
-import { CalculationEngine, CalculationEngineLive } from "@whattax/core/engine";
-import { aud, audDollars, moneyEquals } from "@whattax/core/primitives";
+import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
+import { aud, audDollars, moneyEquals } from "@taxkit/core/primitives";
 import {
   AuTakeHomePay2024_25_Live,
   AuTakeHomePay2025_26_Live,
@@ -13,9 +13,9 @@ import {
   TakeHomeScenarioLive,
   TakeHomeScenarioLiveFromInput,
   TaxablePayRuleId,
-} from "@whattax/rules-au-pay";
-import type { TakeHomeScenarioInput } from "@whattax/rules-au-pay";
-import { expectAt } from "@whattax/testing";
+} from "@taxkit/rules-au-pay";
+import type { TakeHomeScenarioInput } from "@taxkit/rules-au-pay";
+import { expectAt } from "@taxkit/testing";
 import { Effect, Exit, Layer } from "effect";
 
 const runScenario = (

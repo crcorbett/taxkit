@@ -1,7 +1,7 @@
-import { makeFactDescriptor } from "@whattax/core";
-import { LedgerComponent } from "@whattax/core/ledger";
-import { Money } from "@whattax/core/primitives";
-import { TraceNode } from "@whattax/core/trace";
+import { makeFactDescriptor } from "@taxkit/core";
+import { LedgerComponent } from "@taxkit/core/ledger";
+import { Money } from "@taxkit/core/primitives";
+import { TraceNode } from "@taxkit/core/trace";
 import { Context, Schema } from "effect";
 
 import { PayPeriod } from "./pay.js";
@@ -17,7 +17,7 @@ import { PayPeriod } from "./pay.js";
 export class PaygWithholdingComponentFact extends Context.Service<
   PaygWithholdingComponentFact,
   LedgerComponent
->()("whattax/rules-au-pay/fact/PaygWithholdingComponent") {}
+>()("taxkit/rules-au-pay/fact/PaygWithholdingComponent") {}
 
 /**
  * Fact descriptor for the PAYG withholding component.
@@ -26,7 +26,7 @@ export class PaygWithholdingComponentFact extends Context.Service<
  */
 export const PaygWithholdingComponentDescriptor = makeFactDescriptor({
   authority: "derived",
-  id: "whattax/rules-au-pay/fact/PaygWithholdingComponent",
+  id: "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
   schema: LedgerComponent,
   tag: PaygWithholdingComponentFact,
   title: "PAYG withholding ledger component for a single pay period",
@@ -59,7 +59,7 @@ export class PayWithholdingsLedger extends Schema.TaggedClass<PayWithholdingsLed
 export class PayWithholdingsLedgerFact extends Context.Service<
   PayWithholdingsLedgerFact,
   PayWithholdingsLedger
->()("whattax/rules-au-pay/fact/PayWithholdingsLedger") {}
+>()("taxkit/rules-au-pay/fact/PayWithholdingsLedger") {}
 
 /**
  * Fact descriptor for the aggregated pay-period withholding ledger.
@@ -68,7 +68,7 @@ export class PayWithholdingsLedgerFact extends Context.Service<
  */
 export const PayWithholdingsLedgerDescriptor = makeFactDescriptor({
   authority: "derived",
-  id: "whattax/rules-au-pay/fact/PayWithholdingsLedger",
+  id: "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
   schema: PayWithholdingsLedger,
   tag: PayWithholdingsLedgerFact,
   title: "Aggregated withholdings ledger for a single pay period",

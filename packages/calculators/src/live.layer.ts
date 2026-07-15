@@ -1,4 +1,4 @@
-import { CalculationEngine, validateRuleGraph } from "@whattax/core";
+import { CalculationEngine, validateRuleGraph } from "@taxkit/core";
 import { Array, Effect, Layer, Option, Schema } from "effect";
 import { pipe } from "effect/Function";
 

@@ -7,13 +7,13 @@ confidence: low
 
 # UI
 
-Planned shared UI package for WhatTax-owned apps. This directory is currently
+Planned shared UI package for TaxKit-owned apps. This directory is currently
 documentation-only: it has no package manifest, source exports or runtime code.
 
 ## Scope
 
 `packages/ui` should exist as a runtime package only when repeated UI
-components or design tokens are shared across WhatTax apps. It should not own
+components or design tokens are shared across TaxKit apps. It should not own
 tax rules, API contracts or calculator state.
 
 ## Main Areas

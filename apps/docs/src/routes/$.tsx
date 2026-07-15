@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type {
   DocsContentPage,
   DocsNavigation as DocsNavigationValue,
-} from "@whattax/docs-content/schemas";
+} from "@taxkit/docs-content/schemas";
 import { Array, Match, Option, Result, pipe } from "effect";
 
 import { loadDocsPage } from "#/lib/docs/loaders";
@@ -53,7 +53,7 @@ const DocsNavigation = ({
 }>) => (
   <aside className="docs-nav">
     <Link className="docs-nav__home" to="/">
-      WhatTax Docs
+      TaxKit Docs
     </Link>
     {pipe(
       navigation.primaryNavigation,

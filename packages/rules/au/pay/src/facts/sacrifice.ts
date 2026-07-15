@@ -1,9 +1,5 @@
-import {
-  FactQuestion,
-  FactQuestionId,
-  makeFactDescriptor,
-} from "@whattax/core";
-import { Money } from "@whattax/core/primitives";
+import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@taxkit/core";
+import { Money } from "@taxkit/core/primitives";
 import { Context, Schema } from "effect";
 
 import { PayPeriod } from "./pay.js";
@@ -18,8 +14,8 @@ import { PayPeriod } from "./pay.js";
  *
  * @example
  * ```ts
- * import { audDollars } from "@whattax/core/primitives"
- * import { SalarySacrifice } from "@whattax/rules-au-pay/facts"
+ * import { audDollars } from "@taxkit/core/primitives"
+ * import { SalarySacrifice } from "@taxkit/rules-au-pay/facts"
  *
  * const sacrifice = new SalarySacrifice({ amount: audDollars(250), period: "weekly" })
  * ```
@@ -40,7 +36,7 @@ export class SalarySacrifice extends Schema.TaggedClass<SalarySacrifice>()(
 export class SalarySacrificeFact extends Context.Service<
   SalarySacrificeFact,
   SalarySacrifice
->()("whattax/rules-au-pay/fact/SalarySacrifice") {}
+>()("taxkit/rules-au-pay/fact/SalarySacrifice") {}
 
 /**
  * Fact descriptor for pre-tax salary sacrifice.
@@ -49,9 +45,9 @@ export class SalarySacrificeFact extends Context.Service<
  */
 export const SalarySacrificeDescriptor = makeFactDescriptor({
   authority: "input",
-  id: "whattax/rules-au-pay/fact/SalarySacrifice",
+  id: "taxkit/rules-au-pay/fact/SalarySacrifice",
   question: new FactQuestion({
-    id: FactQuestionId.make("whattax/rules-au-pay/question/SalarySacrifice"),
+    id: FactQuestionId.make("taxkit/rules-au-pay/question/SalarySacrifice"),
     inputKind: "money",
     prompt: "Pre-tax salary sacrifice for the pay period",
   }),

@@ -1,4 +1,4 @@
-import { makeParameterDescriptor } from "@whattax/core/parameters";
+import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
   Cents,
   CentsOrInfinity,
@@ -8,13 +8,13 @@ import {
   isoDate,
   taxRate,
   taxYear,
-} from "@whattax/core/primitives";
+} from "@taxkit/core/primitives";
 import {
   SourceArtifact,
   SourceExtract,
   SourceRef,
   sourceChecksum,
-} from "@whattax/core/trace";
+} from "@taxkit/core/trace";
 import { Context, Layer, Schema } from "effect";
 
 /**
@@ -49,7 +49,7 @@ export class LitoTable extends Schema.TaggedClass<LitoTable>()("LitoTable", {
  * @since 0.1.0
  */
 export class AtoLitoTable extends Context.Service<AtoLitoTable, LitoTable>()(
-  "whattax/rules-au-income-tax/parameter/AtoLitoTable"
+  "taxkit/rules-au-income-tax/parameter/AtoLitoTable"
 ) {}
 
 /**
@@ -89,7 +89,7 @@ export const LitoArtifact2025_26 = new SourceArtifact({
  */
 export const AtoLitoTableDescriptor = makeParameterDescriptor({
   effectivePeriod: australianTaxYearInterval("2025-26"),
-  id: "whattax/rules-au-income-tax/parameter/AtoLitoTable",
+  id: "taxkit/rules-au-income-tax/parameter/AtoLitoTable",
   schema: LitoTable,
   source: LitoSource2025_26,
   sourceArtifact: LitoArtifact2025_26,

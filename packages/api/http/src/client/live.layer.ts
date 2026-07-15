@@ -1,14 +1,14 @@
 import { Layer } from "effect";
 import type { HttpClient } from "effect/unstable/http/HttpClient";
 
-import { makeWhatTaxApiClient } from "./index.js";
-import { WhatTaxHttpApiService } from "./service.js";
+import { makeTaxKitApiClient } from "./index.js";
+import { TaxKitHttpApiService } from "./service.js";
 
-export interface MakeWhatTaxApiClientLayerOptions {
+export interface MakeTaxKitApiClientLayerOptions {
   readonly baseUrl?: URL | string | undefined;
   readonly transformClient?: (client: HttpClient) => HttpClient;
 }
 
-export const makeWhatTaxApiClientLayer = (
-  options: MakeWhatTaxApiClientLayerOptions = {}
-) => Layer.effect(WhatTaxHttpApiService, makeWhatTaxApiClient(options));
+export const makeTaxKitApiClientLayer = (
+  options: MakeTaxKitApiClientLayerOptions = {}
+) => Layer.effect(TaxKitHttpApiService, makeTaxKitApiClient(options));

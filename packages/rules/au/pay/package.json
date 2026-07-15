@@ -1,5 +1,5 @@
 {
-  "name": "@whattax/rules-au-pay",
+  "name": "@taxkit/rules-au-pay",
   "version": "0.1.0",
   "private": true,
   "files": [
@@ -77,13 +77,13 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@whattax/core": "workspace:*",
+    "@taxkit/core": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@taxkit/testing": "workspace:*",
     "@types/node": "catalog:",
-    "@whattax/testing": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

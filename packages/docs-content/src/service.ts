@@ -46,4 +46,4 @@ export interface DocsContentServiceShape {
 export class DocsContentService extends Context.Service<
   DocsContentService,
   DocsContentServiceShape
->()("@whattax/docs-content/DocsContentService") {}
+>()("@taxkit/docs-content/DocsContentService") {}

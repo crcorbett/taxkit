@@ -1,4 +1,4 @@
-import { makeParameterDescriptor } from "@whattax/core/parameters";
+import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
   Cents,
   CentsOrInfinity,
@@ -8,13 +8,13 @@ import {
   isoDate,
   taxRate,
   taxYear,
-} from "@whattax/core/primitives";
+} from "@taxkit/core/primitives";
 import {
   SourceArtifact,
   SourceExtract,
   SourceRef,
   sourceChecksum,
-} from "@whattax/core/trace";
+} from "@taxkit/core/trace";
 import { Context, Layer, Schema } from "effect";
 
 /**
@@ -57,7 +57,7 @@ export class IncomeTaxTable extends Schema.TaggedClass<IncomeTaxTable>()(
 export class AtoIncomeTaxTable extends Context.Service<
   AtoIncomeTaxTable,
   IncomeTaxTable
->()("whattax/rules-au-income-tax/parameter/AtoIncomeTaxTable") {}
+>()("taxkit/rules-au-income-tax/parameter/AtoIncomeTaxTable") {}
 
 /**
  * Source reference for ATO resident income tax rates for 2025-26.
@@ -96,7 +96,7 @@ export const IncomeTaxArtifact2025_26 = new SourceArtifact({
  */
 export const AtoIncomeTaxTableDescriptor = makeParameterDescriptor({
   effectivePeriod: australianTaxYearInterval("2025-26"),
-  id: "whattax/rules-au-income-tax/parameter/AtoIncomeTaxTable",
+  id: "taxkit/rules-au-income-tax/parameter/AtoIncomeTaxTable",
   schema: IncomeTaxTable,
   source: IncomeTaxSource2025_26,
   sourceArtifact: IncomeTaxArtifact2025_26,

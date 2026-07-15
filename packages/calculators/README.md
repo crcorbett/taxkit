@@ -50,7 +50,7 @@ This package must not own:
 - HTTP endpoints, OpenAPI annotations or HTTP status mapping
 - Bun serving, app runtime lifecycle or process config
 - SDK client transport or CLI command parsing
-- imports from `@whattax/api-http`, `apps/api`, `apps/web` or runtime modules
+- imports from `@taxkit/api-http`, `apps/api`, `apps/web` or runtime modules
 
 ## Guardrails
 
@@ -81,8 +81,8 @@ This package must not own:
 ## Commands
 
 ```sh
-bun run --filter=@whattax/calculators check-types
-bun run --filter=@whattax/calculators build
+bun run --filter=@taxkit/calculators check-types
+bun run --filter=@taxkit/calculators build
 ```
 
 ## Packaging
@@ -94,13 +94,13 @@ artifact, public entrypoints and concrete dependency ranges.
 
 ## Public Exports
 
-- `@whattax/calculators`
-- `@whattax/calculators/catalog`
-- `@whattax/calculators/errors`
-- `@whattax/calculators/live`
-- `@whattax/calculators/metadata`
-- `@whattax/calculators/service`
-- `@whattax/calculators/schemas`
+- `@taxkit/calculators`
+- `@taxkit/calculators/catalog`
+- `@taxkit/calculators/errors`
+- `@taxkit/calculators/live`
+- `@taxkit/calculators/metadata`
+- `@taxkit/calculators/service`
+- `@taxkit/calculators/schemas`
 
 ## Related Docs
 

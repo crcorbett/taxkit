@@ -1,6 +1,6 @@
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import * as docsConfig from "@taxkit/docs-content/source.config";
 import viteReact from "@vitejs/plugin-react";
-import * as docsConfig from "@whattax/docs-content/source.config";
 import fumadocsMdx from "fumadocs-mdx/vite";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
@@ -30,7 +30,7 @@ export default defineConfig(async ({ command }) => {
       tsconfigPaths: true,
     },
     ssr: {
-      noExternal: [/^@whattax\/docs-content/u, /^@whattax\/docs-fumadocs/u],
+      noExternal: [/^@taxkit\/docs-content/u, /^@taxkit\/docs-fumadocs/u],
       resolve: useSourceWorkspacePackages
         ? {
             conditions: ["source", "node"],

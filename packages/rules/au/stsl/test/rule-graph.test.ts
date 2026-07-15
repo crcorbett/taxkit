@@ -1,17 +1,17 @@
 import { describe, expect, it } from "@effect/vitest";
-import { validateRuleGraph } from "@whattax/core/graph";
-import type { AnyRuleDescriptor } from "@whattax/core/rules";
+import { validateRuleGraph } from "@taxkit/core/graph";
+import type { AnyRuleDescriptor } from "@taxkit/core/rules";
 import {
   GrossPayDescriptor,
   TaxFreeThresholdClaimedDescriptor,
-} from "@whattax/rules-au-pay/facts";
+} from "@taxkit/rules-au-pay/facts";
 import {
   NetPayRuleDescriptor,
   PaygWithholdingRuleDescriptor,
   TaxablePayRuleDescriptor,
-} from "@whattax/rules-au-pay/rule-pack";
-import { StslDebtDescriptor } from "@whattax/rules-au-stsl/facts";
-import { AuStslRuleDescriptors } from "@whattax/rules-au-stsl/rule-pack";
+} from "@taxkit/rules-au-pay/rule-pack";
+import { StslDebtDescriptor } from "@taxkit/rules-au-stsl/facts";
+import { AuStslRuleDescriptors } from "@taxkit/rules-au-stsl/rule-pack";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
   rules.map((rule) => ({
@@ -60,14 +60,14 @@ describe("AU STSL rule graph", () => {
     expect(rulePackSnapshot(AuStslRuleDescriptors)).toMatchInlineSnapshot(`
       [
         {
-          "id": "whattax/rules-au-stsl/rule/StslComponent",
+          "id": "taxkit/rules-au-stsl/rule/StslComponent",
           "parameters": [
             {
               "effectivePeriod": {
                 "from": "2025-09-24",
                 "toExclusive": "2026-07-01",
               },
-              "id": "whattax/rules-au-stsl/parameter/AtoStslTable",
+              "id": "taxkit/rules-au-stsl/parameter/AtoStslTable",
               "source": "ato-publication",
               "sourceArtifact": {
                 "checksum": "sha256:59f5c35e2b9c4a05a5c50bdf3d3993e167a57fa11a0d9fd95f0fb7cc9e884f82",
@@ -77,26 +77,26 @@ describe("AU STSL rule graph", () => {
             },
           ],
           "provides": [
-            "whattax/rules-au-stsl/fact/StslComponent",
+            "taxkit/rules-au-stsl/fact/StslComponent",
           ],
           "requires": [
-            "whattax/rules-au-pay/fact/TaxablePay",
-            "whattax/rules-au-stsl/fact/StslDebt",
+            "taxkit/rules-au-pay/fact/TaxablePay",
+            "taxkit/rules-au-stsl/fact/StslDebt",
           ],
           "sources": [
             "ato-publication",
           ],
         },
         {
-          "id": "whattax/rules-au-stsl/rule/PayWithholdingsLedgerWithStsl",
+          "id": "taxkit/rules-au-stsl/rule/PayWithholdingsLedgerWithStsl",
           "parameters": [],
           "provides": [
-            "whattax/rules-au-pay/fact/PayWithholdingsLedger",
+            "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
           ],
           "requires": [
-            "whattax/rules-au-pay/fact/GrossPay",
-            "whattax/rules-au-pay/fact/PaygWithholdingComponent",
-            "whattax/rules-au-stsl/fact/StslComponent",
+            "taxkit/rules-au-pay/fact/GrossPay",
+            "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
+            "taxkit/rules-au-stsl/fact/StslComponent",
           ],
           "sources": [],
         },

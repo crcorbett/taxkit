@@ -7,12 +7,12 @@ confidence: medium
 
 # TypeScript Config
 
-Shared TypeScript configuration package for WhatTax workspace packages and
+Shared TypeScript configuration package for TaxKit workspace packages and
 apps.
 
 ## Scope
 
-`@whattax/tsconfig` owns reusable TypeScript config exports for the monorepo.
+`@taxkit/tsconfig` owns reusable TypeScript config exports for the monorepo.
 It currently exports the shared base config used by package-level
 `tsconfig.json` files.
 
@@ -24,8 +24,8 @@ It currently exports the shared base config used by package-level
 
 Export paths:
 
-- `@whattax/tsconfig/base`
-- `@whattax/tsconfig/package`
+- `@taxkit/tsconfig/base`
+- `@taxkit/tsconfig/package`
 
 ## Runtime Shape
 

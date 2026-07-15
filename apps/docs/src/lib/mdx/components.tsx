@@ -1,4 +1,4 @@
-import { Picture, Pre } from "@whattax/docs-fumadocs/render";
+import { Picture, Pre } from "@taxkit/docs-fumadocs/render";
 import { Option } from "effect";
 import type { ComponentPropsWithoutRef } from "react";
 

@@ -134,7 +134,7 @@ const PackedArtifactProgram = Effect.gen(function* checkPackedArtifact() {
   const smokePackageRootPath = path.join(
     smokeRootPath,
     "node_modules",
-    "@whattax",
+    "@taxkit",
     "sdk"
   );
   const smokeEntrypointPath = path.join(smokeRootPath, "smoke.mjs");
@@ -266,14 +266,14 @@ const PackedArtifactProgram = Effect.gen(function* checkPackedArtifact() {
   yield* fs.writeFileString(
     smokeEntrypointPath,
     `import assert from "node:assert/strict";
-import { WhatTax } from "@whattax/sdk";
-import * as effect from "@whattax/sdk/effect";
-import { au } from "@whattax/sdk/au";
-import { auEffect } from "@whattax/sdk/au/effect";
-import * as schemas from "@whattax/sdk/schemas";
-import * as testing from "@whattax/sdk/testing";
+import { TaxKit } from "@taxkit/sdk";
+import * as effect from "@taxkit/sdk/effect";
+import { au } from "@taxkit/sdk/au";
+import { auEffect } from "@taxkit/sdk/au/effect";
+import * as schemas from "@taxkit/sdk/schemas";
+import * as testing from "@taxkit/sdk/testing";
 
-assert.equal(typeof WhatTax.calculate, "function", "root SDK import");
+assert.equal(typeof TaxKit.calculate, "function", "root SDK import");
 assert.equal(typeof effect.calculateRunRequest, "function", "Effect run import");
 assert.equal(typeof effect.calculateReportRequest, "function", "Effect report request import");
 assert.equal(typeof effect.calculateReport, "function", "Effect report import");
@@ -282,7 +282,7 @@ assert.equal(typeof au.pay.takeHomePay, "function", "AU SDK import");
 assert.equal(typeof auEffect.createClient, "function", "AU Effect SDK import");
 assert.ok(schemas.CalculatorRunRequest, "schemas request import");
 assert.ok(schemas.CalculatorServiceError, "schemas service error import");
-assert.ok(schemas.WhatTaxCalculationError, "schemas SDK error import");
+assert.ok(schemas.TaxKitCalculationError, "schemas SDK error import");
 assert.ok(testing.AuPayTakeHomeCalculation, "testing import");
 `
   );

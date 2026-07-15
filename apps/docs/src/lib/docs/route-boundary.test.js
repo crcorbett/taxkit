@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import {
   DocsPageNotFoundError,
   DocsSourceError,
-} from "@whattax/docs-content/errors";
+} from "@taxkit/docs-content/errors";
 import { Cause, Effect, Equal, Exit, Result, Schema } from "effect";
 
 import { DocsContentPreloadError, DocsRouteTransportError } from "./errors";

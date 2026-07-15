@@ -1,5 +1,5 @@
-import type { AnnualTaxScenarioInput } from "@whattax/rules-au-income-tax";
-import type { TakeHomeScenarioInputSchema } from "@whattax/rules-au-pay";
+import type { AnnualTaxScenarioInput } from "@taxkit/rules-au-income-tax";
+import type { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay";
 
 import { defineCalculatorCatalogEntry } from "../src/catalog.js";
 import type { CalculatorCatalogEntryDefinition } from "../src/catalog.js";

@@ -1,8 +1,8 @@
 import {
   DocsPageNotFoundError,
   DocsSourceError,
-} from "@whattax/docs-content/errors";
-import { DocsContentPage, DocsNavigation } from "@whattax/docs-content/schemas";
+} from "@taxkit/docs-content/errors";
+import { DocsContentPage, DocsNavigation } from "@taxkit/docs-content/schemas";
 import {
   Array,
   Cause,

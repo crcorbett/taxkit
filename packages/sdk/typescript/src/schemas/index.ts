@@ -6,16 +6,16 @@ export {
   CalculatorRunResponseData,
   CalculatorRunServiceRequest,
   CalculatorServiceError,
-} from "@whattax/calculators/schemas";
+} from "@taxkit/calculators/schemas";
 export {
-  WhatTaxCalculationError,
-  WhatTaxFailure,
-  WhatTaxSchemaDecodeError,
-  WhatTaxSuccess,
-  WhatTaxUnexpectedError,
+  TaxKitCalculationError,
+  TaxKitFailure,
+  TaxKitSchemaDecodeError,
+  TaxKitSuccess,
+  TaxKitUnexpectedError,
 } from "../errors.js";
 export type {
-  WhatTaxCalculationErrorDetail,
-  WhatTaxError,
-  WhatTaxSafeResult,
+  TaxKitCalculationErrorDetail,
+  TaxKitError,
+  TaxKitSafeResult,
 } from "../errors.js";

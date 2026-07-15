@@ -1,5 +1,5 @@
 {
-  "name": "@whattax/tsconfig",
+  "name": "@taxkit/tsconfig",
   "version": "0.1.0",
   "private": true,
   "files": [

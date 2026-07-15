@@ -5,7 +5,7 @@ import { Schema } from "effect";
  *
  * @since 0.1.0
  */
-export const Cents = Schema.Int.pipe(Schema.brand("whattax/Cents"));
+export const Cents = Schema.Int.pipe(Schema.brand("taxkit/Cents"));
 
 /**
  * Whole cents used by all money values in the core package.
@@ -33,7 +33,7 @@ export type Currency = typeof Currency.Type;
  *
  * @example
  * ```ts
- * import { aud } from "@whattax/core";
+ * import { aud } from "@taxkit/core";
  *
  * const withholding = aud(12_345);
  * ```
@@ -58,7 +58,7 @@ export const aud = (cents: number): Money =>
  *
  * @example
  * ```ts
- * import { audDollars } from "@whattax/core";
+ * import { audDollars } from "@taxkit/core";
  *
  * const amount = audDollars(42.5);
  * ```
@@ -75,7 +75,7 @@ export const audDollars = (dollars: number): Money =>
  */
 export const moneyAdd = (a: Money, b: Money): Money => {
   if (a.currency !== b.currency) {
-    throw new Error("whattax/core: cannot add money with different currencies");
+    throw new Error("taxkit/core: cannot add money with different currencies");
   }
   return aud(a.cents + b.cents);
 };
@@ -88,7 +88,7 @@ export const moneyAdd = (a: Money, b: Money): Money => {
 export const moneySub = (a: Money, b: Money): Money => {
   if (a.currency !== b.currency) {
     throw new Error(
-      "whattax/core: cannot subtract money with different currencies"
+      "taxkit/core: cannot subtract money with different currencies"
     );
   }
   return aud(a.cents - b.cents);

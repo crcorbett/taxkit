@@ -4,7 +4,7 @@ import type {
   CalculatorTaxYear,
   CalculatorRunFacts,
   CalculatorRunReport,
-} from "@whattax/calculators/schemas";
+} from "@taxkit/calculators/schemas";
 import { Schema } from "effect";
 import type { Effect } from "effect";
 
@@ -47,7 +47,7 @@ export type AnySdkCalculation = SdkCalculation<
   Schema.Decoder<CalculatorRunReport, never>
 >;
 
-export interface WhatTaxModule<
+export interface TaxKitModule<
   Id extends string,
   Jurisdiction extends CalculatorJurisdiction,
   TaxYear extends CalculatorTaxYear,
@@ -59,7 +59,7 @@ export interface WhatTaxModule<
   readonly taxYear: TaxYear;
 }
 
-export type AnyWhatTaxModule = WhatTaxModule<
+export type AnyTaxKitModule = TaxKitModule<
   string,
   CalculatorJurisdiction,
   CalculatorTaxYear,
@@ -78,7 +78,7 @@ export type CalculationOutput<Calculation> = Calculation extends {
   ? OutputSchema["Type"]
   : never;
 
-export type ModuleCalculation<Modules extends readonly AnyWhatTaxModule[]> =
+export type ModuleCalculation<Modules extends readonly AnyTaxKitModule[]> =
   Modules[number]["calculations"][number];
 
 export const defineSdkCalculation = <
@@ -100,11 +100,11 @@ export const defineSdkCalculation = <
   decodeOutput: Schema.decodeUnknownEffect(calculation.outputSchema),
 });
 
-export const defineWhatTaxModule = <
+export const defineTaxKitModule = <
   const Id extends string,
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
   const Calculations extends readonly AnySdkCalculation[],
 >(
-  module: WhatTaxModule<Id, Jurisdiction, TaxYear, Calculations>
-): WhatTaxModule<Id, Jurisdiction, TaxYear, Calculations> => module;
+  module: TaxKitModule<Id, Jurisdiction, TaxYear, Calculations>
+): TaxKitModule<Id, Jurisdiction, TaxYear, Calculations> => module;

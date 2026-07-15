@@ -7,7 +7,7 @@ confidence: medium
 
 # Core
 
-Shared deterministic WhatTax engine primitives and orchestration package.
+Shared deterministic TaxKit engine primitives and orchestration package.
 
 ## Scope
 
@@ -47,8 +47,8 @@ HTTP handlers or filesystem adapters.
 ## Commands
 
 ```sh
-bun run --filter=@whattax/core check-types
-bun run --filter=@whattax/core build
+bun run --filter=@taxkit/core check-types
+bun run --filter=@taxkit/core build
 ```
 
 ## Packaging

@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/knip/schema.json",
   "ignore": ["docs/**", "apps/web/src/routeTree.gen.ts"],
-  "ignoreDependencies": ["@whattax/tsconfig"],
+  "ignoreDependencies": ["@taxkit/tsconfig"],
   "ignoreIssues": {
     "apps/web/src/lib/route-runtime.ts": ["types"],
     "packages/api/http/src/client/in-process.layer.ts": ["exports"],
@@ -24,7 +24,7 @@
     "apps/api": {
       "entry": ["src/index.ts"],
       "project": ["src/**/*.ts"],
-      "ignoreDependencies": ["@whattax/tsconfig"]
+      "ignoreDependencies": ["@taxkit/tsconfig"]
     },
     "apps/web": {
       "entry": [
@@ -34,7 +34,7 @@
         "vite.config.ts"
       ],
       "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
-      "ignoreDependencies": ["@tanstack/router-plugin", "@whattax/tsconfig"]
+      "ignoreDependencies": ["@tanstack/router-plugin", "@taxkit/tsconfig"]
     },
     "apps/docs": {
       "entry": [
@@ -46,7 +46,7 @@
       ],
       "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
       "ignore": ["examples/**/*.ts", "src/routeTree.gen.ts"],
-      "ignoreDependencies": ["@whattax/tsconfig"]
+      "ignoreDependencies": ["@taxkit/tsconfig"]
     },
     "packages/core": {
       "entry": ["src/index.ts", "src/*/index.ts"],
@@ -64,7 +64,7 @@
         "src/handlers/live.ts"
       ],
       "project": ["src/**/*.ts"],
-      "ignoreDependencies": ["@effect/platform-node", "@whattax/tsconfig"]
+      "ignoreDependencies": ["@effect/platform-node", "@taxkit/tsconfig"]
     },
     "packages/calculators": {
       "entry": ["src/index.ts"],
@@ -73,7 +73,7 @@
     "packages/docs-content": {
       "entry": ["source.config.ts", "src/errors.ts", "src/schemas.ts"],
       "project": ["source.config.ts", "src/**/*.ts"],
-      "ignoreDependencies": ["@shikijs/core", "@whattax/tsconfig", "typescript"]
+      "ignoreDependencies": ["@shikijs/core", "@taxkit/tsconfig", "typescript"]
     },
     "packages/sdk/typescript": {
       "entry": [

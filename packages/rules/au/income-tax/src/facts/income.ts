@@ -1,9 +1,5 @@
-import {
-  FactQuestion,
-  FactQuestionId,
-  makeFactDescriptor,
-} from "@whattax/core";
-import { Money } from "@whattax/core/primitives";
+import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@taxkit/core";
+import { Money } from "@taxkit/core/primitives";
 import { Context, Schema } from "effect";
 
 /**
@@ -16,8 +12,8 @@ import { Context, Schema } from "effect";
  *
  * @example
  * ```ts
- * import { audDollars } from "@whattax/core/primitives"
- * import { AnnualTaxableIncome } from "@whattax/rules-au-income-tax/facts"
+ * import { audDollars } from "@taxkit/core/primitives"
+ * import { AnnualTaxableIncome } from "@taxkit/rules-au-income-tax/facts"
  *
  * const income = new AnnualTaxableIncome({ income: audDollars(95_000) })
  * ```
@@ -37,7 +33,7 @@ export class AnnualTaxableIncome extends Schema.TaggedClass<AnnualTaxableIncome>
 export class AnnualTaxableIncomeFact extends Context.Service<
   AnnualTaxableIncomeFact,
   AnnualTaxableIncome
->()("whattax/rules-au-income-tax/fact/AnnualTaxableIncome") {}
+>()("taxkit/rules-au-income-tax/fact/AnnualTaxableIncome") {}
 
 /**
  * Fact descriptor for annual taxable income and its money-input question.
@@ -46,10 +42,10 @@ export class AnnualTaxableIncomeFact extends Context.Service<
  */
 export const AnnualTaxableIncomeDescriptor = makeFactDescriptor({
   authority: "input",
-  id: "whattax/rules-au-income-tax/fact/AnnualTaxableIncome",
+  id: "taxkit/rules-au-income-tax/fact/AnnualTaxableIncome",
   question: new FactQuestion({
     id: FactQuestionId.make(
-      "whattax/rules-au-income-tax/question/AnnualTaxableIncome"
+      "taxkit/rules-au-income-tax/question/AnnualTaxableIncome"
     ),
     inputKind: "money",
     prompt: "Annual taxable income",

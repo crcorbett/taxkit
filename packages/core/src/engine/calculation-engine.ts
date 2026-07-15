@@ -58,7 +58,7 @@ export interface CalculationEngineService {
 export class CalculationEngine extends Context.Service<
   CalculationEngine,
   CalculationEngineService
->()("whattax/core/CalculationEngine") {}
+>()("taxkit/core/CalculationEngine") {}
 
 /**
  * Live core calculation engine implementation.

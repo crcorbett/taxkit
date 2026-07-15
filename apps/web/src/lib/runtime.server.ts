@@ -1,30 +1,30 @@
 import "@tanstack/react-start/server-only";
-import { makeWhatTaxApiClientLayer } from "@whattax/api-http/client/live";
+import { makeTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
-import { WhatTaxWebConfigError } from "./config";
+import { TaxKitWebConfigError } from "./config";
 import {
-  WhatTaxWebServerConfig,
-  WhatTaxWebServerConfigProviderLive,
+  TaxKitWebServerConfig,
+  TaxKitWebServerConfigProviderLive,
 } from "./config.server";
 
-const WhatTaxApiClientLive = Layer.unwrap(
-  Effect.gen(function* makeWhatTaxApiClientLive() {
-    const config = yield* WhatTaxWebServerConfig;
-    return makeWhatTaxApiClientLayer({ baseUrl: config.httpApi.baseUrl });
+const TaxKitApiClientLive = Layer.unwrap(
+  Effect.gen(function* makeTaxKitApiClientLive() {
+    const config = yield* TaxKitWebServerConfig;
+    return makeTaxKitApiClientLayer({ baseUrl: config.httpApi.baseUrl });
   }).pipe(
     Effect.mapError(
       (cause) =>
-        new WhatTaxWebConfigError({
+        new TaxKitWebConfigError({
           cause,
-          message: `Invalid WhatTax web server config: ${cause.message}`,
+          message: `Invalid TaxKit web server config: ${cause.message}`,
         })
     )
   )
 ).pipe(
   Layer.provide(FetchHttpClient.layer),
-  Layer.provide(WhatTaxWebServerConfigProviderLive)
+  Layer.provide(TaxKitWebServerConfigProviderLive)
 );
 
-export const appRuntime = ManagedRuntime.make(WhatTaxApiClientLive);
+export const appRuntime = ManagedRuntime.make(TaxKitApiClientLive);

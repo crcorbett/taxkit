@@ -9,7 +9,7 @@ import { TraceNode } from "../trace/node.js";
  * @since 0.1.0
  */
 export const ComponentId = Schema.String.pipe(
-  Schema.brand("whattax/ComponentId")
+  Schema.brand("taxkit/ComponentId")
 );
 
 /**

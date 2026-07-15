@@ -1,11 +1,11 @@
-import { CalculationEngine } from "@whattax/core";
+import { CalculationEngine } from "@taxkit/core";
 import type {
   AnyFactDescriptor,
   CalculationError,
   AnyRuleDescriptor,
   CalculationResult,
   GraphValidationIssue,
-} from "@whattax/core";
+} from "@taxkit/core";
 import {
   AnnualTaxLedgerDescriptor,
   AnnualTaxReport,
@@ -18,7 +18,7 @@ import {
   AuAnnualTax2025_26_Live,
   AuAnnualTaxRuleDescriptors,
   CalculateAnnualTax,
-} from "@whattax/rules-au-income-tax";
+} from "@taxkit/rules-au-income-tax";
 import {
   AuPayCalculatorId,
   AuPayJurisdiction,
@@ -41,7 +41,7 @@ import {
   TaxFreeThresholdClaimedDescriptor,
   TakeHomeScenarioInputSchema,
   TakeHomeScenarioLiveFromInput,
-} from "@whattax/rules-au-pay";
+} from "@taxkit/rules-au-pay";
 import type { Option } from "effect";
 import { Array, Data, Effect, HashMap, Layer, Schema } from "effect";
 

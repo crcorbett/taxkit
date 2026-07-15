@@ -7,7 +7,7 @@ confidence: high
 
 # Web App
 
-Current TanStack Start scaffold for WhatTax.
+Current TanStack Start scaffold for TaxKit.
 
 ## Scope
 
@@ -26,25 +26,25 @@ request handling.
 
 ## Runtime Shape
 
-The root route loads `@whattax/api-http/client` through the route runtime and
+The root route loads `@taxkit/api-http/client` through the route runtime and
 renders API health status from the standalone API service over HTTP.
 Server-only API exports must stay out of browser code.
 
 The web runtime reads the API origin from:
 
-- `WHATTAX_API_BASE_URL` on the server
-- `VITE_WHATTAX_API_BASE_URL` in the browser
+- `TAXKIT_API_BASE_URL` on the server
+- `VITE_TAXKIT_API_BASE_URL` in the browser
 
 Both are required runtime config values and are validated with Effect Config and
 Effect Schema. `bun run --filter=web dev` injects both from
-`portless get api.whattax`. Do not include `/api` in the base URL; the typed
+`portless get api.taxkit`. Do not include `/api` in the base URL; the typed
 API client owns route prefixes.
 
 ## Guardrails
 
 - Keep tax rules, facts and calculators in engine packages.
 - Use browser-safe API client exports from routes.
-- Do not import `@whattax/api-http/server` from browser code.
+- Do not import `@taxkit/api-http/server` from browser code.
 - Keep route data acquisition and trust-boundary conversion route-high. Render
   the page shell and semantic landmarks before passing focused readonly values
   and callbacks to leaves.
@@ -69,8 +69,8 @@ than silently falling back to an in-process API.
 
 Use the portless URLs for local browser and app-to-app checks:
 
-- API: `https://api.whattax.localhost`
-- Web: `https://whattax.localhost`
+- API: `https://api.taxkit.localhost`
+- Web: `https://taxkit.localhost`
 
 ## Related Docs
 

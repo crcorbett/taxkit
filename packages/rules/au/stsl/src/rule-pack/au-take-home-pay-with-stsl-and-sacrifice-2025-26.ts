@@ -1,9 +1,9 @@
-import { AtoSchedule1_2025_26_Live } from "@whattax/rules-au-pay/parameters";
+import { AtoSchedule1_2025_26_Live } from "@taxkit/rules-au-pay/parameters";
 import {
   NetPayLive,
   PaygWithholdingLive,
   TaxablePayWithSacrificeLive,
-} from "@whattax/rules-au-pay/rules";
+} from "@taxkit/rules-au-pay/rules";
 import { Layer } from "effect";
 
 import { AtoStsl_2025_26_Live } from "../parameters/stsl-table.js";

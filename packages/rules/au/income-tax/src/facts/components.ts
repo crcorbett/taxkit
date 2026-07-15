@@ -1,5 +1,5 @@
-import { makeFactDescriptor } from "@whattax/core";
-import { LedgerComponent } from "@whattax/core/ledger";
+import { makeFactDescriptor } from "@taxkit/core";
+import { LedgerComponent } from "@taxkit/core/ledger";
 import { Context } from "effect";
 
 /**
@@ -10,7 +10,7 @@ import { Context } from "effect";
 export class IncomeTaxComponentFact extends Context.Service<
   IncomeTaxComponentFact,
   LedgerComponent
->()("whattax/rules-au-income-tax/fact/IncomeTaxComponent") {}
+>()("taxkit/rules-au-income-tax/fact/IncomeTaxComponent") {}
 
 /**
  * Fact descriptor for the marginal-rate income tax component.
@@ -19,7 +19,7 @@ export class IncomeTaxComponentFact extends Context.Service<
  */
 export const IncomeTaxComponentDescriptor = makeFactDescriptor({
   authority: "derived",
-  id: "whattax/rules-au-income-tax/fact/IncomeTaxComponent",
+  id: "taxkit/rules-au-income-tax/fact/IncomeTaxComponent",
   schema: LedgerComponent,
   tag: IncomeTaxComponentFact,
   title: "Income tax at marginal rates",
@@ -33,7 +33,7 @@ export const IncomeTaxComponentDescriptor = makeFactDescriptor({
 export class LitoComponentFact extends Context.Service<
   LitoComponentFact,
   LedgerComponent
->()("whattax/rules-au-income-tax/fact/LitoComponent") {}
+>()("taxkit/rules-au-income-tax/fact/LitoComponent") {}
 
 /**
  * Fact descriptor for the Low Income Tax Offset component.
@@ -42,7 +42,7 @@ export class LitoComponentFact extends Context.Service<
  */
 export const LitoComponentDescriptor = makeFactDescriptor({
   authority: "derived",
-  id: "whattax/rules-au-income-tax/fact/LitoComponent",
+  id: "taxkit/rules-au-income-tax/fact/LitoComponent",
   schema: LedgerComponent,
   tag: LitoComponentFact,
   title: "Low Income Tax Offset",
@@ -56,7 +56,7 @@ export const LitoComponentDescriptor = makeFactDescriptor({
 export class MedicareLevyComponentFact extends Context.Service<
   MedicareLevyComponentFact,
   LedgerComponent
->()("whattax/rules-au-income-tax/fact/MedicareLevyComponent") {}
+>()("taxkit/rules-au-income-tax/fact/MedicareLevyComponent") {}
 
 /**
  * Fact descriptor for the Medicare Levy component.
@@ -65,7 +65,7 @@ export class MedicareLevyComponentFact extends Context.Service<
  */
 export const MedicareLevyComponentDescriptor = makeFactDescriptor({
   authority: "derived",
-  id: "whattax/rules-au-income-tax/fact/MedicareLevyComponent",
+  id: "taxkit/rules-au-income-tax/fact/MedicareLevyComponent",
   schema: LedgerComponent,
   tag: MedicareLevyComponentFact,
   title: "Medicare Levy",

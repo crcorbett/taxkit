@@ -1,5 +1,5 @@
-import { Money, aud } from "@whattax/core/primitives";
-import { TraceNode } from "@whattax/core/trace";
+import { Money, aud } from "@taxkit/core/primitives";
+import { TraceNode } from "@taxkit/core/trace";
 import { Effect, Layer, Schema } from "effect";
 
 import {

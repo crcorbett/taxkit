@@ -1,7 +1,7 @@
-import { CalculationError } from "@whattax/core/errors";
-import { ComponentId, LedgerComponent } from "@whattax/core/ledger";
-import { aud, multiplyCentsByDecimal } from "@whattax/core/primitives";
-import { RuleId, TraceNode } from "@whattax/core/trace";
+import { CalculationError } from "@taxkit/core/errors";
+import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
+import { aud, multiplyCentsByDecimal } from "@taxkit/core/primitives";
+import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import { LitoComponentFact } from "../facts/components.js";
@@ -14,7 +14,7 @@ import type { LitoBracket } from "../parameters/lito-table.js";
  *
  * @since 0.1.0
  */
-export const LitoRuleId = RuleId.make("whattax/rules-au-income-tax/rule/Lito");
+export const LitoRuleId = RuleId.make("taxkit/rules-au-income-tax/rule/Lito");
 
 /**
  * Ledger component id for the Low Income Tax Offset.
@@ -22,7 +22,7 @@ export const LitoRuleId = RuleId.make("whattax/rules-au-income-tax/rule/Lito");
  * @since 0.1.0
  */
 export const LitoComponentId = ComponentId.make(
-  "whattax/rules-au-income-tax/component/Lito"
+  "taxkit/rules-au-income-tax/component/Lito"
 );
 
 const findBracket = (
@@ -41,7 +41,7 @@ const findBracket = (
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `whattax/rules-au-income-tax: no LITO bracket covers income=${incomeCents} cents`,
+          message: `taxkit/rules-au-income-tax: no LITO bracket covers income=${incomeCents} cents`,
         })
       ),
     onSome: Effect.succeed,

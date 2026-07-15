@@ -6,7 +6,7 @@ import {
 } from "effect/unstable/httpapi";
 
 export const HealthResponse = Schema.Struct({
-  service: Schema.Literal("whattax"),
+  service: Schema.Literal("taxkit"),
   status: Schema.Literal("ok"),
 });
 

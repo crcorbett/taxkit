@@ -1,4 +1,4 @@
-import { makeRuleDescriptor } from "@whattax/core/rules";
+import { makeRuleDescriptor } from "@taxkit/core/rules";
 
 import {
   GrossPayDescriptor,

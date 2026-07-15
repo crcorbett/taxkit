@@ -1,5 +1,5 @@
 {
-  "name": "@whattax/rules-au-stsl",
+  "name": "@taxkit/rules-au-stsl",
   "version": "0.1.0",
   "private": true,
   "files": [
@@ -68,14 +68,14 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@whattax/core": "workspace:*",
-    "@whattax/rules-au-pay": "workspace:*",
+    "@taxkit/core": "workspace:*",
+    "@taxkit/rules-au-pay": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@taxkit/testing": "workspace:*",
     "@types/node": "catalog:",
-    "@whattax/testing": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

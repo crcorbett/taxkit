@@ -11,14 +11,14 @@ Implemented rule package for Australian take-home pay and PAYG withholding.
 
 ## Scope
 
-`@whattax/rules-au-pay` owns gross pay, taxable pay, PAYG withholding,
+`@taxkit/rules-au-pay` owns gross pay, taxable pay, PAYG withholding,
 withholdings ledger, net pay, salary-sacrifice pay effects, Schedule 1
 parameters, descriptors, rule packs, calculator program and golden tests.
 
 ## Guardrails
 
 - Reuse canonical schemas, facts, parameter services, rule IDs and component
-  IDs from this package and `@whattax/core`.
+  IDs from this package and `@taxkit/core`.
 - Use Effect `Layer`s for rule derivations and parameter services.
 - Use Effect `Array`, `HashMap`, `HashSet`, `Match`, `Context`, `Layer`,
   `Schema`, `Data`, `Record`, `Result` and `Exit` where they fit.
@@ -28,8 +28,8 @@ parameters, descriptors, rule packs, calculator program and golden tests.
 ## Commands
 
 ```sh
-bun run --filter=@whattax/rules-au-pay check-types
-bun run --filter=@whattax/rules-au-pay test
+bun run --filter=@taxkit/rules-au-pay check-types
+bun run --filter=@taxkit/rules-au-pay test
 ```
 
 ## Packaging

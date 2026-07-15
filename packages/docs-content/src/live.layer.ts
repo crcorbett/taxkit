@@ -1,8 +1,8 @@
 import {
   loadFumadocsPage,
   loadFumadocsPages,
-} from "@whattax/docs-fumadocs/source";
-import type { FumadocsSourceLoader } from "@whattax/docs-fumadocs/source";
+} from "@taxkit/docs-fumadocs/source";
+import type { FumadocsSourceLoader } from "@taxkit/docs-fumadocs/source";
 import { Array as EffectArray, Effect, Layer, Option, Schema } from "effect";
 
 import { DocsPageNotFoundError, DocsSourceError } from "./errors.js";

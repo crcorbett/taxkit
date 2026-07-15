@@ -12,14 +12,14 @@ withholding components.
 
 ## Scope
 
-`@whattax/rules-au-stsl` owns STSL debt facts, Schedule 8 parameter tables,
+`@taxkit/rules-au-stsl` owns STSL debt facts, Schedule 8 parameter tables,
 STSL withholding components, STSL-aware withholdings ledger integration,
 descriptors, rule packs and golden tests.
 
 ## Guardrails
 
 - Reuse canonical schemas, facts, parameter services, rule IDs and component
-  IDs from this package, `@whattax/rules-au-pay` and `@whattax/core`.
+  IDs from this package, `@taxkit/rules-au-pay` and `@taxkit/core`.
 - Use Effect `Layer`s for rule derivations and parameter services.
 - Use Effect `Array`, `HashMap`, `HashSet`, `Match`, `Context`, `Layer`,
   `Schema`, `Data`, `Record`, `Result` and `Exit` where they fit.
@@ -29,8 +29,8 @@ descriptors, rule packs and golden tests.
 ## Commands
 
 ```sh
-bun run --filter=@whattax/rules-au-stsl check-types
-bun run --filter=@whattax/rules-au-stsl test
+bun run --filter=@taxkit/rules-au-stsl check-types
+bun run --filter=@taxkit/rules-au-stsl test
 ```
 
 ## Packaging

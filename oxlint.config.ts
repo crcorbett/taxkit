@@ -160,26 +160,26 @@ export default defineConfig({
     "./tools/oxlint/bun-rules.js",
     "./tools/oxlint/effect-rules.js",
     "./tools/oxlint/mdx-rules.js",
-    "./tools/oxlint/whattax-rules.js",
+    "./tools/oxlint/taxkit-rules.js",
   ],
   overrides: [
     {
       files: ["packages/calculators/src/**/*.ts"],
       rules: {
-        "whattax/no-ambient-time-or-random": "error",
-        "whattax/no-async-await-promise": "error",
-        "whattax/no-conditional-object-spread": "error",
-        "whattax/no-context-nullish-default": "error",
-        "whattax/no-in-operator": "error",
-        "whattax/no-instanceof": "error",
-        "whattax/no-json-parse-stringify": "error",
-        "whattax/no-native-array-methods": "error",
-        "whattax/no-native-collections": "error",
-        "whattax/no-nested-wrapper-calls": "error",
-        "whattax/no-nullish-comparison": "error",
-        "whattax/no-throw": "error",
-        "whattax/no-typeof": "error",
-        "whattax/no-undefined-comparison": "error",
+        "taxkit/no-ambient-time-or-random": "error",
+        "taxkit/no-async-await-promise": "error",
+        "taxkit/no-conditional-object-spread": "error",
+        "taxkit/no-context-nullish-default": "error",
+        "taxkit/no-in-operator": "error",
+        "taxkit/no-instanceof": "error",
+        "taxkit/no-json-parse-stringify": "error",
+        "taxkit/no-native-array-methods": "error",
+        "taxkit/no-native-collections": "error",
+        "taxkit/no-nested-wrapper-calls": "error",
+        "taxkit/no-nullish-comparison": "error",
+        "taxkit/no-throw": "error",
+        "taxkit/no-typeof": "error",
+        "taxkit/no-undefined-comparison": "error",
       },
     },
     {
@@ -225,7 +225,7 @@ export default defineConfig({
     {
       files: decodingBoundaryFiles,
       rules: {
-        "whattax/no-decoding-outside-boundaries": "off",
+        "taxkit/no-decoding-outside-boundaries": "off",
       },
     },
     {
@@ -275,7 +275,7 @@ export default defineConfig({
       // boundary without adding a production file route.
       files: ["apps/docs/src/lib/docs/route-boundary.browser.test.tsx"],
       rules: {
-        "whattax/no-route-transport-restore-outside-consumers": "off",
+        "taxkit/no-route-transport-restore-outside-consumers": "off",
       },
     },
   ],
@@ -322,6 +322,14 @@ export default defineConfig({
     // Effect pipelines intentionally use callback combinators like
     // Effect.mapError/Effect.flatMap instead of async/await.
     "promise/prefer-await-to-callbacks": "off",
+    "taxkit/no-decoding-outside-boundaries": "error",
+    "taxkit/no-route-transport-restore-outside-consumers": [
+      "error",
+      {
+        routeTransportBoundaryModules,
+        routeTransportConsumerFiles,
+      },
+    ],
     "typescript/consistent-type-assertions": [
       "error",
       {
@@ -334,13 +342,5 @@ export default defineConfig({
     // Effect Array supports data-first calls like Array.filter(items, predicate);
     // this Unicorn rule misreads that second argument as a native Array thisArg.
     "unicorn/no-array-method-this-argument": "off",
-    "whattax/no-decoding-outside-boundaries": "error",
-    "whattax/no-route-transport-restore-outside-consumers": [
-      "error",
-      {
-        routeTransportBoundaryModules,
-        routeTransportConsumerFiles,
-      },
-    ],
   },
 });

@@ -1,6 +1,6 @@
-import { ComponentId, LedgerComponent } from "@whattax/core/ledger";
-import { aud, multiplyCentsByDecimal } from "@whattax/core/primitives";
-import { RuleId, TraceNode } from "@whattax/core/trace";
+import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
+import { aud, multiplyCentsByDecimal } from "@taxkit/core/primitives";
+import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { BigDecimal, Effect, Layer } from "effect";
 
 import { MedicareLevyComponentFact } from "../facts/components.js";
@@ -13,7 +13,7 @@ import { AtoMedicareLevyTable } from "../parameters/medicare-levy-table.js";
  * @since 0.1.0
  */
 export const MedicareLevyRuleId = RuleId.make(
-  "whattax/rules-au-income-tax/rule/MedicareLevy"
+  "taxkit/rules-au-income-tax/rule/MedicareLevy"
 );
 
 /**
@@ -22,7 +22,7 @@ export const MedicareLevyRuleId = RuleId.make(
  * @since 0.1.0
  */
 export const MedicareLevyComponentId = ComponentId.make(
-  "whattax/rules-au-income-tax/component/MedicareLevy"
+  "taxkit/rules-au-income-tax/component/MedicareLevy"
 );
 
 /**

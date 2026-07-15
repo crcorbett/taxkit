@@ -1,5 +1,5 @@
 {
-  "name": "@whattax/calculators",
+  "name": "@taxkit/calculators",
   "version": "0.1.0",
   "private": true,
   "files": [
@@ -87,14 +87,14 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@whattax/core": "workspace:*",
-    "@whattax/rules-au-income-tax": "workspace:*",
-    "@whattax/rules-au-pay": "workspace:*",
+    "@taxkit/core": "workspace:*",
+    "@taxkit/rules-au-income-tax": "workspace:*",
+    "@taxkit/rules-au-pay": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
-    "@whattax/testing": "workspace:*",
+    "@taxkit/testing": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

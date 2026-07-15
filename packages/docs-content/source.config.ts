@@ -2,7 +2,7 @@ import {
   defineFumadocsConfig,
   defineFumadocsDocsWithMeta,
   effectSchemaToStandardSchema,
-} from "@whattax/docs-fumadocs/config";
+} from "@taxkit/docs-fumadocs/config";
 
 import { DocsMeta, DocsPageFrontmatter } from "./src/schemas.ts";
 

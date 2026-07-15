@@ -50,4 +50,4 @@ export interface PublicCalculatorServiceShape {
 export class PublicCalculatorService extends Context.Service<
   PublicCalculatorService,
   PublicCalculatorServiceShape
->()("@whattax/calculators/PublicCalculatorService") {}
+>()("@taxkit/calculators/PublicCalculatorService") {}

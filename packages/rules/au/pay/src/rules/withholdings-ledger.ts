@@ -1,9 +1,9 @@
 import {
   isComponentContributing,
   sumLedgerComponents,
-} from "@whattax/core/ledger";
-import type { LedgerComponent } from "@whattax/core/ledger";
-import { RuleId, TraceNode } from "@whattax/core/trace";
+} from "@taxkit/core/ledger";
+import type { LedgerComponent } from "@taxkit/core/ledger";
+import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Effect, Layer } from "effect";
 
 import { GrossPayFact } from "../facts/pay.js";
@@ -20,7 +20,7 @@ import {
  * @since 0.1.0
  */
 export const PayWithholdingsLedgerRuleId = RuleId.make(
-  "whattax/rules-au-pay/rule/PayWithholdingsLedger"
+  "taxkit/rules-au-pay/rule/PayWithholdingsLedger"
 );
 
 /**

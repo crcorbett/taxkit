@@ -1,4 +1,4 @@
-import { WhatTax } from "./index.js";
+import { TaxKit } from "./index.js";
 import {
   AuAnnualIncomeTaxCalculation,
   AuIncomeTax2025_26Module,
@@ -17,7 +17,7 @@ export {
 } from "./internal/au-descriptors.js";
 
 const createAuClient = () =>
-  WhatTax.createClient(AuPay2025_26Module, AuIncomeTax2025_26Module);
+  TaxKit.createClient(AuPay2025_26Module, AuIncomeTax2025_26Module);
 
 export const au = {
   calculations: {
@@ -28,11 +28,11 @@ export const au = {
   createClient: createAuClient,
   incomeTax: {
     annual: (input: CalculationInput<typeof AuAnnualIncomeTaxCalculation>) =>
-      WhatTax.calculate(AuAnnualIncomeTaxCalculation, input),
+      TaxKit.calculate(AuAnnualIncomeTaxCalculation, input),
     calculation: AuAnnualIncomeTaxCalculation,
     safe: {
       annual: (input: CalculationInput<typeof AuAnnualIncomeTaxCalculation>) =>
-        WhatTax.safe.calculate(AuAnnualIncomeTaxCalculation, input),
+        TaxKit.safe.calculate(AuAnnualIncomeTaxCalculation, input),
     },
   },
   modules: {
@@ -46,15 +46,15 @@ export const au = {
     },
     safe: {
       takeHomePay: (input: CalculationInput<typeof AuPayTakeHomeCalculation>) =>
-        WhatTax.safe.calculate(AuPayTakeHomeCalculation, input),
+        TaxKit.safe.calculate(AuPayTakeHomeCalculation, input),
       withholdings: (
         input: CalculationInput<typeof AuPayWithholdingsCalculation>
-      ) => WhatTax.safe.calculate(AuPayWithholdingsCalculation, input),
+      ) => TaxKit.safe.calculate(AuPayWithholdingsCalculation, input),
     },
     takeHomePay: (input: CalculationInput<typeof AuPayTakeHomeCalculation>) =>
-      WhatTax.calculate(AuPayTakeHomeCalculation, input),
+      TaxKit.calculate(AuPayTakeHomeCalculation, input),
     withholdings: (
       input: CalculationInput<typeof AuPayWithholdingsCalculation>
-    ) => WhatTax.calculate(AuPayWithholdingsCalculation, input),
+    ) => TaxKit.calculate(AuPayWithholdingsCalculation, input),
   },
 } as const;

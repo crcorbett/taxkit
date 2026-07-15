@@ -15,7 +15,7 @@ import {
   CalculatorRunResponse,
   RulesResponse,
   TaxYearsResponse,
-} from "@whattax/calculators";
+} from "@taxkit/calculators";
 import { Data, Schema } from "effect";
 import {
   HttpApiEndpoint,
@@ -47,7 +47,7 @@ export {
   listCalculatorCatalogEntries,
   toCalculatorCatalogItem,
   type CalculatorCatalogEntry,
-} from "@whattax/calculators";
+} from "@taxkit/calculators";
 
 export const CalculatorApiErrorEnvelope = Schema.Struct({
   error: CalculatorServiceError,

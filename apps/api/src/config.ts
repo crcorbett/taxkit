@@ -13,7 +13,7 @@ const defaultPort = 4000;
 export class ApiServerConfig extends Context.Service<
   ApiServerConfig,
   ApiServerConfigService
->()("@whattax/api/ServerConfig") {}
+>()("@taxkit/api/ServerConfig") {}
 
 const ApiServerConfigSource = Config.all({
   host: Config.string("API_HOST").pipe(Config.withDefault(defaultHost)),

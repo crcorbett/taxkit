@@ -1,16 +1,16 @@
 import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
-import { WhatTaxApi } from "../api.js";
+import { TaxKitApi } from "../api.js";
 
 export const HealthHandlerLive = HttpApiBuilder.group(
-  WhatTaxApi,
+  TaxKitApi,
   "health",
   (handlers) =>
     Effect.succeed(
       handlers.handle("getHealth", () =>
         Effect.succeed({
-          service: "whattax" as const,
+          service: "taxkit" as const,
           status: "ok" as const,
         })
       )

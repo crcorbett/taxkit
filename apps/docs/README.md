@@ -7,14 +7,14 @@ confidence: high
 
 # Docs app
 
-This private TanStack Start app renders the public WhatTax developer
+This private TanStack Start app renders the public TaxKit developer
 documentation.
 
 It owns routes, the app shell, navigation presentation, app-local MDX component
 composition and browser rendering. It does not own canonical docs schemas,
 validation policy or generated Fumadocs source access; those live in
-`@whattax/docs-content`. Reusable Fumadocs integration lives in
-`@whattax/docs-fumadocs`.
+`@taxkit/docs-content`. Reusable Fumadocs integration lives in
+`@taxkit/docs-fumadocs`.
 
 ## Content root
 
@@ -47,7 +47,7 @@ The required top-level sections are:
 
 The navigation file is the source of truth for sidebar order until a docs
 runtime owns a generated or typed navigation API. It is decoded and validated
-by `@whattax/docs-content`.
+by `@taxkit/docs-content`.
 
 ## Runtime graph
 
@@ -58,16 +58,16 @@ browser
   -> TanStack route loader
     -> createServerFn
       -> DocsContentService
-        -> @whattax/docs-content live layer
-          -> @whattax/docs-fumadocs source adapter
+        -> @taxkit/docs-content live layer
+          -> @taxkit/docs-fumadocs source adapter
           -> packages/docs-content/.source/server
           -> schema-decoded apps/docs/navigation.json representation
       -> schema-encoded Exit representation
     -> TanStack SSR hydration or client-navigation transport
       -> direct route-root restore and Result match
-        -> @whattax/docs-content/client
+        -> @taxkit/docs-content/client
           -> Fumadocs compiled MDX module
-        -> @whattax/docs-fumadocs/render
+        -> @taxkit/docs-fumadocs/render
         -> app-local MDX component map
 ```
 
@@ -87,7 +87,7 @@ bun run docs:validate
 current SDK/API/calculator exports.
 
 Run `build` before `preview`. Both `dev` and `preview` expose the app through
-`https://docs.whattax.localhost` with portless.
+`https://docs.taxkit.localhost` with portless.
 
 `test:browser` runs the programmatic TanStack client-route harness in Chromium.
 It proves success, expected failures, malformed transport and framework error
@@ -115,7 +115,7 @@ that shape.
 Tests: docs runtime
 
 docs change
-  -> @whattax/docs-content validate
+  -> @taxkit/docs-content validate
     -> frontmatter and navigation schemas
     -> local links and allowed MDX components
     -> example and OpenAPI reference checks
@@ -128,7 +128,7 @@ docs change
 ## Guardrails
 
 - Do not import raw `apps/docs/content` files from route loaders.
-- Do not import `@whattax/docs-content/server` or generated `.source/server`
+- Do not import `@taxkit/docs-content/server` or generated `.source/server`
   modules from browser code.
 - Keep app-specific MDX components in `src/lib/mdx/components.tsx`.
 - Use TanStack `Link` for internal docs routes so navigation runs the client
@@ -141,7 +141,7 @@ docs change
   with the route action or nearest policy-owning container.
 - Put loading, empty and recoverable error UI at the smallest owning boundary
   and preserve constrained component footprints.
-- Put generic Fumadocs primitives in `@whattax/docs-fumadocs` only when they
+- Put generic Fumadocs primitives in `@taxkit/docs-fumadocs` only when they
   are reusable outside this app.
 - Use [Documentation style](../../docs/standards/documentation-style.md) and
   the related standards suite before writing or reviewing public docs.

@@ -8,12 +8,12 @@ const ApiMain = Effect.gen(function* apiMain() {
   const config = yield* ApiServerConfig;
 
   yield* Console.info(
-    `WhatTax API listening on http://${config.address.hostname}:${config.address.port}`
+    `TaxKit API listening on http://${config.address.hostname}:${config.address.port}`
   );
 
   return yield* Effect.never;
 }).pipe(
-  Effect.ensuring(Console.info("WhatTax API stopped")),
+  Effect.ensuring(Console.info("TaxKit API stopped")),
   Effect.provide(ApiAppLayer)
 );
 

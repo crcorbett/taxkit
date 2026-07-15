@@ -1,5 +1,5 @@
 {
-  "name": "@whattax/docs-content",
+  "name": "@taxkit/docs-content",
   "version": "0.0.3",
   "private": true,
   "type": "module",
@@ -51,7 +51,7 @@
   "dependencies": {
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
-    "@whattax/docs-fumadocs": "workspace:*",
+    "@taxkit/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
     "fumadocs-core": "^16.8.3",
     "fumadocs-mdx": "^14.3.1",

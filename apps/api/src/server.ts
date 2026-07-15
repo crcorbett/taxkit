@@ -1,4 +1,4 @@
-import { WhatTaxServerLayer } from "@whattax/api-http/server";
+import { TaxKitServerLayer } from "@taxkit/api-http/server";
 import { Effect, Layer } from "effect";
 import * as HttpEffect from "effect/unstable/http/HttpEffect";
 import * as HttpRouter from "effect/unstable/http/HttpRouter";
@@ -32,7 +32,7 @@ const BunHttpServerLive = Layer.effect(
   })
 );
 
-const ApiHttpServerLive = HttpRouter.serve(WhatTaxServerLayer).pipe(
+const ApiHttpServerLive = HttpRouter.serve(TaxKitServerLayer).pipe(
   Layer.provide(BunHttpServerLive.pipe(Layer.provide(ApiServerConfigLive)))
 );
 

@@ -621,8 +621,8 @@
     "securitySchemes": {}
   },
   "info": {
-    "description": "HTTP API for WhatTax health checks, public calculator metadata and public calculator execution.",
-    "title": "WhatTax API",
+    "description": "HTTP API for TaxKit health checks, public calculator metadata and public calculator execution.",
+    "title": "TaxKit API",
     "version": "0.0.1"
   },
   "openapi": "3.1.0",
@@ -640,7 +640,7 @@
                   "additionalProperties": false,
                   "properties": {
                     "service": {
-                      "enum": ["whattax"],
+                      "enum": ["taxkit"],
                       "type": "string"
                     },
                     "status": {

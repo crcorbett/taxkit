@@ -1,11 +1,11 @@
-import type { CalculatorServiceError } from "@whattax/calculators/schemas";
-import { aud } from "@whattax/core/primitives";
+import type { CalculatorServiceError } from "@taxkit/calculators/schemas";
+import { aud } from "@taxkit/core/primitives";
 import {
   AuPayJurisdiction,
   AuPayTaxYear,
   GrossPay,
-} from "@whattax/rules-au-pay";
-import type { TakeHomePayReport } from "@whattax/rules-au-pay";
+} from "@taxkit/rules-au-pay";
+import type { TakeHomePayReport } from "@taxkit/rules-au-pay";
 import type { Effect, Schema } from "effect";
 
 import {
@@ -16,7 +16,7 @@ import {
 } from "../src/effect.js";
 import type {
   SdkCalculatorRunResponse,
-  WhatTaxEffectRequirements,
+  TaxKitEffectRequirements,
 } from "../src/effect.js";
 import {
   AuAnnualIncomeTaxCalculation,
@@ -42,7 +42,7 @@ fullClient.calculations.calculateReport(AuAnnualIncomeTaxCalculation, {
 const _fullRun: Effect.Effect<
   SdkCalculatorRunResponse<TakeHomePayReport>,
   CalculatorServiceError | Schema.SchemaError,
-  WhatTaxEffectRequirements
+  TaxKitEffectRequirements
 > = calculateRunRequest(AuPayTakeHomeCalculation, {
   payload: {
     facts: {

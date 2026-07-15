@@ -6,7 +6,7 @@ import type { Context } from "effect";
  *
  * @since 0.1.0
  */
-export const FactId = Schema.String.pipe(Schema.brand("whattax/FactId"));
+export const FactId = Schema.String.pipe(Schema.brand("taxkit/FactId"));
 
 /**
  * Stable identifier for a fact produced or consumed by rules.
@@ -35,7 +35,7 @@ export type FactAuthority = typeof FactAuthority.Type;
  * @since 0.1.0
  */
 export const FactQuestionId = Schema.String.pipe(
-  Schema.brand("whattax/FactQuestionId")
+  Schema.brand("taxkit/FactQuestionId")
 );
 
 /**

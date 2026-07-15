@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { audDollars, moneyEquals } from "@whattax/core/primitives";
+import { audDollars, moneyEquals } from "@taxkit/core/primitives";
 import {
   CalculateTakeHomePay,
   GrossPay,
@@ -14,7 +14,7 @@ import {
   TaxFreeThresholdClaimedFact,
   TaxablePayWithSacrificeRuleId,
   AuTakeHomePayWithSacrifice2025_26_Live,
-} from "@whattax/rules-au-pay";
+} from "@taxkit/rules-au-pay";
 import {
   AuTakeHomePayWithStsl2025_26_Live,
   AuTakeHomePayWithStslAndSacrifice2025_26_Live,
@@ -22,8 +22,8 @@ import {
   StslComponentRuleId,
   StslDebt,
   StslDebtFact,
-} from "@whattax/rules-au-stsl";
-import { expectAt } from "@whattax/testing";
+} from "@taxkit/rules-au-stsl";
+import { expectAt } from "@taxkit/testing";
 import { Effect, Layer } from "effect";
 
 const weekly1500 = new GrossPay({ amount: audDollars(1500), period: "weekly" });

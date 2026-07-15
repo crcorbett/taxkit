@@ -1,5 +1,5 @@
 {
-  "name": "whattax",
+  "name": "taxkit",
   "private": true,
   "workspaces": {
     "packages": [
@@ -40,15 +40,15 @@
     "clean": "turbo run clean",
     "dev": "portless proxy start --https && turbo run dev --filter=api --filter=web",
     "docs:build": "bun run --filter=docs build",
-    "docs:validate": "bun run --filter=@whattax/docs-content validate",
+    "docs:validate": "bun run --filter=@taxkit/docs-content validate",
     "fix": "ultracite fix --type-aware",
     "format": "oxfmt -c oxfmt.config.ts --write . --no-error-on-unmatched-pattern",
     "format:check": "oxfmt -c oxfmt.config.ts --check . --no-error-on-unmatched-pattern",
     "knip": "knip --no-progress --no-config-hints",
     "lint": "bun run lint:boundary-directives && oxlint -c oxlint.config.ts . --disable-nested-config --no-error-on-unmatched-pattern",
-    "lint:boundary-directives": "oxlint -c oxlint.config.ts . --allow=whattax/no-decoding-outside-boundaries --allow=whattax/no-route-transport-restore-outside-consumers --report-unused-disable-directives-severity=error --disable-nested-config --no-error-on-unmatched-pattern",
+    "lint:boundary-directives": "oxlint -c oxlint.config.ts . --allow=taxkit/no-decoding-outside-boundaries --allow=taxkit/no-route-transport-restore-outside-consumers --report-unused-disable-directives-severity=error --disable-nested-config --no-error-on-unmatched-pattern",
     "prepare": "effect-language-service patch",
-    "release:check": "bun run --filter=@whattax/scripts release:check",
+    "release:check": "bun run --filter=@taxkit/scripts release:check",
     "test": "bun run test:docs-boundaries && bun run test:oxlint && turbo run test",
     "test:docs-boundaries": "bun test apps/docs/src/lib/docs/route-boundary.test.js",
     "test:oxlint": "bun test tools/oxlint",

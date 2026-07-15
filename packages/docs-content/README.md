@@ -5,22 +5,22 @@ source_of_truth: package-root
 confidence: high
 ---
 
-# @whattax/docs-content
+# @taxkit/docs-content
 
 ## Scope
 
-Private source-only package for public WhatTax MDX content contracts. It owns
+Private source-only package for public TaxKit MDX content contracts. It owns
 Effect Schema frontmatter, meta and navigation schemas, tagged docs source
 errors, validation policy and the content service for `apps/docs/content`.
-Reusable Fumadocs internals come from `@whattax/docs-fumadocs`.
+Reusable Fumadocs internals come from `@taxkit/docs-fumadocs`.
 
 This package does not own routes, layout, MDX renderer components or search UI.
 Those belong in the `apps/docs` runtime.
 
 ## Main areas
 
-- `source.config.ts`: WhatTax collection declaration for `apps/docs/content`
-  using reusable `@whattax/docs-fumadocs/config` helpers.
+- `source.config.ts`: TaxKit collection declaration for `apps/docs/content`
+  using reusable `@taxkit/docs-fumadocs/config` helpers.
 - `src/schemas.ts`: canonical docs frontmatter, meta, navigation and
   validation issue schemas.
 - `src/errors.ts`: tagged docs source and lookup errors.
@@ -35,7 +35,7 @@ Those belong in the `apps/docs` runtime.
 
 `fumadocs-mdx` compiles `source.config.ts` into `.source/`. Server-only package
 code adapts that generated collection through `fumadocs-core/source` and the
-reusable `@whattax/docs-fumadocs/source` helpers before exposing page data
+reusable `@taxkit/docs-fumadocs/source` helpers before exposing page data
 through `DocsContentService`. The existing `getPage` and `listPages` methods
 return serialisable content page data for the current app route. The
 `getRenderablePage` and `listRenderablePages` methods expose compiled
@@ -57,7 +57,7 @@ Validation may read raw MDX source text for source-text policy checks such as
 frontmatter, navigation coverage, local links, allowed MDX component usage,
 examples and OpenAPI references. App routes should consume the service boundary
 instead of importing `.source/*` files directly. Browser modules must not
-import `@whattax/docs-content/server`.
+import `@taxkit/docs-content/server`.
 
 ## Frontmatter contract
 
@@ -74,7 +74,7 @@ validation.
 
 ## Validation policy
 
-`bun run --filter=@whattax/docs-content validate` checks:
+`bun run --filter=@taxkit/docs-content validate` checks:
 
 - navigation JSON decodes through `DocsNavigation`;
 - every navigation source exists;
@@ -91,17 +91,17 @@ validation.
 Add new MDX component allowances in `src/validation/policy.ts` only when the
 component is intentionally supported by the docs app renderer. Keep renderer
 implementation in `apps/docs` or reusable primitives in
-`@whattax/docs-fumadocs/render`.
+`@taxkit/docs-fumadocs/render`.
 
 ## Guardrails
 
 - Keep authored content in `apps/docs/content`.
-- Keep generated source behind `@whattax/docs-content`.
+- Keep generated source behind `@taxkit/docs-content`.
 - Do not import `packages/docs-content/.source/*` from browser/runtime code.
 - Do not add app routes, layout, renderer components or search behavior here.
 - Keep generic MDX options, Standard Schema bridging, source loader adapters
-  and reusable renderer primitives in `@whattax/docs-fumadocs`.
-- Regenerate `.source/` with `bun run --filter=@whattax/docs-content build`
+  and reusable renderer primitives in `@taxkit/docs-fumadocs`.
+- Regenerate `.source/` with `bun run --filter=@taxkit/docs-content build`
   after changing content, `source.config.ts` or schema fields that affect
   generated source.
 - Keep docs identifiers, frontmatter, meta, navigation and tagged source errors

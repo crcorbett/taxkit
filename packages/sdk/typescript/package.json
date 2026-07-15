@@ -1,8 +1,8 @@
 {
-  "name": "@whattax/sdk",
+  "name": "@taxkit/sdk",
   "version": "0.1.0",
   "private": true,
-  "description": "TypeScript SDK for in-process WhatTax calculations.",
+  "description": "TypeScript SDK for in-process TaxKit calculations.",
   "files": [
     "dist",
     "README.md"
@@ -77,17 +77,17 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@whattax/calculators": "workspace:*",
-    "@whattax/rules-au-income-tax": "workspace:*",
-    "@whattax/rules-au-pay": "workspace:*",
+    "@taxkit/calculators": "workspace:*",
+    "@taxkit/rules-au-income-tax": "workspace:*",
+    "@taxkit/rules-au-pay": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/platform-bun": "catalog:",
     "@effect/vitest": "catalog:",
+    "@taxkit/core": "workspace:*",
+    "@taxkit/testing": "workspace:*",
     "@types/bun": "catalog:",
-    "@whattax/core": "workspace:*",
-    "@whattax/testing": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

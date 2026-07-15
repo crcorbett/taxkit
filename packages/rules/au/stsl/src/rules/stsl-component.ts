@@ -1,17 +1,17 @@
-import { CalculationError } from "@whattax/core/errors";
-import { ComponentId, LedgerComponent } from "@whattax/core/ledger";
+import { CalculationError } from "@taxkit/core/errors";
+import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
   aud,
   decimalDollarsToCents,
   multiplyCentsByDecimal,
   roundCentsToDollar,
-} from "@whattax/core/primitives";
-import { RuleId, TraceNode } from "@whattax/core/trace";
+} from "@taxkit/core/primitives";
+import { RuleId, TraceNode } from "@taxkit/core/trace";
 import {
   payPeriodToWeeklyFactor,
   TaxablePayFact,
   scaleWeeklyWithholdingToPayPeriodDollars,
-} from "@whattax/rules-au-pay/facts";
+} from "@taxkit/rules-au-pay/facts";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import { StslComponentFact, StslDebtFact } from "../facts/stsl.js";
@@ -24,7 +24,7 @@ import type { StslRow, StslTable } from "../parameters/stsl-table.js";
  * @since 0.1.0
  */
 export const StslComponentRuleId = RuleId.make(
-  "whattax/rules-au-stsl/rule/StslComponent"
+  "taxkit/rules-au-stsl/rule/StslComponent"
 );
 
 /**
@@ -33,7 +33,7 @@ export const StslComponentRuleId = RuleId.make(
  * @since 0.1.0
  */
 export const StslComponentId = ComponentId.make(
-  "whattax/rules-au-stsl/component/Stsl"
+  "taxkit/rules-au-stsl/component/Stsl"
 );
 
 const findRow = (
@@ -52,7 +52,7 @@ const findRow = (
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `whattax/rules-au-stsl: no STSL row covers weekly formula cents=${weeklyFormulaCents}`,
+          message: `taxkit/rules-au-stsl: no STSL row covers weekly formula cents=${weeklyFormulaCents}`,
         })
       ),
     onSome: Effect.succeed,

@@ -7,12 +7,12 @@ confidence: medium
 
 # TypeScript SDK
 
-Public WhatTax TypeScript SDK package.
+Public TaxKit TypeScript SDK package.
 
 ## Scope
 
 `packages/sdk/typescript` owns the planned TypeScript SDK facade for
-in-process WhatTax calculations, schema exports and typed module composition.
+in-process TaxKit calculations, schema exports and typed module composition.
 The package is private while the SDK surface is implemented and downstream
 consumer validation is recorded.
 
@@ -22,7 +22,7 @@ public calculator catalog. The descriptor and facade generics consume
 calculator-owned `CalculatorRunFacts`, `CalculatorRunReport` and
 `CalculatorServiceError` contracts rather than HTTP transport aliases.
 The HTTP API consumes the SDK like an in-process downstream consumer, while the
-SDK remains independent from `@whattax/api-http`.
+SDK remains independent from `@taxkit/api-http`.
 
 Effect-native report helpers are named for the report-only boundary:
 `calculateReport` accepts descriptor-typed facts and `calculateReportRequest`
@@ -53,15 +53,15 @@ Report-only helpers
 ## Plain Facade
 
 ```ts
-import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
+import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
 
-const report = await WhatTax.calculate(au.calculations.takeHomePay, {
+const report = await TaxKit.calculate(au.calculations.takeHomePay, {
   grossPay,
   taxFreeThresholdClaimed: true,
 });
 
-const safeResult = await WhatTax.safe.calculate(au.calculations.takeHomePay, {
+const safeResult = await TaxKit.safe.calculate(au.calculations.takeHomePay, {
   grossPay,
   taxFreeThresholdClaimed: true,
 });
@@ -69,12 +69,12 @@ const safeResult = await WhatTax.safe.calculate(au.calculations.takeHomePay, {
 
 The plain facade returns Promises and does not expose Effect runtime types in
 method signatures. `safe` methods return SDK-owned Data result values:
-`WhatTaxSuccess` or `WhatTaxFailure`.
+`TaxKitSuccess` or `TaxKitFailure`.
 
 ## AU Subpath
 
 ```ts
-import { au } from "@whattax/sdk/au";
+import { au } from "@taxkit/sdk/au";
 
 const payReport = await au.pay.takeHomePay({
   grossPay,
@@ -126,12 +126,12 @@ time.
 The root, AU and schema entrypoints are intended to remain browser-safe. Effect
 entrypoints expose Effect-native types for consumers that want service/layer
 composition. The publish manifest is dist-only and does not expose `source`
-conditions; `bun run --filter=@whattax/sdk check-packed-artifact` validates
+conditions; `bun run --filter=@taxkit/sdk check-packed-artifact` validates
 that every public export resolves to packed files. The focused checker is an
 Effect-native Bun runtime with typed command and validation failures and a
 scope-managed temporary import workspace.
 
-`@whattax/sdk/schemas` re-exports calculator-owned run contracts for consumer
+`@taxkit/sdk/schemas` re-exports calculator-owned run contracts for consumer
 convenience:
 
 - `CalculatorRunFacts`
@@ -143,8 +143,8 @@ convenience:
 - `CalculatorServiceError`
 
 It also exports SDK-owned safe-result and error schemas such as
-`WhatTaxCalculationError`, `WhatTaxCalculationErrorDetail`,
-`WhatTaxSchemaDecodeError` and `WhatTaxUnexpectedError`.
+`TaxKitCalculationError`, `TaxKitCalculationErrorDetail`,
+`TaxKitSchemaDecodeError` and `TaxKitUnexpectedError`.
 
 ## Publication Readiness
 
@@ -162,7 +162,7 @@ package without an explicit release-prep approval.
 The SDK owns the first downstream consumer validation gate:
 
 ```sh
-bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@taxkit/sdk validate:downstream
 ```
 
 The command builds and Bun-packs the nine-package release closure, materializes
@@ -180,12 +180,12 @@ there is no audit-only success mode.
 Use this SDK release-gate order before any future publication work:
 
 ```sh
-bun run --filter=@whattax/sdk check-packed-artifact
-bun run --filter=@whattax/sdk validate:downstream
-bun run --filter=@whattax/sdk check-boundaries
-bun run --filter=@whattax/sdk test-types
-bun run --filter=@whattax/sdk test
-bun run --filter=@whattax/sdk build
+bun run --filter=@taxkit/sdk check-packed-artifact
+bun run --filter=@taxkit/sdk validate:downstream
+bun run --filter=@taxkit/sdk check-boundaries
+bun run --filter=@taxkit/sdk test-types
+bun run --filter=@taxkit/sdk test
+bun run --filter=@taxkit/sdk build
 ```
 
 `validate:downstream` is the strict final package-installation gate. Supporting
@@ -193,25 +193,25 @@ workspace tests and the focused SDK tarball check do not replace it.
 
 ## Guardrails
 
-- Keep this package independent from `@whattax/api-http`.
+- Keep this package independent from `@taxkit/api-http`.
 - Do not import AU rule packages from the root entrypoint.
 - Reuse canonical schemas, branded ids, service contracts, tagged errors and
   constructors from owning packages when implementation starts.
-- Use `@whattax/calculators` as the calculator execution boundary instead of
+- Use `@taxkit/calculators` as the calculator execution boundary instead of
   duplicating catalog lookup or calculation dispatch.
 - Keep transport-owned HTTP clients and OpenAPI helpers in
-  `@whattax/api-http`.
+  `@taxkit/api-http`.
 
 ## Commands
 
 ```sh
-bun run --filter=@whattax/sdk test
-bun run --filter=@whattax/sdk check-types
-bun run --filter=@whattax/sdk build
-bun run --filter=@whattax/sdk test-types
-bun run --filter=@whattax/sdk check-boundaries
-bun run --filter=@whattax/sdk check-packed-artifact
-bun run --filter=@whattax/sdk validate:downstream
+bun run --filter=@taxkit/sdk test
+bun run --filter=@taxkit/sdk check-types
+bun run --filter=@taxkit/sdk build
+bun run --filter=@taxkit/sdk test-types
+bun run --filter=@taxkit/sdk check-boundaries
+bun run --filter=@taxkit/sdk check-packed-artifact
+bun run --filter=@taxkit/sdk validate:downstream
 ```
 
 ## Related Docs

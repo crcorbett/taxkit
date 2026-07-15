@@ -45,7 +45,7 @@ const writeConfiguredConsumer = async (source: string) => {
 const writeUnconfiguredFixture = async (source: string, extension = "tsx") => {
   const path = join(
     "/tmp",
-    `whattax-route-transport-${crypto.randomUUID()}.${extension}`
+    `taxkit-route-transport-${crypto.randomUUID()}.${extension}`
   );
 
   temporaryFiles.push(path);
@@ -57,7 +57,7 @@ const writeUnconfiguredFixture = async (source: string, extension = "tsx") => {
 const diagnosticsFor = (output: string, messageId: string) =>
   output.match(
     new RegExp(
-      `whattax\\(no-route-transport-restore-outside-consumers\\): ${messageId}`,
+      `taxkit\\(no-route-transport-restore-outside-consumers\\): ${messageId}`,
       "gu"
     )
   ) ?? [];
@@ -68,7 +68,7 @@ afterEach(async () => {
   );
 });
 
-describe("whattax/no-route-transport-restore-outside-consumers", () => {
+describe("taxkit/no-route-transport-restore-outside-consumers", () => {
   test("allows direct, immutable binding, named component and head consumers", () => {
     const result = runOxlint([
       "tools/oxlint/fixtures/route-transport-allowed.tsx",
@@ -76,7 +76,7 @@ describe("whattax/no-route-transport-restore-outside-consumers", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.output).not.toContain(
-      "whattax(no-route-transport-restore-outside-consumers)"
+      "taxkit(no-route-transport-restore-outside-consumers)"
     );
   });
 
@@ -488,29 +488,29 @@ describe("whattax/no-route-transport-restore-outside-consumers", () => {
     `);
     const result = runOxlint([fixture]);
 
-    expect(result.output).toContain("whattax(no-decoding-outside-boundaries)");
+    expect(result.output).toContain("taxkit(no-decoding-outside-boundaries)");
   });
 
   test("rejects inline disable directives for both boundary rules", async () => {
     const fixture = await writeUnconfiguredFixture(
       `
-        /* eslint-disable whattax/no-decoding-outside-boundaries */
-        /* oxlint-disable whattax/no-decoding-outside-boundaries */
-        // eslint-disable-next-line whattax/no-decoding-outside-boundaries
+        /* eslint-disable taxkit/no-decoding-outside-boundaries */
+        /* oxlint-disable taxkit/no-decoding-outside-boundaries */
+        // eslint-disable-next-line taxkit/no-decoding-outside-boundaries
         const first = 1;
-        // oxlint-disable-next-line whattax/no-decoding-outside-boundaries
+        // oxlint-disable-next-line taxkit/no-decoding-outside-boundaries
         const second = 2;
-        const third = 3; // eslint-disable-line whattax/no-decoding-outside-boundaries
-        const fourth = 4; // oxlint-disable-line whattax/no-decoding-outside-boundaries
+        const third = 3; // eslint-disable-line taxkit/no-decoding-outside-boundaries
+        const fourth = 4; // oxlint-disable-line taxkit/no-decoding-outside-boundaries
 
-        /* eslint-disable whattax/no-route-transport-restore-outside-consumers */
-        /* oxlint-disable whattax/no-route-transport-restore-outside-consumers */
-        // eslint-disable-next-line whattax/no-route-transport-restore-outside-consumers
+        /* eslint-disable taxkit/no-route-transport-restore-outside-consumers */
+        /* oxlint-disable taxkit/no-route-transport-restore-outside-consumers */
+        // eslint-disable-next-line taxkit/no-route-transport-restore-outside-consumers
         const fifth = 5;
-        // oxlint-disable-next-line whattax/no-route-transport-restore-outside-consumers
+        // oxlint-disable-next-line taxkit/no-route-transport-restore-outside-consumers
         const sixth = 6;
-        const seventh = 7; // eslint-disable-line whattax/no-route-transport-restore-outside-consumers
-        const eighth = 8; // oxlint-disable-line whattax/no-route-transport-restore-outside-consumers
+        const seventh = 7; // eslint-disable-line taxkit/no-route-transport-restore-outside-consumers
+        const eighth = 8; // oxlint-disable-line taxkit/no-route-transport-restore-outside-consumers
         void [first, second, third, fourth, fifth, sixth, seventh, eighth];
       `,
       "ts"
@@ -518,8 +518,8 @@ describe("whattax/no-route-transport-restore-outside-consumers", () => {
     const result = runOxlint(
       [fixture],
       [
-        "--allow=whattax/no-decoding-outside-boundaries",
-        "--allow=whattax/no-route-transport-restore-outside-consumers",
+        "--allow=taxkit/no-decoding-outside-boundaries",
+        "--allow=taxkit/no-route-transport-restore-outside-consumers",
         "--report-unused-disable-directives-severity=error",
       ]
     );
@@ -540,7 +540,7 @@ describe("whattax/no-route-transport-restore-outside-consumers", () => {
     const result = runOxlint([fixture]);
 
     expect(result.output).not.toContain(
-      "whattax(no-route-transport-restore-outside-consumers)"
+      "taxkit(no-route-transport-restore-outside-consumers)"
     );
   });
 
@@ -561,7 +561,7 @@ describe("whattax/no-route-transport-restore-outside-consumers", () => {
     const result = runOxlint([fixture]);
 
     expect(result.output).not.toContain(
-      "whattax(no-route-transport-restore-outside-consumers)"
+      "taxkit(no-route-transport-restore-outside-consumers)"
     );
   });
 });

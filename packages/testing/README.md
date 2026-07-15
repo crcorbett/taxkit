@@ -7,11 +7,11 @@ confidence: medium
 
 # Testing Helpers
 
-Shared test helpers for WhatTax workspace packages.
+Shared test helpers for TaxKit workspace packages.
 
 ## Scope
 
-`@whattax/testing` owns reusable test-only helpers such as `expectAt` for
+`@taxkit/testing` owns reusable test-only helpers such as `expectAt` for
 safe indexed assertions without non-null assertions.
 
 ## Guardrails
@@ -25,8 +25,8 @@ safe indexed assertions without non-null assertions.
 ## Commands
 
 ```sh
-bun run --filter=@whattax/testing check-types
-bun run --filter=@whattax/testing build
+bun run --filter=@taxkit/testing check-types
+bun run --filter=@taxkit/testing build
 ```
 
 ## Packaging

@@ -1821,7 +1821,7 @@ const noRouteTransportRestoreOutsideConsumers = {
 
 export default {
   meta: {
-    name: "whattax",
+    name: "taxkit",
   },
   rules: {
     "no-ambient-time-or-random": noAmbientTimeOrRandom,

@@ -7,12 +7,12 @@ confidence: medium
 
 # API App
 
-Standalone Bun process for the WhatTax Effect HTTP API.
+Standalone Bun process for the TaxKit Effect HTTP API.
 
 ## Scope
 
 `apps/api` owns process config, Bun server startup, request dispatch to
-`@whattax/api-http/server` and graceful shutdown. API contracts, handlers,
+`@taxkit/api-http/server` and graceful shutdown. API contracts, handlers,
 schemas, generated OpenAPI and docs routes stay in `packages/api/http`.
 
 ## Runtime Shape
@@ -65,7 +65,7 @@ instead of being treated as a valid take-home request.
 
 Public API contract and deployment-facing changes are tracked in
 [CHANGELOG.md](./CHANGELOG.md). Package-level API contract changes are also
-tracked in [`@whattax/api-http`](../../packages/api/http/CHANGELOG.md) through
+tracked in [`@taxkit/api-http`](../../packages/api/http/CHANGELOG.md) through
 Changesets.
 
 ## Commands
@@ -87,8 +87,8 @@ bun run --filter=web dev
 ```
 
 `bun run --filter=api dev` serves this app through portless at
-`https://api.whattax.localhost`. `bun run --filter=web dev` injects that URL
-into `WHATTAX_API_BASE_URL` for SSR and `VITE_WHATTAX_API_BASE_URL` for browser
+`https://api.taxkit.localhost`. `bun run --filter=web dev` injects that URL
+into `TAXKIT_API_BASE_URL` for SSR and `VITE_TAXKIT_API_BASE_URL` for browser
 navigation.
 
 ## Public-route smoke
@@ -113,7 +113,7 @@ same public HTTP routes:
 - `GET /api/docs/openapi.json`
 
 The smoke script owns process lifecycle only. It validates response bodies with
-schemas exported by `@whattax/api-http` where those schemas are public, and it
+schemas exported by `@taxkit/api-http` where those schemas are public, and it
 lets the app process stop through Effect-scoped child process cleanup on
 success or failure. The external consumer checks minimal public JSON evidence;
 canonical route schema validation stays in this repo-owned smoke script. The
@@ -132,9 +132,9 @@ public routes, then removes the temp workspace and stops the API process.
 Use the portless URL for local API smoke checks:
 
 ```sh
-curl https://api.whattax.localhost/api/health
-curl https://api.whattax.localhost/api/v1/calculators
-curl -X POST https://api.whattax.localhost/api/v1/calculators/au.pay.take-home/calculate \
+curl https://api.taxkit.localhost/api/health
+curl https://api.taxkit.localhost/api/v1/calculators
+curl -X POST https://api.taxkit.localhost/api/v1/calculators/au.pay.take-home/calculate \
   -H 'content-type: application/json' \
   -d '{"facts":{"grossPay":{"_tag":"GrossPay","amount":{"_tag":"Money","cents":150000,"currency":"AUD"},"period":"weekly"},"taxFreeThresholdClaimed":true}}'
 ```

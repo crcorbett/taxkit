@@ -10,12 +10,12 @@ import type { ErrorComponentProps } from "@tanstack/react-router";
 import {
   DocsPageNotFoundError,
   DocsSourceError,
-} from "@whattax/docs-content/errors";
+} from "@taxkit/docs-content/errors";
 import {
   DocsNavigation,
   DocsPagePath,
   DocsSourcePath,
-} from "@whattax/docs-content/schemas";
+} from "@taxkit/docs-content/schemas";
 import { Effect, Match, Result, Schema } from "effect";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";

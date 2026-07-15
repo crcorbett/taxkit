@@ -73,14 +73,14 @@ export const makeReleaseReadinessPlan = (
     label: "Documentation content validation",
   }),
   new ReleaseCheck({
-    args: ["run", "--filter=@whattax/sdk", "check-packed-artifact"],
+    args: ["run", "--filter=@taxkit/sdk", "check-packed-artifact"],
     command: "bun",
     cwd: workspaceRoot,
     id: "packed-artifact",
     label: "Focused SDK packed artifact proof",
   }),
   new ReleaseCheck({
-    args: ["run", "--filter=@whattax/sdk", "validate:downstream"],
+    args: ["run", "--filter=@taxkit/sdk", "validate:downstream"],
     command: "bun",
     cwd: workspaceRoot,
     id: "downstream-consumer",

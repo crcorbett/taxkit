@@ -1,5 +1,5 @@
 {
-  "name": "@whattax/api-http",
+  "name": "@taxkit/api-http",
   "version": "0.1.0",
   "private": true,
   "files": [
@@ -102,20 +102,20 @@
     "check-types": "tsc --noEmit",
     "test": "vitest run",
     "test:openapi": "vitest run __tests__/openapi-snapshot.test.ts",
-    "update-openapi-snapshot": "UPDATE_WHATTAX_OPENAPI_SNAPSHOT=true vitest run __tests__/openapi-snapshot.test.ts",
+    "update-openapi-snapshot": "UPDATE_TAXKIT_OPENAPI_SNAPSHOT=true vitest run __tests__/openapi-snapshot.test.ts",
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@whattax/calculators": "workspace:*",
-    "@whattax/core": "workspace:*",
-    "@whattax/sdk": "workspace:*",
+    "@taxkit/calculators": "workspace:*",
+    "@taxkit/core": "workspace:*",
+    "@taxkit/sdk": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@taxkit/rules-au-pay": "workspace:*",
+    "@taxkit/testing": "workspace:*",
     "@types/node": "catalog:",
-    "@whattax/rules-au-pay": "workspace:*",
-    "@whattax/testing": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

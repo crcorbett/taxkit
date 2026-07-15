@@ -3,8 +3,8 @@ import {
   FactQuestionId,
   Money,
   makeFactDescriptor,
-} from "@whattax/core";
-import { TraceNode } from "@whattax/core/trace";
+} from "@taxkit/core";
+import { TraceNode } from "@taxkit/core/trace";
 import { Context, Match, Schema } from "effect";
 
 /**
@@ -31,7 +31,7 @@ export type PayPeriod = typeof PayPeriod.Type;
  *
  * @example
  * ```ts
- * import { payPeriodToWeeklyFactor } from "@whattax/rules-au-pay/facts"
+ * import { payPeriodToWeeklyFactor } from "@taxkit/rules-au-pay/facts"
  *
  * const weeklyCents = 400_000 * payPeriodToWeeklyFactor("fortnightly")
  * ```
@@ -73,8 +73,8 @@ export const scaleWeeklyWithholdingToPayPeriodDollars = (
  *
  * @example
  * ```ts
- * import { audDollars } from "@whattax/core/primitives"
- * import { GrossPay } from "@whattax/rules-au-pay/facts"
+ * import { audDollars } from "@taxkit/core/primitives"
+ * import { GrossPay } from "@taxkit/rules-au-pay/facts"
  *
  * const gross = new GrossPay({ amount: audDollars(2_000), period: "fortnightly" })
  * ```
@@ -90,7 +90,7 @@ export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
  * @since 0.1.0
  */
 export class GrossPayFact extends Context.Service<GrossPayFact, GrossPay>()(
-  "whattax/rules-au-pay/fact/GrossPay"
+  "taxkit/rules-au-pay/fact/GrossPay"
 ) {}
 
 /**
@@ -100,9 +100,9 @@ export class GrossPayFact extends Context.Service<GrossPayFact, GrossPay>()(
  */
 export const GrossPayDescriptor = makeFactDescriptor({
   authority: "input",
-  id: "whattax/rules-au-pay/fact/GrossPay",
+  id: "taxkit/rules-au-pay/fact/GrossPay",
   question: new FactQuestion({
-    id: FactQuestionId.make("whattax/rules-au-pay/question/GrossPay"),
+    id: FactQuestionId.make("taxkit/rules-au-pay/question/GrossPay"),
     inputKind: "money",
     prompt: "Gross pay for the pay period",
   }),
@@ -132,7 +132,7 @@ export class TaxFreeThresholdClaimed extends Schema.TaggedClass<TaxFreeThreshold
 export class TaxFreeThresholdClaimedFact extends Context.Service<
   TaxFreeThresholdClaimedFact,
   TaxFreeThresholdClaimed
->()("whattax/rules-au-pay/fact/TaxFreeThresholdClaimed") {}
+>()("taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed") {}
 
 /**
  * Fact descriptor for tax-free-threshold claim status.
@@ -141,10 +141,10 @@ export class TaxFreeThresholdClaimedFact extends Context.Service<
  */
 export const TaxFreeThresholdClaimedDescriptor = makeFactDescriptor({
   authority: "input",
-  id: "whattax/rules-au-pay/fact/TaxFreeThresholdClaimed",
+  id: "taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed",
   question: new FactQuestion({
     id: FactQuestionId.make(
-      "whattax/rules-au-pay/question/TaxFreeThresholdClaimed"
+      "taxkit/rules-au-pay/question/TaxFreeThresholdClaimed"
     ),
     inputKind: "boolean",
     prompt: "Tax-free threshold claimed",
@@ -173,7 +173,7 @@ export class TaxablePay extends Schema.TaggedClass<TaxablePay>()("TaxablePay", {
 export class TaxablePayFact extends Context.Service<
   TaxablePayFact,
   TaxablePay
->()("whattax/rules-au-pay/fact/TaxablePay") {}
+>()("taxkit/rules-au-pay/fact/TaxablePay") {}
 
 /**
  * Fact descriptor for taxable pay.
@@ -182,7 +182,7 @@ export class TaxablePayFact extends Context.Service<
  */
 export const TaxablePayDescriptor = makeFactDescriptor({
   authority: "derived",
-  id: "whattax/rules-au-pay/fact/TaxablePay",
+  id: "taxkit/rules-au-pay/fact/TaxablePay",
   schema: TaxablePay,
   tag: TaxablePayFact,
   title: "Taxable pay for a single pay period",
@@ -205,7 +205,7 @@ export class NetPay extends Schema.TaggedClass<NetPay>()("NetPay", {
  * @since 0.1.0
  */
 export class NetPayFact extends Context.Service<NetPayFact, NetPay>()(
-  "whattax/rules-au-pay/fact/NetPay"
+  "taxkit/rules-au-pay/fact/NetPay"
 ) {}
 
 /**
@@ -215,7 +215,7 @@ export class NetPayFact extends Context.Service<NetPayFact, NetPay>()(
  */
 export const NetPayDescriptor = makeFactDescriptor({
   authority: "derived",
-  id: "whattax/rules-au-pay/fact/NetPay",
+  id: "taxkit/rules-au-pay/fact/NetPay",
   schema: NetPay,
   tag: NetPayFact,
   title: "Net (take-home) pay for a single pay period",

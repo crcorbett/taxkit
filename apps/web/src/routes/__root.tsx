@@ -36,9 +36,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: "width=device-width, initial-scale=1",
         name: "viewport",
       },
-      { title: "WhatTax" },
+      { title: "TaxKit" },
       {
-        content: "WhatTax public app.",
+        content: "TaxKit public app.",
         name: "description",
       },
     ],

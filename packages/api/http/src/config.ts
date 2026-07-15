@@ -1,27 +1,29 @@
 import { Config, Schema } from "effect";
 
-export const WhatTaxHttpApiClientConfigSchema = Schema.Struct({
+export const TaxKitHttpApiClientConfigSchema = Schema.Struct({
   baseUrl: Schema.URLFromString,
 });
 
-export type WhatTaxHttpApiClientConfig = Schema.Schema.Type<
-  typeof WhatTaxHttpApiClientConfigSchema
+export type TaxKitHttpApiClientConfig = Schema.Schema.Type<
+  typeof TaxKitHttpApiClientConfigSchema
 >;
 
-export interface WhatTaxHttpApiConfig {
-  readonly httpApi: WhatTaxHttpApiClientConfig;
+export interface TaxKitHttpApiConfig {
+  readonly httpApi: TaxKitHttpApiClientConfig;
 }
 
-const HttpApiClientConfig = Config.schema(WhatTaxHttpApiClientConfigSchema);
+const HttpApiClientConfig = Config.all({
+  baseUrl: Config.url("BASE_URL"),
+}).pipe(Config.map(TaxKitHttpApiClientConfigSchema.make));
 
-export const WhatTaxHttpApiConfig = {
+export const TaxKitHttpApiConfig = {
   httpApi: HttpApiClientConfig,
-} satisfies Config.Wrap<WhatTaxHttpApiConfig>;
+} satisfies Config.Wrap<TaxKitHttpApiConfig>;
 
-export const WhatTaxHttpApiServerEnvConfig = {
-  httpApi: HttpApiClientConfig.pipe(Config.nested("WHATTAX_API")),
-} satisfies Config.Wrap<WhatTaxHttpApiConfig>;
+export const TaxKitHttpApiServerEnvConfig = {
+  httpApi: HttpApiClientConfig.pipe(Config.nested("TAXKIT_API")),
+} satisfies Config.Wrap<TaxKitHttpApiConfig>;
 
-export const WhatTaxHttpApiViteEnvConfig = {
-  httpApi: HttpApiClientConfig.pipe(Config.nested("VITE_WHATTAX_API")),
-} satisfies Config.Wrap<WhatTaxHttpApiConfig>;
+export const TaxKitHttpApiViteEnvConfig = {
+  httpApi: HttpApiClientConfig.pipe(Config.nested("VITE_TAXKIT_API")),
+} satisfies Config.Wrap<TaxKitHttpApiConfig>;

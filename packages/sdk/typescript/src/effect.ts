@@ -8,14 +8,14 @@ import type {
   CalculatorRunReport,
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
-} from "@whattax/calculators/schemas";
-import { PublicCalculatorService } from "@whattax/calculators/service";
-import type { PublicCalculatorServiceShape } from "@whattax/calculators/service";
+} from "@taxkit/calculators/schemas";
+import { PublicCalculatorService } from "@taxkit/calculators/service";
+import type { PublicCalculatorServiceShape } from "@taxkit/calculators/service";
 import { Effect } from "effect";
 import type { Context, Schema } from "effect";
 
 import type {
-  AnyWhatTaxModule,
+  AnyTaxKitModule,
   CalculationInput,
   ModuleCalculation,
   SdkCalculation,
@@ -23,24 +23,24 @@ import type {
 
 export type {
   AnySdkCalculation,
-  AnyWhatTaxModule,
+  AnyTaxKitModule,
   CalculationInput,
   CalculationOutput,
   ModuleCalculation,
   SdkCalculation,
   SdkCalculationDefinition,
-  WhatTaxModule,
+  TaxKitModule,
 } from "./types.js";
-export { defineSdkCalculation, defineWhatTaxModule } from "./types.js";
+export { defineSdkCalculation, defineTaxKitModule } from "./types.js";
 
-export type WhatTaxEffectRequirements = Context.Service.Identifier<
+export type TaxKitEffectRequirements = Context.Service.Identifier<
   typeof PublicCalculatorService
 >;
 
 const publicCalculatorService: Effect.Effect<
   PublicCalculatorServiceShape,
   never,
-  WhatTaxEffectRequirements
+  TaxKitEffectRequirements
 > = Effect.service(PublicCalculatorService);
 
 export type SdkCalculatorRunPayload<Input> = Omit<
@@ -82,7 +82,7 @@ export const calculateRunRequest = <
 ): Effect.Effect<
   SdkCalculatorRunResponse<OutputSchema["Type"]>,
   CalculatorServiceError | Schema.SchemaError,
-  WhatTaxEffectRequirements
+  TaxKitEffectRequirements
 > =>
   publicCalculatorService.pipe(
     Effect.flatMap((service) => {
@@ -126,7 +126,7 @@ export const calculateReportRequest = <
 ): Effect.Effect<
   OutputSchema["Type"],
   CalculatorServiceError | Schema.SchemaError,
-  WhatTaxEffectRequirements
+  TaxKitEffectRequirements
 > =>
   calculateRunRequest(calculation, request).pipe(
     Effect.map((run) => run.report)
@@ -150,7 +150,7 @@ export const calculateReport = <
 ): Effect.Effect<
   OutputSchema["Type"],
   CalculatorServiceError | Schema.SchemaError,
-  WhatTaxEffectRequirements
+  TaxKitEffectRequirements
 > =>
   calculateReportRequest(calculation, {
     payload: {
@@ -160,7 +160,7 @@ export const calculateReport = <
     },
   });
 
-export const createClient = <const Modules extends readonly AnyWhatTaxModule[]>(
+export const createClient = <const Modules extends readonly AnyTaxKitModule[]>(
   ..._modules: Modules
 ) => ({
   calculations: {

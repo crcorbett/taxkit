@@ -1,7 +1,7 @@
-import { CalculationError } from "@whattax/core/errors";
-import { ComponentId, LedgerComponent } from "@whattax/core/ledger";
-import { aud, multiplyCentsByDecimal } from "@whattax/core/primitives";
-import { RuleId, TraceNode } from "@whattax/core/trace";
+import { CalculationError } from "@taxkit/core/errors";
+import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
+import { aud, multiplyCentsByDecimal } from "@taxkit/core/primitives";
+import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import { IncomeTaxComponentFact } from "../facts/components.js";
@@ -15,7 +15,7 @@ import type { IncomeTaxBracket } from "../parameters/income-tax-table.js";
  * @since 0.1.0
  */
 export const IncomeTaxRuleId = RuleId.make(
-  "whattax/rules-au-income-tax/rule/IncomeTax"
+  "taxkit/rules-au-income-tax/rule/IncomeTax"
 );
 
 /**
@@ -24,7 +24,7 @@ export const IncomeTaxRuleId = RuleId.make(
  * @since 0.1.0
  */
 export const IncomeTaxComponentId = ComponentId.make(
-  "whattax/rules-au-income-tax/component/IncomeTax"
+  "taxkit/rules-au-income-tax/component/IncomeTax"
 );
 
 const findBracket = (
@@ -40,7 +40,7 @@ const findBracket = (
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `whattax/rules-au-income-tax: no income tax bracket covers income=${incomeCents} cents`,
+          message: `taxkit/rules-au-income-tax: no income tax bracket covers income=${incomeCents} cents`,
         })
       ),
     onSome: Effect.succeed,

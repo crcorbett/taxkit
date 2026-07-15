@@ -1,11 +1,11 @@
 import { Context } from "effect";
 import * as HttpRouter from "effect/unstable/http/HttpRouter";
 
-import { WhatTaxServerLayer } from "../server.js";
-import { makeWhatTaxApiInProcessClientLayer } from "./in-process.layer.js";
+import { TaxKitServerLayer } from "../server.js";
+import { makeTaxKitApiInProcessClientLayer } from "./in-process.layer.js";
 
-const { handler } = HttpRouter.toWebHandler(WhatTaxServerLayer);
+const { handler } = HttpRouter.toWebHandler(TaxKitServerLayer);
 
-export const WhatTaxApiInProcessClientLive = makeWhatTaxApiInProcessClientLayer(
+export const TaxKitApiInProcessClientLive = makeTaxKitApiInProcessClientLayer(
   (request) => handler(request, Context.empty())
 );

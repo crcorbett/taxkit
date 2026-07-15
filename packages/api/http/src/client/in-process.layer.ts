@@ -2,14 +2,12 @@ import { Layer } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 import { HttpApiClient } from "effect/unstable/httpapi";
 
-import { WhatTaxApi } from "../api.js";
-import { WhatTaxHttpApiService } from "./service.js";
+import { TaxKitApi } from "../api.js";
+import { TaxKitHttpApiService } from "./service.js";
 
-export type InProcessWhatTaxApiHandler = (
-  request: Request
-) => Promise<Response>;
+export type InProcessTaxKitApiHandler = (request: Request) => Promise<Response>;
 
-const makeInProcessFetch = (handler: InProcessWhatTaxApiHandler) => {
+const makeInProcessFetch = (handler: InProcessTaxKitApiHandler) => {
   const fetch: typeof globalThis.fetch = (
     input: Parameters<typeof fetch>[0],
     init?: Parameters<typeof fetch>[1]
@@ -18,20 +16,20 @@ const makeInProcessFetch = (handler: InProcessWhatTaxApiHandler) => {
   return fetch;
 };
 
-export const makeInProcessFetchLayer = (handler: InProcessWhatTaxApiHandler) =>
+export const makeInProcessFetchLayer = (handler: InProcessTaxKitApiHandler) =>
   Layer.succeed(FetchHttpClient.Fetch, makeInProcessFetch(handler));
 
-export const makeWhatTaxApiInProcessClientLayer = (
-  handler: InProcessWhatTaxApiHandler
+export const makeTaxKitApiInProcessClientLayer = (
+  handler: InProcessTaxKitApiHandler
 ) => {
   const InProcessHttpClientLive = FetchHttpClient.layer.pipe(
     Layer.provide(makeInProcessFetchLayer(handler))
   );
 
   return Layer.effect(
-    WhatTaxHttpApiService,
-    HttpApiClient.make(WhatTaxApi, {
-      baseUrl: "http://whattax.internal",
+    TaxKitHttpApiService,
+    HttpApiClient.make(TaxKitApi, {
+      baseUrl: "http://taxkit.internal",
     })
   ).pipe(Layer.provide(InProcessHttpClientLive));
 };

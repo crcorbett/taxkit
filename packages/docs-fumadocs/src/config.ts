@@ -25,7 +25,7 @@ export const fumadocsMetaStandardSchema =
   effectSchemaToStandardSchema(FumadocsMeta);
 
 export const transformerCodeBlockMeta = (): ShikiTransformer => ({
-  name: "whattax:docs-code-block-meta",
+  name: "taxkit:docs-code-block-meta",
   pre(node) {
     Schema.decodeUnknownOption(FumadocsCodeBlockMeta)(this.options.meta).pipe(
       Option.flatMap((meta) => Option.fromUndefinedOr(meta.title)),

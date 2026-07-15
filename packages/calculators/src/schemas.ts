@@ -10,14 +10,14 @@ import {
   RuleId,
   RuleSourcePolicy,
   SourceRef,
-} from "@whattax/core";
+} from "@taxkit/core";
 import {
   AnnualTaxReport,
   AnnualTaxScenarioInputSchema,
   AuAnnualTaxCalculatorId,
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
-} from "@whattax/rules-au-income-tax";
+} from "@taxkit/rules-au-income-tax";
 import {
   AuPayCalculatorId,
   AuPayJurisdiction,
@@ -25,7 +25,7 @@ import {
   PayWithholdingsLedger,
   TakeHomePayReport,
   TakeHomeScenarioInputSchema,
-} from "@whattax/rules-au-pay";
+} from "@taxkit/rules-au-pay";
 import { Data, Schema } from "effect";
 
 /**

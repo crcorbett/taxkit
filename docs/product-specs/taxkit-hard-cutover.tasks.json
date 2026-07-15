@@ -1,0 +1,163 @@
+{
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/taxkit-hard-cutover.md",
+  "title": "TaxKit Hard Cutover Tasks",
+  "status": "active",
+  "last_reviewed": "2026-07-15",
+  "principles": [
+    "Hard cutover: current mutable surfaces use only the canonical TaxKit identity.",
+    "No compatibility aliases, wrapper helpers, duplicate contracts or fallback configuration.",
+    "Preserve ownership, linear Effect flow, schema-derived contracts and route-leaf composition."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit each accepted coherent task. The parent owns GitHub rename, remote update, push and final local-directory rename after source acceptance.",
+    "requiredBeforeFinalPR": [
+      "bun run verification",
+      "bun run release:check",
+      "tracked-tree identity audit",
+      "GitHub repository and origin verification",
+      "final clean status from /Users/cooper/Projects/taxkit"
+    ],
+    "evidenceRequired": [
+      "Final runtime and release call graphs match the spec.",
+      "Changeset path and major release-train impact.",
+      "Three documented improvement audit passes for each substantial delegated task.",
+      "Recorded npm authentication limitation and no-publication decision."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "TAXKIT-001",
+      "title": "Migrate workspace identity and runtime configuration",
+      "type": "foundation",
+      "dependsOn": [],
+      "goal": "Atomically rename package metadata, imports, public product symbols, Effect identifier strings, config keys, local domains and project-owned lint namespace while preserving all ownership boundaries.",
+      "scope": [
+        "root manifests and workspace manifests",
+        "apps and packages source, tests and READMEs",
+        "Effect schema/context/service identifiers",
+        "Oxlint plugin file and namespace",
+        "environment names, portless domains and test artifacts"
+      ],
+      "outputs": [
+        "All workspace dependencies resolve through @taxkit/*.",
+        "TaxKit-only runtime/product identity in source and tooling.",
+        "Regenerated Bun lockfile."
+      ],
+      "implementationPrompt": "Implement exactly this task. Read the spec, this task object, package-ownership, effect-services, frontend, deployment and testing-and-quality docs before edits. Preserve package ownership and call graphs. Use canonical schema-derived types, IDs, errors, services and layers; keep Effects linear and pipe-first where it clarifies flow. Do not add aliases, forwarding helpers, DTO mirrors, duplicate schemas, fallbacks or decoder exemptions. Keep route restoration in route leaf consumers and compositional React children focused. Run all listed gates and report changed files, evidence, call-graph match, Changeset decision and residual risks. Do not start another task.",
+      "mandatoryVerification": [
+        "bun install --frozen-lockfile",
+        "bun run verification",
+        "targeted lint and type checks for renamed Oxlint, app config and package imports"
+      ],
+      "browserVerification": [
+        "Start the API, web and docs dev commands as needed and prove the canonical local domains are reachable."
+      ],
+      "qualityAudits": [
+        "Pass 1: compare the source and runtime call graphs with the spec; remove compatibility paths or misplaced ownership.",
+        "Pass 2: inspect Effect/schema/service/ID changes for canonical ownership, linear flow, typed errors, unsafe casts and forbidden decoding changes.",
+        "Pass 3: inspect React route consumers, imports and tooling for helper sprawl, server leaks, duplicate contracts and stale namespace references."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Parent verified every affected manifest/import resolves under the new scope.",
+        "Parent accepted three documented audit passes and the final call graph.",
+        "No old configuration fallback, lint exemption or alias was introduced."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "TAXKIT-002",
+      "title": "Complete documentation, release closure and identity evidence",
+      "type": "release",
+      "dependsOn": ["TAXKIT-001"],
+      "goal": "Update maintained documentation and release tooling, add the breaking Changeset, and prove packed downstream artifacts and user-facing runtime surfaces use only TaxKit.",
+      "scope": [
+        "docs, specs, task lists, plans, changelog and repository metadata",
+        "release scripts, package artifact and downstream fixtures",
+        "Changeset configuration and breaking release record"
+      ],
+      "outputs": [
+        "TaxKit-only tracked documentation and release evidence.",
+        "Major Changeset covering the fixed release train.",
+        "Passing full local release-readiness proof."
+      ],
+      "implementationPrompt": "Implement exactly this task after TAXKIT-001 is accepted. Read the spec, task object and docs ownership guidance. Keep documentation factual and current; do not retain compatibility wording or historical aliases in mutable current docs. Reuse existing release validators rather than introducing wrappers. Add one user-facing major Changeset covering all release-train packages. Run the full release closure and report all evidence, call-graph match, Changeset path and residual registry-auth constraint. Do not start another task.",
+      "mandatoryVerification": [
+        "bun run verification",
+        "bun run docs:validate",
+        "bun run release:check",
+        "bun run changeset status"
+      ],
+      "browserVerification": [
+        "bun run --filter=docs test:browser",
+        "API smoke proof against api.taxkit.localhost when the app runtime is started"
+      ],
+      "qualityAudits": [
+        "Pass 1: compare documentation and release command graphs with current package ownership.",
+        "Pass 2: inspect packed/downstream validation for workspace or source leakage and stale identity references.",
+        "Pass 3: inspect Changeset, changelog language, docs links and verification evidence for a complete hard cutover."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Parent accepted all three audit passes and passing release evidence.",
+        "The tracked-tree identity audit reports no retired identity token outside immutable Git history.",
+        "The Changeset is explicit about breaking package identity and no publication is attempted."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "TAXKIT-003",
+      "title": "Perform external and local identity cutover",
+      "type": "operations",
+      "dependsOn": ["TAXKIT-002"],
+      "goal": "Commit accepted source work, rename the GitHub repository, update and push origin, then rename the local checkout and prove the completed state from its final path.",
+      "scope": [
+        "GitHub repository identity",
+        "git origin and pushed main branch",
+        "local project directory"
+      ],
+      "outputs": [
+        "Canonical GitHub repository and origin URL.",
+        "Pushed main branch.",
+        "Clean final checkout at /Users/cooper/Projects/taxkit."
+      ],
+      "implementationPrompt": "This parent-owned operational task must run only after the first two tasks are accepted and committed. Do not alter source architecture. Rename the GitHub repository through the authenticated GitHub CLI, set origin to the canonical URL, push main, then rename the local directory from its parent. Run final remote, status and identity audits from the new path. Record exact evidence and stop if any external operation fails.",
+      "mandatoryVerification": [
+        "gh repo view crcorbett/taxkit --json nameWithOwner,url,defaultBranchRef",
+        "git remote -v",
+        "git status -sb",
+        "bun run verification from /Users/cooper/Projects/taxkit",
+        "tracked-tree identity audit from /Users/cooper/Projects/taxkit"
+      ],
+      "browserVerification": [],
+      "qualityAudits": [
+        "Pass 1: verify GitHub, origin and branch identity are canonical.",
+        "Pass 2: verify the final local path has no stale script, config or lockfile references.",
+        "Pass 3: verify no uncommitted changes, unresolved release evidence or compatibility surface remains."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "GitHub repository, origin, pushed branch and local directory all use TaxKit.",
+        "Final verification passes from the renamed local directory.",
+        "Parent recorded all three audit passes and accepted the task."
+      ],
+      "commitAfterPassing": false
+    }
+  ]
+}

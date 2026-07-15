@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "whattax",
+      "name": "taxkit",
       "devDependencies": {
         "@changesets/cli": "^2.31.0",
         "@effect/language-service": "catalog:",
@@ -21,15 +21,15 @@
       "name": "api",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
-        "@whattax/api-http": "workspace:*",
+        "@taxkit/api-http": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
+        "@taxkit/core": "workspace:*",
+        "@taxkit/rules-au-pay": "workspace:*",
+        "@taxkit/tsconfig": "workspace:*",
         "@types/bun": "catalog:",
         "@types/node": "catalog:",
-        "@whattax/core": "workspace:*",
-        "@whattax/rules-au-pay": "workspace:*",
-        "@whattax/tsconfig": "workspace:*",
         "typescript": "catalog:",
       },
     },
@@ -38,8 +38,8 @@
       "dependencies": {
         "@tanstack/react-router": "catalog:",
         "@tanstack/react-start": "catalog:",
-        "@whattax/docs-content": "workspace:*",
-        "@whattax/docs-fumadocs": "workspace:*",
+        "@taxkit/docs-content": "workspace:*",
+        "@taxkit/docs-fumadocs": "workspace:*",
         "effect": "catalog:",
         "fumadocs-mdx": "^14.3.1",
         "react": "catalog:",
@@ -63,7 +63,7 @@
       "dependencies": {
         "@tanstack/react-router": "catalog:",
         "@tanstack/react-start": "catalog:",
-        "@whattax/api-http": "workspace:*",
+        "@taxkit/api-http": "workspace:*",
         "effect": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",
@@ -79,42 +79,42 @@
       },
     },
     "packages/api/http": {
-      "name": "@whattax/api-http",
-      "version": "0.0.4",
+      "name": "@taxkit/api-http",
+      "version": "0.1.0",
       "dependencies": {
-        "@whattax/calculators": "workspace:*",
-        "@whattax/core": "workspace:*",
-        "@whattax/sdk": "workspace:*",
+        "@taxkit/calculators": "workspace:*",
+        "@taxkit/core": "workspace:*",
+        "@taxkit/sdk": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
+        "@taxkit/rules-au-pay": "workspace:*",
+        "@taxkit/testing": "workspace:*",
         "@types/node": "catalog:",
-        "@whattax/rules-au-pay": "workspace:*",
-        "@whattax/testing": "workspace:*",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
     },
     "packages/calculators": {
-      "name": "@whattax/calculators",
-      "version": "0.0.4",
+      "name": "@taxkit/calculators",
+      "version": "0.1.0",
       "dependencies": {
-        "@whattax/core": "workspace:*",
-        "@whattax/rules-au-income-tax": "workspace:*",
-        "@whattax/rules-au-pay": "workspace:*",
+        "@taxkit/core": "workspace:*",
+        "@taxkit/rules-au-income-tax": "workspace:*",
+        "@taxkit/rules-au-pay": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
-        "@whattax/testing": "workspace:*",
+        "@taxkit/testing": "workspace:*",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
     },
     "packages/core": {
-      "name": "@whattax/core",
-      "version": "0.0.4",
+      "name": "@taxkit/core",
+      "version": "0.1.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -123,12 +123,12 @@
       },
     },
     "packages/docs-content": {
-      "name": "@whattax/docs-content",
-      "version": "0.0.2",
+      "name": "@taxkit/docs-content",
+      "version": "0.0.3",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node": "catalog:",
-        "@whattax/docs-fumadocs": "workspace:*",
+        "@taxkit/docs-fumadocs": "workspace:*",
         "effect": "catalog:",
         "fumadocs-core": "^16.8.3",
         "fumadocs-mdx": "^14.3.1",
@@ -142,8 +142,8 @@
       },
     },
     "packages/docs-fumadocs": {
-      "name": "@whattax/docs-fumadocs",
-      "version": "0.0.2",
+      "name": "@taxkit/docs-fumadocs",
+      "version": "0.0.3",
       "dependencies": {
         "@shikijs/core": "4.0.2",
         "@shikijs/transformers": "^4.0.2",
@@ -162,54 +162,54 @@
       },
     },
     "packages/rules/au/income-tax": {
-      "name": "@whattax/rules-au-income-tax",
-      "version": "0.0.4",
+      "name": "@taxkit/rules-au-income-tax",
+      "version": "0.1.0",
       "dependencies": {
-        "@whattax/core": "workspace:*",
+        "@taxkit/core": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
+        "@taxkit/testing": "workspace:*",
         "@types/node": "catalog:",
-        "@whattax/testing": "workspace:*",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
     },
     "packages/rules/au/pay": {
-      "name": "@whattax/rules-au-pay",
-      "version": "0.0.4",
+      "name": "@taxkit/rules-au-pay",
+      "version": "0.1.0",
       "dependencies": {
-        "@whattax/core": "workspace:*",
+        "@taxkit/core": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
+        "@taxkit/testing": "workspace:*",
         "@types/node": "catalog:",
-        "@whattax/testing": "workspace:*",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
     },
     "packages/rules/au/stsl": {
-      "name": "@whattax/rules-au-stsl",
-      "version": "0.0.4",
+      "name": "@taxkit/rules-au-stsl",
+      "version": "0.1.0",
       "dependencies": {
-        "@whattax/core": "workspace:*",
-        "@whattax/rules-au-pay": "workspace:*",
+        "@taxkit/core": "workspace:*",
+        "@taxkit/rules-au-pay": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
+        "@taxkit/testing": "workspace:*",
         "@types/node": "catalog:",
-        "@whattax/testing": "workspace:*",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
     },
     "packages/scripts": {
-      "name": "@whattax/scripts",
-      "version": "0.0.0",
+      "name": "@taxkit/scripts",
+      "version": "0.0.1",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "effect": "catalog:",
@@ -222,27 +222,27 @@
       },
     },
     "packages/sdk/typescript": {
-      "name": "@whattax/sdk",
-      "version": "0.0.4",
+      "name": "@taxkit/sdk",
+      "version": "0.1.0",
       "dependencies": {
-        "@whattax/calculators": "workspace:*",
-        "@whattax/rules-au-income-tax": "workspace:*",
-        "@whattax/rules-au-pay": "workspace:*",
+        "@taxkit/calculators": "workspace:*",
+        "@taxkit/rules-au-income-tax": "workspace:*",
+        "@taxkit/rules-au-pay": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/vitest": "catalog:",
+        "@taxkit/core": "workspace:*",
+        "@taxkit/testing": "workspace:*",
         "@types/bun": "catalog:",
-        "@whattax/core": "workspace:*",
-        "@whattax/testing": "workspace:*",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
     },
     "packages/testing": {
-      "name": "@whattax/testing",
-      "version": "0.0.4",
+      "name": "@taxkit/testing",
+      "version": "0.1.0",
       "dependencies": {
         "@effect/vitest": "catalog:",
         "effect": "catalog:",
@@ -253,8 +253,8 @@
       },
     },
     "packages/tsconfig": {
-      "name": "@whattax/tsconfig",
-      "version": "0.0.4",
+      "name": "@taxkit/tsconfig",
+      "version": "0.1.0",
     },
   },
   "catalog": {
@@ -742,6 +742,30 @@
 
     "@tanstack/virtual-file-routes": ["@tanstack/virtual-file-routes@1.161.7", "", { "bin": { "intent": "bin/intent.js" } }, "sha512-olW33+Cn+bsCsZKPwEGhlkqS6w3M2slFv11JIobdnCFKMLG97oAI2kWKdx5/zsywTL8flpnoIgaZZPlQTFYhdQ=="],
 
+    "@taxkit/api-http": ["@taxkit/api-http@workspace:packages/api/http"],
+
+    "@taxkit/calculators": ["@taxkit/calculators@workspace:packages/calculators"],
+
+    "@taxkit/core": ["@taxkit/core@workspace:packages/core"],
+
+    "@taxkit/docs-content": ["@taxkit/docs-content@workspace:packages/docs-content"],
+
+    "@taxkit/docs-fumadocs": ["@taxkit/docs-fumadocs@workspace:packages/docs-fumadocs"],
+
+    "@taxkit/rules-au-income-tax": ["@taxkit/rules-au-income-tax@workspace:packages/rules/au/income-tax"],
+
+    "@taxkit/rules-au-pay": ["@taxkit/rules-au-pay@workspace:packages/rules/au/pay"],
+
+    "@taxkit/rules-au-stsl": ["@taxkit/rules-au-stsl@workspace:packages/rules/au/stsl"],
+
+    "@taxkit/scripts": ["@taxkit/scripts@workspace:packages/scripts"],
+
+    "@taxkit/sdk": ["@taxkit/sdk@workspace:packages/sdk/typescript"],
+
+    "@taxkit/testing": ["@taxkit/testing@workspace:packages/testing"],
+
+    "@taxkit/tsconfig": ["@taxkit/tsconfig@workspace:packages/tsconfig"],
+
     "@turbo/darwin-64": ["@turbo/darwin-64@2.9.14", "", { "os": "darwin", "cpu": "x64" }, "sha512-t7QiPflaEyBE4oayeZtSmu4mEfjgIrcNlNNl1z1dmIVPqEdtA7+CfTf8d7KXsOGPh6aNgWjKxyvQg9uGfDQF+A=="],
 
     "@turbo/darwin-arm64": ["@turbo/darwin-arm64@2.9.14", "", { "os": "darwin", "cpu": "arm64" }, "sha512-d23147mC9BsCPA9mJ0h/ubcpbRgcJBXbcG3+Vq7YLhjz3IXuvQsJ1UXH8f4MD76ZjJ4m/E4aRdJV+MW88CDfbw=="],
@@ -883,30 +907,6 @@
     "@vitest/spy": ["@vitest/spy@4.1.7", "", {}, "sha512-kbkI5LMWakyuTIvs6fUJ5qdIVb1XVKsYJAT4OJ938cHMROYMSfmoQdZy0aaAnjbbc8F61vkoTqz/Az+/HiIu5Q=="],
 
     "@vitest/utils": ["@vitest/utils@4.1.7", "", { "dependencies": { "@vitest/pretty-format": "4.1.7", "convert-source-map": "^2.0.0", "tinyrainbow": "^3.1.0" } }, "sha512-T532WBu791cBxJlCl6SO+J14l81DQx6uQHm1bQbmCDY7nqlEIgkza/UFnSBNaUtSf41unldDFjdOBYEQC4b5Hw=="],
-
-    "@whattax/api-http": ["@whattax/api-http@workspace:packages/api/http"],
-
-    "@whattax/calculators": ["@whattax/calculators@workspace:packages/calculators"],
-
-    "@whattax/core": ["@whattax/core@workspace:packages/core"],
-
-    "@whattax/docs-content": ["@whattax/docs-content@workspace:packages/docs-content"],
-
-    "@whattax/docs-fumadocs": ["@whattax/docs-fumadocs@workspace:packages/docs-fumadocs"],
-
-    "@whattax/rules-au-income-tax": ["@whattax/rules-au-income-tax@workspace:packages/rules/au/income-tax"],
-
-    "@whattax/rules-au-pay": ["@whattax/rules-au-pay@workspace:packages/rules/au/pay"],
-
-    "@whattax/rules-au-stsl": ["@whattax/rules-au-stsl@workspace:packages/rules/au/stsl"],
-
-    "@whattax/scripts": ["@whattax/scripts@workspace:packages/scripts"],
-
-    "@whattax/sdk": ["@whattax/sdk@workspace:packages/sdk/typescript"],
-
-    "@whattax/testing": ["@whattax/testing@workspace:packages/testing"],
-
-    "@whattax/tsconfig": ["@whattax/tsconfig@workspace:packages/tsconfig"],
 
     "acorn": ["acorn@8.16.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw=="],
 

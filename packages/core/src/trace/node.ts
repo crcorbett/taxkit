@@ -8,7 +8,7 @@ import { RoundingMode } from "../primitives/rounding.js";
  *
  * @since 0.1.0
  */
-export const RuleId = Schema.String.pipe(Schema.brand("whattax/RuleId"));
+export const RuleId = Schema.String.pipe(Schema.brand("taxkit/RuleId"));
 
 /**
  * Stable identifier for the rule that produced a trace node.
@@ -59,7 +59,7 @@ export type SourceRef = typeof SourceRef.Type;
  * @since 0.1.0
  */
 export const SourceChecksum = Schema.String.pipe(
-  Schema.brand("whattax/SourceChecksum")
+  Schema.brand("taxkit/SourceChecksum")
 );
 
 /**

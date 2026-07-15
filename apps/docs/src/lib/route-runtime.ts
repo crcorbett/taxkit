@@ -1,4 +1,4 @@
-import type { DocsContentService } from "@whattax/docs-content/service";
+import type { DocsContentService } from "@taxkit/docs-content/service";
 import type { Effect, Exit } from "effect";
 
 export interface DocsRouteRuntime {

@@ -1,10 +1,10 @@
-import { RuleId } from "@whattax/core/trace";
+import { RuleId } from "@taxkit/core/trace";
 import {
   GrossPayFact,
   PayWithholdingsLedgerFact,
   PaygWithholdingComponentFact,
-} from "@whattax/rules-au-pay/facts";
-import { buildPayWithholdingsLedger } from "@whattax/rules-au-pay/rules";
+} from "@taxkit/rules-au-pay/facts";
+import { buildPayWithholdingsLedger } from "@taxkit/rules-au-pay/rules";
 import { Effect, Layer } from "effect";
 
 import { StslComponentFact } from "../facts/stsl.js";
@@ -15,7 +15,7 @@ import { StslComponentFact } from "../facts/stsl.js";
  * @since 0.1.0
  */
 export const PayWithholdingsLedgerWithStslRuleId = RuleId.make(
-  "whattax/rules-au-stsl/rule/PayWithholdingsLedgerWithStsl"
+  "taxkit/rules-au-stsl/rule/PayWithholdingsLedgerWithStsl"
 );
 
 /**

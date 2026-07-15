@@ -1,5 +1,5 @@
 {
-  "name": "@whattax/core",
+  "name": "@taxkit/core",
   "version": "0.1.0",
   "private": true,
   "files": [

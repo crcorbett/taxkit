@@ -1,4 +1,4 @@
-import { DocsSourcePath } from "@whattax/docs-content/schemas";
+import { DocsSourcePath } from "@taxkit/docs-content/schemas";
 import { Schema } from "effect";
 
 export class DocsContentPreloadError extends Schema.TaggedErrorClass<DocsContentPreloadError>()(

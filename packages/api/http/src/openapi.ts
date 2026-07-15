@@ -9,7 +9,7 @@ import {
 import { pipe } from "effect/Function";
 import { OpenApi } from "effect/unstable/httpapi";
 
-import { WhatTaxApi } from "./api.js";
+import { TaxKitApi } from "./api.js";
 
 const JsonArray = Schema.Array(Schema.Json);
 const JsonObject = Schema.Record(Schema.String, Schema.Json);
@@ -42,16 +42,16 @@ const normalizeJsonValue = (value: Schema.Json): Schema.Json => {
   );
 };
 
-export const whatTaxOpenApiSpec: OpenApi.OpenAPISpec =
-  OpenApi.fromApi(WhatTaxApi);
+export const taxKitOpenApiSpec: OpenApi.OpenAPISpec =
+  OpenApi.fromApi(TaxKitApi);
 
 const normalizeOpenApiSpec = (spec: OpenApi.OpenAPISpec) =>
   Schema.decodeUnknownEffect(Schema.Json)(spec).pipe(
     Effect.map(normalizeJsonValue)
   );
 
-export const normalizedWhatTaxOpenApiSpec =
-  normalizeOpenApiSpec(whatTaxOpenApiSpec);
+export const normalizedTaxKitOpenApiSpec =
+  normalizeOpenApiSpec(taxKitOpenApiSpec);
 
 export const formatOpenApiSnapshot = (spec: OpenApi.OpenAPISpec) =>
   normalizeOpenApiSpec(spec).pipe(

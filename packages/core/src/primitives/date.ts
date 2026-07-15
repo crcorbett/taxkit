@@ -10,7 +10,7 @@ import { Schema } from "effect";
  *
  * @since 0.1.0
  */
-export const IsoDate = Schema.String.pipe(Schema.brand("whattax/IsoDate"));
+export const IsoDate = Schema.String.pipe(Schema.brand("taxkit/IsoDate"));
 
 /**
  * ISO calendar date used for effective-period boundaries.
@@ -42,12 +42,12 @@ const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/u;
 
 const assertIsoDate = (value: string): void => {
   if (!isoDatePattern.test(value)) {
-    throw new Error(`whattax/core: expected ISO date YYYY-MM-DD, got ${value}`);
+    throw new Error(`taxkit/core: expected ISO date YYYY-MM-DD, got ${value}`);
   }
 
   const timestamp = Date.parse(`${value}T00:00:00.000Z`);
   if (Number.isNaN(timestamp)) {
-    throw new TypeError(`whattax/core: invalid ISO date ${value}`);
+    throw new TypeError(`taxkit/core: invalid ISO date ${value}`);
   }
 };
 
@@ -79,7 +79,7 @@ export const dateInterval = (args: {
 
   if (toExclusive !== undefined && String(from) >= String(toExclusive)) {
     throw new Error(
-      `whattax/core: expected interval start ${from} before end ${toExclusive}`
+      `taxkit/core: expected interval start ${from} before end ${toExclusive}`
     );
   }
 
@@ -109,7 +109,7 @@ export const dateIntervalsOverlap = (
 export const australianTaxYearInterval = (year: string): DateInterval => {
   const startYear = Number.parseInt(year.slice(0, 4), 10);
   if (!Number.isInteger(startYear)) {
-    throw new TypeError(`whattax/core: invalid Australian tax year ${year}`);
+    throw new TypeError(`taxkit/core: invalid Australian tax year ${year}`);
   }
 
   return dateInterval({

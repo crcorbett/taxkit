@@ -4,7 +4,7 @@ import {
   AuAnnualTaxCalculatorId,
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
-} from "@whattax/rules-au-income-tax";
+} from "@taxkit/rules-au-income-tax";
 import {
   AuPayCalculatorId,
   AuPayJurisdiction,
@@ -12,9 +12,9 @@ import {
   PayWithholdingsLedger,
   TakeHomePayReport,
   TakeHomeScenarioInputSchema,
-} from "@whattax/rules-au-pay";
+} from "@taxkit/rules-au-pay";
 
-import { defineSdkCalculation, defineWhatTaxModule } from "../types.js";
+import { defineSdkCalculation, defineTaxKitModule } from "../types.js";
 
 export const AuPayTakeHomeCalculation = defineSdkCalculation({
   calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
@@ -40,7 +40,7 @@ export const AuAnnualIncomeTaxCalculation = defineSdkCalculation({
   taxYear: AuAnnualTaxYear.make("2025-26"),
 });
 
-export const AuPay2025_26Module = defineWhatTaxModule({
+export const AuPay2025_26Module = defineTaxKitModule({
   calculations: [
     AuPayTakeHomeCalculation,
     AuPayWithholdingsCalculation,
@@ -50,7 +50,7 @@ export const AuPay2025_26Module = defineWhatTaxModule({
   taxYear: AuPayTaxYear.make("2025-26"),
 });
 
-export const AuIncomeTax2025_26Module = defineWhatTaxModule({
+export const AuIncomeTax2025_26Module = defineTaxKitModule({
   calculations: [AuAnnualIncomeTaxCalculation] as const,
   id: "au/income-tax/2025-26",
   jurisdiction: AuAnnualTaxJurisdiction.make("AU"),

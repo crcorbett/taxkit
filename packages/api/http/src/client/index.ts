@@ -2,25 +2,25 @@ import type * as EffectTypes from "effect/Effect";
 import type { HttpClient } from "effect/unstable/http/HttpClient";
 import { HttpApiClient } from "effect/unstable/httpapi";
 
-import { WhatTaxApi } from "../api.js";
+import { TaxKitApi } from "../api.js";
 
-export interface WhatTaxApiClientOptions {
+export interface TaxKitApiClientOptions {
   readonly baseUrl?: URL | string | undefined;
   readonly transformClient?: (client: HttpClient) => HttpClient;
 }
 
-export const makeWhatTaxApiClient = (options: WhatTaxApiClientOptions = {}) =>
-  HttpApiClient.make(WhatTaxApi, {
+export const makeTaxKitApiClient = (options: TaxKitApiClientOptions = {}) =>
+  HttpApiClient.make(TaxKitApi, {
     baseUrl: options.baseUrl,
     transformClient: options.transformClient,
   });
 
-export type WhatTaxApiClient = EffectTypes.Success<
-  ReturnType<typeof makeWhatTaxApiClient>
+export type TaxKitApiClient = EffectTypes.Success<
+  ReturnType<typeof makeTaxKitApiClient>
 >;
 
 export {
-  getWhatTaxHttpApiClient,
-  WhatTaxHttpApiService,
-  withWhatTaxHttpApiClient,
+  getTaxKitHttpApiClient,
+  TaxKitHttpApiService,
+  withTaxKitHttpApiClient,
 } from "./service.js";

@@ -1,5 +1,5 @@
-import { docsCollection } from "@whattax/docs-content/client";
-import type { DocsSourcePath } from "@whattax/docs-content/schemas";
+import { docsCollection } from "@taxkit/docs-content/client";
+import type { DocsSourcePath } from "@taxkit/docs-content/schemas";
 import { Effect } from "effect";
 import type { ReactNode } from "react";
 

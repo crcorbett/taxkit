@@ -1,6 +1,6 @@
-import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
-import { au } from "@whattax/sdk/au";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
+import { au } from "@taxkit/sdk/au";
 import { Data, Effect, Schema } from "effect";
 
 class PayPreviewRequestError extends Data.TaggedError(

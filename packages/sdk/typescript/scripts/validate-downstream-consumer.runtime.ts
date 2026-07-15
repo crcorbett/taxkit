@@ -128,47 +128,47 @@ const RootPackageManifest = Schema.Struct({
 const packageClosure = [
   {
     build: true,
-    packageName: "@whattax/core",
+    packageName: "@taxkit/core",
     relativeRoot: "packages/core",
   },
   {
     build: true,
-    packageName: "@whattax/rules-au-income-tax",
+    packageName: "@taxkit/rules-au-income-tax",
     relativeRoot: "packages/rules/au/income-tax",
   },
   {
     build: true,
-    packageName: "@whattax/rules-au-pay",
+    packageName: "@taxkit/rules-au-pay",
     relativeRoot: "packages/rules/au/pay",
   },
   {
     build: true,
-    packageName: "@whattax/rules-au-stsl",
+    packageName: "@taxkit/rules-au-stsl",
     relativeRoot: "packages/rules/au/stsl",
   },
   {
     build: true,
-    packageName: "@whattax/calculators",
+    packageName: "@taxkit/calculators",
     relativeRoot: "packages/calculators",
   },
   {
     build: true,
-    packageName: "@whattax/sdk",
+    packageName: "@taxkit/sdk",
     relativeRoot: "packages/sdk/typescript",
   },
   {
     build: true,
-    packageName: "@whattax/api-http",
+    packageName: "@taxkit/api-http",
     relativeRoot: "packages/api/http",
   },
   {
     build: true,
-    packageName: "@whattax/testing",
+    packageName: "@taxkit/testing",
     relativeRoot: "packages/testing",
   },
   {
     build: false,
-    packageName: "@whattax/tsconfig",
+    packageName: "@taxkit/tsconfig",
     relativeRoot: "packages/tsconfig",
   },
 ] satisfies readonly PackageClosureItem[];
@@ -459,20 +459,20 @@ const writeConsumerFiles = (
       ),
       fs.writeFileString(
         path.join(workspacePath, "src/typecheck.ts"),
-        `import type { CalculationInput } from "@whattax/sdk";
-import { WhatTax } from "@whattax/sdk";
-import { calculateReport } from "@whattax/sdk/effect";
-import { au } from "@whattax/sdk/au";
-import { auEffect } from "@whattax/sdk/au/effect";
+        `import type { CalculationInput } from "@taxkit/sdk";
+import { TaxKit } from "@taxkit/sdk";
+import { calculateReport } from "@taxkit/sdk/effect";
+import { au } from "@taxkit/sdk/au";
+import { auEffect } from "@taxkit/sdk/au/effect";
 import {
   CalculatorRunRequest,
   CalculatorServiceError,
-  WhatTaxFailure,
-  WhatTaxSuccess,
-} from "@whattax/sdk/schemas";
-import { AuPayTakeHomeCalculation } from "@whattax/sdk/testing";
-import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
+  TaxKitFailure,
+  TaxKitSuccess,
+} from "@taxkit/sdk/schemas";
+import { AuPayTakeHomeCalculation } from "@taxkit/sdk/testing";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
 
 const takeHomeFacts: CalculationInput<typeof au.calculations.takeHomePay> = {
   grossPay: new GrossPay({
@@ -482,8 +482,8 @@ const takeHomeFacts: CalculationInput<typeof au.calculations.takeHomePay> = {
   taxFreeThresholdClaimed: true,
 };
 
-WhatTax.calculate(au.calculations.takeHomePay, takeHomeFacts);
-WhatTax.safe.calculate(au.calculations.takeHomePay, takeHomeFacts);
+TaxKit.calculate(au.calculations.takeHomePay, takeHomeFacts);
+TaxKit.safe.calculate(au.calculations.takeHomePay, takeHomeFacts);
 au.pay.takeHomePay(takeHomeFacts);
 au.pay.safe.withholdings(takeHomeFacts);
 calculateReport(au.calculations.takeHomePay, takeHomeFacts);
@@ -493,8 +493,8 @@ auEffect
 
 void CalculatorRunRequest;
 void CalculatorServiceError;
-void WhatTaxFailure;
-void WhatTaxSuccess;
+void TaxKitFailure;
+void TaxKitSuccess;
 void AuPayTakeHomeCalculation;
 
 au.pay.takeHomePay({
@@ -505,14 +505,14 @@ au.pay.takeHomePay({
       ),
       fs.writeFileString(
         path.join(workspacePath, "src/runtime.ts"),
-        `import { PublicCalculatorServiceLive } from "@whattax/calculators/live";
-import { CalculationEngineLive } from "@whattax/core";
-import { aud } from "@whattax/core/primitives";
-import { GrossPay } from "@whattax/rules-au-pay";
+        `import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { CalculationEngineLive } from "@taxkit/core";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
 import { Effect, Layer } from "effect";
-import { WhatTax } from "@whattax/sdk";
-import { calculateReport } from "@whattax/sdk/effect";
-import { au } from "@whattax/sdk/au";
+import { TaxKit } from "@taxkit/sdk";
+import { calculateReport } from "@taxkit/sdk/effect";
+import { au } from "@taxkit/sdk/au";
 
 const ServiceLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
@@ -525,7 +525,7 @@ const takeHomeFacts = {
   taxFreeThresholdClaimed: true,
 };
 
-const plainReport = await WhatTax.calculate(
+const plainReport = await TaxKit.calculate(
   au.calculations.takeHomePay,
   takeHomeFacts
 );
@@ -548,12 +548,12 @@ console.log("Downstream SDK runtime examples passed.");
       ),
       fs.writeFileString(
         path.join(workspacePath, "src/browser-entry.ts"),
-        `import { WhatTax } from "@whattax/sdk";
-import { au } from "@whattax/sdk/au";
-import { CalculatorRunRequest } from "@whattax/sdk/schemas";
+        `import { TaxKit } from "@taxkit/sdk";
+import { au } from "@taxkit/sdk/au";
+import { CalculatorRunRequest } from "@taxkit/sdk/schemas";
 
 export const browserSafeEntrypoints = {
-  root: typeof WhatTax.calculate === "function",
+  root: typeof TaxKit.calculate === "function",
   au: typeof au.pay.takeHomePay === "function",
   schemas: Boolean(CalculatorRunRequest),
 } as const;
@@ -600,7 +600,7 @@ const writeConsumerPackageManifest = (
     const typescriptVersion = yield* catalogVersion(catalog, "typescript");
     const bunTypesVersion = yield* catalogVersion(catalog, "@types/bun");
     const fileDependencyFor = relativeFileDependency(path, workspacePath);
-    const whattaxDependencies = EffectRecord.fromEntries(
+    const taxkitDependencies = EffectRecord.fromEntries(
       EffectArray.map(packedPackages, (packedPackage) => [
         packedPackage.packageName,
         fileDependencyFor(packedPackage),
@@ -612,15 +612,15 @@ const writeConsumerPackageManifest = (
       `${JSON.stringify(
         {
           dependencies: {
-            ...whattaxDependencies,
+            ...taxkitDependencies,
             effect: effectVersion,
           },
           devDependencies: {
             "@types/bun": bunTypesVersion,
             typescript: typescriptVersion,
           },
-          name: "whattax-sdk-downstream-consumer",
-          overrides: whattaxDependencies,
+          name: "taxkit-sdk-downstream-consumer",
+          overrides: taxkitDependencies,
           private: true,
           scripts: {
             "bundle:browser":
@@ -854,7 +854,7 @@ const DownstreamProgram = Effect.gen(function* validateDownstreamConsumer() {
 
   const workspacePath = yield* Effect.acquireRelease(
     fs.makeTempDirectory({
-      prefix: "whattax-sdk-downstream-",
+      prefix: "taxkit-sdk-downstream-",
     }),
     (tempPath) =>
       fs.remove(tempPath, { force: true, recursive: true }).pipe(

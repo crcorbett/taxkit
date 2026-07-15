@@ -1,4 +1,4 @@
-import { RuleId, TraceNode } from "@whattax/core/trace";
+import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Effect, Layer } from "effect";
 
 import { GrossPayFact, TaxablePay, TaxablePayFact } from "../facts/pay.js";
@@ -9,7 +9,7 @@ import { GrossPayFact, TaxablePay, TaxablePayFact } from "../facts/pay.js";
  * @since 0.1.0
  */
 export const TaxablePayRuleId = RuleId.make(
-  "whattax/rules-au-pay/rule/TaxablePay"
+  "taxkit/rules-au-pay/rule/TaxablePay"
 );
 
 /**
