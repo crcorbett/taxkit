@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-17
 source_of_truth: documentation-audit
 confidence: high
 ---
@@ -76,9 +76,9 @@ package until a package manifest, source exports and verification exist.
   `docs/exec-plans/active/` is available for the next live implementation
   plan.
 - `docs/repo-status-outline.html` is a manual snapshot. It was refreshed on
-  2026-07-14 for Effect beta.98, deterministic packed surfaces, portable lint
-  contracts and the implemented `@taxkit/scripts` release-readiness command.
-  It can still drift and must be refreshed after material repo-shape or
+  2026-07-17 for the completed TaxKit cutover, private `1.0.0` release train,
+  strict packed-consumer validation and current delivery priorities. It can
+  still drift and must be refreshed after material repo-shape or
   implemented-surface changes.
 - `packages/ui` remains a planned ownership placeholder.
 - `packages/domain/au/*` remains planned for Australian date dimensions and
@@ -87,7 +87,8 @@ package until a package manifest, source exports and verification exist.
   user-facing product app.
 - `@taxkit/sdk` is implemented as a private package but has not been
   published. Publication remains gated behind explicit release approval,
-  package-name confirmation, `bun run version-repo` and publish verification.
+  a package naming and registry approach, authentication, provenance and
+  publish verification.
 - No generated documentation inventory exists. This audit is deliberately
   maintained by hand until repeated drift justifies an owner, canonical input
   model, deterministic generator and focused tests under the abstraction

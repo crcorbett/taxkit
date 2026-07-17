@@ -1,11 +1,24 @@
 ---
 status: completed
-last_reviewed: 2026-07-02
+last_reviewed: 2026-07-17
 source_of_truth: execution-plan
 confidence: medium
 ---
 
 # Downstream consumer validation
+
+## Superseding validation update
+
+The packed-manifest blocker recorded in this plan was resolved by the later
+repository-foundation work. The current strict validator builds and packs the
+nine-package closure, installs the tarballs in a clean temporary consumer,
+typechecks and runs the SDK, imports every public JavaScript entrypoint and
+bundles the browser-safe surface.
+
+The `1.0.0` versioning pass reran that strict validation successfully. See the
+[current downstream validation spec](../../product-specs/downstream-consumer-validation.md)
+for the implemented graph. The evidence below remains the historical record of
+the earlier diagnostic phase and its blockers.
 
 Spec:
 [Downstream consumer validation](../../product-specs/downstream-consumer-validation.md)

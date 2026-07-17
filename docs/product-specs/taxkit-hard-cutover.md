@@ -1,6 +1,6 @@
 ---
-status: canonical
-last_reviewed: 2026-07-15
+status: implemented
+last_reviewed: 2026-07-17
 source_of_truth: docs
 confidence: high
 ---
@@ -13,6 +13,17 @@ Replace the retired repository identity with TaxKit in every mutable surface.
 This is a breaking cutover, not a compatibility migration: current source,
 packages, docs, URLs, configuration, GitHub identity and local checkout must
 use only the TaxKit identity.
+
+## Implementation status
+
+The cutover is implemented. The repository, checkout, package scope, runtime
+configuration, local domains, documentation and tooling use the TaxKit
+identity. The breaking Changeset has been consumed into the private `1.0.0`
+release train. No package has been published and no release tag has been
+created.
+
+Validation evidence is recorded in the
+[completed execution plan](../exec-plans/completed/taxkit-hard-cutover.md).
 
 ## Problem
 
@@ -47,8 +58,8 @@ failures.
 - Rewriting immutable Git history, external package-registry records or
   GitHub's server-side redirect behaviour. They are historical evidence, not
   live project surfaces.
-- Publishing packages. The target npm scope must be claimed by an authenticated
-  registry account in a separate explicit release operation.
+- Publishing packages or choosing the package naming and registry approach.
+  Those decisions require a separate explicit release operation.
 
 ## Canonical identity
 
@@ -162,17 +173,13 @@ release:check
 
 ## Risks and decisions
 
-The target GitHub repository name is available and the active GitHub account
-has repository access. The target npm package is currently absent from the
-registry, but the local machine is not npm-authenticated, so scope ownership
-cannot be proven until the account performs `npm login` or uses an approved
-automation token. Package metadata can still be cut over and validated locally
-without publication.
+The GitHub repository, origin and local checkout now use the canonical TaxKit
+identity. The package release train is versioned to `1.0.0`, remains private
+and passes packed downstream validation.
 
-This is a public breaking identity change. A Changeset must declare a major
-release theme for every release-train package. Applying versions is a separate
-release approval after scope ownership is available; no package is published
-by this migration.
+Npm publication requires a separate approach covering the public package
+name, registry ownership, authentication, provenance, tagging and publish
+verification. Repository versioning does not approve or perform publication.
 
 ## Acceptance criteria
 

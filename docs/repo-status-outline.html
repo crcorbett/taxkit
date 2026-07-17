@@ -229,13 +229,13 @@
         <p class="lede">
           High-level view of how the repository currently works, what has been
           completed, and what remains to be built. This is a manually refreshed
-          local snapshot reviewed on <code>2026-07-14</code>, not the canonical
+          local snapshot reviewed on <code>2026-07-17</code>, not the canonical
           source of truth.
         </p>
         <div class="meta">
           <span class="pill">Repo: TaxKit</span>
           <span class="pill">Branch: main</span>
-          <span class="pill">Last reviewed: 2026-07-14</span>
+          <span class="pill">Last reviewed: 2026-07-17</span>
           <span class="pill">Snapshot: manual</span>
         </div>
       </header>
@@ -369,6 +369,11 @@
               <td><code>@taxkit/scripts</code> runs nine canonical verification, build, package, API, browser and Changeset gates as one ordered Effect program. It does not version or publish packages.</td>
             </tr>
             <tr>
+              <td>TaxKit cutover and repository release train</td>
+              <td>Done</td>
+              <td>The repository, package scope, configuration, GitHub remote and local checkout use the TaxKit identity. The nine private release-train packages are versioned to <code>1.0.0</code> and pass strict packed-consumer validation.</td>
+            </tr>
+            <tr>
               <td>Architecture docs</td>
               <td>Done for baseline</td>
               <td>Canonical docs now cover facts, rules, calculators, graph/trace/ledgers, API/SDK, ownership, frontend, content, deployment and quality.</td>
@@ -401,11 +406,12 @@
           </div>
           <div class="item">
             <span class="status partial">Partial</span>
-            <h3>Release train</h3>
+            <h3>Package publication</h3>
             <p>
-              Changesets are pending and package versions have not been
-              consumed with <code>bun run version-repo</code>. The SDK has not
-              been published.
+              The repository release train is versioned to <code>1.0.0</code>
+              and no Changesets are pending. Packages remain private, and no
+              npm naming, registry, provenance or publication approach has
+              been approved.
             </p>
           </div>
           <div class="item">
@@ -449,8 +455,8 @@
       <section>
         <h2>Current development priority</h2>
         <ol>
-          <li>Review pending Changesets, then explicitly decide when to run <code>bun run version-repo</code> and begin the release train.</li>
-          <li>Choose the next user-facing slice: docs productisation or a real calculation workflow in <code>apps/web</code>.</li>
+          <li>Choose the next user-facing slice: deploy the docs and API, or build a real calculation workflow in <code>apps/web</code>.</li>
+          <li>Define package naming, registry, provenance and publish verification before approving npm publication.</li>
           <li>Keep <code>packages/ui</code> planned until real consumers satisfy the abstraction-admission contract.</li>
           <li>Keep specs, task lists, completed execution plans and this manual snapshot aligned after material changes.</li>
           <li>Add new rule, calculator or jurisdiction work through focused specs with source and test evidence.</li>

@@ -2,8 +2,8 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/taxkit-hard-cutover.md",
   "title": "TaxKit Hard Cutover Tasks",
-  "status": "active",
-  "last_reviewed": "2026-07-15",
+  "status": "completed",
+  "last_reviewed": "2026-07-17",
   "principles": [
     "Hard cutover: current mutable surfaces use only the canonical TaxKit identity.",
     "No compatibility aliases, wrapper helpers, duplicate contracts or fallback configuration.",
@@ -28,6 +28,7 @@
   "tasks": [
     {
       "id": "TAXKIT-001",
+      "status": "completed",
       "title": "Migrate workspace identity and runtime configuration",
       "type": "foundation",
       "dependsOn": [],
@@ -73,6 +74,7 @@
     },
     {
       "id": "TAXKIT-002",
+      "status": "completed",
       "title": "Complete documentation, release closure and identity evidence",
       "type": "release",
       "dependsOn": ["TAXKIT-001"],
@@ -118,6 +120,7 @@
     },
     {
       "id": "TAXKIT-003",
+      "status": "completed",
       "title": "Perform external and local identity cutover",
       "type": "operations",
       "dependsOn": ["TAXKIT-002"],

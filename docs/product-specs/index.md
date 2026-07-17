@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-17
 source_of_truth: docs
 confidence: medium
 ---
@@ -19,7 +19,7 @@ Specs:
 | [Boundary-only decoding](./boundary-only-decoding.md) | Implemented | Exact decoder placement enforcement, typed calculator continuations and pre-render docs route decoding are in place. |
 | [Documentation structure and development docs](./documentation-structure-and-development-docs.md) | Canonical | Baseline docs structure and local skill routing. |
 | [Documentation improvement roadmap](./documentation-improvement-roadmap.md) | Implemented | README coverage, root routing and maintenance conventions are in place. |
-| [Downstream consumer validation](./downstream-consumer-validation.md) | Implemented foundation; strict gate blocked | SDK diagnostic manifest audit and API temp-workspace smoke exist; strict SDK downstream install remains blocked by packed manifest protocols. |
+| [Downstream consumer validation](./downstream-consumer-validation.md) | Implemented | The nine-package closure passes strict tarball, clean-install, public-import, runtime, type and browser validation. |
 | [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md) | Implemented | Generic Fumadocs code, TaxKit docs contracts and app rendering are split. |
 | [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md) | Implemented | Docs content package, docs app runtime and validation path exist. |
 | [Extract API app](./extract-api-app.md) | Implemented | `apps/api` owns the standalone Bun API runtime. |
@@ -30,7 +30,7 @@ Specs:
 | [SDK-backed HTTP API thin wrapper](./sdk-backed-http-api-thin-wrapper.md) | Implemented | HTTP calculate delegates execution through the SDK Effect facade. |
 | [SDK public naming and export contract](./sdk-public-naming-and-export-contract.md) | Implemented | Public SDK names and packed export contract are stabilised. |
 | [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md) | Implemented | Schema-encoded Effect outcomes survive initial SSR and client navigation before direct route-root restoration. |
-| [TaxKit hard cutover](./taxkit-hard-cutover.md) | Active | Breaking repository, package, configuration, GitHub and local-checkout identity cutover. |
+| [TaxKit hard cutover](./taxkit-hard-cutover.md) | Implemented | Repository, package, configuration, GitHub and local-checkout identity cutover completed; the private release train is versioned to `1.0.0`. |
 | [TypeScript SDK and publishing](./typescript-sdk-and-publishing.md) | Implemented through release prep | SDK implementation and release-prep checks exist; npm publication remains gated. |
 
 Authoring guides:

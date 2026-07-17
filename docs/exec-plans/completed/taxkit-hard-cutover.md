@@ -1,6 +1,6 @@
 ---
 status: completed
-last_reviewed: 2026-07-15
+last_reviewed: 2026-07-17
 source_of_truth: docs
 confidence: high
 ---
@@ -22,6 +22,18 @@ turns stops for replan or user decision.
 | TAXKIT-001 | accepted | Workspace, source, configuration, lint namespace and local domains migrated; parent review and verification accepted. |
 | TAXKIT-002 | accepted | Documentation, release metadata and full release-readiness evidence accepted by parent review. |
 | TAXKIT-003 | accepted | GitHub repository, origin, pushed branch and local directory cut over and verified. |
+
+## Post-completion versioning
+
+On 15 July 2026, commit `d212bb7` consumed the breaking cutover Changeset and
+versioned the nine private release-train packages to `1.0.0`. Repository
+verification and strict downstream validation passed against the generated
+`1.0.0` tarballs, and Changesets reports no pending release.
+
+No npm publication or release tag was created. Publication remains a separate
+decision that needs an explicit package naming, registry, authentication,
+provenance and verification approach. The validation log below preserves the
+state at the original cutover completion, before the Changeset was consumed.
 
 ## Preflight inventory
 
