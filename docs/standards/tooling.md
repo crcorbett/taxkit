@@ -14,8 +14,9 @@ library with stable package boundaries and predictable bundle behavior.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt`.
 - `oxlint-tsgolint` is installed and `ultracite check --type-aware` is the
   default root check command.
-- `knip` is configured in `knip.json` for unused dependency and workspace
-  hygiene.
+- `knip` uses `knip.json` for development-aware dependency and workspace
+  hygiene and `knip.production.json` for production-only package, command and
+  API runtime reachability.
 - TypeScript is cataloged at the root and uses `ES2025` lib support.
 - Changesets record package-facing changes before release automation exists.
   See [Versioning and Changesets](./versioning.md).
@@ -26,6 +27,7 @@ library with stable package boundaries and predictable bundle behavior.
 bun run check
 bun run fix
 bun run knip
+bun run knip:production
 bun run changeset
 bun run version-repo
 bun run check-types
@@ -33,8 +35,11 @@ bun run test
 ```
 
 Use `bun run check` for style and lint checks. Use `bun run fix` only when you
-intend to accept formatter and safe lint fixes. Use `bun run knip` before
-publishing or when changing package boundaries.
+intend to accept formatter and safe lint fixes. Use `bun run knip` for the
+complete development-aware graph. Use `bun run knip:production` when changing
+package exports, repository command entrypoints or the standalone API runtime;
+it excludes test and development reachability. Neither command replaces the
+SDK-owned packed-artifact and strict downstream-consumer gates.
 
 Use `bun run verification` after changes that affect docs routing, package
 exports, Effect config composition, HTTP API contracts, runtime layers or
@@ -183,10 +188,18 @@ Current TaxKit-specific custom rules include:
 
 ## Knip Rules
 
-Knip is configured at the root because TaxKit is a monorepo. Keep this config
-lean: remove unused package dependencies or expose intentional public exports
-through entrypoints before adding ignores. Knip is part of the required quality
-gate alongside `check`, `check-types`, and `test`.
+Knip is configured at the root because TaxKit is a monorepo. Keep both configs
+lean: remove unused package dependencies or correct intentional public exports
+and entrypoints before adding exact, ownership-explained exceptions.
+
+`knip.json` includes development tooling, tests and the current application
+scaffolds. `knip.production.json` uses trailing `!` production patterns for
+every source counterpart of the eight code-bearing release artifacts,
+`@taxkit/scripts` public and executable entrypoints, and `apps/api/src/index.ts`.
+It excludes tests, fixtures, examples, generated output, root tools and the
+docs/web apps. The JSON-only `@taxkit/tsconfig` artifact has no TypeScript
+source entrypoint and stays under strict downstream tarball proof. Both Knip
+graphs are part of root verification.
 
 ## Repository Path Hygiene
 

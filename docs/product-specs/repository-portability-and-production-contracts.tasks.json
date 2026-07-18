@@ -361,7 +361,11 @@
           "package.json",
           "docs/architecture/testing-and-quality.md",
           "docs/standards/tooling.md",
-          "README.md when the command is exposed in the root command map"
+          "README.md when the command is exposed in the root command map",
+          "packages/api/http/src/client/in-process.layer.ts and src/groups/health.ts to remove production-unnecessary exports proven by the graph",
+          "packages/api/http/src/openapi.ts and __tests__/openapi-snapshot.test.ts to return snapshot-only normalization to its test owner",
+          "packages/api/http/__tests__/public-calculation-api.test.ts to consume the already-decoded typed health response after its test-only deep Schema export is removed",
+          "an empty .changeset/*.md no-release record when Changeset status detects the internal API package-file cleanup"
         ],
         "conditional": [
           "knip.json only when canonical development entry definitions are corrected or factored",

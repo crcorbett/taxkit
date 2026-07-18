@@ -16,7 +16,7 @@ const makeInProcessFetch = (handler: InProcessTaxKitApiHandler) => {
   return fetch;
 };
 
-export const makeInProcessFetchLayer = (handler: InProcessTaxKitApiHandler) =>
+const makeInProcessFetchLayer = (handler: InProcessTaxKitApiHandler) =>
   Layer.succeed(FetchHttpClient.Fetch, makeInProcessFetch(handler));
 
 export const makeTaxKitApiInProcessClientLayer = (

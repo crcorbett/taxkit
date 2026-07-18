@@ -47,6 +47,7 @@
     "format": "oxfmt -c oxfmt.config.ts --write . --no-error-on-unmatched-pattern",
     "format:check": "oxfmt -c oxfmt.config.ts --check . --no-error-on-unmatched-pattern",
     "knip": "knip --no-progress --no-config-hints",
+    "knip:production": "knip --production --config knip.production.json --no-progress --no-config-hints",
     "lint": "bun run lint:boundary-directives && oxlint -c oxlint.config.ts . --disable-nested-config --no-error-on-unmatched-pattern",
     "lint:boundary-directives": "oxlint -c oxlint.config.ts . --allow=taxkit/no-decoding-outside-boundaries --allow=taxkit/no-route-transport-restore-outside-consumers --report-unused-disable-directives-severity=error --disable-nested-config --no-error-on-unmatched-pattern",
     "prepare": "effect-language-service patch",
@@ -55,7 +56,7 @@
     "test:docs-boundaries": "bun test apps/docs/src/lib/docs/route-boundary.test.js",
     "test:oxlint": "bun test tools/oxlint",
     "test:repository-paths": "bun test tools/repository-paths",
-    "verification": "bun run check:repository-paths:types && bun run check:repository-paths && bun run check:effect-language-service && bun run lint && bun run format:check && bun run knip && bun run check-types",
+    "verification": "bun run check:repository-paths:types && bun run check:repository-paths && bun run check:effect-language-service && bun run lint && bun run format:check && bun run knip && bun run knip:production && bun run check-types",
     "version-packages": "changeset version",
     "version-repo": "changeset version"
   },

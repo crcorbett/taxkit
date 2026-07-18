@@ -32,10 +32,19 @@ The current repository baseline is canonical root verification:
 
 ```bash
 bun run verification
+bun run knip:production
 ```
 
-Root verification includes lint, format, Knip and workspace type checks. It
-also typechecks and executes the root repository-path gate, which scans
+Root verification includes lint, format, both Knip graphs and workspace type
+checks. The development-aware graph covers repository tooling, tests and
+current application scaffolds. The production graph separately proves the
+eight code-bearing packages in the nine-artifact release closure,
+`@taxkit/scripts` exports and commands, and the standalone API runtime without
+test or development reachability. `@taxkit/tsconfig` is JSON-only and remains
+covered by strict packed/downstream artifact proof rather than a fabricated
+TypeScript entrypoint. Root tools and the docs/web apps are outside the
+production graph by ownership. Root verification also typechecks and executes
+the root repository-path gate, which scans
 Git-tracked readable text and safely reports only repository-relative file,
 positive line and closed finding category. Binary files are identified by a
 NUL byte or failed strict UTF-8 decode and skipped. For docs, that means
@@ -267,6 +276,12 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   values from neutral fragments so the checker and its tests remain inside the
   policy they prove. Reports must never include matched text, usernames,
   process stderr or surrounding content.
+- Keep the development-aware `knip` graph and dedicated `knip:production`
+  graph independent. Production entry and project patterns require Knip's
+  trailing `!` marker, must map manifest exports to real source counterparts,
+  and must not include tests, fixtures, examples, generated output, root tools
+  or the docs/web apps. Exact exceptions need a named owner and runtime reason.
+  Knip does not replace SDK packed-artifact or downstream-consumer proof.
 - Keep `bun run release:check` as orchestration over canonical commands. A new
   release gate must first have an owning package command and focused tests; do
   not implement its validation policy inside `@taxkit/scripts`.

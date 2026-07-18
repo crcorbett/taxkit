@@ -1,0 +1,115 @@
+{
+  "$schema": "./node_modules/knip/schema.json",
+  "ignoreWorkspaces": [
+    ".",
+    "apps/docs",
+    "apps/web",
+    "packages/docs-content",
+    "packages/docs-fumadocs",
+    "packages/tsconfig"
+  ],
+  "ignoreIssues": {
+    "packages/api/http/src/client/service.ts": ["duplicates"]
+  },
+  "workspaces": {
+    "apps/api": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/api/http": {
+      "entry": [
+        "src/index.ts!",
+        "src/api.ts!",
+        "src/client/index.ts!",
+        "src/client/live.layer.ts!",
+        "src/client/server.layer.ts!",
+        "src/config.ts!",
+        "src/server.ts!",
+        "src/handlers/index.ts!",
+        "src/handlers/live.ts!"
+      ],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/calculators": {
+      "entry": [
+        "src/index.ts!",
+        "src/catalog.ts!",
+        "src/errors.ts!",
+        "src/metadata.ts!",
+        "src/service.ts!",
+        "src/live.layer.ts!",
+        "src/schemas.ts!"
+      ],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/core": {
+      "entry": [
+        "src/index.ts!",
+        "src/primitives/index.ts!",
+        "src/facts/index.ts!",
+        "src/parameters/index.ts!",
+        "src/errors/index.ts!",
+        "src/engine/index.ts!",
+        "src/rules/index.ts!",
+        "src/graph/index.ts!",
+        "src/trace/index.ts!",
+        "src/ledger/index.ts!"
+      ],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/rules/au/income-tax": {
+      "entry": [
+        "src/index.ts!",
+        "src/facts/index.ts!",
+        "src/parameters/index.ts!",
+        "src/rules/index.ts!",
+        "src/rule-pack/index.ts!",
+        "src/calculator/index.ts!"
+      ],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/rules/au/pay": {
+      "entry": [
+        "src/index.ts!",
+        "src/facts/index.ts!",
+        "src/parameters/index.ts!",
+        "src/rules/index.ts!",
+        "src/calculator/index.ts!",
+        "src/rule-pack/index.ts!"
+      ],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/rules/au/stsl": {
+      "entry": [
+        "src/index.ts!",
+        "src/facts/index.ts!",
+        "src/parameters/index.ts!",
+        "src/rules/index.ts!",
+        "src/rule-pack/index.ts!"
+      ],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/scripts": {
+      "entry": [
+        "src/index.ts!",
+        "src/release-readiness/release-readiness.runtime.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/release-readiness/test.layer.ts!"]
+    },
+    "packages/sdk/typescript": {
+      "entry": [
+        "src/index.ts!",
+        "src/effect.ts!",
+        "src/au.ts!",
+        "src/au-effect.ts!",
+        "src/schemas/index.ts!",
+        "src/testing/index.ts!"
+      ],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/testing": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts!"]
+    }
+  }
+}

@@ -22,7 +22,6 @@ import {
   CalculatorRunResponse,
   CalculatorServiceError,
 } from "../src/groups/calculators.js";
-import { HealthResponse } from "../src/groups/health.js";
 
 const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
@@ -49,10 +48,8 @@ describe("TaxKit public calculation HTTP API", () => {
     Effect.gen(function* () {
       const client = yield* TaxKitHttpApiService;
       const response = yield* client.health.getHealth();
-      const decoded =
-        yield* Schema.decodeUnknownEffect(HealthResponse)(response);
 
-      expect(decoded).toEqual({
+      expect(response).toEqual({
         service: "taxkit",
         status: "ok",
       });

@@ -29,7 +29,7 @@ decision. Do not publish packages or run `version-repo`.
 | RPC-001 | complete | Parent accepted correction turn 1 after focused, frozen-lockfile, repository-wide and root-test verification. |
 | RPC-002 | complete | Parent accepted correction turn 1 after decision-neutral compatibility review and independent repository verification. |
 | RPC-003 | complete | Parent accepted correction turn 1 after inline-policy enforcement and independent real-binary verification. |
-| RPC-004 | in progress | Production-only Knip graph. |
+| RPC-004 | complete | Parent accepted correction turn 1 after production controls, internal API cleanup and independent full-root verification. |
 | RPC-005 | blocked | Requires explicit user decisions for `STR-DEC-001`, `STR-DEC-002` and `REL-DEC-001`. |
 | RPC-006 | blocked | Requires accepted RPC-003/RPC-004, all three RPC-005 decisions and an exact populated `resolvedScope`. |
 
@@ -495,6 +495,149 @@ Parent acceptance:
   run lint`, `bun run verification`, Changeset status and `git diff --check`
   all passed; Changesets still reports no package release.
 
+## RPC-004 Production Reachability Inventory
+
+The pre-edit audit used each package manifest's `exports.source` paths, or the
+declared distribution path when the SDK has no workspace-only source
+condition, and then checked the real source counterpart before adding a Knip
+pattern. The inventory is configuration evidence, not a second manifest.
+
+| Owner | Manifest or command surface | Production source counterparts |
+| --- | --- | --- |
+| `@taxkit/core` | `.`, `primitives`, `facts`, `parameters`, `errors`, `engine`, `rules`, `graph`, `trace`, `ledger` | `src/index.ts` and the nine matching `src/*/index.ts` files |
+| `@taxkit/rules-au-income-tax` | `.`, `facts`, `parameters`, `rules`, `rule-pack`, `calculator` | `src/index.ts` and the five matching owner `index.ts` files |
+| `@taxkit/rules-au-pay` | `.`, `facts`, `parameters`, `rules`, `calculator`, `rule-pack` | `src/index.ts` and the five matching owner `index.ts` files |
+| `@taxkit/rules-au-stsl` | `.`, `facts`, `parameters`, `rules`, `rule-pack` | `src/index.ts` and the four matching owner `index.ts` files |
+| `@taxkit/calculators` | `.`, `catalog`, `errors`, `metadata`, `service`, `live`, `schemas` | `src/index.ts`, `catalog.ts`, `errors.ts`, `metadata.ts`, `service.ts`, `live.layer.ts`, `schemas.ts` |
+| `@taxkit/api-http` | `.`, `api`, `client`, `client/live`, `client/server`, `config`, `server`, `handlers`, `handlers/live` | The nine exact manifest-owned files under `src` |
+| `@taxkit/sdk` | `.`, `effect`, `au`, `au/effect`, `schemas`, `testing` | `src/index.ts`, `effect.ts`, `au.ts`, `au-effect.ts`, `schemas/index.ts`, `testing/index.ts` |
+| `@taxkit/testing` | `.` | `src/index.ts` |
+| `@taxkit/scripts` | public `.`, manifest `release:check` command | `src/index.ts`, `src/release-readiness/release-readiness.runtime.ts` |
+| standalone `api` | manifest `start` runtime | `apps/api/src/index.ts` with runtime traversal through `src/config.ts` and `src/server.ts` |
+| `@taxkit/tsconfig` | `base.json`, `package.json` | **N/A**: JSON-only artifact; strict downstream tarball validation remains its proof |
+
+Pre-edit controls and exclusions:
+
+- Positive control: production tracing must retain the runtime edge from
+  `apps/api/src/server.ts` to `@taxkit/api-http`.
+- Negative control: a pay-only production trace must not contain
+  `@effect/vitest` or `packages/rules/au/pay/test/**`; both are development-only.
+- Pattern control: every positive entry and project glob must carry Knip
+  6.14.2's trailing `!`, and tests, fixtures, examples, generated output,
+  Vitest config and root tools must not appear as positive patterns.
+- Exact excluded workspaces are root development tooling, the docs/web apps,
+  docs-content/docs-fumadocs website support and JSON-only tsconfig. There is
+  no root production workspace and no website production owner.
+
+### 2026-07-18 - RPC-004 implementation candidate
+
+- Added `knip.production.json` with 64 exact production entry/project patterns
+  across the ten TypeScript owners above. Root `knip:production` invokes the
+  installed Knip 6.14.2 binary with `--production --config
+  knip.production.json --no-progress --no-config-hints`, and root verification
+  runs it after the unchanged development-aware graph.
+- The first isolated production pass found five production-unnecessary API
+  exports and one scripts test-layer file. Returned OpenAPI normalization and
+  formatting to `__tests__/openapi-snapshot.test.ts`, made the health endpoint,
+  health response and in-process fetch layer private to their runtime owners,
+  and excluded only `packages/scripts/src/release-readiness/test.layer.ts`
+  through one exact production negation. No public manifest export or runtime
+  behavior changed.
+- Retained one exact `ignoreIssues` entry:
+  `packages/api/http/src/client/service.ts` has a duplicate-export finding
+  because the package deliberately exposes the same Context service as
+  `TaxKitHttpApiService` and `getTaxKitHttpApiClient`. Removing an existing
+  public compatibility name is not justified by a reachability tool; no other
+  issue exception exists.
+- Positive trace output is `apps/api/src/server.ts:1:10
+  @taxkit/api-http`. Pay-only production traces for both `@effect/vitest` and
+  `packages/rules/au/pay/test/take-home-pay.test.ts` are empty. A structural
+  audit counted all 64 patterns, found zero forbidden positive patterns and
+  confirmed the single exact issue exception.
+- Focused verification passed: both Knip graphs; API HTTP `check-types`,
+  `test:openapi`, full test (5 tests) and build; standalone API `check-types`
+  and build. No app/package/browser import was changed, and the production
+  graph traverses existing browser-safe manifest entrypoints rather than deep
+  server internals.
+
+RPC-004 impact ledger:
+
+| Surface | Decision | Path evidence |
+| --- | --- | --- |
+| Spec, task list and active plan | Change required | The spec/task impact rows and this plan record the proven API cleanup, inventory, controls, exact exception and verification. The product-spec index is N/A because routing/status did not change. |
+| Canonical architecture and standards | Change required | `docs/architecture/testing-and-quality.md` and `docs/standards/tooling.md` distinguish development-aware source hygiene, production reachability and strict packed/downstream proof. |
+| Root and package READMEs | Root change; package N/A | Root `README.md` exposes the command. No package-facing contract changed, so package READMEs remain current. |
+| Knip, lint, fixtures and CI | Change required / N/A | `knip.production.json` and root scripts own the new graph. `knip.json`, Oxlint, lint fixtures and `.github/workflows/quality.yml` are unchanged; CI inherits the new root verification command. |
+| Skills, AGENTS and metadata | N/A | Concurrent approved governance work is preserved. Production reachability adds no skill or instruction policy. |
+| Config, manifests, exports, tests and operations | Change required | Root `package.json`, the three API source owners and their two focused tests changed. Package manifests, declared public entrypoints, generated output and commands are unchanged. |
+| API/SDK/provider/storage/observability/deployment | Internal API cleanup only | The API call graph and outputs are unchanged; there is no provider, storage, telemetry, deployment or rollback mutation. Packed/downstream SDK gates remain separate and were not replaced. |
+| React, website, accessibility and browser proof | N/A | `apps/docs` and `apps/web` are exact excluded owners and no React/browser file changed. |
+
+RPC-004 improvement audits:
+
+1. Manifest and reachability audit: mapped every public source counterpart,
+   scripts command and API runtime before configuration; removed test-only
+   reachability and proved positive/negative runtime controls.
+2. Ownership and finding audit: fixed internal exports at their owners, moved
+   snapshot-only logic to its test, kept one exact public compatibility alias
+   exception, and introduced no manifest mirror, broad ignore, helper, unsafe
+   cast, DTO or Effect control-flow change.
+3. Graph and artifact audit: ran both independent Knip graphs and focused
+   API/app gates, checked all positive patterns and browser-safe imports, and
+   kept strict SDK tarball/downstream proof separate.
+
+Final verification evidence:
+
+- `bun run verification` passed with both Knip graphs and 23 of 23 workspace
+  typecheck tasks. The first attempt found one type-only OpenAPI test import;
+  correcting it to `import type` made the clean rerun pass.
+- `bun run test` passed the 11 repository-path, six docs-boundary and 35 Oxlint
+  tests plus all 18 Turbo tasks. The focused API HTTP suite passed five tests.
+- `bun run build` passed all 14 Turbo tasks. Existing upstream Rolldown pure
+  annotation and bundle-size warnings did not fail either website build and are
+  outside RPC-004.
+- `bun run changeset status --verbose` initially detected the internal API
+  package cleanup without a Changeset and explicitly required `changeset add
+  --empty` for a no-release change. `.changeset/bold-stars-grab.md` records that
+  decision; the final status passes and reports no patch, minor or major package
+  releases. No package version, changelog or publish state changed.
+- JSON parsing, formatting, `git diff --check`, import-path inspection and the
+  64-pattern structural audit passed. Existing browser/runtime consumers still
+  import the API and SDK only through declared package entrypoints.
+
+### 2026-07-18 - RPC-004 parent audit correction turn 1
+
+- Parent review found that root `README.md` called the production Knip scope a
+  "published package" graph. Replaced that implication with
+  "release-artifact package" reachability: this repository currently owns
+  local versioning, Changesets and artifact proof, not npm publication.
+- Audited all RPC-004-added root, architecture, standards, spec, task, plan,
+  configuration and Changeset wording. No other text claims that publication
+  is configured: publication proof remains explicit N/A, packed/downstream
+  validation remains artifact evidence only, and the no-publish/no-versioning
+  policy remains unchanged.
+- No implementation, package manifest, runtime behavior, release version,
+  Changeset selection or RPC-005 scope changed. Focused formatting, diff,
+  repository-path, both Knip and root verification gates plus final no-release
+  Changeset status all passed for the wording correction; root verification
+  completed all 23 workspace typecheck tasks.
+
+Parent acceptance:
+
+- Parent review independently confirmed all manifest-owned source entries, 64
+  marked patterns, the exact scripts test-layer negation and the single API
+  compatibility-alias exception.
+- The positive API trace reached `@taxkit/api-http`; the pay-only
+  `@effect/vitest` and test-file traces were empty. Both Knip graphs passed.
+- Parent serial gates passed: `bun run verification` (23 of 23 typecheck
+  tasks), `bun run test` (18 of 18 Turbo tasks plus focused suites), `bun run
+  build` (14 of 14 Turbo tasks), `git diff --check` and no-release Changeset
+  status. Existing website build warnings remain non-failing and out of scope.
+- Correction turn 1 removed the only wording that implied npm publication.
+  RPC-004 is accepted with its empty no-release Changeset, unchanged public
+  manifest/runtime contracts and final target call graph. RPC-005 remains
+  blocked on the three explicit user decisions.
+
 ## Call-Graph Status
 
 The target call graphs in the spec are the acceptance baseline. RPC-001 still
@@ -518,9 +661,21 @@ the positive non-website scope and the installed Oxlint binary. Accepted,
 rejected and unrelated-shadow fixtures prove that edge. No application runtime,
 package contract, website path, plugin namespace or call-graph owner changed.
 
+RPC-004 matches the target production graph. Manifest-owned source entrypoints,
+the scripts runtime and standalone API entry flow directly into one dedicated
+Knip production graph; the API traversal retains `@taxkit/api-http`, while pay
+tests and `@effect/vitest` do not enter the graph. Root verification invokes
+the unchanged development-aware graph and then the production graph. The only
+additional internal movement returns OpenAPI snapshot normalization from a
+runtime module to its owning test; public API, SDK and browser-safe import
+edges are unchanged.
+
 ## Changeset Policy
 
-Repository-internal tools and documentation record an explicit no-Changeset
-rationale. Every package-facing correction receives a package-owned Changeset,
-including changes to private versioned packages. This rollout does not apply
-pending versions or publish packages.
+Repository-internal tools and documentation normally record an explicit
+no-Changeset rationale. RPC-004 also changes internal files under the versioned
+API package, so Changesets' status gate required an empty no-release record;
+that record names no package and causes no version bump. Every package-facing
+correction receives a package-owned release Changeset, including changes to
+private versioned packages. This rollout does not apply pending versions or
+publish packages.
