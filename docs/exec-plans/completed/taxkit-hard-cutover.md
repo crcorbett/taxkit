@@ -109,7 +109,7 @@ state at the original cutover completion, before the Changeset was consumed.
   `https://github.com/crcorbett/taxkit` and `main` remains the default branch.
 - Local `origin` fetch and push URLs now use the canonical TaxKit repository;
   both accepted source commits were pushed successfully.
-- The checkout moved to `/Users/cooper/Projects/taxkit`.
+- The local checkout directory was renamed to `taxkit`.
 - `bun run verification` passed from the renamed checkout.
 - Final tracked-file content and path audits found no retired identity token.
 - Parent audit pass 1: GitHub repository, remote and branch identity are

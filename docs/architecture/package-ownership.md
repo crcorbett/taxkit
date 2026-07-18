@@ -69,6 +69,13 @@ for production-only runtime helpers.
   deterministic test layer and runtime entrypoint. It invokes canonical root
   and package commands without moving or duplicating their validator logic.
 
+`tools/repository-paths`
+: Root-owned repository portability gate. It owns the closed machine-local path
+  policy, schema-backed safe findings, typed local process and file failures,
+  focused tests and Bun runtime entrypoint. It is not a reusable file-scanner
+  package. `@taxkit/scripts` may invoke its root command but must not mirror the
+  policy.
+
 `packages/api/http`
 : Implemented HTTP API package. It owns Effect HTTP API definitions, boundary
 schemas, thin server handlers, OpenAPI, typed HTTP clients and HTTP
@@ -148,6 +155,9 @@ belongs in apps or explicitly server-only package exports.
 - Keep React in apps or docs packages only.
 - Keep cross-package command orchestration in `packages/scripts`, but keep each
   validator and its domain policy with the package or app it validates.
+- Keep repository path classification and safe reporting in
+  `tools/repository-paths`; do not move it into package orchestration or browser
+  code.
 - Keep app-specific MDX components in `apps/docs`; promote only generic,
   repeated Fumadocs primitives to `packages/docs-fumadocs/render` or repeated
   TaxKit UI primitives to `packages/ui`.

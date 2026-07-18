@@ -16,7 +16,7 @@
       "bun run release:check",
       "tracked-tree identity audit",
       "GitHub repository and origin verification",
-      "final clean status from /Users/cooper/Projects/taxkit"
+      "final clean status from the repository root"
     ],
     "evidenceRequired": [
       "Final runtime and release call graphs match the spec.",
@@ -133,15 +133,15 @@
       "outputs": [
         "Canonical GitHub repository and origin URL.",
         "Pushed main branch.",
-        "Clean final checkout at /Users/cooper/Projects/taxkit."
+        "Clean final checkout at the repository root."
       ],
       "implementationPrompt": "This parent-owned operational task must run only after the first two tasks are accepted and committed. Do not alter source architecture. Rename the GitHub repository through the authenticated GitHub CLI, set origin to the canonical URL, push main, then rename the local directory from its parent. Run final remote, status and identity audits from the new path. Record exact evidence and stop if any external operation fails.",
       "mandatoryVerification": [
         "gh repo view crcorbett/taxkit --json nameWithOwner,url,defaultBranchRef",
         "git remote -v",
         "git status -sb",
-        "bun run verification from /Users/cooper/Projects/taxkit",
-        "tracked-tree identity audit from /Users/cooper/Projects/taxkit"
+        "bun run verification from the repository root",
+        "tracked-tree identity audit from the repository root"
       ],
       "browserVerification": [],
       "qualityAudits": [

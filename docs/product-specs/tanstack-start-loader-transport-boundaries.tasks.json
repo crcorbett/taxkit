@@ -16,7 +16,7 @@
   ],
   "beforeImplementation": [
     "Create docs/exec-plans/active/tanstack-start-loader-transport-boundaries.md and add it to the active plan index before runtime or lint edits.",
-    "Revalidate the current TaxKit docs route flow and the reference files under ~/Projects/site/apps/web/src/lib/loader before editing.",
+    "Revalidate the current TaxKit docs route flow and the reference files under site:apps/web/src/lib/loader before editing.",
     "Review the separate SSR and client-navigation call graphs; recheck bun.lock and installed TanStack Start, TanStack Router and Effect source, then record any API differences before editing.",
     "Use exactly one sequential subagent per task; the parent reviews, audits, verifies and accepts each slice before delegating the next.",
     "Do not run bun run version-repo, publish packages or consume existing Changesets."
@@ -284,7 +284,7 @@
       ],
       "goal": "Prove the serialisable loader contract in a real browser lifecycle and leave every canonical document aligned with the final code.",
       "scope": [
-        "Add app-scoped Vitest Browser Mode and Playwright configuration following the validated ~/Projects/site shape without importing site code.",
+        "Add app-scoped Vitest Browser Mode and Playwright configuration following the validated site repository shape without importing site code.",
         "Keep browser tooling in docs devDependencies and add explicit docs test:browser wiring; do not add production dependencies or production test routes.",
         "Build a programmatic client-side TanStack route harness that consumes encoded loader representations through Route.useLoaderData and the canonical restore operation; do not present this harness as SSR or hydration proof.",
         "Cover success, typed expected failure, malformed transport, defect and interruption; assert expected route UI versus TanStack errorComponent and a clean console.",

@@ -1,0 +1,532 @@
+{
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/repository-portability-and-production-contracts.md",
+  "title": "Repository Portability and Production Contracts Implementation Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-07-18",
+  "principles": [
+    "Keep the rollout website-agnostic: do not change the current docs or web applications, their routes, identity, design, accessibility, performance or deployment.",
+    "Adopt TaxKit-owned contracts and evidence rather than copying another repository's source, names, paths or complete configuration.",
+    "Use owner-named Schema contracts and schema-derived types; do not mechanically brand strings or create a generic schema bucket.",
+    "Add static rules only when exact scopes and real Oxlint binary fixtures prove a reliable signal without broad suppressions.",
+    "Implement one task at a time with parent review, verification and acceptance before the next task begins."
+  ],
+  "decisionBlockers": [
+    {
+      "id": "STR-DEC-001",
+      "decision": "Choose whether the exported IsoDate Schema gains runtime calendar-date validation, is replaced through a compatibility/deprecation path, or is documented as constructor-validated only.",
+      "evidence": [
+        "packages/core/src/primitives/date.ts documents validation but applies only Schema.brand to Schema.String",
+        "effect@4.0.0-beta.98 documents that Schema.brand adds no runtime checks"
+      ],
+      "blocks": [
+        "Package-facing IsoDate correction",
+        "Final rollout acceptance"
+      ]
+    },
+    {
+      "id": "REL-DEC-001",
+      "decision": "Choose whether @taxkit/calculators joins the Changesets fixed group or remains independently versioned.",
+      "evidence": [
+        "The strict downstream validator and repository status treat calculators as the ninth 1.0.0 artifact",
+        ".changeset/config.json and docs/standards/versioning.md define an eight-package fixed group that omits calculators"
+      ],
+      "blocks": [
+        "Package-facing calculators string-contract correction",
+        "Final rollout acceptance"
+      ]
+    }
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit each coherent task only after its mandatory gates pass, three documented improvement audits are accepted, the Changeset decision is reviewed, and the parent confirms the task still matches the spec call graphs.",
+    "requiredBeforeFinalPR": [
+      "bun run check:repository-paths",
+      "bun run knip",
+      "bun run knip:production",
+      "bun run verification",
+      "bun run test",
+      "bun run build",
+      "bun run changeset status --verbose"
+    ],
+    "evidenceRequired": [
+      "Zero tracked machine-local checkout references across every Git-tracked readable text file",
+      "Final repository-path, string-contract, portable-lint and production-Knip call graphs",
+      "String-contract audit summary by owning package or app boundary",
+      "Accepted, rejected, alias and unrelated-shadow real-binary evidence for every new portable lint rule",
+      "Production Knip entrypoint inventory and exact rationale for every exception",
+      "Approved STR-DEC-001 and REL-DEC-001 decision records before final rollout acceptance",
+      "Three documented improvement audit passes for every substantial task",
+      "Changeset path and release-train impact, or explicit no-Changeset rationale for each task"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "RPC-001",
+      "title": "Remove machine-local references and enforce repository path hygiene",
+      "type": "repository-portability",
+      "dependsOn": [],
+      "goal": "Make all tracked source and documentation portable across clean checkouts and prevent workstation-specific checkout paths from returning.",
+      "scope": [
+        "README.md and the 10 other completed-plan/spec/task-list files in the 2026-07-18 baseline path audit",
+        "A focused root repository-path policy and runtime under tools/repository-paths",
+        "Root command wiring and canonical verification",
+        "Architecture, testing and root README guidance required by the new gate"
+      ],
+      "outputs": [
+        "Repository-relative or repository-identity replacements for all 39 baseline references",
+        "Schema-backed path findings and typed command failures",
+        "Deterministic accepted and rejected path-check tests",
+        "Canonical check:repository-paths and check:repository-paths:types root commands included in verification",
+        "A canonical test:repository-paths root command included in the root test graph",
+        "Updated root README, package-ownership, tooling and testing/quality documentation"
+      ],
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list.\n\nBefore editing, read the target spec, this task object, relevant current files, and the relevant docs in docs/architecture/*. Identify the owner for every schema, type, service, layer and tagged error you touch. Review the spec call graphs before editing and report any final difference.\n\nMUST use Effect-native primitives and platform APIs when they fit, including Schema, Array, Match, Context, Layer, Config, Record, Result, Exit, Bun, Platform, ChildProcess and ChildProcessSpawner. Do not use nullable values, mutable records, switch, Object enumeration, ad hoc tags, unsafe casts, custom process handling or hand-rolled runtime wrappers when an Effect primitive fits. Reuse canonical schemas, derived types, tagged errors, services and constructors. Do not create mirrored DTOs, generic file-scanner abstractions or one-use mapper/error helpers. Keep the primary repository check as one meaningful linear Effect pipeline or Effect.gen program; map typed failures inline at the owning boundary.\n\nTask-specific: remove all 39 baseline references from the 11 files named in the spec without deleting useful history. Implement the root-owned tools/repository-paths/schemas.ts, policy.ts, check.runtime.ts, focused tests and tsconfig.json only. Use the repository's Effect v4 ChildProcess/ChildProcessSpawner model for the NUL-delimited git ls-files inventory and Effect FileSystem/Path for reads. Scan every Git-tracked readable text file with bounded concurrency. Treat NUL-containing or strict-UTF-8-invalid payloads as binary. Cover the five closed path categories and accepted relative/repository/HTTPS/prose cases, including an accepted portable tilde-dot tool-state path. Findings contain only repository-relative file, positive line and category and sort by file/line/category; never render matched text, username, process stderr or surrounding content. Build rejected test values from neutral fragments so the checker/tests pass their own scan. Add check:repository-paths and check:repository-paths:types to verification and test:repository-paths to root test. Keep @taxkit/scripts unchanged. Add no service/layer or helper unless it proves a substitution point beyond pure policy and CLI integration.\n\nRun every mandatory verification gate and document at least three improvement audit passes. Report changed files, verification outcomes, residual risks, the final call graph and the internal-tool no-Changeset rationale unless a package-facing contract changes. Do not start or delegate another task. The parent must review, verify and accept this task before the next task begins.",
+      "mandatoryVerification": [
+        "bun run test:repository-paths",
+        "bun run check:repository-paths:types",
+        "bun run check:repository-paths",
+        "Independent git-tracked readable-text audit confirming the 39-reference baseline is zero and the checker/tests are in scope",
+        "bun run verification",
+        "bun run changeset status --verbose and an explicit no-Changeset rationale unless a public package contract changed",
+        "Effect audit: one meaningful linear primary program, typed errors mapped at the owning boundary, canonical Schema-derived findings, no unsafe casts, DTO mirrors, manual object readers or trivial wrappers",
+        "Import audit confirming no browser or runtime surface gained a server-only dependency"
+      ],
+      "browserVerification": [],
+      "downstreamArtifacts": {
+        "change": [
+          "README.md",
+          "docs/exec-plans/completed/sdk-backed-http-api-thin-wrapper.md",
+          "docs/exec-plans/completed/taxkit-hard-cutover.md",
+          "docs/product-specs/docs-fumadocs-package-separation.md",
+          "docs/product-specs/docs-fumadocs-package-separation.tasks.json",
+          "docs/product-specs/docs-mdx-fumadocs-runtime.md",
+          "docs/product-specs/docs-mdx-fumadocs-runtime.tasks.json",
+          "docs/product-specs/tanstack-start-loader-transport-boundaries.md",
+          "docs/product-specs/tanstack-start-loader-transport-boundaries.tasks.json",
+          "docs/product-specs/taxkit-hard-cutover.md",
+          "docs/product-specs/taxkit-hard-cutover.tasks.json",
+          "tools/repository-paths/schemas.ts",
+          "tools/repository-paths/policy.ts",
+          "tools/repository-paths/check.runtime.ts",
+          "tools/repository-paths/*.test.ts",
+          "tools/repository-paths/tsconfig.json",
+          "package.json",
+          "knip.json",
+          "oxlint.config.ts",
+          "docs/architecture/package-ownership.md",
+          "docs/architecture/testing-and-quality.md",
+          "docs/standards/tooling.md"
+        ],
+        "conditional": [
+          "bun.lock only if the root Effect Platform dependency surface changes"
+        ],
+        "notApplicable": [
+          "packages/scripts/** because @taxkit/scripts remains orchestration-only",
+          ".github/workflows/quality.yml because it already invokes root verification",
+          "apps/docs/**, apps/web/** and browser proof"
+        ]
+      },
+      "qualityAudits": [
+        "Pass 1: inspect matching policy, exact exclusions and fixtures for false positives, false negatives and workstation-specific assumptions.",
+        "Pass 2: inspect the command call graph, Effect control flow, schema-derived findings, typed failures, unsafe casts, DTO mirrors and helper sprawl.",
+        "Pass 3: inspect all replacements for preserved historical meaning, relative-link correctness, root verification wiring and zero residual tracked references."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "The parent independently confirms zero tracked machine-local checkout references.",
+        "The path check covers every Git-tracked readable text file and reports safe schema-backed locations.",
+        "Generated, binary or vendored exclusions are exact, documented and tested.",
+        "Runtime-assembled rejected cases fail focused tests, and root verification passes with the tool and tests included in the clean repository scan.",
+        "Root verification typechecks and runs the path scan, while root test runs the focused path suite so CI enforces both contracts.",
+        "The parent accepts all three audit passes, final call graph and Changeset decision before the next task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "RPC-002",
+      "title": "Define and audit the canonical string-contract taxonomy",
+      "type": "schema-contracts",
+      "dependsOn": [
+        "RPC-001"
+      ],
+      "goal": "Define the selection policy and produce a decision-ready audit of package-facing, configured, persisted, diagnostic and provider-facing string contracts without changing package behavior.",
+      "scope": [
+        "Canonical Effect and code-pattern documentation for the six string categories",
+        "String-shaped exported Schemas, types and constructor inputs reachable from the exact nine-package artifact manifests",
+        "@taxkit/scripts command evidence and apps/api configuration/runtime contracts",
+        "Persisted, serialized, process, provider, diagnostic and secret records, with explicit N/A findings where no surface exists",
+        "STR-DEC-001 and REL-DEC-001 evidence plus every additional compatibility decision discovered by the audit"
+      ],
+      "outputs": [
+        "Durable string-contract taxonomy in canonical architecture or standards guidance",
+        "An implementation-evidence inventory of audited owners and decisions",
+        "Decision-ready correction entries with exact owning files, compatibility impact, proof commands and required Changeset/changelog artifacts",
+        "No package contract or runtime behavior changes in this audit slice",
+        "An explicit documentation-only no-Changeset rationale"
+      ],
+      "implementationPrompt": "You are implementing exactly one audit/documentation task from the TaxKit spec/task list.\n\nBefore editing, read the target spec, this task object, package manifests/exports, relevant schemas/config/persistence/transport/diagnostic files, and the relevant docs in docs/architecture/*. Identify the owning package for every Schema, type, ID, constructor, service, layer and tagged error in the ledger. Review the spec call graphs before editing and report any final difference.\n\nUse installed Effect 4.0.0-beta.98 semantics: Schema.brand is nominal and adds no runtime check; raw secret ingress uses RedactedFromValue while Schema.Redacted expects an already-redacted value. Plain string or inline Schema.String/NonEmptyString is correct for ordinary content without independent validation, secrecy, mixing or reuse policy. Do not propose generic brand factories, content-schema wrappers, shared schema buckets, unsafe casts, local DTO mirrors, manual object readers, repeated internal decoding, stringly branching or trivial helpers. Preserve legitimate explicit recursive encoded types and generic descriptor interfaces.\n\nTask-specific: update docs/architecture/effect-services.md as canonical taxonomy owner and keep docs/standards/code-patterns.md to concise linked examples. In the active execution plan, inventory only string-shaped fields in exported Schemas/types/constructor inputs/configuration/encoded or diagnostic contracts reachable from the nine artifact manifests, plus @taxkit/scripts and apps/api. Do not inventory every literal, tag, label, fixture or env-key. Each row records owning module/Schema, field, exposure boundary, current/proposed category, runtime constraints, brand identity, Type, Encoded, constructor path, ingress decode, egress encode, compatibility and keep/change/N/A. Record @taxkit/tsconfig application strings N/A, absent persistence/provider/secret surfaces N/A, STR-DEC-001, REL-DEC-001, scripts cwd/stdout/stderr rendering and SDK Cause.pretty diagnostics. For each proposed correction name exact files, focused owner commands, package-facing Changeset impact and apps/api CHANGELOG impact. Do not change package code, manifests, Changesets config or runtime behavior in this task.\n\nRun every mandatory gate and document three improvement audit passes. Report the ledger, decisions, changed docs, residual risks, call-graph alignment and documentation-only no-Changeset rationale. Do not start or delegate another task. The parent must review and accept this audit before the next task begins.",
+      "mandatoryVerification": [
+        "Complete manifest-to-field ledger with every column and exclusion named in the task prompt",
+        "Evidence that STR-DEC-001 and REL-DEC-001 remain explicit blockers rather than implicit code or release-policy changes",
+        "Audit proving brand-only versus runtime-checked schemas are distinguished, Redacted variants match ingress representation, closed vocabularies use literals, and ordinary content does not create named-schema sprawl",
+        "Audit of scripts cwd/stdout/stderr and SDK Cause.pretty diagnostic egress with a proposed sentinel test or exact local non-persistent policy",
+        "Decision-ready exact owner commands: check-types/test/build; calculators and SDK test-types; API HTTP test:openapi; SDK check-boundaries/packed/downstream when its package graph changes; API app check-types/build/smoke; scripts check-types/test/build",
+        "bun run verification",
+        "Explicit documentation-only no-Changeset rationale",
+        "bun run changeset status --verbose"
+      ],
+      "browserVerification": [],
+      "downstreamArtifacts": {
+        "change": [
+          "docs/architecture/effect-services.md",
+          "docs/standards/code-patterns.md",
+          "the active execution plan audit ledger"
+        ],
+        "conditional": [
+          "No conditional code artifacts in this audit-only task; proposed corrections are recorded for a separately approved slice"
+        ],
+        "notApplicable": [
+          "a central strings or brands package",
+          "owner package source, manifests, tests, READMEs, Changesets and apps/api/CHANGELOG.md in this audit-only task",
+          "database migrations, provider configuration and secret stores when the audit records no current surface",
+          "apps/docs/**, apps/web/** and browser proof",
+          "agent skills and AGENTS.md because the workflow contract is unchanged"
+        ]
+      },
+      "qualityAudits": [
+        "Pass 1: challenge every proposed brand, check, literal or named content contract for semantic value, correct owner, compatibility and schema/helper sprawl.",
+        "Pass 2: inspect Type/Encoded, constructor, ingress/egress and diagnostic data flow; distinguish canonical recursion/generic interfaces from DTO mirrors.",
+        "Pass 3: inspect manifest coverage, explicit N/A rows, exact correction commands/artifacts, decision blockers, docs ownership and no-Changeset accuracy."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Canonical guidance defines all six string-contract categories and when not to brand.",
+        "The audit covers every in-scope owner and records keep/change decisions.",
+        "Every absent persistence, provider, secret or diagnostic surface is recorded as N/A rather than synthesized.",
+        "Every proposed correction names exact owner files, commands, package-facing Changeset impact and any API app changelog impact without changing code.",
+        "STR-DEC-001, REL-DEC-001 and any additional breaking correction are reported as decision blockers.",
+        "The docs introduce no generic brand/content helper policy, misclassified recursive codec, DTO mirror or mechanical branding requirement.",
+        "The parent accepts all three audit passes, final call graph, decision ledger and no-Changeset rationale before the next task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "RPC-003",
+      "title": "Select and enforce additional portable Effect lint contracts",
+      "type": "static-enforcement",
+      "dependsOn": [
+        "RPC-002"
+      ],
+      "goal": "Turn reliable website-agnostic Effect failure modes into binding-aware portable rules without duplicating TaxKit-specific boundaries or creating suppression pressure.",
+      "scope": [
+        "tools/oxlint/effect-rules.js and shared binding analysis",
+        "Portable accepted, rejected and unrelated-shadow fixtures",
+        "Exact rule scopes and boundary files in oxlint.config.ts",
+        "Necessary migrations in existing non-website Effect code",
+        "Effect and testing/quality architecture guidance"
+      ],
+      "outputs": [
+        "A recorded admit/reject decision for each candidate portable rule",
+        "Binding-aware implementations for admitted rules",
+        "Visitor tests and installed-Oxlint binary fixtures",
+        "Exact enabled scopes with no broad ignores or inline suppressions",
+        "Focused source migrations and aligned architecture documentation"
+      ],
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list.\n\nBefore editing, read the target spec, this task object, current Oxlint plugins/config/fixtures, affected source, and the relevant docs in docs/architecture/*. Identify every canonical binding, boundary allowlist, owning schema/type/service/layer/error and current rule overlap. Review the spec call graphs before editing and report any final difference.\n\nMUST implement portable rules with binding-aware AST analysis that resolves canonical direct/namespace imports, renamed bindings, statically known destructuring and reassignment while accepting unrelated shadowed locals. Use current shared binding utilities when they fit. Keep one-off source migrations as direct Effect pipes or Effect.gen programs with typed errors handled inline at the owning boundary. Reuse canonical schemas and derived types. Do not duplicate the exact decoder rule, move route/browser policy into the portable namespace, add broad globs/suppressions, use text-only lint heuristics, introduce unsafe casts/DTO mirrors/manual readers, or extract trivial rule/source helpers.\n\nTask-specific: build the decision matrix before editing. Evaluate bare Effect.tryPromise, host API use in services, adapter execution without an explicit boundary, nullable boundary leakage, Result/Exit re-encoding, non-throwing synchronous decoder placement and any calculator rule that may be genuinely domain-neutral. For every candidate record exact candidate ID, existing overlap, intended scope, positive/negative cases, migration count and admit/reject reason. Explicitly reconcile effect/no-host-imports-in-contracts, effect/no-runtime-execution-outside-boundaries, bun/no-host-api-outside-adapters, bun/no-runtime-outside-entrypoints, effect/no-schema-encoder-outside-egress, effect/no-throwing-schema-sync-codec, taxkit/no-decoding-outside-boundaries and taxkit/no-nullish-comparison. Extend the current owner when semantics match and reject duplicates. Zero new rules is valid when the evidence proves overlap or an unreliable static signal. For admitted rules, add focused cases plus the aggregate installed-Oxlint fixtures. Do not add website or route rules.\n\nRun every mandatory verification gate and document at least three improvement audit passes. Report rules admitted/rejected, changed files, fixture evidence, migrated violations, residual risks, final call-graph alignment and the Changeset or explicit no-Changeset rationale. Do not start or delegate another task. The parent must review, verify and accept this task before the next task begins.",
+      "mandatoryVerification": [
+        "Candidate inventory showing existing overlap, static signal, intended exact scope and admit/reject decision",
+        "bun run test:oxlint",
+        "Real installed-Oxlint accepted, rejected, renamed/aliased and unrelated-shadow fixture evidence for every admitted rule with nested config disabled",
+        "bun run lint",
+        "Audit confirming no broad ignorePatterns, package-wide boundary exemptions or inline disable directives were added",
+        "Effect audit for every migrated violation: meaningful linear control flow, typed error handling at the owning boundary, canonical Schema/type reuse, no unsafe casts, DTO mirrors, manual object readers or trivial wrappers",
+        "Import audit confirming browser/runtime code still consumes browser-safe API and SDK exports",
+        "bun run verification",
+        "bun run changeset for package-facing behavior changes, or explicit tooling/internal no-Changeset rationale",
+        "bun run changeset status --verbose"
+      ],
+      "browserVerification": [],
+      "downstreamArtifacts": {
+        "change": [
+          "tools/oxlint/effect-rules.js for admitted rules only",
+          "tools/oxlint/portable-rules.test.ts",
+          "tools/oxlint/fixtures/effect-accepted.ts",
+          "tools/oxlint/fixtures/effect-rejected.ts.txt",
+          "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
+          "focused rule test files for admitted rules",
+          "oxlint.config.ts for exact admitted scopes",
+          "docs/architecture/effect-services.md",
+          "docs/architecture/testing-and-quality.md",
+          "docs/standards/code-patterns.md"
+        ],
+        "conditional": [
+          "tools/oxlint/binding-tracker.js only when current binding analysis cannot express an admitted rule",
+          "tools/oxlint/bun-rules.js or taxkit-rules.js only when the decision matrix deliberately changes existing ownership",
+          "owner source/tests/README and Changeset only for real migrated behavior"
+        ],
+        "notApplicable": [
+          "route-loader, website and browser rules",
+          "broad package exemptions, inline suppressions and disabled duplicate rules",
+          ".github/workflows/quality.yml because root verification already runs lint"
+        ]
+      },
+      "qualityAudits": [
+        "Pass 1: challenge each candidate for duplicate coverage, false positives, unresolved binding cases and whether review guidance is safer than lint.",
+        "Pass 2: inspect rule visitors, binding resolution, fixtures, exact scopes and source migrations for direct Effect-native control flow and canonical contracts.",
+        "Pass 3: inspect the full lint graph for namespace ownership, suppression pressure, decoder/route-boundary preservation, docs alignment and Changeset accuracy."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Every admitted rule has a reliable binding-aware signal, exact scope and real-binary evidence.",
+        "Rejected rules have a concise reason and remain review guidance rather than dead or disabled code.",
+        "The decision matrix explicitly reconciles every named existing overlapping rule.",
+        "TaxKit-specific decoder, tax and route rules remain separate and at least as strict as before.",
+        "All migrated source remains linear, typed, schema-owned and free of suppression or helper sprawl.",
+        "The parent accepts all three audit passes, final lint call graph and Changeset decision before the next task."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "RPC-004",
+      "title": "Add the production-only package and API dependency graph",
+      "type": "production-reachability",
+      "dependsOn": [
+        "RPC-003"
+      ],
+      "goal": "Prove that the exact nine-package artifact closure, repository command entrypoints and the standalone API runtime are complete without tests, fixtures, examples or development-only modules keeping production code reachable.",
+      "scope": [
+        "A dedicated root production Knip configuration",
+        "Every public export and source counterpart in the eight code-bearing packages of the exact nine-package artifact closure",
+        "An explicit TypeScript source-graph N/A for the JSON-only @taxkit/tsconfig artifact",
+        "@taxkit/scripts executable command entrypoints",
+        "apps/api production runtime entrypoints",
+        "Root scripts, verification and testing/quality documentation"
+      ],
+      "outputs": [
+        "A canonical knip:production root command",
+        "Production entrypoint and project definitions for every in-scope owner",
+        "Corrections for dead, missing or incorrectly exported production code",
+        "Exact documented exceptions for framework or conditional-export behavior",
+        "Root verification and architecture guidance updated for both Knip graphs"
+      ],
+      "implementationPrompt": "You are implementing exactly one task from the TaxKit spec/task list.\n\nBefore editing, read the target spec, this task object, current package manifests/exports/runtime entrypoints/Knip config, and the relevant docs in docs/architecture/*. Identify the owner of every production entrypoint and public export. Review the current and target call graphs before editing and report any final difference.\n\nUse structured configuration and current package manifests as the source of truth. If code changes are required, MUST use Effect-native primitives, canonical schemas/types/errors/services and meaningful linear Effect pipelines with typed errors handled inline at the owning boundary. Do not create manifest mirrors, generic config helpers, unsafe casts, local DTOs, broad Knip ignores, test entrypoints that keep production code alive, or website scope. Browser/runtime code must continue to consume browser-safe exports.\n\nTask-specific: create knip.production.json and make knip:production invoke installed Knip 6.14.2 with --production --config knip.production.json --no-progress --no-config-hints. Use trailing ! production entry/project patterns. Inventory every manifest export and source counterpart for @taxkit/core, @taxkit/rules-au-income-tax, @taxkit/rules-au-pay, @taxkit/rules-au-stsl, @taxkit/calculators, @taxkit/api-http, @taxkit/sdk and @taxkit/testing. Include @taxkit/scripts exported source/executable runtimes and apps/api/src/index.ts. Record @taxkit/tsconfig N/A because it exports JSON only and retain strict downstream tarball proof. Do not add root tools: they are devDependencies/development tooling and remain in knip.json. Exclude tests, Vitest config, fixtures, examples, generated output and development-only tooling. Positive control: apps/api's runtime traversal must retain @taxkit/api-http. Negative control: test-only @effect/vitest in packages/rules/au/pay must not supply production reachability. Resolve findings through correct exports, entrypoints, imports or deletion; every exception must be exact and ownership-explained. Keep the development-aware Knip command and add production Knip to verification. Knip does not replace SDK packed/downstream proof. Do not add apps/docs or apps/web.\n\nRun every mandatory gate and three improvement audits. Report inventory, controls, exceptions, changed files, outcomes, risks, call-graph alignment and Changeset/no-Changeset rationale. Do not start or delegate another task. The parent must review and accept this task before final rollout acceptance.",
+      "mandatoryVerification": [
+        "Documented manifest-to-source entrypoint inventory for the eight code-bearing artifact packages, @taxkit/scripts exports/commands and apps/api, plus @taxkit/tsconfig source-graph N/A",
+        "Exact command evidence for knip --production --config knip.production.json --no-progress --no-config-hints",
+        "bun run knip",
+        "bun run knip:production",
+        "Positive control proving apps/api retains runtime @taxkit/api-http reachability and negative control proving pay-package @effect/vitest test reachability is excluded",
+        "Negative audit proving tests, fixtures, examples, generated files and development-only config do not provide production reachability",
+        "Audit of every production Knip exception for exact path, owner and runtime reason",
+        "Focused package/API type checks, tests and builds for any source or export corrections",
+        "Effect audit for code corrections: meaningful linear control flow, typed errors at owning boundaries, canonical Schema/type reuse, no unsafe casts, DTO mirrors, manual readers or trivial wrappers",
+        "Import audit confirming browser/runtime code still consumes browser-safe API and SDK exports",
+        "bun run verification",
+        "bun run test",
+        "bun run build",
+        "bun run changeset for package-facing export or behavior changes, or explicit internal-tooling no-Changeset rationale",
+        "bun run changeset status --verbose"
+      ],
+      "browserVerification": [],
+      "downstreamArtifacts": {
+        "change": [
+          "knip.production.json",
+          "package.json",
+          "docs/architecture/testing-and-quality.md",
+          "docs/standards/tooling.md",
+          "README.md when the command is exposed in the root command map"
+        ],
+        "conditional": [
+          "knip.json only when canonical development entry definitions are corrected or factored",
+          "package.json and source entrypoints for @taxkit/core, @taxkit/rules-au-income-tax, @taxkit/rules-au-pay, @taxkit/rules-au-stsl, @taxkit/calculators, @taxkit/api-http, @taxkit/sdk and @taxkit/testing only for a proven finding",
+          "packages/scripts/package.json and executable runtime files only for a proven finding",
+          "apps/api/package.json and apps/api/src/index.ts only for a proven finding",
+          "SDK check-packed-artifact and validate:downstream only when export corrections affect the package graph",
+          ".changeset/*.md for package-facing export or behavior corrections"
+        ],
+        "notApplicable": [
+          "apps/docs/**, apps/web/** and browser proof",
+          "packages/tsconfig source entrypoints because the artifact exports JSON only; strict downstream tarball proof remains required when relevant",
+          "tools/repository-paths and other root tools because they are development tooling covered by knip.json",
+          ".github/workflows/quality.yml because root verification inherits the command",
+          "publication approval, deployment configuration, telemetry and data migrations"
+        ]
+      },
+      "qualityAudits": [
+        "Pass 1: inspect every production entrypoint and export against package manifests and actual runtime ownership; remove development/test reachability.",
+        "Pass 2: inspect findings and fixes for correct ownership, minimal exceptions, package boundary integrity, Effect quality and absence of helper/config mirrors.",
+        "Pass 3: inspect both Knip graphs, root verification, builds/tests, architecture docs, final call graph and Changeset accuracy."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Development-aware and production-only Knip commands both pass independently and through root verification.",
+        "The production graph covers every in-scope public export and executable runtime entrypoint without website scope.",
+        "The configuration uses Knip 6.14.2 production patterns and passes both reachability controls.",
+        "No test, fixture, example, generated or development-only entrypoint hides missing production reachability.",
+        "Every exception is exact, documented and tied to a real owner or framework contract.",
+        "The parent accepts all three audit passes, final call graphs and Changeset decisions before final rollout acceptance."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "RPC-005",
+      "title": "Resolve string compatibility and release-train decisions",
+      "type": "product-decision",
+      "dependsOn": [
+        "RPC-002"
+      ],
+      "goal": "Obtain and record explicit owner decisions for IsoDate runtime validation and calculators release-train membership before any package-facing correction begins.",
+      "scope": [
+        "STR-DEC-001 and its audit-led compatibility options",
+        "REL-DEC-001 and its release/versioning evidence",
+        "The target spec, task list and active execution plan",
+        "The exact resolved file, command, Changeset and changelog scope for RPC-006"
+      ],
+      "outputs": [
+        "A dated explicit user decision for STR-DEC-001",
+        "A dated explicit user decision for REL-DEC-001",
+        "The selected compatibility and release-policy consequences recorded in the spec",
+        "RPC-006 updated with an exact resolved scope and no unresolved correction placeholders"
+      ],
+      "implementationPrompt": "You are resolving exactly one product-decision task from the TaxKit spec/task list.\n\nBefore asking for a decision, read the target spec, RPC-002's completed audit ledger and evidence, packages/core/src/primitives/date.ts, installed Effect Schema.brand behavior, .changeset/config.json, docs/standards/versioning.md, the nine artifact manifests and strict downstream validation. Present the current contradiction, concrete compatible choices, recommendation, package-facing impact and exact files/commands for each decision.\n\nDo not infer approval from repository state, prior version alignment or implementation convenience. Do not edit package code, manifests, Changesets configuration or runtime behavior before the user explicitly selects an option for both STR-DEC-001 and REL-DEC-001. If either decision is absent, keep this task and final rollout acceptance blocked.\n\nAfter explicit approval, record the dated decisions in the spec and active plan. Replace RPC-006's unresolved scope with the exact owning files, commands, compatibility treatment, Changeset requirements and apps/api changelog impact identified by the audit and decisions. If a decision requires no code correction, record the exact documentation-only consequence and N/A rationale. Run the mandatory documentation gates and report changed files, recorded decisions and the fully resolved RPC-006 scope. Do not begin RPC-006.",
+      "mandatoryVerification": [
+        "Explicit user approval recorded for STR-DEC-001 and REL-DEC-001",
+        "Evidence audit against the installed Effect version, owning source, Changesets config, versioning standard, artifact manifests and downstream validator",
+        "RPC-006 contains exact files, owner commands, compatibility treatment, Changeset impact and API app changelog impact before it can start",
+        "Documentation ownership and cross-link audit across the spec, task list and active execution plan",
+        "bun run format:check",
+        "bun run verification",
+        "bun run changeset status --verbose"
+      ],
+      "browserVerification": [],
+      "downstreamArtifacts": {
+        "change": [
+          "docs/product-specs/repository-portability-and-production-contracts.md",
+          "docs/product-specs/repository-portability-and-production-contracts.tasks.json",
+          "The active execution plan and validation log"
+        ],
+        "conditional": [
+          "docs/architecture/effect-services.md only when the selected decision changes the taxonomy wording",
+          "docs/standards/versioning.md only in RPC-006 if REL-DEC-001 changes release policy"
+        ],
+        "notApplicable": [
+          "Package source, manifests, .changeset/config.json and Changeset files before RPC-006",
+          "Website, browser, deployment, telemetry and data-migration artifacts"
+        ]
+      },
+      "qualityAudits": [
+        "Pass 1: challenge whether each contradiction is real, current and owned by the cited source rather than historical prose.",
+        "Pass 2: compare every option for compatibility, release semantics, exact downstream artifacts and reversible versus breaking effects.",
+        "Pass 3: confirm the recorded approvals are unambiguous and RPC-006 has a closed exact scope with no inferred decision."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Both decisions quote or link an explicit user approval and record the selected option.",
+        "The spec no longer presents either selected policy as unresolved.",
+        "RPC-006 is implementation-ready with exact files, commands and release artifacts derived from the audit ledger.",
+        "No package-facing or release-policy mutation occurs in this decision-only task.",
+        "The parent accepts all three audits and the no-Changeset rationale before RPC-006 begins."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "RPC-006",
+      "title": "Apply approved string-contract and release-policy corrections",
+      "type": "package-contract-correction",
+      "dependsOn": [
+        "RPC-003",
+        "RPC-004",
+        "RPC-005"
+      ],
+      "startCondition": "Blocked until RPC-005 records both explicit decisions and replaces the unresolved scope below with exact files, commands and artifacts.",
+      "resolvedScope": [],
+      "goal": "Apply only the package-facing string-contract and release-policy corrections explicitly approved through RPC-005, with compatibility proof and complete release artifacts.",
+      "scope": [
+        "Only exact correction rows approved from RPC-002's audit ledger",
+        "Only the STR-DEC-001 and REL-DEC-001 outcomes recorded by RPC-005",
+        "Owning package tests, READMEs, Changesets and API app changelog artifacts named in the resolved scope"
+      ],
+      "outputs": [
+        "Approved corrections implemented at their canonical owning schemas or release configuration",
+        "Focused compatibility and diagnostics-safety tests",
+        "Exact package-facing Changesets and apps/api changelog updates where required",
+        "The audit ledger and canonical guidance updated to final keep/change/N/A outcomes"
+      ],
+      "implementationPrompt": "You are implementing exactly one approved correction task from the TaxKit spec/task list.\n\nSTOP without editing if resolvedScope is empty, either decision lacks explicit recorded approval, or any file/command/release artifact remains a placeholder. Read the target spec, this task object, the RPC-002 audit ledger, RPC-005 decision record, every exact owning source/test/doc file in resolvedScope and the relevant architecture docs before editing.\n\nImplement only approved rows. Use installed Effect 4.0.0-beta.98 Schema semantics, canonical owner-named Schemas and schema-derived Type/Encoded forms. Decode unknown representation values exactly once at ingress and encode only at explicit egress. Use Schema.brand only for nominal identity with a separately enforced stable invariant when runtime validation is promised. Use RedactedFromValue for approved raw secret ingress and Schema.Redacted for already-redacted values. Keep ordinary content as plain string or inline Schema.String/NonEmptyString unless the decision ledger proves independent semantic policy. Preserve legitimate recursive encoded types and generic descriptors. Treat diagnostic safety as an egress data-flow contract and prove sentinel secret/private-path values cannot enter persistent or user-facing output unless an approved local-only policy says otherwise. Do not add generic brand factories, shared schema buckets, mirrored DTOs, unsafe casts, repeated defensive decoding, stringly branching or trivial helpers.\n\nApply the exact compatibility/deprecation and release-train choices recorded by RPC-005. Add a Changeset for every package-facing correction, including private versioned packages. If apps/api HTTP or deployment-facing behavior changes, update apps/api/CHANGELOG.md. Run every exact owner command from resolvedScope plus all mandatory repository gates. Document three improvement audits and report changed files, compatibility evidence, diagnostic egress evidence, final call graph and release artifacts. Do not add website work or publish packages.",
+      "mandatoryVerification": [
+        "Preflight proving both explicit decisions are recorded and resolvedScope contains no placeholder or inferred artifact",
+        "Every exact focused typecheck, test and build command copied from the approved RPC-002 ledger by RPC-005",
+        "Compatibility/deprecation tests required by the selected STR-DEC-001 option",
+        "Sentinel secret and private-path egress tests for every corrected diagnostic boundary, or an explicit approved N/A row",
+        "Audit proving one-time ingress decoding, explicit egress encoding, canonical Schema/type reuse and no unsafe construction, DTO mirrors or repeated internal decoding",
+        "Audit proving .changeset/config.json and docs/standards/versioning.md agree with the selected REL-DEC-001 policy",
+        "bun run verification",
+        "bun run test",
+        "bun run build",
+        "bun run changeset status --verbose"
+      ],
+      "browserVerification": [],
+      "downstreamArtifacts": {
+        "change": [
+          "Exact owner source, tests, documentation and release artifacts populated in resolvedScope by RPC-005",
+          "The RPC-002 audit ledger and active execution-plan validation log"
+        ],
+        "conditional": [
+          "Owning package README when a package-facing contract changes",
+          ".changeset/config.json and docs/standards/versioning.md when the approved release policy changes",
+          "apps/api/CHANGELOG.md when API app HTTP or deployment-facing behavior changes",
+          "SDK packed-artifact and strict downstream validation when an affected export enters that graph"
+        ],
+        "notApplicable": [
+          "Unapproved audit rows and unrelated package cleanup",
+          "npm publication, tags, release pull requests, website, browser, deployment, telemetry and data migrations"
+        ]
+      },
+      "qualityAudits": [
+        "Pass 1: compare every edit with the explicit decisions and exact audit-ledger row; remove scope not directly approved.",
+        "Pass 2: inspect runtime validation, Type/Encoded ownership, ingress/egress placement, diagnostic safety, compatibility and Effect-native control flow.",
+        "Pass 3: inspect focused and repository-wide proof, READMEs, Changesets, changelog, release-group consistency and final keep/change/N/A ledger state."
+      ],
+      "parentAudit": {
+        "required": true,
+        "maxCorrectionTurns": 3,
+        "returnToSameSubagent": true,
+        "escalateAfterFailedTurn": 3
+      },
+      "completionCriteria": [
+        "Only explicitly approved corrections are implemented and every resolvedScope item is accounted for.",
+        "Runtime behavior and documentation match the selected IsoDate contract with compatibility proof.",
+        "Changesets fixed-group configuration, versioning guidance and downstream artifact expectations agree with the selected calculators policy.",
+        "Corrected diagnostics cannot expose sentinel secrets or machine-local paths through covered egresses.",
+        "All focused and repository-wide gates pass with complete Changeset/changelog artifacts and no package publication.",
+        "The parent accepts all three audits and the final call graph before final rollout acceptance."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}

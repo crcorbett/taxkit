@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-18
 source_of_truth: docs
 confidence: high
 ---
@@ -34,8 +34,12 @@ The current repository baseline is canonical root verification:
 bun run verification
 ```
 
-Root verification includes lint, format, Knip and workspace type checks. For
-docs, that means `apps/docs` type checking also typechecks checked examples,
+Root verification includes lint, format, Knip and workspace type checks. It
+also typechecks and executes the root repository-path gate, which scans
+Git-tracked readable text and safely reports only repository-relative file,
+positive line and closed finding category. Binary files are identified by a
+NUL byte or failed strict UTF-8 decode and skipped. For docs, that means
+`apps/docs` type checking also typechecks checked examples,
 and dependent package builds run before type checks through Turbo. Heavier
 docs runtime gates remain explicit package commands so normal local
 verification does not rebuild and validate the whole docs corpus on every
@@ -245,6 +249,11 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   text-search rules.
 - Verification evidence should be recorded in specs, task lists or exec plans
   when work spans multiple packages.
+- Repository portability verification must use the root-owned
+  `check:repository-paths` command. Rejected fixtures assemble private-looking
+  values from neutral fragments so the checker and its tests remain inside the
+  policy they prove. Reports must never include matched text, usernames,
+  process stderr or surrounding content.
 - Keep `bun run release:check` as orchestration over canonical commands. A new
   release gate must first have an owning package command and focused tests; do
   not implement its validation policy inside `@taxkit/scripts`.

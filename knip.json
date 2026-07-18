@@ -16,9 +16,16 @@
         "turbo.json",
         "oxfmt.config.ts",
         "oxlint.config.ts",
-        "tools/effect-language-service/compatibility.ts"
+        "tools/effect-language-service/compatibility.ts",
+        "tools/repository-paths/check.runtime.ts",
+        "tools/repository-paths/*.test.ts"
       ],
-      "project": ["*.json", "*.ts", "tools/effect-language-service/**/*.ts"],
+      "project": [
+        "*.json",
+        "*.ts",
+        "tools/effect-language-service/**/*.ts",
+        "tools/repository-paths/**/*.ts"
+      ],
       "ignoreDependencies": ["typescript"]
     },
     "apps/api": {

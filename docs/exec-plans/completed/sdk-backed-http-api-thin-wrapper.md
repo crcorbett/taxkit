@@ -145,12 +145,10 @@ task.
 - No additional Changeset was required for this slice because it is docs-only;
   the package-facing rename, SDK helper and HTTP thin-wrapper behavior are
   already covered by `.changeset/clear-api-sdk-names.md`.
-- Downstream validation evidence:
-  `/Users/cooper/Projects/adad/vendor/taxkit` was checked out to the final
-  committed TaxKit implementation for this spec, and
-  `/Users/cooper/Projects/adad` passed `pnpm check-types` and `pnpm build`.
-  The downstream app uses the SDK plain facade and HTTP client without
-  adopting any deprecated names.
+- Downstream validation evidence: the `adad` consumer's vendored `taxkit`
+  checkout used the final committed implementation for this spec, and the
+  downstream consumer passed `pnpm check-types` and `pnpm build`. The app uses
+  the SDK plain facade and HTTP client without adopting any deprecated names.
 - Documentation audit target:
   `rg -n 'Production: HTTP calculate|Tests: HTTP over SDK|calculateRunRequest|CalculatorApiHandlerLive|CalculatorApiGroup' docs/architecture packages/*/README.md docs/exec-plans/completed/sdk-backed-http-api-thin-wrapper.md`
   confirms the final public names and call graphs are present in durable docs.

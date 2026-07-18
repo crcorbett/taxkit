@@ -199,7 +199,7 @@ parent reviewer
 ### Content package
 
 Create `packages/docs-content` as a private source-only package, following the
-shape that `Projects/site` uses for its posts package:
+shape used by the `site` repository's posts package:
 
 - `source.config.ts`
 - `src/schemas.ts`

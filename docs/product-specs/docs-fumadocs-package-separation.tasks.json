@@ -41,7 +41,7 @@
       "status": "completed",
       "scope": [
         "Create `packages/docs-fumadocs` with package name `@taxkit/docs-fumadocs`.",
-        "Port reusable ideas from `Projects/site/packages/posts/source.config.ts` and `Projects/mobius/packages/docs/core/src/fumadocs.ts` without copying app-specific or non-Effect patterns blindly.",
+        "Port reusable ideas from `site:packages/posts/source.config.ts` and `mobius:packages/docs/core/src/fumadocs.ts` without copying app-specific or non-Effect patterns blindly.",
         "Expose generic Effect Schema to Standard Schema bridge helpers, generic meta schema, shared MDX options, code block metadata transformer, Fumadocs source loader helpers and page tree helpers.",
         "Add focused tests for schema bridging, page tree conversion and any source loader adapter contracts.",
         "Add package README guidance for browser-safe and server-only exports."

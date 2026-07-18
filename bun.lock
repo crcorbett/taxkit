@@ -7,6 +7,8 @@
       "devDependencies": {
         "@changesets/cli": "^2.31.0",
         "@effect/language-service": "catalog:",
+        "@effect/platform-bun": "catalog:",
+        "@types/bun": "catalog:",
         "effect": "catalog:",
         "knip": "6.14.2",
         "oxfmt": "0.51.0",
@@ -80,7 +82,7 @@
     },
     "packages/api/http": {
       "name": "@taxkit/api-http",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/core": "workspace:*",
@@ -98,7 +100,7 @@
     },
     "packages/calculators": {
       "name": "@taxkit/calculators",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-income-tax": "workspace:*",
@@ -114,7 +116,7 @@
     },
     "packages/core": {
       "name": "@taxkit/core",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -163,7 +165,7 @@
     },
     "packages/rules/au/income-tax": {
       "name": "@taxkit/rules-au-income-tax",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "effect": "catalog:",
@@ -178,7 +180,7 @@
     },
     "packages/rules/au/pay": {
       "name": "@taxkit/rules-au-pay",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "effect": "catalog:",
@@ -193,7 +195,7 @@
     },
     "packages/rules/au/stsl": {
       "name": "@taxkit/rules-au-stsl",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
@@ -223,7 +225,7 @@
     },
     "packages/sdk/typescript": {
       "name": "@taxkit/sdk",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/rules-au-income-tax": "workspace:*",
@@ -242,7 +244,7 @@
     },
     "packages/testing": {
       "name": "@taxkit/testing",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "dependencies": {
         "@effect/vitest": "catalog:",
         "effect": "catalog:",
@@ -254,7 +256,7 @@
     },
     "packages/tsconfig": {
       "name": "@taxkit/tsconfig",
-      "version": "0.1.0",
+      "version": "1.0.0",
     },
   },
   "catalog": {

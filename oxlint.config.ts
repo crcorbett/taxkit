@@ -29,6 +29,9 @@ const decodingBoundaryFiles = [
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
   "tools/oxlint/portable-rules.test.ts",
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
+  "tools/repository-paths/check.runtime.ts",
+  "tools/repository-paths/policy.test.ts",
+  "tools/repository-paths/policy.ts",
 
   // Dynamic dispatch and its transitional repeated scenario decodes.
   "packages/calculators/src/catalog.ts",
@@ -110,6 +113,8 @@ const runtimeBoundaryFiles = [
   "packages/sdk/typescript/src/index.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
+  "tools/repository-paths/check.runtime.test.ts",
+  "tools/repository-paths/check.runtime.ts",
 ];
 
 const processBoundaryFiles = [
@@ -144,6 +149,7 @@ const bunRuntimeEntrypointFiles = [
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
+  "tools/repository-paths/check.runtime.ts",
 ];
 
 export default defineConfig({

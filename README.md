@@ -81,6 +81,7 @@ bun install
 bun run --filter=api dev
 bun run --filter=web dev
 bun run --filter=docs dev
+bun run check:repository-paths
 bun run verification
 bun run release:check
 bun run changeset
@@ -92,6 +93,8 @@ bun run version-repo
 portless URL into `TAXKIT_API_BASE_URL` and `VITE_TAXKIT_API_BASE_URL` before
 serving the web app at `https://taxkit.localhost`. `bun run --filter=docs dev`
 serves the public docs app at `https://docs.taxkit.localhost`. `bun run
+check:repository-paths` rejects machine-local checkout references in tracked
+readable text without printing the matched private value. `bun run
 verification` is the baseline verification command for documentation, package
 wiring and scaffold changes. `bun run release:check` runs the complete ordered
 release evidence, including tests, builds, package artifacts, API smoke, docs
@@ -133,7 +136,7 @@ surfaces materially change.
 Open it directly at:
 
 ```text
-file:///Users/cooper/Projects/taxkit/docs/repo-status-outline.html
+open docs/repo-status-outline.html
 ```
 
 ## Runtime boundary

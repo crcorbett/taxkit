@@ -38,7 +38,7 @@ failures.
 
 - Rename the GitHub repository to `crcorbett/taxkit` and set `origin` to its
   canonical URL.
-- Rename the local checkout to `/Users/cooper/Projects/taxkit`.
+- Rename the local checkout directory to `taxkit`.
 - Rename the root package to `taxkit` and every workspace package from the
   retired scope to `@taxkit/*`.
 - Update all source imports, package dependency declarations, export checks,
@@ -168,8 +168,7 @@ release:check
   metadata.
 - `gh repo view crcorbett/taxkit` reports the renamed repository; `origin`
   points at it and `main` is pushed.
-- The final `git status -sb` is clean when run from
-  `/Users/cooper/Projects/taxkit`.
+- The final `git status -sb` is clean when run from the repository root.
 
 ## Risks and decisions
 

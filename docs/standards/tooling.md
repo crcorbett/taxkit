@@ -187,3 +187,20 @@ Knip is configured at the root because TaxKit is a monorepo. Keep this config
 lean: remove unused package dependencies or expose intentional public exports
 through entrypoints before adding ignores. Knip is part of the required quality
 gate alongside `check`, `check-types`, and `test`.
+
+## Repository Path Hygiene
+
+Run the focused portability gates with:
+
+```bash
+bun run check:repository-paths:types
+bun run test:repository-paths
+bun run check:repository-paths
+```
+
+The root-owned tool inventories tracked files through Effect's child-process
+boundary, reads them through Effect FileSystem and rejects workstation-specific
+home or checkout paths. Use repository-relative links, repository identities or
+pinned HTTPS references in tracked text. Portable tool state such as
+`~/.portless` remains valid. Findings deliberately contain only file, line and
+category so local usernames and matched content cannot leak into logs.

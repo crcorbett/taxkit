@@ -36,7 +36,7 @@ server-function call is one network boundary; it is not a reason to decode
 before the independent route-loader dehydration boundary.
 
 The implementation should follow the serialisable-loader pattern validated in
-`~/Projects/site`, adapted to TaxKit's stricter Effect, lint and component
+the `site` repository, adapted to TaxKit's stricter Effect, lint and component
 composition rules. A route-root transport restore is an explicit boundary
 operation. It is not permission to decode in ordinary components or hooks.
 
@@ -593,7 +593,7 @@ A compile-time fixture must pair a boundary with an incompatible success or
 error program and prove TypeScript rejects the mismatch without casts.
 
 Add Vitest Browser Mode with Playwright for the docs app, following the proven
-configuration shape in `~/Projects/site/apps/web`. A programmatic client-side
+configuration shape in `site:apps/web`. A programmatic client-side
 TanStack route tree should prove direct route-root restoration and framework
 error boundaries without adding production test routes. The harness should
 cover success, recoverable expected failure, malformed transport, defect and
@@ -706,5 +706,5 @@ the no-Changeset rationale. Do not consume existing pending Changesets.
 - [TanStack Start execution model](https://tanstack.com/start/latest/docs/framework/react/guide/execution-model)
 - [TanStack Router SSR](https://tanstack.com/router/latest/docs/guide/ssr)
 - [TanStack Router loader data](https://tanstack.com/router/latest/docs/api/router/useLoaderDataHook)
-- Reference implementation: `~/Projects/site/apps/web/src/lib/loader/serializable.ts`
-- Reference browser proof: `~/Projects/site/apps/web/src/lib/loader/serializable.browser.test.tsx`
+- Reference implementation: `site:apps/web/src/lib/loader/serializable.ts`
+- Reference browser proof: `site:apps/web/src/lib/loader/serializable.browser.test.tsx`

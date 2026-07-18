@@ -70,17 +70,17 @@ Findings:
   rule is generic Fumadocs wiring; TaxKit content policy should remain in
   `@taxkit/docs-content`.
 
-### `Projects/site` reference
+### `site` repository reference
 
 Reference files inspected:
 
-- `/Users/cooper/Projects/site/packages/posts/source.config.ts`
-- `/Users/cooper/Projects/site/packages/posts/src/schemas.ts`
-- `/Users/cooper/Projects/site/packages/posts/src/live.layer.ts`
-- `/Users/cooper/Projects/site/packages/posts/src/server.ts`
-- `/Users/cooper/Projects/site/apps/web/src/lib/runtime.server.ts`
-- `/Users/cooper/Projects/site/packages/ui/src/mdx/code-block.tsx`
-- `/Users/cooper/Projects/site/packages/ui/src/mdx/picture.tsx`
+- `site:packages/posts/source.config.ts`
+- `site:packages/posts/src/schemas.ts`
+- `site:packages/posts/src/live.layer.ts`
+- `site:packages/posts/src/server.ts`
+- `site:apps/web/src/lib/runtime.server.ts`
+- `site:packages/ui/src/mdx/code-block.tsx`
+- `site:packages/ui/src/mdx/picture.tsx`
 
 Findings to copy:
 
@@ -104,16 +104,16 @@ Findings to improve for TaxKit:
   schema and MDX options reusable so future content packages do not duplicate
   them.
 
-### `Projects/mobius/apps/website` reference
+### `mobius` repository website reference
 
 Reference files inspected:
 
-- `/Users/cooper/Projects/mobius/packages/docs/core/src/fumadocs.ts`
-- `/Users/cooper/Projects/mobius/packages/docs/core/src/tree.ts`
-- `/Users/cooper/Projects/mobius/packages/docs/mobius/src/presentation.ts`
-- `/Users/cooper/Projects/mobius/apps/website/src/routes/docs/route.tsx`
-- `/Users/cooper/Projects/mobius/apps/website/src/routes/docs/mobius/$slug.tsx`
-- `/Users/cooper/Projects/mobius/apps/website/src/routes/docs/mobius/-route-boundary.ts`
+- `mobius:packages/docs/core/src/fumadocs.ts`
+- `mobius:packages/docs/core/src/tree.ts`
+- `mobius:packages/docs/mobius/src/presentation.ts`
+- `mobius:apps/website/src/routes/docs/route.tsx`
+- `mobius:apps/website/src/routes/docs/mobius/$slug.tsx`
+- `mobius:apps/website/src/routes/docs/mobius/-route-boundary.ts`
 
 Findings to copy:
 
@@ -454,7 +454,7 @@ The app should keep a small component map that combines:
 
 Route loader data should use Effect Schema-owned serialisable contracts. If the
 app needs to encode `Exit` values, follow the serialisable route boundary
-pattern from `Projects/site` and `Projects/mobius/apps/website`.
+pattern from the `site` and `mobius` repository implementations.
 
 ### Validation and audits
 
@@ -580,7 +580,7 @@ The fourth should be reviewed manually for justified exceptions.
 - [Package boundaries](../architecture/package-boundaries.md)
 - [Effect services](../architecture/effect-services.md)
 - [Testing and quality](../architecture/testing-and-quality.md)
-- `/Users/cooper/Projects/site/packages/posts`
-- `/Users/cooper/Projects/site/packages/ui/src/mdx`
-- `/Users/cooper/Projects/mobius/packages/docs/core`
-- `/Users/cooper/Projects/mobius/apps/website/src/routes/docs`
+- `site:packages/posts`
+- `site:packages/ui/src/mdx`
+- `mobius:packages/docs/core`
+- `mobius:apps/website/src/routes/docs`
