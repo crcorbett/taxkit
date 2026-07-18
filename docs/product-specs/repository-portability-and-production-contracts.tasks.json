@@ -3,7 +3,7 @@
   "spec": "docs/product-specs/repository-portability-and-production-contracts.md",
   "title": "Repository Portability and Production Contracts Implementation Tasks",
   "status": "draft",
-  "last_reviewed": "2026-07-18",
+  "last_reviewed": "2026-07-19",
   "principles": [
     "Keep the rollout website-agnostic: do not change the current docs or web applications, their routes, identity, design, accessibility, performance or deployment.",
     "Adopt TaxKit-owned contracts and evidence rather than copying another repository's source, names, paths or complete configuration.",
@@ -14,38 +14,49 @@
   "decisionBlockers": [
     {
       "id": "STR-DEC-001",
-      "decision": "Choose whether the exported IsoDate Schema gains runtime calendar-date validation, is replaced through a compatibility/deprecation path, or is documented as constructor-validated only.",
+      "status": "resolved",
+      "approvedAt": "2026-07-19",
+      "approvalEvidence": "The user explicitly said: Approve all. Don’t stop for my approval, I have already approved the full SPEC.",
+      "decision": "Tighten the existing exported IsoDate Schema so runtime decoding and the public constructor validate YYYY-MM-DD syntax and a real Gregorian calendar date through one canonical invariant.",
       "evidence": [
         "packages/core/src/primitives/date.ts documents validation but applies only Schema.brand to Schema.String",
-        "effect@4.0.0-beta.98 documents that Schema.brand adds no runtime checks"
+        "effect@4.0.0-beta.98 Schema.brand adds no runtime checks and live decode accepts not-a-date",
+        "The current Date.parse constructor check normalizes and accepts the impossible calendar date 2026-02-29"
       ],
-      "blocks": [
-        "Package-facing IsoDate correction",
-        "Final rollout acceptance"
+      "implementationConsequences": [
+        "RPC-006 changes the canonical core Schema and constructor, adds focused owner tests and compatibility documentation, and runs every resolved downstream command",
+        "The accepted-input tightening is breaking and receives a major @taxkit/core Changeset"
       ]
     },
     {
       "id": "REL-DEC-001",
-      "decision": "Choose whether @taxkit/calculators joins the Changesets fixed group or remains independently versioned.",
+      "status": "resolved",
+      "approvedAt": "2026-07-19",
+      "approvalEvidence": "The user explicitly said: Approve all. Don’t stop for my approval, I have already approved the full SPEC.",
+      "decision": "Add @taxkit/calculators to the Changesets fixed group as the ninth 1.0.0 release-train artifact.",
       "evidence": [
         "The strict downstream validator and repository status treat calculators as the ninth 1.0.0 artifact",
         ".changeset/config.json and docs/standards/versioning.md define an eight-package fixed group that omits calculators"
       ],
-      "blocks": [
-        "Package-facing calculators string-contract correction",
-        "Final rollout acceptance"
+      "implementationConsequences": [
+        "RPC-006 updates .changeset/config.json and docs/standards/versioning.md",
+        "The release-policy edit itself has no package Changeset; package-facing corrections use the resulting fixed group"
       ]
     },
     {
       "id": "STR-DEC-002",
-      "decision": "Choose whether public rulePackVersion fields report owner package semver, a distinct stable rule-pack identifier, or follow a compatibility/deprecation path.",
+      "status": "resolved",
+      "approvedAt": "2026-07-19",
+      "approvalEvidence": "The user explicitly said: Approve all. Don’t stop for my approval, I have already approved the full SPEC.",
+      "decision": "Treat rulePackVersion as an independent owner-defined stable ruleset version, initially rules-au-income-tax/1.0.0 and rules-au-pay/1.0.0, rather than package semver.",
       "evidence": [
         "packages/rules/au/income-tax/src/calculator/annual-tax.ts emits rules-au-income-tax/0.0.0 while its manifest is 1.0.0; this mismatch is evidence only and does not select package semver",
-        "packages/rules/au/pay/src/calculator/take-home-pay.ts emits rules-au-pay/0.0.0 while its manifest is 1.0.0; changing the public encoded value risks exact-value consumers and snapshots"
+        "packages/rules/au/pay/src/calculator/take-home-pay.ts emits rules-au-pay/0.0.0 while its manifest is 1.0.0; changing the public encoded value risks exact-value consumers and snapshots",
+        "The exact-value audit found no consumer or snapshot that pins either 0.0.0 value; the OpenAPI snapshot currently describes both fields only as string"
       ],
-      "blocks": [
-        "Package-facing rulePackVersion contract resolution",
-        "Final rollout acceptance"
+      "implementationConsequences": [
+        "RPC-006 makes each rule owner define and emit its exact approved stable ruleset value without runtime manifest reads or a generic version package",
+        "The observable encoded-value and public constructor contract changes receive major Changesets for @taxkit/rules-au-income-tax and @taxkit/rules-au-pay"
       ]
     }
   ],
@@ -408,6 +419,7 @@
       "id": "RPC-005",
       "title": "Resolve string compatibility and release-train decisions",
       "type": "product-decision",
+      "status": "complete",
       "dependsOn": [
         "RPC-002"
       ],
@@ -425,6 +437,23 @@
         "A dated explicit user decision for REL-DEC-001",
         "The selected compatibility and release-policy consequences recorded in the spec",
         "RPC-006 updated with an exact resolved scope and no unresolved correction placeholders"
+      ],
+      "decisionRecord": {
+        "approvedAt": "2026-07-19",
+        "approvalEvidence": "The user explicitly said: Approve all. Don’t stop for my approval, I have already approved the full SPEC.",
+        "selectedOptions": [
+          "1A / STR-DEC-001: tighten the existing exported IsoDate Schema for real ISO calendar-date runtime validation",
+          "2A / STR-DEC-002: independent stable rule-pack versions initially rules-au-income-tax/1.0.0 and rules-au-pay/1.0.0",
+          "3A / REL-DEC-001: add @taxkit/calculators to the Changesets fixed group",
+          "Full-SPEC approval: implement approved CORR-003 calculator diagnostic sanitization and CORR-004 SDK Cause.pretty replacement in RPC-006"
+        ]
+      },
+      "evidence": [
+        "Installed effect@4.0.0-beta.98 Schema.brand live decoding accepts invalid strings; the current Date.parse constructor check also accepts normalized 2026-02-29",
+        "All nine strict downstream artifact manifests are 1.0.0; the validator already includes @taxkit/calculators while the fixed group has only eight entries",
+        "Only the two report owners contain exact 0.0.0 values; transport and packed-consumer tests consume the reports but do not pin the values, and OpenAPI currently records string only",
+        "A live Standard Schema formatter probe included a secret/private-path sentinel in CalculatorInputIssue.message; packages/sdk/typescript/src/errors.ts forwards Cause.pretty to public errors",
+        "RPC-005 edits only the SPEC, task list and active plan and therefore requires no Changeset"
       ],
       "implementationPrompt": "You are resolving exactly one product-decision task from the TaxKit spec/task list.\n\nBefore asking for a decision, read the target spec, RPC-002's completed audit ledger and evidence, packages/core/src/primitives/date.ts, both rule report owners, installed Effect Schema.brand behavior, .changeset/config.json, docs/standards/versioning.md, the nine artifact manifests and strict downstream validation. Present the current contradiction, concrete compatible choices, recommendation, package-facing impact and exact files/commands for each decision. For STR-DEC-002, treat the package-version mismatch as evidence only: do not presume package semver is the intended value, and audit exact-value consumers and snapshots before recommending keep, change or deprecation.\n\nDo not infer approval from repository state, prior version alignment or implementation convenience. Do not edit package code, manifests, Changesets configuration or runtime behavior before the user explicitly selects an option for STR-DEC-001, STR-DEC-002 and REL-DEC-001. If any decision is absent, keep this task and final rollout acceptance blocked.\n\nAfter explicit approval, record the dated decisions in the spec and active plan. Replace RPC-006's unresolved scope with the exact owning files, commands, compatibility treatment, Changeset requirements and apps/api changelog impact identified by the audit and decisions. If a decision requires no code correction, record the exact documentation-only consequence and N/A rationale. Run the mandatory documentation gates and report changed files, recorded decisions and the fully resolved RPC-006 scope. Do not begin RPC-006.",
       "mandatoryVerification": [
@@ -445,7 +474,7 @@
         ],
         "conditional": [
           "docs/architecture/effect-services.md only when the selected decision changes the taxonomy wording",
-          "docs/standards/versioning.md only in RPC-006 if REL-DEC-001 changes release policy"
+          "docs/standards/versioning.md in RPC-006 because approved REL-DEC-001 changes release policy"
         ],
         "notApplicable": [
           "Package source, manifests, .changeset/config.json and Changeset files before RPC-006",
@@ -481,12 +510,192 @@
         "RPC-004",
         "RPC-005"
       ],
-      "startCondition": "Blocked until RPC-005 records all three explicit decisions and replaces the unresolved scope below with exact files, commands and artifacts.",
-      "resolvedScope": [],
+      "startCondition": "Ready after parent acceptance and commit of RPC-005: all three explicit 2026-07-19 decisions and the full-SPEC CORR-003/CORR-004 approval are recorded below.",
+      "resolvedScope": [
+        {
+          "id": "CORR-001 / STR-DEC-001",
+          "decision": "Tighten the existing IsoDate Schema and public constructor with one real YYYY-MM-DD Gregorian-calendar invariant before the existing taxkit/IsoDate brand.",
+          "change": [
+            "packages/core/src/primitives/date.ts",
+            "packages/core/test/date.test.ts",
+            "packages/core/vitest.config.ts",
+            "packages/core/package.json",
+            "packages/core/README.md",
+            "knip.json",
+            "bun.lock"
+          ],
+          "proofOnly": [
+            "The three AU rule-package tests prove existing canonical dates remain accepted",
+            "Calculator, API HTTP and SDK commands prove the stricter Schema remains compatible with every downstream Type/Encoded path"
+          ],
+          "commands": [
+            "bun run --filter=@taxkit/core check-types",
+            "bun run --filter=@taxkit/core test",
+            "bun run --filter=@taxkit/core build",
+            "bun run --filter=@taxkit/rules-au-income-tax check-types && bun run --filter=@taxkit/rules-au-income-tax test && bun run --filter=@taxkit/rules-au-income-tax build",
+            "bun run --filter=@taxkit/rules-au-pay check-types && bun run --filter=@taxkit/rules-au-pay test && bun run --filter=@taxkit/rules-au-pay build",
+            "bun run --filter=@taxkit/rules-au-stsl check-types && bun run --filter=@taxkit/rules-au-stsl test && bun run --filter=@taxkit/rules-au-stsl build"
+          ],
+          "compatibility": "Breaking accepted-input correction: valid existing dates keep the same branded Type and string Encoded representation; malformed and impossible dates that brand-only Schema decoding or Date.parse normalization accepted must fail focused Schema, constructor, DateInterval and SourceArtifact tests.",
+          "changeset": "Major @taxkit/core entry in the RPC-006 package Changeset; the fixed release train will take the highest major bump when a later deliberate version-repo slice consumes it.",
+          "appsApiChangelog": "No separate IsoDate app entry: no HTTP request accepts IsoDate and valid response encodings do not change. RPC-006 still runs API/OpenAPI proof and updates the app changelog for CORR-002/CORR-003."
+        },
+        {
+          "id": "CORR-002 / STR-DEC-002",
+          "decision": "Make each report owner define an independent exact stable ruleset version, initially rules-au-income-tax/1.0.0 and rules-au-pay/1.0.0, without reading package manifests at runtime.",
+          "change": [
+            "packages/rules/au/income-tax/src/calculator/annual-tax.ts",
+            "packages/rules/au/income-tax/test/annual-tax.test.ts",
+            "packages/rules/au/income-tax/README.md",
+            "packages/rules/au/pay/src/calculator/take-home-pay.ts",
+            "packages/rules/au/pay/test/take-home-pay.test.ts",
+            "packages/rules/au/pay/README.md",
+            "packages/calculators/__tests__/public-calculator-service.test.ts",
+            "packages/api/http/__tests__/public-calculation-api.test.ts",
+            "packages/api/http/__snapshots__/openapi.json",
+            "packages/sdk/typescript/src/index.test.ts",
+            "packages/sdk/typescript/src/effect.test.ts",
+            "packages/sdk/typescript/src/au.test.ts",
+            "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+            "apps/api/scripts/smoke-public-routes.runtime.ts",
+            "apps/api/CHANGELOG.md",
+            "docs/architecture/calculators.md"
+          ],
+          "commands": [
+            "bun run --filter=@taxkit/rules-au-income-tax check-types && bun run --filter=@taxkit/rules-au-income-tax test && bun run --filter=@taxkit/rules-au-income-tax build",
+            "bun run --filter=@taxkit/rules-au-pay check-types && bun run --filter=@taxkit/rules-au-pay test && bun run --filter=@taxkit/rules-au-pay build",
+            "bun run --filter=@taxkit/calculators check-types && bun run --filter=@taxkit/calculators test-types && bun run --filter=@taxkit/calculators test && bun run --filter=@taxkit/calculators build",
+            "bun run --filter=@taxkit/api-http check-types && bun run --filter=@taxkit/api-http test && bun run --filter=@taxkit/api-http test:openapi && bun run --filter=@taxkit/api-http build",
+            "bun run --filter=@taxkit/sdk check-types && bun run --filter=@taxkit/sdk test-types && bun run --filter=@taxkit/sdk test && bun run --filter=@taxkit/sdk build && bun run --filter=@taxkit/sdk check-boundaries && bun run --filter=@taxkit/sdk check-packed-artifact && bun run --filter=@taxkit/sdk validate:downstream",
+            "bun run --filter=api check-types && bun run --filter=api build && bun run --filter=api smoke"
+          ],
+          "compatibility": "Observable report values change from 0.0.0 to the approved 1.0.0 ruleset identifiers, and owner Schemas become exact literals. No existing exact-value assertion was found, so RPC-006 adds assertions at both owners, calculator composition, HTTP, plain/Effect/AU SDK, API smoke and packed downstream boundaries.",
+          "changeset": "Major entries for @taxkit/rules-au-income-tax and @taxkit/rules-au-pay; patch entries for transitively changed @taxkit/calculators, @taxkit/api-http and @taxkit/sdk behavior. The fixed group resolves the train at the highest major bump.",
+          "appsApiChangelog": "Required: document the two public calculate-response rulePackVersion values and their independent-ruleset meaning in apps/api/CHANGELOG.md."
+        },
+        {
+          "id": "CORR-003",
+          "decision": "Replace Standard Schema issue messages that include rejected actual values with stable safe text while preserving CalculatorInputDecodeError, CalculatorInputIssue tags, paths and descriptor help.",
+          "change": [
+            "packages/calculators/src/errors.ts",
+            "packages/calculators/__tests__/public-calculator-service.test.ts",
+            "packages/calculators/README.md",
+            "packages/api/http/__tests__/public-calculation-api.test.ts",
+            "packages/sdk/typescript/src/effect.test.ts",
+            "apps/api/CHANGELOG.md",
+            "docs/architecture/api-and-sdk.md"
+          ],
+          "notApplicable": [
+            "packages/calculators/src/schemas.ts because tags, paths and public error shape remain unchanged",
+            "packages/api/http/__snapshots__/openapi.json for this correction because message values change but the transport Schema shape does not"
+          ],
+          "commands": [
+            "bun run --filter=@taxkit/calculators check-types && bun run --filter=@taxkit/calculators test-types && bun run --filter=@taxkit/calculators test && bun run --filter=@taxkit/calculators build",
+            "bun run --filter=@taxkit/api-http check-types && bun run --filter=@taxkit/api-http test && bun run --filter=@taxkit/api-http test:openapi && bun run --filter=@taxkit/api-http build",
+            "bun run --filter=@taxkit/sdk check-types && bun run --filter=@taxkit/sdk test-types && bun run --filter=@taxkit/sdk test && bun run --filter=@taxkit/sdk build",
+            "bun run --filter=api check-types && bun run --filter=api build && bun run --filter=api smoke"
+          ],
+          "compatibility": "Security and stability correction to observable issue.message text; public tagged error shapes, typed paths and help stay unchanged. Secret and private-path sentinels must be absent from direct calculator, Effect SDK and HTTP egress.",
+          "changeset": "Patch @taxkit/calculators and @taxkit/api-http entries; SDK package impact is covered together with CORR-004.",
+          "appsApiChangelog": "Required: record that calculation field-error messages no longer echo rejected values while paths and help remain stable."
+        },
+        {
+          "id": "CORR-004",
+          "decision": "Remove raw Cause.pretty text from plain SDK public error projection and use stable safe outer/schema/unexpected messages while retaining typed CalculatorServiceError detail.",
+          "change": [
+            "packages/sdk/typescript/src/errors.ts",
+            "packages/sdk/typescript/src/index.test.ts",
+            "packages/sdk/typescript/README.md"
+          ],
+          "notApplicable": [
+            "packages/sdk/typescript/src/effect.ts and its public error channel because Effect consumers already receive typed CalculatorServiceError or SchemaError rather than the plain facade's Cause.pretty projection",
+            "apps/api/CHANGELOG.md because the HTTP API does not use the plain SDK error formatter"
+          ],
+          "commands": [
+            "bun run --filter=@taxkit/sdk check-types",
+            "bun run --filter=@taxkit/sdk test-types",
+            "bun run --filter=@taxkit/sdk test",
+            "bun run --filter=@taxkit/sdk build",
+            "bun run --filter=@taxkit/sdk check-boundaries",
+            "bun run --filter=@taxkit/sdk check-packed-artifact",
+            "bun run --filter=@taxkit/sdk validate:downstream"
+          ],
+          "compatibility": "Patch-level diagnostic-text hardening: exported error tags and typed details remain; safe results and rejected Promises stop exposing raw causes, rejected values and private paths. Sentinel tests cover both plain facade outcomes.",
+          "changeset": "Patch @taxkit/sdk entry.",
+          "appsApiChangelog": "N/A: no HTTP path invokes this formatter."
+        },
+        {
+          "id": "REL-DEC-001",
+          "decision": "Add @taxkit/calculators to the one nine-package Changesets fixed group and align canonical versioning guidance.",
+          "change": [
+            ".changeset/config.json",
+            "docs/standards/versioning.md"
+          ],
+          "notApplicable": [
+            "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts inventory because it already contains the exact nine-package closure including calculators",
+            "Package manifests and versions because RPC-006 adds Changesets but does not run version-repo",
+            "apps/api/CHANGELOG.md because fixed-group membership is not an HTTP or deployment contract"
+          ],
+          "commands": [
+            "bun run changeset status --verbose",
+            "bun run --filter=@taxkit/sdk validate:downstream",
+            "bun run verification"
+          ],
+          "compatibility": "Release-policy alignment only; all nine artifacts are already 1.0.0 and the strict validator already packs calculators.",
+          "changeset": "No package Changeset for the config/docs policy edit itself; RPC-006 package corrections carry the exact entries above.",
+          "appsApiChangelog": "N/A."
+        },
+        {
+          "id": "RPC-006 SDK test-types gate",
+          "decision": "Repair the already-proven eight floating-Effect diagnostics in the SDK compile-time fixture so the mandatory affected-package gate can pass without suppressing the Effect language service.",
+          "change": [
+            "packages/sdk/typescript/type-tests/effect-client.test.ts"
+          ],
+          "commands": [
+            "bun run --filter=@taxkit/sdk test-types"
+          ],
+          "compatibility": "Test-only assignment/use correction; no SDK Type, Encoded, runtime, export or consumer behavior changes.",
+          "changeset": "No additional Changeset beyond the package-facing SDK CORR-004 entry because this file is a compile-time fixture only.",
+          "appsApiChangelog": "N/A.",
+          "notApplicable": [
+            "Disabling the Effect language service, adding suppressions or weakening the test-types command"
+          ]
+        },
+        {
+          "id": "RPC-006 repository closure",
+          "change": [
+            "docs/product-specs/repository-portability-and-production-contracts.md",
+            "docs/product-specs/repository-portability-and-production-contracts.tasks.json",
+            "docs/exec-plans/active/repository-portability-and-production-contracts.md",
+            "One new RPC-006 .changeset/*.md file with major entries for @taxkit/core, @taxkit/rules-au-income-tax and @taxkit/rules-au-pay plus patch entries for @taxkit/calculators, @taxkit/api-http and @taxkit/sdk"
+          ],
+          "commands": [
+            "bun run knip",
+            "bun run knip:production",
+            "bun run format:check",
+            "bun run verification",
+            "bun run test",
+            "bun run build",
+            "bun run changeset status --verbose"
+          ],
+          "notApplicable": [
+            "Product-spec index until final rollout status changes",
+            "Root README and command scripts because RPC-006 adds no root command",
+            "Custom lint rules and fixtures because no lint policy changes",
+            "Skills, AGENTS.md, instruction symlinks, agents/openai.yaml and bundled skill resources because no instruction contract changes",
+            "Provider, secret-store, persistence, migration, storage, file, command, observability, deployment, rollback and operator-runbook surfaces because the corrected egresses are in-process calculator, HTTP and SDK contracts only",
+            "apps/docs, apps/web, React route/container/leaf composition, accessibility and browser proof because website work remains excluded",
+            "npm publication, tags, release pull requests and version-repo"
+          ],
+          "changeset": "RPC-006 must add the approved package entries but must not consume them with version-repo or publish packages.",
+          "appsApiChangelog": "One apps/api/CHANGELOG.md entry covers CORR-002 response-version semantics and CORR-003 safe field-error text."
+        }
+      ],
       "goal": "Apply only the package-facing string-contract and release-policy corrections explicitly approved through RPC-005, with compatibility proof and complete release artifacts.",
       "scope": [
         "Only exact correction rows approved from RPC-002's audit ledger",
         "Only the STR-DEC-001, STR-DEC-002 and REL-DEC-001 outcomes recorded by RPC-005",
+        "CORR-003 calculator Schema-issue diagnostic sanitization and CORR-004 plain SDK Cause.pretty replacement authorized by the user's full-SPEC approval",
         "Owning package tests, READMEs, Changesets and API app changelog artifacts named in the resolved scope"
       ],
       "outputs": [

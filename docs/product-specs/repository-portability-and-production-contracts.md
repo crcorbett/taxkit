@@ -1,6 +1,6 @@
 ---
 status: draft
-last_reviewed: 2026-07-18
+last_reviewed: 2026-07-19
 source_of_truth: docs
 confidence: medium
 ---
@@ -138,42 +138,50 @@ portable Effect rule
 - npm publication, repository versioning, release tags or automated release
   pull requests.
 
-## Decision Blockers
+## Resolved Decisions
 
-Three repository contradictions need explicit approval before package-facing
-string corrections can be accepted:
+On 2026-07-19 the user explicitly approved all three recommended options and
+the full SPEC, and directed implementation not to stop for another approval.
+That approval closes the following repository contradictions without inferring
+policy from current code or version alignment:
 
-1. `IsoDate` is documented as validating calendar-date syntax and reality, but
-   its exported Schema currently applies only `Schema.brand` to
-   `Schema.String`; the runtime checks live in the separate `isoDate`
-   constructor. Installed Effect `4.0.0-beta.98` confirms that `Schema.brand`
-   adds no runtime validation. Decide whether to tighten the exported Schema,
-   introduce a compatible strict replacement/deprecation path, or correct the
-   contract to constructor-only validation.
-2. Repository status and downstream validation treat
-   `@taxkit/calculators` as the ninth release artifact at `1.0.0`, while
-   `.changeset/config.json` and `docs/standards/versioning.md` omit it from the
-   fixed group. Decide whether calculators joins the fixed group or remains an
-   independently versioned package. This spec must not silently change release
-   policy.
-3. `AnnualTaxReport.rulePackVersion` and
-   `TakeHomePayReport.rulePackVersion` are public encoded strings whose runtime
-   values remain `rules-au-income-tax/0.0.0` and `rules-au-pay/0.0.0` after the
-   owning package manifests moved to `1.0.0`. Decide whether these fields own
-   package semver through an owner-defined build/runtime constant, represent a
-   different stable rule-pack identifier, or require a compatibility/deprecation
-   path. Do not introduce runtime manifest reads or a generic version-string
-   package without an explicit owning contract. The manifest mismatch is
-   evidence only; it does not establish that package semver is the intended
-   value. Any encoded-value change is observable behavior and must account for
-   exact-value consumers and snapshots.
+1. **STR-DEC-001 — tighten the existing `IsoDate` Schema.** The exported Schema
+   must validate the `YYYY-MM-DD` representation and a real Gregorian calendar
+   date at runtime. The public `isoDate` constructor must use the same invariant.
+   Installed Effect `4.0.0-beta.98` proves `Schema.brand` alone accepts arbitrary
+   strings, and the current `Date.parse` check also normalizes impossible values
+   such as `2026-02-29`; RPC-006 therefore owns one canonical checked-content
+   invariant before the existing nominal brand. This is an intentional breaking
+   accepted-input correction and requires a major `@taxkit/core` Changeset.
+2. **STR-DEC-002 — rule-pack versions are independent ruleset versions.**
+   `AnnualTaxReport.rulePackVersion` and
+   `TakeHomePayReport.rulePackVersion` identify the stable ruleset contract, not
+   the package manifest version. Their initial owner-defined values are
+   `rules-au-income-tax/1.0.0` and `rules-au-pay/1.0.0`; runtime manifest reads
+   and a generic version package remain prohibited. The exact-value audit found
+   only the two current source literals. Existing calculator, HTTP, SDK, app
+   smoke and strict downstream tests consume the reports but do not pin either
+   value; the OpenAPI snapshot records both fields only as strings. RPC-006 must
+   make each owner Schema and report value exact, then add owner, transport and
+   packed-consumer assertions. The observable encoded-value and constructor
+   contract correction requires major Changesets for both rule packages.
+3. **REL-DEC-001 — calculators joins the fixed release train.**
+   `@taxkit/calculators` joins the Changesets fixed group as the ninth artifact
+   already present at `1.0.0` in the strict downstream closure. RPC-006 updates
+   `.changeset/config.json` and `docs/standards/versioning.md`; the validator's
+   nine-package inventory already contains calculators and needs proof, not a
+   source edit. The policy/configuration edit itself has no package Changeset,
+   while the approved package-facing corrections follow the resulting fixed
+   group.
 
-RPC-002 records the complete decision ledger without changing package
-contracts. Lint and production-graph tasks may proceed after that audit because
-they do not depend on these product decisions. Final acceptance remains blocked
-until all three decisions are recorded and any approved package-facing correction
-has been completed through RPC-006 with the required Changeset or documented
-N/A rationale.
+The full-SPEC approval also authorizes CORR-003, which replaces calculator
+Schema-issue messages that currently include rejected values with stable safe
+text while retaining typed paths/tags, and CORR-004, which removes raw
+`Cause.pretty` text from the plain SDK's exported and rejected-Promise errors.
+Sentinel evaluation reproduced both diagnostic risks. RPC-005 records decisions
+only; RPC-006 implements all four approved correction rows, required package
+Changesets and the API app changelog. No package source, release configuration,
+version, tag or publication changes in RPC-005.
 
 ## Ownership and Boundaries
 
@@ -412,6 +420,19 @@ The 11 baseline files are `README.md`,
 its task list, `docs/product-specs/docs-mdx-fumadocs-runtime.md`, its task list,
 `docs/product-specs/tanstack-start-loader-transport-boundaries.md`, its task
 list, `docs/product-specs/taxkit-hard-cutover.md`, and its task list.
+
+### RPC-005 decision-only impact ledger
+
+| Surface | Decision | Path evidence and RPC-006 consequence |
+| --- | --- | --- |
+| SPEC, tasks, index and active plan | Change required / N/A | This SPEC, `repository-portability-and-production-contracts.tasks.json` and `docs/exec-plans/active/repository-portability-and-production-contracts.md` record the approvals, evidence and exact next scope. `docs/product-specs/index.md` stays N/A until final rollout status changes. |
+| Canonical docs, standards, references and documentation audit | N/A for RPC-005; exact RPC-006 changes | Existing `docs/architecture/effect-services.md` already owns checked-content and safe-diagnostic policy. RPC-006 changes `docs/architecture/calculators.md`, `docs/architecture/api-and-sdk.md` and `docs/standards/versioning.md`. `docs/references/**` and `docs/documentation-audit/**` own no affected contract. |
+| Root and relevant package/app/skill READMEs | N/A for RPC-005; exact RPC-006 changes | Root and skill READMEs expose no changed command. RPC-006 changes `packages/core/README.md`, both affected AU rule READMEs, `packages/calculators/README.md`, `packages/sdk/typescript/README.md` and `apps/api/CHANGELOG.md`; other app/package READMEs remain N/A. |
+| Lint, rules, fixtures, tests, root scripts and CI | N/A for RPC-005; exact RPC-006 changes | This decision slice changes no executable policy. RPC-006's task `resolvedScope` names every focused test and command; `knip.json` changes only to admit the new core owner test. `oxlint.config.ts`, custom rules/fixtures, root scripts and `.github/workflows/quality.yml` remain unchanged because existing root gates inherit package work. |
+| Skills, AGENTS, instruction symlinks and metadata | N/A | `.agents/skills/prd-implementer`, `.agents/skills/prd-writer`, `.agents/skills/effect-client-wrapper`, their `agents/openai.yaml` metadata, root `AGENTS.md` and instruction links own implementation process rather than these product contracts. Concurrent approved governance edits are preserved. |
+| Config, manifests, exports, Schemas, generators, tests, examples, migrations and Changesets | N/A for RPC-005; exact RPC-006 changes | No package/config mutation occurs here. RPC-006 changes the core and two report Schemas, focused tests, core test manifest/lock/Knip wiring, `.changeset/config.json`, generated OpenAPI snapshot and exact package Changesets. Public exports stay on current paths; examples and migrations are N/A. |
+| API, SDK, HTTP, storage, file, command, observability, deployment and operator surfaces | N/A for RPC-005; exact RPC-006 changes | RPC-006 changes calculator diagnostic projection, SDK plain-error projection, HTTP/SDK/packed-consumer proof, API smoke and app changelog. Storage, files, commands, providers, telemetry, deployment, rollback and operator runbooks receive no data or call-graph change. |
+| React route/container/leaf, accessibility and browser surfaces | N/A | `apps/docs/**`, `apps/web/**`, React composition, accessibility and browser proof remain excluded; no corrected owner is a website or React boundary. |
 
 ## Tests and Verification
 
