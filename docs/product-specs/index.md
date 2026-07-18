@@ -27,7 +27,7 @@ Specs:
 | [Public calculation API routes](./public-calculation-api-routes.md) | Implemented | Public metadata, graph and calculate routes exist. |
 | [Public MDX developer documentation](./public-mdx-developer-docs.md) | Implemented | Public MDX docs content and navigation are in place. |
 | [Repository foundation hardening](./repository-foundation-hardening.md) | Implemented | Effect beta.98, CI, deterministic package artifacts, portable linting, release readiness and durable review contracts are implemented and verified. |
-| [Repository portability and production contracts](./repository-portability-and-production-contracts.md) | Draft | Website-agnostic hardening for path hygiene, string contracts, portable Effect linting and the production package/API dependency graph; blocked on the `IsoDate` compatibility and calculators fixed-group decisions. |
+| [Repository portability and production contracts](./repository-portability-and-production-contracts.md) | Implemented | Website-agnostic path hygiene, string contracts, portable Effect linting, production dependency proof and approved package-contract corrections. |
 | [SDK-backed HTTP API thin wrapper](./sdk-backed-http-api-thin-wrapper.md) | Implemented | HTTP calculate delegates execution through the SDK Effect facade. |
 | [SDK public naming and export contract](./sdk-public-naming-and-export-contract.md) | Implemented | Public SDK names and packed export contract are stabilised. |
 | [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md) | Implemented | Schema-encoded Effect outcomes survive initial SSR and client navigation before direct route-root restoration. |

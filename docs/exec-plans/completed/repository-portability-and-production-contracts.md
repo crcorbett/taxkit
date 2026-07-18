@@ -1,5 +1,5 @@
 ---
-status: active
+status: completed
 last_reviewed: 2026-07-19
 source_of_truth: execution-plan
 confidence: high
@@ -31,7 +31,7 @@ decision. Do not publish packages or run `version-repo`.
 | RPC-003 | complete | Parent accepted correction turn 1 after inline-policy enforcement and independent real-binary verification. |
 | RPC-004 | complete | Parent accepted correction turn 1 after production controls, internal API cleanup and independent full-root verification. |
 | RPC-005 | complete | Parent accepted the decision-only slice after independently reproducing the contradictions, reviewing compatibility and exact scope, and rerunning every mandatory gate. |
-| RPC-006 | ready | RPC-003 through RPC-005 are accepted and the task now records all approvals plus an exact populated `resolvedScope`. |
+| RPC-006 | complete | Parent accepted the implementation candidate without a correction turn after focused, packed-consumer, API-smoke and full-root verification. |
 
 ## Decision Log
 
@@ -790,3 +790,163 @@ that record names no package and causes no version bump. Every package-facing
 correction receives a package-owned release Changeset, including changes to
 private versioned packages. This rollout does not apply pending versions or
 publish packages.
+
+### 2026-07-19 - RPC-006 implementation candidate
+
+Preflight and scope:
+
+- Re-read all seven closed `resolvedScope` records after accepted commit
+  `5217d21`. All approved decisions, owners, commands, compatibility treatment,
+  Changeset entries and app-changelog outcomes were concrete; no placeholder or
+  inferred correction remained.
+- Implemented only CORR-001 through CORR-004, REL-DEC-001, the SDK type-test
+  repair and repository closure. Concurrent governance changes under
+  `.agents/**`, root instructions/docs/scripts and `tools/skills/**` remain
+  outside this slice and were neither reverted nor absorbed.
+- Added `.changeset/bright-dates-report.md` with major entries for
+  `@taxkit/core`, `@taxkit/rules-au-income-tax` and `@taxkit/rules-au-pay`, plus
+  patch entries for `@taxkit/calculators`, `@taxkit/api-http` and `@taxkit/sdk`.
+  No version, tag, package changelog, publication or release command ran.
+
+Implemented contracts and artifacts:
+
+- CORR-001: `packages/core/src/primitives/date.ts` now owns one anchored-shape
+  and real Gregorian-calendar predicate. Both the exported `IsoDate` Schema and
+  `isoDate` constructor use it without `Date.parse` normalization. The brand
+  Type and string Encoded form remain. `packages/core/test/date.test.ts` proves
+  valid dates, leap/century rules, malformed/impossible dates, encoded output,
+  `DateInterval` and `SourceArtifact`; package/Vitest/Knip/lock wiring makes the
+  owner test part of normal repository proof.
+- CORR-002: the income-tax and pay report owners each define an exact local
+  literal Schema and emit `rules-au-income-tax/1.0.0` or
+  `rules-au-pay/1.0.0`. Assertions cover both rule owners, calculator
+  composition, HTTP, plain/Effect/AU SDK, external API smoke and the packed
+  downstream consumer. OpenAPI now exposes both exact enums. No manifest read,
+  version package, factory, DTO mirror or unsafe cast was added.
+- CORR-003: `packages/calculators/src/errors.ts` keeps the existing sole
+  Schema-issue projection, tags, normalized paths and descriptor help, while
+  replacing rejected-value formatter output with `Invalid calculator input
+  value`. Direct calculator, Effect SDK and HTTP tests inject secret and
+  private-path sentinels and prove neither reaches public egress.
+- CORR-004: `packages/sdk/typescript/src/errors.ts` no longer calls
+  `Cause.pretty`. Stable outer, Schema and unexpected messages are selected at
+  the existing plain-facade egress; typed `CalculatorServiceError` detail is
+  retained. Safe-result and rejected-Promise fixtures, plus direct Schema and
+  defect fixtures, prove sentinel absence.
+- REL-DEC-001: `.changeset/config.json` and
+  `docs/standards/versioning.md` now agree on the sole nine-package fixed group,
+  including `@taxkit/calculators`; all package versions remain untouched.
+- SDK test-types: all eight Effect-producing compile fixtures are assigned to
+  named values. Assertions and the Effect language service remain enabled with
+  no suppression or weakened command.
+- Canonical owner READMEs, calculator/API architecture, versioning guidance,
+  `apps/api/CHANGELOG.md`, the generated OpenAPI snapshot, this plan, the SPEC
+  and task ledger now describe the implemented contracts. The SPEC's RPC-006
+  impact ledger records every required surface and path-evidenced N/A.
+
+Final call graphs:
+
+```txt
+unknown date string
+  -> core isRealIsoDate predicate
+    -> IsoDate Schema check -> existing taxkit/IsoDate brand -> string egress
+    -> isoDate constructor check -> existing taxkit/IsoDate brand
+      -> DateInterval / SourceArtifact and existing downstream consumers
+
+rule owner exact literal Schema/value
+  -> AnnualTaxReport | TakeHomePayReport
+    -> PublicCalculatorService
+      -> HTTP and Effect/plain/AU SDK
+        -> apps/api external smoke and packed strict downstream consumer
+
+selected calculator Schema failure
+  -> existing toCalculatorInputDecodeError projection
+    -> stable safe issue message + normalized path + optional descriptor help
+      -> direct calculator | Effect SDK | HTTP egress
+
+plain SDK typed failure | Schema failure | defect
+  -> existing toTaxKitCalculationError projection
+    -> stable outer/detail message + retained typed CalculatorServiceError
+      -> TaxKitFailure or rejected Promise
+```
+
+Improvement audits:
+
+1. **Approved-scope and abstraction audit.** Compared every edit with the seven
+   resolved rows. Kept date and version policy in existing owners, used the
+   existing calculator/SDK egress projections, removed the one-use date
+   assertion helper, and rejected generic date/version/sanitizer modules. No
+   unrelated cleanup, website work or governance edit entered the slice.
+2. **Boundary and compatibility audit.** Replaced nullable RegExp match parsing
+   with anchored `test` plus fixed slices; one predicate now enforces runtime
+   Schema and constructor behavior. Existing canonical Type/Encoded/report/error
+   shapes and ingress/egress placement remain. Exact literal output is proven at
+   every named consumer; sentinels are proven absent at each corrected egress.
+3. **Release and closure audit.** Confirmed the Changeset names exactly six
+   affected packages and the fixed group has one nine-package row. Regenerated
+   only the two OpenAPI enum additions, updated all named owner docs/changelog,
+   repaired the real SDK type-test gate and preserved explicit N/A for lint,
+   skills, ops, persistence, React and browser surfaces.
+
+Focused verification completed before repository closure:
+
+- `bun run --filter=@taxkit/core check-types`, `test` (13 tests) and `build`
+  passed.
+- Both affected rule packages passed `check-types`, `test` (13 income-tax and
+  17 pay tests) and `build`; the unchanged STSL package passed `check-types`,
+  `test` (12 tests) and `build`; calculators passed `check-types`, `test-types`,
+  `test` (5 tests) and `build`.
+- API HTTP passed `check-types`, `test` (5 tests), `test:openapi` and `build`;
+  SDK passed `check-types`, `test-types`, `test` (14 tests), `build`,
+  `check-boundaries` and `check-packed-artifact` (38 packed files).
+- The strict downstream consumer packed, installed, typechecked and executed
+  all nine packages, including exact plain/Effect pay and income-tax ruleset
+  versions; export and browser-bundle checks also passed with no diagnostics.
+  The API app passed `check-types`, `build` and its internal/external public
+  route smoke, including both calculation routes.
+- Both development and production Knip graphs, RPC-owned formatting, lint,
+  frozen-lockfile proof, `git diff --check` and all stale/sentinel/unsafe-cast
+  scans passed. The fixed group has exactly one row and nine packages; all
+  seven resolved-scope records remain present.
+- Repository `bun run test` passed all 19 Turbo tasks and `bun run build` passed
+  all 14 Turbo tasks. The build retained only pre-existing third-party
+  Rolldown annotation and chunk-size warnings.
+- `bun run changeset status --verbose` passed. Because all nine packages are in
+  one fixed group, the six package entries in the Changeset correctly resolve
+  to a coordinated 2.0.0 major release for all nine packages; no versioning or
+  publication command ran.
+- Root `bun run verification` initially reached `format:check` while four
+  concurrent, out-of-scope governance files were still being edited. Their
+  owner formatted those files without RPC-006 absorbing them; the parent then
+  reran the complete root verification successfully.
+
+### 2026-07-19 - RPC-006 parent acceptance
+
+The parent accepted RPC-006 without a correction turn after independently
+reviewing every changed contract and rerunning the focused and repository-wide
+proof. The accepted slice contains only the seven closed `resolvedScope`
+records plus final SPEC/task/index/completed-plan bookkeeping; concurrent
+governance changes remain preserved and excluded.
+
+Independent acceptance evidence:
+
+- Core, calculator, API HTTP and SDK focused tests passed, including the core
+  real-calendar suite, exact ruleset values and diagnostic sentinel coverage.
+- The SDK packed-artifact and strict downstream consumer validated all nine
+  tarballs, both plain and Effect result paths, exact ruleset versions, runtime
+  exports and the browser bundle. API internal/external smoke passed for both
+  calculation routes and OpenAPI.
+- `bun install --frozen-lockfile`, `bun run verification`, `bun run test`,
+  `bun run build`, `bun run changeset status --verbose` and
+  `git diff --check` passed. The only build output was existing non-failing
+  third-party annotation and chunk-size warnings.
+- Structural scans found no stale `rules-au-*/0.0.0`, no SDK `Cause.pretty`,
+  no added unsafe casts or suppressions, one exact nine-package fixed group,
+  seven resolved-scope records and unchanged `1.0.0` package manifests.
+- `.changeset/bright-dates-report.md` records the approved six package-facing
+  entries. The fixed group therefore reports a future coordinated `2.0.0`
+  release for all nine packages, but this rollout did not run `version-repo`,
+  publish, tag or create a release pull request.
+- References, documentation-audit/status snapshots, root commands, custom
+  lint, CI, website, browser, deployment and operator surfaces remain N/A for
+  this final correction because their ownership or behavior did not change.

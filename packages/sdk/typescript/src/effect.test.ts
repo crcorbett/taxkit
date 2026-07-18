@@ -25,6 +25,9 @@ const takeHomeFacts = {
   taxFreeThresholdClaimed: true,
 };
 
+const secretSentinel = "taxkit-secret-sentinel";
+const privatePathSentinel = "/private/taxkit-sentinel/effect-sdk-input.json";
+
 describe("Effect SDK facade", () => {
   it.effect(
     "returns the full canonical calculator run response with decoded report",
@@ -49,6 +52,7 @@ describe("Effect SDK facade", () => {
 
         expect(sdkResult).toEqual(serviceResult);
         expect(sdkResult.report._tag).toBe("TakeHomePayReport");
+        expect(sdkResult.report.rulePackVersion).toBe("rules-au-pay/1.0.0");
       }).pipe(Effect.provide(ServiceLive))
   );
 
@@ -78,6 +82,7 @@ describe("Effect SDK facade", () => {
     Effect.gen(function* () {
       const service = yield* PublicCalculatorService;
       const invalidFacts = {
+        rejectedSource: `${secretSentinel}:${privatePathSentinel}`,
         taxableIncome: aud(9_000_000),
       };
       const sdkExit = yield* calculateReport(
@@ -111,6 +116,10 @@ describe("Effect SDK facade", () => {
 
         expect(sdkFailure.error).toEqual(serviceFailure.error);
         expect(sdkFailure.error._tag).toBe("CalculatorInputDecodeError");
+        expect(JSON.stringify(sdkFailure.error)).not.toContain(secretSentinel);
+        expect(JSON.stringify(sdkFailure.error)).not.toContain(
+          privatePathSentinel
+        );
       }
     }).pipe(Effect.provide(ServiceLive))
   );
@@ -124,6 +133,7 @@ describe("Effect SDK facade", () => {
         });
 
         expect(report._tag).toBe("AnnualTaxReport");
+        expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
         expect(report.liability.cents).toBe(1_958_800);
       }).pipe(Effect.provide(ServiceLive))
   );

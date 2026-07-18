@@ -15,6 +15,11 @@ Implemented rule package for Australian take-home pay and PAYG withholding.
 withholdings ledger, net pay, salary-sacrifice pay effects, Schedule 1
 parameters, descriptors, rule packs, calculator program and golden tests.
 
+`TakeHomePayReport.rulePackVersion` is the exact literal
+`rules-au-pay/1.0.0`. It versions this package's ruleset independently from the
+package manifest version so callers can identify the pay rules used without
+runtime manifest reads.
+
 ## Guardrails
 
 - Reuse canonical schemas, facts, parameter services, rule IDs and component

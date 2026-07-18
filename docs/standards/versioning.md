@@ -12,6 +12,7 @@ All `@taxkit/*` packages are in one fixed version group:
 
 - `@taxkit/core`
 - `@taxkit/api-http`
+- `@taxkit/calculators`
 - `@taxkit/rules-au-income-tax`
 - `@taxkit/rules-au-pay`
 - `@taxkit/rules-au-stsl`
@@ -34,7 +35,8 @@ The repository config lives in `.changeset/config.json`.
 
 Important settings:
 
-- `fixed`: keeps all `@taxkit/*` packages on the same version.
+- `fixed`: keeps the nine release-artifact `@taxkit/*` packages on the same
+  version.
 - `privatePackages.version: true`: package versions are managed even while
   packages remain `private: true`.
 - `privatePackages.tag: true`: release tags can still be created for private

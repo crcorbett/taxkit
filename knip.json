@@ -56,8 +56,8 @@
       "ignoreDependencies": ["@taxkit/tsconfig"]
     },
     "packages/core": {
-      "entry": ["src/index.ts", "src/*/index.ts"],
-      "project": ["src/**/*.ts"]
+      "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
     },
     "packages/api/http": {
       "entry": [

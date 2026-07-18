@@ -15,6 +15,11 @@ Implemented rule package for Australian annual income-tax calculations.
 LITO, Medicare levy, annual tax ledger aggregation, official parameter tables,
 descriptors, rule pack, calculator program and golden tests.
 
+`AnnualTaxReport.rulePackVersion` is the exact literal
+`rules-au-income-tax/1.0.0`. It versions this package's ruleset independently
+from the package manifest version so callers can identify the tax rules used
+without runtime manifest reads.
+
 ## Guardrails
 
 - Reuse canonical schemas, facts, parameter services, rule IDs and component

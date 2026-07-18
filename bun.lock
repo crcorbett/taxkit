@@ -122,6 +122,7 @@
       },
       "devDependencies": {
         "typescript": "catalog:",
+        "vitest": "catalog:",
       },
     },
     "packages/docs-content": {

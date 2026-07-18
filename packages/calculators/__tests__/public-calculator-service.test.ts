@@ -29,6 +29,9 @@ const taxableIncomeFacts = (cents: number) => ({
   taxableIncome: aud(cents),
 });
 
+const secretSentinel = "taxkit-secret-sentinel";
+const privatePathSentinel = "/private/taxkit-sentinel/input.json";
+
 const calculateTakeHome = (
   cents: number,
   period: "fortnightly" | "monthly" | "weekly",
@@ -85,6 +88,7 @@ describe("PublicCalculatorService", () => {
       expect(nurse.report.withholdingsTotal.cents).toBe(35_300);
       expect(nurse.report.netPay.cents).toBe(130_100);
       expect(nurse.report.period).toBe("weekly");
+      expect(nurse.report.rulePackVersion).toBe("rules-au-pay/1.0.0");
       expect(nurse.diagnostics.graphIssues.length).toBe(0);
 
       const teacher = yield* calculateTakeHome(346_200, "fortnightly", true);
@@ -144,6 +148,9 @@ describe("PublicCalculatorService", () => {
       Effect.gen(function* () {
         const student = yield* calculateAnnualTax(1_500_000);
         expect(student.report._tag).toBe("AnnualTaxReport");
+        expect(student.report.rulePackVersion).toBe(
+          "rules-au-income-tax/1.0.0"
+        );
         expect(student.report.rawLiability.cents).toBe(-70_000);
         expect(student.report.liability.cents).toBe(0);
 
@@ -193,8 +200,50 @@ describe("PublicCalculatorService", () => {
 
         expect(failure.error._tag).toBe("CalculatorInputDecodeError");
         expect(expectAt(failure.error.issues, 0).path).toEqual(["grossPay"]);
+        expect(expectAt(failure.error.issues, 0).message).toBe(
+          "Invalid calculator input value"
+        );
         expect(failure.error.help?.length).toBe(2);
       }
     }).pipe(Effect.provide(ServiceLive))
+  );
+
+  it.effect(
+    "does not echo rejected values or private paths in input issues",
+    () =>
+      Effect.gen(function* () {
+        const service = yield* PublicCalculatorService;
+        const exit = yield* service
+          .calculate({
+            calculatorId: PayCalculatorId.make("au.pay.take-home"),
+            payload: {
+              facts: {
+                // @ts-expect-error runtime safety coverage bypasses the typed boundary.
+                grossPay: `${secretSentinel}:${privatePathSentinel}`,
+                taxFreeThresholdClaimed: true,
+              },
+              jurisdiction: "AU",
+              taxYear: "2025-26",
+            },
+          })
+          .pipe(Effect.exit);
+
+        expect(Exit.isFailure(exit)).toBe(true);
+        if (Exit.isFailure(exit)) {
+          const failure = expectAt(
+            exit.cause.reasons.filter(Cause.isFailReason),
+            0
+          );
+          const rendered = JSON.stringify(failure.error);
+
+          expect(failure.error._tag).toBe("CalculatorInputDecodeError");
+          expect(expectAt(failure.error.issues, 0).path).toEqual(["grossPay"]);
+          expect(expectAt(failure.error.issues, 0).message).toBe(
+            "Invalid calculator input value"
+          );
+          expect(rendered).not.toContain(secretSentinel);
+          expect(rendered).not.toContain(privatePathSentinel);
+        }
+      }).pipe(Effect.provide(ServiceLive))
   );
 });

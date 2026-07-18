@@ -1,5 +1,14 @@
 # TaxKit API
 
+## Unreleased
+
+### Major Changes
+
+- Calculation responses now expose the independent exact ruleset identifiers
+  `rules-au-pay/1.0.0` and `rules-au-income-tax/1.0.0`. Calculator field errors
+  keep their tagged shape, normalized paths and descriptor help while no longer
+  echoing rejected values in issue messages.
+
 ## 1.0.0
 
 ### Major Changes

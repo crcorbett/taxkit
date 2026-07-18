@@ -18,6 +18,7 @@ describe("AU SDK subpath", () => {
 
     expect(report._tag).toBe("TakeHomePayReport");
     expect(report.netPay.cents).toBe(130_100);
+    expect(report.rulePackVersion).toBe("rules-au-pay/1.0.0");
   });
 
   it("keeps AU helpers thin over the generic descriptor client", async () => {
@@ -30,6 +31,7 @@ describe("AU SDK subpath", () => {
     ]);
 
     expect(helperReport).toEqual(descriptorReport);
+    expect(helperReport.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
   });
 
   it("returns safe AU failures through SDK-owned result values", async () => {

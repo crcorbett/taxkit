@@ -40,6 +40,9 @@ HTTP handlers or filesystem adapters.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,
   `Context`, `Layer`, `Record`, `Result` and `Exit` where they fit.
 - Keep money and rounding explicit.
+- Use `IsoDate` and `isoDate` for effective-period and source-retrieval dates.
+  Both paths enforce one real Gregorian-calendar `YYYY-MM-DD` invariant;
+  malformed dates and impossible dates such as `2026-02-29` are rejected.
 - Use package-owned descriptors and tagged errors.
 - Keep engine inputs separate from application state.
 - Add tests and explicit package exports with each new public subpath.
@@ -48,6 +51,7 @@ HTTP handlers or filesystem adapters.
 
 ```sh
 bun run --filter=@taxkit/core check-types
+bun run --filter=@taxkit/core test
 bun run --filter=@taxkit/core build
 ```
 

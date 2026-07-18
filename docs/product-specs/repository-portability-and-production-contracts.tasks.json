@@ -2,7 +2,7 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/repository-portability-and-production-contracts.md",
   "title": "Repository Portability and Production Contracts Implementation Tasks",
-  "status": "draft",
+  "status": "implemented",
   "last_reviewed": "2026-07-19",
   "principles": [
     "Keep the rollout website-agnostic: do not change the current docs or web applications, their routes, identity, design, accessibility, performance or deployment.",
@@ -505,6 +505,7 @@
       "id": "RPC-006",
       "title": "Apply approved string-contract and release-policy corrections",
       "type": "package-contract-correction",
+      "status": "complete",
       "dependsOn": [
         "RPC-003",
         "RPC-004",
@@ -666,7 +667,7 @@
           "change": [
             "docs/product-specs/repository-portability-and-production-contracts.md",
             "docs/product-specs/repository-portability-and-production-contracts.tasks.json",
-            "docs/exec-plans/active/repository-portability-and-production-contracts.md",
+            "docs/exec-plans/completed/repository-portability-and-production-contracts.md",
             "One new RPC-006 .changeset/*.md file with major entries for @taxkit/core, @taxkit/rules-au-income-tax and @taxkit/rules-au-pay plus patch entries for @taxkit/calculators, @taxkit/api-http and @taxkit/sdk"
           ],
           "commands": [
@@ -699,10 +700,54 @@
         "Owning package tests, READMEs, Changesets and API app changelog artifacts named in the resolved scope"
       ],
       "outputs": [
-        "Approved corrections implemented at their canonical owning schemas or release configuration",
-        "Focused compatibility and diagnostics-safety tests",
-        "Exact package-facing Changesets and apps/api changelog updates where required",
-        "The audit ledger and canonical guidance updated to final keep/change/N/A outcomes"
+        "One core real-Gregorian IsoDate invariant shared by runtime Schema decoding and the public constructor, with core owner tests and package test wiring",
+        "Exact owner-local rules-au-income-tax/1.0.0 and rules-au-pay/1.0.0 literal Schemas proven through rule, calculator, HTTP, plain/Effect/AU SDK, API smoke and strict downstream paths",
+        "Stable safe calculator and plain-SDK diagnostic egress with secret/private-path sentinel proof and typed calculator detail preserved",
+        "@taxkit/calculators added to the sole nine-package Changesets fixed group with canonical versioning guidance",
+        "One exact six-package RPC-006 Changeset and one apps/api changelog entry without consuming versions or publishing packages",
+        "A complete path-evidenced Change required/N/A ledger, final call graphs and three improvement audits in the canonical SPEC and completed plan"
+      ],
+      "impactLedger": [
+        {
+          "surface": "SPEC/tasks/index/completed plan",
+          "decision": "Change required",
+          "evidence": "The implemented SPEC, this task object, docs/product-specs/index.md and docs/exec-plans/completed/repository-portability-and-production-contracts.md record implementation, proof, audits and parent acceptance."
+        },
+        {
+          "surface": "Canonical docs/standards/references/documentation audit",
+          "decision": "Change required / references and audit N/A",
+          "evidence": "docs/architecture/calculators.md, docs/architecture/api-and-sdk.md and docs/standards/versioning.md own the changed policy; docs/references/** and docs/documentation-audit/** own no affected contract."
+        },
+        {
+          "surface": "Root and package/app/skill READMEs",
+          "decision": "Change required for five owner READMEs and app changelog / others N/A",
+          "evidence": "Core, both rule, calculator and SDK READMEs changed; apps/api/CHANGELOG.md records HTTP behavior; root and unrelated README files expose no changed command or owner."
+        },
+        {
+          "surface": "Lint/rules/fixtures/tests/root scripts/CI",
+          "decision": "Change required for focused tests and core test wiring / lint, root scripts and CI N/A",
+          "evidence": "Owner, calculator, HTTP, SDK, API smoke and downstream tests changed; packages/core/vitest.config.ts, package.json and knip.json admit the new suite; no lint or root command policy changed and existing CI inherits root gates."
+        },
+        {
+          "surface": "Skills/AGENTS/instruction symlinks/agents metadata",
+          "decision": "N/A",
+          "evidence": "These surfaces own implementation governance rather than date, report, diagnostic or release-group contracts; concurrent governance edits remain preserved and excluded."
+        },
+        {
+          "surface": "Config/manifests/exports/Schemas/generators/tests/examples/migrations/Changesets",
+          "decision": "Change required / exports, examples and migrations N/A",
+          "evidence": "Owning Schemas, core test manifest/lock wiring, .changeset/config.json, generated OpenAPI snapshot and .changeset/bright-dates-report.md change; current public paths already export the owning contracts."
+        },
+        {
+          "surface": "API/SDK/HTTP/storage/file/command/observability/deployment/operator surfaces",
+          "decision": "Change required for calculator, HTTP, SDK, API smoke and packed consumer / remaining runtime and ops surfaces N/A",
+          "evidence": "Existing in-process egresses carry the corrections; no persistence, provider, filesystem, command, telemetry, hosting, rollback or operator edge changed."
+        },
+        {
+          "surface": "React route/container/leaf/accessibility/browser surfaces",
+          "decision": "N/A",
+          "evidence": "apps/docs/** and apps/web/** remain explicitly excluded and do not own or consume the corrected boundary paths in this task."
+        }
       ],
       "implementationPrompt": "You are implementing exactly one approved correction task from the TaxKit spec/task list.\n\nSTOP without editing if resolvedScope is empty, any decision lacks explicit recorded approval, or any file/command/release artifact remains a placeholder. Read the target spec, this task object, the RPC-002 audit ledger, RPC-005 decision record, every exact owning source/test/doc file in resolvedScope and the relevant architecture docs before editing.\n\nImplement only approved rows. Use installed Effect 4.0.0-beta.98 Schema semantics, canonical owner-named Schemas and schema-derived Type/Encoded forms. Decode unknown representation values exactly once at ingress and encode only at explicit egress. Use Schema.brand only for nominal identity with a separately enforced stable invariant when runtime validation is promised. Use RedactedFromValue for approved raw secret ingress and Schema.Redacted for already-redacted values. Keep ordinary content as plain string or inline Schema.String/NonEmptyString unless the decision ledger proves independent semantic policy. Preserve legitimate recursive encoded types and generic descriptors. Treat diagnostic safety as an egress data-flow contract and prove sentinel secret/private-path values cannot enter persistent or user-facing output unless an approved local-only policy says otherwise. Do not add generic brand factories, shared schema buckets, mirrored DTOs, unsafe casts, repeated defensive decoding, stringly branching or trivial helpers.\n\nApply the exact compatibility/deprecation and release-train choices recorded by RPC-005. Add a Changeset for every package-facing correction, including private versioned packages. If apps/api HTTP or deployment-facing behavior changes, update apps/api/CHANGELOG.md. Run every exact owner command from resolvedScope plus all mandatory repository gates. Document three improvement audits and report changed files, compatibility evidence, diagnostic egress evidence, final call graph and release artifacts. Do not add website work or publish packages.",
       "mandatoryVerification": [

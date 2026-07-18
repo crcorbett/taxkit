@@ -45,6 +45,7 @@ describe("AU annual income tax calculator (2025-26)", () => {
 
       expect(moneyEquals(report.liability, audDollars(16_388))).toBe(true);
       expect(moneyEquals(report.rawLiability, audDollars(16_388))).toBe(true);
+      expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
 
       const incomeTax = expectAt(report.ledger.components, 0);
       const lito = expectAt(report.ledger.components, 1);

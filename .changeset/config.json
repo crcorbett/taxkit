@@ -9,6 +9,7 @@
     [
       "@taxkit/core",
       "@taxkit/api-http",
+      "@taxkit/calculators",
       "@taxkit/rules-au-income-tax",
       "@taxkit/rules-au-pay",
       "@taxkit/rules-au-stsl",

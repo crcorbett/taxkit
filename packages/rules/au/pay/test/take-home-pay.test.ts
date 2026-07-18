@@ -50,6 +50,7 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
       expect(moneyEquals(report.withholdingsTotal, audDollars(304))).toBe(true);
       expect(moneyEquals(report.netPay, audDollars(1196))).toBe(true);
       expect(report.period).toBe("weekly");
+      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.0");
     })
   );
 

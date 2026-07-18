@@ -30,7 +30,7 @@ export const toCalculatorInputDecodeError = (args: {
     schemaIssueFormatter(args.issue).issues,
     (issue) =>
       new CalculatorInputIssue({
-        message: issue.message,
+        message: "Invalid calculator input value",
         path: Option.fromNullishOr(issue.path).pipe(
           Option.match({
             onNone: Array.empty,

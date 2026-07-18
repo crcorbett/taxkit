@@ -41,6 +41,11 @@ This package owns:
 - selected-calculator input decoding through each catalog entry's canonical
   `inputSchema`
 
+The public issue projection preserves the schema issue tag, normalized field
+path and descriptor-backed help, but uses stable message text. Rejected values
+are never copied into calculator errors, so secrets and machine-local paths do
+not escape through direct, SDK or HTTP consumers.
+
 `PublicCalculation*`, `PublicApiError` and `PublicCalculatorError` exports are
 deprecated transitional API-era aliases. New SDK, HTTP and in-process code
 should use the canonical `CalculatorRun*` and `CalculatorServiceError` names.

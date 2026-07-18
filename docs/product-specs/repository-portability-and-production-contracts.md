@@ -1,8 +1,8 @@
 ---
-status: draft
+status: implemented
 last_reviewed: 2026-07-19
 source_of_truth: docs
-confidence: medium
+confidence: high
 ---
 
 # Repository Portability and Production Contracts
@@ -433,6 +433,19 @@ list, `docs/product-specs/taxkit-hard-cutover.md`, and its task list.
 | Config, manifests, exports, Schemas, generators, tests, examples, migrations and Changesets | N/A for RPC-005; exact RPC-006 changes | No package/config mutation occurs here. RPC-006 changes the core and two report Schemas, focused tests, core test manifest/lock/Knip wiring, `.changeset/config.json`, generated OpenAPI snapshot and exact package Changesets. Public exports stay on current paths; examples and migrations are N/A. |
 | API, SDK, HTTP, storage, file, command, observability, deployment and operator surfaces | N/A for RPC-005; exact RPC-006 changes | RPC-006 changes calculator diagnostic projection, SDK plain-error projection, HTTP/SDK/packed-consumer proof, API smoke and app changelog. Storage, files, commands, providers, telemetry, deployment, rollback and operator runbooks receive no data or call-graph change. |
 | React route/container/leaf, accessibility and browser surfaces | N/A | `apps/docs/**`, `apps/web/**`, React composition, accessibility and browser proof remain excluded; no corrected owner is a website or React boundary. |
+
+### RPC-006 implementation impact ledger
+
+| Surface | Decision | Path evidence and final consequence |
+| --- | --- | --- |
+| SPEC, tasks, index and completed plan | Change required | This implemented SPEC, `repository-portability-and-production-contracts.tasks.json`, `docs/product-specs/index.md` and `docs/exec-plans/completed/repository-portability-and-production-contracts.md` record final scope, evidence, call graphs, audits and parent acceptance. |
+| Canonical docs, standards, references and documentation audit | Change required / N/A | `docs/architecture/calculators.md`, `docs/architecture/api-and-sdk.md` and `docs/standards/versioning.md` now own independent ruleset, safe diagnostic and nine-package fixed-train policy. `docs/references/**` and `docs/documentation-audit/**` catalogue no changed runtime contract and remain N/A. |
+| Root and relevant package/app/skill READMEs | Change required / N/A | `packages/core/README.md`, both affected AU rule READMEs, `packages/calculators/README.md` and `packages/sdk/typescript/README.md` describe their corrected contracts; `apps/api/CHANGELOG.md` records HTTP-visible changes. Root and other app/package/skill READMEs expose no changed command or owner and remain N/A. |
+| Lint, rules, fixtures, tests, root scripts and CI | Change required / N/A | Focused owner, calculator, HTTP, SDK, app-smoke and strict-downstream tests prove the corrections; `packages/core/vitest.config.ts`, its package test command and `knip.json` admit the new core suite. No lint policy changed, so `oxlint.config.ts`, custom rules/fixtures, root scripts and `.github/workflows/quality.yml` remain unchanged; CI inherits package tests through existing root gates. |
+| Skills, AGENTS, instruction symlinks and metadata | N/A | `.agents/**`, root `AGENTS.md`, instruction links, bundled resources and `agents/openai.yaml` own implementation process, not the corrected contracts. Their concurrent governance edits are preserved and excluded from this slice. |
+| Config, manifests, exports, Schemas, generators, tests, examples, migrations and Changesets | Change required / N/A | Core and both report owner Schemas, core test manifest/lock wiring, `.changeset/config.json`, the generated OpenAPI snapshot and `.changeset/bright-dates-report.md` change. Existing public export paths already expose the owning report/core Schemas; no new export, generic version module, example or migration is needed. |
+| API, SDK, HTTP, storage, file, command, observability, deployment and operator surfaces | Change required / N/A | The existing calculator projection sanitizes issue messages; HTTP, Effect/plain/AU SDK, packed downstream and API smoke paths prove safe/exact egress. Storage, files, commands, providers, telemetry, deployment, rollback and operator runbooks have no changed edge. |
+| React route/container/leaf, accessibility and browser surfaces | N/A | `apps/docs/**`, `apps/web/**`, React composition, accessibility and browser proof remain excluded and consume none of the corrected in-process owners. |
 
 ## Tests and Verification
 

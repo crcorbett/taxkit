@@ -255,6 +255,12 @@ descriptor-backed help so clients can guide users toward the facts required by
 the selected calculator. Outputs should include reports, traces, ledgers and
 diagnostics where relevant.
 
+Calculator input-error egress preserves the public tagged shape, normalized
+field paths and descriptor help, but replaces formatter text that can include
+the rejected actual value with stable safe text. HTTP, Effect SDK and direct
+calculator consumers must not receive secrets or machine-local paths copied
+from invalid inputs.
+
 The generic calculate route exposes request facts as a union of canonical
 rule-owned calculator input schemas, not `Schema.Unknown`. OpenAPI should show
 the supported fact shapes under `facts.anyOf`; current public shapes include
@@ -319,6 +325,13 @@ modules from browser-safe entrypoints. It also must not expose Effect runtime
 types from the plain TypeScript entrypoint. HTTP clients and OpenAPI transport
 helpers stay in `@taxkit/api-http`, which depends on the SDK rather than the
 reverse.
+
+The plain facade maps typed calculator failures, output Schema failures and
+unexpected defects into stable SDK-owned messages. It preserves a typed
+`CalculatorServiceError` detail when present, but never projects raw
+`Cause.pretty` text, rejected values or private paths into either safe results
+or rejected Promises. Effect consumers continue to receive the typed error
+channel directly.
 
 ## Export boundaries
 

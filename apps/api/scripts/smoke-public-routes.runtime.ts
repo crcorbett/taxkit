@@ -33,6 +33,7 @@ const smokeHost = "127.0.0.1";
 const smokePort = 4173;
 const smokeOrigin = `http://${smokeHost}:${smokePort}`;
 const takeHomeCalculatorId = "au.pay.take-home";
+const annualTaxCalculatorId = "au.income-tax.annual";
 const appRootUrl = new URL("..", import.meta.url);
 const repoRootUrl = new URL("../..", appRootUrl);
 const appRoot = fileURLToPath(appRootUrl);
@@ -70,6 +71,7 @@ const externalConsumerScript = (
   simulateFailure: boolean
 ) => `const origin = ${JSON.stringify(smokeOrigin)};
 const takeHomeCalculatorId = ${JSON.stringify(takeHomeCalculatorId)};
+const annualTaxCalculatorId = ${JSON.stringify(annualTaxCalculatorId)};
 const simulateFailure = ${JSON.stringify(simulateFailure)};
 
 const routeEvidence = [];
@@ -137,6 +139,38 @@ assert(
 assert(
   calculation.report?._tag === "TakeHomePayReport",
   "Calculate route returned the wrong report tag."
+);
+assert(
+  calculation.report?.rulePackVersion === "rules-au-pay/1.0.0",
+  "Calculate route returned the wrong pay ruleset version."
+);
+
+const annualTaxCalculation = await readJson(
+  "POST",
+  \`/api/v1/calculators/\${annualTaxCalculatorId}/calculate\`,
+  {
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      facts: {
+        taxableIncome: {
+          _tag: "Money",
+          cents: 9_000_000,
+          currency: "AUD",
+        },
+      },
+      jurisdiction: "AU",
+      taxYear: "2025-26",
+    }),
+  }
+);
+assert(
+  annualTaxCalculation.report?._tag === "AnnualTaxReport",
+  "Annual-tax calculate route returned the wrong report tag."
+);
+assert(
+  annualTaxCalculation.report?.rulePackVersion ===
+    "rules-au-income-tax/1.0.0",
+  "Annual-tax calculate route returned the wrong ruleset version."
 );
 
 const openApi = await readJson("GET", "/api/docs/openapi.json");

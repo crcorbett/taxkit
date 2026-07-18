@@ -9,6 +9,14 @@ import {
 import { AnnualTaxLedger, AnnualTaxLedgerFact } from "../facts/ledger.js";
 
 /**
+ * Independent version of the Australian annual-income-tax ruleset represented
+ * by this report.
+ *
+ * @since 1.0.0
+ */
+const AnnualTaxRulePackVersion = Schema.Literal("rules-au-income-tax/1.0.0");
+
+/**
  * Annual Australian income tax report for one taxable-income scenario.
  *
  * `rawLiability` is the ledger total before flooring. `liability` is floored
@@ -22,7 +30,7 @@ export class AnnualTaxReport extends Schema.TaggedClass<AnnualTaxReport>()(
     ledger: AnnualTaxLedger,
     liability: Money,
     rawLiability: Money,
-    rulePackVersion: Schema.String,
+    rulePackVersion: AnnualTaxRulePackVersion,
     taxableIncome: Money,
     trace: TraceNode,
   }
@@ -45,7 +53,7 @@ export const CalculateAnnualTax = Effect.gen(function* () {
     ledger,
     liability,
     rawLiability,
-    rulePackVersion: "rules-au-income-tax/0.0.0",
+    rulePackVersion: AnnualTaxRulePackVersion.make("rules-au-income-tax/1.0.0"),
     taxableIncome: income.income,
     trace: ledger.trace,
   });

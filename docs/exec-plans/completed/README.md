@@ -12,6 +12,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Repository portability and production contracts](./repository-portability-and-production-contracts.md)
 - [TaxKit hard cutover](./taxkit-hard-cutover.md)
 - [Repository foundation hardening](./repository-foundation-hardening.md)
 - [TanStack Start loader transport boundaries](./tanstack-start-loader-transport-boundaries.md)

@@ -1,16 +1,42 @@
 import { Schema } from "effect";
 
+const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/u;
+const standardDaysInMonth = [
+  31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
+] as const;
+
+const isRealIsoDate = (value: string): boolean => {
+  if (!isoDatePattern.test(value)) {
+    return false;
+  }
+
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(5, 7));
+  const day = Number(value.slice(8, 10));
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const monthLength =
+    month === 2 && leapYear ? 29 : (standardDaysInMonth[month - 1] ?? 0);
+
+  return (
+    year > 0 && month >= 1 && month <= 12 && day >= 1 && day <= monthLength
+  );
+};
+
 /**
  * ISO calendar date used for effective-period boundaries.
  *
  * The value is branded after validating the `YYYY-MM-DD` shape and checking
- * that JavaScript can parse it as a real date. Effective periods use calendar
- * dates rather than tax-year labels so mid-year official changes can be
- * represented precisely.
+ * the represented year, month and day against Gregorian leap-year and
+ * month-length rules. Effective periods use calendar dates rather than
+ * tax-year labels so mid-year official changes can be represented precisely.
  *
  * @since 0.1.0
  */
-export const IsoDate = Schema.String.pipe(Schema.brand("taxkit/IsoDate"));
+export const IsoDate = Schema.String.check(
+  Schema.makeFilter((value) => isRealIsoDate(value), {
+    expected: "a real Gregorian calendar date in YYYY-MM-DD form",
+  })
+).pipe(Schema.brand("taxkit/IsoDate"));
 
 /**
  * ISO calendar date used for effective-period boundaries.
@@ -38,26 +64,18 @@ export const DateInterval = Schema.Struct({
  */
 export type DateInterval = typeof DateInterval.Type;
 
-const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/u;
-
-const assertIsoDate = (value: string): void => {
-  if (!isoDatePattern.test(value)) {
-    throw new Error(`taxkit/core: expected ISO date YYYY-MM-DD, got ${value}`);
-  }
-
-  const timestamp = Date.parse(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(timestamp)) {
-    throw new TypeError(`taxkit/core: invalid ISO date ${value}`);
-  }
-};
-
 /**
  * Brands a validated ISO calendar date.
  *
  * @since 0.1.0
  */
 export const isoDate = (value: string): IsoDate => {
-  assertIsoDate(value);
+  if (!isRealIsoDate(value)) {
+    throw new TypeError(
+      `taxkit/core: expected a real Gregorian calendar date in YYYY-MM-DD form, got ${value}`
+    );
+  }
+
   return IsoDate.make(value);
 };
 

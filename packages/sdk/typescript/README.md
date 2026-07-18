@@ -71,6 +71,11 @@ The plain facade returns Promises and does not expose Effect runtime types in
 method signatures. `safe` methods return SDK-owned Data result values:
 `TaxKitSuccess` or `TaxKitFailure`.
 
+Plain failures use stable SDK-owned outer, schema-validation and unexpected
+messages. Typed `CalculatorServiceError` detail remains available, while raw
+Effect causes, rejected input values and private paths are not rendered into
+safe results or rejected Promises.
+
 ## AU Subpath
 
 ```ts

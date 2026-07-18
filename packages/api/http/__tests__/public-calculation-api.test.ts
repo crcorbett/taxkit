@@ -9,7 +9,10 @@ import {
   GrossPayDescriptor,
   TaxFreeThresholdClaimedDescriptor,
 } from "@taxkit/rules-au-pay";
-import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import {
+  AuAnnualIncomeTaxCalculation,
+  AuPayTakeHomeCalculation,
+} from "@taxkit/sdk/au/effect";
 import { calculateRunRequest as calculateSdkRunRequest } from "@taxkit/sdk/effect";
 import { expectAt } from "@taxkit/testing";
 import { Array, Cause, Effect, Exit, Layer, Option, Schema } from "effect";
@@ -33,6 +36,9 @@ const TestLive = Layer.mergeAll(
 );
 
 const takeHomeCalculatorId = AuPayCalculatorId.make("au.pay.take-home");
+const annualTaxCalculatorId = AuAnnualIncomeTaxCalculation.calculatorId;
+const secretSentinel = "taxkit-secret-sentinel";
+const privatePathSentinel = "/private/taxkit-sentinel/http-input.json";
 
 const grossPayFacts = (
   cents: number,
@@ -125,11 +131,29 @@ describe("TaxKit public calculation HTTP API", () => {
 
       expect(response.calculator.calculatorId).toBe("au.pay.take-home");
       expect(response.report._tag).toBe("TakeHomePayReport");
+      expect(response.report.rulePackVersion).toBe("rules-au-pay/1.0.0");
       expect(decoded).toEqual(sdkResponse);
       expect(response).toEqual(sdkResponse);
       expect(response.report.withholdingsTotal.cents).toBe(75_600);
       expect(response.report.netPay.cents).toBe(270_600);
       expect(response.diagnostics.graphIssues.length).toBe(0);
+
+      const annualTaxResponse = yield* client.calculatorApi.calculate({
+        params: {
+          calculatorId: annualTaxCalculatorId,
+        },
+        payload: {
+          facts: { taxableIncome: aud(9_000_000) },
+          jurisdiction: "AU",
+          taxYear: "2025-26",
+        },
+        query: {},
+      });
+
+      expect(annualTaxResponse.report._tag).toBe("AnnualTaxReport");
+      expect(annualTaxResponse.report.rulePackVersion).toBe(
+        "rules-au-income-tax/1.0.0"
+      );
     }).pipe(Effect.provide(TestLive))
   );
 
@@ -140,6 +164,7 @@ describe("TaxKit public calculation HTTP API", () => {
         const client = yield* TaxKitHttpApiService;
         const service = yield* PublicCalculatorService;
         const invalidFacts = {
+          rejectedSource: `${secretSentinel}:${privatePathSentinel}`,
           taxableIncome: aud(9_000_000),
         };
         const exit = yield* client.calculatorApi
@@ -230,7 +255,12 @@ describe("TaxKit public calculation HTTP API", () => {
         expect(calculatorError).toEqual(serviceFailure.error);
         expect(calculatorError._tag).toBe("CalculatorInputDecodeError");
         expect(expectAt(calculatorError.issues, 0).path).toEqual(["grossPay"]);
+        expect(expectAt(calculatorError.issues, 0).message).toBe(
+          "Invalid calculator input value"
+        );
         expect(expectAt(inputHelp, 0).factId).toBe(GrossPayDescriptor.id);
+        expect(JSON.stringify(envelope)).not.toContain(secretSentinel);
+        expect(JSON.stringify(envelope)).not.toContain(privatePathSentinel);
       }).pipe(Effect.provide(TestLive))
   );
 });

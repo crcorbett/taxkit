@@ -17,6 +17,14 @@ import {
 } from "../facts/withholdings.js";
 
 /**
+ * Independent version of the Australian pay ruleset represented by this
+ * report.
+ *
+ * @since 1.0.0
+ */
+const PayRulePackVersion = Schema.Literal("rules-au-pay/1.0.0");
+
+/**
  * Take-home pay report for one Australian pay-period scenario.
  *
  * The report preserves gross pay, taxable pay, the withholding ledger,
@@ -30,7 +38,7 @@ export class TakeHomePayReport extends Schema.TaggedClass<TakeHomePayReport>()(
     grossPay: Money,
     netPay: Money,
     period: PayPeriod,
-    rulePackVersion: Schema.String,
+    rulePackVersion: PayRulePackVersion,
     taxablePay: Money,
     trace: TraceNode,
     withholdings: PayWithholdingsLedger,
@@ -56,7 +64,7 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
     grossPay: gross.amount,
     netPay: net.amount,
     period: gross.period,
-    rulePackVersion: "rules-au-pay/0.0.0",
+    rulePackVersion: PayRulePackVersion.make("rules-au-pay/1.0.0"),
     taxablePay: taxable.amount,
     trace: net.trace,
     withholdings: ledger,

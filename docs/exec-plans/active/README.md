@@ -9,6 +9,4 @@ confidence: high
 
 Live implementation plans belong here while work is in progress.
 
-Active execution plans:
-
-- [Repository portability and production contracts](./repository-portability-and-production-contracts.md)
+There are no active execution plans.

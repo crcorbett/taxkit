@@ -115,6 +115,12 @@ Reports should include:
 - optional ledger
 - diagnostics and warnings
 
+Each report owner defines its ruleset-version Schema as an exact literal and
+emits that value directly. Ruleset versions describe the independent tax-rule
+edition used for a calculation; they are not read from package manifests at
+runtime. Current report values are `rules-au-pay/1.0.0` and
+`rules-au-income-tax/1.0.0`.
+
 ## Question Planning
 
 Calculators should expose goal requirements through graph metadata. The UI and CLI can use this to ask for missing facts.

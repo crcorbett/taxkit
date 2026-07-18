@@ -534,6 +534,14 @@ const effectReport = await Effect.runPromise(
     Effect.provide(ServiceLive)
   )
 );
+const plainAnnualReport = await au.incomeTax.annual({
+  taxableIncome: aud(9_000_000),
+});
+const effectAnnualReport = await Effect.runPromise(
+  calculateReport(au.calculations.annualIncomeTax, {
+    taxableIncome: aud(9_000_000),
+  }).pipe(Effect.provide(ServiceLive))
+);
 
 if (plainReport._tag !== "TakeHomePayReport") {
   throw new Error("Plain SDK downstream calculation returned the wrong report.");
@@ -541,6 +549,22 @@ if (plainReport._tag !== "TakeHomePayReport") {
 
 if (effectReport._tag !== "TakeHomePayReport") {
   throw new Error("Effect SDK downstream calculation returned the wrong report.");
+}
+
+if (plainReport.rulePackVersion !== "rules-au-pay/1.0.0") {
+  throw new Error("Plain SDK downstream calculation returned the wrong pay ruleset version.");
+}
+
+if (effectReport.rulePackVersion !== "rules-au-pay/1.0.0") {
+  throw new Error("Effect SDK downstream calculation returned the wrong pay ruleset version.");
+}
+
+if (plainAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.0") {
+  throw new Error("Plain AU SDK downstream calculation returned the wrong income-tax ruleset version.");
+}
+
+if (effectAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.0") {
+  throw new Error("Effect SDK downstream calculation returned the wrong income-tax ruleset version.");
 }
 
 console.log("Downstream SDK runtime examples passed.");

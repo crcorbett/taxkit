@@ -2,6 +2,11 @@ import { CalculatorServiceError } from "@taxkit/calculators/schemas";
 import type { CalculatorServiceError as CalculatorServiceErrorType } from "@taxkit/calculators/schemas";
 import { Array, Cause, Data, Option, Schema } from "effect";
 
+const calculationFailureMessage = "TaxKit calculation failed";
+const schemaDecodeFailureMessage =
+  "TaxKit calculation response failed schema validation";
+const unexpectedFailureMessage = "TaxKit calculation failed unexpectedly";
+
 export class TaxKitSchemaDecodeError extends Schema.TaggedErrorClass<TaxKitSchemaDecodeError>()(
   "TaxKitSchemaDecodeError",
   {
@@ -47,19 +52,19 @@ export type TaxKitSafeResult<Value> = TaxKitFailure | TaxKitSuccess<Value>;
 
 export const toTaxKitCalculationError = (
   cause: Cause.Cause<CalculatorServiceErrorType | Schema.SchemaError>
-): TaxKitCalculationError => {
-  const message = Cause.pretty(cause);
-
-  return new TaxKitCalculationError({
+): TaxKitCalculationError =>
+  new TaxKitCalculationError({
     error: Array.findFirst(cause.reasons, Cause.isFailReason).pipe(
       Option.match({
-        onNone: () => new TaxKitUnexpectedError({ message }),
+        onNone: () =>
+          new TaxKitUnexpectedError({ message: unexpectedFailureMessage }),
         onSome: (failure) =>
           Schema.isSchemaError(failure.error)
-            ? new TaxKitSchemaDecodeError({ message })
+            ? new TaxKitSchemaDecodeError({
+                message: schemaDecodeFailureMessage,
+              })
             : failure.error,
       })
     ),
-    message,
+    message: calculationFailureMessage,
   });
-};
