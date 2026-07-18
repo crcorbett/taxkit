@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-18
 source_of_truth: docs
 confidence: medium
 ---
@@ -72,6 +72,58 @@ when it keeps the source value visible and data flow clearer, for example
 `query.pipe(filterCalculatorEntries, toFactsResponse)`. Do not nest
 transformations in wrapper calls when a left-to-right pipeline makes ownership
 and flow clearer.
+
+## String-shaped contracts
+
+Classify a string-shaped value by the policy it carries, not by the fact that
+its JavaScript representation is a string. The owning package or app owns the
+Schema, schema-derived `Type`, encoded representation and constructor. Do not
+create a central strings package, generic brand factory or content wrapper.
+
+Use these six categories:
+
+- **Open semantic value.** Use an owner-named string Schema and
+  `Schema.brand` when mixing the value with another otherwise-valid string is
+  a real defect, for example a fact ID passed where a rule ID is required.
+  `Schema.brand` is nominal only in the installed Effect version; it does not
+  validate syntax. Add checks only for a stable documented invariant.
+- **Closed vocabulary.** Use an owner-named `Schema.Literal` or
+  `Schema.Literals` for a finite set of kinds, statuses, modes or operations.
+  Use `Match` for material branching over that vocabulary. A literal Schema
+  may also carry an existing owner brand when both the finite runtime contract
+  and nominal identity matter.
+- **Redacted secret.** For raw secret ingress, use an owner-named
+  `Schema.RedactedFromValue` and set `disallowEncode` unless an explicit secret
+  egress exists. `Schema.Redacted` expects an already-redacted value. Reveal a
+  secret only in the owning live adapter at final client construction; do not
+  reveal it merely to apply a brand.
+- **Checked content.** Ordinary titles, descriptions, messages and authored
+  text may remain `string`, `Schema.String` or `Schema.NonEmptyString`. Extract
+  an owner-named Schema only when content has independent validation, secrecy,
+  mixing or repeated boundary policy. Brand only when two valid content
+  domains must not be mixed.
+- **Transport primitive.** Serialized JSON, URLs, headers, file/process
+  representations and encoded keys use owner-named boundary Schemas when they
+  are exported. Parser-local fragments may stay local after the complete
+  representation has been decoded.
+- **Diagnostic text.** Safety is an egress data-flow property, not a nominal
+  string type. Persistent, provider-facing or user-facing diagnostics must not
+  contain secrets, private paths, raw private payloads or unchecked exception
+  bodies. Prove the egress with sentinel tests, or document the exact local,
+  non-persistent operator boundary that intentionally receives raw output.
+
+At every boundary, record the Schema's `Type` and `Encoded` forms separately.
+Decode an unknown or representation-level value once at ingress, pass the
+canonical `Type` inward, and encode only at an explicit HTTP, provider,
+persistence, route or command egress. `Schema.make` is valid construction for
+trusted literals; it is not evidence of runtime validation that the underlying
+Schema does not provide.
+
+Explicit recursive encoded contracts such as `TraceNodeEncoded`, and generic
+descriptor interfaces that preserve schema-to-continuation inference, are not
+DTO mirrors. Keep them when TypeScript cannot otherwise express the recursive
+or generic relation. Do not use that exception for ordinary duplicated object
+shapes.
 
 ## Runtime composition
 

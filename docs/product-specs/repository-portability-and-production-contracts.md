@@ -140,7 +140,7 @@ portable Effect rule
 
 ## Decision Blockers
 
-Two repository contradictions need explicit approval before package-facing
+Three repository contradictions need explicit approval before package-facing
 string corrections can be accepted:
 
 1. `IsoDate` is documented as validating calendar-date syntax and reality, but
@@ -156,11 +156,22 @@ string corrections can be accepted:
    fixed group. Decide whether calculators joins the fixed group or remains an
    independently versioned package. This spec must not silently change release
    policy.
+3. `AnnualTaxReport.rulePackVersion` and
+   `TakeHomePayReport.rulePackVersion` are public encoded strings whose runtime
+   values remain `rules-au-income-tax/0.0.0` and `rules-au-pay/0.0.0` after the
+   owning package manifests moved to `1.0.0`. Decide whether these fields own
+   package semver through an owner-defined build/runtime constant, represent a
+   different stable rule-pack identifier, or require a compatibility/deprecation
+   path. Do not introduce runtime manifest reads or a generic version-string
+   package without an explicit owning contract. The manifest mismatch is
+   evidence only; it does not establish that package semver is the intended
+   value. Any encoded-value change is observable behavior and must account for
+   exact-value consumers and snapshots.
 
 RPC-002 records the complete decision ledger without changing package
 contracts. Lint and production-graph tasks may proceed after that audit because
-they do not depend on either product decision. Final acceptance remains blocked
-until both decisions are recorded and any approved package-facing correction
+they do not depend on these product decisions. Final acceptance remains blocked
+until all three decisions are recorded and any approved package-facing correction
 has been completed through RPC-006 with the required Changeset or documented
 N/A rationale.
 
@@ -462,8 +473,9 @@ Do not run `bun run version-repo` as part of this work.
 - Canonical architecture or standards guidance defines the six string-contract
   categories and current package-facing/config/persistence contracts have been
   audited against them.
-- The `IsoDate` runtime-validation contract and calculators fixed-group
-  membership decisions are recorded before package-facing string corrections.
+- The `IsoDate` runtime-validation contract, calculators fixed-group
+  membership and public rule-pack-version semantics are recorded before
+  package-facing string corrections.
 - Every correction approved by those decisions is completed through RPC-006
   with focused compatibility proof and the required Changeset, changelog or
   explicit N/A artifact.

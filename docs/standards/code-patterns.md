@@ -12,9 +12,16 @@ Effect-native primitives are mandatory where they fit. Use `Data`, `Schema`,
 
 ## Boundary Values
 
-- Define externally visible values with `Schema`.
-- Brand domain primitives that should not be mixed accidentally, such as fact
-  IDs, rule IDs, component IDs, cents, rates, tax years, and effective periods.
+- Follow the canonical
+  [string-shaped contract taxonomy](../architecture/effect-services.md#string-shaped-contracts)
+  before choosing a brand, literal, redacted secret, checked-content Schema,
+  transport primitive or diagnostic policy.
+- Define externally visible values with an owner-named `Schema`.
+- Brand open semantic values only when accidental mixing is a real defect.
+  A brand is nominal and does not add runtime validation.
+- Use `Schema.Literal` or `Schema.Literals` for closed vocabularies. Keep
+  ordinary content as `string` or inline `Schema.String` when it has no
+  independent policy.
 - Derive public TypeScript types from schemas with `typeof Schema.Type`.
 - Reuse canonical schema-derived types, branded ids, service tags, tagged
   errors and constructors from the owning package. Do not mirror canonical
@@ -30,6 +37,10 @@ export type TaxYear = typeof TaxYear.Type;
 
 export const taxYear = (value: string): TaxYear => TaxYear.make(value);
 ```
+
+`TaxYear.make` constructs the nominal value from trusted input; it does not
+prove a tax-year format. Decode unknown input through an owning Schema with
+explicit checks when the owner promises that runtime invariant.
 
 ## Effects, Layers, And Services
 

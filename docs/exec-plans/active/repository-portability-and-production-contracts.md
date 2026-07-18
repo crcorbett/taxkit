@@ -27,11 +27,11 @@ decision. Do not publish packages or run `version-repo`.
 | Task | Status | Notes |
 | --- | --- | --- |
 | RPC-001 | complete | Parent accepted correction turn 1 after focused, frozen-lockfile, repository-wide and root-test verification. |
-| RPC-002 | pending | Audit-only string-contract taxonomy and decision ledger. |
-| RPC-003 | pending | Portable Effect lint decision matrix and admitted rules. |
+| RPC-002 | complete | Parent accepted correction turn 1 after decision-neutral compatibility review and independent repository verification. |
+| RPC-003 | in progress | Portable Effect lint decision matrix and admitted rules. |
 | RPC-004 | pending | Production-only Knip graph. |
-| RPC-005 | blocked | Requires explicit user decisions for `STR-DEC-001` and `REL-DEC-001`. |
-| RPC-006 | blocked | Requires accepted RPC-003/RPC-004, both RPC-005 decisions and an exact populated `resolvedScope`. |
+| RPC-005 | blocked | Requires explicit user decisions for `STR-DEC-001`, `STR-DEC-002` and `REL-DEC-001`. |
+| RPC-006 | blocked | Requires accepted RPC-003/RPC-004, all three RPC-005 decisions and an exact populated `resolvedScope`. |
 
 ## Decision Log
 
@@ -47,6 +47,127 @@ authorised before an explicit user decision.
 Choose whether `@taxkit/calculators` joins the Changesets fixed group or remains
 independently versioned. No release-policy change is authorised before an
 explicit user decision.
+
+### STR-DEC-002 - unresolved
+
+Choose whether the public `rulePackVersion` fields report the owning package
+semver, represent a distinct stable rule-pack identifier, or require a
+compatibility/deprecation path. Both current values remain `0.0.0` while their
+owning package manifests are `1.0.0`; this mismatch is evidence only and does
+not select package semver. Any encoded-value change risks exact-value consumers
+and snapshots. No keep/change/deprecation outcome, Changeset scope or API
+changelog impact is authorised before an explicit decision on the owner and
+meaning of this field.
+
+## RPC-002 String-contract audit ledger
+
+### Scope and method
+
+The audit starts from the export and command surfaces declared by the nine
+artifact manifests: `@taxkit/core`, the three AU rule packages,
+`@taxkit/calculators`, `@taxkit/api-http`, `@taxkit/sdk`, `@taxkit/testing` and
+`@taxkit/tsconfig`. It also covers the exported and executable command
+contracts of `@taxkit/scripts` and the configuration, runtime and smoke-command
+contracts of `apps/api`. Rows include string-shaped exported Schemas, public or
+generic constructor inputs, configuration, explicit encoded contracts and
+diagnostic egress. Ordinary implementation literals, Schema tags, endpoint
+names, fixture text and environment-key names are excluded.
+
+Installed `effect@4.0.0-beta.98` is authoritative: `Schema.brand` changes the
+nominal `Type` without adding runtime checks; `Schema.RedactedFromValue` decodes
+raw input to a redacted `Type`; `Schema.Redacted` accepts a value that is
+already redacted. No audited owner currently has a secret Schema.
+
+| ID | Owning module / Schema; field | Exposure boundary | Current -> proposed category | Runtime constraint | Brand identity | Type | Encoded | Constructor | Ingress decode | Egress encode | Compatibility | Decision |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CORE-01 | `packages/core/src/primitives/date.ts` `IsoDate`; value | Public primitive and `DateInterval` transport/persistence field | open semantic -> checked open semantic | Current Schema: none; `isoDate` separately checks shape/date | `taxkit/IsoDate` | branded `string` | `string` | `IsoDate.make` for trusted values; `isoDate(string)` checks | Owning Schema at external boundaries; constructor for raw public call | `DateInterval`/artifact/trace owners encode at their egress | Tightening the exported Schema changes accepted decode input; constructor-only documentation is compatible | **Change blocked by STR-DEC-001** |
+| CORE-02 | `date.ts` `DateInterval.from`, `toExclusive`; `dateInterval` arguments | Public constructor and encoded effective periods | checked content -> checked content | interval order; date reality only through `isoDate` constructor today | inherited `taxkit/IsoDate` | `IsoDate`, optional `IsoDate` | `string`, optional `string` | `dateInterval({ from, toExclusive })` accepts `string \| IsoDate` | constructor parses raw strings; Schema decode follows `IsoDate` | owning Schema at API/trace/persistence egress | Follows STR-DEC-001; recursive/encoded consumers remain canonical | **Keep pending STR-DEC-001** |
+| CORE-03 | `primitives/tax.ts` `CalculatorId`, `Jurisdiction`, `TaxYear`; raw constructor values | Public identifiers and catalog/context fields | open semantic -> open semantic | none at generic owner; rule owners close supported values with literals | `taxkit/CalculatorId`, `taxkit/Jurisdiction`, `taxkit/TaxYear` | respective branded `string` | `string` | `calculatorId`, `jurisdiction`, `taxYear`; `.make` for trusted literals | concrete rule/calculator/API Schemas decode unknown input | owning response/request Schema | Adding generic lexical checks without a stable cross-owner invariant would reject existing consumers | **Keep** |
+| CORE-04 | `tax.ts` `taxRate(value)`, `decimalCoefficient(value)` | Public textual parser input | transport primitive -> transport primitive | Effect `BigDecimal` parser; output Schema is numeric, not string-shaped | output brands `taxkit/TaxRate`, `taxkit/DecimalCoefficient` | branded `BigDecimal` | `BigDecimal` representation | named parser constructors | constructor is the explicit textual ingress | owning numeric Schema at transport egress | No separate string contract is exported | **Keep** |
+| CORE-05 | `money.ts` `Currency`; `rounding.ts` `RoundingMode`; `facts/descriptor.ts` `FactAuthority`, `FactQuestionInputKind`; `rules/descriptor.ts` `RuleSourcePolicy`; `trace/node.ts` `SourceKind`; `ledger/component.ts` `ComponentEffect`, `ComponentStatus`; `graph/rule-graph.ts` `GraphValidationIssueKind`; `tax.ts` infinity sentinel | Public closed domains | closed vocabulary -> closed vocabulary | exact literal membership | none; semantic closure is sufficient | literal unions | same literal unions | Schema `.make` or trusted literal | owning Schema at request/transport boundary | owning Schema at report/trace/API egress | Closed values remain exhaustive and non-stringly | **Keep** |
+| CORE-06 | `facts/descriptor.ts` `FactId`, `FactQuestionId`; `parameters/descriptor.ts` `ParameterId`; `trace/node.ts` `RuleId`, `SourceChecksum`; `ledger/component.ts` `ComponentId` | Public descriptor, trace and ledger identities | open semantic -> open semantic | none; checksum algorithm/prefix is not promised as runtime validation | owner-specific `taxkit/*` brands | branded `string` | `string` | owner `.make`, descriptor constructors, `sourceChecksum` | decoded through enclosing exported Schema when external | encoded through enclosing descriptor/trace/ledger owner | Mechanical lexical checks would invent policy; brand prevents cross-ID mixing | **Keep** |
+| CORE-07 | `facts/descriptor.ts` `FactQuestion.helpText`, `prompt`; descriptor `title`; `parameters/descriptor.ts` title; `rules/descriptor.ts` title | Public authored/display metadata | checked content -> checked content | optionality only; no reusable content invariant | none | `string`, optional `string` | same | `FactQuestion` and owner descriptor constructors | trusted repository metadata; enclosing Schema when transported | calculator metadata/API response Schemas | Named content brands would add schema sprawl without mixing protection | **Keep** |
+| CORE-08 | `facts/descriptor.ts`/`parameters/descriptor.ts`/`rules/descriptor.ts` constructor `id` and `title` inputs | Public generic descriptor constructor | open semantic + checked content -> same | IDs gain owner brand; titles have no extra constraint | output owner ID brand only | raw `string` input -> branded ID/content output | IDs encode as `string`; titles as `string` | `makeFactDescriptor`, `makeParameterDescriptor`, `makeRuleDescriptor` | trusted definition-time boundary, not unknown ingress | metadata/API owner encodes projected values | Generic interfaces preserve schema/layer inference and are not DTO mirrors | **Keep** |
+| CORE-09 | `trace/node.ts` `SourceRef.reference`, `title`; `SourceExtract.shape`; `SourceArtifact.documentVersion` | Public source evidence and serialized metadata | transport primitive/content -> same | `reference` deliberately supports citation/URL forms; other fields unconstrained content | none | `string` | `string` | owning Schema `.make`/classes | trusted rule data or enclosing Schema decode | trace/parameter metadata egress | No one lexical rule fits all citation references or document versions | **Keep** |
+| CORE-10 | `trace/node.ts` `TraceNode.ruleId`, `title`, `formula`, `inputs` keys and `TraceNodeEncoded` counterparts | Recursive public transport/persistence codec | open semantic/content/transport -> same | owner ID brand; optional formula; record keys unconstrained | `taxkit/RuleId` only | branded ID plus content strings | raw string ID/content/keys | `TraceNode.make` through Schema codec | enclosing trace decode at external representation boundary | explicit owning recursive encoder | `TraceNodeEncoded` is necessary recursive representation, not a DTO mirror | **Keep** |
+| CORE-11 | `ledger/component.ts` `LedgerComponent.id`, `label` and `LedgerComponentEncoded` | Public ledger transport/persistence codec | open semantic + content -> same | ID nominal only; label unconstrained display content | `taxkit/ComponentId` | branded ID, `string` label | raw string ID/label | `LedgerComponent.make` through codec | enclosing ledger decode | explicit owning ledger encoder | Explicit encoded form preserves nested codec types | **Keep** |
+| CORE-12 | `graph/rule-graph.ts` `GraphValidationIssue.message`; `errors/calculation-error.ts` `CalculationError.message` | Package/API diagnostics | diagnostic text -> diagnostic text | generated from canonical graph IDs or owning calculation failures; no nominal safety | none | `string` | `string` | tagged Schema class constructors | internal generation | calculator/API/SDK error egress | Safety depends on generators; no secret/provider surface currently reaches these constructors | **Keep; sentinel coverage joins any diagnostic correction** |
+| RULE-IT-01 | `packages/rules/au/income-tax/src/calculator/metadata.ts` calculator ID, jurisdiction, tax year and context | Public rule-owned catalog context | closed vocabulary with owner brand -> same | exact supported literals | canonical core identity brands | branded literal unions | literal strings | `.make` on trusted catalog literals | calculator/API Schema decodes external context | calculator/API response encoder | Correctly narrows generic core IDs | **Keep** |
+| RULE-IT-02 | `calculator/annual-tax.ts` `AnnualTaxReport.rulePackVersion` | Public report and API/SDK transport | unchecked public encoded value -> unresolved pending its intended meaning | none; emitted value is `rules-au-income-tax/0.0.0` while manifest is `1.0.0`; the mismatch is evidence only | none | `string` | `string` | `AnnualTaxReport` constructor | internal report generation | calculator/API/SDK response encoding | Any value change is observable behavior and can break exact-value consumers or snapshots; keeping, changing or deprecating the field requires an explicit contract decision | **Blocked by STR-DEC-002; no keep/change presumption** |
+| RULE-IT-03 | Exported fact/parameter/rule descriptors, source refs/artifacts and Rule/Component IDs across `facts/*`, `parameters/*`, `rules/*`, `rule-pack/descriptors.ts` | Public static rule metadata | inherited open semantic/content/transport -> same | only canonical core owner constraints | canonical core brands | canonical core Types | canonical core Encoded strings | core constructors and `.make` on trusted literals | repository-owned static definitions | calculator metadata/trace egress | No rule-local mirror or new string policy | **Keep** |
+| RULE-PAY-01 | `packages/rules/au/pay/src/calculator/metadata.ts` calculator ID, jurisdiction, tax year and context | Public rule-owned catalog context | closed vocabulary with owner brand -> same | exact supported literals | canonical core identity brands | branded literal unions | literal strings | `.make` on trusted catalog literals | calculator/API Schema decodes external context | calculator/API response encoder | Correctly narrows generic core IDs | **Keep** |
+| RULE-PAY-02 | `facts/pay.ts` `PayPeriod`; `parameters/schedule1.ts` `Schedule1Scale` | Public calculation/table modes | closed vocabulary -> closed vocabulary | exact literal membership | none | literal unions | same | Schema/class constructors | scenario/table Schema decode | report/table encoding | Existing `Match` branching remains exhaustive | **Keep** |
+| RULE-PAY-03 | `calculator/take-home-pay.ts` `TakeHomePayReport.rulePackVersion` | Public report and API/SDK transport | unchecked public encoded value -> unresolved pending its intended meaning | none; emitted value is `rules-au-pay/0.0.0` while manifest is `1.0.0`; the mismatch is evidence only | none | `string` | `string` | `TakeHomePayReport` constructor | internal report generation | calculator/API/SDK response encoding | Any value change is observable behavior and can break exact-value consumers or snapshots; keeping, changing or deprecating the field requires an explicit contract decision | **Blocked by STR-DEC-002; no keep/change presumption** |
+| RULE-PAY-04 | Exported fact/parameter/rule descriptors, source refs/artifacts and Rule/Component IDs across `facts/*`, `parameters/*`, `rules/*`, `rule-pack/descriptors.ts` | Public static rule metadata | inherited open semantic/content/transport -> same | only canonical core owner constraints | canonical core brands | canonical core Types | canonical core Encoded strings | core constructors and `.make` on trusted literals | repository-owned static definitions | calculator metadata/trace egress | No rule-local mirror or new string policy | **Keep** |
+| RULE-STSL-01 | Exported fact/parameter/rule descriptors, source refs/artifact and Rule/Component IDs across `packages/rules/au/stsl/src` | Public static rule metadata | inherited open semantic/content/transport -> same | only canonical core owner constraints | canonical core brands | canonical core Types | canonical core Encoded strings | core constructors and `.make` on trusted literals | repository-owned static definitions | calculator metadata/trace egress | STSL defines no separate exported string Schema | **Keep; owner-local string Schema N/A** |
+| CALC-01 | `packages/calculators/src/schemas.ts` composed calculator IDs, jurisdictions, tax years, contexts and request fields | Public service/API/SDK request/response | closed vocabulary with owner brands -> same | union of exact rule-owned literals | inherited core identity brands | branded literal unions/structs | literal strings/structs | enclosing Schema `.make`/Data classes | HTTP/SDK boundary decodes complete request | response owner encodes complete representation | Reuses rule owners; no duplicate ID Schema | **Keep** |
+| CALC-02 | `schemas.ts` `HelpMode`, authority/source policy inherited fields | Public request/response modes | closed vocabulary -> closed vocabulary | exact literals | none | literal unions | same | owning Schema | HTTP query decode | response encode | No stringly branch expansion required | **Keep** |
+| CALC-03 | `catalog.ts` entry `description`, `reportSchemaName`, `title`; `schemas.ts` catalog/jurisdiction/descriptor `description`, `title`, `schemaTag`, `reportSchemaName` | Public catalog/metadata content and transport labels | checked content/transport primitive -> same | no independent content constraint; schema tag/name are emitted identifiers but not caller inputs | none | `string` | `string` | catalog definition + Schema-derived Data classes | trusted repository catalog | calculator/API response Schema | Branding display strings or AST tags would add sprawl; generic catalog interfaces preserve schema coupling | **Keep** |
+| CALC-04 | `schemas.ts` `CalculatorInputIssue.message`, `path`; calculator error `message`; `UnsupportedCalculatorError.requestedCalculator` | Public API/SDK diagnostics | diagnostic text/transport path -> diagnostic text/transport path | path normalized to strings; current standard formatter may include rejected values in message | none | `string`, `readonly string[]` | same | tagged Schema class constructors | `errors.ts` converts Schema issue at calculator boundary | API and SDK error encoding | Sanitizing text changes observable error detail but preserves tags/paths | **Change proposed: CORR-003** |
+| CALC-05 | `schemas.ts` `SourceRef`, descriptor IDs/titles, `FactQuestion`, effective periods and graph diagnostics reused in metadata responses | Public metadata transport | canonical inherited categories -> same | canonical owner constraints | canonical core brands | canonical core Types | canonical core Encoded | owner constructors/Data projections | internal typed descriptor projection | calculator/API response encoding | Correct owner reuse; no DTO/string mirror | **Keep** |
+| CALC-06 | `catalog.ts` `CalculatorCatalogEntryDefinition` and dynamic `calculate(facts)` | Generic type-erasure boundary | schema-coupled generic interface -> same | selected input Schema closes over continuation | none beyond field owners | schema-specific Type | enclosing request Encoded | `defineCalculatorCatalogEntry` | selected Schema decodes once after heterogeneous lookup | response owner encodes | This is a required generic boundary, not a DTO mirror or repeated defensive decode | **Keep** |
+| API-01 | `packages/api/http/src/config.ts` `TaxKitHttpApiClientConfigSchema.baseUrl` | Exported package config/provider egress | transport primitive -> transport primitive | valid URL | none | `URL` | `string` | Schema `.make` after `Config.url` | Effect Config parses URL once | provider/client adapter consumes Type; no serialization here | Correct Type/Encoded distinction | **Keep** |
+| API-02 | `groups/health.ts` `HealthResponse.service`, `status`; calculator group schemas | Public HTTP response/request | closed vocabulary/canonical reused contracts -> same | exact health literals and calculator owner constraints | inherited where applicable | literal/canonical Types | literal/canonical Encoded | HTTP API Schema | HttpApi decodes request representations | HttpApi encodes responses | No local calculator DTOs | **Keep** |
+| API-03 | API/OpenAPI endpoint/group names, paths, titles and descriptions | Declarative framework metadata | implementation literals -> excluded | framework-owned declaration | none | N/A | N/A | declarative builders | N/A | generated OpenAPI | Not exported value fields or constructor/config contracts | **N/A** |
+| SDK-01 | `packages/sdk/typescript/src/errors.ts` all `message` fields; `Cause.pretty` projection | Public SDK failure diagnostics | raw diagnostic text -> safe diagnostic text | current Cause pretty-printer may include nested rejected values/private paths | none | `string` | `string` | Schema-tagged error constructors | calculator/Schema Cause converted at SDK boundary | rejected Promise/safe result and exported error Schema | Stable sanitization changes message detail while preserving error tags/details | **Change proposed: CORR-004** |
+| SDK-02 | `types.ts` `SdkCalculation` ID/jurisdiction/year; `TaxKitModule.id` | Public generic SDK descriptor | canonical identities + generic module identity -> same | calculation values use rule literals; module `id` retains literal generic | inherited brands except module ID | branded literals; generic `Id extends string` | strings | `defineSdkCalculation`, `defineTaxKitModule` | trusted exported descriptors | SDK calls through calculator service | Generic interface preserves inference and is not a DTO mirror; no mixing defect proven for module ID | **Keep** |
+| SDK-03 | `effect.ts` generic request/response Omit projections | Public SDK Effect facade | canonical transport contracts -> same | preserves calculator Schemas and selected report decoder | inherited | canonical Types with generic report/input | canonical Encoded through owner | SDK functions | calculator service owns request decode; selected report decoder runs once at type-erasure boundary | API/SDK caller owns external egress | Projection preserves generic report coupling; no duplicated string fields | **Keep** |
+| SDK-04 | `scripts/check-packed-artifact.runtime.ts`, `validate-downstream-consumer.runtime.ts`, `check-import-boundaries.ts`: command/path/stdout/stderr/message and manifest strings | Manifest-declared local validation commands | transport primitives + local diagnostics -> same | decoded package manifests; scoped temp workspaces | none | local `string`/Schema Types | local strings | command/result tagged classes and local Schemas | file/process output decoded at command boundary | terminal only; no persistence/provider/user response | Raw command evidence is intentional for the invoking repository operator | **Keep under explicit local non-persistent policy** |
+| TEST-01 | `packages/testing/src/index.ts` `expectAt` thrown message | Exported test-helper diagnostic | diagnostic text -> diagnostic text | deterministic index only | none | `string` | N/A | thrown test assertion fallback | local typed input | test runner only | No runtime/package consumer data or secret path | **Keep; test-only local boundary** |
+| TSCONFIG-01 | `packages/tsconfig/base.json` and package export map | Compiler JSON artifact | application string contract -> N/A | TypeScript compiler owns option strings | none | JSON | JSON | N/A | TypeScript | TypeScript | No application Schema/source contract exists | **N/A** |
+| SCRIPT-01 | `packages/scripts/src/release-readiness/schemas.ts` `ReleaseCheckId` | Exported repository command vocabulary | closed vocabulary -> closed vocabulary | exact ordered check IDs | none | literal union | same | `ReleaseCheck` | trusted plan construction | report rendering | Exhaustive command policy | **Keep** |
+| SCRIPT-02 | `ReleaseCheck.args`, `command`, `cwd`, `label`; `ReleaseCommandOutcome.stdout`, `stderr` | Exported command evidence and process boundary | transport primitive/content/diagnostic -> same | non-empty command/cwd/label; no content check for process streams | none | strings | strings | Schema-tagged classes | process adapter captures decoded text | returned report and local terminal formatter | Raw fields are useful evidence but unsafe for persistent or remote egress | **Keep under explicit local non-persistent policy** |
+| SCRIPT-03 | `errors.ts` execution/path `message`, `url`; `formatReleaseReadinessError` rendered cwd/stdout/stderr | Local CLI diagnostic egress | diagnostic text -> diagnostic text | no sanitizer; exact command evidence intentionally rendered | none | `string` | N/A | tagged errors and `Match` formatter | process/path failures | `release-readiness.runtime.ts` writes only to invoking terminal | Output may contain workspace paths/secrets printed by child tools; policy forbids capture, persistence, provider or user-facing forwarding | **Keep under explicit local non-persistent policy; sentinel test required before any broader egress** |
+| SCRIPT-04 | `renderReleaseReadinessReport` command/cwd rendering | Local CLI success diagnostic | diagnostic text -> diagnostic text | trusted plan plus outcomes | none | `string` | N/A | pure renderer | typed report | invoking terminal | Same local-only limitation as SCRIPT-03 | **Keep** |
+| APP-API-01 | `apps/api/src/schemas.ts` source `host`, TCP `hostname`; config service | App config and server adapter | transport primitive -> transport primitive | non-empty string; port separately bounded | none | `string` | `string` | Config parse -> Schema decode -> service value | Effect Config/environment then one Schema decode | Bun server option | Hostname is not a secret; accepting DNS/IP/socket host forms is intentional | **Keep** |
+| APP-API-02 | `apps/api/src/index.ts` listening log hostname | Operator diagnostic | diagnostic text -> diagnostic text | derived from validated non-secret config | none | `string` rendering | N/A | template rendering | typed config | process console only | No persistence/provider/user response | **Keep under local runtime-log policy** |
+| APP-API-03 | `apps/api/scripts/smoke-public-routes.runtime.ts` route, command, cwd, stdout/stderr and error messages | Manifest-declared smoke command | transport primitives + local diagnostics -> same | canonical routes, scoped temp workspace and process results | none | local strings | local strings | local tagged errors/records | HTTP/process/file boundaries | invoking terminal only | Raw external-consumer evidence is local and non-persistent | **Keep under explicit local non-persistent policy** |
+
+### Explicit surface N/A findings
+
+- Persistence implementation: N/A. Core owns explicit `TraceNodeEncoded` and
+  `LedgerComponentEncoded` transport/persistence-capable codecs, but no audited
+  package or app persists them to a database, queue or file store.
+- Provider integration: N/A. No in-scope owner wraps a third-party provider SDK
+  or has a provider request/response string contract.
+- Secrets: N/A. No in-scope config or exported Schema currently accepts a
+  credential or secret, so neither `Schema.RedactedFromValue` nor
+  `Schema.Redacted` is currently required.
+- Browser/React: N/A. `apps/docs` and `apps/web` are outside this rollout; no
+  React composition or browser-runtime surface is changed.
+
+### Decision-ready correction entries
+
+| Correction | Exact owning files | Focused owner commands | Compatibility and release artifacts | API app changelog |
+| --- | --- | --- | --- | --- |
+| CORR-001 / STR-DEC-001: align exported `IsoDate` runtime behavior and its documentation | `packages/core/src/primitives/date.ts`; a new focused owner test file under `packages/core/test`; `packages/core/package.json` only if an owner test command must be added; `packages/core/README.md` if accepted-input guidance changes | `bun run --filter=@taxkit/core check-types`; focused date test command recorded by RPC-005; `bun run --filter=@taxkit/core build`; affected AU package `check-types`, `test`, `build`; calculators `check-types`, `test-types`, `test`, `build`; API HTTP `check-types`, `test`, `test:openapi`, `build`; SDK `check-types`, `test-types`, `test`, `build`, `check-boundaries`, `check-packed-artifact`, `validate:downstream` | Tightening is package-facing and requires a `@taxkit/core` Changeset plus any affected owner named by the chosen compatibility path. Constructor-only documentation is docs-only with explicit N/A. Do not infer the choice. | N/A unless the selected option changes an HTTP accepted/encoded contract; if it does, update `apps/api/CHANGELOG.md` and run app `check-types`, `build`, `smoke` |
+| CORR-002 / STR-DEC-002: resolve the intended meaning and compatibility policy of both public `rulePackVersion` fields without presuming a value change | Decision records always: spec, task list and active plan. Conditional only after the decision: `packages/rules/au/income-tax/src/calculator/annual-tax.ts`, its focused report test and README; `packages/rules/au/pay/src/calculator/take-home-pay.ts`, its focused report test and README; exact calculator/API/SDK consumers and snapshots identified by RPC-005 | Commands are also outcome-dependent. If code/output changes, the candidate set is each affected rule package `check-types`, `test`, `build`; calculators `check-types`, `test-types`, `test`, `build`; API HTTP `check-types`, `test`, `test:openapi`, `build`; SDK `check-types`, `test-types`, `test`, `build`, `check-boundaries`, `check-packed-artifact`, `validate:downstream`; app `check-types`, `build`, `smoke`. RPC-005 must close the exact set. | The manifest mismatch is evidence, not the answer. RPC-005 must choose keep/change/deprecate, define the field owner/meaning, identify exact-value consumers and snapshots, and then set the exact compatibility and Changeset scope. Any encoded value change is observable behavioral compatibility risk. No Changeset conclusion is made before that decision. | **Blocked**: RPC-005 determines whether any HTTP behavior or app changelog changes |
+| CORR-003: prove and, if necessary, sanitize calculator Schema-issue diagnostics | `packages/calculators/src/errors.ts`, `packages/calculators/src/schemas.ts` only if the public shape changes, `packages/calculators/__tests__/public-calculator-service.test.ts`, API HTTP calculation tests/OpenAPI snapshot only if output changes | calculators `check-types`, `test-types`, `test`, `build`; API HTTP `check-types`, `test`, `test:openapi`, `build`; SDK `check-types`, `test-types`, `test`, `build`; app `check-types`, `build`, `smoke` | Add secret and private-path sentinel inputs and prove neither appears in `message`; preserve typed paths/tags. Any runtime text/shape correction requires a calculators Changeset and affected API/SDK Changesets as proven by the graph. Test-only proof is internal and needs no Changeset. | **Conditional change** when runtime error output changes |
+| CORR-004: replace raw SDK `Cause.pretty` egress with stable safe messages while retaining typed detail | `packages/sdk/typescript/src/errors.ts`, `packages/sdk/typescript/src/index.test.ts`, `effect.test.ts` only when the Effect facade exposes the behavior, and `packages/sdk/typescript/README.md` if documented error text changes | SDK `check-types`, `test-types`, `test`, `build`, `check-boundaries`, `check-packed-artifact`, `validate:downstream` | Package-facing diagnostic change; add an `@taxkit/sdk` Changeset. Sentinel tests must prove secret/private-path values do not reach exported errors, rejected Promises or safe results. | N/A; the HTTP API does not use this plain-client error formatter |
+| REL-DEC-001: reconcile calculators fixed-group membership | `.changeset/config.json`, `docs/standards/versioning.md`, spec/task/active-plan decision records; downstream validator only if the chosen release-closure policy changes | `bun run changeset status --verbose`; `bun run --filter=@taxkit/sdk validate:downstream`; `bun run verification` | Release-policy decision only. The config/docs edit itself has no package Changeset; subsequent package-facing corrections follow the selected fixed-group behavior. | N/A |
+
+CORR-002 is an additional compatibility decision discovered by this audit. The
+public encoded values are `0.0.0` while the package manifests are `1.0.0`, but
+that mismatch is evidence only and does not establish that package semver is
+the field's intended contract. RPC-005 must choose keep/change/deprecate, record
+the owner and meaning, audit exact-value consumers and snapshots, and set the
+Changeset scope before RPC-006 edits either report. This does not block RPC-003
+or RPC-004.
+
+### RPC-002 downstream impact ledger
+
+| Surface | Decision | Path evidence |
+| --- | --- | --- |
+| Canonical architecture | Change required | `docs/architecture/effect-services.md` now owns the six-category taxonomy, Type/Encoded distinction and diagnostic egress policy. |
+| Standards examples | Change required | `docs/standards/code-patterns.md` links to the canonical owner and keeps only concise selection/construction examples. |
+| Active implementation evidence | Change required | This plan owns the manifest-to-field ledger, correction commands, blockers and three audit passes. |
+| Product spec/task state | Change required | The spec and sibling task list must record CORR-002 as an audit-discovered compatibility decision before RPC-005. |
+| Package READMEs | N/A for RPC-002 | No package contract changes in this audit. CORR-001, CORR-002 and CORR-004 name the exact conditional README owners for RPC-006. |
+| Lint/rules/fixtures/CI | N/A for RPC-002 | No rule or workflow changes. RPC-003 owns lint; root verification already runs docs/static gates. |
+| Skills, AGENTS and metadata | N/A for RPC-002 | Concurrent approved governance files are preserved. The taxonomy does not add a skill or instruction surface. |
+| Config/manifests/schemas/generators/tests/ops | N/A for RPC-002 | No runtime artifact changes. Exact future files and commands are isolated in the correction table. |
+| Frontend/browser/runtime | N/A for RPC-002 | Website apps are excluded; app/API runtime behavior is unchanged. |
+| Migrations/providers/secrets/telemetry/deployment | N/A | No current persistence/provider/secret surface and no operational mutation. |
 
 ## Validation Log
 
@@ -151,6 +272,86 @@ RPC-001 improvement audits:
 - RPC-001 is accepted with the documented no-Changeset rationale. The final
   call graph remains the spec graph, and RPC-002 may now begin.
 
+### 2026-07-18 - RPC-002 implementation candidate
+
+- Audited the nine artifact manifests and exported owners, plus
+  `@taxkit/scripts` and `apps/api`, through Schema, Type/Encoded, constructor,
+  ingress, egress and compatibility. `@taxkit/tsconfig`, current persistence,
+  provider and secret surfaces are explicit N/A findings.
+- Reconciled every row with installed Effect `4.0.0-beta.98`: brands are
+  nominal only, `RedactedFromValue` owns raw ingress and `Redacted` expects an
+  already-redacted value. Recursive `TraceNodeEncoded` and schema-coupled
+  generic interfaces remain justified; no helper/schema bucket, DTO mirror,
+  unsafe cast or repeated internal decoder is proposed.
+- Added the canonical six-category taxonomy and concise linked standards
+  examples. No package/runtime/manifest/test/README/Changeset/changelog/skill
+  or AGENTS file was changed by RPC-002.
+- Preserved `STR-DEC-001` and `REL-DEC-001`. Added routed blocker
+  `STR-DEC-002` because both public `rulePackVersion` fields emit `0.0.0` while
+  their owner manifests are `1.0.0`. That mismatch is evidence only; the spec,
+  task decision routing, RPC-005, RPC-006 and this plan require an explicit
+  owner/meaning, exact-value-consumer and compatibility decision without
+  presuming package semver or a value change.
+- Exact correction files, owner commands, compatibility, Changeset and API app
+  changelog impact are recorded for IsoDate, rule-pack versions, calculator
+  Schema diagnostics, SDK `Cause.pretty` diagnostics and release policy.
+
+Verification evidence:
+
+- Passed: task JSON parsing, format, diff check, relative-link audit, ledger
+  assertions, repository-path check (516 text, 8 binary, 524 tracked), full
+  `bun run verification`, and `bun run changeset status --verbose` with no
+  pending release.
+- Manifest validation proved every named owner command exists. Current focused
+  proof passed for calculators `test-types`, API HTTP `test:openapi` (1 test),
+  SDK `check-boundaries`, scripts `test` (4 tests), and the full API app smoke
+  including its external temp-workspace consumer. SDK packed/downstream was
+  not rerun because this audit changes no package graph; it remains mandatory
+  for an approved SDK/package-graph correction.
+- Standalone SDK `test-types` currently reports eight pre-existing Effect
+  language-service floating-Effect diagnostics in
+  `type-tests/effect-client.test.ts`. RPC-002 cannot edit this code; RPC-006
+  cannot accept an SDK correction until the command passes.
+
+Improvement audits:
+
+1. Taxonomy/sprawl: retained nominal brands only for real mixing risk, literals
+   for closed rule contexts, and plain/inline strings for ordinary content.
+2. Type/Encoded/data flow: separated branded Types, raw encodings, URL
+   conversion, trusted construction, recursive codecs and local versus
+   persistent/provider/user-facing diagnostic egress.
+3. Coverage/artifacts: rechecked every manifest owner, explicit N/A and
+   decision/correction row. Exact future artifacts are isolated; this slice is
+   documentation-only and correctly has no Changeset.
+
+Parent acceptance:
+
+- Correction turn 1 removed the presumption that the `rulePackVersion`
+  mismatch implies package semver or an additive-compatible value change.
+  `STR-DEC-002` now blocks the exact keep/change/deprecation, command,
+  Changeset and app-changelog scope.
+- Parent review independently confirmed all 42 owner-ledger rows, the explicit
+  N/A surfaces, installed package scripts and the three audit passes.
+- Parent gates passed: task JSON parsing, decision-neutral negative scan,
+  `git diff --check`, `bun run verification` (23 of 23 workspace typecheck
+  tasks) and `bun run changeset status --verbose` with no pending release.
+- RPC-002 is accepted with its documentation-only no-Changeset rationale. Its
+  target call graph adds no runtime owner or edge, and RPC-003 may now begin.
+
+### 2026-07-18 - RPC-002 parent audit correction turn 1
+
+- Parent review accepted STR-DEC-002 as a valid routed finding but found that
+  the two report rows and CORR-002 prematurely selected a value-change outcome
+  before the field owner and meaning were resolved.
+- Revised every STR-DEC-002 surface to be decision-neutral: the package-version
+  mismatch is evidence only; package semver is not presumed; any encoded-value
+  change is observable compatibility risk for exact-value consumers and
+  snapshots; keep/change/deprecation, exact commands, Changesets and API app
+  changelog impact remain blocked until RPC-005 closes the decision.
+- Rechecked the spec blocker, task-level evidence and RPC-005 prompt, active
+  decision log, both ledger rows, correction matrix, audit summary and RPC-006
+  routing for the same presumption. No package/runtime artifact was edited.
+
 ## Call-Graph Status
 
 The target call graphs in the spec are the acceptance baseline. RPC-001 still
@@ -160,6 +361,13 @@ findings and the zero-findings verification gate. The implementation adds only
 the required tracked-symlink representation read inside that inventory step;
 it does not introduce another owner or execution layer. Later tasks record
 their graph result before parent acceptance.
+
+RPC-002 matches the target Effect-contract graph: representation/config/process
+values meet owner-named ingress Schemas, canonical Types flow inward and
+encoding is reserved for explicit egress. It adds no runtime owner or edge.
+The ledger records constructor-only IsoDate checking pending STR-DEC-001 and
+distinguishes local non-persistent command evidence from future sentinel-tested
+public diagnostic corrections.
 
 ## Changeset Policy
 

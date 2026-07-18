@@ -35,6 +35,18 @@
         "Package-facing calculators string-contract correction",
         "Final rollout acceptance"
       ]
+    },
+    {
+      "id": "STR-DEC-002",
+      "decision": "Choose whether public rulePackVersion fields report owner package semver, a distinct stable rule-pack identifier, or follow a compatibility/deprecation path.",
+      "evidence": [
+        "packages/rules/au/income-tax/src/calculator/annual-tax.ts emits rules-au-income-tax/0.0.0 while its manifest is 1.0.0; this mismatch is evidence only and does not select package semver",
+        "packages/rules/au/pay/src/calculator/take-home-pay.ts emits rules-au-pay/0.0.0 while its manifest is 1.0.0; changing the public encoded value risks exact-value consumers and snapshots"
+      ],
+      "blocks": [
+        "Package-facing rulePackVersion contract resolution",
+        "Final rollout acceptance"
+      ]
     }
   ],
   "globalVerification": {
@@ -54,7 +66,7 @@
       "String-contract audit summary by owning package or app boundary",
       "Accepted, rejected, alias and unrelated-shadow real-binary evidence for every new portable lint rule",
       "Production Knip entrypoint inventory and exact rationale for every exception",
-      "Approved STR-DEC-001 and REL-DEC-001 decision records before final rollout acceptance",
+      "Approved STR-DEC-001, STR-DEC-002 and REL-DEC-001 decision records before final rollout acceptance",
       "Three documented improvement audit passes for every substantial task",
       "Changeset path and release-train impact, or explicit no-Changeset rationale for each task"
     ]
@@ -160,7 +172,7 @@
         "String-shaped exported Schemas, types and constructor inputs reachable from the exact nine-package artifact manifests",
         "@taxkit/scripts command evidence and apps/api configuration/runtime contracts",
         "Persisted, serialized, process, provider, diagnostic and secret records, with explicit N/A findings where no surface exists",
-        "STR-DEC-001 and REL-DEC-001 evidence plus every additional compatibility decision discovered by the audit"
+        "STR-DEC-001, STR-DEC-002 and REL-DEC-001 evidence plus every additional compatibility decision discovered by the audit"
       ],
       "outputs": [
         "Durable string-contract taxonomy in canonical architecture or standards guidance",
@@ -169,10 +181,10 @@
         "No package contract or runtime behavior changes in this audit slice",
         "An explicit documentation-only no-Changeset rationale"
       ],
-      "implementationPrompt": "You are implementing exactly one audit/documentation task from the TaxKit spec/task list.\n\nBefore editing, read the target spec, this task object, package manifests/exports, relevant schemas/config/persistence/transport/diagnostic files, and the relevant docs in docs/architecture/*. Identify the owning package for every Schema, type, ID, constructor, service, layer and tagged error in the ledger. Review the spec call graphs before editing and report any final difference.\n\nUse installed Effect 4.0.0-beta.98 semantics: Schema.brand is nominal and adds no runtime check; raw secret ingress uses RedactedFromValue while Schema.Redacted expects an already-redacted value. Plain string or inline Schema.String/NonEmptyString is correct for ordinary content without independent validation, secrecy, mixing or reuse policy. Do not propose generic brand factories, content-schema wrappers, shared schema buckets, unsafe casts, local DTO mirrors, manual object readers, repeated internal decoding, stringly branching or trivial helpers. Preserve legitimate explicit recursive encoded types and generic descriptor interfaces.\n\nTask-specific: update docs/architecture/effect-services.md as canonical taxonomy owner and keep docs/standards/code-patterns.md to concise linked examples. In the active execution plan, inventory only string-shaped fields in exported Schemas/types/constructor inputs/configuration/encoded or diagnostic contracts reachable from the nine artifact manifests, plus @taxkit/scripts and apps/api. Do not inventory every literal, tag, label, fixture or env-key. Each row records owning module/Schema, field, exposure boundary, current/proposed category, runtime constraints, brand identity, Type, Encoded, constructor path, ingress decode, egress encode, compatibility and keep/change/N/A. Record @taxkit/tsconfig application strings N/A, absent persistence/provider/secret surfaces N/A, STR-DEC-001, REL-DEC-001, scripts cwd/stdout/stderr rendering and SDK Cause.pretty diagnostics. For each proposed correction name exact files, focused owner commands, package-facing Changeset impact and apps/api CHANGELOG impact. Do not change package code, manifests, Changesets config or runtime behavior in this task.\n\nRun every mandatory gate and document three improvement audit passes. Report the ledger, decisions, changed docs, residual risks, call-graph alignment and documentation-only no-Changeset rationale. Do not start or delegate another task. The parent must review and accept this audit before the next task begins.",
+      "implementationPrompt": "You are implementing exactly one audit/documentation task from the TaxKit spec/task list.\n\nBefore editing, read the target spec, this task object, package manifests/exports, relevant schemas/config/persistence/transport/diagnostic files, and the relevant docs in docs/architecture/*. Identify the owning package for every Schema, type, ID, constructor, service, layer and tagged error in the ledger. Review the spec call graphs before editing and report any final difference.\n\nUse installed Effect 4.0.0-beta.98 semantics: Schema.brand is nominal and adds no runtime check; raw secret ingress uses RedactedFromValue while Schema.Redacted expects an already-redacted value. Plain string or inline Schema.String/NonEmptyString is correct for ordinary content without independent validation, secrecy, mixing or reuse policy. Do not propose generic brand factories, content-schema wrappers, shared schema buckets, unsafe casts, local DTO mirrors, manual object readers, repeated internal decoding, stringly branching or trivial helpers. Preserve legitimate explicit recursive encoded types and generic descriptor interfaces.\n\nTask-specific: update docs/architecture/effect-services.md as canonical taxonomy owner and keep docs/standards/code-patterns.md to concise linked examples. In the active execution plan, inventory only string-shaped fields in exported Schemas/types/constructor inputs/configuration/encoded or diagnostic contracts reachable from the nine artifact manifests, plus @taxkit/scripts and apps/api. Do not inventory every literal, tag, label, fixture or env-key. Each row records owning module/Schema, field, exposure boundary, current/proposed category, runtime constraints, brand identity, Type, Encoded, constructor path, ingress decode, egress encode, compatibility and keep/change/N/A. Record @taxkit/tsconfig application strings N/A, absent persistence/provider/secret surfaces N/A, STR-DEC-001, STR-DEC-002, REL-DEC-001, scripts cwd/stdout/stderr rendering and SDK Cause.pretty diagnostics. For each proposed correction name exact files, focused owner commands, package-facing Changeset impact and apps/api CHANGELOG impact. Do not change package code, manifests, Changesets config or runtime behavior in this task.\n\nRun every mandatory gate and document three improvement audit passes. Report the ledger, decisions, changed docs, residual risks, call-graph alignment and documentation-only no-Changeset rationale. Do not start or delegate another task. The parent must review and accept this audit before the next task begins.",
       "mandatoryVerification": [
         "Complete manifest-to-field ledger with every column and exclusion named in the task prompt",
-        "Evidence that STR-DEC-001 and REL-DEC-001 remain explicit blockers rather than implicit code or release-policy changes",
+        "Evidence that STR-DEC-001, STR-DEC-002 and REL-DEC-001 remain explicit blockers rather than implicit code or release-policy changes",
         "Audit proving brand-only versus runtime-checked schemas are distinguished, Redacted variants match ingress representation, closed vocabularies use literals, and ordinary content does not create named-schema sprawl",
         "Audit of scripts cwd/stdout/stderr and SDK Cause.pretty diagnostic egress with a proposed sentinel test or exact local non-persistent policy",
         "Decision-ready exact owner commands: check-types/test/build; calculators and SDK test-types; API HTTP test:openapi; SDK check-boundaries/packed/downstream when its package graph changes; API app check-types/build/smoke; scripts check-types/test/build",
@@ -214,7 +226,7 @@
         "The audit covers every in-scope owner and records keep/change decisions.",
         "Every absent persistence, provider, secret or diagnostic surface is recorded as N/A rather than synthesized.",
         "Every proposed correction names exact owner files, commands, package-facing Changeset impact and any API app changelog impact without changing code.",
-        "STR-DEC-001, REL-DEC-001 and any additional breaking correction are reported as decision blockers.",
+        "STR-DEC-001, STR-DEC-002, REL-DEC-001 and any additional breaking correction are reported as decision blockers.",
         "The docs introduce no generic brand/content helper policy, misclassified recursive codec, DTO mirror or mechanical branding requirement.",
         "The parent accepts all three audit passes, final call graph, decision ledger and no-Changeset rationale before the next task."
       ],
@@ -395,22 +407,24 @@
       "dependsOn": [
         "RPC-002"
       ],
-      "goal": "Obtain and record explicit owner decisions for IsoDate runtime validation and calculators release-train membership before any package-facing correction begins.",
+      "goal": "Obtain and record explicit owner decisions for IsoDate runtime validation, public rule-pack-version semantics and calculators release-train membership before any package-facing correction begins.",
       "scope": [
         "STR-DEC-001 and its audit-led compatibility options",
+        "STR-DEC-002 and its public report meaning, exact-value-consumer and compatibility evidence",
         "REL-DEC-001 and its release/versioning evidence",
         "The target spec, task list and active execution plan",
         "The exact resolved file, command, Changeset and changelog scope for RPC-006"
       ],
       "outputs": [
         "A dated explicit user decision for STR-DEC-001",
+        "A dated explicit user decision for STR-DEC-002",
         "A dated explicit user decision for REL-DEC-001",
         "The selected compatibility and release-policy consequences recorded in the spec",
         "RPC-006 updated with an exact resolved scope and no unresolved correction placeholders"
       ],
-      "implementationPrompt": "You are resolving exactly one product-decision task from the TaxKit spec/task list.\n\nBefore asking for a decision, read the target spec, RPC-002's completed audit ledger and evidence, packages/core/src/primitives/date.ts, installed Effect Schema.brand behavior, .changeset/config.json, docs/standards/versioning.md, the nine artifact manifests and strict downstream validation. Present the current contradiction, concrete compatible choices, recommendation, package-facing impact and exact files/commands for each decision.\n\nDo not infer approval from repository state, prior version alignment or implementation convenience. Do not edit package code, manifests, Changesets configuration or runtime behavior before the user explicitly selects an option for both STR-DEC-001 and REL-DEC-001. If either decision is absent, keep this task and final rollout acceptance blocked.\n\nAfter explicit approval, record the dated decisions in the spec and active plan. Replace RPC-006's unresolved scope with the exact owning files, commands, compatibility treatment, Changeset requirements and apps/api changelog impact identified by the audit and decisions. If a decision requires no code correction, record the exact documentation-only consequence and N/A rationale. Run the mandatory documentation gates and report changed files, recorded decisions and the fully resolved RPC-006 scope. Do not begin RPC-006.",
+      "implementationPrompt": "You are resolving exactly one product-decision task from the TaxKit spec/task list.\n\nBefore asking for a decision, read the target spec, RPC-002's completed audit ledger and evidence, packages/core/src/primitives/date.ts, both rule report owners, installed Effect Schema.brand behavior, .changeset/config.json, docs/standards/versioning.md, the nine artifact manifests and strict downstream validation. Present the current contradiction, concrete compatible choices, recommendation, package-facing impact and exact files/commands for each decision. For STR-DEC-002, treat the package-version mismatch as evidence only: do not presume package semver is the intended value, and audit exact-value consumers and snapshots before recommending keep, change or deprecation.\n\nDo not infer approval from repository state, prior version alignment or implementation convenience. Do not edit package code, manifests, Changesets configuration or runtime behavior before the user explicitly selects an option for STR-DEC-001, STR-DEC-002 and REL-DEC-001. If any decision is absent, keep this task and final rollout acceptance blocked.\n\nAfter explicit approval, record the dated decisions in the spec and active plan. Replace RPC-006's unresolved scope with the exact owning files, commands, compatibility treatment, Changeset requirements and apps/api changelog impact identified by the audit and decisions. If a decision requires no code correction, record the exact documentation-only consequence and N/A rationale. Run the mandatory documentation gates and report changed files, recorded decisions and the fully resolved RPC-006 scope. Do not begin RPC-006.",
       "mandatoryVerification": [
-        "Explicit user approval recorded for STR-DEC-001 and REL-DEC-001",
+        "Explicit user approval recorded for STR-DEC-001, STR-DEC-002 and REL-DEC-001",
         "Evidence audit against the installed Effect version, owning source, Changesets config, versioning standard, artifact manifests and downstream validator",
         "RPC-006 contains exact files, owner commands, compatibility treatment, Changeset impact and API app changelog impact before it can start",
         "Documentation ownership and cross-link audit across the spec, task list and active execution plan",
@@ -446,7 +460,7 @@
         "escalateAfterFailedTurn": 3
       },
       "completionCriteria": [
-        "Both decisions quote or link an explicit user approval and record the selected option.",
+        "All three decisions quote or link an explicit user approval and record the selected option.",
         "The spec no longer presents either selected policy as unresolved.",
         "RPC-006 is implementation-ready with exact files, commands and release artifacts derived from the audit ledger.",
         "No package-facing or release-policy mutation occurs in this decision-only task.",
@@ -463,12 +477,12 @@
         "RPC-004",
         "RPC-005"
       ],
-      "startCondition": "Blocked until RPC-005 records both explicit decisions and replaces the unresolved scope below with exact files, commands and artifacts.",
+      "startCondition": "Blocked until RPC-005 records all three explicit decisions and replaces the unresolved scope below with exact files, commands and artifacts.",
       "resolvedScope": [],
       "goal": "Apply only the package-facing string-contract and release-policy corrections explicitly approved through RPC-005, with compatibility proof and complete release artifacts.",
       "scope": [
         "Only exact correction rows approved from RPC-002's audit ledger",
-        "Only the STR-DEC-001 and REL-DEC-001 outcomes recorded by RPC-005",
+        "Only the STR-DEC-001, STR-DEC-002 and REL-DEC-001 outcomes recorded by RPC-005",
         "Owning package tests, READMEs, Changesets and API app changelog artifacts named in the resolved scope"
       ],
       "outputs": [
@@ -477,9 +491,9 @@
         "Exact package-facing Changesets and apps/api changelog updates where required",
         "The audit ledger and canonical guidance updated to final keep/change/N/A outcomes"
       ],
-      "implementationPrompt": "You are implementing exactly one approved correction task from the TaxKit spec/task list.\n\nSTOP without editing if resolvedScope is empty, either decision lacks explicit recorded approval, or any file/command/release artifact remains a placeholder. Read the target spec, this task object, the RPC-002 audit ledger, RPC-005 decision record, every exact owning source/test/doc file in resolvedScope and the relevant architecture docs before editing.\n\nImplement only approved rows. Use installed Effect 4.0.0-beta.98 Schema semantics, canonical owner-named Schemas and schema-derived Type/Encoded forms. Decode unknown representation values exactly once at ingress and encode only at explicit egress. Use Schema.brand only for nominal identity with a separately enforced stable invariant when runtime validation is promised. Use RedactedFromValue for approved raw secret ingress and Schema.Redacted for already-redacted values. Keep ordinary content as plain string or inline Schema.String/NonEmptyString unless the decision ledger proves independent semantic policy. Preserve legitimate recursive encoded types and generic descriptors. Treat diagnostic safety as an egress data-flow contract and prove sentinel secret/private-path values cannot enter persistent or user-facing output unless an approved local-only policy says otherwise. Do not add generic brand factories, shared schema buckets, mirrored DTOs, unsafe casts, repeated defensive decoding, stringly branching or trivial helpers.\n\nApply the exact compatibility/deprecation and release-train choices recorded by RPC-005. Add a Changeset for every package-facing correction, including private versioned packages. If apps/api HTTP or deployment-facing behavior changes, update apps/api/CHANGELOG.md. Run every exact owner command from resolvedScope plus all mandatory repository gates. Document three improvement audits and report changed files, compatibility evidence, diagnostic egress evidence, final call graph and release artifacts. Do not add website work or publish packages.",
+      "implementationPrompt": "You are implementing exactly one approved correction task from the TaxKit spec/task list.\n\nSTOP without editing if resolvedScope is empty, any decision lacks explicit recorded approval, or any file/command/release artifact remains a placeholder. Read the target spec, this task object, the RPC-002 audit ledger, RPC-005 decision record, every exact owning source/test/doc file in resolvedScope and the relevant architecture docs before editing.\n\nImplement only approved rows. Use installed Effect 4.0.0-beta.98 Schema semantics, canonical owner-named Schemas and schema-derived Type/Encoded forms. Decode unknown representation values exactly once at ingress and encode only at explicit egress. Use Schema.brand only for nominal identity with a separately enforced stable invariant when runtime validation is promised. Use RedactedFromValue for approved raw secret ingress and Schema.Redacted for already-redacted values. Keep ordinary content as plain string or inline Schema.String/NonEmptyString unless the decision ledger proves independent semantic policy. Preserve legitimate recursive encoded types and generic descriptors. Treat diagnostic safety as an egress data-flow contract and prove sentinel secret/private-path values cannot enter persistent or user-facing output unless an approved local-only policy says otherwise. Do not add generic brand factories, shared schema buckets, mirrored DTOs, unsafe casts, repeated defensive decoding, stringly branching or trivial helpers.\n\nApply the exact compatibility/deprecation and release-train choices recorded by RPC-005. Add a Changeset for every package-facing correction, including private versioned packages. If apps/api HTTP or deployment-facing behavior changes, update apps/api/CHANGELOG.md. Run every exact owner command from resolvedScope plus all mandatory repository gates. Document three improvement audits and report changed files, compatibility evidence, diagnostic egress evidence, final call graph and release artifacts. Do not add website work or publish packages.",
       "mandatoryVerification": [
-        "Preflight proving both explicit decisions are recorded and resolvedScope contains no placeholder or inferred artifact",
+        "Preflight proving all three explicit decisions are recorded and resolvedScope contains no placeholder or inferred artifact",
         "Every exact focused typecheck, test and build command copied from the approved RPC-002 ledger by RPC-005",
         "Compatibility/deprecation tests required by the selected STR-DEC-001 option",
         "Sentinel secret and private-path egress tests for every corrected diagnostic boundary, or an explicit approved N/A row",
