@@ -210,6 +210,19 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   arbitrary functions and cross-module value flow remain review-only because
   Oxlint cannot resolve them without interprocedural type analysis; do not add
   broad suppressions to simulate that analysis.
+- `effect/no-bare-effect-try-promise` requires direct inline function-valued
+  `try` and `catch` properties for canonical `Effect.tryPromise` calls in
+  packages, `apps/api` and repository tools. Its focused binary fixtures cover
+  root, namespace and subpath imports, renamed bindings, static
+  aliases/destructuring, reassignment, arrow/function/method properties,
+  extracted, shorthand, non-function and spread policy, and unrelated shadowed
+  locals. Website applications are not in this rule's current scope.
+- Nullable leakage and hand-rolled `Result`/`Exit` representations remain
+  review concerns outside the exact calculator and manual-tag contracts. A
+  `null` literal, `Schema.NullOr`, `Option.getOrNull` or domain tag name cannot
+  prove boundary leakage or outcome re-encoding without type/provenance
+  analysis. Do not add text-only rules or duplicate the repository-wide
+  decoder placement owner.
 - `taxkit/no-route-transport-restore-outside-consumers` governs the separate
   post-hydration restore operation. It tracks scope-resolved direct, unaliased
   named imports from canonical route-boundary modules and permits a restore

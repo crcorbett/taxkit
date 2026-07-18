@@ -30,6 +30,11 @@ export const acceptedTaggedValue = new ExpectedError({ cause: "expected" });
 
 export const acceptedEncodedOutput = encodeOutput("accepted");
 
+export const acceptedPromiseBoundary = Effect.tryPromise({
+  catch: (cause) => new ExpectedError({ cause: String(cause) }),
+  try: () => Promise.resolve("accepted"),
+});
+
 export const acceptedMatch = (value: "first" | "second") =>
   Match.value(value).pipe(
     Match.when("first", () => 1),

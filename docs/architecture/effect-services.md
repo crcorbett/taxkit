@@ -137,6 +137,28 @@ where the root Effect is the process lifecycle. Process entrypoints should
 compose config, platform layers and server layers, then let Effect
 interruption/scopes release resources.
 
+## Promise boundaries
+
+Fallible Promise and SDK calls enter Effect with an explicit inline rejection
+mapping:
+
+```ts
+Effect.tryPromise({
+  try: () => providerOperation(),
+  catch: () => new ProviderRequestError({ message: "Provider request failed" }),
+});
+```
+
+Do not use callback-form `Effect.tryPromise`, which exposes
+`Cause.UnknownError` instead of the owning boundary's closed tagged error. Keep
+the `try` and `catch` policy inline so the raw rejection cannot escape or be
+hidden in a generic options/helper value. Both properties must be direct inline
+arrow, function or object-method implementations; do not use shorthand,
+extracted callbacks, non-function values or spread policy. Use `Effect.promise`
+only when a Promise rejection is intentionally treated as a defect. The current
+portable lint scope enforces this contract in packages, the API app and
+repository tools; website applications remain outside this rollout.
+
 ## Callsite error handling
 
 One-off Effect error handling MUST stay at the callsite. Error transformations

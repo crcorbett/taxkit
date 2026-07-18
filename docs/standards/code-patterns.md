@@ -52,6 +52,12 @@ explicit checks when the owner promises that runtime invariant.
   facts.
 - Calculation failures should use typed tagged errors, normally
   `CalculationError`, rather than `throw` or `Effect.die`.
+- Wrap fallible Promise/SDK calls with inline
+  `Effect.tryPromise({ try, catch })`, mapping the rejection to the owning
+  tagged error. Both properties must contain direct inline arrow, function or
+  method implementations. Do not use callback-form `Effect.tryPromise`,
+  shorthand, extracted/non-function properties, spreads or a generic options
+  helper. Use `Effect.promise` only when rejection is intentionally a defect.
 - Decimal tax rates and official formula coefficients should use Effect
   `BigDecimal`-backed primitives, not plain JavaScript numbers.
 - Keep caller-provided facts, derived facts, and parameter services distinct in

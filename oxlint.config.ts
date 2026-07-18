@@ -83,6 +83,25 @@ const effectErrorContractFiles = [
   "tools/oxlint/fixtures/.generated-effect-rejected.ts",
 ];
 
+const portableEffectSourceFiles = [
+  "apps/api/**/*.{ts,tsx,js,jsx}",
+  "packages/api/http/**/*.{ts,tsx,js,jsx}",
+  "packages/calculators/**/*.{ts,tsx,js,jsx}",
+  "packages/core/**/*.{ts,tsx,js,jsx}",
+  "packages/docs-content/**/*.{ts,tsx,js,jsx}",
+  "packages/docs-fumadocs/**/*.{ts,tsx,js,jsx}",
+  "packages/rules/au/income-tax/**/*.{ts,tsx,js,jsx}",
+  "packages/rules/au/pay/**/*.{ts,tsx,js,jsx}",
+  "packages/rules/au/stsl/**/*.{ts,tsx,js,jsx}",
+  "packages/scripts/**/*.{ts,tsx,js,jsx}",
+  "packages/sdk/typescript/**/*.{ts,tsx,js,jsx}",
+  "packages/testing/**/*.{ts,tsx,js,jsx}",
+  "tools/effect-language-service/**/*.{ts,tsx,js,jsx}",
+  "tools/oxlint/**/*.{ts,tsx,js,jsx}",
+  "tools/repository-paths/**/*.{ts,tsx,js,jsx}",
+  "tools/skills/**/*.{ts,tsx,js,jsx}",
+];
+
 const schemaEncoderEgressFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/docs/src/lib/docs/route-boundary.ts",
@@ -136,6 +155,7 @@ const bunAdapterFiles = [
   "apps/api/src/server.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
+  "tools/oxlint/no-bare-effect-try-promise.test.ts",
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
   "tools/oxlint/portable-rules.test.ts",
@@ -169,6 +189,12 @@ export default defineConfig({
     "./tools/oxlint/taxkit-rules.js",
   ],
   overrides: [
+    {
+      files: portableEffectSourceFiles,
+      rules: {
+        "effect/no-bare-effect-try-promise": "error",
+      },
+    },
     {
       files: ["packages/calculators/src/**/*.ts"],
       rules: {

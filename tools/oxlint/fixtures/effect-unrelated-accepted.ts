@@ -9,6 +9,7 @@ interface Effect<Value, Error, Requirements = never> {
 
 const Effect = {
   runPromise: <Value>(value: Value) => value,
+  tryPromise: <Value>(value: () => Promise<Value>) => value(),
 };
 const ManagedRuntime = {
   make: <Value>(value: Value) => value,
@@ -30,6 +31,7 @@ export type LocalEffect = Effect<string, unknown>;
 export const localCause = { cause: Schema.Unknown };
 export const localRuntimeValues = [
   Effect.runPromise("local"),
+  Effect.tryPromise(() => Promise.resolve("local")),
   ManagedRuntime.make("local"),
   BunRuntime.runMain("local"),
   console.log("local"),

@@ -408,6 +408,78 @@ const noThrowingSchemaSyncCodec = schemaCodecRule({
   messageId: "noThrowingSchemaSyncCodec",
 });
 
+const tryPromiseSemantics = new Set([
+  "Effect.tryPromise",
+  "effect.Effect.tryPromise",
+]);
+
+const noBareEffectTryPromise = {
+  create(context) {
+    const tracker = createBindingTracker(context.sourceCode);
+
+    return {
+      AssignmentExpression: tracker.trackAssignment,
+      CallExpression(node) {
+        if (!tryPromiseSemantics.has(tracker.calledSemantic(node))) {
+          return;
+        }
+
+        const options = node.arguments?.[0];
+        const optionProperties =
+          options?.type === "ObjectExpression"
+            ? options.properties.filter(
+                (property) =>
+                  property.type === "Property" &&
+                  (propertyName(property.key) === "try" ||
+                    propertyName(property.key) === "catch")
+              )
+            : [];
+        const inlineFunctionKeys = new Set(
+          optionProperties
+            .filter(
+              (property) =>
+                property.kind === "init" &&
+                (property.value?.type === "ArrowFunctionExpression" ||
+                  property.value?.type === "FunctionExpression")
+            )
+            .map((property) => propertyName(property.key))
+        );
+        const hasDynamicSpread =
+          options?.type === "ObjectExpression" &&
+          options.properties.some(
+            (property) => property.type === "SpreadElement"
+          );
+
+        if (
+          optionProperties.length !== 2 ||
+          inlineFunctionKeys.size !== 2 ||
+          hasDynamicSpread
+        ) {
+          context.report({
+            messageId: "noBareEffectTryPromise",
+            node: node.callee,
+          });
+        }
+      },
+      ImportDeclaration(node) {
+        tracker.trackImport(node, effectImportSemantic);
+      },
+      VariableDeclarator: tracker.trackVariable,
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Require explicit inline rejection mapping at Effect.tryPromise boundaries.",
+    },
+    messages: {
+      noBareEffectTryPromise:
+        "Use Effect.tryPromise({ try: () => ..., catch: (cause) => ... }) with direct inline function-valued properties, and map rejection at this callsite to the boundary's canonical tagged error. Do not extract, spread, shorthand, or omit the rejection policy. Use Effect.promise only when rejection is intentionally a defect.",
+    },
+    type: "problem",
+  },
+};
+
 const hasTaggedErrorCallAncestor = (node, tracker) => {
   let current = node?.parent;
 
@@ -624,6 +696,7 @@ const noEffectTestGlobalMix = {
 export default {
   meta: { name: "effect" },
   rules: {
+    "no-bare-effect-try-promise": noBareEffectTryPromise,
     "no-console-outside-runtime": noConsoleOutsideRuntime,
     "no-effect-test-global-mix": noEffectTestGlobalMix,
     "no-host-imports-in-contracts": noHostImportsInContracts,

@@ -55,10 +55,14 @@ const execute = Fx.runPromise;
 const executeSync = EffectRoot.Effect.runSync;
 const { make: makeRuntime } = RuntimeManager;
 const executeMain = Runtime.runMain;
+const { tryPromise: attemptPromise } = Fx;
 export const rejectedRuntime = execute(Fx.succeed("rejected"));
 export const rejectedSyncRuntime = executeSync(Fx.succeed("rejected"));
 export const rejectedManagedRuntime = makeRuntime(Fx.succeed("rejected"));
 executeMain(Fx.void);
+export const rejectedPromiseBoundary = attemptPromise(() =>
+  Promise.resolve("rejected")
+);
 
 const { argv: rejectedArguments } = process;
 const { log: writeLog } = console;

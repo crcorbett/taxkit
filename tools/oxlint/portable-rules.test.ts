@@ -21,6 +21,7 @@ const fixtureCases = [
     namespace: "effect",
     rejected: "tools/oxlint/fixtures/effect-rejected.ts.txt",
     rules: [
+      "no-bare-effect-try-promise",
       "no-console-outside-runtime",
       "no-effect-test-global-mix",
       "no-host-imports-in-contracts",

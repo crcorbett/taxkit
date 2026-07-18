@@ -28,8 +28,8 @@ decision. Do not publish packages or run `version-repo`.
 | --- | --- | --- |
 | RPC-001 | complete | Parent accepted correction turn 1 after focused, frozen-lockfile, repository-wide and root-test verification. |
 | RPC-002 | complete | Parent accepted correction turn 1 after decision-neutral compatibility review and independent repository verification. |
-| RPC-003 | in progress | Portable Effect lint decision matrix and admitted rules. |
-| RPC-004 | pending | Production-only Knip graph. |
+| RPC-003 | complete | Parent accepted correction turn 1 after inline-policy enforcement and independent real-binary verification. |
+| RPC-004 | in progress | Production-only Knip graph. |
 | RPC-005 | blocked | Requires explicit user decisions for `STR-DEC-001`, `STR-DEC-002` and `REL-DEC-001`. |
 | RPC-006 | blocked | Requires accepted RPC-003/RPC-004, all three RPC-005 decisions and an exact populated `resolvedScope`. |
 
@@ -58,6 +58,44 @@ not select package semver. Any encoded-value change risks exact-value consumers
 and snapshots. No keep/change/deprecation outcome, Changeset scope or API
 changelog impact is authorised before an explicit decision on the owner and
 meaning of this field.
+
+## RPC-003 Portable Effect lint decision matrix
+
+The pre-edit inventory compared the current TaxKit plugin graph, configured
+allowlists and live source with each candidate. The admitted non-website scope
+is an explicit owner list in `oxlint.config.ts`: `apps/api`; the API HTTP,
+calculators, core, docs-content, docs-fumadocs, three rule, scripts, SDK and
+testing package trees; and the effect-language-service, Oxlint,
+repository-paths and skills tool trees. Current source has five bare
+`Effect.tryPromise` calls, all under the excluded `apps/docs` website surface;
+the admitted scope therefore has zero source migrations. Passing root lint
+confirms zero current violations for the already-enabled owners.
+
+| Candidate ID | Candidate and current overlap | Static signal, exact scope and fixture cases | Migration count | Decision |
+| --- | --- | --- | --- | --- |
+| `EFF-TRY-001` | Bare `Effect.tryPromise`; no current TaxKit rule owns explicit rejection mapping. | Resolve `Effect.tryPromise` from root/namespace/subpath imports, renamed bindings, static destructuring/aliases and reassignment. Reject callback, missing, extracted, shorthand, non-function, spread and non-inline policy; accept direct inline arrow/function/method-valued `try` and `catch` properties plus unrelated shadowed locals in the admitted non-website scope. | 0 in scope; 5 website calls intentionally untouched. | **Admit** as `effect/no-bare-effect-try-promise`. |
+| `HOST-001` | Host APIs in service/config/schema/error contracts overlap `effect/no-host-imports-in-contracts`; Bun value use overlaps `bun/no-host-api-outside-adapters`. | Existing contract-file globs reject Node/Bun/platform imports, while the global Bun rule resolves global aliases/destructuring/reassignment and exact adapter files disable only that owner. Accepted live/layer adapters and unrelated shadowed globals remain valid. | 0 | **Reject duplicate**; retain both existing owners and scopes. |
+| `RUNTIME-001` | Adapter execution without an explicit boundary overlaps `effect/no-runtime-execution-outside-boundaries` and `bun/no-runtime-outside-entrypoints`. | Existing binding-aware rules resolve direct/namespace imports, aliases, destructuring and reassignment; exact runtime/entrypoint files are already listed. | 0 | **Reject duplicate**; the Effect owner covers all runtime methods and `ManagedRuntime.make`, while the Bun owner keeps `runMain` entrypoint-specific. |
+| `NULL-001` | Nullable boundary leakage partially overlaps calculator-scoped `taxkit/no-nullish-comparison`. | A raw `null`, `Schema.NullOr`, object `null` or `Option.getOrNull` occurrence does not by itself prove an internal leak: protocol Schemas and exact adapters legitimately own nullable representations. Type/flow-aware ownership is unavailable to the plugin. | 0 | **Reject** as unreliable outside the existing calculator policy; retain review guidance and the stricter calculator rule. |
+| `OUTCOME-001` | Manual `Result`/`Exit` re-encoding has no direct TaxKit rule; `effect/no-manual-tag` already rejects every manual `_tag` object. | Literal tags such as `Success`, `Failure` and `Error` can be legitimate owner-named domain vocabularies. Without type/provenance analysis, tag-name matching would create false positives and duplicate the safe structural `_tag` ban. | 0 | **Reject**; use owner Schema review and the existing manual-tag rule. |
+| `CODEC-001` | Non-throwing synchronous decoder placement is already covered by repository-wide `taxkit/no-decoding-outside-boundaries`; throwing codecs are covered by `effect/no-throwing-schema-sync-codec`. | The TaxKit rule already resolves Schema imports, aliases, destructuring and decoder factories and permits only exact `decodingBoundaryFiles`. `effect/no-schema-encoder-outside-egress` independently preserves explicit egress. | 0 | **Reject duplicate**; do not weaken or move decoder ownership. |
+| `CALC-001` | `no-typeof`, `no-instanceof`, `no-in-operator`, `no-undefined-comparison`, `no-nullish-comparison`, `no-conditional-object-spread` and `no-context-nullish-default`. | These encode calculator request/context and tagged-domain policy or need type/flow knowledge to distinguish host/adapter code. | 0 | **Retain in `taxkit`**; no portable move. |
+| `CALC-002` | `no-native-array-methods`, `no-nested-wrapper-calls`, `no-native-collections`, `no-throw`, `no-async-await-promise`, `no-json-parse-stringify` and `no-ambient-time-or-random`. | The concepts can be portable, but the current visitors match unbound global/identifier names or syntax without proving Effect-owned scope. Broadening would report unrelated shadows or valid boundary mechanics. | 0 | **Retain in calculator scope** until a separate binding/provenance design proves exact semantics. |
+| `ROUTE-001` | Route-loader mapper policy is website-specific and overlaps the separate strict route transport consumer owner. | Website and route files are explicit RPC-003 N/A surfaces. | 0 | **Reject from this rollout**; do not add or move route rules. |
+
+### RPC-003 pre-edit downstream impact ledger
+
+| Surface | Decision | Path evidence |
+| --- | --- | --- |
+| Active plan | Change required | This plan records the pre-edit matrix, implementation candidate, verification and three audits. |
+| Product spec, task list and index | N/A for RPC-003 | The canonical artifacts already define the admitted-or-zero outcome, exact candidate set, verification and dependencies; implementation discovered no changed requirement or new task. Concurrent governance hunks are preserved. |
+| Canonical docs and standards | Change required | `docs/architecture/effect-services.md`, `docs/architecture/testing-and-quality.md` and `docs/standards/code-patterns.md` must describe the admitted rejection-mapping contract and rejected review-only cases. |
+| Lint rules, fixtures and exact config | Change required | `tools/oxlint/effect-rules.js`, a focused rule test, the three Effect fixture classes, `portable-rules.test.ts` and `oxlint.config.ts` own the one admitted rule. |
+| Bun/TaxKit rules and binding tracker | N/A unless implementation disproves the matrix | Existing owners and `tools/oxlint/binding-tracker.js` already supply the required semantics; no namespace move or new binding abstraction is admitted. |
+| Root/package READMEs, manifests, exports, schemas, generators and migrations | N/A | The admitted scope has zero source migrations and changes no package contract or runtime artifact. |
+| Skills, AGENTS, instruction metadata and CI | N/A | Concurrent governance edits are preserved; `.github/workflows/quality.yml` already inherits root lint through verification. |
+| Provider/API/SDK/storage/command/observability/deployment | N/A | This is static tooling with no provider, transport, storage or operator behavior change. |
+| React, website, route, accessibility and browser proof | N/A | `apps/docs`, `apps/web` and route-loader policy are explicitly excluded. |
 
 ## RPC-002 String-contract audit ledger
 
@@ -352,6 +390,111 @@ Parent acceptance:
   decision log, both ledger rows, correction matrix, audit summary and RPC-006
   routing for the same presumption. No package/runtime artifact was edited.
 
+### 2026-07-18 - RPC-003 implementation candidate
+
+- Recorded the complete pre-edit matrix above. Admitted only
+  `effect/no-bare-effect-try-promise`; rejected duplicate host/runtime/codec
+  candidates, unreliable nullable/outcome candidates, every unproven
+  calculator namespace move and website-specific route-loader policy.
+- Implemented the admitted rule with the existing shared binding tracker. It
+  resolves canonical root, namespace and `effect/Effect` imports, renamed
+  bindings, static aliases/destructuring and reassignment, and requires one
+  direct inline function-valued `try` property and one direct inline
+  function-valued `catch` property with no dynamic spread. Reassignment to an
+  unrelated local clears the tracked semantic.
+- Enabled the rule with positive non-website scopes for packages, `apps/api`
+  and repository tools. No `off` override, package exemption, ignore pattern
+  or inline directive was added. The focused lint test received only the exact
+  Bun host-adapter entry needed to execute the installed binary and create its
+  temporary fixtures.
+- Added focused installed-binary cases plus the aggregate accepted, rejected
+  and unrelated-shadow fixtures. The admitted scope has zero source
+  migrations. Five callback-form calls under `apps/docs` remain unchanged and
+  outside this rollout.
+- Updated Effect, testing and code-pattern guidance with the inline rejection
+  mapping contract and the review-only reasons for nullable leakage and
+  `Result`/`Exit` re-encoding. Existing Bun, TaxKit decoder, calculator and
+  route-transport plugin ownership remains unchanged.
+
+Verification evidence:
+
+- `bun run test:oxlint` passed 35 tests and 77 assertions across the focused
+  rule, aggregate real-binary fixtures and existing decoder/route suites. The
+  focused rule proves six rejected canonical binding forms; seven rejected
+  non-inline, missing, extracted, non-function and spread-policy calls; three
+  accepted inline arrow/function/method styles; unrelated shadows; and
+  semantic clearing after reassignment, always with
+  `--disable-nested-config`.
+- `bun run lint` passed after adding only the focused test file to the exact
+  Bun host-adapter boundary list. `bun run verification` passed the repository
+  path/type gates, Effect language service, lint, format, skill policy, Knip
+  and all 23 workspace typecheck tasks.
+- `bun run --filter @taxkit/sdk check-boundaries` passed. A changed-file import
+  audit found no app, package runtime or website source migration, so existing
+  browser-safe API/SDK imports and runtime ownership are unchanged.
+- JSON parsing, `git diff --check`, added-line scans for ignore/off/disable
+  policy and Changeset status passed. Changesets reports no package release.
+  This is repository-internal lint tooling and documentation with no
+  publishable package behavior change, so no Changeset is required.
+
+RPC-003 improvement audits:
+
+1. Candidate and false-positive audit: challenged every candidate against the
+   current namespaces and source. Kept exact host, runtime, encoder, throwing
+   codec, decoder, calculator and route owners; rejected raw tag/null matching
+   because it cannot prove outcome or boundary provenance.
+2. Visitor and flow audit: reused one binding tracker rather than adding a
+   second analyzer, kept the rule to one visitor and one semantic set, proved
+   aliases/destructuring/reassignment/shadows through the installed binary and
+   introduced no helper, unsafe cast, DTO mirror, manual reader or source
+   migration.
+3. Full lint-graph audit: replaced broad positive globs with an explicit
+   app/package/tool owner list and removed the proposed decoder exemption from
+   the focused test by rendering process bytes through the host adapter
+   instead. The final graph has only the necessary Bun test boundary, no
+   suppressions, unchanged Bun/TaxKit namespace exports, unchanged
+   decoder/route strictness, aligned architecture docs and an internal-tooling
+   no-Changeset decision.
+
+Parent acceptance:
+
+- Correction turn 1 closed the key-presence loophole: the rule now requires
+  direct inline function-valued `try` and `catch` properties and rejects
+  callback, missing, duplicate, extracted, non-function, shorthand and spread
+  policy while preserving unrelated-shadow and reassignment semantics.
+- Parent review confirmed the decision matrix, explicit owner list, unchanged
+  decoder/route ownership, one necessary Bun test boundary and zero source
+  migrations.
+- Parent gates passed: 35 of 35 Oxlint tests (77 assertions), SDK import
+  boundaries, `git diff --check`, Changeset status with no pending release and
+  a serial `bun run verification` with 23 of 23 workspace typecheck tasks.
+  One earlier parallel parent run observed an intentionally invalid generated
+  fixture before test cleanup; the clean serial gate passed.
+- RPC-003 is accepted with its repository-internal no-Changeset rationale.
+  Its final call graph matches the target and RPC-004 may now begin.
+
+### 2026-07-18 - RPC-003 parent audit correction turn 1
+
+- Parent review found that key-presence alone accepted extracted or invalid
+  `catch` policy such as `catch: sharedMapper` and `catch: undefined`, contrary
+  to the matrix and callsite-owned error-mapping contract.
+- Tightened the admitted visitor to require exactly one direct `try` and one
+  direct `catch` property whose values are inline arrow/function expressions
+  or object methods. Missing, callback, extracted, non-function, duplicate and
+  spread-overridable policy now reports; unrelated shadowed locals remain
+  accepted.
+- Expanded the focused installed-binary fixture to seven rejected policy forms
+  and three accepted inline property styles while preserving the six canonical
+  binding rejections, alias clearing and `--disable-nested-config` execution.
+- Challenged and removed the proposed decoder-boundary exemption for the
+  focused test. Process bytes now render through its owning host adapter, so
+  only the exact Bun host-adapter entry remains and the repository-wide TaxKit
+  decoder rule is not weakened.
+- Reconciled the matrix, Effect architecture, testing guidance, code patterns
+  and verification counts with the final visitor. `bun run test:oxlint`, `bun
+  run lint`, `bun run verification`, Changeset status and `git diff --check`
+  all passed; Changesets still reports no package release.
+
 ## Call-Graph Status
 
 The target call graphs in the spec are the acceptance baseline. RPC-001 still
@@ -368,6 +511,12 @@ encoding is reserved for explicit egress. It adds no runtime owner or edge.
 The ledger records constructor-only IsoDate checking pending STR-DEC-001 and
 distinguishes local non-persistent command evidence from future sentinel-tested
 public diagnostic corrections.
+
+RPC-003 matches the target lint-test graph. One canonical `Effect.tryPromise`
+call flows through the existing binding tracker, the admitted portable visitor,
+the positive non-website scope and the installed Oxlint binary. Accepted,
+rejected and unrelated-shadow fixtures prove that edge. No application runtime,
+package contract, website path, plugin namespace or call-graph owner changed.
 
 ## Changeset Policy
 
