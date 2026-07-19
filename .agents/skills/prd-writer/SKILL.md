@@ -146,7 +146,11 @@ Task lists must follow `docs/product-specs/writing-task-lists.md` and include:
 - current/target production, test, browser, CLI, or provider call graphs
 - the path-evidenced impact ledger represented in task outputs
 - task-specific mandatory verification and browser verification
-- at least three documented quality audits for substantial tasks
+- one primary trajectory accountable for the accepted outcome, with delegation
+  limited to independently provable, adversarial-review, or disjoint slices
+- documented ownership/call-graph, implementation-quality, and
+  verification-coverage risk audits for substantial tasks; do not use a fixed
+  audit-pass or subagent count as acceptance proof
 - the parent correction loop and sequential acceptance protocol
 - `commitAfterPassing`
 - `bun run verification` plus focused gates

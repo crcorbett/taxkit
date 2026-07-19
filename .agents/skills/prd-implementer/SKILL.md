@@ -105,28 +105,34 @@ route loader/action or server function
 
 ## Sequential Task Loop
 
+Use a goal only when the user explicitly requests one. Goal state and worker
+counts are coordination state, never acceptance proof.
+
 For each task:
 
-1. Delegate exactly one task with its SPEC, task object, task-list path, active
-   plan, relevant files, ledger rows, and verification gates.
+1. Keep the primary trajectory accountable. Delegate a bounded slice only when
+   it has independent proof value, adversarial-review value, or explicitly
+   disjoint writes; include its SPEC, task object, paths, ledger, and gates.
 2. Require direct edits, including SPEC/tasks/plan improvements discovered while
    implementing.
 3. Review the complete diff and local evidence against the task, architecture,
    impact ledger, call graphs, and release contract.
 4. Run focused verification and the required quality audits.
-5. Return incomplete work to the same subagent with exact corrections.
-6. Stop after the third failed correction turn, record the blocker, and replan
-   or ask for a decision.
+5. Correct incomplete work directly or return a delegated slice to the same
+   owner with exact failed evidence.
+6. If the same blocker persists and safe alternatives are exhausted, record it
+   precisely and replan or ask for a decision.
 7. Accept and commit the slice only when all required ledger rows and gates are
    complete.
-8. Delegate the next task only after acceptance.
+8. Begin the next task only after acceptance.
 
 Default to strict serial execution. Parallelize only tasks whose task list proves
 independent dependencies and disjoint write scopes.
 
-## Mandatory Subagent Prompt
+## Delegated Slice Prompt
 
-Include this block, tightened with task-specific paths and gates:
+When delegation meets the rule above, include this block tightened with
+task-specific paths and gates:
 
 ```text
 Implement exactly one TaxKit task. Edit the canonical SPEC, sibling task list,

@@ -41,11 +41,23 @@ describe("repo-owned skill policy", () => {
   test("prd review routes through the canonical edit-first review contract", () => {
     const skill = readSkill("prd-review");
 
-    expect(skill).toContain("/Users/cooper/.codex/skills/prd-review/SKILL.md");
+    expect(skill).toContain("Use this repository-owned contract directly");
     expect(skill).toContain("DeepWiki");
     expect(skill).toContain("Change required");
     expect(skill).toContain("effect-client-wrapper");
     expect(skill).toContain("helper sprawl");
+  });
+
+  test("prd coordination is evidence-led rather than ritual-counted", () => {
+    const writer = readSkill("prd-writer");
+    const implementer = readSkill("prd-implementer");
+
+    expect(writer).toContain("primary trajectory");
+    expect(implementer).toContain("primary trajectory");
+    expect(implementer).toContain(
+      "Use a goal only when the user explicitly requests one"
+    );
+    expect(implementer).not.toContain("one sequential subagent per task");
   });
 
   test("package structure applies the TaxKit profile and canonical contract", () => {
@@ -58,13 +70,34 @@ describe("repo-owned skill policy", () => {
       "utf-8"
     );
 
-    expect(skill).toContain(
-      "/Users/cooper/.codex/skills/package-structure/SKILL.md"
-    );
-    expect(skill).toContain("flat and sequential");
+    expect(skill).toContain("Use this skill directly");
+    expect(skill).toContain("Required separation");
+    expect(skill).toContain("flat, composable, readable, and sequential");
     expect(skill).toContain("helper sprawl");
     expect(profile).toContain("@taxkit/docs-content");
     expect(profile).toContain("bun run release:check");
+  });
+
+  test("local skills and profiles contain no personal installation path", () => {
+    const personalRoot = ["", "Users", "cooper"].join("/");
+    for (const name of [
+      "prd-writer",
+      "prd-implementer",
+      "prd-review",
+      "package-structure",
+      "effect-client-wrapper",
+    ]) {
+      expect(readSkill(name)).not.toContain(personalRoot);
+    }
+    const profile = readFileSync(
+      resolve(
+        root,
+        ".agents/skills/package-structure/references/repository-profile.md"
+      ),
+      "utf-8"
+    );
+    expect(profile).not.toContain(personalRoot);
+    expect(profile).toContain("git rev-parse --show-toplevel");
   });
 
   test("effect client wrapper requires the accepted provider boundary", () => {

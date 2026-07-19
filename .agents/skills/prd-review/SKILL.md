@@ -5,19 +5,22 @@ description: Re-review, edit, and strengthen this repository's product requireme
 
 # Repository PRD Review
 
-Load `/Users/cooper/.codex/skills/prd-review/SKILL.md` and follow it in full.
-Repository-local instructions and commands win over generic examples. Stop if
-the global skill is missing; do not recreate it from memory.
+Use this repository-owned contract directly. Repository-local instructions,
+installed types, and commands win over generic guidance. An available global
+`prd-review` skill may add generic techniques, but this review never depends on
+its filesystem path.
 
 Always:
 
 1. open the exact SPEC and associated tasks, inspect worktree state, and edit
    both in place unless the user explicitly requests findings only;
-2. read applicable `AGENTS.md`, every repository-owned readable `docs/**` and
-   `README*`, manifests, lock/runtime config, lint/format/test/CI config,
-   repository skills and metadata, and representative implementation files;
-3. delegate at least one bounded read-only evidence slice to a subagent when
-   available, then independently verify and reconcile it;
+2. ground in `AGENTS.md`, owning architecture, affected `README*`, manifests,
+   config, skills, and implementation; investigate unresolved decisions; then
+   land by accounting for every repository-owned readable `docs/**` and
+   `README*` before acceptance;
+3. use one primary reviewer; delegate a bounded read-only evidence slice only
+   when independent discovery, adversarial review, or a proved disjoint scope
+   materially improves the evidence, then independently reconcile it;
 4. use DeepWiki through Executor only for upstream packages/libraries such as
    Effect or TanStack—not to inspect this repository;
 5. mark docs, READMEs, lint/static rules, skills, configuration, tests, release
