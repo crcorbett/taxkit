@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-18
 source_of_truth: root-docs
 confidence: high
 ---
@@ -44,6 +44,19 @@ fast.
 - MUST decode representation-level or unknown values only at explicit trust or
   type-erasure boundaries. Pass schema-derived values inward without repeated
   defensive decoding. See `docs/architecture/effect-services.md`.
+- MUST edit the canonical SPEC, sibling task list and active plan as review or
+  implementation findings arise. Every substantial SPEC must record a
+  path-evidenced `Change required`/`N/A` ledger for docs, relevant READMEs,
+  lint/rules/fixtures/CI, skills/instructions/metadata, config/manifests/schemas/
+  generators/tests/ops, and frontend/runtime surfaces.
+- Provider integrations MUST expose named Effect operations, use owner-named
+  Schema and `Config.schema` contracts, decode SDK output immediately, translate
+  to schema-tagged errors without `instanceof`, and provide live/mock Layers.
+  Do not expose a raw client or generic SDK callback.
+- React composition flows route -> policy-owning container -> leaf: routes own
+  transport restoration/outcome matching, containers own remote commands and
+  coordination, and leaves render focused readonly values plus local interaction
+  state. Do not move boundaries into hooks, providers, wrappers or leaves.
 - Verify with `bun run verification` when docs, package wiring or code changes
   can affect the repo.
 - For package-facing work, add or update a Changeset before committing. Use

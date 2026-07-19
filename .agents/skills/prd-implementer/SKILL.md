@@ -1,182 +1,213 @@
 ---
 name: prd-implementer
-description: "Thin router for implementing specs and plans in TaxKit. Use when executing a SPEC or plan so work follows the canonical iterative rollout and verification flow."
+description: "Implement TaxKit SPECs and task lists in verified sequential slices. Use when executing a SPEC or plan so code, canonical planning artifacts, documentation, lint, skills, Effect boundaries, React composition, and release evidence stay synchronized as findings arise."
 ---
 
 # PRD Implementer
 
-This skill is intentionally thin. It routes implementation work into the canonical execution docs instead of embedding another rollout framework inside the skill.
+Implement one end-to-end task at a time and keep the SPEC, task list, active
+plan, code, docs, and enforcement surfaces truthful throughout the rollout.
 
 ## Start Here
 
 Read in this order:
 
-1. the target spec
-2. the sibling task list when the spec has one
-3. `docs/exec-plans/implementing-specs.md`
-4. the relevant architecture docs for the touched packages
+1. `AGENTS.md`
+2. the target SPEC and sibling task list
+3. the matching active execution plan, when present
+4. `docs/exec-plans/implementing-specs.md`
+5. the relevant architecture, design, standards, README, source, manifest,
+   config, lint, fixture, test, skill, CI, and operator files
 
-## Default Rules
+Use local source and installed package versions for TaxKit. Use DeepWiki through
+Executor MCP only to research upstream libraries such as Effect, TanStack,
+Fumadocs, Knip, or Oxlint; never use it to inspect the local codebase.
 
-- Implement in small, end-to-end slices.
-- When a task list exists, implement it one task at a time with one sequential
-  subagent per task.
-- Create or set one comprehensive active goal before task-list execution. The
-  goal must state that subagents implement tasks sequentially and that the
-  parent agent reviews, audits, verifies, and accepts each task before
-  delegating the next one. It must also state that the parent stops for replan
-  or user decision after the third failed correction turn for the same task.
-- Start with a tracer bullet before broadening.
-- Verify after each meaningful slice with `bun run verification`, plus targeted
-  tests, browser checks, or runtime smoke tests where relevant.
-- Add or update a Changeset for every package-facing slice before committing.
-  If a slice is docs-only, app-internal, or otherwise not package-facing, record
-  that reason in the handoff.
-- Keep the active execution plan current while code moves.
-- Review the target spec's call-graph diagrams before editing and report
-  whether the final implementation still matches them.
-- Prefer compile-time safety, canonical schemas, and canonical typed errors from owning packages.
-- Prefer meaningful linear Effect control flow for primary operations. Use
-  pipe-first composition when it makes data flow clearer, and use
-  `Effect.gen` when step-by-step sequencing is the clearer expression. Keep
-  typed error handling in the following `.pipe(...)` with `Effect.catchTag`,
-  `Effect.catchTags` or `Effect.mapError`.
-- Avoid wrapper/helper sprawl. A helper must be reused, name a real boundary or
-  domain concept, or be materially clearer than inline code; one-line wrappers
-  and tiny property readers are a smell.
-- MUST use Effect-native primitives and platform APIs when they fit:
-  `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`,
-  `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`,
-  `Platform`, `Command` and `ManagedRuntime`.
-- MUST reuse canonical schemas, schema-derived types, branded IDs, service
-  tags, tagged errors and constructors from owning packages. Do not create
-  mirrored DTOs or redeclare canonical fields such as `id: string` outside the
-  owning schema/type source.
-- Use mock layers for external providers in automated tests unless the task
-  explicitly calls for a live integration test.
+## Edit Canonical Artifacts During Implementation
 
-## Task-List Delegation Loop
+- Edit the SPEC, sibling task list, and active plan whenever implementation
+  proves a missing requirement, changed call graph, incorrect path, new
+  dependency, stronger acceptance criterion, or required downstream artifact.
+- Do not defer those edits to a review memo or final cleanup task.
+- Keep task status, dependencies, outputs, verification, ledger decisions, and
+  evidence synchronized with the implementation.
+- Preserve unrelated user changes and stop before overwriting overlapping work.
+
+## Required Impact Ledger
+
+Before accepting each task, update the SPEC/task path-evidenced ledger. Mark each
+surface `Change required` or `N/A` with evidence:
+
+1. SPEC, tasks, index, and active plan
+2. canonical docs, standards, references, and documentation audit
+3. root and relevant app/package/skill READMEs
+4. lint config, custom rules, accepted/rejected fixtures, focused tests, root
+   scripts, and CI inheritance
+5. repo skills, `AGENTS.md`, instruction symlinks, bundled resources, and
+   `agents/openai.yaml`
+6. config, manifests, exports, schemas, branded IDs, generators, generated
+   output, fixtures, tests, examples, migrations, and Changesets
+7. provider/API/SDK/HTTP/storage/file/command boundaries, observability,
+   deployment, rollback, and operator runbooks
+8. React route/container/leaf composition, accessibility, and browser proof
+
+Implement every required row in the same task or add a concrete dependent task
+before acceptance. An unimplemented `Change required` row blocks completion.
+
+## Effect Implementation Rules
+
+- Keep the primary success path flat, sequential, and composable. Prefer a
+  readable pipe; use `Effect.gen` for real sequencing and the installed Effect
+  v4 `Effect.fn` for meaningful named operation or tracing boundaries, not to
+  wrap one line.
+- Handle expected errors at the owning boundary, usually in the outer
+  `.pipe(...)` with `catchTag`, `catchTags`, or `mapError`.
+- Reuse canonical Schema-derived `Type` and `Encoded` forms, branded IDs,
+  services, errors, and constructors. Do not mirror DTOs or redeclare
+  `id: string`, status, metadata, or provider fields.
+- Decode `unknown` and provider SDK results immediately inside the exact ingress
+  adapter. Pass decoded values inward and encode only at an explicit egress.
+- Use owner-named `Config.schema` fragments and app-owned `ConfigProvider`
+  composition. Do not introduce primitive semantic config or manual env parsing.
+- Use `Schema.TaggedErrorClass` for public expected failures. Translate provider
+  failures once without `instanceof`, raw `_tag` checks, or unknown public error
+  channels.
+- Expose named provider operations behind a `Context.Service`; never expose the
+  raw client or a generic SDK `use` callback. Provide explicit live and
+  deterministic mock Layers.
+- Use Effect-native collections, `Option`, `Match`, `Result`, `Exit`, Platform,
+  Command, and managed runtimes when they own the problem.
+- Keep one-use decoding, encoding, mapping, property access, layer creation, and
+  Effect fragments inline. Admit an abstraction only when it satisfies
+  `docs/design-docs/abstraction-admission.md`.
+
+## React Implementation Rules
+
+Follow `docs/architecture/frontend.md`:
+
+```text
+route loader/action or server function
+  -> direct route-root restore and Result match
+    -> page shell and semantic landmarks
+      -> policy-owning section container and smallest owning fallback
+        -> leaf with readonly values and focused commands
+```
+
+- Routes restore encoded transport once and own top-level outcome matching.
+- Containers own remote/domain commands and focused coordination.
+- Leaves render focused readonly values and own local interaction state only.
+- Leaves must not decode transport data, acquire Effect services, run runtimes,
+  read environment/storage, fetch boundary data, or construct provider clients.
+- Keep loading, empty, unavailable, and recoverable errors at the smallest
+  owning boundary with stable dimensions.
+- Reject hooks, providers, wrappers, and feature components whose only purpose
+  is to move a boundary, hide route JSX, pass through state, or silence lint.
+
+## Sequential Task Loop
 
 For each task:
 
-1. Delegate exactly that task to a subagent with the task object, spec,
-   task-list path, relevant files, and architecture docs.
-2. Tell the subagent to edit files directly, run the task's verification gates,
-   and report changed files plus evidence.
-3. Review the subagent diff, run any needed local verification, and audit the
-   work against the spec, task, and architecture docs.
-4. Send the task back to the same subagent if the slice is incomplete or below
-   the quality bar.
-5. Count each parent review that sends corrections back as an audit turn.
-6. Stop after the third failed correction turn for the same task, record the
-   blocker and replan or ask for a decision.
-7. Mark the task complete only after the parent agent is satisfied.
-8. Commit the coherent slice when `commitAfterPassing` requires it.
-9. Delegate the next task only after the current task is accepted.
+1. Delegate exactly one task with its SPEC, task object, task-list path, active
+   plan, relevant files, ledger rows, and verification gates.
+2. Require direct edits, including SPEC/tasks/plan improvements discovered while
+   implementing.
+3. Review the complete diff and local evidence against the task, architecture,
+   impact ledger, call graphs, and release contract.
+4. Run focused verification and the required quality audits.
+5. Return incomplete work to the same subagent with exact corrections.
+6. Stop after the third failed correction turn, record the blocker, and replan
+   or ask for a decision.
+7. Accept and commit the slice only when all required ledger rows and gates are
+   complete.
+8. Delegate the next task only after acceptance.
 
-Default to serial delegation. Do not parallelize task-list implementation unless
-the task list explicitly says the tasks are independent and write scopes are
-disjoint.
+Default to strict serial execution. Parallelize only tasks whose task list proves
+independent dependencies and disjoint write scopes.
 
-## Review Bar
+## Mandatory Subagent Prompt
 
-Before accepting a task, audit for:
+Include this block, tightened with task-specific paths and gates:
 
-- no helper sprawl
-- canonical type/schema/id/error reuse
-- strict Effect service/layer patterns
-- meaningful linear Effect control flow with typed errors handled in the
-  following `.pipe(...)`
-- Effect primitives where they fit: `Array`, `Option`, `Chunk`, `HashMap`,
-  `HashSet`, `Match`, `Schema`, tagged errors, and services
-- no `Object.values`, `Object.entries`, `switch`, unsafe casts, local DTO
-  mirrors, or stringly branching when an Effect/schema-owned approach fits
-- no trivial wrappers/helpers; every new helper is either reused, names a real
-  boundary/domain concept, or is longer than a few meaningful lines because it
-  genuinely clarifies the operation
-- browser code consumes browser-safe API/SDK exports
-- package-local README and architecture docs stay aligned when ownership moves
-- runtime/package call graphs in the spec still match the implementation, or
-  the spec/docs were updated with the final graph
-- at least three documented improvement audit passes for substantial code,
-  API, SDK, app, package-boundary or docs-runtime work
+```text
+Implement exactly one TaxKit task. Edit the canonical SPEC, sibling task list,
+and active plan as findings arise; do not leave proven requirements only in the
+handoff.
 
-## Subagent Prompt Block
+Complete the path-evidenced Change required/N/A impact ledger for docs, every
+relevant README, lint/custom rules/fixtures/CI, repo skills/AGENTS/metadata,
+config/manifests/schemas/generators/tests/ops, and React/runtime surfaces.
+Implement every required row or add a concrete dependent task.
 
-Use this block when delegating each task-list slice:
+Keep primary Effect operations flat, sequential, and composable. Use pipe-first
+flow, Effect.gen for genuine sequencing, and installed Effect.fn only for
+meaningful named operations. Reuse canonical Schema Type/Encoded contracts,
+branded IDs, services, Schema tagged errors, Config.schema fragments, and
+ConfigProvider composition. Decode provider output immediately at ingress and
+encode only at egress. Never expose a raw provider client or generic SDK use
+callback, accept raw id: string, use primitive semantic config, branch with
+instanceof, or allow unchecked SDK output to escape.
 
-```md
-You are implementing exactly one task from the TaxKit spec/task list.
+For React, keep transport restore/outcome matching at the route, remote/domain
+commands and coordination in the owning container, and readonly rendering/local
+interaction state in leaves. Do not move boundaries into hooks, providers,
+wrappers, or leaves.
 
-Before editing:
+Keep one-use logic inline. Reject helper, mapper, wrapper, hook, provider,
+service, layer, schema, config, and module sprawl unless the abstraction has an
+owner, semantic weight, a real second use/substitution point, a simpler call
+graph, and focused tests.
 
-- Read the target spec, this task object, relevant current files, and the relevant docs in `docs/architecture/*`.
-- Identify the owning package for every schema, type, ID, service, layer and tagged error you touch.
-- Review the spec's call-graph diagrams before editing, and update/report them if implementation discovers a different final graph.
-
-Implementation rules:
-
-- MUST use Effect-native primitives when they fit: `Data`, `Schema`, `Array`, `Chunk`, `HashSet`, `HashMap`, `Match`, `Context`, `Layer`, `Config`, `Service`, `Record`, `Result`, `Exit`, `Bun`, `Platform`, `Command` and `ManagedRuntime`.
-- Do not fall back to plain TypeScript control flow, nullable values, mutable records, mutable arrays, `switch`, `Object.values`, `Object.entries`, ad hoc `_tag` objects, unsafe casts, stringly branching, custom env parsing or hand-rolled runtime wrappers when an Effect/schema/platform primitive fits.
-- Reuse canonical schema-derived types, branded IDs, tagged errors, service contracts and constructors from the owning package.
-- Do not create mirrored DTOs, local duplicate types, local duplicate schemas or transport-only shape copies when an owning schema or API/SDK contract already exists.
-- Keep one-off Effect error handling and transformations inline at the callsite. Do not extract tiny mapper/wrapper helpers for single-use `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` or `Effect.catchAllDefect`.
-- Browser/runtime code must consume browser-safe API/SDK exports instead of importing server-only internals.
-- Package-facing changes MUST add or update a Changeset with `bun run changeset`, using a user-facing changelog summary. If the task is not package-facing, state that explicitly in the handoff.
-
-Verification and handoff:
-
-- Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
-- Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.
-- For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.
-- Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.
-- Report the Changeset path and release-train impact, or report why no Changeset was required.
-- Report changed files, verification commands, outcomes and residual risks.
-- Report whether the final implementation still matches the spec's call graph.
-- Do not start or delegate another task. The parent agent must review, audit, verify and explicitly accept this task before the next task begins.
+Run all task gates, focused lint fixtures and stale-pattern scans, skill
+validation, bun run verification unless explicitly narrowed, and package/API/
+SDK/browser/downstream proof required by the blast radius. Report changed files,
+evidence, call-graph alignment, ledger completion, Changeset impact, and risks.
+Do not start another task.
 ```
+
+## Parent Review Bar
+
+Reject a task when any relevant condition fails:
+
+- required ledger row is missing, still pending, or lacks path evidence
+- SPEC/task/plan no longer matches the implementation
+- primary Effect flow is fragmented, nested, wrapper-heavy, or hides sequencing
+- meaningful operations lack useful naming where local `Effect.fn` fits
+- raw public primitives, DTO mirrors, unchecked provider output, repeated
+  decoding, primitive config, unsafe casts, `instanceof`, or raw clients remain
+- public expected failures are not schema-tagged and closed
+- live/mock provider substitution or provider-result decoding is untested
+- helper, mapper, wrapper, hook, provider, service, layer, or module sprawl lacks
+  admission evidence
+- route/container/leaf responsibilities or browser/server imports are inverted
+- docs, relevant READMEs, lint rules/fixtures, skills/metadata, manifests,
+  generators, tests, or operator artifacts are stale
+- focused verification, stale scans, skill validation, browser/API/SDK proof,
+  Changeset evidence, or root verification is missing
 
 ## Verification Baseline
 
-After each task-list slice, run the task's mandatory verification. Choose the
-smallest verification set that proves the change, then broaden when the blast
-radius justifies it. By default, that includes:
+Choose the smallest proving checks during iteration, then broaden before task
+acceptance:
 
-1. `bun run verification`
-2. targeted tests or smoke checks named by the task
-3. `bun run changeset` for package-facing changes, or an explicit no-changeset
-   rationale for docs-only/app-internal work
-4. browser/runtime verification for user-facing flows
-5. architecture or import audits when boundaries move
+1. skill validation and skill-policy stale scans when skills change
+2. focused custom-lint visitor and installed-binary fixture tests when rules move
+3. owning package typecheck, tests, and build
+4. API, SDK packed/downstream, browser, runtime, or operator proof for the real
+   changed boundary
+5. `bun run verification`
+6. `bun run changeset` for package-facing changes or explicit no-Changeset
+   rationale
 
-Do not defer verification until the end of the rollout.
-
-Use this verification ladder when a task list does not already define a more
-specific gate:
-
-| Change                           | Minimum verification                                                                        |
-| -------------------------------- | ------------------------------------------------------------------------------------------- |
-| docs-only                        | content/link/path review plus `bun run verification` when docs wiring or task plans changed |
-| narrow type-level/backend change | owning package typecheck plus targeted tests                                                |
-| runtime package change           | owning package typecheck, targeted tests and build                                          |
-| cross-package flow               | package checks for each touched owner plus one end-to-end proof                             |
-| user-facing UI or API behaviour  | package checks plus browser/runtime/API verification on the actual route                    |
+Do not defer all proof or documentation reconciliation to the final rollout
+task.
 
 ## Common References
 
 - `docs/exec-plans/implementing-specs.md`
-- `docs/product-specs/writing-task-lists.md`
 - `docs/product-specs/writing-specs.md`
+- `docs/product-specs/writing-task-lists.md`
 - `docs/architecture/effect-services.md`
-- `docs/architecture/package-ownership.md`
-- `docs/architecture/api-and-sdk.md`
+- `docs/architecture/configuration.md`
 - `docs/architecture/frontend.md`
-
-## Notes
-
-- Use old or imported planning material only as background.
-- Do not turn a spec into a giant one-pass implementation.
-- Record uncertainty and deferred debt explicitly in the active plan.
-- Do not continue after three failed parent audit turns on the same delegated
-  task. Escalate with evidence and either re-scope the task or ask for a
-  decision.
+- `docs/architecture/testing-and-quality.md`
+- `docs/design-docs/abstraction-admission.md`

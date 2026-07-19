@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-14
+last_reviewed: 2026-07-18
 source_of_truth: docs
 confidence: high
 ---
@@ -83,6 +83,32 @@ A spec is not:
 
 Link to canonical architecture docs instead of re-explaining them.
 
+## Edit-first review and downstream impact
+
+Review the canonical SPEC and sibling task list in place. When repository
+inspection proves a missing requirement, incorrect path, changed call graph or
+downstream artifact, edit the artifacts immediately instead of leaving the
+finding only in a review memo.
+
+Every substantial SPEC must include a path-evidenced downstream-impact ledger.
+Mark every row `Change required` or `N/A`, cite the inspected paths, and mirror
+required work into concrete task objects with acceptance and verification:
+
+- canonical docs, standards, references and documentation audit;
+- root and every relevant app/package/skill README;
+- lint config, custom rules, accepted/rejected fixtures, focused tests, root
+  scripts and CI inheritance;
+- repo-owned skills, `AGENTS.md`, instruction symlinks, bundled resources and
+  `agents/openai.yaml` metadata;
+- config, manifests, exports, schemas, branded IDs, generators, generated
+  output, fixtures, tests, examples, migrations and Changesets;
+- provider/API/SDK/HTTP/storage/file/command boundaries, observability,
+  deployment, rollback and operator runbooks; and
+- React route/container/leaf composition, accessibility and browser proof.
+
+An `N/A` row needs evidence. A `Change required` row without an implementation
+task is not ready for implementation.
+
 ## Call graphs
 
 Specs that describe runtime behaviour, service boundaries, package boundaries,
@@ -152,6 +178,15 @@ confidence: high | medium | low
 - For Effect TypeScript work, require meaningful linear Effect control flow,
   typed errors handled at owning boundaries, canonical schema-derived types,
   and an explicit audit against `docs/architecture/effect-services.md`.
+- For provider work, require named operations, locally supported `Effect.fn`
+  where the operation benefits from naming/tracing, owner-named
+  `Config.schema`/`ConfigProvider` composition, immediate SDK-output decoding,
+  schema-tagged errors without `instanceof`, and live/mock Layers. Forbid raw
+  clients, generic SDK callbacks, raw identifier fields and unchecked outputs.
+- For frontend work, require the route -> policy-owning container -> leaf graph
+  from `docs/architecture/frontend.md`; routes own transport restoration,
+  containers own remote/domain commands, and leaves render focused readonly
+  values plus local interaction state.
 - For implementation task lists, repeat Effect/code-quality audits in each
   task's verification gates rather than relying on one top-level reminder.
 - Substantial delegated tasks must require at least three documented

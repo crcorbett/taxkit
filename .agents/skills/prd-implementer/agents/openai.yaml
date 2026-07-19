@@ -1,0 +1,4 @@
+interface:
+  display_name: "TaxKit PRD Implementer"
+  short_description: "Implement TaxKit specs in verified slices"
+  default_prompt: "Use $prd-implementer to implement the TaxKit SPEC sequentially and keep code, tasks, docs, and evidence synchronized."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Package Structure"
+  short_description: "Apply this repository package contract"
+  default_prompt: "Use $package-structure to scaffold or audit a package with this repository profile and the canonical global package contract."

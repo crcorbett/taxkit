@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-14
+last_reviewed: 2026-07-18
 source_of_truth: docs
 confidence: high
 ---
@@ -51,6 +51,7 @@ plan already gives enough sequencing.
       "Changeset path and release-train impact, or no-changeset rationale"
     ]
   },
+  "downstreamArtifactImpact": [],
   "tasks": []
 }
 ```
@@ -93,6 +94,14 @@ Keep field names consistent with existing task lists:
 - `parentAudit`
 - `completionCriteria`
 - `commitAfterPassing`
+
+The sibling SPEC owns the full path-evidenced downstream-impact ledger. Mirror
+each `Change required` row into the task list through
+`downstreamArtifactImpact`, task `outputs`, or task-local
+`downstreamArtifacts`. Every substantial task must account for docs, relevant
+READMEs, lint/rules/fixtures/CI, skills/AGENTS/metadata, config/manifests/schemas/
+generators/tests/ops, and frontend/runtime surfaces. Preserve explicit `N/A`
+evidence rather than dropping a surface.
 
 Tasks that will be delegated should include an implementation prompt, or an
 equivalent field in the task object, that embeds the mandatory subagent
@@ -166,6 +175,12 @@ Also include non-command gates when they are material:
 - Effect audit against `docs/architecture/effect-services.md`, including
   meaningful linear Effect control flow, typed errors handled in `.pipe(...)`,
   schema decoding at boundaries, no unsafe casts and no trivial helper sprawl
+- provider audit for named operations, meaningful local `Effect.fn`,
+  `Config.schema`/`ConfigProvider`, immediate SDK-output decoding,
+  schema-tagged errors without `instanceof`, live/mock Layers, and no raw client
+  or generic callback escape
+- React audit for route restoration/outcome ownership, policy-owning containers,
+  focused readonly leaves, smallest-owning fallbacks and browser evidence
 - at least three documented improvement audit passes for substantial Effect,
   API, SDK, app or package-boundary slices
 - diff audit for forbidden wrappers, unsafe casts or browser/server import

@@ -84,6 +84,7 @@ bun run --filter=docs dev
 bun run check:repository-paths
 bun run knip:production
 bun run verification
+bun run test:skills
 bun run release:check
 bun run changeset
 bun run version-repo
@@ -99,7 +100,9 @@ readable text without printing the matched private value. `bun run
 knip:production` checks the release-artifact package, repository command and
 API runtime graph without test or development reachability. `bun run
 verification` is the baseline verification command for documentation, package
-wiring and scaffold changes. `bun run release:check` runs the complete ordered
+wiring and scaffold changes and includes repo-owned skill policy checks. `bun
+run test:skills` runs that focused stale-pattern suite directly. `bun run
+release:check` runs the complete ordered
 release evidence, including tests, builds, package artifacts, API smoke, docs
 browser proof and Changeset status.
 

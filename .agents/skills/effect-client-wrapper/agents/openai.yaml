@@ -1,0 +1,4 @@
+interface:
+  display_name: "Effect Client Wrapper"
+  short_description: "Wrap provider SDKs with typed Effect services"
+  default_prompt: "Use $effect-client-wrapper to wrap this provider SDK with named operations, schemas, Config, and live/mock Layers."

@@ -33,6 +33,7 @@ The current repository baseline is canonical root verification:
 ```bash
 bun run verification
 bun run knip:production
+bun run test:skills
 ```
 
 Root verification includes lint, format, both Knip graphs and workspace type
@@ -47,8 +48,10 @@ production graph by ownership. Root verification also typechecks and executes
 the root repository-path gate, which scans
 Git-tracked readable text and safely reports only repository-relative file,
 positive line and closed finding category. Binary files are identified by a
-NUL byte or failed strict UTF-8 decode and skipped. For docs, that means
-`apps/docs` type checking also typechecks checked examples,
+NUL byte or failed strict UTF-8 decode and skipped. For skill governance it
+also runs `test:skills`, which validates required policy language and rejects
+stale provider-wrapper examples. For docs, `apps/docs` type checking also
+typechecks checked examples,
 and dependent package builds run before type checks through Turbo. Heavier
 docs runtime gates remain explicit package commands so normal local
 verification does not rebuild and validate the whole docs corpus on every
@@ -276,6 +279,11 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   values from neutral fragments so the checker and its tests remain inside the
   policy they prove. Reports must never include matched text, usernames,
   process stderr or surrounding content.
+- Repo-owned skill changes must pass the skill validator and `bun run
+  test:skills`. The stale-pattern test checks fenced provider examples for raw
+  clients, generic SDK callbacks, raw IDs, primitive config, `instanceof`, and
+  unchecked SDK result escape; semantic Effect/React quality remains a parent
+  review responsibility.
 - Keep the development-aware `knip` graph and dedicated `knip:production`
   graph independent. Production entry and project patterns require Knip's
   trailing `!` marker, must map manifest exports to real source counterparts,

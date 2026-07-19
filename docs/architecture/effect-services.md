@@ -73,6 +73,12 @@ when it keeps the source value visible and data flow clearer, for example
 transformations in wrapper calls when a left-to-right pipeline makes ownership
 and flow clearer.
 
+Use the installed Effect v4 `Effect.fn` when a reusable operation benefits from
+a stable stack-frame boundary, readable tracing name or operation-level
+transforms. Keep it on meaningful service/provider operations; do not wrap a
+single expression merely to add another name. Primary operations remain one
+flat, sequential pipe or generator.
+
 ## String-shaped contracts
 
 Classify a string-shaped value by the policy it carries, not by the fact that
@@ -124,6 +130,31 @@ descriptor interfaces that preserve schema-to-continuation inference, are not
 DTO mirrors. Keep them when TypeScript cannot otherwise express the recursive
 or generic relation. Do not use that exception for ordinary duplicated object
 shapes.
+
+## Provider and SDK adapters
+
+Third-party SDKs remain private inside one exact live adapter. Public
+`Context.Service` contracts expose owner-named operations over canonical
+Schema-derived input/output and closed schema-tagged errors. They must not expose
+the raw client, accept a generic callback over the SDK, publish raw identifier
+fields or allow an SDK result to escape unchecked.
+
+Encode canonical input at provider egress and decode `unknown` provider output
+immediately at provider ingress. Map transport and malformed-response failures
+to safe `Schema.TaggedErrorClass` values at the operation boundary. Do not use
+`instanceof`, raw provider tags, exception objects, response bodies or secrets in
+public error contracts. Use decoded literals/tagged unions with `Match` or typed
+Effect handlers.
+
+Provider configuration follows `configuration.md`: owner-named Schema and
+`Config.schema` fragments, app-owned `ConfigProvider`, and secret unwrapping
+only at final SDK construction. A provider service must have an explicit live
+Layer and deterministic mock Layer with focused encoding, failure, malformed
+output and substitution tests.
+
+Use [the repo-owned effect client wrapper skill](../../.agents/skills/effect-client-wrapper/SKILL.md)
+when introducing or reviewing a provider adapter. Its canonical example and
+stale-pattern audit are acceptance requirements, not an optional template.
 
 ## Runtime composition
 

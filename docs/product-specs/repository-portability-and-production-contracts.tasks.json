@@ -218,7 +218,7 @@
           "owner package source, manifests, tests, READMEs, Changesets and apps/api/CHANGELOG.md in this audit-only task",
           "database migrations, provider configuration and secret stores when the audit records no current surface",
           "apps/docs/**, apps/web/** and browser proof",
-          "agent skills and AGENTS.md because the workflow contract is unchanged"
+          "Further RPC-002 edits to agent skills and AGENTS.md: the separate approved governance slice already reconciles them and RPC-002 must preserve that edit-first impact-ledger and provider-boundary contract"
         ]
       },
       "qualityAudits": [

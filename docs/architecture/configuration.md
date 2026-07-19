@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-07-18
 source_of_truth: docs
 confidence: medium
 ---
@@ -117,6 +117,10 @@ When composed with `ServiceViteEnvConfigFragment`, this maps `baseUrl` to
   runtime primitives for configuration. Do not parse `process.env` or
   `import.meta.env` by hand when an Effect config/schema composition can own
   the shape.
+- Provider credentials and other semantic values use owner-named Schemas with
+  `Config.schema`; use `Schema.Redacted` or `Schema.RedactedFromValue` according
+  to the actual ingress representation. Do not expose primitive config values
+  through service APIs or unwrap secrets before final adapter construction.
 
 ## Related Docs
 

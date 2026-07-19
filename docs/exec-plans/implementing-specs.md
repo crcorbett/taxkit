@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-14
+last_reviewed: 2026-07-18
 source_of_truth: docs
 confidence: high
 ---
@@ -13,17 +13,26 @@ Implement specs in small, verifiable slices.
 
 1. Read the target spec and task list.
 2. Audit current code and docs before editing.
-3. Implement the smallest useful slice.
-4. Verify that any spec call-graph diagrams still match the implementation, or
+3. Update the SPEC, sibling task list and active plan immediately when that audit
+   or implementation proves a missing requirement, changed graph or downstream
+   artifact.
+4. Implement the smallest useful slice.
+5. Verify that any spec call-graph diagrams still match the implementation, or
    update the spec/docs with the final graph.
-5. Run the task's mandatory verification, including `bun run verification`
+6. Run the task's mandatory verification, including `bun run verification`
    unless the task explicitly documents a narrower gate.
-6. Add or update a Changeset for package-facing changes, or record why the
+7. Add or update a Changeset for package-facing changes, or record why the
    slice is not package-facing.
-7. Record validation and versioning evidence in the active exec plan when one
+8. Record validation and versioning evidence in the active exec plan when one
    exists.
-8. Commit only after the coherent slice passes verification and the Changeset
+9. Commit only after the coherent slice passes verification and the Changeset
    decision is reviewed.
+
+Before acceptance, complete the SPEC/task path-evidenced `Change required`/`N/A`
+ledger for canonical docs, relevant READMEs, lint/rules/fixtures/CI,
+skills/AGENTS/metadata, config/manifests/schemas/generators/tests/ops, and
+frontend/runtime surfaces. Implement each required row in the current task or
+add a concrete dependent task.
 
 ## Task list execution protocol
 
@@ -84,6 +93,8 @@ Every accepted task must pass these audits where relevant:
   ordinary function props
 - meaningful linear Effect control flow, using pipe-first composition or
   `Effect.gen` where it best expresses the operation
+- locally supported Effect v4 `Effect.fn` for meaningful named operation or
+  tracing boundaries, not one-line wrappers
 - typed errors handled at an owning boundary, usually in `.pipe(...)` with
   `Effect.catchTag`, `Effect.catchTags` or `Effect.mapError`
 - Effect-native primitives where they fit: `Array`, `Option`, `Chunk`,
@@ -97,6 +108,14 @@ Every accepted task must pass these audits where relevant:
   when ownership moves
 - runtime, API, SDK, frontend and package-boundary call graphs still match the
   implementation, or the spec/docs were updated with the final graph
+- provider clients expose named operations, decode SDK output immediately, use
+  owner-named `Config.schema`/`ConfigProvider`, translate to schema-tagged errors
+  without `instanceof`, and provide live/mock Layers without raw-client escape
+- React routes own transport restoration/outcome matching, containers own remote
+  commands/coordination, and leaves receive focused readonly values and own only
+  local interaction state
+- every required docs/README/lint/skill/config/manifest/schema/generator/test/ops
+  ledger row is implemented and verified
 
 Substantial tasks must also include at least three documented improvement audit
 passes before acceptance. The passes should ask what can be improved while the

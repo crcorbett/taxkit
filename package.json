@@ -56,7 +56,8 @@
     "test:docs-boundaries": "bun test apps/docs/src/lib/docs/route-boundary.test.js",
     "test:oxlint": "bun test tools/oxlint",
     "test:repository-paths": "bun test tools/repository-paths",
-    "verification": "bun run check:repository-paths:types && bun run check:repository-paths && bun run check:effect-language-service && bun run lint && bun run format:check && bun run knip && bun run knip:production && bun run check-types",
+    "test:skills": "bun test tools/skills",
+    "verification": "bun run check:repository-paths:types && bun run check:repository-paths && bun run check:effect-language-service && bun run lint && bun run format:check && bun run test:skills && bun run knip && bun run knip:production && bun run check-types",
     "version-packages": "changeset version",
     "version-repo": "changeset version"
   },
