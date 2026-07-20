@@ -5,6 +5,8 @@ authority: canonical
 owner: taxkit-documentation-owner
 last_reviewed: 2026-07-20
 review_trigger: acceptance or scope change in TaxKit HGI-200 through HGI-206
+successor: null
+tombstone: false
 ---
 
 # Harness-governance documentation
@@ -47,18 +49,20 @@ state. The active execution plan owns the current bounded sequence.
 | Task | State | Acceptance owner |
 | --- | --- | --- |
 | HGI-200 — lifecycle router, architecture successor, current-intent route, and corpus receipts | In progress | This SPEC, active plan, accepted audit receipts, fresh-context retrieval, repository verification, and scoped Git receipt |
-| HGI-201 — architecture and semantic-owner reconciliation | Pending | Architecture owners and changed-boundary proof |
-| HGI-202 — critical journeys and proof model | Pending | `docs/verification/**` and journey-matched evidence |
-| HGI-207 — lint/config/CI enforcement review | Pending | Executable owner and focused negative/positive tests |
-| HGI-208 — local skill reconciliation | Pending | Repo-local skill source, generated copies if any, and skill-policy tests |
-| HGI-203 — release evidence and artifact identity | Pending | Bounded release-proof owner with explicit non-claims |
-| HGI-204 — target-owned release/recovery runbooks | Pending | `docs/runbooks/**`, authority, rollback, and escalation evidence |
-| HGI-205 — docs-maintenance embedding | Pending | Change-impact contract in PRD and docs-maintainer workflows |
+| HGI-207 — documentation and release-semantics decisions | Pending; depends on HGI-200 | Product-owner decisions for public-doc lifecycle, archive/candidate retention, and publication/deployment non-claims |
+| HGI-201 — PRD guides and local skills | Pending; depends on HGI-200 | Current architecture/standards/runbook routing with ritual contradictions removed |
+| HGI-202 — docs policy and public-maintainer separation | Pending; depends on HGI-200, HGI-201, HGI-207 | Machine-checkable public, maintainer, generated, and package-README ownership |
+| HGI-208 — TaxKit docs-maintenance skill | Pending; depends on HGI-202 | Repo-local skill source and focused skill-policy proof |
+| HGI-203 — critical journeys, release proof, and bounded receipts | Pending; depends on HGI-202, HGI-208 | `docs/verification/**` and journey-matched evidence with explicit non-claims |
+| HGI-204 — release and recovery runbooks | Pending; depends on HGI-203 | `docs/runbooks/**`, authority, rollback, and escalation evidence |
+| HGI-205 — CI, controls, and automation governance | Pending; depends on HGI-202, HGI-203, HGI-204 | Executable owner and focused negative/positive controls |
 | HGI-206 — repository closeout | Pending | No unresolved critical owner drift; accepted receipts and pushed commit identity |
 
 Task state changes in this table and the active execution plan occur in the
-same slice. A task is not complete because prose exists: its named acceptance
-owner must contain bounded evidence and limitations.
+same slice. Completed historical plans cannot carry active work: retained
+follow-ups route to the explicit successor tasks above. A task is not complete
+because prose exists: its named acceptance owner must contain bounded evidence
+and limitations.
 
 ## Non-goals and authority
 

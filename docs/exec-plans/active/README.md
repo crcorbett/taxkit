@@ -1,8 +1,12 @@
 ---
-status: canonical
-last_reviewed: 2026-07-17
-source_of_truth: docs
-confidence: high
+document_type: execution-plan-index
+lifecycle: current
+authority: canonical
+owner: taxkit-documentation-owner
+last_reviewed: 2026-07-20
+review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
+successor: null
+tombstone: false
 ---
 
 # Active exec plans

@@ -1,8 +1,12 @@
 ---
-status: completed
-last_reviewed: 2026-06-25
-source_of_truth: exec-plan
-confidence: medium
+document_type: execution-plan
+lifecycle: historical
+authority: supporting
+owner: taxkit-execution-history-owner
+last_reviewed: 2026-07-20
+review_trigger: historical rollout, proof, or successor correction
+successor: null
+tombstone: false
 ---
 
 # Extract API App Execution Plan

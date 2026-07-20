@@ -1,8 +1,12 @@
 ---
-status: implemented
-last_reviewed: 2026-07-01
-source_of_truth: docs
-confidence: high
+document_type: product-spec
+lifecycle: implemented
+authority: supporting
+owner: taxkit-product-owner
+last_reviewed: 2026-07-20
+review_trigger: historical intent, task evidence, or successor correction
+successor: null
+tombstone: false
 ---
 
 # API compatibility harness

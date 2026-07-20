@@ -1,8 +1,12 @@
 ---
-status: canonical
-last_reviewed: 2026-07-17
-source_of_truth: docs
-confidence: high
+document_type: execution-plan-index
+lifecycle: historical
+authority: canonical
+owner: taxkit-execution-history-owner
+last_reviewed: 2026-07-20
+review_trigger: completed-plan retention, evidence, or successor correction
+successor: ../active/harness-governance-documentation.md
+tombstone: false
 ---
 
 # Completed exec plans
@@ -32,6 +36,10 @@ Completed plans:
 - [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md)
 - [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md)
 
-Deferred follow-up remains in the completed plan bodies when useful. For
-example, SDK npm publication is still gated by explicit release approval, and
-docs runtime seam follow-ups remain recorded in the docs runtime plan.
+Completed plans retain provenance and limitations, not active follow-up work.
+The retained follow-ups are explicit successors in the current harness plan:
+HGI-207 resolves publication and lifecycle semantics, HGI-201/208 own PRD and
+skill routing, HGI-202 owns public/maintainer documentation policy, HGI-203
+owns bounded release proof, HGI-204 owns release/recovery operations, and
+HGI-205 owns executable controls. Their dependency order is defined in the
+[active harness plan](../active/harness-governance-documentation.md).

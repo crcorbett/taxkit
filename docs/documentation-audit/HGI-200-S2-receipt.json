@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-200",
+  "sliceId": "HGI-200-S2",
+  "status": "accepted",
+  "observedAt": "2026-07-20T19:38:53Z",
+  "baseCommit": "f8fe7cae833ac4b01bfe94b30967c57e4de43f12",
+  "authority": "local TaxKit documentation writes and read-only local checks only",
+  "acceptedOutcome": "The 19 pre-campaign product SPECs, 20 completed execution plans, and two active-plan records have separated semantic metadata; indexes route completed history away from active work and the local harness route matches canonical HGI dependencies.",
+  "classification": {
+    "requiredFields": ["document_type", "lifecycle", "authority", "owner", "review_trigger", "successor", "tombstone"],
+    "preCampaignProductSpecs": {"count": 19, "lifecycle": "implemented", "authority": "supporting", "owner": "taxkit-product-owner"},
+    "completedPlans": {"count": 20, "lifecycle": "historical", "authority": "supporting", "owner": "taxkit-execution-history-owner"},
+    "activePlanRecords": {"count": 2, "lifecycle": "current", "authority": "canonical", "owner": "taxkit-documentation-owner"}
+  },
+  "successorRouting": {
+    "historicalPlanPolicy": "Completed-plan bodies retain provenance and limitations only.",
+    "activeSuccessors": ["HGI-207", "HGI-201", "HGI-202", "HGI-208", "HGI-203", "HGI-204", "HGI-205"],
+    "dependencyOrder": "HGI-207 and HGI-201 after HGI-200; HGI-202 after HGI-200/HGI-201/HGI-207; HGI-208 after HGI-202; HGI-203 after HGI-202/HGI-208; HGI-204 after HGI-203; HGI-205 after HGI-202/HGI-203/HGI-204; HGI-206 after HGI-200 through HGI-205."
+  },
+  "impactLedger": [
+    {"surface": "historical product SPECs", "decision": "Change required", "owner": "per-file frontmatter"},
+    {"surface": "completed and active execution plans", "decision": "Change required", "owner": "per-file frontmatter and plan indexes"},
+    {"surface": "active HGI intent", "decision": "Change required", "owner": "harness-governance SPEC and active plan"},
+    {"surface": "public MDX, binary evidence, and architecture tombstone route", "decision": "Preserve", "owner": "existing public, evidence, and architecture owners"},
+    {"surface": "code, packages, CI configuration, providers, release, publication", "decision": "N/A", "owner": "unchanged"}
+  ],
+  "checks": [
+    {"check": "focused metadata classifier", "status": "passed", "result": "19 pre-campaign specs, 20 completed plans, and 2 active-plan records contain all seven required fields."},
+    {"check": "JSON parsing", "status": "passed", "result": "Product task lists and existing audit receipts parse."},
+    {"check": "focused relative-link resolution", "status": "passed", "result": "Product-spec index, plan indexes, active harness SPEC, and active harness plan targets resolve."},
+    {"check": "bun run check:repository-paths", "status": "passed", "result": "539 text and 8 binary files from 547 tracked files."},
+    {"check": "bun run verification", "status": "passed", "result": "Repository paths/types, Effect language service, lint, format, skill tests, Knip, production Knip, and 23 typecheck/build tasks passed."},
+    {"check": "git diff --check", "status": "passed", "result": "No whitespace errors."}
+  ],
+  "postcondition": "Current indexes expose only the current harness route; completed records remain reachable as historical supporting evidence with explicit successor task routing.",
+  "rollback": "Revert the HGI-200-S2 documentation slice together; retain completed plans, public content, binary assets, and architecture tombstone routes in place.",
+  "limitations": ["Classification and local checks do not prove the historical implementation behavior, publication, registry state, provider state, or production behavior.", "HGI-200 remains in progress pending its parent acceptance and remaining route retrieval proof."],
+  "nonClaims": ["No public MDX, binary asset, or architecture tombstone was moved or deleted.", "No release, publication, provider access, commit, push, or external planning-workspace change occurred."]
+}

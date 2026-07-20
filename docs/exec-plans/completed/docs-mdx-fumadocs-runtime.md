@@ -1,8 +1,12 @@
 ---
-status: completed
-last_reviewed: 2026-06-25
-source_of_truth: execution-plan
-confidence: high
+document_type: execution-plan
+lifecycle: historical
+authority: supporting
+owner: taxkit-execution-history-owner
+last_reviewed: 2026-07-20
+review_trigger: historical rollout, proof, or successor correction
+successor: null
+tombstone: false
 ---
 
 # Docs MDX Fumadocs runtime execution plan
