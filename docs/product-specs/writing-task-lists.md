@@ -67,15 +67,14 @@ Task objects should use this shape:
   "goal": "Prove the riskiest contract with the smallest working path.",
   "scope": [],
   "outputs": [],
-  "implementationPrompt": "Paste the Mandatory Subagent Contract here, followed by task-specific files, outputs and gates.",
+  "implementationPrompt": "Paste the Delegated Slice Contract here when delegation is justified, followed by task-specific files, outputs and gates.",
   "mandatoryVerification": [],
   "browserVerification": [],
   "qualityAudits": [],
   "parentAudit": {
     "required": true,
-    "maxCorrectionTurns": 3,
-    "returnToSameSubagent": true,
-    "escalateAfterFailedTurn": 3
+    "basis": "Review the diff, task gates, architecture, and path-evidenced ledger.",
+    "recovery": "Correct, re-scope, or seek a decision when an observed blocker cannot be resolved safely."
   },
   "completionCriteria": [],
   "commitAfterPassing": true
@@ -104,8 +103,8 @@ generators/tests/ops, and frontend/runtime surfaces. Preserve explicit `N/A`
 evidence rather than dropping a surface.
 
 Tasks that will be delegated should include an implementation prompt, or an
-equivalent field in the task object, that embeds the mandatory subagent
-contract from `docs/exec-plans/implementing-specs.md` followed by task-specific
+equivalent field in the task object, that embeds the delegated slice contract
+from `docs/exec-plans/implementing-specs.md` followed by task-specific
 files, outputs and verification gates.
 
 When the sibling spec includes call graphs, delegated tasks must instruct the
@@ -116,24 +115,20 @@ important negative claims, such as "HTTP calculate does not construct the
 calculator response" or "browser entrypoints do not import server-only
 modules."
 
-Delegated tasks should include `qualityAudits` for repeatable implementation
-review prompts that must run at least three times before the task is accepted.
-Use these audits for Effect shape, canonical schema/type reuse, call-graph
+Delegated tasks should include `qualityAudits` that match the task's actual
+risks. Use them for Effect shape, canonical schema/type reuse, call-graph
 cleanliness, unsafe casts, helper sprawl, browser-safe imports and docs
-alignment.
+alignment. Their evidence—not a fixed audit count—supports acceptance.
 
 Delegated tasks should also include `parentAudit`. The parent audit is the
 review loop owned by the main agent after a subagent reports completion:
 
 - `required` should be `true` for delegated implementation work.
-- `maxCorrectionTurns` should be `3` unless the spec explains a different
-  limit.
-- `returnToSameSubagent` should be `true` so corrections stay with the context
-  that created the slice.
-- `escalateAfterFailedTurn` should be `3`, meaning the parent records the
-  blocker, updates the active plan, and asks for a decision or replans the task
-  after the third failed correction turn instead of silently accepting weak
-  work.
+- `basis` should name the diff, task gates, architecture, and path-evidenced
+  ledger the primary owner reviews.
+- `recovery` should say how an unresolved observed blocker is corrected,
+  re-scoped, or escalated. It must not prescribe a fixed worker or correction
+  count.
 
 ## Sequencing model
 
@@ -181,8 +176,8 @@ Also include non-command gates when they are material:
   or generic callback escape
 - React audit for route restoration/outcome ownership, policy-owning containers,
   focused readonly leaves, smallest-owning fallbacks and browser evidence
-- at least three documented improvement audit passes for substantial Effect,
-  API, SDK, app or package-boundary slices
+- boundary-matched semantic review evidence for substantial Effect, API, SDK,
+  app or package-boundary slices
 - diff audit for forbidden wrappers, unsafe casts or browser/server import
   leaks
 - OpenAPI, SDK packed-artifact or downstream-consumer evidence
@@ -197,23 +192,22 @@ Example task:
 {
   "id": "task-001",
   "title": "Implement the first end-to-end slice",
-  "implementationPrompt": "Paste the Mandatory Subagent Contract here, followed by task-specific files, outputs and gates.",
+  "implementationPrompt": "Paste the Delegated Slice Contract here when delegation is justified, followed by task-specific files, outputs and gates.",
   "mandatoryVerification": [
     "bun run verification",
     "bun run changeset or explicit no-changeset rationale"
   ],
   "qualityAudits": [
-    "Run the implementation improvement audit at least three times: cleaner call graph, clearer package boundaries, more direct Effect-native control flow, canonical schema/type/id/error reuse, no unsafe casts, no DTO mirrors, no wrapper/helper sprawl, and updated specs/docs when implementation differs."
+    "Review the final call graph, package boundaries, direct Effect-native control flow, canonical schema/type/id/error reuse, unsafe casts, DTO mirrors, wrapper/helper sprawl, and updated specs/docs when implementation differs."
   ],
   "parentAudit": {
     "required": true,
-    "maxCorrectionTurns": 3,
-    "returnToSameSubagent": true,
-    "escalateAfterFailedTurn": 3
+    "basis": "Review the diff, task gates, architecture, and path-evidenced ledger.",
+    "recovery": "Correct, re-scope, or seek a decision when an observed blocker cannot be resolved safely."
   },
   "completionCriteria": [
     "Parent agent reviewed the diff against the spec, task and architecture docs.",
-    "Parent agent completed and recorded at least three relevant quality audit passes.",
+    "Parent agent recorded boundary-matched semantic review evidence.",
     "Parent agent verified the final call graph against the implementation.",
     "Parent agent verified canonical Effect/schema/type/id reuse.",
     "Parent agent audited Effect control flow, unsafe casts and helper sprawl.",
@@ -238,13 +232,13 @@ Each task should:
 - include architecture audits when boundaries, schemas or runtime ownership move
 - include call-graph review and negative audits when runtime/package flows move
 - include Effect-native and canonical-type prompt guidance when delegated
-- include at least three documented quality audit passes for substantial code,
+- include boundary-matched semantic review evidence for substantial code,
   package-boundary, API, SDK, app or docs-runtime changes
 - repeat Effect/code-quality audits inside each delegated task rather than
   relying on a single global reminder
-- require a parent audit loop that returns incomplete work to the same subagent
-  for up to three correction turns, then escalates instead of accepting an
-  unresolved slice
+- require a primary-owner review and recovery path that corrects, re-scopes, or
+  seeks a decision for an unresolved slice without treating worker or turn
+  counts as acceptance proof
 - require parent review and acceptance before the next delegated task starts
 
 Prefer progressive end-to-end slices over package-by-package TODO lists.

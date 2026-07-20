@@ -1,0 +1,18 @@
+const AccountId = Schema.String.pipe(Schema.brand("AccountId"));
+const ProviderConfig = Config.schema(
+  Schema.Struct({ token: Schema.Redacted(Schema.NonEmptyString) })
+);
+
+export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()(
+  "ProviderError",
+  { message: Schema.String }
+) {}
+
+const getAccount = Effect.fn("ProviderClient.getAccount")(
+  function* (id: typeof AccountId.Type) {
+    const rawResponse = yield* Effect.tryPromise(() => sdk.accounts.get(id));
+    return yield* Schema.decodeUnknownEffect(AccountResponse)(rawResponse);
+  }
+);
+
+export const ProviderClientLive = Layer.effect(ProviderClient, makeClient);

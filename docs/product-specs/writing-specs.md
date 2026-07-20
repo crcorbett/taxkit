@@ -172,9 +172,10 @@ confidence: high | medium | low
 - Include call-graph diagrams for runtime, API, SDK, frontend, package-boundary
   or test-harness changes.
 - Make acceptance criteria concrete enough to verify.
-- For multi-slice delegated work, acceptance criteria must require parent
-  review of each subagent diff against the spec, task list and architecture
-  docs before the next task begins.
+- For delegated work, acceptance criteria must justify the delegation with
+  independent proof value, adversarial-review value, or a disjoint write scope.
+  The primary owner reviews the resulting diff against the spec, task list and
+  architecture docs; delegation and worker count are never acceptance proof.
 - For Effect TypeScript work, require meaningful linear Effect control flow,
   typed errors handled at owning boundaries, canonical schema-derived types,
   and an explicit audit against `docs/architecture/effect-services.md`.
@@ -189,14 +190,15 @@ confidence: high | medium | low
   values plus local interaction state.
 - For implementation task lists, repeat Effect/code-quality audits in each
   task's verification gates rather than relying on one top-level reminder.
-- Substantial delegated tasks must require at least three documented
-  improvement audit passes before acceptance. The audits should inspect for a
-  cleaner call graph, clearer package boundaries, more direct Effect-native
-  control flow, canonical schema/type/id/error reuse, unsafe casts, local DTO
-  mirrors and wrapper/helper sprawl.
-- Delegated task lists must define the parent audit loop: the parent reviews
-  the diff and evidence locally, returns incomplete work to the same subagent,
-  and stops for replan or user decision after the third failed correction turn.
+- Substantial tasks must name the semantic review needed for their actual risk:
+  call graphs, package boundaries, direct Effect-native control flow, canonical
+  schema/type/id/error reuse, unsafe casts, DTO mirrors, wrapper/helper sprawl,
+  and the relevant consumer proof. Do not use a fixed audit-pass count as a
+  substitute for those checks.
+- Delegated task lists must define the primary owner's review and recovery
+  path. Review the diff and evidence locally; correct, re-scope, or seek a
+  decision when the observed blocker cannot be resolved safely. Do not encode a
+  fixed correction-turn count as an acceptance rule.
 - Use `bun run verification` as the default repo-level acceptance gate when a
   spec changes code, docs wiring, package metadata or task plans.
 - Package-facing specs must define the expected Changeset impact: affected

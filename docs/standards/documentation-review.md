@@ -138,9 +138,11 @@ Use this checklist for documentation task lists:
 - [ ] Each task includes a link audit or explicit follow-up.
 - [ ] Each task includes example validation or explicit follow-up.
 - [ ] Each task includes a Changeset or no-changeset rationale.
-- [ ] Substantial docs-runtime or docs-wiring tasks require at least three
-      documented improvement audit passes.
-- [ ] Delegated tasks include the parent audit loop: return incomplete work to
-      the same subagent, stop after the third failed correction turn, and
-      replan or ask for a decision.
+- [ ] Substantial docs-runtime or docs-wiring tasks record the
+      boundary-matched evidence needed to support acceptance; a fixed audit
+      pass count is not evidence.
+- [ ] Delegated tasks justify the delegation with independent proof value,
+      adversarial review value, or a disjoint write scope. The primary owner
+      reviews the resulting diff and evidence, corrects or replans from the
+      observed blocker, and never treats worker count as acceptance proof.
 - [ ] Each task requires parent review for style, structure and accuracy.

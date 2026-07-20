@@ -1,0 +1,16 @@
+interface ProviderClient {
+  readonly use: <A>(callback: (sdk: ProviderSdk) => Promise<A>) => Effect.Effect<A>;
+}
+
+interface Request {
+  readonly id: string;
+}
+
+const token = Config.string("PROVIDER_TOKEN");
+
+const getAccount = (request: Request) =>
+  Effect.tryPromise({
+    try: () => sdk.accounts.get(request.id),
+    catch: (error) =>
+      error instanceof ProviderSdkError ? error : new Error(String(error)),
+  });

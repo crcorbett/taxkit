@@ -36,49 +36,37 @@ add a concrete dependent task.
 
 ## Task list execution protocol
 
-When a spec has a sibling task list, execute it as a sequence of delegated
-tasks. Do not start broad implementation locally.
+When a spec has a sibling task list, execute it as a sequence of bounded,
+verifiable tasks. Keep the primary trajectory accountable; delegate only when
+independent proof value, adversarial review value, or a disjoint write scope
+materially improves the evidence.
 
 Before implementation begins:
 
-1. Create or set one comprehensive active goal with the goal tool available in
-   the runtime.
-2. The goal must explicitly say the task list will be implemented one task at a
-   time.
-3. The goal must explicitly say one subagent is used per task, sequentially.
-4. The goal must explicitly say the parent agent owns review, audit,
-   verification and final acceptance for each task before the next task is
-   delegated.
-5. The goal must explicitly say repeated parent audit failures stop the rollout
-   for replan or user decision after the third failed correction turn.
+1. State the task's bounded outcome, current owner, required evidence, and
+   dependencies in its active plan.
+2. Name any delegation's independent proof value, adversarial review value, or
+   disjoint write scope before assigning it.
+3. Name the primary owner's review, verification, and recovery responsibility.
 
 Execution loop:
 
-1. Delegate exactly one task-list task to a subagent.
-2. Give the subagent the task object, the product spec, the task-list path and
-   the relevant architecture docs or files to inspect.
-3. Tell the subagent to edit files directly, run that task's
-   `mandatoryVerification` and report changed files plus verification
-   evidence.
-4. Review the subagent's diff and verification evidence locally.
-5. Run any additional targeted checks needed to trust the slice.
-6. Audit the slice against the task, spec, architecture docs and repo
-   conventions.
-7. If anything is missing or below the bar, send the task back to the same
-   subagent with concrete corrections.
-8. Count that parent review as an audit turn whenever it produces corrections.
-   Return to the same subagent for no more than three failed correction turns
-   before stopping to record the blocker, update the active plan and ask for a
-   decision or re-scope the task.
-9. Mark the task complete only when the parent agent is satisfied that the task
-   scope and verification gates are genuinely complete.
-10. Commit the coherent slice when the task list requires
-    `commitAfterPassing`.
-11. Delegate the next task only after the current task is accepted.
+1. Implement the bounded task directly, or give an authorized delegate the task
+   object, product SPEC, paths, ledger, relevant architecture docs, and gates.
+2. Require direct edits and task-specific verification evidence.
+3. Review the resulting diff and evidence against the task, SPEC, architecture,
+   and repository conventions.
+4. Run targeted checks needed to trust the changed boundary.
+5. Correct incomplete work directly or return it with concrete failed evidence.
+   If the same observed blocker cannot be resolved safely, record it, update
+   the active plan, and re-scope or seek a decision.
+6. Mark the task complete only when its scope, ledger, and verification gates
+   are genuinely complete.
+7. Commit the coherent slice when the task list requires `commitAfterPassing`.
+8. Start a dependent task only after its dependencies are accepted.
 
-Do not run multiple task-list implementation subagents in parallel unless the
-task list explicitly says a task is independent and the write scopes are
-disjoint. The default is strict serial execution.
+Parallel work requires proven independent dependencies and disjoint write
+scopes. Worker count is never acceptance evidence.
 
 ## Parent review bar
 
@@ -117,13 +105,12 @@ Every accepted task must pass these audits where relevant:
 - every required docs/README/lint/skill/config/manifest/schema/generator/test/ops
   ledger row is implemented and verified
 
-Substantial tasks must also include at least three documented improvement audit
-passes before acceptance. The passes should ask what can be improved while the
-implementation still works, then inspect for cleaner call graphs, clearer
-package boundaries, more direct Effect-native control flow, canonical
-schema/type/id/error reuse, fewer unsafe casts, fewer local mirrors and less
-wrapper/helper sprawl. If an audit identifies a real improvement, make the
-change or record the explicit follow-up before accepting the task.
+Substantial tasks must include boundary-matched semantic review evidence before
+acceptance. Inspect cleaner call graphs, clearer package boundaries, direct
+Effect-native control flow, canonical schema/type/id/error reuse, unsafe casts,
+local mirrors, and wrapper/helper sprawl as the changed boundary requires. If a
+review identifies a real improvement, make the change or record the explicit
+follow-up before accepting the task; a fixed audit count is not a substitute.
 
 ## Guardrails
 
@@ -150,8 +137,9 @@ change or record the explicit follow-up before accepting the task.
 - Keep public docs neutral to downstream private products.
 - Runtime, API, SDK, frontend and package-boundary changes must leave the
   relevant spec/architecture call graphs accurate.
-- Do not continue past three failed parent correction turns for the same
-  delegated task. Stop, record the evidence and replan or ask for a decision.
+- When an observed blocker cannot be resolved safely, stop, record the
+  evidence, and replan or ask for a decision. Do not use a fixed correction
+  count as a proxy for judgment.
 
 ## Slice design rules
 
@@ -175,7 +163,7 @@ Bad early slices:
 - many partial files with no executable path
 - speculative abstractions for future steps
 
-## Mandatory Subagent Contract
+## Delegated Slice Contract
 
 Use this prompt block when delegating a task-list slice to a subagent:
 
@@ -199,7 +187,8 @@ Implementation rules:
 Verification and handoff:
 - Run this task's mandatory verification gates, including `bun run verification` unless the task explicitly documents a narrower gate.
 - Run task-specific tests, smoke checks, browser checks or architecture audits required by the task's blast radius.
-- For substantial code, API, SDK, app, package-boundary or docs-runtime work, run and document at least three implementation improvement audit passes before handoff.
+- For substantial code, API, SDK, app, package-boundary or docs-runtime work,
+  record the boundary-matched semantic review evidence before handoff.
 - Audit the diff for helper sprawl, canonical type/schema/id/error reuse, unsafe casts, local DTO mirrors, stringly branching and browser-safe imports where relevant.
 - Report the Changeset path and release-train impact, or report why no Changeset was required.
 - Report changed files, verification commands, outcomes and residual risks.

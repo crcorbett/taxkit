@@ -45,14 +45,14 @@ are satisfied; line count is not evidence either way.
 ## Review
 
 Static lint cannot prove semantic weight or call-graph improvement. Review the
-ledger during the three required audit passes, verify each claimed consumer in
-the diff, and reject speculative reuse or tests that merely call through the
-abstraction. Removal is the default when an abstraction loses its owner,
-substitution point or simplifying effect.
+ledger against the final diff and call graph, verify each claimed consumer,
+and record boundary-matched evidence for every admission requirement. Reject
+speculative reuse or tests that merely call through the abstraction. A fixed
+review-pass count is not evidence. Removal is the default when an abstraction
+loses its owner, substitution point or simplifying effect.
 
 ## Related Docs
 
 - [Effect services](../architecture/effect-services.md)
 - [Frontend](../architecture/frontend.md)
 - [Testing and quality](../architecture/testing-and-quality.md)
-

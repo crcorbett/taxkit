@@ -13,6 +13,91 @@ const readMetadata = (name: string) =>
     "utf-8"
   );
 
+interface CoordinationFixture {
+  readonly workflow: {
+    readonly delegation: {
+      readonly rationale: string;
+      readonly requiredWorkerCount: number | null;
+    };
+    readonly acceptance: {
+      readonly evidence: readonly string[];
+      readonly fixedAuditPassCount: number | null;
+    };
+  };
+}
+
+const readFixture = (name: string): CoordinationFixture => {
+  const fixture: CoordinationFixture = JSON.parse(
+    readFileSync(
+      resolve(root, "tools/skills/fixtures/hgi-201", `${name}.json`),
+      "utf-8"
+    )
+  );
+
+  return fixture;
+};
+
+const readProviderFixture = (name: "accepted" | "rejected") =>
+  readFileSync(
+    resolve(
+      root,
+      "tools/skills/fixtures/hgi-201",
+      `provider-boundary.${name}.ts.txt`
+    ),
+    "utf-8"
+  );
+
+const classifyProviderBoundarySource = (source: string) =>
+  [
+    /\buse\s*:/u.test(source) || /\.use\s*\(/u.test(source)
+      ? "generic-sdk-use-callback"
+      : null,
+    /\b(?:id|[A-Za-z][A-Za-z0-9]*Id)\s*:\s*string\b/u.test(source)
+      ? "raw-string-id"
+      : null,
+    /Config\.(?:string|nonEmptyString|redacted)\s*\(/u.test(source)
+      ? "primitive-config"
+      : null,
+    /\binstanceof\b/u.test(source) ? "instanceof-policy" : null,
+    /Effect\.tryPromise/u.test(source) &&
+    !/Schema\.decodeUnknownEffect\([^)]*\)\([\s\n]*rawResponse[\s\n]*\)/u.test(
+      source
+    )
+      ? "unchecked-sdk-output"
+      : null,
+  ].filter((reason): reason is string => reason !== null);
+
+const classifyCoordinationPolicy = (
+  fixture: ReturnType<typeof readFixture>
+) => {
+  const hasDelegationRationale = [
+    "independent-proof",
+    "adversarial-review",
+    "disjoint-write-scope",
+  ].includes(fixture.workflow.delegation.rationale);
+  const hasSemanticEvidence = fixture.workflow.acceptance.evidence.includes(
+    "boundary-matched-semantic-review"
+  );
+
+  return {
+    accepts:
+      fixture.workflow.delegation.requiredWorkerCount === null &&
+      fixture.workflow.acceptance.fixedAuditPassCount === null &&
+      hasDelegationRationale &&
+      hasSemanticEvidence,
+    reasons: [
+      fixture.workflow.delegation.requiredWorkerCount === null
+        ? null
+        : "fixed-worker-count",
+      fixture.workflow.acceptance.fixedAuditPassCount === null
+        ? null
+        : "fixed-audit-count",
+      hasDelegationRationale ? null : "missing-delegation-rationale",
+      hasSemanticEvidence ? null : "missing-semantic-evidence",
+    ].filter((reason): reason is string => reason !== null),
+  };
+};
+
 const typescriptFences = (source: string) =>
   Array.from(
     source.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/gu),
@@ -58,6 +143,95 @@ describe("repo-owned skill policy", () => {
       "Use a goal only when the user explicitly requests one"
     );
     expect(implementer).not.toContain("one sequential subagent per task");
+  });
+
+  test("HGI-201 coordination fixtures reject ritual and accept semantic evidence", () => {
+    expect(classifyCoordinationPolicy(readFixture("ritual"))).toEqual({
+      accepts: false,
+      reasons: ["fixed-worker-count", "fixed-audit-count"],
+    });
+    expect(classifyCoordinationPolicy(readFixture("evidence-led"))).toEqual({
+      accepts: true,
+      reasons: [],
+    });
+  });
+
+  test("HGI-201 provider fixtures reject stale code and accept the owned boundary", () => {
+    expect(
+      classifyProviderBoundarySource(readProviderFixture("rejected"))
+    ).toEqual([
+      "generic-sdk-use-callback",
+      "raw-string-id",
+      "primitive-config",
+      "instanceof-policy",
+      "unchecked-sdk-output",
+    ]);
+    expect(
+      classifyProviderBoundarySource(readProviderFixture("accepted"))
+    ).toEqual([]);
+  });
+
+  test("every current HGI-201 owner rejects fixed coordination ritual", () => {
+    const currentOwners = [
+      ".agents/skills/docs-writer/SKILL.md",
+      ".agents/skills/prd-writer/SKILL.md",
+      ".agents/skills/prd-implementer/SKILL.md",
+      "docs/product-specs/writing-specs.md",
+      "docs/product-specs/writing-task-lists.md",
+      "docs/exec-plans/implementing-specs.md",
+      "docs/design-docs/abstraction-admission.md",
+      "docs/architecture/effect-services.md",
+      "docs/architecture/testing-and-quality.md",
+      "docs/standards/documentation-review.md",
+    ];
+    const fixedRitual =
+      /(?:three|required|documented|fixed)\s+(?:improvement\s+)?audit\s+passes|three\s+failed\s+correction\s+turns|one\s+sequential\s+subagent\s+per\s+task/iu;
+
+    for (const owner of currentOwners) {
+      expect(readFileSync(resolve(root, owner), "utf-8")).not.toMatch(
+        fixedRitual
+      );
+    }
+  });
+
+  test("current guides preserve the boundary contract while rejecting ritual", () => {
+    const guideSources = [
+      readFileSync(
+        resolve(root, "docs/product-specs/writing-specs.md"),
+        "utf-8"
+      ),
+      readFileSync(
+        resolve(root, "docs/product-specs/writing-task-lists.md"),
+        "utf-8"
+      ),
+      readFileSync(
+        resolve(root, "docs/exec-plans/implementing-specs.md"),
+        "utf-8"
+      ),
+    ].join("\n");
+    const providerSkill = readSkill("effect-client-wrapper");
+    const boundarySources = [
+      guideSources,
+      readSkill("prd-implementer"),
+      readFileSync(
+        resolve(root, "docs/architecture/effect-services.md"),
+        "utf-8"
+      ),
+    ].join("\n");
+
+    expect(guideSources).toContain("independent proof value");
+    expect(guideSources).toContain("path-evidenced");
+    expect(guideSources).toContain("fixed audit count");
+    expect(boundarySources).toContain("flat, sequential");
+    expect(boundarySources).toContain("branded IDs");
+    expect(boundarySources).toContain("route");
+    expect(boundarySources).toContain("container");
+    expect(boundarySources).toContain("leaf");
+    expect(providerSkill).toContain("generic SDK `use` callback");
+    expect(providerSkill).toContain("Config.schema");
+    expect(providerSkill).toContain("without `instanceof`");
+    expect(providerSkill).toContain("decode every SDK output");
+    expect(providerSkill).toContain("deterministic mock Layers");
   });
 
   test("package structure applies the TaxKit profile and canonical contract", () => {
@@ -114,14 +288,8 @@ describe("repo-owned skill policy", () => {
   test("effect client wrapper code does not teach stale escape hatches", () => {
     const code = typescriptFences(readSkill("effect-client-wrapper"));
 
-    expect(code).not.toMatch(/\buse\s*:/u);
-    expect(code).not.toMatch(/\.use\s*\(/u);
+    expect(classifyProviderBoundarySource(code)).toEqual([]);
     expect(code).not.toMatch(/\bclient\s*:/u);
-    expect(code).not.toMatch(/\b[A-Za-z][A-Za-z0-9]*Id\s*:\s*string\b/u);
-    expect(code).not.toMatch(
-      /Config\.(?:string|nonEmptyString|redacted)\s*\(/u
-    );
-    expect(code).not.toContain("instanceof");
     expect(code).not.toMatch(/Promise<\s*[A-Z]\s*>/u);
     expect(code).toMatch(
       /const rawResponse = yield\* Effect\.tryPromise[\s\S]*Schema\.decodeUnknownEffect\([^)]*\)\([\s\n]*rawResponse[\s\n]*\)/u

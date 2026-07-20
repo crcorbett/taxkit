@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-201",
+  "status": "accepted-pending-git-receipt",
+  "observedAt": "2026-07-20T23:48:13Z",
+  "baseCommit": "080583d499d88136a7d5b87e74892ba1bbb98f20",
+  "authority": "local TaxKit documentation and skill-policy changes with local checks only",
+  "acceptedOutcome": "A fresh evaluator accepted the corrected current-owner scan, semantic coordination/provider fixtures, clean-clone skill routing, and preserved Effect/package/React contracts.",
+  "scope": [
+    "current PRD/task-list and implementation guides",
+    "current architecture and documentation-review policy",
+    "repository-local docs-writer skill",
+    "semantic coordination and provider-boundary contradiction fixtures"
+  ],
+  "impactLedger": [
+    {
+      "surface": "current PRD/task and implementation guides",
+      "decision": "Change required",
+      "paths": [
+        "docs/product-specs/writing-specs.md",
+        "docs/product-specs/writing-task-lists.md",
+        "docs/exec-plans/implementing-specs.md"
+      ],
+      "acceptance": "Guides require evidence-led primary-owner review and reject fixed worker, audit-pass, and correction-turn counts."
+    },
+    {
+      "surface": "durable architecture and documentation standards",
+      "decision": "Change required",
+      "paths": [
+        "docs/architecture/effect-services.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/design-docs/abstraction-admission.md",
+        "docs/standards/documentation-review.md"
+      ],
+      "acceptance": "Every current owner rejects fixed pass/correction ritual while preserving Effect boundary and helper-admission rules and requiring boundary-matched review."
+    },
+    {
+      "surface": "repository-local skills and metadata",
+      "decision": "Change required",
+      "paths": [".agents/skills/docs-writer/SKILL.md"],
+      "acceptance": "Docs-writing guidance is clean-clone portable and routes to current repository owners without ritual."
+    },
+    {
+      "surface": "Effect client wrapper and coordination contradiction fixtures",
+      "decision": "Change required",
+      "paths": [
+        "tools/skills/fixtures/hgi-201/evidence-led.json",
+        "tools/skills/fixtures/hgi-201/ritual.json",
+        "tools/skills/fixtures/hgi-201/provider-boundary.accepted.ts.txt",
+        "tools/skills/fixtures/hgi-201/provider-boundary.rejected.ts.txt",
+        "tools/skills/skill-policies.test.ts"
+      ],
+      "acceptance": "Semantic classifiers reject fixed coordination counts and generic SDK callbacks, raw string IDs, primitive config, instanceof policy, and unchecked SDK output; the accepted fixtures and canonical skill code pass."
+    },
+    {
+      "surface": "Package structure, PRD skills, AGENTS, root README, manifests, code, CI, public docs",
+      "decision": "Preserve",
+      "paths": [],
+      "acceptance": "Existing canonical boundary and portability contracts remain unchanged; this candidate adds no package or runtime behavior."
+    },
+    {
+      "surface": "release, recovery, publication, provider operations, and docs verification runbooks",
+      "decision": "N/A",
+      "paths": [],
+      "acceptance": "HGI-204 and HGI-203 remain the future target owners; no repeatable operation is copied into a skill."
+    }
+  ],
+  "verification": [
+    {
+      "check": "python3 /Users/cooper/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/docs-writer",
+      "status": "passed",
+      "result": "Skill is valid."
+    },
+    {
+      "check": "bun run test:skills",
+      "status": "passed",
+      "result": "12 tests passed, including accepted/rejected semantic coordination and provider-boundary fixtures plus a scan of every current HGI-201 owner."
+    },
+    {
+      "check": "bun run verification",
+      "status": "passed",
+      "result": "Repository path/type accounting for 541 text and eight binary paths, Effect language-service, lint, format, 12 skill tests, Knip, production Knip, and 23 workspace typecheck/build tasks passed after the evaluator-driven correction."
+    },
+    {
+      "check": "fresh-context rejection and correction",
+      "status": "passed",
+      "result": "The first evaluator correctly rejected fixed three-pass ritual in two omitted current owners and phrase-only contradiction coverage. Both owners were corrected and the policy test now traverses every current owner and accepted/rejected provider code fixtures."
+    },
+    {
+      "check": "fresh-context final acceptance",
+      "status": "passed",
+      "result": "An independent worker reproduced quick validation and 12 skill-policy tests, confirmed all ten current owners reject ritual, verified the provider fixtures catch all five prohibited patterns while accepted examples pass, and found no remaining acceptance blocker."
+    },
+    {
+      "check": "git diff --check",
+      "status": "passed",
+      "result": "No whitespace errors."
+    }
+  ],
+  "limitations": [
+    "A scoped Git receipt and remote readback remain required before HGI-201 closes.",
+    "Local checks do not prove release, publication, registry, provider, deployment, production, or external consumer state."
+  ],
+  "nonClaims": [
+    "No provider, external planning workspace, release, publication, or deployment was accessed.",
+    "No target-owned runbook or verification route was created."
+  ],
+  "rollback": "Revert this bounded HGI-201 candidate slice; leave HGI-200 and retained historical/public evidence untouched.",
+  "nextTrigger": "Commit and publish the accepted semantic slice, record exact Git identity/readback, then proceed with HGI-207."
+}

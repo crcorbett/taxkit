@@ -18,6 +18,7 @@ Current HGI-200 receipts:
 - [`HGI-200-S1-receipt.json`](HGI-200-S1-receipt.json)
 - [`HGI-200-S1-git-receipt.json`](HGI-200-S1-git-receipt.json)
 - [`HGI-200-S2-receipt.json`](HGI-200-S2-receipt.json)
+- [`HGI-201-candidate.json`](HGI-201-candidate.json)
 - [`HGI-200-validation.json`](HGI-200-validation.json)
 
 ## Current docs inventory

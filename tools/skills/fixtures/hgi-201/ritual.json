@@ -1,0 +1,12 @@
+{
+  "workflow": {
+    "delegation": {
+      "rationale": "independent-proof",
+      "requiredWorkerCount": 1
+    },
+    "acceptance": {
+      "evidence": ["boundary-matched-semantic-review"],
+      "fixedAuditPassCount": 3
+    }
+  }
+}

@@ -271,8 +271,8 @@ Do not extract one-use fragments such as `decodePayload`, `mapDecodeError`,
 `runDecoder`, `withDecodedInput` or generic `decodeOrFail`. A shared helper is
 appropriate only when it owns real, repeated policy, such as the generic
 catalogue constructor that preserves schema-to-continuation coupling. Review
-helper reuse and ownership in the required three audit passes rather than
-adding a brittle function-size rule.
+helper reuse and ownership with the task's path-evidenced semantic audit rather
+than a brittle function-size rule or a fixed audit count.
 
 `taxkit/no-decoding-outside-boundaries` enforces decoder placement across the
 repository. Its exact file allowlist belongs only in `oxlint.config.ts`; this

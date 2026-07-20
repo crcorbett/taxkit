@@ -134,14 +134,13 @@ operations after a human reviews pending Changesets and the release impact.
 ## Review evidence
 
 Substantial code, package-boundary, API, SDK, app-runtime or documentation
-rollouts record three audit passes in their task evidence or execution plan:
-
-1. Compare the final code and command graphs with their owning architecture and
-   spec.
-2. Inspect Effect flow, schemas, tagged errors, unsafe casts, DTO mirrors and
-   helper or abstraction sprawl.
-3. Inspect CI, lint, packed-consumer, browser/API, documentation and Changeset
-   evidence appropriate to the changed surface.
+rollouts record the review evidence their changed boundaries require. Acceptance
+is based on path-evidenced task gates and semantic review, not a fixed number of
+audit passes or workers. Review the final code and command graphs against their
+owning architecture and SPEC; inspect Effect flow, schemas, tagged errors,
+unsafe casts, DTO mirrors, and helper or abstraction sprawl; then inspect the
+CI, lint, packed-consumer, browser/API, documentation, and Changeset evidence
+that applies to the changed surface.
 
 New shared abstractions must satisfy the
 [abstraction admission contract](../design-docs/abstraction-admission.md).
@@ -265,8 +264,10 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   fixtures must run with `--disable-nested-config` and cover every allowed and
   rejected consumer, import, member, data-source and forwarding category.
 - The lint rule cannot determine whether a helper owns meaningful repeated
-  policy. Use the boundary contract, compile-time tests, three documented
-  audit passes and parent review to reject one-use decoder/error wrappers.
+  policy. Use the boundary contract, final call graph, compile-time tests, and
+  primary-owner review to reject one-use decoder/error wrappers. Record the
+  observed consumer and substitution evidence; a fixed audit-pass count is not
+  acceptance proof.
 - Static lint also cannot infer whether `Schema.Defect()` should be replaced by
   an owning provider/domain error, whether an arbitrary provider SDK import is
   a true adapter, or whether a new abstraction has semantic weight. Keep those
