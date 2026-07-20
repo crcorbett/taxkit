@@ -16,6 +16,7 @@ Current HGI-200 receipts:
 - [`corpus-inventory.json`](corpus-inventory.json)
 - [`link-report.json`](link-report.json)
 - [`HGI-200-S1-receipt.json`](HGI-200-S1-receipt.json)
+- [`HGI-200-S1-git-receipt.json`](HGI-200-S1-git-receipt.json)
 
 ## Current docs inventory
 
