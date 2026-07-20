@@ -5,6 +5,13 @@
   "status": "accepted",
   "observedAt": "2026-07-20T19:38:53Z",
   "baseCommit": "f8fe7cae833ac4b01bfe94b30967c57e4de43f12",
+  "semanticCommit": "94a090fedbbbd89e7211e1c88251abec73de4967",
+  "remoteReadback": {
+    "observedAt": "2026-07-20T20:23:41Z",
+    "ref": "refs/heads/main",
+    "commit": "94a090fedbbbd89e7211e1c88251abec73de4967",
+    "matchesSemanticCommit": true
+  },
   "authority": "local TaxKit documentation writes and read-only local checks only",
   "acceptedOutcome": "The 19 pre-campaign product SPECs, 20 completed execution plans, and two active-plan records have separated semantic metadata; indexes route completed history away from active work and the local harness route matches canonical HGI dependencies.",
   "classification": {
@@ -36,5 +43,5 @@
   "postcondition": "Current indexes expose only the current harness route; completed records remain reachable as historical supporting evidence with explicit successor task routing.",
   "rollback": "Revert the HGI-200-S2 documentation slice together; retain completed plans, public content, binary assets, and architecture tombstone routes in place.",
   "limitations": ["Classification and local checks do not prove the historical implementation behavior, publication, registry state, provider state, or production behavior.", "HGI-200 remains in progress pending its parent acceptance and remaining route retrieval proof."],
-  "nonClaims": ["No public MDX, binary asset, or architecture tombstone was moved or deleted.", "No release, publication, provider access, commit, push, or external planning-workspace change occurred."]
+  "nonClaims": ["No public MDX, binary asset, or architecture tombstone was moved or deleted.", "No release, registry publication, provider access, deployment, or production behavior was performed or proved."]
 }
