@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-14
-source_of_truth: docs
-confidence: high
+document_type: architecture-router
+lifecycle: current
+authority: canonical
+owner: taxkit-architecture-owner
+last_reviewed: 2026-07-20
+review_trigger: package ownership, runtime boundary, public contract, or architecture-route change
 ---
 
 # TaxKit architecture
@@ -10,6 +12,9 @@ confidence: high
 This directory is the implementation reference for the TaxKit tax calculator
 architecture. It is also the routing guide for the implemented surface that
 exists today.
+Documentation lifecycle, public/maintainer separation, history, and known owner
+gaps are routed by [`../README.md`](../README.md). The legacy
+[`../architecture.md`](../architecture.md) path is a tombstone to this file.
 
 TaxKit is the open-source engine repository. Today it contains a standalone
 Bun API app, a TanStack Start web scaffold, a Fumadocs-backed docs app, the
@@ -85,7 +90,7 @@ explicit TaxKit input facts
 
 ## Documents
 
-- [Architecture atlas](../architecture.md)
+- [Documentation lifecycle router](../README.md)
 - [Package boundaries](./package-boundaries.md)
 - [Package ownership](./package-ownership.md)
 - [Effect services](./effect-services.md)

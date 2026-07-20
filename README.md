@@ -114,6 +114,8 @@ fixed release-train package versions and changelogs.
 ## Documentation entry points
 
 - [AGENTS.md](./AGENTS.md): short atlas for agents and task routing.
+- [Maintainer documentation](./docs/README.md): lifecycle, truth layers,
+  semantic owners, public/maintainer separation and known owner gaps.
 - [CLAUDE.md](./CLAUDE.md): Claude-compatible pointer to the canonical root
   operating rules.
 - [CHANGELOG.md](./CHANGELOG.md): root release-train changelog. Package-level
@@ -122,8 +124,8 @@ fixed release-train package versions and changelogs.
 - Engineering conventions start with [Effect services](./docs/architecture/effect-services.md),
   [Configuration](./docs/architecture/configuration.md), [Package ownership](./docs/architecture/package-ownership.md)
   and [Code patterns](./docs/standards/code-patterns.md).
-- [Product specs](./docs/product-specs/index.md): current implementation
-  intent and task lists.
+- [Product specs](./docs/product-specs/index.md): current, implemented and
+  historical intent inventory and task lists.
 - [Exec plans](./docs/exec-plans/README.md): live and completed rollout plans.
 - [Design docs](./docs/design-docs/index.md): documentation and design
   conventions.

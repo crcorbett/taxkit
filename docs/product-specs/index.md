@@ -7,13 +7,17 @@ confidence: medium
 
 # Product specs
 
-Current specs live here. Each spec should be compact, current, and linked to
-the architecture docs that own durable boundaries.
+This is the SPEC inventory and admission route. Current implementation intent
+requires a genuinely active SPEC/task and an entry in
+[`../exec-plans/active/README.md`](../exec-plans/active/README.md). Implemented,
+superseded, and historical specs remain reachable for provenance but are not
+default current context. See [`../README.md`](../README.md) for lifecycle.
 
 Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
+| [Harness-governance documentation](./harness-governance-documentation.md) | In progress | Repository-local outcomes and tasks for the active documentation-governance rollout. |
 | [API compatibility harness](./api-compatibility-harness.md) | Implemented | OpenAPI snapshot, route fixtures and live API app smoke coverage are in place. |
 | [API HTTP package topology](./api-http-package-topology.md) | Implemented | The implemented HTTP API package now lives at `packages/api/http` as `@taxkit/api-http`. |
 | [Boundary-only decoding](./boundary-only-decoding.md) | Implemented | Exact decoder placement enforcement, typed calculator continuations and pre-render docs route decoding are in place. |

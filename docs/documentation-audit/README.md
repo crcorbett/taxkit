@@ -7,6 +7,16 @@ confidence: high
 
 # Documentation audit
 
+This route owns dated audit and corpus-accounting evidence, not current
+maintainer policy. Lifecycle and semantic ownership are defined by
+[`../README.md`](../README.md).
+
+Current HGI-200 receipts:
+
+- [`corpus-inventory.json`](corpus-inventory.json)
+- [`link-report.json`](link-report.json)
+- [`HGI-200-S1-receipt.json`](HGI-200-S1-receipt.json)
+
 ## Current docs inventory
 
 Current tracked documentation entrypoints:
@@ -72,9 +82,9 @@ package until a package manifest, source exports and verification exist.
 
 ## Missing or stale docs
 
-- Completed execution plans have been moved to `docs/exec-plans/completed/`.
-  `docs/exec-plans/active/` is available for the next live implementation
-  plan.
+- Completed execution plans live under `docs/exec-plans/completed/`. The
+  HGI-200 through HGI-206 rollout is the only current plan under
+  `docs/exec-plans/active/`; completed material remains historical.
 - `docs/repo-status-outline.html` is a manual snapshot. It was refreshed on
   2026-07-17 for the completed TaxKit cutover, private `1.0.0` release train,
   strict packed-consumer validation and current delivery priorities. It can
