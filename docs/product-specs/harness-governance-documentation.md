@@ -48,9 +48,9 @@ state. The active execution plan owns the current bounded sequence.
 
 | Task | State | Acceptance owner |
 | --- | --- | --- |
-| HGI-200 — lifecycle router, architecture successor, current-intent route, and corpus receipts | In progress | This SPEC, active plan, accepted audit receipts, fresh-context retrieval, repository verification, and scoped Git receipt |
-| HGI-207 — documentation and release-semantics decisions | Pending; depends on HGI-200 | Product-owner decisions for public-doc lifecycle, archive/candidate retention, and publication/deployment non-claims |
-| HGI-201 — PRD guides and local skills | Pending; depends on HGI-200 | Current architecture/standards/runbook routing with ritual contradictions removed |
+| HGI-200 — lifecycle router, architecture successor, current-intent route, and corpus receipts | Completed | S1/S2 receipts, integrated fresh-context acceptance, repository verification, and pushed Git identity |
+| HGI-207 — documentation and release-semantics decisions | Next; HGI-200 satisfied | Product-owner decisions for public-doc lifecycle, archive/candidate retention, and publication/deployment non-claims |
+| HGI-201 — PRD guides and local skills | Next; HGI-200 satisfied | Current architecture/standards/runbook routing with ritual contradictions removed |
 | HGI-202 — docs policy and public-maintainer separation | Pending; depends on HGI-200, HGI-201, HGI-207 | Machine-checkable public, maintainer, generated, and package-README ownership |
 | HGI-208 — TaxKit docs-maintenance skill | Pending; depends on HGI-202 | Repo-local skill source and focused skill-policy proof |
 | HGI-203 — critical journeys, release proof, and bounded receipts | Pending; depends on HGI-202, HGI-208 | `docs/verification/**` and journey-matched evidence with explicit non-claims |

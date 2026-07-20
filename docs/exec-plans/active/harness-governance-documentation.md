@@ -21,9 +21,12 @@ deletion/movement require separately approved authority and target runbooks.
 
 ## Progress
 
-- **HGI-200 — in progress:** one maintainer router, lifecycle/truth layers,
-  legacy architecture tombstone, public/history separation, and corpus proof.
-- HGI-207 (decisions) and HGI-201 (PRD/local skills) depend on HGI-200.
+- **HGI-200 — completed:** one maintainer router, lifecycle/truth layers,
+  legacy architecture tombstone, public/history separation, metadata for 19
+  retained SPECs, 20 completed-plan records and two active records, integrated
+  fresh-context acceptance, corpus proof, and pushed Git identity.
+- **HGI-207 and HGI-201 — next and dependency-ready:** the decision gate and
+  PRD/local-skill reconciliation can proceed as independent bounded slices.
 - HGI-202 (docs policy) depends on HGI-200, HGI-201, and HGI-207; HGI-208
   (docs-maintenance skill) depends on HGI-202.
 - HGI-203 (critical journeys/release proof) depends on HGI-202 and HGI-208;
@@ -41,14 +44,14 @@ public docs, completed plans, specs, and binary evidence in place. Stop before
 another semantic-owner class, publication/provider access, evidence movement,
 or an unresolved lifecycle decision.
 
-HGI-200-S2 classifies the retained pre-campaign SPEC and plan records, makes
+HGI-200-S2 classified the retained pre-campaign SPEC and plan records, makes
 the historical indexes route follow-ups to explicit current HGI tasks, and
 corrects the local HGI task IDs and dependency order. Its bounded receipt is
 [`HGI-200-S2-receipt.json`](../../documentation-audit/HGI-200-S2-receipt.json).
-It does not accept the HGI-200 parent or alter public content, binary evidence,
-or the architecture tombstone route.
+It did not alter public content, binary evidence, or the architecture tombstone
+route. Integrated parent acceptance is recorded in
+[`HGI-200-validation.json`](../../documentation-audit/HGI-200-validation.json).
 
-Acceptance requires corpus/link receipts, a held-out route test,
-`bun run check:repository-paths`, `bun run verification`, and a scoped Git
-receipt. These local checks do not prove publication, registry state, external
-consumers, API/docs production behavior, or release authority.
+The next slice must remain bounded to HGI-207 decisions or HGI-201 current
+guides/skills. These local records do not prove publication, registry state,
+external consumers, API/docs production behavior, or release authority.

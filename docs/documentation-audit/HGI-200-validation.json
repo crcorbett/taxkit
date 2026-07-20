@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-200",
+  "status": "accepted",
+  "observedAt": "2026-07-20T20:33:03Z",
+  "candidate": {
+    "branch": "main",
+    "commit": "50d0c7f74711b88dc396d4924008f3210538b8f8",
+    "tree": "2ff12bd2c29c9c1dd9b68512e14951e39b9e8ceb",
+    "originMain": "50d0c7f74711b88dc396d4924008f3210538b8f8"
+  },
+  "claim": "TaxKit current, historical, public, and binary documentation is classified and routed by one maintainer owner without loading completed history into the golden path.",
+  "acceptedClassification": {
+    "retainedPreCampaignSpecs": 19,
+    "completedPlanRecords": 20,
+    "activePlanRecords": 2,
+    "binaryAssetsPreserved": 8,
+    "architectureTombstone": "docs/architecture.md -> docs/architecture/README.md"
+  },
+  "freshContextAcceptance": {
+    "result": "passed",
+    "goldenPath": "AGENTS.md -> docs/README.md -> current architecture, product-spec index, and active-plan index",
+    "observedPostcondition": "The worker retrieved the sole lifecycle router, one-way architecture successor, current harness intent, opt-in history, public-doc separation, metadata counts, and internally consistent successor task chain without reading completed-plan bodies by default."
+  },
+  "verification": [
+    {
+      "command": "bun run check:repository-paths",
+      "result": "passed; 540 text and 8 binary files from 548 tracked paths at parent acceptance"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed; repository paths/types, Effect setup, lint/format, eight skill tests, both Knip graphs, and 23 Turbo tasks"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed on a clean main worktree"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/README.md",
+      "sha256": "08f7fd10f16ec7b2dffa9a14e329d3c017242fc541d6feea99592014484ddecb"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "6c8c50a2c65208cd581aefd7787c4a983ac0583b626f9dc0f637493d702ecf3f"
+    },
+    {
+      "path": "docs/architecture/README.md",
+      "sha256": "6751aabdc8bdff8ad3a29f0afebd199fbc598627ef55b5c17db39e33af2b85a5"
+    },
+    {
+      "path": "docs/product-specs/index.md",
+      "sha256": "b4f4f0b24f1af7072ac3b48950d5a3410f445f19555b024f71b11029b0ccb411"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-200-S1-receipt.json",
+      "sha256": "25dfce41ee20d1707891ad15e12edb280cc41b47649467cede0ae2e6f2963229"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-200-S2-receipt.json",
+      "sha256": "f764927e282f66565ac8f443262958438f34b242aee25f82bc7a9f1b32312101"
+    }
+  ],
+  "limitations": [
+    "Classification does not prove retained historical implementation behavior.",
+    "Local checks do not prove public docs runtime, release, publication, registry, provider, deployment, production, or external-consumer behavior.",
+    "The external campaign ledger is updated separately."
+  ],
+  "nonClaims": [
+    "No public MDX, binary asset, completed history, or architecture evidence was moved or deleted.",
+    "No provider, publication, release, registry, deployment, or production operation occurred."
+  ],
+  "nextTrigger": "Begin HGI-207 decision records or HGI-201 PRD/local-skill reconciliation as separate dependency-ready slices."
+}
