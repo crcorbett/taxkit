@@ -25,11 +25,11 @@ deletion/movement require separately approved authority and target runbooks.
   legacy architecture tombstone, public/history separation, metadata for 19
   retained SPECs, 20 completed-plan records and two active records, integrated
   fresh-context acceptance, corpus proof, and pushed Git identity.
-- **HGI-201 — accepted; Git receipt pending:** current PRD/task and
+- **HGI-201 — completed:** current PRD/task and
   implementation guides, `docs-writer`, architecture/standards review rules,
   and semantic contradiction fixtures now reject fixed worker/pass-count ritual
   while preserving the Effect, provider-boundary, package, and React contract.
-  Accepted semantic receipt: [`HGI-201-candidate.json`](../../documentation-audit/HGI-201-candidate.json).
+  Exact Git publication/readback: [`HGI-201-validation.json`](../../documentation-audit/HGI-201-validation.json).
 - **HGI-207 — next and dependency-ready:** the decision gate can proceed as an
   independent bounded slice.
 - HGI-202 (docs policy) depends on HGI-200, HGI-201, and HGI-207; HGI-208
@@ -57,7 +57,7 @@ It did not alter public content, binary evidence, or the architecture tombstone
 route. Integrated parent acceptance is recorded in
 [`HGI-200-validation.json`](../../documentation-audit/HGI-200-validation.json).
 
-HGI-201 passed independent acceptance; exact Git publication/readback remains
-before parent closeout. The next semantic slice is HGI-207 decisions. These
-local records do not prove publication, registry state,
+HGI-201 passed independent acceptance and exact Git publication/readback. The
+next semantic slice is HGI-207 decisions. These local records do not prove
+publication, registry state,
 external consumers, API/docs production behavior, or release authority.

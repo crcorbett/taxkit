@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-201",
+  "status": "accepted",
+  "observedAt": "2026-07-21T00:54:21+01:00",
+  "authority": "local TaxKit documentation, skill-policy, Git commit, push to main, and read-only remote ref readback; no provider, release, or publication operation",
+  "baseCommit": "080583d499d88136a7d5b87e74892ba1bbb98f20",
+  "semanticCommit": "291374b48ec7bc566f2290c1adf2acac436da482",
+  "semanticTree": "0399694142d57a191f9616ecdcf26b797d84708e",
+  "changedPathCount": 18,
+  "sortedChangedPathSha256": "48af6d4055d07500e24acca7fdbb20bddad3cddf8735c2ed477edb4dc43aba00",
+  "candidateReceiptSha256": "f0e56825b0f191bc42e8f7f47b20b97391eeaa8d5cbac86cf1cb689eb2de7c13",
+  "checks": [
+    {
+      "check": "evaluator-driven contradiction correction",
+      "status": "passed",
+      "result": "The first evaluator exposed fixed three-pass ritual in two omitted current owners and phrase-only coverage; both owners and the test model were corrected before acceptance."
+    },
+    {
+      "check": "semantic policy fixtures",
+      "status": "passed",
+      "result": "Twelve skill-policy tests traverse all ten current owners, reject fixed coordination counts, reject generic SDK callbacks, raw string IDs, primitive config, instanceof policy, and unchecked SDK output, and accept the owned provider boundary."
+    },
+    {
+      "check": "repository verification",
+      "status": "passed",
+      "result": "quick_validate accepted docs-writer; repository path/type, Effect language-service, lint, format, skill, Knip, production Knip, and all 23 workspace type/build tasks passed."
+    },
+    {
+      "check": "fresh-context final acceptance",
+      "status": "passed",
+      "result": "An independent worker reproduced quick validation and the 12 policy tests, confirmed clean-clone routing and the Effect/package/React contracts, and found no blocker."
+    },
+    {
+      "check": "Git publication/readback",
+      "status": "passed",
+      "result": "After push and fetch, local HEAD and origin/main both resolved to 291374b48ec7bc566f2290c1adf2acac436da482."
+    }
+  ],
+  "postcondition": "TaxKit HGI-201 has accepted current PRD/implementation guidance and semantic contradiction enforcement; HGI-207 is the next independent decision gate.",
+  "rollback": "Revert the closeout evidence commit, then semantic commit 291374b48ec7bc566f2290c1adf2acac436da482; preserve HGI-200 and retained historical/public evidence.",
+  "limitations": [
+    "This receipt proves repository guidance, tests, and Git publication only.",
+    "HGI-203 proof and HGI-204 runbook owners remain intentionally absent until their dependencies are satisfied."
+  ],
+  "nonClaims": [
+    "No release, publication, registry, provider, deployment, production, external-consumer, or external-planning state is proved or changed."
+  ]
+}

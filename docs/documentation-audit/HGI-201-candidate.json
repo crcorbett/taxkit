@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "taskId": "HGI-201",
-  "status": "accepted-pending-git-receipt",
+  "status": "accepted",
   "observedAt": "2026-07-20T23:48:13Z",
   "baseCommit": "080583d499d88136a7d5b87e74892ba1bbb98f20",
   "authority": "local TaxKit documentation and skill-policy changes with local checks only",
@@ -98,7 +98,7 @@
     }
   ],
   "limitations": [
-    "A scoped Git receipt and remote readback remain required before HGI-201 closes.",
+    "This receipt and HGI-201-validation.json prove repository guidance/tests and Git publication only.",
     "Local checks do not prove release, publication, registry, provider, deployment, production, or external consumer state."
   ],
   "nonClaims": [
@@ -106,5 +106,5 @@
     "No target-owned runbook or verification route was created."
   ],
   "rollback": "Revert this bounded HGI-201 candidate slice; leave HGI-200 and retained historical/public evidence untouched.",
-  "nextTrigger": "Commit and publish the accepted semantic slice, record exact Git identity/readback, then proceed with HGI-207."
+  "nextTrigger": "Use HGI-201-validation.json for Git/readback identity and proceed with HGI-207."
 }
