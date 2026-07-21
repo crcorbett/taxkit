@@ -67,7 +67,7 @@
   ],
   "verification": [
     {
-      "check": "python3 /Users/cooper/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/docs-writer",
+      "check": "installed skill-creator quick_validate.py against .agents/skills/docs-writer",
       "status": "passed",
       "result": "Skill is valid."
     },
