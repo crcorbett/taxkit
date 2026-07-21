@@ -35,4 +35,9 @@ Always:
 8. apply every supported finding to the SPEC/tasks and run the repository's real
    documentation, lint, typecheck, test, build, and skill checks that apply.
 
+Invoke `$docs-maintainer` while landing review findings. Require its complete
+`Change required`/`Preserve`/`N/A` impact ledger and owner-specific proof;
+do not let `$docs-writer` substitute for maintenance, lifecycle, generated,
+package, runbook, proof, or validation work.
+
 Report only edits made, evidence, commands, and genuine unresolved blockers.

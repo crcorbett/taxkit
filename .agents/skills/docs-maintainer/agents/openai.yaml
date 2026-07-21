@@ -1,0 +1,4 @@
+interface:
+  display_name: "TaxKit Docs Maintainer"
+  short_description: "Keep TaxKit documentation owners aligned"
+  default_prompt: "Use $docs-maintainer to assess this TaxKit change and update the correct documentation owners."

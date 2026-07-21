@@ -1,0 +1,4 @@
+interface:
+  display_name: "TaxKit Public Copy Writer"
+  short_description: "Write reader-focused TaxKit public copy"
+  default_prompt: "Use $docs-writer after $docs-maintainer has selected the owner to improve this TaxKit public page for reader fit."

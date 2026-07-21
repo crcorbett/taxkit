@@ -29,6 +29,11 @@ understand TaxKit. Use DeepWiki through Executor MCP only for upstream packages
 or libraries such as Effect, TanStack, Fumadocs, Knip, or Oxlint. Never use
 DeepWiki as a substitute for inspecting this checkout.
 
+Invoke `$docs-maintainer` during impact design and again when the SPEC/tasks
+land. Its complete `Change required`/`Preserve`/`N/A` ledger routes public,
+generated, package, lifecycle, runbook, proof and ordinary documentation
+surfaces; `$docs-writer` may only refine public copy after that route.
+
 ## Edit-First Review
 
 - Edit the SPEC and sibling task list as soon as a material finding is proven.

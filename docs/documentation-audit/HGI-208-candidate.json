@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-208",
+  "status": "local-candidate",
+  "observedAt": "2026-07-21T23:14:39Z",
+  "baseCommit": "7710d2e10a5161f878d0454455c22b98ce769b71",
+  "authority": "local TaxKit repository writes and local checks only",
+  "outcome": "One portable repository-local docs-maintainer skill owns documentation maintenance. docs-writer is retained only for public-copy wording after docs-maintainer selects the owner.",
+  "impactLedger": [
+    {"surface":"root route","decision":"Change required","paths":["AGENTS.md","docs/README.md"],"evidence":"Material triggers and ordinary-change route now name docs-maintainer.","nonClaim":"No external documentation state."},
+    {"surface":"maintainer skill/profile/UI","decision":"Change required","paths":[".agents/skills/docs-maintainer/SKILL.md",".agents/skills/docs-maintainer/agents/openai.yaml",".agents/skills/docs-maintainer/references/repository-profile.md"],"evidence":"Local skill maps all owner classes and exact commands without global paths.","nonClaim":"Skill retrieval proves no runtime behaviour."},
+    {"surface":"docs-writer and Claude mirrors","decision":"Change required","paths":[".agents/skills/docs-writer/SKILL.md",".agents/skills/docs-writer/agents/openai.yaml",".claude/skills/docs-maintainer",".claude/skills/docs-writer"],"evidence":"Writer is public-copy-only with matching UI metadata; both relative mirrors resolve their canonical local skills.","nonClaim":"No external agent installation is changed."},
+    {"surface":"PRD lifecycle","decision":"Change required","paths":[".agents/skills/prd-writer/SKILL.md",".agents/skills/prd-review/SKILL.md",".agents/skills/prd-implementer/SKILL.md"],"evidence":"Design, review landing, each material slice and closeout invoke docs-maintainer.","nonClaim":"No planning workspace mutation."},
+    {"surface":"skill policy and fixtures","decision":"Change required","paths":["tools/skills/skill-policies.test.ts","tools/skills/fixtures/hgi-208/**"],"evidence":"Mechanical negative fixtures cover missing impact, competing owner, generated output, lifecycle, mirror and portability.","nonClaim":"Fixtures do not prove fresh-worker performance."},
+    {"surface":"calculator rules and schemas","decision":"N/A","paths":["packages/calculators/**","packages/rules/**"],"evidence":"No calculator implementation changes; the profile routes future changes to their source and consumer owners.","nonClaim":"No calculation behaviour checked."},
+    {"surface":"SDK exports/examples","decision":"N/A","paths":["packages/sdk/typescript/**"],"evidence":"No SDK change; profile requires export-map, README and packed-consumer proof when affected.","nonClaim":"No package or consumer proof run."},
+    {"surface":"HTTP/OpenAPI and public runtime","decision":"N/A","paths":["packages/api/http/**","apps/docs/**","packages/docs-content/**","packages/docs-fumadocs/**"],"evidence":"No API, generated OpenAPI, MDX, navigation or Fumadocs source change.","nonClaim":"No API/docs runtime, SSR, hydration or deployment proof."},
+    {"surface":"package READMEs and architecture/standards","decision":"Preserve","paths":["README.md","apps/*/README.md","packages/**/README.md","docs/architecture/**","docs/standards/**"],"evidence":"Only routing language changes; canonical owners remain current.","nonClaim":"No package contract change."},
+    {"surface":"commands, CI, versioning and release proof","decision":"N/A","paths":["package.json",".github/**",".changeset/**","docs/evidence/releases/**","docs/runbooks/**"],"evidence":"No command, workflow, version, release or runbook behaviour change; skill routes future changes to their owners.","nonClaim":"No release, publication, registry, provider or deployment operation."},
+    {"surface":"dated audit evidence","decision":"Change required","paths":["docs/documentation-audit/HGI-208-candidate.json","docs/documentation-audit/README.md"],"evidence":"Candidate records the bounded local slice and its nonclaims.","nonClaim":"Candidate is not acceptance, Git publication or external evidence."}
+  ],
+  "checks": [
+    {"command":"quick_validate.py for docs-maintainer, docs-writer, prd-writer, prd-review and prd-implementer","status":"passed","postcondition":"All five repository-local skill packages are structurally valid."},
+    {"command":"bun run test:skills","status":"passed","postcondition":"16 tests and 125 assertions accepted singular ownership, mirrors/UI metadata, PRD routes, boundary compatibility and every HGI-208 negative fixture."},
+    {"command":"bun run check:docs","status":"passed","postcondition":"0 violations across 589 inspected paths; 120 maintainer and 62 public paths remained correctly classified."},
+    {"command":"bun run check:repository-paths","status":"passed","postcondition":"568 text and 8 binary tracked paths passed checkout-portability policy."},
+    {"command":"bun run verification","status":"passed","postcondition":"Repository path/docs types and checks, Effect language-service check, lint, format, skill tests, Knip, production Knip and 23 typecheck/build tasks passed after the final profile/metadata hardening."},
+    {"command":"git diff --check","status":"passed","postcondition":"The complete local candidate patch has no whitespace errors."}
+  ],
+  "forwardTests": {
+    "status": "passed",
+    "workers": 2,
+    "scenarios": [
+      {"id":"HGI208-CALCULATOR","status":"passed","postcondition":"The fresh worker selected rule/schema, package/public/architecture and consumer-proof owners without copying rule truth."},
+      {"id":"HGI208-SDK-EXPORT","status":"passed","postcondition":"The fresh worker selected source/export maps, package/public examples and packed/downstream consumer proof while preserving Effect/client boundaries."},
+      {"id":"HGI208-OPENAPI","status":"passed","postcondition":"The fresh worker kept HTTP Schema authoritative, regenerated checked OpenAPI/Fumadocs owners and rejected hand-edited output or deployment inference."},
+      {"id":"HGI208-PUBLIC-LIFECYCLE","status":"passed","postcondition":"The fresh worker required one strict addressable record and one-to-one owner-policy binding for the exact page and preserved independent draft navigation and availability nonclaims."},
+      {"id":"HGI208-CI-RELEASE","status":"passed","postcondition":"The fresh worker routed CI, versioning, runbook and bounded release-proof owners and refused publication/provider claims."},
+      {"id":"HGI208-PORTABILITY","status":"passed","postcondition":"The fresh worker used only checked-in skill/profile/mirror/metadata/routes and named no personal or global dependency."}
+    ],
+    "nonClaim": "Fresh-context routing proves no product change, release, deployment, publication, registry/provider state or external consumer behaviour."
+  },
+  "limitations": [
+    "This local candidate does not prove fresh-worker behaviour; independent scenarios remain pending.",
+    "It does not establish deployment, SSR, hydration, publication, registry, provider state or consumer behaviour."
+  ],
+  "nonClaims": [
+    "No release, registry, provider, deployment, public-site or external system is accessed or changed.",
+    "No generated or public/package implementation truth is copied into the skill."
+  ],
+  "rollback": "Revert the docs-maintainer skill, mirror, writer narrowing, PRD routes, policy fixtures and candidate together.",
+  "nextTrigger": "Run independent fresh-context scenarios and record their separate acceptance result."
+}

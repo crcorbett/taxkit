@@ -35,6 +35,10 @@ Current HGI-207 decision records:
 - [`HGI-207-candidate.json`](HGI-207-candidate.json)
 - [`HGI-207-validation.json`](HGI-207-validation.json)
 
+Current HGI-208 local candidate:
+
+- [`HGI-208-candidate.json`](HGI-208-candidate.json)
+
 ## Current docs inventory
 
 Current tracked documentation entrypoints:

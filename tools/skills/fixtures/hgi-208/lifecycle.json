@@ -1,0 +1,8 @@
+{
+  "impactLedger": "complete",
+  "maintenanceOwners": ["docs-maintainer"],
+  "generated": "source-and-check",
+  "lifecycle": "prose-only",
+  "mirror": "valid",
+  "portable": true
+}

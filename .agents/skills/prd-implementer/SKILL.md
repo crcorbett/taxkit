@@ -33,6 +33,11 @@ Fumadocs, Knip, or Oxlint; never use it to inspect the local codebase.
   evidence synchronized with the implementation.
 - Preserve unrelated user changes and stop before overwriting overlapping work.
 
+Invoke `$docs-maintainer` in every material implementation slice and at
+closeout. It selects the canonical owner and records the complete `Change
+required`/`Preserve`/`N/A` ledger before the slice is accepted; `$docs-writer`
+is only a later public-copy aid and never a maintenance substitute.
+
 ## Required Impact Ledger
 
 Before accepting each task, update the SPEC/task path-evidenced ledger. Mark each

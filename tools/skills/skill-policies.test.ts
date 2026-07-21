@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { lstatSync, readFileSync, readlinkSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "../..");
@@ -103,6 +103,38 @@ const typescriptFences = (source: string) =>
     source.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/gu),
     (match) => match[1] ?? ""
   ).join("\n");
+
+interface Hgi208Fixture {
+  readonly impactLedger: string;
+  readonly maintenanceOwners: readonly string[];
+  readonly generated: string;
+  readonly lifecycle: string;
+  readonly mirror: string;
+  readonly portable: boolean;
+}
+
+const readHgi208Fixture = (name: string): Hgi208Fixture => {
+  const fixture: Hgi208Fixture = JSON.parse(
+    readFileSync(
+      resolve(root, "tools/skills/fixtures/hgi-208", `${name}.json`),
+      "utf-8"
+    )
+  );
+
+  return fixture;
+};
+
+const classifyHgi208Fixture = (fixture: Hgi208Fixture) =>
+  [
+    fixture.impactLedger === "complete" ? null : "missing-impact",
+    fixture.maintenanceOwners.join(",") === "docs-maintainer"
+      ? null
+      : "competing-maintenance-skill",
+    fixture.generated === "source-and-check" ? null : "stale-generated-docs",
+    fixture.lifecycle === "accepted-record-and-binding" ? null : "lifecycle",
+    fixture.mirror === "valid" ? null : "mirror",
+    fixture.portable ? null : "personal-path-dependency",
+  ].filter((reason): reason is string => reason !== null);
 
 describe("repo-owned skill policy", () => {
   test("prd skills require edit-first path-evidenced impact ledgers", () => {
@@ -310,5 +342,75 @@ describe("repo-owned skill policy", () => {
       expect(metadata).toContain("short_description:");
       expect(metadata).toContain(`$${name}`);
     }
+  });
+
+  test("HGI-208 docs maintainer has one portable maintenance owner", () => {
+    const maintainer = readSkill("docs-maintainer");
+    const writer = readSkill("docs-writer");
+    const profile = readFileSync(
+      resolve(
+        root,
+        ".agents/skills/docs-maintainer/references/repository-profile.md"
+      ),
+      "utf-8"
+    );
+    const metadata = readMetadata("docs-maintainer");
+    const personalRoot = ["", "Users", "cooper"].join("/");
+
+    expect(maintainer).toContain("Change required");
+    expect(maintainer).toContain("Preserve");
+    expect(maintainer).toContain("N/A");
+    expect(maintainer).toContain("report-only");
+    expect(maintainer).toContain("never hand-edit");
+    expect(maintainer).toContain("accepted record");
+    expect(maintainer).not.toContain(personalRoot);
+    expect(profile).toContain("git rev-parse --show-toplevel");
+    expect(profile).not.toContain(personalRoot);
+    expect(writer).toContain("does not own");
+    expect(writer).not.toContain(
+      "Use this skill for TaxKit documentation work"
+    );
+    expect(metadata).toContain("$docs-maintainer");
+    expect(readMetadata("docs-writer")).toContain("$docs-writer");
+    expect(profile).toContain("tools/documentation/owner-policy.json");
+    expect(profile).toContain("public.statusDecision.acceptanceRecords");
+    expect(profile).toContain("packages/api/http/__snapshots__/openapi.json");
+  });
+
+  test("HGI-208 Claude mirror points at the local canonical skill", () => {
+    const mirror = resolve(root, ".claude/skills/docs-maintainer");
+
+    expect(lstatSync(mirror).isSymbolicLink()).toBe(true);
+    expect(readlinkSync(mirror)).toBe("../../.agents/skills/docs-maintainer");
+  });
+
+  test("HGI-208 negative fixtures reject documentation governance gaps", () => {
+    expect(classifyHgi208Fixture(readHgi208Fixture("accepted"))).toEqual([]);
+    expect(classifyHgi208Fixture(readHgi208Fixture("missing-impact"))).toEqual([
+      "missing-impact",
+    ]);
+    expect(classifyHgi208Fixture(readHgi208Fixture("competing-skill"))).toEqual(
+      ["competing-maintenance-skill"]
+    );
+    expect(
+      classifyHgi208Fixture(readHgi208Fixture("stale-generated-docs"))
+    ).toEqual(["stale-generated-docs"]);
+    expect(classifyHgi208Fixture(readHgi208Fixture("lifecycle"))).toEqual([
+      "lifecycle",
+    ]);
+    expect(classifyHgi208Fixture(readHgi208Fixture("mirror"))).toEqual([
+      "mirror",
+    ]);
+    expect(classifyHgi208Fixture(readHgi208Fixture("personal-path"))).toEqual([
+      "personal-path-dependency",
+    ]);
+  });
+
+  test("HGI-208 PRD routes invoke docs maintainer at all material boundaries", () => {
+    expect(readSkill("prd-writer")).toContain("$docs-maintainer");
+    expect(readSkill("prd-review")).toContain("$docs-maintainer");
+    const implementer = readSkill("prd-implementer");
+    expect(implementer).toContain("every material implementation slice");
+    expect(implementer).toContain("closeout");
   });
 });

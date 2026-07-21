@@ -71,6 +71,14 @@ earliest durable owner and necessary pointers in the same slice. Counts prove
 accounting only; semantic and consumer claims need owner review and
 boundary-matched proof.
 
+Use the repository-local `$docs-maintainer` skill for this impact decision on
+both PRD and ordinary changes. `$docs-writer` is limited to public-copy wording
+after the maintenance route has selected the owner; it cannot close lifecycle,
+generated-content, package, proof, or validation work. Background freshness
+scans produce report-only candidates and cannot publish policy or documentation
+without separately attached implementation authority, review and publication
+identity.
+
 `bun run check:docs` enforces the mechanical owner contract in
 [`../tools/documentation/owner-policy.json`](../tools/documentation/owner-policy.json).
 It checks maintainer metadata, links, documented commands, workspace README

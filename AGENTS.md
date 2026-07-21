@@ -26,6 +26,14 @@ file; edit `AGENTS.md` only.
 6. Retain artifact identity, authority, postconditions, limitations,
    non-claims, and rollback.
 
+For any material calculator/rule/schema, SDK/export/example, HTTP/OpenAPI,
+public MDX/navigation/runtime, package/app, command/CI/versioning/release-proof,
+lifecycle, SPEC, plan, runbook, or skill change, invoke the repository-local
+`$docs-maintainer` route before accepting the slice. Record `Change required`,
+`Preserve`, or evidenced `N/A` for its documentation impact. Scheduled or
+background freshness work is report-only candidate output unless a separately
+attached implementation authority names the reviewer and publisher.
+
 ## Task routes
 
 - Repository and package topology:

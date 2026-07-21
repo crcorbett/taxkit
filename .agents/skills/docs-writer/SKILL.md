@@ -1,91 +1,25 @@
 ---
 name: docs-writer
-description: "Use when writing or editing TaxKit developer documentation, MDX pages, package READMEs, contribution guides, docs specs, or documentation task lists so the work follows the canonical documentation style and templates."
+description: "Write or revise TaxKit public-facing explanatory copy after documentation ownership, lifecycle, generated-content, package, and verification impacts have been resolved by docs-maintainer. Use for reader-focused wording, examples, headings, and page-template fit only."
 ---
 
-# Docs writer
+# TaxKit public-copy writer
 
-Use this skill for TaxKit documentation work.
+Use this narrow skill only after `$docs-maintainer` has decided the semantic
+owner and impact ledger. It owns reader fit, clear Australian English, page
+template choice, headings, examples and public-copy review; it does not own
+documentation maintenance, lifecycle, generated content, package READMEs,
+runbooks, proof, skills, impact decisions, commands or validation.
 
-## Start here
+Read `docs/standards/documentation-style.md`,
+`docs/standards/documentation-writing.md`,
+`docs/standards/documentation-templates.md`,
+`docs/standards/documentation-review.md`,
+`docs/standards/documentation-architecture.md`,
+`docs/standards/documentation-user-journeys.md`, and the target public
+page/template and reader-journey owner.
+Keep public MDX task-first, link rather than duplicate architecture, and use
+current schema-derived names supplied by the owning implementation.
 
-Read first:
-
-1. `docs/standards/documentation-style.md`
-2. `docs/standards/documentation-writing.md`
-3. `docs/standards/documentation-templates.md`, then the specific template
-   file under `docs/standards/documentation-templates/` that matches the page
-   type
-4. `docs/standards/documentation-review.md`
-5. `docs/standards/documentation-architecture.md`
-6. `docs/standards/documentation-user-journeys.md`, then the specific journey
-   file under `docs/standards/documentation-user-journeys/` that matches the
-   target reader
-7. the relevant docs architecture page, usually
-   `docs/architecture/content-and-posts.md`
-8. any page, README, spec or task list being edited
-
-## Required style
-
-Follow the documentation standards suite thoroughly:
-
-- write in second person
-- use Australian spelling
-- use sentence-case headings and sidebar labels
-- keep prose brief, clear, straightforward and sophisticated
-- avoid marketing language and banned hype words
-- choose the documented page template that fits the page type
-- add or update a template before creating a new repeatable page type
-- identify the primary reader and reader need before writing
-- use architecture diagrams or flowcharts only when useful
-- avoid sequence diagrams unless they are clearly the best representation
-- use current SDK/API names and canonical schema/type references
-- review with the audit lists in `docs/standards/documentation-review.md`
-
-## Task-list rule
-
-When creating or editing a documentation task list, every task that writes or
-changes docs must require implementers to read and follow the documentation
-standards suite:
-
-- `docs/standards/documentation-style.md`
-- `docs/standards/documentation-writing.md`
-- `docs/standards/documentation-templates.md`
-- the specific template file in `docs/standards/documentation-templates/`
-- `docs/standards/documentation-review.md`
-- `docs/standards/documentation-architecture.md`
-- `docs/standards/documentation-user-journeys.md`
-- the specific journey file in `docs/standards/documentation-user-journeys/`
-
-The task's verification or completion criteria must include parent review for:
-
-- reader fit and user journey
-- voice and Australian spelling
-- sentence-case headings
-- absence of marketing language
-- correct page template, or a documented new template
-- useful diagrams only
-- current SDK/API names
-- canonical schema/type references
-- link and source-of-truth accuracy
-- boundary-matched semantic review evidence for substantial docs-runtime,
-  docs-wiring or public MDX structure work
-- for delegated tasks, a stated independent-proof, adversarial-review, or
-  disjoint-write rationale plus primary-owner review and recovery from an
-  observed blocker; worker and correction-turn counts are never acceptance
-  proof
-
-## Output expectations
-
-For a small docs edit, update the page and run the narrowest useful validation.
-
-For a new docs section or MDX set, update:
-
-- the content pages
-- the navigation or index page
-- the relevant architecture or standards doc when ownership changes
-- the task list or exec plan when implementation sequencing changes
-
-Run `bun run verification` when docs wiring, package READMEs, specs or task
-lists change. For docs-only changes, state the no-changeset rationale unless a
-package-facing README or package behaviour changed.
+Return the copy change and reader-fit review to `$docs-maintainer`, which runs
+the owner-specific checks and closes the slice.

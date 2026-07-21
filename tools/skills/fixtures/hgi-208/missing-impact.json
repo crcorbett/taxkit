@@ -1,0 +1,8 @@
+{
+  "impactLedger": "missing",
+  "maintenanceOwners": ["docs-maintainer"],
+  "generated": "source-and-check",
+  "lifecycle": "accepted-record-and-binding",
+  "mirror": "valid",
+  "portable": true
+}
