@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "taskId": "HGI-202",
-  "status": "candidate",
-  "observedAt": "2026-07-21T22:46:57Z",
+  "status": "accepted",
+  "observedAt": "2026-07-21T22:49:36Z",
   "authority": "local TaxKit repository writes and verification only; no Git publication/readback, release, publication, registry, deployment, provider, credential, or external-state access",
   "baseCommit": "b102e018cd10a7e5da740451e79905f6e1ff4ad3",
-  "semanticCommit": null,
-  "semanticTree": null,
+  "semanticCommit": "5e44261a9bb631415ae02b7afcbb68ef86bd8b68",
+  "semanticTree": "9d672574b2199c541562952ff9b591156b609bea",
   "changedPathCount": 26,
   "sortedChangedPathSha256": "97f2af10391de1bf7770f33a16437c19975a3a1664358b43aa8ec5993ad0232a",
   "candidateSha256": "5c66782140d9be207ddfb04e61e9458f2d7e022ec9ee2e41801c6c6843300a3e",
@@ -29,12 +29,12 @@
     },
     {
       "check": "Git publication and readback",
-      "status": "pending",
-      "result": "No semantic commit, push, fetch, or origin/main readback exists for this candidate yet."
+      "status": "passed",
+      "result": "Semantic commit 5e44261a9bb631415ae02b7afcbb68ef86bd8b68 has parent b102e018cd10a7e5da740451e79905f6e1ff4ad3, tree 9d672574b2199c541562952ff9b591156b609bea, 26 declared paths, and sorted-path digest 97f2af10391de1bf7770f33a16437c19975a3a1664358b43aa8ec5993ad0232a; after push and fetch, local HEAD and origin/main both matched the semantic commit."
     }
   ],
-  "postcondition": "The local documentation-policy candidate is independently accepted but not yet committed, pushed, or read back from origin/main.",
-  "rollback": "Before publication, revert the bounded local HGI-202 slice. After publication, revert the future closeout then semantic commit while preserving HGI-202-S1 evidence.",
+  "postcondition": "The independently accepted HGI-202 documentation-policy candidate is committed, pushed to main, and read back from origin/main with exact semantic identity.",
+  "rollback": "Revert the closeout evidence commit, then semantic commit 5e44261a9bb631415ae02b7afcbb68ef86bd8b68 while preserving HGI-202-S1 evidence.",
   "limitations": [
     "Repository checks and Git identity do not establish public-site, registry, provider, release, or deployment state.",
     "HGI-208 and later release-proof/runbook work remain separate successors."

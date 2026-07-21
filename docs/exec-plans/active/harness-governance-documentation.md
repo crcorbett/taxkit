@@ -34,13 +34,15 @@ deletion/movement require separately approved authority and target runbooks.
   `published` semantics, transient tarball handling, and sanitized release
   receipt retention while preserving publication/deployment non-claims. See
   [`hgi-207/README.md`](../../documentation-audit/hgi-207/README.md).
-- **HGI-202 — completed locally:** the mechanical owner contract, Effect-native
+- **HGI-202 — completed and published:** the mechanical owner contract, Effect-native
   bounded `check:docs` gate, exact lint boundaries, public status and navigation
   ownership controls, and positive/negative fixtures are recorded in
   [`HGI-202-candidate.json`](../../documentation-audit/HGI-202-candidate.json)
   and [`HGI-202-receipt.json`](../../documentation-audit/HGI-202-receipt.json).
-  It does not claim a commit, push, release, publication, deployment, or
-  external availability.
+  Exact semantic Git identity and origin/main readback are recorded in
+  [`HGI-202-validation.json`](../../documentation-audit/HGI-202-validation.json).
+  This does not claim a release, public-doc publication, deployment, provider
+  state, or external availability.
 - HGI-208 (docs-maintenance skill) depends on completed HGI-202 and is next.
 - HGI-203 (critical journeys/release proof) depends on HGI-202 and HGI-208;
   HGI-204 (runbooks) depends on HGI-203.
