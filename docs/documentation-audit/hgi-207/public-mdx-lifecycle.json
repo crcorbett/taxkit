@@ -1,0 +1,30 @@
+{
+  "id": "DEC-TAXKIT-HGI-207-PUBLIC-MDX-LIFECYCLE",
+  "state": "deferred",
+  "semanticOwner": "TaxKit product owner with the apps/docs public-doc owner",
+  "evidence": [
+    "The source receipt records that apps/docs/navigation.json and all 61 tracked public MDX files declare draft.",
+    "apps/docs/navigation.schema.json accepts a string status but does not define draft semantics.",
+    "docs/README.md separates public docs from maintainer-document lifecycle policy."
+  ],
+  "rejectedAlternatives": [
+    "Treat draft as proof that the public site is unpublished or unavailable; local content metadata cannot establish external availability.",
+    "Treat draft as accepted current public truth; no product-owner decision defines that consequence.",
+    "Change public MDX or navigation status in this decision-draft slice."
+  ],
+  "acceptedOrDefaultBehavior": "Preserve the existing draft metadata and navigation in place. Until the named owners define draft semantics, downstream controls must treat it as an unresolved public-content lifecycle marker and must not infer publication, accuracy, availability, or an accepted-current state from it.",
+  "affectedTasks": ["HGI-202", "HGI-203", "HGI-205"],
+  "taskBlocking": [
+    {"taskId": "HGI-202", "blocks": true, "inheritedNonClaim": "No semantic public-doc lifecycle or public availability is established."},
+    {"taskId": "HGI-203", "blocks": false, "inheritedNonClaim": "Journey proof cannot treat draft metadata as public-runtime proof."},
+    {"taskId": "HGI-205", "blocks": true, "inheritedNonClaim": "Automation cannot enforce an unchosen draft consequence."}
+  ],
+  "authorityImpact": "Only the named product owner and public-doc owner may choose the semantic consequence of draft; this local record grants no public-site, provider, publication, or deployment authority.",
+  "nonClaims": [
+    "Draft metadata does not prove public publication, unpublication, runtime availability, correctness, or user visibility.",
+    "This record does not change any public MDX, navigation, generated source, or docs runtime."
+  ],
+  "carryingCost": "Keep the unresolved marker visible in HGI-202 and HGI-205 planning and recheck the metadata inventory when its semantics are chosen.",
+  "reviewOrResumeTrigger": "The TaxKit product owner and apps/docs owner choose and record the meaning, permitted use, and transition authority for draft.",
+  "receipt": {"path": "./source-receipt.json", "sha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea"}
+}

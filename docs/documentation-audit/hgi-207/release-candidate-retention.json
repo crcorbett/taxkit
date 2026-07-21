@@ -1,0 +1,30 @@
+{
+  "id": "DEC-TAXKIT-HGI-207-RELEASE-CANDIDATE-RETENTION",
+  "state": "deferred",
+  "semanticOwner": "TaxKit release maintainer",
+  "evidence": [
+    "The source receipt found no retained release-candidate directory in the repository inventory.",
+    "docs/standards/versioning.md defines private package versioning and future publication conditions, but not an immutable candidate-retention policy.",
+    "packages/scripts/README.md documents local packed-artifact validation but not candidate identity, storage, retention, promotion, or recovery."
+  ],
+  "rejectedAlternatives": [
+    "Treat each locally packed tarball as a retained immutable candidate before publication exists.",
+    "Treat a successful local release:check or packed-artifact check as a retained candidate or publication proof.",
+    "Add candidate storage or artifact movement in this decision-draft slice."
+  ],
+  "acceptedOrDefaultBehavior": "No repository-local candidate-retention class is established. Local packed artifacts remain check inputs only; they must not be represented as immutable, promotable, retained, published, or externally available candidates until the release maintainer chooses an artifact identity, storage location, retention period, promotion boundary, recovery procedure, and authority model.",
+  "affectedTasks": ["HGI-203", "HGI-204", "HGI-205"],
+  "taskBlocking": [
+    {"taskId": "HGI-203", "blocks": true, "inheritedNonClaim": "Packed-artifact validation does not create an immutable release candidate."},
+    {"taskId": "HGI-204", "blocks": true, "inheritedNonClaim": "No runbook may promise candidate retention, promotion, or recovery without a chosen candidate contract."},
+    {"taskId": "HGI-205", "blocks": true, "inheritedNonClaim": "Automation cannot retain or promote an undefined candidate class."}
+  ],
+  "authorityImpact": "Choosing candidate storage or promotion would introduce release-artifact authority; this local record grants none.",
+  "nonClaims": [
+    "No immutable candidate artifact, retention period, storage location, promotion route, registry state, or publication exists by virtue of this record.",
+    "No package tarball was created, moved, retained, published, or deleted."
+  ],
+  "carryingCost": "Keep release proof and recovery work explicitly blocked on the candidate contract rather than encoding an accidental filesystem convention.",
+  "reviewOrResumeTrigger": "The TaxKit release maintainer approves a candidate identity, storage, immutability mechanism, retention and deletion policy, promotion authority, recovery path, and boundary-matched readback.",
+  "receipt": {"path": "./source-receipt.json", "sha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea"}
+}

@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-17
-source_of_truth: documentation-audit
-confidence: high
+document_type: evidence-index
+lifecycle: evidence
+authority: supporting
+owner: taxkit-documentation-owner
+last_reviewed: 2026-07-21
+review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
 # Documentation audit
@@ -21,6 +23,10 @@ Current HGI-200 receipts:
 - [`HGI-201-candidate.json`](HGI-201-candidate.json)
 - [`HGI-201-validation.json`](HGI-201-validation.json)
 - [`HGI-200-validation.json`](HGI-200-validation.json)
+
+Current HGI-207 decision draft:
+
+- [`hgi-207/README.md`](hgi-207/README.md)
 
 ## Current docs inventory
 

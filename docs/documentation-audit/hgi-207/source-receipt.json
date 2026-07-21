@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-207",
+  "slice": "decision-draft",
+  "status": "observed",
+  "observedAt": "2026-07-21T01:00:22+01:00",
+  "baseCommit": "7f0e357fc0728bbbb0bd6a27facabf48857322bc",
+  "authority": "local TaxKit documentation writes and read-only local inspection only",
+  "inventory": {
+    "publicMdxFiles": 61,
+    "publicMdxDraftFiles": 61,
+    "navigationStatus": "draft",
+    "retainedReleaseCandidateDirectories": [],
+    "canonicalReleaseProofOrRunbookRoute": null
+  },
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "0f16dbf2c068e5f25188ae0951c556e0123744cafc89d059f691fa98e7de65c7",
+      "observation": "Local release checks do not authorize or prove publication; provider, registry, publication, release, and deployment operations require named authority, a receipt, rollback or revocation, and readback."
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "08f7fd10f16ec7b2dffa9a14e329d3c017242fc541d6feea99592014484ddecb",
+      "observation": "Public docs are a separate product surface; historical, public, and binary evidence must not be moved or deleted without an approved retention manifest; canonical release-proof and runbook routes do not yet exist."
+    },
+    {
+      "path": "docs/product-specs/harness-governance-documentation.md",
+      "sha256": "9e90bb403f23d1267f4c10af552a60269325a07780116bef7b4232e3ddee9ca8",
+      "observation": "HGI-207 is the next decision gate and the local campaign explicitly does not prove publication, registry, deployment, credentials, or external-consumer behavior."
+    },
+    {
+      "path": "docs/exec-plans/active/harness-governance-documentation.md",
+      "sha256": "c80a56b1d5808d8dd2653df3b5d82754ea4f6457a8cf35e057516c8829bfa6e8",
+      "observation": "HGI-207 is dependency-ready and release, publication, registry, deployment, provider, credential, and evidence movement require separately approved authority and target runbooks."
+    },
+    {
+      "path": "apps/docs/navigation.json",
+      "sha256": "d9a661669c010adcc979c0f4c4394bf248aa7b614e20a5893369d900dc3c7dad",
+      "observation": "The authored navigation status is draft; all 61 tracked public MDX files also declare status draft."
+    },
+    {
+      "path": "apps/docs/navigation.schema.json",
+      "sha256": "97c923fc2042724fbbd86ccb588cdbdc00ddde6903cdf59554e97e135b326013",
+      "observation": "The navigation schema accepts a string status and does not define the semantic consequence of draft."
+    },
+    {
+      "path": "docs/standards/versioning.md",
+      "sha256": "70da3157338d543bd624bf24f8ae082e46e064b5d44b9de94f93b5ea2912f0dc",
+      "observation": "Changesets manage private package versions; future npm publication is conditional on later package readiness and removing private flags."
+    },
+    {
+      "path": "packages/scripts/README.md",
+      "sha256": "4da8fad9532455ba2c939112aa17576f9e2540c909f208eb8f14b42b0953ed1b",
+      "observation": "release:check records command outcomes and runs local package-owned gates, but it does not define retained candidate artifacts, log redaction, evidence location, or external publication/deployment proof."
+    }
+  ],
+  "limitations": [
+    "This receipt is a local source inventory, not public-site, registry, deployment, provider, or external-consumer readback.",
+    "An empty retained-candidate directory inventory does not prove that no candidate or release artifact exists outside the inspected repository paths."
+  ],
+  "nonClaims": [
+    "No public MDX, navigation, release artifact, evidence, runbook, provider, registry, publication, or deployment state was changed.",
+    "No maintainer approval or external authority was inferred from the inspected files."
+  ]
+}

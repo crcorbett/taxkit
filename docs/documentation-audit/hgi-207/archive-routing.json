@@ -1,0 +1,31 @@
+{
+  "id": "DEC-TAXKIT-HGI-207-ARCHIVE-ROUTING",
+  "state": "accepted",
+  "semanticOwner": "TaxKit documentation owner through docs/README.md",
+  "evidence": [
+    "docs/README.md defines explicit lifecycle routes and says historical, public, and binary evidence must not be moved or deleted without an approved retention manifest.",
+    "The local HGI SPEC requires public docs, completed history, failed or inconclusive evidence, and binary artifacts to remain separately routed and retained until an approved manifest authorizes movement or deletion.",
+    "The active HGI plan records that HGI-200 preserved public content, binary evidence, and historical plans in place."
+  ],
+  "rejectedAlternatives": [
+    "Physically move implemented specs, completed plans, public docs, or binary evidence as part of HGI-207.",
+    "Delete or collapse retained historical, public, failed, inconclusive, or binary evidence after lifecycle classification.",
+    "Treat a decision record as an approved retention manifest."
+  ],
+  "acceptedOrDefaultBehavior": "Use strict lifecycle routing while retaining existing paths in place. Physical archive movement or deletion is unavailable unless a separately approved retention manifest names the targets, authority, retention basis, rollback or recovery, and readback.",
+  "affectedTasks": ["HGI-202", "HGI-203", "HGI-204", "HGI-205"],
+  "taskBlocking": [
+    {"taskId": "HGI-202", "blocks": false, "inheritedNonClaim": "Lifecycle routing does not make retained public content current public truth."},
+    {"taskId": "HGI-203", "blocks": false, "inheritedNonClaim": "Retained paths do not establish release-proof retention policy."},
+    {"taskId": "HGI-204", "blocks": false, "inheritedNonClaim": "Runbooks cannot authorize archive movement without a retention manifest."},
+    {"taskId": "HGI-205", "blocks": false, "inheritedNonClaim": "Controls may enforce routing but cannot authorize deletion or movement."}
+  ],
+  "authorityImpact": "This accepted local default preserves existing evidence and grants no deletion, movement, publication, registry, provider, or deployment authority.",
+  "nonClaims": [
+    "Strict lifecycle routing does not prove the historical implementation, public availability, release, or consumer behavior of a retained artifact.",
+    "No archive, history, public content, binary artifact, or evidence was moved or deleted."
+  ],
+  "carryingCost": "Maintain links and lifecycle metadata at retained paths; review any proposed retention manifest against the named evidence classes.",
+  "reviewOrResumeTrigger": "A proposed retention manifest names a bounded target set, named authority, retention basis, recovery path, and readback for physical movement or deletion.",
+  "receipt": {"path": "./source-receipt.json", "sha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea"}
+}
