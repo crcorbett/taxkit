@@ -23,6 +23,7 @@ Current HGI-200 receipts:
 - [`HGI-201-candidate.json`](HGI-201-candidate.json)
 - [`HGI-201-validation.json`](HGI-201-validation.json)
 - [`HGI-202-S1-candidate.json`](HGI-202-S1-candidate.json)
+- [`HGI-202-S1-validation.json`](HGI-202-S1-validation.json)
 - [`HGI-200-validation.json`](HGI-200-validation.json)
 
 Current HGI-207 decision records:

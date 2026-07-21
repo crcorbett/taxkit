@@ -38,8 +38,10 @@ deletion/movement require separately approved authority and target runbooks.
 - **HGI-202-S1 — accepted partial:** the mechanical owner contract,
   Effect-native bounded `check:docs` gate, remaining maintainer classifications,
   exact lint boundaries, and opaque-public-status proof passed repository
-  verification and fresh-context acceptance. This partial does not complete
-  HGI-202 or resolve HGI-207's product-owner decision.
+  verification, fresh-context acceptance, and exact Git publication/readback
+  in [`HGI-202-S1-validation.json`](../../documentation-audit/HGI-202-S1-validation.json).
+  This partial does not complete HGI-202 or resolve HGI-207's product-owner
+  decision.
 - HGI-202 (docs policy) depends on HGI-200, HGI-201, and HGI-207; HGI-208
   (docs-maintenance skill) depends on HGI-202.
 - HGI-203 (critical journeys/release proof) depends on HGI-202 and HGI-208;

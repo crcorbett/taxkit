@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-202-S1",
+  "parentTaskId": "HGI-202",
+  "status": "accepted-partial-published",
+  "observedAt": "2026-07-21T17:58:59Z",
+  "baseCommit": "d480303492c09954a7dafcdd1ba6ba22adf365cb",
+  "semanticCommit": "ec463ba12c91beaddec1f56a612312d98cdbb035",
+  "semanticTree": "88aabbbe8a7dfb6e306fe0cbdc9a6433101978da",
+  "changedPathCount": 28,
+  "sortedChangedPathSha256": "d9b4dde1c8c1cfad97d27fbab2a78387a462e189550ecd803f4b8bd130eba565",
+  "candidateReceiptSha256": "2766a5f8659ea4f7742f28f80daf0eb5a2d08bfefa563ce422b075849deaac4a",
+  "authority": "local TaxKit repository documentation-policy implementation, validation, commit, and main-branch push only",
+  "checks": [
+    {
+      "check": "bun run check:docs -- --json",
+      "status": "passed",
+      "result": "Bounded receipt reported 0 violations, 572 inspected paths, 120 maintainer paths, 62 public paths, no omitted diagnostics, and tmp/docs-policy-report.json as the full ignored detail path."
+    },
+    {
+      "check": "bun run check:docs:types and bun run test:documentation",
+      "status": "passed",
+      "result": "Tooling typecheck passed; seven focused policy/runtime tests passed with 15 assertions."
+    },
+    {
+      "check": "bun run verification",
+      "status": "passed",
+      "result": "Repository path checks, docs policy, Effect language service, exact lint boundaries, format, 12 skill tests, both Knip modes, and 23 typecheck/build tasks passed after final reviewer corrections."
+    },
+    {
+      "check": "bun run test and bun run build",
+      "status": "passed",
+      "result": "All repository test families and 19 workspace test tasks passed; all 14 workspace build tasks passed."
+    },
+    {
+      "check": "focused docs, paths, skills, lint, format, JSON, and patch-integrity checks",
+      "status": "passed",
+      "result": "docs:validate, check:repository-paths, test:skills, lint, format:check, jq parsing, and git diff --check passed."
+    },
+    {
+      "check": "fresh-context Terra acceptance",
+      "status": "passed",
+      "result": "The independent reviewer reproduced the current tree, required correction of placeholder-filter handling, impact-ledger coverage, and one unnecessary runtime-test exception, then accepted the corrected Effect-native policy, exact allowlists, receipts, boundaries, impact ledger, and non-claims with no remaining blocker."
+    }
+  ],
+  "remoteReadback": {
+    "branch": "main",
+    "remote": "origin",
+    "remoteCommitAfterSemanticPush": "ec463ba12c91beaddec1f56a612312d98cdbb035",
+    "semanticCommitPresent": true
+  },
+  "postcondition": "The accepted HGI-202-S1 mechanical foundation is identifiable by semantic commit, tree, sorted path digest, and candidate-receipt digest on pushed TaxKit main; HGI-202 remains pending.",
+  "limitations": [
+    "HGI-202 is not complete because the product owner has not accepted public draft semantics; HGI-208 through HGI-206 remain dependency-gated.",
+    "The type-aware Ultracite adapter and repository-wide findings remain HGI-205 work.",
+    "Local and Git evidence does not establish publication, deployment, runtime public availability, external consumer state, provider state, or public status semantics."
+  ],
+  "nonClaims": [
+    "No public MDX/navigation, package contract, generated artifact, provider, environment, credential, release, publication, or deployment was changed or accessed.",
+    "No final five-pass cross-system audit was performed."
+  ],
+  "rollback": "Revert semantic commit ec463ba12c91beaddec1f56a612312d98cdbb035 and this validation-record commit as a bounded pair; preserve HGI-200, HGI-201, HGI-207, public content, and retained historical evidence."
+}
