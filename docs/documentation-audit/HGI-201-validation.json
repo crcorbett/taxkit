@@ -9,7 +9,8 @@
   "semanticTree": "0399694142d57a191f9616ecdcf26b797d84708e",
   "changedPathCount": 18,
   "sortedChangedPathSha256": "48af6d4055d07500e24acca7fdbb20bddad3cddf8735c2ed477edb4dc43aba00",
-  "candidateReceiptSha256": "f0e56825b0f191bc42e8f7f47b20b97391eeaa8d5cbac86cf1cb689eb2de7c13",
+  "semanticCandidateReceiptSha256": "f0e56825b0f191bc42e8f7f47b20b97391eeaa8d5cbac86cf1cb689eb2de7c13",
+  "correctedCandidateReceiptSha256": "7a1e3041c86f0eb2d5e1825d0da5a422ccafe8b4d2d65eeb96ee38b668147d3c",
   "checks": [
     {
       "check": "evaluator-driven contradiction correction",
@@ -35,10 +36,15 @@
       "check": "Git publication/readback",
       "status": "passed",
       "result": "After push and fetch, local HEAD and origin/main both resolved to 291374b48ec7bc566f2290c1adf2acac436da482."
+    },
+    {
+      "check": "post-publication portability correction",
+      "status": "passed",
+      "result": "HGI-207 verification exposed a personal installed-skill path in the semantic receipt. Correction 8d2e58c replaced it with a portable installed-skill reference; the full verification graph then passed 547 text and eight binary paths, and origin/main read back exactly at 8d2e58c035e36acc6badce798e9b40e4cec9a6fa."
     }
   ],
   "postcondition": "TaxKit HGI-201 has accepted current PRD/implementation guidance and semantic contradiction enforcement; HGI-207 is the next independent decision gate.",
-  "rollback": "Revert the closeout evidence commit, then semantic commit 291374b48ec7bc566f2290c1adf2acac436da482; preserve HGI-200 and retained historical/public evidence.",
+  "rollback": "Revert the validation-correction receipt commit, portability correction 8d2e58c035e36acc6badce798e9b40e4cec9a6fa, closeout d3206c6cb6441b34667aaac96d0c26ee252fd1f4, then semantic commit 291374b48ec7bc566f2290c1adf2acac436da482; preserve HGI-200 and retained historical/public evidence.",
   "limitations": [
     "This receipt proves repository guidance, tests, and Git publication only.",
     "HGI-203 proof and HGI-204 runbook owners remain intentionally absent until their dependencies are satisfied."
