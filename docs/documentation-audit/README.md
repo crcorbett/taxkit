@@ -24,6 +24,9 @@ Current HGI-200 receipts:
 - [`HGI-201-validation.json`](HGI-201-validation.json)
 - [`HGI-202-S1-candidate.json`](HGI-202-S1-candidate.json)
 - [`HGI-202-S1-validation.json`](HGI-202-S1-validation.json)
+- [`HGI-202-candidate.json`](HGI-202-candidate.json)
+- [`HGI-202-receipt.json`](HGI-202-receipt.json)
+- [`HGI-202-validation.json`](HGI-202-validation.json)
 - [`HGI-200-validation.json`](HGI-200-validation.json)
 
 Current HGI-207 decision records:
@@ -118,7 +121,8 @@ package until a package manifest, source exports and verification exist.
   from a schema-decoded owner policy. It emits bounded receipts and writes the
   complete sanitized report to the ignored `tmp/docs-policy-report.json`.
   This evidence index remains curated because a mechanical inventory cannot
-  decide public lifecycle semantics or replace owner judgment.
+  establish page-level acceptance, runtime state, external availability, or
+  replace owner judgment.
 
 ## Docs maintenance convention
 

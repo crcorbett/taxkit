@@ -27,5 +27,5 @@
   ],
   "carryingCost": "Maintain links and lifecycle metadata at retained paths; review any proposed retention manifest against the named evidence classes.",
   "reviewOrResumeTrigger": "A proposed retention manifest names a bounded target set, named authority, retention basis, recovery path, and readback for physical movement or deletion.",
-  "receipt": {"path": "./source-receipt.json", "sha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea"}
+  "receipt": {"path": "./source-receipt.json", "sha256": "6405bb8a282231b5fd7e19790690c42ab635695f868e1098b975ee694f362cf4"}
 }

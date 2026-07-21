@@ -10,15 +10,15 @@ review_trigger: product-owner decision, public-doc status change, retention-mani
 # HGI-207 decision records
 
 This is the accepted repository-local decision route for HGI-207. It records
-evidence-backed defaults and explicit deferrals; it does not substitute for a
-named product-owner, publication, registry, or deployment authority.
+accepted lifecycle and receipt policies; it does not substitute for publication,
+registry, deployment, provider, or external-readback authority.
 
 | Decision | State | Effect on downstream work |
 | --- | --- | --- |
-| [Public MDX and navigation lifecycle](public-mdx-lifecycle.json) | Deferred | HGI-202 cannot encode a semantic `draft` policy. |
+| [Public MDX and navigation lifecycle](public-mdx-lifecycle.json) | Accepted | `draft` is an authored, locally renderable, visibly labelled candidate; `published` is explicitly accepted current public documentation. Neither proves external availability. |
 | [Archive movement and lifecycle routing](archive-routing.json) | Accepted | HGI-202 through HGI-205 must retain paths and use strict lifecycle routing unless an approved manifest says otherwise. |
-| [Immutable release candidates](release-candidate-retention.json) | Deferred | HGI-203 and HGI-204 cannot retain candidate tarballs as a governed class yet. |
-| [Release logs and proof retention](release-proof-retention.json) | Deferred | HGI-203 and HGI-204 cannot prescribe full-log retention, redaction, or a canonical location yet. |
+| [Release candidates](release-candidate-retention.json) | Accepted | Tarballs are transient local test inputs, deleted by their owning command; only sanitized commit/package/digest/check receipts may remain. |
+| [Release logs and proof retention](release-proof-retention.json) | Accepted | Future durable proof is sanitized JSON under `docs/evidence/releases/**`; raw logs and secrets are prohibited and provider CI logs are transient. |
 | [Publication and deployment non-claims](publication-deployment-nonclaims.json) | Accepted | HGI-202 through HGI-205 must not claim publication or deployment from local repository evidence. |
 
 [Source receipt](source-receipt.json) records the exact local sources and

@@ -1,11 +1,15 @@
-import { Array, Order } from "effect";
+import { Array, Order, Record } from "effect";
 
 import {
   DocumentationDiagnostic,
   DocumentationPathClass,
   DocumentationReport,
 } from "./schemas.js";
-import type { DocumentationInvariant, OwnerPolicy } from "./schemas.js";
+import type {
+  DocumentationInvariant,
+  OwnerPolicy,
+  PublicPageAcceptanceRecord,
+} from "./schemas.js";
 
 export type DocumentationFile = Readonly<{ path: string; text: string }>;
 export type WorkspaceScripts = Readonly<{
@@ -13,6 +17,7 @@ export type WorkspaceScripts = Readonly<{
   scripts: ReadonlySet<string>;
 }>;
 export type DocumentationInspection = Readonly<{
+  acceptanceRecords?: ReadonlyMap<string, PublicPageAcceptanceRecord | null>;
   files: readonly DocumentationFile[];
   ownerPolicy: OwnerPolicy;
   rootScripts: ReadonlySet<string>;
@@ -51,7 +56,11 @@ const metadata = (text: string): ReadonlyMap<string, string> => {
   return new Map(
     globalThis.Array.from(
       (block ?? "").matchAll(/^([a-z_]+):\s*(\S.*)$/gmu),
-      (entry) => [entry[1] ?? "", entry[2] ?? ""]
+      (entry) => {
+        const value = entry[2] ?? "";
+        const quoted = /^(?:"([\s\S]*)"|'([\s\S]*)')$/u.exec(value);
+        return [entry[1] ?? "", quoted?.[1] ?? quoted?.[2] ?? value];
+      }
     )
   );
 };
@@ -327,12 +336,142 @@ const inspectOwners = (
   return result;
 };
 
+const inspectPublicStatus = (
+  inspection: DocumentationInspection
+): readonly DocumentationDiagnostic[] => {
+  const result: DocumentationDiagnostic[] = [];
+  const policy = inspection.ownerPolicy;
+  const allowedStatuses = new Set<string>(
+    Record.keys(policy.public.statusDecision.statuses)
+  );
+  const navigation = inspection.files.find(
+    (file) => file.path === policy.public.navigation.path
+  );
+  const publicFiles = inspection.files.filter(
+    (file) =>
+      policy.public.roots.some((root) => isUnder(file.path, root)) &&
+      file.path.endsWith(".mdx")
+  );
+  const acceptedRecords = new Map<string, string>();
+  const recordPaths = new Set<string>();
+  const statusFor = (file: DocumentationFile): string | null =>
+    file.path === policy.public.navigation.path
+      ? (() => {
+          const [, status] = /"status"\s*:\s*"([^"]+)"/u.exec(file.text) ?? [];
+          return status ?? null;
+        })()
+      : (metadata(file.text).get("status") ?? null);
+
+  for (const binding of policy.public.statusDecision.acceptanceRecords) {
+    if (acceptedRecords.has(binding.path)) {
+      result.push(
+        diagnostic(
+          "owner-policy",
+          policy.public.statusDecision.owner,
+          binding.path,
+          "keep exactly one accepted-record binding for each published public path"
+        )
+      );
+    } else {
+      acceptedRecords.set(binding.path, binding.record);
+    }
+    if (recordPaths.has(binding.record)) {
+      result.push(
+        diagnostic(
+          "owner-policy",
+          policy.public.statusDecision.owner,
+          binding.record,
+          "bind each accepted record to exactly one published public path"
+        )
+      );
+    } else {
+      recordPaths.add(binding.record);
+    }
+  }
+
+  for (const file of [...publicFiles, ...(navigation ? [navigation] : [])]) {
+    const status = statusFor(file);
+    if (!status || !allowedStatuses.has(status)) {
+      result.push(
+        diagnostic(
+          "owner-policy",
+          policy.public.statusDecision.owner,
+          file.path,
+          "use a public status represented by the accepted public lifecycle policy"
+        )
+      );
+    }
+    if (status === "published" && !acceptedRecords.has(file.path)) {
+      result.push(
+        diagnostic(
+          "owner-policy",
+          policy.public.statusDecision.owner,
+          file.path,
+          "bind this published public path to an addressable accepted record"
+        )
+      );
+    }
+  }
+  for (const binding of policy.public.statusDecision.acceptanceRecords) {
+    const publicFile = inspection.files.find(
+      (file) => file.path === binding.path
+    );
+    const recordFile = inspection.files.find(
+      (file) => file.path === binding.record
+    );
+    if (recordFile) {
+      const acceptanceRecord =
+        inspection.acceptanceRecords?.get(binding.record) ?? null;
+      if (!acceptanceRecord) {
+        result.push(
+          diagnostic(
+            "owner-policy",
+            policy.public.statusDecision.owner,
+            binding.record,
+            "replace this file with a valid accepted page-level record"
+          )
+        );
+      } else if (acceptanceRecord.targetPath !== binding.path) {
+        result.push(
+          diagnostic(
+            "owner-policy",
+            policy.public.statusDecision.owner,
+            binding.record,
+            `bind the accepted record targetPath exactly to ${binding.path}`
+          )
+        );
+      }
+    } else {
+      result.push(
+        diagnostic(
+          "owner-policy",
+          policy.public.statusDecision.owner,
+          binding.record,
+          "restore the addressable accepted record or remove its published-path binding"
+        )
+      );
+    }
+    if (!publicFile || statusFor(publicFile) !== "published") {
+      result.push(
+        diagnostic(
+          "owner-policy",
+          policy.public.statusDecision.owner,
+          binding.path,
+          "remove the stale accepted-record binding or restore the exact published public path"
+        )
+      );
+    }
+  }
+  return result;
+};
+
 export const inspectDocumentation = (
   inspection: DocumentationInspection
 ): DocumentationReport => {
   const paths = new Set(Array.map(inspection.files, (file) => file.path));
   const diagnostics = [
     ...inspectOwners(inspection, paths),
+    ...inspectPublicStatus(inspection),
     ...Array.flatMap(inspection.files, (file) => {
       const pathClass = classifyDocumentationPath(
         inspection.ownerPolicy,
@@ -351,7 +490,6 @@ export const inspectDocumentation = (
               ),
             ];
       }
-      // Public status, including `draft`, is deliberately opaque until the owner-policy decision path changes.
       return pathClass === "maintainer"
         ? inspectMaintainer(inspection, file, paths)
         : [];

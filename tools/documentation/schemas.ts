@@ -73,6 +73,17 @@ const OwnerBinding = Schema.Struct({
   path: Schema.NonEmptyString,
 });
 
+export const PublicPageAcceptanceRecord = Schema.Struct({
+  observedAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  owner: Schema.NonEmptyString,
+  schemaVersion: Schema.Literal(1),
+  state: Schema.Literal("accepted"),
+  targetPath: Schema.NonEmptyString,
+});
+export type PublicPageAcceptanceRecord = typeof PublicPageAcceptanceRecord.Type;
+
 export const OwnerPolicy = Schema.Struct({
   fumadocs: Schema.Struct({
     build: OwnerBinding,
@@ -100,9 +111,19 @@ export const OwnerPolicy = Schema.Struct({
     navigation: OwnerBinding,
     roots: Schema.Array(Schema.NonEmptyString),
     statusDecision: Schema.Struct({
+      acceptanceRecords: Schema.Array(
+        Schema.Struct({
+          path: Schema.NonEmptyString,
+          record: Schema.NonEmptyString,
+        })
+      ),
       owner: Schema.NonEmptyString,
       path: Schema.NonEmptyString,
-      semantics: Schema.Literal("deferred-opaque"),
+      semantics: Schema.Literal("accepted-public-lifecycle"),
+      statuses: Schema.Struct({
+        draft: Schema.Literal("authored-candidate"),
+        published: Schema.Literal("accepted-current"),
+      }),
     }),
   }),
   sdkDocs: Schema.Struct({

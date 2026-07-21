@@ -1,6 +1,6 @@
 {
   "id": "DEC-TAXKIT-HGI-207-RELEASE-CANDIDATE-RETENTION",
-  "state": "deferred",
+  "state": "accepted",
   "semanticOwner": "TaxKit release maintainer",
   "evidence": [
     "The source receipt found no retained release-candidate directory in the repository inventory.",
@@ -8,23 +8,23 @@
     "packages/scripts/README.md documents local packed-artifact validation but not candidate identity, storage, retention, promotion, or recovery."
   ],
   "rejectedAlternatives": [
-    "Treat each locally packed tarball as a retained immutable candidate before publication exists.",
-    "Treat a successful local release:check or packed-artifact check as a retained candidate or publication proof.",
-    "Add candidate storage or artifact movement in this decision-draft slice."
+    "Treat a locally packed tarball as a retained, promotable, or published candidate.",
+    "Treat a successful local release:check or packed-artifact check as publication proof.",
+    "Move or retain package tarballs as release evidence."
   ],
-  "acceptedOrDefaultBehavior": "No repository-local candidate-retention class is established. Local packed artifacts remain check inputs only; they must not be represented as immutable, promotable, retained, published, or externally available candidates until the release maintainer chooses an artifact identity, storage location, retention period, promotion boundary, recovery procedure, and authority model.",
+  "acceptedOrDefaultBehavior": "Package tarballs are transient local test inputs. The owning command deletes them; they are never retained, promotable, or published candidates. Retain only sanitized commit, package, digest, and check receipts, never the tarballs themselves.",
   "affectedTasks": ["HGI-203", "HGI-204", "HGI-205"],
   "taskBlocking": [
-    {"taskId": "HGI-203", "blocks": true, "inheritedNonClaim": "Packed-artifact validation does not create an immutable release candidate."},
-    {"taskId": "HGI-204", "blocks": true, "inheritedNonClaim": "No runbook may promise candidate retention, promotion, or recovery without a chosen candidate contract."},
-    {"taskId": "HGI-205", "blocks": true, "inheritedNonClaim": "Automation cannot retain or promote an undefined candidate class."}
+    {"taskId": "HGI-203", "blocks": false, "inheritedNonClaim": "Packed-artifact validation does not create an immutable release candidate."},
+    {"taskId": "HGI-204", "blocks": false, "inheritedNonClaim": "Runbooks must describe transient test inputs and sanitized receipts, not candidate retention or promotion."},
+    {"taskId": "HGI-205", "blocks": false, "inheritedNonClaim": "Automation may delete its own transient tarballs and retain only approved sanitized receipts."}
   ],
-  "authorityImpact": "Choosing candidate storage or promotion would introduce release-artifact authority; this local record grants none.",
+  "authorityImpact": "The release maintainer accepted the transient-input policy. This record grants no artifact storage, promotion, registry, publication, or deployment authority.",
   "nonClaims": [
-    "No immutable candidate artifact, retention period, storage location, promotion route, registry state, or publication exists by virtue of this record.",
-    "No package tarball was created, moved, retained, published, or deleted."
+    "No immutable candidate artifact, promotion route, registry state, or publication exists by virtue of this record.",
+    "This record does not create, move, retain, publish, or delete a package tarball."
   ],
-  "carryingCost": "Keep release proof and recovery work explicitly blocked on the candidate contract rather than encoding an accidental filesystem convention.",
-  "reviewOrResumeTrigger": "The TaxKit release maintainer approves a candidate identity, storage, immutability mechanism, retention and deletion policy, promotion authority, recovery path, and boundary-matched readback.",
-  "receipt": {"path": "./source-receipt.json", "sha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea"}
+  "carryingCost": "Owning commands must keep tarball cleanup scoped to their own transient inputs and receipts sanitized.",
+  "reviewOrResumeTrigger": "Any request to retain, promote, publish, or externally store a tarball requires a superseding decision and separately authorized operation.",
+  "receipt": {"path": "./source-receipt.json", "sha256": "6405bb8a282231b5fd7e19790690c42ab635695f868e1098b975ee694f362cf4"}
 }

@@ -30,20 +30,18 @@ deletion/movement require separately approved authority and target runbooks.
   and semantic contradiction fixtures now reject fixed worker/pass-count ritual
   while preserving the Effect, provider-boundary, package, and React contract.
   Exact Git publication/readback: [`HGI-201-validation.json`](../../documentation-audit/HGI-201-validation.json).
-- **HGI-207 — completed:** [`HGI-207-validation.json`](../../documentation-audit/HGI-207-validation.json)
-  accepts strict lifecycle routing and publication/deployment non-claims, while
-  deferring public `draft` semantics, immutable candidates, and release
-  proof/log retention to their named maintainers. HGI-202 through HGI-205 must
-  inherit those decisions and blockers rather than choose a policy implicitly.
-- **HGI-202-S1 — accepted partial:** the mechanical owner contract,
-  Effect-native bounded `check:docs` gate, remaining maintainer classifications,
-  exact lint boundaries, and opaque-public-status proof passed repository
-  verification, fresh-context acceptance, and exact Git publication/readback
-  in [`HGI-202-S1-validation.json`](../../documentation-audit/HGI-202-S1-validation.json).
-  This partial does not complete HGI-202 or resolve HGI-207's product-owner
-  decision.
-- HGI-202 (docs policy) depends on HGI-200, HGI-201, and HGI-207; HGI-208
-  (docs-maintenance skill) depends on HGI-202.
+- **HGI-207 — completed:** accepted decisions define public `draft` and
+  `published` semantics, transient tarball handling, and sanitized release
+  receipt retention while preserving publication/deployment non-claims. See
+  [`hgi-207/README.md`](../../documentation-audit/hgi-207/README.md).
+- **HGI-202 — completed locally:** the mechanical owner contract, Effect-native
+  bounded `check:docs` gate, exact lint boundaries, public status and navigation
+  ownership controls, and positive/negative fixtures are recorded in
+  [`HGI-202-candidate.json`](../../documentation-audit/HGI-202-candidate.json)
+  and [`HGI-202-receipt.json`](../../documentation-audit/HGI-202-receipt.json).
+  It does not claim a commit, push, release, publication, deployment, or
+  external availability.
+- HGI-208 (docs-maintenance skill) depends on completed HGI-202 and is next.
 - HGI-203 (critical journeys/release proof) depends on HGI-202 and HGI-208;
   HGI-204 (runbooks) depends on HGI-203.
 - HGI-205 (CI/controls/automation) depends on HGI-202, HGI-203, and HGI-204;
@@ -67,7 +65,8 @@ It did not alter public content, binary evidence, or the architecture tombstone
 route. Integrated parent acceptance is recorded in
 [`HGI-200-validation.json`](../../documentation-audit/HGI-200-validation.json).
 
-HGI-201 passed independent acceptance and exact Git publication/readback. The
-next semantic slice is HGI-207 decisions. These local records do not prove
+HGI-201 passed independent acceptance and exact Git publication/readback. HGI-207
+and HGI-202 now have local completion receipts; the next semantic slice is
+HGI-208. These local records do not prove
 publication, registry state,
 external consumers, API/docs production behavior, or release authority.

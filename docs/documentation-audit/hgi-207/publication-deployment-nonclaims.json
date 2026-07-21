@@ -27,5 +27,5 @@
   ],
   "carryingCost": "Keep explicit non-claims in downstream docs, proof, runbook, and automation contracts until target readback is available.",
   "reviewOrResumeTrigger": "A separately authorized publication or deployment proposal names its target, principal, environment, approval, runbook, receipt, rollback or revocation, and readback contract.",
-  "receipt": {"path": "./source-receipt.json", "sha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea"}
+  "receipt": {"path": "./source-receipt.json", "sha256": "6405bb8a282231b5fd7e19790690c42ab635695f868e1098b975ee694f362cf4"}
 }

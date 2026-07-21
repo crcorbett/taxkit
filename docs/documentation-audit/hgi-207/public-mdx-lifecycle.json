@@ -1,30 +1,30 @@
 {
   "id": "DEC-TAXKIT-HGI-207-PUBLIC-MDX-LIFECYCLE",
-  "state": "deferred",
+  "state": "accepted",
   "semanticOwner": "TaxKit product owner with the apps/docs public-doc owner",
   "evidence": [
     "The source receipt records that apps/docs/navigation.json and all 61 tracked public MDX files declare draft.",
-    "apps/docs/navigation.schema.json accepts a string status but does not define draft semantics.",
+    "apps/docs/navigation.schema.json and @taxkit/docs-content validate status representation while the owner policy owns lifecycle consequences.",
     "docs/README.md separates public docs from maintainer-document lifecycle policy."
   ],
   "rejectedAlternatives": [
     "Treat draft as proof that the public site is unpublished or unavailable; local content metadata cannot establish external availability.",
-    "Treat draft as accepted current public truth; no product-owner decision defines that consequence.",
-    "Change public MDX or navigation status in this decision-draft slice."
+    "Treat draft as accepted current public truth.",
+    "Relabel public MDX or navigation by bulk inference rather than explicit page-level acceptance."
   ],
-  "acceptedOrDefaultBehavior": "Preserve the existing draft metadata and navigation in place. Until the named owners define draft semantics, downstream controls must treat it as an unresolved public-content lifecycle marker and must not infer publication, accuracy, availability, or an accepted-current state from it.",
+  "acceptedOrDefaultBehavior": "draft means authored, locally renderable, visibly labelled candidate public documentation. It is not accepted-current truth, publication, deployment, external availability, correctness, or user visibility. published means explicitly accepted current public documentation; it still does not prove runtime or external availability. Preserve the existing 61 public MDX files and navigation as draft unless repository evidence records explicit page-level acceptance.",
   "affectedTasks": ["HGI-202", "HGI-203", "HGI-205"],
   "taskBlocking": [
-    {"taskId": "HGI-202", "blocks": true, "inheritedNonClaim": "No semantic public-doc lifecycle or public availability is established."},
+    {"taskId": "HGI-202", "blocks": false, "inheritedNonClaim": "Public lifecycle semantics do not establish public availability."},
     {"taskId": "HGI-203", "blocks": false, "inheritedNonClaim": "Journey proof cannot treat draft metadata as public-runtime proof."},
-    {"taskId": "HGI-205", "blocks": true, "inheritedNonClaim": "Automation cannot enforce an unchosen draft consequence."}
+    {"taskId": "HGI-205", "blocks": false, "inheritedNonClaim": "Automation may validate status representation and ownership, not external availability."}
   ],
-  "authorityImpact": "Only the named product owner and public-doc owner may choose the semantic consequence of draft; this local record grants no public-site, provider, publication, or deployment authority.",
+  "authorityImpact": "The TaxKit product owner and apps/docs public-doc owner accepted these local lifecycle semantics. This decision grants no public-site, provider, publication, deployment, or external-readback authority.",
   "nonClaims": [
     "Draft metadata does not prove public publication, unpublication, runtime availability, correctness, or user visibility.",
-    "This record does not change any public MDX, navigation, generated source, or docs runtime."
+    "This decision does not relabel any public MDX, navigation, generated source, or docs runtime."
   ],
-  "carryingCost": "Keep the unresolved marker visible in HGI-202 and HGI-205 planning and recheck the metadata inventory when its semantics are chosen.",
-  "reviewOrResumeTrigger": "The TaxKit product owner and apps/docs owner choose and record the meaning, permitted use, and transition authority for draft.",
-  "receipt": {"path": "./source-receipt.json", "sha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea"}
+  "carryingCost": "Keep page-level acceptance evidence explicit before transitioning any draft page to published.",
+  "reviewOrResumeTrigger": "A page-level acceptance record authorizes a specific draft-to-published transition; external availability still requires boundary-matched runtime evidence.",
+  "receipt": {"path": "./source-receipt.json", "sha256": "6405bb8a282231b5fd7e19790690c42ab635695f868e1098b975ee694f362cf4"}
 }

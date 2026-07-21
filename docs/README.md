@@ -53,7 +53,7 @@ lifecycle; migrate it only when its owner is materially revised.
 | Completed history | [`exec-plans/completed/README.md`](exec-plans/completed/README.md) | Historical provenance, never default policy. |
 | Public docs product | [`../apps/docs/README.md`](../apps/docs/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md), and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) | Consumer-facing content/runtime, not maintainer lifecycle policy. |
 | Repeatable release/recovery operations | No canonical target-owned runbook route yet | HGI-204 creates `docs/runbooks/**`; do not expand architecture/README prose into a runbook. |
-| Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md) for current checks; no canonical `docs/verification/**`/release evidence route yet | HGI-203 creates bounded proof and journey owners. |
+| Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md) for current checks; future sanitized release receipts belong under `docs/evidence/releases/**` | HGI-203 creates the bounded receipt schema and journey owners; raw logs and secrets are never durable proof. |
 | References | [`references/README.md`](references/README.md) | Revalidate mutable external guidance. |
 | Audit/accounting | [`documentation-audit/README.md`](documentation-audit/README.md) | Dated evidence, not policy. |
 
@@ -74,7 +74,8 @@ boundary-matched proof.
 `bun run check:docs` enforces the mechanical owner contract in
 [`../tools/documentation/owner-policy.json`](../tools/documentation/owner-policy.json).
 It checks maintainer metadata, links, documented commands, workspace README
-coverage, public/maintainer separation, and generated-source edges with bounded
-diagnostics and a JSON detail receipt. Public `status` values remain opaque:
-the HGI-207 decision record, not this command, owns the unresolved meaning of
-`draft`.
+coverage, public/maintainer separation, accepted public-status representation,
+and generated-source edges with bounded diagnostics and a JSON detail receipt.
+`draft` means authored, locally renderable, visibly labelled candidate content;
+`published` means explicitly accepted current public documentation. Neither
+status proves runtime or external availability.

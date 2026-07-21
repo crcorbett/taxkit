@@ -6,9 +6,14 @@
       "owner": "apps/docs-public-doc-owner"
     },
     "statusDecision": {
+      "acceptanceRecords": [],
       "path": "docs/documentation-audit/hgi-207/public-mdx-lifecycle.json",
       "owner": "taxkit-product-owner",
-      "semantics": "deferred-opaque"
+      "semantics": "accepted-public-lifecycle",
+      "statuses": {
+        "draft": "authored-candidate",
+        "published": "accepted-current"
+      }
     }
   },
   "maintainer": {

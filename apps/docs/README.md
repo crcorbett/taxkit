@@ -109,11 +109,13 @@ Use the matching template and user journey for each page. If a repeated page
 shape does not have a template, add the template before writing more pages in
 that shape.
 
-The required frontmatter `status` is schema-validated, but its product
-consequence remains deferred under HGI-207. Do not treat `draft` as proof of
-publication, unpublication, availability, accuracy, or accepted-current truth.
-The repository-wide `bun run check:docs` command enforces path ownership while
-leaving that semantic choice opaque.
+The required frontmatter `status` is schema-validated. `draft` means authored,
+locally renderable, visibly labelled candidate content, not accepted-current
+truth, publication, deployment, availability, accuracy, or user visibility.
+`published` means explicitly accepted current public documentation, still not
+runtime or external availability proof. Preserve draft pages unless explicit
+page-level acceptance records their transition. `bun run check:docs` enforces
+status representation and path ownership without asserting external state.
 
 ## Validation graph
 

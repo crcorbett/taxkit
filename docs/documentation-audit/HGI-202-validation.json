@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-202",
+  "status": "candidate",
+  "observedAt": "2026-07-21T22:46:57Z",
+  "authority": "local TaxKit repository writes and verification only; no Git publication/readback, release, publication, registry, deployment, provider, credential, or external-state access",
+  "baseCommit": "b102e018cd10a7e5da740451e79905f6e1ff4ad3",
+  "semanticCommit": null,
+  "semanticTree": null,
+  "changedPathCount": 26,
+  "sortedChangedPathSha256": "97f2af10391de1bf7770f33a16437c19975a3a1664358b43aa8ec5993ad0232a",
+  "candidateSha256": "5c66782140d9be207ddfb04e61e9458f2d7e022ec9ee2e41801c6c6843300a3e",
+  "acceptanceReportSha256": "9cb8b5f65eec6312dd4928b76f1e4a56522f038c879dfce6fabe5e074746c68a",
+  "checks": [
+    {
+      "check": "documentation policy and fixtures",
+      "status": "passed",
+      "result": "bun run test:documentation, bun run check:docs:types, bun run check:docs, and bun run docs:validate passed; strict-record decoding and positive, missing-binding, missing-record, invalid-record, wrong-target, stale, duplicate-path, and duplicate-record controls are covered."
+    },
+    {
+      "check": "repository verification",
+      "status": "passed",
+      "result": "bun run check:repository-paths, bun run test:skills, bun run lint, bun run format:check, bun run verification, bun run test, bun run build, and git diff --check passed on the local candidate."
+    },
+    {
+      "check": "fresh-context acceptance",
+      "status": "passed",
+      "result": "After two control-correction rounds, a new independent worker reproduced the strict runtime decode and one-to-one published-path policy, all 17 fixtures, the complete digest chain and 17-row class ledger, and every external-state nonclaim."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "pending",
+      "result": "No semantic commit, push, fetch, or origin/main readback exists for this candidate yet."
+    }
+  ],
+  "postcondition": "The local documentation-policy candidate is independently accepted but not yet committed, pushed, or read back from origin/main.",
+  "rollback": "Before publication, revert the bounded local HGI-202 slice. After publication, revert the future closeout then semantic commit while preserving HGI-202-S1 evidence.",
+  "limitations": [
+    "Repository checks and Git identity do not establish public-site, registry, provider, release, or deployment state.",
+    "HGI-208 and later release-proof/runbook work remain separate successors."
+  ],
+  "nonClaims": [
+    "No public page was accepted or relabelled, and no release, publication, registry, deployment, provider, credential, runtime, SSR, hydration, or external availability is proved or changed."
+  ]
+}

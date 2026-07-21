@@ -1,6 +1,6 @@
 {
   "id": "DEC-TAXKIT-HGI-207-RELEASE-PROOF-RETENTION",
-  "state": "deferred",
+  "state": "accepted",
   "semanticOwner": "TaxKit release and verification maintainers",
   "evidence": [
     "docs/README.md says no canonical docs/verification or release-evidence route exists yet and assigns bounded proof ownership to HGI-203 and operational routing to HGI-204.",
@@ -8,23 +8,23 @@
     "The source receipt found no canonical release-proof or runbook route."
   ],
   "rejectedAlternatives": [
-    "Retain all full command logs indefinitely in the repository.",
-    "Redact or delete logs using an unstated convention.",
-    "Treat an existing documentation-audit receipt as the canonical release proof packet or full-log store."
+    "Retain raw command logs or secrets as durable release proof.",
+    "Treat provider CI logs as durable canonical proof.",
+    "Treat a local check as publication, deployment, registry, production, or external-consumer proof."
   ],
-  "acceptedOrDefaultBehavior": "No full-log or proof-packet retention, redaction, or location policy is established. HGI-203 and HGI-204 must design and obtain maintainer acceptance for the minimal required proof fields, sensitive-data handling, canonical location, access boundary, retention and deletion schedule, integrity/readback, and recovery before claiming durable release evidence.",
+  "acceptedOrDefaultBehavior": "The future canonical release-proof route is bounded sanitized JSON receipts under docs/evidence/releases/**. Receipts contain only commit, package, digest, and check evidence; raw logs and secrets are prohibited. Accepted receipts remain in Git history until explicitly superseded. Provider CI logs are transient/default and are not durable proof.",
   "affectedTasks": ["HGI-203", "HGI-204", "HGI-205"],
   "taskBlocking": [
-    {"taskId": "HGI-203", "blocks": true, "inheritedNonClaim": "A local check outcome is not a governed retained proof packet or full-log record."},
-    {"taskId": "HGI-204", "blocks": true, "inheritedNonClaim": "A release/recovery runbook cannot promise evidence retention or redaction without a policy."},
-    {"taskId": "HGI-205", "blocks": true, "inheritedNonClaim": "Automation cannot enforce retention or redaction criteria that have not been chosen."}
+    {"taskId": "HGI-203", "blocks": false, "inheritedNonClaim": "A local check outcome is not publication, deployment, registry, production, or external-consumer proof."},
+    {"taskId": "HGI-204", "blocks": false, "inheritedNonClaim": "Runbooks must use sanitized JSON receipts and must not retain raw logs or secrets."},
+    {"taskId": "HGI-205", "blocks": false, "inheritedNonClaim": "Automation may enforce receipt shape and reject raw-log or secret retention; provider logs remain transient."}
   ],
-  "authorityImpact": "Retention, redaction, access, and deletion decisions may affect sensitive operational data and require the named maintainers; this record authorizes no evidence movement or deletion.",
+  "authorityImpact": "Release and verification maintainers accepted the receipt route and retention boundary. This record grants no release, provider, registry, publication, deployment, or destructive evidence-operation authority.",
   "nonClaims": [
-    "No full release logs, proof packets, retention period, redaction rule, canonical evidence location, access boundary, or deletion policy is established.",
+    "No raw release logs, secrets, provider logs, publication, registry, deployment, production, or external-consumer evidence is retained by this policy.",
     "No release, publication, registry, deployment, production, or external-consumer state is proved."
   ],
-  "carryingCost": "Preserve the absence as an explicit blocker so future proof or runbook work does not silently create a retention policy.",
-  "reviewOrResumeTrigger": "The TaxKit release and verification maintainers approve a bounded evidence schema, redaction classification, canonical location, access model, retention/deletion schedule, integrity readback, and recovery procedure.",
-  "receipt": {"path": "./source-receipt.json", "sha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea"}
+  "carryingCost": "HGI-203 must define the bounded receipt schema and HGI-204 the operational procedure without expanding the approved data class.",
+  "reviewOrResumeTrigger": "A change to receipt fields, Git-history retention, or any raw/provider log handling requires a superseding maintainer decision.",
+  "receipt": {"path": "./source-receipt.json", "sha256": "6405bb8a282231b5fd7e19790690c42ab635695f868e1098b975ee694f362cf4"}
 }

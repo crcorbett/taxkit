@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "taskId": "HGI-207",
   "status": "accepted",
-  "observedAt": "2026-07-21T11:38:23+01:00",
-  "baseCommit": "7f0e357fc0728bbbb0bd6a27facabf48857322bc",
+  "observedAt": "2026-07-21T22:46:57Z",
+  "baseCommit": "b102e018cd10a7e5da740451e79905f6e1ff4ad3",
   "authority": "local TaxKit documentation and decision-record changes with read-only repository inspection only",
-  "acceptedOutcome": "Five evidence-backed decision records accept strict lifecycle routing and publication/deployment non-claims, defer three maintainer-owned public and release-retention choices without inventing policy, and map every consequence to HGI-202 through HGI-205.",
-  "sourceReceiptSha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea",
+  "acceptedOutcome": "Five evidence-backed decision records accept strict lifecycle routing, public draft/published semantics, transient local tarball handling, sanitized release-receipt retention, and publication/deployment non-claims.",
+  "sourceReceiptSha256": "6405bb8a282231b5fd7e19790690c42ab635695f868e1098b975ee694f362cf4",
   "decisions": [
     {
       "path": "hgi-207/archive-routing.json",
@@ -15,8 +15,8 @@
     },
     {
       "path": "hgi-207/public-mdx-lifecycle.json",
-      "state": "deferred",
-      "outcome": "Preserve draft metadata without inferring publication or current-truth semantics until the product and public-doc owners decide them."
+      "state": "accepted",
+      "outcome": "draft is authored, locally renderable, visibly labelled candidate content; published is explicitly accepted current documentation. Neither proves external availability."
     },
     {
       "path": "hgi-207/publication-deployment-nonclaims.json",
@@ -25,13 +25,13 @@
     },
     {
       "path": "hgi-207/release-candidate-retention.json",
-      "state": "deferred",
-      "outcome": "Local packed artifacts are check inputs, not governed immutable candidates, until the release maintainer chooses the candidate contract."
+      "state": "accepted",
+      "outcome": "Local packed tarballs are transient check inputs, deleted by their owning command; only sanitized commit/package/digest/check receipts may remain."
     },
     {
       "path": "hgi-207/release-proof-retention.json",
-      "state": "deferred",
-      "outcome": "No full-log or proof-packet retention, redaction, location, access, or deletion policy is inferred before maintainer approval."
+      "state": "accepted",
+      "outcome": "Future durable proof is sanitized JSON under docs/evidence/releases/**; raw logs and secrets are prohibited and provider CI logs are transient."
     }
   ],
   "verification": [
@@ -43,12 +43,12 @@
     {
       "check": "source provenance and public lifecycle inventory",
       "status": "passed",
-      "result": "Every source digest reproduces from base commit 7f0e357; all 61 tracked public MDX files and navigation carry draft metadata, while the receipt makes no publication or availability claim."
+      "result": "Every source digest reproduces from the current local candidate; all 61 tracked public MDX files and navigation carry draft metadata, while the receipt makes no publication or availability claim."
     },
     {
       "check": "fresh-context decision-to-task trace",
       "status": "passed",
-      "result": "An independent evaluator accepted all five semantic choices and blockers after identifying and verifying correction of legacy metadata on the materially revised documentation-audit index."
+      "result": "After two control-correction rounds, a new independent reviewer reproduced all five accepted decisions, the strict page-acceptance boundary, source/digest chain, transient tarball and sanitized receipt policies, and every external-state nonclaim."
     },
     {
       "check": "bun run docs:validate",
@@ -68,12 +68,12 @@
   ],
   "limitations": [
     "These local decisions do not establish public-site availability, registry publication, deployment, SSR, hydration, production, or external-consumer behavior.",
-    "HGI-202 remains blocked on public draft semantics; HGI-203 through HGI-205 remain blocked where candidate and proof-retention contracts require named maintainer decisions."
+    "These local decisions do not create page-level acceptance, durable release receipts, runbooks, provider evidence, or external availability proof."
   ],
   "nonClaims": [
     "No public content, release artifact, evidence, provider, registry, publication, deployment, or external system was mutated.",
-    "No deferred decision is represented as accepted policy."
+    "No release artifact, raw log, secret, provider CI log, or external system was retained or mutated."
   ],
   "rollback": "Revert this bounded HGI-207 decision-record slice; preserve HGI-200, HGI-201, historical evidence, public content, and the prior decision provenance.",
-  "nextTrigger": "Obtain the named maintainer choices for public draft semantics, immutable candidates, and release proof/log retention before completing their blocked downstream tasks."
+  "nextTrigger": "Proceed with HGI-202 local completion and then HGI-208; page transitions, release receipts, runbooks, and external operations remain separately scoped."
 }

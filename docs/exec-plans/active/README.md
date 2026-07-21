@@ -16,4 +16,5 @@ lifecycle is owned by [`../../README.md`](../../README.md).
 
 - [Harness-governance documentation rollout](./harness-governance-documentation.md):
   TaxKit documentation ownership, controls, runbooks, proof, and harness
-  requalification; HGI-200 and HGI-201 are complete, and HGI-207 is next.
+  requalification; HGI-200, HGI-201, HGI-207, and HGI-202 are complete, and
+  HGI-208 is next.

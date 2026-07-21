@@ -10,6 +10,7 @@ import {
   DocumentationCheckError,
   DocumentationReceipt,
   OwnerPolicy,
+  PublicPageAcceptanceRecord,
   WorkspacePackageManifest,
 } from "./schemas.js";
 
@@ -20,6 +21,10 @@ const receiptLimit = 20;
 const RepositoryPath = Schema.NonEmptyString.pipe(
   Schema.check(Schema.isPattern(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$)).+$/u))
 );
+export const decodePublicPageAcceptanceRecord = Schema.decodeUnknownEffect(
+  Schema.fromJsonString(PublicPageAcceptanceRecord),
+  { onExcessProperty: "error" }
+);
 
 const receiptFor = (report: ReturnType<typeof inspectDocumentation>) =>
   new DocumentationReceipt({
@@ -27,7 +32,7 @@ const receiptFor = (report: ReturnType<typeof inspectDocumentation>) =>
     inspected: report.inspected,
     maintainer: report.maintainer,
     nonClaim:
-      "This local mechanical check does not establish public availability, publication, deployment, runtime behaviour, or public status semantics.",
+      "This local mechanical check validates public status and acceptance-record ownership only; it does not establish public availability, publication, deployment, or runtime behaviour.",
     ok: report.diagnostics.length === 0,
     omittedDiagnostics: Math.max(0, report.diagnostics.length - receiptLimit),
     postcondition:
@@ -145,6 +150,22 @@ export const checkDocumentation = (repositoryRoot: string) =>
         () => new DocumentationCheckError({ operation: "decode-owner-policy" })
       )
     );
+    const acceptanceRecords = new Map(
+      yield* Effect.forEach(
+        ownerPolicy.public.statusDecision.acceptanceRecords,
+        (binding) => {
+          const recordFile = files.find((file) => file.path === binding.record);
+          return recordFile
+            ? decodePublicPageAcceptanceRecord(recordFile.text).pipe(
+                Effect.match({
+                  onFailure: () => [binding.record, null] as const,
+                  onSuccess: (record) => [binding.record, record] as const,
+                })
+              )
+            : Effect.succeed([binding.record, null] as const);
+        }
+      )
+    );
     const manifests = yield* Effect.forEach(
       Array.filter(inventory, (entry) =>
         /^(?:apps|packages)\/.+\/package\.json$/u.test(entry)
@@ -191,6 +212,7 @@ export const checkDocumentation = (repositoryRoot: string) =>
         )
       );
     return inspectDocumentation({
+      acceptanceRecords,
       files,
       ownerPolicy,
       rootScripts: new Set(Record.keys(rootManifest.scripts ?? {})),

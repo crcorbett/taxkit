@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-202",
+  "status": "accepted-local",
+  "observedAt": "2026-07-21T22:46:57Z",
+  "baseCommit": "b102e018cd10a7e5da740451e79905f6e1ff4ad3",
+  "candidatePath": "HGI-202-candidate.json",
+  "candidateSha256": "5c66782140d9be207ddfb04e61e9458f2d7e022ec9ee2e41801c6c6843300a3e",
+  "authority": "local TaxKit repository writes and local verification only",
+  "checks": [
+    {"command": "bun run test:documentation", "result": "passed: 17 tests, including strict-record decoding plus positive, missing-binding, missing-record, invalid-record, wrong-target, stale, duplicate-path, and duplicate-record fixtures."},
+    {"command": "bun run check:docs:types && bun run check:docs", "result": "passed: owner-policy schema decoded and 0 violations across 576 inspected files, including 62 public paths."},
+    {"command": "bun run docs:validate", "result": "passed: docs content validator reported 0 issues."},
+    {"command": "bun run check:repository-paths && bun run test:skills && bun run lint && bun run format:check", "result": "passed."},
+    {"command": "bun run verification && git diff --check", "result": "passed."}
+  ],
+  "postcondition": "Accepted public lifecycle representation and one-to-one published-path acceptance-record ownership are mechanically enforced; each addressable record must decode as accepted and name the exact targetPath, without an external-availability assertion. Public content and navigation remain draft.",
+  "limitations": ["No commit, push, release, publication, deployment, provider access, or final five-pass audit is included."],
+  "nonClaims": ["This receipt is not a durable release receipt and proves no external state."],
+  "rollback": "Revert the bounded HGI-202 local slice and retain prior S1 evidence.",
+  "nextTrigger": "HGI-208."
+}

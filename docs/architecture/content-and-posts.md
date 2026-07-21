@@ -45,9 +45,9 @@ on the open-source tax engine and avoid downstream private-product specifics.
 
 `tools/documentation/owner-policy.json`
 : Machine-readable separation between public content, maintainer documents,
-  generated artifacts, and authored SDK documentation. It records ownership
-  and regeneration edges but does not assign lifecycle meaning to public
-  status.
+generated artifacts, and authored SDK documentation. It validates accepted
+public-status representation and navigation ownership without claiming runtime
+or external availability.
 
 `docs/architecture`
 : Durable implementation architecture.
@@ -84,7 +84,7 @@ docs implementation
     -> MDX component allowlist
     -> examples and OpenAPI reference checks
   -> bun run check:docs
-    -> public/maintainer path separation and opaque public status
+  -> public/maintainer path separation and accepted status representation
     -> generated Fumadocs and OpenAPI owner edges
     -> maintainer metadata, links, commands and package README coverage
   -> @taxkit/docs-fumadocs tests
@@ -105,10 +105,12 @@ docs implementation
 - Validate public MDX through `@taxkit/docs-content`, which owns Effect Schema
   frontmatter, navigation coverage, source-text policy, local link, MDX
   component allowlist, examples and OpenAPI reference checks.
-- Keep `draft` and `published` as schema representation values without
-  inferring their product consequence. Until the product and public-doc owners
-  accept HGI-207's deferred choice, neither value establishes publication,
-  external availability, correctness, or accepted-current truth.
+- `draft` means authored, locally renderable, visibly labelled candidate public
+  documentation; it is not accepted-current truth, publication, deployment,
+  external availability, correctness, or user visibility. `published` means
+  explicitly accepted current public documentation; it still does not establish
+  runtime or external availability. Preserve draft pages unless explicit
+  page-level acceptance records their transition.
 - Keep reusable Fumadocs code in `@taxkit/docs-fumadocs`; keep TaxKit
   content contracts in `@taxkit/docs-content`; keep route composition and
   app-specific rendering in `apps/docs`.

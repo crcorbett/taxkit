@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "taskId": "HGI-207",
-  "slice": "decision-draft",
+  "slice": "accepted-decision-policy",
   "status": "observed",
-  "observedAt": "2026-07-21T01:00:22+01:00",
-  "baseCommit": "7f0e357fc0728bbbb0bd6a27facabf48857322bc",
+  "observedAt": "2026-07-21T22:39:36Z",
+  "baseCommit": "b102e018cd10a7e5da740451e79905f6e1ff4ad3",
   "authority": "local TaxKit documentation writes and read-only local inspection only",
   "inventory": {
     "publicMdxFiles": 61,
@@ -16,23 +16,23 @@
   "sources": [
     {
       "path": "AGENTS.md",
-      "sha256": "0f16dbf2c068e5f25188ae0951c556e0123744cafc89d059f691fa98e7de65c7",
+      "sha256": "789cf88e4e7a42d9827608ac76b80e11c8df4c7e8b27ee85005d447fecbb81ed",
       "observation": "Local release checks do not authorize or prove publication; provider, registry, publication, release, and deployment operations require named authority, a receipt, rollback or revocation, and readback."
     },
     {
       "path": "docs/README.md",
-      "sha256": "08f7fd10f16ec7b2dffa9a14e329d3c017242fc541d6feea99592014484ddecb",
-      "observation": "Public docs are a separate product surface; historical, public, and binary evidence must not be moved or deleted without an approved retention manifest; canonical release-proof and runbook routes do not yet exist."
+      "sha256": "e2ce817a06f3b73c5c3e58a1ac5ec810ac17524fd4199ee19146df7ccf6a98cd",
+      "observation": "Public docs are a separate product surface; draft and published have accepted local lifecycle semantics without external-availability claims, and future sanitized release receipts belong under docs/evidence/releases/**."
     },
     {
       "path": "docs/product-specs/harness-governance-documentation.md",
-      "sha256": "9e90bb403f23d1267f4c10af552a60269325a07780116bef7b4232e3ddee9ca8",
-      "observation": "HGI-207 is the next decision gate and the local campaign explicitly does not prove publication, registry, deployment, credentials, or external-consumer behavior."
+      "sha256": "17ff14ef0f1aee229005eadcca168504d42235794f893eac005b44afce52b4b5",
+      "observation": "HGI-207 and HGI-202 are completed locally; HGI-208 is next, and no local policy claims publication, registry, deployment, credentials, or external-consumer behavior."
     },
     {
       "path": "docs/exec-plans/active/harness-governance-documentation.md",
-      "sha256": "c80a56b1d5808d8dd2653df3b5d82754ea4f6457a8cf35e057516c8829bfa6e8",
-      "observation": "HGI-207 is dependency-ready and release, publication, registry, deployment, provider, credential, and evidence movement require separately approved authority and target runbooks."
+      "sha256": "cc98cde58523663f76d411224e0f52d294abde69e20d821f9cde12aeef56e241",
+      "observation": "HGI-202 is locally complete after accepted HGI-207 choices; HGI-208 is next and release, publication, registry, deployment, provider, credential, and evidence movement still require separately approved authority and target runbooks."
     },
     {
       "path": "apps/docs/navigation.json",
@@ -46,13 +46,26 @@
     },
     {
       "path": "docs/standards/versioning.md",
-      "sha256": "70da3157338d543bd624bf24f8ae082e46e064b5d44b9de94f93b5ea2912f0dc",
+      "sha256": "dc9cc7fccf301ce9f3e585be2243ee4700913aae82a69ffac56c8c378fba8f86",
       "observation": "Changesets manage private package versions; future npm publication is conditional on later package readiness and removing private flags."
     },
     {
       "path": "packages/scripts/README.md",
       "sha256": "4da8fad9532455ba2c939112aa17576f9e2540c909f208eb8f14b42b0953ed1b",
       "observation": "release:check records command outcomes and runs local package-owned gates, but it does not define retained candidate artifacts, log redaction, evidence location, or external publication/deployment proof."
+    }
+    ,{
+      "path": "tools/documentation/owner-policy.json",
+      "sha256": "6201789254032d33e564eb48ed80582a23b9d9251c2da4408f4ef2e3d3f2bc0a",
+      "observation": "The machine-readable owner policy represents draft as authored-candidate and published as accepted-current; acceptanceRecords is empty while all 61 MDX pages and navigation remain draft."
+    },{
+      "path": "tools/documentation/schemas.ts",
+      "sha256": "8e4803f7f36bda08c3eb751677a012e02e5e67725755783129db0877b267ac39",
+      "observation": "The decoded owner-policy schema requires accepted public lifecycle semantics and an exact accepted page-level JSON record with targetPath, accepted state, owner, and observedAt."
+    },{
+      "path": "tools/documentation/policy.ts",
+      "sha256": "29e26ef0c34d9b01abe56ed409dc536d7775f4195bbcb2000f8809d2452b597e",
+      "observation": "The checker requires each published MDX or navigation path to have a unique, addressable, schema-valid accepted record bound to that exact path, without making an external-state assertion."
     }
   ],
   "limitations": [

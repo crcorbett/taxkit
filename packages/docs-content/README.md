@@ -72,10 +72,11 @@ Fumadocs receives that schema through `Schema.toStandardSchemaV1(...)`, so the
 Effect Schema contract remains canonical while Fumadocs performs frontmatter
 validation.
 
-`DocsContentStatus` owns the allowed representation values only. HGI-207 leaves
-the product consequence of `draft` unresolved, so neither this package nor the
-mechanical `bun run check:docs` policy may infer publication, unpublication,
-availability, accuracy, or accepted-current truth from the value.
+`DocsContentStatus` owns the allowed representation values. HGI-207 defines
+`draft` as authored, locally renderable, visibly labelled candidate content and
+`published` as explicitly accepted current public documentation. Neither this
+package nor `bun run check:docs` may infer publication, deployment, runtime or
+external availability, correctness, or user visibility from either value.
 
 ## Validation policy
 

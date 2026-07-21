@@ -30,6 +30,7 @@ const decodingBoundaryFiles = [
   "tools/oxlint/portable-rules.test.ts",
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
   "tools/documentation/check.runtime.ts",
+  "tools/documentation/check.runtime.test.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/repository-paths/policy.test.ts",
   "tools/repository-paths/policy.ts",
@@ -138,6 +139,7 @@ const runtimeBoundaryFiles = [
   "tools/repository-paths/check.runtime.test.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/documentation/check.runtime.ts",
+  "tools/documentation/check.runtime.test.ts",
 ];
 
 const processBoundaryFiles = [
