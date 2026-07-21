@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-207",
+  "status": "accepted",
+  "observedAt": "2026-07-21T11:40:12+01:00",
+  "authority": "local TaxKit documentation and decision-record writes, Git commit and push to main, and read-only remote-ref readback; no provider, registry, publication, release, or deployment operation",
+  "baseCommit": "7f0e357fc0728bbbb0bd6a27facabf48857322bc",
+  "semanticCommit": "af576849560b0282be827cf130fb835d0176d7ff",
+  "semanticTree": "83b3cc220b3ab08f304e2269d0c2dcd6dd70fc85",
+  "changedPathCount": 11,
+  "sortedChangedPathSha256": "0fbb753709f07eb155a1fe459a2a6f433d9914199c608aa75b7f35d69b568614",
+  "candidateReceiptSha256": "a7adcfcf2eaa72b850e22dc7189ee3605e14d78bd83886688cbb906e9a2f8ba9",
+  "sourceReceiptSha256": "927c4b1191d48f597af7de9de8670c504576e2013367398a0963f706953537ea",
+  "checks": [
+    {
+      "check": "decision schema and immutable source provenance",
+      "status": "passed",
+      "result": "Five records passed decision-record.schema.json, exact affected-task/task-blocking equality, receipt linkage, and reproduction of every source digest from base commit 7f0e357."
+    },
+    {
+      "check": "public lifecycle inventory",
+      "status": "passed",
+      "result": "The receipt records 61 tracked public MDX files and navigation with draft metadata without claiming publication, availability, correctness, or accepted-current truth."
+    },
+    {
+      "check": "fresh-context decision-to-task acceptance",
+      "status": "passed",
+      "result": "An independent evaluator accepted the choice/deferral semantics and downstream blockers after exposing and verifying correction of legacy metadata on the materially revised evidence index."
+    },
+    {
+      "check": "repository verification",
+      "status": "passed",
+      "result": "With all candidate paths staged, repository accounting passed for 555 text and eight binary files from 563 tracked files; Effect language-service, lint, format, 12 skill tests, both Knip graphs, and 23 workspace tasks passed."
+    },
+    {
+      "check": "Git publication and readback",
+      "status": "passed",
+      "result": "After push and fetch, local HEAD and origin/main both resolved to af576849560b0282be827cf130fb835d0176d7ff."
+    }
+  ],
+  "postcondition": "TaxKit HGI-207 has accepted, addressable decision records. HGI-202 is blocked on public draft semantics, and HGI-203 through HGI-205 are blocked where candidate and proof-retention contracts require named maintainer choices.",
+  "rollback": "Revert the validation-receipt commit, then semantic commit af576849560b0282be827cf130fb835d0176d7ff; preserve HGI-200, HGI-201, historical evidence, and public content.",
+  "limitations": [
+    "The decision records do not establish public-site availability, registry publication, deployment, SSR, hydration, production, or external-consumer behavior.",
+    "Deferred policy choices remain unresolved and must not be encoded implicitly by downstream controls."
+  ],
+  "nonClaims": [
+    "No public content, release artifact, retained proof, provider, registry, publication, deployment, or external system was mutated or proved.",
+    "Git publication proves only the committed repository artifact and remote ref identity."
+  ]
+}

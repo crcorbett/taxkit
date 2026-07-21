@@ -30,7 +30,7 @@ deletion/movement require separately approved authority and target runbooks.
   and semantic contradiction fixtures now reject fixed worker/pass-count ritual
   while preserving the Effect, provider-boundary, package, and React contract.
   Exact Git publication/readback: [`HGI-201-validation.json`](../../documentation-audit/HGI-201-validation.json).
-- **HGI-207 — decision draft recorded:** [`documentation-audit/hgi-207`](../../documentation-audit/hgi-207/README.md)
+- **HGI-207 — completed:** [`HGI-207-validation.json`](../../documentation-audit/HGI-207-validation.json)
   accepts strict lifecycle routing and publication/deployment non-claims, while
   deferring public `draft` semantics, immutable candidates, and release
   proof/log retention to their named maintainers. HGI-202 through HGI-205 must

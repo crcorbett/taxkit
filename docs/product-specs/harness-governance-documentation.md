@@ -49,7 +49,7 @@ state. The active execution plan owns the current bounded sequence.
 | Task | State | Acceptance owner |
 | --- | --- | --- |
 | HGI-200 — lifecycle router, architecture successor, current-intent route, and corpus receipts | Completed | S1/S2 receipts, integrated fresh-context acceptance, repository verification, and pushed Git identity |
-| HGI-207 — documentation and release-semantics decisions | Decision draft recorded; maintainer choices remain | Accepted strict lifecycle routing and publication/deployment non-claims; explicit deferrals for public `draft` semantics, immutable candidates, and proof/log retention in [`../documentation-audit/hgi-207/`](../documentation-audit/hgi-207/README.md) |
+| HGI-207 — documentation and release-semantics decisions | Completed; deferred maintainer choices block affected downstream work | Accepted strict lifecycle routing and publication/deployment non-claims; explicit deferrals for public `draft` semantics, immutable candidates, and proof/log retention in [`../documentation-audit/HGI-207-validation.json`](../documentation-audit/HGI-207-validation.json) |
 | HGI-201 — PRD guides and local skills | Completed | Current architecture/standards/runbook routing, semantic contradiction fixtures, full verification, independent acceptance, and `HGI-201-validation.json` |
 | HGI-202 — docs policy and public-maintainer separation | Pending; depends on HGI-200, HGI-201, HGI-207 | Machine-checkable public, maintainer, generated, and package-README ownership |
 | HGI-208 — TaxKit docs-maintenance skill | Pending; depends on HGI-202 | Repo-local skill source and focused skill-policy proof |

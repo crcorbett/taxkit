@@ -7,9 +7,9 @@ last_reviewed: 2026-07-21
 review_trigger: product-owner decision, public-doc status change, retention-manifest approval, release artifact change, or publication/deployment capability change
 ---
 
-# HGI-207 decision draft
+# HGI-207 decision records
 
-This is the repository-local decision-draft route for HGI-207. It records
+This is the accepted repository-local decision route for HGI-207. It records
 evidence-backed defaults and explicit deferrals; it does not substitute for a
 named product-owner, publication, registry, or deployment authority.
 
@@ -22,5 +22,5 @@ named product-owner, publication, registry, or deployment authority.
 | [Publication and deployment non-claims](publication-deployment-nonclaims.json) | Accepted | HGI-202 through HGI-205 must not claim publication or deployment from local repository evidence. |
 
 [Source receipt](source-receipt.json) records the exact local sources and
-inventory supporting this draft. Supersede an accepted decision through a new
-record; preserve this draft and its receipt for provenance.
+inventory supporting these records. Supersede an accepted decision through a
+new record; preserve this record set and its receipt for provenance.

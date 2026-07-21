@@ -24,9 +24,11 @@ Current HGI-200 receipts:
 - [`HGI-201-validation.json`](HGI-201-validation.json)
 - [`HGI-200-validation.json`](HGI-200-validation.json)
 
-Current HGI-207 decision draft:
+Current HGI-207 decision records:
 
 - [`hgi-207/README.md`](hgi-207/README.md)
+- [`HGI-207-candidate.json`](HGI-207-candidate.json)
+- [`HGI-207-validation.json`](HGI-207-validation.json)
 
 ## Current docs inventory
 
