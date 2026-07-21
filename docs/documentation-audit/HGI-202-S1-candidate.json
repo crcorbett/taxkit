@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-202-S1",
+  "parentTaskId": "HGI-202",
+  "status": "accepted-partial",
+  "observedAt": "2026-07-21T17:52:25Z",
+  "acceptedAt": "2026-07-21T17:57:51Z",
+  "baseCommit": "d480303492c09954a7dafcdd1ba6ba22adf365cb",
+  "authority": "local TaxKit documentation-policy, documentation, lint-configuration, and command-wiring changes only",
+  "acceptedOutcome": "Fresh-context acceptance passed for the mechanical foundation: machine-readable documentation ownership, bounded Effect-native checks, maintainer lifecycle metadata, package README coverage, exact runtime allowlists, and deliberately opaque public status semantics.",
+  "scope": [
+    "schema-decoded documentation owner policy",
+    "Effect-native tracked and nonignored-untracked documentation inventory",
+    "bounded human and JSON receipts with a complete ignored report",
+    "current maintainer metadata, link, command, generated-owner, and package-README checks",
+    "root verification and lint-boundary integration"
+  ],
+  "impactLedger": [
+    {
+      "surface": "documentation policy implementation and tests",
+      "decision": "Change required",
+      "paths": [
+        "tools/documentation/"
+      ],
+      "acceptance": "The decoded owner graph separates public, maintainer, generated, package-manifest, and manual-snapshot classes; focused fixtures cover failures, current versus historical handling, opaque draft status, package coverage, links, and filtered Bun commands."
+    },
+    {
+      "surface": "maintainer docs, root/app/package READMEs, architecture, and standards",
+      "decision": "Change required",
+      "paths": [
+        "AGENTS.md",
+        "README.md",
+        "apps/docs/README.md",
+        "docs/README.md",
+        "docs/architecture/content-and-posts.md",
+        "docs/productionization-core-calculations.md",
+        "docs/productionization-core-hardening.md",
+        "docs/standards/",
+        "packages/docs-content/README.md"
+      ],
+      "acceptance": "Current owners route the check and carry explicit lifecycle metadata; historical productionization records retain provenance; the current tooling owner states the unqualified type-aware adapter truth."
+    },
+    {
+      "surface": "evidence, bounded report lifecycle, and audit routing",
+      "decision": "Change required",
+      "paths": [
+        ".gitignore",
+        "docs/documentation-audit/HGI-202-S1-candidate.json",
+        "docs/documentation-audit/README.md"
+      ],
+      "acceptance": "The candidate is routed from the evidence index; complete sanitized checker detail is written to ignored tmp/docs-policy-report.json while bounded receipts remain legible in console or JSON mode."
+    },
+    {
+      "surface": "public MDX, public navigation, and public status semantics",
+      "decision": "Preserve",
+      "paths": [],
+      "acceptance": "No public MDX or navigation path changes. All 62 public paths are inventoried, while draft remains an opaque product value with no inferred publication, deployment, rendering, or availability consequence."
+    },
+    {
+      "surface": "generated documentation and OpenAPI",
+      "decision": "Owner contract change; generated artifacts preserved",
+      "paths": [
+        "tools/documentation/owner-policy.json"
+      ],
+      "acceptance": "The owner contract names Fumadocs and OpenAPI source, generated, test, route, and command relationships; this slice regenerates no tracked generated artifact."
+    },
+    {
+      "surface": "package README coverage",
+      "decision": "Mechanical enforcement added",
+      "paths": [
+        "tools/documentation/policy.ts",
+        "tools/documentation/policy.test.ts"
+      ],
+      "acceptance": "Every current apps/** or packages/** manifest is inventoried before public classification and requires the nearest package README."
+    },
+    {
+      "surface": "lint and runtime boundary configuration",
+      "decision": "Change required",
+      "paths": [
+        "oxlint.config.ts"
+      ],
+      "acceptance": "Portable Effect lint covers tools/documentation sources; only check.runtime.ts is added to the exact decoding, encoding-egress, runtime-execution, process, console, Bun-adapter, and Bun-runtime boundary arrays. Repository lint passes without inline suppressions."
+    },
+    {
+      "surface": "root commands and CI",
+      "decision": "Command change; workflow preserved",
+      "paths": [
+        "package.json"
+      ],
+      "acceptance": "check:docs, its typecheck, and documentation tests are root-owned. Existing .github/workflows/quality.yml already invokes bun run verification, so no duplicated workflow step is needed."
+    },
+    {
+      "surface": "skills",
+      "decision": "Preserve",
+      "paths": [],
+      "acceptance": "HGI-208 remains the sole owner for the TaxKit-local docs-maintainer skill after full HGI-202 acceptance."
+    },
+    {
+      "surface": "runbooks, release proof, provider operations, and external systems",
+      "decision": "N/A",
+      "paths": [],
+      "acceptance": "HGI-203 and HGI-204 remain the named owners. This local mechanical slice performs no provider, publication, release, deployment, or recovery operation."
+    },
+    {
+      "surface": "SPEC and active task state",
+      "decision": "Change required; parent remains pending",
+      "paths": [
+        "docs/product-specs/harness-governance-documentation.md",
+        "docs/exec-plans/active/harness-governance-documentation.md"
+      ],
+      "acceptance": "HGI-202-S1 is explicitly partial; HGI-202 remains pending on the deferred public draft-semantics decision."
+    },
+    {
+      "surface": "Changeset",
+      "decision": "N/A",
+      "paths": [],
+      "acceptance": "The slice changes repository tooling and documentation governance only; it changes no package-facing runtime or published package contract."
+    }
+  ],
+  "verification": [
+    {
+      "check": "bun run check:docs",
+      "status": "passed",
+      "result": "0 violations across 571 inspected files, including 120 maintainer and 62 public paths before this candidate receipt was added."
+    },
+    {
+      "check": "bun run check:docs:types and bun run test:documentation",
+      "status": "passed",
+      "result": "Typecheck passed and seven focused tests passed with 15 assertions, including proof that a root script cannot mask a missing filtered-workspace script."
+    },
+    {
+      "check": "bun run verification",
+      "status": "passed",
+      "result": "Repository paths, documentation policy, Effect language service, lint, format, skill tests, development and production Knip, and all 23 typecheck/build tasks passed."
+    },
+    {
+      "check": "bun run test",
+      "status": "passed",
+      "result": "Documentation, repository-path, docs-boundary, Oxlint, and all 19 workspace test tasks passed."
+    },
+    {
+      "check": "bun run build",
+      "status": "passed",
+      "result": "All 14 workspace build tasks passed."
+    },
+    {
+      "check": "bun run docs:validate, bun run check:repository-paths, bun run test:skills, bun run lint, bun run format:check, and git diff --check",
+      "status": "passed",
+      "result": "Focused documentation content, repository path, skill, lint, format, and patch-integrity gates passed."
+    },
+    {
+      "check": "fresh-context Terra acceptance",
+      "status": "passed",
+      "result": "An independent reviewer reproduced the bounded JSON check, docs typecheck/tests, lint, full verification, and patch integrity; verified exact allowlists, Effect/Schema boundaries, public opacity, complete impact routing, and all non-claims; and found no remaining blocker after two concrete corrections."
+    }
+  ],
+  "limitations": [
+    "HGI-202 is not complete because the product owner has not accepted the consequence of public draft status.",
+    "The root check and fix scripts request type-aware Ultracite, but the optional oxlint-tsgolint adapter is not installed or qualified; HGI-205 owns adapter qualification and the existing repository-wide findings.",
+    "Local mechanical checks cannot establish public availability, publication, deployment, runtime behaviour, external consumer state, or public status semantics."
+  ],
+  "nonClaims": [
+    "No public MDX, navigation, package runtime, release, publication, deployment, provider, environment, credential, or external planning system was changed or accessed.",
+    "This candidate does not complete HGI-202 or unblock HGI-208 through HGI-206."
+  ],
+  "rollback": "Revert this bounded HGI-202-S1 candidate slice; preserve HGI-200, HGI-201, HGI-207, retained historical evidence, and all public content.",
+  "nextTrigger": "Publish exact semantic Git identity and a separate validation/readback receipt, then request the public draft-semantics decision required for HGI-202 completion."
+}

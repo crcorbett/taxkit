@@ -1,3 +1,12 @@
+---
+document_type: standard
+lifecycle: current
+authority: canonical
+owner: taxkit-release-owner
+last_reviewed: 2026-07-21
+review_trigger: Changesets, release train, package publication, or version command change
+---
+
 # Versioning And Changesets
 
 TaxKit uses Changesets to manage package versions and package changelogs.

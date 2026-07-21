@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-21
 source_of_truth: app-root
 confidence: high
 ---
@@ -108,6 +108,12 @@ Before writing or reviewing public docs, read:
 Use the matching template and user journey for each page. If a repeated page
 shape does not have a template, add the template before writing more pages in
 that shape.
+
+The required frontmatter `status` is schema-validated, but its product
+consequence remains deferred under HGI-207. Do not treat `draft` as proof of
+publication, unpublication, availability, accuracy, or accepted-current truth.
+The repository-wide `bun run check:docs` command enforces path ownership while
+leaving that semantic choice opaque.
 
 ## Validation graph
 

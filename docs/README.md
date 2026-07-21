@@ -3,7 +3,7 @@ document_type: documentation-router
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 review_trigger: any maintainer/public docs class, root route, SPEC, plan, runbook, proof, evidence, or lifecycle change
 ---
 
@@ -70,3 +70,11 @@ proof/evidence, skills, lint/config/CI, and active SPEC/tasks. Update the
 earliest durable owner and necessary pointers in the same slice. Counts prove
 accounting only; semantic and consumer claims need owner review and
 boundary-matched proof.
+
+`bun run check:docs` enforces the mechanical owner contract in
+[`../tools/documentation/owner-policy.json`](../tools/documentation/owner-policy.json).
+It checks maintainer metadata, links, documented commands, workspace README
+coverage, public/maintainer separation, and generated-source edges with bounded
+diagnostics and a JSON detail receipt. Public `status` values remain opaque:
+the HGI-207 decision record, not this command, owns the unresolved meaning of
+`draft`.

@@ -1,3 +1,12 @@
+---
+document_type: standard
+lifecycle: current
+authority: canonical
+owner: taxkit-documentation-owner
+last_reviewed: 2026-07-21
+review_trigger: public API documentation or JSDoc lint contract change
+---
+
 # Docstring Conventions
 
 Docstrings should help external contributors understand tax-domain intent,

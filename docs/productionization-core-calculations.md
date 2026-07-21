@@ -1,3 +1,13 @@
+---
+document_type: execution-record
+lifecycle: historical
+authority: supporting
+owner: taxkit-core-maintainers
+last_reviewed: 2026-07-21
+review_trigger: core calculation productionization provenance audit
+successor: docs/architecture/README.md
+---
+
 # Core Calculation Productionization
 
 This file is the working checklist and change record for productionizing the current TaxKit calculation-engine spikes. It is intentionally detailed so work can resume from this document without relying on chat history.

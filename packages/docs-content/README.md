@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-06-10
+last_reviewed: 2026-07-21
 source_of_truth: package-root
 confidence: high
 ---
@@ -71,6 +71,11 @@ The schema source of truth is `DocsPageFrontmatter` in `src/schemas.ts`.
 Fumadocs receives that schema through `Schema.toStandardSchemaV1(...)`, so the
 Effect Schema contract remains canonical while Fumadocs performs frontmatter
 validation.
+
+`DocsContentStatus` owns the allowed representation values only. HGI-207 leaves
+the product consequence of `draft` unresolved, so neither this package nor the
+mechanical `bun run check:docs` policy may infer publication, unpublication,
+availability, accuracy, or accepted-current truth from the value.
 
 ## Validation policy
 

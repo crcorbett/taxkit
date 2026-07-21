@@ -22,6 +22,7 @@ Current HGI-200 receipts:
 - [`HGI-200-S2-receipt.json`](HGI-200-S2-receipt.json)
 - [`HGI-201-candidate.json`](HGI-201-candidate.json)
 - [`HGI-201-validation.json`](HGI-201-validation.json)
+- [`HGI-202-S1-candidate.json`](HGI-202-S1-candidate.json)
 - [`HGI-200-validation.json`](HGI-200-validation.json)
 
 Current HGI-207 decision records:
@@ -112,10 +113,11 @@ package until a package manifest, source exports and verification exist.
   published. Publication remains gated behind explicit release approval,
   a package naming and registry approach, authentication, provenance and
   publish verification.
-- No generated documentation inventory exists. This audit is deliberately
-  maintained by hand until repeated drift justifies an owner, canonical input
-  model, deterministic generator and focused tests under the abstraction
-  admission contract.
+- `tools/documentation` now inventories tracked and nonignored untracked files
+  from a schema-decoded owner policy. It emits bounded receipts and writes the
+  complete sanitized report to the ignored `tmp/docs-policy-report.json`.
+  This evidence index remains curated because a mechanical inventory cannot
+  decide public lifecycle semantics or replace owner judgment.
 
 ## Docs maintenance convention
 
@@ -142,8 +144,8 @@ At audit time, check that:
    aligned after each implementation slice.
 2. Refresh `docs/repo-status-outline.html` whenever repo shape or implemented
    surfaces materially change.
-3. Keep the status snapshot and documentation inventory manual until recurring
-   drift satisfies the abstraction-admission bar for automation.
+3. Keep the status snapshot and this evidence index curated; use
+   `bun run check:docs` for the admitted mechanical inventory and policy graph.
 4. Reject generated inventory or package proposals that have no implemented
    owner, consumer, simpler maintenance graph and focused proof.
 5. Keep planned package families labelled as planned until package manifests,

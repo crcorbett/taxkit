@@ -3,7 +3,7 @@ document_type: agent-router
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 ---
 
 # TaxKit repository guide
@@ -21,8 +21,8 @@ file; edit `AGENTS.md` only.
 3. Put current implementation intent in a SPEC/task and active execution plan;
    never reopen completed work as policy.
 4. Update the earliest durable owner and required pointers in the same slice.
-5. Run focused checks and `bun run verification`; package-facing changes also
-   need an appropriate Changeset.
+5. Run `bun run check:docs`, focused checks, and `bun run verification`;
+   package-facing changes also need an appropriate Changeset.
 6. Retain artifact identity, authority, postconditions, limitations,
    non-claims, and rollback.
 

@@ -29,6 +29,7 @@ const decodingBoundaryFiles = [
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
   "tools/oxlint/portable-rules.test.ts",
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
+  "tools/documentation/check.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/repository-paths/policy.test.ts",
   "tools/repository-paths/policy.ts",
@@ -97,6 +98,7 @@ const portableEffectSourceFiles = [
   "packages/sdk/typescript/**/*.{ts,tsx,js,jsx}",
   "packages/testing/**/*.{ts,tsx,js,jsx}",
   "tools/effect-language-service/**/*.{ts,tsx,js,jsx}",
+  "tools/documentation/**/*.{ts,tsx,js,jsx}",
   "tools/oxlint/**/*.{ts,tsx,js,jsx}",
   "tools/repository-paths/**/*.{ts,tsx,js,jsx}",
   "tools/skills/**/*.{ts,tsx,js,jsx}",
@@ -108,6 +110,7 @@ const schemaEncoderEgressFiles = [
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.test.js",
   "tools/oxlint/fixtures/effect-accepted.ts",
+  "tools/documentation/check.runtime.ts",
 ];
 
 const throwingCodecTestFiles = [
@@ -134,6 +137,7 @@ const runtimeBoundaryFiles = [
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/repository-paths/check.runtime.test.ts",
   "tools/repository-paths/check.runtime.ts",
+  "tools/documentation/check.runtime.ts",
 ];
 
 const processBoundaryFiles = [
@@ -141,6 +145,7 @@ const processBoundaryFiles = [
   "apps/docs/vitest.browser.config.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
+  "tools/documentation/check.runtime.ts",
 ];
 
 const consoleBoundaryFiles = [
@@ -149,6 +154,7 @@ const consoleBoundaryFiles = [
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
+  "tools/documentation/check.runtime.ts",
 ];
 
 const bunAdapterFiles = [
@@ -159,6 +165,7 @@ const bunAdapterFiles = [
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
   "tools/oxlint/portable-rules.test.ts",
+  "tools/documentation/check.runtime.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
@@ -169,6 +176,7 @@ const bunRuntimeEntrypointFiles = [
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
+  "tools/documentation/check.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
 ];
 

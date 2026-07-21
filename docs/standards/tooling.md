@@ -1,3 +1,12 @@
+---
+document_type: standard
+lifecycle: current
+authority: canonical
+owner: taxkit-tooling-owner
+last_reviewed: 2026-07-21
+review_trigger: formatter, lint, dependency, typecheck, Changeset, or root command change
+---
+
 # Formatting, Linting, And Dependency Hygiene
 
 TaxKit uses Bun workspaces and Ultracite with the Oxlint/Oxfmt provider. The
@@ -12,11 +21,16 @@ library with stable package boundaries and predictable bundle behavior.
 - `oxlint.config.ts` extends `ultracite/oxlint/core` and
   `ultracite/oxlint/react`.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt`.
-- `oxlint-tsgolint` is installed and `ultracite check --type-aware` is the
-  default root check command.
+- The root `check` and `fix` scripts request Ultracite's type-aware mode. The
+  optional `oxlint-tsgolint` adapter is not currently installed or qualified,
+  so those commands stop before linting rather than silently weakening the
+  configured policy. HGI-205 owns adapter qualification and the existing
+  repository-wide type-aware findings.
 - `knip` uses `knip.json` for development-aware dependency and workspace
   hygiene and `knip.production.json` for production-only package, command and
   API runtime reachability.
+- `tools/documentation` owns the Effect-native `check:docs` policy, bounded
+  receipts, negative fixtures, and machine-readable owner contract.
 - TypeScript is cataloged at the root and uses `ES2025` lib support.
 - Changesets record package-facing changes before release automation exists.
   See [Versioning and Changesets](./versioning.md).
@@ -26,6 +40,7 @@ library with stable package boundaries and predictable bundle behavior.
 ```sh
 bun run check
 bun run fix
+bun run check:docs
 bun run knip
 bun run knip:production
 bun run changeset
@@ -34,12 +49,22 @@ bun run check-types
 bun run test
 ```
 
-Use `bun run check` for style and lint checks. Use `bun run fix` only when you
-intend to accept formatter and safe lint fixes. Use `bun run knip` for the
-complete development-aware graph. Use `bun run knip:production` when changing
-package exports, repository command entrypoints or the standalone API runtime;
-it excludes test and development reachability. Neither command replaces the
+Until HGI-205 qualifies the type-aware adapter and findings, use
+`bun run lint` for the accepted Oxlint gate and `bun run format:check` for the
+accepted Oxfmt gate; `bun run verification` invokes both. Do not remove
+`--type-aware` from `check` or `fix` to make those aspirational commands pass.
+Use `bun run fix` only after HGI-205 and only when you intend to accept
+formatter and safe lint fixes. Use `bun run knip` for the complete
+development-aware graph. Use `bun run knip:production` when changing package
+exports, repository command entrypoints or the standalone API runtime; it
+excludes test and development reachability. Neither command replaces the
 SDK-owned packed-artifact and strict downstream-consumer gates.
+
+Use `bun run check:docs` for mechanical documentation ownership. Its bounded
+console output names the violated invariant, owner, target, recovery hint, and
+full JSON detail path. The check treats public lifecycle status as an opaque
+product value and cannot prove publication, runtime rendering, or external
+availability.
 
 Use `bun run verification` after changes that affect docs routing, package
 exports, Effect config composition, HTTP API contracts, runtime layers or

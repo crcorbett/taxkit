@@ -1,3 +1,13 @@
+---
+document_type: execution-record
+lifecycle: historical
+authority: supporting
+owner: taxkit-core-maintainers
+last_reviewed: 2026-07-21
+review_trigger: core hardening productionization provenance audit
+successor: docs/architecture/README.md
+---
+
 # Core Hardening Productionization
 
 This file records the follow-up hardening goal for the calculation engine. It is

@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-21
 source_of_truth: root-docs
 confidence: high
 ---
@@ -82,6 +82,7 @@ bun run --filter=api dev
 bun run --filter=web dev
 bun run --filter=docs dev
 bun run check:repository-paths
+bun run check:docs
 bun run knip:production
 bun run verification
 bun run test:skills
@@ -96,8 +97,12 @@ portless URL into `TAXKIT_API_BASE_URL` and `VITE_TAXKIT_API_BASE_URL` before
 serving the web app at `https://taxkit.localhost`. `bun run --filter=docs dev`
 serves the public docs app at `https://docs.taxkit.localhost`. `bun run
 check:repository-paths` rejects machine-local checkout references in tracked
-readable text without printing the matched private value. `bun run
-knip:production` checks the release-artifact package, repository command and
+readable text without printing the matched private value. `bun run check:docs`
+checks maintainer metadata, links, documented commands, workspace README
+coverage, public/maintainer path separation, and generated-source ownership.
+It treats public content status as opaque and does not establish publication,
+availability, accuracy, or accepted-current truth. `bun run knip:production`
+checks the release-artifact package, repository command and
 API runtime graph without test or development reachability. `bun run
 verification` is the baseline verification command for documentation, package
 wiring and scaffold changes and includes repo-owned skill policy checks. `bun

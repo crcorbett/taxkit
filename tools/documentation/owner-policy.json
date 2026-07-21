@@ -1,0 +1,61 @@
+{
+  "public": {
+    "roots": ["apps/docs/content"],
+    "navigation": {
+      "path": "apps/docs/navigation.json",
+      "owner": "apps/docs-public-doc-owner"
+    },
+    "statusDecision": {
+      "path": "docs/documentation-audit/hgi-207/public-mdx-lifecycle.json",
+      "owner": "taxkit-product-owner",
+      "semantics": "deferred-opaque"
+    }
+  },
+  "maintainer": {
+    "roots": ["docs"],
+    "rootEntrypoints": ["AGENTS.md", "README.md"],
+    "snapshotExemptions": [
+      {
+        "documentClass": "manual-html-snapshot",
+        "path": "docs/repo-status-outline.html",
+        "reason": "Retained non-canonical status snapshot with an explicit refresh trigger in the audit index."
+      }
+    ]
+  },
+  "fumadocs": {
+    "source": {
+      "path": "packages/docs-content/source.config.ts",
+      "owner": "packages/docs-content-owner"
+    },
+    "generatedRoot": "packages/docs-content/.source",
+    "build": {
+      "path": "packages/docs-content/package.json",
+      "owner": "packages/docs-content-owner",
+      "command": "build"
+    }
+  },
+  "openApi": {
+    "source": {
+      "path": "packages/api/http/src/openapi.ts",
+      "owner": "packages/api/http-owner"
+    },
+    "snapshot": {
+      "path": "packages/api/http/__snapshots__/openapi.json",
+      "owner": "packages/api/http-owner"
+    },
+    "test": {
+      "path": "packages/api/http/__tests__/openapi-snapshot.test.ts",
+      "owner": "packages/api/http-owner",
+      "command": "test:openapi"
+    },
+    "liveRoute": {
+      "path": "packages/api/http/src/server/live.layer.ts",
+      "owner": "packages/api/http-owner",
+      "command": "test"
+    }
+  },
+  "sdkDocs": {
+    "roots": ["packages/sdk/typescript/README.md"],
+    "owner": "packages/sdk/typescript-owner"
+  }
+}

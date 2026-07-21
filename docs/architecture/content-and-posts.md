@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-07-21
 source_of_truth: docs
 confidence: medium
 ---
@@ -43,6 +43,12 @@ on the open-source tax engine and avoid downstream private-product specifics.
   Standard Schema bridging, source loader adapters, page-tree helpers and
   generic MDX render primitives.
 
+`tools/documentation/owner-policy.json`
+: Machine-readable separation between public content, maintainer documents,
+  generated artifacts, and authored SDK documentation. It records ownership
+  and regeneration edges but does not assign lifecycle meaning to public
+  status.
+
 `docs/architecture`
 : Durable implementation architecture.
 
@@ -77,6 +83,10 @@ docs implementation
     -> navigation coverage and local link checks
     -> MDX component allowlist
     -> examples and OpenAPI reference checks
+  -> bun run check:docs
+    -> public/maintainer path separation and opaque public status
+    -> generated Fumadocs and OpenAPI owner edges
+    -> maintainer metadata, links, commands and package README coverage
   -> @taxkit/docs-fumadocs tests
   -> apps/docs build and browser screenshots when rendering changes
   -> bun run verification
@@ -95,6 +105,10 @@ docs implementation
 - Validate public MDX through `@taxkit/docs-content`, which owns Effect Schema
   frontmatter, navigation coverage, source-text policy, local link, MDX
   component allowlist, examples and OpenAPI reference checks.
+- Keep `draft` and `published` as schema representation values without
+  inferring their product consequence. Until the product and public-doc owners
+  accept HGI-207's deferred choice, neither value establishes publication,
+  external availability, correctness, or accepted-current truth.
 - Keep reusable Fumadocs code in `@taxkit/docs-fumadocs`; keep TaxKit
   content contracts in `@taxkit/docs-content`; keep route composition and
   app-specific rendering in `apps/docs`.

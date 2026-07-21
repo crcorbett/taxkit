@@ -1,3 +1,13 @@
+---
+document_type: audit-record
+lifecycle: historical
+authority: supporting
+owner: taxkit-standards-owner
+last_reviewed: 2026-07-21
+review_trigger: productionization provenance or successor-route audit
+successor: docs/standards/README.md
+---
+
 # Productionization Audit
 
 This audit captures structural improvements completed while hardening the core

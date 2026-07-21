@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 review_trigger: acceptance or scope change in TaxKit HGI-200 through HGI-206
 successor: null
 tombstone: false
@@ -35,6 +35,11 @@ deletion/movement require separately approved authority and target runbooks.
   deferring public `draft` semantics, immutable candidates, and release
   proof/log retention to their named maintainers. HGI-202 through HGI-205 must
   inherit those decisions and blockers rather than choose a policy implicitly.
+- **HGI-202-S1 — accepted partial:** the mechanical owner contract,
+  Effect-native bounded `check:docs` gate, remaining maintainer classifications,
+  exact lint boundaries, and opaque-public-status proof passed repository
+  verification and fresh-context acceptance. This partial does not complete
+  HGI-202 or resolve HGI-207's product-owner decision.
 - HGI-202 (docs policy) depends on HGI-200, HGI-201, and HGI-207; HGI-208
   (docs-maintenance skill) depends on HGI-202.
 - HGI-203 (critical journeys/release proof) depends on HGI-202 and HGI-208;
