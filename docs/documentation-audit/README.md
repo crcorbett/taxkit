@@ -35,9 +35,10 @@ Current HGI-207 decision records:
 - [`HGI-207-candidate.json`](HGI-207-candidate.json)
 - [`HGI-207-validation.json`](HGI-207-validation.json)
 
-Current HGI-208 local candidate:
+Accepted HGI-208 documentation-maintenance candidate and Git receipt:
 
 - [`HGI-208-candidate.json`](HGI-208-candidate.json)
+- [`HGI-208-validation.json`](HGI-208-validation.json)
 
 ## Current docs inventory
 

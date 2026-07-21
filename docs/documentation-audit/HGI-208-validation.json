@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-208",
+  "status": "accepted",
+  "observedAt": "2026-07-21T23:17:11Z",
+  "authority": "local TaxKit skill/docs/tooling implementation, user-authorized Git publication, and read-only remote ref readback; no release, provider, deployment, publication, or public-site operation",
+  "baseCommit": "7710d2e10a5161f878d0454455c22b98ce769b71",
+  "semanticCommit": "9fb4d8036283a43341fbd9c045f18de1283b5577",
+  "semanticTree": "968299ad63f3aa7e0a47c0fdfd729d116a40ee55",
+  "changedPathCount": 21,
+  "sortedChangedPathSha256": "92f10cfa723c4b404a96806ce801e4c831bb601ac1ff5b4db08099824a3b9c3e",
+  "candidate": {
+    "path": "docs/documentation-audit/HGI-208-candidate.json",
+    "sha256": "78b3970a0866cc616e448caa19d55d776dd76a416e282f795c9a1218a3178bb3"
+  },
+  "independentEvidence": [
+    {
+      "path": "planning:evaluations/hgi-208/forward-a.report.md",
+      "sha256": "a1d1023d07283e2b7294181b89ab472f40fb6e8e74ae74e02a45e81ef2126648"
+    },
+    {
+      "path": "planning:evaluations/hgi-208/forward-b.report.md",
+      "sha256": "b5854c6bbfd17d2bbff8ff99d8973f6b3e41980cf510245519d9675053699da3"
+    },
+    {
+      "path": "planning:evaluations/hgi-208/parent-acceptance.report.md",
+      "sha256": "df75dd9fa278bbc5ab03ef87624d2ca29e98808e20ce79f16dd105cda4c526af"
+    }
+  ],
+  "checks": [
+    {
+      "check": "skill structural validation",
+      "status": "passed",
+      "result": "The approved quick_validate.py accepted docs-maintainer, docs-writer, prd-writer, prd-review, and prd-implementer."
+    },
+    {
+      "check": "skill policy and adversarial fixtures",
+      "status": "passed",
+      "result": "bun run test:skills passed 16 tests and 125 assertions, including singular ownership, relative mirror/UI metadata, PRD invocation and missing-impact/competing-owner/generated/lifecycle/mirror/personal-path fixtures."
+    },
+    {
+      "check": "documentation and checkout policy",
+      "status": "passed",
+      "result": "bun run check:docs reported 0 violations across 589 inspected paths; bun run check:repository-paths accepted 568 text and 8 binary tracked paths."
+    },
+    {
+      "check": "fresh-context behavior",
+      "status": "passed",
+      "result": "Two fresh Terra workers passed calculator, SDK/export, OpenAPI, public lifecycle, CI/release and clean-clone portability scenarios; an independent grader accepted the corrected validator evidence and every semantic route."
+    },
+    {
+      "check": "repository verification",
+      "status": "passed",
+      "result": "bun run verification and git diff --check passed after final profile, docs-writer metadata and candidate-evidence hardening."
+    },
+    {
+      "check": "semantic commit identity",
+      "status": "passed",
+      "result": "Semantic commit 9fb4d8036283a43341fbd9c045f18de1283b5577 has parent 7710d2e10a5161f878d0454455c22b98ce769b71, tree 968299ad63f3aa7e0a47c0fdfd729d116a40ee55, 21 declared paths and the reproduced sorted-path digest."
+    }
+  ],
+  "postcondition": "TaxKit has one portable repository-local documentation-maintenance owner with accurate local routes, a non-overlapping public-copy writer, relative mirrors/UI metadata, PRD and ordinary-change invocation, negative fixtures, and fresh-context acceptance.",
+  "rollback": "Revert the HGI-208 closeout, then semantic commit 9fb4d8036283a43341fbd9c045f18de1283b5577; keep HGI-202 policy and prior evidence intact.",
+  "limitations": [
+    "This receipt proves repository skill/docs/tooling behavior and Git identity only.",
+    "Fresh-context selection does not prove every future documentation change or external client discovery."
+  ],
+  "nonClaims": [
+    "No release, package publication, registry, provider, deployment, SSR/hydration, public-site availability, or external consumer behavior is proved or changed."
+  ]
+}
