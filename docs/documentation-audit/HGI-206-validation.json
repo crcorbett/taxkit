@@ -1,0 +1,68 @@
+{
+  "taskId": "HGI-206",
+  "status": "passed",
+  "observedAt": "2026-07-22T09:43:07Z",
+  "baseCommit": "a8a58882cd6c5f8003d31dc0c0567d78093597b9",
+  "semanticCommit": "c2f41c10dca141c7cb7e066b3a2bff48048101fc",
+  "semanticTree": "091b094f4ffb003fa6d024a6a583b6d282168203",
+  "semanticReadback": {
+    "localHead": "c2f41c10dca141c7cb7e066b3a2bff48048101fc",
+    "originMain": "c2f41c10dca141c7cb7e066b3a2bff48048101fc"
+  },
+  "source": {
+    "changedPaths": 31,
+    "changedPathDigest": "29f7c6a2d187a8b195ee24c8cba9a691e63d74c1ade37593c979eb285c96d38a",
+    "aggregateDigest": "db7f881d895614993f50f1e261998a7d89d1c8256591c0f8b918a2b3a93e16d4",
+    "manifest": {
+      "path": "tools/evals/hgi-206-source-manifest.json",
+      "sha256": "9b82d6ca1bb14e5d52eb6a13e96c5c2f479554b5387c76a32a32326ea609f44f"
+    }
+  },
+  "candidate": {
+    "path": "docs/documentation-audit/HGI-206-candidate.json",
+    "sha256": "984dd921ba156cb20da20955f3d14ae0eeb3c8790e6a31f7badf29334b5b0d6b"
+  },
+  "results": {
+    "path": "tools/evals/hgi-206-results.json",
+    "sha256": "9e3d2338c2ff31a8de5cb0d74bd5c7b7741aedcc3ab30a548efa50137ef49d1c"
+  },
+  "observations": {
+    "path": "tools/evals/hgi-206-contradiction-observations.json",
+    "sha256": "09aed28f0286c791fc929c591cf0323b321b0c3e8745982eee955698ea7a50c8"
+  },
+  "checks": [
+    {
+      "name": "independent portable-path re-audit",
+      "postcondition": "PASS: a fresh independent re-audit accepted the repaired repository-local evidence contract, including portable paths, the non-self-referential source aggregate, retained failed-attempt provenance, addressable bounded receipts, typed contradiction results, and precise impact routing."
+    },
+    {
+      "name": "post-commit repository-path and focused verifier checks",
+      "postcondition": "bun run check:repository-paths and bun run check:hgi-206 passed against the semantic commit; the focused verifier binds the 31-path digest, source aggregate, candidate, results, and observations identities."
+    },
+    {
+      "name": "post-commit type and full repository verification",
+      "postcondition": "The HGI-206 type/test checks and bun run verification passed, including repository-path/types, quality workflow, documentation/runbook, Effect language-service, lint/format, skill/workflow tests, both Knip graphs, and workspace typecheck/build tasks."
+    },
+    {
+      "name": "canonical local release graph",
+      "postcondition": "A sequential bun run release:check -- --ci completed all 9 ordered local checks: verification, tests, builds, docs validation, packed SDK, downstream consumer, API smoke, docs browser, and changeset status."
+    },
+    {
+      "name": "retained concurrent release-check failure",
+      "postcondition": "The earlier concurrent release-check failure is retained as an orchestration concurrency fault; it is not attributed to the accepted HGI-206 semantic tree and is not used as a successful verification result."
+    },
+    {
+      "name": "semantic publication readback",
+      "postcondition": "Before this validation artifact, local HEAD and origin/main both resolved to c2f41c10dca141c7cb7e066b3a2bff48048101fc; this receipt is a separate closeout commit."
+    }
+  ],
+  "rollback": "Revert the HGI-206 validation closeout commit, then semantic commit c2f41c10dca141c7cb7e066b3a2bff48048101fc; retain the candidate, source manifest, result/observation evidence, failed independent attempt, and the retained concurrent-failure provenance.",
+  "limitations": [
+    "The acceptance evidence is repository-local and target-specific; it does not establish a future epoch or independent result beyond the recorded re-audit.",
+    "The retained concurrent failure is orchestration evidence, not a defect diagnosis for the accepted semantic tree."
+  ],
+  "nonClaims": [
+    "No version, tag, hosted release, registry publication, deployment, provider access, public-site availability, recovery operation, or external consumer outcome was performed or established.",
+    "Local repository, packed-consumer, API, browser, and release-graph checks do not prove provider, publication, release, or production actuality."
+  ]
+}
