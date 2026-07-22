@@ -1,0 +1,41 @@
+{
+  "taskId": "HGI-204",
+  "status": "passed",
+  "observedAt": "2026-07-22T03:22:29Z",
+  "baseCommit": "8f256b236e38970ecad159d5606c0dd277fbaf79",
+  "semanticCommit": "e6e19a5a7c3f7c6e0522f981a57a433de9e1ac3c",
+  "candidate": {
+    "path": "docs/documentation-audit/HGI-204-candidate.json",
+    "sha256": "b2a6e6f6393c217c891df2083c55808d1b43f4d79af43129b2ac9f3d3cba7086",
+    "contractPath": "tools/documentation/runbook-contract.json",
+    "contractSha256": "0f6dcc53c2440711f0f45b11e3ee3f5510d91d1859819a93585035a120757551",
+    "boundedReceipt": "tmp/runbook-validation-report.json",
+    "boundedReceiptSha256": "a1f6a83716bf86b1c61b114ae9d8e6fe646a38332106564496a5617f4a94ef81",
+    "boundedReceiptBytes": 623,
+    "runbooks": 4,
+    "commandsInspected": 10,
+    "operationsExecuted": 0
+  },
+  "checks": [
+    {
+      "name": "fresh independent acceptance",
+      "postcondition": "The exact four-runbook inventory, nine unknown-stop operations, HGI-203 handoff, Effect-native bounded validator, documentation routes and adversarial fixtures passed with no blocker."
+    },
+    {
+      "name": "post-commit repository verification",
+      "postcondition": "Full verification, 18 focused runbook tests, documentation policy across 617 files, repository-path policy across 617 tracked files, 16 skill tests, both Knip graphs, 23 workspace typecheck tasks and git diff --check passed."
+    },
+    {
+      "name": "semantic publication readback",
+      "postcondition": "Local HEAD and origin/main both resolved to e6e19a5a7c3f7c6e0522f981a57a433de9e1ac3c after push and fetch."
+    }
+  ],
+  "rollback": "Revert the HGI-204 closeout commit, then semantic e6e19a5a7c3f7c6e0522f981a57a433de9e1ac3c; retain accepted HGI-203 proof and HGI-204 candidate/validation provenance.",
+  "limitations": [
+    "The accepted validator proves repository-local static consistency only and executes none of the documented commands.",
+    "The ignored bounded receipt is diagnostic evidence, not clean-clone accepted proof or operation authority."
+  ],
+  "nonClaims": [
+    "No runbook versioning, commit, tag, hosted release, registry publication, deployment, provider access, public-site mutation or recovery mutation was performed."
+  ]
+}

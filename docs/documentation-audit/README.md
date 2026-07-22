@@ -53,15 +53,17 @@ release-readiness attempt, independent acceptance and semantic Git readback.
 Its explicit non-claims still exclude publication, tags, releases,
 deployments, providers and public availability.
 
-HGI-204 runbook candidate pending independent acceptance:
+Accepted HGI-204 operational-runbook candidate and Git receipt:
 
 - [`HGI-204-candidate.json`](HGI-204-candidate.json)
+- [`HGI-204-validation.json`](HGI-204-validation.json)
 - [`../runbooks/README.md`](../runbooks/README.md)
 - [`../operations/authority-model.md`](../operations/authority-model.md)
 
-The candidate proves static, non-executing consistency only. It does not grant
-or establish version, Git, hosted-release, registry, deployment, provider or
-recovery authority or state.
+The accepted candidate passed fresh-context acceptance, full repository
+verification, semantic publication and exact `origin/main` readback. Its
+static, non-executing proof does not grant or establish version, Git,
+hosted-release, registry, deployment, provider or recovery authority or state.
 
 ## Current docs inventory
 

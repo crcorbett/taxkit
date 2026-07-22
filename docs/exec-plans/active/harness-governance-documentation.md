@@ -48,12 +48,12 @@ deletion/movement require separately approved authority and target runbooks.
   semantic commit `f3a7bdf4e63fcc6ce9dedaf963337def9f65c3a5`; its exact candidate,
   attempt, bounded summary, independent acceptance and Git readback are in
   [`HGI-203-validation.json`](../../documentation-audit/HGI-203-validation.json).
-  HGI-204 is implemented as a candidate: exactly four canonical runbooks, one
-  authority model, strict accepted-evidence binding and a non-executing
-  Effect-native validator are recorded in
-  [`HGI-204-candidate.json`](../../documentation-audit/HGI-204-candidate.json).
-  Independent acceptance remains pending.
-- HGI-205 (CI/controls/automation) depends on HGI-202, HGI-203, and HGI-204;
+- **HGI-204 — completed and published:** exactly four canonical runbooks, one
+  authority model, strict accepted-evidence binding, a non-executing
+  Effect-native validator, adversarial fixtures, fresh-context acceptance and
+  exact semantic Git readback are recorded in
+  [`HGI-204-validation.json`](../../documentation-audit/HGI-204-validation.json).
+- HGI-205 (CI/controls/automation) is the next pending TaxKit slice;
   HGI-206 (requalification/closeout) depends on HGI-200 through HGI-205.
 
 Completed-plan follow-ups are not active work in historical plan bodies. Their
@@ -74,9 +74,8 @@ It did not alter public content, binary evidence, or the architecture tombstone
 route. Integrated parent acceptance is recorded in
 [`HGI-200-validation.json`](../../documentation-audit/HGI-200-validation.json).
 
-HGI-201 and HGI-203 passed independent acceptance and exact Git
+HGI-201, HGI-203 and HGI-204 passed independent acceptance and exact Git
 publication/readback. HGI-207, HGI-202 and HGI-208 have local completion
-receipts; HGI-204 is candidate-ready pending independent acceptance. These
-local records do not prove
+receipts. These local records do not prove
 publication, registry state,
 external consumers, API/docs production behavior, or release authority.

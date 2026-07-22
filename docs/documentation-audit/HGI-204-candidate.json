@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "taskId": "HGI-204",
   "status": "candidate",
-  "observedAt": "2026-07-22T04:15:00Z",
+  "observedAt": "2026-07-22T03:15:00Z",
   "baseCommit": "8f256b236e38970ecad159d5606c0dd277fbaf79",
   "owner": "taxkit-runbook-contract-owner",
   "outcome": "Exactly four canonical TaxKit runbooks, one authority model, one strict machine contract, an Effect-native non-executing validator, adversarial fixtures, maintenance routing and package-safe HGI-203 Schema consumption are implemented for independent acceptance.",
