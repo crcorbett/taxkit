@@ -1,0 +1,42 @@
+{
+  "taskId": "HGI-205",
+  "status": "passed",
+  "observedAt": "2026-07-22T06:18:12Z",
+  "baseCommit": "f698616e5073f968d7500e747ebf8306098b6bc5",
+  "semanticCommit": "082550135ce73bbdbb952fbb686d30061fdca425",
+  "semanticTree": "9faffaf80f5b928e47b9d241302ba8255991d323",
+  "candidatePatchSha256": "712ea6e2196c7b03f94ce41367036b558980046e9174b526427b735eb88604a7",
+  "candidate": {
+    "path": "docs/documentation-audit/HGI-205-candidate.json",
+    "sha256": "853c651d65f2486d7c7f8e9ba14ea4e35383e841e2f3980b5e088fe29322702c",
+    "implementationDigest": "dc572f9b5186f0f2d1443f083be4af020f8c985c7b95a5bd99282e4949e15bf4",
+    "workflow": ".github/workflows/quality.yml",
+    "workflowSha256": "52abacac2a099e8c651e8a0805af86b2ca9704a6c9777f438dbfed4b476dd829"
+  },
+  "checks": [
+    {
+      "name": "independent fresh-context acceptance",
+      "postcondition": "YAML 1.2 structure, exact workflow permissions/timeouts/concurrency/SHA pins, skip and tolerance rejection, fail-closed imported-call analysis, exact controls, relational automation contracts, six isolated real-source mutations, documentation provenance, impact paths and candidate digest passed."
+    },
+    {
+      "name": "post-commit repository verification",
+      "postcondition": "Repository paths, quality workflow, documentation and four-runbook policies, Effect language-service checks, lint/format, 16 skill tests, 10 governance tests with 84 assertions, both Knip graphs, 23 workspace typecheck/build tasks, and git diff --check passed."
+    },
+    {
+      "name": "canonical CI release graph",
+      "postcondition": "bun run release:check -- --ci exited 0 after all nine ordered checks: verification, tests, builds, docs validation, packed SDK, downstream consumer, API smoke, docs browser, and changeset status."
+    },
+    {
+      "name": "semantic publication readback",
+      "postcondition": "After push and fetch, local HEAD and origin/main both resolved to 082550135ce73bbdbb952fbb686d30061fdca425."
+    }
+  ],
+  "rollback": "Revert the HGI-205 closeout commit, then semantic commit 082550135ce73bbdbb952fbb686d30061fdca425; retain HGI-203/HGI-204 accepted evidence, failed/inconclusive candidates, and the canonical release:check graph.",
+  "limitations": [
+    "The accepted controls prove repository-local, packed-consumer and browser/API test behavior only.",
+    "Static workflow fixtures and local CI mode do not establish a hosted GitHub Actions run."
+  ],
+  "nonClaims": [
+    "No version, tag, hosted release, registry publication, deployment, provider, public-site or recovery mutation was performed or established."
+  ]
+}

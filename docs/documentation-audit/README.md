@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -59,6 +59,19 @@ Accepted HGI-204 operational-runbook candidate and Git receipt:
 - [`HGI-204-validation.json`](HGI-204-validation.json)
 - [`../runbooks/README.md`](../runbooks/README.md)
 - [`../operations/authority-model.md`](../operations/authority-model.md)
+
+Accepted HGI-205 CI, control and automation-governance candidate and Git
+receipt:
+
+- [`HGI-205-candidate.json`](HGI-205-candidate.json)
+- [`HGI-205-validation.json`](HGI-205-validation.json)
+- [`../standards/controls.md`](../standards/controls.md)
+- [`../operations/automation-register.md`](../operations/automation-register.md)
+
+The accepted local/static proof covers the exact canonical CI graph, workflow
+guards, six release-boundary mutations, control and automation ownership, and
+semantic Git readback. It does not prove hosted CI, publication, deployment,
+provider state or public availability.
 
 The accepted candidate passed fresh-context acceptance, full repository
 verification, semantic publication and exact `origin/main` readback. Its

@@ -53,10 +53,13 @@ deletion/movement require separately approved authority and target runbooks.
   Effect-native validator, adversarial fixtures, fresh-context acceptance and
   exact semantic Git readback are recorded in
   [`HGI-204-validation.json`](../../documentation-audit/HGI-204-validation.json).
-- HGI-205 (CI/controls/automation) is implemented locally with workflow guards,
-  the canonical CI release graph, controls and automation owners, and focused
-  fixtures. It remains pending independent acceptance and task-ledger closeout;
-  HGI-206 (requalification/closeout) depends on HGI-200 through HGI-205.
+- **HGI-205 — completed and published:** the exact bounded read-only workflow,
+  canonical nine-check CI release graph, immutable action/authority controls,
+  control and automation owners, six isolated release-boundary mutations,
+  full verification, independent acceptance and origin/main readback are
+  recorded in
+  [`HGI-205-validation.json`](../../documentation-audit/HGI-205-validation.json).
+  HGI-206 (requalification/closeout) is now the next TaxKit slice.
 
 Completed-plan follow-ups are not active work in historical plan bodies. Their
 explicit successors are HGI-207 for lifecycle/publication decisions, HGI-201
@@ -76,7 +79,7 @@ It did not alter public content, binary evidence, or the architecture tombstone
 route. Integrated parent acceptance is recorded in
 [`HGI-200-validation.json`](../../documentation-audit/HGI-200-validation.json).
 
-HGI-201, HGI-203 and HGI-204 passed independent acceptance and exact Git
+HGI-201, HGI-203, HGI-204 and HGI-205 passed independent acceptance and exact Git
 publication/readback. HGI-207, HGI-202 and HGI-208 have local completion
 receipts. These local records do not prove
 publication, registry state,
