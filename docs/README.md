@@ -52,8 +52,8 @@ lifecycle; migrate it only when its owner is materially revised.
 | Current intent | [`product-specs/index.md`](product-specs/index.md) and [`exec-plans/active/README.md`](exec-plans/active/README.md) | Only genuinely active work; implemented/history stays inventory. |
 | Completed history | [`exec-plans/completed/README.md`](exec-plans/completed/README.md) | Historical provenance, never default policy. |
 | Public docs product | [`../apps/docs/README.md`](../apps/docs/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md), and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) | Consumer-facing content/runtime, not maintainer lifecycle policy. |
-| Repeatable release/recovery operations | No canonical target-owned runbook route yet | HGI-204 creates `docs/runbooks/**`; do not expand architecture/README prose into a runbook. |
-| Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md) for current checks; future sanitized release receipts belong under `docs/evidence/releases/**` | HGI-203 creates the bounded receipt schema and journey owners; raw logs and secrets are never durable proof. |
+| Repeatable release/recovery operations | [`runbooks/README.md`](runbooks/README.md) and [`operations/authority-model.md`](operations/authority-model.md) | Exactly four target-owned procedures; stop consequential operations when principal or receipt is unknown. |
+| Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md), [`verification/critical-journeys.json`](verification/critical-journeys.json), [`evidence/releases/HGI-203-local.json`](evidence/releases/HGI-203-local.json), and [`documentation-audit/HGI-203-validation.json`](documentation-audit/HGI-203-validation.json) | Accepted HGI-203 owns the five journeys and bounded local proof; HGI-204 runbooks consume it. Raw logs and secrets are never durable proof. |
 | References | [`references/README.md`](references/README.md) | Revalidate mutable external guidance. |
 | Audit/accounting | [`documentation-audit/README.md`](documentation-audit/README.md) | Dated evidence, not policy. |
 
@@ -87,3 +87,9 @@ and generated-source edges with bounded diagnostics and a JSON detail receipt.
 `draft` means authored, locally renderable, visibly labelled candidate content;
 `published` means explicitly accepted current public documentation. Neither
 status proves runtime or external availability.
+
+`bun run check:runbooks` Schema-decodes the canonical runbook contract and
+accepted HGI-203 handoff, reconciles the exact four Markdown owners, commands,
+evidence paths, stop operations, index rows and authority rows, and writes only
+the ignored bounded receipt `tmp/runbook-validation-report.json`. It executes
+none of the documented procedures and establishes no consequential state.

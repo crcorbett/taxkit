@@ -31,6 +31,9 @@ const decodingBoundaryFiles = [
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/check.runtime.test.ts",
+  "tools/documentation/runbook-check.runtime.ts",
+  "tools/documentation/runbook-check.runtime.test.ts",
+  "tools/documentation/runbook-policy.test.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/repository-paths/policy.test.ts",
   "tools/repository-paths/policy.ts",
@@ -116,6 +119,7 @@ const schemaEncoderEgressFiles = [
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
+  "tools/documentation/runbook-check.runtime.ts",
 ];
 
 const throwingCodecTestFiles = [
@@ -145,6 +149,8 @@ const runtimeBoundaryFiles = [
   "tools/repository-paths/check.runtime.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/check.runtime.test.ts",
+  "tools/documentation/runbook-check.runtime.ts",
+  "tools/documentation/runbook-policy.test.ts",
 ];
 
 const processBoundaryFiles = [
@@ -153,6 +159,7 @@ const processBoundaryFiles = [
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
+  "tools/documentation/runbook-check.runtime.ts",
 ];
 
 const consoleBoundaryFiles = [
@@ -163,6 +170,7 @@ const consoleBoundaryFiles = [
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
+  "tools/documentation/runbook-check.runtime.ts",
 ];
 
 const bunAdapterFiles = [
@@ -174,6 +182,8 @@ const bunAdapterFiles = [
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
   "tools/oxlint/portable-rules.test.ts",
   "tools/documentation/check.runtime.ts",
+  "tools/documentation/runbook-check.runtime.ts",
+  "tools/documentation/runbook-check.runtime.test.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
@@ -186,6 +196,7 @@ const bunRuntimeEntrypointFiles = [
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/documentation/check.runtime.ts",
+  "tools/documentation/runbook-check.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
 ];
 

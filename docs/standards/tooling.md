@@ -31,6 +31,8 @@ library with stable package boundaries and predictable bundle behavior.
   API runtime reachability.
 - `tools/documentation` owns the Effect-native `check:docs` policy, bounded
   receipts, negative fixtures, and machine-readable owner contract.
+- `tools/documentation` also owns the flat sequential, non-executing
+  `check:runbooks` validator and its strict prose/sidecar adversarial fixtures.
 - TypeScript is cataloged at the root and uses `ES2025` lib support.
 - Changesets record package-facing changes before release automation exists.
   See [Versioning and Changesets](./versioning.md).
@@ -41,6 +43,7 @@ library with stable package boundaries and predictable bundle behavior.
 bun run check
 bun run fix
 bun run check:docs
+bun run check:runbooks
 bun run knip
 bun run knip:production
 bun run changeset
@@ -65,6 +68,14 @@ console output names the violated invariant, owner, target, recovery hint, and
 full JSON detail path. The check treats public lifecycle status as an opaque
 product value and cannot prove publication, runtime rendering, or external
 availability.
+
+Use `bun run check:runbooks` after any runbook, release command, Changesets,
+package graph, HGI-203 handoff, recovery or authority-boundary change. It checks
+the exact four-runbook inventory and canonical paths, public command existence,
+prose/sidecar agreement, unique owners, substantive required sections, accepted
+proof binding and unknown-principal stops. It executes no documented command;
+its only output artifact is the ignored bounded
+`tmp/runbook-validation-report.json` receipt.
 
 Use `bun run verification` after changes that affect docs routing, package
 exports, Effect config composition, HTTP API contracts, runtime layers or

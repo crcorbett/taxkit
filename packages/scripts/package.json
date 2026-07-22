@@ -14,6 +14,12 @@
       "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./release-readiness": {
+      "bun": "./src/release-readiness/index.ts",
+      "source": "./src/release-readiness/index.ts",
+      "types": "./dist/release-readiness/index.d.ts",
+      "default": "./dist/release-readiness/index.js"
     }
   },
   "publishConfig": {
@@ -21,6 +27,10 @@
       ".": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "./release-readiness": {
+        "types": "./dist/release-readiness/index.d.ts",
+        "default": "./dist/release-readiness/index.js"
       }
     },
     "access": "public"

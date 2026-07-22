@@ -1,0 +1,340 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-204",
+  "owner": "taxkit-runbook-contract-owner",
+  "reviewTrigger": "release command, Changesets, package graph, HGI-203 evidence, recovery, or authority-boundary change",
+  "acceptedHandoff": {
+    "packet": "docs/evidence/releases/HGI-203-local.json",
+    "journeyInventory": "docs/verification/critical-journeys.json",
+    "acceptedSummary": "docs/evidence/releases/HGI-203-accepted-attempt.json",
+    "failedProvenance": "docs/evidence/releases/HGI-203-failed-attempts.json",
+    "validationReceipt": "docs/documentation-audit/HGI-203-validation.json"
+  },
+  "authorityStops": [
+    {
+      "operation": "versioning",
+      "principal": "unknown",
+      "principalSource": "no standing principal in repository evidence",
+      "status": "unknown-stop",
+      "resource": "TaxKit package manifests and changelogs",
+      "environment": "local checkout",
+      "approvalBoundary": "named principal and exact release-train scope required per run",
+      "durationOrRevocation": "must be supplied by the approval receipt",
+      "auditReceipt": "pre/post Changeset, version and changed-path receipt",
+      "rollbackPrecondition": "exact changed manifests and artifacts identified before mutation",
+      "escalation": "requesting repository owner"
+    },
+    {
+      "operation": "commit",
+      "principal": "unknown",
+      "principalSource": "no standing principal in repository evidence",
+      "status": "unknown-stop",
+      "resource": "TaxKit Git history",
+      "environment": "local Git repository",
+      "approvalBoundary": "named principal, exact paths, branch and message required per run",
+      "durationOrRevocation": "must be supplied by the approval receipt",
+      "auditReceipt": "commit, tree and changed-path identity",
+      "rollbackPrecondition": "accepted semantic scope and local revert owner identified",
+      "escalation": "requesting repository owner"
+    },
+    {
+      "operation": "push",
+      "principal": "unknown",
+      "principalSource": "no standing principal in repository evidence",
+      "status": "unknown-stop",
+      "resource": "TaxKit remote branch",
+      "environment": "Git remote",
+      "approvalBoundary": "named principal, remote, branch and expected commit required per run",
+      "durationOrRevocation": "must be supplied by the approval receipt",
+      "auditReceipt": "remote commit SHA readback",
+      "rollbackPrecondition": "remote recovery authority and expected prior state identified",
+      "escalation": "requesting repository owner"
+    },
+    {
+      "operation": "tag",
+      "principal": "unknown",
+      "principalSource": "no standing principal in repository evidence",
+      "status": "unknown-stop",
+      "resource": "TaxKit Git tag or hosted release",
+      "environment": "Git provider",
+      "approvalBoundary": "named principal, target commit and immutable tag identity required per run",
+      "durationOrRevocation": "must be supplied by the approval receipt",
+      "auditReceipt": "provider tag or release readback",
+      "rollbackPrecondition": "provider-specific tag or release recovery established",
+      "escalation": "requesting repository owner"
+    },
+    {
+      "operation": "release",
+      "principal": "unknown",
+      "principalSource": "no standing principal in repository evidence",
+      "status": "unknown-stop",
+      "resource": "TaxKit hosted release",
+      "environment": "Git provider",
+      "approvalBoundary": "named principal, provider, target commit and release identity required per run",
+      "durationOrRevocation": "must be supplied by the approval receipt",
+      "auditReceipt": "hosted release readback",
+      "rollbackPrecondition": "provider-specific release recovery established",
+      "escalation": "requesting repository owner"
+    },
+    {
+      "operation": "registry-publication",
+      "principal": "unknown",
+      "principalSource": "no standing principal in repository evidence",
+      "status": "unknown-stop",
+      "resource": "TaxKit package/version set",
+      "environment": "npm registry",
+      "approvalBoundary": "named principal, registry, package/version set and credential scope required per run",
+      "durationOrRevocation": "credential expiry or revocation must be supplied",
+      "auditReceipt": "registry readback for every exact artifact",
+      "rollbackPrecondition": "registry deprecation/recovery and credential revocation established",
+      "escalation": "requesting repository owner"
+    },
+    {
+      "operation": "deployment",
+      "principal": "unknown",
+      "principalSource": "no standing principal or deployment runbook in repository evidence",
+      "status": "unknown-stop",
+      "resource": "TaxKit application or infrastructure deployment",
+      "environment": "runtime environment",
+      "approvalBoundary": "provider-specific runbook and named principal required per run",
+      "durationOrRevocation": "deployment and credential revocation must be supplied",
+      "auditReceipt": "provider and runtime readback",
+      "rollbackPrecondition": "environment-specific rollback and reconciliation established",
+      "escalation": "requesting repository owner"
+    },
+    {
+      "operation": "provider-access",
+      "principal": "unknown",
+      "principalSource": "no standing principal or provider reader in repository evidence",
+      "status": "unknown-stop",
+      "resource": "external provider state",
+      "environment": "external provider",
+      "approvalBoundary": "named principal, identity, operation, resource and environment required per run",
+      "durationOrRevocation": "credential expiry or revocation must be supplied",
+      "auditReceipt": "provider operation and readback receipt",
+      "rollbackPrecondition": "provider-specific recovery and revocation established",
+      "escalation": "requesting repository owner"
+    },
+    {
+      "operation": "recovery-mutation",
+      "principal": "unknown",
+      "principalSource": "no standing recovery principal in repository evidence",
+      "status": "unknown-stop",
+      "resource": "named local or external recovery target",
+      "environment": "affected recovery environment",
+      "approvalBoundary": "named principal, exact target and rollback operation required per run",
+      "durationOrRevocation": "must be supplied by the approval receipt",
+      "auditReceipt": "pre/post target identity and recovery postcondition",
+      "rollbackPrecondition": "changed manifests or artifacts identified before mutation",
+      "escalation": "requesting repository owner"
+    }
+  ],
+  "runbooks": [
+    {
+      "id": "release-readiness",
+      "path": "docs/runbooks/release-readiness.md",
+      "owner": "taxkit-release-readiness-operation-owner",
+      "acceptedEvidenceRequired": true,
+      "commands": [
+        {
+          "scriptOwner": "root",
+          "script": "test:release-readiness",
+          "argv": ["bun", "run", "test:release-readiness"],
+          "invocation": "bun run test:release-readiness",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
+        },
+        {
+          "scriptOwner": "root",
+          "script": "verification",
+          "argv": ["bun", "run", "verification"],
+          "invocation": "bun run verification",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
+        },
+        {
+          "scriptOwner": "root",
+          "script": "release:check",
+          "argv": ["bun", "run", "release:check"],
+          "invocation": "bun run release:check",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
+        },
+        {
+          "scriptOwner": "root",
+          "script": "release:present",
+          "argv": ["bun", "run", "release:present"],
+          "invocation": "RELEASE_ATTEMPT_PATH=<repository-relative-receipt.json> RELEASE_ATTEMPT_SHA256=sha256:<64-hex-digest> bun run release:present",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [
+            "RELEASE_ATTEMPT_PATH",
+            "RELEASE_ATTEMPT_SHA256"
+          ],
+          "executeInDryRun": false
+        }
+      ],
+      "evidencePaths": [
+        "docs/evidence/releases/HGI-203-local.json",
+        "docs/verification/critical-journeys.json",
+        "docs/evidence/releases/HGI-203-accepted-attempt.json",
+        "docs/evidence/releases/HGI-203-failed-attempts.json",
+        "docs/documentation-audit/HGI-203-validation.json"
+      ],
+      "stopOperations": [
+        "versioning",
+        "commit",
+        "push",
+        "tag",
+        "release",
+        "registry-publication",
+        "deployment",
+        "provider-access",
+        "recovery-mutation"
+      ]
+    },
+    {
+      "id": "versioning",
+      "path": "docs/runbooks/versioning.md",
+      "owner": "taxkit-versioning-operation-owner",
+      "acceptedEvidenceRequired": false,
+      "commands": [
+        {
+          "scriptOwner": "root",
+          "script": "changeset",
+          "argv": ["bun", "run", "changeset", "status", "--verbose"],
+          "invocation": "bun run changeset status --verbose",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
+        },
+        {
+          "scriptOwner": "root",
+          "script": "version-repo",
+          "argv": ["bun", "run", "version-repo"],
+          "invocation": "bun run version-repo",
+          "requiredAuthority": "versioning",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
+        }
+      ],
+      "evidencePaths": [
+        ".changeset/config.json",
+        "docs/standards/versioning.md",
+        "docs/operations/authority-model.md"
+      ],
+      "stopOperations": [
+        "versioning",
+        "commit",
+        "push",
+        "tag",
+        "release",
+        "registry-publication",
+        "deployment",
+        "provider-access",
+        "recovery-mutation"
+      ]
+    },
+    {
+      "id": "packed-consumer-proof",
+      "path": "docs/runbooks/packed-consumer-proof.md",
+      "owner": "taxkit-packed-consumer-operation-owner",
+      "acceptedEvidenceRequired": false,
+      "commands": [
+        {
+          "scriptOwner": "@taxkit/sdk",
+          "script": "check-packed-artifact",
+          "argv": [
+            "bun",
+            "run",
+            "--filter=@taxkit/sdk",
+            "check-packed-artifact"
+          ],
+          "invocation": "bun run --filter=@taxkit/sdk check-packed-artifact",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
+        },
+        {
+          "scriptOwner": "@taxkit/sdk",
+          "script": "validate:downstream",
+          "argv": ["bun", "run", "--filter=@taxkit/sdk", "validate:downstream"],
+          "invocation": "bun run --filter=@taxkit/sdk validate:downstream",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
+        }
+      ],
+      "evidencePaths": [
+        "packages/sdk/typescript/package.json",
+        "packages/sdk/typescript/README.md",
+        "docs/evidence/releases/HGI-203-accepted-attempt.json"
+      ],
+      "stopOperations": [
+        "versioning",
+        "commit",
+        "push",
+        "tag",
+        "release",
+        "registry-publication",
+        "deployment",
+        "provider-access",
+        "recovery-mutation"
+      ]
+    },
+    {
+      "id": "recovery",
+      "path": "docs/runbooks/recovery.md",
+      "owner": "taxkit-recovery-operation-owner",
+      "acceptedEvidenceRequired": true,
+      "commands": [
+        {
+          "scriptOwner": "root",
+          "script": "release:present",
+          "argv": ["bun", "run", "release:present"],
+          "invocation": "RELEASE_ATTEMPT_PATH=<repository-relative-receipt.json> RELEASE_ATTEMPT_SHA256=sha256:<64-hex-digest> bun run release:present",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [
+            "RELEASE_ATTEMPT_PATH",
+            "RELEASE_ATTEMPT_SHA256"
+          ],
+          "executeInDryRun": false
+        },
+        {
+          "scriptOwner": "root",
+          "script": "changeset",
+          "argv": ["bun", "run", "changeset", "status", "--verbose"],
+          "invocation": "bun run changeset status --verbose",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
+        }
+      ],
+      "evidencePaths": [
+        "docs/evidence/releases/HGI-203-accepted-attempt.json",
+        "docs/evidence/releases/HGI-203-failed-attempts.json",
+        "docs/operations/authority-model.md"
+      ],
+      "stopOperations": [
+        "versioning",
+        "commit",
+        "push",
+        "tag",
+        "release",
+        "registry-publication",
+        "deployment",
+        "provider-access",
+        "recovery-mutation"
+      ]
+    }
+  ],
+  "dryRun": {
+    "executeCommands": false,
+    "operationsExecuted": [],
+    "reportPath": "tmp/runbook-validation-report.json",
+    "postcondition": "Exactly four runbook contracts, paths, substantive sections, commands, evidence owners, authority stops, rollback and escalation are inspected without command execution.",
+    "nonClaim": "Static validation performs no versioning, commit, push, tag, publication, release, deployment, provider access or recovery mutation and proves no external state."
+  }
+}

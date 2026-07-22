@@ -132,3 +132,154 @@ export const OwnerPolicy = Schema.Struct({
   }),
 });
 export type OwnerPolicy = typeof OwnerPolicy.Type;
+
+export const RunbookId = Schema.Literals([
+  "release-readiness",
+  "versioning",
+  "packed-consumer-proof",
+  "recovery",
+]);
+export type RunbookId = typeof RunbookId.Type;
+
+export const ConsequentialOperation = Schema.Literals([
+  "versioning",
+  "commit",
+  "push",
+  "tag",
+  "release",
+  "registry-publication",
+  "deployment",
+  "provider-access",
+  "recovery-mutation",
+]);
+export type ConsequentialOperation = typeof ConsequentialOperation.Type;
+
+const RunbookCommand = Schema.Struct({
+  argv: Schema.NonEmptyArray(Schema.NonEmptyString),
+  executeInDryRun: Schema.Literal(false),
+  invocation: Schema.NonEmptyString,
+  requiredAuthority: Schema.Literals(["local-proof", "versioning"]),
+  requiredEnvironment: Schema.Array(
+    Schema.Literals(["RELEASE_ATTEMPT_PATH", "RELEASE_ATTEMPT_SHA256"])
+  ),
+  script: Schema.NonEmptyString,
+  scriptOwner: Schema.Literals(["root", "@taxkit/sdk"]),
+});
+
+const RunbookEntry = Schema.Struct({
+  acceptedEvidenceRequired: Schema.Boolean,
+  commands: Schema.NonEmptyArray(RunbookCommand),
+  evidencePaths: Schema.NonEmptyArray(Schema.NonEmptyString),
+  id: RunbookId,
+  owner: Schema.NonEmptyString,
+  path: Schema.NonEmptyString,
+  stopOperations: Schema.NonEmptyArray(ConsequentialOperation),
+});
+
+const AuthorityStop = Schema.Struct({
+  approvalBoundary: Schema.NonEmptyString,
+  auditReceipt: Schema.NonEmptyString,
+  durationOrRevocation: Schema.NonEmptyString,
+  environment: Schema.NonEmptyString,
+  escalation: Schema.NonEmptyString,
+  operation: ConsequentialOperation,
+  principal: Schema.NonEmptyString,
+  principalSource: Schema.NonEmptyString,
+  resource: Schema.NonEmptyString,
+  rollbackPrecondition: Schema.NonEmptyString,
+  status: Schema.Literals(["unknown-stop", "approved"]),
+});
+
+export const RunbookContract = Schema.Struct({
+  acceptedHandoff: Schema.Struct({
+    acceptedSummary: Schema.NonEmptyString,
+    failedProvenance: Schema.NonEmptyString,
+    journeyInventory: Schema.NonEmptyString,
+    packet: Schema.NonEmptyString,
+    validationReceipt: Schema.NonEmptyString,
+  }),
+  authorityStops: Schema.NonEmptyArray(AuthorityStop),
+  dryRun: Schema.Struct({
+    executeCommands: Schema.Literal(false),
+    nonClaim: Schema.NonEmptyString,
+    operationsExecuted: Schema.Tuple([]),
+    postcondition: Schema.NonEmptyString,
+    reportPath: Schema.Literal("tmp/runbook-validation-report.json"),
+  }),
+  owner: Schema.NonEmptyString,
+  reviewTrigger: Schema.NonEmptyString,
+  runbooks: Schema.NonEmptyArray(RunbookEntry),
+  schemaVersion: Schema.Literal(1),
+  taskId: Schema.Literal("HGI-204"),
+});
+export type RunbookContract = typeof RunbookContract.Type;
+
+const CommitSha = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
+const Sha256 = Schema.String.check(
+  Schema.isPattern(/^(?:sha256:)?[a-f0-9]{64}$/u)
+);
+
+export const Hgi203ValidationProjection = Schema.Struct({
+  candidate: Schema.Struct({
+    acceptedSummary: Schema.Literal(
+      "docs/evidence/releases/HGI-203-accepted-attempt.json"
+    ),
+    acceptedSummarySha256: Sha256,
+    attemptId: Schema.String.check(Schema.isPattern(/^release-[0-9]+$/u)),
+    contentManifest: Schema.Literal(
+      "docs/evidence/releases/HGI-203-content-manifest.txt"
+    ),
+    contentManifestSha256: Sha256,
+    packet: Schema.Literal("docs/evidence/releases/HGI-203-local.json"),
+    packetSha256: Sha256,
+  }),
+  semanticCommit: CommitSha,
+  status: Schema.Literal("passed"),
+  taskId: Schema.Literal("HGI-203"),
+});
+export type Hgi203ValidationProjection = typeof Hgi203ValidationProjection.Type;
+
+export const RunbookInvariant = Schema.Literals([
+  "exact-inventory",
+  "unique-owner",
+  "required-section",
+  "existing-command",
+  "evidence-path",
+  "authority-stop",
+  "accepted-handoff",
+  "non-executing",
+]);
+export type RunbookInvariant = typeof RunbookInvariant.Type;
+
+export class RunbookDiagnostic extends Schema.TaggedClass<RunbookDiagnostic>()(
+  "RunbookDiagnostic",
+  {
+    invariant: RunbookInvariant,
+    owner: Schema.NonEmptyString,
+    recovery: Schema.NonEmptyString,
+    target: Schema.NonEmptyString,
+  }
+) {}
+
+export class RunbookValidationReceipt extends Schema.TaggedClass<RunbookValidationReceipt>()(
+  "RunbookValidationReceipt",
+  {
+    diagnostics: Schema.Array(RunbookDiagnostic),
+    inspectedCommands: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+    inspectedRunbooks: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+    nonClaim: Schema.NonEmptyString,
+    ok: Schema.Boolean,
+    omittedDiagnostics: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+    operationsExecuted: Schema.Tuple([]),
+    postcondition: Schema.NonEmptyString,
+    reportPath: Schema.Literal("tmp/runbook-validation-report.json"),
+    schemaVersion: Schema.Literal(1),
+    taskId: Schema.Literal("HGI-204"),
+    violationCount: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+  }
+) {}
+
+export class RunbookValidationError extends Schema.TaggedErrorClass<RunbookValidationError>()(
+  "RunbookValidationError",
+  { operation: Schema.NonEmptyString }
+) {}

@@ -8,6 +8,7 @@
         "@changesets/cli": "^2.31.0",
         "@effect/language-service": "catalog:",
         "@effect/platform-bun": "catalog:",
+        "@taxkit/scripts": "workspace:*",
         "@types/bun": "catalog:",
         "effect": "catalog:",
         "knip": "6.14.2",

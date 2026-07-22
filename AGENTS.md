@@ -21,7 +21,8 @@ file; edit `AGENTS.md` only.
 3. Put current implementation intent in a SPEC/task and active execution plan;
    never reopen completed work as policy.
 4. Update the earliest durable owner and required pointers in the same slice.
-5. Run `bun run check:docs`, focused checks, and `bun run verification`;
+5. Run `bun run check:docs`, `bun run check:runbooks` when operations changed,
+   focused checks, and `bun run verification`;
    package-facing changes also need an appropriate Changeset.
 6. Retain artifact identity, authority, postconditions, limitations,
    non-claims, and rollback.
@@ -56,6 +57,9 @@ attached implementation authority names the reviewer and publisher.
 - Standards, tests, and release checks:
   [`docs/standards/README.md`](docs/standards/README.md) and
   [`docs/architecture/testing-and-quality.md`](docs/architecture/testing-and-quality.md).
+- Repeatable release, versioning, packed-consumer and recovery operations:
+  [`docs/runbooks/README.md`](docs/runbooks/README.md) and
+  [`docs/operations/authority-model.md`](docs/operations/authority-model.md).
 - References and audits: [`docs/references/README.md`](docs/references/README.md)
   and [`docs/documentation-audit/README.md`](docs/documentation-audit/README.md).
 

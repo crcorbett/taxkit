@@ -20,6 +20,8 @@ This package owns:
 - the `ReleaseCommandRunner` service contract
 - the Effect Platform child-process live layer and deterministic test layer
 - the release-readiness program, rendering policy and Bun runtime entrypoint
+- the narrow `@taxkit/scripts/release-readiness` source/types/default export
+  for the HGI-203 proof packet, accepted-summary and journey-inventory Schemas
 
 It does not own the validators it invokes. SDK packing and downstream checks
 stay in `packages/sdk/typescript`, docs validation and browser proof stay with
@@ -139,6 +141,14 @@ stream-redactor seams are executed by production code and directly exercised by
 the focused tests, but are intentionally absent from the package public export
 map. The normal Knip graph, package index and focused tests remain the owners for
 all other unused exports.
+
+The package root does not expose proof internals or a generic digest helper.
+Repository tooling that must validate the accepted HGI-203 handoff imports only
+the three Schemas from `@taxkit/scripts/release-readiness`; hashing remains at
+the consuming filesystem boundary. The subpath carries `bun` and `source`
+live-source conditions plus `types` and `default` build conditions, so
+repository tooling and direct Bun tests resolve live source while built
+consumers resolve declarations and JavaScript.
 
 ## Local proof boundary
 

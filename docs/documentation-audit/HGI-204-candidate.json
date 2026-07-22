@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-204",
+  "status": "candidate",
+  "observedAt": "2026-07-22T04:15:00Z",
+  "baseCommit": "8f256b236e38970ecad159d5606c0dd277fbaf79",
+  "owner": "taxkit-runbook-contract-owner",
+  "outcome": "Exactly four canonical TaxKit runbooks, one authority model, one strict machine contract, an Effect-native non-executing validator, adversarial fixtures, maintenance routing and package-safe HGI-203 Schema consumption are implemented for independent acceptance.",
+  "inventory": [
+    {
+      "id": "release-readiness",
+      "path": "docs/runbooks/release-readiness.md",
+      "owner": "taxkit-release-readiness-operation-owner"
+    },
+    {
+      "id": "versioning",
+      "path": "docs/runbooks/versioning.md",
+      "owner": "taxkit-versioning-operation-owner"
+    },
+    {
+      "id": "packed-consumer-proof",
+      "path": "docs/runbooks/packed-consumer-proof.md",
+      "owner": "taxkit-packed-consumer-operation-owner"
+    },
+    {
+      "id": "recovery",
+      "path": "docs/runbooks/recovery.md",
+      "owner": "taxkit-recovery-operation-owner"
+    }
+  ],
+  "authority": {
+    "principal": "unknown for documented consequential operations",
+    "status": "unknown-stop",
+    "operations": [
+      "versioning",
+      "commit",
+      "push",
+      "tag",
+      "release",
+      "registry-publication",
+      "deployment",
+      "provider-access",
+      "recovery-mutation"
+    ],
+    "model": "docs/operations/authority-model.md",
+    "contract": "tools/documentation/runbook-contract.json",
+    "localSliceAuthority": "Repository writes and local/read-only verification only; no documented consequential operation is authorized by this candidate."
+  },
+  "acceptedHgi203Handoff": {
+    "packet": {
+      "path": "docs/evidence/releases/HGI-203-local.json",
+      "sha256": "f467f3b6378b03ae50f7b1e3df3d19a7a07d15c1047af81a0269100d3db1976e"
+    },
+    "journeyInventory": {
+      "path": "docs/verification/critical-journeys.json",
+      "sha256": "13b7c960ff7b5f5fef236cff4cef800409f822e6be2a552eaa78b64be2d8ad5a"
+    },
+    "acceptedSummary": {
+      "path": "docs/evidence/releases/HGI-203-accepted-attempt.json",
+      "sha256": "b11d02d38d1ec6961d6749a8b471c48ac92b2d95a9f0f00c7faeb68df3bd668c"
+    },
+    "failedProvenance": {
+      "path": "docs/evidence/releases/HGI-203-failed-attempts.json",
+      "sha256": "9fb2ad0f3671bd6e2c4b8215e21be13947a3688c449e329f91ce96373f8ebbf9"
+    },
+    "validationReceipt": {
+      "path": "docs/documentation-audit/HGI-203-validation.json",
+      "sha256": "f106085e47e29645362a25322671978a1d137b3c2dce977b1a41c3cab8a93ce3"
+    },
+    "semanticCommit": "f3a7bdf4e63fcc6ce9dedaf963337def9f65c3a5",
+    "attemptId": "release-1784687182331"
+  },
+  "validator": {
+    "command": "bun run check:runbooks",
+    "contractPath": "tools/documentation/runbook-contract.json",
+    "contractSha256": "0f6dcc53c2440711f0f45b11e3ee3f5510d91d1859819a93585035a120757551",
+    "receiptPath": "tmp/runbook-validation-report.json",
+    "receiptSha256": "a1f6a83716bf86b1c61b114ae9d8e6fe646a38332106564496a5617f4a94ef81",
+    "receiptBytes": 623,
+    "operationsExecuted": [],
+    "observedPostcondition": "Four runbooks and ten declared command contracts passed with zero violations and zero executed operations.",
+    "failurePostcondition": "A subprocess pre-receipt fixture exited 1 with one bounded recovery line, no stack, and no fixture or home path."
+  },
+  "fixtures": [
+    "valid exact inventory including substantive final section",
+    "unknown principal",
+    "nonexistent command",
+    "missing bun run prefix",
+    "wrong executable prefix",
+    "missing documented command arguments",
+    "duplicate owner",
+    "missing rollback",
+    "missing escalation",
+    "candidate or tmp accepted-proof substitution",
+    "stale or hash-mismatched proof",
+    "sidecar and Markdown command divergence",
+    "extra runbook file and index row",
+    "swapped authority table fields",
+    "version-repo authority downgrade",
+    "accepted-evidence flag drift",
+    "extra mutable attempt detail artifact",
+    "bounded pre-receipt subprocess failure"
+  ],
+  "impactLedger": [
+    {
+      "class": "calculator rules, facts and schemas",
+      "decision": "N/A",
+      "evidence": "No calculator or rules source, Schema, behavior or public contract changed.",
+      "owner": "owning calculator and rule packages",
+      "acceptance": "Repository verification preserves their existing gates.",
+      "limitation": "This slice makes no calculator-correctness claim."
+    },
+    {
+      "class": "SDK exports, examples and packed consumer",
+      "decision": "Preserve",
+      "evidence": "The packed-consumer runbook routes existing @taxkit/sdk commands and README without changing SDK source or exports.",
+      "owner": "packages/sdk/typescript",
+      "acceptance": "Declared commands are resolved from the SDK package manifest and full verification preserves package checks.",
+      "limitation": "No registry or external consumer was observed."
+    },
+    {
+      "class": "HTTP, OpenAPI and public MDX/runtime",
+      "decision": "N/A",
+      "evidence": "No API schema, OpenAPI source/snapshot, MDX, navigation, Fumadocs source or runtime file changed.",
+      "owner": "packages/api/http and docs app/packages",
+      "acceptance": "Documentation policy and full repository verification remain the preservation gates.",
+      "limitation": "No API, publication, SSR/hydration or public availability claim is made."
+    },
+    {
+      "class": "package exports and package README",
+      "decision": "Change required",
+      "evidence": "@taxkit/scripts now exposes only three owning HGI-203 Schemas through @taxkit/scripts/release-readiness with bun/source/types/default conditions; its README and one patch Changeset describe the boundary.",
+      "owner": "packages/scripts/package.json, packages/scripts/src/release-readiness/index.ts and packages/scripts/README.md",
+      "acceptance": "Direct Bun export fixture, package typecheck/build, Knip and frozen install.",
+      "limitation": "No package was versioned or published."
+    },
+    {
+      "class": "architecture, standards and repository routes",
+      "decision": "Change required",
+      "evidence": "AGENTS.md and docs/README.md route the exact index/authority owner; tooling and versioning standards route checks and authority without copying procedures. Architecture remains unchanged because no architecture boundary changed.",
+      "owner": "docs/README.md, AGENTS.md, docs/standards/tooling.md and docs/standards/versioning.md",
+      "acceptance": "check:docs, check:repository-paths and link validation.",
+      "limitation": "Routes do not establish operational success."
+    },
+    {
+      "class": "commands, runbooks, authority and release proof",
+      "decision": "Change required",
+      "evidence": "Exactly four procedure owners, one authority model, one strict sidecar and check:runbooks consume the accepted HGI-203 graph without copying its Schemas or running commands.",
+      "owner": "docs/runbooks, docs/operations/authority-model.md and tools/documentation",
+      "acceptance": "Bounded validator receipt and eighteen positive/adversarial focused scenarios.",
+      "limitation": "Static inspection proves no Git, version, hosted-release, registry, deployment, provider or recovery state."
+    },
+    {
+      "class": "skills and maintenance profile",
+      "decision": "Change required",
+      "evidence": "The repo-local docs-maintainer skill and TaxKit profile route operation changes to the canonical index, sidecar, authority model and check without duplicating steps.",
+      "owner": ".agents/skills/docs-maintainer",
+      "acceptance": "bun run test:skills and repository path policy.",
+      "limitation": "The skill teaches maintenance judgment and grants no operation authority."
+    },
+    {
+      "class": "lint, config and tests",
+      "decision": "Change required",
+      "evidence": "Oxlint admits only the exact new decode, encode, runtime, console and Bun boundaries; fixtures exercise structural, semantic, authority, handoff, prose-divergence and bounded-output failures.",
+      "owner": "oxlint.config.ts and tools/documentation/*.test.ts",
+      "acceptance": "lint, check:docs:types, focused documentation tests and full verification.",
+      "limitation": "Tests observe local deterministic policy only."
+    },
+    {
+      "class": "active SPEC, execution plan and evidence index",
+      "decision": "Change required",
+      "evidence": "The TaxKit SPEC and active plan mark HGI-204 candidate pending independent acceptance; the audit index routes this candidate.",
+      "owner": "docs/product-specs/harness-governance-documentation.md, docs/exec-plans/active/harness-governance-documentation.md and docs/documentation-audit/README.md",
+      "acceptance": "Task state and evidence route change together; final completion waits for independent acceptance and Git receipt.",
+      "limitation": "Candidate status is not acceptance or completion."
+    },
+    {
+      "class": "CI and continuous automation",
+      "decision": "Preserve",
+      "evidence": "check:runbooks joins local verification, but no workflow or continuous authority is added; HGI-205 remains the explicit successor.",
+      "owner": "package.json and future HGI-205 controls",
+      "acceptance": "Local full verification must pass before independent review.",
+      "limitation": "No CI-provider run or continuous automation state is claimed."
+    }
+  ],
+  "verification": [
+    {
+      "command": "bun test tools/documentation/runbook-policy.test.ts",
+      "status": "passed",
+      "postcondition": "17 strict policy fixtures passed through the public release-readiness Schema export path, including exact allowed arguments and rejected missing/wrong prefixes."
+    },
+    {
+      "command": "bun run test:documentation",
+      "status": "passed",
+      "postcondition": "35 documentation tests passed, including the bounded subprocess failure fixture."
+    },
+    {
+      "command": "bun run --filter=@taxkit/scripts check-types && bun run --filter=@taxkit/scripts build",
+      "status": "passed",
+      "postcondition": "The narrow subpath resolves and emits declarations/JavaScript at the documented build paths."
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "status": "passed",
+      "postcondition": "The only new lock importer edge is the root workspace dependency on @taxkit/scripts."
+    },
+    {
+      "command": "bun run test:skills",
+      "status": "passed",
+      "postcondition": "16 repository-owned skill policy tests passed."
+    },
+    {
+      "command": "bun run check:docs && bun run check:repository-paths && bun run knip && bun run knip:production && bun run verification && git diff --check",
+      "status": "passed",
+      "postcondition": "Documentation policy passed across 617 files, repository-path policy passed across 603 tracked files, both Knip graphs passed, formatting/lint/skills/runbook/effect-language-service gates passed, and 23/23 workspace typecheck tasks completed."
+    }
+  ],
+  "evaluation": {
+    "scenariosPath": "planning:docs/product-specs/harness-governance-improvements/evaluations/hgi-204/scenarios.json",
+    "scenariosSha256": "119f2fb38c5e704e427b17ba88e5a73aa5c381ac69591551ca81655702e4456a",
+    "rubricPath": "planning:docs/product-specs/harness-governance-improvements/evaluations/hgi-204/grader-rubric.md",
+    "rubricSha256": "ec5b282d06a27337d060d039f5fc30db0e0bf0423b49c4a5313bf5dc6c6f3dd9",
+    "independentAcceptance": "pending"
+  },
+  "rollback": "Revert the future HGI-204 semantic commit while retaining accepted HGI-203 evidence and this candidate/validation provenance; remove the local validator and routes together so no stale command remains.",
+  "limitations": [
+    "The validator inspects repository-local structure, prose and accepted evidence only; it deliberately executes none of the documented commands.",
+    "The bounded ignored receipt is non-authoritative and is not clean-clone accepted evidence.",
+    "Independent fresh-context acceptance and exact Git publication/readback remain pending."
+  ],
+  "nonClaims": [
+    "No version change, commit from a runbook, push, tag, hosted release, registry publication, deployment, provider access, public-site mutation or recovery mutation occurred.",
+    "Local tests do not establish external consumers, registry state, deployment state, SSR/hydration or public availability."
+  ]
+}

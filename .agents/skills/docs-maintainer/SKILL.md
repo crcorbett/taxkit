@@ -60,6 +60,11 @@ Use the profile's path map. In particular:
 - Keep runbooks as repeatable, authority-bound operations with preconditions,
   receipts, rollback and escalation. Keep raw logs, secrets and transient
   tarballs out of durable docs; retain only allowed sanitized proof.
+- Route repeatable TaxKit operations to `docs/runbooks/README.md`; do not copy
+  their procedure into this skill or a README. When a release command,
+  Changesets, package graph, proof handoff, recovery target or authority
+  boundary changes, update the owning runbook, machine contract and authority
+  model together, then run `bun run check:runbooks`.
 - Use successor/tombstone links for replaced current docs. Historical and
   failed material retains provenance outside default current routes.
 - `docs-writer` is a public-copy authoring aid only. It never owns maintenance,
@@ -74,6 +79,7 @@ commands from the profile. For material documentation governance work run:
 ```bash
 bun run test:skills
 bun run check:docs
+bun run check:runbooks
 bun run check:repository-paths
 bun run verification
 git diff --check

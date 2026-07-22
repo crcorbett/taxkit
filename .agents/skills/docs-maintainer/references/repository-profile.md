@@ -14,8 +14,8 @@ below are repository-local; resolve the checkout with `git rev-parse --show-topl
 | Public MDX/navigation/lifecycle                     | `apps/docs/content/**`, `apps/docs/navigation.json`, and `tools/documentation/owner-policy.json`; `published` requires one exact `public.statusDecision.acceptanceRecords` binding to a strict addressable record, with the durable lifecycle decision routed from `docs/documentation-audit/hgi-207/public-mdx-lifecycle.json` |
 | Public docs runtime/generated Fumadocs              | `apps/docs/README.md`, `packages/docs-content/source.config.ts`, `packages/docs-content/.source`, and `packages/docs-fumadocs`; regenerate/check through the owning commands and never hand-edit generated output                                                                                                               |
 | Package/app roots                                   | owning package/app README, package ownership architecture, root routes only when discoverability changes                                                                                                                                                                                                                        |
-| Commands, CI, versioning and release readiness      | `package.json`, workflow/command owner, `docs/standards/versioning.md`, testing-quality architecture, runbook/proof owner when present                                                                                                                                                                                          |
-| Runbooks, proof and history                         | target-owned `docs/runbooks/**`, sanitized `docs/evidence/releases/**`, or dated `docs/documentation-audit/**`; preserve provenance and non-claims                                                                                                                                                                              |
+| Commands, CI, versioning and release readiness      | `package.json`, workflow/command owner, `docs/standards/versioning.md`, `docs/runbooks/README.md`, testing-quality architecture and proof owner                                                                                                                                                                                 |
+| Runbooks, authority, proof and history              | exactly four target-owned procedures routed by `docs/runbooks/README.md`; `docs/operations/authority-model.md`; `tools/documentation/runbook-contract.json`; sanitized `docs/evidence/releases/**`; or dated `docs/documentation-audit/**`; preserve provenance and non-claims                                                  |
 | PRD and implementation                              | target SPEC, sibling tasks and active plan; local `prd-writer`, `prd-review`, `prd-implementer` invoke this skill                                                                                                                                                                                                               |
 
 Public `published` needs an exact accepted record and one-to-one binding in
@@ -28,7 +28,7 @@ not provider, registry, deployment, public-site or consumer proof.
 ## Commands and boundaries
 
 - Baseline documentation/path/skill checks: `bun run test:skills`, `bun run
-check:docs`, `bun run check:repository-paths`.
+check:docs`, `bun run check:runbooks`, `bun run check:repository-paths`.
 - Full local closeout: `bun run verification` and `git diff --check`.
 - Public content/runtime: `bun run docs:validate`, `bun run docs:build`,
   `bun run --filter=docs test:browser` when applicable.
@@ -36,6 +36,9 @@ check:docs`, `bun run check:repository-paths`.
   and `bun run --filter=@taxkit/sdk validate:downstream` when applicable.
 - Release evidence: `bun run release:check` is local proof only; versioning,
   publication and deployment remain separately authorized operations.
+- Runbook contract: `bun run check:runbooks` is inspect-only and writes the
+  bounded ignored `tmp/runbook-validation-report.json`; it never runs a
+  documented procedure or establishes external state.
 
 For each check, state its observable postcondition and what it does not prove.
 Keep background freshness reports as candidates until an attached implementation
