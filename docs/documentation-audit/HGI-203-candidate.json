@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-203",
+  "status": "accepted-candidate",
+  "baseCommit": "e63a7b60c369ca880a49dce5d1ffddcf49a6365e",
+  "authority": "Local TaxKit writes and local checks only; no registry, tag, release, deployment, provider or public-site authority.",
+  "attempts": [
+    {
+      "attemptId": "release-check-2026-07-22-initial",
+      "terminalState": "inconclusive",
+      "lastSuccessfulCheck": null,
+      "observedExitCode": 1,
+      "provenance": "The superseded truncate-only runner did not retain complete detail.",
+      "detail": "docs/evidence/releases/HGI-203-failed-attempts.json",
+      "recovery": "Replace the retention boundary before another attempt.",
+      "nonClaim": "No failure cause is inferred."
+    },
+    {
+      "attemptId": "release-1784677428611",
+      "terminalState": "non-zero-exit",
+      "lastSuccessfulCheck": null,
+      "observedExitCode": 1,
+      "provenance": "Retained verification detail identified unused exports in the first candidate.",
+      "detail": "docs/evidence/releases/HGI-203-failed-attempts.json",
+      "recovery": "Repair the named exports before another attempt.",
+      "nonClaim": "The failed local check establishes no external state."
+    },
+    {
+      "attemptId": "release-1784678327050",
+      "terminalState": "non-zero-exit",
+      "lastSuccessfulCheck": null,
+      "observedExitCode": 1,
+      "provenance": "Retained verification detail rejected a superseded direct-host-API fallback.",
+      "detail": "docs/evidence/releases/HGI-203-failed-attempts.json",
+      "recovery": "Use the repaired Effect Platform boundary before another attempt.",
+      "nonClaim": "The historical failure does not describe the repaired candidate."
+    },
+    {
+      "attemptId": "release-1784680719450",
+      "terminalState": "non-zero-exit",
+      "lastSuccessfulCheck": null,
+      "observedExitCode": 1,
+      "provenance": "The repaired one-attempt runner retained bounded proof of a repository path-policy failure in an adversarial test fixture.",
+      "detail": "tmp/release-readiness/release-1784680719450.json (sha256:f787c722b7252ea5ab3087cb2ffa445110fdd4120e12e3f82c34bd787f75bf54)",
+      "recovery": "Construct the home-path fixture without embedding a literal personal path, then rerun only because source materially changed.",
+      "nonClaim": "No later check or external operation ran."
+    },
+    {
+      "attemptId": "release-1784680881090",
+      "terminalState": "non-zero-exit",
+      "lastSuccessfulCheck": null,
+      "observedExitCode": 1,
+      "provenance": "Verification reached Knip and identified four unnecessary exported internal Schemas.",
+      "detail": "tmp/release-readiness/release-1784680881090.json (sha256:f64e5809fa78bfdb759fea7d359207ee6f909f5e33988f69084e5badaea4a747)",
+      "recovery": "Make the evidence Schemas module-private and rerun only after Knip and package checks pass.",
+      "nonClaim": "No later check or external operation ran."
+    },
+    {
+      "attemptId": "release-1784681114807",
+      "terminalState": "non-zero-exit",
+      "lastSuccessfulCheck": null,
+      "observedExitCode": 1,
+      "provenance": "Verification reached production Knip, which excludes tests and therefore rejected five intentionally testable production seams.",
+      "detail": "tmp/release-readiness/release-1784681114807.json (sha256:ff8e0435b6333b112cebed494a5a0b387d1de94105915320ca99abb658a5ba9b)",
+      "recovery": "Use exact per-file production-Knip export exceptions for only the evidence boundary and live redactor seams, with ordinary Knip still active.",
+      "nonClaim": "No later check or external operation ran."
+    },
+    {
+      "attemptId": "release-1784681291382",
+      "terminalState": "success",
+      "lastSuccessfulCheck": "changeset-status",
+      "observedExitCode": 0,
+      "provenance": "All nine canonical local checks completed once in order with distinct sanitized detail artifacts.",
+      "detail": "docs/evidence/releases/HGI-203-accepted-attempt.json and tmp/release-readiness/release-1784681291382.json (sha256:b98556e3e7f0837339b58de02b2cf1b6f5ff8c7e8cdca213577b23e14de1c84a)",
+      "recovery": "Use the immutable attempt summary for independent acceptance; do not replay it for presentation.",
+      "nonClaim": "Local success is not publication, a tag, release, deployment, provider proof or public availability."
+    },
+    {
+      "attemptId": "fresh-context-acceptance-after-release-1784681291382",
+      "terminalState": "failed",
+      "lastSuccessfulCheck": "focused-release-readiness-tests",
+      "observedExitCode": 1,
+      "provenance": "Independent fresh-context review found that the prior successful attempt was not bound to the current content manifest, the verifier did not decode and traverse the accepted summary through all 18 retained details, and receipt/presentation persistence was not immutable.",
+      "detail": "This bounded candidate ledger; raw reviewer context is not a durable policy owner.",
+      "recovery": "Bind candidate identity inside the immutable receipt, verify the complete packet-summary-receipt-detail chain, and implement an idempotent non-executing presentation sidecar before one new attempt.",
+      "nonClaim": "The rejected proof chain did not invalidate the underlying local checks or establish external state."
+    },
+    {
+      "attemptId": "release-1784682661821",
+      "terminalState": "success",
+      "lastSuccessfulCheck": "changeset-status",
+      "observedExitCode": 0,
+      "provenance": "All nine canonical local checks completed once in order against candidate content manifest sha256:5343781a326c50f2be34525f968ab509a45c615f2cac2398a09299f2bdb1c385. The immutable receipt records the same candidate identity and all 18 sanitized detail artifacts.",
+      "detail": "docs/evidence/releases/HGI-203-accepted-attempt.json and tmp/release-readiness/release-1784682661821.json (sha256:ab44fc83f12732152a26b5cbe3f82d713bdbb1500121c7bb01c48f0da38222de)",
+      "recovery": "Use release:present with the retained receipt path and digest; do not rerun checks to reconstruct terminal output.",
+      "nonClaim": "Local success is not publication, a tag, release, deployment, provider proof, deployed SSR/hydration or public availability."
+    },
+    {
+      "attemptId": "fresh-context-acceptance-after-release-1784682661821",
+      "terminalState": "failed",
+      "lastSuccessfulCheck": "complete-local-detail-verification",
+      "observedExitCode": 1,
+      "provenance": "Independent fresh-context review proved that a clean clone would require ignored prior receipt/detail files both before a new attempt and inside the package test graph, conflicting with the accepted raw-log retention policy.",
+      "detail": "This bounded candidate ledger; HGI-207 remains the durable retention-policy owner.",
+      "recovery": "Separate candidate-only transient detail verification from accepted bounded-summary verification, require a new candidate packet before another attempt, and prove both branches with focused tests.",
+      "nonClaim": "The clean-clone defect did not establish any external state or invalidate the earlier check outputs for their old candidate."
+    },
+    {
+      "attemptId": "release-1784683980794",
+      "terminalState": "success",
+      "lastSuccessfulCheck": "changeset-status",
+      "observedExitCode": 0,
+      "provenance": "All nine canonical local checks completed once in order against candidate content manifest sha256:89b6873bfc3f5006b7aef2fa426542cf7b27c6fdddd67c1fc8f159f05bfe9a13. Candidate proof verifies all transient details; accepted proof remains clean-clone-safe and bounded.",
+      "detail": "docs/evidence/releases/HGI-203-accepted-attempt.json and tmp/release-readiness/release-1784683980794.json (sha256:c4c030400acc9b7f885dde12fcc8419f1d4cf60a25e498c4c080cbe6f58a88c7)",
+      "recovery": "Use release:present with the retained receipt path and digest while local details exist; after acceptance use the bounded committed summary and prepare a new candidate packet before another attempt.",
+      "nonClaim": "Local success is not publication, a tag, release, deployment, provider proof, deployed SSR/hydration or public availability."
+    },
+    {
+      "attemptId": "release-1784685027038",
+      "terminalState": "success",
+      "lastSuccessfulCheck": "changeset-status",
+      "observedExitCode": 0,
+      "provenance": "All nine canonical local checks completed once against a candidate identity that was subsequently superseded by an expectation-only focused-test correction.",
+      "detail": "tmp/release-readiness/release-1784685027038.json (sha256:b3534166e11a954a01937b0981c1b269e026b1c16be0f2027f137df227ea2da3)",
+      "recovery": "Retain this successful receipt as bounded superseded provenance; use only the final receipt for current acceptance.",
+      "nonClaim": "This prior local success does not prove the final candidate identity or any external state."
+    },
+    {
+      "attemptId": "release-1784685204080",
+      "terminalState": "success",
+      "lastSuccessfulCheck": "changeset-status",
+      "observedExitCode": 0,
+      "provenance": "All nine canonical local checks completed once in order against candidate content manifest sha256:d273b3a67a70fb66108b62ea096dcba29d9d1fa5ae05ce82846756dff394e9eb. The immutable receipt records that identity and all 18 sanitized detail artifacts. This successful candidate was subsequently superseded by the workspace-path terminal-disclosure repair.",
+      "detail": "docs/evidence/releases/HGI-203-accepted-attempt.json (sha256:88417b4f94f061711fcfc36e0a9c08b0af0593e179c4aecfc3377698f02eb309) and tmp/release-readiness/release-1784685204080.json (sha256:a2bdc3df6b244f27e9482cdcd49344e371ca59a48b3331984c3a89273c3e4e5c)",
+      "recovery": "Retain this successful receipt as bounded superseded provenance; use only the final workspace-path-safe receipt for current acceptance.",
+      "nonClaim": "This prior local success does not prove the final candidate identity or any external state."
+    },
+    {
+      "attemptId": "release-1784685718369",
+      "terminalState": "success",
+      "lastSuccessfulCheck": "changeset-status",
+      "observedExitCode": 0,
+      "provenance": "All nine canonical local checks completed once in order against workspace-path-safe candidate content manifest sha256:43a1e3f7e81990a7f72e74fe75806eae723b0cac9cdf6f35a87c205346cc15c9. The immutable receipt records that identity and all 18 sanitized detail artifacts. This successful candidate was subsequently superseded by cross-platform home-path redaction coverage.",
+      "detail": "docs/evidence/releases/HGI-203-accepted-attempt.json (sha256:1c3a28e5048e80dfc4c91762018b45289227e01d7dfe178bbddbf52b95443740) and tmp/release-readiness/release-1784685718369.json (sha256:52a489b4fd777bd4d564f68362cfe4c8854cf4304d9e5aaf8db8a15448fb5366)",
+      "recovery": "Retain this successful receipt as bounded superseded provenance; use only the final cross-platform-redacted receipt for current acceptance.",
+      "nonClaim": "This prior local success does not prove the final candidate identity or any external state."
+    },
+    {
+      "attemptId": "release-1784686361939",
+      "terminalState": "success",
+      "lastSuccessfulCheck": "changeset-status",
+      "observedExitCode": 0,
+      "provenance": "All nine canonical local checks completed once in order against cross-platform-home-redacted candidate content manifest sha256:7cb8996baf8939e5fbc7bb4311d508e3cb25a457b4d2ce31de19df9b78f14faa. Fresh acceptance subsequently found file-URL and diagnostic-prefix home paths outside that redaction boundary, so this success is superseded and cannot prove the repaired candidate.",
+      "detail": "docs/evidence/releases/HGI-203-accepted-attempt.json (sha256:790e8d85cfc10a9ee3da9d03bb775356907e8b5df9f3e3a6d4e347982079e360) and tmp/release-readiness/release-1784686361939.json (sha256:e1c9847e9b49be8678316c34d7b715a3b93fe9a12b3b4b7ccc24e7ac08c6fcb6)",
+      "recovery": "Retain this successful receipt as bounded superseded provenance; use only the new file-URL-safe candidate attempt for current acceptance.",
+      "nonClaim": "This prior local success does not prove the repaired candidate or any publication, tag, release, deployment, provider, deployed SSR/hydration or public availability."
+    },
+    {
+      "attemptId": "release-1784687182331",
+      "terminalState": "success",
+      "lastSuccessfulCheck": "changeset-status",
+      "observedExitCode": 0,
+      "provenance": "All nine canonical local checks completed once in order against the final file-URL-safe and diagnostic-prefix-safe cross-platform-home-redacted candidate content manifest sha256:3947352634ef4f7341f5ab9e2b05fc26f3424c148ebf8932b98e656c3e70c619. The immutable receipt records that exact identity and all 18 sanitized detail artifacts; packet journey pointers bind to the bounded summary.",
+      "detail": "docs/evidence/releases/HGI-203-accepted-attempt.json (sha256:b11d02d38d1ec6961d6749a8b471c48ac92b2d95a9f0f00c7faeb68df3bd668c) and tmp/release-readiness/release-1784687182331.json (sha256:e3757246a17eda154cb05fdb390592d7a2c6a606ef45436b318d5845cee8345c)",
+      "recovery": "Use release:present with this retained receipt path and digest; do not rerun checks to reconstruct terminal output.",
+      "nonClaim": "Local success is not publication, a tag, release, deployment, provider proof, deployed SSR/hydration or public availability."
+    }
+  ],
+  "impactLedger": [
+    {
+      "surface": "Documentation and maintainer routing",
+      "decision": "Change required",
+      "paths": [
+        "docs/architecture/testing-and-quality.md",
+        "docs/documentation-audit/README.md"
+      ],
+      "owner": "Testing-and-quality architecture and documentation-audit index",
+      "lifecycle": "Accepted candidate pending Git publication/readback",
+      "verification": "bun run check:docs",
+      "proof": "docs/documentation-audit/HGI-203-candidate.json",
+      "nonClaim": "Documentation does not establish runtime, publication or deployment state."
+    },
+    {
+      "surface": "Package README",
+      "decision": "Change required",
+      "paths": [
+        "packages/scripts/README.md"
+      ],
+      "owner": "@taxkit/scripts package owner",
+      "lifecycle": "Canonical package behavior",
+      "verification": "bun run check:docs and bun run test:release-readiness",
+      "proof": "packages/scripts/README.md",
+      "nonClaim": "The README does not authorize a release."
+    },
+    {
+      "surface": "Critical journeys, proof packet and failed evidence",
+      "decision": "Change required",
+      "paths": [
+        "docs/verification/critical-journeys.json",
+        "docs/evidence/releases/**"
+      ],
+      "owner": "TaxKit release-readiness maintainer",
+      "lifecycle": "Candidate evidence retained separately from accepted release evidence",
+      "verification": "Strict Schema decoding, digest readback and adversarial boundary fixtures",
+      "proof": "docs/evidence/releases/HGI-203-local.json",
+      "nonClaim": "Local proof establishes no registry, provider or public availability."
+    },
+    {
+      "surface": "Release command, Effect boundary and tests",
+      "decision": "Change required",
+      "paths": [
+        "package.json",
+        "packages/scripts/src/release-readiness/**",
+        "packages/scripts/src/index.ts"
+      ],
+      "owner": "@taxkit/scripts",
+      "lifecycle": "Canonical local release-readiness implementation",
+      "verification": "bun run release:check, bun run test:release-readiness and package check-types",
+      "proof": "Immutable attempt receipt under tmp/release-readiness plus HGI-203-local.json",
+      "nonClaim": "The command performs no tag, publication, deployment or provider operation."
+    },
+    {
+      "surface": "Lint and boundary configuration",
+      "decision": "Change required",
+      "paths": [
+        "oxlint.config.ts",
+        "knip.production.json"
+      ],
+      "owner": "Repository lint policy",
+      "lifecycle": "Exact decoder and persisted-JSON egress allowlists",
+      "verification": "bun run lint, lint boundary directives, bun run knip and bun run knip:production",
+      "proof": "Decoder/encoder allowlists name only evidence.boundary.ts; production Knip export exceptions name only the two production-used focused-test seams.",
+      "nonClaim": "A lint allowlist does not replace semantic review."
+    },
+    {
+      "surface": "SPEC, task and active execution lifecycle",
+      "decision": "Change required",
+      "paths": [
+        "docs/product-specs/harness-governance-documentation.md",
+        "docs/exec-plans/active/harness-governance-documentation.md"
+      ],
+      "owner": "TaxKit governance lifecycle router",
+      "lifecycle": "HGI-203 in progress until independent acceptance and Git readback",
+      "verification": "bun run check:docs and central task validators",
+      "proof": "Canonical central HGI-203 execution packet plus this repository candidate ledger",
+      "nonClaim": "Repository lifecycle prose cannot complete the canonical task by itself."
+    },
+    {
+      "surface": "Changeset and versioning decision",
+      "decision": "Change required",
+      "paths": [
+        ".changeset/calm-runs-prove.md"
+      ],
+      "owner": "Changesets release-intent owner",
+      "lifecycle": "Empty internal Changeset for a private package command and contract change",
+      "verification": "bun run changeset status --verbose",
+      "proof": ".changeset/calm-runs-prove.md and the accepted attempt's changeset-status detail",
+      "nonClaim": "The Changeset does not version or publish a package."
+    },
+    {
+      "surface": "Runbooks and CI",
+      "decision": "N/A for this slice",
+      "paths": [
+        "docs/runbooks/**",
+        ".github/**",
+        "docs/standards/versioning.md"
+      ],
+      "owner": "HGI-204 and HGI-205",
+      "lifecycle": "Preserved for successor tasks",
+      "verification": "git diff path review",
+      "proof": "No runbook, workflow or durable versioning-policy path changes in HGI-203.",
+      "nonClaim": "HGI-203 does not choose release authority, CI retention or publication policy."
+    },
+    {
+      "surface": "Skills and repository instructions",
+      "decision": "N/A for this slice",
+      "paths": [
+        "AGENTS.md",
+        ".agents/skills/**"
+      ],
+      "owner": "HGI-208 accepted docs-maintenance skill",
+      "lifecycle": "Preserved",
+      "verification": "bun run test:skills",
+      "proof": "The accepted local skill already requires this impact ledger and evidence routing.",
+      "nonClaim": "No skill behavior changes in HGI-203."
+    }
+  ],
+  "verification": [
+    {
+      "command": "bun run test:release-readiness",
+      "status": "passed: 39 tests, including every split position for standalone, file-URL and diagnostic-prefix macOS/Linux paths plus Windows-drive and UNC home paths; live retained-detail and bounded-excerpt raw-prefix negatives; relative-path preservation; workspace-path terminal disclosure; exact journey binding; accepted-identity reuse rejection; and immutable receipt/presentation behavior"
+    },
+    {
+      "command": "bun run release:check",
+      "status": "passed: release-1784687182331, nine ordered checks exactly once for the final file-URL-safe cross-platform-home-redacted candidate, true exit 0, candidate identity sha256:3947352634ef4f7341f5ab9e2b05fc26f3424c148ebf8932b98e656c3e70c619"
+    },
+    {
+      "command": "bun run release:present (twice against the same receipt)",
+      "status": "passed: release:present ran twice against release-1784687182331 with the same immutable sidecar sha256:7b20e913f467f843a42b2a9d61d1edfde5c4f70eee7897682e5aafa1b2f2113a; no release checks reran"
+    },
+    {
+      "command": "bun run verification",
+      "status": "passed inside the final retained release attempt"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed after final packet and summary binding"
+    },
+    {
+      "command": "fresh-context HGI-203 acceptance",
+      "status": "passed: independent every-split probe covered 10 absolute/file-URL/diagnostic-prefix home forms and preserved seven relative/identifier forms; 39 focused tests, exact manifest and 18-detail digest readback, packet-summary-receipt binding, leak scan, presentation identity, superseded-attempt uniqueness and git diff check all passed"
+    }
+  ],
+  "nonClaims": [
+    "No npm publication, tag, release, deployment, provider access, deployed SSR/hydration or public availability."
+  ],
+  "rollback": "Revert the future HGI-203 semantic commit while retaining failed, inconclusive and accepted evidence."
+}

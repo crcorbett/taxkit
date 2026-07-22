@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-203",
+  "attempts": [
+    {
+      "attemptId": "release-check-2026-07-22-initial",
+      "terminalState": "inconclusive",
+      "observedExitCode": 1,
+      "lastSuccessfulCheck": null,
+      "detailPath": null,
+      "detailSha256": null,
+      "provenance": "The original truncate-only implementation did not retain complete detail, so the failure cannot be diagnosed retrospectively.",
+      "resumeTrigger": "Replace the retention boundary before another attempt.",
+      "nonClaim": "No cause is inferred and no release result is established."
+    },
+    {
+      "attemptId": "release-1784677428611",
+      "terminalState": "non-zero-exit",
+      "observedExitCode": 1,
+      "lastSuccessfulCheck": null,
+      "detailPath": "tmp/release-readiness/verification-1784677428611.jsonl",
+      "detailSha256": "sha256:ec2cf3737aef1995bc5925250c391d62dd562cb0be17a7b0f4b5e55bbad71568",
+      "provenance": "The retained verification detail identified unused exports in the first HGI-203 candidate.",
+      "resumeTrigger": "Repair the unused exports before a new attempt.",
+      "nonClaim": "The failed local check establishes no publication or deployment state."
+    },
+    {
+      "attemptId": "release-1784678327050",
+      "terminalState": "non-zero-exit",
+      "observedExitCode": 1,
+      "lastSuccessfulCheck": null,
+      "detailPath": "tmp/release-readiness/attempt-1784678327050-751b2f88-5416-486a-8ec9-428f50ed83bf.jsonl",
+      "detailSha256": "sha256:db9c4c10054ed333a947882e078bd714a4c147ecf91b7c439339633443eaeef2",
+      "provenance": "The retained verification detail showed Effect-boundary, direct-host-API and lint violations in a superseded fallback implementation.",
+      "resumeTrigger": "Replace the fallback with an Effect Platform implementation before a new attempt.",
+      "nonClaim": "This historical failure does not describe the repaired candidate and proves no external state."
+    },
+    {
+      "attemptId": "release-1784680719450",
+      "terminalState": "non-zero-exit",
+      "observedExitCode": 1,
+      "lastSuccessfulCheck": null,
+      "detailPaths": [
+        "tmp/release-readiness/verification-stdout-GDczhW/72649b9ddeb2.log",
+        "tmp/release-readiness/verification-stderr-udiJrY/1606f6f7dc14.log"
+      ],
+      "detailSha256": [
+        "sha256:3194ca81de0afb8069fcbe17266a91f48d485e7633a6fb5dd1f9c78d80a386f1",
+        "sha256:cc951285e21bfae0878f3e784d99dc1c9f75588224b7a7bb3d9162c4fde7d5bd"
+      ],
+      "receiptPath": "tmp/release-readiness/release-1784680719450.json",
+      "receiptSha256": "sha256:f787c722b7252ea5ab3087cb2ffa445110fdd4120e12e3f82c34bd787f75bf54",
+      "provenance": "The repaired runner preserved a true verification exit of 1 and identified one repository-policy fixture containing a literal personal home-path shape.",
+      "resumeTrigger": "Remove the literal personal path from the adversarial fixture while preserving its constructed-path coverage.",
+      "nonClaim": "No later release check ran and no external operation occurred."
+    },
+    {
+      "attemptId": "release-1784680881090",
+      "terminalState": "non-zero-exit",
+      "observedExitCode": 1,
+      "lastSuccessfulCheck": null,
+      "detailPaths": [
+        "tmp/release-readiness/verification-stdout-RdfkL1/874701b5de79.log",
+        "tmp/release-readiness/verification-stderr-mQ62Xt/e552ea125338.log"
+      ],
+      "detailSha256": [
+        "sha256:13d78672e6374a2ae8a9c882fae08b961313106857d29a557c5a3663375c6f37",
+        "sha256:60c8f102fe94c9a60d194bdc36e9836f65cfe09f3549ebef70801c8e70af2b6d"
+      ],
+      "receiptPath": "tmp/release-readiness/release-1784680881090.json",
+      "receiptSha256": "sha256:f64e5809fa78bfdb759fea7d359207ee6f909f5e33988f69084e5badaea4a747",
+      "provenance": "Repository verification reached Knip and rejected four unnecessary exports from the new internal evidence Schemas.",
+      "resumeTrigger": "Remove the unused public export modifiers and rerun only after Knip and package type checks pass.",
+      "nonClaim": "No later release check ran and no external operation occurred."
+    },
+    {
+      "attemptId": "release-1784681114807",
+      "terminalState": "non-zero-exit",
+      "observedExitCode": 1,
+      "lastSuccessfulCheck": null,
+      "detailPaths": [
+        "tmp/release-readiness/verification-stdout-k16JWa/bdee79e85394.log",
+        "tmp/release-readiness/verification-stderr-MWupqI/09d44e997741.log"
+      ],
+      "detailSha256": [
+        "sha256:d5736336d3b5f9606d5b4fcdc3134cf39cb369d0634b62f7602d869cc00ba246",
+        "sha256:48b0feaa66f2c2b3495499f9d8fabe7f8c9ccafc7426c1ffda65b1c9aa434a5d"
+      ],
+      "receiptPath": "tmp/release-readiness/release-1784681114807.json",
+      "receiptSha256": "sha256:ff8e0435b6333b112cebed494a5a0b387d1de94105915320ca99abb658a5ba9b",
+      "provenance": "Repository verification reached the production Knip graph, which classified five production-used focused-test seams as unused exports because tests are excluded from that graph.",
+      "resumeTrigger": "Add exact production-Knip exceptions for only the evidence boundary and live redactor test seams, document them, and prove both Knip graphs pass.",
+      "nonClaim": "No later release check ran and no external operation occurred."
+    }
+  ],
+  "rollback": "Retain this provenance index when reverting HGI-203; do not restore failed implementations.",
+  "nonClaim": "This index preserves bounded provenance, not complete historical raw output. Exact ignored paths and digests identify locally retained detail when present."
+}

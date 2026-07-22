@@ -1,0 +1,28 @@
+# HGI-203 changed-content manifest
+# Base commit: e63a7b60c369ca880a49dce5d1ffddcf49a6365e
+# Recipe: concatenate the sorted repository-relative path list below as `SHA256<two spaces>path<newline>` after hashing exact file bytes with SHA-256.
+# Exclusions: this self-referential manifest, HGI-203-local.json, HGI-203-accepted-attempt.json, HGI-203-failed-attempts.json and HGI-203-candidate.json. These five evidence/output ledgers change only to bind or record an attempt after the implementation candidate is frozen.
+2d1e9d2f6ecc4fa31c5964a13aff013c0355055b958b32dbff5f0c6297bc8c49  .changeset/calm-runs-prove.md
+1e891e5e078b26c790cbb6eff931d483c8215a744837be50e07ec57fd4f2719f  docs/architecture/testing-and-quality.md
+e79ae15111b0349817e2f533830731065c76638d39f3ab91126790c35d1cf3d2  docs/documentation-audit/README.md
+d7131c86cfdd6b43076a349dddffe312dad2221710a5d5c536a9d540f7df975b  docs/evidence/releases/HGI-203-build-manifest.txt
+8857982a000747212958a091db77c7faa16704e7de0a8213040410fd7a298f9c  docs/exec-plans/active/harness-governance-documentation.md
+4bd274dc864c0d8663bb70918d7317a9b318cae9bf9a357e0733589433d4afd0  docs/product-specs/harness-governance-documentation.md
+13b7c960ff7b5f5fef236cff4cef800409f822e6be2a552eaa78b64be2d8ad5a  docs/verification/critical-journeys.json
+f24cdce08f78f94d6408e793582be786c8e0ec9055ccc3d7d7e618c32ba38c1f  knip.production.json
+9404be1cd6cdc2f0cc1debae42b89fa2267c7bda0e46ab4c0f476e402c3bd863  oxlint.config.ts
+c75cb2e7ab8ae9721fdcfafee00a16fb263e30058d54fe9e0824de63746cb563  package.json
+7ee12344aeaaa0fd868241ea0c6031f8ccbe697845b0fd709be6a8dfa63af93f  packages/scripts/README.md
+b1aaea90ca9c9759036bcbf5ce45c5741b2a20778319e7ba1c4a752144cd7396  packages/scripts/package.json
+0062a3d54de869b9b9588c62b9d6e887d541a055a10c436fef69333229f84539  packages/scripts/src/index.ts
+07aac52ba702a84d2af0d831b2bef5dd01011f2b0f3095ec85a7631b3674d148  packages/scripts/src/release-readiness/errors.ts
+c22702391bd0fe3d63536750476a0647ae16e8d9ccb3123b5dc7a7118969e7ae  packages/scripts/src/release-readiness/evidence.boundary.test.ts
+a2aaaf478cc003452d671d6d0a5cdeaea783d50e6497a6995b4fce6b318fffa5  packages/scripts/src/release-readiness/evidence.boundary.ts
+3dc8a348e150fbdd56d3b22d5588907fae38a65faeb0aad091229d9f9493b2b2  packages/scripts/src/release-readiness/live.layer.test.ts
+3fe7a8e5c6967b28c915af03b8eb2d29f223799acabe42d55100bb9a4927934e  packages/scripts/src/release-readiness/live.layer.ts
+b1e08326851c475d86295402e157b6a448f7288a84d1822945b0c756e9e7606b  packages/scripts/src/release-readiness/present.runtime.ts
+9444965703e360d2cdcfdcb5fc4fc2102dc4f29b6f04af6671b7cfc865b97e56  packages/scripts/src/release-readiness/program.test.ts
+e8c80d7e437a783d3cea93c9e7291702327648225ce20afacb9b1a658de4c22e  packages/scripts/src/release-readiness/program.ts
+2e1b2e3607d208f24b7362c900460b86b6ac1519cf0389a68d8c50787871a922  packages/scripts/src/release-readiness/release-readiness.runtime.ts
+1b54614c098453a1ceedca1405624485908ca96c7e221e1427f46bd6b9624ae3  packages/scripts/src/release-readiness/schemas.ts
+1bd3dc7466d4b452d79b7b76ffbc52cc457214266d901aafa56e8a804ec666e8  packages/scripts/src/release-readiness/test.layer.ts

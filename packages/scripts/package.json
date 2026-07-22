@@ -30,6 +30,7 @@
     "check-types": "tsc --noEmit",
     "clean": "rm -rf dist .turbo *.tsbuildinfo",
     "release:check": "bun run src/release-readiness/release-readiness.runtime.ts",
+    "release:present": "bun run src/release-readiness/present.runtime.ts",
     "test": "vitest run"
   },
   "dependencies": {

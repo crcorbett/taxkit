@@ -9,7 +9,9 @@
     "packages/tsconfig"
   ],
   "ignoreIssues": {
-    "packages/api/http/src/client/service.ts": ["duplicates"]
+    "packages/api/http/src/client/service.ts": ["duplicates"],
+    "packages/scripts/src/release-readiness/evidence.boundary.ts": ["exports"],
+    "packages/scripts/src/release-readiness/live.layer.ts": ["exports"]
   },
   "workspaces": {
     "apps/api": {
@@ -92,6 +94,7 @@
     "packages/scripts": {
       "entry": [
         "src/index.ts!",
+        "src/release-readiness/present.runtime.ts!",
         "src/release-readiness/release-readiness.runtime.ts!"
       ],
       "project": ["src/**/*.ts!", "!src/release-readiness/test.layer.ts!"]

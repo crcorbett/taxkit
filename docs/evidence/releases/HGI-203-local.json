@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-203",
+  "lifecycle": "accepted",
+  "actor": "Local TaxKit release-readiness worker",
+  "environment": "Local TaxKit checkout at base e63a7b60c369ca880a49dce5d1ffddcf49a6365e",
+  "authority": "Local file writes and command execution only; no tag, publication, release, deployment or provider authority.",
+  "candidate": {
+    "baseCommit": "e63a7b60c369ca880a49dce5d1ffddcf49a6365e",
+    "contentManifest": "docs/evidence/releases/HGI-203-content-manifest.txt",
+    "contentSha256": "sha256:3947352634ef4f7341f5ab9e2b05fc26f3424c148ebf8932b98e656c3e70c619",
+    "digestRecipe": "Hash the exact bytes of every sorted path recorded in HGI-203-content-manifest.txt; then hash that retained manifest. The base commit plus manifest digest identifies the dirty candidate without a circular self-hash.",
+    "exclusions": [
+      "docs/evidence/releases/HGI-203-content-manifest.txt",
+      "docs/evidence/releases/HGI-203-local.json",
+      "docs/evidence/releases/HGI-203-accepted-attempt.json",
+      "docs/evidence/releases/HGI-203-failed-attempts.json",
+      "docs/documentation-audit/HGI-203-candidate.json"
+    ]
+  },
+  "packageDigests": [
+    {
+      "target": "bun.lock",
+      "sha256": "sha256:716c5c81153cd4079f476d7e1f8e1a7af3ad8e20a59661d8fc1c48666f2e9cec",
+      "provenance": "Exact locked workspace dependency graph bytes."
+    },
+    {
+      "target": "packages/scripts/package.json",
+      "sha256": "sha256:b1aaea90ca9c9759036bcbf5ce45c5741b2a20778319e7ba1c4a752144cd7396",
+      "provenance": "Exact @taxkit/scripts package manifest and release command contract."
+    }
+  ],
+  "buildDigests": [
+    {
+      "target": "docs/evidence/releases/HGI-203-build-manifest.txt",
+      "sha256": "sha256:d7131c86cfdd6b43076a349dddffe312dad2221710a5d5c536a9d540f7df975b",
+      "provenance": "Retained preflight manifest of the named scripts and SDK build outputs."
+    }
+  ],
+  "exportDigests": [
+    {
+      "target": "packages/sdk/typescript/package.json",
+      "sha256": "sha256:49230f2294084d3544ed176887b46fc7f919dc47d80e57df415de1d429e0561b",
+      "provenance": "Exact SDK public export map and packed-package contract."
+    }
+  ],
+  "journeyInventory": "docs/verification/critical-journeys.json",
+  "journeyInventorySha256": "sha256:13b7c960ff7b5f5fef236cff4cef800409f822e6be2a552eaa78b64be2d8ad5a",
+  "journeyResults": [
+    {
+      "id": "taxkit-calculator-direct",
+      "status": "passed",
+      "evidencePath": "docs/evidence/releases/HGI-203-accepted-attempt.json"
+    },
+    {
+      "id": "taxkit-sdk-packed",
+      "status": "passed",
+      "evidencePath": "docs/evidence/releases/HGI-203-accepted-attempt.json"
+    },
+    {
+      "id": "taxkit-http-api",
+      "status": "passed",
+      "evidencePath": "docs/evidence/releases/HGI-203-accepted-attempt.json"
+    },
+    {
+      "id": "taxkit-docs-runtime",
+      "status": "passed",
+      "evidencePath": "docs/evidence/releases/HGI-203-accepted-attempt.json"
+    },
+    {
+      "id": "taxkit-release-closure",
+      "status": "passed",
+      "evidencePath": "docs/evidence/releases/HGI-203-accepted-attempt.json"
+    }
+  ],
+  "packedConsumerEvidence": "docs/evidence/releases/HGI-203-accepted-attempt.json",
+  "apiEvidence": "docs/evidence/releases/HGI-203-accepted-attempt.json",
+  "docsEvidence": "docs/evidence/releases/HGI-203-accepted-attempt.json",
+  "attempt": {
+    "attemptId": "release-1784687182331",
+    "terminalState": "success",
+    "observedExitCode": 0,
+    "failedCheck": null,
+    "lastSuccessfulCheck": "changeset-status",
+    "detailArtifacts": [
+      {
+        "path": "docs/evidence/releases/HGI-203-accepted-attempt.json",
+        "sha256": "sha256:b11d02d38d1ec6961d6749a8b471c48ac92b2d95a9f0f00c7faeb68df3bd668c"
+      }
+    ],
+    "provenance": "One final sequential execution of all nine canonical local TaxKit release-readiness checks against the file-URL-safe, diagnostic-prefix-safe cross-platform home-redaction candidate; all journey evidence pointers and results bind to this bounded accepted-attempt summary.",
+    "postcondition": "Every ordered local check completed once with a true zero exit and retained sanitized detail.",
+    "recovery": "Use the immutable bounded attempt summary, receipt and verified local detail paths for review; do not rerun for presentation.",
+    "resumeTrigger": "Independent acceptance may change lifecycle without altering this attempt; a materially new candidate identity requires a new attempt.",
+    "rollback": "Revert the candidate semantic commit while retaining this attempt receipt and all failed or accepted evidence.",
+    "limitation": "This local attempt does not establish registry, release, deployment, provider, deployed SSR or public-site state.",
+    "nonClaim": "No package was published and no tag, release, deployment or provider mutation was performed."
+  },
+  "retainedEvidence": [
+    "docs/documentation-audit/HGI-203-candidate.json",
+    "docs/evidence/releases/HGI-203-accepted-attempt.json",
+    "docs/evidence/releases/HGI-203-build-manifest.txt",
+    "docs/evidence/releases/HGI-203-content-manifest.txt",
+    "docs/evidence/releases/HGI-203-failed-attempts.json",
+    "docs/verification/critical-journeys.json"
+  ],
+  "limitations": [
+    "No registry publication, external package install, deployment, provider state, deployed SSR/hydration or public availability is observed.",
+    "The final local release-evidence graph passed once for this file-URL-safe cross-platform-home-redacted candidate and fresh-context acceptance passed; Git publication/readback remains pending."
+  ],
+  "nonClaims": [
+    "This packet does not authorize or prove npm publication, a tag, a release, deployment, provider access or public-site availability."
+  ],
+  "rollback": "Revert the future HGI-203 semantic commit; retain accepted, failed and inconclusive evidence and never restore a superseded fallback implementation.",
+  "provenance": "Schema-decoded candidate packet for the exact base commit and final file-URL-safe content manifest, bound to one successful immutable local attempt, bounded accepted-attempt summary and fresh-context acceptance; Git publication/readback is still pending."
+}

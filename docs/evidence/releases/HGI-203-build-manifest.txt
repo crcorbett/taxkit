@@ -1,0 +1,19 @@
+# HGI-203 preflight build manifest
+# Recipe: run `bun run --filter=@taxkit/scripts build` and the canonical SDK build, then SHA-256 each listed repository-relative output in byte order.
+# This retained manifest identifies local build outputs; it does not claim a published package, registry artifact, deployment or provider state.
+99e8c10e634fb3e170d6e50950ad63422b3f6931969c495423037aa968d4f051  packages/scripts/dist/index.d.ts
+2f5028f082ac5e8bce6178fdcecec767e124e14c9dcc38a91cfd45a384e7a10c  packages/scripts/dist/index.js
+b68046493c49f9491926280b9444bff0b197917f8d0dd2481c7d434849af54fd  packages/scripts/dist/release-readiness/evidence.boundary.js
+54fa7fa9ff8cd162ed475a0d67f1432da473e36eab91e33ac70d5fcc126c1f8d  packages/scripts/dist/release-readiness/live.layer.js
+a58efcb679398f709c9b0dbac6b467eecbe22f226d194b5aa19616553540e2f8  packages/scripts/dist/release-readiness/present.runtime.js
+af7ce6b76dbba01adf38f35bc32e63217fc0615dbf2b5ad5ac1f8f082f2c34f6  packages/scripts/dist/release-readiness/program.js
+593247f2cba5c65a7196f3225ffcc49c42b496033deaeb98cff37c3c85b57551  packages/scripts/dist/release-readiness/release-readiness.runtime.js
+c3cec888b492cb5d6909cbe321c0726ae2e97b9415212d6ff6a545a7e8fb41f5  packages/scripts/dist/release-readiness/schemas.js
+2df3f6a5776494259e00f64ca2c3da64ace55b746194032590d0986a1714b853  packages/sdk/typescript/dist/index.d.ts
+b3a92db9d8513f612e9b886116faf74e73c3d5f03e1f0cf9dba206e15390040b  packages/sdk/typescript/dist/index.js
+5967c3a2bae1646ea21e9205b0fbb42a2b9c44f9311e9d0f6f80185e68f74d54  packages/sdk/typescript/dist/au.d.ts
+2f2e83a7c35a0c33ae581a40eba89ec08e490f8763fdd16bd3959e87d1e5094d  packages/sdk/typescript/dist/au.js
+e2715a2d204d8fde1fd0a264baeda29948bc8d5897102ea11f3570ee0a2dfc5c  packages/sdk/typescript/dist/au-effect.d.ts
+752dac506a8d4320b1dc587feb27d30eafd034746238bcb98e03329ff191c70c  packages/sdk/typescript/dist/au-effect.js
+429ad613aa4cfd98f212440dc76e197b0641aa1100ae02366a2d37a8ebd2c7ef  packages/sdk/typescript/dist/effect.d.ts
+1552dff34f3eeab81eabb7a09313de980aea0bb7c2926a2124bb709a152ec6c7  packages/sdk/typescript/dist/effect.js

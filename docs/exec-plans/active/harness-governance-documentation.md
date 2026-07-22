@@ -43,8 +43,10 @@ deletion/movement require separately approved authority and target runbooks.
   [`HGI-202-validation.json`](../../documentation-audit/HGI-202-validation.json).
   This does not claim a release, public-doc publication, deployment, provider
   state, or external availability.
-- HGI-208 (docs-maintenance skill) depends on completed HGI-202 and is next.
-- HGI-203 (critical journeys/release proof) depends on HGI-202 and HGI-208;
+- HGI-208 (docs-maintenance skill) is completed; HGI-203 is the active candidate
+  pending independent acceptance.
+- HGI-203 (critical journeys/release proof) has satisfied its HGI-202 and HGI-208
+  dependencies;
   HGI-204 (runbooks) depends on HGI-203.
 - HGI-205 (CI/controls/automation) depends on HGI-202, HGI-203, and HGI-204;
   HGI-206 (requalification/closeout) depends on HGI-200 through HGI-205.
@@ -67,8 +69,8 @@ It did not alter public content, binary evidence, or the architecture tombstone
 route. Integrated parent acceptance is recorded in
 [`HGI-200-validation.json`](../../documentation-audit/HGI-200-validation.json).
 
-HGI-201 passed independent acceptance and exact Git publication/readback. HGI-207
-and HGI-202 now have local completion receipts; the next semantic slice is
-HGI-208. These local records do not prove
+HGI-201 passed independent acceptance and exact Git publication/readback. HGI-207,
+HGI-202 and HGI-208 now have local completion receipts; the next semantic slice is
+HGI-203. These local records do not prove
 publication, registry state,
 external consumers, API/docs production behavior, or release authority.

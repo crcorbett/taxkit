@@ -131,6 +131,30 @@ root release:check
 approval. Versioning, changelog application and publishing remain explicit
 operations after a human reviews pending Changesets and the release impact.
 
+The five consumer-visible release journeys are maintained in
+[`../verification/critical-journeys.json`](../verification/critical-journeys.json):
+calculator direct use, packed SDK, HTTP API, docs runtime and release closure.
+Their packet is bounded, sanitised local evidence in
+[`../evidence/releases/HGI-203-local.json`](../evidence/releases/HGI-203-local.json);
+raw logs and transient tarballs are not committed. Complete sanitized command
+detail is retained at unique ignored paths with digests, while a bounded attempt
+receipt binds the verified base commit and changed-content manifest digest.
+`release:present` verifies that receipt and all referenced detail before writing
+or reusing an immutable presentation sidecar, so terminal output remains
+reconstructable without rerunning. The failed-provenance index retains prior
+terminal evidence outside the default route. Local browser proof does not prove deployed SSR,
+hydration or public availability, and no local receipt proves publication or
+deployment.
+
+Candidate evidence verifies every sorted safe path and digest in its exact
+changed-content manifest, plus the complete transient attempt receipt/detail
+chain. Accepted lifecycle evidence retains only the bounded sanitized JSON
+summary in Git and does not require ignored raw command logs in a clean clone.
+A later release attempt must first prepare a new candidate packet; the runtime
+fails closed instead of reusing an accepted candidate identity. It compares the
+base commit, manifest path and manifest digest with the accepted summary, so
+changing lifecycle back to `candidate` alone cannot reuse an accepted proof.
+
 ## Review evidence
 
 Substantial code, package-boundary, API, SDK, app-runtime or documentation

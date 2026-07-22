@@ -52,8 +52,8 @@ state. The active execution plan owns the current bounded sequence.
 | HGI-207 — documentation and release-semantics decisions | Completed | Accepted public lifecycle semantics, transient tarball handling, sanitized release-receipt retention, strict lifecycle routing, and publication/deployment non-claims in [`../documentation-audit/hgi-207/README.md`](../documentation-audit/hgi-207/README.md) |
 | HGI-201 — PRD guides and local skills | Completed | Current architecture/standards/runbook routing, semantic contradiction fixtures, full verification, independent acceptance, and `HGI-201-validation.json` |
 | HGI-202 — docs policy and public-maintainer separation | Completed and published; HGI-208 is next | Machine-checkable public, maintainer, generated, package-README, and accepted public-status/navigation ownership; see [`../documentation-audit/HGI-202-validation.json`](../documentation-audit/HGI-202-validation.json) |
-| HGI-208 — TaxKit docs-maintenance skill | Pending; depends on HGI-202 | Repo-local skill source and focused skill-policy proof |
-| HGI-203 — critical journeys, release proof, and bounded receipts | Pending; depends on HGI-202, HGI-208 | `docs/verification/**` and journey-matched evidence with explicit non-claims |
+| HGI-208 — TaxKit docs-maintenance skill | Completed | Repo-local skill source and focused skill-policy proof |
+| HGI-203 — critical journeys, release proof, and bounded receipts | In progress; candidate pending independent acceptance | `docs/verification/**`, strict release packet, immutable attempt receipt, and journey-matched evidence with explicit non-claims |
 | HGI-204 — release and recovery runbooks | Pending; depends on HGI-203 | `docs/runbooks/**`, authority, rollback, and escalation evidence |
 | HGI-205 — CI, controls, and automation governance | Pending; depends on HGI-202, HGI-203, HGI-204 | Executable owner and focused negative/positive controls |
 | HGI-206 — repository closeout | Pending | No unresolved critical owner drift; accepted receipts and pushed commit identity |

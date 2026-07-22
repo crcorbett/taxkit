@@ -1,16 +1,27 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Console, Effect, Layer } from "effect";
+import { Clock, Console, Effect, Layer } from "effect";
 import * as Path from "effect/Path";
 
 import {
   formatReleaseReadinessError,
+  ReleaseEvidenceDecodeError,
   ReleaseWorkspacePathError,
 } from "./errors.js";
+import {
+  persistReleaseAttemptReceipt,
+  readReleaseAcceptedAttemptSummary,
+  readReleaseEvidence,
+  verifyNewReleaseCandidateIdentity,
+} from "./evidence.boundary.js";
 import { ReleaseCommandRunnerLive } from "./live.layer.js";
-import { runReleaseReadiness } from "./program.js";
+import {
+  makeSuccessfulAttemptReceipt,
+  runReleaseReadiness,
+} from "./program.js";
 import {
   makeReleaseReadinessPlan,
+  ReleaseAttemptId,
   renderReleaseReadinessReport,
 } from "./schemas.js";
 
@@ -21,23 +32,61 @@ const ReleaseReadinessRuntimeLive = ReleaseCommandRunnerLive.pipe(
 
 const program = Effect.gen(function* releaseReadinessMain() {
   const path = yield* Path.Path;
-  const workspaceRoot = yield* path.fromFileUrl(workspaceRootUrl).pipe(
-    Effect.mapError(
-      (cause) =>
-        new ReleaseWorkspacePathError({
-          message: cause.message,
-          url: workspaceRootUrl.toString(),
-        })
+  const workspaceRoot = yield* path
+    .fromFileUrl(workspaceRootUrl)
+    .pipe(
+      Effect.mapError(
+        () =>
+          new ReleaseWorkspacePathError({ target: "repository workspace root" })
+      )
+    );
+  const evidence = yield* readReleaseEvidence(workspaceRoot);
+  if (evidence.packet.lifecycle === "accepted") {
+    return yield* new ReleaseEvidenceDecodeError({
+      evidencePath: "docs/evidence/releases/HGI-203-local.json",
+      operation: "prepare-new-candidate-packet-before-release-attempt",
+    });
+  }
+  const acceptedAttempt =
+    yield* readReleaseAcceptedAttemptSummary(workspaceRoot);
+  yield* verifyNewReleaseCandidateIdentity(
+    evidence.packet.candidate,
+    acceptedAttempt
+  );
+  const candidate = {
+    baseCommit: evidence.packet.candidate.baseCommit,
+    contentManifest: evidence.packet.candidate.contentManifest,
+    contentSha256: evidence.packet.candidate.contentSha256,
+  };
+  const attemptId = ReleaseAttemptId.make(
+    `release-${yield* Clock.currentTimeMillis}`
+  );
+  const report = yield* runReleaseReadiness(
+    makeReleaseReadinessPlan(workspaceRoot),
+    attemptId,
+    candidate
+  ).pipe(
+    Effect.tapErrorTag("ReleaseAttemptFailedError", (error) =>
+      Effect.gen(function* persistFailedReleaseAttempt() {
+        const artifact = yield* persistReleaseAttemptReceipt(
+          workspaceRoot,
+          error.attempt
+        );
+        yield* Console.error(formatReleaseReadinessError(error));
+        yield* Console.error(`RECEIPT ${artifact.path} (${artifact.sha256})`);
+      })
     )
   );
+  const artifact = yield* persistReleaseAttemptReceipt(
+    workspaceRoot,
+    makeSuccessfulAttemptReceipt(report, candidate)
+  );
+  yield* Console.info(renderReleaseReadinessReport(report));
+  yield* Console.info(`RECEIPT ${artifact.path} (${artifact.sha256})`);
 
-  return yield* runReleaseReadiness(makeReleaseReadinessPlan(workspaceRoot));
+  return report;
 }).pipe(
-  Effect.tap((report) => Console.info(renderReleaseReadinessReport(report))),
-  Effect.tapErrorTag("ReleaseCheckFailedError", (error) =>
-    Console.error(formatReleaseReadinessError(error))
-  ),
-  Effect.tapErrorTag("ReleaseCommandExecutionError", (error) =>
+  Effect.tapErrorTag("ReleaseEvidenceDecodeError", (error) =>
     Console.error(formatReleaseReadinessError(error))
   ),
   Effect.tapErrorTag("ReleaseWorkspacePathError", (error) =>
@@ -46,4 +95,4 @@ const program = Effect.gen(function* releaseReadinessMain() {
   Effect.provide(ReleaseReadinessRuntimeLive)
 );
 
-BunRuntime.runMain(program);
+BunRuntime.runMain(program, { disableErrorReporting: true });

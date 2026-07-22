@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-203",
+  "attemptId": "release-1784687182331",
+  "terminalState": "success",
+  "observedExitCode": 0,
+  "lastSuccessfulCheck": "changeset-status",
+  "receiptPath": "tmp/release-readiness/release-1784687182331.json",
+  "receiptSha256": "sha256:e3757246a17eda154cb05fdb390592d7a2c6a606ef45436b318d5845cee8345c",
+  "candidate": {
+    "baseCommit": "e63a7b60c369ca880a49dce5d1ffddcf49a6365e",
+    "contentManifest": "docs/evidence/releases/HGI-203-content-manifest.txt",
+    "contentSha256BeforeAttempt": "sha256:3947352634ef4f7341f5ab9e2b05fc26f3424c148ebf8932b98e656c3e70c619"
+  },
+  "outcomes": [
+    {
+      "check": "verification",
+      "exitCode": 0,
+      "stdout": {
+        "path": "tmp/release-readiness/verification-stdout-8MAW9F/f52e54782450.log",
+        "sha256": "sha256:11b03b1de68cbf547a6aa8c84bb37d8fb8aa4e646138b208d804c80aa08fa21a"
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/verification-stderr-F3eGhg/25d2c7092cf0.log",
+        "sha256": "sha256:f999cbeb277345493e071d3845364e603e4b69b7f48417e0464b2274284a96fa"
+      }
+    },
+    {
+      "check": "test",
+      "exitCode": 0,
+      "stdout": {
+        "path": "tmp/release-readiness/test-stdout-nSdFj8/ab07cec48c64.log",
+        "sha256": "sha256:6768a57f34de5abc66c83a2867aadedffab2b6afddc56df133ac1eab0e0fa340"
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/test-stderr-2oDLWl/7e9daefd01d5.log",
+        "sha256": "sha256:8d5155239cd43a4f83405aa3eb8f63252ddaa88423a4fc2651b678a5b9b05bf9"
+      }
+    },
+    {
+      "check": "build",
+      "exitCode": 0,
+      "stdout": {
+        "path": "tmp/release-readiness/build-stdout-58qsVd/019ad819d317.log",
+        "sha256": "sha256:db3c4b40db3c0598b3539cff9bc68d028e770478cca2b514d53e82216f2f623f"
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/build-stderr-W5GQhn/e8dd600b6e19.log",
+        "sha256": "sha256:28f8ecef671d9bede803690c08306ed5dddd9c604fe063327374b3505306949d"
+      }
+    },
+    {
+      "check": "docs-validation",
+      "exitCode": 0,
+      "stdout": {
+        "path": "tmp/release-readiness/docs-validation-stdout-t8Hmou/7b39a7ce7c71.log",
+        "sha256": "sha256:28c675c6813766571df8590cf3591680f4005323ea0131a2e4d296042d6e4df3"
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/docs-validation-stderr-cSduoz/35fddd499e74.log",
+        "sha256": "sha256:fa716046feffc889185c27ff166be3a83b30bfcf141267adbeec74ffaa33a899"
+      }
+    },
+    {
+      "check": "packed-artifact",
+      "exitCode": 0,
+      "stdout": {
+        "path": "tmp/release-readiness/packed-artifact-stdout-GNh7Hh/9e178c4966e4.log",
+        "sha256": "sha256:7be04dd468baa59eb7738fea0c851cce0b6c6b5888510712a647a3811ca88c45"
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/packed-artifact-stderr-8qtGvn/0ed2c61f24ee.log",
+        "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "check": "downstream-consumer",
+      "exitCode": 0,
+      "stdout": {
+        "path": "tmp/release-readiness/downstream-consumer-stdout-bLCHqK/a17364cea042.log",
+        "sha256": "sha256:aff08615168545b409d4971dc5206850562cb87a26f9fd97813b9ee2eb49b6be"
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/downstream-consumer-stderr-114mRq/0384d64a50c4.log",
+        "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "check": "api-smoke",
+      "exitCode": 0,
+      "stdout": {
+        "path": "tmp/release-readiness/api-smoke-stdout-rPq98B/6e702fbef217.log",
+        "sha256": "sha256:6de7c642bfb77945781e86301e48db5df0af355a9cb64b0d65b6a893ceb7ca5c"
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/api-smoke-stderr-9rNaGW/de85997d67c1.log",
+        "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "check": "docs-browser",
+      "exitCode": 0,
+      "stdout": {
+        "path": "tmp/release-readiness/docs-browser-stdout-YjXBTB/49baa05472b4.log",
+        "sha256": "sha256:126879e8ab8800fbb4bb7e3d60668a6500235508dc267fe5a5e69ae3a885d839"
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/docs-browser-stderr-lnCjwP/99bf0c8a5667.log",
+        "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "check": "changeset-status",
+      "exitCode": 0,
+      "stdout": {
+        "path": "tmp/release-readiness/changeset-status-stdout-QpBnNk/3d0d1a2b8fb3.log",
+        "sha256": "sha256:a08d9f9df0e5cfbbe7675e1691520975f616bdb805999d8be6f8c41c3b03fbd8"
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/changeset-status-stderr-UgewC2/a3408560bf09.log",
+        "sha256": "sha256:6783eecd27525875cf25d1cf0aab03c032e5e38653288d20a3b7c49fc4277627"
+      }
+    }
+  ],
+  "journeyEvidence": {
+    "taxkit-calculator-direct": [
+      "verification",
+      "test"
+    ],
+    "taxkit-sdk-packed": [
+      "build",
+      "packed-artifact",
+      "downstream-consumer"
+    ],
+    "taxkit-http-api": ["api-smoke"],
+    "taxkit-docs-runtime": [
+      "docs-validation",
+      "docs-browser"
+    ],
+    "taxkit-release-closure": [
+      "verification",
+      "test",
+      "build",
+      "docs-validation",
+      "packed-artifact",
+      "downstream-consumer",
+      "api-smoke",
+      "docs-browser",
+      "changeset-status"
+    ]
+  },
+  "postcondition": "Every ordered local check completed once with a true zero exit and retained sanitized detail.",
+  "limitation": "This local attempt does not establish registry, release, deployment, provider, deployed SSR or public-site state.",
+  "nonClaim": "No package was published and no tag, release, deployment or provider mutation was performed.",
+  "rollback": "Revert the candidate semantic commit while retaining this attempt receipt and all failed or accepted evidence."
+}
