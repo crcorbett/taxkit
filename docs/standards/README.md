@@ -3,7 +3,7 @@ document_type: standards-router
 lifecycle: current
 authority: canonical
 owner: taxkit-standards-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: standards owner, lifecycle, or enforcement route change
 ---
 
@@ -17,6 +17,7 @@ quality tools.
 ## Documents
 
 - [Code patterns](./code-patterns.md)
+- [Controls and automation governance](./controls.md)
 - [Docstring conventions](./docstrings.md)
 - [Documentation architecture](./documentation-architecture.md)
 - [Documentation review](./documentation-review.md)

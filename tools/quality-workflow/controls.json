@@ -1,0 +1,35 @@
+[
+  {
+    "id": "quality-workflow-semantics",
+    "owner": "taxkit-ci-release-maintainer",
+    "signal": "A quality workflow or action pin changes.",
+    "preventedFailure": "A comment, another job, mutable action pin, permission expansion, timeout omission or extra release/mutation step falsely appears compliant.",
+    "fixture": "tools/quality-workflow/policy.test.ts",
+    "evidence": "bun run check:quality-workflow",
+    "recovery": "Repair the exact tagged finding in .github/workflows/quality.yml.",
+    "reviewTrigger": "Workflow, trigger, job, action, permission, timeout, concurrency or release graph change.",
+    "retirementCondition": "A stronger schema-decoded CI workflow owner replaces this contract."
+  },
+  {
+    "id": "canonical-release-graph",
+    "owner": "@taxkit/scripts release-readiness",
+    "signal": "Any public export, packed SDK, API, public docs/manifest, workflow or release-script source changes.",
+    "preventedFailure": "A partial workflow graph claims release-readiness while skipping an owning boundary command.",
+    "fixture": "packages/scripts/src/release-readiness/program.test.ts",
+    "evidence": "bun run release:check -- --ci",
+    "recovery": "Repair the named failed check and preserve CI report-only semantics.",
+    "reviewTrigger": "Release check order, owning command, package graph or public boundary change.",
+    "retirementCondition": "A stronger canonical graph replaces all nine ordered checks."
+  },
+  {
+    "id": "context-candidate-admission",
+    "owner": "taxkit-documentation-owner",
+    "signal": "A proposal adds recurring documentation or context freshness work.",
+    "preventedFailure": "Untrusted generated output edits canonical context, self-trains or claims publication.",
+    "fixture": "tools/quality-workflow/automation-register.json",
+    "evidence": "bun run check:quality-workflow",
+    "recovery": "Quarantine the candidate and use separately authorized publication recovery.",
+    "reviewTrigger": "Candidate source, retrieval, reviewer, publisher, retention or recovery contract change.",
+    "retirementCondition": "A separately accepted canonical context-governance owner replaces this register."
+  }
+]

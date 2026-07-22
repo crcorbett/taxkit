@@ -18,13 +18,16 @@
         "oxlint.config.ts",
         "tools/effect-language-service/compatibility.ts",
         "tools/repository-paths/check.runtime.ts",
-        "tools/repository-paths/*.test.ts"
+        "tools/repository-paths/*.test.ts",
+        "tools/quality-workflow/check.runtime.ts",
+        "tools/quality-workflow/*.test.ts"
       ],
       "project": [
         "*.json",
         "*.ts",
         "tools/effect-language-service/**/*.ts",
-        "tools/repository-paths/**/*.ts"
+        "tools/repository-paths/**/*.ts",
+        "tools/quality-workflow/**/*.ts"
       ],
       "ignoreDependencies": ["typescript"]
     },

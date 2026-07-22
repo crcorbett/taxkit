@@ -1,0 +1,101 @@
+[
+  {
+    "id": "public-export",
+    "target": "packages/sdk/typescript/src/index.ts",
+    "defect": "Remove the public TaxKit export while leaving the implementation present.",
+    "mutation": {
+      "search": "export const TaxKit = {",
+      "replacement": "const TaxKit = {"
+    },
+    "command": {
+      "executable": "bun",
+      "args": ["run", "--filter=@taxkit/sdk", "validate:downstream"]
+    },
+    "runner": "tools/quality-workflow/release-boundary.test.ts",
+    "expectedFailedCheck": "downstream-consumer",
+    "failureOracle": "TaxKit",
+    "recovery": "Restore the documented browser-safe TaxKit export and rerun downstream-consumer."
+  },
+  {
+    "id": "packed-sdk",
+    "target": "packages/sdk/typescript/package.json",
+    "defect": "Point the packed root export at an absent artifact.",
+    "mutation": {
+      "search": "\"default\": \"./dist/index.js\"",
+      "replacement": "\"default\": \"./dist/missing-fixture.js\""
+    },
+    "command": {
+      "executable": "bun",
+      "args": ["run", "--filter=@taxkit/sdk", "check-packed-artifact"]
+    },
+    "runner": "tools/quality-workflow/release-boundary.test.ts",
+    "expectedFailedCheck": "packed-artifact",
+    "failureOracle": "missing-fixture.js",
+    "recovery": "Restore the packed root export target and rerun packed-artifact."
+  },
+  {
+    "id": "api-contract",
+    "target": "packages/api/http/src/openapi.ts",
+    "defect": "Replace the schema-derived OpenAPI paths with an empty document.",
+    "mutation": {
+      "search": "OpenApi.fromApi(TaxKitApi);",
+      "replacement": "({ openapi: \"3.1.0\", info: { title: \"fixture\", version: \"0\" }, paths: {} } as OpenApi.OpenAPISpec);"
+    },
+    "command": {
+      "executable": "bun",
+      "args": ["run", "--filter=api", "smoke"]
+    },
+    "runner": "tools/quality-workflow/release-boundary.test.ts",
+    "expectedFailedCheck": "api-smoke",
+    "failureOracle": "OpenAPI document did not include the calculate route",
+    "recovery": "Restore the schema-derived OpenAPI document and rerun api-smoke."
+  },
+  {
+    "id": "public-docs-manifest",
+    "target": "apps/docs/navigation.json",
+    "defect": "Point one public navigation entry at a missing authored page.",
+    "mutation": {
+      "search": "content/start/overview.mdx",
+      "replacement": "content/start/missing-fixture.mdx"
+    },
+    "command": { "executable": "bun", "args": ["run", "docs:validate"] },
+    "runner": "tools/quality-workflow/release-boundary.test.ts",
+    "expectedFailedCheck": "docs-validation",
+    "failureOracle": "navigation source missing",
+    "recovery": "Restore the authored navigation source and rerun docs-validation."
+  },
+  {
+    "id": "workflow-semantics",
+    "target": ".github/workflows/quality.yml",
+    "defect": "Replace the canonical CI command in the actual quality job.",
+    "mutation": {
+      "search": "bun run release:check -- --ci",
+      "replacement": "bun run verification"
+    },
+    "command": {
+      "executable": "bun",
+      "args": ["run", "check:quality-workflow"]
+    },
+    "runner": "tools/quality-workflow/release-boundary.test.ts",
+    "expectedFailedCheck": "quality-workflow",
+    "failureOracle": "canonical-release-graph",
+    "recovery": "Restore the decoded canonical release command in the actual quality job."
+  },
+  {
+    "id": "release-script",
+    "target": "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
+    "defect": "Read candidate evidence from the report-only CI branch.",
+    "mutation": {
+      "search": "const report = yield* runCiReleaseReadiness(",
+      "replacement": "const candidateEvidence = yield* readReleaseEvidence(workspaceRoot);\n    const report = yield* runCiReleaseReadiness("
+    },
+    "command": {
+      "executable": "bun",
+      "args": ["run", "check:quality-workflow"]
+    },
+    "runner": "tools/quality-workflow/release-boundary.test.ts",
+    "expectedFailedCheck": "quality-workflow",
+    "failureOracle": "release-runtime-boundary",
+    "recovery": "Remove candidate evidence reads from CI mode and rerun quality-workflow."
+  }
+]

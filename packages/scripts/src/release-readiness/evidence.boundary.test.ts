@@ -80,14 +80,20 @@ const failedFixtureReceipt: ReleaseAttemptReceipt = {
 
 describe("release evidence boundary", () => {
   it.effect(
-    "decodes and verifies the actual retained inventory and packet",
+    "decodes retained accepted evidence without treating it as a current candidate",
     () =>
       Effect.gen(function* testActualReleaseEvidence() {
-        const { workspaceRoot } = yield* readEvidenceTexts;
-        const evidence = yield* readReleaseEvidence(workspaceRoot);
+        const { inventoryText, packetText, workspaceRoot } =
+          yield* readEvidenceTexts;
+        const inventory = yield* decodeReleaseJourneyInventory(inventoryText);
+        const packet = yield* decodeReleaseProofPacket(packetText);
+        const currentVerification = yield* readReleaseEvidence(
+          workspaceRoot
+        ).pipe(Effect.flip);
 
-        expect(evidence.inventory.journeys).toHaveLength(5);
-        expect(evidence.packet.taskId).toBe("HGI-203");
+        expect(inventory.journeys).toHaveLength(5);
+        expect(packet.taskId).toBe("HGI-203");
+        expect(currentVerification._tag).toBe("ReleaseEvidenceDecodeError");
       }).pipe(Effect.provide(BunServices.layer))
   );
 

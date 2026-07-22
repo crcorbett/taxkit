@@ -7,7 +7,10 @@ import {
   Result,
 } from "effect";
 
-import { ReleaseAttemptFailedError } from "./errors.js";
+import {
+  CiReleaseCheckFailedError,
+  ReleaseAttemptFailedError,
+} from "./errors.js";
 import type {
   ReleaseAttemptReceipt,
   ReleaseCandidateIdentity,
@@ -17,7 +20,7 @@ import type {
   ReleaseTerminalState,
   ReleaseAttemptId,
 } from "./schemas.js";
-import { ReleaseReadinessReport } from "./schemas.js";
+import { CiReleaseReadinessReport, ReleaseReadinessReport } from "./schemas.js";
 import { ReleaseCommandRunner } from "./service.js";
 
 const collectDetailArtifacts = (
@@ -167,6 +170,49 @@ export const runReleaseReadiness = (
 
     return new ReleaseReadinessReport({
       attemptId,
+      outcomes: yield* Ref.get(completed),
+    });
+  });
+
+export const runCiReleaseReadiness = (checks: readonly ReleaseCheck[]) =>
+  Effect.gen(function* runCiReleaseReadinessProgram() {
+    const commandRunner = yield* ReleaseCommandRunner;
+    const completed = yield* Ref.make<readonly ReleaseCommandOutcome[]>([]);
+
+    yield* Effect.forEach(
+      checks,
+      (check) =>
+        Effect.gen(function* runCiReleaseCheck() {
+          const priorOutcomes = yield* Ref.get(completed);
+          const target = [check.command, ...check.args].join(" ");
+          const outcome = yield* commandRunner.execute(check).pipe(
+            Effect.catchTag("ReleaseCommandExecutionError", (error) =>
+              Effect.fail(
+                new CiReleaseCheckFailedError({
+                  failedCheck: check.id,
+                  lastSuccessfulCheck: lastSuccessfulCheck(priorOutcomes),
+                  observedExitCode: error.observedExitCode,
+                  target,
+                  terminalState: error.terminalState,
+                })
+              )
+            )
+          );
+          if (outcome.terminalState !== "success") {
+            return yield* new CiReleaseCheckFailedError({
+              failedCheck: check.id,
+              lastSuccessfulCheck: lastSuccessfulCheck(priorOutcomes),
+              observedExitCode: outcome.exitCode,
+              target,
+              terminalState: outcome.terminalState,
+            });
+          }
+          return yield* Ref.update(completed, EffectArray.append(outcome));
+        }),
+      { concurrency: 1 }
+    );
+    return new CiReleaseReadinessReport({
+      mode: "ci",
       outcomes: yield* Ref.get(completed),
     });
   });

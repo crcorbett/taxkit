@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-18
+last_reviewed: 2026-07-22
 source_of_truth: docs
 confidence: high
 ---
@@ -130,6 +130,20 @@ root release:check
 `release:check` is the complete local release-evidence graph, not publication
 approval. Versioning, changelog application and publishing remain explicit
 operations after a human reviews pending Changesets and the release impact.
+
+The Quality workflow invokes `bun run release:check -- --ci` for every
+configured pull request and push rather than relying on path filters. The
+explicit CI mode runs the same nine ordered checks without consuming or
+rewriting an HGI-203 candidate packet; it returns bounded local command detail
+only. A non-CI `release:check` remains the authority-bound new-candidate
+operation in the release-readiness runbook. Its static contract is owned by
+[`../../tools/quality-workflow/check.runtime.ts`](../../tools/quality-workflow/check.runtime.ts): it rejects missing read-only permissions, timeout or concurrency
+limits, floating action references, absent canonical graph invocation, and
+additional workflow-local release steps. Its fixtures name public exports,
+packed SDK, API, docs, manifests, workflows, and release scripts as
+release-relevant boundaries. This is local workflow-configuration proof only;
+it does not prove a hosted run, publication, deployment, registry state, or
+external consumer behaviour.
 
 The five consumer-visible release journeys are maintained in
 [`../verification/critical-journeys.json`](../verification/critical-journeys.json):

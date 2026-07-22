@@ -37,6 +37,10 @@ const decodingBoundaryFiles = [
   "tools/repository-paths/check.runtime.ts",
   "tools/repository-paths/policy.test.ts",
   "tools/repository-paths/policy.ts",
+  "tools/quality-workflow/check.runtime.ts",
+  "tools/quality-workflow/policy.test.ts",
+  "tools/quality-workflow/policy.ts",
+  "tools/quality-workflow/release-boundary.test.ts",
 
   // Dynamic dispatch and its transitional repeated scenario decodes.
   "packages/calculators/src/catalog.ts",
@@ -47,6 +51,9 @@ const decodingBoundaryFiles = [
   // Release-evidence decoders and their adversarial boundary fixtures.
   "packages/scripts/src/release-readiness/evidence.boundary.test.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
+  "packages/scripts/src/release-readiness/cli.test.ts",
+  "packages/scripts/src/release-readiness/cli.ts",
+  "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   // Cross-process command output restored by the release-readiness live layer.
   "packages/scripts/src/release-readiness/live.layer.ts",
 
@@ -140,6 +147,7 @@ const runtimeBoundaryFiles = [
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
+  "packages/scripts/src/release-readiness/cli.test.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/src/index.ts",
@@ -147,6 +155,9 @@ const runtimeBoundaryFiles = [
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/repository-paths/check.runtime.test.ts",
   "tools/repository-paths/check.runtime.ts",
+  "tools/quality-workflow/check.runtime.ts",
+  "tools/quality-workflow/policy.test.ts",
+  "tools/quality-workflow/release-boundary.test.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/check.runtime.test.ts",
   "tools/documentation/runbook-check.runtime.ts",
@@ -181,6 +192,7 @@ const bunAdapterFiles = [
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
   "tools/oxlint/portable-rules.test.ts",
+  "tools/quality-workflow/release-boundary.test.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
   "tools/documentation/runbook-check.runtime.test.ts",
@@ -198,6 +210,8 @@ const bunRuntimeEntrypointFiles = [
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
+  "tools/quality-workflow/check.runtime.ts",
+  "tools/quality-workflow/release-boundary.test.ts",
 ];
 
 export default defineConfig({

@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: acceptance or scope change in TaxKit HGI-200 through HGI-206
 successor: null
 tombstone: false
@@ -53,7 +53,9 @@ deletion/movement require separately approved authority and target runbooks.
   Effect-native validator, adversarial fixtures, fresh-context acceptance and
   exact semantic Git readback are recorded in
   [`HGI-204-validation.json`](../../documentation-audit/HGI-204-validation.json).
-- HGI-205 (CI/controls/automation) is the next pending TaxKit slice;
+- HGI-205 (CI/controls/automation) is implemented locally with workflow guards,
+  the canonical CI release graph, controls and automation owners, and focused
+  fixtures. It remains pending independent acceptance and task-ledger closeout;
   HGI-206 (requalification/closeout) depends on HGI-200 through HGI-205.
 
 Completed-plan follow-ups are not active work in historical plan bodies. Their

@@ -3,7 +3,7 @@ document_type: documentation-router
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-22
 review_trigger: any maintainer/public docs class, root route, SPEC, plan, runbook, proof, evidence, or lifecycle change
 ---
 
@@ -53,6 +53,7 @@ lifecycle; migrate it only when its owner is materially revised.
 | Completed history | [`exec-plans/completed/README.md`](exec-plans/completed/README.md) | Historical provenance, never default policy. |
 | Public docs product | [`../apps/docs/README.md`](../apps/docs/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md), and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) | Consumer-facing content/runtime, not maintainer lifecycle policy. |
 | Repeatable release/recovery operations | [`runbooks/README.md`](runbooks/README.md) and [`operations/authority-model.md`](operations/authority-model.md) | Exactly four target-owned procedures; stop consequential operations when principal or receipt is unknown. |
+| CI controls and recurring automation | [`standards/controls.md`](standards/controls.md) and [`operations/automation-register.md`](operations/automation-register.md) | Quality workflow admission, release-graph controls, and report-only candidate boundaries; neither route grants external authority. |
 | Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md), [`verification/critical-journeys.json`](verification/critical-journeys.json), [`evidence/releases/HGI-203-local.json`](evidence/releases/HGI-203-local.json), and [`documentation-audit/HGI-203-validation.json`](documentation-audit/HGI-203-validation.json) | Accepted HGI-203 owns the five journeys and bounded local proof; HGI-204 runbooks consume it. Raw logs and secrets are never durable proof. |
 | References | [`references/README.md`](references/README.md) | Revalidate mutable external guidance. |
 | Audit/accounting | [`documentation-audit/README.md`](documentation-audit/README.md) | Dated evidence, not policy. |

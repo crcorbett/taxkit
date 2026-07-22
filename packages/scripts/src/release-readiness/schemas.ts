@@ -99,6 +99,19 @@ export class ReleaseReadinessReport extends Schema.TaggedClass<ReleaseReadinessR
   }
 ) {}
 
+export class CiReleaseReadinessReport extends Schema.TaggedClass<CiReleaseReadinessReport>()(
+  "CiReleaseReadinessReport",
+  {
+    mode: Schema.Literal("ci"),
+    outcomes: Schema.Array(ReleaseCommandOutcome),
+  }
+) {}
+
+export const ReleaseReadinessCli = Schema.Struct({
+  mode: Schema.Literals(["candidate", "ci"]),
+});
+export type ReleaseReadinessCli = typeof ReleaseReadinessCli.Type;
+
 export const ReleaseAttemptReceipt = Schema.Struct({
   attemptId: ReleaseAttemptId,
   candidate: ReleaseCandidateIdentity,

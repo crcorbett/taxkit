@@ -30,6 +30,9 @@ scoped candidate packet. It does not include versioning or any external state.
 - A new run requires a new schema-valid `candidate` packet and content manifest;
   never substitute `tmp/**`, a candidate, failed, superseded, inconclusive, or
   stale/hash-mismatched record for accepted proof.
+- Report-only CI mode is distinct from a candidate attempt. It requires no
+  candidate packet, reads or writes no candidate/attempt receipt, and makes no
+  candidate claim.
 
 ## Authority
 
@@ -45,15 +48,20 @@ everything else. An accepted packet proves an observation, not authority.
    `RELEASE_ATTEMPT_PATH=<repository-relative-receipt.json> RELEASE_ATTEMPT_SHA256=sha256:<64-hex-digest> bun run release:present`.
 3. Run the focused boundary suite with `bun run test:release-readiness`.
 4. Run the repository graph with `bun run verification`.
-5. Only for an explicitly prepared new candidate, run `bun run release:check`
+5. To validate only the checked-out CI revision, run `bun run release:check --
+   --ci`. Its nine-check report may be repeated after a material revision or
+   environment change, but cannot be promoted into candidate or release proof.
+6. Only for an explicitly prepared new candidate, run `bun run release:check`
    once. Do not rerun merely to improve presentation or conceal a failure.
-6. Preserve the immutable attempt, bounded summary, candidate identity,
+7. Preserve the immutable attempt, bounded summary, candidate identity,
    limitations and failed-attempt provenance; request independent acceptance.
 
 ## Evidence and postcondition
 
-The postcondition is one identified candidate, one immutable terminal attempt,
-exact journey outcomes, sanitized bounded evidence, and no false-success state.
+Candidate mode's postcondition is one identified candidate, one immutable
+terminal attempt, exact journey outcomes, sanitized bounded evidence, and no
+false-success state. CI mode's postcondition is only a bounded nine-check report
+for the checked-out revision, with no candidate or attempt receipt.
 The five handoff paths above remain the canonical accepted HGI-203 evidence.
 
 ## Rollback

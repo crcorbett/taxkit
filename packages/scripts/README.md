@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-22
 source_of_truth: package-readme
 confidence: high
 ---
@@ -36,6 +36,21 @@ From the repository root, run:
 bun run release:check
 ```
 
+For CI validation of the checked-out revision, use the separate report-only
+mode:
+
+```sh
+bun run release:check -- --ci
+```
+
+CLI arguments are Schema-decoded at ingress. `--ci` runs the same nine-command
+graph and stops on the first tagged failure, but it does not read accepted or
+candidate HGI-203 evidence, create a candidate identity, or persist an attempt
+receipt. Its bounded report makes no candidate, publication, registry,
+deployment, provider or public-availability claim. No arguments select the
+candidate-attempt mode described below; every other argument shape fails
+closed.
+
 The command runs these checks sequentially and stops after the first typed
 failure:
 
@@ -59,8 +74,9 @@ and common token prefixes are removed before any byte reaches retained detail.
 The same rule covers file URLs and diagnostic field prefixes without treating
 ordinary relative paths as host disclosure.
 
-One run has one `release-<millisecond>` identity and one immutable JSON attempt
-receipt. The receipt binds the base commit and changed-content manifest digest
+One candidate-mode run has one `release-<millisecond>` identity and one
+immutable JSON attempt receipt. The receipt binds the base commit and
+changed-content manifest digest
 that the runtime verified before starting. Verification hashes every sorted,
 unique, safe path recorded in that content manifest and rejects any undeclared
 evidence-ledger exclusion. The receipt then records the terminal state,
@@ -116,6 +132,9 @@ contract and live layer depend only on the Effect `ChildProcessSpawner`
 capability. The Bun runtime entrypoint resolves the repository root with
 `Path.fromFileUrl`, composes `BunServices.layer`, and is the only place that
 provides the host implementation or executes the completed Effect.
+`runCiReleaseReadiness` is the separate report-only program: it uses the command
+runner but has no candidate or receipt dependency. The runtime selects exactly
+one program after Schema-decoding the CLI mode.
 
 ## Testing
 

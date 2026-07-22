@@ -1,0 +1,180 @@
+[
+  {
+    "id": "quality-ci",
+    "owner": "taxkit-ci-release-maintainer",
+    "signal": {
+      "kind": "pull-request-or-push",
+      "revisionSource": "github.sha"
+    },
+    "durableState": {
+      "kind": "immutable-revision-validation",
+      "location": "checked-out-repository-revision",
+      "revisionSource": "github.sha"
+    },
+    "authority": {
+      "principal": "taxkit-ci-release-maintainer",
+      "resource": "taxkit-repository-and-runner",
+      "environment": "github-actions-ci",
+      "grants": ["contents:read"],
+      "denied": [
+        "credential-write",
+        "deployment",
+        "external-state-recovery",
+        "provider-write",
+        "publication",
+        "registry-write",
+        "release"
+      ]
+    },
+    "resource": {
+      "id": "taxkit-repository-and-runner",
+      "scope": ["immutable repository revision", "configured Actions runner"]
+    },
+    "environment": {
+      "id": "github-actions-ci",
+      "trigger": "configured-pull-request-or-push"
+    },
+    "proof": {
+      "command": "bun run release:check -- --ci",
+      "failureIdentity": "first failed ordered check and target",
+      "successPostcondition": "all nine ordered repository checks passed for the immutable revision",
+      "nonClaims": [
+        "tag",
+        "registry publication",
+        "deployment",
+        "provider state",
+        "public availability"
+      ]
+    },
+    "stopAndEscalation": {
+      "mode": "fail-closed",
+      "stopConditions": [
+        "first tagged check failure",
+        "unknown workflow shape"
+      ],
+      "escalationOwner": "taxkit-ci-release-maintainer"
+    },
+    "rollback": {
+      "action": "revert the workflow or control change",
+      "authorityRequired": "taxkit-ci-release-maintainer"
+    },
+    "recovery": {
+      "action": "repair the named source boundary and run the canonical graph on a new revision",
+      "owner": "taxkit-ci-release-maintainer",
+      "verificationCommand": "bun run release:check -- --ci"
+    },
+    "retirementCondition": {
+      "condition": "a stronger canonical CI owner replaces the quality workflow",
+      "successorRequired": true,
+      "approvalOwner": "taxkit-ci-release-maintainer"
+    },
+    "externalState": {
+      "status": "not-established",
+      "nonClaims": [
+        "tag",
+        "registry publication",
+        "deployment",
+        "provider state",
+        "public availability"
+      ]
+    }
+  },
+  {
+    "id": "documentation-context-freshness",
+    "owner": "taxkit-documentation-owner",
+    "signal": {
+      "kind": "foreground-maintainer-request",
+      "revisionSource": "foreground-maintainer-supplied-immutable-revision"
+    },
+    "durableState": {
+      "kind": "report-only-context-candidate",
+      "location": "tmp/context-candidates/",
+      "revisionSource": "foreground-maintainer-supplied-immutable-revision"
+    },
+    "authority": {
+      "principal": "taxkit-documentation-owner",
+      "resource": "explicit-source-set-and-candidate",
+      "environment": "local-report-only",
+      "grants": [],
+      "denied": [
+        "canonical-repository-edit",
+        "deployment",
+        "external-state-recovery",
+        "provider-write",
+        "publication",
+        "registry-write",
+        "release"
+      ]
+    },
+    "resource": {
+      "id": "explicit-source-set-and-candidate",
+      "scope": ["foreground maintainer source set", "untrusted candidate file"]
+    },
+    "environment": {
+      "id": "local-report-only",
+      "trigger": "foreground-maintainer-only"
+    },
+    "proof": {
+      "command": "bun run check:quality-workflow",
+      "failureIdentity": "Schema path and rejected candidate contract",
+      "successPostcondition": "report-only candidate envelope is decoded and remains outside canonical retrieval",
+      "nonClaims": [
+        "canonical edit",
+        "publication",
+        "provider state",
+        "external availability"
+      ]
+    },
+    "stopAndEscalation": {
+      "mode": "fail-closed",
+      "stopConditions": [
+        "unknown source or exclusion",
+        "unknown reviewer or publisher",
+        "unknown recovery identity"
+      ],
+      "escalationOwner": "taxkit-documentation-owner"
+    },
+    "rollback": {
+      "action": "quarantine the untrusted candidate",
+      "authorityRequired": "separately named publication authority"
+    },
+    "recovery": {
+      "action": "restore the recorded last-known-good revision after separately authorized publication readback",
+      "owner": "taxkit-documentation-owner",
+      "verificationCommand": "bun run check:quality-workflow"
+    },
+    "retirementCondition": {
+      "condition": "a separately accepted canonical context-governance owner replaces the report-only contract",
+      "successorRequired": true,
+      "approvalOwner": "taxkit-documentation-owner"
+    },
+    "externalState": {
+      "status": "not-established",
+      "nonClaims": [
+        "canonical edit",
+        "publication",
+        "provider state",
+        "external availability"
+      ]
+    },
+    "candidate": {
+      "candidatePath": "tmp/context-candidates/",
+      "classification": "untrusted-report-only",
+      "targetRevision": "immutable repository revision supplied by the foreground maintainer",
+      "responsibleReviewer": "taxkit-documentation-owner",
+      "publisher": "separately named publication authority",
+      "publicationStatus": "not-published",
+      "selfFeedbackExclusions": [
+        "all prior candidate reports",
+        "the current candidate report"
+      ],
+      "generatedEvidenceExclusions": [
+        "tmp/**",
+        "generated receipts",
+        "mutable CI output"
+      ],
+      "lastKnownGoodRecovery": "recorded accepted repository revision after separately authorized publication readback",
+      "recovery": "quarantine candidate and route publication recovery to the named publisher"
+    }
+  }
+]

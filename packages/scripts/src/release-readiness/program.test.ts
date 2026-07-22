@@ -6,7 +6,7 @@ import {
   ReleaseWorkspacePathError,
 } from "./errors.js";
 import { makeReleaseOutputRedactor } from "./live.layer.js";
-import { runReleaseReadiness } from "./program.js";
+import { runCiReleaseReadiness, runReleaseReadiness } from "./program.js";
 import {
   makeReleaseReadinessPlan,
   ReleaseAttemptId,
@@ -44,6 +44,23 @@ const successfulResults = Array.reduce(
 );
 
 describe("release readiness", () => {
+  it.effect(
+    "runs CI as a report-only graph with no candidate or attempt receipt claim",
+    () =>
+      Effect.gen(function* testCiReportBoundary() {
+        const memory = yield* makeReleaseCommandRunnerTest(successfulResults);
+        const report = yield* runCiReleaseReadiness(checks).pipe(
+          Effect.provide(memory.layer)
+        );
+
+        expect(report.mode).toBe("ci");
+        expect(report.outcomes).toHaveLength(9);
+        expect(JSON.stringify(report)).not.toContain("candidate");
+        expect(JSON.stringify(report)).not.toContain("receipt");
+        expect(yield* Ref.get(memory.invocations)).toHaveLength(9);
+      })
+  );
+
   it.effect(
     "runs every canonical check once in order with exact arguments and cwd",
     () =>

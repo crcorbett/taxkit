@@ -31,6 +31,22 @@ export class ReleaseAttemptFailedError extends Data.TaggedError(
   readonly attempt: ReleaseAttemptReceipt;
 }> {}
 
+export class CiReleaseCheckFailedError extends Data.TaggedError(
+  "CiReleaseCheckFailedError"
+)<{
+  readonly failedCheck: ReleaseCheck["id"];
+  readonly lastSuccessfulCheck: ReleaseCheck["id"] | null;
+  readonly observedExitCode: number | null;
+  readonly target: string;
+  readonly terminalState: ReleaseTerminalState;
+}> {}
+
+export class ReleaseReadinessCliError extends Data.TaggedError(
+  "ReleaseReadinessCliError"
+)<{
+  readonly target: "release:check arguments";
+}> {}
+
 export class ReleaseEvidenceDecodeError extends Data.TaggedError(
   "ReleaseEvidenceDecodeError"
 )<{
@@ -47,7 +63,9 @@ export class ReleaseWorkspacePathError extends Data.TaggedError(
 export type ReleaseReadinessError =
   | ReleaseAttemptFailedError
   | ReleaseCheckFailedError
+  | CiReleaseCheckFailedError
   | ReleaseCommandExecutionError
+  | ReleaseReadinessCliError
   | ReleaseEvidenceDecodeError
   | ReleaseWorkspacePathError;
 
@@ -55,6 +73,20 @@ export const formatReleaseReadinessError = Match.typeTags<
   ReleaseReadinessError,
   string
 >()({
+  CiReleaseCheckFailedError: ({
+    failedCheck,
+    lastSuccessfulCheck,
+    observedExitCode,
+    target,
+    terminalState,
+  }) =>
+    [
+      `FAIL [${failedCheck}] ${terminalState}`,
+      `target: ${target}`,
+      `exitCode: ${observedExitCode ?? "unavailable"}`,
+      `last successful check: ${lastSuccessfulCheck ?? "none"}`,
+      "recovery: repair the named local boundary and rerun CI; no candidate or attempt receipt exists in CI mode.",
+    ].join("\n"),
   ReleaseAttemptFailedError: ({ attempt }) =>
     [
       `FAIL [${attempt.failedCheck ?? "release-readiness"}] ${attempt.terminalState}`,
@@ -100,6 +132,8 @@ export const formatReleaseReadinessError = Match.typeTags<
       `operation: ${operation}`,
       "recovery: repair the retained packet or inventory; do not infer a release result",
     ].join("\n"),
+  ReleaseReadinessCliError: () =>
+    "FAIL [release-cli] target=release:check arguments; recovery=use no arguments for a candidate attempt or exactly --ci for a report-only CI run.",
   ReleaseWorkspacePathError: ({ target }) =>
     [
       "FAIL [workspace-path] Resolve repository root",

@@ -3,6 +3,7 @@ import * as BunServices from "@effect/platform-bun/BunServices";
 import { Clock, Console, Effect, Layer } from "effect";
 import * as Path from "effect/Path";
 
+import { decodeReleaseReadinessCli } from "./cli.js";
 import {
   formatReleaseReadinessError,
   ReleaseEvidenceDecodeError,
@@ -17,6 +18,7 @@ import {
 import { ReleaseCommandRunnerLive } from "./live.layer.js";
 import {
   makeSuccessfulAttemptReceipt,
+  runCiReleaseReadiness,
   runReleaseReadiness,
 } from "./program.js";
 import {
@@ -40,6 +42,16 @@ const program = Effect.gen(function* releaseReadinessMain() {
           new ReleaseWorkspacePathError({ target: "repository workspace root" })
       )
     );
+  const cli = yield* decodeReleaseReadinessCli(Bun.argv.slice(2));
+  if (cli.mode === "ci") {
+    const report = yield* runCiReleaseReadiness(
+      makeReleaseReadinessPlan(workspaceRoot)
+    );
+    yield* Console.info(
+      `CI release graph passed ${report.outcomes.length} ordered checks; postcondition=repository checks passed for this CI revision; nonclaim=no candidate, attempt receipt, publication, tag, release, deployment or provider mutation.`
+    );
+    return report;
+  }
   const evidence = yield* readReleaseEvidence(workspaceRoot);
   if (evidence.packet.lifecycle === "accepted") {
     return yield* new ReleaseEvidenceDecodeError({
@@ -86,7 +98,13 @@ const program = Effect.gen(function* releaseReadinessMain() {
 
   return report;
 }).pipe(
+  Effect.tapErrorTag("CiReleaseCheckFailedError", (error) =>
+    Console.error(formatReleaseReadinessError(error))
+  ),
   Effect.tapErrorTag("ReleaseEvidenceDecodeError", (error) =>
+    Console.error(formatReleaseReadinessError(error))
+  ),
+  Effect.tapErrorTag("ReleaseReadinessCliError", (error) =>
     Console.error(formatReleaseReadinessError(error))
   ),
   Effect.tapErrorTag("ReleaseWorkspacePathError", (error) =>
