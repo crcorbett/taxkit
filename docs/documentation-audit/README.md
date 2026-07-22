@@ -40,17 +40,18 @@ Accepted HGI-208 documentation-maintenance candidate and Git receipt:
 - [`HGI-208-candidate.json`](HGI-208-candidate.json)
 - [`HGI-208-validation.json`](HGI-208-validation.json)
 
-HGI-203 release-readiness candidate:
+Accepted HGI-203 release-readiness candidate and Git receipt:
 
 - [`HGI-203-candidate.json`](HGI-203-candidate.json)
+- [`HGI-203-validation.json`](HGI-203-validation.json)
 - [`../verification/critical-journeys.json`](../verification/critical-journeys.json)
 - [`../evidence/releases/HGI-203-local.json`](../evidence/releases/HGI-203-local.json)
 - [`../evidence/releases/HGI-203-failed-attempts.json`](../evidence/releases/HGI-203-failed-attempts.json)
 
-The local packet remains a candidate until the strict boundary, real
-release-readiness attempt, independent acceptance and Git readback all pass.
-Its explicit non-claims exclude publication, tags, releases, deployments,
-providers and public availability.
+The accepted local packet passed the strict boundary, one exact final
+release-readiness attempt, independent acceptance and semantic Git readback.
+Its explicit non-claims still exclude publication, tags, releases,
+deployments, providers and public availability.
 
 ## Current docs inventory
 

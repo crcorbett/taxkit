@@ -1,0 +1,40 @@
+{
+  "taskId": "HGI-203",
+  "status": "passed",
+  "observedAt": "2026-07-22T02:36:24Z",
+  "baseCommit": "e63a7b60c369ca880a49dce5d1ffddcf49a6365e",
+  "semanticCommit": "f3a7bdf4e63fcc6ce9dedaf963337def9f65c3a5",
+  "candidate": {
+    "contentManifest": "docs/evidence/releases/HGI-203-content-manifest.txt",
+    "contentManifestSha256": "3947352634ef4f7341f5ab9e2b05fc26f3424c148ebf8932b98e656c3e70c619",
+    "packet": "docs/evidence/releases/HGI-203-local.json",
+    "packetSha256": "f467f3b6378b03ae50f7b1e3df3d19a7a07d15c1047af81a0269100d3db1976e",
+    "attemptId": "release-1784687182331",
+    "receiptSha256": "e3757246a17eda154cb05fdb390592d7a2c6a606ef45436b318d5845cee8345c",
+    "acceptedSummary": "docs/evidence/releases/HGI-203-accepted-attempt.json",
+    "acceptedSummarySha256": "b11d02d38d1ec6961d6749a8b471c48ac92b2d95a9f0f00c7faeb68df3bd668c",
+    "presentationSidecarSha256": "7b20e913f467f843a42b2a9d61d1edfde5c4f70eee7897682e5aafa1b2f2113a"
+  },
+  "checks": [
+    {
+      "name": "fresh independent acceptance",
+      "postcondition": "Exactly five journeys, candidate/attempt/detail binding, clean-clone accepted proof, reuse rejection, immutable presentation and cross-platform streaming redaction passed."
+    },
+    {
+      "name": "post-commit repository verification",
+      "postcondition": "39 focused tests, documentation policy, repository path policy, full verification and git diff --check passed."
+    },
+    {
+      "name": "semantic publication readback",
+      "postcondition": "Local HEAD and origin/main both resolved to f3a7bdf4e63fcc6ce9dedaf963337def9f65c3a5 after push and fetch."
+    }
+  ],
+  "rollback": "Revert the HGI-203 closeout commit, then semantic f3a7bdf4e63fcc6ce9dedaf963337def9f65c3a5; retain accepted, failed and superseded release evidence.",
+  "limitations": [
+    "Local release-readiness proof does not establish registry publication, tags, releases, deployment, provider state, deployed SSR/hydration or public availability.",
+    "Ignored raw detail remains local operational evidence; the committed accepted summary is the clean-clone proof owner."
+  ],
+  "nonClaims": [
+    "No package was published and no tag, release, deployment, provider or public-site mutation was performed."
+  ]
+}
