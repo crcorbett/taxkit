@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-206",
+  "lifecycle": "current-worker-visible",
+  "targetCommit": "a8a58882cd6c5f8003d31dc0c0567d78093597b9",
+  "owner": "TaxKit harness owner",
+  "reviewTrigger": "worker, host, tool, Bun, Effect, repository skill, public boundary, or release-graph change",
+  "authority": {
+    "mode": "local-read-and-verification",
+    "stopsBefore": [
+      "versioning",
+      "commit",
+      "push",
+      "tag",
+      "release",
+      "registry-publication",
+      "deployment",
+      "provider-access",
+      "public-site-mutation",
+      "recovery-mutation"
+    ]
+  },
+  "journeys": [
+    {
+      "id": "HGI206-CALCULATOR-FRESH",
+      "owner": "docs/verification/critical-journeys.json#taxkit-calculator-direct",
+      "command": "bun run test",
+      "oracle": "The retained test detail names the executed @taxkit/calculators workspace task.",
+      "receipt": "docs/documentation-audit/hgi-206/receipts/calculator.json",
+      "recovery": "packages/calculators/README.md and the calculator package owner",
+      "nonClaim": "Local calculator proof does not establish publication, deployment, provider state, or public availability."
+    },
+    {
+      "id": "HGI206-PACKED-SDK-FRESH",
+      "owner": "docs/runbooks/packed-consumer-proof.md",
+      "command": "bun run --filter=@taxkit/sdk check-packed-artifact && bun run --filter=@taxkit/sdk validate:downstream",
+      "oracle": "The isolated consumer installs the generated dist-only tarball rather than workspace source.",
+      "receipt": "docs/documentation-audit/hgi-206/receipts/packed-sdk.json",
+      "recovery": "packages/sdk/typescript/README.md and taxkit-packed-consumer-operation-owner",
+      "nonClaim": "The transient local tarball establishes no registry publication or external availability."
+    },
+    {
+      "id": "HGI206-HTTP-API-FRESH",
+      "owner": "apps/api/README.md",
+      "command": "bun run --filter=api smoke",
+      "oracle": "The smoke client Schema-decodes real local health, metadata, calculation, schema-error, and OpenAPI responses.",
+      "receipt": "docs/documentation-audit/hgi-206/receipts/http-api.json",
+      "recovery": "apps/api/README.md and packages/api/http/README.md",
+      "nonClaim": "The ephemeral local API establishes no deployed API, provider, or public availability state."
+    },
+    {
+      "id": "HGI206-DOCS-RUNTIME-FRESH",
+      "owner": "apps/docs/README.md",
+      "command": "bun run docs:validate && bun run --filter=docs test:browser",
+      "oracle": "The browser harness observes local render, navigation, server-function, recoverable-error, and console states.",
+      "receipt": "docs/documentation-audit/hgi-206/receipts/docs-runtime.json",
+      "recovery": "apps/docs/README.md and packages/docs-content/README.md",
+      "nonClaim": "Local docs-runtime proof establishes no public-site, deployed SSR, hydration, or availability state."
+    },
+    {
+      "id": "HGI206-RELEASE-READINESS-FRESH",
+      "owner": "docs/runbooks/README.md",
+      "command": "bun run release:check -- --ci",
+      "oracle": "The canonical nine-check graph runs in report-only CI mode without candidate or attempt mutation.",
+      "receipt": "docs/documentation-audit/hgi-206/receipts/release-readiness.json",
+      "recovery": "docs/runbooks/release-readiness.md and taxkit-release-readiness-operation-owner",
+      "nonClaim": "A green local CI graph is not versioning, a commit, push, tag, release, registry publication, deployment, provider state, or public availability."
+    }
+  ],
+  "seededContradictions": [
+    {
+      "id": "stale-owner",
+      "reject": "historical owner or command",
+      "repairOwner": "docs/README.md",
+      "invariant": "retrieve the current semantic owner"
+    },
+    {
+      "id": "imitation-proof",
+      "reject": "unit-only or static-search boundary proof",
+      "repairOwner": "docs/verification/critical-journeys.json",
+      "invariant": "exercise the named consumer boundary and oracle"
+    },
+    {
+      "id": "mutable-proof",
+      "reject": "latest, tmp, candidate, failed, superseded, or hash-mismatched proof as accepted",
+      "repairOwner": "docs/evidence/releases/HGI-203-accepted-attempt.json",
+      "invariant": "accepted proof has immutable identity"
+    },
+    {
+      "id": "authority-expansion",
+      "reject": "capability or history as authority",
+      "repairOwner": "docs/operations/authority-model.md",
+      "invariant": "unknown principal stops consequential work"
+    },
+    {
+      "id": "runbook-duplication",
+      "reject": "procedure copied into a skill or README",
+      "repairOwner": "docs/runbooks/README.md",
+      "invariant": "exactly four target-owned procedures"
+    },
+    {
+      "id": "effect-boundary",
+      "reject": "unchecked ingress, instanceof policy, nested runtime, or helper/common/utils sprawl",
+      "repairOwner": "AGENTS.md",
+      "invariant": "Schema-decoded typed, flat sequential Effect boundaries"
+    }
+  ],
+  "independentGrade": {
+    "status": "pending",
+    "owner": "independent fresh-context grader",
+    "resultPath": "outside the worker-visible TaxKit repository candidate",
+    "nonClaim": "Worker-local scenario preparation is not independent acceptance."
+  }
+}

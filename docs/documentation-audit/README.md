@@ -78,6 +78,13 @@ verification, semantic publication and exact `origin/main` readback. Its
 static, non-executing proof does not grant or establish version, Git,
 hosted-release, registry, deployment, provider or recovery authority or state.
 
+HGI-206 worker-visible requalification candidate (independent held-out grading
+is pending):
+
+- [`HGI-206-candidate.json`](HGI-206-candidate.json)
+- [`../verification/harness-epochs.md`](../verification/harness-epochs.md)
+- [`../verification/effectiveness.md`](../verification/effectiveness.md)
+
 ## Current docs inventory
 
 Current tracked documentation entrypoints:

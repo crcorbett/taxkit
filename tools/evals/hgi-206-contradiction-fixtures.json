@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "taskId": "HGI-206",
+  "purpose": "Typed local negative inputs; the evaluator derives a rejection for each forbidden claim without an external action.",
+  "fixtures": [
+    {
+      "id": "stale-owner",
+      "target": "docs/README.md",
+      "claim": "owner=docs/legacy-owner.md",
+      "invariant": "current router rejects stale owner",
+      "owner": "docs/README.md",
+      "recovery": "route to current router",
+      "nonClaim": "No external owner is queried."
+    },
+    {
+      "id": "stale-command",
+      "target": "tools/evals/hgi-206-scenarios.json",
+      "claim": "command=bun run retired:journey",
+      "invariant": "scenario rejects retired command",
+      "owner": "tools/evals/hgi-206-scenarios.json",
+      "recovery": "use journey command",
+      "nonClaim": "No command executes."
+    },
+    {
+      "id": "imitation-proof",
+      "target": "docs/verification/critical-journeys.json",
+      "claim": "proof=static-search",
+      "invariant": "journey requires named boundary oracle",
+      "owner": "docs/verification/critical-journeys.json",
+      "recovery": "use boundary receipt",
+      "nonClaim": "No runtime is invoked."
+    },
+    {
+      "id": "mutable-artifact-identity",
+      "target": "docs/runbooks/release-readiness.md",
+      "claim": "identity=latest",
+      "invariant": "proof rejects mutable/candidate/tmp/failed identity",
+      "owner": "docs/runbooks/release-readiness.md",
+      "recovery": "use immutable accepted identity",
+      "nonClaim": "No release evidence changes."
+    },
+    {
+      "id": "raw-unbounded-evidence",
+      "target": "docs/verification/effectiveness.md",
+      "claim": "evidence=raw-log",
+      "invariant": "evidence requires bounded sanitized receipt/detail",
+      "owner": "docs/verification/effectiveness.md",
+      "recovery": "write bounded evidence",
+      "nonClaim": "No raw log retained."
+    },
+    {
+      "id": "unsafe-rerun",
+      "target": "docs/operations/authority-model.md",
+      "claim": "action=rerun-consequential",
+      "invariant": "failure stops consequential rerun",
+      "owner": "docs/operations/authority-model.md",
+      "recovery": "stop and escalate",
+      "nonClaim": "No operation reruns."
+    },
+    {
+      "id": "unknown-principal-authority-expansion",
+      "target": "docs/operations/authority-model.md",
+      "claim": "principal=unknown",
+      "invariant": "unknown principal cannot expand authority",
+      "owner": "docs/operations/authority-model.md",
+      "recovery": "name authority receipt",
+      "nonClaim": "No authority granted."
+    },
+    {
+      "id": "duplicated-runbook",
+      "target": "docs/runbooks/README.md",
+      "claim": "procedure=duplicate",
+      "invariant": "procedure has one target-owned runbook",
+      "owner": "docs/runbooks/README.md",
+      "recovery": "remove duplicate",
+      "nonClaim": "No runbook action occurs."
+    },
+    {
+      "id": "missing-recovery",
+      "target": "docs/verification/effectiveness.md",
+      "claim": "recovery=",
+      "invariant": "failure evidence names recovery and owner",
+      "owner": "docs/verification/effectiveness.md",
+      "recovery": "add recovery owner",
+      "nonClaim": "No recovery claimed."
+    },
+    {
+      "id": "missing-rollback-escalation",
+      "target": "docs/runbooks/README.md",
+      "claim": "rollback-escalation=missing",
+      "invariant": "consequential runbook requires rollback and escalation",
+      "owner": "docs/runbooks/README.md",
+      "recovery": "add rollback and escalation",
+      "nonClaim": "No operation authorised."
+    },
+    {
+      "id": "invented-timing",
+      "target": "docs/verification/effectiveness.md",
+      "claim": "clock=estimated",
+      "invariant": "four clocks reject inferred timing",
+      "owner": "docs/verification/effectiveness.md",
+      "recovery": "record null or direct telemetry",
+      "nonClaim": "No timing measured."
+    },
+    {
+      "id": "unchecked-boundary-input",
+      "target": "docs/architecture/effect-services.md",
+      "claim": "input=unchecked",
+      "invariant": "boundary input is Schema-decoded",
+      "owner": "docs/architecture/effect-services.md",
+      "recovery": "decode at boundary",
+      "nonClaim": "No provider contacted."
+    },
+    {
+      "id": "instanceof-policy",
+      "target": "AGENTS.md",
+      "claim": "policy=instanceof",
+      "invariant": "provider policy rejects instanceof",
+      "owner": "AGENTS.md",
+      "recovery": "map tagged error",
+      "nonClaim": "No SDK call occurs."
+    },
+    {
+      "id": "nested-runtime",
+      "target": "AGENTS.md",
+      "claim": "runtime=nested",
+      "invariant": "runtime execution stays at entrypoint",
+      "owner": "AGENTS.md",
+      "recovery": "return composed Effect",
+      "nonClaim": "No Effect executes."
+    },
+    {
+      "id": "helper-common-utils-sprawl",
+      "target": "AGENTS.md",
+      "claim": "module=helper/common/utils",
+      "invariant": "one-use transformation rejects helper/common/utils sprawl",
+      "owner": "AGENTS.md",
+      "recovery": "inline transformation",
+      "nonClaim": "No implementation changes."
+    }
+  ]
+}

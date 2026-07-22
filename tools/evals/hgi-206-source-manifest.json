@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 3,
+  "taskId": "HGI-206",
+  "algorithm": "For every files[] member, SHA-256 its exact bytes; emit <sha256><two ASCII spaces><path><LF>; sort rows by ASCII path; SHA-256 the resulting byte stream. changedPaths is the unique ASCII-sorted union of git diff --name-only -z <baseCommit> -- and git ls-files -z --others --exclude-standard, with one LF per path; no path is excluded from that name-only digest, so derived-content circularity does not apply.",
+  "digest": "db7f881d895614993f50f1e261998a7d89d1c8256591c0f8b918a2b3a93e16d4",
+  "exclusions": [
+    {
+      "path": "tools/evals/hgi-206-source-manifest.json",
+      "reason": "Self-referential source-manifest aggregate record."
+    },
+    {
+      "path": "tools/evals/hgi-206-results.json",
+      "reason": "Derived result binds the source digest and observation hash."
+    },
+    {
+      "path": "docs/documentation-audit/HGI-206-candidate.json",
+      "reason": "Candidate is bound last to final source and evidence hashes."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/receipts/calculator.json",
+      "reason": "Derived receipt binds the source digest and bounded-detail hash."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/receipts/docs-runtime.json",
+      "reason": "Derived receipt binds the source digest and bounded-detail hash."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/receipts/http-api.json",
+      "reason": "Derived receipt binds the source digest and bounded-detail hash."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/receipts/packed-sdk.json",
+      "reason": "Derived receipt binds the source digest and bounded-detail hash."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/receipts/release-readiness.json",
+      "reason": "Derived receipt binds the source digest and bounded-detail hash."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/details/calculator.json",
+      "reason": "Derived bounded detail is hashed by its journey receipt."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/details/docs-runtime.json",
+      "reason": "Derived bounded detail is hashed by its journey receipt."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/details/http-api.json",
+      "reason": "Derived bounded detail is hashed by its journey receipt."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/details/packed-sdk.json",
+      "reason": "Derived bounded detail is hashed by its journey receipt."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/details/release-readiness.json",
+      "reason": "Derived bounded detail is hashed by its journey receipt."
+    },
+    {
+      "path": "docs/documentation-audit/hgi-206/failed-independent-2026-07-22.json",
+      "reason": "Retained failed-attempt evidence is hashed by the final candidate."
+    }
+  ],
+  "files": [
+    {
+      "path": ".agents/skills/docs-maintainer/SKILL.md",
+      "sha256": "17454a6fe858d18b7e2a97d4e0addeb9c1417688e46cd3e619b0cfbe1a37de7f"
+    },
+    {
+      "path": ".agents/skills/docs-maintainer/references/repository-profile.md",
+      "sha256": "a75ae5d411e58e69ad0bde48a02d5dfeba60fd26b59d89dc28c293843653b9a3"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "ff6f785fd42723c2f3f95ee4e522c193879b06ac4d0f71e75169c07eec9d0a7c"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "52dc76e24d02a6fae621359c1a1ff5f1dfc80016c9eccc3a0ed1e585b125eb39"
+    },
+    {
+      "path": "docs/architecture/effect-services.md",
+      "sha256": "4b8a7e8af13b4a3daa76b75fbb8e00c64613fcac320241ee1304d04f5e13c37c"
+    },
+    {
+      "path": "docs/documentation-audit/README.md",
+      "sha256": "06e8c249ca8ffbd1f0bd5ddfa56fe67aaa613ebe02771c017f408e8ee285774f"
+    },
+    {
+      "path": "docs/exec-plans/active/harness-governance-documentation.md",
+      "sha256": "522913d22717e9c02b91902344c9ed6570d19580c653117b5e2d51b4df8e83bc"
+    },
+    {
+      "path": "docs/operations/authority-model.md",
+      "sha256": "e2d688383f2ea7bbf381c245a05196e16f139c19d316a2159f946feb776a2309"
+    },
+    {
+      "path": "docs/product-specs/harness-governance-documentation.md",
+      "sha256": "b250763b7b49a27a85e62e4d9e40b7217fb39986aab351062a09e439496794a7"
+    },
+    {
+      "path": "docs/runbooks/README.md",
+      "sha256": "c0b4f68052e2ecfc37cdf8e797fac4a5a4397bc5c7bd1662fb7a210a2433195f"
+    },
+    {
+      "path": "docs/runbooks/release-readiness.md",
+      "sha256": "887a4a8004c57e11ddec02a6c28b60d82271ef43bf10eeb14bc4b009847e1871"
+    },
+    {
+      "path": "docs/verification/critical-journeys.json",
+      "sha256": "13b7c960ff7b5f5fef236cff4cef800409f822e6be2a552eaa78b64be2d8ad5a"
+    },
+    {
+      "path": "docs/verification/effectiveness.md",
+      "sha256": "0b1f1448fa157436e9b0540ea762e8641a8c21c36743c387693a4b184ad9c509"
+    },
+    {
+      "path": "docs/verification/harness-epochs.md",
+      "sha256": "73389e9b7ad3988a6a7aeaf240baa0b35160f5ccd384e2242bfb384737b35c33"
+    },
+    {
+      "path": "oxlint.config.ts",
+      "sha256": "5b484720bade434c4b1d2a2de3c5919ab5d96d93dac9f1d443c40584f6ed6ad5"
+    },
+    {
+      "path": "package.json",
+      "sha256": "65da85f2b1eedf804e32c5cc01ddb1f18876ddfb0206be081fa8edc4ae904b6e"
+    },
+    {
+      "path": "tools/evals/hgi-206-contradiction-fixtures.json",
+      "sha256": "b542fe3e73eff5a0605b6d8e9d310aa2c8f52c168667919b965e5d8cc9bb400d"
+    },
+    {
+      "path": "tools/evals/hgi-206-contradiction-observations.json",
+      "sha256": "09aed28f0286c791fc929c591cf0323b321b0c3e8745982eee955698ea7a50c8"
+    },
+    {
+      "path": "tools/evals/hgi-206-scenarios.json",
+      "sha256": "ba4e726a9d6556fe41da5e172f720fa7a8e7c9359a8afa9900e7fb421653a8bf"
+    },
+    {
+      "path": "tools/evals/hgi-206/check.runtime.ts",
+      "sha256": "571beaaf0493022b830daafaf06dfa8c8ee41087c9fb591297a92fc1ff4eadd3"
+    },
+    {
+      "path": "tools/evals/hgi-206/input.boundary.ts",
+      "sha256": "cf4ec50a49f9189439e86ad9e67d23f03447c527e19d084039cea15d612d85ca"
+    },
+    {
+      "path": "tools/evals/hgi-206/schemas.ts",
+      "sha256": "cfb6bd2ee12b8661592221bdebedb97916008e457f92404e60ac9304b4fca9c8"
+    },
+    {
+      "path": "tools/evals/hgi-206/service.test.ts",
+      "sha256": "d622c99ca4ee177f3eb278a830dc8686a088d9ebfbead53476d466afb9af9adc"
+    },
+    {
+      "path": "tools/evals/hgi-206/service.ts",
+      "sha256": "acdcec6ad859ab0d7e5c1e4139dfc669a440fccf614edabd4f6d13fd68d2179b"
+    },
+    {
+      "path": "tools/evals/tsconfig.json",
+      "sha256": "b8059a55c6704bcb53025edc2e2b4459ef5f4db8095cda07419d21edac42ea94"
+    }
+  ],
+  "changedPaths": [
+    "docs/README.md",
+    "docs/documentation-audit/HGI-206-candidate.json",
+    "docs/documentation-audit/README.md",
+    "docs/documentation-audit/hgi-206/details/calculator.json",
+    "docs/documentation-audit/hgi-206/details/docs-runtime.json",
+    "docs/documentation-audit/hgi-206/details/http-api.json",
+    "docs/documentation-audit/hgi-206/details/packed-sdk.json",
+    "docs/documentation-audit/hgi-206/details/release-readiness.json",
+    "docs/documentation-audit/hgi-206/failed-independent-2026-07-22.json",
+    "docs/documentation-audit/hgi-206/receipts/calculator.json",
+    "docs/documentation-audit/hgi-206/receipts/docs-runtime.json",
+    "docs/documentation-audit/hgi-206/receipts/http-api.json",
+    "docs/documentation-audit/hgi-206/receipts/packed-sdk.json",
+    "docs/documentation-audit/hgi-206/receipts/release-readiness.json",
+    "docs/exec-plans/active/harness-governance-documentation.md",
+    "docs/product-specs/harness-governance-documentation.md",
+    "docs/verification/effectiveness.md",
+    "docs/verification/harness-epochs.md",
+    "oxlint.config.ts",
+    "package.json",
+    "tools/evals/hgi-206-contradiction-fixtures.json",
+    "tools/evals/hgi-206-contradiction-observations.json",
+    "tools/evals/hgi-206-results.json",
+    "tools/evals/hgi-206-scenarios.json",
+    "tools/evals/hgi-206-source-manifest.json",
+    "tools/evals/hgi-206/check.runtime.ts",
+    "tools/evals/hgi-206/input.boundary.ts",
+    "tools/evals/hgi-206/schemas.ts",
+    "tools/evals/hgi-206/service.test.ts",
+    "tools/evals/hgi-206/service.ts",
+    "tools/evals/tsconfig.json"
+  ],
+  "changedPathDigest": "29f7c6a2d187a8b195ee24c8cba9a691e63d74c1ade37593c979eb285c96d38a"
+}

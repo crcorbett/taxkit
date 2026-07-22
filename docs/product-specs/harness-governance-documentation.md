@@ -55,8 +55,8 @@ state. The active execution plan owns the current bounded sequence.
 | HGI-208 — TaxKit docs-maintenance skill | Completed | Repo-local skill source and focused skill-policy proof |
 | HGI-203 — critical journeys, release proof, and bounded receipts | Completed and published | Accepted five-journey inventory, strict release packet, immutable attempt receipt, bounded summary, cross-platform redaction, independent acceptance and `HGI-203-validation.json` |
 | HGI-204 — release and recovery runbooks | Completed and published | Exactly four runbooks, authority model, strict HGI-203 handoff, non-executing bounded validator, adversarial fixtures, fresh-context acceptance and `HGI-204-validation.json` |
-| HGI-205 — CI, controls, and automation governance | Implemented locally; awaits independent acceptance and task-ledger closeout; depends on HGI-202, HGI-203, HGI-204 | `tools/quality-workflow/`, canonical CI graph, controls and automation registers |
-| HGI-206 — repository closeout | Pending | No unresolved critical owner drift; accepted receipts and pushed commit identity |
+| HGI-205 — CI, controls, and automation governance | Completed and published | Canonical CI graph, controls, automation registers, independent acceptance and `HGI-205-validation.json` |
+| HGI-206 — repository closeout | In progress | Target-specific epoch, current journey receipts, impact ledger, independent fresh-context grade, then parent-owned closeout |
 
 Task state changes in this table and the active execution plan occur in the
 same slice. Completed historical plans cannot carry active work: retained

@@ -84,3 +84,12 @@ publication/readback. HGI-207, HGI-202 and HGI-208 have local completion
 receipts. These local records do not prove
 publication, registry state,
 external consumers, API/docs production behavior, or release authority.
+
+HGI-206 is in progress at the exact HGI-205 closeout
+`a8a58882cd6c5f8003d31dc0c0567d78093597b9`. Its worker-visible local epoch,
+five current journey routes, bounded receipts, contradiction repair owners,
+four-clock null handling and complete impact ledger are in
+[`HGI-206-candidate.json`](../../documentation-audit/HGI-206-candidate.json).
+Independent fresh-context grading remains pending and this candidate makes no
+Git publication, release, registry, deployment, provider, public-site or
+recovery claim.
