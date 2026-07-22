@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: taxkit-product-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-22
 review_trigger: product-spec admission, lifecycle, evidence, or successor change
 successor: null
 tombstone: false
@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Harness-governance documentation](./harness-governance-documentation.md) | In progress | Repository-local outcomes and tasks for the active documentation-governance rollout. |
+| [Harness-governance documentation](./harness-governance-documentation.md) | Implemented | HGI-200 through HGI-208 are accepted locally; HGI-206 records the bounded repository epoch and closeout without claiming release, provider, or public actuality. |
 | [API compatibility harness](./api-compatibility-harness.md) | Implemented | OpenAPI snapshot, route fixtures and live API app smoke coverage are in place. |
 | [API HTTP package topology](./api-http-package-topology.md) | Implemented | The implemented HTTP API package now lives at `packages/api/http` as `@taxkit/api-http`. |
 | [Boundary-only decoding](./boundary-only-decoding.md) | Implemented | Exact decoder placement enforcement, typed calculator continuations and pre-render docs route decoding are in place. |

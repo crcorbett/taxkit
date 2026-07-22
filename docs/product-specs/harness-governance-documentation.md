@@ -1,10 +1,10 @@
 ---
 document_type: product-spec
-lifecycle: current
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: taxkit-documentation-owner
 last_reviewed: 2026-07-22
-review_trigger: acceptance or scope change in TaxKit HGI-200 through HGI-206
+review_trigger: retained HGI-200 through HGI-206 proof, limitation, or successor correction
 successor: null
 tombstone: false
 ---
@@ -20,15 +20,17 @@ current truth. Material implementation slices update the earliest durable
 owner and leave bounded proof of the claim they make.
 
 The cross-repository campaign ledger owns dependency order and aggregate
-status. This repository-local SPEC owns TaxKit outcomes, acceptance, and task
-state. The active execution plan owns the current bounded sequence.
+status. This implemented repository-local SPEC retains TaxKit outcomes,
+acceptance, and task state. The completed execution plan retains the accepted
+bounded sequence without remaining on the active route.
 
 ## Invariants
 
 - `docs/README.md` is the sole maintainer-document lifecycle and truth-layer
   router; root entry points only point to it.
-- Current intent requires both this active SPEC/task owner and an entry under
-  `docs/exec-plans/active/`.
+- During implementation, current intent required both this SPEC/task owner and
+  an entry under `docs/exec-plans/active/`; accepted work now routes through
+  this implemented SPEC and `docs/exec-plans/completed/`.
 - Durable policy lives in architecture, standards, lint/config/CI, tests, or
   skills according to semantic ownership; evidence never silently becomes
   policy.
@@ -56,11 +58,11 @@ state. The active execution plan owns the current bounded sequence.
 | HGI-203 — critical journeys, release proof, and bounded receipts | Completed and published | Accepted five-journey inventory, strict release packet, immutable attempt receipt, bounded summary, cross-platform redaction, independent acceptance and `HGI-203-validation.json` |
 | HGI-204 — release and recovery runbooks | Completed and published | Exactly four runbooks, authority model, strict HGI-203 handoff, non-executing bounded validator, adversarial fixtures, fresh-context acceptance and `HGI-204-validation.json` |
 | HGI-205 — CI, controls, and automation governance | Completed and published | Canonical CI graph, controls, automation registers, independent acceptance and `HGI-205-validation.json` |
-| HGI-206 — repository closeout | In progress | Target-specific epoch, current journey receipts, impact ledger, independent fresh-context grade, then parent-owned closeout |
+| HGI-206 — repository closeout | Completed and published | Accepted target-specific epoch, five journey receipts, complete impact ledger, independent portable-path re-audit, full verification, sequential local release graph, semantic commit `c2f41c10dca141c7cb7e066b3a2bff48048101fc`, and validation closeout `8c983d992f0b5eca46eb2777debded7dbccf0e7a` |
 
-Task state changes in this table and the active execution plan occur in the
-same slice. Completed historical plans cannot carry active work: retained
-follow-ups route to the explicit successor tasks above. A task is not complete
+Task state changes in this table and the execution plan occurred in the same
+accepted campaign. The completed plan now lives under `docs/exec-plans/completed/`;
+completed historical plans cannot carry active work. A task is not complete
 because prose exists: its named acceptance owner must contain bounded evidence
 and limitations.
 

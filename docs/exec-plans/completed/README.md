@@ -3,9 +3,9 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: taxkit-execution-history-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-22
 review_trigger: completed-plan retention, evidence, or successor correction
-successor: ../active/harness-governance-documentation.md
+successor: null
 tombstone: false
 ---
 
@@ -35,11 +35,9 @@ Completed plans:
 - [Public MDX developer docs](./public-mdx-developer-docs.md)
 - [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md)
 - [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md)
+- [Harness-governance documentation rollout](./harness-governance-documentation.md)
 
 Completed plans retain provenance and limitations, not active follow-up work.
-The retained follow-ups are explicit successors in the current harness plan:
-HGI-207 resolves publication and lifecycle semantics, HGI-201/208 own PRD and
-skill routing, HGI-202 owns public/maintainer documentation policy, HGI-203
-owns bounded release proof, HGI-204 owns release/recovery operations, and
-HGI-205 owns executable controls. Their dependency order is defined in the
-[active harness plan](../active/harness-governance-documentation.md).
+The harness-governance plan records the accepted HGI-200 through HGI-208
+dependency order and routes its final HGI-206 proof; it creates no current
+release, publication, registry, deployment, provider, or recovery work.

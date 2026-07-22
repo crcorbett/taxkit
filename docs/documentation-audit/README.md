@@ -78,10 +78,11 @@ verification, semantic publication and exact `origin/main` readback. Its
 static, non-executing proof does not grant or establish version, Git,
 hosted-release, registry, deployment, provider or recovery authority or state.
 
-HGI-206 worker-visible requalification candidate (independent held-out grading
-is pending):
+Accepted HGI-206 repository-local requalification and closeout:
 
 - [`HGI-206-candidate.json`](HGI-206-candidate.json)
+- [`HGI-206-validation.json`](HGI-206-validation.json)
+- [`HGI-206-lifecycle-correction-candidate.json`](HGI-206-lifecycle-correction-candidate.json)
 - [`../verification/harness-epochs.md`](../verification/harness-epochs.md)
 - [`../verification/effectiveness.md`](../verification/effectiveness.md)
 
@@ -151,8 +152,8 @@ package until a package manifest, source exports and verification exist.
 ## Missing or stale docs
 
 - Completed execution plans live under `docs/exec-plans/completed/`. The
-  HGI-200 through HGI-206 rollout is the only current plan under
-  `docs/exec-plans/active/`; completed material remains historical.
+  accepted HGI-200 through HGI-206 rollout is retained there; no execution plan
+  is currently active.
 - `docs/repo-status-outline.html` is a manual snapshot. It was refreshed on
   2026-07-17 for the completed TaxKit cutover, private `1.0.0` release train,
   strict packed-consumer validation and current delivery priorities. It can

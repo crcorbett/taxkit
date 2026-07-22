@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: taxkit-harness-owner
 last_reviewed: 2026-07-22
-review_trigger: HGI-206 independent result, repeated contradiction, or epoch change
+review_trigger: repeated contradiction or worker, host, tool, runtime, skill, target, or scenario epoch change
 ---
 
 # Harness effectiveness
@@ -16,12 +16,14 @@ treating activity counts as efficacy.
 
 | Intervention | Decision | Evidence owner | Review trigger |
 | --- | --- | --- | --- |
-| Current maintainer router and active-intent routing | Retain pending independent grade | `docs/README.md` and HGI-206 candidate | stale-owner contradiction or lifecycle change |
-| Five critical journeys and bounded release evidence | Retain pending independent grade | `docs/verification/critical-journeys.json` | consumer boundary or oracle change |
-| Four canonical runbooks and authority stops | Retain pending independent grade | `docs/runbooks/README.md` and `docs/operations/authority-model.md` | operation, principal, or recovery change |
-| Repo-local skills and lint/test policy | Retain pending independent grade | `.agents/skills/**`, `tools/skills/**`, `tools/oxlint/**` | skill or enforcement change |
+| Current maintainer router and lifecycle routing | Revise | `docs/README.md`, completed plan route, and HGI-206 lifecycle correction | stale-owner contradiction or lifecycle change |
+| Five critical journeys and bounded release evidence | Retain | `docs/verification/critical-journeys.json` and HGI-206 validation | consumer boundary or oracle change |
+| Four canonical runbooks and authority stops | Retain | `docs/runbooks/README.md`, `docs/operations/authority-model.md`, and HGI-206 validation | operation, principal, or recovery change |
+| Repo-local skills and lint/test policy | Retain | `.agents/skills/**`, `tools/skills/**`, `tools/oxlint/**`, and HGI-206 validation | skill or enforcement change |
 | Any causal comparison or ablation claim | Inconclusive | independent grader result | condition-blind comparison is available |
 
-`Retain pending independent grade` is not acceptance. `Inconclusive` is retained
-because this single epoch has no condition-blind comparison. The candidate
-receipt names the exact observations, limitations and next owner.
+The lifecycle route is `Revise` because the first accepted closeout left stale
+in-progress pointers; the correction updates the current router, SPEC/indexes,
+and completed plan without changing the epoch evidence. `Inconclusive` remains
+because this single epoch has no condition-blind comparison. The candidate and
+validation receipts name the exact observations, limitations, and recovery.

@@ -13,6 +13,12 @@ HGI-206 qualifies only one recorded local TaxKit evaluation epoch. Its worker-vi
 scenario contract is [`../../tools/evals/hgi-206-scenarios.json`](../../tools/evals/hgi-206-scenarios.json);
 the independent grader remains outside that default context.
 
+The independent portable-path re-audit accepted the corrected evidence
+contract, and the semantic and validation closeout commits are recorded in
+[`../documentation-audit/HGI-206-validation.json`](../documentation-audit/HGI-206-validation.json).
+That acceptance does not widen the epoch beyond the target, scenarios, tools,
+skills, limitations, or non-claims recorded here.
+
 The target is accepted HGI-205 closeout
 `a8a58882cd6c5f8003d31dc0c0567d78093597b9`. A result binds its worker/model,
 host, tools, runtime, skill digests, target identity, retrieval, invocation and

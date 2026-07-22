@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-206-lifecycle-correction",
+  "status": "candidate",
+  "observedAt": "2026-07-22T15:09:36Z",
+  "baseCommit": "8c983d992f0b5eca46eb2777debded7dbccf0e7a",
+  "trigger": "Cross-repository HGI-401 preparation found current routers and intent owners still describing accepted HGI-206 as in progress with grading pending.",
+  "authority": {
+    "localWrite": true,
+    "externalAccess": "git-push-only-after-local-acceptance",
+    "providerAccess": false
+  },
+  "claims": [
+    "HGI-206 is accepted and published at semantic commit c2f41c10dca141c7cb7e066b3a2bff48048101fc with validation closeout 8c983d992f0b5eca46eb2777debded7dbccf0e7a.",
+    "The repository-local SPEC is implemented, its execution plan belongs in completed history, no execution plan is currently active, and current harness verification routes to the validation receipt rather than the pre-acceptance candidate alone.",
+    "The lifecycle correction changes routing and effectiveness disposition only; it does not rewrite the accepted epoch evidence or product implementation."
+  ],
+  "impactLedger": [
+    {
+      "surface": "active and completed execution-plan lifecycle",
+      "decision": "Change required",
+      "paths": ["docs/exec-plans/active/README.md", "docs/exec-plans/completed/README.md", "docs/exec-plans/completed/harness-governance-documentation.md"],
+      "owner": "TaxKit execution-plan lifecycle indexes and retained completed plan",
+      "evidence": "All repository-local HGI-200 through HGI-208 tasks have accepted receipts; the plan no longer owns active work.",
+      "nonClaim": "Moving the plan does not complete HGI-400 or any external operation."
+    },
+    {
+      "surface": "SPEC and product-spec index",
+      "decision": "Change required",
+      "paths": ["docs/product-specs/harness-governance-documentation.md", "docs/product-specs/index.md"],
+      "owner": "TaxKit product-spec lifecycle owner",
+      "evidence": "HGI-206 validation records local acceptance and Git publication; the SPEC becomes implemented/supporting.",
+      "nonClaim": "Implemented documentation does not establish release, registry, provider, deployment, public-site, or consumer actuality."
+    },
+    {
+      "surface": "documentation and evidence routers",
+      "decision": "Change required",
+      "paths": ["docs/README.md", "docs/documentation-audit/README.md"],
+      "owner": "TaxKit documentation router and dated evidence index",
+      "evidence": "Current navigation now routes completed requalification to HGI-206-validation and keeps the candidate as retained pre-acceptance evidence.",
+      "nonClaim": "A router link is not independent proof."
+    },
+    {
+      "surface": "harness epoch and effectiveness",
+      "decision": "Change required",
+      "paths": ["docs/verification/harness-epochs.md", "docs/verification/effectiveness.md"],
+      "owner": "TaxKit harness owner",
+      "evidence": "The accepted result is recorded while the stale lifecycle route is explicitly revised; the no-comparison result remains inconclusive.",
+      "nonClaim": "The correction proves no causal effect, variance stability, future epoch, or cross-repository qualification."
+    },
+    {
+      "surface": "root, app and package READMEs",
+      "decision": "Preserve",
+      "paths": [],
+      "owner": "Existing public and package entry points",
+      "evidence": "No setup, export, consumer contract, app behavior, or package ownership changed.",
+      "nonClaim": "Preservation is not a new public contract claim."
+    },
+    {
+      "surface": "skills, agent instructions, lint, config, tests and CI",
+      "decision": "Preserve",
+      "paths": [],
+      "owner": "Existing TaxKit policy, skill, tooling and workflow owners",
+      "evidence": "The correction changes only current documentation lifecycle and is exercised by existing documentation/skill/repository gates.",
+      "nonClaim": "Passing local gates does not prove hosted CI."
+    },
+    {
+      "surface": "runbooks, authority and rollback",
+      "decision": "Preserve",
+      "paths": [],
+      "owner": "docs/runbooks/README.md and docs/operations/authority-model.md",
+      "evidence": "No operation, principal, resource, environment, recovery path, or authority boundary changed.",
+      "nonClaim": "No runbook was executed."
+    },
+    {
+      "surface": "product code, schemas, APIs, generated docs and public MDX",
+      "decision": "N/A",
+      "paths": [],
+      "owner": "Existing source and generated owners",
+      "evidence": "The defect is a completed-task lifecycle contradiction only; no product or generated contract changed.",
+      "nonClaim": "No product behavior, generated output, or public content is established."
+    },
+    {
+      "surface": "release, registry, provider, deployment and external consumers",
+      "decision": "N/A",
+      "paths": [],
+      "owner": "Separately authorised target operations",
+      "evidence": "This correction performs no external readback or consequence beyond the later ordinary Git publication of repository documentation.",
+      "nonClaim": "No version, tag, hosted release, registry publication, deployment, provider, public-site, recovery, or external-consumer outcome is established."
+    }
+  ],
+  "verification": [
+    "bun run test:skills",
+    "bun run check:docs",
+    "bun run check:runbooks",
+    "bun run check:repository-paths",
+    "bun run verification",
+    "git diff --check"
+  ],
+  "retainedFailures": [
+    {
+      "command": "bun run test:skills && bun run check:docs && bun run check:runbooks && bun run check:repository-paths && git diff --check",
+      "lastSuccessfulStep": "bun run test:skills passed 16 tests",
+      "failure": "The pre-stage documentation inventory still included the deleted tracked active-plan path and reported five missing-frontmatter violations.",
+      "recovery": "Stage the explicit plan move and candidate-owned documentation paths so the Git-index-backed policy observes the intended lifecycle tree, then rerun the same checks.",
+      "nonClaim": "The failure is not a passing docs receipt and does not establish a semantic or provider defect."
+    }
+  ],
+  "rollback": "Revert the lifecycle-correction validation commit and semantic commit in reverse order; preserve the original HGI-206 candidate, validation, failed orchestration, results and receipts.",
+  "limitations": [
+    "This candidate is not accepted until the named checks pass against the committed semantic tree and the validation receipt is published.",
+    "The central HGI-400 target must be re-pinned after the accepted correction; the old frozen TaxKit target cannot be used as current-truth qualification."
+  ],
+  "nonClaims": [
+    "No HGI-400 worker or grader has run.",
+    "No provider, deployment, release, registry, credential, public-site, recovery, or external-consumer state was read or changed."
+  ]
+}

@@ -1,11 +1,11 @@
 ---
 document_type: execution-plan
-lifecycle: current
-authority: canonical
-owner: taxkit-documentation-owner
+lifecycle: historical
+authority: supporting
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-07-22
-review_trigger: acceptance or scope change in TaxKit HGI-200 through HGI-206
-successor: null
+review_trigger: retained HGI-200 through HGI-206 proof, limitation, or successor correction
+successor: ../../product-specs/harness-governance-documentation.md
 tombstone: false
 ---
 
@@ -59,7 +59,8 @@ deletion/movement require separately approved authority and target runbooks.
   full verification, independent acceptance and origin/main readback are
   recorded in
   [`HGI-205-validation.json`](../../documentation-audit/HGI-205-validation.json).
-  HGI-206 (requalification/closeout) is now the next TaxKit slice.
+  HGI-206 subsequently completed the repository-local requalification and
+  closeout.
 
 Completed-plan follow-ups are not active work in historical plan bodies. Their
 explicit successors are HGI-207 for lifecycle/publication decisions, HGI-201
@@ -85,11 +86,14 @@ receipts. These local records do not prove
 publication, registry state,
 external consumers, API/docs production behavior, or release authority.
 
-HGI-206 is in progress at the exact HGI-205 closeout
-`a8a58882cd6c5f8003d31dc0c0567d78093597b9`. Its worker-visible local epoch,
-five current journey routes, bounded receipts, contradiction repair owners,
-four-clock null handling and complete impact ledger are in
+**HGI-206 — completed and published:** the worker-visible local epoch, five
+journey routes, bounded receipts, contradiction repair owners, four-clock null
+handling and complete impact ledger are retained in
 [`HGI-206-candidate.json`](../../documentation-audit/HGI-206-candidate.json).
-Independent fresh-context grading remains pending and this candidate makes no
-Git publication, release, registry, deployment, provider, public-site or
-recovery claim.
+Independent portable-path re-audit, full repository verification, the
+sequential nine-step local release graph, semantic commit
+`c2f41c10dca141c7cb7e066b3a2bff48048101fc`, and validation closeout
+`8c983d992f0b5eca46eb2777debded7dbccf0e7a` are recorded in
+[`HGI-206-validation.json`](../../documentation-audit/HGI-206-validation.json).
+No version, tag, hosted release, registry publication, deployment, provider,
+public-site, recovery, or external-consumer actuality was established.
