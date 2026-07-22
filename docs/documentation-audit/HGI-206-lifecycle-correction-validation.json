@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "taskId": "HGI-206-lifecycle-correction",
+  "status": "passed",
+  "observedAt": "2026-07-22T15:25:53Z",
+  "baseCommit": "8c983d992f0b5eca46eb2777debded7dbccf0e7a",
+  "semanticCommit": "7a381605ea0bcecad0231d2ebf36394e91881349",
+  "semanticTree": "31df17e8d874b3adcef35143ca47446bd078d972",
+  "changedPaths": {
+    "count": 11,
+    "sortedPathSha256": "d92ac9f3baa6e5cafaf5e1707a971f8e5d6ae3cc586567d4f89709d0bdf50ece"
+  },
+  "artifacts": [
+    {
+      "path": "docs/documentation-audit/HGI-206-lifecycle-correction-candidate.json",
+      "sha256": "7415c1d817d5cfa9ad3256ee316bf6d009b4b9bffb307ffafb0b449249c2de2c"
+    },
+    {
+      "path": "docs/documentation-audit/HGI-206-validation.json",
+      "sha256": "b0bcbba1a58996f7028de84ccb9cb42f69f2c02470896f3596216d32ae3b563d"
+    }
+  ],
+  "claims": [
+    "TaxKit current navigation no longer contradicts accepted HGI-206: the SPEC is implemented, the plan is historical under completed, no plan is active, and requalification routes to the accepted validation receipt.",
+    "Harness effectiveness now records the lifecycle route as revised while retaining the journey, runbook, skill and lint interventions and leaving causal comparison inconclusive.",
+    "The correction is documentation lifecycle only and preserves the accepted HGI-206 target-specific epoch, failures, limitations and non-claims."
+  ],
+  "checks": [
+    {
+      "command": "bun run test:skills; bun run check:docs; bun run check:runbooks; bun run check:repository-paths; git diff --cached --check",
+      "exitCode": 0,
+      "observedPostcondition": "Sixteen skill tests passed; documentation policy passed over 659 tracked files; four runbooks and ten commands passed without execution; 651 text and eight binary paths passed portability; the staged diff had no whitespace errors."
+    },
+    {
+      "command": "bun run verification",
+      "exitCode": 0,
+      "observedPostcondition": "Repository path/type checks, quality workflow, documentation and runbook contracts, Effect language service, lint, formatting over 434 files, 16 skill tests, 10 quality-workflow tests including six isolated release-boundary mutations, both Knip graphs, and 23 Turbo type/build tasks passed."
+    },
+    {
+      "command": "git commit -m 'docs: close TaxKit harness lifecycle'; git rev-parse HEAD HEAD^{tree}; git status --short --branch",
+      "exitCode": 0,
+      "observedPostcondition": "The semantic tree is committed at 7a381605ea0bcecad0231d2ebf36394e91881349 with tree 31df17e8d874b3adcef35143ca47446bd078d972; local main is one commit ahead of origin/main before this validation closeout."
+    }
+  ],
+  "retainedFailures": [
+    {
+      "command": "bun run test:skills && bun run check:docs && bun run check:runbooks && bun run check:repository-paths && git diff --check",
+      "lastSuccessfulStep": "bun run test:skills passed 16 tests",
+      "observedState": "Before the explicit rename was staged, the Git-index-backed documentation policy still inventoried the deleted active-plan path and reported five missing-frontmatter violations.",
+      "recovery": "The exact correction paths were staged, making the intended plan move visible to the policy; the same focused checks and full verification then passed.",
+      "nonClaim": "The failed pre-stage run is retained as orchestration/lifecycle evidence and is not a successful documentation receipt."
+    }
+  ],
+  "rollback": "Revert this validation closeout, then semantic commit 7a381605ea0bcecad0231d2ebf36394e91881349; preserve the original HGI-206 candidate, validation, results, failed evidence, and this correction provenance.",
+  "limitations": [
+    "The correction proves repository-local lifecycle and verification only; it does not widen the accepted HGI-206 epoch.",
+    "The HGI-400 cross-repository contract must use a new TaxKit target identity and recomputed fixture/projection digests before any worker dispatch."
+  ],
+  "nonClaims": [
+    "No HGI-400 worker, grader, causal comparison, variance result, or permanent worker qualification is established.",
+    "No version, tag, hosted release, registry publication, deployment, provider, credential, public-site, recovery, or external-consumer state was read, changed, or established."
+  ],
+  "postcondition": "The accepted HGI-206 outcome, current routers, implemented SPEC, completed plan route, epoch/effectiveness owners, candidate, and validation evidence agree on repository-local completion."
+}

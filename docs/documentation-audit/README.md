@@ -83,6 +83,7 @@ Accepted HGI-206 repository-local requalification and closeout:
 - [`HGI-206-candidate.json`](HGI-206-candidate.json)
 - [`HGI-206-validation.json`](HGI-206-validation.json)
 - [`HGI-206-lifecycle-correction-candidate.json`](HGI-206-lifecycle-correction-candidate.json)
+- [`HGI-206-lifecycle-correction-validation.json`](HGI-206-lifecycle-correction-validation.json)
 - [`../verification/harness-epochs.md`](../verification/harness-epochs.md)
 - [`../verification/effectiveness.md`](../verification/effectiveness.md)
 
