@@ -1,0 +1,14 @@
+{
+  "classifications": [
+    "tests",
+    "fixtures",
+    "configuration",
+    "exports",
+    "manifests",
+    "lifecycle",
+    "release",
+    "rollback",
+    "critical journeys",
+    "semantic owners"
+  ]
+}

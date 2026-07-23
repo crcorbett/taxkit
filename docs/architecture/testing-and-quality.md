@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-24
 source_of_truth: docs
 confidence: high
 ---
@@ -321,7 +321,11 @@ supporting gate and cannot replace semantic ownership or call-graph review.
 - Repo-owned skill changes must pass the skill validator and `bun run
   test:skills`. The stale-pattern test checks fenced provider examples for raw
   clients, generic SDK callbacks, raw IDs, primitive config, `instanceof`, and
-  unchecked SDK result escape; semantic Effect/React quality remains a parent
+  unchecked SDK result escape. Positive and adversarial fixtures also protect
+  the PRD route/container/leaf ownership boundary and require separate
+  documentation-impact classifications for tests, fixtures, configuration,
+  exports, manifests, lifecycle, release, rollback, critical journeys and
+  semantic owners. Broader semantic Effect/React quality remains a parent
   review responsibility.
 - Keep the development-aware `knip` graph and dedicated `knip:production`
   graph independent. Production entry and project patterns require Knip's

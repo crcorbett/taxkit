@@ -47,6 +47,33 @@ const readProviderFixture = (name: "accepted" | "rejected") =>
     "utf-8"
   );
 
+const readTextFixture = (
+  family: "react-leaf-boundary",
+  name: "accepted" | "rejected"
+) =>
+  readFileSync(
+    resolve(root, "tools/skills/fixtures/hgi-201", `${family}.${name}.txt`),
+    "utf-8"
+  );
+
+interface DocumentationImpactFixture {
+  readonly classifications: readonly string[];
+}
+
+const readDocumentationImpactFixture = (
+  name: "accepted" | "rejected"
+): DocumentationImpactFixture =>
+  JSON.parse(
+    readFileSync(
+      resolve(
+        root,
+        "tools/skills/fixtures/hgi-201",
+        `documentation-impact.${name}.json`
+      ),
+      "utf-8"
+    )
+  );
+
 const classifyProviderBoundarySource = (source: string) =>
   [
     /\buse\s*:/u.test(source) || /\.use\s*\(/u.test(source)
@@ -66,6 +93,71 @@ const classifyProviderBoundarySource = (source: string) =>
       ? "unchecked-sdk-output"
       : null,
   ].filter((reason): reason is string => reason !== null);
+
+const affirmativeLeafSentences = (source: string) =>
+  source
+    .split(/[.!?]\s*|\n+/u)
+    .filter((sentence) =>
+      /\b(?:presentation\s+)?lea(?:f|ves)\b/iu.test(sentence)
+    )
+    .filter(
+      (sentence) =>
+        !/\b(?:must not|do not|does not|never|forbid|forbids|reject|rejects)\b/iu.test(
+          sentence
+        )
+    );
+
+const classifyReactLeafBoundarySource = (source: string) => {
+  const sentences = affirmativeLeafSentences(source);
+  const matches = (pattern: RegExp) =>
+    sentences.some((sentence) => pattern.test(sentence));
+
+  return [
+    matches(
+      /\b(?:owns?|handles?|manages?)\b[^.!?\n]*\b(?:data\s+loading|boundary\s+data|fetch(?:ing)?|quer(?:y|ies|ying))\b|\b(?:loads?\s+(?:their\s+own\s+)?(?:boundary\s+)?data|fetch(?:es)?|quer(?:y|ies))\b|\b(?:uses?|calls?|invokes?|runs?|executes?)\b[^.!?\n]*\buse(?:Suspense|Infinite)?Quer(?:y|ies)\b/iu
+    )
+      ? "leaf-owned-data-loading"
+      : null,
+    matches(
+      /\b(?:owns?|handles?|manages?|acquires?|uses?|runs?|calls?|invokes?|executes?|performs?)\b[^.!?\n]*\b(?:Effect|services?|runtimes?|RPC)\b/iu
+    )
+      ? "leaf-owned-effect-service-rpc"
+      : null,
+    matches(
+      /\b(?:owns?|handles?|manages?|runs?|calls?|invokes?|executes?|performs?)\b[^.!?\n]*\b(?:remote|domain)?\s*(?:mutations?|commands?)\b|\b(?:uses?|calls?|invokes?|runs?|executes?)\b[^.!?\n]*\buseMutation\b/iu
+    )
+      ? "leaf-owned-mutation-command"
+      : null,
+    matches(
+      /\b(?:owns?|handles?|manages?|runs?|coordinates?|orchestrates?)\b[^.!?\n]*\b(?:shared\s+workflows?|workflow\s+orchestration|error\s+policy)\b/iu
+    )
+      ? "leaf-owned-shared-workflow-policy"
+      : null,
+  ].filter((reason): reason is string => reason !== null);
+};
+
+const requiredDocumentationImpactClassifications = [
+  "tests",
+  "fixtures",
+  "configuration",
+  "exports",
+  "manifests",
+  "lifecycle",
+  "release",
+  "rollback",
+  "critical journeys",
+  "semantic owners",
+] as const;
+
+const classifyDocumentationImpactFixture = (
+  fixture: DocumentationImpactFixture
+) => {
+  const classifications = new Set(fixture.classifications);
+
+  return requiredDocumentationImpactClassifications
+    .filter((classification) => !classifications.has(classification))
+    .map((classification) => `missing-${classification.replaceAll(" ", "-")}`);
+};
 
 const classifyCoordinationPolicy = (
   fixture: ReturnType<typeof readFixture>
@@ -201,6 +293,116 @@ describe("repo-owned skill policy", () => {
     expect(
       classifyProviderBoundarySource(readProviderFixture("accepted"))
     ).toEqual([]);
+  });
+
+  test("HGI-201 React fixtures reject leaf-owned boundaries and accept compositional leaves", () => {
+    expect(
+      classifyReactLeafBoundarySource(
+        readTextFixture("react-leaf-boundary", "rejected")
+      )
+    ).toEqual([
+      "leaf-owned-data-loading",
+      "leaf-owned-effect-service-rpc",
+      "leaf-owned-mutation-command",
+      "leaf-owned-shared-workflow-policy",
+    ]);
+    expect(
+      classifyReactLeafBoundarySource(
+        readTextFixture("react-leaf-boundary", "accepted")
+      )
+    ).toEqual([]);
+  });
+
+  test("HGI-201 React policy catches hook ownership without rejecting supplied values", () => {
+    expect(
+      classifyReactLeafBoundarySource(
+        "Presentation leaves use useQuery, call useSuspenseQuery, invoke useInfiniteQuery and run useQueries for their data. Presentation leaves call useMutation to save."
+      )
+    ).toEqual(["leaf-owned-data-loading", "leaf-owned-mutation-command"]);
+    expect(
+      classifyReactLeafBoundarySource(
+        "Presentation leaves receive a readonly value derived by a useQuery owner and an onSave callback."
+      )
+    ).toEqual([]);
+  });
+
+  test("HGI-201 impact fixtures require independently classified documentation surfaces", () => {
+    expect(
+      classifyDocumentationImpactFixture(
+        readDocumentationImpactFixture("rejected")
+      )
+    ).toEqual([
+      "missing-tests",
+      "missing-fixtures",
+      "missing-configuration",
+      "missing-exports",
+      "missing-manifests",
+      "missing-lifecycle",
+      "missing-release",
+      "missing-rollback",
+      "missing-critical-journeys",
+      "missing-semantic-owners",
+    ]);
+    expect(
+      classifyDocumentationImpactFixture(
+        readDocumentationImpactFixture("accepted")
+      )
+    ).toEqual([]);
+  });
+
+  test("current PRD skills and frontend docs preserve the route-container-leaf boundary", () => {
+    const prdSkills = ["prd-writer", "prd-review", "prd-implementer"].map(
+      readSkill
+    );
+    const frontend = readFileSync(
+      resolve(root, "docs/architecture/frontend.md"),
+      "utf-8"
+    );
+    const sources = [...prdSkills, frontend];
+
+    for (const source of sources) {
+      expect(classifyReactLeafBoundarySource(source)).toEqual([]);
+    }
+
+    for (const skill of prdSkills) {
+      const normalized = skill.replaceAll(/\s+/gu, " ");
+
+      expect(normalized).toContain(
+        "Route/feature boundaries or policy-owning containers own data loading"
+      );
+      expect(normalized).toContain(
+        "Presentation leaves receive narrow readonly values and callbacks"
+      );
+      expect(normalized).toContain(
+        "rendering, accessibility, focus, and local UI interaction state only"
+      );
+    }
+
+    const normalizedFrontend = frontend.replaceAll(/\s+/gu, " ");
+
+    expect(normalizedFrontend).toContain(
+      "Leaf components receive focused readonly values, callbacks or `children`"
+    );
+    expect(normalizedFrontend).toContain(
+      "owned by the route action or nearest policy-owning container"
+    );
+  });
+
+  test("current PRD and docs-maintainer skills keep impact classifications separate", () => {
+    const owners = [
+      "prd-writer",
+      "prd-review",
+      "prd-implementer",
+      "docs-maintainer",
+    ];
+    const requiredContract =
+      "Classify these as separate impact rows; do not collapse them into broader rows: tests; fixtures; configuration; exports; manifests; lifecycle; release; rollback; critical journeys; semantic owners.";
+
+    for (const owner of owners) {
+      expect(readSkill(owner).replaceAll(/\s+/gu, " ")).toContain(
+        requiredContract
+      );
+    }
   });
 
   test("every current HGI-201 owner rejects fixed coordination ritual", () => {

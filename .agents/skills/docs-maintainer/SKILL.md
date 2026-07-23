@@ -40,6 +40,10 @@ explicit limitation. Cover:
   sanitized proof/history; and
 - skills/mirrors, lint/config/tests, active SPEC/tasks and execution evidence.
 
+Classify these as separate impact rows; do not collapse them into broader rows:
+tests; fixtures; configuration; exports; manifests; lifecycle; release;
+rollback; critical journeys; semantic owners.
+
 `N/A` requires local evidence, not silence. Do not update every README by
 habit, defer documentation to closeout, or copy implementation truth into this
 skill. Update active intent whenever the change proves a requirement,

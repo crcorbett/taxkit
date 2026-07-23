@@ -56,6 +56,10 @@ surface `Change required` or `N/A` with evidence:
    deployment, rollback, and operator runbooks
 8. React route/container/leaf composition, accessibility, and browser proof
 
+Classify these as separate impact rows; do not collapse them into broader rows:
+tests; fixtures; configuration; exports; manifests; lifecycle; release;
+rollback; critical journeys; semantic owners.
+
 Implement every required row in the same task or add a concrete dependent task
 before acceptance. An unimplemented `Change required` row blocks completion.
 
@@ -99,10 +103,14 @@ route loader/action or server function
 ```
 
 - Routes restore encoded transport once and own top-level outcome matching.
-- Containers own remote/domain commands and focused coordination.
-- Leaves render focused readonly values and own local interaction state only.
+- Route/feature boundaries or policy-owning containers own data loading,
+  fetch/query execution, Effect/service/RPC execution, remote/domain mutations
+  and commands, shared workflow/orchestration, and loading/error policy.
+- Presentation leaves receive narrow readonly values and callbacks. They own
+  rendering, accessibility, focus, and local UI interaction state only.
 - Leaves must not decode transport data, acquire Effect services, run runtimes,
-  read environment/storage, fetch boundary data, or construct provider clients.
+  read environment/storage, fetch or query boundary data, execute remote/domain
+  mutations or commands, own shared workflows, or construct provider clients.
 - Keep loading, empty, unavailable, and recoverable errors at the smallest
   owning boundary with stable dimensions.
 - Reject hooks, providers, wrappers, and feature components whose only purpose

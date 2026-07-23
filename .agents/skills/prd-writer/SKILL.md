@@ -69,6 +69,10 @@ Cover at least:
 8. React routes, containers, leaves, loading/empty/error states, accessibility,
    browser proof, and server/browser import boundaries
 
+Classify these as separate impact rows; do not collapse them into broader rows:
+tests; fixtures; configuration; exports; manifests; lifecycle; release;
+rollback; critical journeys; semantic owners.
+
 Use a compact table with columns equivalent to:
 
 ```text
@@ -126,9 +130,14 @@ route loader/action or server function
 
 - Keep restoration and top-level outcome matching in the direct route owner.
 - Let containers own remote/domain commands and focused coordination.
-- Let leaves render focused readonly values and own only local interaction
-  state; do not let leaves decode transport data, acquire services, run
-  runtimes, read environment/storage, or construct provider clients.
+- Route/feature boundaries or policy-owning containers own data loading,
+  fetch/query execution, Effect/service/RPC execution, remote/domain mutations
+  and commands, shared workflow/orchestration, and loading/error policy.
+- Presentation leaves receive narrow readonly values and callbacks. They own
+  rendering, accessibility, focus, and local UI interaction state only; do not
+  let them decode transport data, acquire Effect services, run runtimes, read
+  environment/storage, fetch or query boundary data, execute remote/domain
+  mutations or commands, own shared workflows, or construct provider clients.
 - Place loading, empty, unavailable, and recoverable error UI at the smallest
   owning composition boundary with stable dimensions.
 - Do not add hooks, providers, wrappers, or feature components merely to move a

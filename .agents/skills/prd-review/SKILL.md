@@ -25,15 +25,30 @@ Always:
    Effect or TanStack—not to inspect this repository;
 5. mark docs, READMEs, lint/static rules, skills, configuration, tests, release
    and operational artifacts `Change required` or `N/A` with exact paths and
-   evidence;
+   evidence; classify tests, fixtures, configuration, exports, manifests,
+   lifecycle, release, rollback, critical journeys, and semantic owners as
+   separate impact rows rather than hiding them in catch-all groups;
 6. require `Context.Service`, explicit Layers, boundary-only codecs, flat
-   sequential Effects, deterministic test Layers, narrow leaf ownership, and no
-   helper sprawl where applicable;
+   sequential Effects, deterministic test Layers, the explicit route/container/
+   leaf ownership contract below, and no helper sprawl where applicable;
 7. make rewriting any stale `effect-client-wrapper` an acceptance task,
    including generic SDK callbacks, raw identifiers/client access, primitive
    config, runtime class policy, and unchecked provider output;
 8. apply every supported finding to the SPEC/tasks and run the repository's real
    documentation, lint, typecheck, test, build, and skill checks that apply.
+
+Route/feature boundaries or policy-owning containers own data loading,
+fetch/query execution, Effect/service/RPC execution, remote/domain mutations
+and commands, shared workflow/orchestration, and loading/error policy.
+Presentation leaves receive narrow readonly values and callbacks. They own
+rendering, accessibility, focus, and local UI interaction state only; they do
+not load, fetch, or query boundary data, acquire services, run Effect or RPC,
+execute remote/domain mutations or commands, or own shared workflow/error
+policy.
+
+Classify these as separate impact rows; do not collapse them into broader rows:
+tests; fixtures; configuration; exports; manifests; lifecycle; release;
+rollback; critical journeys; semantic owners.
 
 Invoke `$docs-maintainer` while landing review findings. Require its complete
 `Change required`/`Preserve`/`N/A` impact ledger and owner-specific proof;

@@ -1,0 +1,7 @@
+Presentation leaves own data loading.
+Presentation leaves fetch boundary data and query the API.
+Presentation leaves use useQuery and call useInfiniteQuery for boundary data.
+Presentation leaves acquire Effect services and run Effect programs and RPC calls.
+Presentation leaves execute remote mutations and domain commands.
+Presentation leaves call useMutation for remote writes.
+Presentation leaves own shared workflow orchestration and error policy.

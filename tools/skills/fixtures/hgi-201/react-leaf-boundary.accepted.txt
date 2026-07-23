@@ -1,0 +1,7 @@
+Route and feature boundaries or policy-owning containers own data loading,
+fetch and query execution, Effect, service, and RPC execution, remote and
+domain mutations and commands, shared workflow orchestration, and loading and
+error policy.
+
+Presentation leaves receive narrow readonly values and callbacks. They own
+rendering, accessibility, focus, and local UI interaction state only.
