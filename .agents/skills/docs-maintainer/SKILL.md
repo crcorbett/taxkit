@@ -3,7 +3,7 @@ name: docs-maintainer
 description: "Maintain TaxKit documentation after material calculator, schema, SDK/export, HTTP/OpenAPI, public MDX/navigation, docs-runtime, package, CI, release-proof, lifecycle, SPEC, or operational changes. Use for documentation-impact assessment, stale generated or package docs, documentation audits, ordinary implementation slices, and PRD design, review, implementation, and closeout."
 ---
 
-# TaxKit Docs Maintainer
+# TaxKit Documentation Maintainer
 
 Keep the earliest durable semantic owner current in the same implementation
 slice. This repository-local skill is complete without any global skill.
