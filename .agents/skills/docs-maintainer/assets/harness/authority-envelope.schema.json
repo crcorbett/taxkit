@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/schemas/harness-authority-envelope.v1.json",
+  "title": "Harness authority envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "principal",
+    "identitySource",
+    "localWrite",
+    "externalAccess",
+    "operations",
+    "resources",
+    "environments",
+    "duration",
+    "revocation",
+    "approvalRequired",
+    "approvalReceipt",
+    "stopConditions",
+    "readback",
+    "rollback",
+    "escalation"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1" },
+    "principal": { "$ref": "#/$defs/nonEmptyString" },
+    "identitySource": { "$ref": "#/$defs/nonEmptyString" },
+    "localWrite": { "type": "boolean" },
+    "externalAccess": { "enum": ["none", "read_only", "mutation"] },
+    "operations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "resources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "environments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "duration": { "$ref": "#/$defs/nonEmptyString" },
+    "revocation": { "$ref": "#/$defs/nonEmptyString" },
+    "approvalRequired": { "type": "boolean" },
+    "approvalReceipt": { "type": ["string", "null"] },
+    "stopConditions": { "$ref": "#/$defs/nonEmptyStrings" },
+    "readback": { "$ref": "#/$defs/nonEmptyStrings" },
+    "rollback": { "$ref": "#/$defs/nonEmptyStrings" },
+    "escalation": { "$ref": "#/$defs/nonEmptyString" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "externalAccess": { "const": "none" } },
+        "required": ["externalAccess"]
+      },
+      "then": {
+        "properties": {
+          "operations": { "maxItems": 0 },
+          "resources": { "maxItems": 0 },
+          "environments": { "maxItems": 0 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "externalAccess": { "const": "mutation" } },
+        "required": ["externalAccess"]
+      },
+      "then": {
+        "properties": {
+          "approvalRequired": { "const": true },
+          "approvalReceipt": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  }
+}

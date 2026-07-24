@@ -10,6 +10,22 @@ installed types, and commands win over generic guidance. An available global
 `prd-review` skill may add generic techniques, but this review never depends on
 its filesystem path.
 
+## Preserve structured audit acceptance
+
+For substantial repository, operational, automation, migration, or harness
+work, read the embedded repository harness contract, contract map, and invariant
+register under `../docs-maintainer/references/`.
+
+For an audit-derived SPEC, validate the accepted-finding crosswalk when a local
+validator exists. Confirm every accepted finding maps to an owning requirement
+and task and retains stable finding/invariant IDs, complete impact-surface
+decisions, verification, journeys, and proof. Rejected, deferred, and optional
+findings remain outside implementation scope unless explicitly accepted.
+
+Finish ordinary repository work after the accepted corrections, normal checks,
+applicable journeys, and one fresh independent review. Require comparative
+evaluation only when the SPEC makes a general harness-effect claim.
+
 Always:
 
 1. open the exact SPEC and associated tasks, inspect worktree state, and edit

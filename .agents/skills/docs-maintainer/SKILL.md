@@ -8,6 +8,25 @@ description: "Maintain TaxKit documentation after material calculator, schema, S
 Keep the earliest durable semantic owner current in the same implementation
 slice. This repository-local skill is complete without any global skill.
 
+## Load the structured harness contract
+
+For a repository-wide audit, substantial PRD, or cross-cutting harness change,
+read [the embedded harness contract](references/repository-harness-contract.md).
+Load its contract map and invariant register first, then only the applicable
+context/ownership, proof/evaluation, operations/authority, and repository
+variation modules under `references/harness/`.
+
+Use the fixed Schemas and templates under `assets/harness/` for repository
+profiles, critical journeys, bounded receipts, authority envelopes, and
+feedback or automation controls. Do not replace these field contracts with
+free-form prose. For ordinary localized work, keep using the impact-ledger
+workflow below without preloading the broader contract.
+
+Repository-wide documentation findings must use stable IDs and record
+consequence, evidence, semantic owner, root correction, duplicated guidance to
+retire, affected surfaces, proof, authority, limitations, and non-claims.
+Separate important corrections from optional improvements.
+
 ## Start and select the mode
 
 1. Read `AGENTS.md`, then `docs/README.md`, the exact changed code/configuration

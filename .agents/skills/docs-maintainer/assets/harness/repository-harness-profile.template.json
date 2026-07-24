@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1",
+  "repository": "example",
+  "purpose": "Describe the repository's consumer-facing purpose.",
+  "lifecyclePhase": "active",
+  "identitySource": "git rev-parse HEAD and git status --short --branch",
+  "owners": {
+    "docsRouter": "docs/README.md",
+    "architecture": ["docs/architecture/"],
+    "standards": ["docs/standards/"],
+    "readmes": ["README.md", "apps/**/README.md", "packages/**/README.md"],
+    "generatedReference": ["docs/reference/"],
+    "runbooks": ["docs/runbooks/"],
+    "proof": ["docs/proof/"],
+    "evidence": ["docs/evidence/"],
+    "activeSpecs": ["docs/product-specs/"],
+    "activePlans": ["docs/exec-plans/active/"],
+    "archives": ["docs/exec-plans/completed/", "docs/evidence/failed/"],
+    "skills": [".agents/skills/"],
+    "agentGuidance": ["AGENTS.md"]
+  },
+  "commands": {
+    "documentation": ["bun run docs:check"],
+    "skills": ["bun run test:skills"],
+    "focused": ["Replace with repository-owned focused commands."],
+    "closeout": ["bun run verification"]
+  },
+  "representativeJobs": [
+    {
+      "id": "JOB-001",
+      "consumer": "Named user or downstream consumer",
+      "acceptedOutcome": "Observable accepted outcome",
+      "owningPaths": ["apps/example/", "packages/example/"]
+    }
+  ],
+  "criticalJourneyOwner": "docs/critical-journeys/",
+  "boundaryFacts": [
+    "Name important runtime, provider, release, and trust boundaries."
+  ],
+  "exclusions": [
+    "Name generated, vendored, binary, inaccessible, or out-of-scope material."
+  ],
+  "nonClaims": ["Name what repository-local proof does not establish."],
+  "exceptions": []
+}

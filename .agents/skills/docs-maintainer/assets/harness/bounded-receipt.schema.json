@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/schemas/harness-bounded-receipt.v1.json",
+  "title": "Harness bounded receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "status",
+    "claim",
+    "target",
+    "candidateIdentity",
+    "actor",
+    "authorityReceipt",
+    "environment",
+    "journeyIds",
+    "observations",
+    "postconditions",
+    "detailArtifacts",
+    "limitations",
+    "nonClaims",
+    "rollbackOrRecovery",
+    "observedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1" },
+    "status": {
+      "enum": [
+        "passed",
+        "failed",
+        "blocked",
+        "skipped",
+        "inconclusive",
+        "no_op"
+      ]
+    },
+    "claim": { "$ref": "#/$defs/nonEmptyString" },
+    "target": { "$ref": "#/$defs/nonEmptyString" },
+    "candidateIdentity": { "$ref": "#/$defs/nonEmptyString" },
+    "actor": { "$ref": "#/$defs/nonEmptyString" },
+    "authorityReceipt": { "$ref": "#/$defs/nonEmptyString" },
+    "environment": { "$ref": "#/$defs/nonEmptyString" },
+    "journeyIds": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "observations": { "$ref": "#/$defs/nonEmptyStrings" },
+    "postconditions": { "$ref": "#/$defs/nonEmptyStrings" },
+    "detailArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "$ref": "#/$defs/nonEmptyString" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "limitations": { "$ref": "#/$defs/nonEmptyStrings" },
+    "nonClaims": { "$ref": "#/$defs/nonEmptyStrings" },
+    "rollbackOrRecovery": { "$ref": "#/$defs/nonEmptyString" },
+    "observedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  }
+}
