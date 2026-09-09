@@ -383,6 +383,7 @@ export default defineConfig({
     "./tools/oxlint/bun-rules.js",
     "./tools/oxlint/effect-rules.js",
     "./tools/oxlint/mdx-rules.js",
+    "./tools/oxlint/package-rules.js",
     "./tools/oxlint/taxkit-rules.js",
     {
       name: "anti-slop",
@@ -579,6 +580,7 @@ export default defineConfig({
         property: "values",
       },
     ],
+    "package/no-cross-package-source-imports": "error",
     // Effect pipelines intentionally use callback combinators like
     // Effect.mapError/Effect.flatMap instead of async/await.
     "promise/prefer-await-to-callbacks": "off",

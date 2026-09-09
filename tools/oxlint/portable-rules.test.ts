@@ -13,6 +13,7 @@ const generatedFixtures = [
   "tools/oxlint/fixtures/.generated-bun-rejected.ts",
   "tools/oxlint/fixtures/.generated-mdx-rejected.tsx",
   "tools/oxlint/fixtures/.generated-anti-slop-effect-rejected.ts",
+  "apps/web/src/.generated-package-rejected.ts",
 ] as const;
 
 const antiSlopRules = [
@@ -83,6 +84,13 @@ const fixtureCases = [
     namespace: "anti-slop-effect",
     rejected: "tools/oxlint/fixtures/anti-slop-effect-rejected.ts.txt",
     rules: ["no-service-constructor-imports"],
+  },
+  {
+    accepted: ["tools/oxlint/fixtures/package-accepted.ts"],
+    generated: generatedFixtures[4],
+    namespace: "package",
+    rejected: "tools/oxlint/fixtures/package-rejected.ts.txt",
+    rules: ["no-cross-package-source-imports"],
   },
 ] as const;
 

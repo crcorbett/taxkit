@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-31
+last_reviewed: 2026-09-09
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -180,6 +180,10 @@ belongs in apps or explicitly server-only package exports.
 - Define reusable config schemas in the package that owns the runtime contract,
   then compose and provide them from app-specific config modules.
 - Import from the owner instead of redefining boundary values locally.
+- Use another workspace's named public export. The global
+  `package/no-cross-package-source-imports` rule rejects aliases and relative
+  paths that reach into a different app or package's private `src` tree,
+  including TaxKit's nested rule and transport packages.
 - Add server-only exports for filesystem, HTTP server and Node adapters.
 - Keep React in apps or docs packages only.
 - Keep cross-package command orchestration in `packages/scripts`, but keep each

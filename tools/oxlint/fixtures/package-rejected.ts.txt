@@ -1,0 +1,6 @@
+import "@taxkit/core/src/index.js";
+
+export * from "../../../packages/rules/au/pay/src/index.js";
+
+export const loadCalculator = () =>
+  import("../../../packages/calculators/src/index.js");
