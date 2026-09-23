@@ -18,8 +18,8 @@ proof. Starting point: clean isolated worktree from
 | Task | State | Evidence and next action |
 | --- | --- | --- |
 | ADM-001 infrastructure owner | Locally verified | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Exact provider parity remains unproved. |
-| ADM-002 release upgrade | Locally verified; hosted plan open | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. API, browser, Worker, release CI and full local checks pass. A fresh beta.79 provider plan capture is still required before any deployment. |
-| ADM-003 Doppler reconciliation | Locally verified; token scope open | Live project/config and secret-name metadata, GitHub secret-name metadata, workflow consumers and local adapter agree. No credential source changed. Token scope/expiry and this checkout's personal login remain unproved. |
+| ADM-002 release upgrade | Locally verified; development plan captured; hosted plan open | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks pass. A beta.79 development plan proposes one `DocsWebsite` create; Preview and Production plans remain unproved. |
+| ADM-003 Doppler reconciliation | Locally verified; personal login passed; bridge scope open | The checkout-scoped personal login and custody check passed. Fixed `taxkit/dev` values matched the expected account without value output. Automation bridge token scope and expiry remain unproved. |
 | ADM-004 delivery | Pending | Local proof, reviewed PR, authorised hosted proof and exact remote-main readback. |
 
 ## 2026-09-24 development authority and CLI correction
@@ -43,12 +43,26 @@ token environment values take precedence over profile credentials, including
 under `CI=1`. The three hosted mutation workflows now use that command with
 `CI=1` and no profile-login step, retaining Doppler as their only Cloudflare
 credential source. The workflow contract test, `check:docs` and
-`check:runbooks` passed locally after this correction. A live provider run is
-still needed to establish bootstrap and plan behaviour.
+`check:runbooks` passed locally after this correction. The live development
+capture below proves the current plan-reader form and the supported bootstrap
+command in this account.
+
+The [sanitised development receipt](../../evidence/deployments/2026-09-24-alchemy-beta79-dev-plan/receipt.json)
+binds clean commit `0dd3cfc4857cdbffe947e25a400768b40bb71d0c`,
+Alchemy beta.79, account `f9f94270a4a5af8af7010d891020922d` and
+`dev_cooper`. The personal Doppler login passed custody validation. The
+state-store Worker settings returned HTTP 200 before and after the supported
+bootstrap command, which exited successfully. The exact clean-commit plan
+parsed as one `DocsWebsite` **create**. Its two safe lines are retained in
+[plan.txt](../../evidence/deployments/2026-09-24-alchemy-beta79-dev-plan/plan.txt),
+SHA-256 `da20a6a0593162c6b97bbfdd888c9258e77cb3b0badef3798d594fd4a6c5c07d`.
+The bootstrap's precise mutation, if any, was not observed. No Website apply
+or hosted stage was run.
 
 Documentation impact for this slice: **Change required** for the three
-workflows, their contract test, deployment architecture, automation register
-and this active plan; **Preserve** for the runbook's authority boundary,
+workflows, their contract test and plan reader, deployment architecture,
+automation register, dated evidence and index, task ledger and this active
+plan; **Preserve** for the runbook's authority boundary,
 historical completed plan, public docs and old beta.64 captures; **N/A** for
 SDK/API contracts, package exports and a Changeset because no published package
 behaviour changed.
@@ -140,10 +154,11 @@ state, hosted Worker, Doppler token or public URL was checked by them.
   and local parser tests pass. A further beta.79 source review found that an
   empty plan now says `Plan: no resources`; the current parser accepts that
   only for an already-absent teardown and rejects beta.64's old empty text.
-  `bun run test:docs-deployment` passed 94 tests after the correction. No fresh
-  sanitised beta.79 provider plan capture was obtained. Do not dispatch a Preview, Production or teardown provider run
-  from this revision until version-matched plan output has been captured and
-  reviewed under the resource-specific authority model.
+  `bun run test:docs-deployment` passed 94 tests after the correction. At that
+  point no fresh sanitised beta.79 provider plan capture had been obtained.
+  The later development capture above qualifies the current parser for one
+  `dev_cooper` create plan. Preview, Production and teardown still require
+  their own authority and version-matched plan review.
 
 ## ADM-003 credential inventory
 
@@ -166,10 +181,11 @@ Production environments. Workflow source checks the fixed project/config
 metadata before passing named outputs to consumers. The local adapter strips
 ambient Doppler and provider values, selects only `taxkit/dev`, disables
 fallback and Bun env-file loading, and accepts only the two Cloudflare names.
-The current checkout's `check:doppler-custody` stopped with safe reason
-`scoped-token`; local cloud development is unqualified here. Metadata alone
-does not prove bridge token scope, expiry or value. No direct duplicate secret
-source was found to remove, and no GitHub or Doppler setting was changed.
+Before the approved login, this checkout's `check:doppler-custody` stopped
+with safe reason `scoped-token`. It passed after the checkout-scoped personal
+login. Metadata and that personal login do not prove bridge token scope,
+expiry or value. No direct duplicate secret source was found to remove, and
+no GitHub or Doppler automation setting was changed.
 
 ## Authority and limits
 

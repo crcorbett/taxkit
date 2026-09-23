@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "ADM-002-dev-plan-2026-09-24",
+  "observedAt": "2026-09-23T23:33:01Z",
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/alchemy-doppler-modernisation",
+    "exactCommit": "0dd3cfc4857cdbffe947e25a400768b40bb71d0c",
+    "workingTreeCleanAtFinalPlan": true
+  },
+  "authority": {
+    "approvingPrincipal": "Cooper, TaxKit owner",
+    "executingPrincipal": "checkout-scoped personal Doppler login",
+    "operations": [
+      "Doppler login",
+      "Alchemy state-store bootstrap",
+      "Alchemy plan"
+    ],
+    "environment": "TaxKit development",
+    "stage": "dev_cooper",
+    "credentialSource": "Doppler taxkit/dev",
+    "cloudflareAccountId": "f9f94270a4a5af8af7010d891020922d",
+    "resources": [
+      "alchemy-state-store",
+      "TaxKitDocsCloudflare/DocsWebsite"
+    ],
+    "excluded": [
+      "Website apply",
+      "Preview deployment",
+      "Production deployment",
+      "teardown",
+      "pull-request merge"
+    ]
+  },
+  "implementation": {
+    "alchemyVersion": "2.0.0-beta.79",
+    "alchemySourceCommit": "473c39591c7993a708199d0ef8f0d38416885dde",
+    "effectVersion": "4.0.0-rc.117"
+  },
+  "bootstrap": {
+    "command": "alchemy provider cloudflare bootstrap",
+    "completed": true,
+    "stateStoreHttpBefore": 200,
+    "stateStoreHttpAfter": 200,
+    "mutationDetailsObserved": false
+  },
+  "plan": {
+    "logicalResourceId": "DocsWebsite",
+    "resourceType": "Cloudflare.Worker",
+    "action": "create",
+    "rawOutputSha256": "2350f4e9ec134863f0e662ccbef53abd9943e474ca811db1828bcd2addcb8d35",
+    "sanitisedOutputSha256": "da20a6a0593162c6b97bbfdd888c9258e77cb3b0badef3798d594fd4a6c5c07d",
+    "sanitisedOutputPath": "plan.txt",
+    "rawOutputRetained": false,
+    "secretValuesIncluded": false
+  },
+  "rollbackAndRevocation": {
+    "dopplerLogin": "doppler login revoke --scope=./",
+    "stateStore": "No teardown attempted; any state-store recovery requires a separate account-matched review."
+  },
+  "readback": [
+    "Doppler custody check passed.",
+    "Fixed taxkit/dev account identity and token presence passed without value output.",
+    "Cloudflare state-store Worker settings returned HTTP 200 before and after bootstrap.",
+    "The exact clean-commit beta.79 plan parsed as one DocsWebsite create."
+  ],
+  "nonClaims": [
+    "No Website plan was applied.",
+    "Bootstrap completion and HTTP 200 do not identify whether the state-store Worker changed.",
+    "No Preview, Production, hosted docs, public URL, or merge was proved.",
+    "The development plan does not authorise a hosted workflow run."
+  ]
+}
