@@ -28,21 +28,21 @@ export class QualityWorkflowFinding extends Schema.TaggedClass<QualityWorkflowFi
   }
 ) {}
 
-export class QualityWorkflowYamlError extends Schema.TaggedErrorClass<QualityWorkflowYamlError>()(
+export class QualityWorkflowYamlError extends Schema.TaggedError<QualityWorkflowYamlError>()(
   "QualityWorkflowYamlError",
   {
     target: Schema.NonEmptyString,
   }
 ) {}
 
-export class QualityWorkflowInputError extends Schema.TaggedErrorClass<QualityWorkflowInputError>()(
+export class QualityWorkflowInputError extends Schema.TaggedError<QualityWorkflowInputError>()(
   "QualityWorkflowInputError",
   {
     target: Schema.NonEmptyString,
   }
 ) {}
 
-export class QualityWorkflowPolicyError extends Schema.TaggedErrorClass<QualityWorkflowPolicyError>()(
+export class QualityWorkflowPolicyError extends Schema.TaggedError<QualityWorkflowPolicyError>()(
   "QualityWorkflowPolicyError",
   { findings: Schema.NonEmptyArray(QualityWorkflowFinding) }
 ) {}

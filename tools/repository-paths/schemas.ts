@@ -39,7 +39,7 @@ export class RepositoryPathReport extends Schema.TaggedClass<RepositoryPathRepor
   }
 ) {}
 
-export class RepositoryPolicyViolationError extends Schema.TaggedErrorClass<RepositoryPolicyViolationError>()(
+export class RepositoryPolicyViolationError extends Schema.TaggedError<RepositoryPolicyViolationError>()(
   "RepositoryPolicyViolationError",
   {
     report: RepositoryPathReport,
@@ -52,7 +52,7 @@ const RepositoryInventoryOperation = Schema.Literals([
   "resolve-repository-root",
 ]);
 
-export class RepositoryInventoryError extends Schema.TaggedErrorClass<RepositoryInventoryError>()(
+export class RepositoryInventoryError extends Schema.TaggedError<RepositoryInventoryError>()(
   "RepositoryInventoryError",
   {
     exitCode: Schema.optional(Schema.Int),
@@ -60,7 +60,7 @@ export class RepositoryInventoryError extends Schema.TaggedErrorClass<Repository
   }
 ) {}
 
-export class RepositoryFileReadError extends Schema.TaggedErrorClass<RepositoryFileReadError>()(
+export class RepositoryFileReadError extends Schema.TaggedError<RepositoryFileReadError>()(
   "RepositoryFileReadError",
   {
     file: RepositoryRelativeFile,

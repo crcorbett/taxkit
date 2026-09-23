@@ -1,0 +1,96 @@
+{
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/alchemy-doppler-modernisation.md",
+  "title": "Alchemy and Doppler modernisation tasks",
+  "status": "active",
+  "last_reviewed": "2026-09-24",
+  "principles": [
+    "Preserve the single Website resource and exact stage and state identity.",
+    "Treat local proof, provider state and hosted behaviour as different claims.",
+    "Keep secret values out of source, logs, caches, artefacts and receipts."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit each coherent slice after its focused checks and documentation impact pass.",
+    "requiredBeforeFinalPR": [
+      "bun install --frozen-lockfile",
+      "bun run verification",
+      "bun run check:runbooks",
+      "bun run check:repository-paths",
+      "git diff --check"
+    ],
+    "evidenceRequired": [
+      "Exact release versions and reference source revisions",
+      "Resource identity and one-resource graph comparison",
+      "Secret-name inventory with source, consumer and bootstrap exception",
+      "Local check results separated from provider and hosted proof"
+    ]
+  },
+  "downstreamArtifactImpact": [
+    "Change required: infrastructure package, root composition, imports, tests and deployment input digests.",
+    "Change required: deployment and package architecture, app/tool/package READMEs, runbook, active SPEC/tasks/plan and indexes.",
+    "Change required where applicable: manifests, lockfile, version-bound fixtures, generated OpenAPI, local package-structure profile and Changeset.",
+    "Preserve: historical provider receipts, authority model, protected GitHub environments, public MDX and stable resource identity."
+  ],
+  "tasks": [
+    {
+      "id": "ADM-001",
+      "status": "locally-verified",
+      "title": "Move the unchanged Website graph to one infrastructure owner",
+      "type": "foundation",
+      "dependsOn": [],
+      "goal": "Give the root a small composition role with one typed resource graph.",
+      "scope": ["alchemy.run.ts", "packages/infrastructure", "apps/docs/src/lib/build", "tools/docs-deployment", "docs/architecture", ".agents/skills/package-structure/references/repository-profile.md"],
+      "outputs": ["Private source-only package with stage Schema, Website policy and one-resource stack", "Updated package imports, digests, tests and canonical documentation"],
+      "mandatoryVerification": ["bun run check:docs", "bun run check:repository-paths", "bun run check:docs-deployment:types", "bun run test:docs-deployment", "bun run verification"],
+      "browserVerification": [],
+      "qualityAudits": ["Check one Website, exact identities and properties, no app Alchemy dependency, no helper sprawl or unsafe casts.", "Check installed Effect Schema and Config APIs and documentation impact rows."],
+      "completionCriteria": ["One-resource declaration tests pass.", "Root composition, architecture and READMEs agree.", "Changeset decision is recorded."],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "ADM-002",
+      "status": "locally-verified-dev-plan-captured-hosted-open",
+      "title": "Upgrade Alchemy and the matching Effect v4 family",
+      "type": "compatibility",
+      "dependsOn": ["ADM-001"],
+      "goal": "Use current compatible published releases without changing the public docs behaviour.",
+      "scope": ["package.json", "bun.lock", "packages", "apps", "tools/docs-deployment", "docs/runbooks/docs-deployment.md"],
+      "outputs": ["Exact version and lockfile update", "Installed-API migration", "Current-version parser with fresh provider capture still required, preserved historical fixtures and package Changeset"],
+      "mandatoryVerification": ["bun install --frozen-lockfile", "bun run check-types", "bun run test:docs-deployment", "bun run knip:production", "bun run docs:build", "bun run verification"],
+      "browserVerification": ["Run the repository docs Worker/browser journey when build behaviour changes."],
+      "qualityAudits": ["Inspect Schema errors, OpenAPI and Website props against exact release source and installed types.", "Scan for duplicate DTOs, unsafe casts, raw provider clients and pass-through helpers.", "Keep secret-bearing output out of fixtures and receipts."],
+      "completionCriteria": ["Frozen install and local tests pass.", "Current plan parser accepts qualified current output; historical fixtures remain correctly labelled.", "If fresh version-matched provider output is unavailable, hosted parser proof remains open and deployment stops.", "Version and proof limits are documented."],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "ADM-003",
+      "status": "locally-verified-personal-login-passed-bridge-scope-open",
+      "title": "Reconcile Doppler and deployment workflow contracts",
+      "type": "operations",
+      "dependsOn": ["ADM-002"],
+      "goal": "Prove one governed source and the exact consumer for each manageable credential.",
+      "scope": [".github/workflows", "tools/docs-deployment", "docs/runbooks/docs-deployment.md", "docs/architecture/deployment.md"],
+      "outputs": ["Secret-name inventory and safe metadata readback", "Any necessary narrow workflow/adapter corrections", "Rotation, revocation and recovery documentation"],
+      "mandatoryVerification": ["bun run check:doppler-custody", "bun run check:docs-deployment", "bun run check:quality-workflow", "bun run check:runbooks", "bun run verification"],
+      "browserVerification": [],
+      "qualityAudits": ["Check fixed dev, ci, stg_preview and prd config selection, least privilege, no fallback and no secret value output.", "Check GitHub bootstrap tokens are the only direct bridge; preserve host-issued GitHub token and Alchemy state ownership."],
+      "completionCriteria": ["Every secret name has a source and consumer.", "Preview and Production are isolated.", "No duplicate direct-source credential remains where replacement has been proven."],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "ADM-004",
+      "status": "pending",
+      "title": "Close local proof and qualify hosted delivery",
+      "type": "delivery",
+      "dependsOn": ["ADM-003"],
+      "goal": "Confirm exact candidate locally and in hosted checks before merging.",
+      "scope": ["docs/exec-plans/active", "docs/evidence/deployments", "GitHub pull request and hosted checks"],
+      "outputs": ["Bounded proof receipt", "Reviewed pull request", "Remote main readback when merge is authorised"],
+      "mandatoryVerification": ["bun run verification", "bun run check:docs", "bun run check:runbooks", "git diff --check"],
+      "browserVerification": ["Obtain exact-candidate hosted Preview and Production proof only after resource-specific authority and plan review."],
+      "qualityAudits": ["Name principal, action, resource, environment, approval, receipt, rollback and readback before each external mutation.", "Do not infer deployment or public availability from local checks."],
+      "completionCriteria": ["Required local and hosted checks pass or an exact blocker is recorded.", "PR is reviewed and merged only within the authority model.", "Remote main and plan lifecycle are read back."],
+      "commitAfterPassing": true
+    }
+  ]
+}

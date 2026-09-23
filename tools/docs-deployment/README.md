@@ -36,7 +36,7 @@ operator procedure and authority live in
 - `workflow-evidence.schemas.ts`, `workflow-evidence.ts` and
   `workflow-evidence.runtime.ts` form one closed command with `bootstrap`,
   `plan`, `replan` and `provider` modes. It calculates shared tracked-file identities, reuses
-  the beta.64 plan projection and provider inventory Schemas, decodes bounded
+  the beta.79 plan projection and provider inventory Schemas, decodes bounded
   Wrangler JSON, and encodes sanitised bootstrap, plan, provider and GitHub
   output files. Its only child process is fixed `git ls-files`; it cannot choose
   or run Alchemy, Wrangler, GitHub or another executable.
@@ -65,17 +65,21 @@ operator procedure and authority live in
 - `strict-boundaries.policy.ts` checks the named application and deployment
   adapters for ambient host access, raw concurrency, lost workflow/credential
   boundaries and unmanaged docs runtime state.
-- Root `alchemy.run.ts` owns the native
-  `Cloudflare.Website.Vite("DocsWebsite")` resource. This directory does not
+- Private `@taxkit/infrastructure` owns the native
+  `Cloudflare.Website.Vite("DocsWebsite")` declaration; root owns its provider
+  and state composition. This directory does not
   build or spawn the docs app.
-- `workflow-plan-projection.ts` is the single beta.64-bound host adapter for
+- `workflow-plan-projection.ts` is the single beta.79-bound host adapter for
   Alchemy's text plan output. It admits only the current native Website
-  resource and fails closed on any other resource line. The
+  resource and fails closed on any other resource line. Beta.79's upstream
+  `formatPlanLines` emits `Plan: no resources` for an empty plan; the adapter
+  admits that line only for an already-absent teardown. The
   `fixtures/alchemy-beta.64/` manifest binds five real sanitised GitHub
   artefact captures to Alchemy `2.0.0-beta.64`, upstream commit
   `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`, their source run/artefact
   identities and SHA-256 digests. The fixture tests recompute every digest and
-  cover create, update, no-op, delete and already-absent destroy.
+  cover create, update, no-op, delete and already-absent destroy. The old
+  empty-plan text remains historical and is rejected by the current parser.
 
 The retired orphan classifier has no current workflow, command, Schema,
 service, runtime or child-process boundary. Its immutable JSON receipts remain

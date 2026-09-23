@@ -1,7 +1,7 @@
 import { DocsSourcePath } from "@taxkit/docs-content/schemas";
 import { Schema } from "effect";
 
-export class DocsContentPreloadError extends Schema.TaggedErrorClass<DocsContentPreloadError>()(
+export class DocsContentPreloadError extends Schema.TaggedError<DocsContentPreloadError>()(
   "DocsContentPreloadError",
   {
     message: Schema.String,
@@ -9,7 +9,7 @@ export class DocsContentPreloadError extends Schema.TaggedErrorClass<DocsContent
   }
 ) {}
 
-export class DocsRouteTransportError extends Schema.TaggedErrorClass<DocsRouteTransportError>()(
+export class DocsRouteTransportError extends Schema.TaggedError<DocsRouteTransportError>()(
   "DocsRouteTransportError",
   {
     message: Schema.String,

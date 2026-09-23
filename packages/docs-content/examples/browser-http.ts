@@ -15,7 +15,7 @@ const CalculatorRunHttpResponse = Schema.Struct({
   report: Schema.Unknown,
 });
 
-const apiBaseUrl = Config.string("TAXKIT_API_BASE_URL").pipe(
+const apiBaseUrl = Config.String("TAXKIT_API_BASE_URL").pipe(
   Config.withDefault("http://127.0.0.1:4000")
 );
 

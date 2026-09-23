@@ -26,8 +26,8 @@ const decodingBoundaryFiles = [
   "apps/docs/src/lib/docs/route-boundary.test.js",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
-  "apps/docs/src/lib/build/cloudflare-stack.test.ts",
-  "apps/docs/src/lib/build/cloudflare-stack.ts",
+  "packages/infrastructure/src/cloudflare/website.test.ts",
+  "packages/infrastructure/src/cloudflare/website.ts",
   "apps/docs/src/lib/build/docs-build-target.ts",
   "packages/docs-content/src/navigation.ts",
 
@@ -197,7 +197,7 @@ const runtimeBoundaryFiles = [
   "apps/docs/src/server.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
-  "apps/docs/src/lib/build/cloudflare-stack.test.ts",
+  "packages/infrastructure/src/cloudflare/website.test.ts",
   "apps/docs/vite.config.ts",
   "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/runtime.server.ts",
@@ -399,6 +399,20 @@ export default defineConfig({
       files: ["**/*.{ts,tsx,mts,cts}"],
       rules: {
         "no-redeclare": "off",
+      },
+    },
+    {
+      // Effect v4's Schema.TaggedError factory is a class base. Oxlint
+      // mistakes its class declaration for an Error thrown without `new`.
+      files: [
+        "**/errors.ts",
+        "**/errors/*.ts",
+        "**/schemas.ts",
+        "**/*.schemas.ts",
+        "tools/docs-deployment/workflow-plan-projection.ts",
+      ],
+      rules: {
+        "unicorn/throw-new-error": "off",
       },
     },
     {

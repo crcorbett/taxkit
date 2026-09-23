@@ -1,6 +1,5 @@
+import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import { Schema } from "effect";
-
-import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
 
 export const WorkflowCheckName = Schema.Literals([
   "workflow-input",
@@ -72,7 +71,7 @@ export const WorkflowTeardownProofCheckConfig = Schema.Struct({
   TAXKIT_WORKFLOW_TEARDOWN_READBACK: Schema.NonEmptyString,
 });
 
-export class WorkflowCheckInputError extends Schema.TaggedErrorClass<WorkflowCheckInputError>()(
+export class WorkflowCheckInputError extends Schema.TaggedError<WorkflowCheckInputError>()(
   "WorkflowCheckInputError",
   {
     check: WorkflowCheckName,
@@ -80,7 +79,7 @@ export class WorkflowCheckInputError extends Schema.TaggedErrorClass<WorkflowChe
   }
 ) {}
 
-export class WorkflowCheckReadError extends Schema.TaggedErrorClass<WorkflowCheckReadError>()(
+export class WorkflowCheckReadError extends Schema.TaggedError<WorkflowCheckReadError>()(
   "WorkflowCheckReadError",
   {
     check: WorkflowCheckName,
@@ -88,7 +87,7 @@ export class WorkflowCheckReadError extends Schema.TaggedErrorClass<WorkflowChec
   }
 ) {}
 
-export class WorkflowCheckMismatchError extends Schema.TaggedErrorClass<WorkflowCheckMismatchError>()(
+export class WorkflowCheckMismatchError extends Schema.TaggedError<WorkflowCheckMismatchError>()(
   "WorkflowCheckMismatchError",
   {
     check: WorkflowCheckName,

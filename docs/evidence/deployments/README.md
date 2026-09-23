@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-08-31
+last_reviewed: 2026-09-24
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -11,6 +11,16 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
+
+## 2026-09-24 Alchemy beta.79 development plan
+
+The [sanitised receipt](./2026-09-24-alchemy-beta79-dev-plan/receipt.json)
+binds a checkout-scoped personal Doppler login, a completed Cloudflare
+state-store bootstrap with Worker HTTP 200 before and after, and an exact
+clean-commit `dev_cooper` plan. The [two-line plan](./2026-09-24-alchemy-beta79-dev-plan/plan.txt)
+proposes one `DocsWebsite` create. The bootstrap's precise mutation was not
+observed. No Website apply, Preview, Production, hosted journey or merge was
+attempted under this development-only approval.
 
 ## 2026-08-03 capability probe
 

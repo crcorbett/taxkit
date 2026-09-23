@@ -2,7 +2,7 @@ import { Schema } from "effect";
 
 import { FumadocsNonEmptyText, FumadocsSourceOperation } from "./schemas.js";
 
-export class FumadocsPageNotFoundError extends Schema.TaggedErrorClass<FumadocsPageNotFoundError>()(
+export class FumadocsPageNotFoundError extends Schema.TaggedError<FumadocsPageNotFoundError>()(
   "FumadocsPageNotFoundError",
   {
     locale: Schema.optional(Schema.String),
@@ -10,7 +10,7 @@ export class FumadocsPageNotFoundError extends Schema.TaggedErrorClass<FumadocsP
   }
 ) {}
 
-export class FumadocsSourceLoadError extends Schema.TaggedErrorClass<FumadocsSourceLoadError>()(
+export class FumadocsSourceLoadError extends Schema.TaggedError<FumadocsSourceLoadError>()(
   "FumadocsSourceLoadError",
   {
     message: FumadocsNonEmptyText,

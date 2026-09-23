@@ -3,7 +3,7 @@ const ProviderConfig = Config.schema(
   Schema.Struct({ token: Schema.Redacted(Schema.NonEmptyString) })
 );
 
-export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()(
+export class ProviderError extends Schema.TaggedError<ProviderError>()(
   "ProviderError",
   { message: Schema.String }
 ) {}

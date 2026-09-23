@@ -1,7 +1,5 @@
 import { Config, Data, Effect, Schema, SchemaGetter } from "effect";
 
-import { DocsDeploymentStage } from "../src/lib/build/docs-deployment-stage.js";
-
 const CommitSha = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
 const Sha256 = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u));
 const CloudflareAccountId = Schema.String.check(
@@ -17,6 +15,11 @@ const WorkersDevUrl = Schema.String.check(
   Schema.isPattern(
     /^https:\/\/(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+workers\.dev$/u
   )
+);
+// This proof input rejects invalid stage text independently of Alchemy's
+// deployment declaration; the workflow also checks the exact stage identity.
+const HostedProofStage = Schema.String.check(
+  Schema.isPattern(/^(?:prod|pr-[1-9]\d*)$/u)
 );
 const EvidenceDirectory = Schema.String.check(
   Schema.isMaxLength(512),
@@ -65,7 +68,7 @@ const HostedProofConfig = Schema.Struct({
     Schema.Union([Schema.Literal(""), ProviderIdentity])
   ),
   TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY: ProviderIdentity,
-  TAXKIT_DOCS_STAGE: DocsDeploymentStage,
+  TAXKIT_DOCS_STAGE: HostedProofStage,
   TAXKIT_DOCS_STATE_STORE_ID: ProviderIdentity,
   TAXKIT_DOCS_VERSION_ID: ProviderIdentity,
   TAXKIT_DOCS_WORKER_NAME: ProviderIdentity,
@@ -87,7 +90,7 @@ export interface CloudflareHostedProofConfig {
   readonly previewPrNumber: number | null;
   readonly previousVersionId: string | null;
   readonly rollbackRecoveryIdentity: string;
-  readonly stage: typeof DocsDeploymentStage.Type;
+  readonly stage: string;
   readonly stateStoreId: string;
   readonly versionId: string;
   readonly workerName: string;

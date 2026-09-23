@@ -459,17 +459,17 @@ export const Failed = Schema.Struct({
 });
 export type Failed = typeof Failed.Type;
 
-export class Hgi206CommandError extends Schema.TaggedErrorClass<Hgi206CommandError>()(
+export class Hgi206CommandError extends Schema.TaggedError<Hgi206CommandError>()(
   "Hgi206CommandError",
   { exitCode: Schema.Number, target: NonEmpty }
 ) {}
 
-export class Hgi206InputError extends Schema.TaggedErrorClass<Hgi206InputError>()(
+export class Hgi206InputError extends Schema.TaggedError<Hgi206InputError>()(
   "Hgi206InputError",
   { target: NonEmpty }
 ) {}
 
-export class Hgi206InvariantError extends Schema.TaggedErrorClass<Hgi206InvariantError>()(
+export class Hgi206InvariantError extends Schema.TaggedError<Hgi206InvariantError>()(
   "Hgi206InvariantError",
   {
     detailsPath: RelativePath,

@@ -9,6 +9,8 @@ import {
   AlchemyPlanFixtureManifest,
   alchemyPlanSourceCommit,
   alchemyPlanTextVersion,
+  historicalAlchemyPlanSourceCommit,
+  historicalAlchemyPlanTextVersion,
   projectAlchemyPlanText,
   stringifyWorkflowPlanProjection,
 } from "./workflow-plan-projection.js";
@@ -83,7 +85,7 @@ const readManifest = async () => {
   )(source);
 };
 
-describe("beta.64 Alchemy plan projection", () => {
+describe("Alchemy plan projection and historical capture custody", () => {
   test("binds the parser and fixture manifest to the exact dependency source", async () => {
     const [manifest, packageSource, lockfileSource] = await Promise.all([
       readManifest(),
@@ -99,17 +101,17 @@ describe("beta.64 Alchemy plan projection", () => {
       match.groups?.["version"] === undefined ? [] : [match.groups["version"]]
     );
 
-    expect(alchemyPlanTextVersion).toBe("2.0.0-beta.64");
+    expect(alchemyPlanTextVersion).toBe("2.0.0-beta.79");
     expect(alchemyPlanSourceCommit).toBe(
-      "31edd3c4b2f0f3310fad07f5423aee20cf72be8d"
+      "473c39591c7993a708199d0ef8f0d38416885dde"
     );
-    expect(manifest.alchemyVersion).toBe(alchemyPlanTextVersion);
-    expect(manifest.upstream.commit).toBe(alchemyPlanSourceCommit);
+    expect(manifest.alchemyVersion).toBe(historicalAlchemyPlanTextVersion);
+    expect(manifest.upstream.commit).toBe(historicalAlchemyPlanSourceCommit);
     expect(rootPackage.workspaces.catalog.alchemy).toBe(alchemyPlanTextVersion);
     expect(resolvedAlchemyVersions).toEqual([alchemyPlanTextVersion]);
   });
 
-  test("validates all five real captures and recomputes their sanitised digests", async () => {
+  test("validates all five historical captures and parses the shared action lines", async () => {
     const manifest = await readManifest();
     const seen = new Set<string>();
 
@@ -120,16 +122,24 @@ describe("beta.64 Alchemy plan projection", () => {
           "utf-8"
         );
         const digest = createHash("sha256").update(source).digest("hex");
-        const [resource] = await project(source, capture.kind);
-        return { capture, digest, resource, source };
+        const projected =
+          capture.scenario === "empty-destroy"
+            ? []
+            : await project(source, capture.kind);
+        const action =
+          capture.scenario === "empty-destroy" ? "noop" : projected[0]?.action;
+        return { action, capture, digest, source };
       })
     );
 
-    for (const { capture, digest, resource, source } of captures) {
+    for (const { action, capture, digest, source } of captures) {
       seen.add(capture.scenario);
       expect(Buffer.byteLength(source)).toBe(capture.finalBytes);
       expect(digest).toBe(capture.finalSha256);
-      expect(resource?.action).toBe(capture.action);
+      expect(action).toBe(capture.action);
+      if (capture.scenario === "empty-destroy") {
+        expect(source).toBe("Plan: no changes\n");
+      }
       expect(source).not.toMatch(
         /(?:https?:\/\/|CLOUDFLARE|credential|token|account(?:Id| ID)|\/Users\/|[A-Za-z]:\\\\)/iu
       );
@@ -469,6 +479,7 @@ describe("beta.64 Alchemy plan projection", () => {
         "Plan: no changes\n[DocsWebsite] delete\n",
         "Plan: 1 to delete\n",
         "Plan: no changes\nPlan: no changes\n",
+        "Plan: no changes\n",
       ].map((source) =>
         expect(project(source, "destroy")).rejects.toHaveProperty(
           "_tag",
@@ -478,7 +489,20 @@ describe("beta.64 Alchemy plan projection", () => {
     );
   });
 
-  test("normalises beta.64 ANSI and timestamp log variation without admitting it", async () => {
+  test("accepts beta.79's exact empty-resource summary only for destroy", async () => {
+    await expect(project("Plan: no resources\n", "destroy")).resolves.toEqual([
+      {
+        action: "noop",
+        logicalId: "DocsWebsite",
+        resourceType: "Cloudflare.Worker",
+      },
+    ]);
+    await expect(
+      project("Plan: no resources\n", "deploy")
+    ).rejects.toHaveProperty("_tag", "WorkflowPlanProjectionError");
+  });
+
+  test("normalises beta.79 ANSI and timestamp log variation without admitting it", async () => {
     await expect(
       project(
         "Plan: 1 to update\n\u001B[32m[DocsWebsite] update\u001B[0m\n[12:34:56.789] INFO update available\n",
@@ -491,5 +515,23 @@ describe("beta.64 Alchemy plan projection", () => {
         resourceType: "Cloudflare.Worker",
       },
     ]);
+    await expect(
+      project(
+        "[09:28:11.043] INFO (#1): Loading state\n[09:28:11.043] INFO (#1): Plan: 1 to create\n[09:28:11.043] INFO (#1): [DocsWebsite] create\n",
+        "deploy"
+      )
+    ).resolves.toEqual([
+      {
+        action: "create",
+        logicalId: "DocsWebsite",
+        resourceType: "Cloudflare.Worker",
+      },
+    ]);
+    await expect(
+      project(
+        "[09:28:11.043] INFO (#1): Plan: 1 to create\n[09:28:11.043] INFO (#1): [DocsWebsite] create\n[09:28:11.043] INFO (#1): [Unexpected] create\n",
+        "deploy"
+      )
+    ).rejects.toHaveProperty("_tag", "WorkflowPlanProjectionError");
   });
 });

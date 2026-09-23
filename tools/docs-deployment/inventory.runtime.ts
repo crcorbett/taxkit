@@ -1,5 +1,6 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
+import { docsCloudflareStackName } from "@taxkit/infrastructure/website";
 import { AlchemyContextLive, AuthProviders } from "alchemy";
 import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
 import { credentialsFilePath } from "alchemy/Auth/Credentials";
@@ -21,7 +22,6 @@ import {
 import * as FileSystem from "effect/FileSystem";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
-import { docsCloudflareStackName } from "../../apps/docs/src/lib/build/cloudflare-stack.js";
 import {
   readDocsDeploymentStateStoreCredentials,
   requireDocsDeploymentStateStoreAccount,
@@ -38,11 +38,11 @@ import {
 
 const InventoryRuntimeConfig = Config.unwrap({
   ci: Config.schema(Schema.Literals(["1", "true"]), "CI"),
-  profile: Config.string("ALCHEMY_PROFILE").pipe(Config.withDefault("default")),
-  reportPath: Config.string("TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT").pipe(
+  profile: Config.String("ALCHEMY_PROFILE").pipe(Config.withDefault("default")),
+  reportPath: Config.String("TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT").pipe(
     Config.option
   ),
-  stateCredentialsJson: Config.redacted(
+  stateCredentialsJson: Config.Redacted(
     "ALCHEMY_STATE_STORE_CREDENTIALS_JSON"
   ).pipe(Config.option),
 });
@@ -56,14 +56,13 @@ const deploymentStack = {
 };
 
 const platformLayer = Layer.mergeAll(
-  BunServices.layer,
   FetchHttpClient.layer,
   LoggingCli,
   Layer.succeed(AuthProviders, {}),
   Layer.succeed(ArtifactStore, createArtifactStore()),
   Layer.succeed(Stack, deploymentStack),
   Layer.succeed(Stage, "prod")
-);
+).pipe(Layer.provideMerge(BunServices.layer));
 const runtimeLayer = Layer.merge(
   platformLayer,
   AlchemyContextLive.pipe(Layer.provide(platformLayer))

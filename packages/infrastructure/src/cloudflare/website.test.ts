@@ -1,17 +1,17 @@
-import { Effect, Schema } from "effect";
 import { readFile } from "node:fs/promises";
+
+import { Effect, Schema } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { DocsDeploymentStage } from "../stage";
 import {
   decodeDocsCloudflareStackStage,
   docsWorkerAssetHeaders,
   docsWorkerObservability,
-} from "./cloudflare-stack";
-import { DocsDeploymentStage } from "./docs-deployment-stage";
+} from "./website";
 
-const decodeDocsDeploymentStage = Schema.decodeUnknownEffect(
-  DocsDeploymentStage
-);
+const decodeDocsDeploymentStage =
+  Schema.decodeUnknownEffect(DocsDeploymentStage);
 
 describe("docs Cloudflare stack policy", () => {
   it.each(["prod", "pr-1", "pr-214"])(
@@ -24,9 +24,9 @@ describe("docs Cloudflare stack policy", () => {
   it.each(["", "preview", "pr-0", "pr-01", "prod-2"])(
     "rejects the unowned deployment stage %s",
     (stage) => {
-      expect(
-        Effect.runSyncExit(decodeDocsDeploymentStage(stage))._tag
-      ).toBe("Failure");
+      expect(Effect.runSyncExit(decodeDocsDeploymentStage(stage))._tag).toBe(
+        "Failure"
+      );
     }
   );
 
@@ -34,9 +34,9 @@ describe("docs Cloudflare stack policy", () => {
     "accepts the local-only stack stage %s",
     (stage) => {
       expect(Effect.runSync(decodeDocsCloudflareStackStage(stage))).toBe(stage);
-      expect(
-        Effect.runSyncExit(decodeDocsDeploymentStage(stage))._tag
-      ).toBe("Failure");
+      expect(Effect.runSyncExit(decodeDocsDeploymentStage(stage))._tag).toBe(
+        "Failure"
+      );
     }
   );
 
@@ -69,7 +69,7 @@ describe("docs Cloudflare stack policy", () => {
 
   it("keeps immutable asset headers in the Vite public input", async () => {
     const headers = await readFile(
-      new URL("../../../public/_headers", import.meta.url),
+      new URL("../../../../apps/docs/public/_headers", import.meta.url),
       "utf-8"
     );
 

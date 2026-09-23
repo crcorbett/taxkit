@@ -131,10 +131,16 @@ while a future product workflow is still unscoped.
   and does not own an Effect runtime.
 
 Root `alchemy.run.ts`
-: Repository deployment composition for the docs app. It owns one stack,
-  stage admission, Cloudflare providers and remote state, one build resource
-  and one prebuilt Worker resource. It is not a package, reusable provider
-  facade or application runtime owner.
+: Repository deployment composition for the docs app. It owns Cloudflare
+  providers and remote state, decodes the stage, and calls the private
+  infrastructure package. It is not an application runtime owner.
+
+`packages/infrastructure`
+: Private source-only owner of the `TaxKitDocsCloudflare` stack identity,
+  deployment stage Schema and one `Cloudflare.Website.Vite("DocsWebsite")`
+  resource policy. Its outputs remain Alchemy Outputs until the deployment
+  boundary resolves them. The docs app has no runtime dependency on it;
+  app-local proof scripts independently assert expected built settings.
 
 `tools/docs-deployment`
 : Repository-local Schema, policy and command boundary for docs deployment

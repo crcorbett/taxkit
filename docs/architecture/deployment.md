@@ -32,12 +32,15 @@ intent and task state belong in the active SPEC and execution plan.
   `@cloudflare/vite-plugin@1.47.0` emits `dist/server/index.js`, its server
   modules and `dist/client` assets. The former docs-app Nitro/Vercel bridge was
   retired after local parity; `apps/web` remains a separate Nitro owner.
-- Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack. Hosted workflow
+- Root `alchemy.run.ts` composes one `TaxKitDocsCloudflare` stack. Hosted workflow
   and evidence admission remains branded `pr-<number>` or `prod`; local
   `alchemy dev` separately admits only Alchemy's `dev_<user>` default without
   widening that deployment Schema. The root also owns the mutation composition's
   `Cloudflare.state()`, and one logical
-  `Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy injects its
+  `Cloudflare.Website.Vite("DocsWebsite")` resource declared by private
+  `@taxkit/infrastructure`. That package owns the stage Schema, logical
+  identity and Website settings; root owns providers and remote state.
+  Alchemy injects its
   Cloudflare Vite integration, builds the app, and owns the SSR Worker/assets
   lifecycle and physical Worker name. The separate read-only inventory owner uses Alchemy's public
   `makeHttpStateStore` after an Effect FileSystem/Schema boundary decodes the
@@ -45,7 +48,7 @@ intent and task state belong in the active SPEC and execution plan.
   nested process cannot see that cache. Missing, malformed and unreadable
   credential input remain distinct safe failures; neither path can bootstrap,
   write or delete state.
-  The beta.64 Vite memo also includes the lockfile and the sibling
+  The beta.79 Vite memo also includes the lockfile and the sibling
   `docs-content` and `docs-fumadocs` package trees as native build inputs.
 - The Worker uses compatibility date `2026-06-24`, `nodejs_compat`, default
   asset-first full-stack routing, a provider Worker URL, built-in invocation
@@ -89,7 +92,8 @@ intent and task state belong in the active SPEC and execution plan.
 
 ```text
 frozen source and lock
-  -> root Cloudflare.Website.Vite("DocsWebsite")
+  -> root provider and state composition
+    -> @taxkit/infrastructure Website.Vite("DocsWebsite")
     -> Alchemy injects the Cloudflare Vite integration
     -> Vite builds the TanStack SSR Worker and client assets
     -> Alchemy applies one isolated pr-N or fixed prod website resource
@@ -135,10 +139,12 @@ parse Turbo's combined console output as provider evidence.
 
 Ephemeral GitHub runners do not retain Alchemy's derived
 `cloudflare-state-store` credential after a plan or apply. The three mutation
-workflows therefore run the supported `alchemy cloudflare bootstrap` operation
-with `CI=0` immediately before planning or teardown. A preceding supported
-`alchemy login` with `CI=1` writes only the `method: "env"` profile selector.
-Bootstrap is a mutation-capable control-plane operation: beta.64 may refresh
+workflows therefore run `alchemy provider cloudflare bootstrap` with `CI=1`
+immediately before planning or teardown. Alchemy beta.79 retired the old
+`alchemy login` and `alchemy cloudflare bootstrap` commands. Its Cloudflare
+provider reads the two named environment values supplied by the fixed Doppler
+bridge under `CI=1`, without storing a Cloudflare token in a profile.
+Bootstrap is a mutation-capable control-plane operation: beta.79 may refresh
 credentials, use a short-lived edge-preview Worker to read the secret, and
 create or upgrade the state-store Worker before caching the account-matched
 credential on that runner. The inventory command reads the resulting cache
@@ -147,7 +153,7 @@ local OAuth profile is copied into CI.
 
 After bootstrap and plan complete, the closed `workflow-evidence` Effect
 command writes a sanitised bootstrap receipt. It binds the exact candidate,
-stage, workflow run, Alchemy `2.0.0-beta.64` and matching upstream source
+stage, workflow run, Alchemy `2.0.0-beta.79` and matching upstream source
 commit to those three allowed effects. It records state-store facts before and
 after as `not-observed`; successful bootstrap command completion is not a
 claim that no provider mutation occurred or that provider state was read back.
@@ -320,21 +326,26 @@ so these two identities are intentionally distinct. The hosted receipt must
 match stage semantics with exactly one desktop and one mobile screenshot.
 The current workflow adapter keeps shared evidence meanings in one closed-mode
 Effect command. It calculates tracked candidate identities, calls the existing
-beta.64 plan projection owner, decodes the existing state/provider inventory
+beta.79 plan projection owner, decodes the existing state/provider inventory
 and bounded Wrangler deployment JSON, and Schema-encodes plan, bootstrap,
 provider and GitHub output files. The command has no Alchemy, Wrangler or
 GitHub execution capability. YAML still owns environment protection,
 permissions, the exact non-cancellable lock, operation choice and provider
 command order.
-The plan parser and its proof move together. Five real sanitised plan captures
+The plan parser and its proof move together. Beta.79's upstream
+`formatPlanLines` emits `Plan: no resources` for an empty plan. The current
+parser admits that text only for an already-absent teardown; it rejects the
+former empty-plan text. Five real sanitised plan captures
 under `tools/docs-deployment/fixtures/alchemy-beta.64/` bind create, update,
 no-op, delete and already-absent destroy to Alchemy `2.0.0-beta.64` and exact
 upstream commit `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`. Their manifest records the
 GitHub run and artefact route, redaction rule and raw/final digests. Tests
 strictly decode the manifest, recompute fixture digests and reject version
 drift, unexpected resources, unsupported actions and malformed lines. These
-retained captures prove parser compatibility only, not current provider or
-hosted state.
+retained captures prove historical beta.64 output and digest custody. Four
+shared action formats also pass the current parser; the old empty-plan format
+does not. Neither upstream source nor these captures prove current provider
+or hosted state.
 Report-only dispatch is
 forced to the reviewed default branch before installing dependencies or
 materialising the state bearer, while Preview rejects non-numeric PR identity
@@ -403,8 +414,9 @@ does not prove provider or public availability.
 ## Guardrails
 
 - Do not couple engine packages to deployment providers.
-- Keep provider composition at root and app build semantics in `apps/docs`;
-  do not add an infrastructure package or expose a raw provider client.
+- Keep provider composition at root, one resource declaration in
+  `@taxkit/infrastructure`, and app build semantics in `apps/docs`.
+  Do not expose a raw provider client.
 - Decode stage and provider readback representations at their ingress and keep
   physical names and URLs provider-owned.
 - Treat `.wrangler/**` and `apps/docs/dist/**` as ignored generated output.

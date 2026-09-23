@@ -2,8 +2,11 @@ import { Effect, Schema } from "effect";
 
 import type { DeploymentPlanProjection } from "./schemas.js";
 
-export const alchemyPlanTextVersion = "2.0.0-beta.64" as const;
+export const alchemyPlanTextVersion = "2.0.0-beta.79" as const;
 export const alchemyPlanSourceCommit =
+  "473c39591c7993a708199d0ef8f0d38416885dde" as const;
+export const historicalAlchemyPlanTextVersion = "2.0.0-beta.64" as const;
+export const historicalAlchemyPlanSourceCommit =
   "31edd3c4b2f0f3310fad07f5423aee20cf72be8d" as const;
 
 const Sha256 = Schema.String.check(Schema.isPattern(/^[0-9a-f]{64}$/u));
@@ -66,7 +69,7 @@ const FixtureCapture = Schema.Union([
 ]);
 
 export const AlchemyPlanFixtureManifest = Schema.Struct({
-  alchemyVersion: Schema.Literal(alchemyPlanTextVersion),
+  alchemyVersion: Schema.Literal(historicalAlchemyPlanTextVersion),
   captures: Schema.Array(FixtureCapture).pipe(
     Schema.check(Schema.isLengthBetween(5, 5))
   ),
@@ -84,7 +87,7 @@ export const AlchemyPlanFixtureManifest = Schema.Struct({
   }),
   schemaVersion: Schema.Literal(1),
   upstream: Schema.Struct({
-    commit: Schema.Literal(alchemyPlanSourceCommit),
+    commit: Schema.Literal(historicalAlchemyPlanSourceCommit),
     repository: Schema.Literal("https://github.com/sam-goodwin/alchemy"),
   }),
 });
@@ -120,7 +123,7 @@ export const WorkflowPlanProjectionKind = Schema.Literals([
 ]);
 export type WorkflowPlanProjectionKind = typeof WorkflowPlanProjectionKind.Type;
 
-export class WorkflowPlanProjectionError extends Schema.TaggedErrorClass<WorkflowPlanProjectionError>()(
+export class WorkflowPlanProjectionError extends Schema.TaggedError<WorkflowPlanProjectionError>()(
   "WorkflowPlanProjectionError",
   {
     reason: Schema.NonEmptyString,
@@ -130,6 +133,8 @@ export class WorkflowPlanProjectionError extends Schema.TaggedErrorClass<Workflo
 // oxlint-disable-next-line eslint/no-control-regex -- ANSI colour is an explicit Alchemy host-output boundary.
 const ansiEscape = /\u001B\[[0-?]*[ -/]*[@-~]/gu;
 const timestampLog = /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] [A-Z]+ /u;
+const timestampedPlanLine =
+  /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] INFO \(#\d+\): (?<planLine>Plan: .+|\[[^\]]+\] .+)$/u;
 const resourceLine = /^\[[^\]]+\] /u;
 const nativeResourceLine = /^\[DocsWebsite\] (?:create|update|noop|delete)$/u;
 const planSummaryLine = /^Plan: /u;
@@ -145,11 +150,17 @@ export const projectAlchemyPlanText = (
     const lines = source
       .replace(ansiEscape, "")
       .split(/\r?\n/u)
-      .filter((line) => !timestampLog.test(line));
+      .flatMap((line) => {
+        const planLine = timestampedPlanLine.exec(line)?.groups?.["planLine"];
+        if (planLine !== undefined) {
+          return [planLine];
+        }
+        return timestampLog.test(line) ? [] : [line];
+      });
     const planSummaries = lines.filter((line) => planSummaryLine.test(line));
     if (planSummaries.length !== 1) {
       return yield* fail(
-        "beta.64 Alchemy plan output must contain exactly one plan summary"
+        "beta.79 Alchemy plan output must contain exactly one plan summary"
       );
     }
     if (
@@ -160,7 +171,7 @@ export const projectAlchemyPlanText = (
           !resourceLine.test(line)
       )
     ) {
-      return yield* fail("unsupported beta.64 Alchemy plan output line");
+      return yield* fail("unsupported beta.79 Alchemy plan output line");
     }
 
     const resourceLines = lines.filter((line) => resourceLine.test(line));
@@ -168,7 +179,7 @@ export const projectAlchemyPlanText = (
       (line) => !nativeResourceLine.test(line)
     );
     if (unexpected.length > 0) {
-      return yield* fail("unsupported beta.64 Alchemy plan resource line");
+      return yield* fail("unsupported beta.79 Alchemy plan resource line");
     }
 
     const resources = yield* Effect.all(
@@ -224,11 +235,11 @@ export const projectAlchemyPlanText = (
 
     const expectedSummary =
       resources.length === 0
-        ? "Plan: no changes"
+        ? "Plan: no resources"
         : `Plan: 1 to ${resources[0]?.action}`;
     if (planSummaries[0] !== expectedSummary) {
       return yield* fail(
-        "beta.64 Alchemy plan summary does not match its native resource action"
+        "beta.79 Alchemy plan summary does not match its native resource action"
       );
     }
 

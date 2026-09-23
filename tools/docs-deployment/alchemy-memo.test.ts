@@ -1,12 +1,11 @@
 import { describe, expect, test } from "bun:test";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
+import { docsWorkerMemo } from "@taxkit/infrastructure/website";
 import { hashDirectory } from "alchemy/Command/Memo";
 import { Effect } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
-
-import { docsWorkerMemo } from "../../apps/docs/src/lib/build/cloudflare-stack.js";
 
 describe("native Alchemy docs memo", () => {
   test("invalidates for both sibling docs workspaces", async () => {

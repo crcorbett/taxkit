@@ -254,17 +254,17 @@ export const EpochValidation = Schema.Struct({
 });
 export type EpochValidation = typeof EpochValidation.Type;
 
-export class EpochInputError extends Schema.TaggedErrorClass<EpochInputError>()(
+export class EpochInputError extends Schema.TaggedError<EpochInputError>()(
   "EpochInputError",
   { target: NonEmpty }
 ) {}
 
-export class EpochCommandError extends Schema.TaggedErrorClass<EpochCommandError>()(
+export class EpochCommandError extends Schema.TaggedError<EpochCommandError>()(
   "EpochCommandError",
   { exitCode: Schema.Number, target: NonEmpty }
 ) {}
 
-export class EpochInvariantError extends Schema.TaggedErrorClass<EpochInvariantError>()(
+export class EpochInvariantError extends Schema.TaggedError<EpochInvariantError>()(
   "EpochInvariantError",
   { invariant: NonEmpty, recovery: NonEmpty, target: NonEmpty }
 ) {}

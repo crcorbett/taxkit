@@ -19,7 +19,7 @@ import { taxKitOpenApiSpec } from "../src/openapi.js";
 
 const snapshotUrl = new URL("../__snapshots__/openapi.json", import.meta.url);
 
-const updateOpenApiSnapshot = Config.boolean(
+const updateOpenApiSnapshot = Config.Boolean(
   "UPDATE_TAXKIT_OPENAPI_SNAPSHOT"
 ).pipe(Config.withDefault(false));
 

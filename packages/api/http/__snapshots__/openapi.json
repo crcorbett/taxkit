@@ -1,7 +1,7 @@
 {
   "components": {
     "schemas": {
-      "AnnualTaxLedger": {
+      "AnnualTaxLedgerEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -17,7 +17,7 @@
                   "type": "string"
                 },
                 "amount": {
-                  "$ref": "#/components/schemas/Money"
+                  "$ref": "#/components/schemas/MoneyEncoded"
                 },
                 "effect": {
                   "enum": ["additive", "subtractive", "informational"],
@@ -51,7 +51,7 @@
             "type": "array"
           },
           "rawLiability": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           },
           "trace": {
             "$ref": "#/components/schemas/Objects_"
@@ -60,7 +60,7 @@
         "required": ["_tag", "components", "rawLiability", "trace"],
         "type": "object"
       },
-      "AnnualTaxReport": {
+      "AnnualTaxReportEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -68,20 +68,20 @@
             "type": "string"
           },
           "ledger": {
-            "$ref": "#/components/schemas/AnnualTaxLedger"
+            "$ref": "#/components/schemas/AnnualTaxLedgerEncoded"
           },
           "liability": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           },
           "rawLiability": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           },
           "rulePackVersion": {
             "enum": ["rules-au-income-tax/1.0.0"],
             "type": "string"
           },
           "taxableIncome": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           },
           "trace": {
             "$ref": "#/components/schemas/Objects_"
@@ -98,7 +98,7 @@
         ],
         "type": "object"
       },
-      "CalculationDiagnostics": {
+      "CalculationDiagnosticsEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -107,7 +107,7 @@
           },
           "graphIssues": {
             "items": {
-              "$ref": "#/components/schemas/GraphValidationIssue"
+              "$ref": "#/components/schemas/GraphValidationIssueEncoded"
             },
             "type": "array"
           }
@@ -115,7 +115,7 @@
         "required": ["_tag", "graphIssues"],
         "type": "object"
       },
-      "CalculationError": {
+      "CalculationErrorEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -137,7 +137,7 @@
         "required": ["_tag", "message"],
         "type": "object"
       },
-      "CalculatorInputDecodeError": {
+      "CalculatorInputDecodeErrorEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -179,7 +179,7 @@
                     "question": {
                       "anyOf": [
                         {
-                          "$ref": "#/components/schemas/FactQuestion"
+                          "$ref": "#/components/schemas/FactQuestionEncoded"
                         },
                         {
                           "type": "null"
@@ -202,7 +202,7 @@
           },
           "issues": {
             "items": {
-              "$ref": "#/components/schemas/CalculatorInputIssue"
+              "$ref": "#/components/schemas/CalculatorInputIssueEncoded"
             },
             "type": "array"
           },
@@ -213,7 +213,7 @@
         "required": ["_tag", "issues", "message"],
         "type": "object"
       },
-      "CalculatorInputIssue": {
+      "CalculatorInputIssueEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -233,7 +233,7 @@
         "required": ["_tag", "message", "path"],
         "type": "object"
       },
-      "FactQuestion": {
+      "FactQuestionEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -264,7 +264,7 @@
         "required": ["_tag", "id", "inputKind", "prompt"],
         "type": "object"
       },
-      "GraphValidationIssue": {
+      "GraphValidationIssueEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -289,7 +289,7 @@
         "required": ["_tag", "kind", "message"],
         "type": "object"
       },
-      "GrossPay": {
+      "GrossPayEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -297,7 +297,7 @@
             "type": "string"
           },
           "amount": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           },
           "period": {
             "enum": ["weekly", "fortnightly", "monthly"],
@@ -307,7 +307,7 @@
         "required": ["_tag", "amount", "period"],
         "type": "object"
       },
-      "Money": {
+      "MoneyEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -418,7 +418,7 @@
         ],
         "type": "object"
       },
-      "PayWithholdingsLedger": {
+      "PayWithholdingsLedgerEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -434,7 +434,7 @@
                   "type": "string"
                 },
                 "amount": {
-                  "$ref": "#/components/schemas/Money"
+                  "$ref": "#/components/schemas/MoneyEncoded"
                 },
                 "effect": {
                   "enum": ["additive", "subtractive", "informational"],
@@ -472,7 +472,7 @@
             "type": "string"
           },
           "total": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           },
           "trace": {
             "$ref": "#/components/schemas/Objects_"
@@ -481,7 +481,7 @@
         "required": ["_tag", "components", "period", "total", "trace"],
         "type": "object"
       },
-      "TakeHomePayReport": {
+      "TakeHomePayReportEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -489,10 +489,10 @@
             "type": "string"
           },
           "grossPay": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           },
           "netPay": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           },
           "period": {
             "enum": ["weekly", "fortnightly", "monthly"],
@@ -503,16 +503,16 @@
             "type": "string"
           },
           "taxablePay": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           },
           "trace": {
             "$ref": "#/components/schemas/Objects_"
           },
           "withholdings": {
-            "$ref": "#/components/schemas/PayWithholdingsLedger"
+            "$ref": "#/components/schemas/PayWithholdingsLedgerEncoded"
           },
           "withholdingsTotal": {
-            "$ref": "#/components/schemas/Money"
+            "$ref": "#/components/schemas/MoneyEncoded"
           }
         },
         "required": [
@@ -528,7 +528,7 @@
         ],
         "type": "object"
       },
-      "UnsupportedCalculatorContextError": {
+      "UnsupportedCalculatorContextErrorEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -568,8 +568,16 @@
               "taxYear": {
                 "anyOf": [
                   {
-                    "enum": ["2025-26", "2025-26"],
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "enum": ["2025-26"],
+                        "type": "string"
+                      },
+                      {
+                        "enum": ["2025-26"],
+                        "type": "string"
+                      }
+                    ]
                   },
                   {
                     "type": "null"
@@ -602,7 +610,7 @@
         "required": ["_tag", "context", "message", "requestedCalculator"],
         "type": "object"
       },
-      "UnsupportedCalculatorError": {
+      "UnsupportedCalculatorErrorEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
@@ -706,8 +714,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["2025-26", "2025-26"],
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    },
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    }
+                  ]
                 },
                 {
                   "type": "null"
@@ -770,8 +786,16 @@
                                 ]
                               },
                               "taxYear": {
-                                "enum": ["2025-26", "2025-26"],
-                                "type": "string"
+                                "anyOf": [
+                                  {
+                                    "enum": ["2025-26"],
+                                    "type": "string"
+                                  },
+                                  {
+                                    "enum": ["2025-26"],
+                                    "type": "string"
+                                  }
+                                ]
                               }
                             },
                             "required": ["jurisdiction", "taxYear"],
@@ -935,8 +959,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["2025-26", "2025-26"],
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    },
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    }
+                  ]
                 },
                 {
                   "type": "null"
@@ -992,8 +1024,16 @@
                           ]
                         },
                         "taxYear": {
-                          "enum": ["2025-26", "2025-26"],
-                          "type": "string"
+                          "anyOf": [
+                            {
+                              "enum": ["2025-26"],
+                              "type": "string"
+                            },
+                            {
+                              "enum": ["2025-26"],
+                              "type": "string"
+                            }
+                          ]
                         }
                       },
                       "required": ["jurisdiction", "taxYear"],
@@ -1067,16 +1107,16 @@
                     "error": {
                       "anyOf": [
                         {
-                          "$ref": "#/components/schemas/CalculationError"
+                          "$ref": "#/components/schemas/CalculationErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/CalculatorInputDecodeError"
+                          "$ref": "#/components/schemas/CalculatorInputDecodeErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorError"
+                          "$ref": "#/components/schemas/UnsupportedCalculatorErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorContextError"
+                          "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
                     }
@@ -1155,7 +1195,7 @@
                         "additionalProperties": false,
                         "properties": {
                           "grossPay": {
-                            "$ref": "#/components/schemas/GrossPay"
+                            "$ref": "#/components/schemas/GrossPayEncoded"
                           },
                           "taxFreeThresholdClaimed": {
                             "type": "boolean"
@@ -1168,7 +1208,7 @@
                         "additionalProperties": false,
                         "properties": {
                           "taxableIncome": {
-                            "$ref": "#/components/schemas/Money"
+                            "$ref": "#/components/schemas/MoneyEncoded"
                           }
                         },
                         "required": ["taxableIncome"],
@@ -1206,8 +1246,16 @@
                   "taxYear": {
                     "anyOf": [
                       {
-                        "enum": ["2025-26", "2025-26"],
-                        "type": "string"
+                        "anyOf": [
+                          {
+                            "enum": ["2025-26"],
+                            "type": "string"
+                          },
+                          {
+                            "enum": ["2025-26"],
+                            "type": "string"
+                          }
+                        ]
                       },
                       {
                         "type": "null"
@@ -1275,8 +1323,16 @@
                               ]
                             },
                             "taxYear": {
-                              "enum": ["2025-26", "2025-26"],
-                              "type": "string"
+                              "anyOf": [
+                                {
+                                  "enum": ["2025-26"],
+                                  "type": "string"
+                                },
+                                {
+                                  "enum": ["2025-26"],
+                                  "type": "string"
+                                }
+                              ]
                             }
                           },
                           "required": ["jurisdiction", "taxYear"],
@@ -1338,18 +1394,18 @@
                       "type": "object"
                     },
                     "diagnostics": {
-                      "$ref": "#/components/schemas/CalculationDiagnostics"
+                      "$ref": "#/components/schemas/CalculationDiagnosticsEncoded"
                     },
                     "report": {
                       "anyOf": [
                         {
-                          "$ref": "#/components/schemas/TakeHomePayReport"
+                          "$ref": "#/components/schemas/TakeHomePayReportEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/PayWithholdingsLedger"
+                          "$ref": "#/components/schemas/PayWithholdingsLedgerEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/AnnualTaxReport"
+                          "$ref": "#/components/schemas/AnnualTaxReportEncoded"
                         }
                       ]
                     }
@@ -1370,16 +1426,16 @@
                     "error": {
                       "anyOf": [
                         {
-                          "$ref": "#/components/schemas/CalculationError"
+                          "$ref": "#/components/schemas/CalculationErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/CalculatorInputDecodeError"
+                          "$ref": "#/components/schemas/CalculatorInputDecodeErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorError"
+                          "$ref": "#/components/schemas/UnsupportedCalculatorErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorContextError"
+                          "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
                     }
@@ -1461,8 +1517,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["2025-26", "2025-26"],
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    },
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    }
+                  ]
                 },
                 {
                   "type": "null"
@@ -1524,8 +1588,16 @@
                               ]
                             },
                             "taxYear": {
-                              "enum": ["2025-26", "2025-26"],
-                              "type": "string"
+                              "anyOf": [
+                                {
+                                  "enum": ["2025-26"],
+                                  "type": "string"
+                                },
+                                {
+                                  "enum": ["2025-26"],
+                                  "type": "string"
+                                }
+                              ]
                             }
                           },
                           "required": ["jurisdiction", "taxYear"],
@@ -1619,7 +1691,7 @@
                           "question": {
                             "anyOf": [
                               {
-                                "$ref": "#/components/schemas/FactQuestion"
+                                "$ref": "#/components/schemas/FactQuestionEncoded"
                               },
                               {
                                 "type": "null"
@@ -1796,7 +1868,7 @@
                     },
                     "validationIssues": {
                       "items": {
-                        "$ref": "#/components/schemas/GraphValidationIssue"
+                        "$ref": "#/components/schemas/GraphValidationIssueEncoded"
                       },
                       "type": "array"
                     }
@@ -1823,16 +1895,16 @@
                     "error": {
                       "anyOf": [
                         {
-                          "$ref": "#/components/schemas/CalculationError"
+                          "$ref": "#/components/schemas/CalculationErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/CalculatorInputDecodeError"
+                          "$ref": "#/components/schemas/CalculatorInputDecodeErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorError"
+                          "$ref": "#/components/schemas/UnsupportedCalculatorErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorContextError"
+                          "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
                     }
@@ -1937,8 +2009,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["2025-26", "2025-26"],
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    },
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    }
+                  ]
                 },
                 {
                   "type": "null"
@@ -2000,8 +2080,16 @@
                               ]
                             },
                             "taxYear": {
-                              "enum": ["2025-26", "2025-26"],
-                              "type": "string"
+                              "anyOf": [
+                                {
+                                  "enum": ["2025-26"],
+                                  "type": "string"
+                                },
+                                {
+                                  "enum": ["2025-26"],
+                                  "type": "string"
+                                }
+                              ]
                             }
                           },
                           "required": ["jurisdiction", "taxYear"],
@@ -2076,7 +2164,7 @@
                           "question": {
                             "anyOf": [
                               {
-                                "$ref": "#/components/schemas/FactQuestion"
+                                "$ref": "#/components/schemas/FactQuestionEncoded"
                               },
                               {
                                 "type": "null"
@@ -2109,7 +2197,7 @@
                           "question": {
                             "anyOf": [
                               {
-                                "$ref": "#/components/schemas/FactQuestion"
+                                "$ref": "#/components/schemas/FactQuestionEncoded"
                               },
                               {
                                 "type": "null"
@@ -2310,16 +2398,16 @@
                     "error": {
                       "anyOf": [
                         {
-                          "$ref": "#/components/schemas/CalculationError"
+                          "$ref": "#/components/schemas/CalculationErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/CalculatorInputDecodeError"
+                          "$ref": "#/components/schemas/CalculatorInputDecodeErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorError"
+                          "$ref": "#/components/schemas/UnsupportedCalculatorErrorEncoded"
                         },
                         {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorContextError"
+                          "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
                     }
@@ -2408,8 +2496,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["2025-26", "2025-26"],
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    },
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    }
+                  ]
                 },
                 {
                   "type": "null"
@@ -2439,7 +2535,7 @@
                           "question": {
                             "anyOf": [
                               {
-                                "$ref": "#/components/schemas/FactQuestion"
+                                "$ref": "#/components/schemas/FactQuestionEncoded"
                               },
                               {
                                 "type": "null"
@@ -2601,8 +2697,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["2025-26", "2025-26"],
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    },
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    }
+                  ]
                 },
                 {
                   "type": "null"
@@ -2831,8 +2935,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["2025-26", "2025-26"],
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    },
+                    {
+                      "enum": ["2025-26"],
+                      "type": "string"
+                    }
+                  ]
                 },
                 {
                   "type": "null"
@@ -2873,8 +2985,16 @@
                             ]
                           },
                           "taxYear": {
-                            "enum": ["2025-26", "2025-26"],
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "enum": ["2025-26"],
+                                "type": "string"
+                              },
+                              {
+                                "enum": ["2025-26"],
+                                "type": "string"
+                              }
+                            ]
                           }
                         },
                         "required": ["jurisdiction", "taxYear"],

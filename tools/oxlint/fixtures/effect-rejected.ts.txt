@@ -11,7 +11,7 @@ import {
   Schema as S,
 } from "effect";
 
-const TaggedSchemaError = S.TaggedErrorClass;
+const TaggedSchemaError = S.TaggedError;
 const { Unknown: UnknownCause } = S;
 
 export class UntypedError extends TaggedSchemaError<UntypedError>()(

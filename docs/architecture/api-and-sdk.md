@@ -272,6 +272,12 @@ that is valid for a different calculator must fail as
 `CalculatorInputDecodeError` with descriptor-backed help for the selected
 calculator.
 
+The Effect `4.0.0-rc.117` upgrade changes generated OpenAPI component names
+to encoded-side names ending in `Encoded` and adds a nested union around
+supported tax years. The API package owns this document change and its
+snapshot. Public route paths, status codes and JSON field names remain stable;
+route tests and the standalone API smoke check cover those runtime claims.
+
 Public JSON examples must use canonical schema values, including tagged values
 such as `GrossPay` and `Money` where the owning schema requires those tags.
 

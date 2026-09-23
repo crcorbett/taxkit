@@ -28,6 +28,7 @@ Implemented packages and apps:
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
 - `packages/scripts`
+- `packages/infrastructure` (private, source-only deployment graph)
 - `packages/testing`
 - `packages/tsconfig`
 

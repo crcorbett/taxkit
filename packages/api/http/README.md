@@ -185,6 +185,12 @@ bun run --filter=api smoke:public-routes
 module, so a route, method, status envelope or schema-reference change flows
 through the same `OpenApi.fromApi(TaxKitApi)` call graph.
 
+Effect `4.0.0-rc.117` generates encoded component names with an `Encoded`
+suffix and nests the supported tax-year union one level deeper. The current
+snapshot records that document change. The route paths, methods, status codes
+and JSON field names remain the same; the API smoke and route tests check
+their runtime behaviour.
+
 The committed normalized snapshot lives at:
 
 ```txt

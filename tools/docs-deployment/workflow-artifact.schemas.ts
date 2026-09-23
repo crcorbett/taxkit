@@ -15,7 +15,7 @@ export const WorkflowArtifactConfig = Schema.Struct({
   TAXKIT_WORKFLOW_ARTIFACT_UPLOAD: Schema.NonEmptyString,
 });
 
-export class WorkflowArtifactPreparationError extends Schema.TaggedErrorClass<WorkflowArtifactPreparationError>()(
+export class WorkflowArtifactPreparationError extends Schema.TaggedError<WorkflowArtifactPreparationError>()(
   "WorkflowArtifactPreparationError",
   {
     path: Schema.NonEmptyString,

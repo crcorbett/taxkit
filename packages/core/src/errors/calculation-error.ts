@@ -5,7 +5,7 @@ import { Schema } from "effect";
  *
  * @since 0.1.0
  */
-export class CalculationError extends Schema.TaggedErrorClass<CalculationError>()(
+export class CalculationError extends Schema.TaggedError<CalculationError>()(
   "CalculationError",
   {
     cause: Schema.optional(Schema.Unknown),

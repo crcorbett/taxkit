@@ -14,6 +14,10 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
+The [Alchemy and Doppler modernisation](./alchemy-doppler-modernisation.md)
+plan tracks the current one-resource ownership move, compatible Alchemy and
+Effect v4 upgrade, Doppler reconciliation and bounded delivery proof.
+
 The implemented [Oxlint policy refresh](../../product-specs/oxlint-policy-refresh.md)
 and its [completed plan](../completed/oxlint-policy-refresh.md) record the
 current generic and Effect anti-slop policy, structural finding fixes, local

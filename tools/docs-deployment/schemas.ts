@@ -1,6 +1,5 @@
+import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import { Schema } from "effect";
-
-import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
 
 const CommitSha = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
 const Sha256 = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u));
@@ -1250,12 +1249,12 @@ export const DeploymentResumePreflightReceipt = Schema.Struct({
 export type DeploymentResumePreflightReceipt =
   typeof DeploymentResumePreflightReceipt.Type;
 
-export class DocsDeploymentInputError extends Schema.TaggedErrorClass<DocsDeploymentInputError>()(
+export class DocsDeploymentInputError extends Schema.TaggedError<DocsDeploymentInputError>()(
   "DocsDeploymentInputError",
   { target: Schema.NonEmptyString }
 ) {}
 
-export class DocsDeploymentPolicyError extends Schema.TaggedErrorClass<DocsDeploymentPolicyError>()(
+export class DocsDeploymentPolicyError extends Schema.TaggedError<DocsDeploymentPolicyError>()(
   "DocsDeploymentPolicyError",
   { findings: Schema.NonEmptyArray(Schema.NonEmptyString) }
 ) {}
