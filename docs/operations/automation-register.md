@@ -61,11 +61,12 @@ Teardown executes reviewed default-branch code rather than pull-request-head
 code.
 
 Because GitHub runners are ephemeral, each mutation workflow refreshes the
-account-matched Alchemy `cloudflare-state-store` cache with the installed
-`alchemy cloudflare bootstrap` command before it reads provider/state
-postconditions. The preceding `alchemy login` command persists only the
-environment-method selector; the token remains a GitHub environment secret.
-That bootstrap is mutation-capable: beta.64 may refresh credentials, read a
+account-matched Alchemy `cloudflare-state-store` cache with
+`alchemy provider cloudflare bootstrap` under `CI=1` before it reads
+provider/state postconditions. Alchemy beta.79 reads the named Cloudflare
+values supplied by the fixed Doppler bridge directly from the environment;
+it does not need a profile login or persist the token in a profile.
+That bootstrap is mutation-capable: beta.79 may refresh credentials, read a
 short-lived edge-preview secret, and create or upgrade the state-store Worker.
 The sanitised workflow receipt records those allowed effects and explicitly
 records its before/after provider facts as not observed. No local OAuth

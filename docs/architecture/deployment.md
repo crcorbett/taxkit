@@ -139,9 +139,11 @@ parse Turbo's combined console output as provider evidence.
 
 Ephemeral GitHub runners do not retain Alchemy's derived
 `cloudflare-state-store` credential after a plan or apply. The three mutation
-workflows therefore run the supported `alchemy cloudflare bootstrap` operation
-with `CI=0` immediately before planning or teardown. A preceding supported
-`alchemy login` with `CI=1` writes only the `method: "env"` profile selector.
+workflows therefore run `alchemy provider cloudflare bootstrap` with `CI=1`
+immediately before planning or teardown. Alchemy beta.79 retired the old
+`alchemy login` and `alchemy cloudflare bootstrap` commands. Its Cloudflare
+provider reads the two named environment values supplied by the fixed Doppler
+bridge under `CI=1`, without storing a Cloudflare token in a profile.
 Bootstrap is a mutation-capable control-plane operation: beta.79 may refresh
 credentials, use a short-lived edge-preview Worker to read the secret, and
 create or upgrade the state-store Worker before caching the account-matched

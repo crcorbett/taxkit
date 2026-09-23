@@ -259,11 +259,10 @@ describe("docs deployment workflow admission", () => {
     );
     for (const source of sources) {
       expect(source).toContain(
-        'ALCHEMY_PLAIN=1 CI=1 bunx alchemy login --profile "$ALCHEMY_PROFILE" > /dev/null'
+        'ALCHEMY_PLAIN=1 CI=1 bunx alchemy provider cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store'
       );
-      expect(source).toContain(
-        'ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store'
-      );
+      expect(source).not.toContain("bunx alchemy login");
+      expect(source).not.toContain("bunx alchemy cloudflare bootstrap");
     }
   });
 

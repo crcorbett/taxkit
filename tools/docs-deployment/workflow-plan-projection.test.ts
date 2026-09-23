@@ -515,5 +515,23 @@ describe("Alchemy plan projection and historical capture custody", () => {
         resourceType: "Cloudflare.Worker",
       },
     ]);
+    await expect(
+      project(
+        "[09:28:11.043] INFO (#1): Loading state\n[09:28:11.043] INFO (#1): Plan: 1 to create\n[09:28:11.043] INFO (#1): [DocsWebsite] create\n",
+        "deploy"
+      )
+    ).resolves.toEqual([
+      {
+        action: "create",
+        logicalId: "DocsWebsite",
+        resourceType: "Cloudflare.Worker",
+      },
+    ]);
+    await expect(
+      project(
+        "[09:28:11.043] INFO (#1): Plan: 1 to create\n[09:28:11.043] INFO (#1): [DocsWebsite] create\n[09:28:11.043] INFO (#1): [Unexpected] create\n",
+        "deploy"
+      )
+    ).rejects.toHaveProperty("_tag", "WorkflowPlanProjectionError");
   });
 });

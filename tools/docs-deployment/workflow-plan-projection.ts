@@ -133,6 +133,8 @@ export class WorkflowPlanProjectionError extends Schema.TaggedError<WorkflowPlan
 // oxlint-disable-next-line eslint/no-control-regex -- ANSI colour is an explicit Alchemy host-output boundary.
 const ansiEscape = /\u001B\[[0-?]*[ -/]*[@-~]/gu;
 const timestampLog = /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] [A-Z]+ /u;
+const timestampedPlanLine =
+  /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] INFO \(#\d+\): (?<planLine>Plan: .+|\[[^\]]+\] .+)$/u;
 const resourceLine = /^\[[^\]]+\] /u;
 const nativeResourceLine = /^\[DocsWebsite\] (?:create|update|noop|delete)$/u;
 const planSummaryLine = /^Plan: /u;
@@ -148,7 +150,13 @@ export const projectAlchemyPlanText = (
     const lines = source
       .replace(ansiEscape, "")
       .split(/\r?\n/u)
-      .filter((line) => !timestampLog.test(line));
+      .flatMap((line) => {
+        const planLine = timestampedPlanLine.exec(line)?.groups?.["planLine"];
+        if (planLine !== undefined) {
+          return [planLine];
+        }
+        return timestampLog.test(line) ? [] : [line];
+      });
     const planSummaries = lines.filter((line) => planSummaryLine.test(line));
     if (planSummaries.length !== 1) {
       return yield* fail(

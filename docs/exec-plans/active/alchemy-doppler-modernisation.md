@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-09-23
+last_reviewed: 2026-09-24
 review_trigger: task progress, version, proof, provider authority, or lifecycle change
 ---
 
@@ -21,6 +21,37 @@ proof. Starting point: clean isolated worktree from
 | ADM-002 release upgrade | Locally verified; hosted plan open | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. API, browser, Worker, release CI and full local checks pass. A fresh beta.79 provider plan capture is still required before any deployment. |
 | ADM-003 Doppler reconciliation | Locally verified; token scope open | Live project/config and secret-name metadata, GitHub secret-name metadata, workflow consumers and local adapter agree. No credential source changed. Token scope/expiry and this checkout's personal login remain unproved. |
 | ADM-004 delivery | Pending | Local proof, reviewed PR, authorised hosted proof and exact remote-main readback. |
+
+## 2026-09-24 development authority and CLI correction
+
+Cooper approved one checkout-scoped personal Doppler login and Alchemy
+state-store bootstrap and plan for the TaxKit development stage. This approval
+covers the Cloudflare state-store prerequisite and a plan of the single
+`DocsWebsite` graph. It does not cover applying that Website plan, Preview or
+Production deployment, teardown, or merging a pull request. The credential
+source is `taxkit/dev`; the candidate is this branch's exact commit at the
+time of the provider operation. The local Doppler login can be revoked with
+`doppler login revoke --scope=./`. A bootstrap-created or changed state-store
+requires account-matched provider readback and a separate reviewed recovery
+decision before any teardown.
+
+Installed Alchemy beta.79 source shows that `alchemy login` and
+`alchemy cloudflare bootstrap` are retired compatibility commands that exit
+non-zero. Its supported bootstrap command is
+`alchemy provider cloudflare bootstrap`. Complete Cloudflare account and API
+token environment values take precedence over profile credentials, including
+under `CI=1`. The three hosted mutation workflows now use that command with
+`CI=1` and no profile-login step, retaining Doppler as their only Cloudflare
+credential source. The workflow contract test, `check:docs` and
+`check:runbooks` passed locally after this correction. A live provider run is
+still needed to establish bootstrap and plan behaviour.
+
+Documentation impact for this slice: **Change required** for the three
+workflows, their contract test, deployment architecture, automation register
+and this active plan; **Preserve** for the runbook's authority boundary,
+historical completed plan, public docs and old beta.64 captures; **N/A** for
+SDK/API contracts, package exports and a Changeset because no published package
+behaviour changed.
 
 ## Research readback
 
