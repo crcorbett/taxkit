@@ -227,7 +227,7 @@ export const projectAlchemyPlanText = (
 
     const expectedSummary =
       resources.length === 0
-        ? "Plan: no changes"
+        ? "Plan: no resources"
         : `Plan: 1 to ${resources[0]?.action}`;
     if (planSummaries[0] !== expectedSummary) {
       return yield* fail(

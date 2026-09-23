@@ -106,8 +106,11 @@ state, hosted Worker, Doppler token or public URL was checked by them.
   and standalone smoke.
 - The retained beta.64 plan captures and failed-apply receipt remain bound to
   their historical version. The parser's current version constant is beta.79,
-  and local parser tests pass, but no fresh sanitised beta.79 plan capture was
-  obtained. Do not dispatch a Preview, Production or teardown provider run
+  and local parser tests pass. A further beta.79 source review found that an
+  empty plan now says `Plan: no resources`; the current parser accepts that
+  only for an already-absent teardown and rejects beta.64's old empty text.
+  `bun run test:docs-deployment` passed 94 tests after the correction. No fresh
+  sanitised beta.79 provider plan capture was obtained. Do not dispatch a Preview, Production or teardown provider run
   from this revision until version-matched plan output has been captured and
   reviewed under the resource-specific authority model.
 

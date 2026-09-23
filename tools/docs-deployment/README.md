@@ -71,12 +71,15 @@ operator procedure and authority live in
   build or spawn the docs app.
 - `workflow-plan-projection.ts` is the single beta.79-bound host adapter for
   Alchemy's text plan output. It admits only the current native Website
-  resource and fails closed on any other resource line. The
+  resource and fails closed on any other resource line. Beta.79's upstream
+  `formatPlanLines` emits `Plan: no resources` for an empty plan; the adapter
+  admits that line only for an already-absent teardown. The
   `fixtures/alchemy-beta.64/` manifest binds five real sanitised GitHub
   artefact captures to Alchemy `2.0.0-beta.64`, upstream commit
   `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`, their source run/artefact
   identities and SHA-256 digests. The fixture tests recompute every digest and
-  cover create, update, no-op, delete and already-absent destroy.
+  cover create, update, no-op, delete and already-absent destroy. The old
+  empty-plan text remains historical and is rejected by the current parser.
 
 The retired orphan classifier has no current workflow, command, Schema,
 service, runtime or child-process boundary. Its immutable JSON receipts remain

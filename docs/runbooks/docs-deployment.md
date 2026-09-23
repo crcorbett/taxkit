@@ -270,7 +270,9 @@ do not copy their old commands into this runbook.
 A deployment is accepted only when the exact workflow receipt, Alchemy stage,
 Cloudflare Worker/version and hosted result agree. Teardown is accepted only
 when the exact stage and Worker are absent, or when the decoded plan and
-readback both prove they were already absent. Preserve failed, cancelled,
+readback both prove they were already absent. On beta.79, an empty plan says
+`Plan: no resources`; the older `Plan: no changes` empty-plan text is not
+accepted by the current parser. Preserve failed, cancelled,
 superseded and no-op attempts with their limits.
 
 ### Retired history

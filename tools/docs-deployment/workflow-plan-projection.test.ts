@@ -111,7 +111,7 @@ describe("Alchemy plan projection and historical capture custody", () => {
     expect(resolvedAlchemyVersions).toEqual([alchemyPlanTextVersion]);
   });
 
-  test("validates all five real captures and recomputes their sanitised digests", async () => {
+  test("validates all five historical captures and parses the shared action lines", async () => {
     const manifest = await readManifest();
     const seen = new Set<string>();
 
@@ -122,16 +122,24 @@ describe("Alchemy plan projection and historical capture custody", () => {
           "utf-8"
         );
         const digest = createHash("sha256").update(source).digest("hex");
-        const [resource] = await project(source, capture.kind);
-        return { capture, digest, resource, source };
+        const projected =
+          capture.scenario === "empty-destroy"
+            ? []
+            : await project(source, capture.kind);
+        const action =
+          capture.scenario === "empty-destroy" ? "noop" : projected[0]?.action;
+        return { action, capture, digest, source };
       })
     );
 
-    for (const { capture, digest, resource, source } of captures) {
+    for (const { action, capture, digest, source } of captures) {
       seen.add(capture.scenario);
       expect(Buffer.byteLength(source)).toBe(capture.finalBytes);
       expect(digest).toBe(capture.finalSha256);
-      expect(resource?.action).toBe(capture.action);
+      expect(action).toBe(capture.action);
+      if (capture.scenario === "empty-destroy") {
+        expect(source).toBe("Plan: no changes\n");
+      }
       expect(source).not.toMatch(
         /(?:https?:\/\/|CLOUDFLARE|credential|token|account(?:Id| ID)|\/Users\/|[A-Za-z]:\\\\)/iu
       );
@@ -471,6 +479,7 @@ describe("Alchemy plan projection and historical capture custody", () => {
         "Plan: no changes\n[DocsWebsite] delete\n",
         "Plan: 1 to delete\n",
         "Plan: no changes\nPlan: no changes\n",
+        "Plan: no changes\n",
       ].map((source) =>
         expect(project(source, "destroy")).rejects.toHaveProperty(
           "_tag",
@@ -478,6 +487,19 @@ describe("Alchemy plan projection and historical capture custody", () => {
         )
       )
     );
+  });
+
+  test("accepts beta.79's exact empty-resource summary only for destroy", async () => {
+    await expect(project("Plan: no resources\n", "destroy")).resolves.toEqual([
+      {
+        action: "noop",
+        logicalId: "DocsWebsite",
+        resourceType: "Cloudflare.Worker",
+      },
+    ]);
+    await expect(
+      project("Plan: no resources\n", "deploy")
+    ).rejects.toHaveProperty("_tag", "WorkflowPlanProjectionError");
   });
 
   test("normalises beta.79 ANSI and timestamp log variation without admitting it", async () => {
