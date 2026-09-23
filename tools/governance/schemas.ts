@@ -223,14 +223,14 @@ export class GovernanceFinding extends Schema.TaggedClass<GovernanceFinding>()(
   }
 ) {}
 
-export class GovernanceInputError extends Schema.TaggedErrorClass<GovernanceInputError>()(
+export class GovernanceInputError extends Schema.TaggedError<GovernanceInputError>()(
   "GovernanceInputError",
   {
     target: NonEmpty,
   }
 ) {}
 
-export class GovernancePolicyError extends Schema.TaggedErrorClass<GovernancePolicyError>()(
+export class GovernancePolicyError extends Schema.TaggedError<GovernancePolicyError>()(
   "GovernancePolicyError",
   {
     findings: Schema.NonEmptyArray(GovernanceFinding),

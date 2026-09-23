@@ -128,9 +128,9 @@ export type WorkflowEvidenceIdentity = typeof WorkflowEvidenceIdentity.Type;
 
 export const WorkflowBootstrapReceipt = Schema.Struct({
   alchemySourceCommit: Schema.Literal(
-    "31edd3c4b2f0f3310fad07f5423aee20cf72be8d"
+    "473c39591c7993a708199d0ef8f0d38416885dde"
   ),
-  alchemyVersion: Schema.Literal("2.0.0-beta.64"),
+  alchemyVersion: Schema.Literal("2.0.0-beta.79"),
   allowedEffects: Schema.Tuple([
     Schema.Literal("credential-refresh"),
     Schema.Literal("edge-preview-secret-read"),
@@ -139,7 +139,7 @@ export const WorkflowBootstrapReceipt = Schema.Struct({
   candidateCommit: WorkflowEvidenceCommitSha,
   limitations: Schema.Tuple([
     Schema.Literal(
-      "This receipt records the allowed beta.64 bootstrap effects, not which provider mutations occurred."
+      "This receipt records the allowed beta.79 bootstrap effects, not which provider mutations occurred."
     ),
     Schema.Literal(
       "State-store facts before and after bootstrap were not independently read back in this step."
@@ -170,7 +170,7 @@ const WranglerDeployment = Schema.Struct({
 export const WranglerDeployments = Schema.NonEmptyArray(WranglerDeployment);
 export type WranglerDeployments = typeof WranglerDeployments.Type;
 
-export class WorkflowEvidenceConfigError extends Schema.TaggedErrorClass<WorkflowEvidenceConfigError>()(
+export class WorkflowEvidenceConfigError extends Schema.TaggedError<WorkflowEvidenceConfigError>()(
   "WorkflowEvidenceConfigError",
   {
     mode: Schema.optional(WorkflowEvidenceMode),
@@ -178,28 +178,28 @@ export class WorkflowEvidenceConfigError extends Schema.TaggedErrorClass<Workflo
   }
 ) {}
 
-export class WorkflowEvidenceInputReadError extends Schema.TaggedErrorClass<WorkflowEvidenceInputReadError>()(
+export class WorkflowEvidenceInputReadError extends Schema.TaggedError<WorkflowEvidenceInputReadError>()(
   "WorkflowEvidenceInputReadError",
   {
     role: Schema.NonEmptyString,
   }
 ) {}
 
-export class WorkflowEvidencePlanProjectionError extends Schema.TaggedErrorClass<WorkflowEvidencePlanProjectionError>()(
+export class WorkflowEvidencePlanProjectionError extends Schema.TaggedError<WorkflowEvidencePlanProjectionError>()(
   "WorkflowEvidencePlanProjectionError",
   {
     operation: Schema.NonEmptyString,
   }
 ) {}
 
-export class WorkflowEvidenceProviderDecodeError extends Schema.TaggedErrorClass<WorkflowEvidenceProviderDecodeError>()(
+export class WorkflowEvidenceProviderDecodeError extends Schema.TaggedError<WorkflowEvidenceProviderDecodeError>()(
   "WorkflowEvidenceProviderDecodeError",
   {
     role: Schema.NonEmptyString,
   }
 ) {}
 
-export class WorkflowEvidenceReceiptWriteError extends Schema.TaggedErrorClass<WorkflowEvidenceReceiptWriteError>()(
+export class WorkflowEvidenceReceiptWriteError extends Schema.TaggedError<WorkflowEvidenceReceiptWriteError>()(
   "WorkflowEvidenceReceiptWriteError",
   {
     role: Schema.NonEmptyString,

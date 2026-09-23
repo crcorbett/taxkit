@@ -76,7 +76,7 @@ export const DocsDeploymentInventoryReport = Schema.Struct({
 export type DocsDeploymentInventoryReport =
   typeof DocsDeploymentInventoryReport.Type;
 
-export class DocsDeploymentInventoryInputError extends Schema.TaggedErrorClass<DocsDeploymentInventoryInputError>()(
+export class DocsDeploymentInventoryInputError extends Schema.TaggedError<DocsDeploymentInventoryInputError>()(
   "DocsDeploymentInventoryInputError",
   {
     fileJsonObject: Schema.optional(Schema.Boolean),
@@ -85,14 +85,14 @@ export class DocsDeploymentInventoryInputError extends Schema.TaggedErrorClass<D
   }
 ) {}
 
-export class DocsDeploymentInventoryReadError extends Schema.TaggedErrorClass<DocsDeploymentInventoryReadError>()(
+export class DocsDeploymentInventoryReadError extends Schema.TaggedError<DocsDeploymentInventoryReadError>()(
   "DocsDeploymentInventoryReadError",
   {
     operation: Schema.NonEmptyString,
   }
 ) {}
 
-export class DocsDeploymentInventoryDisagreementError extends Schema.TaggedErrorClass<DocsDeploymentInventoryDisagreementError>()(
+export class DocsDeploymentInventoryDisagreementError extends Schema.TaggedError<DocsDeploymentInventoryDisagreementError>()(
   "DocsDeploymentInventoryDisagreementError",
   {
     findings: Schema.NonEmptyArray(Schema.NonEmptyString),

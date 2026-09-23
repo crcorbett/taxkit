@@ -15,7 +15,7 @@ Owner: `taxkit-docs-deployment-operation-owner`
 
 This runbook owns the TaxKit docs deployment made by root `alchemy.run.ts`.
 The current graph has one
-`Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy `2.0.0-beta.64`
+`Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy `2.0.0-beta.79`
 owns the Vite build, assets, Worker and resource lifecycle.
 
 Preview uses the exact `pr-N` stage for one same-repository pull request.
@@ -67,7 +67,7 @@ only calculates shared identities, decodes provider output and writes
 sanitised evidence. It cannot grant authority or run Alchemy, Wrangler or an
 arbitrary command.
 
-Alchemy login/bootstrap is mutation-capable in beta.64. It may refresh the
+Alchemy login/bootstrap is mutation-capable in beta.79. It may refresh the
 provider credential, read a short-lived edge-preview secret, and create or
 upgrade state-store resources. Authorise it as part of the exact workflow
 operation. Its receipt proves only that the bounded step completed; it does
@@ -147,7 +147,7 @@ There is intentionally no external lease.
    Cloudflare outputs reach only provider steps. The workflow performs the
    authorised bootstrap and runs `alchemy plan`. Alchemy owns the Vite build;
    do not add a second build process.
-4. The typed evidence command decodes the raw plan with the single beta.64
+4. The typed evidence command decodes the raw plan with the single beta.79
    parser. Accept only one `DocsWebsite` `create`, `update` or `noop` action for
    deploy. The plan receipt must bind the exact candidate, lockfile,
    configuration, stage and sanitised plan digest. Stop on another resource,
@@ -323,7 +323,7 @@ Also stop when any of these occurs:
   from the approved identity;
 - Quality is missing, pending or failed;
 - the plan contains another resource, an unsupported action or malformed
-  beta.64 output;
+  beta.79 output;
 - replan differs from the accepted digest;
 - Alchemy state and Cloudflare readback disagree;
 - a matching manual mutation or workflow is already active;
@@ -337,7 +337,7 @@ GitHub concurrency does not lock manual CLI mutation or another system. The
 repository does not use an external lease. Normal concurrent manual mutation
 is unsupported.
 
-Alchemy beta.64 bootstrap can change provider or state-store data before plan
+Alchemy beta.79 bootstrap can change provider or state-store data before plan
 output. A plan-only workflow is therefore not wholly read-only. Remote and Bun
 caches can save time but do not replace frozen installation, live provider
 commands or receipt checks.

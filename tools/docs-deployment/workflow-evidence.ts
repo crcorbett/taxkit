@@ -307,8 +307,8 @@ export const writeBootstrapWorkflowEvidence = (
     const bootstrap = yield* Schema.decodeUnknownEffect(
       WorkflowBootstrapReceipt
     )({
-      alchemySourceCommit: "31edd3c4b2f0f3310fad07f5423aee20cf72be8d",
-      alchemyVersion: "2.0.0-beta.64",
+      alchemySourceCommit: "473c39591c7993a708199d0ef8f0d38416885dde",
+      alchemyVersion: "2.0.0-beta.79",
       allowedEffects: [
         "credential-refresh",
         "edge-preview-secret-read",
@@ -316,7 +316,7 @@ export const writeBootstrapWorkflowEvidence = (
       ],
       candidateCommit: config.TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT,
       limitations: [
-        "This receipt records the allowed beta.64 bootstrap effects, not which provider mutations occurred.",
+        "This receipt records the allowed beta.79 bootstrap effects, not which provider mutations occurred.",
         "State-store facts before and after bootstrap were not independently read back in this step.",
       ],
       observedAt: yield* observedAt,

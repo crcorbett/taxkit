@@ -9,6 +9,8 @@ import {
   AlchemyPlanFixtureManifest,
   alchemyPlanSourceCommit,
   alchemyPlanTextVersion,
+  historicalAlchemyPlanSourceCommit,
+  historicalAlchemyPlanTextVersion,
   projectAlchemyPlanText,
   stringifyWorkflowPlanProjection,
 } from "./workflow-plan-projection.js";
@@ -83,7 +85,7 @@ const readManifest = async () => {
   )(source);
 };
 
-describe("beta.64 Alchemy plan projection", () => {
+describe("Alchemy plan projection and historical capture custody", () => {
   test("binds the parser and fixture manifest to the exact dependency source", async () => {
     const [manifest, packageSource, lockfileSource] = await Promise.all([
       readManifest(),
@@ -99,12 +101,12 @@ describe("beta.64 Alchemy plan projection", () => {
       match.groups?.["version"] === undefined ? [] : [match.groups["version"]]
     );
 
-    expect(alchemyPlanTextVersion).toBe("2.0.0-beta.64");
+    expect(alchemyPlanTextVersion).toBe("2.0.0-beta.79");
     expect(alchemyPlanSourceCommit).toBe(
-      "31edd3c4b2f0f3310fad07f5423aee20cf72be8d"
+      "473c39591c7993a708199d0ef8f0d38416885dde"
     );
-    expect(manifest.alchemyVersion).toBe(alchemyPlanTextVersion);
-    expect(manifest.upstream.commit).toBe(alchemyPlanSourceCommit);
+    expect(manifest.alchemyVersion).toBe(historicalAlchemyPlanTextVersion);
+    expect(manifest.upstream.commit).toBe(historicalAlchemyPlanSourceCommit);
     expect(rootPackage.workspaces.catalog.alchemy).toBe(alchemyPlanTextVersion);
     expect(resolvedAlchemyVersions).toEqual([alchemyPlanTextVersion]);
   });
@@ -478,7 +480,7 @@ describe("beta.64 Alchemy plan projection", () => {
     );
   });
 
-  test("normalises beta.64 ANSI and timestamp log variation without admitting it", async () => {
+  test("normalises beta.79 ANSI and timestamp log variation without admitting it", async () => {
     await expect(
       project(
         "Plan: 1 to update\n\u001B[32m[DocsWebsite] update\u001B[0m\n[12:34:56.789] INFO update available\n",

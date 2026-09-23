@@ -57,7 +57,7 @@ export class DocumentationReceipt extends Schema.TaggedClass<DocumentationReceip
   }
 ) {}
 
-export class DocumentationCheckError extends Schema.TaggedErrorClass<DocumentationCheckError>()(
+export class DocumentationCheckError extends Schema.TaggedError<DocumentationCheckError>()(
   "DocumentationCheckError",
   { operation: Schema.NonEmptyString }
 ) {}
@@ -281,7 +281,7 @@ export class RunbookValidationReceipt extends Schema.TaggedClass<RunbookValidati
   }
 ) {}
 
-export class RunbookValidationError extends Schema.TaggedErrorClass<RunbookValidationError>()(
+export class RunbookValidationError extends Schema.TaggedError<RunbookValidationError>()(
   "RunbookValidationError",
   { operation: Schema.NonEmptyString }
 ) {}

@@ -81,7 +81,7 @@ const noManualTag = {
     docs: { description: "Disallow manual Effect _tag object literals." },
     messages: {
       noManualTag:
-        "Do not construct manual _tag object literals. Define the canonical variant with Data.TaggedClass, Data.TaggedError, Schema.TaggedClass, or Schema.TaggedErrorClass and use its constructor.",
+        "Do not construct manual _tag object literals. Define the canonical variant with Data.TaggedClass, Data.TaggedError, Schema.TaggedClass, or Schema.TaggedError and use its constructor.",
     },
     type: "problem",
   },
@@ -514,9 +514,9 @@ const isUnknownCauseProperty = (node) => {
 
 const taggedErrorConstructorSemantics = new Set([
   "Data.TaggedError",
-  "Schema.TaggedErrorClass",
+  "Schema.TaggedError",
   "effect.Data.TaggedError",
-  "effect.Schema.TaggedErrorClass",
+  "effect.Schema.TaggedError",
 ]);
 
 const unknownSchemaSemantics = new Set([

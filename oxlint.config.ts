@@ -402,6 +402,20 @@ export default defineConfig({
       },
     },
     {
+      // Effect v4's Schema.TaggedError factory is a class base. Oxlint
+      // mistakes its class declaration for an Error thrown without `new`.
+      files: [
+        "**/errors.ts",
+        "**/errors/*.ts",
+        "**/schemas.ts",
+        "**/*.schemas.ts",
+        "tools/docs-deployment/workflow-plan-projection.ts",
+      ],
+      rules: {
+        "unicorn/throw-new-error": "off",
+      },
+    },
+    {
       files: portableEffectSourceFiles,
       rules: {
         "effect/no-bare-effect-try-promise": "error",

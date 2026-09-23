@@ -1,13 +1,13 @@
 import { Schema } from "effect";
 
-export class LocalDopplerCommandError extends Schema.TaggedErrorClass<LocalDopplerCommandError>()(
+export class LocalDopplerCommandError extends Schema.TaggedError<LocalDopplerCommandError>()(
   "LocalDopplerCommandError",
   {
     reason: Schema.Literals(["process-start", "process-exit"]),
   }
 ) {}
 
-export class DopplerCustodyError extends Schema.TaggedErrorClass<DopplerCustodyError>()(
+export class DopplerCustodyError extends Schema.TaggedError<DopplerCustodyError>()(
   "DopplerCustodyError",
   {
     reason: Schema.Literals([

@@ -35,7 +35,7 @@ export const declareDocsStack = ({
       memo: docsWorkerMemo,
       observability: docsWorkerObservability,
       rootDir: "apps/docs",
-      url: true,
+      workersDev: true,
     });
 
     return {

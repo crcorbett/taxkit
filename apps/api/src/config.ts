@@ -16,9 +16,9 @@ export class ApiServerConfig extends Context.Service<
 >()("@taxkit/api/ServerConfig") {}
 
 const ApiServerConfigSource = Config.all({
-  host: Config.string("API_HOST").pipe(Config.withDefault(defaultHost)),
-  port: Config.port("API_PORT").pipe(
-    Config.orElse(() => Config.port("PORT")),
+  host: Config.String("API_HOST").pipe(Config.withDefault(defaultHost)),
+  port: Config.Port("API_PORT").pipe(
+    Config.orElse(() => Config.Port("PORT")),
     Config.withDefault(defaultPort)
   ),
 });

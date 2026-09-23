@@ -130,7 +130,7 @@ readback. After a failed mutation, inspect state before replay.
 | READMEs | Change required: new package, `apps/docs/README.md`, `tools/docs-deployment/README.md`; root README preserved if discovery remains through docs router. |
 | Runbook and authority | Change required: `docs/runbooks/docs-deployment.md` for version and exact operations; preserve `docs/operations/authority-model.md`. |
 | Commands, CI, config, tests | Change required where direct imports, digests, plan fixtures or versions change; preserve approval and protected environment boundaries. |
-| Public MDX, API/SDK contracts, calculators | N/A unless installed Effect changes the generated OpenAPI; then update the generated owner and its tests, without changing public semantics. |
+| Public MDX, API/SDK contracts, calculators | Change required: Effect rc.117 changes generated OpenAPI component references and tax-year union shape; update the API owner, snapshot, tests and Changeset. Preserve route paths, status codes and JSON field names. Public MDX remains N/A. |
 | Skills and agent instructions | Change required: add the new source-only infrastructure exception to the local package-structure profile; preserve other skill rules and `AGENTS.md`. |
 | Historical proof | Preserve: dated beta.64/provider observations remain historical; new evidence names candidate, environment, limits and non-claims. |
 | Changeset | Change required if a published package's installed behaviour changes; the private infrastructure package alone does not need one. |

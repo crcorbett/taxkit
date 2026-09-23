@@ -1249,12 +1249,12 @@ export const DeploymentResumePreflightReceipt = Schema.Struct({
 export type DeploymentResumePreflightReceipt =
   typeof DeploymentResumePreflightReceipt.Type;
 
-export class DocsDeploymentInputError extends Schema.TaggedErrorClass<DocsDeploymentInputError>()(
+export class DocsDeploymentInputError extends Schema.TaggedError<DocsDeploymentInputError>()(
   "DocsDeploymentInputError",
   { target: Schema.NonEmptyString }
 ) {}
 
-export class DocsDeploymentPolicyError extends Schema.TaggedErrorClass<DocsDeploymentPolicyError>()(
+export class DocsDeploymentPolicyError extends Schema.TaggedError<DocsDeploymentPolicyError>()(
   "DocsDeploymentPolicyError",
   { findings: Schema.NonEmptyArray(Schema.NonEmptyString) }
 ) {}

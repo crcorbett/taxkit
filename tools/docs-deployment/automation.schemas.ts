@@ -149,14 +149,14 @@ export class DeploymentAutomationFinding extends Schema.TaggedClass<DeploymentAu
   }
 ) {}
 
-export class DeploymentAutomationInputError extends Schema.TaggedErrorClass<DeploymentAutomationInputError>()(
+export class DeploymentAutomationInputError extends Schema.TaggedError<DeploymentAutomationInputError>()(
   "DeploymentAutomationInputError",
   {
     target: Schema.NonEmptyString,
   }
 ) {}
 
-export class DeploymentAutomationPolicyError extends Schema.TaggedErrorClass<DeploymentAutomationPolicyError>()(
+export class DeploymentAutomationPolicyError extends Schema.TaggedError<DeploymentAutomationPolicyError>()(
   "DeploymentAutomationPolicyError",
   {
     findings: Schema.NonEmptyArray(DeploymentAutomationFinding),

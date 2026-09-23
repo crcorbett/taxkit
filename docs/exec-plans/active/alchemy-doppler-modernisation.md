@@ -18,8 +18,8 @@ proof. Starting point: clean isolated worktree from
 | Task | State | Evidence and next action |
 | --- | --- | --- |
 | ADM-001 infrastructure owner | Locally verified | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Exact provider parity remains unproved. |
-| ADM-002 release upgrade | Pending | Published tags read: Alchemy beta.79 and Effect rc.117. Verify installed APIs, frozen install, fixtures and broad checks. |
-| ADM-003 Doppler reconciliation | Pending | Inventory current named sources and consumers; read metadata without values. |
+| ADM-002 release upgrade | Locally verified; hosted plan open | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. API, browser, Worker, release CI and full local checks pass. A fresh beta.79 provider plan capture is still required before any deployment. |
+| ADM-003 Doppler reconciliation | Locally verified; token scope open | Live project/config and secret-name metadata, GitHub secret-name metadata, workflow consumers and local adapter agree. No credential source changed. Token scope/expiry and this checkout's personal login remain unproved. |
 | ADM-004 delivery | Pending | Local proof, reviewed PR, authorised hosted proof and exact remote-main readback. |
 
 ## Research readback
@@ -80,6 +80,62 @@ by this review.
 
 These are local source and test results. No Alchemy plan, Cloudflare
 state, hosted Worker, Doppler token or public URL was checked by them.
+
+## ADM-002 local proof and open boundary
+
+- `bunx bun@1.3.14 install --frozen-lockfile`, `bun run verification`,
+  `bun run test`, `bun run docs:build` and
+  `bun run --filter=docs test:cloudflare-built` passed. The built Worker
+  returned SSR 200, immutable asset 200 and missing-page 404 locally.
+- `bun run release:check -- --ci` passed all nine ordered local checks,
+  including the packed SDK consumer, standalone API smoke, browser route
+  journey and Changeset status. This mode creates no release attempt or
+  publication receipt. The non-CI mode correctly rejected the retained
+  HGI-203 packet, whose journey-inventory digest already differs on
+  `origin/main`; that packet is not a new candidate.
+- Effect rc.117 requires `Schema.TaggedError`, upper-case primitive `Config`
+  constructors and Bun's supplied HTTP server Layer. Alchemy beta.79 uses
+  `workersDev: true` instead of the former Website `url` option. Current
+  source and installed types were checked. Vitest 5's browser test runs React
+  in its ordinary test mode and asserts only the two expected TanStack route
+  warnings for rejected loader Effects.
+- The generated OpenAPI document now names encoded component references with
+  an `Encoded` suffix and nests the tax-year union one level deeper. The
+  committed snapshot, API owner and Changeset record that change. API route
+  paths, status codes and JSON field names were checked through route tests
+  and standalone smoke.
+- The retained beta.64 plan captures and failed-apply receipt remain bound to
+  their historical version. The parser's current version constant is beta.79,
+  and local parser tests pass, but no fresh sanitised beta.79 plan capture was
+  obtained. Do not dispatch a Preview, Production or teardown provider run
+  from this revision until version-matched plan output has been captured and
+  reviewed under the resource-specific authority model.
+
+## ADM-003 credential inventory
+
+Read-only Doppler metadata on 2026-09-23 showed project `taxkit` and exactly
+`ci`, `dev`, `stg_preview` and `prd` configurations. `doppler secrets
+--only-names` showed the following names; Doppler's automatic
+`DOPPLER_PROJECT`, `DOPPLER_CONFIG` and `DOPPLER_ENVIRONMENT` metadata also
+appeared in each configuration. No secret value was read or printed.
+
+| Config | Governed names | Exact consumer |
+| --- | --- | --- |
+| `ci` | `TURBO_TEAM`, `TURBO_TOKEN` | Trusted Quality, receipt, Preview and Production Turbo steps through repository `DOPPLER_CI_TOKEN`. |
+| `dev` | `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN` | Local cloud development after checkout-scoped personal login; no service token bridge. |
+| `stg_preview` | `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN` | Preview and teardown provider steps through the Preview environment `DOPPLER_PROVIDER_TOKEN`. |
+| `prd` | `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN` | Production provider steps through the Production environment `DOPPLER_PROVIDER_TOKEN`. |
+
+Read-only GitHub metadata showed only the repository `DOPPLER_CI_TOKEN` name
+and separate `DOPPLER_PROVIDER_TOKEN` names in the protected Preview and
+Production environments. Workflow source checks the fixed project/config
+metadata before passing named outputs to consumers. The local adapter strips
+ambient Doppler and provider values, selects only `taxkit/dev`, disables
+fallback and Bun env-file loading, and accepts only the two Cloudflare names.
+The current checkout's `check:doppler-custody` stopped with safe reason
+`scoped-token`; local cloud development is unqualified here. Metadata alone
+does not prove bridge token scope, expiry or value. No direct duplicate secret
+source was found to remove, and no GitHub or Doppler setting was changed.
 
 ## Authority and limits
 

@@ -48,7 +48,7 @@ intent and task state belong in the active SPEC and execution plan.
   nested process cannot see that cache. Missing, malformed and unreadable
   credential input remain distinct safe failures; neither path can bootstrap,
   write or delete state.
-  The beta.64 Vite memo also includes the lockfile and the sibling
+  The beta.79 Vite memo also includes the lockfile and the sibling
   `docs-content` and `docs-fumadocs` package trees as native build inputs.
 - The Worker uses compatibility date `2026-06-24`, `nodejs_compat`, default
   asset-first full-stack routing, a provider Worker URL, built-in invocation
@@ -142,7 +142,7 @@ Ephemeral GitHub runners do not retain Alchemy's derived
 workflows therefore run the supported `alchemy cloudflare bootstrap` operation
 with `CI=0` immediately before planning or teardown. A preceding supported
 `alchemy login` with `CI=1` writes only the `method: "env"` profile selector.
-Bootstrap is a mutation-capable control-plane operation: beta.64 may refresh
+Bootstrap is a mutation-capable control-plane operation: beta.79 may refresh
 credentials, use a short-lived edge-preview Worker to read the secret, and
 create or upgrade the state-store Worker before caching the account-matched
 credential on that runner. The inventory command reads the resulting cache
@@ -151,7 +151,7 @@ local OAuth profile is copied into CI.
 
 After bootstrap and plan complete, the closed `workflow-evidence` Effect
 command writes a sanitised bootstrap receipt. It binds the exact candidate,
-stage, workflow run, Alchemy `2.0.0-beta.64` and matching upstream source
+stage, workflow run, Alchemy `2.0.0-beta.79` and matching upstream source
 commit to those three allowed effects. It records state-store facts before and
 after as `not-observed`; successful bootstrap command completion is not a
 claim that no provider mutation occurred or that provider state was read back.
@@ -324,7 +324,7 @@ so these two identities are intentionally distinct. The hosted receipt must
 match stage semantics with exactly one desktop and one mobile screenshot.
 The current workflow adapter keeps shared evidence meanings in one closed-mode
 Effect command. It calculates tracked candidate identities, calls the existing
-beta.64 plan projection owner, decodes the existing state/provider inventory
+beta.79 plan projection owner, decodes the existing state/provider inventory
 and bounded Wrangler deployment JSON, and Schema-encodes plan, bootstrap,
 provider and GitHub output files. The command has no Alchemy, Wrangler or
 GitHub execution capability. YAML still owns environment protection,

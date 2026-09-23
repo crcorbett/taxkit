@@ -79,7 +79,7 @@ describe("effect/no-bare-effect-try-promise", () => {
     const fixture = await writeFixture(`
       import { Effect as Fx, Schema } from "effect";
 
-      class BoundaryError extends Schema.TaggedErrorClass<BoundaryError>()(
+      class BoundaryError extends Schema.TaggedError<BoundaryError>()(
         "BoundaryError",
         { message: Schema.String }
       ) {}

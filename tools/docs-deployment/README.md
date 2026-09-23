@@ -36,7 +36,7 @@ operator procedure and authority live in
 - `workflow-evidence.schemas.ts`, `workflow-evidence.ts` and
   `workflow-evidence.runtime.ts` form one closed command with `bootstrap`,
   `plan`, `replan` and `provider` modes. It calculates shared tracked-file identities, reuses
-  the beta.64 plan projection and provider inventory Schemas, decodes bounded
+  the beta.79 plan projection and provider inventory Schemas, decodes bounded
   Wrangler JSON, and encodes sanitised bootstrap, plan, provider and GitHub
   output files. Its only child process is fixed `git ls-files`; it cannot choose
   or run Alchemy, Wrangler, GitHub or another executable.
@@ -69,7 +69,7 @@ operator procedure and authority live in
   `Cloudflare.Website.Vite("DocsWebsite")` declaration; root owns its provider
   and state composition. This directory does not
   build or spawn the docs app.
-- `workflow-plan-projection.ts` is the single beta.64-bound host adapter for
+- `workflow-plan-projection.ts` is the single beta.79-bound host adapter for
   Alchemy's text plan output. It admits only the current native Website
   resource and fails closed on any other resource line. The
   `fixtures/alchemy-beta.64/` manifest binds five real sanitised GitHub

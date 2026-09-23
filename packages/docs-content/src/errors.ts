@@ -17,21 +17,21 @@ export const DocsSourceOperation = Schema.Literals([
 ]);
 export type DocsSourceOperation = typeof DocsSourceOperation.Type;
 
-export class DocsPageNotFoundError extends Schema.TaggedErrorClass<DocsPageNotFoundError>()(
+export class DocsPageNotFoundError extends Schema.TaggedError<DocsPageNotFoundError>()(
   "DocsPageNotFoundError",
   {
     path: DocsPagePath,
   }
 ) {}
 
-export class DocsSlugNotFoundError extends Schema.TaggedErrorClass<DocsSlugNotFoundError>()(
+export class DocsSlugNotFoundError extends Schema.TaggedError<DocsSlugNotFoundError>()(
   "DocsSlugNotFoundError",
   {
     slug: DocsPageSlug,
   }
 ) {}
 
-export class DocsSourceError extends Schema.TaggedErrorClass<DocsSourceError>()(
+export class DocsSourceError extends Schema.TaggedError<DocsSourceError>()(
   "DocsSourceError",
   {
     message: DocsNonEmptyText,
@@ -40,7 +40,7 @@ export class DocsSourceError extends Schema.TaggedErrorClass<DocsSourceError>()(
   }
 ) {}
 
-export class DocsValidationFailedError extends Schema.TaggedErrorClass<DocsValidationFailedError>()(
+export class DocsValidationFailedError extends Schema.TaggedError<DocsValidationFailedError>()(
   "DocsValidationFailedError",
   {
     issues: Schema.Array(Schema.String),

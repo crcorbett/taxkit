@@ -107,7 +107,7 @@ local start does not grant provider authority or prove a deployment.
 
 `dev:vite` is the fast, infrastructure-free portless Vite path at
 `https://docs.taxkit.localhost`.
-Alchemy beta.64 injects its Cloudflare Vite plugin for the native resource;
+Alchemy beta.79 injects its Cloudflare Vite plugin for the native resource;
 standalone Vite installs the same official plugin only when the documented
 `ALCHEMY_CLOUDFLARE_VITE_INJECTED` guard is absent.
 
@@ -174,7 +174,7 @@ Root `alchemy.run.ts` composes the private
 `@taxkit/infrastructure` declaration of
 `Cloudflare.Website.Vite("DocsWebsite")`. Alchemy owns Vite build execution,
 assets, the SSR Worker lifecycle and the physical Worker name as one logical
-resource. Its beta.64 memo includes the lockfile and both sibling docs
+resource. Its beta.79 memo includes the lockfile and both sibling docs
 packages, so those authored inputs participate in Alchemy's resource input.
 The standalone `build:cloudflare` alias and workerd harness are provider-free
 preflight proof; their `dist/**` output is not asserted to be the exact artifact

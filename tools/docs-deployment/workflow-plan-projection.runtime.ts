@@ -46,7 +46,7 @@ export const projectWorkflowPlan = Effect.gen(function* () {
       Effect.mapError(
         () =>
           new WorkflowPlanProjectionError({
-            reason: "could not read the beta.64 Alchemy plan output",
+            reason: "could not read the beta.79 Alchemy plan output",
           })
       )
     );

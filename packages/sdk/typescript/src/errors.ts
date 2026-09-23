@@ -7,14 +7,14 @@ const schemaDecodeFailureMessage =
   "TaxKit calculation response failed schema validation";
 const unexpectedFailureMessage = "TaxKit calculation failed unexpectedly";
 
-export class TaxKitSchemaDecodeError extends Schema.TaggedErrorClass<TaxKitSchemaDecodeError>()(
+export class TaxKitSchemaDecodeError extends Schema.TaggedError<TaxKitSchemaDecodeError>()(
   "TaxKitSchemaDecodeError",
   {
     message: Schema.String,
   }
 ) {}
 
-export class TaxKitUnexpectedError extends Schema.TaggedErrorClass<TaxKitUnexpectedError>()(
+export class TaxKitUnexpectedError extends Schema.TaggedError<TaxKitUnexpectedError>()(
   "TaxKitUnexpectedError",
   {
     message: Schema.String,
@@ -30,7 +30,7 @@ export const TaxKitCalculationErrorDetail = Schema.Union([
 export type TaxKitCalculationErrorDetail =
   typeof TaxKitCalculationErrorDetail.Type;
 
-export class TaxKitCalculationError extends Schema.TaggedErrorClass<TaxKitCalculationError>()(
+export class TaxKitCalculationError extends Schema.TaggedError<TaxKitCalculationError>()(
   "TaxKitCalculationError",
   {
     error: TaxKitCalculationErrorDetail,
