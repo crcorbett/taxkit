@@ -130,6 +130,7 @@
     "version-repo": "changeset version"
   },
   "dependencies": {
+    "@taxkit/infrastructure": "workspace:*",
     "alchemy": "catalog:"
   },
   "devDependencies": {

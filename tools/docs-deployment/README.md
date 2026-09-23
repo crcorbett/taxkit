@@ -65,8 +65,9 @@ operator procedure and authority live in
 - `strict-boundaries.policy.ts` checks the named application and deployment
   adapters for ambient host access, raw concurrency, lost workflow/credential
   boundaries and unmanaged docs runtime state.
-- Root `alchemy.run.ts` owns the native
-  `Cloudflare.Website.Vite("DocsWebsite")` resource. This directory does not
+- Private `@taxkit/infrastructure` owns the native
+  `Cloudflare.Website.Vite("DocsWebsite")` declaration; root owns its provider
+  and state composition. This directory does not
   build or spawn the docs app.
 - `workflow-plan-projection.ts` is the single beta.64-bound host adapter for
   Alchemy's text plan output. It admits only the current native Website

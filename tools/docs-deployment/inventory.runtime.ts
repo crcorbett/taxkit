@@ -1,5 +1,6 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
+import { docsCloudflareStackName } from "@taxkit/infrastructure/website";
 import { AlchemyContextLive, AuthProviders } from "alchemy";
 import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
 import { credentialsFilePath } from "alchemy/Auth/Credentials";
@@ -21,7 +22,6 @@ import {
 import * as FileSystem from "effect/FileSystem";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
-import { docsCloudflareStackName } from "../../apps/docs/src/lib/build/cloudflare-stack.js";
 import {
   readDocsDeploymentStateStoreCredentials,
   requireDocsDeploymentStateStoreAccount,

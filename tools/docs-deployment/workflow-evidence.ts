@@ -36,14 +36,16 @@ const configurationFiles = [
   "alchemy.run.ts",
   "apps/docs/package.json",
   "apps/docs/vite.config.ts",
-  "apps/docs/src/lib/build/cloudflare-stack.ts",
-  "apps/docs/src/lib/build/docs-deployment-stage.ts",
+  "packages/infrastructure/src/cloudflare/website.ts",
+  "packages/infrastructure/src/stage.ts",
+  "packages/infrastructure/src/stack.ts",
   "apps/docs/public/_headers",
 ] as const;
 
 const deploymentInputRoots = [
   "alchemy.run.ts",
   "apps/docs",
+  "packages/infrastructure",
   "packages/docs-content",
   "packages/docs-fumadocs",
 ] as const;

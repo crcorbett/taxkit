@@ -1,9 +1,9 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
+import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import { Config, Console, Effect, Match, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 
-import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
 import { DeploymentPlanProjection } from "./schemas.js";
 import { workflowSha256 } from "./workflow-check.boundary.js";
 import {

@@ -1,9 +1,9 @@
+import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
+import { docsCloudflareStackName } from "@taxkit/infrastructure/website";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { State } from "alchemy/State";
 import { Context, Effect, HashSet, Layer, Schema } from "effect";
 
-import { docsCloudflareStackName } from "../../apps/docs/src/lib/build/cloudflare-stack.js";
-import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
 import type { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 import {
   DocsDeploymentInventoryDisagreementError,

@@ -11,10 +11,6 @@ import type { Browser, Page, Request } from "playwright";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { DocsRecoverableError } from "../src/components/docs-route-states";
-import {
-  docsWorkerCompatibilityDate,
-  docsWorkerCompatibilityFlags,
-} from "../src/lib/build/cloudflare-stack";
 
 const { join } = nodePath;
 
@@ -300,11 +296,9 @@ const generatedConfig = Effect.runSync(
 );
 
 assert.deepEqual(generatedConfig.vars, {});
-assert.equal(generatedConfig.compatibility_date, docsWorkerCompatibilityDate);
-assert.deepEqual(
-  generatedConfig.compatibility_flags,
-  docsWorkerCompatibilityFlags
-);
+// Keep the built-output oracle independent of the infrastructure declaration.
+assert.equal(generatedConfig.compatibility_date, "2026-06-24");
+assert.deepEqual(generatedConfig.compatibility_flags, ["nodejs_compat"]);
 assert.deepEqual(generatedConfig.assets, {
   directory: `../${docsWorkerAssetOutputDirectory}`,
 });

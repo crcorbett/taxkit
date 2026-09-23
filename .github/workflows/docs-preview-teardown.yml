@@ -237,8 +237,8 @@ jobs:
             fi
           done
           lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
-          config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
-          deployment_input_sha256="$(git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256 | cut -d ' ' -f1)"
+          config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts packages/infrastructure/src/cloudflare/website.ts packages/infrastructure/src/stage.ts packages/infrastructure/src/stack.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          deployment_input_sha256="$(git ls-files -z -- alchemy.run.ts apps/docs packages/infrastructure packages/docs-content packages/docs-fumadocs | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256 | cut -d ' ' -f1)"
           destroy_sha256="$(
             TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
             TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256="$config_sha256" \

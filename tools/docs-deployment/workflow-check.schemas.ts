@@ -1,6 +1,5 @@
+import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import { Schema } from "effect";
-
-import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
 
 export const WorkflowCheckName = Schema.Literals([
   "workflow-input",

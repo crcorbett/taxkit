@@ -170,7 +170,8 @@ Nitro remains an independent owner only where another application still uses
 it. Final hosted requalification of the exact retirement candidate and the
 report-only Alchemy state boundary remain separate claims.
 
-Root `alchemy.run.ts` uses public Alchemy
+Root `alchemy.run.ts` composes the private
+`@taxkit/infrastructure` declaration of
 `Cloudflare.Website.Vite("DocsWebsite")`. Alchemy owns Vite build execution,
 assets, the SSR Worker lifecycle and the physical Worker name as one logical
 resource. Its beta.64 memo includes the lockfile and both sibling docs

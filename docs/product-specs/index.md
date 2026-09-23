@@ -21,6 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
+| [Alchemy and Doppler modernisation](./alchemy-doppler-modernisation.md) | Current | Active successor implementation intent and [task ledger](./alchemy-doppler-modernisation.tasks.json); current source and provider proof remain separate. |
 | [Oxlint policy refresh](./oxlint-policy-refresh.md) | Implemented | The generic and Effect anti-slop policy, portable mutable-test-state rule and structural finding fixes are implemented. Candidate `48384d5` passed hosted Quality run `33375644482`; [PR #76](https://github.com/crcorbett/taxkit/pull/76) merged it as `1a0b180`, and main Quality run `33376169245` passed on that merge. No package publication or deployment was performed. |
 | [Doppler configuration governance](./doppler-configuration-governance.md) | Implemented | The reviewed slices, TaxKit-only bootstrap, merged-main Quality and exact absent-stage teardown are proved. The hard cutover removed direct GitHub values and eight old Cloudflare tokens. Hosted fork, served Preview and Production/rollback remain explicit non-claims. |
 | [Alchemy deployment structure corrections](./alchemy-deployment-structure-corrections.md) | Implemented | Findings `ALC-AUD-001` through `ALC-AUD-005` and decisions `ALC-AUD-R001` through `ALC-AUD-R003` are closed. [PR #71](https://github.com/crcorbett/taxkit/pull/71) merged the verified candidate as `28ed00f`; the [completed plan](../exec-plans/completed/alchemy-deployment-structure-corrections.md) retains ordered delivery and claim-matched proof. |

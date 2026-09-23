@@ -1,0 +1,37 @@
+{
+  "name": "@taxkit/infrastructure",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./stack": {
+      "source": "./src/stack.ts",
+      "types": "./src/stack.ts",
+      "default": "./src/stack.ts"
+    },
+    "./stage": {
+      "source": "./src/stage.ts",
+      "types": "./src/stage.ts",
+      "default": "./src/stage.ts"
+    },
+    "./website": {
+      "source": "./src/cloudflare/website.ts",
+      "types": "./src/cloudflare/website.ts",
+      "default": "./src/cloudflare/website.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "alchemy": "catalog:",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

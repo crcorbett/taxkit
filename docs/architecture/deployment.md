@@ -32,12 +32,15 @@ intent and task state belong in the active SPEC and execution plan.
   `@cloudflare/vite-plugin@1.47.0` emits `dist/server/index.js`, its server
   modules and `dist/client` assets. The former docs-app Nitro/Vercel bridge was
   retired after local parity; `apps/web` remains a separate Nitro owner.
-- Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack. Hosted workflow
+- Root `alchemy.run.ts` composes one `TaxKitDocsCloudflare` stack. Hosted workflow
   and evidence admission remains branded `pr-<number>` or `prod`; local
   `alchemy dev` separately admits only Alchemy's `dev_<user>` default without
   widening that deployment Schema. The root also owns the mutation composition's
   `Cloudflare.state()`, and one logical
-  `Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy injects its
+  `Cloudflare.Website.Vite("DocsWebsite")` resource declared by private
+  `@taxkit/infrastructure`. That package owns the stage Schema, logical
+  identity and Website settings; root owns providers and remote state.
+  Alchemy injects its
   Cloudflare Vite integration, builds the app, and owns the SSR Worker/assets
   lifecycle and physical Worker name. The separate read-only inventory owner uses Alchemy's public
   `makeHttpStateStore` after an Effect FileSystem/Schema boundary decodes the
@@ -89,7 +92,8 @@ intent and task state belong in the active SPEC and execution plan.
 
 ```text
 frozen source and lock
-  -> root Cloudflare.Website.Vite("DocsWebsite")
+  -> root provider and state composition
+    -> @taxkit/infrastructure Website.Vite("DocsWebsite")
     -> Alchemy injects the Cloudflare Vite integration
     -> Vite builds the TanStack SSR Worker and client assets
     -> Alchemy applies one isolated pr-N or fixed prod website resource
@@ -403,8 +407,9 @@ does not prove provider or public availability.
 ## Guardrails
 
 - Do not couple engine packages to deployment providers.
-- Keep provider composition at root and app build semantics in `apps/docs`;
-  do not add an infrastructure package or expose a raw provider client.
+- Keep provider composition at root, one resource declaration in
+  `@taxkit/infrastructure`, and app build semantics in `apps/docs`.
+  Do not expose a raw provider client.
 - Decode stage and provider readback representations at their ingress and keep
   physical names and URLs provider-owned.
 - Treat `.wrangler/**` and `apps/docs/dist/**` as ignored generated output.

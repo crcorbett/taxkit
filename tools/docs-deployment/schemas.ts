@@ -1,6 +1,5 @@
+import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import { Schema } from "effect";
-
-import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
 
 const CommitSha = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
 const Sha256 = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u));

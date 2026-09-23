@@ -5,6 +5,7 @@
     "": {
       "name": "taxkit",
       "dependencies": {
+        "@taxkit/infrastructure": "workspace:*",
         "alchemy": "catalog:",
       },
       "devDependencies": {
@@ -168,6 +169,19 @@
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "@types/react": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
+    "packages/infrastructure": {
+      "name": "@taxkit/infrastructure",
+      "version": "0.0.1",
+      "dependencies": {
+        "alchemy": "catalog:",
+        "effect": "catalog:",
+      },
+      "devDependencies": {
+        "@types/bun": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
@@ -1007,6 +1021,8 @@
     "@taxkit/docs-content": ["@taxkit/docs-content@workspace:packages/docs-content"],
 
     "@taxkit/docs-fumadocs": ["@taxkit/docs-fumadocs@workspace:packages/docs-fumadocs"],
+
+    "@taxkit/infrastructure": ["@taxkit/infrastructure@workspace:packages/infrastructure"],
 
     "@taxkit/rules-au-income-tax": ["@taxkit/rules-au-income-tax@workspace:packages/rules/au/income-tax"],
 
