@@ -188,6 +188,25 @@ historical token receipts and public docs; **N/A** for packages, app READMEs,
 generated references, skills, workflows, tests and a Changeset because no
 source or provider configuration changed.
 
+## 2026-09-24 Production Preview ancestry correction
+
+The accepted Preview deploy ran from reviewed `main` commit `7b983127ad7a9300904e2168a7cb4c52839d1a32`.
+The later Preview-proof merge moved `main` to
+`51e3cb00405a25c85fd4a7b0eded275eeb8ed88b`. GitHub's compare readback
+reported the Preview commit as an ancestor (`ahead_by: 1`, `behind_by: 0`).
+The Production preflight previously required those commits to be identical,
+which would stop the approved plan before provider work. It now requires the
+Preview workflow commit to be an ancestor of the current `main` workflow
+commit. The successful run, candidate, plan digest, stage, provider receipt
+and hosted proof checks remain exact. This source change is local until its
+reviewed workflow reaches `main`; no Production run is claimed here.
+
+Documentation impact: **Change required** for the Production workflow,
+contract test, deployment architecture, runbook and this active plan;
+**Preserve** for the SPEC target, task status, authority model, historical
+Preview receipts and public docs; **N/A** for package/app READMEs, generated
+references, skills and a Changeset because no package or public API changed.
+
 Documentation impact for this correction: **Change required** for three
 workflow commands, the contract test, safe plan-reader error, deployment
 architecture, runbook, automation register, this active plan and dated failure

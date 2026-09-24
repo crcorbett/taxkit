@@ -193,6 +193,12 @@ screenshot files for that mode and rejects admitted JSON containing credential
 names, deterministic sentinels or token shapes. Raw Alchemy plan/replan/destroy
 output, provider stderr, intermediate inventories and raw hosted diagnostics
 remain runner-local.
+Production accepts a successful Preview run from the reviewed `main` history
+when its workflow commit is an ancestor of the current `main` workflow commit.
+The candidate, Preview plan digest and provider and hosted receipts must still
+match exactly. This permits later evidence-only merges without making the
+accepted Preview proof depend on the current tip's commit identity.
+
 Production plan, deploy and rollback use the same fixed `prod` GitHub
 concurrency group with cancellation disabled. Preview and teardown keep their
 shared exact-`pr-N` non-cancellable group. These GitHub locks do not cover a
