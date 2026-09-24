@@ -12,6 +12,17 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
 
+## 2026-09-24 Alchemy beta.79 Preview deployment
+
+The [sanitised deployment receipt](./2026-09-24-alchemy-beta79-preview-deploy/receipt.json)
+binds the separately approved exact-digest `pr-78` apply, one Cloudflare
+`DocsWebsite` Worker, the successful receipt reconciler, hosted HTTP/browser
+proof and hash-checked desktop and mobile screenshots. An independent HTTP
+request returned 200; account-matched state and Cloudflare inventory agreed
+on one `pr-78` stage and Worker after the run. This is Preview evidence only;
+Production, public custom-domain availability and manual teardown remain
+outside the approved operation.
+
 ## 2026-09-24 Doppler automation-token metadata
 
 The [sanitised metadata receipt](./2026-09-24-doppler-token-metadata/receipt.json)

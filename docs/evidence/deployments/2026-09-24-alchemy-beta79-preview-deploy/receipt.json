@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "ADM-004-preview-deploy-2026-09-24",
+  "observedAt": "2026-09-24T01:43:51Z",
+  "repository": "crcorbett/taxkit",
+  "authority": {
+    "approver": "Cooper, TaxKit owner",
+    "approvedOperation": "one exact-digest Preview deployment and provider and hosted-site checks",
+    "protectedEnvironment": "taxkit-docs-preview",
+    "stage": "pr-78",
+    "productionApproved": false,
+    "manualTeardownApproved": false
+  },
+  "source": {
+    "workflowCommit": "7b983127ad7a9300904e2168a7cb4c52839d1a32",
+    "candidatePullRequest": 78,
+    "candidateCommit": "84d65144938b7b8b25672f070e790b74ec09237d",
+    "candidateQualityRun": 35934465978,
+    "acceptedPreviewPlanRun": 35939686472,
+    "acceptedPreviewPlanSha256": "7ef11dd43e8a5a20e14e4177d1db0dcfa02277a5538bd4457082bcbc5ca22e86"
+  },
+  "preflight": {
+    "providerFreeDocsDeploymentCheck": "passed",
+    "accountMatched": true,
+    "stateAndProviderAgreement": "state-provider-agree",
+    "pr78StateStageCount": 0,
+    "pr78ProviderWorkerCount": 0,
+    "activePreviewWriterInRecentGitHubRuns": false
+  },
+  "deployment": {
+    "runId": 35943710629,
+    "result": "success",
+    "planArtifactId": 10785679138,
+    "providerAndHostedArtifactId": 10785892606,
+    "reconcilerRunId": 35943838280,
+    "reconciledRunArtifactId": 10785996986,
+    "reconciledConclusion": "success",
+    "alchemyVersion": "2.0.0-beta.79",
+    "planAction": "create",
+    "logicalResource": "TaxKitDocsCloudflare/pr-78/DocsWebsite",
+    "initialPlanMatchedAcceptedDigest": true,
+    "replanMatchedAcceptedDigest": true,
+    "initialAndReplanProjectionEqual": true,
+    "initialAndReplanIdentityEqual": true,
+    "acceptedPlanSha256": "7ef11dd43e8a5a20e14e4177d1db0dcfa02277a5538bd4457082bcbc5ca22e86"
+  },
+  "providerReadback": {
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "stateStoreId": "cloudflare-http",
+    "stage": "pr-78",
+    "workerName": "taxkitdocscloudflare-docswebsiqmpqqa4magljz7gnjaxyppdn",
+    "url": "https://taxkitdocscloudflare-docswebsiqmpqqa4magljz7gnjaxyppdn.coopercorbett.workers.dev",
+    "deploymentId": "0e749110-78f5-46c5-85dd-edd44361e9ff",
+    "versionId": "71423cfd-2ca5-498a-a5a4-6d355713a140",
+    "previousVersionId": null,
+    "rollbackRecoveryIdentity": "preview-35943710629"
+  },
+  "hostedProof": {
+    "environment": "preview",
+    "stage": "pr-78",
+    "browserAndHttpWorkflowStep": "passed",
+    "diagnosticsCount": 0,
+    "providerAndHostedIdentityEqual": true,
+    "screenshots": [
+      {
+        "kind": "desktop",
+        "pathInArtifact": "docs/evidence/deployments/workflow-35943710629/preview-desktop-84d6514.png",
+        "sha256": "128c8f300d1911111fd3fc22a89289efc6961df29582421a53bd77e9ff8c82cf",
+        "hashChecked": true
+      },
+      {
+        "kind": "mobile",
+        "pathInArtifact": "docs/evidence/deployments/workflow-35943710629/preview-mobile-84d6514.png",
+        "sha256": "9ebc4108397d334eedff97d8ae79ddc103ee61a62bf87a995becf3715b32c945",
+        "hashChecked": true
+      }
+    ],
+    "independentRootHttpStatusAfterRun": 200,
+    "independentRootContentType": "text/html; charset=utf-8"
+  },
+  "readbackAfterRun": {
+    "credentialSource": "checkout-scoped Doppler taxkit/dev",
+    "accountMatched": true,
+    "stateAndProviderAgreement": "state-provider-agree",
+    "stateStoreVersion": 7,
+    "pr78StateStageCount": 1,
+    "pr78ProviderWorkerCount": 1,
+    "rawInventoryRetainedInRepository": false
+  },
+  "recovery": {
+    "recoveryIdentity": "preview-35943710629",
+    "manualExactStageTeardown": "Requires separate approval for closed PR #78, two equal destroy plans and state and provider absence readback. After an interrupted mutation, inspect state and provider before any retry."
+  },
+  "nonClaims": [
+    "The exact state-store effects of the successful bootstrap were not independently observed.",
+    "Preview HTTP and browser proof does not establish Production deployment or public custom-domain availability.",
+    "The HTTP observation and screenshots do not guarantee permanent site availability.",
+    "No Production plan, Production apply, manual teardown, DNS change, package publication or credential mutation occurred."
+  ]
+}
