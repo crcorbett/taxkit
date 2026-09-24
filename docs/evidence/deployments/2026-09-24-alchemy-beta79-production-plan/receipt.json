@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "ADM-004-production-plan-2026-09-24",
+  "observedAt": "2026-09-24T04:14:34.363Z",
+  "repository": "crcorbett/taxkit",
+  "authority": {
+    "approver": "Cooper, TaxKit owner",
+    "approvedOperation": "one fixed Production state-store bootstrap and Website plan",
+    "protectedEnvironment": "taxkit-docs-production",
+    "githubReviewer": "crcorbett",
+    "stage": "prod",
+    "productionWebsiteApplyApproved": false
+  },
+  "source": {
+    "workflowCommit": "908177969768945d25e963d93e8eaf59c2d4006b",
+    "workflowCorrectionPullRequest": 82,
+    "candidatePullRequest": 78,
+    "candidateCommit": "84d65144938b7b8b25672f070e790b74ec09237d",
+    "acceptedPreviewRunId": 35943710629,
+    "acceptedPreviewPlanSha256": "7ef11dd43e8a5a20e14e4177d1db0dcfa02277a5538bd4457082bcbc5ca22e86"
+  },
+  "workflow": {
+    "runId": 35946380336,
+    "conclusion": "success",
+    "planArtifactId": 10790221249,
+    "reconcilerRunId": 35954390853,
+    "reconcilerConclusion": "success",
+    "reconciledRunArtifactId": 10789309580
+  },
+  "plan": {
+    "operation": "production-plan",
+    "logicalResource": "TaxKitDocsCloudflare/prod/DocsWebsite",
+    "resourceType": "Cloudflare.Worker",
+    "action": "update",
+    "acceptedPlanSha256": "886e7cf0fe2bb07aa50e6c0e1ecf2a2582bd163eacb59ee121cd9b6cfd69566e",
+    "configSha256": "b7c576cfb842f538bb77a040c543b151496af5861869f33e1fb8ea9923204929",
+    "deploymentInputSha256": "84e7d2484015b1d6297574744349c5490feba1cdcc6227136fac96ab106288a3",
+    "lockfileSha256": "bd3e1e74f63bc46b5bfd14cfa814cb6ea3fb7ecb8caf685b0d974d2bb7be72c1"
+  },
+  "readbackAfterPlan": {
+    "observedAt": "2026-09-24T04:14:34.363Z",
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "productionWorkerMatches": 1,
+    "workerName": "taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev",
+    "workerModifiedOn": "2026-08-21T05:34:43.818083Z",
+    "latestDeploymentId": "cfcc5cea-9196-417e-b37c-5856bbbb5df2",
+    "latestDeploymentVersionId": "4d2439eb-f1f7-4dff-89c6-ba5433ce570b",
+    "latestDeploymentTrafficPercentage": 100,
+    "independentRootHttpStatus": 200,
+    "independentRootContentType": "text/html; charset=utf-8"
+  },
+  "bootstrap": {
+    "result": "bootstrap-command-completed",
+    "allowedEffects": [
+      "credential-refresh",
+      "edge-preview-secret-read",
+      "state-store-create-or-upgrade"
+    ],
+    "preciseProviderEffectsObserved": false
+  },
+  "recovery": {
+    "currentProductionVersionBeforeAnyApply": "4d2439eb-f1f7-4dff-89c6-ba5433ce570b",
+    "nextOperation": "A separately approved deploy must require an equal Production replan, fixed-stage provider and state readback, and hosted proof. A rollback needs its own approval and fresh expected-current-version check."
+  },
+  "nonClaims": [
+    "The plan and independent Worker readback do not prove that the Alchemy state store was unchanged by bootstrap.",
+    "The plan does not prove the proposed update will apply or that hosted Production behaviour will pass.",
+    "No Production Website apply, rollback, package publication, DNS change or custom-domain change occurred."
+  ]
+}

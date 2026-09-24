@@ -12,6 +12,17 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
 
+## 2026-09-24 Alchemy beta.79 Production plan
+
+The [sanitised plan receipt](./2026-09-24-alchemy-beta79-production-plan/receipt.json)
+binds the reviewed workflow, separately approved fixed `prod` plan, successful
+GitHub receipt check and one `DocsWebsite` Worker **update** projection. A
+fresh account-matched Cloudflare read still found the existing Production
+Worker on its earlier deployment version, and its root URL returned HTTP 200.
+The state-store bootstrap completed, but its precise effects were not observed.
+No Production Website apply or hosted proof ran; a deploy needs separate
+approval of the exact plan digest.
+
 ## 2026-09-24 Alchemy beta.79 Preview deployment
 
 The [sanitised deployment receipt](./2026-09-24-alchemy-beta79-preview-deploy/receipt.json)

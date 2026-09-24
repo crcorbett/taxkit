@@ -18,9 +18,9 @@ proof. Starting point: clean isolated worktree from
 | Task | State | Evidence and next action |
 | --- | --- | --- |
 | ADM-001 infrastructure owner | Locally verified; one-resource Preview deployment proved | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Hosted `pr-78` readback found one state stage and one Cloudflare Worker; Production property parity remains unproved. |
-| ADM-002 release upgrade | Locally verified; beta.79 hosted Preview passed | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks pass. The hosted Preview plan, equal replan, apply and browser proof passed; Production plan and hosted behaviour remain unproved. |
-| ADM-003 Doppler reconciliation | Locally verified; service-token metadata checked; bridge binding open | The checkout-scoped personal login and custody check passed. Fixed `taxkit/dev` values matched the expected account without value output. Read-only Doppler metadata shows one read-only, unexpired token per `ci`, `stg_preview` and `prd`; GitHub bridge names match the expected locations. The unreadable GitHub values cannot be bound to exact token identities. |
-| ADM-004 delivery | Merged; hosted Preview deployed and proved; Production open | PRs #78, #79 and #80 merged with Quality and exact-stage cleanup evidence. Preview run `35943710629` matched the accepted digest, deployed one `DocsWebsite` Worker and passed provider and hosted browser proof. Production plan, deploy and rollback proof remain open. |
+| ADM-002 release upgrade | Locally verified; beta.79 Preview hosted and Production planned | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks, hosted Preview apply/browser proof and fixed Production plan passed. Production apply and hosted behaviour remain unproved. |
+| ADM-003 Doppler reconciliation | Locally verified; fixed bridges exercised; exact binding open | The checkout-scoped personal login and custody check passed. Read-only Doppler metadata shows one read-only, unexpired token per `ci`, `stg_preview` and `prd`; the hosted Preview and Production plan runs checked their fixed config identities. GitHub bridge values remain unreadable and cannot be bound to exact token identities. |
+| ADM-004 delivery | Merged; Preview hosted; Production plan accepted, deploy open | PRs #78–#82 merged with Quality and exact-stage cleanup evidence. Preview run `35943710629` passed provider and hosted browser proof. Separately approved Production plan run `35946380336` passed with one `DocsWebsite` update and digest `886e7cf0…fd69566e`; deploy and rollback proof remain open. |
 
 ## 2026-09-24 development authority and CLI correction
 
@@ -178,8 +178,9 @@ environment. The successful Preview plan checked `stg_preview` identity; PR
 #80's Quality checked `ci` identity. The [sanitised metadata receipt](../../evidence/deployments/2026-09-24-doppler-token-metadata/receipt.json)
 records the exact names, access and expiry without bearer values or IDs.
 GitHub does not reveal its secret values, so names and nearby timestamps do
-not prove the exact bridge-token binding. Production's bridge has not been
-exercised by this modernisation's hosted workflow.
+not prove the exact bridge-token binding. At this metadata readback,
+Production's bridge had not yet been exercised by this modernisation's hosted
+workflow.
 
 Documentation impact for this metadata slice: **Change required** for the
 dated receipt, deployment evidence index, task ledger and this plan;
@@ -198,14 +199,47 @@ The Production preflight previously required those commits to be identical,
 which would stop the approved plan before provider work. It now requires the
 Preview workflow commit to be an ancestor of the current `main` workflow
 commit. The successful run, candidate, plan digest, stage, provider receipt
-and hosted proof checks remain exact. This source change is local until its
-reviewed workflow reaches `main`; no Production run is claimed here.
+and hosted proof checks remain exact. PR #82 subsequently merged this change
+as `908177969768945d25e963d93e8eaf59c2d4006b` with passing Quality and
+automatic Preview cleanup.
 
 Documentation impact: **Change required** for the Production workflow,
 contract test, deployment architecture, runbook and this active plan;
 **Preserve** for the SPEC target, task status, authority model, historical
 Preview receipts and public docs; **N/A** for package/app READMEs, generated
 references, skills and a Changeset because no package or public API changed.
+
+## 2026-09-24 accepted fixed Production plan
+
+Cooper approved one fixed `prod` bootstrap and plan for PR #78 candidate
+`84d65144938b7b8b25672f070e790b74ec09237d`, with accepted Preview run
+`35943710629` and digest
+`7ef11dd43e8a5a20e14e4177d1db0dcfa02277a5538bd4457082bcbc5ca22e86`.
+Cooper then explicitly authorised approval of the `crcorbett` review in the
+protected `taxkit-docs-production` environment. The approved [Production plan
+run `35946380336`](https://github.com/crcorbett/taxkit/actions/runs/35946380336)
+and independent [receipt check `35954390853`](https://github.com/crcorbett/taxkit/actions/runs/35954390853)
+completed successfully on reviewed `main` `908177969768945d25e963d93e8eaf59c2d4006b`.
+The allowlisted plan artifact `10790221249` proposes one `Cloudflare.Worker`
+`DocsWebsite` **update** on `prod`; its canonical digest is
+`886e7cf0fe2bb07aa50e6c0e1ecf2a2582bd163eacb59ee121cd9b6cfd69566e`.
+
+A fresh account-matched Cloudflare read found one existing Production Worker,
+still on deployment `cfcc5cea-9196-417e-b37c-5856bbbb5df2` and version
+`4d2439eb-f1f7-4dff-89c6-ba5433ce570b` at 100% traffic. Its root URL
+returned HTTP 200. The state-store bootstrap completed, but its exact effects
+were not independently observed. The [sanitised plan receipt](../../evidence/deployments/2026-09-24-alchemy-beta79-production-plan/receipt.json)
+retains the approval, artifact, plan and readback identities. No Website apply,
+hosted Production proof or rollback ran. A deploy requires a separate approval
+of this exact candidate and digest, then an equal replan and provider and hosted
+readback. Any rollback requires its own approval and fresh current-version
+check.
+
+Documentation impact: **Change required** for the dated receipt, deployment
+evidence index, active task ledger and this plan; **Preserve** for the SPEC,
+runbook, authority model, architecture, historical receipts and public docs;
+**N/A** for packages, app READMEs, generated references, skills, workflows,
+tests and a Changeset because no repository runtime or published API changed.
 
 Documentation impact for this correction: **Change required** for three
 workflow commands, the contract test, safe plan-reader error, deployment
