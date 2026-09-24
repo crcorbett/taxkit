@@ -123,10 +123,24 @@ export const WorkflowPlanProjectionKind = Schema.Literals([
 ]);
 export type WorkflowPlanProjectionKind = typeof WorkflowPlanProjectionKind.Type;
 
+export const WorkflowPlanProjectionReason = Schema.Literals([
+  "workflow plan projection requires the candidate, digest, stage and plan paths",
+  "could not read the beta.79 Alchemy plan output",
+  "beta.79 Alchemy plan output must contain exactly one plan summary",
+  "unsupported beta.79 Alchemy plan output line",
+  "unsupported beta.79 Alchemy plan resource line",
+  "unsupported native Alchemy plan action",
+  "a native deployment plan must contain exactly one DocsWebsite action",
+  "a native deployment plan cannot delete the DocsWebsite resource",
+  "a native teardown plan must contain at most one DocsWebsite action",
+  "a native teardown plan may only delete or noop the DocsWebsite resource",
+  "beta.79 Alchemy plan summary does not match its native resource action",
+]);
+
 export class WorkflowPlanProjectionError extends Schema.TaggedError<WorkflowPlanProjectionError>()(
   "WorkflowPlanProjectionError",
   {
-    reason: Schema.NonEmptyString,
+    reason: WorkflowPlanProjectionReason,
   }
 ) {}
 
@@ -139,7 +153,7 @@ const resourceLine = /^\[[^\]]+\] /u;
 const nativeResourceLine = /^\[DocsWebsite\] (?:create|update|noop|delete)$/u;
 const planSummaryLine = /^Plan: /u;
 
-const fail = (reason: string) =>
+const fail = (reason: typeof WorkflowPlanProjectionReason.Type) =>
   Effect.fail(new WorkflowPlanProjectionError({ reason }));
 
 export const projectAlchemyPlanText = (

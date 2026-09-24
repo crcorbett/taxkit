@@ -20,7 +20,7 @@ proof. Starting point: clean isolated worktree from
 | ADM-001 infrastructure owner | Locally verified | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Exact provider parity remains unproved. |
 | ADM-002 release upgrade | Locally verified; development plan captured; hosted plan open | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks pass. A beta.79 development plan proposes one `DocsWebsite` create; Preview and Production plans remain unproved. |
 | ADM-003 Doppler reconciliation | Locally verified; personal login passed; bridge scope open | The checkout-scoped personal login and custody check passed. Fixed `taxkit/dev` values matched the expected account without value output. Automation bridge token scope and expiry remain unproved. |
-| ADM-004 delivery | Pending | Local proof, reviewed PR, authorised hosted proof and exact remote-main readback. |
+| ADM-004 delivery | Merged; hosted Preview plan stopped | PR #78 and merged-main Quality passed. Automatic teardown and first Preview plan stopped after bootstrap. State/provider readback agrees for absent `pr-78`; follow-up workflow correction and hosted plan proof remain open. |
 
 ## 2026-09-24 development authority and CLI correction
 
@@ -40,7 +40,7 @@ Installed Alchemy beta.79 source shows that `alchemy login` and
 non-zero. Its supported bootstrap command is
 `alchemy provider cloudflare bootstrap`. Complete Cloudflare account and API
 token environment values take precedence over profile credentials, including
-under `CI=1`. The three hosted mutation workflows now use that command with
+under `CI=1`. The three hosted mutation workflows initially used that command with
 `CI=1` and no profile-login step, retaining Doppler as their only Cloudflare
 credential source. The workflow contract test, `check:docs` and
 `check:runbooks` passed locally after this correction. The live development
@@ -58,6 +58,49 @@ parsed as one `DocsWebsite` **create**. Its two safe lines are retained in
 SHA-256 `da20a6a0593162c6b97bbfdd888c9258e77cb3b0badef3798d594fd4a6c5c07d`.
 The bootstrap's precise mutation, if any, was not observed. No Website apply
 or hosted stage was run.
+
+## 2026-09-24 merged-main teardown stop and cache correction
+
+Cooper approved merging [PR #78](https://github.com/crcorbett/taxkit/pull/78)
+before its first Preview plan, because the dispatch must use reviewed workflow
+code on `main`. PR head `84d65144938b7b8b25672f070e790b74ec09237d`
+passed Quality; squash merge `6b2a8578851872ed9de81b669c5de0b511821e92`
+passed merged-main Quality. The PR-close teardown run
+[`35936287064`](https://github.com/crcorbett/taxkit/actions/runs/35936287064)
+completed the mutation-capable state-store bootstrap, then stopped before any
+destroy because the inventory command found no cached state-store credential.
+At that point, no Preview plan had been dispatched and no teardown artifact
+was uploaded.
+
+The separately approved Preview-only plan was then dispatched from merged
+`main` as run [`35937015746`](https://github.com/crcorbett/taxkit/actions/runs/35937015746).
+Its bootstrap succeeded, but the plan reader rejected the hosted output before
+a plan receipt was written. The allowlisted artifact contains only the workflow
+input and bootstrap receipts. The plan command exited successfully, while a
+private local diagnostic plan parsed as one `DocsWebsite` create; that local
+result does not establish the hosted output. After both stopped runs, read-only
+Alchemy state and Cloudflare inventory agreed with no `pr-78` stage or Worker,
+state-store version 7, and HTTP 200 for its Worker settings. The
+[sanitised stop receipt](../../evidence/deployments/2026-09-24-alchemy-beta79-preview-stop/receipt.json)
+retains the exact run and readback identities without raw provider output.
+
+Installed Alchemy beta.79 writes that cache only when the bootstrap runs with
+`CI=0`; complete Doppler-supplied Cloudflare environment credentials retain
+priority in either mode. This follow-up changes the three mutation
+workflow bootstrap commands to `CI=0`, keeps later inventory and plans under
+`CI=1`, and updates the contract test and deployment owners. It also retains a
+fixed, safe plan-reader reason in future errors because the hosted raw output
+was intentionally not uploaded. The bootstrap's exact provider effects in the
+failed runs remain unknown. No Website apply, accepted Preview plan, Production
+operation or retry is claimed here.
+
+Documentation impact for this correction: **Change required** for three
+workflow commands, the contract test, safe plan-reader error, deployment
+architecture, runbook, automation register, this active plan and dated failure
+evidence; **Preserve** for historical beta.64 receipts, authority model,
+public docs and protected GitHub environments; **N/A** for package exports,
+SDK/API contracts and a Changeset because no published package behaviour
+changed.
 
 Documentation impact for this slice: **Change required** for the three
 workflows, their contract test and plan reader, deployment architecture,

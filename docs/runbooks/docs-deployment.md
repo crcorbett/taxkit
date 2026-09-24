@@ -49,7 +49,9 @@ expiring, single-config bridge for `taxkit/stg_preview`. Preview also requires
 repository `DOPPLER_CI_TOKEN` for `taxkit/ci`; teardown must not use it.
 Production requires the `taxkit-docs-production` environment's separate
 `DOPPLER_PROVIDER_TOKEN` for `taxkit/prd` and the same repository `ci` bridge.
-Do not copy any credential into a local file, command, log or receipt. The
+Do not manually copy a credential into a file, command, log or receipt. The
+Alchemy-managed state-store cache on an ephemeral mutation runner is the sole
+file exception; do not upload or retain it beyond that job. The
 TaxKit Doppler configs and bridges are established. Every deployment still
 needs its own exact operation approval; credential bootstrap does not grant
 deployment authority.
@@ -72,6 +74,13 @@ provider credential, read a short-lived edge-preview secret, and create or
 upgrade state-store resources. Authorise it as part of the exact workflow
 operation. Its receipt proves only that the bounded step completed; it does
 not prove that no provider state changed.
+
+Run the supported Cloudflare bootstrap with `CI=0` in the mutation workflow's
+provider step. Beta.79 writes its account-matched state-store credential cache
+only in that mode; the following `CI=1` inventory read needs that cache in the
+same job. Complete Doppler-provided Cloudflare environment credentials remain
+the bootstrap's authentication source. A successful bootstrap without the
+cache is a stopped operation requiring state and provider readback before retry.
 
 The Cloudflare token is available only to the named bootstrap, plan,
 replan/apply and destroy steps that need it. It must not be moved to a job,

@@ -254,9 +254,10 @@ const makeProjection = (
       "deploy"
     ).pipe(
       Effect.mapError(
-        () =>
+        (error) =>
           new WorkflowEvidencePlanProjectionError({
             operation: config.TAXKIT_WORKFLOW_EVIDENCE_OPERATION,
+            reason: error.reason,
           })
       )
     );

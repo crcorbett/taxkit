@@ -12,6 +12,16 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
 
+## 2026-09-24 merged-main Preview stops
+
+The [sanitised failure receipt](./2026-09-24-alchemy-beta79-preview-stop/receipt.json)
+binds PR #78's merged-main Quality result, the failed automatic `pr-78`
+teardown and the failed first Preview plan run. Both runs completed the
+mutation-capable state-store bootstrap; neither destroyed or applied the docs
+Website. Read-only state and Cloudflare inventory later agreed with no
+`pr-78` stage or Worker, and the state-store Worker settings returned HTTP 200.
+The exact bootstrap effects and hosted plan projection cause remain unproved.
+
 ## 2026-09-24 Alchemy beta.79 development plan
 
 The [sanitised receipt](./2026-09-24-alchemy-beta79-dev-plan/receipt.json)
