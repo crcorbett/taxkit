@@ -12,6 +12,14 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
 
+## 2026-09-24 Doppler automation-token metadata
+
+The [sanitised metadata receipt](./2026-09-24-doppler-token-metadata/receipt.json)
+records one read-only, unexpired service token in each fixed `ci`,
+`stg_preview` and `prd` Doppler config, the expected secret names in those
+configs, and the matching GitHub bridge secret names. GitHub does not expose
+bridge values, so the exact token-to-bridge binding remains unproved.
+
 ## 2026-09-24 accepted Alchemy beta.79 Preview plan
 
 The [sanitised hosted receipt](./2026-09-24-alchemy-beta79-preview-plan/receipt.json)

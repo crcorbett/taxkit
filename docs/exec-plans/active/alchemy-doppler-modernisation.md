@@ -19,7 +19,7 @@ proof. Starting point: clean isolated worktree from
 | --- | --- | --- |
 | ADM-001 infrastructure owner | Locally verified | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Exact provider parity remains unproved. |
 | ADM-002 release upgrade | Locally verified; development and hosted Preview plans captured | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks pass. The development and hosted Preview plans each propose one `DocsWebsite` create; Production plan and hosted Website behaviour remain unproved. |
-| ADM-003 Doppler reconciliation | Locally verified; personal login passed; bridge scope open | The checkout-scoped personal login and custody check passed. Fixed `taxkit/dev` values matched the expected account without value output. Automation bridge token scope and expiry remain unproved. |
+| ADM-003 Doppler reconciliation | Locally verified; service-token metadata checked; bridge binding open | The checkout-scoped personal login and custody check passed. Fixed `taxkit/dev` values matched the expected account without value output. Read-only Doppler metadata shows one read-only, unexpired token per `ci`, `stg_preview` and `prd`; GitHub bridge names match the expected locations. The unreadable GitHub values cannot be bound to exact token identities. |
 | ADM-004 delivery | Merged; hosted Preview plan accepted; apply open | PRs #78 and #79, their Quality checks, PR #79 automatic cleanup and the second Preview plan passed. State/provider readback agrees that `pr-78` and `pr-79` are absent. Preview apply, hosted Website proof and Production proof remain open. |
 
 ## 2026-09-24 development authority and CLI correction
@@ -125,6 +125,28 @@ dated receipt, deployment evidence index, active task ledger and this plan;
 model, historical failure receipt and public docs; **N/A** for package and
 app READMEs, generated references, skills, workflows, tests and a Changeset
 because this slice changes no executable or published behaviour.
+
+## 2026-09-24 Doppler token metadata readback
+
+Read-only Doppler metadata listed one `read` service token in each fixed
+automation config: `taxkit/ci`, `taxkit/stg_preview` and `taxkit/prd`. All three
+expire on 18 November 2026. Names-only Doppler inventory still shows the
+expected Turbo pair in `ci` and Cloudflare pair in `dev`, `stg_preview` and
+`prd`. GitHub readback shows only `DOPPLER_CI_TOKEN` at repository level and
+one `DOPPLER_PROVIDER_TOKEN` in each matching Preview and Production
+environment. The successful Preview plan checked `stg_preview` identity; PR
+#80's Quality checked `ci` identity. The [sanitised metadata receipt](../../evidence/deployments/2026-09-24-doppler-token-metadata/receipt.json)
+records the exact names, access and expiry without bearer values or IDs.
+GitHub does not reveal its secret values, so names and nearby timestamps do
+not prove the exact bridge-token binding. Production's bridge has not been
+exercised by this modernisation's hosted workflow.
+
+Documentation impact for this metadata slice: **Change required** for the
+dated receipt, deployment evidence index, task ledger and this plan;
+**Preserve** for the SPEC, deployment runbook, authority model, architecture,
+historical token receipts and public docs; **N/A** for packages, app READMEs,
+generated references, skills, workflows, tests and a Changeset because no
+source or provider configuration changed.
 
 Documentation impact for this correction: **Change required** for three
 workflow commands, the contract test, safe plan-reader error, deployment

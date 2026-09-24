@@ -64,7 +64,7 @@
     },
     {
       "id": "ADM-003",
-      "status": "locally-verified-personal-login-passed-bridge-scope-open",
+      "status": "locally-verified-service-token-metadata-bridge-binding-open",
       "title": "Reconcile Doppler and deployment workflow contracts",
       "type": "operations",
       "dependsOn": ["ADM-002"],
