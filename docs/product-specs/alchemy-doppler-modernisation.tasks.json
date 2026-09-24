@@ -79,7 +79,7 @@
     },
     {
       "id": "ADM-004",
-      "status": "merged-preview-deployed-and-hosted-proved-production-open",
+      "status": "merged-preview-deployed-production-planned-deploy-open",
       "title": "Close local proof and qualify hosted delivery",
       "type": "delivery",
       "dependsOn": ["ADM-003"],
