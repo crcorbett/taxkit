@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "ADM-004-preview-stop-2026-09-24",
+  "observedAt": "2026-09-24T00:13:43Z",
+  "repository": "crcorbett/taxkit",
+  "authority": {
+    "approver": "Cooper, TaxKit owner",
+    "approvedOperations": ["merge PR #78", "automatic PR-close cleanup", "Preview-only bootstrap and plan"],
+    "stage": "pr-78",
+    "protectedEnvironment": "taxkit-docs-preview",
+    "expectedCloudflareAccountId": "f9f94270a4a5af8af7010d891020922d"
+  },
+  "source": {
+    "pullRequest": 78,
+    "candidateCommit": "84d65144938b7b8b25672f070e790b74ec09237d",
+    "mergedMainCommit": "6b2a8578851872ed9de81b669c5de0b511821e92",
+    "candidateQualityRun": 35934465978,
+    "mergedMainQualityRun": 35936287090,
+    "candidateQuality": "success",
+    "mergedMainQuality": "success"
+  },
+  "automaticTeardown": {
+    "runId": 35936287064,
+    "result": "failure",
+    "lastSuccessfulStep": "Run mutation-capable Alchemy state-store bootstrap",
+    "stoppedStep": "Equal dry-run and destroy exact Preview stage",
+    "safeError": "missing cached Cloudflare state-store credentials",
+    "cacheVisible": false,
+    "destroyAttempted": false,
+    "artifactUploaded": false,
+    "bootstrapMutationDetailsObserved": false
+  },
+  "previewPlan": {
+    "runId": 35937015746,
+    "artifactId": 10782989405,
+    "result": "failure",
+    "lastSuccessfulStep": "Run mutation-capable Alchemy state-store bootstrap",
+    "stoppedStep": "Plan exact Preview candidate",
+    "safeError": "WorkflowEvidencePlanProjectionError",
+    "alchemyPlanCommandExit": 0,
+    "planProjectionAccepted": false,
+    "websiteApplyAttempted": false,
+    "bootstrapMutationDetailsObserved": false,
+    "allowlistedArtifactContains": ["workflow-input.json", "bootstrap.json"]
+  },
+  "readbackAfterStops": {
+    "credentialSource": "checkout-scoped Doppler taxkit/dev",
+    "accountIdentityMatchedExpected": true,
+    "stateAndProviderAgreement": "state-provider-agree",
+    "stateStoreVersion": 7,
+    "pr78StateStageCount": 0,
+    "pr78ProviderWorkerCount": 0,
+    "stateStoreWorkerSettingsHttpStatus": 200,
+    "readOnlyInventoryReportSha256BeforePlan": "a6e341b1fbb922cce4f9643ceb93d1e5cf16ea7d174c0aad17b4ffb1b99cbf30",
+    "rawInventoryRetainedInRepository": false
+  },
+  "sourceFinding": {
+    "alchemyVersion": "2.0.0-beta.79",
+    "bootstrapCacheRule": "beta.79 writes cloudflare-state-store credentials only when CI=0",
+    "workflowBootstrapModeAtFailure": "CI=1",
+    "providerAuthRule": "complete Cloudflare environment credentials take precedence in either CI mode",
+    "localReadOnlyPlanParserResult": "one DocsWebsite create; hosted raw plan output was not retained",
+    "hostedProjectionRootReason": "unknown pending safe reason reporting"
+  },
+  "nonClaims": [
+    "The exact provider mutations of either successful bootstrap were not observed.",
+    "No teardown plan or destroy was executed in the failed automatic cleanup.",
+    "The hosted Preview plan projection was not accepted, and its raw output was not retained.",
+    "The local diagnostic plan is not a hosted workflow receipt or permission to apply.",
+    "No Preview Website apply, Production operation or public-site proof occurred."
+  ]
+}

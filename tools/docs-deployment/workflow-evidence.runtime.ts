@@ -81,7 +81,9 @@ const program = runWorkflowEvidence.pipe(
     Console.error(`FAIL [workflow-evidence] input=${error.role}`)
   ),
   Effect.tapErrorTag("WorkflowEvidencePlanProjectionError", (error) =>
-    Console.error(`FAIL [workflow-evidence] plan=${error.operation}`)
+    Console.error(
+      `FAIL [workflow-evidence] plan=${error.operation} reason=${error.reason ?? "projection-or-receipt"}`
+    )
   ),
   Effect.tapErrorTag("WorkflowEvidenceProviderDecodeError", (error) =>
     Console.error(`FAIL [workflow-evidence] provider=${error.role}`)

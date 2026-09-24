@@ -315,8 +315,14 @@ describe("workflow evidence command", () => {
           makePlanConfig(repositoryRoot, directory)
         );
         Result.match(invalidPlan, {
-          onFailure: (error) =>
-            expect(error._tag).toBe("WorkflowEvidencePlanProjectionError"),
+          onFailure: (error) => {
+            expect(error._tag).toBe("WorkflowEvidencePlanProjectionError");
+            if (error._tag === "WorkflowEvidencePlanProjectionError") {
+              expect(error.reason).toBe(
+                "beta.79 Alchemy plan output must contain exactly one plan summary"
+              );
+            }
+          },
           onSuccess: () => expect.unreachable(),
         });
 

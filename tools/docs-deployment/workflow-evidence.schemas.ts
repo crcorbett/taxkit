@@ -1,6 +1,8 @@
 import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import { Schema } from "effect";
 
+import { WorkflowPlanProjectionReason } from "./workflow-plan-projection.js";
+
 const WorkflowEvidenceCommitSha = Schema.String.check(
   Schema.isPattern(/^[a-f0-9]{40}$/u)
 );
@@ -189,6 +191,7 @@ export class WorkflowEvidencePlanProjectionError extends Schema.TaggedError<Work
   "WorkflowEvidencePlanProjectionError",
   {
     operation: Schema.NonEmptyString,
+    reason: Schema.optional(WorkflowPlanProjectionReason),
   }
 ) {}
 

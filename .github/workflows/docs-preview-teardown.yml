@@ -162,7 +162,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
-          ALCHEMY_PLAIN=1 CI=1 bunx alchemy provider cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store
+          # CI=0 writes the account-matched state-store cache for inventory in this job.
+          # The complete Doppler-provided Cloudflare environment pair remains the auth source.
+          ALCHEMY_PLAIN=1 CI=0 bunx alchemy provider cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store
           TAXKIT_WORKFLOW_EVIDENCE_BOOTSTRAP_PATH="$RUNNER_TEMP/docs-deployment/bootstrap.json" \
           TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
           TAXKIT_WORKFLOW_EVIDENCE_MODE=bootstrap \
