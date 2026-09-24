@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "ADM-004-preview-plan-2026-09-24",
+  "observedAt": "2026-09-24T01:04:53Z",
+  "repository": "crcorbett/taxkit",
+  "authority": {
+    "approver": "Cooper, TaxKit owner",
+    "approvedOperations": [
+      "mark PR #79 ready and merge",
+      "automatic PR #79 Preview cleanup",
+      "one Preview-only bootstrap and plan for merged PR #78"
+    ],
+    "protectedEnvironment": "taxkit-docs-preview",
+    "stage": "pr-78",
+    "websiteApplyApproved": false
+  },
+  "source": {
+    "workflowCommit": "976545a9ca8aa15f64963b2fa01dbbea4c6ef4d0",
+    "workflowCommitSource": "PR #79 squash merge on main",
+    "workflowQualityRun": 35939463827,
+    "candidatePullRequest": 78,
+    "candidateCommit": "84d65144938b7b8b25672f070e790b74ec09237d",
+    "candidateQualityRun": 35934465978,
+    "candidateMergedMainCommit": "6b2a8578851872ed9de81b669c5de0b511821e92"
+  },
+  "automaticCleanup": {
+    "pullRequest": 79,
+    "runId": 35939463603,
+    "artifactId": 10784655939,
+    "result": "success",
+    "acceptedDestroyPlanMatchedSecondPlan": true,
+    "stateStageAbsent": true,
+    "providerWorkerAbsent": true
+  },
+  "previewPlan": {
+    "runId": 35939686472,
+    "runAttempt": 1,
+    "artifactId": 10784398178,
+    "result": "success",
+    "operation": "plan",
+    "alchemyVersion": "2.0.0-beta.79",
+    "bootstrapResult": "bootstrap-command-completed",
+    "stack": "TaxKitDocsCloudflare",
+    "stage": "pr-78",
+    "logicalResources": [
+      {
+        "logicalId": "DocsWebsite",
+        "resourceType": "Cloudflare.Worker",
+        "action": "create"
+      }
+    ],
+    "acceptedPlanSha256": "7ef11dd43e8a5a20e14e4177d1db0dcfa02277a5538bd4457082bcbc5ca22e86",
+    "replanSha256": null,
+    "websiteApplyAttempted": false,
+    "hostedHttpOrBrowserProofAttempted": false,
+    "allowlistedArtifactContains": [
+      "bootstrap.json",
+      "identity.json",
+      "plan.json",
+      "projection.json",
+      "workflow-input.json"
+    ]
+  },
+  "readbackAfterPlan": {
+    "credentialSource": "checkout-scoped Doppler taxkit/dev",
+    "expectedCloudflareAccountMatched": true,
+    "stateAndProviderAgreement": "state-provider-agree",
+    "stateStoreVersion": 7,
+    "pr78StateStageCount": 0,
+    "pr78ProviderWorkerCount": 0,
+    "pr79StateStageCount": 0,
+    "pr79ProviderWorkerCount": 0,
+    "rawInventoryRetainedInRepository": false
+  },
+  "recovery": {
+    "currentWebsiteStageAbsent": true,
+    "ifApplyIsLaterApproved": "Replan and require this exact digest before applying; after a failed or interrupted mutation, stop and read back state and provider before any retry or separately authorised exact-stage teardown."
+  },
+  "nonClaims": [
+    "The plan is not permission to apply the Website.",
+    "The exact state-store effects of the successful bootstrap were not observed.",
+    "No Preview Website deployment, served-site proof, Production operation or public-site proof occurred.",
+    "The checkout-scoped development inventory does not prove the scope or expiry of the hosted Doppler bridge token."
+  ]
+}

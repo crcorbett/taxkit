@@ -49,7 +49,7 @@
     },
     {
       "id": "ADM-002",
-      "status": "locally-verified-dev-plan-captured-hosted-open",
+      "status": "locally-verified-dev-and-preview-plans-captured",
       "title": "Upgrade Alchemy and the matching Effect v4 family",
       "type": "compatibility",
       "dependsOn": ["ADM-001"],
@@ -79,11 +79,11 @@
     },
     {
       "id": "ADM-004",
-      "status": "pending",
+      "status": "merged-preview-plan-accepted-apply-open",
       "title": "Close local proof and qualify hosted delivery",
       "type": "delivery",
       "dependsOn": ["ADM-003"],
-      "goal": "Confirm exact candidate locally and in hosted checks before merging.",
+      "goal": "Confirm the exact candidate locally, merge reviewed workflow code after Quality passes, then qualify the hosted Preview plan and separately authorised deployment.",
       "scope": ["docs/exec-plans/active", "docs/evidence/deployments", "GitHub pull request and hosted checks"],
       "outputs": ["Bounded proof receipt", "Reviewed pull request", "Remote main readback when merge is authorised"],
       "mandatoryVerification": ["bun run verification", "bun run check:docs", "bun run check:runbooks", "git diff --check"],

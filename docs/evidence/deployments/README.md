@@ -12,6 +12,16 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
 
+## 2026-09-24 accepted Alchemy beta.79 Preview plan
+
+The [sanitised hosted receipt](./2026-09-24-alchemy-beta79-preview-plan/receipt.json)
+binds PR #79's merged workflow, its successful automatic `pr-79` cleanup, and
+the successful `pr-78` plan for the exact merged PR #78 candidate. The plan
+proposes one `DocsWebsite` Worker create and retains the digest needed for a
+separately approved apply. Account-matched readback after planning found no
+`pr-78` or `pr-79` stage or Worker. No Website apply, hosted browser proof or
+Production operation was performed.
+
 ## 2026-09-24 merged-main Preview stops
 
 The [sanitised failure receipt](./2026-09-24-alchemy-beta79-preview-stop/receipt.json)
