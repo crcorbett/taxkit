@@ -634,6 +634,11 @@ describe("docs deployment workflow admission", () => {
       ].join("")
     );
     expect(production).toContain(".head_sha");
+    expect(production).toContain(
+      ["compare/", "$", "{preview_source_sha}...", "$", "{GITHUB_SHA}"].join("")
+    );
+    expect(production).toContain("ahead|identical) ;;");
+    expect(production).not.toContain('test "$preview_source_sha" = "$(gh api');
     expect(production).toContain(".head_branch");
     expect(production).toContain(".name");
     expect(production).not.toContain('gh run view "$ACCEPTED_PREVIEW_RUN_ID"');

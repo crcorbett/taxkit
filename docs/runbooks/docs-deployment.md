@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-09-24
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -148,6 +148,10 @@ There is intentionally no external lease.
    without its named receipt is not an accepted input.
 3. The workflow checks candidate and Quality identity, installs frozen
    dependencies, and saves Bun and browser caches before any Doppler fetch.
+   Production also requires the successful Preview run to come from a reviewed
+   `main` commit that is an ancestor of the current workflow commit. A later
+   documentation or proof merge does not invalidate the accepted Preview run;
+   a run from another branch or a diverged commit stops before credentials.
    Preview fetches and checks `taxkit/ci` and `taxkit/stg_preview` separately;
    Production fetches and checks `taxkit/ci` and `taxkit/prd` separately;
    teardown fetches and checks only `taxkit/stg_preview`. A missing bridge,

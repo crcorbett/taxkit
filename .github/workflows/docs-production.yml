@@ -87,7 +87,11 @@ jobs:
           preview_run="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${ACCEPTED_PREVIEW_RUN_ID}")"
           preview_path="$(jq -er .path <<<"$preview_run")"
           preview_source_sha="$(jq -er .head_sha <<<"$preview_run")"
-          test "$preview_source_sha" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+          preview_ancestry="$(gh api "repos/${GITHUB_REPOSITORY}/compare/${preview_source_sha}...${GITHUB_SHA}" --jq .status)"
+          case "$preview_ancestry" in
+            ahead|identical) ;;
+            *) exit 1 ;;
+          esac
           printf 'ACCEPTED_PREVIEW_WORKFLOW_COMMIT=%s\n' "$preview_source_sha" >> "$GITHUB_ENV"
           test "$(jq -r .name <<<"$preview_run")" = "Docs Preview Deployment"
           test "$(jq -r .head_branch <<<"$preview_run")" = "main"
