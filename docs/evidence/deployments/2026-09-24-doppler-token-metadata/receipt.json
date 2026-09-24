@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "ADM-003-doppler-token-metadata-2026-09-24",
+  "observedAt": "2026-09-24T01:18:32Z",
+  "repository": "crcorbett/taxkit",
+  "project": "taxkit",
+  "operation": "read-only token metadata, GitHub secret-name and Doppler secret-name inventory",
+  "credentialSource": "checkout-scoped personal Doppler login",
+  "dopplerServiceTokens": [
+    {
+      "config": "ci",
+      "count": 1,
+      "name": "taxkit-ci-20260831",
+      "access": "read",
+      "expiresAt": "2026-11-18T03:00:33.000Z"
+    },
+    {
+      "config": "stg_preview",
+      "count": 1,
+      "name": "taxkit-preview-20260831",
+      "access": "read",
+      "expiresAt": "2026-11-18T03:00:43.000Z"
+    },
+    {
+      "config": "prd",
+      "count": 1,
+      "name": "taxkit-production-20260831",
+      "access": "read",
+      "expiresAt": "2026-11-18T03:00:48.000Z"
+    }
+  ],
+  "dopplerSecretNames": {
+    "ci": ["TURBO_TEAM", "TURBO_TOKEN"],
+    "dev": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"],
+    "stg_preview": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"],
+    "prd": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]
+  },
+  "githubBridgeNames": {
+    "repository": ["DOPPLER_CI_TOKEN"],
+    "taxkit-docs-preview": ["DOPPLER_PROVIDER_TOKEN"],
+    "taxkit-docs-production": ["DOPPLER_PROVIDER_TOKEN"]
+  },
+  "hostedObservations": {
+    "previewPlanRun": 35939686472,
+    "previewConfigIdentityCheck": "passed",
+    "qualityRun": 35941976205,
+    "ciConfigIdentityCheck": "passed"
+  },
+  "nonClaims": [
+    "GitHub secret values are unreadable, so names and timestamps do not prove which exact Doppler service token each bridge contains.",
+    "The Production bridge has not been exercised by this modernisation's hosted workflow.",
+    "Read-only Doppler token access does not prove Cloudflare token scope, rotation, or a Website deployment.",
+    "No secret value, token identifier, hash or bearer was retained."
+  ]
+}

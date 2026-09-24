@@ -18,9 +18,9 @@ proof. Starting point: clean isolated worktree from
 | Task | State | Evidence and next action |
 | --- | --- | --- |
 | ADM-001 infrastructure owner | Locally verified | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Exact provider parity remains unproved. |
-| ADM-002 release upgrade | Locally verified; development plan captured; hosted plan open | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks pass. A beta.79 development plan proposes one `DocsWebsite` create; Preview and Production plans remain unproved. |
-| ADM-003 Doppler reconciliation | Locally verified; personal login passed; bridge scope open | The checkout-scoped personal login and custody check passed. Fixed `taxkit/dev` values matched the expected account without value output. Automation bridge token scope and expiry remain unproved. |
-| ADM-004 delivery | Merged; hosted Preview plan stopped | PR #78 and merged-main Quality passed. Automatic teardown and first Preview plan stopped after bootstrap. State/provider readback agrees for absent `pr-78`; follow-up workflow correction and hosted plan proof remain open. |
+| ADM-002 release upgrade | Locally verified; development and hosted Preview plans captured | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks pass. The development and hosted Preview plans each propose one `DocsWebsite` create; Production plan and hosted Website behaviour remain unproved. |
+| ADM-003 Doppler reconciliation | Locally verified; service-token metadata checked; bridge binding open | The checkout-scoped personal login and custody check passed. Fixed `taxkit/dev` values matched the expected account without value output. Read-only Doppler metadata shows one read-only, unexpired token per `ci`, `stg_preview` and `prd`; GitHub bridge names match the expected locations. The unreadable GitHub values cannot be bound to exact token identities. |
+| ADM-004 delivery | Merged; hosted Preview plan accepted; apply open | PRs #78 and #79, their Quality checks, PR #79 automatic cleanup and the second Preview plan passed. State/provider readback agrees that `pr-78` and `pr-79` are absent. Preview apply, hosted Website proof and Production proof remain open. |
 
 ## 2026-09-24 development authority and CLI correction
 
@@ -93,6 +93,60 @@ fixed, safe plan-reader reason in future errors because the hosted raw output
 was intentionally not uploaded. The bootstrap's exact provider effects in the
 failed runs remain unknown. No Website apply, accepted Preview plan, Production
 operation or retry is claimed here.
+
+## 2026-09-24 accepted hosted Preview plan
+
+Cooper approved marking [PR #79](https://github.com/crcorbett/taxkit/pull/79)
+ready, merging it, waiting for its automatic `pr-79` cleanup, then running one
+new Preview-only bootstrap and plan for the merged PR #78 candidate. PR #79
+head `57b270a624fbe64ef76bdc5768e85aeaefd46872` passed Quality and merged
+as `976545a9ca8aa15f64963b2fa01dbbea4c6ef4d0`; merged-main Quality also
+passed. [Automatic cleanup run `35939463603`](https://github.com/crcorbett/taxkit/actions/runs/35939463603)
+compared equal destroy plans and read back no `pr-79` stage or Worker.
+
+[Preview plan run `35939686472`](https://github.com/crcorbett/taxkit/actions/runs/35939686472)
+used reviewed `main` workflow commit `976545a9ca8aa15f64963b2fa01dbbea4c6ef4d0`
+and exact PR #78 candidate `84d65144938b7b8b25672f070e790b74ec09237d`.
+The bootstrap and hosted plan passed. The allowlisted artifact
+`10784398178` records one `TaxKitDocsCloudflare/pr-78/DocsWebsite`
+`Cloudflare.Worker` **create** with accepted plan SHA-256
+`7ef11dd43e8a5a20e14e4177d1db0dcfa02277a5538bd4457082bcbc5ca22e86`.
+The replan/apply and hosted HTTP/browser steps were skipped for this plan
+operation. Read-only account-matched state and Cloudflare inventory after the
+run agreed that neither `pr-78` nor `pr-79` has a stage or Worker, with
+state-store version 7. The [sanitised receipt](../../evidence/deployments/2026-09-24-alchemy-beta79-preview-plan/receipt.json)
+retains identities, postconditions and limits. A separate exact-digest Preview
+apply approval is required before deployment; this plan does not authorise
+Production or prove served-site behaviour.
+
+Documentation impact for this evidence slice: **Change required** for the
+dated receipt, deployment evidence index, active task ledger and this plan;
+**Preserve** for the SPEC target, deployment runbook, architecture, authority
+model, historical failure receipt and public docs; **N/A** for package and
+app READMEs, generated references, skills, workflows, tests and a Changeset
+because this slice changes no executable or published behaviour.
+
+## 2026-09-24 Doppler token metadata readback
+
+Read-only Doppler metadata listed one `read` service token in each fixed
+automation config: `taxkit/ci`, `taxkit/stg_preview` and `taxkit/prd`. All three
+expire on 18 November 2026. Names-only Doppler inventory still shows the
+expected Turbo pair in `ci` and Cloudflare pair in `dev`, `stg_preview` and
+`prd`. GitHub readback shows only `DOPPLER_CI_TOKEN` at repository level and
+one `DOPPLER_PROVIDER_TOKEN` in each matching Preview and Production
+environment. The successful Preview plan checked `stg_preview` identity; PR
+#80's Quality checked `ci` identity. The [sanitised metadata receipt](../../evidence/deployments/2026-09-24-doppler-token-metadata/receipt.json)
+records the exact names, access and expiry without bearer values or IDs.
+GitHub does not reveal its secret values, so names and nearby timestamps do
+not prove the exact bridge-token binding. Production's bridge has not been
+exercised by this modernisation's hosted workflow.
+
+Documentation impact for this metadata slice: **Change required** for the
+dated receipt, deployment evidence index, task ledger and this plan;
+**Preserve** for the SPEC, deployment runbook, authority model, architecture,
+historical token receipts and public docs; **N/A** for packages, app READMEs,
+generated references, skills, workflows, tests and a Changeset because no
+source or provider configuration changed.
 
 Documentation impact for this correction: **Change required** for three
 workflow commands, the contract test, safe plan-reader error, deployment
