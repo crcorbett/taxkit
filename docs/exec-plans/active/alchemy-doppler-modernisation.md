@@ -17,10 +17,10 @@ proof. Starting point: clean isolated worktree from
 
 | Task | State | Evidence and next action |
 | --- | --- | --- |
-| ADM-001 infrastructure owner | Locally verified | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Exact provider parity remains unproved. |
-| ADM-002 release upgrade | Locally verified; development and hosted Preview plans captured | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks pass. The development and hosted Preview plans each propose one `DocsWebsite` create; Production plan and hosted Website behaviour remain unproved. |
+| ADM-001 infrastructure owner | Locally verified; one-resource Preview deployment proved | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Hosted `pr-78` readback found one state stage and one Cloudflare Worker; Production property parity remains unproved. |
+| ADM-002 release upgrade | Locally verified; beta.79 hosted Preview passed | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks pass. The hosted Preview plan, equal replan, apply and browser proof passed; Production plan and hosted behaviour remain unproved. |
 | ADM-003 Doppler reconciliation | Locally verified; service-token metadata checked; bridge binding open | The checkout-scoped personal login and custody check passed. Fixed `taxkit/dev` values matched the expected account without value output. Read-only Doppler metadata shows one read-only, unexpired token per `ci`, `stg_preview` and `prd`; GitHub bridge names match the expected locations. The unreadable GitHub values cannot be bound to exact token identities. |
-| ADM-004 delivery | Merged; hosted Preview plan accepted; apply open | PRs #78 and #79, their Quality checks, PR #79 automatic cleanup and the second Preview plan passed. State/provider readback agrees that `pr-78` and `pr-79` are absent. Preview apply, hosted Website proof and Production proof remain open. |
+| ADM-004 delivery | Merged; hosted Preview deployed and proved; Production open | PRs #78, #79 and #80 merged with Quality and exact-stage cleanup evidence. Preview run `35943710629` matched the accepted digest, deployed one `DocsWebsite` Worker and passed provider and hosted browser proof. Production plan, deploy and rollback proof remain open. |
 
 ## 2026-09-24 development authority and CLI correction
 
@@ -125,6 +125,46 @@ dated receipt, deployment evidence index, active task ledger and this plan;
 model, historical failure receipt and public docs; **N/A** for package and
 app READMEs, generated references, skills, workflows, tests and a Changeset
 because this slice changes no executable or published behaviour.
+
+## 2026-09-24 approved Preview deployment and hosted proof
+
+Cooper separately approved one exact-digest `pr-78` Preview deployment. The
+accepted plan run `35939686472` named PR #78 head
+`84d65144938b7b8b25672f070e790b74ec09237d`, stage `pr-78`, one
+`DocsWebsite` create and SHA-256
+`7ef11dd43e8a5a20e14e4177d1db0dcfa02277a5538bd4457082bcbc5ca22e86`.
+Before dispatch, account-matched state and Cloudflare inventory agreed that
+the stage and Worker were absent. The provider-free deployment check passed;
+no competing workflow writer was active.
+
+[Preview deploy run `35943710629`](https://github.com/crcorbett/taxkit/actions/runs/35943710629)
+used reviewed `main` workflow commit `7b983127ad7a9300904e2168a7cb4c52839d1a32`
+and the exact accepted candidate. Its new plan and replan matched the accepted
+digest and each other before apply. The run deployed one Worker at
+[`taxkitdocscloudflare-docswebsiqmpqqa4magljz7gnjaxyppdn.coopercorbett.workers.dev`](https://taxkitdocscloudflare-docswebsiqmpqqa4magljz7gnjaxyppdn.coopercorbett.workers.dev),
+deployment `0e749110-78f5-46c5-85dd-edd44361e9ff`, version
+`71423cfd-2ca5-498a-a5a4-6d355713a140`. The hosted HTTP/browser step
+passed and retained hash-checked desktop and mobile screenshots in provider
+artifact `10785892606`. The separate receipt reconciler run
+[`35943838280`](https://github.com/crcorbett/taxkit/actions/runs/35943838280)
+accepted the exact candidate and source run. An independent HTTP request
+returned 200, and account-matched state/Cloudflare inventory agreed on one
+`pr-78` stage and one Worker after the run.
+
+The [sanitised Preview deployment receipt](../../evidence/deployments/2026-09-24-alchemy-beta79-preview-deploy/receipt.json)
+retains the plan and provider artifact identities, screenshot hashes, state
+readback, URL and rollback recovery identity `preview-35943710629`. The
+bootstrap's precise effects are not independently known. This Preview result
+does not prove Production, public custom-domain availability or permanent
+uptime. Manual exact-stage teardown of this closed PR needs a separately
+approved destroy operation and absence readback.
+
+Documentation impact for this deployment evidence: **Change required** for
+the dated receipt, deployment evidence index, active task ledger and this
+plan; **Preserve** for the SPEC target, runbook, authority model, deployment
+architecture, historical plan/failure receipts and public docs; **N/A** for
+package and app READMEs, generated references, skills, workflows, tests and a
+Changeset because no repository runtime or published behaviour changed.
 
 ## 2026-09-24 Doppler token metadata readback
 

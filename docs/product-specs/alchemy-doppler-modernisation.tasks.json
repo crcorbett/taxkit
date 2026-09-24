@@ -49,7 +49,7 @@
     },
     {
       "id": "ADM-002",
-      "status": "locally-verified-dev-and-preview-plans-captured",
+      "status": "locally-verified-hosted-preview-deployed-production-open",
       "title": "Upgrade Alchemy and the matching Effect v4 family",
       "type": "compatibility",
       "dependsOn": ["ADM-001"],
@@ -79,7 +79,7 @@
     },
     {
       "id": "ADM-004",
-      "status": "merged-preview-plan-accepted-apply-open",
+      "status": "merged-preview-deployed-and-hosted-proved-production-open",
       "title": "Close local proof and qualify hosted delivery",
       "type": "delivery",
       "dependsOn": ["ADM-003"],
