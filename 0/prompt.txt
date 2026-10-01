@@ -1,0 +1,12 @@
+<environment_context>
+  <current_date>2026-07-19</current_date>
+  <timezone>Europe/Madrid</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/taxkit</root><root>/Users/cooper/.codex/visualizations/2026/07/15/019f663b-6195-7130-8d2a-6bf5aaf24a8b</root><root>/Users/cooper/Projects/bundjil</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+  <subagents>
+    - 019f765f-f92c-7522-8e84-2bbd70dd7b16
+    - 019f7677-987b-7511-a232-fc8b0b07d8bf
+    - 019f768c-ba22-7500-b289-dbe6de70c9f3
+    - 019f7755-fabb-7643-aaee-48f28158b9d6
+    - 019f776b-25dc-7a73-9bbb-4854523b86f0
+  </subagents>
+</environment_context>
