@@ -1,0 +1,1 @@
+Hmm why are we doing child spawning? This seems weird and wrong? Does Alchemy suggest doing this? Shouldn't we use native Alchemy dev server stuff?
