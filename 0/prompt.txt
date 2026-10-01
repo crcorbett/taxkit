@@ -1,0 +1,1 @@
+Ok have we recently improved our skills and docs for harness engineering? See recent commits. It should properly reflect [$repo-structure](/Users/cooper/.agents/skills/repo-structure/SKILL.md) and [$docs-writer](/Users/cooper/Projects/taxkit/.agents/skills/docs-writer/SKILL.md) now
