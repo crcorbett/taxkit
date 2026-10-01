@@ -1,0 +1,1 @@
+Message that we want effect and alchemy upgrades from the outset, screenshot verification, and not to overcook/overkill the implementation. Get the thread to then draft the spec, that is a series of vertical spikes to quickly deliver end to end solution, then iteratively extend the solution to achieve the full spec
