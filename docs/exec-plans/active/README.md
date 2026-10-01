@@ -11,8 +11,8 @@ tombstone: false
 
 # Active exec plans
 
-The [Entire session history setup](./entire-session-history.md) plan tracks
-recording, history import and hosted publication verification.
+The completed [Entire session history setup](../completed/entire-session-history.md)
+retains recording, import and hosted publication proof.
 
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).

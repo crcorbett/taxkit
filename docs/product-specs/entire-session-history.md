@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: supporting
 owner: taxkit-tooling-owner
 last_reviewed: 2026-10-01
@@ -48,4 +48,7 @@ requires a separate explicit deletion decision; disabling does not unpublish.
 A fresh Claude Code session edited this spec using the installed Entire
 recording commands.
 
-Execution: [active plan](../exec-plans/active/entire-session-history.md).
+All acceptance tasks are complete. The [completed plan](../exec-plans/completed/entire-session-history.md)
+and [dated proof](../documentation-audit/entire-session-history/2026-10-01.json)
+retain import counts, hosted transcripts and exact GitHub readback.
+[Draft PR #84](https://github.com/crcorbett/taxkit/pull/84) contains the setup.

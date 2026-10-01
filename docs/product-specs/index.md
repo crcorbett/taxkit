@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Entire AI work history](./entire-session-history.md) | Current | Codex and Claude Code recording, Sydney connection, local history import and hosted publication proof. |
+| [Entire AI work history](./entire-session-history.md) | Implemented | Both agents recorded fresh sessions linked to a normal commit and push; 742 past turns imported. [Dated proof](../documentation-audit/entire-session-history/2026-10-01.json) and [draft PR #84](https://github.com/crcorbett/taxkit/pull/84) retain the public Sydney setup. |
 | [Alchemy and Doppler modernisation](./alchemy-doppler-modernisation.md) | Current | Active successor implementation intent and [task ledger](./alchemy-doppler-modernisation.tasks.json); current source and provider proof remain separate. |
 | [Oxlint policy refresh](./oxlint-policy-refresh.md) | Implemented | The generic and Effect anti-slop policy, portable mutable-test-state rule and structural finding fixes are implemented. Candidate `48384d5` passed hosted Quality run `33375644482`; [PR #76](https://github.com/crcorbett/taxkit/pull/76) merged it as `1a0b180`, and main Quality run `33376169245` passed on that merge. No package publication or deployment was performed. |
 | [Doppler configuration governance](./doppler-configuration-governance.md) | Implemented | The reviewed slices, TaxKit-only bootstrap, merged-main Quality and exact absent-stage teardown are proved. The hard cutover removed direct GitHub values and eight old Cloudflare tokens. Hosted fork, served Preview and Production/rollback remain explicit non-claims. |

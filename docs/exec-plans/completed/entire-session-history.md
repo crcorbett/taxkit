@@ -1,6 +1,6 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: supporting
 owner: taxkit-tooling-owner
 last_reviewed: 2026-10-01
@@ -11,7 +11,7 @@ review_trigger: Entire setup, import, capture, publication, or verification resu
 
 Spec: [Entire AI work history](../../product-specs/entire-session-history.md).
 
-## Sequence
+## Completed sequence
 
 1. Read project owners and DAW as a read-only reference; inspect clean checkout,
    fetch and fast-forward main, then use `codex/entire-session-history`.
@@ -51,3 +51,18 @@ No deployment, package publication or merge is requested.
 
 A fresh Codex CLI session edited this plan using the installed Entire recording
 commands.
+
+## Outcome
+
+All setup and publication tasks are complete. The native importer added 742
+turns from 44 non-empty Codex sessions; three selected files were empty. No prior
+Claude Code history was found. Both agents are configured and their fresh
+conversations and tool activity are hosted with setup commit `bbc08c5`. Sydney
+returned all 743 checkpoint references; GitHub returned the same source SHA.
+A repeat import added zero turns, and all original files were unchanged.
+
+`bun run verification` passed after rerunning with access to the temporary
+folders needed by its isolated fixture. Focused docs, runbook, path and format
+checks passed. The [dated proof](../../documentation-audit/entire-session-history/2026-10-01.json)
+retains identities, limitations and recovery. [Draft PR #84](https://github.com/crcorbett/taxkit/pull/84)
+contains this slice. No platform action remains; no merge or deployment is claimed.

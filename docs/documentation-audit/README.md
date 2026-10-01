@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-08-24
+last_reviewed: 2026-10-01
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -12,6 +12,14 @@ review_trigger: documentation-audit receipt, evidence class, corpus inventory, o
 This route owns dated audit and corpus-accounting evidence, not current
 maintainer policy. Lifecycle and semantic ownership are defined by
 [`../README.md`](../README.md).
+
+Entire session history setup evidence:
+
+- [2026-10-01 setup and hosted publication proof](entire-session-history/2026-10-01.json)
+
+This receipt records public Sydney storage, both fresh agent transcripts,
+GitHub source readback, native import counts and unchanged originals. It grants
+no deployment, package publication, merge or history-deletion authority.
 
 Accepted CI cache qualification and closeout evidence:
 
