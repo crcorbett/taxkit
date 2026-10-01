@@ -1,0 +1,3 @@
+What is the purpose of this?
+"The docs app’s server runtime now manages its diagnostic identity/state through Effect instead of global randomness and mutable variables." and "
+2. Workflow file and receipt handling gained a shared boundary"
