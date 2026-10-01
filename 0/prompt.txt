@@ -1,0 +1,37 @@
+<skill>
+<name>thread-status</name>
+<path>/Users/cooper/.codex/skills/thread-status/SKILL.md</path>
+---
+name: thread-status
+description: Review and update recent Codex thread titles with semantic status prefixes. Use when the user asks to run a thread status pass, clean up the Codex sidebar, identify completed or blocked threads, or apply the ✅, 🚨, and ⏳ title convention to recent Codex work.
+---
+
+# Thread Status
+
+Use the live Codex thread tools to review recent threads and update their titles. Do not rely on local session-index files unless the live thread tools are unavailable and the user explicitly accepts local-only coverage.
+
+## Workflow
+
+1. List up to 30 recent threads across available hosts. Respect a different limit or scope supplied by the user.
+2. Exclude automation-run threads. Treat threads as peers even when one created, delegated to, or coordinates another.
+3. Read the latest completed turn of each candidate with outputs disabled. Read one additional turn only when the thread's own pending responsibility is unclear.
+4. Classify the thread using only its own contract:
+   - `✅` — Its requested result was delivered or completion was clearly reported, with no pending work or retained responsibility.
+   - `🚨` — It explicitly awaits user input, approval, credentials, permission, a choice, or another action only the user can provide.
+   - `⏳` — Its work remains active, monitored, pending on tools or remote work, or genuinely uncertain.
+5. Be conservative with `✅`. Idle UI state is not proof of completion. An error is not `🚨` when the thread is still handling it autonomously. Standing monitors and recurring work remain `⏳` unless explicitly paused or ended.
+6. Classify coordinators independently:
+   - Mark a parent `✅` when it finished dispatching, steering, or reporting and retained no monitoring or follow-up responsibility, even if a child remains `⏳`.
+   - Mark a parent `⏳` only when the parent itself retains coordination, monitoring, or follow-up work.
+   - Mark a parent `🚨` only when the parent's own next step awaits the user.
+7. Build the title:
+   - Use exactly one status prefix and one space.
+   - Strip any existing `✅`, `🚨`, or `⏳` prefix first.
+   - Preserve a useful title body when the topic is unchanged.
+   - Otherwise use a concise title body describing the thread's current task.
+   - If only status changed, change only the prefix.
+8. Rename only when the resulting title differs. Do not message, archive, pin, fork, or otherwise alter threads.
+9. Handle the calling thread last. If this status pass completes its only requested work, mark it `✅` immediately before the final response; otherwise classify its remaining responsibility normally.
+10. Report changed titles and genuine uncertainties concisely. If nothing changed, say so.
+
+</skill>
