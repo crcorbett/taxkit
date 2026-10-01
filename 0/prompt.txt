@@ -1,0 +1,1 @@
+Ok I want to ensure we've pulled the latest oxlint rules from our \\\~/Projects/site and are using these, including the anti-slop rules. Spin up another task to do this work
