@@ -3,13 +3,16 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-08-31
+last_reviewed: 2026-10-01
 review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
 successor: null
 tombstone: false
 ---
 
 # Active exec plans
+
+The completed [Entire session history setup](../completed/entire-session-history.md)
+retains recording, import and hosted publication proof.
 
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).

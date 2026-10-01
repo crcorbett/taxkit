@@ -1,0 +1,126 @@
+{
+  "document_type": "setup-evidence",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-tooling-owner",
+  "observed_at": "2026-10-01T13:30:27+10:00",
+  "principal": "Cooper Corbett (github:crcorbett)",
+  "approval": "Explicit setup, backfill and future checkpoint publication approval; explicit public chat publication selection after visibility readback.",
+  "repository": "crcorbett/taxkit",
+  "visibility": "public",
+  "base_sha": "9832897",
+  "setup_commit": "bbc08c5a9645df586d81da37fdff2e484bfe207b",
+  "branch": "codex/entire-session-history",
+  "pull_request": "https://github.com/crcorbett/taxkit/pull/84",
+  "entire": {
+    "cli_version": "0.11.3",
+    "jurisdiction": "au",
+    "cluster": "aws-ap-southeast-2.entire.io",
+    "repository_id": "01M3TPYA5YHVN9VHEX8Q7ERW3M",
+    "repository_url": "https://entire.io/gh/crcorbett/taxkit",
+    "remote": "entire",
+    "github_remote_preserved": "origin",
+    "github_url": "https://github.com/crcorbett/taxkit.git",
+    "telemetry": false,
+    "absolute_git_hook_path": true,
+    "commit_linking": "always",
+    "codex_hooks": 7,
+    "claude_code_hooks": 8,
+    "codex_approval_records": "present"
+  },
+  "import": {
+    "selected_codex_files": 47,
+    "non_empty_imported_codex_sessions": 44,
+    "empty_files": 3,
+    "turns_imported": 742,
+    "turns_skipped_on_repeat": 742,
+    "turns_added_on_repeat": 0,
+    "source_locations": 10,
+    "compressed_source_files": 36,
+    "original_files_changed": 0,
+    "claude_code_history_found": 0,
+    "claude_code_setup": "installed and fresh session verified",
+    "method": "Native importer, after dry-run. Selected temporary copies decompressed archives and changed only the initial working-folder field to the current checkout. Originals were hash-checked unchanged.",
+    "ordinary_claude_chats": "Skipped: no direct native importer or readily available export."
+  },
+  "publication": {
+    "normal_git_commit_and_push": true,
+    "checkpoint_id": "01M3TQNF4Y9PWFRKHK308HW3CE",
+    "checkpoint_refs_uploaded": 743,
+    "checkpoint_refs_read_back_from_sydney": 743,
+    "github_source_sha_readback": "bbc08c5a9645df586d81da37fdff2e484bfe207b",
+    "hosted_session_rows": 46,
+    "fresh_sessions": [
+      {
+        "agent": "Codex",
+        "session_id": "01a0f577-c1e2-7e81-9cee-d9ed8a425764",
+        "url": "https://entire.io/gh/crcorbett/taxkit/session/01a0f577-c1e2-7e81-9cee-d9ed8a425764",
+        "model": "gpt-5.5",
+        "transcript_visible": true,
+        "tool_calls_visible": true,
+        "linked_setup_commit_visible": true
+      },
+      {
+        "agent": "Claude Code",
+        "session_id": "ab768783-a760-410b-a2fc-a9a02cf4c7da",
+        "url": "https://entire.io/gh/crcorbett/taxkit/session/ab768783-a760-410b-a2fc-a9a02cf4c7da",
+        "transcript_visible": true,
+        "tool_calls_visible": true,
+        "linked_setup_commit_visible": true
+      }
+    ],
+    "representative_import": {
+      "url": "https://entire.io/gh/crcorbett/taxkit/session/019f663b-6195-7130-8d2a-6bf5aaf24a8b",
+      "checkpoints": 167,
+      "transcript_visible": true,
+      "tool_calls_visible": true
+    }
+  },
+  "checks": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "result": "passed"
+    },
+    {
+      "command": "bun run check:docs",
+      "result": "passed"
+    },
+    {
+      "command": "bun run check:runbooks",
+      "result": "passed"
+    },
+    {
+      "command": "bun run check:repository-paths",
+      "result": "passed"
+    },
+    {
+      "command": "bun run format:check",
+      "result": "passed"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "limitations": [
+    "Initial restricted verification failed while installing an isolated fixture; the authorised rerun passed the full graph.",
+    "The configured gpt-6.1-sol name and a gpt-5.4 retry were rejected by the standalone Codex CLI account endpoint. The recording check succeeded with listed model gpt-5.5, without changing the user model setting.",
+    "DAW was inspected read-only.",
+    "Future clones need their own Git hooks, Codex trust review and local checkpoint destination.",
+    "Imported sessions are read-only; three empty files produced no checkpoints.",
+    "Raw transcripts and machine-local logs are excluded from source commits.",
+    "No deployment, package publication or merge was performed."
+  ],
+  "platform_action_required": null,
+  "recovery": "entire disable stops future capture without deleting history. Revert this slice and remove its added local remote to restore source setup. Published-history deletion needs separate explicit authority.",
+  "local_log_sha256": {
+    "import-result": "bac422896e5bd80f5a73156c5960184236ba1285e184ef6aad4f58b8ab356551",
+    "import-repeat": "5aa6c631bda5f33516be4123b7869226b78e1276cc6892c308c4c89883c36830",
+    "verification": "b92c0a2b709c67f7be053930811dd4cb4bb950ee9111cd76e4914998d1c105c5",
+    "first-push": "6ec045974a396fdbd67ff9204ec9bb05ebeb5759b7382d3ddf0a06e0a617cf98"
+  }
+}

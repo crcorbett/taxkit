@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: taxkit-execution-history-owner
-last_reviewed: 2026-08-24
+last_reviewed: 2026-10-01
 review_trigger: completed-plan retention, evidence, or successor correction
 successor: null
 tombstone: false
@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Entire session history setup](./entire-session-history.md)
 - [Oxlint Policy Refresh](./oxlint-policy-refresh.md)
 - [Doppler configuration governance](./doppler-configuration-governance.md)
 - [Alchemy deployment structure corrections](./alchemy-deployment-structure-corrections.md)
