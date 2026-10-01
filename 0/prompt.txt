@@ -1,0 +1,1 @@
+Can you spin up a thread to investigate deploying our docs app using alchemy + Cloudflare. See ~/Projects/site for a reference implementation.
