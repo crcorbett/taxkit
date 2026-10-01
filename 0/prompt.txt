@@ -1,0 +1,1 @@
+Once this is done, and you are happy with the SPEC (if changes are needed, pass back to the thread to make them). Then archive that thread, and open a new one for the implementation
