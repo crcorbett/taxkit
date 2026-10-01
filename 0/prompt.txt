@@ -1,0 +1,263 @@
+<skill>
+<name>alchemy-iac</name>
+<path>/Users/cooper/.agents/skills/alchemy-iac/SKILL.md</path>
+---
+name: alchemy-iac
+description: Design, implement, audit, or migrate governed Alchemy infrastructure-as-code in Effect TypeScript repositories. Use for alchemy.run.ts entrypoints, provider Layers, Cloudflare resources, Axiom datasets or dashboards, WorkOS redirect configuration, Vercel project integration, custom Alchemy Resources or Actions, stage and state design, infrastructure file conventions, deployment authority, provider readback, receipts, drift, teardown, and infrastructure tests. Also use when deciding that Alchemy should not own a hosted resource.
+---
+
+# Alchemy IaC
+
+Build infrastructure as an explicit, typed, reviewable resource graph. Keep mutation authority, provider ownership, state, stage identity, provider readback, and public behaviour as separate claims.
+
+Use this skill with `$strict-effect-ts` whenever infrastructure code contains material Effect programs. Also load repository-local `AGENTS.md`, `$repo-structure`, `$package-structure`, and provider-specific instructions when available.
+
+## Non-negotiable rules
+
+1. Inspect the exact checkout, instructions, installed Alchemy version, existing entrypoints, active infrastructure packages, workflows, and dirty state before proposing a structure.
+2. Establish who owns each resource before writing code. Do not add Alchemy merely because a provider exists.
+3. Treat a tool capability as different from authority. Require an explicit operation, resource scope, stage, credential source, and mutation boundary.
+4. Keep `alchemy.run.ts` a composition root. Decode inputs, select providers and state, compose named stacks, and return typed outputs. Move domain policy into stable owner modules.
+5. Decode all external input at ingress with Effect Schema or Config. Keep secrets redacted. Never let `unknown`, raw JSON, primitive environment strings, or provider SDK objects cross the boundary.
+6. Model provider dependencies as Layers. Construct them once at the application root. Do not import or expose raw provider clients from domain services.
+7. Separate desired-state planning from mutation. A plan classifies change; it does not authorise apply.
+8. Make custom resource reconciliation convergent and deletion explicit. Default adopted or foreign resources to `retain`.
+9. Resolve Alchemy Outputs before persisting durable receipts or crossing process boundaries.
+10. Prove source identity, provider identity, Preview, Production, and public behaviour independently. A green workflow, Alchemy state, successful exporter response, or HTTP 200 is not interchangeable with provider or journey proof.
+11. Make every stage collision-resistant. Include stable logical names and explicit physical identity where provider defaults are ambiguous.
+12. Prefer no IaC over ceremonial IaC. If Vercel Git, a provider console, or another declared owner already governs the lifecycle, document the boundary and omit the resource graph unless Alchemy has a narrow named role.
+13. Never write credentials, bearer tokens, state secrets, raw provider payloads, local absolute paths, or unbounded logs into receipts.
+14. Do not mutate providers, issue credentials, deploy, destroy, push, or publish merely because this skill is loaded. Follow the user's exact authority.
+
+## Workflow
+
+### 1. Discover the current contract
+
+Read, in order:
+
+1. Repository and package instructions.
+2. Current architecture and deployment documentation.
+3. `package.json`, lockfile, and installed Alchemy/Effect/provider versions.
+4. `alchemy*.run.ts`, infrastructure packages, provider modules, workflows, tests, and receipts.
+5. Provider ownership and live-readback instructions.
+6. Git status for every checkout that may be edited.
+
+Record the current owner of each resource and each claim. Do not use a stale SPEC, historical receipt, or another worktree as current truth.
+
+### 2. Decide whether Alchemy belongs
+
+For every proposed resource, answer:
+
+- What lifecycle does Alchemy own: create, adopt, observe, configure, reconcile, or destroy?
+- What system owns deployment provenance?
+- Can the provider expose independent readback?
+- Can the operation be retried safely?
+- What happens on partial failure?
+- What is the removal policy?
+- Does the repository need this resource, or only documentation of another owner's boundary?
+
+Use [ownership and boundaries](references/architecture/ownership-and-boundaries.md) for the decision.
+
+### 3. Design identity before resources
+
+Define:
+
+- stack name;
+- logical stage;
+- environment;
+- repository and application identity;
+- branch/ref/revision where relevant;
+- provider account, project, organisation, tenant, or zone;
+- physical resource naming;
+- state backend and state namespace;
+- retention and teardown policy.
+
+Keep proof stages isolated from Preview and Production. See [stages, state, and identity](references/architecture/stages-state-and-identity.md).
+
+### 4. Choose a file layout
+
+Start small. Extract only stable semantic owners.
+
+A compact application normally uses:
+
+```text
+alchemy.run.ts
+src/lib/build/
+  schemas.ts
+  cloudflare.ts
+datasets/
+  definitions.ts
+  index.ts
+dashboards/
+  definitions.ts
+  index.ts
+  <dashboard>.ts
+tools/infrastructure/
+  preflight.ts
+  readback.ts
+  receipt.ts
+```
+
+A reusable or multi-provider package normally uses:
+
+```text
+packages/infrastructure/src/
+  schemas.ts
+  errors.ts
+  service.ts
+  live.layer.ts
+  memory.layer.ts
+  providers.ts
+  inventory.ts
+  drift.ts
+  receipt.ts
+  stacks/
+  cloudflare/
+  axiom/
+  workos/
+  vercel/
+alchemy.run.ts
+alchemy.preview.run.ts
+alchemy.production.run.ts
+```
+
+Do not create every listed file. Create a file only when it owns a coherent contract. Read [layout and composition](references/architecture/layout-and-composition.md) and [worked layouts and patterns](references/examples/layouts-and-patterns.md).
+
+### 5. Build a pure desired-state graph
+
+- Decode stage, authority, and configuration first.
+- Declare typed catalogues for datasets, dashboards, routes, redirects, projects, and bindings.
+- Give every resource a stable logical name.
+- Keep provider graph construction deterministic.
+- Keep direct environment access and runtime execution at the root adapter.
+- Return only the outputs downstream consumers need.
+- Do not run provider mutation from module import side effects.
+
+Read [resource graphs and Outputs](references/architecture/resource-graphs-and-outputs.md).
+
+### 6. Add provider ownership deliberately
+
+Load only the relevant provider references:
+
+- [Cloudflare](references/providers/cloudflare.md)
+- [Axiom](references/providers/axiom.md)
+- [WorkOS](references/providers/workos.md)
+- [Vercel](references/providers/vercel.md)
+- [custom Resources and Actions](references/providers/custom-resources.md)
+
+For multi-provider changes, write an ownership table before code:
+
+| Resource | Desired-state owner | Deployment owner | Readback source | Removal policy |
+| --- | --- | --- | --- | --- |
+| Example | Alchemy | provider API | independent provider query | retain/delete |
+
+Treat “not managed by Alchemy” as a valid, reviewable answer.
+
+### 7. Gate plan and apply
+
+Before mutation:
+
+1. Resolve the exact stage and source revision.
+2. Validate credential provenance and minimum capability.
+3. Run capacity, entitlement, quota, and identity preflights.
+4. Generate a plan.
+5. Reject unexpected create, replace, delete, adoption, or cross-stage change.
+6. Require the operation-specific authority.
+7. Apply serially when provider ordering, rate limits, or uncertain writes demand it.
+8. Read back through the provider independently.
+9. Run the claim-matched public or application journey.
+10. Emit a sanitised receipt.
+
+Read [authority, plan, and apply](references/operations/authority-plan-apply.md) and [readback, receipts, and claims](references/operations/readback-receipts-and-claims.md).
+
+### 8. Design recovery before Production
+
+Define retry, rollback, adoption, drift, partial-write recovery, and destroy semantics before enabling Production. Test retained-resource isolation and prove that a disposable stage can be destroyed without touching Preview or Production. Read [adoption, drift, recovery, and destroy](references/operations/adoption-drift-recovery-and-destroy.md).
+
+### 9. Verify proportionately
+
+Run the layers of proof relevant to the claim:
+
+1. static structure and policy;
+2. typecheck and unit tests;
+3. provider-free memory graph tests;
+4. plan classification;
+5. isolated provider apply;
+6. provider readback;
+7. application journey;
+8. teardown and residue readback.
+
+Use [the verification matrix](references/testing/verification-matrix.md). State every skipped layer as a non-claim.
+
+### 10. Review documentation ownership
+
+Update the current architecture owner, runbook, and receipt contract when behaviour changes. Do not copy live identities into generic documentation. Do not turn a historical receipt into a mutable design document.
+
+## Alchemy with Effect
+
+Use Effect for configuration, provider adapters, custom providers, plans, readback, retry, timeouts, concurrency, structured errors, receipts, logging, tracing, and tests. Keep Alchemy's root runtime boundary thin.
+
+Read:
+
+- [Effect services, Config, Schema, and errors](references/effect/services-config-and-errors.md)
+- [infrastructure observability](references/effect/observability.md)
+- `$strict-effect-ts` for the full language policy
+
+## Review checklist
+
+Reject the change if any answer is unclear:
+
+- Is the resource lifecycle owner explicit?
+- Is the current stage decoded rather than inferred from a loose string?
+- Are physical names collision-resistant?
+- Is state ownership explicit?
+- Are adopted resources retained by default?
+- Are provider Layers composed at the root?
+- Are SDK/HTTP outputs decoded immediately?
+- Are plan and apply separately authorised?
+- Are replacement and deletion classified?
+- Is provider readback independent of state?
+- Is public behaviour proved separately?
+- Are receipts portable, bounded, and secret-negative?
+- Can a proof stage be destroyed without affecting Production?
+- Is the file layout semantic rather than ceremonial?
+- Does the repository actually need Alchemy for this lifecycle?
+
+Consult [anti-patterns](references/examples/anti-patterns.md) during review.
+
+## Reference map
+
+Architecture:
+
+- [ownership and boundaries](references/architecture/ownership-and-boundaries.md)
+- [layout and composition](references/architecture/layout-and-composition.md)
+- [stages, state, and identity](references/architecture/stages-state-and-identity.md)
+- [resource graphs and Outputs](references/architecture/resource-graphs-and-outputs.md)
+
+Providers:
+
+- [Cloudflare](references/providers/cloudflare.md)
+- [Axiom](references/providers/axiom.md)
+- [WorkOS](references/providers/workos.md)
+- [Vercel](references/providers/vercel.md)
+- [custom Resources and Actions](references/providers/custom-resources.md)
+
+Operations:
+
+- [authority, plan, and apply](references/operations/authority-plan-apply.md)
+- [readback, receipts, and claims](references/operations/readback-receipts-and-claims.md)
+- [adoption, drift, recovery, and destroy](references/operations/adoption-drift-recovery-and-destroy.md)
+
+Effect and testing:
+
+- [services, Config, Schema, and errors](references/effect/services-config-and-errors.md)
+- [observability](references/effect/observability.md)
+- [verification matrix](references/testing/verification-matrix.md)
+
+Examples and provenance:
+
+- [layouts and patterns](references/examples/layouts-and-patterns.md)
+- [anti-patterns](references/examples/anti-patterns.md)
+- [primary sources and version policy](references/sources.md)
+
+</skill>
