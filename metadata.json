@@ -3,11 +3,12 @@
   "checkpoint_id": "01M3TQNF4Y9PWFRKHK308HW3CE",
   "strategy": "manual-commit",
   "branch": "codex/entire-session-history",
-  "checkpoints_count": 1,
+  "checkpoints_count": 2,
   "files_touched": [
     "README.md",
     "docs/exec-plans/active/README.md",
     "docs/exec-plans/active/entire-session-history.md",
+    "docs/product-specs/entire-session-history.md",
     "docs/product-specs/index.md"
   ],
   "sessions": [
@@ -17,14 +18,20 @@
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
       "prompt": "/0/prompt.txt"
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "compact_transcript": "/1/transcript.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": "/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 69362,
-    "cache_creation_tokens": 0,
-    "cache_read_tokens": 214016,
-    "output_tokens": 2542,
-    "api_call_count": 8,
-    "subagent_tokens_complete": true
+    "input_tokens": 69368,
+    "cache_creation_tokens": 12411,
+    "cache_read_tokens": 237046,
+    "output_tokens": 3122,
+    "api_call_count": 11
   }
 }
