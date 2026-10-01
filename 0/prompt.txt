@@ -1,0 +1,14 @@
+I need you to explain ELI5 what these are in a column beside them (add numbers too for easy reference):
+
+"Bring over before further docs-site work
+Priority	Foundation
+P0	**Repository path hygiene.** Remove machine-local checkout references and add a verification gate banning home-directory and Projects/** paths in tracked text. I found **33 references across 8 tracked files**, so this is currently not clean.
+P0	**String-contract taxonomy from Bundjil.** Audit exported/configured/persisted strings as: branded semantic values, literal closed vocabularies, redacted secrets, checked content, transport primitives or diagnostics. Do not mechanically brand every string.
+P0	**Complete portable Effect linting from site.** Selectively port rules for bare Effect.tryPromise, nullable boundary leakage, Result/Exit re-encoding, route-loader mappers, host APIs in services, adapter execution and synchronous decoder placement. Keep TaxKit’s stricter decoder and route-consumer rules.
+P0	**Canonical web identity and route metadata.** Schema-own base URL, canonical paths, site identity, titles, descriptions, images, indexing policy, page kinds and generated head/JSON-LD. Initially keep this app-owned; create a shared SEO package only when a second real consumer exists.
+P1	**Production dependency graph.** Add a production-specific Knip configuration so tests, fixtures and development-only imports cannot conceal broken runtime exports.
+P1	**Real application proof.** Test the built docs app for initial SSR, hydration, client navigation without a document reload, server-function transport, malformed data, 404s and console cleanliness. Current browser tests explicitly do not prove all of this.
+P1	**Route evidence contracts.** Use schema-backed reports for status, content type, redirects, security headers, canonical metadata, sitemap/robots output and generated assets. Keep the verification contract deployment-neutral.
+P1	**Design-system governance.** Define tokens, typography, spacing, semantic surfaces, component states, accessibility requirements, usage/non-use guidance and desktop/mobile browser proof before multiplying pages.
+P2	**Performance and accessibility budgets.** Add Lighthouse or equivalent thresholds, keyboard/focus checks, reduced-motion behavior, contrast checks and stable loading/error layouts.
+P2	**Deployment proof.** Once a host is selected, require preview-first deployment, exact-commit evidence, smoke verification and rollback ownership. Do not copy Cloudflare or Alchemy configuration before that decision."
