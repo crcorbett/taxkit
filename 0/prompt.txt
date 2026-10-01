@@ -1,0 +1,15 @@
+<environment_context>
+  <current_date>2026-09-23</current_date>
+  <timezone>Australia/Melbourne</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/taxkit</root></workspace_roots><permission_profile type="managed"><file_system type="restricted"><entry access="read"><special>:root</special></entry><entry access="write"><path>/Users/cooper/Projects/taxkit</path></entry><entry access="write"><special>:slash_tmp</special></entry><entry access="write"><special>:tmpdir</special></entry><entry access="write"><path>/Users/cooper/.codex/visualizations/2026/07/15/019f663b-6195-7130-8d2a-6bf5aaf24a8b</path></entry><entry access="read"><path>/Users/cooper/Projects/taxkit/.git</path></entry><entry access="read"><path>/Users/cooper/Projects/taxkit/.agents</path></entry><entry access="read"><path>/Users/cooper/Projects/taxkit/.codex</path></entry></file_system></permission_profile></filesystem>
+  <subagents>
+    <agent name="/root/effect_string_contract_audit" />
+    <agent name="/root/lint_config_evidence" />
+    <agent name="/root/rpc_001_path_hygiene" />
+    <agent name="/root/rpc_002_string_audit" />
+    <agent name="/root/rpc_003_portable_effect_lint" />
+    <agent name="/root/rpc_004_production_knip" />
+    <agent name="/root/rpc_005_decisions" />
+    <agent name="/root/rpc_006_contracts" />
+  </subagents>
+</environment_context>
