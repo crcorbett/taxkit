@@ -1,0 +1,168 @@
+<skill>
+<name>repo-structure</name>
+<path>/Users/cooper/.agents/skills/repo-structure/SKILL.md</path>
+---
+name: repo-structure
+description: Scaffold, audit, migrate, or validate a strict Bun and Turbo TypeScript monorepo with a TanStack Start app, Effect v4 domain/RPC/HTTP API packages, live-types export conditions, Oxlint/Oxfmt, Vitest, Knip, docs, CI, and repository-owned skills. Use for repository topology, root tooling, workspace contracts, current dependency snapshots, app/runtime composition, or a new repo based on the Site architecture. Do not use for an isolated package inside an established repository.
+---
+
+# Repository Structure
+
+Create a small repository whose boundaries are executable, documented, and
+updateable. Resolve current versions first; render only from a recorded snapshot.
+
+## Audit before scaffolding
+
+1. Read `AGENTS.md`, all repository-owned readable `docs/**` and `README*`,
+   manifests, workspace/lock/runtime config, lint/format/test/CI config, skills,
+   and representative apps/packages. Exclude generated, dependency, build, and
+   vendored trees explicitly.
+2. Inspect worktree state. For an existing repository, patch only authorized
+   paths and preserve unrelated work.
+3. For an existing-repository audit, read the
+   [repository audit router](references/repository-audit.md), then load its
+   [workflow](references/audit/workflow.md),
+   [corpus and journeys](references/audit/corpus-and-journeys.md),
+   [lenses](references/audit/lenses.md),
+   [findings and acceptance](references/audit/findings-and-acceptance.md), and
+   [variation and stopping](references/audit/variation-and-stopping.md).
+   Then read the
+   [repository contract](references/repository-contract.md),
+   [TanStack and Effect architecture](references/tanstack-effect.md), and
+   [tooling and docs](references/tooling-and-docs.md).
+4. Load the canonical sibling
+   [`package-structure`](../package-structure/SKILL.md) and
+   [`docs-maintainer`](../docs-maintainer/SKILL.md) skills. Resolve them
+   relative to this installed skill collection, or pass the skill collection
+   explicitly to the renderer. Stop before rendering if either is unavailable;
+   do not invent package/document contracts or assume a user's home directory.
+
+## Audit an existing repository
+
+Default to report-first. Define the target revision, claimed jobs, accepted
+outcomes, proof boundaries, authority, exclusions, and stop conditions. Account
+for the repository corpus, then follow a small set of representative jobs from
+request through ownership, implementation, proof, delivery, and acceptance.
+Use prior collaboration evidence when available and authorized; treat it as
+trajectory evidence rather than repository policy.
+
+For a whole-repository audit, create the structured scope and finding artifacts
+from `assets/audit/`; do not use free-form prose as the sole audit record.
+Validate them with `scripts/validate_audit_artifacts.py`. Return a
+consequence-ordered Markdown view with stable IDs, separate important
+corrections from optional improvements, identify the earliest owning
+correction, and name duplicated machinery to retire. Stop for acceptance before
+implementation unless the original request authorizes both. Record accepted
+finding IDs in the crosswalk, hand them to `prd-writer`, then use `prd-review`
+and `prd-implementer`.
+
+For most repositories, stop after the structural and trajectory audit,
+accepted important corrections, normal repository checks, and one fresh
+independent review. Do not create a comparative harness evaluation unless the
+claim is that a particular intervention changes future worker behavior.
+
+## Resolve or select versions
+
+Rendering is offline and deterministic. The checked-in snapshot is a known-good
+fallback, not permission to call it current. To research a refresh, use primary
+registries/official sources and DeepWiki only for upstream packages—not the
+local codebase:
+
+```bash
+python3 scripts/resolve_versions.py --output /tmp/provisional-versions.json
+```
+
+Effect ecosystem packages must share one exact v4 beta version until v4 is
+stable. TanStack Start and Router resolve independently. Never emit `latest`.
+Alchemy beta and the preview-only Cloudflare scaffold require an explicit
+qualified/rejected decision; never infer compatibility from a registry tag.
+Read [version policy](references/version-policy.md); a snapshot is adopted only
+after full compatibility rendering and verification.
+
+## Render safely
+
+The target must be an absolute, new path. There is no overwrite mode:
+
+```bash
+python3 scripts/render_repository.py \
+  --target /absolute/new/repository \
+  --name example \
+  --scope @example \
+  --source-condition @example/source \
+  --versions assets/version-snapshot.json
+```
+
+The renderer stages root/app/docs/tooling assets, invokes the canonical package
+renderer for domain, RPC, and HTTP API packages, copies every complete current
+repository-skill folder, adds only the declared repository-local profiles,
+creates `.claude/skills/**` links to `.agents/skills/**`, validates the copied
+trees against their canonical sources, then atomically renames. It never
+templates lockfiles, generated route trees, output, caches, or dependency trees.
+
+Every scaffold includes the minimum repository-owned harness:
+
+- fixed invariant and audit guidance inside the copied local skills;
+- a repository harness profile as the sole local variation surface;
+- one docs router and documentation owner map;
+- structured audit scope, finding, and accepted-finding templates plus schemas;
+- critical journeys, proof and bounded-receipt contracts;
+- authority, feedback/control, automation, epoch, effectiveness, evidence, and
+  runbook owners;
+- deterministic governance and audit validation; and
+- an active bootstrap-harness task that qualifies the rendered defaults before
+  they become current repository truth.
+
+The render receipt records official sources, selected versions, compatibility
+decisions, config digests, limitations, and an explicitly absent lockfile. After
+the first `bun install`, run `scripts/finalize_repository_receipt.py` to bind the
+receipt to `bun.lock`; do not claim a bootstrapped fixture before that phase.
+
+Use `--skills-root /absolute/skill-collection` only when the sibling skills are
+installed outside the default collection. Generated repository-local skills
+must remain useful without that global collection after rendering. Each copied
+skill is the complete canonical folder. The docs-maintainer and
+package-structure skills receive explicit generated repository profiles; those
+profiles are the only permitted tree differences. Claude compatibility
+surfaces are links, never independently maintained copies.
+
+## Enforce the architecture
+
+- Domain service owns Schemas, failures, operations, live/test Layers.
+- RPC and HTTP API own independent transport contracts over that service.
+- The app owns router, framework adaptation, client/server runtime composition,
+  Effect execution, SSR Exit codecs, and disposal.
+- Browser runtime uses Fetch; server loaders use the in-process HTTP client and
+  never loop back to deployment HTTP.
+- Route/feature boundaries own data loading, Effect/service execution,
+  mutations, commands, shared state, and workflow/error policy. Presentation
+  leaves receive narrow readonly values and action callbacks, then own
+  rendering, accessibility, pure derivation, and genuinely local UI state.
+- Decode unknown values at ingress and encode at outward boundaries only.
+- Keep Effects flat and sequential; reject generic client escape hatches,
+  runtime execution in packages, service-aware presentation leaves, boolean
+  prop matrices, giant routes, and one-use helper/hooks.
+
+## Verify and maintain
+
+Run in this order:
+
+```bash
+bun install
+bun run format:check
+bun run lint
+bun run test:lint-rules
+bun run check-types
+bun run test
+bun run build
+python3 scripts/validate_repository.py /absolute/repository
+```
+
+Inspect export consumers and generated docs in addition to command status. Read
+[maintenance](references/maintenance.md) before changing versions, assets,
+profiles, rules, or skill baselines. Report exact commands, exit codes, and any
+blocked upstream incompatibility; do not waive a failing compatibility fixture.
+Use the generated docs-maintainer owner map and lifecycle/skill checks for
+documentation impact, and retain a bounded impact receipt with explicit
+non-claims.
+
+</skill>
