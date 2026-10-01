@@ -1,0 +1,1 @@
+Ok can you archive the other tasks in the project, and then spin up a new task (GPT-6 Sol High) focussed on the alchemy and doppler work. Following the implementations in \~/Projects/site and \~/Projects/daw for reference, and strictly following cloned effect and alchemy repos (both should be bumped to latest values). We will need to use Doppler to manage all secrets / creds too
