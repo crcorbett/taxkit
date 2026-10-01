@@ -1,0 +1,1 @@
+Ok can we get the sub thread to proceed? Ensure it refers to existing implementations in Projects/site and Projects/Bundjil for your we handle alchemy/cloudflare credentials/env/token for reference implementations too (don’t mention these repos in any docs though). You have my authority / approval for any mutations and prod/preview deployments etc you need or the sub thread needs
