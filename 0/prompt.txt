@@ -1,0 +1,2 @@
+- The older duplicate Quality run was cancelled during Chromium setup only. It remains a runner limitation, not a code failure.
+Does this need to be addressed?
