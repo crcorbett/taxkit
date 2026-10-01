@@ -1,0 +1,276 @@
+<skill>
+<name>prd-review</name>
+<path>/Users/cooper/.codex/worktrees/2a2e/taxkit/.agents/skills/prd-review/SKILL.md</path>
+---
+name: prd-review
+description: Re-review, edit, and strengthen product requirements documents, technical SPECs, and their implementation tasks against the actual repository. Use when asked to review, improve, tighten, validate, or make a SPEC implementation-ready, especially for Effect/TypeScript and React codebases where evidence-backed improvements must be applied in place and include every required downstream change to documentation, READMEs, lint rules, repository-owned skills, configuration, tests, and operational artifacts. Also cover upstream-library research through DeepWiki, architecture and composition patterns, helper-sprawl prevention, and testable acceptance criteria. Do not use for ordinary code review without a product or technical specification.
+---
+
+# PRD Review
+
+Review and edit the SPEC and its implementation tasks against repository truth until an implementation agent can follow them without inventing architecture or proliferating helpers.
+
+## Establish scope and authority
+
+1. Open the exact SPEC named by the user before drawing conclusions. If no path is given, locate likely SPECs with `rg --files` and identify the most relevant one from repository context.
+2. Read applicable `AGENTS.md` files and inspect the working tree before editing.
+3. Default to editing the SPEC and its directly associated repository-local task artifacts in place. Switch to report-only mode only when the user explicitly says `read-only`, `do not edit`, or `findings only`.
+4. Locate task checklists, implementation plans, or task files directly associated with the SPEC. Update external issue trackers only when the user has placed them in scope and authorized writes.
+5. Preserve the document's product intent. Resolve ambiguity from repository evidence; surface material product decisions instead of silently choosing them.
+
+## Own and extend the evidence search
+
+Keep one primary reviewer accountable for integration, edits, proof, and
+closeout. Delegate a bounded independent pass only when fresh discovery,
+adversarial review, or a proved disjoint scope materially improves the evidence.
+Do not use subagent count as acceptance proof. When delegation is justified,
+give it the SPEC path and a distinct evidence slice such as:
+
+- Effect services, errors, Layers, Schemas, and execution boundaries;
+- React component composition and leaf-component conventions;
+- lint, test, build, and repository-documentation requirements;
+- downstream docs, READMEs, lint-rule, skill, configuration, and operational-artifact impacts.
+
+Ask for file-and-line evidence, contradictions, and missing SPEC requirements.
+Do not ask the subagent to edit the SPEC. Verify and reconcile its findings
+yourself. Absence of delegation is not a limitation when the work has no useful
+independent evidence boundary.
+
+## Read the repository contract in phases
+
+Use three phases so exhaustive accounting does not preload unrelated context:
+
+1. **Grounding:** read the SPEC/tasks, root instructions, owning architecture,
+   directly affected `README*`, code, configuration, and commands. Load the
+   sibling [`docs-maintainer`](../docs-maintainer/SKILL.md) and its local
+   repository profile when present. For substantial repository, operational,
+   automation, migration, or harness work, also read
+   [`repository-harness-contract`](../docs-maintainer/references/repository-harness-contract.md).
+   Load its contract map and invariant register directly. When the SPEC derives
+   from an audit, locate and validate the structured accepted-finding crosswalk
+   and preserve its stable finding and invariant IDs.
+2. **Investigation:** expand only for unresolved local decisions and upstream
+   library questions; delegate only under the evidence rule above.
+3. **Landing:** build an inventory with `rg --files` and read, rather than merely
+   grep, every repository-owned readable text file under `docs/**` plus every
+   repository `README*`. Re-run the docs-maintainer owner map and exact checks,
+   reconcile contradictions, and edit the SPEC/tasks.
+
+Include nested READMEs and documentation that conflicts with the SPEC. Exclude
+dependency trees, generated build output, vendored repositories, and `.git`.
+Across the three phases also inspect:
+
+- package manifests, lockfiles, workspace configuration, and runtime versions;
+- TypeScript, formatter, linter, and test configuration;
+- CI workflows and the scripts they actually run;
+- architecture decision records, active plans, conventions, and nearby feature docs;
+- repository-owned `SKILL.md` files, skill UI metadata, bundled skill resources, agent or command instructions, and their validation tooling;
+- representative implementation files on the paths the SPEC will change.
+
+Track the file count and which files were read. Call out generated, binary, vendored, inaccessible, or irrelevant exclusions rather than silently skipping them. Re-read the SPEC after the documentation pass. Follow repository-local instructions over generic preferences.
+
+Treat context as layered. External systems own live external state, repository
+docs own durable repository truth, and the active SPEC/tasks own only the
+current change. Inventory the full readable docs/README corpus for impact
+accounting, but deeply load current, canonical, affected, and contradictory
+owners just in time. Relevance-route history and raw evidence instead of
+preloading or rewriting it as current guidance.
+
+## Research upstream libraries with DeepWiki
+
+Use the Executor MCP's `deepwiki_mcp` integration to research third-party packages and libraries implicated by the SPEC, such as Effect, effect-smol, React, framework packages, or lint and build tooling. Do not use DeepWiki to analyze the current codebase; derive local architecture and conventions from the current checkout, its documentation, and its configuration.
+
+First load the Executor `execute` guidance, then discover the DeepWiki tool schemas instead of guessing them. Identify relevant dependency names and installed versions from manifests, lockfiles, imports, and package metadata. Resolve each package to its upstream `owner/repo`; do not use the current repository's Git remote as the DeepWiki target.
+
+For each material upstream dependency, use DeepWiki to investigate only questions that affect the SPEC, such as:
+
+1. supported APIs and recommended patterns for the installed version;
+2. service, runtime, composition, error, resource, or integration boundaries;
+3. constraints, migration concerns, and common misuse relevant to the proposed work.
+
+Prefer DeepWiki's `read_wiki_structure`, `read_wiki_contents`, and `ask_question` operations when those names exist in the discovered schema. Request source paths or citations in the answers. Treat DeepWiki as secondary upstream evidence because it may index a newer default branch: reconcile claims against the installed package version, local type definitions, official versioned documentation, and repository usage. Never let DeepWiki override proven local conventions. If DeepWiki or Executor MCP is unavailable, state that explicitly; never imply that it was used.
+
+## Review the SPEC against the codebase
+
+Create an evidence map from each material SPEC requirement to supporting documentation, code, or an explicitly new design decision. Check the document for:
+
+- clear problem statement, goals, non-goals, users, flows, and success criteria;
+- current-state and proposed architecture with named ownership boundaries;
+- concrete data, API, state, error, and dependency contracts;
+- security, privacy, accessibility, performance, observability, migration, rollback, and rollout requirements where applicable;
+- implementation phases with independently verifiable acceptance criteria;
+- exact test, lint, typecheck, build, and runtime proof commands used by this repository;
+- explicit unknowns and decisions that cannot be proven from the repository.
+
+Remove vague instructions such as "handle errors," "add tests," or "follow existing patterns." Replace them with named patterns, failure cases, owners, and observable outcomes.
+
+## Review the harness contract
+
+Use the complete local repository-harness reference for material work. In
+addition to the checks below, verify whole-job ownership, coherent repository
+precedent, completed migrations, tool operability, dependency and lifetime
+ownership, artifact delivery, and proportional carrying cost where applicable.
+
+For material work, edit the SPEC/tasks to cover every applicable lens:
+
+- skills teach judgment and routing; runbooks own repeatable procedures,
+  preconditions, authority, steps, bounded evidence, rollback, and escalation;
+- tool output identifies the violated invariant, exact target, recovery hint,
+  omitted-detail path, and postcondition instead of emitting unbounded logs;
+- proof identifies the artifact, boundary or critical journey, actor,
+  environment, evidence, limitations, non-claims, and release identity;
+- authority records principal, identity source, operation, resource,
+  environment, duration, approval, revocation, audit receipt, rollback, and
+  escalation separately from capability;
+- repeated findings move to the earliest durable schema, type, lint rule, test,
+  generator, runbook, or canonical document, with weaker reminders retired;
+- continuous automation is admitted only for settled work with a signal,
+  durable state, sufficient authority, convergence, per-run proof, bounded
+  failure, stopping, and escalation;
+- the evaluation epoch records model/worker, host, tools, runtime, skills,
+  target, authority, scenario, grader, accepted outcome, baseline,
+  disconfirming result, and the four distinct timing clocks;
+- each repository maintains a small consumer-visible journey inventory with an
+  owner and oracle against plausible imitation; and
+- failed, blocked, deferred, superseded, inconclusive, and no-op work retains
+  provenance, observed state, limitations, successor/tombstone, escalation, and
+  recovery outside the default context route.
+
+Use these as named risk/evidence lenses, not a fixed review ritual. Reject
+three-pass rules, one-subagent-per-task rules, file-count acceptance, or any
+activity quota presented as proof.
+
+## Cover every downstream artifact
+
+Perform an explicit impact pass and add required changes to the SPEC and tasks for each affected repository-owned surface:
+
+- **Documentation:** product and architecture docs, indexes, ADRs, API references, runbooks, migration guides, diagrams, and cross-links.
+- **READMEs:** root and package-level setup, commands, environment variables, examples, architecture summaries, troubleshooting, and contributor guidance.
+- **Lint and static rules:** linter, formatter, TypeScript, custom-rule implementations and tests, suppressions, package scripts, and CI enforcement. Name the rule ID, config path, intended scope, failure examples, and verification command when a rule must change.
+- **Skills and agent instructions:** applicable `SKILL.md` files, `agents/openai.yaml`, references, scripts, templates, examples, and repository-owned agent or command instructions. Keep skill metadata synchronized and require the relevant skill validator after changes.
+- **Adjacent artifacts:** manifests, lockfiles, generators, templates, fixtures, Schemas, sample configuration, environment documentation, migrations, telemetry, dashboards, release notes, and rollout or rollback procedures.
+
+For every surface, mark it `Change required`, `Preserve`, or `N/A` with repository evidence. For each required change, name the exact file or narrowly bounded file set, the content or rule to change, its dependency/order, its acceptance criterion, and the command or inspection that proves completion. Do not add generic tasks such as "update docs," "fix lint," or "update skills."
+
+Prefer updating the canonical source and its necessary pointers over duplicating the same guidance across files. Treat user-global skills or artifacts outside the repository as out of write scope unless the user explicitly includes them; a global skill may still supply an invoked method. The docs-maintainer method never invents local commands, provider state, archive rules, mirrors, or exceptions. Require documentation owners and pointers to be edited during the owning implementation slice rather than deferred to closeout.
+
+## Apply improvements to the SPEC and tasks
+
+Do not stop at describing an evidence-backed improvement. Apply it to the SPEC and every in-scope task artifact as soon as the relevant evidence pass is complete.
+
+- Rewrite vague or incorrect requirements as concrete constraints, patterns, failure cases, and observable acceptance criteria.
+- Synchronize implementation tasks with the revised design, including dependencies, ordering, ownership boundaries, validation commands, and completion evidence.
+- Add concrete tasks for every downstream artifact marked `Change required`; link each task to the SPEC requirement that caused it.
+- Keep tasks atomic and traceable to SPEC requirements. Remove or merge stale, duplicated, contradictory, or superseded tasks.
+- If no separate task artifact exists, add or update an implementation-task section in the SPEC; do not create a new task file unless repository conventions call for one.
+- When a finding depends on an unresolved product decision, record the decision as an explicit blocker and add the decision task instead of inventing an answer.
+- After reconciling subagent evidence, make any additional edits it supports. Independently verify those edits against the current checkout.
+
+Reserve the final response for changes actually made, unresolved decisions, and validation gaps. Do not present already-actionable findings merely as suggestions. In explicitly requested report-only mode, provide an exact proposed patch instead.
+
+This review edits the SPEC and task artifacts. Implement downstream code, documentation, configuration, lint, or skill changes only when the user also requests implementation.
+
+## Enforce Effect design quality
+
+Derive the required Effect style from the installed Effect version and representative repository code. Ensure the SPEC requires, where applicable:
+
+- typed domain failures for expected conditions and defects only for truly unexpected failures;
+- services and dependencies expressed through the repository's established Context/Service and Layer patterns;
+- Schema-based validation and transformation at untrusted boundaries;
+- resource lifetime, retry, timeout, concurrency, interruption, and telemetry behavior to be explicit at the correct boundary;
+- `Effect.gen`, `Effect.fn`, or the repository's equivalent for clean, readable, linear orchestration and `pipe`/combinators when they improve local composition;
+- Effects to remain lazy and composable until an application or framework execution boundary;
+- Promise and callback APIs to be wrapped once at the boundary, without scattered `runPromise`, nested execution, or ad hoc `try/catch` islands;
+- errors to retain useful causes and context without collapsing the typed error channel;
+- tests to use the repository's established test Layers, clocks, and service substitution patterns.
+
+Do not equate linear composition with one monolithic generator. Retain meaningful service and domain boundaries. Do not impose generic Effect idioms that contradict the codebase. Add concise code sketches only when they eliminate ambiguity, and make them match the repository's actual APIs and version.
+
+### Enforce external-client acceptance
+
+When the SPEC touches a third-party SDK, API client, callback library, or Promise-based provider, inspect every applicable `effect-client-wrapper` skill and make its rewrite part of the SPEC and tasks when stale. Require:
+
+- named application-owned operations instead of a generic SDK `use` callback, unconstrained generic result, or exposed raw client;
+- owning Schema-derived inputs, branded identifiers instead of raw `id: string`, encoded requests, and immediate decoding of unknown SDK outputs;
+- Schema-backed `Config`/`ConfigProvider` configuration with redacted secrets, rather than primitive/manual configuration passed through the program;
+- typed Schema-tagged provider and decode failures with tagged matching, never `instanceof` policy branching;
+- flat operation-local Effects with one-use mapping and error handling inline, operation-specific retry policy, and explicit live plus mock/test Layers.
+
+Acceptance requires a stale-pattern scan over the affected skills, docs, examples, and live adapter surfaces. Do not mark the SPEC or wrapper task ready while any generic `use` callback, raw-client accessor, raw identifier primitive, primitive config example, `instanceof` branch, unchecked provider result, or pass-through helper remains without a path-specific justified exception.
+
+## Forbid helper sprawl
+
+Make the anti-sprawl rule explicit in the SPEC:
+
+- Keep one-use logic beside its caller unless it forms reusable domain behavior, an independently testable policy, or a real I/O boundary.
+- Reuse or extend an established service, module, component, hook, Schema, or utility before adding a parallel abstraction.
+- Do not create pass-through wrappers, single-call forwarding helpers, speculative utility modules, generic `utils` dumping grounds, or barrels solely to hide imports.
+- Extract shared code only when there is demonstrated reuse or a stable semantic boundary; name that boundary and its owner in the SPEC.
+- Prefer a small number of cohesive modules with linear control flow over chains of tiny helpers that obscure behavior.
+
+Require the implementer to justify each new shared abstraction during review.
+
+## Enforce React composition
+
+Match the repository's React framework and component conventions. Ensure the SPEC favors:
+
+- focused leaf components with explicit, narrow props and minimal knowledge of application services;
+- shared state, data loading, Effect execution, and orchestration at clear feature or route boundaries while permitting genuinely local UI state in leaves;
+- composition through children, slots, provider boundaries, and small domain components instead of boolean-prop matrices;
+- colocated feature code and local one-use components before global component or hook extraction;
+- accessible semantics, keyboard behavior, focus states, loading, empty, error, and disabled states;
+- stable data flow without duplicated state, synchronization Effects, or unnecessary prop drilling.
+
+Reject giant route components, premature design-system primitives, and hooks that merely rename a single call. Require deviations only when repository evidence supports them.
+
+## Make lint and verification executable
+
+Read the actual repository configuration and name the exact applicable commands in the SPEC. Require:
+
+- no new blanket lint disables, ignored files, `any`, `ts-ignore`, or equivalent escape hatches without a documented reason;
+- formatting, lint, typecheck, unit/integration tests, and build checks appropriate to the changed packages;
+- focused tests for domain failures and composition boundaries, not only happy-path snapshots;
+- runtime or browser proof for user-visible or integration behavior;
+- validation results to distinguish pre-existing failures from regressions caused by the implementation.
+
+Do not invent command names. If the repository lacks a needed rule, state the rule text and propose the narrowest enforceable configuration change.
+
+## Complete and report
+
+1. Confirm that every evidence-backed finding and downstream-artifact impact has been applied to the SPEC and associated tasks or recorded as an explicit unresolved blocker.
+2. For an audit-derived SPEC, confirm every accepted finding ID maps to an
+   owning requirement and task, while rejected, deferred, and optional findings
+   remain outside implementation scope unless explicitly accepted.
+   Confirm its complete fixed impact-surface map, verification, journeys, and
+   proof survived the handoff rather than being reduced to a summary.
+3. Re-read the SPEC and task artifacts together to ensure their phases, dependencies, acceptance criteria, and verification commands agree.
+4. Verify that docs, READMEs, lint rules, skills, and adjacent artifacts are each marked `Change required` or `N/A` with evidence.
+5. Remove duplicated, contradictory, stale, or non-actionable prose and tasks.
+6. Re-read the full diff against the original intent and the evidence map.
+7. Run available documentation formatting or lint checks plus `git diff --check`; otherwise inspect headings, links, code fences, and internal consistency manually.
+8. Confirm the docs-maintainer impact ledger, semantic owners, lifecycle
+   transitions, exact checks, proof, and non-claims agree with the landed
+   SPEC/tasks.
+9. For ordinary repository work, stop after accepted corrections, normal
+   repository checks, applicable journeys, and one fresh independent review.
+   Do not require comparative evaluation unless the SPEC makes a general
+   harness-effect claim.
+
+Finish with a concise report containing:
+
+- the outcome (`ready`, `ready after changes`, or `blocked`) and the SPEC path;
+- the most important improvements applied to the SPEC and tasks or, in explicitly requested report-only mode, the proposed patch;
+- an evidence ledger covering the SPEC, documentation/README count and exclusions, local code/config, upstream packages researched through DeepWiki, and subagent scope;
+- a compact review matrix for Effect, linear composition, helper sprawl, React composition, testing/operations, docs, READMEs, lint rules, skills, and adjacent artifacts, marking each `Pass`, `Strengthened`, `Gap`, or `N/A`;
+- local repository evidence and upstream-library evidence reconciled, including version mismatches or contradictions;
+- unresolved product decisions or blockers;
+- validation performed and any remaining gaps.
+
+Keep tool output and the final handoff bounded. For each claimed result, retain
+an addressable receipt with target, command or procedure owner, postcondition,
+artifact digest where applicable, limitations, recovery, and explicit
+non-claims. Preserve raw failed evidence outside the default route.
+
+Use file-and-line references for actionable findings. Do not claim the SPEC is implementation-ready while mandatory evidence, unresolved contradictions, or non-negotiable decisions remain.
+
+</skill>
