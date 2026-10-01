@@ -1,0 +1,24 @@
+<codex_delegation>
+  <source_host_id>slingshot:env_e_6a0672dd80bc8326ad6dcc62f6a9a363</source_host_id>
+  <source_thread_id>019ff625-045d-74a0-8da5-1d3e46394c0d</source_thread_id>
+  <input>Continue TaxKit with this goal.
+
+
+Execution model: use gpt-5.6-sol with high reasoning for this entire goal. Cooper grants full repository implementation authority for this project. Establish this as the thread's governing parent goal with the goal tools immediately; do not create duplicate goals if an unfinished parent goal already exists.
+
+Mandatory engineering guidance:
+- Read repository-local AGENTS.md, the active SPEC/task ledger/ExecPlan, and all applicable local instructions before editing.
+- Fully follow /Users/cooper/.agents/skills/docs-maintainer/SKILL.md and /Users/cooper/.agents/skills/strict-effect-ts/SKILL.md. For Alchemy/IaC work also follow /Users/cooper/.agents/skills/alchemy-iac/SKILL.md.
+- Every code audit must consult the local cloned Effect repository for the installed API where available and/or DeepWiki. Use Effect v4 guidance only, matching the installed package version; never rely on Effect v3 guidance. Locate and record the exact reference revision/version used.
+- Work in small coherent slices. Update the owning docs, SPEC/tasks, architecture, and proof/evidence in the same slice. Preserve unrelated dirty worktree changes. Use apply_patch for edits.
+- Treat host callbacks as narrow adapters only. Enforce Schema at ingress/egress, closed typed errors, named services, private live Layers, an application-owned runtime, Effect-managed time/randomness/concurrency/resources, deterministic tests, and secret-negative structured observability.
+- Run the repository's real focused checks after every slice, distinguish pre-existing failures, and do not claim strictness or completion without direct evidence.
+- Continue iteratively through the audit queue until the codebase is as strict and coherent as practical. Finish with a fresh repository-wide audit and a bounded handoff listing changed files, checks, remaining exceptions, and non-claims.
+
+
+Goal: make the apps side, especially the docs application and its Alchemy/Cloudflare integration, best-in-class under strict Effect TypeScript and Alchemy IaC practice. This is a repository code-quality and architecture goal, not an instruction to publish packages, change domains/DNS, or perform unrelated deployment operations.
+
+Start from the exact current origin/main and inspect the installed Effect, TanStack Start, Fumadocs, Alchemy, Cloudflare, and provider versions. Use the locally cloned repositories for those libraries where available, and use DeepWiki for current primary guidance where useful; record exact versions/revisions and use Effect v4 only. Audit apps/docs and the Alchemy composition/infrastructure boundary iteratively: schemas and decoding, typed errors, services/Layers, runtime ownership, host-framework adapters, SSR/hydration, HTTP/Cloudflare boundaries, config/secrets, serialization, tests, observability, package exports, and docs/SPEC ownership. Apply coherent improvements with deterministic verification, updating canonical documentation and task context in the same slice.
+
+Do not copy reference-repository paths into durable TaxKit docs. Do not publish packages or alter external resources unless a later goal explicitly authorises that. Continue until the code-quality audit is satisfied or every residual is a named, bounded, tested exception; then run a fresh terminal audit and provide exact evidence.</input>
+</codex_delegation>
