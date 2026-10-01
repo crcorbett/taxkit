@@ -1,0 +1,1 @@
+Were these changes mainly focused on scripts / verificiation etc and not actual funcitonality of taxkit or the docs app?
