@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-08-28
-source_of_truth: root-docs
-confidence: high
+document_type: repository-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-repository-maintainers
+last_reviewed: 2026-10-01
+review_trigger: contributor setup, repository entry points, or supported commands change
 ---
 
 # TaxKit
@@ -73,6 +75,57 @@ Start with:
 - [Package ownership](./docs/architecture/package-ownership.md)
 - [Package boundaries](./docs/architecture/package-boundaries.md)
 - [API and SDK architecture](./docs/architecture/api-and-sdk.md)
+
+## AI work history
+
+[Entire](https://entire.io/gh/crcorbett/taxkit) records Codex and Claude Code
+conversations and tool activity alongside Git commits. TaxKit and these chat
+records are public.
+Keep credentials out of chats: Entire removes detected secrets, but detection
+is not a guarantee.
+
+Install Entire on each machine, then run from the checkout:
+
+```sh
+entire enable --agent codex --telemetry=false --absolute-git-hook-path
+entire enable --agent claude-code --telemetry=false --absolute-git-hook-path
+entire status
+entire doctor
+```
+
+Open `/hooks` in Codex and review the seven Entire commands, then start a fresh
+chat. Start a fresh Claude Code chat too. The shared settings are
+`.entire/settings.json`, `.codex/hooks.json` and `.claude/settings.json`.
+Anonymous usage reporting is off and commit linking is set to `always`.
+Each clone needs its own Git recording commands and Codex approvals. Local
+logs, working transcripts and machine-specific settings are ignored by Git.
+
+This repository has an Entire connection in Australia (Sydney). Keep `origin`
+as the direct GitHub remote and add the regional remote in another clone:
+
+```sh
+entire repo remote add entire /gh/crcorbett/taxkit --cluster aws-ap-southeast-2.entire.io
+entire enable --agent codex --telemetry=false --absolute-git-hook-path --checkpoint-push-remote entire
+```
+
+Finish the normal workflow with `git commit` and `git push entire BRANCH`.
+Entire uploads chat checkpoints and forwards source changes to GitHub.
+The checkpoint destination is a local setting for this clone. A push through
+`origin` can also trigger a separate checkpoint upload to that destination.
+Ending a chat alone does not prove that it was published. Check the hosted
+Sessions page for its conversation and linked commit.
+
+The native importer supports past Codex and Claude Code chats. Preview first
+with `entire import codex --dry-run` and `entire import claude-code --dry-run`.
+It normally scans the previous 30 days; use `--path` and `--session` for selected
+history. Repeated imports skip turns already imported. Old checkout locations
+and compressed Codex archives need selected temporary copies; preserve the
+originals. Imported chats are read-only in Entire. Ordinary Claude web and
+desktop chats have no direct importer in this CLI version.
+
+See [Entire's setup guide](https://docs.entire.io/quickstart),
+[import guide](https://docs.entire.io/guides/sessions/import-past-agent-history)
+and the [setup spec](./docs/product-specs/entire-session-history.md).
 
 ## Commands
 

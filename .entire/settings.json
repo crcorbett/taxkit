@@ -1,0 +1,11 @@
+{
+  "enabled": true,
+  "absolute_git_hook_path": true,
+  "telemetry": false,
+  "commit_linking": "always",
+  "checkpoints": {
+    "primary": {
+      "type": "git-refs"
+    }
+  }
+}
