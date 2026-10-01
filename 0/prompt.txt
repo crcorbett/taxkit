@@ -1,0 +1,1 @@
+Ensure the task uses goal tool to set a goal for the implementation
