@@ -1,0 +1,1 @@
+Can you review and summarise, do you need to tell it to investigate certain areas more or ensure it aligns better with docs/** patterns, rules etc?
