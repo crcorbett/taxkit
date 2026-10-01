@@ -1,0 +1,1 @@
+Ok commit the SPEC, and spin up new task to implement [$prd-implementer](/Users/cooper/Projects/taxkit/.agents/skills/prd-implementer/SKILL.md) with full approval
