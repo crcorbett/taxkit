@@ -1,0 +1,7 @@
+<environment_context>
+  <cwd>/Users/cooper/Projects/taxkit</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-08-28</current_date>
+  <timezone>Australia/Melbourne</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/taxkit</root><root>/Users/cooper/.codex/visualizations/2026/08/27/01a0439a-1d48-7c03-8299-1c331309fab3</root><root>/Users/cooper/.codex/visualizations/2026/08/27/01a0439c-793b-78e3-99c0-2a1262bfbd03</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
