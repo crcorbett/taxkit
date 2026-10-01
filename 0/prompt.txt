@@ -1,0 +1,3 @@
+I dont know if we actually need the gh pr list stuff. That doesn't scale to other contributors neatly and was probably meant to be an ephemeral helper.
+
+Set a new goal to fix the Alchemy implementation per its guidance (clone the repo locally so you can read its code / docs to help)
