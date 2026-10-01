@@ -1,0 +1,3 @@
+Okay, make your suggested improvements. And merge.
+
+Then archive any of the project subthreads that are now completed.Then should we look at how to improve the CICD efficiency? If you look at the ~/project/slash site repo, we recently did a similar process of trying to improve the CI efficiency. You should spin up a new project subthread to investigate this and propose improvements we can make to our own repo.
