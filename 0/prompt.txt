@@ -1,0 +1,1 @@
+Ok please spin up a subthread to audit our alchemy structure and deployments against the alchemy docs, and a cloned copy of its repo. It needs to identify any code smells or incorrect usage/structure in our code.
