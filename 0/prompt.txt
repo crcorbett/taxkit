@@ -1,0 +1,15 @@
+Ok now this:
+```
+makeDocsDeploymentChildEnvironment
+```
+```diff
+ restoreDocsDeploymentJsonCommand(
++   operation,
++   exitCode,
++   stdout,
++   stderr,
++   schema
++ )
+```
+
+Why do we need these? Also shouldn't we be using the native Effect TS CLI and Command packages?
