@@ -1,0 +1,4 @@
+<codex_delegation>
+  <source_thread_id>019f663b-6195-7130-8d2a-6bf5aaf24a8b</source_thread_id>
+  <input>Continue the existing Doppler research, SPEC review and implementation goal in the saved TaxKit project. Preserve all work and the governing goal. Confirm the task is operating against TaxKit before continuing.</input>
+</codex_delegation>
