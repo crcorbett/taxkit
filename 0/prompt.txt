@@ -1,0 +1,4 @@
+<codex_delegation>
+  <source_thread_id>01a04376-0bf8-7690-9b2e-cd94a26cc44c</source_thread_id>
+  <input>Run [$thread-status](/Users/cooper/.codex/skills/thread-status/SKILL.md) for this project. Follow the skill fully, review the project’s recent tasks, and handle this Main task last.</input>
+</codex_delegation>
