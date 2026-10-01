@@ -1,0 +1,22 @@
+<codex_delegation>
+  <source_thread_id>019f663b-6195-7130-8d2a-6bf5aaf24a8b</source_thread_id>
+  <input>Make Doppler the governed source for TaxKit credentials and environment variables across local Bun development, Alchemy/Cloudflare deployment work, and GitHub Actions, while keeping secrets out of source control, logs, caches and evidence files.
+
+At the start, read the repository-local AGENTS.md, docs/README.md and all task-owning architecture, operations, standards, runbook, SPEC and execution-plan documents. Immediately use the goal tools to establish this whole request as the task’s governing parent goal. Do not create a duplicate if an unfinished parent goal already exists.
+
+Work through this as one end-to-end task:
+
+1. Research before proposing changes. Thoroughly inspect the current TaxKit implementation and the working Doppler patterns in /Users/cooper/Projects/bundjil and /Users/cooper/Projects/site. Search other relevant sibling projects under /Users/cooper/Projects for useful, current examples. Compare how they handle Doppler projects/configs, local Bun commands, environment selection, Alchemy and Cloudflare inputs, GitHub Actions, service tokens, secret redaction, developer onboarding, CI caching, preview versus production separation, and recovery. Check installed package and CLI versions and use current official Doppler, Alchemy, Bun, GitHub Actions and Cloudflare guidance where needed. Record exact versions and reference revisions used. Treat reference repositories as evidence only: do not copy their local paths, private names, secret values or repository-specific assumptions into durable TaxKit files.
+
+2. Draft the PRD/SPEC. Fully use the repository-local prd-writer skill. Define the present problem, ownership model, environments, trust boundaries, credential lifecycle, least-privilege access, bootstrap flow, failure and recovery behaviour, migration plan, test/proof requirements, rollout slices, explicit non-goals and a machine-readable task ledger. Prefer a small end-to-end vertical slice first, then extend it. Avoid unnecessary machinery.
+
+3. Review it before implementation. Fully use the repository-local prd-review skill and revise the SPEC until it is coherent, testable and consistent with TaxKit’s architecture, authority model and documentation rules. Do not treat the first draft as approved merely because this task requested implementation; complete the review and record its outcome.
+
+4. Implement the reviewed SPEC. Fully use the repository-local prd-implementer skill. Also follow docs-maintainer, strict-effect-ts, alchemy-iac and repo-structure for every relevant slice. Preserve the existing native Alchemy design. Use typed and decoded configuration boundaries, redacted secrets, clear environment ownership and secret-negative observability. Keep host scripts and workflow adapters narrow. Do not weaken current deployment proof, preview/production controls or repository checks.
+
+5. Verify and close out. Test local Doppler-assisted Bun commands, the Alchemy configuration path, GitHub workflow behaviour through deterministic tests or safe hosted proof where authorised, missing/malformed configuration, secret-negative logs and receipts, preview/production isolation, and documented recovery. Run focused checks after each slice and the full repository verification at closeout. Update the SPEC, task ledger, active/completed execution plans, canonical architecture, operations docs and runbooks in the same slices. Commit coherent work, open and merge the required pull request to main when checks pass, then confirm exact origin/main identity and hosted check results.
+
+Repository implementation and pull-request/merge work are approved by this request. Do not publish packages, change DNS/domains, deploy unrelated resources, expose secrets, or create/rotate/revoke Doppler, GitHub or Cloudflare credentials without the explicit operation-specific authority required by docs/operations/authority-model.md. If a provider mutation is genuinely needed, finish every safe repository and planning step first, then present the exact principal, resource, environment, change, rollback and readback needed for approval.
+
+Finish only when the reviewed SPEC is implemented as far as current authority allows, all remaining exceptions are named and bounded, and the task provides a plain-English summary of what changed, what was proved, what remains, and what was deliberately not claimed.</input>
+</codex_delegation>
