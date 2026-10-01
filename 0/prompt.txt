@@ -1,0 +1,5 @@
+<environment_context>
+  <current_date>2026-08-01</current_date>
+  <timezone>Australia/Melbourne</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/taxkit</root><root>/Users/cooper/.codex/visualizations/2026/07/15/019f663b-6195-7130-8d2a-6bf5aaf24a8b</root><root>/Users/cooper/Projects/learned</root><root>/Users/cooper/Projects/bundjil</root><root>/Users/cooper/Projects/adad</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
