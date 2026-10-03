@@ -56,6 +56,12 @@ intent and task state belong in the active SPEC and execution plan.
 - The initial app has no runtime bindings, secrets or stateful application
   service. KV, D1, R2, Durable Objects, Queues, Hyperdrive, Cron, custom
   domains, DNS and third-party observability are absent.
+- The hosted browser check retries a page load only after a same-site hashed
+  JavaScript asset returns 404 during hydration. This covers a short edge
+  transition after a Worker update and records its retry count. The separate
+  manual Production hosted verification workflow has no provider credentials
+  and cannot change the Worker. A successful later check does not turn an
+  earlier failed deploy workflow into a success.
 - `tools/docs-deployment/automation-register.json` and `controls.json` own the
   Schema-decoded desired state for three workflow classes: Preview delivery,
   Production delivery and exact-stage Preview teardown. All three are

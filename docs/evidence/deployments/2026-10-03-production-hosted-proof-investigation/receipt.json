@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "ADM-004-production-hosted-proof-investigation-2026-10-03",
+  "repository": "crcorbett/taxkit",
+  "sourceRunId": 37093118715,
+  "sourceRunConclusion": "failure",
+  "sourceLog": {
+    "hostedStepStartedAt": "2026-10-03T03:27:02.218Z",
+    "safeFailureAt": "2026-10-03T03:27:33.774Z",
+    "safeFailure": "FAIL [hosted-proof] execution=browser-proof",
+    "rawBrowserExceptionRetained": false
+  },
+  "cloudflareTelemetry": {
+    "queryStatus": "COMPLETED",
+    "timeframeFrom": "2026-10-03T03:26:50Z",
+    "timeframeTo": "2026-10-03T03:27:40Z",
+    "workerName": "taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev",
+    "observedEvents": [
+      {
+        "at": "2026-10-03T03:27:02.884Z",
+        "versionId": "4d2439eb-f1f7-4dff-89c6-ba5433ce570b",
+        "path": "/guides/calculate-australian-take-home-pay",
+        "status": 200
+      },
+      {
+        "at": "2026-10-03T03:27:03.343Z",
+        "versionId": "4d2439eb-f1f7-4dff-89c6-ba5433ce570b",
+        "path": "/__docs-evidence__/missing",
+        "status": 404
+      },
+      {
+        "at": "2026-10-03T03:27:03.804Z",
+        "versionId": "4d2439eb-f1f7-4dff-89c6-ba5433ce570b",
+        "path": "/assets/calculate-australian-take-home-pay-CPWSzSN1.js",
+        "status": 404
+      }
+    ],
+    "laterObservedVersionId": "6456470d-0f8d-4d5b-b5b2-521e1306bd32",
+    "laterPassingHostedTestAt": "2026-10-03T03:31:16Z"
+  },
+  "assessment": {
+    "bestSupportedCause": "The browser check began while an edge still served the previous Worker version. That version returned 404 for a JavaScript asset needed by the page; the check then failed about 30 seconds later. A missing script preventing hydration is the strongest explanation.",
+    "confidence": "high for a mixed-version asset failure; the precise Playwright assertion is unproved because the original exception was deliberately sanitised",
+    "expectedMissingRoute404": "The 404 for /__docs-evidence__/missing is an expected test assertion, unlike the JavaScript asset 404.",
+    "readbackLimit": "The Cloudflare deployment API reported the new version at 100% traffic, but that control-plane readback did not prove every edge had stopped serving the previous version."
+  },
+  "recovery": {
+    "operation": "Improve the hosted browser check to retry only when a hashed JavaScript asset returns 404 during hydration, then run a separate credential-free hosted check against the already deployed Production Worker.",
+    "productionReapplyRequired": false,
+    "rollbackRequired": false
+  },
+  "nonClaims": [
+    "Cloudflare invocation logs do not contain the browser's raw Playwright exception or prove the exact line that timed out.",
+    "The original GitHub deployment run remains failed and cannot be retroactively changed to success.",
+    "No Production apply, rollback, DNS change, custom-domain change or publication was performed during this investigation."
+  ]
+}

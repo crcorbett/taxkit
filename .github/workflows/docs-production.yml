@@ -452,7 +452,7 @@ jobs:
           env -u TAXKIT_DOCS_PREVIEW_PR_NUMBER \
             TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY="$hosted_rollback_identity" \
             bun apps/docs/scripts/test-cloudflare-hosted.tsx > "$RUNNER_TEMP/docs-deployment/hosted-proof.raw.json"
-          jq '{acceptedPlanSha256,accountId,candidateCommit,configSha256,deploymentInputSha256,deploymentId,diagnostics,environment,lockfileSha256,previewPrNumber,previousVersionId:(if .previousVersionId == "" then null else .previousVersionId end),rollbackRecoveryIdentity,screenshots,stage,stateStoreId,url,versionId,workerName}' "$RUNNER_TEMP/docs-deployment/hosted-proof.raw.json" > "$RUNNER_TEMP/docs-deployment/hosted-proof.json"
+          jq '{acceptedPlanSha256,assetPropagationRetries,accountId,candidateCommit,configSha256,deploymentInputSha256,deploymentId,diagnostics,environment,lockfileSha256,previewPrNumber,previousVersionId:(if .previousVersionId == "" then null else .previousVersionId end),rollbackRecoveryIdentity,screenshots,stage,stateStoreId,url,versionId,workerName} | if .assetPropagationRetries == null then del(.assetPropagationRetries) else . end' "$RUNNER_TEMP/docs-deployment/hosted-proof.raw.json" > "$RUNNER_TEMP/docs-deployment/hosted-proof.json"
           mkdir -p "$RUNNER_TEMP/docs-deployment/docs/evidence/deployments"
           cp -R "$TAXKIT_DOCS_EVIDENCE_DIRECTORY" "$RUNNER_TEMP/docs-deployment/docs/evidence/deployments/"
           TAXKIT_WORKFLOW_PROVIDER_READBACK="$RUNNER_TEMP/docs-deployment/provider-readback.json" \

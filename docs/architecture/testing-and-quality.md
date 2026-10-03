@@ -310,7 +310,7 @@ release-relevant boundaries. This is local workflow-configuration proof only;
 it does not prove a hosted run, publication, deployment, registry state, or
 external consumer behaviour.
 
-All five workflows pin `actions/checkout` v7.0.1 by exact commit. Quality and
+All six workflows pin `actions/checkout` v7.0.1 by exact commit. Quality and
 the receipt reconciler also pin Doppler's v2.0.0 fetch action to its exact
 commit and leave broad environment injection disabled. Checkout
 places the selected Git revision in GitHub's workspace; it does not install or
@@ -334,6 +334,15 @@ default-branch workflow identity, protected-environment and credential
 readback, exact-candidate execution, provider/state agreement and a dated
 receipt. Quality retains `contents: read`, cancellable concurrency and no
 provider credential or mutation edge.
+
+The separate manual Production hosted check reads a reviewed deployment proof
+file on `main` and runs the same HTTP and Chromium checks against the live
+Worker. It uses no deployment credential and cannot update the Worker. Its
+focused local browser test first serves a JavaScript asset as 404, then 200,
+and checks that the browser retries once and clears the first attempt's
+diagnostic. A successful hosted run establishes the recorded site behaviour at
+that time; it does not change the failed original deploy run or prove a
+rollback.
 
 The credentialed `check:docs-deployment-inventory` command is also excluded
 from root verification and Quality. Its focused service fixtures prove

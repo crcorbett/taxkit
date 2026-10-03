@@ -7,9 +7,17 @@ import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { Console, Effect, Match } from "effect";
 import { chromium } from "playwright";
-import type { Browser, Page, Request } from "playwright";
+import type {
+  Browser,
+  Page,
+  Request,
+  Response as PlaywrightResponse,
+} from "playwright";
 
-import { runCloudflareHostedProof } from "./cloudflare-hosted-proof.boundary.js";
+import {
+  HostedProofAssetPropagationError,
+  runCloudflareHostedProof,
+} from "./cloudflare-hosted-proof.boundary.js";
 import type { CloudflareHostedProofHost } from "./cloudflare-hosted-proof.boundary.js";
 
 interface BrowserRouterHarness {
@@ -69,13 +77,75 @@ const assertComputedContrast = async (page: Page) => {
   return Number(ratio.toFixed(2));
 };
 
-const waitForHydratedRouter = async (page: Page) => {
+const waitForHydratedRouter = async (page: Page, timeoutMs: number) => {
   await page.waitForFunction(
     () =>
       globalThis.__TSR_ROUTER__ !== undefined &&
       document.querySelector('[data-tk-hydrated="true"]') !== null &&
-      document.querySelector('[data-tk-navigation-interactive="true"]') !== null
+      document.querySelector('[data-tk-navigation-interactive="true"]') !==
+        null,
+    undefined,
+    { timeout: timeoutMs }
   );
+};
+
+export const visitHydratedPage = async ({
+  attempts,
+  delayMs,
+  diagnostics,
+  hydrationTimeoutMs = 30_000,
+  origin,
+  page,
+  path,
+}: {
+  readonly attempts: number;
+  readonly delayMs: number;
+  readonly diagnostics: string[];
+  readonly hydrationTimeoutMs?: number;
+  readonly origin: string;
+  readonly page: Page;
+  readonly path: string;
+}): Promise<number> => {
+  let missingScriptAsset = false;
+  const observeMissingScriptAsset = (response: PlaywrightResponse) => {
+    if (response.status() !== 404) {
+      return;
+    }
+    const url = new URL(response.url());
+    if (
+      url.origin === origin &&
+      /^\/assets\/[^/?#]+-[A-Za-z0-9_-]{8,}\.js$/u.test(url.pathname)
+    ) {
+      missingScriptAsset = true;
+    }
+  };
+  page.on("response", observeMissingScriptAsset);
+  try {
+    const visitAttempt = async (attempt: number): Promise<number> => {
+      missingScriptAsset = false;
+      const diagnosticsBeforeAttempt = diagnostics.length;
+      await page.goto(`${origin}${path}`, { waitUntil: "domcontentloaded" });
+      try {
+        await waitForHydratedRouter(page, hydrationTimeoutMs);
+        return attempt - 1;
+      } catch (error) {
+        if (!missingScriptAsset) {
+          throw error;
+        }
+      }
+      if (attempt === attempts) {
+        throw new HostedProofAssetPropagationError({
+          reason: "missing-script-asset",
+        });
+      }
+      diagnostics.length = diagnosticsBeforeAttempt;
+      await Bun.sleep(delayMs);
+      return visitAttempt(attempt + 1);
+    };
+    return await visitAttempt(1);
+  } finally {
+    page.off("response", observeMissingScriptAsset);
+  }
 };
 
 const digest = async (url: URL) =>
@@ -215,6 +285,7 @@ const playwrightHostedProofHost = {
       viewport: { height: 1000, width: 1440 },
     });
     const diagnostics: string[] = [];
+    let assetPropagationRetries = 0;
     let documentRequests = 0;
     const serverFunctionResponses: {
       readonly method: string;
@@ -259,11 +330,21 @@ const playwrightHostedProofHost = {
       }
     });
 
-    await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
+    const visit = async (target: Page, path: string) => {
+      assetPropagationRetries += await visitHydratedPage({
+        attempts: hostedPropagationAttempts,
+        delayMs: hostedPropagationDelayMs,
+        diagnostics,
+        origin,
+        page: target,
+        path,
+      });
+    };
+
+    await visit(page, knownPath);
     await page
       .getByRole("heading", { name: "Calculate Australian take-home pay" })
       .waitFor();
-    await waitForHydratedRouter(page);
     assert.equal(await page.getByRole("main").count(), 1);
     assert.equal(await page.getByRole("article").count(), 1);
     assert.equal(
@@ -315,8 +396,7 @@ const playwrightHostedProofHost = {
     await page.getByTestId("route-not-found").waitFor();
     assert.equal(documentRequests, navigationDocumentBaseline);
 
-    await page.goto(`${origin}/start`, { waitUntil: "domcontentloaded" });
-    await waitForHydratedRouter(page);
+    await visit(page, "/start");
     await page.keyboard.press("Tab");
     const skipLink = page.getByRole("link", { name: "Skip to documentation" });
     assert.equal(
@@ -329,11 +409,10 @@ const playwrightHostedProofHost = {
       true
     );
 
-    await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
+    await visit(page, knownPath);
     await page
       .getByRole("heading", { name: "Calculate Australian take-home pay" })
       .waitFor();
-    await waitForHydratedRouter(page);
     await page.screenshot({
       fullPage: true,
       path: fileURLToPath(desktopScreenshot),
@@ -360,10 +439,7 @@ const playwrightHostedProofHost = {
         `mobile requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
       );
     });
-    await mobilePage.goto(`${origin}${knownPath}`, {
-      waitUntil: "domcontentloaded",
-    });
-    await waitForHydratedRouter(mobilePage);
+    await visit(mobilePage, knownPath);
     await mobilePage.getByRole("button", { name: "Open navigation" }).click();
     await mobilePage
       .getByRole("button", { name: "Close navigation" })
@@ -392,6 +468,7 @@ const playwrightHostedProofHost = {
         path: assetPath,
         status: assetResponse.status,
       },
+      assetPropagationRetries,
       browser: { name: "chromium", version: browserVersion },
       candidateCommit,
       configSha256,

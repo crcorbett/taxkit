@@ -269,6 +269,17 @@ For fast credential-free work, use `bun run docs:dev:vite` instead.
 
 ## Evidence and postcondition
 
+If a Production apply succeeds but the same run's browser step fails, retain
+the failed workflow result. Inspect the narrow Cloudflare Worker logs around
+the failure, including the served version and any JavaScript asset 404. A
+separately dispatched `Docs Production Hosted Verification` workflow can run
+the current browser test against the already deployed URL using a reviewed
+`docs/evidence/deployments/<dated-route>/hosted-proof.json` on `main`. It has
+no provider or Doppler credentials and performs no apply or rollback. Check
+the current Worker version separately before attributing its result to a
+specific deployment. Its passing result supplements, but cannot repair, the
+original failed workflow receipt.
+
 Retain sanitised receipts with the exact candidate, workflow run, operation,
 stage, account identity, plan digest, provider identity, postcondition and
 non-claims. Do not retain a bearer token, temporary secret-bearing URL, raw

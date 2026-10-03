@@ -105,8 +105,16 @@ export class HostedProofConfigurationError extends Data.TaggedError(
 export class HostedProofExecutionError extends Data.TaggedError(
   "HostedProofExecutionError"
 )<{
-  readonly operation: "browser-close" | "browser-launch" | "browser-proof";
+  readonly operation:
+    | "asset-propagation"
+    | "browser-close"
+    | "browser-launch"
+    | "browser-proof";
 }> {}
+
+export class HostedProofAssetPropagationError extends Data.TaggedError(
+  "HostedProofAssetPropagationError"
+)<{ readonly reason: "missing-script-asset" }> {}
 
 export class HostedProofEvidenceError extends Data.TaggedError(
   "HostedProofEvidenceError"
@@ -200,8 +208,13 @@ export const runCloudflareHostedProof = <BrowserHandle>(
     const config = yield* loadHostedProofConfig;
     const browser = yield* acquireBrowser(host);
     const observation = yield* Effect.tryPromise({
-      catch: () =>
-        new HostedProofExecutionError({ operation: "browser-proof" }),
+      catch: (error) =>
+        new HostedProofExecutionError({
+          operation:
+            error instanceof HostedProofAssetPropagationError
+              ? "asset-propagation"
+              : "browser-proof",
+        }),
       try: (signal) => host.run(config, browser, signal),
     });
 

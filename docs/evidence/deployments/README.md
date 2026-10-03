@@ -12,6 +12,17 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
 
+## 2026-10-03 Production hosted-proof investigation
+
+The [sanitised investigation receipt](./2026-10-03-production-hosted-proof-investigation/receipt.json)
+correlates the failed GitHub check with Cloudflare's saved Worker logs. The
+previous Worker version served the guide page, then returned 404 for a hashed
+JavaScript asset. The check failed about 30 seconds later. This strongly
+supports a short period when the page and its assets came from different
+deployment versions. The original browser exception was not retained, so its
+exact failing assertion remains unknown. A later test and Worker readback
+observed the new version; the original GitHub run remains failed.
+
 ## 2026-10-03 Alchemy beta.79 Production deployment
 
 The [sanitised deployment receipt](./2026-10-03-alchemy-beta79-production-deploy/receipt.json)
