@@ -51,3 +51,9 @@ I also want posthog and axiom added to track product analytics and visits, trace
 We need to re-use the existing datasets in axiom because we're limited to 3, see how we manage this in \~/Projects/site and \~/Projects/common-practice. We have all events going to those 3 datasets, and then we filter based on app/project, stage etc.
 
 Posthog I want basic traffic analytics, and calculator usage analytics. I dont need calculator details, but what one was used. We dont need consent dialogs. [$development-workflows:repo-structure](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.1/skills/repo-structure/SKILL.md) describes posthog in more detail.
+
+---
+
+What else? Do we use RPC for the website? Any other design decisions? [$development-workflows:grill-with-docs](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.1/skills/grill-with-docs/SKILL.md) \
+\
+Have you ensured extrem,e effect tightening, with Effect and no imperative/mutable, instead declarative,immutable, functional style with services,layers,piping, no helper sprawl etc
