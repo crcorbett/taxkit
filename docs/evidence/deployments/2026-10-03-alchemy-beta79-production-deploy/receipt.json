@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "ADM-004-production-deploy-2026-10-03",
+  "repository": "crcorbett/taxkit",
+  "authority": {
+    "approver": "Cooper, TaxKit owner",
+    "approvedOperation": "one exact-plan Production deployment and protected-environment review",
+    "protectedEnvironment": "taxkit-docs-production",
+    "githubReviewer": "crcorbett",
+    "stage": "prod",
+    "rollbackOrRetryApproved": false
+  },
+  "source": {
+    "workflowCommit": "03a25cc0fe68f7aa8140bf2d816d7e4bd8e13eea",
+    "candidatePullRequest": 78,
+    "candidateCommit": "84d65144938b7b8b25672f070e790b74ec09237d",
+    "acceptedPreviewRunId": 35943710629,
+    "acceptedProductionPlanRunId": 35946380336,
+    "acceptedProductionPlanSha256": "886e7cf0fe2bb07aa50e6c0e1ecf2a2582bd163eacb59ee121cd9b6cfd69566e"
+  },
+  "workflow": {
+    "runId": 37093118715,
+    "conclusion": "failure",
+    "protectedEnvironmentReview": "approved",
+    "planArtifactId": 11262892110,
+    "reconcilerRunId": 37093270529,
+    "reconcilerConclusion": "success",
+    "reconcilerArtifactId": 11262627855,
+    "reconcilerResult": "workflow-run-failure.json records failure, not a successful deployment receipt",
+    "providerArtifactUploaded": false
+  },
+  "apply": {
+    "operation": "production-equal-replan",
+    "logicalResource": "TaxKitDocsCloudflare/prod/DocsWebsite",
+    "resourceType": "Cloudflare.Worker",
+    "action": "update",
+    "acceptedPlanSha256": "886e7cf0fe2bb07aa50e6c0e1ecf2a2582bd163eacb59ee121cd9b6cfd69566e",
+    "replanSha256": "886e7cf0fe2bb07aa50e6c0e1ecf2a2582bd163eacb59ee121cd9b6cfd69566e",
+    "applyStepResult": "Done: 1 succeeded",
+    "runnerPostApplyInventoryCheck": "passed",
+    "rollbackRecoveryIdentity": "production-37093118715"
+  },
+  "originalHostedProofFailure": {
+    "step": "Hosted Production HTTP and browser proof",
+    "safeError": "FAIL [hosted-proof] execution=browser-proof",
+    "exactCause": "unknown",
+    "effect": "No hosted-proof.json or provider artifact was uploaded by the deployment workflow"
+  },
+  "independentReadback": {
+    "observedAt": "2026-10-03T03:32:57Z",
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "productionWorkerMatches": 1,
+    "workerName": "taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev",
+    "latestDeploymentId": "0a18a513-450a-4213-8418-bb65fc8fbabd",
+    "latestDeploymentVersionId": "6456470d-0f8d-4d5b-b5b2-521e1306bd32",
+    "latestDeploymentTrafficPercentage": 100,
+    "previousVersionId": "4d2439eb-f1f7-4dff-89c6-ba5433ce570b",
+    "rootHttpStatus": 200,
+    "knownDocsRouteHttpStatus": 200,
+    "missingRouteHttpStatus": 404
+  },
+  "independentHostedProof": {
+    "result": "passed after the GitHub run failed, against the deployed Production Worker",
+    "exactRepositoryScript": "apps/docs/scripts/test-cloudflare-hosted.tsx",
+    "output": "hosted-proof.json",
+    "outputSchema": "DeploymentWorkflowHostedProbe",
+    "schemaValidation": "passed",
+    "browserDiagnostics": 0,
+    "desktopScreenshot": "../workflow-37093118715/production-desktop-84d6514.png",
+    "desktopScreenshotSha256": "e8b75dbfa8cdd95fe3a1f85da53c71214376c99e4ee9e28691de25d0f2ed3d23",
+    "mobileScreenshot": "../workflow-37093118715/production-mobile-84d6514.png",
+    "mobileScreenshotSha256": "498d5168e46cfe6e6e2fd19ccb28207cb8d4cd9cf4464a41e2979399dde272ae"
+  },
+  "recovery": {
+    "expectedCurrentVersionForAnyLaterRecoveryDecision": "6456470d-0f8d-4d5b-b5b2-521e1306bd32",
+    "previousVersion": "4d2439eb-f1f7-4dff-89c6-ba5433ce570b",
+    "nextOperation": "Any rollback or retry needs separate approval and a fresh current-version check."
+  },
+  "nonClaims": [
+    "The GitHub deployment workflow failed overall and its reconciler did not accept it as a successful deployment receipt.",
+    "The later independent hosted check does not explain or erase the original browser-proof failure.",
+    "The runner's passing inventory check does not prove that Alchemy state remained unchanged after the run.",
+    "No rollback, second apply, custom-domain change, DNS change, publication or permanent-uptime proof is claimed."
+  ]
+}

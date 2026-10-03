@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-09-24
+last_reviewed: 2026-10-03
 review_trigger: task progress, version, proof, provider authority, or lifecycle change
 ---
 
@@ -17,10 +17,10 @@ proof. Starting point: clean isolated worktree from
 
 | Task | State | Evidence and next action |
 | --- | --- | --- |
-| ADM-001 infrastructure owner | Locally verified; one-resource Preview deployment proved | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Hosted `pr-78` readback found one state stage and one Cloudflare Worker; Production property parity remains unproved. |
-| ADM-002 release upgrade | Locally verified; beta.79 Preview hosted and Production planned | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks, hosted Preview apply/browser proof and fixed Production plan passed. Production apply and hosted behaviour remain unproved. |
+| ADM-001 infrastructure owner | Locally verified; Preview and Production Worker updates observed | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Preview found one state stage and Worker; Production readback found the updated Worker. Full Production property parity remains unproved. |
+| ADM-002 release upgrade | Locally verified; beta.79 Preview and Production hosted | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks and Preview hosted proof passed. Production Worker updated and an independent exact-script hosted check passed; its original GitHub browser step failed. |
 | ADM-003 Doppler reconciliation | Locally verified; fixed bridges exercised; exact binding open | The checkout-scoped personal login and custody check passed. Read-only Doppler metadata shows one read-only, unexpired token per `ci`, `stg_preview` and `prd`; the hosted Preview and Production plan runs checked their fixed config identities. GitHub bridge values remain unreadable and cannot be bound to exact token identities. |
-| ADM-004 delivery | Merged; Preview hosted; Production plan accepted, deploy open | PRs #78–#82 merged with Quality and exact-stage cleanup evidence. Preview run `35943710629` passed provider and hosted browser proof. Separately approved Production plan run `35946380336` passed with one `DocsWebsite` update and digest `886e7cf0…fd69566e`; deploy and rollback proof remain open. |
+| ADM-004 delivery | Merged; Preview hosted; Production applied with failed CI proof | PRs #78–#82 merged with Quality and exact-stage cleanup evidence. Preview proof and Production plan passed. Approved Production run `37093118715` applied one Worker update; its browser step failed. Later independent hosted proof passed. The failed run and rollback proof remain open. |
 
 ## 2026-09-24 development authority and CLI correction
 
@@ -240,6 +240,56 @@ evidence index, active task ledger and this plan; **Preserve** for the SPEC,
 runbook, authority model, architecture, historical receipts and public docs;
 **N/A** for packages, app READMEs, generated references, skills, workflows,
 tests and a Changeset because no repository runtime or published API changed.
+
+## 2026-10-03 approved Production apply and later independent proof
+
+Cooper approved one Production deployment for exact PR #78 candidate
+`84d65144938b7b8b25672f070e790b74ec09237d` and accepted plan digest
+`886e7cf0fe2bb07aa50e6c0e1ecf2a2582bd163eacb59ee121cd9b6cfd69566e`.
+The protected environment review was also approved. Before dispatch, a fresh
+account-matched read found one existing Production Worker on version
+`4d2439eb-f1f7-4dff-89c6-ba5433ce570b` at 100% traffic. Source checks
+confirmed the deploy inputs in current `main` `03a25cc0fe68f7aa8140bf2d816d7e4bd8e13eea`
+matched the accepted plan's source.
+
+[Deploy run `37093118715`](https://github.com/crcorbett/taxkit/actions/runs/37093118715)
+passed its initial plan, equal replan and one-Worker apply steps. The plan
+artifact `11262892110` records the same accepted digest for the replan. Its
+post-apply state and provider inventory check passed inside the runner. The
+hosted browser proof then failed with only the safe message
+`FAIL [hosted-proof] execution=browser-proof`; the exact cause is unknown.
+That stopped the provider evidence preparation and upload. The run's overall
+result is **failure**. Separate [receipt check `37093270529`](https://github.com/crcorbett/taxkit/actions/runs/37093270529)
+correctly recorded the failed run and did not accept it as a successful deploy.
+
+Independent account-matched Cloudflare readback at `2026-10-03T03:32:57Z`
+found one Production Worker with new deployment
+`0a18a513-450a-4213-8418-bb65fc8fbabd` and version
+`6456470d-0f8d-4d5b-b5b2-521e1306bd32` at 100% traffic. Root and known
+docs URLs returned 200; a missing route returned 404. The exact repository
+hosted test was then run read-only against that deployed Worker from the
+reviewed source. It passed SSR, asset, browser navigation, accessibility and
+mobile checks with zero browser diagnostics. Its output passed
+`DeploymentWorkflowHostedProbe` schema validation, and both saved screenshot
+hashes matched their files. This later test proves the observed site behaviour;
+it does not turn the original failed GitHub run into a success or establish
+why that browser step failed.
+
+The [sanitised receipt](../../evidence/deployments/2026-10-03-alchemy-beta79-production-deploy/receipt.json),
+[hosted test output](../../evidence/deployments/2026-10-03-alchemy-beta79-production-deploy/hosted-proof.json)
+and screenshots retain the exact IDs and checks. No rollback or second apply
+was approved or performed. Any later recovery needs a fresh check that version
+`6456470d-0f8d-4d5b-b5b2-521e1306bd32` is still current, plus separate
+approval. The runner checked Alchemy state at apply time; later independent
+Alchemy state agreement remains unproved. Custom-domain availability and
+permanent uptime remain unproved.
+
+Documentation impact for this evidence: **Change required** for this plan,
+the task ledger, deployment evidence index, dated receipt and saved hosted
+proof; **Preserve** for the runbook, architecture, authority model and earlier
+receipts; **N/A** for package and app READMEs, SDK/API contracts, generated
+references, workflows, skills and a Changeset because this evidence adds no
+runtime or published source change.
 
 Documentation impact for this correction: **Change required** for three
 workflow commands, the contract test, safe plan-reader error, deployment
