@@ -2,7 +2,7 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/alchemy-doppler-modernisation.md",
   "title": "Alchemy and Doppler modernisation tasks",
-  "status": "active",
+  "status": "implemented",
   "last_reviewed": "2026-10-03",
   "principles": [
     "Preserve the single Website resource and exact stage and state identity.",
@@ -34,7 +34,7 @@
   "tasks": [
     {
       "id": "ADM-001",
-      "status": "locally-verified",
+      "status": "completed",
       "title": "Move the unchanged Website graph to one infrastructure owner",
       "type": "foundation",
       "dependsOn": [],
@@ -49,7 +49,7 @@
     },
     {
       "id": "ADM-002",
-      "status": "locally-verified-hosted-preview-production-applied-independent-proof",
+      "status": "completed",
       "title": "Upgrade Alchemy and the matching Effect v4 family",
       "type": "compatibility",
       "dependsOn": ["ADM-001"],
@@ -64,7 +64,7 @@
     },
     {
       "id": "ADM-003",
-      "status": "locally-verified-service-token-metadata-bridge-binding-open",
+      "status": "completed",
       "title": "Reconcile Doppler and deployment workflow contracts",
       "type": "operations",
       "dependsOn": ["ADM-002"],
@@ -79,7 +79,7 @@
     },
     {
       "id": "ADM-004",
-      "status": "merged-preview-deployed-production-applied-ci-proof-failed-rollback-open",
+      "status": "completed",
       "title": "Close local proof and qualify hosted delivery",
       "type": "delivery",
       "dependsOn": ["ADM-003"],

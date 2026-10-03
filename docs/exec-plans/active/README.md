@@ -17,9 +17,11 @@ retains recording, import and hosted publication proof.
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The [Alchemy and Doppler modernisation](./alchemy-doppler-modernisation.md)
-plan tracks the current one-resource ownership move, compatible Alchemy and
-Effect v4 upgrade, Doppler reconciliation and bounded delivery proof.
+The implemented [Alchemy and Doppler modernisation](../../product-specs/alchemy-doppler-modernisation.md)
+and its [completed plan](../completed/alchemy-doppler-modernisation.md)
+retain the one-resource owner, Alchemy/Effect upgrade, Doppler contract,
+Production update and separate hosted proof. The original failed deploy run,
+untested rollback and other proof limits remain dated history.
 
 The implemented [Oxlint policy refresh](../../product-specs/oxlint-policy-refresh.md)
 and its [completed plan](../completed/oxlint-policy-refresh.md) record the

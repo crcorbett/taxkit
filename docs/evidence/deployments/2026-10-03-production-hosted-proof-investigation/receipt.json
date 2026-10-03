@@ -45,13 +45,52 @@
     "readbackLimit": "The Cloudflare deployment API reported the new version at 100% traffic, but that control-plane readback did not prove every edge had stopped serving the previous version."
   },
   "recovery": {
-    "operation": "Improve the hosted browser check to retry only when a hashed JavaScript asset returns 404 during hydration, then run a separate credential-free hosted check against the already deployed Production Worker.",
+    "operation": "The hosted browser check now retries only when a hashed JavaScript asset returns 404 during failed hydration. A separate credential-free GitHub check passed against the already deployed Production Worker.",
     "productionReapplyRequired": false,
     "rollbackRequired": false
+  },
+  "closeout": {
+    "fixPullRequest": 86,
+    "fixHeadCommit": "ec843afc7cdabc80481a8d7e66c34c8340cc43d0",
+    "mergeCommit": "a41c3dc542147ce685881213f29b86fa6f33d68f",
+    "pullRequestQualityRunId": 37096372428,
+    "mergedMainQualityRunId": 37096551339,
+    "automaticPreviewTeardown": {
+      "runId": 37096551323,
+      "conclusion": "success",
+      "stage": "pr-86",
+      "planAction": "noop",
+      "stateStageAbsent": true,
+      "providerWorkerAbsent": true,
+      "artifactId": 11264577637
+    },
+    "productionHostedVerification": {
+      "runId": 37096642146,
+      "conclusion": "success",
+      "runSourceCommit": "a41c3dc542147ce685881213f29b86fa6f33d68f",
+      "jobCompletedAt": "2026-10-03T04:29:14Z",
+      "artifactId": 11264123556,
+      "candidateCommit": "84d65144938b7b8b25672f070e790b74ec09237d",
+      "deploymentId": "0a18a513-450a-4213-8418-bb65fc8fbabd",
+      "versionId": "6456470d-0f8d-4d5b-b5b2-521e1306bd32",
+      "assetPropagationRetries": 0,
+      "diagnostics": [],
+      "screenshotSha256": {
+        "desktop": "128c8f300d1911111fd3fc22a89289efc6961df29582421a53bd77e9ff8c82cf",
+        "mobile": "9ebc4108397d334eedff97d8ae79ddc103ee61a62bf87a995becf3715b32c945"
+      },
+      "screenshotBytesMatchHashes": true
+    },
+    "independentProductionReadbackAfterHostedVerification": {
+      "deploymentId": "0a18a513-450a-4213-8418-bb65fc8fbabd",
+      "versionId": "6456470d-0f8d-4d5b-b5b2-521e1306bd32",
+      "trafficPercentage": 100
+    }
   },
   "nonClaims": [
     "Cloudflare invocation logs do not contain the browser's raw Playwright exception or prove the exact line that timed out.",
     "The original GitHub deployment run remains failed and cannot be retroactively changed to success.",
-    "No Production apply, rollback, DNS change, custom-domain change or publication was performed during this investigation."
+    "No Production apply, rollback, DNS change, custom-domain change or publication was performed during this investigation or recovery.",
+    "A Production rollback was not exercised because the live Worker passed the separate hosted check without one."
   ]
 }
