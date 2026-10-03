@@ -1,13 +1,34 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-09-23
+last_reviewed: 2026-10-03
 review_trigger: Alchemy, Effect, Doppler, deployment, or proof contract change
+status: implemented
 ---
 
 # Alchemy and Doppler modernisation
+
+## Closeout
+
+The one-resource infrastructure owner, beta.79 and Effect rc.117 upgrade,
+fixed Doppler configuration contract and reviewed deployment workflows are
+implemented on `main`. Preview deployment, the approved Production Worker
+update, and independent hosted behaviour have dated evidence. The Production
+deploy workflow itself failed after its apply step; Cloudflare logs strongly
+support a missing JavaScript asset during edge version change. The corrected
+hosted check was merged in [PR #86](https://github.com/crcorbett/taxkit/pull/86),
+and [read-only Production check `37096642146`](https://github.com/crcorbett/taxkit/actions/runs/37096642146)
+passed against the deployed Worker. The [completed execution plan](../exec-plans/completed/alchemy-doppler-modernisation.md)
+and [dated investigation receipt](../evidence/deployments/2026-10-03-production-hosted-proof-investigation/receipt.json)
+retain the proof and limits. No second Production apply or rollback was needed.
+
+GitHub does not reveal its stored secret values, so the exact Doppler
+bridge-token binding remains unproved. The original browser exception was not
+saved, and the original failed workflow remains failed. Custom-domain
+availability and permanent uptime are outside this SPEC's proof. These are
+recorded limits, not pending implementation steps for this modernisation.
 
 ## Goal and current state
 

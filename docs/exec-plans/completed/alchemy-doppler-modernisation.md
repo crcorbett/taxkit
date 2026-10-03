@@ -1,8 +1,8 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: supporting
-owner: taxkit-documentation-owner
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-10-03
 review_trigger: task progress, version, proof, provider authority, or lifecycle change
 ---
@@ -17,10 +17,46 @@ proof. Starting point: clean isolated worktree from
 
 | Task | State | Evidence and next action |
 | --- | --- | --- |
-| ADM-001 infrastructure owner | Locally verified; Preview and Production Worker updates observed | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Preview found one state stage and Worker; Production readback found the updated Worker. Full Production property parity remains unproved. |
-| ADM-002 release upgrade | Locally verified; beta.79 Preview and Production hosted | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks and Preview hosted proof passed. Production Worker updated and an independent exact-script hosted check passed; its original GitHub browser step failed. |
-| ADM-003 Doppler reconciliation | Locally verified; fixed bridges exercised; exact binding open | The checkout-scoped personal login and custody check passed. Read-only Doppler metadata shows one read-only, unexpired token per `ci`, `stg_preview` and `prd`; the hosted Preview and Production plan runs checked their fixed config identities. GitHub bridge values remain unreadable and cannot be bound to exact token identities. |
-| ADM-004 delivery | Merged; Preview hosted; Production applied with failed CI proof | PRs #78–#82 merged with Quality and exact-stage cleanup evidence. Preview proof and Production plan passed. Approved Production run `37093118715` applied one Worker update; its browser step failed. Later independent hosted proof passed. The failed run and rollback proof remain open. |
+| ADM-001 infrastructure owner | Completed with a property-readback limit | Private source-only owner, root composition, imports, workflow input digests and docs changed together. Preview found one state stage and Worker; Production readback found the updated Worker. Full Production property parity remains unproved. |
+| ADM-002 release upgrade | Completed | Exact Alchemy beta.79, Effect rc.117 and Vitest 5.0.1 installed. Local checks and Preview hosted proof passed. The Production Worker updated, and separate hosted checks passed. Its original GitHub browser step remains failed. |
+| ADM-003 Doppler reconciliation | Completed with a bridge-binding limit | The checkout-scoped personal login and custody check passed. Read-only Doppler metadata showed one read-only, unexpired token per `ci`, `stg_preview` and `prd`; hosted runs checked their fixed config identities. GitHub bridge values remain unreadable and cannot be bound to exact token identities. |
+| ADM-004 delivery | Completed with the original failure retained | PRs #78–#82 and #86 merged with Quality and exact-stage cleanup evidence. Preview proof and Production plan passed. Approved Production run `37093118715` applied one Worker update; its browser step failed. Independent Production hosted checks later passed, including GitHub run `37096642146`. No second apply or rollback was needed. |
+
+## Final closeout on 2026-10-03
+
+[PR #86](https://github.com/crcorbett/taxkit/pull/86) merged the bounded
+hosted-proof recovery as `a41c3dc542147ce685881213f29b86fa6f33d68f`.
+Its pull-request Quality run `37096372428` and merged-main Quality run
+[`37096551339`](https://github.com/crcorbett/taxkit/actions/runs/37096551339)
+passed. Automatic Preview cleanup run
+[`37096551323`](https://github.com/crcorbett/taxkit/actions/runs/37096551323)
+found no `pr-86` Worker or state stage and accepted an equal no-op destroy
+plan. [Read-only Production hosted check
+`37096642146`](https://github.com/crcorbett/taxkit/actions/runs/37096642146)
+then passed from that merged source against the existing Production Worker. It
+reported zero asset retries, no browser diagnostics, and desktop/mobile
+screenshots whose saved bytes matched their SHA-256 values. Independent
+Cloudflare readback after that check still found deployment
+`0a18a513-450a-4213-8418-bb65fc8fbabd`, version
+`6456470d-0f8d-4d5b-b5b2-521e1306bd32` at 100% traffic. The
+[investigation receipt](../../evidence/deployments/2026-10-03-production-hosted-proof-investigation/receipt.json)
+retains the run and artifact identities.
+
+The original Production deploy run remains failed. Cloudflare invocation
+logs support a stale JavaScript asset as its cause, but its exact browser
+assertion is unknown. No rollback was exercised because the live Worker passed
+the separate hosted check without a new Production change. GitHub's write-only
+secret values, full Production property parity, custom-domain availability and
+permanent uptime are not established by this closeout. This plan has no active
+implementation step left.
+
+Documentation impact for closeout: **Change required** for the SPEC and task
+ledger lifecycle, completed plan, active/completed/SPEC indexes, dated
+investigation receipt, deployment evidence index and the deployment
+architecture's automation-status ownership; **Preserve** for the original failed
+deployment receipt, operational runbook, authority model and public docs;
+**N/A** for generated references, SDK/API contracts, skills, workflows and a
+Changeset because closeout changes no executable or published behaviour.
 
 ## 2026-09-24 development authority and CLI correction
 

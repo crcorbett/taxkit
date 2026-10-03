@@ -64,10 +64,11 @@ intent and task state belong in the active SPEC and execution plan.
   earlier failed deploy workflow into a success.
 - `tools/docs-deployment/automation-register.json` and `controls.json` own the
   Schema-decoded desired state for three workflow classes: Preview delivery,
-  Production delivery and exact-stage Preview teardown. All three are
-  `not-established` for the native one-resource graph until new matching
-  provider receipts are promoted. Historical two-resource and orphan receipts
-  remain evidence, not current automation state.
+  Production delivery and exact-stage Preview teardown. Each class's current
+  status and matching receipts belong in that register. A new workflow result
+  still needs its own matching receipt before it can support a new deployment
+  claim. Historical two-resource and orphan receipts remain evidence, not
+  current automation state.
 - Five workflow receipt executables are narrow Bun adapters. Each decodes one
   Config Schema from the host environment, reads receipt JSON and screenshot
   bytes through the shared Effect FileSystem/Crypto boundary in
@@ -277,8 +278,8 @@ The report-only orphan workflow has a separate unresolved boundary. Run
 that owner correction, `30967000841` reached deployment inventory but could not
 derive Alchemy beta.64's HTTP state-store bearer with the read-only Cloudflare
 token. The mutation bootstrap path is not permitted for report-only inventory.
-Therefore the deployment register remains `not-established` as an aggregate
-state claim, and scheduled orphan detection remains an inconclusive,
+At that historical point, the deployment register was `not-established` as
+an aggregate state claim, and scheduled orphan detection was an inconclusive,
 non-mutating report rather than an absence or teardown signal.
 
 ## 2026-08-09 docs-app bridge-retirement observation

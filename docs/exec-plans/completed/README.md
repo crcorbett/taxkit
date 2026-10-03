@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Alchemy and Doppler modernisation](./alchemy-doppler-modernisation.md)
 - [Entire session history setup](./entire-session-history.md)
 - [Oxlint Policy Refresh](./oxlint-policy-refresh.md)
 - [Doppler configuration governance](./doppler-configuration-governance.md)
