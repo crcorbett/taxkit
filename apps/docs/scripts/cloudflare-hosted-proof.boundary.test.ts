@@ -2,7 +2,10 @@ import { describe, expect, test } from "bun:test";
 
 import { ConfigProvider, Effect, Fiber, Match, Result } from "effect";
 
-import { runCloudflareHostedProof } from "./cloudflare-hosted-proof.boundary.js";
+import {
+  HostedProofAssetPropagationError,
+  runCloudflareHostedProof,
+} from "./cloudflare-hosted-proof.boundary.js";
 import type { CloudflareHostedProofHost } from "./cloudflare-hosted-proof.boundary.js";
 
 type TestConfig = Readonly<Record<string, string | undefined>>;
@@ -164,6 +167,29 @@ describe("Cloudflare hosted proof boundary", () => {
       onFailure: (error) => {
         expect(error._tag).toBe("HostedProofExecutionError");
         expect(JSON.stringify(error)).not.toContain("private-upstream-value");
+      },
+      onSuccess: () => expect.unreachable(),
+    });
+  });
+
+  test("reports a bounded asset propagation failure without raw browser data", async () => {
+    const { counts, host } = makeHost({
+      run: () =>
+        Promise.reject(
+          new HostedProofAssetPropagationError({
+            reason: "missing-script-asset",
+          })
+        ),
+    });
+    const result = await runResult(host);
+
+    expect(counts.closed).toBe(1);
+    Result.match(result, {
+      onFailure: (error) => {
+        expect(error._tag).toBe("HostedProofExecutionError");
+        if (error._tag === "HostedProofExecutionError") {
+          expect(error.operation).toBe("asset-propagation");
+        }
       },
       onSuccess: () => expect.unreachable(),
     });

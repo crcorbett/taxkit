@@ -291,6 +291,43 @@ receipts; **N/A** for package and app READMEs, SDK/API contracts, generated
 references, workflows, skills and a Changeset because this evidence adds no
 runtime or published source change.
 
+## 2026-10-03 Production browser-failure investigation and recovery
+
+The original Production run remains failed. A narrow Cloudflare invocation-log
+query for its browser step found that the older Worker version
+`4d2439eb-f1f7-4dff-89c6-ba5433ce570b` served the known docs page, the
+expected missing-route test, and then returned 404 for a JavaScript asset
+needed by the page. The safe browser failure followed about 30 seconds later.
+The missing asset during version change is the strongest supported cause;
+the exact Playwright assertion is unknown because the original browser
+exception was not retained. The [dated investigation receipt](../../evidence/deployments/2026-10-03-production-hosted-proof-investigation/receipt.json)
+records the event times, versions and limits.
+
+The hosted browser check now retries page loading only when it observes a
+same-site JavaScript asset returning 404 while waiting for the page to become
+interactive. It records the retry count and gives a bounded reason if the
+asset remains missing. Other browser failures still stop immediately. A
+focused Chromium test exercises the transient missing-asset case. The
+separate, manually dispatched Production hosted verification workflow reads
+reviewed evidence from `main` and tests the already deployed URL with no
+deployment credentials or apply step. It retains a safe result and hashed
+screenshots. This check is to be run after merge; its actual result belongs in
+the dated investigation receipt, not in the old failed deployment receipt.
+
+Local checks passed: frozen install, 17 focused hosted-proof tests (including
+two Chromium propagation cases), full `bun run verification`, and
+`git diff --check`. These checks do not establish a new hosted result.
+
+Documentation impact for this recovery: **Change required** for the hosted
+proof script, its tests and receipt schema, Preview and Production proof
+projections, the separate read-only workflow, app README, deployment
+architecture, testing and quality architecture, automation register, runbook,
+evidence index, dated receipt, task ledger and this plan; **Preserve** for the
+historical deployment receipt, authority model, public docs, provider
+resource declaration and existing protected environments; **N/A** for SDK/API
+contracts, generated references, skills and a Changeset because the published
+site and package behaviour do not change.
+
 Documentation impact for this correction: **Change required** for three
 workflow commands, the contract test, safe plan-reader error, deployment
 architecture, runbook, automation register, this active plan and dated failure

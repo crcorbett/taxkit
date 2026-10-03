@@ -1,0 +1,95 @@
+name: Docs Production Hosted Verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      evidence_path:
+        description: Reviewed Production hosted-proof.json path on main
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: taxkit-docs-production-hosted-verification
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Check live Production without deployment credentials
+    if: github.repository == 'crcorbett/taxkit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      EVIDENCE_PATH: ${{ inputs.evidence_path }}
+    steps:
+      - name: Check reviewed source and evidence path
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          [[ "$EVIDENCE_PATH" =~ ^docs/evidence/deployments/[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+/hosted-proof\.json$ ]]
+
+      - name: Check out reviewed main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install locked dependencies and browser
+        run: |
+          bun install --frozen-lockfile
+          apps/docs/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Check the stale-asset recovery test
+        run: bun test apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts
+
+      - name: Check the live Production site
+        run: |
+          set -euo pipefail
+          test -f "$EVIDENCE_PATH"
+          jq -e '.environment == "production" and .stage == "prod" and .diagnostics == [] and (.screenshots | length) == 2' "$EVIDENCE_PATH" >/dev/null
+          export TAXKIT_DOCS_ACCOUNT_ID="$(jq -er .accountId "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_CANDIDATE_COMMIT="$(jq -er .candidateCommit "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_CONFIG_SHA256="$(jq -er .configSha256 "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_DEPLOYMENT_ID="$(jq -er .deploymentId "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_DEPLOYMENT_INPUT_SHA256="$(jq -er .deploymentInputSha256 "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_ENVIRONMENT=production
+          export TAXKIT_DOCS_EVIDENCE_DIRECTORY="docs/evidence/deployments/workflow-$GITHUB_RUN_ID"
+          export TAXKIT_DOCS_HOSTED_PROPAGATION_ATTEMPTS=6
+          export TAXKIT_DOCS_HOSTED_PROPAGATION_DELAY_MS=2000
+          export TAXKIT_DOCS_HOSTED_URL="$(jq -er .url "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_LOCKFILE_SHA256="$(jq -er .lockfileSha256 "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_PLAN_SHA256="$(jq -er .acceptedPlanSha256 "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_PREVIOUS_VERSION_ID="$(jq -r '.previousVersionId // ""' "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY="$(jq -er .rollbackRecoveryIdentity "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_STAGE=prod
+          export TAXKIT_DOCS_STATE_STORE_ID="$(jq -er .stateStoreId "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_VERSION_ID="$(jq -er .versionId "$EVIDENCE_PATH")"
+          export TAXKIT_DOCS_WORKER_NAME="$(jq -er .workerName "$EVIDENCE_PATH")"
+          mkdir -p "$TAXKIT_DOCS_EVIDENCE_DIRECTORY" "$RUNNER_TEMP/hosted-verification/docs/evidence/deployments"
+          bun apps/docs/scripts/test-cloudflare-hosted.tsx > "$RUNNER_TEMP/hosted-proof.raw.json"
+          jq -e --slurpfile expected "$EVIDENCE_PATH" '
+            . as $actual | $expected[0] as $old |
+            [$actual.acceptedPlanSha256,$actual.accountId,$actual.candidateCommit,$actual.configSha256,$actual.deploymentId,$actual.deploymentInputSha256,$actual.lockfileSha256,$actual.url,$actual.versionId,$actual.workerName] ==
+            [$old.acceptedPlanSha256,$old.accountId,$old.candidateCommit,$old.configSha256,$old.deploymentId,$old.deploymentInputSha256,$old.lockfileSha256,$old.url,$old.versionId,$old.workerName] and
+            $actual.diagnostics == [] and $actual.assetPropagationRetries >= 0 and ($actual.screenshots | length) == 2
+          ' "$RUNNER_TEMP/hosted-proof.raw.json" >/dev/null
+          while IFS=$'\t' read -r path digest; do
+            [[ "$path" =~ ^docs/evidence/deployments/workflow-[0-9]+/production-(desktop|mobile)-[a-f0-9]{7}\.png$ ]]
+            test "$(sha256sum "$path" | cut -d' ' -f1)" = "$digest"
+          done < <(jq -r '.screenshots[] | [.path,.sha256] | @tsv' "$RUNNER_TEMP/hosted-proof.raw.json")
+          jq '{acceptedPlanSha256,assetPropagationRetries,accountId,candidateCommit,configSha256,deploymentInputSha256,deploymentId,diagnostics,environment,lockfileSha256,previewPrNumber,previousVersionId,rollbackRecoveryIdentity,screenshots,stage,stateStoreId,url,versionId,workerName}' "$RUNNER_TEMP/hosted-proof.raw.json" > "$RUNNER_TEMP/hosted-verification/hosted-proof.json"
+          cp -R "$TAXKIT_DOCS_EVIDENCE_DIRECTORY" "$RUNNER_TEMP/hosted-verification/docs/evidence/deployments/"
+
+      - name: Upload safe hosted results
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: taxkit-docs-production-hosted-verify-${{ github.run_id }}
+          path: ${{ runner.temp }}/hosted-verification
+          if-no-files-found: error
+          retention-days: 30

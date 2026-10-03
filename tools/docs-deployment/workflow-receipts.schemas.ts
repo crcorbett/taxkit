@@ -96,6 +96,9 @@ const WorkflowScreenshot = Schema.Struct({
 export const DeploymentWorkflowHostedProbe = Schema.Struct({
   acceptedPlanSha256: Sha256,
   accountId: CloudflareAccountId,
+  assetPropagationRetries: Schema.optional(
+    Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))
+  ),
   candidateCommit: CommitSha,
   configSha256: Sha256,
   deploymentId: ProviderIdentity,

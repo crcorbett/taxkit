@@ -60,6 +60,12 @@ identities, provider/state readback, bounded receipts and fail-closed recovery.
 Teardown executes reviewed default-branch code rather than pull-request-head
 code.
 
+`docs-production-hosted-verify.yml` is a separate, manually dispatched
+report-only browser check. It reads a reviewed dated Production proof file on
+`main`, uses no Doppler or Cloudflare credential, and cannot run Alchemy or
+change the Worker. It does not add a fourth deployment automation class or
+replace provider/state readback and the original workflow receipt.
+
 Because GitHub runners are ephemeral, each mutation workflow refreshes the
 account-matched Alchemy `cloudflare-state-store` cache with
 `alchemy provider cloudflare bootstrap` under `CI=0` before it reads

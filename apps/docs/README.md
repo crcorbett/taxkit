@@ -204,11 +204,20 @@ focused host adapter acquired and closed through an Effect Scope, including on
 failure or interruption. Provider-free boundary tests prove those local input
 and cleanup rules only; they do not prove a hosted deployment. The harness
 writes candidate-qualified desktop/mobile PNGs and emits the behavioural
-observation used to build Schema-decoded receipts. The first dated
-Preview observation was torn down but did not meet the final evidence contract,
-so it remains disconfirming history. Fresh candidate `d9cb894…` passed the
-corrected hosted, screenshot and pre-mutation contracts, independent
-adversarial review and full repository gates and was then torn down; DCD-002
+observation used to build Schema-decoded receipts. The hosted check retries a
+page load only when Chromium sees a 404 for a same-site hashed JavaScript
+asset during hydration. It records how many such retries were needed and
+fails with a bounded asset-propagation reason if they are
+exhausted. Other browser failures still stop immediately. The separate
+credential-free Production hosted verification workflow can recheck an
+already deployed Worker using reviewed, dated evidence; it does not apply or
+roll back a Worker.
+
+The first dated Preview observation was torn down but did not meet the final
+evidence contract, so it remains disconfirming history. Fresh candidate
+`d9cb894…` passed the corrected hosted, screenshot and pre-mutation contracts,
+independent adversarial review and full repository gates and was then torn
+down; DCD-002
 is accepted. DCD-003 then deployed that source to fixed `prod`, qualified
 `c99984c…` through Preview and Production, removed the successor Preview, and
 restored `d9cb894…` through the same normal Alchemy graph. The current
