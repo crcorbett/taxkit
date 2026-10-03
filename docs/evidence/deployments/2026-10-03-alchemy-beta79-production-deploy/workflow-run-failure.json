@@ -1,0 +1,6 @@
+{
+  "conclusion": "failure",
+  "nonClaim": "This run is not a successful deployment receipt and cannot establish external state.",
+  "schemaVersion": 1,
+  "workflowRunId": "37093118715"
+}

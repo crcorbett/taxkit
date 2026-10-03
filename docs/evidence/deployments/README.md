@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-09-24
+last_reviewed: 2026-10-03
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -11,6 +11,18 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
+
+## 2026-10-03 Alchemy beta.79 Production deployment
+
+The [sanitised deployment receipt](./2026-10-03-alchemy-beta79-production-deploy/receipt.json)
+records one approved `prod` Worker update. Its new Production version was
+independently read back at 100% traffic, and the exact repository hosted test
+later passed with [saved results](./2026-10-03-alchemy-beta79-production-deploy/hosted-proof.json)
+and hash-checked desktop and mobile screenshots. The original
+[GitHub deploy run](https://github.com/crcorbett/taxkit/actions/runs/37093118715)
+failed at its browser proof step after applying the Worker. Its receipt check
+correctly recorded a failure, and no provider artifact was uploaded. The
+browser failure's exact cause is unknown. No rollback or second apply ran.
 
 ## 2026-09-24 Alchemy beta.79 Production plan
 
