@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M42RZQB7EPH91DE83TKBSSF2",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T06:17:57.587182Z",
+  "branch": "codex/dev-73-enforcement-canaries",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/architecture/testing-and-quality.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/standards/controls.md",
+    "docs/standards/tooling.md",
+    "oxlint.config.ts",
+    "tools/oxlint/portable-rules.test.ts",
+    "tools/quality-workflow/fixtures/strict-enforcement-defects.json",
+    "tools/quality-workflow/release-boundary.test.ts",
+    "tools/quality-workflow/schemas.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5cd4f6eeff9c",
+  "checkpoint_transcript_start": 1221,
+  "transcript_lines_at_start": 1221,
+  "compact_transcript_start": 151,
+  "token_usage": {
+    "input_tokens": 133316,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 6414208,
+    "output_tokens": 28917,
+    "api_call_count": 46
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T06:17:57.46285Z",
+    "agent_lines": 293,
+    "agent_removed": 5,
+    "human_added": 114,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 407,
+    "total_lines_changed": 412,
+    "agent_percentage": 72.33009708737865,
+    "metric_version": 2
+  }
+}
