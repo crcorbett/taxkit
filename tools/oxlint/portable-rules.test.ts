@@ -226,6 +226,34 @@ const fixtureCases = [
     ],
   },
   {
+    accepted: [
+      "tools/docs-deployment/input.boundary.ts",
+      "tools/docs-deployment/input.boundary.test.ts",
+      "tools/docs-deployment/workflow-artifact.ts",
+      "tools/docs-deployment/workflow-artifact.schemas.ts",
+      "tools/docs-deployment/workflow-artifact.runtime.ts",
+      "tools/docs-deployment/workflow-artifact.test.ts",
+      "tools/docs-deployment/strict-boundaries.policy.ts",
+      "tools/docs-deployment/strict-boundaries.contract.test.ts",
+      "tools/docs-deployment/alchemy-memo.test.ts",
+    ],
+    generated: "tools/docs-deployment/.generated-artifact-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
     accepted: ["tools/skills/skill-policies.test.ts"],
     generated: "tools/skills/.generated-strict-rejected.ts",
     namespace: "strict-effect",
@@ -690,6 +718,7 @@ test.each([
   "tools/documentation/runbook-check.runtime.ts",
   "tools/evals/hgi-206/check.runtime.ts",
   "tools/evals/harness-foundation/check.runtime.ts",
+  "tools/docs-deployment/workflow-artifact.runtime.ts",
 ])("keeps the command runtime admission exact: %s", (path) => {
   expect(
     Array.filter(

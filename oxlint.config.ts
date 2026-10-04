@@ -169,6 +169,10 @@ const portableEffectSourceFiles = [
   "tools/skills/**/*.{ts,tsx,js,jsx}",
   "tools/governance/**/*.{ts,tsx,js,jsx}",
   "tools/evals/**/*.{ts,tsx,js,jsx}",
+  "tools/docs-deployment/input.boundary*.ts",
+  "tools/docs-deployment/workflow-artifact*.ts",
+  "tools/docs-deployment/strict-boundaries*.ts",
+  "tools/docs-deployment/alchemy-memo.test.ts",
 ];
 
 const schemaEncoderEgressFiles = [
@@ -252,7 +256,6 @@ const runtimeBoundaryFiles = [
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/inventory.service.test.ts",
   "tools/docs-deployment/policy.test.ts",
-  "tools/docs-deployment/alchemy-memo.test.ts",
   "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/workflow-artifact.runtime.ts",
   "tools/docs-deployment/workflow-evidence.runtime.ts",
@@ -336,7 +339,6 @@ const bunAdapterFiles = [
   "tools/docs-deployment/doppler-custody.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/local-doppler.runtime.ts",
-  "tools/docs-deployment/workflow-artifact.runtime.ts",
   "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
@@ -432,6 +434,12 @@ export default defineConfig({
         "tools/quality-workflow/**",
         "tools/documentation/**",
         "tools/evals/**",
+        "tools/docs-deployment/input.boundary.ts",
+        "tools/docs-deployment/input.boundary.test.ts",
+        "tools/docs-deployment/workflow-artifact*.ts",
+        "tools/docs-deployment/strict-boundaries*.ts",
+        "tools/docs-deployment/alchemy-memo.test.ts",
+        "tools/docs-deployment/.generated-artifact-strict-rejected.ts",
         "packages/testing/**",
         "packages/api/http/**",
         "packages/docs-content/**",
@@ -525,6 +533,19 @@ export default defineConfig({
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["tools/governance/check.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/workflow-artifact.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/docs-deployment/workflow-artifact.runtime.ts",
+            ],
+          },
         ],
       },
     },

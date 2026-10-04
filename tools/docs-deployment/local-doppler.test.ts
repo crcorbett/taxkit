@@ -1,7 +1,6 @@
-import { describe, expect, test } from "bun:test";
-
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { Effect, FileSystem, Schema } from "effect";
+import { describe, expect, test } from "vitest";
 
 import { runLocalDocsWithDoppler } from "./local-doppler.js";
 

@@ -1,6 +1,5 @@
-import { describe, expect, test } from "bun:test";
-
 import { Array as EffectArray, Effect, Schema } from "effect";
+import { describe, expect, test } from "vitest";
 // These fixtures are immutable historical deployment evidence. They are
 // decoded through the explicitly historical plan Schemas and do not test
 // current workflow admission.

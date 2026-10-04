@@ -695,3 +695,13 @@ the two existing historical verifier failures and reject unknown options with
 bounded output. Full verification typechecks both owners and runs these focused
 tests. Real lint fixtures qualify all ten source/test files and a rejected
 neighbour, plus exact assertions for the two runtime admissions.
+
+
+Deployment-tool tests use Bun-hosted Vitest. Their migrated upload, input,
+source-contract and native memo suites use `@effect/vitest` with scoped local
+FileSystem work. The 94 retained cases remain present. Added tests check
+empty/ASCII/UTF-8 hash bytes, safe read/decode/Crypto errors, empty required
+source, overlapping upload directories and an admitted symlink leaving the
+source directory. Actual lint fixtures accept each of the nine migrated files,
+reject a neighbouring generated file and check the one exact runtime admission.
+These tests run no provider command; other deployment-tool strict work is pending.

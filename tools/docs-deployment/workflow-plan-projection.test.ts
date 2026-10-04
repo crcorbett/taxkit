@@ -1,8 +1,8 @@
-import { describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
 import { Array as EffectArray, Effect, Schema } from "effect";
+import { describe, expect, test } from "vitest";
 
 import { DeploymentPlanProjection } from "./schemas.js";
 import {

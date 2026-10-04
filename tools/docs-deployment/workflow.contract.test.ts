@@ -1,7 +1,7 @@
-import { describe, expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 
 import { Array as EffectArray } from "effect";
+import { describe, expect, test } from "vitest";
 
 const workflowPaths = {
   preview: ".github/workflows/docs-preview.yml",

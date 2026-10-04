@@ -1,8 +1,7 @@
-import { describe, expect, test } from "bun:test";
-
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { Effect, Match, Option, Redacted, Result } from "effect";
 import * as FileSystem from "effect/FileSystem";
+import { describe, expect, test } from "vitest";
 
 import {
   readDocsDeploymentStateStoreCredentials,

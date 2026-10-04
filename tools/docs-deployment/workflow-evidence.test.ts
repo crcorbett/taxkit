@@ -1,10 +1,9 @@
-import { describe, expect, test } from "bun:test";
-
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { ConfigProvider, Effect, Match, Result, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import type * as Scope from "effect/Scope";
+import { describe, expect, test } from "vitest";
 
 import { DeploymentPlanReceipt } from "./schemas.js";
 import { runWorkflowEvidence } from "./workflow-evidence.runtime.js";

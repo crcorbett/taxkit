@@ -1,6 +1,6 @@
-import { Array as EffectArray } from "effect";
-import * as Array from "effect/Array";
+import { Array as EffectArray, Order, Record as EffectRecord } from "effect";
 import * as Effect from "effect/Effect";
+import { forEach } from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as HashSet from "effect/HashSet";
 import * as Path from "effect/Path";
@@ -75,8 +75,12 @@ const screenshotFile = /\.(?:json|png)$/iu;
 const isProviderMode = (mode: WorkflowArtifactMode) =>
   mode === "preview-provider" || mode === "production-provider";
 
-const isAllowed = (mode: WorkflowArtifactMode, relativePath: string) =>
-  HashSet.has(allowedFiles[mode], relativePath) ||
+const isAllowed = (
+  mode: WorkflowArtifactMode,
+  selectedFiles: HashSet.HashSet<string>,
+  relativePath: string
+) =>
+  HashSet.has(selectedFiles, relativePath) ||
   (isProviderMode(mode) &&
     relativePath.startsWith(screenshotPrefix) &&
     screenshotFile.test(relativePath));
@@ -111,25 +115,35 @@ export const prepareWorkflowArtifact = (
     const members = yield* fileSystem
       .readDirectory(sourceRoot, { recursive: true })
       .pipe(Effect.mapError(() => fail("artifact-source", "file-read")));
-    const inspected = yield* Effect.all(
-      EffectArray.map(members.toSorted(), (member) =>
+    const selectedFiles = yield* EffectRecord.get(allowedFiles, mode).pipe(
+      Effect.fromOption,
+      Effect.mapError(() => fail("artifact-mode", "config"))
+    );
+    const required = yield* EffectRecord.get(requiredFiles, mode).pipe(
+      Effect.fromOption,
+      Effect.mapError(() => fail("artifact-mode", "config"))
+    );
+    const inspected = yield* forEach(
+      EffectArray.sort(members, Order.String),
+      (member) =>
         fileSystem.stat(path.join(sourceRoot, member)).pipe(
-          Effect.map((info) => (info.type === "File" ? member : null)),
+          Effect.map((info) => (info.type === "File" ? [member] : [])),
           Effect.mapError(() => fail(member, "file-read"))
-        )
-      ),
+        ),
       { concurrency: 1 }
     );
-    const files = Array.filter(
-      inspected,
-      (member): member is string => member !== null
+    const admitted = EffectArray.filter(
+      EffectArray.flatten(inspected),
+      (member) => isAllowed(mode, selectedFiles, member)
     );
-    const admitted = Array.filter(files, (member) => isAllowed(mode, member));
-    for (const required of requiredFiles[mode]) {
-      if (!admitted.includes(required)) {
-        return yield* fail(required, "required-file");
-      }
-    }
+    yield* forEach(
+      required,
+      (member) =>
+        EffectArray.contains(admitted, member)
+          ? Effect.void
+          : Effect.fail(fail(member, "required-file")),
+      { concurrency: 1 }
+    );
     if (admitted.length === 0) {
       return yield* fail("artifact-upload", "empty");
     }
@@ -139,8 +153,9 @@ export const prepareWorkflowArtifact = (
     yield* fileSystem
       .makeDirectory(uploadRoot, { recursive: true })
       .pipe(Effect.mapError(() => fail("artifact-upload", "file-write")));
-    yield* Effect.all(
-      EffectArray.map(admitted, (relativePath) =>
+    yield* forEach(
+      admitted,
+      (relativePath) =>
         Effect.gen(function* copyAdmittedArtifact() {
           const sourcePath = path.join(sourceRoot, relativePath);
           const realSourcePath = yield* fileSystem
@@ -171,8 +186,7 @@ export const prepareWorkflowArtifact = (
           yield* fileSystem
             .writeFile(destination, bytes)
             .pipe(Effect.mapError(() => fail(relativePath, "file-write")));
-        })
-      ),
+        }),
       { concurrency: 1 }
     );
   });

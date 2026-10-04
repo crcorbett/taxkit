@@ -1,4 +1,5 @@
-import { Effect, Schema } from "effect";
+import { Crypto, Effect, Schema } from "effect";
+import { Hex } from "effect/encoding";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
@@ -20,7 +21,7 @@ export const readDeploymentJson = <A>(
       .readFileString(path.join(repositoryRoot, target))
       .pipe(Effect.mapError(() => new DocsDeploymentInputError({ target })));
 
-    return yield* Schema.decodeUnknownEffect(Schema.fromJsonString(schema), {
+    return yield* Schema.decodeEffect(Schema.fromJsonString(schema), {
       onExcessProperty: "error",
     })(source).pipe(
       Effect.mapError(() => new DocsDeploymentInputError({ target }))
@@ -33,7 +34,7 @@ export const readDeploymentSha256 = (
 ): Effect.Effect<
   string,
   DocsDeploymentInputError,
-  FileSystem.FileSystem | Path.Path
+  Crypto.Crypto | FileSystem.FileSystem | Path.Path
 > =>
   Effect.gen(function* readDeploymentSha256AtBoundary() {
     const fileSystem = yield* FileSystem.FileSystem;
@@ -41,5 +42,9 @@ export const readDeploymentSha256 = (
     const bytes = yield* fileSystem
       .readFile(path.join(repositoryRoot, target))
       .pipe(Effect.mapError(() => new DocsDeploymentInputError({ target })));
-    return new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
+    const crypto = yield* Crypto.Crypto;
+    const digest = yield* crypto
+      .digest("SHA-256", bytes)
+      .pipe(Effect.mapError(() => new DocsDeploymentInputError({ target })));
+    return Hex.encode(digest).toLowerCase();
   });

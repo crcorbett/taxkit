@@ -3,7 +3,7 @@ document_type: developer-guide
 lifecycle: current
 authority: supporting
 owner: taxkit-deployment-tool-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-10-04
 review_trigger: docs deployment command, receipt Schema, workflow adapter, provider inventory, authority, or proof change
 ---
 
@@ -22,7 +22,9 @@ operator procedure and authority live in
   errors. `schemas.ts` also decodes immutable historical v1/v2 receipts, while
   current v2 plans admit only the native one-resource graph. Historical
   decoders are not current deployment admission.
-- `input.boundary.ts` owns repository-relative retained-evidence reads.
+- `input.boundary.ts` owns repository-relative retained-evidence reads, typed
+  JSON decoding and SHA-256 through Effect Crypto. Read/decode/hash failures
+  expose only the safe target identity, preserving retained digest bytes.
 - `workflow-check.boundary.ts` owns workflow-provided file, JSON and SHA-256
   ingress through Effect FileSystem, Crypto and Schema.
 - `inventory-credentials.boundary.ts` owns Alchemy state-store credential
@@ -36,7 +38,7 @@ operator procedure and authority live in
 - `workflow-evidence.schemas.ts`, `workflow-evidence.ts` and
   `workflow-evidence.runtime.ts` form one closed command with `bootstrap`,
   `plan`, `replan` and `provider` modes. It calculates shared tracked-file identities, reuses
-  the beta.79 plan projection and provider inventory Schemas, decodes bounded
+  the beta.80 plan projection and provider inventory Schemas, decodes bounded
   Wrangler JSON, and encodes sanitised bootstrap, plan, provider and GitHub
   output files. Its only child process is fixed `git ls-files`; it cannot choose
   or run Alchemy, Wrangler, GitHub or another executable.
@@ -45,7 +47,10 @@ operator procedure and authority live in
   source/upload directories. The Effect program copies only the named safe
   JSON and screenshot files for that mode, follows no file outside the source
   directory, scans admitted JSON for secret sentinels and token shapes, and
-  reports only a safe file name and reason. Raw Alchemy output, stderr,
+  reports only a safe file name and reason. Mode lookups fail closed; ordered
+  Effect traversal preserves the file allowlist and serial copy behaviour.
+  Its command has one exact strict runtime admission; ordinary files and tests
+  have none. Raw Alchemy output, stderr,
   inventories and hosted diagnostics remain in the runner work directory.
 - `inventory.runtime.ts` is the provider/state readback composition owner. It
   remains read-only unless a separately authorized workflow owns mutation.
@@ -69,9 +74,9 @@ operator procedure and authority live in
   `Cloudflare.Website.Vite("DocsWebsite")` declaration; root owns its provider
   and state composition. This directory does not
   build or spawn the docs app.
-- `workflow-plan-projection.ts` is the single beta.79-bound host adapter for
+- `workflow-plan-projection.ts` is the single beta.80-bound host adapter for
   Alchemy's text plan output. It admits only the current native Website
-  resource and fails closed on any other resource line. Beta.79's upstream
+  resource and fails closed on any other resource line. Beta.80's upstream
   `formatPlanLines` emits `Plan: no resources` for an empty plan; the adapter
   admits that line only for an already-absent teardown. The
   `fixtures/alchemy-beta.64/` manifest binds five real sanitised GitHub
@@ -108,3 +113,19 @@ static adapter contracts. Root
 `verification` invokes them once. These local commands do not dispatch
 workflows, access providers, deploy, destroy, prove hosted behavior or grant
 operational authority.
+
+## Local checking
+
+`test:docs-deployment` uses Bun-hosted Vitest with the shared source resolver.
+The upload-file, retained-input, source-contract and native memo tests use
+`@effect/vitest`, scoped FileSystem fixtures and ordered Effect work. The
+remaining suites preserve their existing assertions under Vitest; their full
+strict migration is pending in DEV-73. Local command checks read retained
+records only. Static source checks, saved receipts and local passing tests do
+not establish current provider state or authorise a deployment.
+
+The strict source-contract findings and path/source types derive from their
+owning Schemas. Pure inspection preserves finding order using Effect arrays;
+checked missing source reads become empty input so required source patterns
+fail. This source-pattern check supplements the actual lint fixtures, rather
+than proving that a runtime or deployment has run.

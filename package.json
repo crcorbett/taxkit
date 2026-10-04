@@ -110,7 +110,7 @@
     "test:documentation": "turbo run //#test:documentation:task",
     "test:documentation:task": "bun --bun vitest run --config tools/vitest.config.ts tools/documentation",
     "test:docs-deployment": "turbo run //#test:docs-deployment:task",
-    "test:docs-deployment:task": "bun --conditions=source test tools/docs-deployment",
+    "test:docs-deployment:task": "bun --conditions=source node_modules/vitest/vitest.mjs run --config tools/vitest.config.ts tools/docs-deployment",
     "test:docs-boundaries": "turbo run //#test:docs-boundaries:task",
     "test:docs-boundaries:task": "bun run --filter=docs check-import-boundaries && bun test apps/docs/src/lib/docs/route-boundary.test.js && bun run --filter=docs test",
     "test:hgi-206": "bun --bun vitest run --config tools/vitest.config.ts tools/evals/hgi-206",

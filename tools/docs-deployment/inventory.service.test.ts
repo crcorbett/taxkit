@@ -1,6 +1,5 @@
-import { describe, expect, test } from "bun:test";
-
 import { Effect, Schema } from "effect";
+import { describe, expect, test } from "vitest";
 
 import { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 import { requireDocsDeploymentInventoryAgreement } from "./inventory.service.js";

@@ -1,4 +1,4 @@
-import { Array as EffectArray } from "effect";
+import { Array as EffectArray, Option, Record, Schema } from "effect";
 
 const strictAppBoundaryPaths = [
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
@@ -22,24 +22,35 @@ const strictAppBoundaryPaths = [
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ] as const;
 
-export type StrictAppBoundaryPath = (typeof strictAppBoundaryPaths)[number];
-export type StrictAppBoundarySources = Readonly<
-  Record<StrictAppBoundaryPath, string>
->;
+export const StrictAppBoundaryPath = Schema.Literals(strictAppBoundaryPaths);
+export type StrictAppBoundaryPath = typeof StrictAppBoundaryPath.Type;
+export const StrictAppBoundarySources = Schema.Record(
+  StrictAppBoundaryPath,
+  Schema.String
+);
+export type StrictAppBoundarySources = typeof StrictAppBoundarySources.Type;
 
-export interface StrictAppBoundaryFinding {
-  readonly invariant:
-    | "credential-boundary"
-    | "host-ingress"
-    | "hosted-proof-boundary"
-    | "local-doppler-boundary"
-    | "raw-concurrency"
-    | "runtime-owner"
-    | "runtime-probe"
-    | "workflow-artifact-boundary"
-    | "workflow-boundary";
-  readonly path: StrictAppBoundaryPath;
-}
+export const StrictAppBoundaryFinding = Schema.Struct({
+  invariant: Schema.Literals([
+    "credential-boundary",
+    "host-ingress",
+    "hosted-proof-boundary",
+    "local-doppler-boundary",
+    "raw-concurrency",
+    "runtime-owner",
+    "runtime-probe",
+    "workflow-artifact-boundary",
+    "workflow-boundary",
+  ]),
+  path: StrictAppBoundaryPath,
+});
+export type StrictAppBoundaryFinding = typeof StrictAppBoundaryFinding.Type;
+
+// Missing source is inspected as empty: required ownership patterns fail closed.
+export const readStrictAppBoundarySource = (
+  sources: StrictAppBoundarySources,
+  path: StrictAppBoundaryPath
+): string => Record.get(sources, path).pipe(Option.getOrElse(() => ""));
 
 const workflowEvidenceRuntimePath =
   "tools/docs-deployment/workflow-evidence.runtime.ts" as const;
@@ -71,8 +82,7 @@ const includesEvery = (source: string, values: readonly string[]): boolean =>
 
 const inspectGenericBoundaries = (
   sources: StrictAppBoundarySources
-): StrictAppBoundaryFinding[] => {
-  const findings: StrictAppBoundaryFinding[] = [];
+): readonly StrictAppBoundaryFinding[] => {
   const hostIngressPatterns = [
     "process.env",
     "Bun.file",
@@ -89,8 +99,8 @@ const inspectGenericBoundaries = (
     'concurrency: "unbounded"',
   ] as const;
 
-  for (const path of strictAppBoundaryPaths) {
-    const source = sources[path];
+  return EffectArray.flatMap(strictAppBoundaryPaths, (path) => {
+    const source = readStrictAppBoundarySource(sources, path);
     const applicableHostIngressPatterns = EffectArray.filter(
       hostIngressPatterns,
       (pattern) =>
@@ -99,24 +109,28 @@ const inspectGenericBoundaries = (
           (path === localDopplerRuntimePath && pattern === "process.env")
         )
     );
-    if (includesAny(source, applicableHostIngressPatterns)) {
-      findings.push(finding("host-ingress", path));
-    }
-    if (includesAny(source, runtimeExecutionPatterns)) {
-      findings.push(finding("runtime-owner", path));
-    }
-    if (includesAny(source, rawConcurrencyPatterns)) {
-      findings.push(finding("raw-concurrency", path));
-    }
-  }
-  return findings;
+    return [
+      ...(includesAny(source, applicableHostIngressPatterns)
+        ? [finding("host-ingress", path)]
+        : []),
+      ...(includesAny(source, runtimeExecutionPatterns)
+        ? [finding("runtime-owner", path)]
+        : []),
+      ...(includesAny(source, rawConcurrencyPatterns)
+        ? [finding("raw-concurrency", path)]
+        : []),
+    ];
+  });
 };
 
 const inspectHostedProofBoundary = (
   sources: StrictAppBoundarySources
 ): readonly StrictAppBoundaryFinding[] => {
-  const boundary = sources[hostedProofBoundaryPath];
-  const host = sources[hostedProofHostPath];
+  const boundary = readStrictAppBoundarySource(
+    sources,
+    hostedProofBoundaryPath
+  );
+  const host = readStrictAppBoundarySource(sources, hostedProofHostPath);
   const validBoundary = includesEvery(boundary, [
     "Config.schema(",
     "Effect.acquireRelease(",
@@ -139,29 +153,29 @@ const inspectHostedProofBoundary = (
 
 const inspectWorkflowBoundaries = (
   sources: StrictAppBoundarySources
-): StrictAppBoundaryFinding[] => {
-  const findings: StrictAppBoundaryFinding[] = [];
+): readonly StrictAppBoundaryFinding[] => {
   const requiredPatterns = [
     "Config.schema(",
     "readWorkflowReceipt(",
     "BunRuntime.runMain(program)",
   ] as const;
 
-  for (const path of workflowRuntimePaths) {
-    if (!includesEvery(sources[path], requiredPatterns)) {
-      findings.push(finding("workflow-boundary", path));
-    }
-  }
-  if (
-    !includesEvery(sources[workflowEvidenceRuntimePath], [
-      "Config.schema(",
-      "runWorkflowEvidence",
-      "BunRuntime.runMain(program)",
-    ])
-  ) {
-    findings.push(finding("workflow-boundary", workflowEvidenceRuntimePath));
-  }
-  return findings;
+  return [
+    ...EffectArray.flatMap(workflowRuntimePaths, (path) =>
+      includesEvery(
+        readStrictAppBoundarySource(sources, path),
+        requiredPatterns
+      )
+        ? []
+        : [finding("workflow-boundary", path)]
+    ),
+    ...(includesEvery(
+      readStrictAppBoundarySource(sources, workflowEvidenceRuntimePath),
+      ["Config.schema(", "runWorkflowEvidence", "BunRuntime.runMain(program)"]
+    )
+      ? []
+      : [finding("workflow-boundary", workflowEvidenceRuntimePath)]),
+  ];
 };
 
 const inspectWorkflowArtifactBoundary = (
@@ -170,8 +184,8 @@ const inspectWorkflowArtifactBoundary = (
   const runtimePath =
     "tools/docs-deployment/workflow-artifact.runtime.ts" as const;
   const servicePath = "tools/docs-deployment/workflow-artifact.ts" as const;
-  const runtime = sources[runtimePath];
-  const service = sources[servicePath];
+  const runtime = readStrictAppBoundarySource(sources, runtimePath);
+  const service = readStrictAppBoundarySource(sources, servicePath);
   const valid =
     includesEvery(runtime, [
       "Config.schema(WorkflowArtifactConfig)",
@@ -195,9 +209,11 @@ const inspectCredentialBoundary = (
 ): readonly StrictAppBoundaryFinding[] => {
   const boundaryPath =
     "tools/docs-deployment/inventory-credentials.boundary.ts" as const;
-  const credentialBoundary = sources[boundaryPath];
-  const inventoryRuntime =
-    sources["tools/docs-deployment/inventory.runtime.ts"];
+  const credentialBoundary = readStrictAppBoundarySource(sources, boundaryPath);
+  const inventoryRuntime = readStrictAppBoundarySource(
+    sources,
+    "tools/docs-deployment/inventory.runtime.ts"
+  );
   const boundaryRequirements = [
     "FileSystem.FileSystem",
     "Schema.fromJsonString(",
@@ -222,10 +238,13 @@ const inspectLocalDopplerBoundary = (
   const custodyRuntimePath =
     "tools/docs-deployment/doppler-custody.runtime.ts" as const;
   const commandPath = "tools/docs-deployment/local-doppler.ts" as const;
-  const custody = sources[custodyPath];
-  const custodyRuntime = sources[custodyRuntimePath];
-  const command = sources[commandPath];
-  const runtime = sources[localDopplerRuntimePath];
+  const custody = readStrictAppBoundarySource(sources, custodyPath);
+  const custodyRuntime = readStrictAppBoundarySource(
+    sources,
+    custodyRuntimePath
+  );
+  const command = readStrictAppBoundarySource(sources, commandPath);
+  const runtime = readStrictAppBoundarySource(sources, localDopplerRuntimePath);
   const valid =
     includesEvery(custody, [
       "FileSystem.FileSystem",
@@ -260,9 +279,15 @@ const inspectDocsRuntimeBoundary = (
   sources: StrictAppBoundarySources
 ): readonly StrictAppBoundaryFinding[] => {
   const factoryPath = "apps/docs/src/lib/runtime-factory.server.ts" as const;
-  const runtimeFactory = sources[factoryPath];
-  const runtimeComposition = sources["apps/docs/src/lib/runtime.server.ts"];
-  const serverAdapter = sources["apps/docs/src/server.ts"];
+  const runtimeFactory = readStrictAppBoundarySource(sources, factoryPath);
+  const runtimeComposition = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/src/lib/runtime.server.ts"
+  );
+  const serverAdapter = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/src/server.ts"
+  );
   const forbiddenFactoryPatterns = [
     "globalThis.crypto",
     "randomUUID",

@@ -744,3 +744,42 @@ This includes 21 Quality cases/all ten isolated mutations, 21 skill cases and
 the fresh source-only documentation check. Matching unchanged-input package,
 build and two Chromium check caches were reused. Final docs/runbook checks
 precede commit; hosted proof remains separate.
+
+
+## Local T002 deployment input and upload-file tools
+
+Continue from #106 at `d95ab45`. Retained file JSON uses typed Schema decoding;
+SHA-256 uses Effect Crypto with the same bytes and safe target errors. The
+upload program uses checked mode lookups, ordered Effect traversal and persistent
+allowlists. The original modes, required files, content checks and real-path
+containment remain. The upload command has one exact canonical runtime admission;
+its obsolete raw Bun permission and the memo test's execution admission are removed.
+Source-contract path/source/finding types derive from owning Schemas. Pure
+ordered findings replace mutation; checked missing reads use empty source so
+required patterns fail. The native memo test uses scoped ordered Effect work.
+
+The test command now uses Bun-hosted Vitest with source resolution. All 94
+retained cases remain; only the migrated suites use `@effect/vitest` in this
+slice. The other suites retain assertions but remain pending strict migration.
+Added input/hash/error, empty-source and upload path tests execute only within
+scoped temporary files. Lint scope covers the nine migrated files and their
+rejected neighbour, not the whole deployment directory.
+
+Documentation impact: **Change required** for tool README, code/test/command
+owners, strict selectors, testing/tooling pointers, this plan/task ledger and
+the [dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-deployment-artifacts.json).
+**Preserve** deployment modes/resource identities, source-contract oracles,
+all historical receipt and capture bytes, workflows, runbook procedures, package
+exports, lock, canonical skills, retained tax results and provider state.
+**N/A** Changesets, public content and operational procedure edits: root local
+checking tools only. Recover by reverting the complete slice.
+
+Before changes, the actual reviewed strict selectors produced 82 findings across
+eight source/test files; this is an incremental observation, not a repository
+defect count or a trend. Focused types/lint passed, with 108 deployment-tool
+cases (94 retained, fourteen added) and 137 lint-suite cases. Frozen install,
+complete tests, the 15-task build and full verification passed, including
+21 Quality cases/all ten isolated mutations, 21 skill cases and the fresh
+source-only documentation check. Matching unchanged-input package/build and
+two Chromium proof caches were reused. Final documentation checks precede commit. #105's corrected hosted Quality passed at
+`adc79d2` (run 37184994613); #106 hosted proof remains separate.

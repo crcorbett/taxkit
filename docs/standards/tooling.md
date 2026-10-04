@@ -444,3 +444,13 @@ and byte operations belong to their named input boundaries and use safe typed
 errors. `check:harness-foundation-epoch:types` and Bun-hosted `test:hgi-206` run
 inside root verification. Root verification runs focused policy/host tests;
 it does not assert that either saved historical epoch qualifies today's graph.
+
+
+DEV-73 also applies all eleven canonical rules to the migrated retained-input,
+upload-file, source-contract and native memo owners under `tools/docs-deployment`.
+The upload command alone has an exact runtime admission. Its former raw Bun
+API permission and the memo test's execution permission are removed. Input
+hashing uses Effect Crypto; typed file JSON is decoded once at ingress.
+The rest of this directory remains explicitly pending for strict migration.
+The existing deployment test command uses Bun-hosted Vitest and shared source
+resolution; its assertions still read local fixtures and saved records.

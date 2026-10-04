@@ -1,6 +1,5 @@
-import { describe, expect, test } from "bun:test";
-
 import { Array as EffectArray, Effect, Schema } from "effect";
+import { describe, expect, test } from "vitest";
 
 import automationJson from "./automation-register.json";
 import { inspectDeploymentAutomationRegisters } from "./automation.policy.js";

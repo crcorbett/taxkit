@@ -1,9 +1,8 @@
-import { describe, expect, test } from "bun:test";
-
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { ConfigProvider, Effect, Match, Result } from "effect";
 import type { Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
+import { describe, expect, test } from "vitest";
 
 import { readWorkflowSha256 } from "./workflow-check.boundary.js";
 import { checkWorkflowInput } from "./workflow-input-check.runtime.js";
