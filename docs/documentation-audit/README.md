@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -376,3 +376,9 @@ At audit time, check that:
 - [Native API host candidate](clean-slate-foundation/2026-10-05-native-api-host.json):
   actual native local Worker, shared HTTP/RPC calculation, origin/body policy and
   request cleanup proof; connected Website and complete tracing remain pending.
+
+
+- [Native two-app graph](clean-slate-foundation/2026-10-05-native-app-graph.json):
+  native source/default planner correction, mock-only plan classification,
+  same-resource origins/binding and root secret selection; real Website and
+  provider operations remain unqualified.

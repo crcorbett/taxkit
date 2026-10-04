@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-09-24
+last_reviewed: 2026-10-05
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -17,6 +17,12 @@ This runbook owns the TaxKit docs deployment made by root `alchemy.run.ts`.
 The current graph has one
 `Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy `2.0.0-beta.80`
 owns the Vite build, assets, Worker and resource lifecycle.
+
+The separate active `alchemy.apps.run.ts` API/Website candidate is outside this
+procedure. Its native Stack declares secrets and cannot accept `--env-file`.
+Do not redirect these docs commands or transfer their provider authority to that
+candidate. Its graph is qualified only with local memory/mock planning; app
+provider plan/apply/recovery authority is still unestablished.
 
 Preview uses the exact `pr-N` stage for one same-repository pull request.
 Production uses the fixed `prod` stage. The runbook also covers the narrowly

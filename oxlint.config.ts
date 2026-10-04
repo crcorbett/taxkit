@@ -14,6 +14,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Native app root stage ingress, checked before constructing secret Layers.
+  "packages/infrastructure/src/apps-secrets.boundary.ts",
   // Native RPC parser unknown envelopes and exact adversarial transport fixtures.
   "packages/api/rpc/src/server-serialization.boundary.ts",
   "packages/api/rpc/test/handlers.test.ts",

@@ -3,6 +3,13 @@
   "private": true,
   "type": "module",
   "main": "dist/index.js",
+  "exports": {
+    "./worker": {
+      "source": "./src/worker.ts",
+      "types": "./dist/worker.d.ts",
+      "default": "./dist/worker.js"
+    }
+  },
   "scripts": {
     "dev": "portless run --name api.taxkit bun --watch src/index.ts",
     "start": "bun src/index.ts",

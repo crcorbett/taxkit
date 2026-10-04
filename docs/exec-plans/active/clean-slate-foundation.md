@@ -1872,3 +1872,44 @@ Readback confirms GitHub Quality run `37218849773` passed the exact RPC draft
 not qualify the current API host candidate. T003 remains in progress for the
 Website, native binding/origin graph, root secret precedence, real browser
 journeys and complete native fatal/log/trace paths.
+
+
+## T003 native app graph candidate
+
+Continue above API draft #129 at
+`1e72f6b39bb580215f3ef985337e2d00e8f4cfec`. GitHub Quality run `37221971202`
+passed that exact API host commit. The separate candidate `alchemy.apps.run.ts`
+declares API and Website native resources with self URLs, peer Outputs and the
+same-stage private `TAXKIT_API` binding. Native Stack secrets select checked
+Doppler stages and disable ambient application overrides. Current docs workflows
+continue to use their existing root and authority.
+
+Actual native planning exposed a beta.80 deadlock: resolving peer properties
+waited on the same memoised resource through the address cycle. A narrow patch
+defers fresh/circular resource Outputs before recursive property resolution,
+covering native source and compiled entry points plus generated mapping. Native
+mock plans complete create/no-change/update; missing early-create capability
+still fails. Removing the patch brings back the timeout in both installed entry
+points. Original bytes are restored. Real Cloudflare diff, apply and Doppler
+retrieval are not proved. The Website application is still the existing scaffold;
+T003 remains in progress.
+
+Documentation impact is **Change required** for infrastructure/API exports and
+READMEs, deployment/configuration/package/quality owners, the docs procedure's
+explicit candidate exclusion, exact decoding permission/canaries, task evidence
+and the [graph receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-native-app-graph.json).
+**Preserve** current docs identities/procedures, public HTTP/RPC contracts,
+canonical skills, retained calculators and all historical evidence. Public MDX,
+release/version/publication and Changesets are **N/A**: this slice changes only
+private app/infrastructure composition and a private locked dependency patch.
+Website runtime/browser and complete native privacy/lifetime proof remain next.
+
+
+The graph sub-slice passes 32 infrastructure cases and the source/default patch
+removal oracle. Full qualification passes frozen 795-install/1021-package
+installation, all 16 builds, 27 workspace test tasks, 435 actual CLI cases,
+both unused-code inventories and compiler paths. Full verification includes 32
+Quality cases with 13 isolated cases in 373.78 seconds, 206 deployment cases,
+21 skill cases, 16 evaluation cases and actual Chromium 24 SDK/four retained
+website cases. Current browser results still belong to the scaffold; the real
+Website/RPC/Atom connection remains the next T003 work.

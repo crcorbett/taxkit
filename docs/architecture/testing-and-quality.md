@@ -989,3 +989,29 @@ experiments establish one artifact's workerd startup/HTTP/RPC/error behaviour.
 They do not qualify cloud deployment, real Website wiring, complete fatal
 protocol paths or exported telemetry; the active task and receipt retain those
 limits and the local proxy/upload observations.
+
+
+### Native app graph proof
+
+`packages/infrastructure/src/apps-stack.test.ts` runs actual native Stack/Plan
+with the real two-app declaration, memory state and a typed mock Worker provider.
+Explicit native profile, credential and HTTP services fail on access; provider
+writes fail on call. Real-clock tests bound each plan to one second. Create,
+no-change and update cases retain the circular peer addresses, self URL markers,
+same private peer resource, fresh Output values and null for absent addresses.
+A provider without `precreate` still produces native `UnsatisfiedResourceCycle`.
+Native root selection tests check stages, fixed safe failure, fixture-provider
+precedence and the upstream env-file conflict before secret access.
+
+Alchemy beta.80 publishes distinct Bun source and default compiled planner
+entries. Both are corrected by the exact tracked patch; the compiled source map
+is generated from the corrected native source. The dated receipt records an
+independent source run and deliberate patch removal: both entries time out on
+the same actual graph without the correction, then their original bytes are
+restored. Passing mock classifications do not establish Cloudflare's real diff
+or Apply. No hosted or Doppler retrieval claim follows.
+
+Only `apps-secrets.boundary.ts` receives stage-decoding permission. Actual CLI
+fixtures at that real path admit decoding while rejecting encoding and runtime
+execution; a neighbouring source still rejects decoding. Scoped finalisers
+restore the real source after each fixture.

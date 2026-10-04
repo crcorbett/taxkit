@@ -183,3 +183,21 @@ client, never merely for a brand or diagnostic.
 - [Package ownership](./package-ownership.md)
 - [API and SDK](./api-and-sdk.md)
 - [Frontend](./frontend.md)
+
+
+## Native app root secret selection
+
+`alchemy.apps.run.ts` selects native `Stack.secrets` using the infrastructure
+package's `apps-secrets.boundary.ts`. Checked `prod` selects `taxkit/prd`,
+`pr-N` selects `taxkit/stg_preview`, and `dev_identity` selects `taxkit/dev`.
+Bad stages fail with a fixed Config error before profile, credential or HTTP
+access. An explicitly disabled native `Secrets.ProcessEnv` entry keeps ambient
+application keys from overriding the selected provider. Native profile/credential
+selection keeps its own upstream semantics.
+
+The precedence test replaces the remote Doppler Layer with checked fixture
+providers and runs real native Stack configuration. It proves ordering and
+ambient suppression, not Doppler download or credential access. Native Stack
+also rejects `--env-file` when the root declares secrets. The existing docs
+fetch bridge and its empty env-file remain their own operating contract; no
+current docs command selects the candidate app root.

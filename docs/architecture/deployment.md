@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-10-05
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -428,7 +428,7 @@ does not prove provider or public availability.
 ## Guardrails
 
 - Do not couple engine packages to deployment providers.
-- Keep provider composition at root, one resource declaration in
+- Keep provider composition at root, target-owned resource declarations in
   `@taxkit/infrastructure`, and app build semantics in `apps/docs`.
   Do not expose a raw provider client.
 - Decode stage and provider readback representations at their ingress and keep
@@ -453,3 +453,27 @@ does not prove provider or public availability.
 - [Testing and quality](./testing-and-quality.md)
 - [Docs deployment runbook](../runbooks/docs-deployment.md)
 - [Dated deployment evidence](../evidence/deployments/README.md)
+
+
+## Native two-app candidate
+
+The active clean-slate T003 work adds a separate `alchemy.apps.run.ts` candidate,
+owned by `@taxkit/infrastructure/apps-stack` and `./apps-secrets`. Its
+`TaxKitAppsCloudflare` graph declares the native API `TaxKitApi` and standard
+Vite Website `TaxKitWebsite`. The API app exposes only its named `api/worker`
+composition export to the infrastructure package. Each native host owns its
+self URL and uses the peer resource Output for the other address. The website's
+`TAXKIT_API` private service binding targets the same declared API resource and
+stage; no persisted Production URL is substituted into a local/Preview graph.
+
+This graph has provider-free native declaration/planner proof. A narrowly
+versioned beta.80 patch fixes the planner's circular property-resolution wait
+in both its source and compiled entries. It preserves native cycle rejection
+when a provider cannot create an early resource. The proof provider models
+create/no-change/update; it does not qualify Cloudflare's real diff, apply,
+adoption, teardown or rollback. Website runtime/build integration remains active
+work. The docs deployment runbook and workflows continue to select
+`alchemy.run.ts`; their authority does not cover this candidate or its resources.
+Native Stack secrets select the checked stage's Doppler configuration and reject
+`--env-file`; see [configuration](./configuration.md) and the
+[graph receipt](../documentation-audit/clean-slate-foundation/2026-10-05-native-app-graph.json).

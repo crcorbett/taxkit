@@ -1407,6 +1407,20 @@ test.each([
 });
 
 describe("exact native RPC lint boundaries", () => {
+  test.effect("rejects decoding beside the native app stage ingress", () =>
+    Effect.gen(function* () {
+      const path =
+        "packages/infrastructure/src/.generated-app-decoder-neighbour.ts";
+      yield* writeLintFixture(
+        join(repositoryRoot, path),
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);'
+      );
+      const result = yield* runOxlint(path);
+      expect(result.files).toBe(1);
+      expect(result.exitCode).not.toBe(0);
+      expect(result.codes).toContain("taxkit(no-decoding-outside-boundaries)");
+    }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+  );
   test.effect("rejects decoding in a neighbouring RPC source file", () =>
     Effect.gen(function* () {
       const path = "packages/api/rpc/src/.generated-decoder-neighbour.ts";
@@ -1479,6 +1493,27 @@ describe("exact native RPC lint boundaries", () => {
     },
     {
       path: "apps/api/test/worker.boundary.test.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
+      path: "packages/infrastructure/src/apps-secrets.boundary.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "packages/infrastructure/src/apps-secrets.boundary.ts",
+      rejected: true,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "packages/infrastructure/src/apps-secrets.boundary.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:

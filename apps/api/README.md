@@ -226,3 +226,10 @@ curl -X POST https://api.taxkit.localhost/api/v1/calculators/au.pay.take-home/ca
 - `docs/architecture/effect-services.md`
 - `docs/architecture/package-ownership.md`
 - `docs/product-specs/extract-api-app.md`
+
+
+The private `api/worker` app export supplies the native Worker class and instance
+composition to `@taxkit/infrastructure/apps-stack`. Its source, compiled runtime
+and declaration paths are explicit. The graph owns peer binding and addresses;
+the API app owns request handling and checked runtime configuration. This export
+does not make a public package or change the existing HTTP/OpenAPI contract.

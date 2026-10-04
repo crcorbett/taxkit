@@ -165,7 +165,8 @@ Root `alchemy.run.ts`
 and adds the native Alchemy Worker candidate for active DEV-74. The native
 instance owns one router and calculator service; incoming requests own body
 limits, dispatch and cleanup. HTTP and RPC share the named calculator operation.
-The stack/website connection remains pending in the active plan.
+The private `api/worker` export supplies native composition to the infrastructure
+graph; website runtime connection remains pending in the active plan.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs
@@ -230,3 +231,11 @@ belongs in apps or explicitly server-only package exports.
 - [Package boundaries](./package-boundaries.md)
 - [Effect services](./effect-services.md)
 - [API and SDK](./api-and-sdk.md)
+
+
+`@taxkit/infrastructure` also owns the separate native app candidate graph and
+root secret selection through explicit source-only exports. It consumes the
+API's named app export rather than reaching through a workspace filesystem
+path. Engine, HTTP and RPC packages have no infrastructure dependency. The API
+app retains ownership of native request/instance behaviour; root composition
+retains provider and state selection.

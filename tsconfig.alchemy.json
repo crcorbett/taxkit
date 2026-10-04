@@ -7,5 +7,9 @@
     "sourceMap": false,
     "types": ["bun"]
   },
-  "include": ["alchemy.run.ts", "packages/infrastructure/src/**/*.ts"]
+  "include": [
+    "alchemy.run.ts",
+    "alchemy.apps.run.ts",
+    "packages/infrastructure/src/**/*.ts"
+  ]
 }

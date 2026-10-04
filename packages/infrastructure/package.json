@@ -18,6 +18,16 @@
       "source": "./src/cloudflare/website.ts",
       "types": "./src/cloudflare/website.ts",
       "default": "./src/cloudflare/website.ts"
+    },
+    "./apps-stack": {
+      "source": "./src/apps-stack.ts",
+      "types": "./src/apps-stack.ts",
+      "default": "./src/apps-stack.ts"
+    },
+    "./apps-secrets": {
+      "source": "./src/apps-secrets.boundary.ts",
+      "types": "./src/apps-secrets.boundary.ts",
+      "default": "./src/apps-secrets.boundary.ts"
     }
   },
   "scripts": {
@@ -27,6 +37,7 @@
   },
   "dependencies": {
     "alchemy": "catalog:",
+    "api": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
