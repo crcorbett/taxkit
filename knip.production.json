@@ -90,7 +90,8 @@
         "src/**/*.ts!",
         "!src/**/*.test.ts!",
         "!src/test.layer.ts!"
-      ]
+      ],
+      "ignoreDependencies": ["vite/client"]
     },
     "packages/docs-fumadocs": {
       "entry": [

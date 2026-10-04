@@ -56,7 +56,7 @@ const CrosswalkEntry = Schema.Struct({
 });
 const AcceptedFindingsRegister = Schema.Struct({
   entries: Schema.Array(CrosswalkEntry).pipe(
-    Schema.check(Schema.isLengthBetween(8, 8))
+    Schema.check(Schema.isBetweenLength(8, 8))
   ),
 });
 const TaskLedger = Schema.Struct({
@@ -101,9 +101,9 @@ describe("Alchemy plan projection and historical capture custody", () => {
       match.groups?.["version"] === undefined ? [] : [match.groups["version"]]
     );
 
-    expect(alchemyPlanTextVersion).toBe("2.0.0-beta.79");
+    expect(alchemyPlanTextVersion).toBe("2.0.0-beta.80");
     expect(alchemyPlanSourceCommit).toBe(
-      "473c39591c7993a708199d0ef8f0d38416885dde"
+      "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04"
     );
     expect(manifest.alchemyVersion).toBe(historicalAlchemyPlanTextVersion);
     expect(manifest.upstream.commit).toBe(historicalAlchemyPlanSourceCommit);
@@ -489,7 +489,7 @@ describe("Alchemy plan projection and historical capture custody", () => {
     );
   });
 
-  test("accepts beta.79's exact empty-resource summary only for destroy", async () => {
+  test("accepts beta.80's exact empty-resource summary only for destroy", async () => {
     await expect(project("Plan: no resources\n", "destroy")).resolves.toEqual([
       {
         action: "noop",
@@ -502,7 +502,7 @@ describe("Alchemy plan projection and historical capture custody", () => {
     ).rejects.toHaveProperty("_tag", "WorkflowPlanProjectionError");
   });
 
-  test("normalises beta.79 ANSI and timestamp log variation without admitting it", async () => {
+  test("normalises beta.80 ANSI and timestamp log variation without admitting it", async () => {
     await expect(
       project(
         "Plan: 1 to update\n\u001B[32m[DocsWebsite] update\u001B[0m\n[12:34:56.789] INFO update available\n",

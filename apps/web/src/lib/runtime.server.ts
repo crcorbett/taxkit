@@ -1,7 +1,7 @@
 import "@tanstack/react-start/server-only";
 import { createTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
 import { Effect, Layer, ManagedRuntime } from "effect";
-import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
 
 import { TaxKitWebConfigError } from "./config";
 import {

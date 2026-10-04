@@ -184,11 +184,16 @@ const isExpectedServerFunctionAbort = (request: Request, origin: string) => {
   );
 };
 
-const processEnvironment = EffectRecord.filter(Bun.env, (_, name) =>
-  /^(?:CI|COLORTERM|LANG|LC_ALL|NO_COLOR|PATH|TERM|TMPDIR|TZ)$/u.test(name)
-);
-processEnvironment.NO_COLOR = "1";
-processEnvironment.WRANGLER_SEND_METRICS = "false";
+const processEnvironment = {
+  ...EffectRecord.filter(Bun.env, (_, name) =>
+    /^(?:CI|COLORTERM|LANG|LC_ALL|NO_COLOR|PATH|PLAYWRIGHT_BROWSERS_PATH|TERM|TMPDIR|TZ)$/u.test(
+      name
+    )
+  ),
+  NO_COLOR: "1",
+  WRANGLER_SEND_METRICS: "false",
+  XDG_CONFIG_HOME: fileURLToPath(new URL("provider-config/", receiptRoot)),
+};
 
 const runProcess = async (
   executable: string,
@@ -216,6 +221,7 @@ const runProcess = async (
 interface ProcessEntry {
   readonly command: string;
   readonly parentPid: number;
+  readonly state: string;
   readonly pid: number;
 }
 
@@ -223,13 +229,14 @@ const readProcessTable = async (): Promise<readonly ProcessEntry[]> => {
   const output = await runProcess("/bin/ps", fileURLToPath(repositoryRoot), [
     "-ax",
     "-o",
-    "pid=,ppid=,command=",
+    "pid=,ppid=,stat=,command=",
   ]);
 
   return output.split("\n").flatMap((line) => {
-    const match = /^\s*(?<pid>\d+)\s+(?<parentPid>\d+)\s+(?<command>.+)$/u.exec(
-      line
-    );
+    const match =
+      /^\s*(?<pid>\d+)\s+(?<parentPid>\d+)\s+(?<state>\S+)\s+(?<command>.+)$/u.exec(
+        line
+      );
 
     return match === null
       ? []
@@ -238,6 +245,7 @@ const readProcessTable = async (): Promise<readonly ProcessEntry[]> => {
             command: match.groups?.["command"] ?? "",
             parentPid: Number(match.groups?.["parentPid"]),
             pid: Number(match.groups?.["pid"]),
+            state: match.groups?.["state"] ?? "",
           },
         ];
   });
@@ -262,6 +270,25 @@ const descendantEntries = (
   }
 
   return descendants;
+};
+
+const waitForDescendantExit = async (
+  observed: readonly ProcessEntry[],
+  attempts: number
+): Promise<readonly ProcessEntry[]> => {
+  const processTable = await readProcessTable();
+  const remaining = processTable.filter(
+    (entry) =>
+      !entry.state.startsWith("Z") &&
+      observed.some(
+        (child) => child.pid === entry.pid && child.command === entry.command
+      )
+  );
+  if (remaining.length === 0 || attempts === 0) {
+    return remaining;
+  }
+  await Bun.sleep(100);
+  return waitForDescendantExit(observed, attempts - 1);
 };
 
 const reservePort = () => {
@@ -1083,13 +1110,12 @@ try {
     workerOutput,
     /(?:\[wrangler:error\]|Uncaught|Internal error|Error 110[12])/u
   );
-  const remainingProcesses = await readProcessTable();
-  const remainingPids = new Set(remainingProcesses.map(({ pid }) => pid));
-
+  const remainingDescendants = await waitForDescendantExit(
+    observedDescendants,
+    50
+  );
   assert.deepEqual(
-    observedDescendants
-      .map(({ pid }) => pid)
-      .filter((pid) => remainingPids.has(pid)),
+    remainingDescendants,
     [],
     "Wrangler left an observed local workerd descendant running."
   );

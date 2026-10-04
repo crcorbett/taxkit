@@ -1,5 +1,5 @@
 import { Context } from "effect";
-import * as HttpRouter from "effect/unstable/http/HttpRouter";
+import * as HttpRouter from "effect/http/HttpRouter";
 
 import { TaxKitServerLayer } from "../server.js";
 import { createTaxKitApiInProcessClientLayer } from "./in-process.layer.js";

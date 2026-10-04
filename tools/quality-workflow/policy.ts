@@ -1,5 +1,5 @@
+import ts from "@typescript/typescript6";
 import { Effect, Schema } from "effect";
-import ts from "typescript";
 import { parseDocument } from "yaml";
 
 import {

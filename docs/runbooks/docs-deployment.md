@@ -15,7 +15,7 @@ Owner: `taxkit-docs-deployment-operation-owner`
 
 This runbook owns the TaxKit docs deployment made by root `alchemy.run.ts`.
 The current graph has one
-`Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy `2.0.0-beta.79`
+`Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy `2.0.0-beta.80`
 owns the Vite build, assets, Worker and resource lifecycle.
 
 Preview uses the exact `pr-N` stage for one same-repository pull request.
@@ -69,7 +69,7 @@ only calculates shared identities, decodes provider output and writes
 sanitised evidence. It cannot grant authority or run Alchemy, Wrangler or an
 arbitrary command.
 
-Alchemy login/bootstrap is mutation-capable in beta.79. It may refresh the
+Alchemy login/bootstrap is mutation-capable in beta.80. It may refresh the
 provider credential, read a short-lived edge-preview secret, and create or
 upgrade state-store resources. Authorise it as part of the exact workflow
 operation. Its receipt proves only that the bounded step completed; it does
@@ -160,7 +160,7 @@ There is intentionally no external lease.
    Cloudflare outputs reach only provider steps. The workflow performs the
    authorised bootstrap and runs `alchemy plan`. Alchemy owns the Vite build;
    do not add a second build process.
-4. The typed evidence command decodes the raw plan with the single beta.79
+4. The typed evidence command decodes the raw plan with the single beta.80
    parser. Accept only one `DocsWebsite` `create`, `update` or `noop` action for
    deploy. The plan receipt must bind the exact candidate, lockfile,
    configuration, stage and sanitised plan digest. Stop on another resource,
@@ -294,7 +294,7 @@ do not copy their old commands into this runbook.
 A deployment is accepted only when the exact workflow receipt, Alchemy stage,
 Cloudflare Worker/version and hosted result agree. Teardown is accepted only
 when the exact stage and Worker are absent, or when the decoded plan and
-readback both prove they were already absent. On beta.79, an empty plan says
+readback both prove they were already absent. On beta.80, an empty plan says
 `Plan: no resources`; the older `Plan: no changes` empty-plan text is not
 accepted by the current parser. Preserve failed, cancelled,
 superseded and no-op attempts with their limits.
@@ -349,7 +349,7 @@ Also stop when any of these occurs:
   from the approved identity;
 - Quality is missing, pending or failed;
 - the plan contains another resource, an unsupported action or malformed
-  beta.79 output;
+  beta.80 output;
 - replan differs from the accepted digest;
 - Alchemy state and Cloudflare readback disagree;
 - a matching manual mutation or workflow is already active;
@@ -363,7 +363,7 @@ GitHub concurrency does not lock manual CLI mutation or another system. The
 repository does not use an external lease. Normal concurrent manual mutation
 is unsupported.
 
-Alchemy beta.79 bootstrap can change provider or state-store data before plan
+Alchemy beta.80 bootstrap can change provider or state-store data before plan
 output. A plan-only workflow is therefore not wholly read-only. Remote and Bun
 caches can save time but do not replace frozen installation, live provider
 commands or receipt checks.

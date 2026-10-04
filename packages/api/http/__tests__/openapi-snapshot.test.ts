@@ -13,7 +13,7 @@ import {
   Schema,
 } from "effect";
 import { pipe } from "effect/Function";
-import type { OpenApi } from "effect/unstable/httpapi";
+import type { OpenApi } from "effect/http-api";
 
 import { taxKitOpenApiSpec } from "../src/openapi.js";
 
@@ -26,33 +26,30 @@ const updateOpenApiSnapshot = Config.Boolean(
 const JsonArray = Schema.Array(Schema.Json);
 const JsonObject = Schema.Record(Schema.String, Schema.Json);
 
-const normalizeJsonValue = (value: Schema.Json): Schema.Json => {
-  const normalizeJsonArray = (array: Schema.JsonArray): Schema.JsonArray =>
-    EffectArray.map(array, normalizeJsonValue);
-  const normalizeJsonObject = (object: Schema.JsonObject): Schema.JsonObject =>
-    pipe(
-      EffectRecord.toEntries(object),
-      EffectArray.sortWith(([key]) => key, Order.String),
-      EffectArray.map(([key, child]): readonly [string, Schema.Json] => [
-        key,
-        normalizeJsonValue(child),
-      ]),
-      EffectRecord.fromEntries
-    );
-
-  return Schema.decodeUnknownOption(JsonArray)(value).pipe(
+const normalizeJsonValue = (value: Schema.Json): Schema.Json =>
+  Schema.decodeUnknownOption(JsonArray)(value).pipe(
     Option.match({
       onNone: () =>
         Schema.decodeUnknownOption(JsonObject)(value).pipe(
           Option.match({
             onNone: () => value,
-            onSome: normalizeJsonObject,
+            onSome: (object) =>
+              pipe(
+                EffectRecord.toEntries(object),
+                EffectArray.sortWith(([key]) => key, Order.String),
+                EffectArray.map(
+                  ([key, child]): readonly [string, Schema.Json] => [
+                    key,
+                    normalizeJsonValue(child),
+                  ]
+                ),
+                EffectRecord.fromEntries
+              ),
           })
         ),
-      onSome: normalizeJsonArray,
+      onSome: (array) => EffectArray.map(array, normalizeJsonValue),
     })
   );
-};
 
 const normalizeOpenApiSpec = (spec: OpenApi.OpenAPISpec) =>
   Schema.decodeUnknownEffect(Schema.Json)(spec).pipe(

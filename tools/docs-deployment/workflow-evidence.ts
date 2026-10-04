@@ -1,8 +1,9 @@
-import { Array, Clock, Crypto, Effect, Encoding, Schema, Stream } from "effect";
+import { Array, Clock, Crypto, Effect, Schema, Stream } from "effect";
+import { Hex } from "effect/encoding";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
-import * as ChildProcess from "effect/unstable/process/ChildProcess";
-import * as ChildProcessSpawner from "effect/unstable/process/ChildProcessSpawner";
+import * as ChildProcess from "effect/process/ChildProcess";
+import * as ChildProcessSpawner from "effect/process/ChildProcessSpawner";
 
 import type { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 import { DocsDeploymentInventoryReport as DocsDeploymentInventoryReportSchema } from "./inventory.schemas.js";
@@ -53,7 +54,7 @@ const deploymentInputRoots = [
 const sha256Bytes = (bytes: Uint8Array, role: string) =>
   Crypto.Crypto.pipe(
     Effect.flatMap((crypto) => crypto.digest("SHA-256", bytes)),
-    Effect.map(Encoding.encodeHex),
+    Effect.map(Hex.encode),
     Effect.map((digest) => digest.toLowerCase()),
     Effect.mapError(() => new WorkflowEvidenceInputReadError({ role }))
   );
@@ -308,8 +309,8 @@ export const writeBootstrapWorkflowEvidence = (
     const bootstrap = yield* Schema.decodeUnknownEffect(
       WorkflowBootstrapReceipt
     )({
-      alchemySourceCommit: "473c39591c7993a708199d0ef8f0d38416885dde",
-      alchemyVersion: "2.0.0-beta.79",
+      alchemySourceCommit: "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
+      alchemyVersion: "2.0.0-beta.80",
       allowedEffects: [
         "credential-refresh",
         "edge-preview-secret-read",
@@ -317,7 +318,7 @@ export const writeBootstrapWorkflowEvidence = (
       ],
       candidateCommit: config.TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT,
       limitations: [
-        "This receipt records the allowed beta.79 bootstrap effects, not which provider mutations occurred.",
+        "This receipt records the allowed beta.80 bootstrap effects, not which provider mutations occurred.",
         "State-store facts before and after bootstrap were not independently read back in this step.",
       ],
       observedAt: yield* observedAt,

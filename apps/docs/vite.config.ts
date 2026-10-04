@@ -4,7 +4,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import * as docsConfig from "@taxkit/docs-content/source.config";
 import viteReact from "@vitejs/plugin-react";
-import fumadocsMdx from "fumadocs-mdx/vite";
+import mdx from "fumadocs-mdx/vite";
 import { defineConfig } from "vite";
 
 const docsContentConfigPath = fileURLToPath(
@@ -14,28 +14,15 @@ const docsContentSourceDirectory = fileURLToPath(
   new URL("../../packages/docs-content/.source", import.meta.url)
 );
 
-export default defineConfig(async () => {
+export default defineConfig(() => {
   const alchemyOwnsCloudflareVite =
     // oxlint-disable-next-line effect/no-process-outside-boundaries -- Vite configuration is the exact host boundary for Alchemy's documented process-local injection signal.
     process.env.ALCHEMY_CLOUDFLARE_VITE_INJECTED === "1";
 
-  const docsMdx = await fumadocsMdx(docsConfig, {
+  const docsMdxForBuild = mdx(docsConfig, {
     configPath: docsContentConfigPath,
     outDir: docsContentSourceDirectory,
   });
-  const originalDocsMdxBuildStart = docsMdx.buildStart;
-  if (originalDocsMdxBuildStart === undefined) {
-    throw new TypeError("Fumadocs Vite plugin must expose a buildStart hook.");
-  }
-  let docsMdxBuildStartResult: Promise<unknown> | undefined;
-  const docsMdxForBuild = {
-    ...docsMdx,
-    buildStart: () => {
-      docsMdxBuildStartResult ??= Promise.resolve(originalDocsMdxBuildStart());
-      return docsMdxBuildStartResult;
-    },
-    sharedDuringBuild: true,
-  };
 
   return {
     plugins: [

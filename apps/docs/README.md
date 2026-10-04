@@ -107,7 +107,7 @@ local start does not grant provider authority or prove a deployment.
 
 `dev:vite` is the fast, infrastructure-free portless Vite path at
 `https://docs.taxkit.localhost`.
-Alchemy beta.79 injects its Cloudflare Vite plugin for the native resource;
+Alchemy beta.80 injects its Cloudflare Vite plugin for the native resource;
 standalone Vite installs the same official plugin only when the documented
 `ALCHEMY_CLOUDFLARE_VITE_INJECTED` guard is absent.
 
@@ -122,7 +122,9 @@ source-owned, so a clean direct app build does not require a prebuilt workspace
 artifact. The Vite config resolves the Fumadocs config and generated-source
 paths from its own file location, so the standalone and repository-root
 Alchemy builds use the same generated source even after a cached package
-build. `dev:vite` and `preview` expose the app through portless.
+build. Fumadocs MDX 15 supplies its native plugin array; the old single-plugin
+`buildStart` wrapper is removed. Local build and browser checks qualify this
+generator change separately from any provider artifact. `dev:vite` and `preview` expose the app through portless.
 
 `test:browser` runs the programmatic TanStack client-route harness in Chromium.
 It proves success, expected failures, malformed transport and framework error
@@ -174,7 +176,7 @@ Root `alchemy.run.ts` composes the private
 `@taxkit/infrastructure` declaration of
 `Cloudflare.Website.Vite("DocsWebsite")`. Alchemy owns Vite build execution,
 assets, the SSR Worker lifecycle and the physical Worker name as one logical
-resource. Its beta.79 memo includes the lockfile and both sibling docs
+resource. Its beta.80 memo includes the lockfile and both sibling docs
 packages, so those authored inputs participate in Alchemy's resource input.
 The standalone `build:cloudflare` alias and workerd harness are provider-free
 preflight proof; their `dist/**` output is not asserted to be the exact artifact
@@ -328,3 +330,12 @@ docs change
 - Apply [Abstraction
   admission](../../docs/design-docs/abstraction-admission.md) before adding a
   shared hook, provider, component family or package.
+
+The local built-Worker proof preserves `PLAYWRIGHT_BROWSERS_PATH` in its
+bounded child-process environment so Mermaid builds and browser checks use the
+same installed Chromium cache. Wrangler uses an isolated config/log directory
+under the ignored proof output, without forwarding provider credentials or the
+user's provider configuration.
+The proof waits up to five seconds for observed Wrangler descendants to exit.
+Zombie process-table entries have already exited; they are recorded by the OS
+until its parent reaps them and are not treated as running Workers.

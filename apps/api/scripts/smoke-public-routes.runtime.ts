@@ -23,11 +23,11 @@ import {
   Stream,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
+import * as HttpBody from "effect/http/HttpBody";
+import * as HttpClient from "effect/http/HttpClient";
+import type * as HttpClientResponse from "effect/http/HttpClientResponse";
 import * as Path from "effect/Path";
-import * as HttpBody from "effect/unstable/http/HttpBody";
-import * as HttpClient from "effect/unstable/http/HttpClient";
-import type * as HttpClientResponse from "effect/unstable/http/HttpClientResponse";
-import { ChildProcess } from "effect/unstable/process";
+import { ChildProcess } from "effect/process";
 
 import { ApiServerConfigSourceSchema } from "../src/schemas.js";
 

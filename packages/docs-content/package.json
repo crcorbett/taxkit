@@ -65,14 +65,15 @@
     "@effect/platform-node": "catalog:",
     "@taxkit/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
-    "fumadocs-core": "^16.8.3",
-    "fumadocs-mdx": "^14.3.1",
-    "yaml": "^2.9.0"
+    "fumadocs-core": "16.16.0",
+    "fumadocs-mdx": "15.4.6",
+    "yaml": "2.9.1"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
     "@types/bun": "catalog:",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

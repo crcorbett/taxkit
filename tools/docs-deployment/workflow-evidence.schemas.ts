@@ -130,9 +130,9 @@ export type WorkflowEvidenceIdentity = typeof WorkflowEvidenceIdentity.Type;
 
 export const WorkflowBootstrapReceipt = Schema.Struct({
   alchemySourceCommit: Schema.Literal(
-    "473c39591c7993a708199d0ef8f0d38416885dde"
+    "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04"
   ),
-  alchemyVersion: Schema.Literal("2.0.0-beta.79"),
+  alchemyVersion: Schema.Literal("2.0.0-beta.80"),
   allowedEffects: Schema.Tuple([
     Schema.Literal("credential-refresh"),
     Schema.Literal("edge-preview-secret-read"),
@@ -141,7 +141,7 @@ export const WorkflowBootstrapReceipt = Schema.Struct({
   candidateCommit: WorkflowEvidenceCommitSha,
   limitations: Schema.Tuple([
     Schema.Literal(
-      "This receipt records the allowed beta.79 bootstrap effects, not which provider mutations occurred."
+      "This receipt records the allowed beta.80 bootstrap effects, not which provider mutations occurred."
     ),
     Schema.Literal(
       "State-store facts before and after bootstrap were not independently read back in this step."

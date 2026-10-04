@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-tooling-owner
-last_reviewed: 2026-08-31
+last_reviewed: 2026-10-04
 review_trigger: formatter, lint, dependency, typecheck, governance gate, Changeset, or root command change
 ---
 
@@ -20,7 +20,7 @@ library with stable package boundaries and predictable bundle behavior.
 - `ultracite` wraps the configured provider commands.
 - `oxlint.config.ts` extends `ultracite/oxlint/core`, the reviewed React
   profile and the Remix profile. Oxlint and `@oxlint/plugins` use the same
-  1.80.0 plugin runtime.
+  1.86.0 plugin runtime.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt` and preserves authored Markdown
   wrapping. Agent instructions, documentation, generated routes and the
   vendored anti-slop source have exact formatter ignores; application and
@@ -48,7 +48,23 @@ library with stable package boundaries and predictable bundle behavior.
   hashes both complete validator closures and reconciles the immutable Git
   target, canonical skill/journey projections, receipts, retained failures,
   independent review, clocks, authority, limitations and non-claims.
-- TypeScript is cataloged at the root and uses `ES2025` lib support.
+- TypeScript 7.0.2 is the exact root compiler; `@effect/tsgo` 0.48.0 patches
+  its native binary at install and supplies Effect diagnostics. Errors remain
+  fatal; warnings and suggestions remain visible without failing compilation.
+  `check:effect-language-service` runs the native diagnostic command and the
+  compatibility compilation. Its plugin configuration identifier remains
+  `@effect/language-service` (the upstream-required name); Knip excludes this
+  exact identifier from dependency discovery because `@effect/tsgo` provides it.
+  Explicit Bun host types belong to tools/configs,
+  not browser or domain packages.
+- The two AST policy tools import the official `@typescript/typescript6`
+  compatibility API at 6.0.2. This supports programmatic syntax inspection;
+  it does not replace the TypeScript 7 compiler. Remove it after a qualified
+  native compiler API replaces those checks. See the
+  [official side-by-side guidance](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0).
+- Stable Effect 4 imports use `effect/http`, `effect/http-api`,
+  `effect/process` and `effect/encoding`; no RC import paths remain in owned
+  executable code. The exact graph remains in the root catalogue and lockfile.
 - Changesets record package-facing changes before release automation exists.
   See [Versioning and Changesets](./versioning.md).
 

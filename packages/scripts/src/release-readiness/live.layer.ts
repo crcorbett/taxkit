@@ -10,7 +10,7 @@ import {
   Stream,
 } from "effect";
 import * as Path from "effect/Path";
-import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
+import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
 import { ReleaseCommandExecutionError } from "./errors.js";
 import { sha256Text } from "./evidence.boundary.js";

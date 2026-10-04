@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { Effect, Match, Result } from "effect";
 import * as FileSystem from "effect/FileSystem";
-import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
+import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
 import { checkRepositoryPaths } from "./check.runtime.js";
 import { RepositoryRelativeFile } from "./schemas.js";

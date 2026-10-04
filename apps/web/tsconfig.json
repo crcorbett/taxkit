@@ -2,7 +2,6 @@
   "extends": "../../tsconfig.base.json",
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
   "compilerOptions": {
-    "baseUrl": ".",
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "allowImportingTsExtensions": true,
     "noEmit": true,

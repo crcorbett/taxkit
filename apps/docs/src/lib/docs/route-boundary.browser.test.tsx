@@ -278,7 +278,6 @@ describe("docs route boundary browser harness", () => {
             expect(render.consoleError).not.toHaveBeenCalled();
             expect(render.consoleWarn.mock.calls).toEqual([
               [`Warning: Error in route match: /$scenario/${scenario}`],
-              [`Warning: Error in route match: /$scenario/${scenario}`],
             ]);
           })
         )

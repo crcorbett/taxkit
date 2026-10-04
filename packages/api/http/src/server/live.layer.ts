@@ -1,10 +1,10 @@
 import { PublicCalculatorServiceLive } from "@taxkit/calculators";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Effect, Layer } from "effect";
-import * as HttpRouter from "effect/unstable/http/HttpRouter";
-import * as HttpServer from "effect/unstable/http/HttpServer";
-import * as HttpServerResponse from "effect/unstable/http/HttpServerResponse";
-import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
+import { HttpApiBuilder, HttpApiScalar } from "effect/http-api";
+import * as HttpRouter from "effect/http/HttpRouter";
+import * as HttpServer from "effect/http/HttpServer";
+import * as HttpServerResponse from "effect/http/HttpServerResponse";
 
 import { TaxKitApi } from "../api.js";
 import { CalculatorApiHandlerLive } from "../handlers/calculators.js";

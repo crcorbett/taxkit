@@ -14,7 +14,7 @@ import {
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
-import { ChildProcess } from "effect/unstable/process";
+import { ChildProcess } from "effect/process";
 
 interface CommandResult {
   readonly commandLine: string;

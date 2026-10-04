@@ -1,4 +1,5 @@
-import { Crypto, Effect, Encoding, Schema } from "effect";
+import { Crypto, Effect, Schema } from "effect";
+import { Hex } from "effect/encoding";
 import * as FileSystem from "effect/FileSystem";
 
 import {
@@ -72,7 +73,7 @@ export const readWorkflowSha256 = (
           })
       )
     );
-    return Encoding.encodeHex(digest).toLowerCase();
+    return Hex.encode(digest).toLowerCase();
   });
 
 export const workflowSha256 = (
@@ -92,5 +93,5 @@ export const workflowSha256 = (
             })
         )
       );
-    return Encoding.encodeHex(digest).toLowerCase();
+    return Hex.encode(digest).toLowerCase();
   });

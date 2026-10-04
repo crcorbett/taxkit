@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-03
+last_reviewed: 2026-10-04
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -27,10 +27,22 @@ dependency choices; they prove no install, build, package compatibility,
 provider change or deployment. The original observation is retained separately
 from the later measurement/image research.
 The latest review binds the current proposal, all settled Q1–Q13 answers and
-the installed 0.6.0 skill baseline. Q14 final shared understanding remains
-pending before implementation. Earlier reviews remain unchanged for their
+the installed 0.6.0 skill baseline. The historical Q14 hold was superseded by Cooper's 4 October implementation request; the current SPEC and active plan record
+that authority. Earlier reviews remain unchanged for their
 original drafts, digests and then-current baseline; they do not prove the
 current proposal or installed enforcement.
+
+Clean slate implementation evidence:
+
+- [Retention manifest](clean-slate-foundation/retention-manifest.json)
+- [4 October baseline checks](clean-slate-foundation/2026-10-04-baseline.json)
+- [4 October version observations](clean-slate-foundation/2026-10-04-version-observations.json)
+- [4 October partial dependency qualification](clean-slate-foundation/2026-10-04-stable-dependency-qualification.json)
+- [4 October Medicare scope conflict](clean-slate-foundation/2026-10-04-medicare-scope-conflict.json)
+
+The baseline preserves tax results and historical provider proof. The Medicare
+finding requires a scope decision before changing retained results; no correction
+or current-law qualification is claimed.
 
 Entire session history setup evidence:
 

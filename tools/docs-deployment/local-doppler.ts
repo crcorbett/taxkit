@@ -2,8 +2,8 @@ import * as Array from "effect/Array";
 import * as Effect from "effect/Effect";
 import * as HashSet from "effect/HashSet";
 import * as Match from "effect/Match";
+import * as ChildProcess from "effect/process/ChildProcess";
 import * as Record from "effect/Record";
-import * as ChildProcess from "effect/unstable/process/ChildProcess";
 
 import { LocalDopplerCommandError } from "./local-doppler.schemas.js";
 

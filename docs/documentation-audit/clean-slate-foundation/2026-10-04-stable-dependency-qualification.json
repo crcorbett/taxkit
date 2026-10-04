@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-04",
+  "repository": "crcorbett/taxkit",
+  "cwd": "/workspace/taxkit",
+  "baseCommit": "771a506a071277f1f975672c4edaa9e32bf629b0",
+  "candidate": "DEV-73 stable dependency migration tracked diff; partial task, no application rebuild",
+  "authority": "Cooper implementation request; reviewable commit/draft PR only, no merge/deploy/publication",
+  "runtime": {
+    "bun": "1.4.2",
+    "node": "24.16.0",
+    "typescript": "7.0.2",
+    "effect": "4.0.0"
+  },
+  "configurationSha256": {
+    "package.json": "e3cf0030738854106ced91e85668027a1c023c0778b001b2cd454de22663eb3a",
+    "bun.lock": "90df1f71a74eee258397d73ae1e6330467d211cf8cdfa108816642d57e3f0ac6",
+    "tsconfig.base.json": "2d30ad24d1b9934bac40c66445274b6d18e96ac5d5e58a3e2ff8f28ab1cf6fff"
+  },
+  "checks": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-frozen.log",
+      "sha256": "b525e6d66c870cbf9fe9db75aad2849b31f88709ae36cc7eb2430c3e9525b770"
+    },
+    {
+      "command": "bun run test",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-test.log",
+      "sha256": "56a29f7629d1efd5e6bd7552e7931d72801420cb92cd1b1e626ad5f6c345c059"
+    },
+    {
+      "command": "bun run build",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-build.log",
+      "sha256": "d15088ce29c8016f876ce8e97cf90052f415fb1e122661ef9877003f4fbe9fc4"
+    },
+    {
+      "command": "bun run sdk:check-packed-artifact",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-packed.log",
+      "sha256": "4008ad99ac50c14d9b4886f7e5b604a193957cd4a85978c0168629f48aa19695"
+    },
+    {
+      "command": "bun run sdk:validate-downstream",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-downstream.log",
+      "sha256": "b42da0ac820cfc25735b0b4d475f8395722873b7eacc5d0af63910a3ec54ebd9"
+    },
+    {
+      "command": "bun run api:smoke",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-smoke.log",
+      "sha256": "4c00de7570e26fc6db613d07d13e55e90bf3187407f08f0e908dc828ecfd3eec"
+    },
+    {
+      "command": "bun run docs:test:browser",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-browser2.log",
+      "sha256": "9d136334776926afd2267cdce57b92737b7c8381694dbb855136fda2b1c16c55"
+    },
+    {
+      "command": "bun run --filter=docs test:cloudflare-built",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-built-browser4.log",
+      "sha256": "12930233351c9c951152f93e53c419c41cd5d1d71076fc92fe8b7371a1927070"
+    },
+    {
+      "command": "bun run changeset:status",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-changeset2.log",
+      "sha256": "c8fee168b69be4a0d6e61292e7f48c64dc833f7d48b53343aa20842cc414b35c"
+    },
+    {
+      "command": "bun run verification",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t002-verification12.log",
+      "sha256": "2892d0843c3d29f82dff16e7ecc9f6a34519d093a9464dd43908e5b4b7c3b8a1"
+    }
+  ],
+  "verification": "passed; docs-only evidence additions checked separately after this run",
+  "preservation": [
+    "No edits to core/calculator/rule implementations or their expected results",
+    "Committed OpenAPI snapshot unchanged",
+    "All three retained 2025\u201326 calculators remain present; current-law Medicare correction is a separate pending decision"
+  ],
+  "sourceComparison": {
+    "alchemy": "2.0.0-beta.80",
+    "commit": "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
+    "source": "https://registry.npmjs.org/alchemy/2.0.0-beta.80",
+    "LoggingCliChange": "only stable effect/cli/Prompt import versus beta.79",
+    "LoggingCliSha256": "9c5695fb83c4b024ad1bcc24f8f197d0a344e51dc9c99482571eee1a1f352eaf",
+    "NamespaceTreeSha256": "455126bd6198157aa0cb1a0ed45e8ca8eb00df5ab900b5c414f8b04fe79c418d",
+    "NamespaceTreeChange": "byte-identical to beta.79"
+  },
+  "retainedFailures": [
+    "Old language-service patch rejects TypeScript 7; migrated to upstream native @effect/tsgo",
+    "Initial diagnostic fixture was skipped under wrong plugin configuration name; corrected identifier and confirmed checked file",
+    "New upstream lint findings corrected without disabling rules",
+    "Concurrent repository lint encountered negative test fixtures; sequential run required",
+    "Browser expectations corrected for one upstream route warning instead of two",
+    "Built-Worker proof needed bounded Chromium cache and isolated Wrangler config paths",
+    "Built-Worker cleanup raced process exit and treated OS zombies as running; bounded wait now distinguishes them",
+    "Intentional negative type test updated for native Effect diagnostic directive syntax"
+  ],
+  "remaining": [
+    "Complete canonical skill adoption and strict enforcement",
+    "Integrate Atom/Scheduler fixture and narrow peer patch into repository qualification",
+    "DEV-74\u201381 implementation",
+    "Medicare correction scope decision for adad"
+  ],
+  "recovery": "Revert this slice and reinstall its parent frozen graph; no provider recovery needed",
+  "nonClaims": [
+    "Not completion of DEV-73",
+    "No merged, deployed, published or current-law Medicare-corrected candidate",
+    "Local Turbo cache reuse is recorded in command logs",
+    "Raw logs are environment-local; durable receipt retains bounded outcomes and hashes",
+    "Full application requirements and provider compatibility not proven"
+  ],
+  "atomScratch": {
+    "cwd": "/tmp/taxkit-atom-qualification",
+    "status": "two Chromium tests pass in isolated scratch, not yet integrated into repository gate",
+    "versions": {
+      "react": "19.3.0",
+      "react-dom": "19.3.0",
+      "effect": "4.0.0",
+      "@effect/atom-react": "4.0.0",
+      "scheduler": "0.28.0"
+    },
+    "patch": "Atom peer metadata only: >=0.25.0 <0.28.0 || 0.28.0",
+    "postconditions": [
+      "Scheduled callback executes; cancelled callback does not",
+      "SSR output hydrates without recoverable/uncaught errors",
+      "StrictMode runs resource effect twice with one registry identity",
+      "50 rapid updates produce expected final value",
+      "Resource finalizer executes once after provider disposal"
+    ],
+    "retainedFailure": "Initial fixture updated before hydration completed; corrected to await mount effect before update, retained failure log",
+    "sourceSha256": "db9d4a31bef282e1bbdf18146c9095fcebd247e52c44a4616419eec83e5dfad2",
+    "logSha256": "d6f2f6099892193b232c544be782aa40d83b5193d23b5e1f591e64b4572799cf",
+    "limitations": [
+      "Temporary fixture is not clean-clone runnable repository proof",
+      "No app lifetime or RPC cancellation qualified"
+    ]
+  }
+}

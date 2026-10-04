@@ -20,7 +20,7 @@ import {
   Schema,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
-import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
 
 import {
   readDocsDeploymentStateStoreCredentials,

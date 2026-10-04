@@ -77,3 +77,52 @@ revision will be named only after the affected package and downstream checks.
 Resume through the first incomplete task and retain failed-check evidence.
 Revert this slice to its starting Git source for local recovery; provider
 recovery remains separately governed by the retained deployment runbook.
+
+## T002 dependency migration (partial slice)
+
+The stable Effect migration is isolated on
+`codex/dev-73-stable-effect-qualification`, based on T001 commit
+`771a506a071277f1f975672c4edaa9e32bf629b0` ([draft PR 88](https://github.com/crcorbett/taxkit/pull/88)).
+T001 hosted Quality passed. T002 remains in progress: this dependency slice does
+not complete Atom/Scheduler lifecycle qualification, canonical skill adoption,
+or the full immutable/strict-policy migration required before T003.
+
+The graph uses Bun 1.4.2, TypeScript 7.0.2, stable Effect/platform 4.0.0, React
+19.3.0, Alchemy beta.80, Fumadocs 15.4.6/core 16.16.0, Vite 8.3.2, Vitest 5.0.3
+and Playwright 1.63.0. The native `@effect/tsgo` 0.48.0 tool patches TypeScript 7;
+its configuration must retain the upstream `@effect/language-service` identifier.
+A skipped diagnostic fixture was found and corrected during qualification.
+The two programmatic AST tools use the official TypeScript 6 compatibility API;
+the compiler remains TypeScript 7. Warnings/suggestions remain visible and
+errors remain fatal.
+
+The current Alchemy text adapter is bound to beta.80 commit
+`ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04`. Comparing the published beta.79 and
+beta.80 source shows the formatter's only change is the stable Effect Prompt
+import; NamespaceTree is byte-identical. Parser tests and deployment evidence
+checks execute locally. Historical beta.64 captures and hosted receipts remain
+unchanged. This does not qualify a fresh provider plan, bootstrap or deployment.
+
+The [Medicare scope conflict](../../documentation-audit/clean-slate-foundation/2026-10-04-medicare-scope-conflict.json)
+records primary legislation that disagrees with retained 2025–26 individual
+thresholds. Cooper was asked whether to authorise a separate source-backed
+correction. No tax result has changed while that decision remains pending.
+Adad DEV-68/69 must not treat retained-output preservation as current-law proof.
+
+| Affected surface | Decision | Evidence / limitation |
+| --- | --- | --- |
+| Manifests, lock, compiler, Effect imports and language tooling | Change required | Exact graph, native diagnostic gate, stable module paths; package/consumer checks. |
+| HTTP OpenAPI and all three calculators/rule packages | Preserve results/contracts | Existing golden tests and snapshot retained; Medicare accuracy conflict remains explicit. |
+| Fumadocs integration and generated route tree | Change required | Current plugin array contract and generator output; browser, SSR and built-Worker checks. |
+| Deployment parser and operational docs | Change required | Current beta.80 identity with source comparison and local tests; historical receipts preserved. |
+| Process/browser proof environment | Change required | Named browser-cache input, isolated Wrangler config/logs, bounded descendant exit check. No credentials forwarded. |
+| Knip and existing lint rules | Change required | Current dependency ownership and seven stricter upstream lint findings; this is not the complete T002 policy adoption. |
+| Changesets | Change required | Major fixed-train compatibility boundary in `stable-effect-toolchain.md`; no versions consumed or published. |
+| Canonical skills, complete strict enforcement, Atom lifecycle | Pending | Required remaining T002 work; downstream tasks remain queued. |
+
+Recovery for this slice is to revert its source/manifests/lock together and
+reinstall the previous frozen graph. No provider state is changed by that local
+recovery. Full application improvements DEV-74–81 remain unimplemented.
+
+The [partial qualification receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-stable-dependency-qualification.json)
+records the exact graph, command evidence, retained failures and pending work.

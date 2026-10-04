@@ -1,7 +1,7 @@
 import * as BunHttpServer from "@effect/platform-bun/BunHttpServer";
 import { TaxKitServerLayer } from "@taxkit/api-http/server";
 import { Effect, Layer } from "effect";
-import * as HttpRouter from "effect/unstable/http/HttpRouter";
+import * as HttpRouter from "effect/http/HttpRouter";
 
 import { ApiServerConfig, ApiServerConfigLive } from "./config.js";
 

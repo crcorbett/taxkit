@@ -1,7 +1,7 @@
 {
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/clean-slate-foundation.md",
-  "title": "Clean slate TaxKit foundation \u2014 implementation slices",
+  "title": "Clean slate TaxKit foundation — implementation slices",
   "status": "in_progress",
   "last_reviewed": "2026-10-04",
   "authority": "Cooper explicitly authorised implementation, reviewable commits and draft PRs on 2026-10-04. No merge, deploy or publication; provider-plan approval remains separate.",
@@ -297,7 +297,12 @@
         "Retained valid calculations produce unchanged golden results; breaking interfaces have an appropriate Changeset.",
         "No owned application, domain, test, script or infrastructure workflow retains forbidden mutation or imperative loops. Every necessary host construct has an exact owner/containment/test/removal record; copied reference templates do not provide an escape for executable owned code."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-stable-dependency-qualification.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-version-observations.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-medicare-scope-conflict.json"
+      ]
     },
     {
       "id": "CSF-T003",

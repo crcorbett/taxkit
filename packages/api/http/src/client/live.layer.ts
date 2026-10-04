@@ -1,5 +1,5 @@
 import { Layer } from "effect";
-import type { HttpClient } from "effect/unstable/http/HttpClient";
+import type { HttpClient } from "effect/http/HttpClient";
 
 import { createTaxKitApiClient } from "./index.js";
 import { TaxKitHttpApiService } from "./service.js";

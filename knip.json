@@ -38,7 +38,7 @@
         "tools/quality-workflow/**/*.ts",
         "tools/docs-deployment/**/*.ts"
       ],
-      "ignoreDependencies": ["typescript"]
+      "ignoreDependencies": ["typescript", "@effect/language-service"]
     },
     "apps/api": {
       "entry": ["src/index.ts"],

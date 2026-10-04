@@ -47,15 +47,16 @@ const destructuresBunHostMethod = (pattern) =>
       bunHostMethods.has(propertyName(property.key))
   );
 
+const isHostMethod = (semantic) =>
+  semantic?.startsWith("Global.Bun.") &&
+  bunHostMethods.has(semantic.slice("Global.Bun.".length));
+
 const noHostApiOutsideAdapters = {
   create(context) {
     const tracker = createBindingTracker(
       context.sourceCode,
       new Map([["Bun", "Global.Bun"]])
     );
-    const isHostMethod = (semantic) =>
-      semantic?.startsWith("Global.Bun.") &&
-      bunHostMethods.has(semantic.slice("Global.Bun.".length));
 
     return {
       AssignmentExpression(node) {

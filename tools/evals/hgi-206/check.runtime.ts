@@ -3,7 +3,7 @@ import * as BunServices from "@effect/platform-bun/BunServices";
 import { Array, Console, Effect, Match, Stream } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
-import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
+import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
 import {
   readHgi206Json,

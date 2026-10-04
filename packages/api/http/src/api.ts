@@ -1,4 +1,4 @@
-import { HttpApi, OpenApi } from "effect/unstable/httpapi";
+import { HttpApi, OpenApi } from "effect/http-api";
 
 import { CalculatorApiGroup } from "./groups/calculators.js";
 import { HealthGroup } from "./groups/health.js";

@@ -1,7 +1,13 @@
 {
-  "$schema": "./node_modules/@effect/language-service/schema.json",
+  "$schema": "./node_modules/@effect/tsgo/schema.json",
   "compilerOptions": {
-    "plugins": [{ "name": "@effect/language-service" }],
+    "plugins": [
+      {
+        "name": "@effect/language-service",
+        "ignoreEffectSuggestionsInTscExitCode": true,
+        "ignoreEffectWarningsInTscExitCode": true
+      }
+    ],
     "target": "ES2024",
     "module": "ES2022",
     "moduleResolution": "bundler",

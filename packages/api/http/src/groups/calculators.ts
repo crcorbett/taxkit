@@ -22,7 +22,7 @@ import {
   HttpApiGroup,
   HttpApiSchema,
   OpenApi,
-} from "effect/unstable/httpapi";
+} from "effect/http-api";
 
 export {
   CalculatorCatalog,

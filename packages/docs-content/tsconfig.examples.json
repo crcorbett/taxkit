@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "baseUrl": ".",
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "noEmit": true,
@@ -26,9 +25,6 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2024",
-    "typeRoots": [
-      "../../node_modules/.bun/@types+bun@1.3.14/node_modules/@types"
-    ],
     "types": ["bun"]
   },
   "include": ["examples/**/*.ts"]

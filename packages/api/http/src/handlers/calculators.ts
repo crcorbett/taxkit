@@ -8,7 +8,7 @@ import {
 import { calculateRunRequest as calculateSdkRunRequest } from "@taxkit/sdk/effect";
 import type { AnySdkCalculation } from "@taxkit/sdk/effect";
 import { Array, Effect, HashMap, Option, Schema } from "effect";
-import { HttpApiBuilder } from "effect/unstable/httpapi";
+import { HttpApiBuilder } from "effect/http-api";
 
 import { TaxKitApi } from "../api.js";
 import { CalculatorApiErrorEnvelopeData } from "../groups/calculators.js";

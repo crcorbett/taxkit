@@ -480,6 +480,13 @@ const noBareEffectTryPromise = {
   },
 };
 
+const taggedErrorConstructorSemantics = new Set([
+  "Data.TaggedError",
+  "Schema.TaggedError",
+  "effect.Data.TaggedError",
+  "effect.Schema.TaggedError",
+]);
+
 const hasTaggedErrorCallAncestor = (node, tracker) => {
   let current = node?.parent;
 
@@ -511,13 +518,6 @@ const isUnknownCauseProperty = (node) => {
     propertyName(current.key) === "cause"
   );
 };
-
-const taggedErrorConstructorSemantics = new Set([
-  "Data.TaggedError",
-  "Schema.TaggedError",
-  "effect.Data.TaggedError",
-  "effect.Schema.TaggedError",
-]);
 
 const unknownSchemaSemantics = new Set([
   "Schema.Unknown",
@@ -699,25 +699,25 @@ const runtimeFunctionNodeTypes = new Set([
   "FunctionExpression",
 ]);
 
+const isModuleLevel = (node) => {
+  let current = node.parent;
+  while (current && current.type !== "Program") {
+    if (runtimeFunctionNodeTypes.has(current.type)) {
+      return false;
+    }
+    if (
+      current.type === "TSModuleDeclaration" &&
+      (current.declare || current.global || current.id?.name === "global")
+    ) {
+      return false;
+    }
+    current = current.parent;
+  }
+  return current?.type === "Program";
+};
+
 const noModuleLevelMutableTestState = {
   create(context) {
-    const isModuleLevel = (node) => {
-      let current = node.parent;
-      while (current && current.type !== "Program") {
-        if (runtimeFunctionNodeTypes.has(current.type)) {
-          return false;
-        }
-        if (
-          current.type === "TSModuleDeclaration" &&
-          (current.declare || current.global || current.id?.name === "global")
-        ) {
-          return false;
-        }
-        current = current.parent;
-      }
-      return current?.type === "Program";
-    };
-
     return {
       VariableDeclaration(node) {
         if (node.kind !== "const" && isModuleLevel(node)) {
