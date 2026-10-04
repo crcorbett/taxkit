@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43GBGNTZ3MJX2634J0WVE0H",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T13:06:24.02592Z",
+  "branch": "codex/dev-73-infrastructure-native-tests",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".changeset/readonly-infrastructure-memo.md",
+    "docs/architecture/package-ownership.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/standards/versioning.md",
+    "oxlint.config.ts",
+    "packages/infrastructure/README.md",
+    "packages/infrastructure/src/cloudflare/website.test.ts",
+    "packages/infrastructure/src/stack.ts",
+    "tools/docs-deployment/alchemy-memo.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "b7d70ba853ae",
+  "checkpoint_transcript_start": 10035,
+  "transcript_lines_at_start": 10035,
+  "compact_transcript_start": 1234,
+  "token_usage": {
+    "input_tokens": 167660,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 7966080,
+    "output_tokens": 42707,
+    "api_call_count": 54
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T13:06:23.253561Z",
+    "agent_lines": 114,
+    "agent_removed": 45,
+    "human_added": 244,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 358,
+    "total_lines_changed": 406,
+    "agent_percentage": 39.16256157635468,
+    "metric_version": 2
+  }
+}
