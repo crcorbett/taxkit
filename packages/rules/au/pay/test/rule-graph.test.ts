@@ -14,11 +14,12 @@ import {
   AuTakeHomePayWithSacrificeRuleDescriptors,
   PaygWithholdingRuleDescriptor,
 } from "@taxkit/rules-au-pay/rule-pack";
+import { Array as EffectArray } from "effect";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
-  rules.map((rule) => ({
+  EffectArray.map(rules, (rule) => ({
     id: rule.id,
-    parameters: (rule.parameters ?? []).map((parameter) => ({
+    parameters: EffectArray.map(rule.parameters ?? [], (parameter) => ({
       effectivePeriod: parameter.effectivePeriod,
       id: parameter.id,
       source: parameter.source.kind,
@@ -30,9 +31,9 @@ const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
           }
         : undefined,
     })),
-    provides: rule.provides.map((fact) => fact.id),
-    requires: rule.requires.map((fact) => fact.id),
-    sources: rule.sources.map((source) => source.kind),
+    provides: EffectArray.map(rule.provides, (fact) => fact.id),
+    requires: EffectArray.map(rule.requires, (fact) => fact.id),
+    sources: EffectArray.map(rule.sources, (source) => source.kind),
   }));
 
 describe("AU take-home pay rule graph", () => {
@@ -207,7 +208,9 @@ describe("AU take-home pay rule graph", () => {
       rules: AuTakeHomePayRuleDescriptors,
     });
 
-    expect(issues.map((issue) => issue.kind)).toContain("missing-provider");
+    expect(EffectArray.map(issues, (issue) => issue.kind)).toContain(
+      "missing-provider"
+    );
   });
 
   it("surfaces caller question metadata on input fact descriptors", () => {
@@ -239,7 +242,7 @@ describe("AU take-home pay rule graph", () => {
       ],
     });
 
-    expect(issues.map((issue) => issue.kind)).toContain(
+    expect(EffectArray.map(issues, (issue) => issue.kind)).toContain(
       "parameter-source-mismatch"
     );
   });
@@ -274,6 +277,8 @@ describe("AU take-home pay rule graph", () => {
       ],
     });
 
-    expect(issues.map((issue) => issue.kind)).toContain("parameter-overlap");
+    expect(EffectArray.map(issues, (issue) => issue.kind)).toContain(
+      "parameter-overlap"
+    );
   });
 });

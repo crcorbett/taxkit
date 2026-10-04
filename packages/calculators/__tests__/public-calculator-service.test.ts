@@ -7,7 +7,7 @@ import {
   GrossPay,
 } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
-import { Cause, Effect, Exit, Layer } from "effect";
+import { Array as EffectArray, Cause, Effect, Exit, Layer } from "effect";
 
 import { PublicCalculatorServiceLive } from "../src/live.layer.js";
 import { PublicCalculatorService } from "../src/service.js";
@@ -194,7 +194,7 @@ describe("PublicCalculatorService", () => {
       expect(Exit.isFailure(exit)).toBe(true);
       if (Exit.isFailure(exit)) {
         const failure = expectAt(
-          exit.cause.reasons.filter(Cause.isFailReason),
+          EffectArray.filter(exit.cause.reasons, Cause.isFailReason),
           0
         );
 
@@ -231,7 +231,7 @@ describe("PublicCalculatorService", () => {
         expect(Exit.isFailure(exit)).toBe(true);
         if (Exit.isFailure(exit)) {
           const failure = expectAt(
-            exit.cause.reasons.filter(Cause.isFailReason),
+            EffectArray.filter(exit.cause.reasons, Cause.isFailReason),
             0
           );
           const rendered = JSON.stringify(failure.error);

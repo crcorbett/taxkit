@@ -26,7 +26,7 @@
       "outcome": "passed, including web:test:browser and its two real Chromium tests"
     },
     {
-      "command": "bun run check:types --filter=web",
+      "command": "bun run --filter=web check-types",
       "outcome": "passed; diagnostic warnings remain visible"
     }
   ],

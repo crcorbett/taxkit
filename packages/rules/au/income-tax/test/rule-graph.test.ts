@@ -3,11 +3,12 @@ import { validateRuleGraph } from "@taxkit/core/graph";
 import type { AnyRuleDescriptor } from "@taxkit/core/rules";
 import { AnnualTaxableIncomeDescriptor } from "@taxkit/rules-au-income-tax/facts";
 import { AuAnnualTaxRuleDescriptors } from "@taxkit/rules-au-income-tax/rule-pack";
+import { Array as EffectArray } from "effect";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
-  rules.map((rule) => ({
+  EffectArray.map(rules, (rule) => ({
     id: rule.id,
-    parameters: (rule.parameters ?? []).map((parameter) => ({
+    parameters: EffectArray.map(rule.parameters ?? [], (parameter) => ({
       effectivePeriod: parameter.effectivePeriod,
       id: parameter.id,
       source: parameter.source.kind,
@@ -19,9 +20,9 @@ const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
           }
         : undefined,
     })),
-    provides: rule.provides.map((fact) => fact.id),
-    requires: rule.requires.map((fact) => fact.id),
-    sources: rule.sources.map((source) => source.kind),
+    provides: EffectArray.map(rule.provides, (fact) => fact.id),
+    requires: EffectArray.map(rule.requires, (fact) => fact.id),
+    sources: EffectArray.map(rule.sources, (source) => source.kind),
   }));
 
 describe("AU annual tax rule graph", () => {

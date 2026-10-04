@@ -15,7 +15,7 @@ import {
   MedicareLevyRuleId,
 } from "@taxkit/rules-au-income-tax";
 import { expectAt } from "@taxkit/testing";
-import { Effect, Exit, Layer } from "effect";
+import { Array as EffectArray, Effect, Exit, Layer } from "effect";
 
 const runScenario = (incomeDollars: number) =>
   Effect.gen(function* () {
@@ -199,16 +199,19 @@ describe("AU annual income tax calculator (2025-26)", () => {
         const report = yield* runScenario(80_000);
 
         expect({
-          ledger: report.ledger.components.map((component) => ({
+          ledger: EffectArray.map(report.ledger.components, (component) => ({
             cents: component.amount.cents,
             effect: component.effect,
             id: component.id,
             status: component.status,
           })),
-          traceChildren: report.trace.children.map((child) => ({
+          traceChildren: EffectArray.map(report.trace.children, (child) => ({
             rounding: child.rounding,
             ruleId: child.ruleId,
-            sourceKinds: child.sources.map((source) => source.kind),
+            sourceKinds: EffectArray.map(
+              child.sources,
+              (source) => source.kind
+            ),
           })),
           traceRoot: report.trace.ruleId,
         }).toEqual({

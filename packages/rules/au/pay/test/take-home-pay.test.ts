@@ -16,7 +16,7 @@ import {
 } from "@taxkit/rules-au-pay";
 import type { TakeHomeScenarioInput } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
-import { Effect, Exit, Layer } from "effect";
+import { Array as EffectArray, Effect, Exit, Layer } from "effect";
 
 const runScenario = (
   pack: typeof AuTakeHomePay2025_26_Live,
@@ -103,21 +103,30 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         });
 
         expect({
-          explanationOrder: report.trace.children.map((child) => ({
-            children: child.children.map((grandchild) => ({
-              children: grandchild.children.map((leaf) => leaf.ruleId),
+          explanationOrder: EffectArray.map(report.trace.children, (child) => ({
+            children: EffectArray.map(child.children, (grandchild) => ({
+              children: EffectArray.map(
+                grandchild.children,
+                (leaf) => leaf.ruleId
+              ),
               rounding: grandchild.rounding,
               ruleId: grandchild.ruleId,
-              sourceKinds: grandchild.sources.map((source) => source.kind),
+              sourceKinds: EffectArray.map(
+                grandchild.sources,
+                (source) => source.kind
+              ),
             })),
             ruleId: child.ruleId,
           })),
-          ledger: report.withholdings.components.map((component) => ({
-            cents: component.amount.cents,
-            effect: component.effect,
-            id: component.id,
-            status: component.status,
-          })),
+          ledger: EffectArray.map(
+            report.withholdings.components,
+            (component) => ({
+              cents: component.amount.cents,
+              effect: component.effect,
+              id: component.id,
+              status: component.status,
+            })
+          ),
           root: report.trace.ruleId,
         }).toEqual({
           explanationOrder: [

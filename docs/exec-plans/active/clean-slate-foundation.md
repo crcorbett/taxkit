@@ -172,3 +172,27 @@ and a gate, without a shipped package or app feature change. Revert this slice
 and reinstall the parent frozen graph for recovery.
 
 The [Atom qualification receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-atom-qualification.json) records the exact graph, bounded peer patch and passing full verification.
+
+## T002 immutable domain migration
+
+Replace mutable graph construction with a checked-index immutable Graph snapshot,
+Medicare local reassignment with Match, and native array traversal with Effect
+Array operations in rules and calculator tests. Tax tables, branching boundaries,
+rounding, ledger order and trace formula strings remain unchanged. The pending
+Medicare policy decision is independent of this behaviour-preserving migration.
+
+Enable the canonical immutable-collections rule across core, all rule packages
+and calculators, including tests. Actual Oxlint binary positive and negative
+fixtures cover those three path families. This is incremental enforcement:
+other strict rules and owned app/tool/config paths remain T002 work, and DEV-73
+is not complete. There are no new exemptions or disabled existing rules.
+
+Documentation impact: **Change required** for the lint gate, regression fixture,
+this progress owner and the package Changeset. **Preserve** all tax results,
+public contracts and historical provenance. **N/A** for provider operations.
+Recover by reverting this complete slice; no external state changes.
+
+Verification on 4 October: frozen install, root tests (including all three
+retained calculator golden suites and 46 Oxlint tests), type checks, build and
+full verification passed. Existing visible upstream diagnostic warnings remain
+non-fatal. No snapshots, tax tables or source artifact records were changed.

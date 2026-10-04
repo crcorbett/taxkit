@@ -380,6 +380,11 @@ export default defineConfig({
     "tools/oxlint/anti-slop/**",
   ],
   jsPlugins: [
+    {
+      name: "strict-effect",
+      specifier:
+        "./.agents/skills/strict-effect-ts/assets/oxlint/effect-policy.ts",
+    },
     "./tools/oxlint/bun-rules.js",
     "./tools/oxlint/effect-rules.js",
     "./tools/oxlint/mdx-rules.js",
@@ -395,6 +400,16 @@ export default defineConfig({
     },
   ],
   overrides: [
+    {
+      // DEV-73 incremental adoption: immutable domain construction and tests.
+      // Remaining strict rules and owned paths stay explicitly pending in T002.
+      files: [
+        "packages/core/**",
+        "packages/rules/**",
+        "packages/calculators/**",
+      ],
+      rules: { "strict-effect/no-imperative-collections": "error" },
+    },
     {
       files: ["**/*.{ts,tsx,mts,cts}"],
       rules: {

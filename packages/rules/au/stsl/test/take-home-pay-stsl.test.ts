@@ -24,7 +24,7 @@ import {
   StslDebtFact,
 } from "@taxkit/rules-au-stsl";
 import { expectAt } from "@taxkit/testing";
-import { Effect, Layer } from "effect";
+import { Array as EffectArray, Effect, Layer } from "effect";
 
 const weekly1500 = new GrossPay({ amount: audDollars(1500), period: "weekly" });
 const weekly1800 = new GrossPay({ amount: audDollars(1800), period: "weekly" });
@@ -173,16 +173,23 @@ describe("AU take-home pay with STSL", () => {
       const report = yield* stslScenario(weekly1500, stslEnabled);
 
       expect({
-        ledger: report.withholdings.components.map((component) => ({
-          cents: component.amount.cents,
-          id: component.id,
-          status: component.status,
-        })),
-        ledgerChildren: expectAt(report.trace.children, 0).children.map(
+        ledger: EffectArray.map(
+          report.withholdings.components,
+          (component) => ({
+            cents: component.amount.cents,
+            id: component.id,
+            status: component.status,
+          })
+        ),
+        ledgerChildren: EffectArray.map(
+          expectAt(report.trace.children, 0).children,
           (child) => ({
             rounding: child.rounding,
             ruleId: child.ruleId,
-            sourceKinds: child.sources.map((source) => source.kind),
+            sourceKinds: EffectArray.map(
+              child.sources,
+              (source) => source.kind
+            ),
           })
         ),
         root: report.trace.ruleId,

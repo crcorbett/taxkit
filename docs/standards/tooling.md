@@ -342,3 +342,12 @@ home or checkout paths. Use repository-relative links, repository identities or
 pinned HTTPS references in tracked text. Portable tool state such as
 `~/.portless` remains valid. Findings deliberately contain only file, line and
 category so local usernames and matched content cannot leak into logs.
+
+## Incremental clean-slate enforcement
+
+DEV-73 currently enforces the canonical strict Effect immutable-collections rule
+in core, rules and calculators, including their tests. Positive/negative actual
+Oxlint fixtures cover each family; lint and fixture caches explicitly include
+the canonical plugin asset. The remaining ten strict rules and remaining owned
+paths are pending in T002. Existing repository rules continue to apply; this
+partial adoption is not repository-wide strict-compliance evidence.

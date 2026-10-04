@@ -1,7 +1,7 @@
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import { aud, multiplyCentsByDecimal } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { BigDecimal, Effect, Layer } from "effect";
+import { BigDecimal, Effect, Layer, Match } from "effect";
 
 import { MedicareLevyComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
@@ -42,22 +42,29 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
 
     const incomeCents = income.income.cents;
 
-    let levyCents: number;
-    let formula: string;
-
-    if (incomeCents <= table.thresholdCents) {
-      levyCents = 0;
-      formula = "levy = 0 (below threshold)";
-    } else if (incomeCents <= table.shadeInMaxCents) {
-      levyCents = multiplyCentsByDecimal(
-        incomeCents - table.thresholdCents,
-        table.shadeInRate
-      );
-      formula = "levy = round(shadeInRate * (income - threshold))";
-    } else {
-      levyCents = multiplyCentsByDecimal(incomeCents, table.levyRate);
-      formula = "levy = round(levyRate * income)";
-    }
+    const { levyCents, formula } = Match.value(incomeCents).pipe(
+      Match.when(
+        (cents) => cents <= table.thresholdCents,
+        () => ({
+          formula: "levy = 0 (below threshold)",
+          levyCents: 0,
+        })
+      ),
+      Match.when(
+        (cents) => cents <= table.shadeInMaxCents,
+        (cents) => ({
+          formula: "levy = round(shadeInRate * (income - threshold))",
+          levyCents: multiplyCentsByDecimal(
+            cents - table.thresholdCents,
+            table.shadeInRate
+          ),
+        })
+      ),
+      Match.orElse((cents) => ({
+        formula: "levy = round(levyRate * income)",
+        levyCents: multiplyCentsByDecimal(cents, table.levyRate),
+      }))
+    );
 
     const levyAmount = aud(levyCents);
     const status = levyCents === 0 ? "zeroed" : "active";

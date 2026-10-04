@@ -104,37 +104,39 @@ const collectParameters = (
 const buildDependencyGraph = (
   rules: readonly AnyRuleDescriptor[],
   providers: HashMap.HashMap<FactId, readonly AnyRuleDescriptor[]>
-): Graph.DirectedGraph<FactId, string> =>
-  Graph.directed<FactId, string>((mutable) => {
-    let nodeIndices = HashMap.empty<FactId, Graph.NodeIndex>();
-
-    for (const key of HashMap.keys(providers)) {
-      nodeIndices = HashMap.set(nodeIndices, key, Graph.addNode(mutable, key));
-    }
-
-    for (const rule of rules) {
-      for (const required of rule.requires) {
-        const requiredKey = factKey(required);
-        const sourceIndex = HashMap.get(nodeIndices, requiredKey);
-        if (Option.isNone(sourceIndex)) {
-          continue;
-        }
-
-        for (const provided of rule.provides) {
-          const providedKey = factKey(provided);
-          const targetIndex = HashMap.get(nodeIndices, providedKey);
-          if (Option.isSome(targetIndex)) {
-            Graph.addEdge(
-              mutable,
-              sourceIndex.value,
-              targetIndex.value,
-              `${requiredKey} -> ${providedKey}`
-            );
-          }
-        }
-      }
-    }
+): Graph.DirectedGraph<FactId, string> => {
+  const nodes = Array.map(
+    Array.fromIterable(HashMap.keys(providers)),
+    (data, index) => ({ data, index })
+  );
+  const nodeIndices = HashMap.fromIterable(
+    Array.map(nodes, ({ data, index }) => [data, index] as const)
+  );
+  return Graph.fromSnapshot({
+    edges: Array.map(
+      Array.flatMap(rules, (rule) =>
+        Array.flatMap(rule.requires, (required) =>
+          Array.flatMap(rule.provides, (provided) =>
+            Option.all([
+              HashMap.get(nodeIndices, factKey(required)),
+              HashMap.get(nodeIndices, factKey(provided)),
+            ]).pipe(
+              Option.map(([source, target]) => ({
+                data: `${factKey(required)} -> ${factKey(provided)}`,
+                source,
+                target,
+              })),
+              Option.toArray
+            )
+          )
+        )
+      ),
+      (edge, index) => ({ ...edge, index })
+    ),
+    nodes,
+    type: "directed",
   });
+};
 
 /**
  * Validates that selected rule descriptors can be composed for input facts.

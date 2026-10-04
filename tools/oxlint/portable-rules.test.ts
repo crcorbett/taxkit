@@ -14,6 +14,9 @@ const generatedFixtures = [
   "tools/oxlint/fixtures/.generated-mdx-rejected.tsx",
   "tools/oxlint/fixtures/.generated-anti-slop-effect-rejected.ts",
   "apps/web/src/.generated-package-rejected.ts",
+  "packages/core/src/.generated-strict-rejected.ts",
+  "packages/rules/au/pay/test/.generated-strict-rejected.ts",
+  "packages/calculators/__tests__/.generated-strict-rejected.ts",
 ] as const;
 
 const antiSlopRules = [
@@ -35,6 +38,29 @@ const antiSlopRules = [
 ] as const;
 
 const fixtureCases = [
+  {
+    accepted: ["packages/core/src/graph/rule-graph.ts"],
+    generated: "packages/core/src/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: ["no-imperative-collections"],
+  },
+  {
+    accepted: ["packages/rules/au/pay/test/rule-graph.test.ts"],
+    generated: "packages/rules/au/pay/test/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: ["no-imperative-collections"],
+  },
+  {
+    accepted: [
+      "packages/calculators/__tests__/public-calculator-service.test.ts",
+    ],
+    generated: "packages/calculators/__tests__/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: ["no-imperative-collections"],
+  },
   {
     accepted: [
       "tools/oxlint/fixtures/effect-accepted.ts",
