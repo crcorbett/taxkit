@@ -1,0 +1,41 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43QJDEW0ZYXPBX3AS7VPRT3",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T15:12:29.279261Z",
+  "branch": "codex/dev-73-native-built-worker-proof",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/docs/scripts/cloudflare-built-browser.live.test.ts",
+    "apps/docs/scripts/cloudflare-built-browser.live.ts",
+    "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
+    "apps/docs/scripts/cloudflare-built-proof.live.layer.test.ts",
+    "apps/docs/scripts/cloudflare-built-proof.live.layer.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "b7d70ba853ae",
+  "checkpoint_transcript_start": 12134,
+  "transcript_lines_at_start": 12134,
+  "compact_transcript_start": 1484,
+  "token_usage": {
+    "input_tokens": 348905,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 17705600,
+    "output_tokens": 94339,
+    "api_call_count": 122
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T15:12:28.505871Z",
+    "agent_lines": 2517,
+    "agent_removed": 0,
+    "human_added": 1046,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 3563,
+    "total_lines_changed": 4733,
+    "agent_percentage": 53.1798013944644,
+    "metric_version": 2
+  }
+}
