@@ -1,49 +1,59 @@
-import { aud } from "@taxkit/core/primitives";
+import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { CalculationEngineLive } from "@taxkit/core";
+import { aud, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
-import { au } from "@taxkit/sdk/au";
-import { Data, Effect, Schema } from "effect";
+import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import { calculateReport } from "@taxkit/sdk/effect";
+import { Effect, Layer, Schema } from "effect";
+import * as HttpServerRequest from "effect/http/HttpServerRequest";
 
-class PayPreviewRequestError extends Data.TaggedError(
-  "PayPreviewRequestError"
-)<{
-  readonly cause: unknown;
-}> {}
-
-class PayPreviewCalculationError extends Data.TaggedError(
-  "PayPreviewCalculationError"
-)<{
-  readonly cause: unknown;
-}> {}
+class PayPreviewRequestError extends Schema.TaggedError<PayPreviewRequestError>()(
+  "PayPreviewRequestError",
+  { message: Schema.String }
+) {}
 
 const PayPreviewRequest = Schema.Struct({
-  grossPayCents: Schema.Number,
-  period: Schema.Literals(["fortnightly", "monthly", "weekly"]),
+  grossPayCents: Cents,
+  period: GrossPay.fields.period,
   taxFreeThresholdClaimed: Schema.Boolean,
 });
 
+const PayPreviewResponse = Schema.Struct({
+  netPayCents: Cents,
+  withholdingsCents: Cents,
+});
+
+const TaxKitLayer = PublicCalculatorServiceLive.pipe(
+  Layer.provide(CalculationEngineLive)
+);
+
 export const handlePayPreview = (request: Request) =>
   Effect.gen(function* () {
-    const body = yield* Effect.tryPromise({
-      catch: (cause) => new PayPreviewRequestError({ cause }),
-      try: () => request.json(),
-    }).pipe(
-      Effect.flatMap(Schema.decodeUnknownEffect(PayPreviewRequest)),
-      Effect.mapError((cause) => new PayPreviewRequestError({ cause }))
+    const body = yield* HttpServerRequest.fromWeb(request).text.pipe(
+      Effect.flatMap(
+        Schema.decodeEffect(Schema.fromJsonString(PayPreviewRequest))
+      ),
+      Effect.mapError(
+        () =>
+          new PayPreviewRequestError({
+            message: "Invalid pay preview request.",
+          })
+      )
     );
-    const report = yield* Effect.tryPromise({
-      catch: (cause) => new PayPreviewCalculationError({ cause }),
-      try: () =>
-        au.pay.takeHomePay({
-          grossPay: new GrossPay({
-            amount: aud(body.grossPayCents),
-            period: body.period,
-          }),
-          taxFreeThresholdClaimed: body.taxFreeThresholdClaimed,
-        }),
+    const report = yield* calculateReport(AuPayTakeHomeCalculation, {
+      grossPay: new GrossPay({
+        amount: aud(body.grossPayCents),
+        period: body.period,
+      }),
+      taxFreeThresholdClaimed: body.taxFreeThresholdClaimed,
     });
-
-    return Response.json({
+    const response = yield* Schema.encodeEffect(
+      Schema.fromJsonString(PayPreviewResponse)
+    )({
       netPayCents: report.netPay.cents,
       withholdingsCents: report.withholdingsTotal.cents,
     });
-  });
+    return new Response(response, {
+      headers: { "content-type": "application/json" },
+    });
+  }).pipe(Effect.provide(TaxKitLayer));

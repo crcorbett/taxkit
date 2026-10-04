@@ -24,7 +24,7 @@ export const effectSchemaToStandardSchema = <
 export const transformerCodeBlockMeta = (): ShikiTransformer => ({
   name: "taxkit:docs-code-block-meta",
   pre(node) {
-    applyCodeBlockMeta(node, this.options);
+    return applyCodeBlockMeta(node, this.options);
   },
 });
 

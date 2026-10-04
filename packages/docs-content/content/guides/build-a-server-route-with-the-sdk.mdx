@@ -25,30 +25,65 @@ TaxKit for the calculation.
 ## Example
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { CalculationEngineLive } from "@taxkit/core";
+import { aud, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
-import { au } from "@taxkit/sdk/au";
+import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import { calculateReport } from "@taxkit/sdk/effect";
+import { Effect, Layer, Schema } from "effect";
+import * as HttpServerRequest from "effect/http/HttpServerRequest";
 
-export const handlePayPreview = async (request: Request): Promise<Response> => {
-  const body = (await request.json()) as {
-    grossPayCents: number;
-    period: "weekly" | "fortnightly" | "monthly";
-    taxFreeThresholdClaimed: boolean;
-  };
+class PayPreviewRequestError extends Schema.TaggedError<PayPreviewRequestError>()(
+  "PayPreviewRequestError",
+  { message: Schema.String }
+) {}
 
-  const report = await au.pay.takeHomePay({
-    grossPay: new GrossPay({
-      amount: aud(body.grossPayCents),
-      period: body.period,
-    }),
-    taxFreeThresholdClaimed: body.taxFreeThresholdClaimed,
-  });
+const PayPreviewRequest = Schema.Struct({
+  grossPayCents: Cents,
+  period: GrossPay.fields.period,
+  taxFreeThresholdClaimed: Schema.Boolean,
+});
 
-  return Response.json({
-    netPayCents: report.netPay.cents,
-    withholdingsCents: report.withholdingsTotal.cents,
-  });
-};
+const PayPreviewResponse = Schema.Struct({
+  netPayCents: Cents,
+  withholdingsCents: Cents,
+});
+
+const TaxKitLayer = PublicCalculatorServiceLive.pipe(
+  Layer.provide(CalculationEngineLive)
+);
+
+export const handlePayPreview = (request: Request) =>
+  Effect.gen(function* () {
+    const body = yield* HttpServerRequest.fromWeb(request).text.pipe(
+      Effect.flatMap(
+        Schema.decodeEffect(Schema.fromJsonString(PayPreviewRequest))
+      ),
+      Effect.mapError(
+        () =>
+          new PayPreviewRequestError({
+            message: "Invalid pay preview request.",
+          })
+      )
+    );
+    const report = yield* calculateReport(AuPayTakeHomeCalculation, {
+      grossPay: new GrossPay({
+        amount: aud(body.grossPayCents),
+        period: body.period,
+      }),
+      taxFreeThresholdClaimed: body.taxFreeThresholdClaimed,
+    });
+    const response = yield* Schema.encodeEffect(
+      Schema.fromJsonString(PayPreviewResponse)
+    )({
+      netPayCents: report.netPay.cents,
+      withholdingsCents: report.withholdingsTotal.cents,
+    });
+    return new Response(response, {
+      headers: { "content-type": "application/json" },
+    });
+  }).pipe(Effect.provide(TaxKitLayer));
 ```
 
 ## Verify the result
@@ -71,9 +106,11 @@ Expected response:
 
 ## Handle errors
 
-Use `TaxKit.safe.calculate` if your route should return expected failures
-without a thrown Promise rejection. Map the safe failure to your application's
-HTTP status and response shape.
+The handler returns an Effect. Your server host owns execution and maps the
+typed failure channel to its HTTP status and response shape. Invalid JSON,
+fractional cents and unsupported periods fail request validation before the
+calculator runs. Provider or request details are not included in the safe
+request error.
 
 ## Related pages
 

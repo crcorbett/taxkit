@@ -357,3 +357,35 @@ records passing focused tests (11 path, 15 governance), 70 real CLI lint cases,
 all repository tests, full verification and build. The refreshed provisional
 inventory reports 1,550 strict diagnostics before additional host/fixture
 qualification; this is not a confirmed defect count or whole-repository acceptance.
+
+## T002 docs adapters and checked examples
+
+Extend all eleven canonical strict rules to docs-content and docs-fumadocs.
+Generated collection operations return Effects; the private processed-text
+boundary preserves receiver identity and redacts SDK failures. The Fumadocs
+live Layer owns representation decoding. Shiki consumes immutable replacement
+nodes. Fumadocs MDX configuration is synchronous in the installed version and
+needs no Promise or runtime admission. Only the validation executable retains
+an exact runtime admission, checked by real CLI cases and a configuration test.
+
+The browser example uses the typed API client and takes an explicit URL. The
+server example validates canonical cents/period request fields and calls the
+native Effect SDK. Align both draft guides with the checked files, retaining
+all documented calculator results and draft lifecycle. Add request rejection,
+retained-result, processed-text receiver and secret-redaction tests.
+
+Documentation impact: **Change required** for both package READMEs, public
+examples/guides, generated-collection architecture, strict fixture scope,
+Changeset and this plan. **Preserve** tax rules/results, published-status
+records, OpenAPI and provider state. **N/A** for operational runbook changes:
+no deployment or release procedure changes. Initial full verification caught
+missing Knip example entries; include examples rather than ignore dependencies.
+The local workerd proof passed but exposed hard-coded old dependency versions
+in its receipt. Read installed manifests (including Wrangler’s resolved workerd)
+at the harness owner and rerun before retaining the evidence. No historical
+receipt is rewritten. Recover by reverting this complete slice.
+
+The [docs-adapter receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-docs-adapter-boundaries.json)
+records frozen install, all tests (75 lint and 13 docs-content), full verification,
+build and the corrected local workerd proof. Its observed dependency versions
+come from installed manifests. This is not provider or whole-T002 acceptance.

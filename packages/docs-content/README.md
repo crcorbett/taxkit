@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: package-root
-confidence: high
+document_type: package-guide
+lifecycle: current
+authority: canonical
+owner: repository-maintainers
+last_reviewed: 2026-10-04
+review_trigger: package contracts or generated-source boundaries change
 ---
 
 # @taxkit/docs-content
@@ -72,11 +74,24 @@ instead of importing `.source/*` files directly. Browser modules must not
 import `@taxkit/docs-content/server`.
 
 The generated Fumadocs loader retains a `getText("raw")` filesystem branch,
-but the runtime adapter requests only `getText("processed")`. The validation
+but the runtime adapter requests only `getText("processed")`. Its private
+`generated-page.boundary.ts` owns the named text read, preserves the SDK method
+receiver and maps rejections to a safe tagged error. Raw representations are
+decoded once by the Fumadocs live Layer. The SDK offers no abort signal for
+this read; interrupting its awaiting Effect does not prove provider cancellation. The validation
 policy remains Node-only and is dynamically imported only by
 `validateContent`. Normal docs requests must not initialize either filesystem
 operation; `apps/docs` owns the isolated workerd failure oracle for that
 boundary.
+
+## Checked examples
+
+The browser HTTP example accepts an explicit `URL` and calls the typed API
+client through `FetchHttpClient.layer`; it has no implicit server or environment
+lookup. The server example Schema-decodes the request using canonical cents and
+period fields, invokes the native Effect SDK, and Schema-encodes its response.
+Both export programs for an application-owned host. Tests preserve the
+documented weekly pay result and reject invalid representations.
 
 ## Frontmatter contract
 

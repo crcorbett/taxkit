@@ -29,8 +29,7 @@ export const CodeBlockBody = ({ children, ...props }: CodeBlockBodyProps) =>
   createElement("div", { ...props, "data-slot": "code-block-body" }, children);
 
 export const Pre = ({ children, ...props }: PreProps) => {
-  const title = props["data-title"];
-  const language = props["data-language"];
+  const { "data-title": title, "data-language": language } = props;
   const label = Option.fromUndefinedOr(title).pipe(
     Option.orElse(() => Option.fromUndefinedOr(language))
   );

@@ -87,6 +87,42 @@ const fixtureCases = [
     ],
   },
   {
+    accepted: ["packages/docs-content/src/validate.runtime.ts"],
+    generated: "packages/docs-content/src/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
+    accepted: ["packages/docs-fumadocs/src/live.layer.ts"],
+    generated: "packages/docs-fumadocs/src/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
     accepted: ["packages/testing/src/index.ts"],
     generated: "packages/testing/src/.generated-strict-rejected.ts",
     namespace: "strict-effect",
@@ -392,6 +428,7 @@ test.effect.each([
 test.each([
   "tools/repository-paths/check.runtime.ts",
   "tools/governance/check.runtime.ts",
+  "packages/docs-content/src/validate.runtime.ts",
 ])("keeps the command runtime admission exact: %s", (path) => {
   expect(
     Array.filter(

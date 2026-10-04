@@ -1,5 +1,4 @@
 import { Effect, Layer, Option, Schema } from "effect";
-import type { LoaderOutput } from "fumadocs-core/source";
 
 import {
   FumadocsPageNotFoundError,
@@ -13,12 +12,12 @@ type UntrustedFumadocsPage = typeof Schema.Unknown.Type;
 
 export interface FumadocsGeneratedCollectionAdapter {
   readonly getPage: (
-    slugs: NonNullable<Parameters<LoaderOutput["getPage"]>[0]>,
-    locale?: Parameters<LoaderOutput["getPage"]>[1]
-  ) => UntrustedFumadocsPage | Promise<UntrustedFumadocsPage>;
+    slugs: readonly string[],
+    locale?: string
+  ) => Effect.Effect<UntrustedFumadocsPage, FumadocsSourceLoadError>;
   readonly listPages: (
-    locale?: Parameters<LoaderOutput["getPages"]>[0]
-  ) => UntrustedFumadocsPage | Promise<UntrustedFumadocsPage>;
+    locale?: string
+  ) => Effect.Effect<UntrustedFumadocsPage, FumadocsSourceLoadError>;
 }
 
 export const makeFumadocsSourceLive = (
@@ -28,17 +27,14 @@ export const makeFumadocsSourceLive = (
     FumadocsSource,
     FumadocsSource.of({
       getPage: (slugs, locale) =>
-        Effect.tryPromise({
-          catch: () =>
-            new FumadocsSourceLoadError({
-              message: "The Fumadocs page lookup failed.",
-              operation: "getPage",
-            }),
-          try: () =>
-            Promise.resolve(
-              adapter.getPage(globalThis.Array.from(slugs), locale)
-            ),
-        }).pipe(
+        adapter.getPage(slugs, locale).pipe(
+          Effect.mapError(
+            () =>
+              new FumadocsSourceLoadError({
+                message: "The Fumadocs page lookup failed.",
+                operation: "getPage",
+              })
+          ),
           Effect.flatMap((candidate) =>
             Option.fromUndefinedOr(candidate).pipe(
               Option.match({
@@ -73,14 +69,14 @@ export const makeFumadocsSourceLive = (
           )
         ),
       listPages: (locale) =>
-        Effect.tryPromise({
-          catch: () =>
-            new FumadocsSourceLoadError({
-              message: "The Fumadocs page listing failed.",
-              operation: "listPages",
-            }),
-          try: () => Promise.resolve(adapter.listPages(locale)),
-        }).pipe(
+        adapter.listPages(locale).pipe(
+          Effect.mapError(
+            () =>
+              new FumadocsSourceLoadError({
+                message: "The Fumadocs page listing failed.",
+                operation: "listPages",
+              })
+          ),
           Effect.flatMap((candidate) =>
             Schema.decodeUnknownEffect(FumadocsSourcePages)(candidate).pipe(
               Effect.mapError(

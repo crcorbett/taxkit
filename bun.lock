@@ -160,6 +160,11 @@
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
+        "@taxkit/api-http": "workspace:*",
+        "@taxkit/calculators": "workspace:*",
+        "@taxkit/core": "workspace:*",
+        "@taxkit/rules-au-pay": "workspace:*",
+        "@taxkit/sdk": "workspace:*",
         "@types/bun": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",

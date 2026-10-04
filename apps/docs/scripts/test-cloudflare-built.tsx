@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import nodePath from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -28,6 +29,8 @@ declare global {
   var __TSR_ROUTER__: BrowserRouterHarness | undefined;
 }
 
+const proofRequire = createRequire(import.meta.url);
+const DependencyManifest = Schema.Struct({ version: Schema.String });
 const appRoot = new URL("../", import.meta.url);
 const repositoryRoot = new URL("../../", appRoot);
 const builtRoot = new URL("dist/", appRoot);
@@ -1013,6 +1016,31 @@ try {
     ["rev-parse", "HEAD"]
   );
   const sourceCommit = sourceCommitOutput.trim();
+  const wranglerManifestPath = proofRequire.resolve("wrangler/package.json");
+  const wranglerRequire = createRequire(wranglerManifestPath);
+  const cloudflareVitePluginSource = await readFile(
+    proofRequire.resolve("@cloudflare/vite-plugin/package.json"),
+    "utf-8"
+  );
+  const wranglerSource = await readFile(wranglerManifestPath, "utf-8");
+  const workerdSource = await readFile(
+    wranglerRequire.resolve("workerd/package.json"),
+    "utf-8"
+  );
+  const [cloudflareVitePluginManifest, wranglerManifest, workerdManifest] =
+    Effect.runSync(
+      Effect.all([
+        Schema.decodeUnknownEffect(Schema.fromJsonString(DependencyManifest))(
+          cloudflareVitePluginSource
+        ),
+        Schema.decodeUnknownEffect(Schema.fromJsonString(DependencyManifest))(
+          wranglerSource
+        ),
+        Schema.decodeUnknownEffect(Schema.fromJsonString(DependencyManifest))(
+          workerdSource
+        ),
+      ])
+    );
   const receipt = {
     browser: {
       name: "Chromium",
@@ -1026,9 +1054,9 @@ try {
       worktreeQualifiedBeforeCommit: true,
     },
     dependencies: {
-      cloudflareVitePlugin: "1.47.0",
-      workerd: "1.20260722.1",
-      wrangler: "4.114.0",
+      cloudflareVitePlugin: cloudflareVitePluginManifest.version,
+      workerd: workerdManifest.version,
+      wrangler: wranglerManifest.version,
     },
     evidenceClass: "local-workerd",
     filesystem: {

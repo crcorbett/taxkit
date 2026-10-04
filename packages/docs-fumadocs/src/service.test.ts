@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Match } from "effect";
+import { Effect, Match, Schema } from "effect";
 
+import { FumadocsSourceLoadError } from "./errors.js";
 import { makeFumadocsSourceLive } from "./live.layer.js";
 import { FumadocsSource } from "./service.js";
 import { makeFumadocsSourceTest } from "./test.layer.js";
@@ -47,7 +48,7 @@ describe("FumadocsSource", () => {
   );
 
   it.effect(
-    "maps a thrown generated-loader failure to a safe tagged error",
+    "maps a failed generated-loader operation to a safe tagged error",
     () =>
       Effect.gen(function* () {
         const source = yield* FumadocsSource;
@@ -55,19 +56,26 @@ describe("FumadocsSource", () => {
       }).pipe(
         Effect.provide(
           makeFumadocsSourceLive({
-            getPage: () => guide,
-            listPages: () => {
-              throw new Error("provider detail");
-            },
+            getPage: () => Effect.succeed(guide),
+            listPages: () =>
+              Effect.fail(
+                new FumadocsSourceLoadError({
+                  message: "provider detail",
+                  operation: "listPages",
+                })
+              ),
           })
         ),
         Effect.flip,
         Effect.tap((error) =>
-          Effect.sync(() => {
+          Effect.gen(function* () {
             expect(error._tag).toBe("FumadocsSourceLoadError");
             expect(error.message).toBe("The Fumadocs page listing failed.");
             expect(error.operation).toBe("listPages");
-            expect(JSON.stringify(error)).not.toContain("provider detail");
+            const encoded = yield* Schema.encodeEffect(
+              Schema.fromJsonString(FumadocsSourceLoadError)
+            )(error);
+            expect(encoded).not.toContain("provider detail");
           })
         )
       )
@@ -80,8 +88,8 @@ describe("FumadocsSource", () => {
     }).pipe(
       Effect.provide(
         makeFumadocsSourceLive({
-          getPage: () => ({ ...guide, markdown: 42 }),
-          listPages: () => [guide],
+          getPage: () => Effect.succeed({ ...guide, markdown: 42 }),
+          listPages: () => Effect.succeed([guide]),
         })
       ),
       Effect.flip,

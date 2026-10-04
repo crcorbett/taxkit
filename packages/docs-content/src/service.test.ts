@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect } from "effect";
+import { Effect, Match, Schema } from "effect";
 
+import { DocsSourceError } from "./errors.js";
 import { DocsPagePath } from "./schemas.js";
 import { DocsContentService } from "./service.js";
 import { makeDocsContentServiceTest } from "./test.layer.js";
@@ -66,11 +67,15 @@ describe("DocsContentService", () => {
         ),
         Effect.flip,
         Effect.tap((error) =>
-          Effect.sync(() => {
-            expect(error._tag).toBe("DocsSourceError");
-            expect(JSON.stringify(error)).not.toContain(
-              "Missing canonical fields."
+          Effect.gen(function* () {
+            const sourceError = Match.value(error).pipe(
+              Match.tag("DocsSourceError", (value) => value),
+              Match.orElse(() => expect.fail("Expected source error"))
             );
+            const encoded = yield* Schema.encodeEffect(
+              Schema.fromJsonString(DocsSourceError)
+            )(sourceError);
+            expect(encoded).not.toContain("Missing canonical fields.");
           })
         )
       )

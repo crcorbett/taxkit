@@ -117,3 +117,11 @@ docs implementation
 - [API and SDK](./api-and-sdk.md)
 - [Package ownership](./package-ownership.md)
 - [../product-specs/index.md](../product-specs/index.md)
+
+## Generated collection boundary
+
+Generated collection adapters expose named Effect operations with safe tagged
+failures. The collection owner wraps synchronous loader calls and processed-text
+Promise reads, preserving the SDK receiver. The reusable Fumadocs live Layer
+decodes raw representations through its owning Schemas. Shiki metadata
+transformation returns replacement nodes instead of mutating SDK-owned input.

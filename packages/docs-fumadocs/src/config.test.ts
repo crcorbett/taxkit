@@ -10,10 +10,11 @@ describe("effectSchemaToStandardSchema", () => {
       description: Schema.String,
       title: Schema.String,
     });
-    const standardSchema = effectSchemaToStandardSchema(PageFrontmatter);
+    const { "~standard": validation } =
+      effectSchemaToStandardSchema(PageFrontmatter);
 
     expect(
-      standardSchema["~standard"].validate({
+      validation.validate({
         description: "Use package helpers.",
         title: "Docs package",
       })
@@ -24,7 +25,7 @@ describe("effectSchemaToStandardSchema", () => {
       },
     });
     expect(
-      standardSchema["~standard"].validate({
+      validation.validate({
         title: "Docs package",
       })
     ).toHaveProperty("issues");
@@ -33,16 +34,22 @@ describe("effectSchemaToStandardSchema", () => {
 
 describe("code block metadata", () => {
   it("copies code block title and language to data attributes", () => {
-    const node = { properties: {} };
+    const node = {
+      children: [],
+      properties: {},
+      tagName: "pre",
+      type: "element",
+    } satisfies Parameters<typeof applyCodeBlockMeta>[0];
 
-    applyCodeBlockMeta(node, {
+    const result = applyCodeBlockMeta(node, {
       lang: "ts",
       meta: {
         title: "example.ts",
       },
     });
 
-    expect(node.properties).toEqual({
+    expect(node.properties).toEqual({});
+    expect(result.properties).toEqual({
       "data-language": "ts",
       "data-title": "example.ts",
     });

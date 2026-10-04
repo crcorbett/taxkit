@@ -17,46 +17,48 @@ the TypeScript SDK in-process.
 
 ## Steps
 
-1. Build a `CalculatorRunRequest` JSON body.
-2. Send it to the calculate endpoint.
-3. Check `response.ok`.
-4. Render either the report or `CalculatorApiErrorEnvelope.error`.
+1. Supply your API base URL as a `URL` value.
+2. Construct canonical facts for the typed API client.
+3. Run the returned Effect at your application host.
+4. Render the report or handle its typed failure channel.
 
 ## Example
 
 ```ts
-const response = await fetch(
-  "http://127.0.0.1:4000/api/v1/calculators/au.pay.take-home/calculate",
-  {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      facts: {
-        grossPay: {
-          _tag: "GrossPay",
-          amount: { _tag: "Money", cents: 346200, currency: "AUD" },
-          period: "fortnightly",
+import { createTaxKitApiClient } from "@taxkit/api-http/client";
+import { aud } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
+import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import { Effect } from "effect";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
+
+export const calculateTakeHomePay = (baseUrl: URL) =>
+  Effect.gen(function* () {
+    const client = yield* createTaxKitApiClient({ baseUrl });
+    return yield* client.calculatorApi.calculate({
+      params: { calculatorId: AuPayTakeHomeCalculation.calculatorId },
+      payload: {
+        facts: {
+          grossPay: new GrossPay({
+            amount: aud(346_200),
+            period: "fortnightly",
+          }),
+          taxFreeThresholdClaimed: true,
         },
-        taxFreeThresholdClaimed: true,
+        jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+        taxYear: AuPayTakeHomeCalculation.taxYear,
       },
-      jurisdiction: "AU",
-      taxYear: "2025-26",
-    }),
-  }
-);
-
-const body = await response.json();
-
-if (!response.ok) {
-  console.error(body.error.message);
-} else {
-  console.log(body.report.netPay.cents);
-}
+      query: { help: "errors" },
+    });
+  }).pipe(Effect.provide(FetchHttpClient.layer));
 ```
 
 ## Verify the result
 
-Expected output:
+Call `calculateTakeHomePay(new URL("http://127.0.0.1:4000"))` for your local
+API, or supply your deployed URL explicitly. The example has no default server
+and reads no browser environment variables. The returned response contains
+`report.netPay.cents` with the expected value:
 
 ```txt
 270600

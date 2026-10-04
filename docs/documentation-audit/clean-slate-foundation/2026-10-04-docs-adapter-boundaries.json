@@ -1,0 +1,83 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "3217c6c856da1c599a013d4e3de12722d710000c",
+  "implemented": [
+    "All eleven canonical strict rules in docs-content and docs-fumadocs, including tests and examples",
+    "Effect-native generated collection adapter and private processed-text boundary; receiver and error redaction tested",
+    "Immutable Shiki metadata node replacement and checked validation collections",
+    "Canonical request/response server example and typed HTTP client example with explicit URL; aligned draft guides and declared dependencies",
+    "Development Knip includes checked examples; local proof harness reads installed dependency manifests instead of historical hard-coded versions"
+  ],
+  "verification": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "result": "passed"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed; 75 real CLI lint cases, 13 docs-content tests, retained calculator results"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed after adding Knip example entries and correcting the receipt decoder to the existing Effect boundary; no rule weakened"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed; 15 tasks"
+    },
+    {
+      "command": "bun run --filter=docs test:cloudflare-built",
+      "result": "passed; SSR 200, immutable asset 200, missing 404, zero document requests during client navigation, three server functions, zero browser diagnostics"
+    }
+  ],
+  "local_workerd": {
+    "candidate": {
+      "assetsSha256": "5ecaae7602a070eae26ad8aec158f953be2bc34e0731dd863bb6068e27d67e58",
+      "deploymentInputSha256": "3663ca2a459956a7f2c67f9d7224ddf28a55c8d0a30d586a56a45c797972008b",
+      "sourceCommit": "3217c6c856da1c599a013d4e3de12722d710000c",
+      "workerModulesSha256": "efac8035b4847cd45cad20a5415d66af9ffbc73854a871ebb74b23396b22b1cf",
+      "worktreeQualifiedBeforeCommit": true
+    },
+    "dependencies": {
+      "cloudflareVitePlugin": "1.62.5",
+      "workerd": "1.20261001.1",
+      "wrangler": "4.147.0"
+    },
+    "oracles": {
+      "accessibility": "passed",
+      "assetCacheHeaders": "passed",
+      "assets": "passed",
+      "clientNavigationWithoutDocumentReload": "passed",
+      "clientNotFound": "passed",
+      "concurrentRequestIsolation": "passed",
+      "consoleAndPageErrors": "passed",
+      "directNotFound": "passed",
+      "hydration": "passed",
+      "malformedServerFunction": "passed",
+      "mobileNavigationDisclosure": "passed",
+      "pendingNavigation": "passed",
+      "recoverableError": "passed",
+      "reducedMotion": "passed",
+      "serverFunctionTransport": "passed",
+      "ssr": "passed"
+    },
+    "filesystem": {
+      "isolatedOutputOnlyExecution": true,
+      "nodeFileSystemModules": [
+        "assets/policy-Cdij7yMg.js",
+        "assets/runtime.server-BII9CHVU.js"
+      ],
+      "providerCredentialEnvironmentAllowed": false,
+      "requestTimePolicyImportObserved": false
+    }
+  },
+  "limitations": [
+    "DEV-73 remains incomplete outside migrated scopes; no full-repository strict compliance claim",
+    "Fumadocs processed-text SDK method has no abort signal; awaiting Effect interruption is not provider cancellation proof",
+    "Earlier local receipts contained hard-coded historical Cloudflare versions; they are not current dependency evidence and are not rewritten",
+    "No tax rule or Medicare value change, merge, deployment, publication or provider apply"
+  ],
+  "recovery": "Revert the complete slice; provider state is unchanged"
+}

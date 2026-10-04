@@ -1,36 +1,44 @@
+import { FumadocsSourceLoadError } from "@taxkit/docs-fumadocs/errors";
 import type { FumadocsGeneratedCollectionAdapter } from "@taxkit/docs-fumadocs/live";
 import { makeFumadocsSourceLive } from "@taxkit/docs-fumadocs/live";
-import { Option } from "effect";
+import { Array, Effect, Option } from "effect";
 
+import { readGeneratedPage } from "./generated-page.boundary.js";
 import { source } from "./server.js";
-
-type GeneratedPage = ReturnType<typeof source.getPages>[number];
-
-const sourcePageRepresentation = async (page: GeneratedPage) => ({
-  browserPath: page.path,
-  frontmatter: {
-    description: page.data.description,
-    status: page.data.status,
-    title: page.data.title,
-  },
-  markdown: await page.data.getText("processed"),
-  slugs: page.slugs,
-  sourcePath: `content/${page.path}`,
-});
 
 const generatedCollectionAdapter: FumadocsGeneratedCollectionAdapter = {
   getPage: (slugs, locale) =>
-    Option.fromUndefinedOr(
-      source.getPage(globalThis.Array.from(slugs), locale)
-    ).pipe(
-      Option.match({
-        onNone: () => Option.none<never>().pipe(Option.getOrUndefined),
-        onSome: sourcePageRepresentation,
-      })
+    Effect.try({
+      catch: () =>
+        new FumadocsSourceLoadError({
+          message: "The generated page lookup failed.",
+          operation: "getPage",
+        }),
+      try: () => source.getPage(Array.fromIterable(slugs), locale),
+    }).pipe(
+      Effect.flatMap((page) =>
+        Option.fromUndefinedOr(page).pipe(
+          Option.match({
+            onNone: () => Effect.void,
+            onSome: (value) => readGeneratedPage(value, "getPage"),
+          })
+        )
+      )
     ),
   listPages: (locale) =>
-    Promise.all(
-      globalThis.Array.from(source.getPages(locale), sourcePageRepresentation)
+    Effect.try({
+      catch: () =>
+        new FumadocsSourceLoadError({
+          message: "The generated page listing failed.",
+          operation: "listPages",
+        }),
+      try: () => source.getPages(locale),
+    }).pipe(
+      Effect.flatMap((pages) =>
+        Effect.forEach(pages, (page) => readGeneratedPage(page, "listPages"), {
+          concurrency: "unbounded",
+        })
+      )
     ),
 };
 

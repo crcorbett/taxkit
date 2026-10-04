@@ -617,3 +617,8 @@ supporting gate and cannot replace semantic ownership or call-graph review.
 - [Testing and validation](./testing-and-validation.md)
 - [Graph, trace and ledgers](./graph-trace-ledgers.md)
 - [API and SDK](./api-and-sdk.md)
+
+Checked docs-content examples are explicit development Knip entries and use
+declared workspace development dependencies. Their server boundary tests run
+the retained weekly calculation and reject malformed input; generated-page
+tests prove processed-text selection, receiver identity and error redaction.

@@ -9,6 +9,7 @@ import {
   Match,
   Option,
   Order,
+  Record,
   Schema,
 } from "effect";
 import type { Effect as EffectType } from "effect";
@@ -151,7 +152,7 @@ const decodeFrontmatter = (
           )
         ),
       onSome: (match) =>
-        Option.fromNullishOr(match.groups?.["body"]).pipe(
+        Record.get(match.groups ?? {}, "body").pipe(
           Option.match({
             onNone: () =>
               Effect.fail(
@@ -164,11 +165,14 @@ const decodeFrontmatter = (
               ),
             onSome: (body) =>
               parseFrontmatterBody(source, body).pipe(
-                Effect.flatMap(Schema.decodeUnknownEffect(DocsPageFrontmatter)),
-                Effect.mapError((error) =>
-                  globalThis.Array.isArray(error)
-                    ? error
-                    : frontmatterIssue(source, error.message)
+                Effect.flatMap((candidate) =>
+                  Schema.decodeUnknownEffect(DocsPageFrontmatter)(
+                    candidate
+                  ).pipe(
+                    Effect.mapError((error) =>
+                      frontmatterIssue(source, error.message)
+                    )
+                  )
                 )
               ),
           })
@@ -188,7 +192,7 @@ const checkPattern = (
       onSome: (match) =>
         EffectArray.of(
           new DocsValidationIssue({
-            message: `${label}: ${match[0]}`,
+            message: `${label}: ${EffectArray.head(match).pipe(Option.getOrElse(() => ""))}`,
             path: [source],
           })
         ),
@@ -268,7 +272,7 @@ const validateLocalLinkTarget = (
       () => Effect.succeed(EffectArray.empty<DocsValidationIssue>())
     ),
     Match.orElse((value) =>
-      Option.fromNullishOr(value.split("#")[0]).pipe(
+      EffectArray.head(value.split("#")).pipe(
         Option.filter((withoutAnchor) => withoutAnchor.length > 0),
         Option.match({
           onNone: () =>
@@ -302,7 +306,7 @@ const validateLocalLinks = (source: DocsSourcePath, absolutePath: string) =>
       Effect.forEach(
         EffectArray.fromIterable(markdown.matchAll(relativeLinkPattern)),
         (match) =>
-          Option.fromNullishOr(match.groups?.["target"]).pipe(
+          Record.get(match.groups ?? {}, "target").pipe(
             Option.match({
               onNone: () =>
                 Effect.succeed(EffectArray.empty<DocsValidationIssue>()),
@@ -336,7 +340,7 @@ const listMdxSources: EffectType.Effect<
 > = collectMdxPaths(absoluteContentRoot).pipe(
   Effect.flatMap((paths) => Effect.forEach(paths, contentSourcePath)),
   Effect.mapError(() => sourceError()),
-  Effect.map((paths) => paths.toSorted(Order.String))
+  Effect.map((paths) => EffectArray.sort(paths, Order.String))
 );
 
 export { getNavigation } from "../navigation.js";
@@ -365,12 +369,15 @@ const validateNavigationCoversSources = (
   sources: readonly DocsSourcePath[]
 ) =>
   EffectArray.map(
-    EffectArray.fromIterable(
-      HashSet.difference(
-        HashSet.fromIterable(sources),
-        navigationSourceSet(navigation)
-      )
-    ).toSorted(Order.String),
+    EffectArray.sort(
+      EffectArray.fromIterable(
+        HashSet.difference(
+          HashSet.fromIterable(sources),
+          navigationSourceSet(navigation)
+        )
+      ),
+      Order.String
+    ),
     missingNavigationIssue
   );
 

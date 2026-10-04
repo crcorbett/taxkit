@@ -4,6 +4,7 @@ import {
   HashSet,
   Match,
   Option,
+  Record,
   Schema,
 } from "effect";
 
@@ -31,7 +32,7 @@ export const validateMdxComponentPolicy = (
       markdownWithoutFencedCode(markdown).matchAll(mdxComponentPattern)
     ),
     (match) =>
-      Option.fromNullishOr(match.groups?.["component"]).pipe(
+      Record.get(match.groups ?? {}, "component").pipe(
         Option.match({
           onNone: () =>
             Effect.succeed(EffectArray.empty<DocsValidationIssue>()),

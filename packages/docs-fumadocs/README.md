@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: package-root
-confidence: high
+document_type: package-guide
+lifecycle: current
+authority: canonical
+owner: repository-maintainers
+last_reviewed: 2026-10-04
+review_trigger: package contracts or generated-source boundaries change
 ---
 
 # @taxkit/docs-fumadocs
@@ -31,10 +33,15 @@ collection locations, routes, app layout or runtime execution.
 | `@taxkit/docs-fumadocs/render` | Browser-safe generic picture and code-block primitives. |
 
 The live Layer is the only boundary that accepts generated-provider
-representations. It wraps provider throws and promises, decodes each value
-through the package Schemas and exposes only canonical service values and safe
-tagged errors. Consumers call named service operations; they do not pass
+representations. Its named adapter operations return Effects with
+`FumadocsSourceLoadError` failures. The generated collection owner translates
+its SDK calls into that channel; the live Layer decodes each successful value
+through the package Schemas and maps failures to safe service errors. Consumers call named service operations; they do not pass
 callbacks or receive raw provider pages.
+
+The Shiki `pre` transformer returns a replacement HAST node with decoded
+metadata. It preserves the input node; the installed Shiki transformer contract
+consumes the returned node.
 
 ## Build ordering
 

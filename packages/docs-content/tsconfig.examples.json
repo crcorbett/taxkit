@@ -20,7 +20,8 @@
       "@taxkit/sdk/au": ["../sdk/typescript/src/au.ts"],
       "@taxkit/sdk/au/effect": ["../sdk/typescript/src/au-effect.ts"],
       "@taxkit/sdk/effect": ["../sdk/typescript/src/effect.ts"],
-      "@taxkit/sdk/schemas": ["../sdk/typescript/src/schemas/index.ts"]
+      "@taxkit/sdk/schemas": ["../sdk/typescript/src/schemas/index.ts"],
+      "@taxkit/api-http/client": ["../api/http/src/client/index.ts"]
     },
     "skipLibCheck": true,
     "strict": true,

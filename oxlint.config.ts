@@ -165,6 +165,10 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  "packages/docs-content/src/service.test.ts",
+  "packages/docs-content/src/generated-page.boundary.test.ts",
+  "packages/docs-fumadocs/src/service.test.ts",
+  "packages/docs-content/examples/node-server.ts",
   "tools/governance/check.runtime.ts",
   "packages/api/http/__tests__/openapi-snapshot.test.ts",
   "packages/api/http/__tests__/public-calculation-api.test.ts",
@@ -415,6 +419,8 @@ export default defineConfig({
         "tools/governance/**",
         "packages/testing/**",
         "packages/api/http/**",
+        "packages/docs-content/**",
+        "packages/docs-fumadocs/**",
       ],
       rules: {
         "strict-effect/error-constructor-new": "error",
@@ -468,6 +474,15 @@ export default defineConfig({
       },
     },
     {
+      files: ["packages/docs-content/src/validate.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["packages/docs-content/src/validate.runtime.ts"] },
+        ],
+      },
+    },
+    {
       files: ["**/*.{ts,tsx,mts,cts}"],
       rules: {
         "no-redeclare": "off",
@@ -478,6 +493,7 @@ export default defineConfig({
       // mistakes its class declaration for an Error thrown without `new`.
       files: [
         "**/errors.ts",
+        "packages/docs-content/examples/node-server.ts",
         "**/errors/*.ts",
         "**/schemas.ts",
         "**/*.schemas.ts",
