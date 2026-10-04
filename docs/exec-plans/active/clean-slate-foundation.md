@@ -1217,3 +1217,69 @@ across 376 owned source arguments, with exact permissions preserved; existing
 fixture/host cases remain to be qualified and this is not a confirmed defect
 count. Continue with API app, documentation app, web and infrastructure paths,
 then complete the semantic/readonly review and DEV-74–81 implementation.
+
+
+## Local T002 API app boundaries
+
+All API app source, command, native test and test-configuration paths now
+receive the canonical strict rules. Only `src/index.ts` and the smoke runtime
+can execute an application program; actual CLI fixtures qualify their exact
+selectors and reject a neighbouring command fixture. The installed stable
+Config API's `orElse` catches invalid values as well as absence. The first
+settings fixtures exposed that fallback; `Config.option` plus `flatMap` now
+uses `PORT` only when `API_PORT` is absent. Invalid present primary ports fail
+with a safe settings error. Host trimming, blank fallback and normal defaults
+remain; caller providers can be substituted without ambient mutation.
+
+The smoke command has checked settings/arguments and named native HTTP
+operations. It reuses the endpoint-owned `HealthResponse` through a new root
+export, existing catalog/run Schemas and native HTTP body encoding. Headers
+and body decoding share each deadline: 15 seconds for health including retries,
+five seconds for other requests. Its OpenAPI projection requires the calculate
+path and retains the existing isolated-mutation failure oracle. The external
+consumer remains deliberate plain JavaScript outside the checkout, covering
+health/catalog/take-home/annual/OpenAPI. Native command services own a 30-second
+limit, 1 MiB stdout bound, drained stderr, exact decoded route evidence and safe
+reason/available-exit errors. Command scopes stop processes; folder cleanup
+failure fails otherwise successful work and remains alongside earlier failure.
+Expected-error reporting occurs before final scope closure.
+
+Focused qualification passes: source/script/test compiler projects, all 45
+native API cases, all 310 lint cases (297 retained, ten accepted API files,
+one rejected neighbour and two exact runtime selectors), actual positive
+standalone API smoke and both unused-code profiles. Complete repository verification and the actual failure simulation pass;
+independent readback confirms both observed API processes exited, their
+folders are absent and smoke port 4173 is available.
+The previous SDK-script revision `60db52739b19dddf8301a8363bd0cd7fa0740bb7`
+passed hosted Quality run `37197728534`; it does not qualify this later API work.
+
+Documentation impact: **Change required** for API app settings, command/test
+ownership, endpoint Schema export and HTTP patch Changeset, app/HTTP READMEs,
+API/SDK and testing architecture, lint/config/CLI canaries, current T002 ledger,
+active plan and dated receipt. **Preserve** all HTTP wire shapes and route paths,
+retained tax rules/results, dependency selections, fixed release graph, current
+journey/mutation oracle, historical evidence and canonical skills/digests.
+**N/A** public/generated content, operational runbook procedure, workflow and
+provider state: commands and consequential authority are unchanged. Revert this
+complete slice to recover. T002 remains in progress; continue documentation
+app, web, infrastructure and whole semantic/readonly review, then DEV-74–81.
+Medicare correction still awaits Cooper's separate bounded decision.
+
+
+Final API qualification passed: frozen 793-install/1020-package graph (selected
+versions unchanged; test dependency declarations recorded), all 45 native API
+cases, 310 actual lint cases, complete 23-task tests (17 matching caches) and
+15-task build (12 matching caches), actual positive/forced-failure/invalid-port
+API checks and independent process/folder/port readback, final 46-file SDK and
+nine-package consumer proof, full verification with all 21 Quality cases/all
+ten isolated faults and fresh source-only documentation (217.24 seconds),
+176 deployment-tool cases, 21 skill cases, 16 evaluation cases and both unused-code
+profiles. Chromium passes 24 SDK cases using matching unchanged-input caches and
+two web cases in an actual run.
+The production unused-export check found the test-only settings-program export;
+it is now private and tests compose the same live settings Layer. No exclusion
+was added. Final documentation/runbook/format/diff and Changeset checks pass;
+the HTTP patch remains pending with the existing major fixed train. The
+[API app receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-api-app-boundaries.json)
+records failures, recovery and the proof limits. This accepts only this local
+API slice; DEV-73 and the overall continuation goal remain unfinished.

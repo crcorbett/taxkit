@@ -33,6 +33,35 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
+      "apps/api/src/config.ts",
+      "apps/api/src/schemas.ts",
+      "apps/api/src/server.ts",
+      "apps/api/src/index.ts",
+      "apps/api/scripts/routes.ts",
+      "apps/api/scripts/schemas.ts",
+      "apps/api/scripts/smoke-public-routes.runtime.ts",
+      "apps/api/scripts/smoke-boundaries.test.ts",
+      "apps/api/test/config.test.ts",
+      "apps/api/vitest.config.ts",
+    ],
+    generated: "apps/api/scripts/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
+    accepted: [
       "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
       "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
       "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
@@ -965,6 +994,8 @@ test.effect.each([
 );
 
 test.each([
+  "apps/api/src/index.ts",
+  "apps/api/scripts/smoke-public-routes.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",

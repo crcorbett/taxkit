@@ -39,12 +39,16 @@
         "effect": "catalog:",
       },
       "devDependencies": {
+        "@effect/vitest": "catalog:",
+        "@taxkit/calculators": "workspace:*",
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
         "@taxkit/tsconfig": "workspace:*",
         "@types/bun": "catalog:",
         "@types/node": "catalog:",
         "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
       },
     },
     "apps/docs": {

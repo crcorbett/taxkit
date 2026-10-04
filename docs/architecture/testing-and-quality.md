@@ -213,6 +213,16 @@ owned by the deployment migration, reviewed on runtime/entry/privacy changes,
 and retired after an equally strong non-public provider oracle exists;
 otherwise its bounded carrying cost remains explicit.
 
+The API app's native test command covers isolated Config providers, primary
+port validation, smoke argument/port ingress, stalled headers and bodies,
+invalid HTTP responses, native child-process failures, bounded command output,
+interruption, consumer timeout and folder cleanup failures. Controlled fixtures
+use native test services and a virtual clock. The actual smoke command still
+proves the standalone loopback server and external plain JavaScript consumer;
+fixtures alone do not prove that process or hosted execution. Its OpenAPI-path
+mutation retains the exact existing calculate-path failure oracle, now checked
+before the external consumer runs.
+
 Public API route work should also capture contract evidence from the standalone
 API app:
 

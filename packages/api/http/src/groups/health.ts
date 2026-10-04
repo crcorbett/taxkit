@@ -1,7 +1,7 @@
 import { Schema } from "effect";
 import { HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/http-api";
 
-const HealthResponse = Schema.Struct({
+export const HealthResponse = Schema.Struct({
   service: Schema.Literal("taxkit"),
   status: Schema.Literal("ok"),
 });

@@ -14,6 +14,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  "apps/api/scripts/routes.ts",
+  "apps/api/test/config.test.ts",
   "packages/sdk/typescript/scripts/script-boundaries.test.ts",
   // Exact synthetic register fixture ingress; no command execution admission.
   "tools/docs-deployment/automation.check.runtime.test.ts",
@@ -199,6 +201,8 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  "apps/api/scripts/smoke-boundaries.test.ts",
+  "apps/api/test/config.test.ts",
   "packages/sdk/typescript/scripts/script-boundaries.test.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   // Plain Promise rejection and calculator error representations: secret-negative tests only.
@@ -335,7 +339,6 @@ const processBoundaryFiles = [
 ];
 
 const consoleBoundaryFiles = [
-  "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
@@ -444,6 +447,14 @@ export default defineConfig({
   overrides: [
     {
       files: [
+        "apps/api/src/config.ts",
+        "apps/api/scripts/routes.ts",
+        "apps/api/scripts/smoke-public-routes.runtime.ts",
+      ],
+      rules: { "unicorn/throw-new-error": "off" },
+    },
+    {
+      files: [
         "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
         "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
         "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
@@ -497,6 +508,7 @@ export default defineConfig({
         "packages/scripts/**",
         "packages/sdk/typescript/src/**",
         "packages/sdk/typescript/scripts/**",
+        "apps/api/**",
         "packages/sdk/typescript/type-tests/**",
         "packages/sdk/typescript/vitest*.config.ts",
         "packages/testing/**",
@@ -519,6 +531,24 @@ export default defineConfig({
         "strict-effect/tagged-error-name": "error",
         "taxkit/no-native-collections": "error",
         "taxkit/no-object-writes": "error",
+      },
+    },
+    {
+      files: ["apps/api/src/index.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/api/src/index.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/api/scripts/smoke-public-routes.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/api/scripts/smoke-public-routes.runtime.ts"] },
+        ],
       },
     },
     {

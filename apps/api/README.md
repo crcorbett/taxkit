@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-08-10
-source_of_truth: package-readme
-confidence: medium
+document_type: app-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-api-app-owner
+last_reviewed: 2026-10-04
+review_trigger: API app settings, startup, smoke command or shutdown change
 ---
 
 # API App
@@ -33,6 +35,13 @@ Environment overrides:
 - `API_HOST`
 - `API_PORT`
 - `PORT` as the fallback port supplied by portless
+
+`API_PORT` takes priority. A present, invalid value fails startup rather than
+using `PORT`; missing values use the fallback and then port 4000. Ports must
+be whole numbers from 1 to 65535. Host names are trimmed and blank host values
+use the default. Settings use the caller's Effect ConfigProvider; the live app
+uses the environment and tests supply isolated providers. The safe
+`ApiServerConfigError` does not include the rejected value.
 
 ## Routes
 
@@ -75,6 +84,7 @@ bun run --filter=api dev
 bun run --filter=api start
 bun run --filter=api smoke:public-routes
 bun run --filter=api check-types
+bun run --filter=api test
 bun run --filter=api build
 bun run --filter=api clean
 ```
@@ -101,8 +111,8 @@ bun run --filter=api smoke:public-routes
 ```
 
 The command starts `apps/api` at `http://127.0.0.1:4173` by default, waits for
-`GET /api/health`, calls the public calculator metadata route, posts one
-take-home-pay calculation and reads the generated OpenAPI document. It then
+`GET /api/health`, calls the public calculator metadata route, posts a
+take-home-pay calculation and checks the generated OpenAPI document. It then
 creates a temp consumer workspace outside the repo, writes a dependency-free
 `fetch` consumer and runs that consumer from the temp workspace against the
 same public HTTP routes:
@@ -110,6 +120,7 @@ same public HTTP routes:
 - `GET /api/health`
 - `GET /api/v1/calculators`
 - `POST /api/v1/calculators/au.pay.take-home/calculate`
+- `POST /api/v1/calculators/au.income-tax.annual/calculate`
 - `GET /api/docs/openapi.json`
 
 The smoke script owns process lifecycle only. It validates response bodies with
@@ -117,11 +128,30 @@ schemas exported by `@taxkit/api-http` where those schemas are public, and it
 lets the app process stop through Effect-scoped child process cleanup on
 success or failure. The external consumer checks minimal public JSON evidence;
 canonical route schema validation stays in this repo-owned smoke script. The
-temp workspace is removed on success and failure.
+temp workspace is removed on success and failure. Failed cleanup also fails
+the command and remains alongside an earlier command failure.
 
 When the default loopback port is occupied, set `TAXKIT_API_SMOKE_PORT` to an
 available port. The isolated release-boundary harness uses this override so a
 neighbouring local development server cannot change its failure oracle.
+
+The smoke command uses checked Config settings and arguments, named HTTP
+operations and the exported `HealthResponse`, catalog and calculation Schemas.
+The OpenAPI check requires its calculate path before running the plain external
+consumer. Health readiness has a 15-second total limit, including retries and
+response-body reading; other requests have a five-second limit. The external
+consumer has a 30-second limit and a 1 MiB stdout limit. Its stderr is drained
+without retention. Successful stdout is decoded into the exact expected route
+coverage; failures report their bounded reason and available exit code.
+Cancellation stops both child processes and removes the workspace. The external
+consumer deliberately uses ordinary JavaScript `fetch` and JSON to check a
+caller outside the repository.
+
+`check-types` covers source, scripts, test fixtures and test configuration.
+`test` runs native Effect fixtures for settings, stalled headers/bodies,
+invalid responses, child-process faults, cancellation and cleanup. All API
+source and test paths receive the canonical strict rules, with execution
+admitted only at the two existing app/command entrypoints.
 
 Use the failure simulation when you need deterministic cleanup evidence for a
 downstream consumer failure:

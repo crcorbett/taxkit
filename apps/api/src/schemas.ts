@@ -26,3 +26,8 @@ export const ApiServerConfigSchema = Schema.Struct({
 export type ApiServerConfigService = Schema.Schema.Type<
   typeof ApiServerConfigSchema
 >;
+
+export class ApiServerConfigError extends Schema.TaggedError<ApiServerConfigError>()(
+  "ApiServerConfigError",
+  { operation: Schema.Literal("settings") }
+) {}

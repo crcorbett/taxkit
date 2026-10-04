@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Patch Changes
+
+- Invalid present `API_PORT` values now fail with a safe settings error rather
+  than silently using `PORT`. Normal defaults and valid overrides remain.
+- Public-route smoke checks cover complete request deadlines, the OpenAPI
+  calculate path and checked external-consumer evidence. Cancellation and
+  timeout stop the child processes; failed temporary-folder cleanup fails the
+  command and remains alongside earlier failures.
+
 ### Major Changes
 
 - Calculation responses now expose the independent exact ruleset identifiers

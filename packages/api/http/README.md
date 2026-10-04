@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-24
-source_of_truth: package-readme
-confidence: medium
+document_type: package-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-http-api-owner
+last_reviewed: 2026-10-04
+review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
 # HTTP API
@@ -18,6 +20,11 @@ handler adapters and typed client helpers used by TaxKit apps. Reusable
 calculator schemas, catalog entries, metadata projections, graph construction,
 calculation dispatch and schema-guided expected error shaping live in
 `@taxkit/calculators`.
+
+The root export includes `HealthResponse`, the same Schema used by the health
+endpoint. The API app's smoke check uses this owner to validate the real health
+response without copying its shape. This addition preserves the health wire
+format and all existing routes.
 
 The implemented API surface is:
 

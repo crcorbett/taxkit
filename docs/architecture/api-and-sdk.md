@@ -28,6 +28,18 @@ that owns host/port config, process startup through
 shutdown through Effect interruption and scoped layer finalizers. It delegates
 API contracts, handlers, schemas and generated docs to `packages/api/http`.
 
+API settings use the caller's native ConfigProvider and owning port/host
+Schemas. Missing ports use `PORT` and then 4000; an invalid present `API_PORT`
+fails with a bounded settings error. Hosts retain trimming and blank fallback.
+The app's smoke command has named native HTTP operations, the public
+`HealthResponse` Schema and existing calculator Schemas. Request deadlines
+include headers and body decoding (health 15 seconds including retries, other
+routes five seconds). It checks the OpenAPI calculate path and then runs a
+plain JavaScript consumer outside the checkout. That command has a 30-second
+limit, scoped lifetime, checked route evidence and bounded output/error
+reporting. Failed cleanup remains a failure, including alongside failed work.
+These checks establish local app/consumer behaviour only.
+
 The current implemented API surface is:
 
 ```txt

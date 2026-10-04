@@ -1,4 +1,5 @@
 export { TaxKitApi } from "./api.js";
+export { HealthResponse } from "./groups/health.js";
 export {
   CalculatorCatalog,
   CalculatorCatalogItem,

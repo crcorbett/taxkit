@@ -40,8 +40,19 @@
       "ignoreDependencies": ["typescript", "@effect/language-service"]
     },
     "apps/api": {
-      "entry": ["src/index.ts"],
-      "project": ["src/**/*.ts"],
+      "entry": [
+        "src/index.ts",
+        "scripts/smoke-public-routes.runtime.ts",
+        "scripts/**/*.test.ts",
+        "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": [
+        "src/**/*.ts",
+        "scripts/**/*.ts",
+        "test/**/*.ts",
+        "vitest.config.ts"
+      ],
       "ignoreDependencies": ["@taxkit/tsconfig"]
     },
     "apps/web": {

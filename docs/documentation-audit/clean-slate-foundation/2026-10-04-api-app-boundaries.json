@@ -1,0 +1,193 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "60db52739b19dddf8301a8363bd0cd7fa0740bb7",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted checks separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Canonical strict rules across API source/scripts/native tests/configuration; two exact existing runtime admissions",
+    "Caller-owned ConfigProvider and canonical port/host schemas; missing-only fallback; bounded setting errors",
+    "Root HealthResponse export reuses unchanged endpoint schema; named native HTTP operations and owning body encoding",
+    "Full header/body deadlines: readiness 15 seconds including retry, other routes 5 seconds",
+    "Exact OpenAPI calculate-path assertion preserves isolated mutation oracle",
+    "Plain external consumer retained; native command scope, 30-second limit, 1048576-byte stdout bound, drained stderr and decoded exact route evidence",
+    "Safe closed command errors; cleanup failure remains alongside previous work failure; no mutable process exit handling",
+    "Actual TypeScript projects and native tests cover scripts, fixtures and configuration"
+  ],
+  "checks": [
+    {
+      "command": "focused compiler and native API tests",
+      "outcome": "pass; 45 cases including 14 settings cases; source/scripts/tests projects",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/api-app-types-final.log",
+        "/private/tmp/taxkit-local-toolchain/api-app-tests-final.log"
+      ]
+    },
+    {
+      "command": "actual lint corpus",
+      "outcome": "pass; 310 cases = 297 retained + 10 accepted API files + one rejected neighbour + two exact runtime selectors",
+      "log": "/private/tmp/taxkit-local-toolchain/api-app-policy-tests.log"
+    },
+    {
+      "command": "actual local API smoke",
+      "outcome": "pass; started standalone loopback server, decoded native responses, external plain HTTP consumer covered both calculation routes; workspace removed and API stopped",
+      "log": "/private/tmp/taxkit-local-toolchain/api-app-smoke-first.log"
+    },
+    {
+      "command": "frozen install",
+      "outcome": "pass; 793 installs/1020 packages; existing selections unchanged; only API test dependency declarations added",
+      "log": "/private/tmp/taxkit-local-toolchain/api-app-install-qualified.log"
+    },
+    {
+      "command": "complete repository tests and build",
+      "outcome": "pass; 23 test tasks, 17 matching caches; 15 build tasks, 12 matching caches",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/api-app-all-tests-first.log",
+        "/private/tmp/taxkit-local-toolchain/api-app-all-build-first.log"
+      ]
+    },
+    {
+      "command": "actual API success/failure/invalid-port checks and independent readback",
+      "outcome": "pass; intentional consumer failure exits 1; folder absent; both observed process identities absent and loopback port 4173 available; invalid port rejected before startup",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/api-app-smoke-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/api-app-smoke-simulated-failure.log",
+        "/private/tmp/taxkit-local-toolchain/api-app-smoke-invalid-port.log"
+      ]
+    },
+    {
+      "command": "actual SDK packed and installed consumers",
+      "outcome": "pass; 46-file SDK tarball; nine concrete-range packages; all three retained calculator results, lifetime, public imports and browser bundle; temporary folders removed",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/api-app-packed-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/api-app-downstream-qualified.log"
+      ]
+    },
+    {
+      "command": "full repository verification",
+      "outcome": "pass; all 21 Quality cases/all ten isolated faults/fresh source-only documentation; 176 deployment-tool cases, 21 skill cases, 16 evaluation cases, compiler/language/lint/format and both unused-code profiles; 24 SDK Chromium matching caches reused; actual two-case web Chromium run passed",
+      "quality_duration_seconds": 217.24,
+      "log": "/private/tmp/taxkit-local-toolchain/api-app-verification-first.log"
+    },
+    {
+      "command": "final docs/runbooks/format/diff/Changeset checks",
+      "outcome": "pass; HTTP patch pending; no version application",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/api-app-docs-final.log",
+        "/private/tmp/taxkit-local-toolchain/api-app-runbooks-final.log",
+        "/private/tmp/taxkit-local-toolchain/api-app-format-closeout.log",
+        "/private/tmp/taxkit-local-toolchain/api-app-changesets-final.log"
+      ]
+    }
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "apps/api",
+        "packages/api/http/src/groups/health.ts",
+        "packages/api/http/src/index.ts",
+        "packages/api/http/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/testing-and-quality.md",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "knip.json",
+        "bun.lock",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        ".changeset/checked-api-app-boundaries.md",
+        "apps/api/CHANGELOG.md"
+      ],
+      "reason": "Runtime settings, smoke lifetime/errors and reusable health Schema ownership changed together"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "HTTP wire shapes and route paths",
+        "all retained tax rules/results",
+        "selected dependency versions and release graph",
+        "current journey and exact OpenAPI mutation oracle",
+        "historical receipts and failed attempts",
+        "canonical skills and digests",
+        "docs/product-specs/clean-slate-foundation.md"
+      ],
+      "reason": "Approved local strict migration preserves product scope and tax results"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "public/generated content",
+        "runbook command/procedure",
+        "CI workflow",
+        "provider/registry/deployment state"
+      ],
+      "reason": "Existing commands and consequential authority unchanged; local checks only"
+    }
+  ],
+  "recovery": {
+    "attempts": [
+      {
+        "outcome": "failed settings test",
+        "observed": "Config.orElse accepted invalid API_PORT by using PORT; five of fourteen tests failed",
+        "log": "/private/tmp/taxkit-local-toolchain/api-app-tests-first.log"
+      },
+      {
+        "outcome": "corrected",
+        "observed": "Installed Config.option/flatMap missing-only fallback; all fourteen settings tests passed",
+        "log": "/private/tmp/taxkit-local-toolchain/api-app-tests-settings-qualified.log"
+      },
+      {
+        "outcome": "failed production unused-export check then corrected",
+        "observed": "loadApiServerConfig was only exported for tests; now private; tests use the same ApiServerConfigLive Layer; both unused-code profiles pass without an added exclusion",
+        "logs": [
+          "/private/tmp/taxkit-local-toolchain/api-app-knip-production-first.log",
+          "/private/tmp/taxkit-local-toolchain/api-app-tests-config-private.log",
+          "/private/tmp/taxkit-local-toolchain/api-app-knip-production-second.log"
+        ]
+      }
+    ],
+    "rollback": "Revert this complete slice; no provider operation or version application"
+  },
+  "limitations": [
+    "Native fixture counts do not establish standalone or hosted behaviour",
+    "OpenAPI decoding is a focused projection, not a full document schema claim",
+    "External consumer remains ordinary JavaScript with its own wire checks",
+    "Unavailable exit codes remain None; captured command output/native errors are not retained",
+    "Companion SDK validation remains bound to its earlier exact revision",
+    "DEV-73 app/config/infrastructure and semantic/readonly acceptance remain unfinished",
+    "Medicare correction awaits separate bounded decision",
+    "SDK Chromium reused matching unchanged-input caches; web Chromium actually ran two cases",
+    "Format and Changeset tasks passed; default-sandbox runs also reported a shared-cache IO permission warning after task success"
+  ],
+  "non_claims": [
+    "No merge, deployment, publication, provider apply or version application",
+    "No hosted qualification of this later API revision",
+    "No completion of DEV-73 or DEV-74\u201381"
+  ],
+  "hosted_parent": {
+    "revision": "60db52739b19dddf8301a8363bd0cd7fa0740bb7",
+    "pr": 116,
+    "run": 37197728534,
+    "outcome": "success",
+    "nonclaim": "Qualifies the SDK-script parent only, not this later API revision"
+  },
+  "versioning": {
+    "changeset": "@taxkit/api-http patch for HealthResponse export",
+    "app": "api is private and has no package version; app behaviour recorded in its Unreleased changelog",
+    "nonclaim": "No version application; existing fixed major train remains pending"
+  }
+}
