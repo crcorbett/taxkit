@@ -1,0 +1,53 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43TXQQ4Y0MHPWZTZ6T1KYJH",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T16:11:06.191126Z",
+  "branch": "codex/dev-73-foundation-acceptance-review",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/docs/scripts/cloudflare-built-browser.live.test.ts",
+    "apps/docs/scripts/cloudflare-built-browser.live.ts",
+    "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+    "docs/architecture/README.md",
+    "docs/architecture/configuration.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/facts.md",
+    "docs/architecture/package-boundaries.md",
+    "docs/architecture/rules-and-parameters.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/README.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "oxlint.config.ts",
+    "tools/oxlint/portable-rules.test.ts",
+    "tools/skills/canonical-skill-baseline.json"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "b7d70ba853ae",
+  "checkpoint_transcript_start": 13532,
+  "transcript_lines_at_start": 13532,
+  "compact_transcript_start": 1643,
+  "token_usage": {
+    "input_tokens": 418925,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 16824576,
+    "output_tokens": 59762,
+    "api_call_count": 108
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T16:11:05.384422Z",
+    "agent_lines": 823,
+    "agent_removed": 445,
+    "human_added": 6,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 829,
+    "total_lines_changed": 1278,
+    "agent_percentage": 99.21752738654148,
+    "metric_version": 2
+  }
+}
