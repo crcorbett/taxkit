@@ -1,0 +1,42 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M430WZJKASH7NJQ1B09BYSST",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T08:36:17.356291Z",
+  "branch": "codex/dev-73-deployment-receipt-policies",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-04-lint-file-deadlines.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/standards/tooling.md",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5cd4f6eeff9c",
+  "checkpoint_transcript_start": 4210,
+  "transcript_lines_at_start": 4210,
+  "compact_transcript_start": 510,
+  "token_usage": {
+    "input_tokens": 225251,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 9835520,
+    "output_tokens": 42555,
+    "api_call_count": 76
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T08:36:16.92697Z",
+    "agent_lines": 151,
+    "agent_removed": 16,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 151,
+    "total_lines_changed": 167,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
