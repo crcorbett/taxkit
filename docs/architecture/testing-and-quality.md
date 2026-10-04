@@ -496,7 +496,7 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   negative cases for encoding and `Schema.decodeTo`, and real Oxlint CLI
   fixtures for both a prohibited file and an exact allowlisted file. Run those
   fixture commands with `--disable-nested-config`.
-- The Oxlint CLI, repository-path and governance suites run through Bun-hosted Vitest with `@effect/vitest`.
+- The Oxlint CLI, repository-path, governance and skill-policy suites run through Bun-hosted Vitest with `@effect/vitest`.
   Effect scopes own fixture cleanup and child processes; the shared
   `tools/oxlint/cli-fixture.ts` boundary decodes process bytes.
   `check:oxlint:types` checks the tests and their imported lint configuration.
@@ -622,3 +622,8 @@ Checked docs-content examples are explicit development Knip entries and use
 declared workspace development dependencies. Their server boundary tests run
 the retained weekly calculation and reject malformed input; generated-page
 tests prove processed-text selection, receiver identity and error redaction.
+
+Skill-policy fixture reads use Effect FileSystem and exact Schema-owned JSON
+ingress. Bounded Effect traversal owns repeated I/O; pure classification uses
+persistent collections. `check:skills:types` checks this suite during root
+verification. A readLink assertion proves the actual canonical symlink target.

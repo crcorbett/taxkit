@@ -14,6 +14,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact fixture ingress: three Schema-owned historical policy corpora.
+  "tools/skills/skill-policies.test.ts",
   // Application configuration, executable smoke checks and checked examples.
   "apps/api/src/config.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
@@ -417,6 +419,7 @@ export default defineConfig({
         "tools/oxlint/*.ts",
         "tools/repository-paths/**",
         "tools/governance/**",
+        "tools/skills/**",
         "packages/testing/**",
         "packages/api/http/**",
         "packages/docs-content/**",

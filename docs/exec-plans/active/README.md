@@ -95,3 +95,6 @@ and
 The completed docs application migration and its bounded local screenshot
 evidence are retained under
 [`../completed/docs-application-architecture.md`](../completed/docs-application-architecture.md).
+
+The [TaxKit local continuation prompt](clean-slate-local-handoff.md) records the
+4 October requested cloud-to-local handoff for the active clean-slate plan.

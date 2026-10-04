@@ -134,6 +134,7 @@
     "//#test:repository-paths:task": { "outputs": [] },
     "//#test:quality-workflow:task": { "outputs": [] },
     "//#test:skills:task": { "outputs": [] },
+    "//#check:skills:types:task": { "outputs": [] },
     "//#changeset:status:task": { "outputs": [] },
     "dev": {
       "cache": false,

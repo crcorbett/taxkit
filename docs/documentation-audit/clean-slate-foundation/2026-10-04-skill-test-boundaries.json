@@ -1,0 +1,38 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "eb13b36c274b4da017acb170f4505a19caf9a156",
+  "implemented": [
+    "Bun-hosted Effect Vitest for all 21 retained skill-policy cases",
+    "Effect FileSystem and three Schema-owned JSON fixture corpora at an exact ingress admission",
+    "Bounded repeated I/O, persistent collection membership and checked captures/tuple bindings",
+    "All eleven canonical rules in tools/skills, real CLI fixtures and explicit check:skills:types in root verification",
+    "Committed local continuation prompt after Cooper requested a handoff"
+  ],
+  "verification": [
+    {
+      "command": "bun run test:skills",
+      "result": "21 tests passed; readLink retains actual mirror target proof instead of redundant lstat plus readLink assertions"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed including 77 real CLI lint cases"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed including skill test types, lint, format, documentation, governance, release-boundary checks and browser gate"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed; 15 tasks"
+    }
+  ],
+  "limitations": [
+    "No dependency versions or canonical skill trees changed; preceding frozen-install evidence retained",
+    "Whole DEV-73 enforcement and DEV-74\u201381 remain unfinished",
+    "No tax-result change, Medicare correction, merge, deployment, publication or provider apply"
+  ],
+  "handoff": "docs/exec-plans/active/clean-slate-local-handoff.md",
+  "recovery": "Revert this root-tooling slice; no external provider state changed"
+}

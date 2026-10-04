@@ -389,3 +389,27 @@ The [docs-adapter receipt](../../documentation-audit/clean-slate-foundation/2026
 records frozen install, all tests (75 lint and 13 docs-content), full verification,
 build and the corrected local workerd proof. Its observed dependency versions
 come from installed manifests. This is not provider or whole-T002 acceptance.
+
+## T002 skill-policy test boundaries and local handoff
+
+Run the retained skill-policy suite through Bun-hosted Effect Vitest, with
+Effect FileSystem, canonical fixture Schemas, bounded repeated I/O, persistent
+membership and checked capture groups. Replace unchecked tuple indexes with
+explicit tuple bindings. The actual readLink operation proves the mirror is a
+symbolic link and has its required target. Preserve every policy assertion and
+historical fixture. Enforce all eleven canonical rules and add an explicit
+TypeScript test gate plus real CLI path coverage. The exact test file is an
+admitted ingress owner for its three existing JSON fixture corpora.
+
+Documentation impact: **Change required** for test-host and typecheck ownership,
+commands, strict path coverage, this plan and the continuation prompt.
+**Preserve** canonical skill trees/hashes, historical fixtures, tax results and
+all provider state. **N/A** for a Changeset: root test tooling only.
+Cooper requested a local-thread handoff after this slice on 4 October. Stop at
+the committed/pushed handoff; the remaining approved work stays incomplete.
+Recover by reverting this slice; no provider operation was performed.
+
+The [skill-test receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-skill-test-boundaries.json)
+records 21 retained tests, 77 actual CLI cases, all tests, full verification and
+build. Resume using the [local continuation prompt](clean-slate-local-handoff.md);
+the approved overall goal is unfinished, and cloud execution stops for handoff.
