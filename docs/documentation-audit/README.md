@@ -382,3 +382,9 @@ At audit time, check that:
   native source/default planner correction, mock-only plan classification,
   same-resource origins/binding and root secret selection; real Website and
   provider operations remain unqualified.
+
+
+- [Native Website candidate](clean-slate-foundation/2026-10-05-native-website.json):
+  real private binding and direct browser RPC, idle/repeated request correction,
+  form/hydration/cleanup and built import proof. T003 and full exported tracing
+  remain unfinished; local tests do not establish deployment.

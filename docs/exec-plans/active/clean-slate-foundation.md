@@ -1913,3 +1913,79 @@ Quality cases with 13 isolated cases in 373.78 seconds, 206 deployment cases,
 21 skill cases, 16 evaluation cases and actual Chromium 24 SDK/four retained
 website cases. Current browser results still belong to the scaffold; the real
 Website/RPC/Atom connection remains the next T003 work.
+
+
+## T003 native Website implementation
+
+Continue above graph draft #130, commit
+`f373345f07fd877bdf903d24a0d7eb78f5fadb85`. The Website replaces its two retained
+HTTP runtimes with one server runner using the same native private binding and a
+React-owned Atom graph using the root loader's checked public API address.
+TanStack carries named transport functions and encoded loader values, never an
+Effect Context. The first calculator keeps explicit Calculate and ephemeral
+page state; edits and unmount interrupt old calls. Native app build, initial
+render/navigation, shared calculator result, full-body deadline, real binding,
+CORS, hydration and browser bundle proof remain required before acceptance.
+T003 remains in progress. Current docs deployment authority is preserved.
+
+
+The [Website receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-native-website.json)
+records the native candidate, exact host permissions and bounded local proof.
+Real app use exposed a native receive-loop lifetime error, idle settings being
+collected, `/rpc/` redirect drift, HTTP tracing headers despite RPC tracing being
+off, and a broad fact import loading the engine in the browser. The earliest
+owners are corrected and have regression oracles. Root restoration passes
+checked submissions through ordinary React context; no Effect Context crosses
+the framework transport. The saved native pair command builds compiled RPC
+dependencies, then the actual Alchemy native API/Website artifacts. It qualifies
+private/direct browser calls, repeated and idle use, expected unavailable-error
+hydration without replay, no-JavaScript form, editing, request limits and the
+browser import boundary. Full repository closeout is pending.
+
+Documentation impact is **Change required** for affected app/package READMEs,
+frontend/configuration/service/transport/package/quality owners, exact command/
+SDK/encoding permissions and canaries, both unused-code inventories, generated
+Wrangler declarations, the current journey and task/evidence pointers.
+**Preserve** existing docs deployment procedures/resources, public HTTP/OpenAPI,
+canonical skills, all historical evidence and retained tax results. A pay-package
+patch Changeset records the narrow fact import; private app/RPC/infra changes
+need no other Changeset. Native builders perform local source work only.
+T003 remains in progress for complete native failure/trace/cancellation proof;
+all calculator pages and exported telemetry remain later work. No merge,
+deployment, publication or provider operation is authorised.
+
+
+Adding the native Website journey exposed a reader that still applied HGI-203's
+fixed five-journey Schema to today's inventory. A separate explicit current
+Schema admits the six current journeys; the original historical Schema and
+packet digest remain intact. Release/runbook readers and focused tests use the
+correct owner. This is part of the Website documentation slice, not a new
+accepted release attempt.
+
+Current governance and its repository profile now require the named sixth
+Website journey too. Missing or substituted Website entries fail the current
+check. The saved HFI/HGI checkers and their expected nonzero historical failure
+identities are preserved; no old source hashes or acceptance records are
+refreshed.
+
+The Website sub-slice passes full local closeout: all 16 build tasks, all 27
+package/app test tasks, 452 actual CLI lint cases, local HTTP consumer smoke and
+full verification including the fresh native API/Website build and Chromium
+journey. Current governance requires six named journeys; its negative fixtures
+and the saved historical nonzero command identities pass. The final full check
+also validates generated Wrangler declarations and both unused-code inventories.
+The initial full runs stopped on the old journey assumption, unchecked list
+access in its new negative test, then a native RPC fixture missing its required
+URL; each correction was checked before the passing final run.
+This accepts the local Website sub-slice only. T003 remains in progress for the
+full native failure/trace/cancellation paths and development pair. Source review
+found that TanStack's native server-function failure handling can independently
+log and serialise errors; the Effect host logger alone cannot qualify that path.
+No old HFI/HGI hash or acceptance record is refreshed.
+
+The final staged diff check found trailing spaces in Wrangler's own generated
+runtime declarations. `.gitattributes` suppresses only end-of-line whitespace
+checks for that exact generated file, preserving the generator's bytes. A
+temporary ordinary source fixture still fails `git diff --check` and is restored
+byte-for-byte; the staged generated output passes. Generated type checking and
+post-receipt docs/runbook checks remain required before committing.

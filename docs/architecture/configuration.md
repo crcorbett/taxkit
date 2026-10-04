@@ -83,48 +83,33 @@ URL is a string and the canonical value is a `URL`. The fragment reads the
 named URL through native `Config.URL` and constructs the owning Schema value.
 Its `Config.nested` namespaces are `TAXKIT_API` and `VITE_TAXKIT_API`.
 
-The [server app config](../../apps/web/src/lib/config.server.ts) composes the
-package fragment rather than defining the HTTP setting again:
+The Website now uses the RPC origin owner rather than the retained HTTP
+client configuration. [Server settings](../../apps/web/src/lib/config.server.ts)
+read `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` through `Config.schema`.
+Native resource addresses come from the app graph, with `Worker.URL` for self
+and the peer Output for the other host. Config receives runtime binding values;
+missing/deferred outputs do not become guessed URLs.
 
-```ts
-export const TaxKitWebServerConfig = Config.all({
-  ...TaxKitHttpApiServerEnvConfig,
-});
-```
-
-This excerpt describes package composition; the owning module also maps config
-failure inline to the safe app error. Its native `ConfigProvider.fromEnv()` and
-`ConfigProvider.constantCase` read `TAXKIT_API_BASE_URL` at server runtime.
-`Config.nested`, `Config.Wrap` and `Config.URL` are supported by the installed
-Effect 4 version. Use `typeof ConfigSchema.Type` for new schema-derived type
-examples; the package's existing `Schema.Schema.Type` form remains supported.
+`TAXKIT_API` is a native SDK Fetcher object. Its methods are not string-tree
+configuration, so an owning Schema checks that object separately before the
+private live Layer adapts it. The application service exposes named operations,
+never the native object. The adapter preserves its receiver and unrelated
+adapter defects. Settings errors contain only fixed safe fields.
 
 ## Browser configuration boundary
 
-The [client config module](../../apps/web/src/lib/config.client.ts) composes
-`TaxKitHttpApiViteEnvConfig`. Its provider receives only the build-selected
-public input:
+The root TanStack server function returns Schema-encoded public settings only.
+The root route restores the branded API origin and seeds the React Atom registry.
+The public settings atom stays alive for that registry's lifetime, including an
+idle form. Disposing the registry clears its values. No binding, credential or
+Effect Context is serialised to the browser.
 
-```ts
-export const TaxKitWebClientConfigProviderLive = ConfigProvider.layer(
-  ConfigProvider.fromEnv({ env: __TAXKIT_WEB_CLIENT_INPUT__ }).pipe(
-    ConfigProvider.constantCase
-  )
-);
-```
-
-The [input owner](../../apps/web/src/lib/config.client-input.ts) defines and
-constructs the checked input containing only optional `VITE_TAXKIT_API_BASE_URL`.
-The [Vite config](../../apps/web/vite.config.ts) loads that input with native
-`Config.schema` and replaces the typed constant during the build. It sets
-`envPrefix: []` so Vite cannot automatically copy other prefixed environment
-values into browser code. The URL is then read through the package-owned config
-fragment. Do not pass the whole `import.meta.env` or process environment to the
-browser provider.
-
-The browser config test and built-bundle sentinel check prove that unrelated
-credential markers do not reach the qualified browser bundle. This is local
-build proof, separate from any hosted environment or provider configuration.
+[Vite configuration](../../apps/web/vite.config.ts) sets `envPrefix: []`. There
+is no public origin build constant or browser ambient environment read. The
+local Wrangler fixture owns test names/origins and generated Worker types;
+Alchemy's apps graph owns runtime resource bindings. The saved native pair test
+checks the actual browser call and audits its built files separately from
+provider/deployed configuration.
 
 ## Schema-owned settings
 

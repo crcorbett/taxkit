@@ -28,7 +28,7 @@ fibre and cleanup scope; the app constructs no backend ManagedRuntime.
 
 The Worker checks `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` with the
 canonical RPC origin policy. Its own origin comes from native `Worker.URL`;
-the future stack composition must supply the matching website resource Output.
+the apps stack supplies the matching website resource Output.
 Absent or invalid settings return a fixed native Config error without the
 rejected value. CORS allows the checked website origin and `content-type`,
 with credentials disabled. Other origins receive no allow-origin header.
@@ -218,7 +218,7 @@ curl -X POST https://api.taxkit.localhost/api/v1/calculators/au.pay.take-home/ca
 - Do not create a runtime inside request handling.
 - Keep process-owned resources in `ApiAppLayer` so root fiber interruption
   releases them through scoped finalizers.
-- Keep `apps/web` as an HTTP client of this app, not an in-process API mount.
+- Keep `apps/web` as a native RPC client of this app, with no in-process API mount.
 
 ## Related Docs
 
@@ -233,3 +233,9 @@ composition to `@taxkit/infrastructure/apps-stack`. Its source, compiled runtime
 and declaration paths are explicit. The graph owns peer binding and addresses;
 the API app owns request handling and checked runtime configuration. This export
 does not make a public package or change the existing HTTP/OpenAPI contract.
+
+The shared `@taxkit/api-rpc/request-boundary` now owns the native streamed POST
+limit; the app keeps its compatibility alias. `@taxkit/api-rpc/host-telemetry`
+owns the same fixed logging/reporting policy used by the Website. Existing API
+proof remains applicable through its focused regression tests; this reuse does
+not qualify native trace export or every framework logging path.

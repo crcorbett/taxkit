@@ -1,0 +1,2 @@
+# Preserve exact Wrangler runtime declarations; ordinary source keeps Git's whitespace checks.
+apps/web/src/worker-runtime.generated.d.ts whitespace=-blank-at-eol

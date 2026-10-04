@@ -69,6 +69,9 @@ describe("harness governance policy", () => {
     Effect.gen(function* () {
       const inputs = yield* loadAcceptedInputs();
       expect(inspectGovernance(inputs)).toEqual([]);
+      expect(
+        EffectArray.map(inputs.journeys.journeys, (journey) => journey.id)
+      ).toEqual(acceptedFixture.expected.journeys);
       expect(acceptedFixture.expected.findings).toEqual([
         "HE-001",
         "HE-002",
@@ -300,6 +303,59 @@ describe("harness governance policy", () => {
           receipt: { ...inputs.receipt, nonClaims: ["Local checks passed."] },
         },
         "external-claim"
+      );
+    })
+  );
+  it.effect("rejects a missing or substituted current Website journey", () =>
+    Effect.gen(function* () {
+      const inputs = yield* loadAcceptedInputs();
+      const [firstJourney, ...otherJourneys] = inputs.journeys.journeys;
+      const [firstJob, ...otherJobs] = inputs.profile.representativeJobs;
+      expectInvariant(
+        {
+          ...inputs,
+          journeys: {
+            ...inputs.journeys,
+            journeys: [
+              firstJourney,
+              ...EffectArray.filter(
+                otherJourneys,
+                (journey) => journey.id !== "taxkit-native-website"
+              ),
+            ],
+          },
+        },
+        "critical-journey"
+      );
+      expectInvariant(
+        {
+          ...inputs,
+          journeys: {
+            ...inputs.journeys,
+            journeys: EffectArray.map(inputs.journeys.journeys, (journey) =>
+              journey.id === "taxkit-native-website"
+                ? { ...journey, id: "taxkit-website-imitation" }
+                : journey
+            ),
+          },
+        },
+        "critical-journey"
+      );
+      expectInvariant(
+        {
+          ...inputs,
+          profile: {
+            ...inputs.profile,
+            representativeJobs: [
+              firstJob,
+              ...EffectArray.filter(
+                otherJobs,
+                (job) => job.id !== "TAXKIT-NATIVE-WEBSITE"
+              ),
+            ],
+          },
+        },
+        "repository-profile"
       );
     })
   );

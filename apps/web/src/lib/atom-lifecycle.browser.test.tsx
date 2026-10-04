@@ -83,7 +83,7 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
                     </AtomHarness>
                   )
                 );
-                document.body.append(element);
+                document.body.appendChild(element);
                 return element;
               }),
               (element) => Effect.sync(() => element.remove())

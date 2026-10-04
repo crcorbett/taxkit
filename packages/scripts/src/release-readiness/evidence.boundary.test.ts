@@ -6,6 +6,7 @@ import {
   Effect,
   FileSystem,
   PlatformError,
+  Result,
   Schema,
 } from "effect";
 import * as Path from "effect/Path";
@@ -26,7 +27,11 @@ import {
   verifyNewReleaseCandidateIdentity,
   verifyReleaseEvidence,
 } from "./evidence.boundary.js";
-import { ReleaseAttemptId, ReleaseAcceptedAttemptSummary } from "./schemas.js";
+import {
+  ReleaseAttemptId,
+  ReleaseAcceptedAttemptSummary,
+  ReleaseJourneyInventory,
+} from "./schemas.js";
 import type { ReleaseAttemptReceipt } from "./schemas.js";
 
 const workspaceRootUrl = new URL("../../../..", import.meta.url);
@@ -104,9 +109,37 @@ describe("release evidence boundary", () => {
           workspaceRoot
         ).pipe(Effect.flip);
 
-        expect(inventory.journeys).toHaveLength(5);
+        expect(inventory.journeys).toHaveLength(6);
         expect(packet.taskId).toBe("HGI-203");
         expect(currentVerification._tag).toBe("ReleaseEvidenceDecodeError");
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+
+  it.effect(
+    "separates the current native journey from the immutable historical shape",
+    () =>
+      Effect.gen(function* () {
+        const { historicalInventoryText, inventoryText } =
+          yield* readEvidenceTexts;
+        const historical = yield* Schema.decodeEffect(
+          Schema.fromJsonString(ReleaseJourneyInventory)
+        )(historicalInventoryText);
+        expect(historical.journeys).toHaveLength(5);
+        const expandedHistory = yield* Schema.decodeEffect(
+          Schema.fromJsonString(ReleaseJourneyInventory)
+        )(inventoryText).pipe(Effect.result);
+        expect(Result.isFailure(expandedHistory)).toBe(true);
+        const missingNative = yield* decodeReleaseJourneyInventory(
+          historicalInventoryText
+        ).pipe(Effect.flip);
+        expect(missingNative._tag).toBe("ReleaseEvidenceDecodeError");
+        const unknownNative = yield* decodeReleaseJourneyInventory(
+          inventoryText.replace(
+            "taxkit-native-website",
+            "taxkit-native-unknown"
+          )
+        ).pipe(Effect.flip);
+        expect(unknownNative._tag).toBe("ReleaseEvidenceDecodeError");
       }).pipe(Effect.provide(BunServices.layer))
   );
 

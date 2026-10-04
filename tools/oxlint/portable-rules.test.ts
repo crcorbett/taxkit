@@ -163,13 +163,19 @@ const fixtureCases = [
   {
     accepted: [
       "apps/web/src/lib/config.ts",
-      "apps/web/src/lib/config.client.ts",
-      "apps/web/src/lib/config.client-input.ts",
       "apps/web/src/lib/config.server.ts",
       "apps/web/src/lib/config.boundary.test.ts",
       "apps/web/src/lib/route-context.ts",
-      "apps/web/src/lib/runtime.client.ts",
       "apps/web/src/lib/runtime.server.ts",
+      "apps/web/src/lib/calculator.atoms.ts",
+      "apps/web/src/lib/loaders.ts",
+      "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+      "apps/web/scripts/native-pair-build.runtime.ts",
+      "apps/web/test/native-pair.boundary.test.ts",
+      "apps/web/vitest.native.config.ts",
+      "apps/web/src/lib/form.boundary.ts",
+      "apps/web/src/lib/loaders.server.ts",
+      "apps/web/src/server.ts",
       "apps/web/src/routes/index.tsx",
       "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
       "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
@@ -1320,10 +1326,12 @@ test.each([
   "apps/docs/src/server.ts",
   "apps/docs/vite.config.ts",
   "apps/web/vite.config.ts",
-  "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/runtime.server.ts",
-  "apps/web/src/routes/index.tsx",
+  "apps/web/src/lib/loaders.server.ts",
+  "apps/web/src/lib/loaders.ts",
   "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+  "apps/web/scripts/native-pair-build.runtime.ts",
+  "apps/web/src/server.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/scripts/check-import-boundaries.runtime.ts",
@@ -1383,6 +1391,7 @@ test.each([
 test.each([
   "packages/sdk/typescript/src/client.runtime.ts",
   "apps/docs/src/server.ts",
+  "apps/web/src/server.ts",
 ])("keeps the host Promise result admission exact: %s", (path) => {
   expect(
     Array.filter(
@@ -1435,6 +1444,62 @@ describe("exact native RPC lint boundaries", () => {
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
   test.effect.each([
+    {
+      path: "apps/web/src/lib/config.server.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/config.server.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
+      path: "apps/web/src/lib/calculator.atoms.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
+      path: "apps/web/src/lib/calculator.atoms.ts",
+      rejected: true,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/loaders.ts",
+      rejected: false,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
+      path: "apps/web/src/lib/loaders.ts",
+      rejected: true,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/server.ts",
+      rejected: false,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/server.ts",
+      rejected: true,
+      rule: "strict-effect(no-imperative-collections)",
+      source:
+        "export const run = () => { const values = [1]; values.push(2); return values; };",
+    },
     {
       path: "packages/api/rpc/src/server-serialization.boundary.ts",
       rejected: false,
@@ -1535,7 +1600,7 @@ describe("exact native RPC lint boundaries", () => {
         expect(result.exitCode).not.toBe(0);
         expect(result.codes).toContain(rule);
       } else {
-        expect(result.exitCode).toBe(0);
+        expect(result.exitCode, result.codes.join(", ")).toBe(0);
         expect(result.codes).not.toContain(rule);
       }
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))

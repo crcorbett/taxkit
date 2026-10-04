@@ -6,16 +6,29 @@
   "identitySource": "git rev-parse HEAD, git status --short --branch, and the content-addressed candidate manifest",
   "owners": {
     "docsRouter": "docs/README.md",
-    "architecture": ["docs/architecture/README.md", "docs/architecture/"],
-    "standards": ["docs/standards/README.md", "docs/standards/"],
-    "readmes": ["README.md", "apps/**/README.md", "packages/**/README.md"],
+    "architecture": [
+      "docs/architecture/README.md",
+      "docs/architecture/"
+    ],
+    "standards": [
+      "docs/standards/README.md",
+      "docs/standards/"
+    ],
+    "readmes": [
+      "README.md",
+      "apps/**/README.md",
+      "packages/**/README.md"
+    ],
     "generatedReference": [
       "packages/api/http/src/openapi.ts",
       "packages/api/http/__snapshots__/openapi.json",
       "packages/docs-content/source.config.ts",
       "packages/docs-content/.source/"
     ],
-    "runbooks": ["docs/runbooks/README.md", "docs/runbooks/"],
+    "runbooks": [
+      "docs/runbooks/README.md",
+      "docs/runbooks/"
+    ],
     "proof": [
       "docs/verification/critical-journeys.json",
       "docs/verification/docs-deployment-journeys.json",
@@ -27,15 +40,25 @@
       "docs/evidence/",
       "tools/evals/"
     ],
-    "activeSpecs": ["docs/product-specs/index.md"],
-    "activePlans": ["docs/exec-plans/active/README.md"],
+    "activeSpecs": [
+      "docs/product-specs/index.md"
+    ],
+    "activePlans": [
+      "docs/exec-plans/active/README.md"
+    ],
     "archives": [
       "docs/exec-plans/completed/",
       "docs/documentation-audit/",
       "docs/evidence/"
     ],
-    "skills": [".agents/skills/", ".claude/skills/"],
-    "agentGuidance": ["AGENTS.md", "CLAUDE.md"]
+    "skills": [
+      ".agents/skills/",
+      ".claude/skills/"
+    ],
+    "agentGuidance": [
+      "AGENTS.md",
+      "CLAUDE.md"
+    ]
   },
   "commands": {
     "documentation": [
@@ -44,7 +67,9 @@
       "bun run check:docs-deployment",
       "bun run check:repository-paths"
     ],
-    "skills": ["bun run test:skills"],
+    "skills": [
+      "bun run test:skills"
+    ],
     "focused": [
       "bun run check:harness-governance:types",
       "bun run test:harness-governance",
@@ -52,7 +77,10 @@
       "bun run check:harness-foundation-epoch:types",
       "bun run check:harness-foundation-epoch"
     ],
-    "closeout": ["bun run verification", "git diff --check"]
+    "closeout": [
+      "bun run verification",
+      "git diff --check"
+    ]
   },
   "representativeJobs": [
     {
@@ -103,6 +131,16 @@
         "packages/scripts/src/release-readiness/",
         "docs/verification/critical-journeys.json#taxkit-release-closure"
       ]
+    },
+    {
+      "id": "TAXKIT-NATIVE-WEBSITE",
+      "consumer": "Local Website reader and calculator user",
+      "acceptedOutcome": "The native API and Website artifacts support private form and public browser calculations with checked settings, hydration, interruption and safe browser imports.",
+      "owningPaths": [
+        "apps/web/",
+        "packages/api/rpc/",
+        "docs/verification/critical-journeys.json#taxkit-native-website"
+      ]
     }
   ],
   "criticalJourneyOwner": "docs/verification/critical-journeys.json",
@@ -111,7 +149,7 @@
     "The local release-readiness graph grants no versioning, Git, registry, release, deployment, provider, public-site, or recovery authority.",
     "The existing Quality workflow invokes bun run release:check -- --ci for pull requests and main-branch pushes; that graph begins with root verification and remains the sole hosted CI route.",
     "Exactly five operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
-    "The separate four-entry docs deployment journey owner and dated deployment receipts never alter the five local release journeys or historical HGI/HFI evidence.",
+    "The current six local journeys include the native Website. The separate four-entry docs deployment journey owner and dated deployment receipts grant no additional authority; historical five-journey HGI/HFI evidence remains unchanged.",
     "Repository-local skills and validators must work from a clean clone without reading a user home or global skill installation."
   ],
   "exclusions": [

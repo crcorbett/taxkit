@@ -62,8 +62,9 @@ const makeHttpTransport = Effect.fnUntraced(function* (
   const handler = yield* HttpRouter.toHttpEffect(
     TaxKitRpcHttpLayer.pipe(Layer.provide(CalculatorFixture(mode)))
   );
-  return HttpClient.make((request) =>
-    handler.pipe(
+  return HttpClient.make((request, url) =>
+    Effect.sync(() => expect(url.pathname).toBe("/rpc")).pipe(
+      Effect.andThen(handler),
       Effect.provideService(
         HttpServerRequest.HttpServerRequest,
         HttpServerRequest.fromClientRequest(request)
@@ -162,7 +163,12 @@ describe("native calculator RPC", () => {
     "uses native POST and JSON with a checked full calculator result",
     () =>
       Effect.gen(function* () {
-        const transport = yield* makeHttpTransport("success");
+        const nativeTransport = yield* makeHttpTransport("success");
+        const transport = HttpClient.make((request) => {
+          expect(request.headers).not.toHaveProperty("b3");
+          expect(request.headers).not.toHaveProperty("traceparent");
+          return nativeTransport.execute(request);
+        });
         yield* Effect.gen(function* () {
           const client = yield* TaxKitRpcClient;
           const response = yield* client.calculate(CalculationRequest);
@@ -346,7 +352,12 @@ describe("native calculator RPC", () => {
         disableTracing: true,
       }).pipe(
         Effect.provide(
-          RpcClient.layerProtocolHttp({ url: `${origin.origin}/rpc` }).pipe(
+          RpcClient.layerProtocolHttp({
+            transformClient: HttpClient.mapRequest(
+              HttpClientRequest.setUrl(`${origin.origin}/rpc`)
+            ),
+            url: `${origin.origin}/rpc`,
+          }).pipe(
             Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
             Layer.provide(RpcSerialization.layerJson)
           )

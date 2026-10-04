@@ -65,15 +65,22 @@
         "vite.config.ts",
         "src/**/*.test.ts",
         "vitest.config.ts",
-        "vitest.browser.config.ts"
+        "vitest.browser.config.ts",
+        "scripts/**/*.ts",
+        "test/**/*.ts",
+        "src/**/*.browser.test.tsx",
+        "vitest.native.config.ts"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "vite.config.ts",
         "vitest.config.ts",
-        "vitest.browser.config.ts"
+        "vitest.browser.config.ts",
+        "scripts/**/*.ts",
+        "test/**/*.ts",
+        "vitest.native.config.ts"
       ],
-      "ignoreDependencies": ["@tanstack/router-plugin", "@taxkit/tsconfig"]
+      "ignoreDependencies": ["@taxkit/tsconfig", "cloudflare"]
     },
     "apps/docs": {
       "entry": [

@@ -1,5 +1,6 @@
 import { describe, expect, it as test } from "@effect/vitest";
 import {
+  CurrentReleaseJourneyInventory,
   ReleaseAcceptedAttemptSummary,
   ReleaseJourneyInventory,
   ReleaseProofPacket,
@@ -87,7 +88,7 @@ const validInspection = Effect.gen(function* () {
       Schema.decodeUnknownEffect(ReleaseJourneyInventory)(
         historicalJourneyInventoryJson
       ),
-      Schema.decodeUnknownEffect(ReleaseJourneyInventory)(
+      Schema.decodeUnknownEffect(CurrentReleaseJourneyInventory)(
         currentJourneyInventoryJson
       ),
     ]);

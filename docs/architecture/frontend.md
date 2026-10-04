@@ -9,9 +9,9 @@ review_trigger: frontend runtime, transport, rendering, build adapter, or compos
 
 # Frontend
 
-TaxKit currently has two browser-facing TanStack Start apps: `apps/web` for
-API/runtime smoke behaviour and `apps/docs` for public developer
-documentation.
+TaxKit has two browser-facing TanStack Start apps: `apps/web` is the native
+calculator Website candidate and `apps/docs` remains the public developer
+documentation app until its replacement is qualified.
 
 ## Scope
 
@@ -21,12 +21,12 @@ define tax calculation rules.
 ## Main areas
 
 `apps/web`
-: Current scaffold app and health-check integration surface. It calls
-  `apps/api` over HTTP for SSR loaders and browser navigation.
+: Native Website candidate with checked settings, a take-home form, server
+  rendering over the private API binding and direct browser RPC.
 
 `apps/api`
-: Current standalone Bun API runtime. It owns API process startup and serves
-  the `packages/api/http` routes.
+: Retained standalone Bun API and native Alchemy Worker candidate. The Worker
+  serves HTTP and RPC through the same checked calculator operation.
 
 `apps/docs`
 : Fumadocs-backed public documentation site for rule references, API docs, SDK
@@ -49,45 +49,48 @@ API through the configured API base URL. Server-only handlers, filesystem code
 and Node adapters must stay behind explicit server exports and out of
 `apps/web`.
 
-The web runtime reads:
+The Website's native graph supplies its own origin from `Worker.URL`, the API
+origin from the peer resource Output, and the private `TAXKIT_API` binding.
+`config.server.ts` checks semantic origin strings through Config and the native
+SDK object through Schema. Missing or invalid settings become fixed checked
+errors; deferred planning outputs do not become invented deployment addresses.
+Vite exposes no ambient public env prefix or guessed build-time API address.
 
-- `TAXKIT_API_BASE_URL` for server-rendered loaders
-- `VITE_TAXKIT_API_BASE_URL` for browser navigation
+The Website owns one server ManagedRuntime. The browser owns a React Atom
+registry, not another ManagedRuntime. The root loader receives encoded plain
+settings through a TanStack server function, restores the branded origin and
+seeds the registry. Settings remain alive until that registry is disposed.
+`calculator.atoms.ts` describes scoped native RPC operations and synchronous
+form commands. The focused container owns command coordination and interrupts
+its operation on unmount; the leaf renders readonly values and callbacks.
 
-Both runtime-specific values are mapped into the package-owned
-`@taxkit/api-http/config` schema by `apps/web/src/lib/config.server.ts` and
-`apps/web/src/lib/config.client.ts`. Those modules compose package config
-fragments that use `Config.nested(...)`, then provide runtime env sources with
-`ConfigProvider.fromEnv(...)` and `ConfigProvider.constantCase`. Local dev
-scripts inject them from `portless get api.taxkit`; deployed environments
-should set them explicitly.
+Explicit Calculate reaches POST `/rpc` directly in the browser and uses the
+native private Fetcher binding for a standard server HTML form. Both calls
+reach the API's shared named operation. Neither initial rendering nor editing
+calculates. Editing interrupts work and removes a previous answer. The form
+works without JavaScript. Schema-encoded submissions restore checked outcomes
+through TanStack's native server request context; no Effect Context or native
+binding crosses into loader data.
 
-The exact Vite configuration host selects only the existing public browser
-input through installed Vite `loadEnv` file/environment precedence and native
-Config, then Schema-encodes a typed build constant. Automatic public-prefix
-exposure is disabled while Vite's mode/SSR metadata remains native. Browser ConfigProvider
-consumes that constant; the HTTP owner still validates its URL at runtime.
-Absence and invalid raw values retain runtime failure timing. Browser source
-has no ambient environment read. The app's Schema-owned settings error contains
-only the runtime kind, settings operation and a fixed safe message.
+The protocol Layer retains connection configuration. Each calculation owns its
+native RPC client's receive-loop scope, avoiding a suspended earlier Worker
+request's fibre blocking later requests. The client explicitly sets `/rpc` and
+omits credentials/rejects redirects. Both RPC and HTTP tracing are disabled on
+this connection pending safe export qualification; the API allows only the
+matching Website origin and `content-type` in browser CORS.
 
-The existing web root loader directly calls its runtime's named health
-operation with the Router abort signal and returns readonly health fields.
-Its context contract selects the actual native ManagedRuntime methods, instead
-of mirroring Promise signatures. The module runtimes, loader, Vite host and
-browser test's fake execution host have exact execution admissions. All web
-source/tests/configurations receive canonical strict rules; generated route
-output remains owned by TanStack. Native Chromium tests use the actual file
-route and generated HTTP client with a fake HTTP transport, prove health
-decoding and interruption/HTTP-signal abortion when its preload is retired.
-This does not establish every navigation/unmount path or remote cancellation.
+The native API and Website share streamed POST limits and fixed log/report
+containment. The Website's native HTTP Cause response boundary produces empty
+unexpected-error responses and preserves interruption classification. This
+contains host errors; it does not qualify all framework console or native trace
+paths. The saved native pair test runs actual native artifacts, a private API
+binding and real Chromium. Focused browser tests qualify idle settings, editing,
+form unmount and expected-error hydration. The app README owns exact commands,
+generated Wrangler declarations and the distinction between standalone and
+Alchemy-native build output. Full T003 privacy/fatal proof and all calculator
+pages remain active work.
 
-Web SSR and browser runtimes should use module-scoped
-`ManagedRuntime.make(...)` values from fully provided layers. Do not create
-Effect runtimes inside route loaders, React components or request-local helper
-functions.
-
-Docs SSR loaders use the same runtime rule. `apps/docs` keeps one module-scoped
+Docs SSR loaders retain their existing module-scoped runtime rule. `apps/docs` keeps one module-scoped
 server runtime for `DocsContentServiceLive`, composed over the TaxKit generated
 collection Layer, plus one app-private runtime-probe Layer, and exposes explicit
 disposal for tests and future host lifecycle integration. Native runtime tests

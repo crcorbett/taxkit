@@ -1,6 +1,7 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import {
+  CurrentReleaseJourneyInventory,
   ReleaseAcceptedAttemptSummary,
   ReleaseJourneyInventory,
   ReleaseProofPacket,
@@ -189,9 +190,9 @@ const makeProgram = (rootUrl: URL) =>
           })
       )
     );
-    yield* Schema.decodeEffect(Schema.fromJsonString(ReleaseJourneyInventory))(
-      currentJourneyInventoryText
-    ).pipe(
+    yield* Schema.decodeEffect(
+      Schema.fromJsonString(CurrentReleaseJourneyInventory)
+    )(currentJourneyInventoryText).pipe(
       Effect.mapError(
         () =>
           new RunbookValidationError({

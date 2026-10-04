@@ -282,6 +282,21 @@ export const ReleaseJourneyInventory = Schema.Struct({
 });
 export type ReleaseJourneyInventory = typeof ReleaseJourneyInventory.Type;
 
+// The retained HGI-203 packet keeps its exact five-journey Schema above.
+// Current inventory explicitly adds the native Website without changing history.
+export const CurrentReleaseJourneyInventory = Schema.Struct({
+  ...ReleaseJourneyInventory.fields,
+  journeys: Schema.Tuple([
+    ...ReleaseJourneyInventory.fields.journeys.elements,
+    Schema.Struct({
+      ...CriticalJourneyFields,
+      id: Schema.Literal("taxkit-native-website"),
+    }),
+  ]),
+});
+export type CurrentReleaseJourneyInventory =
+  typeof CurrentReleaseJourneyInventory.Type;
+
 const JourneyResultFields = {
   evidencePath: RelativeEvidencePath,
   status: Schema.Literals(["passed", "failed", "inconclusive"]),

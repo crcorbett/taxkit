@@ -207,9 +207,11 @@ describe("native paired app graph and planner", () => {
         expect(website.Props).toBeDefined();
         expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
         expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
-        expect(isSelfUrl(website.Props.env?.VITE_WEBSITE_PUBLIC_ORIGIN)).toBe(
-          true
-        );
+        expect(Record.keys(website.Props.env ?? {})).toEqual([
+          "API_PUBLIC_ORIGIN",
+          "TAXKIT_API",
+          "WEBSITE_PUBLIC_ORIGIN",
+        ]);
         const apiNode = Record.get(plan.resources, "TaxKitApi").pipe(
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );

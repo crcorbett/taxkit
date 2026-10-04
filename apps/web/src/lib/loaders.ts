@@ -1,0 +1,21 @@
+import { createServerFn } from "@tanstack/react-start";
+import { Effect } from "effect";
+
+import { loadWebsiteSettingsServer } from "./loaders.server";
+import type { WebsiteServerRenderContext } from "./schemas";
+
+const websiteSettings = createServerFn({ method: "GET" }).handler(() =>
+  loadWebsiteSettingsServer()
+);
+// The framework owns this plain Promise transport. Its small Effect carries
+// the request signal and encoded SSR submission; it owns no client or Layer.
+export const loadWebsiteSettings = (options: {
+  readonly signal: AbortSignal;
+  readonly submission?: WebsiteServerRenderContext["submission"];
+}) =>
+  Effect.runPromise(
+    Effect.promise(() => websiteSettings({ signal: options.signal })).pipe(
+      Effect.map((settings) => ({ settings, submission: options.submission }))
+    ),
+    { signal: options.signal }
+  );

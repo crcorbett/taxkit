@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/knip/schema.json",
-  "ignoreWorkspaces": ["apps/web", "packages/tsconfig"],
+  "ignoreWorkspaces": ["packages/tsconfig"],
   "ignoreIssues": {
     "packages/api/http/src/client/service.ts": ["duplicates"],
     "packages/scripts/src/release-readiness/evidence.boundary.ts": ["exports"]
@@ -166,9 +166,28 @@
         "src/server.ts!",
         "src/live.layer.ts!",
         "src/schemas.ts!",
-        "src/errors.ts!"
+        "src/errors.ts!",
+        "src/request-boundary.ts!",
+        "src/host-telemetry.ts!"
       ],
       "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
+    },
+    "apps/web": {
+      "entry": [
+        "src/router.tsx!",
+        "src/server.ts!",
+        "src/routes/**/*.{ts,tsx}!",
+        "vite.config.ts!"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}!",
+        "!src/**/*.test.ts!",
+        "!src/**/*.browser.test.tsx!",
+        "vite.config.ts!"
+      ],
+      "vite": false,
+      "ignoreDependencies": ["cloudflare"],
+      "ignoreExportsUsedInFile": true
     }
   }
 }

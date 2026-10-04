@@ -1,5 +1,5 @@
 import { CalculatorRpcOrigin } from "@taxkit/api-rpc/schemas";
-import { ByteSize, Duration, Schema } from "effect";
+import { Schema } from "effect";
 
 const ApiServerHostSchema = Schema.NonEmptyString;
 
@@ -44,11 +44,3 @@ export const ApiWorkerSettings = Schema.Struct({
 });
 
 export type ApiWorkerSettings = typeof ApiWorkerSettings.Type;
-
-export const ApiRequestBodyLimit = ByteSize.mebibytes(1);
-export const ApiRequestBodyDeadline = Duration.seconds(5);
-
-export class ApiRequestBodyRejected extends Schema.TaggedError<ApiRequestBodyRejected>()(
-  "ApiRequestBodyRejected",
-  { reason: Schema.Literals(["size", "deadline"]) }
-) {}

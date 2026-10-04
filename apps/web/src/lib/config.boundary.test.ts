@@ -1,166 +1,76 @@
 import { describe, expect, it } from "@effect/vitest";
-import {
-  Array,
-  ConfigProvider,
-  Effect,
-  Option,
-  Record,
-  Result,
-  Schema,
-} from "effect";
+import { ConfigProvider, Effect, Result, Schema } from "effect";
+import { vi } from "vitest";
 
-import webConfig from "../../vite.config.ts";
-import { TaxKitWebConfigError } from "./config";
-import {
-  TaxKitWebClientConfig,
-  TaxKitWebClientConfigProviderLive,
-} from "./config.client";
-import {
-  TaxKitWebClientInput,
-  TaxKitWebClientInputConfig,
-} from "./config.client-input";
 import { TaxKitWebServerConfig } from "./config.server";
+import { WebsitePublicSettings, WebsiteSettingsTransport } from "./schemas";
 
-const runtimes = [
-  {
-    config: TaxKitWebClientConfig,
-    key: "VITE_TAXKIT_API_BASE_URL",
-    runtime: "client",
-  },
-  {
-    config: TaxKitWebServerConfig,
-    key: "TAXKIT_API_BASE_URL",
-    runtime: "server",
-  },
-] as const;
-
-describe("web settings boundary", () => {
-  it.effect.each(["build", "serve"] as const)(
-    "exposes only the typed API build input for %s",
-    (command) =>
+const binding = { connect: vi.fn(), fetch: vi.fn() };
+const settings = {
+  API_PUBLIC_ORIGIN: "https://api.taxkit.example",
+  TAXKIT_API: binding,
+  WEBSITE_PUBLIC_ORIGIN: "https://taxkit.example",
+};
+describe("native website settings boundary", () => {
+  it.effect(
+    "retains the binding receiver and restores branded origins through JSON",
+    () =>
       Effect.gen(function* () {
-        const config = webConfig({ command, mode: "production" });
-        expect(config.envPrefix).toEqual([]);
-        expect(Record.keys(config.define ?? {})).toEqual([
-          "__TAXKIT_WEB_CLIENT_INPUT__",
-        ]);
-        const encoded = yield* Effect.fromOption(
-          Record.get(config.define ?? {}, "__TAXKIT_WEB_CLIENT_INPUT__")
-        );
-        const decoded = yield* Schema.decodeUnknownEffect(
-          Schema.fromJsonString(TaxKitWebClientInput)
-        )(encoded);
-        expect(Schema.is(TaxKitWebClientInput)(decoded)).toBe(true);
-      })
-  );
-
-  it.effect.each(
-    Array.flatMap(runtimes, (runtime) =>
-      Array.map(
-        ["http://localhost:4000", "https://api.taxkit.example"],
-        (baseUrl) => ({
-          ...runtime,
-          baseUrl,
-        })
-      )
-    )
-  )(
-    "loads $runtime URL $baseUrl with the HTTP owner's Config",
-    ({ baseUrl, config, key }) =>
-      Effect.gen(function* () {
-        const settings = yield* config.pipe(
+        const checked = yield* TaxKitWebServerConfig(binding).pipe(
           Effect.provideService(
             ConfigProvider.ConfigProvider,
-            ConfigProvider.fromEnv({ env: { [key]: baseUrl } }).pipe(
-              ConfigProvider.constantCase
-            )
+            ConfigProvider.fromUnknown(settings)
           )
         );
-        expect(settings.httpApi.baseUrl.href).toBe(`${baseUrl}/`);
-      })
-  );
-
-  it.effect.each(
-    Array.flatMap(runtimes, (runtime) =>
-      Array.map([undefined, "", "TAXKIT_SECRET_SENTINEL"], (value) => ({
-        ...runtime,
-        value,
-      }))
-    )
-  )(
-    "rejects $runtime settings $value with a safe error",
-    ({ config, key, runtime, value }) =>
-      Effect.gen(function* () {
-        const result = yield* config.pipe(
-          Effect.provideService(
-            ConfigProvider.ConfigProvider,
-            ConfigProvider.fromEnv({
-              env: Option.fromUndefinedOr(value).pipe(
-                Option.match({
-                  onNone: () => ({}),
-                  onSome: (present) => ({ [key]: present }),
-                })
-              ),
-            }).pipe(ConfigProvider.constantCase)
-          ),
-          Effect.result
+        expect(checked.binding).toBe(binding);
+        expect(checked.apiOrigin.href).toBe("https://api.taxkit.example/");
+        const encoded = yield* Schema.encodeEffect(
+          Schema.fromJsonString(WebsiteSettingsTransport)
+        )(
+          Result.succeed(
+            WebsitePublicSettings.make({ apiOrigin: checked.apiOrigin })
+          )
         );
-        expect(Result.isFailure(result)).toBe(true);
-        if (Result.isFailure(result)) {
-          const encoded = yield* Schema.encodeEffect(
-            Schema.fromJsonString(TaxKitWebConfigError)
-          )(result.failure);
-          expect(encoded).toBe(
-            `{"_tag":"TaxKitWebConfigError","message":"TaxKit web settings are missing or invalid.","operation":"settings","runtime":"${runtime}"}`
-          );
-          expect(String(result.failure)).not.toContain(
-            "TAXKIT_SECRET_SENTINEL"
-          );
-          expect(encoded).not.toContain("cause");
+        const restored = yield* Schema.decodeUnknownEffect(
+          Schema.fromJsonString(WebsiteSettingsTransport)
+        )(encoded);
+        expect(Result.isSuccess(restored)).toBe(true);
+        if (Result.isSuccess(restored)) {
+          expect(restored.success.apiOrigin).toBeInstanceOf(URL);
         }
       })
   );
-
   it.effect.each([
-    { env: {}, expected: "{}" },
+    { ...settings, API_PUBLIC_ORIGIN: undefined },
     {
-      env: { VITE_TAXKIT_API_BASE_URL: "TAXKIT_SECRET_SENTINEL" },
-      expected: '{"VITE_TAXKIT_API_BASE_URL":"TAXKIT_SECRET_SENTINEL"}',
+      ...settings,
+      API_PUBLIC_ORIGIN:
+        "https://api.taxkit.example/secret-canary?token=secret-canary",
     },
-    {
-      env: {
-        TAXKIT_API_BASE_URL: "SERVER_ONLY_SENTINEL",
-        VITE_TAXKIT_API_BASE_URL: "https://api.taxkit.example",
-      },
-      expected: '{"VITE_TAXKIT_API_BASE_URL":"https://api.taxkit.example"}',
-    },
+    { ...settings, WEBSITE_PUBLIC_ORIGIN: "secret-canary" },
+    { ...settings, TAXKIT_API: { fetch: vi.fn() } },
+    { ...settings, TAXKIT_API: "secret-canary" },
   ])(
-    "selects only the existing public build input $expected",
-    ({ env, expected }) =>
+    "rejects missing or invalid settings without carrying raw input",
+    (input) =>
       Effect.gen(function* () {
-        const input = yield* TaxKitWebClientInputConfig.pipe(
+        const checked = yield* TaxKitWebServerConfig(input.TAXKIT_API).pipe(
           Effect.provideService(
             ConfigProvider.ConfigProvider,
-            ConfigProvider.fromEnv({ env })
-          )
-        );
-        expect(
-          yield* Schema.encodeEffect(
-            Schema.fromJsonString(TaxKitWebClientInput)
-          )(input)
-        ).toBe(expected);
-      })
-  );
-
-  it.effect(
-    "keeps an absent compiled browser URL a runtime configuration failure",
-    () =>
-      Effect.gen(function* () {
-        const result = yield* TaxKitWebClientConfig.pipe(
-          Effect.provide(TaxKitWebClientConfigProviderLive),
+            ConfigProvider.fromUnknown(input)
+          ),
           Effect.result
         );
-        expect(Result.isFailure(result)).toBe(true);
+        expect(Result.isFailure(checked)).toBe(true);
+        if (Result.isFailure(checked)) {
+          expect(checked.failure.message).toBe(
+            "TaxKit web settings are missing or invalid."
+          );
+          const encoded = yield* Schema.encodeEffect(
+            Schema.fromJsonString(WebsiteSettingsTransport)
+          )(checked);
+          expect(encoded).not.toContain("secret-canary");
+        }
       })
   );
 });

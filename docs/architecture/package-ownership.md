@@ -124,8 +124,11 @@ request-preserving calculator helpers such as `calculateRunRequest`,
 calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
 
 `apps/web`
-: Current scaffold app. It proves the runtime boundary and health endpoint
-while the accepted T003 calculator workflow is being implemented.
+: Native TanStack Website candidate. It owns form presentation/commands, the
+  server runner and React Atom registry. The private server binding and checked
+  public browser address reach the separate API through native RPC. The root
+  restores encoded outcomes. Tax rules and calculations remain package/API-owned;
+  full T003 acceptance and the other calculator pages remain in progress.
 
 `apps/docs`
 : Implemented public documentation app. It owns TanStack Start routes, the
@@ -166,7 +169,8 @@ and adds the native Alchemy Worker candidate for active DEV-74. The native
 instance owns one router and calculator service; incoming requests own body
 limits, dispatch and cleanup. HTTP and RPC share the named calculator operation.
 The private `api/worker` export supplies native composition to the infrastructure
-graph; website runtime connection remains pending in the active plan.
+graph. The Website uses its private binding for SSR and checked public origin
+for browser RPC; full T003 acceptance remains pending.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs

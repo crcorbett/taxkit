@@ -216,8 +216,9 @@ arguments and retained packet failures return nonzero before any release check.
 ## Local proof boundary
 
 [`../../docs/verification/critical-journeys.json`](../../docs/verification/critical-journeys.json)
-owns exactly five consumer-visible journeys: calculator direct use, packed SDK,
-HTTP API, docs runtime and release closure. The initial retained packet is
+owns six current consumer-visible journeys: calculator direct use, packed SDK,
+HTTP API, docs runtime, release closure and the native Website. The accepted
+HGI-203 snapshot retains its original five. The initial retained packet is
 [`../../docs/evidence/releases/HGI-203-local.json`](../../docs/evidence/releases/HGI-203-local.json).
 Both are local evidence only: they do not prove npm publication, a tag, a
 release, deployment, provider state, deployed SSR/hydration or public
@@ -247,3 +248,11 @@ experiments in the default documentation route.
 - `docs/architecture/testing-and-quality.md`
 - `docs/design-docs/abstraction-admission.md`
 - `docs/standards/versioning.md`
+
+
+`ReleaseJourneyInventory` preserves the exact historical five-journey HGI-203
+shape. `CurrentReleaseJourneyInventory` additionally requires the native Website
+journey in today's inventory. The current reader and runbook check use that
+current Schema; historical packet verification keeps the retained Schema and
+original digest. Adding a current journey does not qualify it as part of the old
+accepted release or establish a new release attempt.

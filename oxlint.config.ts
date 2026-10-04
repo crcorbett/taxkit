@@ -20,8 +20,14 @@ const decodingBoundaryFiles = [
   "packages/api/rpc/src/server-serialization.boundary.ts",
   "packages/api/rpc/test/handlers.test.ts",
   "packages/api/rpc/test/deadline.test.ts",
-  // Actual Vite-defined JSON input is decoded once with the owning build-input Schema.
+  // Exact native website settings, form and hydration boundaries.
   "apps/web/src/lib/config.boundary.test.ts",
+  "apps/web/src/lib/config.server.ts",
+  "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+  "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+  "apps/web/src/lib/form.boundary.ts",
+  "apps/web/src/routes/__root.tsx",
+  "apps/web/src/server.ts",
   "apps/api/scripts/routes.ts",
   "apps/api/test/config.test.ts",
   "packages/sdk/typescript/scripts/script-boundaries.test.ts",
@@ -175,13 +181,17 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  "apps/web/test/native-pair.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
   // Test-only native request/reply bytes; no production encoder admission.
   "packages/api/rpc/test/handlers.test.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
   "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
-  "apps/web/vite.config.ts",
+  "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+  "apps/web/src/lib/loaders.server.ts",
+  "apps/web/src/server.ts",
+  "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/src/lib/config.boundary.test.ts",
   // Exact negative wire fixtures; native encoding only, no decoder/runtime/throwing codec admission.
   "apps/docs/src/lib/docs/route-boundary.test.ts",
@@ -250,6 +260,7 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  "apps/web/scripts/native-pair-build.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
@@ -264,10 +275,11 @@ const runtimeBoundaryFiles = [
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/vite.config.ts",
   "apps/web/vite.config.ts",
-  "apps/web/src/routes/index.tsx",
-  "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
-  "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/runtime.server.ts",
+  "apps/web/src/lib/loaders.ts",
+  "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+  "apps/web/src/lib/loaders.server.ts",
+  "apps/web/src/server.ts",
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
@@ -352,6 +364,7 @@ const bunAdapterFiles = [
 ];
 
 const bunRuntimeEntrypointFiles = [
+  "apps/web/scripts/native-pair-build.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
@@ -393,6 +406,7 @@ export default defineConfig({
     ".agents/**",
     ".claude/**",
     "apps/web/src/routeTree.gen.ts",
+    "apps/web/src/worker-runtime.generated.d.ts",
     "dist/**",
     ".output/**",
     ".tanstack/**",
@@ -429,6 +443,8 @@ export default defineConfig({
         "packages/api/rpc/src/live.layer.ts",
         "packages/api/rpc/src/server-serialization.boundary.ts",
         "apps/web/src/lib/config.ts",
+        "apps/web/src/lib/form.boundary.ts",
+        "packages/api/rpc/src/request-boundary.ts",
         "apps/api/scripts/routes.ts",
         "apps/api/scripts/smoke-public-routes.runtime.ts",
       ],
@@ -582,20 +598,53 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/src/lib/runtime.client.ts"],
+      files: ["apps/web/src/lib/config.server.ts"],
+      rules: { "anti-slop/no-unknown-parameters": "off" },
+    },
+    {
+      files: [
+        "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
+        "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+      ],
+      rules: { "unicorn/prefer-dom-node-append": "off" },
+    },
+    {
+      files: ["apps/web/test/native-pair.boundary.test.ts"],
       rules: {
-        "strict-effect/no-runtime-outside-boundary": [
+        "strict-effect/no-imperative-collections": [
           "error",
-          { allowedFiles: ["apps/web/src/lib/runtime.client.ts"] },
+          {
+            allowedMethods: [
+              {
+                file: "apps/web/test/native-pair.boundary.test.ts",
+                method: "fill",
+                receiver: "payInput",
+              },
+              {
+                file: "apps/web/test/native-pair.boundary.test.ts",
+                method: "fill",
+                receiver: "errorPayInput",
+              },
+            ],
+          },
         ],
       },
     },
     {
-      files: ["apps/web/src/lib/runtime.server.ts"],
+      files: ["apps/web/scripts/native-pair-build.runtime.ts"],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
           "error",
-          { allowedFiles: ["apps/web/src/lib/runtime.server.ts"] },
+          { allowedFiles: ["apps/web/scripts/native-pair-build.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/src/lib/loaders.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/src/lib/loaders.ts"] },
         ],
       },
     },
@@ -613,11 +662,38 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/src/routes/index.tsx"],
+      files: ["apps/web/src/server.ts"],
+      rules: {
+        "strict-effect/no-promise-workflow": [
+          "error",
+          { allowedFiles: ["apps/web/src/server.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/src/lib/loaders.server.ts"],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
           "error",
-          { allowedFiles: ["apps/web/src/routes/index.tsx"] },
+          { allowedFiles: ["apps/web/src/lib/loaders.server.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/src/server.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/src/server.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/src/lib/runtime.server.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/src/lib/runtime.server.ts"] },
         ],
       },
     },

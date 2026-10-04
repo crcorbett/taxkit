@@ -50,7 +50,10 @@ entry once and binds the website privately to that same API resource as
 `TAXKIT_API`. Each host receives its own address from native `Worker.URL` and
 the other address from the peer's native Output. Absent peer URLs become null,
 not invented addresses; runtime application Config remains the checked ingress.
-The website application connection is still pending in T003.
+The Website candidate now consumes the binding and checked public API origin.
+The graph supplies only three Website runtime values; it does not copy origins
+into Vite browser build constants. The Website's native pair test covers local
+runtime use; full T003 qualification remains in progress.
 
 Root native secret selection checks the existing `prod`, `pr-N` and
 `dev_identity` stage rules. It selects Doppler project `taxkit`, respectively

@@ -20,7 +20,7 @@ import {
   ReleaseAcceptedAttemptSummary,
   ReleaseAttemptReceipt,
   ReleaseEvidenceArtifact,
-  ReleaseJourneyInventory,
+  CurrentReleaseJourneyInventory,
   ReleasePresentationReceipt,
   ReleaseProofPacket,
 } from "./schemas.js";
@@ -55,14 +55,14 @@ export const sha256Text = (text: string) =>
   );
 
 export const decodeReleaseJourneyInventory = (text: string) =>
-  Schema.decodeUnknownEffect(Schema.fromJsonString(ReleaseJourneyInventory))(
-    text
-  ).pipe(
+  Schema.decodeUnknownEffect(
+    Schema.fromJsonString(CurrentReleaseJourneyInventory)
+  )(text).pipe(
     Effect.mapError(
       () =>
         new ReleaseEvidenceDecodeError({
           evidencePath: journeyInventoryPath,
-          operation: "decode-five-journey-inventory",
+          operation: "decode-current-journey-inventory",
         })
     )
   );
@@ -589,7 +589,7 @@ export const readReleaseEvidence = (workspaceRoot: string) =>
           () =>
             new ReleaseEvidenceDecodeError({
               evidencePath: journeyInventoryPath,
-              operation: "read-five-journey-inventory",
+              operation: "read-current-journey-inventory",
             })
         )
       );

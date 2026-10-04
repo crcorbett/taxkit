@@ -6,7 +6,10 @@
     "src/**/*.d.ts",
     "vite.config.ts",
     "vitest.config.ts",
-    "vitest.browser.config.ts"
+    "vitest.browser.config.ts",
+    "scripts/**/*.ts",
+    "test/**/*.ts",
+    "vitest.native.config.ts"
   ],
   "compilerOptions": {
     "lib": ["ES2024", "DOM", "DOM.Iterable"],

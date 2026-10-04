@@ -1,135 +1,109 @@
 ---
-status: canonical
+document_type: app-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-web-app-owner
 last_reviewed: 2026-10-05
-source_of_truth: package-readme
-confidence: high
+review_trigger: website rendering, settings, transport, form, generated types or build change
 ---
 
-# Web App
+# Website app
 
-Current TanStack Start scaffold for TaxKit.
+`apps/web` is the native TanStack Start Website candidate. Its first form uses
+native Effect RPC to calculate Australian take-home pay. Tax calculation stays
+in the separate API app. The current public docs app remains `apps/docs`.
 
-## Scope
+## What runs where
 
-`apps/web` proves the current browser/server runtime split and calls the
-standalone Effect HTTP API service owned by `apps/api`. It is not the
-long-term calculation engine and should not own tax-domain contracts or API
-request handling.
+The server has one `ManagedRuntime` in `src/lib/runtime.server.ts`. Its checked
+`WebsiteServerApplication` exposes settings and calculation only. The private
+`TAXKIT_API` service binding supplies the server connection. The native Alchemy
+Fetcher adapter keeps the binding's receiver attached.
 
-## Main Areas
+The root route restores Schema-encoded settings and seeds a React-owned Atom
+registry. `calculator.atoms.ts` describes the browser connection and commands;
+it creates no browser runner. Checked settings stay alive for that registry's
+lifetime, including time spent waiting before the first click. The browser calls
+the checked `API_PUBLIC_ORIGIN` directly at POST `/rpc`. The server function
+transports settings only. No calculation runs when the page loads.
 
-- `src/routes/`: TanStack Router routes
-- `src/lib/runtime.server.ts`: server `ManagedRuntime`
-- `src/lib/runtime.client.ts`: client `ManagedRuntime`
-- `src/lib/route-context.ts`: route runtime contract and context selection
-- `src/lib/runtime-selection.ts`: isomorphic selection of the server/client runtime
-- `src/server.ts`: server entrypoint
+Calculate sends the existing canonical request. Editing interrupts unfinished
+work and clears the previous answer. Leaving the form interrupts its operation;
+disposing the registry releases its resources. The standard HTML POST form also
+works without JavaScript, using the private binding and the same API operation.
+Server submissions use an encoded checked result when TanStack loads the page
+in the browser. Neither an Effect Context nor a service binding is serialised.
 
-## Runtime Shape
+The shared RPC client owns its receive-loop scope per calculation. Retaining a
+client started by an earlier Worker request can stall a later request. Its
+transport Layer keeps configuration, and each call creates and releases the
+native RPC client without building a Layer or runner. Both RPC and HTTP tracing
+are disabled for this connection; HTTP tracing otherwise adds headers outside
+the admitted browser CORS policy. This is containment, not completed tracing.
 
-The root route loads `@taxkit/api-http/client` through the route runtime and
-renders API health status from the standalone API service over HTTP.
-Server-only API exports must stay out of browser code. The root loader uses
-the native runtime contract and passes the Router abort signal to its existing
-HTTP operation. It returns readonly health fields without a hand-written
-Promise interface or a one-use runtime wrapper.
+## Settings and generated owners
 
-The web runtime reads the API origin from:
+Alchemy's apps graph supplies `API_PUBLIC_ORIGIN`, `WEBSITE_PUBLIC_ORIGIN` and
+`TAXKIT_API` from the matching native resources. Origin Schemas admit HTTPS or
+local HTTP origins and reject paths, queries, fragments and credentials. Config
+reads semantic strings; Schema checks the native binding object separately.
+Expected settings errors use fixed safe fields. No guessed production address
+or browser build-time origin is used. Automatic Vite env-prefix exposure is off.
 
-- `TAXKIT_API_BASE_URL` on the server
-- `VITE_TAXKIT_API_BASE_URL` in the browser
+`wrangler.jsonc` owns the standalone local fixture and compatibility settings.
+Its local names and addresses are test inputs, not deployed resources. Wrangler
+owns `src/worker-runtime.generated.d.ts`; regenerate it rather than editing it.
+TanStack owns `src/routeTree.gen.ts`.
 
-Both are required runtime config values and are validated with the HTTP
-package's Effect Config and URL Schema. The exact Vite host reads only the
-public browser input using Vite's normal file/environment precedence, then
-Schema-encodes it into a typed build constant. Automatic public-prefix
-exposure is disabled; Vite still supplies its standard mode/SSR metadata.
-Browser modules do not read
-`import.meta.env`. Missing or invalid raw URLs still fail at runtime; the build
-does not guess a URL or change that validation timing. Settings failures expose
-only the client/server identity, settings operation and fixed safe message.
-`bun run --filter=web dev` injects both from
-`portless get api.taxkit`. Do not include `/api` in the base URL; the typed
-API client owns route prefixes.
+## Checks
 
-## Guardrails
-
-- Keep tax rules, facts and calculators in engine packages.
-- Use browser-safe API client exports from routes.
-- Do not import `@taxkit/api-http/server` from browser code.
-- Keep route data acquisition and trust-boundary conversion route-high. Render
-  the page shell and semantic landmarks before passing focused readonly values
-  and callbacks to leaves.
-- Keep local UI commands in leaves; keep remote or domain commands in the route
-  action or nearest policy-owning container.
-- Put loading, empty and recoverable error UI at the smallest owning boundary
-  while preserving a stable footprint and the surrounding page shell.
-- Keep the app README local; route durable architecture to `docs/architecture`.
-
-## Commands
-
-```bash
-bun run --filter=api dev
-bun run --filter=web dev
+```sh
+bun run --filter=web generate:worker-types
+bun run --filter=web check:worker-types
 bun run --filter=web check-types
 bun run --filter=web test
 bun run --filter=web test:browser
 bun run --filter=web build
+bun run --filter=web build:native-pair
+bun run --filter=web test:native-pair
 ```
 
-Run `apps/api` before loading the web root locally. Without the API process,
-the root route should fail with an attributable HTTP transport error rather
-than silently falling back to an in-process API.
+`build:native-pair` first builds compiled RPC dependencies, then uses Alchemy's
+public native source builders for both apps. It acquires no cloud provider,
+state, plan, credentials or apply. The API output is ignored under
+`.alchemy/native-pair`; the native Website output is `dist/server/server.js`.
+A standalone Cloudflare Vite build instead produces `dist/server/index.js`.
+Run the native build immediately before its test, because a normal build
+replaces that Website output.
 
-Use the portless URLs for local browser and app-to-app checks:
+The native pair test requires the selected Node 24.16.0 and installed Chromium.
+It owns local ports 4196 and 4197 and disposes its browser and Workers on exit.
+The public API and private binding use separate local isolates built from the
+same API artifact. The test covers an initial page, repeated private requests
+across idle time, one exact browser POST, omitted cookies/tracing headers,
+editing, and a calculation without JavaScript. It does not prove deployment,
+provider cancellation or every failure/trace-export path.
 
-- API: `https://api.taxkit.localhost`
-- Web: `https://taxkit.localhost`
+The Atom/Scheduler browser checks cover scheduling, StrictMode remount,
+hydration, rapid updates, editing and form unmount cancellation, and expected
+server-error restoration without replaying a calculation. Effect scopes own
+fixture cleanup. Exact lint admissions cover required execution, encoding,
+native binding input and Playwright's `fill` operation; nearby application
+files retain the restrictions. Both Knip graphs include the Website.
 
-## Related Docs
+`dev` runs the standalone native Website fixture. A matching native API service
+must also be registered for its private binding; the retained Bun HTTP process
+alone cannot supply it. The complete development pair and all calculator pages
+remain active clean-slate work.
 
-- `docs/architecture/frontend.md`
-- `docs/architecture/api-and-sdk.md`
-- `docs/architecture/deployment.md`
-- `docs/design-docs/abstraction-admission.md`
+## Related owners
 
-## Atom compatibility proof
+- [Frontend architecture](../../docs/architecture/frontend.md)
+- [RPC package](../../packages/api/rpc/README.md)
+- [API app](../api/README.md)
+- [Native apps graph](../../packages/infrastructure/README.md)
+- [Active execution plan](../../docs/exec-plans/active/clean-slate-foundation.md)
 
-`bun run web:test:browser` builds the web app and runs the Chromium qualification
-in `src/lib/atom-lifecycle.browser.test.tsx`. It is part of root `verification`.
-The fixture uses Effect test scopes to dispose React roots on failure and proves
-SSR hydration without errors, one registry through StrictMode effect remount,
-50 rapid updates, scheduled/cancelled work and final resource disposal. It does
-not yet replace the app's existing runtime or qualify RPC cancellation.
-
-The exact candidate is Atom 4.0.0, React/React DOM 19.3.0 and Scheduler 0.28.0.
-The root patch changes only Atom's Scheduler peer range to admit exactly 0.28.0;
-remove it when upstream metadata admits that version. One Scheduler version is
-present in the lockfile. Bun resolves peers from registry metadata before patching
-and may still print the original peer warning; the installed manifest and runtime
-fixture are the qualified correction. Atom/Scheduler are development dependencies
-until the application migration adopts their runtime owner.
-
-The browser test config extends Vite's browser conditions with `source`; replacing
-the defaults with only `source` selects the Node renderer and is not a valid
-browser hydration test. The test imports the actual browser renderer and waits
-for hydration before issuing updates.
-
-## Strict and route proof
-
-Canonical strict rules cover source, tests and all Vite/Vitest configuration.
-Only the two existing runtime composition modules, root loader, Vite host and
-fake browser-test runtime have exact execution permissions. They retain all
-other rules; no async workflow or raw settings exception is admitted. The
-compiler and development Knip graph include both test configurations and Vite.
-The package test command uses Bun-hosted Vitest and native Effect tests.
-
-Settings tests cover valid, missing and invalid server/browser inputs, exact
-secret-negative error bytes, public build-input selection and absent compiled
-browser settings. The real file-route Chromium tests call the actual generated
-HTTP client through a fake HTTP transport. They prove health decoding and
-interruption of pending HTTP work when the Router retires its preload. The
-HTTP abort signal is observed as aborted. This proves the tested preload
-retirement, not all navigation/unmount paths or remote provider cancellation.
-Both retained Atom/Scheduler cases still run. Browser dependencies are listed
-for optimisation so Vite does not reload tests while they start.
+Retained 2025–26 results are unchanged. The Medicare decision, remaining
+calculator pages, full native failure/privacy qualification and safe exported
+telemetry remain separate unfinished tasks.

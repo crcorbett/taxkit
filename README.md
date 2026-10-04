@@ -31,8 +31,8 @@ validation, but it is not published yet.
 - [apps/docs](./apps/docs/README.md): TanStack Start public documentation app
   that renders MDX through package-owned docs content and reusable Fumadocs
   helpers.
-- [apps/web](./apps/web/README.md): TanStack Start app that loads health data
-  from `apps/api` through server/client runtime boundaries.
+- [apps/web](./apps/web/README.md): Native TanStack Website candidate with a take-home form,
+  private server binding and direct checked browser RPC to the API.
 - [packages/api/http](./packages/api/http/README.md): Effect HTTP API contract,
   generated docs, public calculator routes, thin handler adapters, server
   handler exports and browser-safe client exports.
@@ -148,9 +148,11 @@ bun run version-repo
 ```
 
 `bun run --filter=api dev` serves the API through portless at
-`https://api.taxkit.localhost`. `bun run --filter=web dev` injects that
-portless URL into `TAXKIT_API_BASE_URL` and `VITE_TAXKIT_API_BASE_URL` before
-serving the web app at `https://taxkit.localhost`. `bun run --filter=docs dev`
+`https://api.taxkit.localhost`. The native Website requires its matching private
+Worker binding; the retained Bun process alone cannot supply it. Use `bun run
+web:test:native-pair` for the saved local native API/Website/Chromium journey.
+The [Website README](./apps/web/README.md) owns its standalone development
+fixture, generated types and native build commands. `bun run --filter=docs dev`
 is the credentialed, Alchemy-managed Cloudflare development path. It requires a
 repository-scoped Doppler login and an authorised `taxkit/dev` config, runs the
 pass/fail-only `bun run check:doppler-custody` check first during onboarding,
@@ -266,9 +268,9 @@ open docs/repo-status-outline.html
 - `apps/docs` is the docs runtime owner. It consumes `@taxkit/docs-content`
   and `@taxkit/docs-fumadocs` rather than owning canonical frontmatter,
   navigation or reusable Fumadocs internals.
-- `apps/web/src/lib/runtime.server.ts` and
-  `apps/web/src/lib/runtime.client.ts` own the web SSR and browser client
-  runtimes. They call the standalone API over HTTP.
+- `apps/web/src/lib/runtime.server.ts` owns one server runner. React's Atom
+  registry owns browser execution and cleanup. Both use native RPC to the
+  separate API; the Website contains no calculation fallback.
 - `@taxkit/api-http/client` and `@taxkit/api-http/client/live` are
   browser-safe.
 - `@taxkit/api-http/client/server`, `@taxkit/api-http/server` and handler

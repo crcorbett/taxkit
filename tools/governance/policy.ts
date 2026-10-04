@@ -31,6 +31,7 @@ const expectedJourneyIds = [
   "taxkit-http-api",
   "taxkit-docs-runtime",
   "taxkit-release-closure",
+  "taxkit-native-website",
 ];
 const requiredExternalBoundaries = [
   "hosted CI",
@@ -362,7 +363,7 @@ const inspectJourneys = (
         finding(
           "critical-journey",
           "docs/verification/critical-journeys.json",
-          "Restore the five retained TaxKit journeys with local authority, owning commands, oracles, and non-claims."
+          "Restore the six current TaxKit journeys with local authority, owning commands, oracles, and non-claims; preserve historical snapshots separately."
         ),
       ];
 };

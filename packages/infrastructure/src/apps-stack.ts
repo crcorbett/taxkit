@@ -21,8 +21,6 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
       env: {
         API_PUBLIC_ORIGIN: apiOrigin,
         TAXKIT_API: api,
-        VITE_API_PUBLIC_ORIGIN: apiOrigin,
-        VITE_WEBSITE_PUBLIC_ORIGIN: Worker.URL,
         WEBSITE_PUBLIC_ORIGIN: Worker.URL,
       },
       rootDir: "apps/web",

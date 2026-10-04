@@ -1,4 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
+import { CalculatorHostTelemetryLive } from "@taxkit/api-rpc/host-telemetry";
 import {
   CalculatorRpcPayload,
   CalculatorRpcVersion,
@@ -34,7 +35,6 @@ import {
 } from "effect/http";
 import { TestClock, TestConsole } from "effect/testing";
 
-import { ApiSafeTelemetryLive } from "../src/worker-telemetry.layer.js";
 import { ApiWorkerApplication } from "../src/worker.application.js";
 import { ApiWorkerSettingsConfig } from "../src/worker.config.js";
 import { ApiWorkerInit } from "../src/worker.js";
@@ -480,25 +480,25 @@ describe("native API application", () => {
     })
   );
 
-  it.effect(
-    "replaces native log and reporter fields before console egress",
-    () =>
+  it.effect.each(["api", "website"] as const)(
+    "replaces %s native log and reporter fields before console egress",
+    (host) =>
       Effect.gen(function* () {
         yield* Effect.log(sensitiveSentinel).pipe(
           Effect.annotateLogs({ [sensitiveSentinel]: sensitiveSentinel }),
           Effect.withLogSpan(sensitiveSentinel),
-          Effect.provide(ApiSafeTelemetryLive)
+          Effect.provide(CalculatorHostTelemetryLive(host))
         );
         yield* Effect.die(sensitiveSentinel).pipe(
           Effect.withErrorReporting,
           Effect.exit,
-          Effect.provide(ApiSafeTelemetryLive)
+          Effect.provide(CalculatorHostTelemetryLive(host))
         );
         const lines = yield* TestConsole.logLines;
         expect(lines.length).toBe(2);
         const output = yield* Schema.encodeEffect(Json)(lines);
         expect(output).not.toContain(sensitiveSentinel);
-        expect(output).toContain("api.runtime.event");
+        expect(output).toContain(`${host}.runtime.event`);
         expect(output).not.toContain("annotations");
         expect(output).not.toContain("cause");
       }).pipe(Effect.provide(TestConsole.layer))

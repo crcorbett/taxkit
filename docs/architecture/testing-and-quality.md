@@ -57,7 +57,7 @@ test or development reachability. It also models the real `apps/docs`,
 including the generated browser/server source consumed by the app and the
 build-time Vite/source config. `@taxkit/tsconfig` is JSON-only and remains
 covered by strict packed/downstream artifact proof rather than a fabricated
-TypeScript entrypoint. Root tools and `apps/web` remain outside the production
+TypeScript entrypoint. Root tools remain outside the production
 graph by ownership. Root verification also typechecks and executes
 the root repository-path gate, which scans
 Git-tracked readable text and safely reports only repository-relative file,
@@ -206,7 +206,7 @@ The separate
 deployment-supporting claims: local workerd, hosted Preview, hosted Production
 and Production rollback/operator proof. `bun run check:docs-deployment`
 Schema-decodes that owner and the admitted dated receipts. It does not join the
-five local release journeys. The accepted DCD-002 requalification chain binds
+local release journeys or historical HGI/HFI snapshots. The accepted DCD-002 requalification chain binds
 exact candidate `d9cb8945529fb72158e59ca0daf02a98e1e4de1a`, exact
 pre-deploy and pre-destroy state/provider readback, equal plans, provider
 Worker/deployment/version/assets/URL readback, hosted HTTP/browser proof,
@@ -435,10 +435,11 @@ writes ignored desktop/mobile PNGs and a digest manifest for visual review.
 Those images supplement, but cannot replace, the behavioral oracles or prove
 provider-global isolate lifetime.
 
-The five consumer-visible release journeys are maintained in
+The six current consumer-visible journeys, including the native Website, are maintained in
 [`../verification/critical-journeys.json`](../verification/critical-journeys.json):
-calculator direct use, packed SDK, HTTP API, docs runtime and release closure.
-Their packet is bounded, sanitised local evidence in
+calculator direct use, packed SDK, HTTP API, docs runtime, release closure and
+the native Website. The original five-journey packet remains bounded, sanitised
+historical local evidence in
 [`../evidence/releases/HGI-203-local.json`](../evidence/releases/HGI-203-local.json);
 raw logs and transient tarballs are not committed. Complete sanitized command
 detail is retained at unique ignored paths with digests, while a bounded attempt
@@ -699,7 +700,8 @@ supporting gate and cannot replace semantic ownership or call-graph review.
 - Keep the development-aware `knip` graph and dedicated `knip:production`
   graph independent. Production entry and project patterns require Knip's
   trailing `!` marker, must map manifest exports to real source counterparts,
-  and must not include tests, fixtures, examples, root tools or `apps/web`.
+  and must not include tests, fixtures, examples or root tools. The native Website
+  is included, with its scripts and fixtures excluded from production.
   The docs production graph intentionally includes `apps/docs`, both docs
   packages and the generated `.source/browser.ts` and `.source/server.ts`
   modules they actually consume; `--no-gitignore` admits those two generated
@@ -1015,3 +1017,38 @@ Only `apps-secrets.boundary.ts` receives stage-decoding permission. Actual CLI
 fixtures at that real path admit decoding while rejecting encoding and runtime
 execution; a neighbouring source still rejects decoding. Scoped finalisers
 restore the real source after each fixture.
+
+
+## Native Website pair proof
+
+The Website README owns `build:native-pair` and `test:native-pair`. Public native
+Alchemy source builders produce the API and Website artifacts with no provider,
+credentials, state, plan or apply. Compiled RPC dependencies build first because
+ordinary native bundler imports select compiled exports. A missing compiled
+export must fail actual Worker startup; a source-only unit test is insufficient.
+The native Website main is `server.js`, distinct from the standalone Cloudflare
+Vite `index.js` output. Build sequentially before testing.
+
+The saved native pair test runs actual workerd modules and Chromium through the
+public API URL and private binding. It catches retaining a receive loop across
+Worker requests, idle settings collection, `/rpc/` redirect drift, automatic HTTP
+trace headers and replay on page load. It also checks editing, no-JavaScript
+calculation, invalid input, bounded upload rejection, built browser imports and
+observed native log fields. Browser Atom fixtures separately check editing,
+form unmount and expected-error hydration. Fixture scopes dispose resources;
+observation queues use non-blocking `Queue.clear` when silence is the expected
+result. `Queue.takeAll` waits for an item and cannot prove an empty queue.
+
+Exact real-CLI canaries admit only the named Website hosts/encoders and reject
+execution/encoding/decoding in other owners. The generated Wrangler file stays
+outside formatter/lint edits; its real generator owns byte identity. Both Knip
+graphs now include the Website. These checks establish local candidate behaviour,
+not complete native failure/privacy paths, cloud deployment, exported telemetry
+or remote cancellation. T003 remains in progress until its other criteria pass.
+
+
+The current inventory now has six named journeys, including the native Website.
+The scripts owner explicitly separates `CurrentReleaseJourneyInventory` from
+the exact retained five-journey `ReleaseJourneyInventory` used by HGI-203. The
+runbook reader checks each against its own Schema. A current inventory change
+must not loosen the historical packet or attribute new proof to that attempt.

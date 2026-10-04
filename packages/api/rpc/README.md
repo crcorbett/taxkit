@@ -12,7 +12,7 @@ review_trigger: RPC contracts, native codecs, clients, handlers, exports or tran
 Private compiled Effect 4 RPC transport over the existing calculator service.
 It owns the versioned calculation connection, thin handlers and checked clients.
 Tax definitions and calculation remain with `@taxkit/calculators` and rule
-packages. This is the first part of T003; the two app hosts are still pending.
+packages. Both native app candidates now consume it; full T003 acceptance remains pending.
 
 ## Exports
 
@@ -23,9 +23,12 @@ packages. This is the first part of T003; the two app hosts are still pending.
 - `./handlers`: handler Layer calling `PublicCalculatorService.calculate` once.
 - `./service`: closed `TaxKitRpcClient.calculate` client contract.
 - `./server`: native POST `/rpc` Layer with JSON serialisation and checked ingress.
-- `./live`: caller-scoped native client Layer; the app supplies its HttpClient.
+- `./live`: configured protocol Layer with a native client scope per calculation;
+  the app supplies its HttpClient.
 - `./test`: explicit test-only in-process client over the same handler.
 - `./testing/fixtures`: deterministic real-calculator and failure fixtures only.
+- `./request-boundary`: shared native POST body limit, one MiB and five seconds.
+- `./host-telemetry`: API/Website log and reporter containment with fixed fields.
 
 Workspace source conditions resolve `src`; ordinary imports and declarations
 resolve `dist`. Build with `bun run --filter=@taxkit/api-rpc build`. This private
@@ -51,10 +54,14 @@ Effect 4.0.0, whose RPC APIs remain marked unstable. Requalify on upgrades.
 
 A single five-second budget includes headers and complete body decoding. Earlier
 caller interruption releases pending body work. Client resources belong to the
-caller Layer scope; this package creates no runtime. Public calls provide
-credential omission and redirect rejection when the operation runs. The tests
-check that policy at the HttpClient boundary; actual browser enforcement and
-CORS belong to T003's app-host proof.
+calculation scope; the protocol configuration belongs to the caller Layer.
+This package creates no runtime or Layer during calculation. A native Worker
+can suspend between requests, so a receive loop acquired by an earlier request
+must not be retained for later calls. Public calls omit credentials and reject
+redirects. The native HTTP transform sets exactly `/rpc`, avoiding the default
+empty-path client's `/rpc/` redirect. RPC and HTTP tracing are both disabled for
+this transport; the tests check actual native request headers. The Website's
+saved local pair test also checks real browser enforcement and CORS.
 
 ## Documentation impact
 
@@ -77,9 +84,10 @@ This package does not authorise a plan, deployment or secret access.
 
 ## Non-claims
 
-Unit transport proof is not a real Worker, Website, service-binding, browser CORS,
-provider, telemetry backend or deployed calculation. The apps are not connected
-to this package yet. Retained tax results remain unchanged; Medicare correction
+Unit transport proof alone is not Worker, Website, binding or browser proof.
+The Website's local pair receipt separately records its native built artifacts
+and real Chromium journey. Neither proves a provider, telemetry backend or
+deployed calculation. Full native fatal/error/trace paths remain pending. Retained tax results remain unchanged; Medicare correction
 is a separate unresolved decision. The canonical render receipt records its
 original scaffold and explicit stable-version adaptation; structural validation
 alone does not prove runtime behaviour.

@@ -31,7 +31,7 @@ epoch verifier also distinguishes required epoch/effectiveness owner changes
 from preserved HGI evidence. Any source, receipt, review, or target mismatch
 fails closed.
 
-The five current journeys are calculator, packed SDK consumer, HTTP API,
+The five historical HFI-004 journeys are calculator, packed SDK consumer, HTTP API,
 documentation runtime, and report-only release readiness. Their command,
 boundary oracle, receipt and recovery owner live in the scenario contract.
 Those commands establish local observations only; they never establish hosted
@@ -95,3 +95,8 @@ print bounded repair messages without raw error stacks or private paths.
 Unknown options also fail. Pure policy fixtures use saved declared hashes to
 check accepted and rejected bindings; those fixtures are not fresh source proof.
 Actual source qualification for the rebuilt product remains pending.
+
+The current inventory also includes `taxkit-native-website`. Current governance
+and release readers check all six named journeys. This addition does not alter
+the saved HFI-004 scenarios, hashes or failure identity, and does not qualify a
+new foundation epoch.

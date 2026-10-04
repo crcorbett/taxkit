@@ -23,7 +23,6 @@
       "@vitejs/plugin-react": "6.1.1",
       "alchemy": "2.0.0-beta.80",
       "effect": "4.0.0",
-      "nitro": "3.0.260903-beta",
       "react": "19.3.0",
       "react-dom": "19.3.0",
       "typescript": "7.0.2",
@@ -130,11 +129,12 @@
     "docs:test:browser": "turbo run test:browser --filter=docs",
     "changeset:status": "turbo run //#changeset:status:task",
     "changeset:status:task": "changeset status --verbose",
-    "verification": "bun run check:skills:types && bun run check:oxlint:types && bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow:types && bun run check:quality-workflow && bun run check:docs:types && bun run check:harness-foundation-epoch:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run check:docs-deployment:types && bun run check:docs-deployment-tools:types && bun run check:docs-deployment && bun run check:docs-deployment-automation && bun run test:docs-deployment && bun run lint && bun run format:check && bun run test:skills && bun run test:hgi-206 && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types && bun run sdk:test:browser && bun run web:test:browser",
+    "verification": "bun run check:skills:types && bun run check:oxlint:types && bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow:types && bun run check:quality-workflow && bun run check:docs:types && bun run check:harness-foundation-epoch:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run check:docs-deployment:types && bun run check:docs-deployment-tools:types && bun run check:docs-deployment && bun run check:docs-deployment-automation && bun run test:docs-deployment && bun run lint && bun run format:check && bun run test:skills && bun run test:hgi-206 && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types && bun run sdk:test:browser && bun run web:test:browser && bun run --filter=web check:worker-types && bun run web:test:native-pair",
     "version-packages": "changeset version",
     "version-repo": "changeset version",
     "web:test:browser": "turbo run test:browser --filter=web",
-    "sdk:test:browser": "turbo run test:browser --filter=@taxkit/sdk"
+    "sdk:test:browser": "turbo run test:browser --filter=@taxkit/sdk",
+    "web:test:native-pair": "bun run --filter=web build:native-pair && bun run --filter=web test:native-pair"
   },
   "dependencies": {
     "@taxkit/infrastructure": "workspace:*",

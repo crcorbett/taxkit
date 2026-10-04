@@ -57,7 +57,7 @@ GET /api/v1/facts
 GET /api/v1/rules
 ```
 
-`apps/web` consumes this API over HTTP. It must not mount the canonical API or
+`apps/web` consumes the separate API through native RPC. It must not mount the canonical API or
 import server-only `@taxkit/api-http` exports.
 
 API process entrypoints should be Effect programs run with
@@ -400,7 +400,8 @@ do not establish the later calculator UI, transport limits or whole-task accepta
 `@taxkit/api-rpc` now owns one versioned `Calculate` procedure over canonical
 calculator request/result Schemas. Its native server explicitly mounts POST
 `/rpc` with JSON; its handler delegates to `PublicCalculatorService.calculate`.
-The private generated client lives in the caller's Layer scope. Expected
+The protocol lives in the caller's Layer scope; each calculation acquires and
+releases its native generated client's receive loop. Expected
 calculator failures project to fixed reasons, while version disagreement,
 unavailable transport, invalid replies and a complete-response deadline remain
 separate checked failures. Independent adapter defects remain defects.
@@ -412,9 +413,11 @@ it does not classify every SchemaError as an invalid response. Installed Effect
 4.0.0 source and actual wire tests qualify these hooks. RPC APIs remain unstable.
 
 The [package README](../../packages/api/rpc/README.md) owns its explicit exports
-and current proof limits. The existing apps do not consume it yet; T003's real
-Worker/Website binding, browser CORS, origin and tracing qualification remain
-in progress. Public HTTP/OpenAPI still has its existing contract and runtime.
+and current proof limits. The native API/Website candidates now consume it.
+The saved Website pair check exercises actual built artifacts, repeated private
+binding calls, an idle browser form, exact browser CORS and no-JavaScript POST.
+Full native fatal, framework logging and trace qualification remain in progress.
+Public HTTP/OpenAPI keeps its existing contract and shared application operation.
 
 Calculator Schemas use narrow core/rule Schema entrypoints. Diagnostics and
 report/input definitions have separate canonical modules; old entrypoints

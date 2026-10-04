@@ -48,6 +48,16 @@
       "source": "./src/__testing__/fixtures.ts",
       "types": "./dist/__testing__/fixtures.d.ts",
       "default": "./dist/__testing__/fixtures.js"
+    },
+    "./request-boundary": {
+      "source": "./src/request-boundary.ts",
+      "types": "./dist/request-boundary.d.ts",
+      "default": "./dist/request-boundary.js"
+    },
+    "./host-telemetry": {
+      "source": "./src/host-telemetry.ts",
+      "types": "./dist/host-telemetry.d.ts",
+      "default": "./dist/host-telemetry.js"
     }
   },
   "publishConfig": {

@@ -177,12 +177,15 @@ explicit disposal operation for focused tests and host lifecycle integration;
 it has no browser Effect runtime. Browser routes restore the schema-encoded
 server-function transport and render canonical values.
 
-The web scaffold owns its server and browser health-client runtimes in the
-[web runtime selection](../../apps/web/src/lib/runtime-selection.ts). Its route context admits only `runPromise` and `runPromiseExit` from the
-native runtime, while route cancellation reaches the health HTTP request
-through Effect interruption. These module-owned runtimes belong to the web
-host; the SDK's caller-owned disposal contract is separate. Browser configuration
-receives only the checked public input selected by the build configuration.
+The Website candidate owns one server runner and a React Atom registry in the
+browser. Its route context contains one named framework settings transport,
+never an Effect runtime or Context. The root restores encoded values and passes
+checked submission state through ordinary React context. The container owns
+commands; focused leaves render readonly values. Editing and form unmount
+interrupt active work. Private binding transport belongs to the server Layer;
+public browser transport belongs to the registry. The RPC protocol Layer keeps
+configuration, while each native client receive loop has a calculation scope.
+No calculation builds a Layer or runner. See the [Website owner](../../apps/web/README.md).
 The SDK owns one runtime per client, with caller disposal and bounded one-shot
 helpers; see the [SDK lifetime owner](api-and-sdk.md#typescript-sdk-facade).
 
