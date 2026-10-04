@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index 439a4571edf144a3aff776a3802187fdf5675da1..bd4e7f33d9fe4ef3ff01a85461d79db05098a55b 100644
+--- a/package.json
++++ b/package.json
+@@ -48,7 +48,7 @@
+   },
+   "peerDependencies": {
+     "react": ">=19.0.0 <20.0.0",
+-    "scheduler": ">=0.25.0 <0.28.0",
++    "scheduler": ">=0.25.0 <0.28.0 || 0.28.0",
+     "effect": "^4.0.0"
+   },
+   "devDependencies": {

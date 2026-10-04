@@ -1,0 +1,47 @@
+{
+  "document_type": "qualification-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "b726afb556fcafdb929b41417a8b0cf4a4aec92c",
+  "versions": {
+    "@effect/atom-react": "4.0.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "scheduler": "0.28.0",
+    "vitest": "5.0.3",
+    "playwright": "1.63.0"
+  },
+  "patch": {
+    "path": "patches/@effect%2Fatom-react@4.0.0.patch",
+    "scope": "Exact Scheduler 0.28.0 peer admission only; no runtime edits",
+    "warning": "Bun reports original registry peer range before applying patch; retained and documented"
+  },
+  "evidence": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "passed"
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "passed, including web:test:browser and its two real Chromium tests"
+    },
+    {
+      "command": "bun run check:types --filter=web",
+      "outcome": "passed; diagnostic warnings remain visible"
+    }
+  ],
+  "proof": [
+    "default scheduling and cancellation",
+    "SSR hydration without recoverable or uncaught errors",
+    "StrictMode registry identity",
+    "50 rapid updates without loss",
+    "Effect-scoped root/host teardown and final disposal"
+  ],
+  "limitations": [
+    "Does not implement app Atom state or RPC interruption; T003 owns these",
+    "Does not complete strict-policy enforcement",
+    "No tax results or parameters changed",
+    "Not merged or deployed"
+  ],
+  "recovery": "Revert this slice and reinstall the parent frozen dependency graph"
+}

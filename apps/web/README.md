@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-10-04
 source_of_truth: package-readme
 confidence: high
 ---
@@ -78,3 +78,25 @@ Use the portless URLs for local browser and app-to-app checks:
 - `docs/architecture/api-and-sdk.md`
 - `docs/architecture/deployment.md`
 - `docs/design-docs/abstraction-admission.md`
+
+## Atom compatibility proof
+
+`bun run web:test:browser` builds the web app and runs the Chromium qualification
+in `src/lib/atom-lifecycle.browser.test.tsx`. It is part of root `verification`.
+The fixture uses Effect test scopes to dispose React roots on failure and proves
+SSR hydration without errors, one registry through StrictMode effect remount,
+50 rapid updates, scheduled/cancelled work and final resource disposal. It does
+not yet replace the app's existing runtime or qualify RPC cancellation.
+
+The exact candidate is Atom 4.0.0, React/React DOM 19.3.0 and Scheduler 0.28.0.
+The root patch changes only Atom's Scheduler peer range to admit exactly 0.28.0;
+remove it when upstream metadata admits that version. One Scheduler version is
+present in the lockfile. Bun resolves peers from registry metadata before patching
+and may still print the original peer warning; the installed manifest and runtime
+fixture are the qualified correction. Atom/Scheduler are development dependencies
+until the application migration adopts their runtime owner.
+
+The browser test config extends Vite's browser conditions with `source`; replacing
+the defaults with only `source` selects the Node renderer and is not a valid
+browser hydration test. The test imports the actual browser renderer and waits
+for hydration before issuing updates.

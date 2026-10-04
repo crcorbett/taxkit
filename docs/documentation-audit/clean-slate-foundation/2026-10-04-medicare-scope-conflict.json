@@ -14,7 +14,13 @@
   "primarySource": {
     "url": "https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/epub/OEBPS/document_1/document_1.html",
     "owner": "Federal Register of Legislation",
-    "provisions": "Schedule 5 items 3 and 5 amend the individual thresholds; item 14 applies the changes to 2025\u201326 and later income years"
+    "provisions": "Schedule 5 items 3 and 5 amend the individual thresholds; item 14 applies the changes to 2025–26 and later income years",
+    "status": "enacted Act No. 58 of 2026; not a proposal",
+    "royalAssent": "2026-06-30",
+    "schedule5Commencement": "2026-07-01",
+    "assessmentApplication": "2025–26 and later income years, under Schedule 5 item 14",
+    "retrievedOn": "2026-10-04",
+    "sha256": "792f1caab00e3fc71b536ff738b44944d98b36f2f18a3ec83d4151fda6920fcb"
   },
   "observedLaw2025_26": {
     "individualThresholdCents": 2801100,
@@ -27,5 +33,124 @@
     "No new tax rate or source record has been adopted.",
     "No compatible Medicare-corrected upstream commit exists from this task yet."
   ],
-  "recovery": "No correction applied; existing rates, results and provenance remain addressable in the T001 retention manifest."
+  "recovery": "No correction applied; existing rates, results and provenance remain addressable in the T001 retention manifest.",
+  "calculatorImpact": {
+    "direct": [
+      "au.income-tax.annual and its API/SDK report, ledger and trace"
+    ],
+    "preserve": [
+      "au.pay.take-home",
+      "au.pay.withholdings"
+    ],
+    "reason": "The two pay calculators compose AtoSchedule1_2025_26_Live, not AtoMedicareLevy_2025_26_Live. Public annual support remains 2025–26 only."
+  },
+  "whatIfTest": {
+    "classification": "what-if actual-rule execution; no source or runtime table changed",
+    "results": [
+      {
+        "incomeDollars": 20000,
+        "old": {
+          "levyCents": 0,
+          "liabilityCents": 0
+        },
+        "proposed": {
+          "levyCents": 0,
+          "liabilityCents": 0
+        }
+      },
+      {
+        "incomeDollars": 27222,
+        "old": {
+          "levyCents": 0,
+          "liabilityCents": 74352
+        },
+        "proposed": {
+          "levyCents": 0,
+          "liabilityCents": 74352
+        }
+      },
+      {
+        "incomeDollars": 28011,
+        "old": {
+          "levyCents": 7890,
+          "liabilityCents": 94866
+        },
+        "proposed": {
+          "levyCents": 0,
+          "liabilityCents": 86976
+        }
+      },
+      {
+        "incomeDollars": 30000,
+        "old": {
+          "levyCents": 27780,
+          "liabilityCents": 146580
+        },
+        "proposed": {
+          "levyCents": 19890,
+          "liabilityCents": 138690
+        }
+      },
+      {
+        "incomeDollars": 34027,
+        "old": {
+          "levyCents": 68050,
+          "liabilityCents": 251282
+        },
+        "proposed": {
+          "levyCents": 60160,
+          "liabilityCents": 243392
+        }
+      },
+      {
+        "incomeDollars": 35013,
+        "old": {
+          "levyCents": 70026,
+          "liabilityCents": 269034
+        },
+        "proposed": {
+          "levyCents": 70020,
+          "liabilityCents": 269028
+        }
+      },
+      {
+        "incomeDollars": 35014,
+        "old": {
+          "levyCents": 70028,
+          "liabilityCents": 269052
+        },
+        "proposed": {
+          "levyCents": 70028,
+          "liabilityCents": 269052
+        }
+      },
+      {
+        "incomeDollars": 50000,
+        "old": {
+          "levyCents": 100000,
+          "liabilityCents": 653800
+        },
+        "proposed": {
+          "levyCents": 100000,
+          "liabilityCents": 653800
+        }
+      },
+      {
+        "incomeDollars": 80000,
+        "old": {
+          "levyCents": 160000,
+          "liabilityCents": 1638800
+        },
+        "proposed": {
+          "levyCents": 160000,
+          "liabilityCents": 1638800
+        }
+      }
+    ],
+    "command": "bun --conditions=source run tmp/medicare-impact.ts",
+    "sourceSha256": "8b03e7bc987a1c829fd9a6ec07c1fe22ebb5885e429e05b945cdef9c682dbf9a",
+    "exitCode": 0,
+    "limitations": "Isolated table substitution exercises actual current rule/engine code; no adopted rule/source artifact, publication or deployed correction."
+  },
+  "recommendation": "Authorise a separate correction of only the annual 2025–26 single non-SAPTO table with newly retrieved source provenance, boundary/unchanged-range tests, updated annual golden/trace evidence, Changeset and explicit adad qualification. Do not add future-year, family, SAPTO or surcharge support."
 }

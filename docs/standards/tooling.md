@@ -70,6 +70,9 @@ library with stable package boundaries and predictable bundle behavior.
 - Stable Effect 4 imports use `effect/http`, `effect/http-api`,
   `effect/process` and `effect/encoding`; no RC import paths remain in owned
   executable code. The exact graph remains in the root catalogue and lockfile.
+- `web:test:browser` qualifies the exact Atom/React/Scheduler graph in Chromium
+  and runs within `verification`. The narrow peer-metadata patch and removal
+  condition are documented by `apps/web/README.md`; no library source is patched.
 - Changesets record package-facing changes before release automation exists.
   See [Versioning and Changesets](./versioning.md).
 

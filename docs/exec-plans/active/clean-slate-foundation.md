@@ -153,3 +153,22 @@ records full verification and the actual-command provisional strict-rule scan:
 are not all adjudicated defects. The root's existing gate remains green; the
 stronger clean-slate policy is not yet integrated or accepted. DEV-74 remains
 blocked by that unfinished DEV-73 requirement.
+
+## T002 repository-integrated Atom qualification
+
+The previously isolated Atom lifecycle proof now lives with the web app and
+runs through `web:test:browser` within root verification. The exact peer patch
+only adds Scheduler 0.28.0 to Atom 4.0.0's accepted range. Test effects own React
+root/host disposal; real Chromium proves hydration, scheduling/cancellation,
+StrictMode registry identity, rapid updates and final disposal. App runtime
+adoption and RPC interruption remain with T003. Bun's pre-patch peer warning is
+retained and explained; it is not silenced by an override.
+
+Documentation impact: **Change required** for root/web manifests, lock, exact
+patch, browser config/fixture, command/gate and owning README/tooling standard.
+**Preserve** all tax parameters/results, package API, current app runtime and
+provider state. **N/A** for a new Changeset: this adds development qualification
+and a gate, without a shipped package or app feature change. Revert this slice
+and reinstall the parent frozen graph for recovery.
+
+The [Atom qualification receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-atom-qualification.json) records the exact graph, bounded peer patch and passing full verification.
