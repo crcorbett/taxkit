@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "agentGuidance": false,
   "globalDependencies": [
     ".bun-version",
     "tsconfig.base.json",
@@ -113,6 +114,7 @@
     "//#check:repository-paths:task": { "outputs": [] },
     "//#check:repository-paths:types:task": { "outputs": [] },
     "//#check:quality-workflow:task": { "outputs": [] },
+    "//#check:quality-workflow:types:task": { "outputs": [] },
     "//#format:check:task": { "outputs": [] },
     "//#lint:task": {
       "inputs": [

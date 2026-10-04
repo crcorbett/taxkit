@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-24
+last_reviewed: 2026-10-04
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -24,6 +24,15 @@ through the app-local Playwright executable; a shallow checkout, cached
 policy. The Schema-decoded workflow,
 control register and negative corpus are owned by `tools/quality-workflow/` and
 run through `bun run check:quality-workflow`.
+
+`bun run test:quality-workflow` runs the policy cases and six isolated
+release-boundary mutations through Bun-hosted Effect Vitest. Each mutation
+runs its real owning command. Scoped temporary clones retain relative symbolic
+links and clean up on success, failure and interruption; child processes and
+the loopback-port reservation have the same lifetime owner. Syntax inspection
+uses immutable traversal and checked record/array access. The root verification
+also runs `bun run check:quality-workflow:types`, covering the policy and tests.
+This changes local checking, not CI permissions or provider authority.
 
 Every eligible deterministic command under that graph is a Turbo task. Quality
 binds the Vercel team cache as read/write on all configured events.

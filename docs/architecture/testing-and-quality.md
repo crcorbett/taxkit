@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-08-31
+last_reviewed: 2026-10-04
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
@@ -627,3 +627,13 @@ Skill-policy fixture reads use Effect FileSystem and exact Schema-owned JSON
 ingress. Bounded Effect traversal owns repeated I/O; pure classification uses
 persistent collections. `check:skills:types` checks this suite during root
 verification. A readLink assertion proves the actual canonical symlink target.
+
+The Quality-workflow test owner uses Bun-hosted Effect Vitest, Effect FileSystem,
+and scoped platform child processes. Its isolated release-boundary suite runs
+all six retained owning commands from temporary repository copies, preserves
+relative links and removes each copy on completion or interruption. The native
+Effect Bun HTTP server owns the short-lived loopback-port reservation. Its
+policy source and tests have a focused `check:quality-workflow:types` project in
+root verification and all eleven canonical strict rules. The executable alone
+has an exact runtime admission. This local test-host qualification does not
+change the hosted workflow or establish publication/deployment.

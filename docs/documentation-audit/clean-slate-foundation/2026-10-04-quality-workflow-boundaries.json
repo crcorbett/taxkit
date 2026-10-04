@@ -1,0 +1,117 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "4fb6bc685c90c7442787fcf24a7d694b49038132",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR checks read-only",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare result correction"
+    ]
+  },
+  "implemented": [
+    "Bun-hosted Effect Vitest for retained Quality policy and all six real-command isolated release mutations",
+    "Scoped Effect FileSystem, child processes and native ephemeral loopback server; bounded repository-copy concurrency",
+    "Exact relative symbolic-link preservation and ordinary-file-only readLink EINVAL fallback",
+    "Immutable syntax traversal, persistent reserved-name membership and checked Array/Record reads",
+    "Focused policy/test type project in root verification; previously unverified record accesses, error/context unions and non-empty arrays corrected",
+    "All eleven canonical rules for tools/quality-workflow; one exact executable admission; real CLI scope and selector proof",
+    "Supported Turbo agentGuidance opt-out prevents checking commands editing the canonical AGENTS router",
+    "Rejected workflow shape errors map to safe QualityWorkflowInputError without exposing rejected input"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "package.json",
+        "turbo.json",
+        "oxlint.config.ts",
+        "tools/quality-workflow/tsconfig.json",
+        "tools/oxlint/portable-rules.test.ts",
+        "docs/standards/tooling.md",
+        "docs/standards/controls.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "reason": "New test/type ownership, exact lint scope, scoped resources and progress evidence"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "AGENTS.md",
+        ".agents/skills/**",
+        ".github/workflows/quality.yml",
+        "tools/quality-workflow/fixtures/release-boundary-defects.json",
+        "packages/**"
+      ],
+      "reason": "Canonical guidance, skill fingerprints, hosted permissions, mutation oracles, package contracts and retained tax results remain unchanged"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public docs",
+        "operational runbooks",
+        "provider state"
+      ],
+      "reason": "Only root checking tools change; no versioned package or consequential operation"
+    }
+  ],
+  "verification": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "result": "passed on pinned Bun 1.4.2 and Node 24.16.0; lockfile unchanged"
+    },
+    {
+      "command": "actual installed Oxlint with all eleven rules across owned paths",
+      "result": "1,505 provisional strict diagnostics before this slice; includes intentional fixtures and unqualified hosts, not a defect count"
+    },
+    {
+      "command": "bun run test:oxlint:task",
+      "result": "80 real CLI tests passed"
+    },
+    {
+      "command": "bun run test:quality-workflow:task",
+      "result": "20 tests passed in final root verification: 18 retained policy cases, one named-error privacy case and the six actual-command mutations grouped in one retained release-boundary test"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed, including 80 CLI cases and retained package tests"
+    },
+    {
+      "command": "bun run check:docs; bun run check:runbooks; bun run lint; bun run format:check",
+      "result": "passed in final verification; final receipt-only docs/format checks also required before commit"
+    },
+    {
+      "command": "bun run check:quality-workflow:types:task",
+      "result": "passed; platform unstable-API warnings remain visible"
+    },
+    {
+      "command": "bun run verification; bun run build",
+      "result": "both passed, including 21 skill tests, 20 Quality tests, new quality source/test type project and two Chromium Atom lifecycle tests; build completed 15 tasks"
+    }
+  ],
+  "local_recovery_observations": [
+    "Initial isolated install was denied by filesystem sandbox; safe escalation ran the same offline test successfully",
+    "Temporary copy from the failed attempt was independently confirmed absent",
+    "Full isolated mutation suite succeeded and no fixture-copy directories remained",
+    "Turbo appended its default managed AGENTS block during a check; canonical router restored and supported opt-out applied before final verification"
+  ],
+  "limitations": [
+    "Whole DEV-73 and DEV-74–81 remain unfinished",
+    "Canonical skill assets were not modified",
+    "Medicare correction still awaits Cooper scope decision",
+    "Local tool and test proof is not merge, release, provider, deployment or current-law Medicare qualification",
+    "Existing installed platform unstable-API and build directive warnings remain visible; they did not fail the required checks"
+  ],
+  "recovery": "Revert the complete root-tooling slice; no external provider state changed"
+}

@@ -1,96 +1,113 @@
-import { describe, expect, test } from "bun:test";
+import * as BunHttpServer from "@effect/platform-bun/BunHttpServer";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { describe, expect, it as test } from "@effect/vitest";
 import {
-  copyFile,
-  lstat,
-  mkdir,
-  mkdtemp,
-  readFile,
-  readlink,
-  rm,
-  symlink,
-  writeFile,
-} from "node:fs/promises";
-import { tmpdir } from "node:os";
-import nodePath from "node:path";
-
-import { Array as EffectArray, Effect, Schema } from "effect";
+  Array as EffectArray,
+  Effect,
+  FileSystem,
+  Match,
+  Path,
+  Result,
+  Schema,
+  Stream,
+} from "effect";
+import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
 import { ReleaseBoundaryFixtureCorpus } from "./schemas.js";
 
-const { dirname, join } = nodePath;
-const repositoryRoot = new URL("../..", import.meta.url).pathname;
-const fixtures = Effect.runSync(
-  Schema.decodeUnknownEffect(
-    Schema.fromJsonString(ReleaseBoundaryFixtureCorpus)
-  )(
-    await Bun.file(
-      new URL("fixtures/release-boundary-defects.json", import.meta.url)
-    ).text()
-  )
-);
+const repositoryRootUrl = new URL("../..", import.meta.url);
 
-const run = async (
+// The test scope owns each process and drains both pipes while waiting for its exit.
+const runBoundaryCommand = Effect.fnUntraced(function* (
   cwd: string,
   executable: string,
   args: readonly string[],
-  environment: Record<string, string> = {}
-) => {
-  const process = Bun.spawn([executable, ...args], {
-    cwd,
-    env: {
-      ...globalThis.process.env,
-      ...environment,
-    },
-    stderr: "pipe",
-    stdout: "pipe",
-  });
-  const [exitCode, stderr, stdout] = await Promise.all([
-    process.exited,
-    new Response(process.stderr).text(),
-    new Response(process.stdout).text(),
-  ]);
+  environment: Readonly<Record<string, string>> = {}
+) {
+  const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+  const child = yield* spawner.spawn(
+    ChildProcess.make(executable, args, {
+      cwd,
+      env: environment,
+      extendEnv: true,
+      stderr: "pipe",
+      stdin: "ignore",
+      stdout: "pipe",
+    })
+  );
+  const [exitCode, stderr, stdout] = yield* Effect.all(
+    [
+      child.exitCode,
+      Stream.mkString(Stream.decodeText(child.stderr)),
+      Stream.mkString(Stream.decodeText(child.stdout)),
+    ],
+    { concurrency: "unbounded" }
+  );
   return { exitCode, stderr, stdout };
-};
+});
 
-const findAvailableLoopbackPort = () => {
-  const reservation = Bun.serve({
-    fetch: () => new Response("reserved"),
-    hostname: "127.0.0.1",
-    port: 0,
+// A scoped native server reserves an ephemeral address; it closes before the smoke command starts.
+const findAvailableLoopbackPort = Effect.gen(function* () {
+  const server = yield* BunHttpServer.make({ hostname: "127.0.0.1", port: 0 });
+  return Match.value(server.address).pipe(
+    Match.tags({
+      InetAddressV4: (address) => address.port,
+      InetAddressV6: (address) => address.port,
+      UnixPathAddress: () => expect.unreachable(),
+    }),
+    Match.exhaustive
+  );
+}).pipe(Effect.scoped);
+
+const prepareWorkspace = Effect.fnUntraced(function* (repositoryRoot: string) {
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const workspace = yield* fs.makeTempDirectoryScoped({
+    prefix: "taxkit-hgi205-boundaries-",
   });
-  const { port } = reservation;
-  reservation.stop(true);
-
-  return port;
-};
-
-const prepareWorkspace = async () => {
-  const workspace = await mkdtemp(join(tmpdir(), "taxkit-hgi205-boundaries-"));
-  const inventory = await run(repositoryRoot, "git", [
+  const inventory = yield* runBoundaryCommand(repositoryRoot, "git", [
     "ls-files",
     "--cached",
     "--others",
     "--exclude-standard",
   ]);
   expect(inventory.exitCode).toBe(0);
-  await Promise.all(
-    EffectArray.map(
-      EffectArray.filter(
-        inventory.stdout.trim().split("\n"),
-        (relativePath) => relativePath.length > 0
-      ),
-      async (relativePath) => {
-        const destination = join(workspace, relativePath);
-        await mkdir(dirname(destination), { recursive: true });
-        const source = join(repositoryRoot, relativePath);
-        const sourceStat = await lstat(source);
-        await (sourceStat.isSymbolicLink()
-          ? readlink(source).then((link) => symlink(link, destination))
-          : copyFile(source, destination));
-      }
-    )
+  yield* Effect.forEach(
+    EffectArray.filter(
+      inventory.stdout.trim().split("\n"),
+      (relativePath) => relativePath.length > 0
+    ),
+    (relativePath) =>
+      Effect.gen(function* () {
+        const destination = path.join(workspace, relativePath);
+        yield* fs.makeDirectory(path.dirname(destination), { recursive: true });
+        const source = path.join(repositoryRoot, relativePath);
+        // FileSystem.stat follows links in the installed platform. readLink preserves the exact relative target.
+        // Only the host's EINVAL (ordinary file) falls back to copyFile; permission/missing/other errors fail.
+        yield* fs.readLink(source).pipe(
+          Effect.flatMap((target) => fs.symlink(target, destination)),
+          Effect.catchTag("PlatformError", (error) =>
+            Match.value(error.reason._tag).pipe(
+              Match.when(
+                "Unknown",
+                () =>
+                  error.reason.method === "readLink" &&
+                  Result.isSuccess(
+                    Schema.decodeUnknownResult(
+                      Schema.Struct({ code: Schema.Literal("EINVAL") })
+                    )(error.reason.cause)
+                  )
+              ),
+              Match.orElse(() => false)
+            )
+              ? fs.copyFile(source, destination)
+              : Effect.fail(error)
+          )
+        );
+      }),
+    { concurrency: 16 }
   );
-  const install = await run(workspace, "bun", [
+  const install = yield* runBoundaryCommand(workspace, "bun", [
     "install",
     "--offline",
     "--frozen-lockfile",
@@ -112,57 +129,62 @@ const prepareWorkspace = async () => {
     ["testing", "packages/testing"],
     ["tsconfig", "packages/tsconfig"],
   ] as const;
-  const scope = join(workspace, "node_modules", "@taxkit");
-  await mkdir(scope, { recursive: true });
-  await Promise.all(
-    EffectArray.map(workspacePackages, async ([name, packageRoot]) => {
-      const alias = join(scope, name);
-      await rm(alias, { force: true, recursive: true });
-      await symlink(join("..", "..", packageRoot), alias, "dir");
-    })
-  );
-  const apiScope = join(workspace, "apps", "api", "node_modules", "@taxkit");
-  await mkdir(apiScope, { recursive: true });
-  await Promise.all(
-    EffectArray.map(workspacePackages, async ([name, packageRoot]) => {
-      const alias = join(apiScope, name);
-      await rm(alias, { force: true, recursive: true });
-      await symlink(join("..", "..", "..", "..", packageRoot), alias, "dir");
-    })
+  yield* Effect.forEach(
+    [
+      {
+        prefix: ["..", ".."],
+        scope: path.join(workspace, "node_modules", "@taxkit"),
+      },
+      {
+        prefix: ["..", "..", "..", ".."],
+        scope: path.join(workspace, "apps", "api", "node_modules", "@taxkit"),
+      },
+    ],
+    ({ scope, prefix }) =>
+      Effect.gen(function* () {
+        yield* fs.makeDirectory(scope, { recursive: true });
+        yield* Effect.forEach(workspacePackages, ([name, packageRoot]) =>
+          Effect.gen(function* () {
+            const alias = path.join(scope, name);
+            yield* fs.remove(alias, { force: true, recursive: true });
+            yield* fs.symlink(path.join(...prefix, packageRoot), alias);
+          })
+        );
+      })
   );
   return workspace;
-};
+});
 
 const expected = {
-  "api-contract": {
+  apiContract: {
     check: "api-smoke",
     command: ["bun", "run", "--filter=api", "smoke"],
     recovery:
       "Restore the schema-derived OpenAPI document and rerun api-smoke.",
     target: "packages/api/http/src/openapi.ts",
   },
-  "packed-sdk": {
+  packedSdk: {
     check: "packed-artifact",
     command: ["bun", "run", "--filter=@taxkit/sdk", "check-packed-artifact"],
     recovery:
       "Restore the packed root export target and rerun packed-artifact.",
     target: "packages/sdk/typescript/package.json",
   },
-  "public-docs-manifest": {
+  publicDocsManifest: {
     check: "docs-validation",
     command: ["bun", "run", "docs:validate"],
     recovery:
       "Restore the authored navigation source and rerun docs-validation.",
     target: "packages/docs-content/navigation.json",
   },
-  "public-export": {
+  publicExport: {
     check: "downstream-consumer",
     command: ["bun", "run", "--filter=@taxkit/sdk", "validate:downstream"],
     recovery:
       "Restore the documented browser-safe TaxKit export and rerun downstream-consumer.",
     target: "packages/sdk/typescript/src/index.ts",
   },
-  "release-script": {
+  releaseScript: {
     check: "quality-workflow",
     command: ["bun", "run", "check:quality-workflow"],
     recovery:
@@ -170,7 +192,7 @@ const expected = {
     target:
       "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   },
-  "workflow-semantics": {
+  workflowSemantics: {
     check: "quality-workflow",
     command: ["bun", "run", "check:quality-workflow"],
     recovery:
@@ -180,73 +202,99 @@ const expected = {
 } as const;
 
 describe("HGI-205 isolated release-boundary mutations", () => {
-  test("executes every real owning command and retains exact failure identity", async () => {
-    const runFixture = async (fixture: (typeof fixtures)[number]) => {
-      const workspace = await prepareWorkspace();
-      try {
-        const contract = expected[fixture.id];
-        expect(fixture.expectedFailedCheck).toBe(contract.check);
-        expect(fixture.target).toBe(contract.target);
-        expect(fixture.recovery).toBe(contract.recovery);
-        expect([fixture.command.executable, ...fixture.command.args]).toEqual(
-          contract.command
-        );
-        expect(fixture.runner).toBe(
-          "tools/quality-workflow/release-boundary.test.ts"
-        );
-
-        const target = join(workspace, fixture.target);
-        const source = await readFile(target, "utf-8");
-        expect(source.includes(fixture.mutation.search)).toBe(true);
-        await writeFile(
-          target,
-          source.replaceAll(
-            fixture.mutation.search,
-            fixture.mutation.replacement
+  test.effect(
+    "executes every real owning command and retains exact failure identity",
+    () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+        const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
+        const fixtures = yield* fs
+          .readFileString(
+            path.join(
+              repositoryRoot,
+              "tools/quality-workflow/fixtures/release-boundary-defects.json"
+            )
           )
+          .pipe(
+            Effect.flatMap(
+              Schema.decodeEffect(
+                Schema.fromJsonString(ReleaseBoundaryFixtureCorpus),
+                { onExcessProperty: "error" }
+              )
+            )
+          );
+        yield* Effect.forEach(fixtures, (fixture) =>
+          Effect.gen(function* () {
+            const workspace = yield* prepareWorkspace(repositoryRoot);
+            const contract = Match.value(fixture.id).pipe(
+              Match.when("api-contract", () => expected.apiContract),
+              Match.when("packed-sdk", () => expected.packedSdk),
+              Match.when(
+                "public-docs-manifest",
+                () => expected.publicDocsManifest
+              ),
+              Match.when("public-export", () => expected.publicExport),
+              Match.when("release-script", () => expected.releaseScript),
+              Match.when(
+                "workflow-semantics",
+                () => expected.workflowSemantics
+              ),
+              Match.exhaustive
+            );
+            expect(fixture.expectedFailedCheck).toBe(contract.check);
+            expect(fixture.target).toBe(contract.target);
+            expect(fixture.recovery).toBe(contract.recovery);
+            expect([
+              fixture.command.executable,
+              ...fixture.command.args,
+            ]).toEqual(contract.command);
+            expect(fixture.runner).toBe(
+              "tools/quality-workflow/release-boundary.test.ts"
+            );
+            const target = path.join(workspace, fixture.target);
+            const source = yield* fs.readFileString(target);
+            expect(source.includes(fixture.mutation.search)).toBe(true);
+            yield* fs.writeFileString(
+              target,
+              source.replaceAll(
+                fixture.mutation.search,
+                fixture.mutation.replacement
+              )
+            );
+            if (fixture.id === "api-contract") {
+              const build = yield* runBoundaryCommand(workspace, "bun", [
+                "run",
+                "build",
+                "--filter=api...",
+                "--force",
+              ]);
+              expect(build.exitCode, `${build.stderr}\n${build.stdout}`).toBe(
+                0
+              );
+            }
+            const environment =
+              fixture.id === "api-contract"
+                ? {
+                    TAXKIT_API_SMOKE_PORT: String(
+                      yield* findAvailableLoopbackPort
+                    ),
+                  }
+                : {};
+            const result = yield* runBoundaryCommand(
+              workspace,
+              fixture.command.executable,
+              fixture.command.args,
+              environment
+            );
+            yield* fs.writeFileString(target, source);
+            expect(result.exitCode).not.toBe(0);
+            expect(`${result.stdout}\n${result.stderr}`).toContain(
+              fixture.failureOracle
+            );
+          }).pipe(Effect.scoped)
         );
-        if (fixture.id === "api-contract") {
-          const build = await run(workspace, "bun", [
-            "run",
-            "build",
-            "--filter=api...",
-            "--force",
-          ]);
-          expect(build.exitCode).toBe(0);
-        }
-        const environment =
-          fixture.id === "api-contract"
-            ? {
-                TAXKIT_API_SMOKE_PORT: String(findAvailableLoopbackPort()),
-              }
-            : undefined;
-        const result = await run(
-          workspace,
-          fixture.command.executable,
-          fixture.command.args,
-          environment
-        );
-        await writeFile(target, source);
-
-        expect(result.exitCode).not.toBe(0);
-        expect(`${result.stdout}\n${result.stderr}`).toContain(
-          fixture.failureOracle
-        );
-      } finally {
-        await rm(workspace, { force: true, recursive: true });
-      }
-    };
-    const runFixtures = async (
-      remaining: readonly (typeof fixtures)[number][]
-    ): Promise<void> => {
-      const [fixture, ...rest] = remaining;
-      if (fixture === undefined) {
-        return;
-      }
-      await runFixture(fixture);
-      await runFixtures(rest);
-    };
-
-    await runFixtures(fixtures);
-  }, 300_000);
+      }).pipe(Effect.provide(BunServices.layer)),
+    300_000
+  );
 });

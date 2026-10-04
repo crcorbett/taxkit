@@ -413,3 +413,56 @@ The [skill-test receipt](../../documentation-audit/clean-slate-foundation/2026-1
 records 21 retained tests, 77 actual CLI cases, all tests, full verification and
 build. Resume using the [local continuation prompt](clean-slate-local-handoff.md);
 the approved overall goal is unfinished, and cloud execution stops for handoff.
+
+## Local T002 Quality-workflow continuation
+
+Resume locally from the complete handoff revision `4fb6bc6`. Live readback on
+4 October confirms draft PRs #88–99 remain open and their latest hosted Quality
+checks passed, including #99 run `37178632478`. DEV-72 remains In Review and
+DEV-73 remains In Progress. Preserve native relations: DEV-76 depends on both
+DEV-74 and DEV-75. No newer Medicare scope decision was found. The approved
+end-to-end DEV-73–81 goal remains active; the earlier cloud pause is history.
+
+The pinned Bun 1.4.2 frozen installation passed locally. The actual installed
+Oxlint binary reports 1,505 strict diagnostics when all eleven rules are applied
+to owned paths before host/fixture qualification. This is a provisional inventory,
+not a defect count; command admissions and intentional fixtures are included.
+
+Migrate the Quality-workflow policy and release-boundary tests to Bun-hosted
+Effect Vitest. Scope owns temporary copies, child processes and the ephemeral
+loopback server. Preserve exact relative links; the installed FileSystem.stat
+follows them, so readLink distinguishes links from ordinary files. Only host
+EINVAL from readLink admits copying an ordinary file; all other errors fail.
+Replace native mutable syntax walks and unchecked lookups with immutable
+traversal, persistent membership and checked Array/Record reads. Typechecking
+exposed previously unverified record access, effect error/context inference and
+non-empty fixture arrays; correct the owners without loosening types.
+
+Enable all eleven rules for `tools/quality-workflow/**`, one exact command
+runtime admission, real CLI path fixtures and a focused type project in root
+verification. Retain all 18 policy cases and all six actual-command mutation
+oracles; add a safe named-error check for rejected workflow shapes. No tracked edits may overlap those isolated-clone checks.
+
+Documentation impact: **Change required** for root commands/type project, lint
+scope and fixtures, tooling/controls standards, testing architecture, this active
+plan and its dated receipt. **Preserve** workflow permissions, canonical skill
+trees/hashes, release mutation corpus, package exports, tax results and provider
+state. **N/A** for Changesets, public docs and runbooks: root test tooling changes
+no versioned package surface or operational procedure. Recover by reverting the
+complete slice. DEV-73 remains unfinished until all its remaining paths and
+semantic reviews are qualified; then continue DEV-74–81 in accepted order.
+
+Local qualification exposed Turbo 2.11.7 automatically appending a managed
+AGENTS.md block. Restore the canonical router and use its documented
+`agentGuidance: false` configuration to prevent later checks changing tracked
+source. The existing task guidance and provider authority remain unchanged.
+
+The [Quality-workflow receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-quality-workflow-boundaries.json)
+records this slice's local checks and remaining limits. It is a DEV-73 progress
+checkpoint, not completion of the full enforcement or later rebuild.
+
+Local Quality-workflow qualification passed: frozen install, 80 actual CLI lint
+cases, all repository tests, 20 Quality tests (including the six real-command
+mutations), full verification, 21 skill tests, two Chromium Atom lifecycle tests
+and the 15-task build. The canonical AGENTS router remains unchanged after
+those checks. No package, tax result, canonical skill or hosted workflow changed.

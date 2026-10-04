@@ -365,3 +365,20 @@ The repository-path and governance commands have exact canonical runtime admissi
 Effects themselves. Its real-command accepted/rejected fixtures and exact
 configuration assertion reject missing enforcement or a widened command selector.
 Repository-path and governance tests use the Bun-hosted Effect Vitest runner.
+
+Quality-workflow source and tests also use all eleven canonical rules. Its
+only runtime admission is `tools/quality-workflow/check.runtime.ts`; real CLI
+fixtures and the exact-selector assertion protect it. `test:quality-workflow`
+uses Bun-hosted Effect Vitest and `check:quality-workflow:types` checks its
+source and tests in root verification. The test scope owns temporary clones,
+child processes and the ephemeral loopback server. Effect FileSystem preserves
+relative symbolic links; only an ordinary-file `readLink` EINVAL permits the
+copy-file fallback. Other filesystem errors fail the test. The six isolated
+release-boundary mutations still execute their actual owning commands.
+
+The pinned Turbo version defaults to automatic root AGENTS.md edits when it
+detects an agent. TaxKit opts out with `agentGuidance: false` in `turbo.json`,
+keeping the canonical task router under maintainer control and preventing a
+checking command from changing tracked source during isolated-clone tests.
+Read the installed Turbo package's `docs/README.md` and applicable reference
+before changing its task configuration.

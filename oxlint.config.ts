@@ -226,8 +226,6 @@ const runtimeBoundaryFiles = [
   "tools/repository-paths/check.runtime.test.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/quality-workflow/check.runtime.ts",
-  "tools/quality-workflow/policy.test.ts",
-  "tools/quality-workflow/release-boundary.test.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/check.runtime.test.ts",
   "tools/documentation/runbook-check.runtime.ts",
@@ -321,7 +319,6 @@ const bunAdapterFiles = [
   "apps/docs/scripts/test-built.tsx",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
-  "tools/quality-workflow/release-boundary.test.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
   "tools/documentation/runbook-check.runtime.test.ts",
@@ -356,7 +353,6 @@ const bunRuntimeEntrypointFiles = [
   "tools/documentation/runbook-check.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/quality-workflow/check.runtime.ts",
-  "tools/quality-workflow/release-boundary.test.ts",
   "tools/evals/hgi-206/check.runtime.ts",
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
@@ -420,6 +416,7 @@ export default defineConfig({
         "tools/repository-paths/**",
         "tools/governance/**",
         "tools/skills/**",
+        "tools/quality-workflow/**",
         "packages/testing/**",
         "packages/api/http/**",
         "packages/docs-content/**",
@@ -464,6 +461,15 @@ export default defineConfig({
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["tools/repository-paths/check.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/quality-workflow/check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/quality-workflow/check.runtime.ts"] },
         ],
       },
     },
