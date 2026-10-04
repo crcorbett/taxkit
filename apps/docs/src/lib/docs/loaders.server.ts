@@ -41,7 +41,7 @@ export const loadDocsPageServer = (data: typeof Schema.Unknown.Type) =>
       Effect.flatMap(({ splat }) =>
         Effect.gen(function* loadDocsPageEffect() {
           const content = yield* DocsContentService;
-          const path = yield* Schema.decodeUnknownEffect(DocsPagePath)(
+          const path = yield* Schema.decodeEffect(DocsPagePath)(
             `/${splat}`
           ).pipe(
             Effect.mapError(

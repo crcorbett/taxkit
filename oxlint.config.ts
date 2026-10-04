@@ -32,7 +32,6 @@ const decodingBoundaryFiles = [
   "packages/docs-content/examples/node-server.ts",
   "apps/docs/src/lib/docs/loaders.ts",
   "apps/docs/src/lib/docs/loaders.server.ts",
-  "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
@@ -239,7 +238,6 @@ const schemaEncoderEgressFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/docs/src/server.ts",
   "apps/docs/src/lib/docs/route-boundary.ts",
-  "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/loaders.server.ts",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
@@ -261,7 +259,6 @@ const throwingCodecTestFiles = [
 
   // Pure policy fixtures encode their Schema-owned accepted record bytes.
   "tools/documentation/policy.test.ts",
-  "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "packages/docs-content/src/validation/policy.runtime.test.ts",
   "tools/docs-deployment/workflow-plan-projection.test.ts",
 ];
@@ -510,6 +507,10 @@ export default defineConfig({
         "apps/docs/scripts/.generated-imports-strict-rejected.ts",
         "apps/docs/vitest.scripts.config.ts",
         "apps/docs/vitest.server.config.ts",
+        "apps/docs/vitest.browser.config.ts",
+        "apps/docs/vite.config.ts",
+        "apps/docs/src/**",
+        "apps/docs/src/.generated-app-strict-rejected.ts",
         "apps/docs/src/lib/runtime-factory.server*.ts",
         "apps/docs/src/lib/docs/route-boundary.test.ts",
         "apps/docs/src/lib/docs/.generated-native-tests-strict-rejected.ts",
@@ -556,6 +557,55 @@ export default defineConfig({
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["apps/docs/src/lib/runtime-factory.server.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/docs/src/lib/docs/loaders.server.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/docs/src/lib/docs/loaders.server.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/docs/src/server.ts"],
+      rules: {
+        "strict-effect/no-promise-workflow": [
+          "error",
+          { allowedFiles: ["apps/docs/src/server.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/docs/src/server.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/docs/src/server.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/docs/vite.config.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/docs/vite.config.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/docs/src/lib/docs/route-boundary.browser.test.tsx"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
+            ],
+          },
         ],
       },
     },

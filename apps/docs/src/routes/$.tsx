@@ -210,10 +210,13 @@ const DocsPageContainer = ({
         );
 
         if (currentLink !== null) {
-          navigationElement.scrollTop =
-            currentLink.offsetTop -
-            navigationElement.clientHeight / 2 +
-            currentLink.clientHeight / 2;
+          navigationElement.scrollTo({
+            behavior: "instant",
+            top:
+              currentLink.offsetTop -
+              navigationElement.clientHeight / 2 +
+              currentLink.clientHeight / 2,
+          });
         }
       });
     }

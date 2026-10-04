@@ -77,11 +77,17 @@ Only the private factory owns runtime creation permission; its tests own none.
 The probe Layer owns
 its construction state in an Effect `Ref`, creates its non-secret identifier
 through Effect `Random`, and admits a deterministic identity Effect in tests.
-The Worker host callback runs the typed probe read through that same runtime
-and Schema-encodes it at response-header egress. It owns no mutable counter or
-randomness. The browser owns no Effect runtime. A browser-reachable loader
-defines only the TanStack server-function transport stub; its dynamic
-`.server.ts` implementation acquires the service, decodes route input before
+The Worker callback executes its native request program at the exact host,
+normalises the framework's response or promise, and passes the request abort
+signal to that program. Framework promise cancellation is a separate concern.
+Only opt-in proof requests acquire the existing docs runtime's cached context
+for the typed probe read and Schema encoding at response-header egress;
+ordinary responses do not initialise docs services. Response body/status and
+unrelated headers are preserved. It owns no mutable counter or randomness.
+The browser owns no Effect runtime. A browser-reachable loader defines only
+the TanStack server-function transport stub. The installed Start compiler
+extracts its handler and removes unused static server imports from browser
+callers; the named `.server.ts` implementation acquires the service, decodes route input before
 lookup and preloads compiled MDX through the browser-safe client loader. App
 routes should not read `packages/docs-content/content` files,
 `navigation.json` or generated `.source/server` modules directly.
@@ -96,6 +102,10 @@ It ignores server, test and generated owners and non-file directory entries,
 rejects browser runtime execution/file presence, and fails closed on file-service
 errors. Native fixtures and real CLI strict-rule canaries qualify this checker
 separately from transitive browser-bundle and local Worker behaviour.
+All docs app source and Vite/server-test/browser-test configurations receive
+the canonical strict rules. Exact hosts retain only the execution or promise
+result construct they require. The Vite host reads Alchemy's injection signal
+through an owning Config Schema, with absence preserving the original default.
 
 The opt-in proof response establishes one construction and stable identity only
 for the observed process/isolate. It does not establish a global singleton

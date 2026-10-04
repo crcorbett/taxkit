@@ -106,6 +106,15 @@ permission, with a neighbouring rejection fixture and an exact-selector test. Th
 the deterministic `DocsContentService` test Layer over the generic
 `FumadocsSource` test Layer and covers accepted, missing and malformed content.
 
+The docs Chromium route harness uses native Effect tests and scoped DOM,
+React, router-history and console-spy resources. Its fake server-function
+loader is its only execution host. The actual compiler includes the Vite,
+server-test and browser-test configurations, and unused-code inventories own
+the browser configuration. Canonical strict rules cover all docs app source;
+real CLI canaries accept named hosts and reject a neighbouring source file.
+The built local Worker separately checks extracted server functions, hydration,
+navigation, immutable asset headers and one reused docs runtime context.
+
 Release-facing package work must also prove actual tarballs rather than
 workspace imports or dry-run file lists:
 
@@ -552,7 +561,11 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   of direct environment/file/JSON/runtime execution, raw Promise concurrency,
   ambient child environments, bypassed shared boundaries and unmanaged docs
   runtime state/randomness. It permits only the named process-byte adapter and
-  Worker fetch/ManagedRuntime bridge documented by the tool owner. This
+  Worker native request/cached ManagedRuntime context bridge documented by the
+  tool owner. Worker bypass fixtures reject extra execution, eager docs
+  acquisition, missing abort signal/typed encoding and lost response fields or
+  unrelated-header filtering. These remain source assertions, separate from
+  actual Worker behaviour and underlying framework promise cancellation. This
   semantic control runs once inside `test:docs-deployment`; do not duplicate it
   as another root-verification command or broaden it into a repository-wide
   text ban.

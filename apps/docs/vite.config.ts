@@ -4,6 +4,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import * as docsConfig from "@taxkit/docs-content/source.config";
 import viteReact from "@vitejs/plugin-react";
+import { Config, Effect, Schema } from "effect";
 import mdx from "fumadocs-mdx/vite";
 import { defineConfig } from "vite";
 
@@ -15,9 +16,12 @@ const docsContentSourceDirectory = fileURLToPath(
 );
 
 export default defineConfig(() => {
-  const alchemyOwnsCloudflareVite =
-    // oxlint-disable-next-line effect/no-process-outside-boundaries -- Vite configuration is the exact host boundary for Alchemy's documented process-local injection signal.
-    process.env.ALCHEMY_CLOUDFLARE_VITE_INJECTED === "1";
+  const alchemyOwnsCloudflareVite = Effect.runSync(
+    Config.schema(Schema.String, "ALCHEMY_CLOUDFLARE_VITE_INJECTED").pipe(
+      Config.withDefault(""),
+      Config.map((value) => value === "1")
+    )
+  );
 
   const docsMdxForBuild = mdx(docsConfig, {
     configPath: docsContentConfigPath,

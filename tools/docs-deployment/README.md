@@ -82,7 +82,12 @@ operator procedure and authority live in
   supplies the two named Cloudflare values through the process environment.
 - `strict-boundaries.policy.ts` checks the named application and deployment
   adapters for ambient host access, raw concurrency, lost workflow/credential
-  boundaries and unmanaged docs runtime state.
+  boundaries and unmanaged docs runtime state. The exact Worker host may
+  execute one native request program. The source contract also requires lazy
+  documentation context acquisition, typed probe encoding, preserved response
+  fields/other headers and the request abort signal; deliberate bypass fixtures
+  reject lost ownership. This source control is separate from actual Worker
+  behaviour and framework promise cancellation.
 - Private `@taxkit/infrastructure` owns the native
   `Cloudflare.Website.Vite("DocsWebsite")` declaration; root owns its provider
   and state composition. This directory does not

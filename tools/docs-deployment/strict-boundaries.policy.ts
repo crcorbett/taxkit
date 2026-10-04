@@ -101,6 +101,10 @@ const inspectGenericBoundaries = (
 
   return EffectArray.flatMap(strictAppBoundaryPaths, (path) => {
     const source = readStrictAppBoundarySource(sources, path);
+    const isWorkerExecutionHost =
+      path === "apps/docs/src/server.ts" &&
+      source.match(/\bEffect\.runPromise\(/gu)?.length === 1 &&
+      !source.includes("Effect.runSync");
     const applicableHostIngressPatterns = EffectArray.filter(
       hostIngressPatterns,
       (pattern) =>
@@ -110,7 +114,8 @@ const inspectGenericBoundaries = (
       ...(includesAny(source, applicableHostIngressPatterns)
         ? [finding("host-ingress", path)]
         : []),
-      ...(includesAny(source, runtimeExecutionPatterns)
+      ...(includesAny(source, runtimeExecutionPatterns) &&
+      !isWorkerExecutionHost
         ? [finding("runtime-owner", path)]
         : []),
       ...(includesAny(source, rawConcurrencyPatterns)
@@ -302,9 +307,20 @@ const inspectDocsRuntimeBoundary = (
   ] as const;
   const factoryRequirements = ["Context.Service", "Ref.make("] as const;
   const adapterRequirements = [
-    "docsRuntime.runPromise(",
+    "fetch: (request: Request)",
+    "Effect.runPromise(",
+    "Promise.resolve(startHandler(request))",
+    "return response;",
+    "const context = yield* docsRuntime.contextEffect;",
     "readDocsRuntimeProbe",
-    "Schema.encodeUnknownEffect(",
+    "Effect.provide(context)",
+    "Schema.encodeEffect(DocsRuntimeProbeSnapshot)",
+    "name !== runtimeProofResponseHeader",
+    "name !== runtimeProofIsolateHeader",
+    "new Response(response.body",
+    "status: response.status",
+    "statusText: response.statusText",
+    "{ signal: request.signal }",
   ] as const;
   const valid =
     !/^let\s+/mu.test(runtimeFactory) &&
@@ -313,7 +329,9 @@ const inspectDocsRuntimeBoundary = (
     runtimeComposition.includes("Random.nextIntBetween(") &&
     runtimeComposition.match(/createDocsRuntime\(/gu)?.length === 1 &&
     runtimeComposition.match(/createDocsRuntimeProbeLayer\(/gu)?.length === 1 &&
-    includesEvery(serverAdapter, adapterRequirements);
+    includesEvery(serverAdapter, adapterRequirements) &&
+    serverAdapter.indexOf("const context = yield* docsRuntime.contextEffect;") >
+      serverAdapter.indexOf("return response;");
 
   return valid ? [] : [finding("runtime-probe", factoryPath)];
 };

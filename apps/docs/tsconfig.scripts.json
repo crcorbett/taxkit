@@ -6,7 +6,10 @@
     "scripts/test-cloudflare-hosted.tsx",
     "scripts/check-import-boundaries.runtime.ts",
     "scripts/check-import-boundaries.runtime.test.ts",
-    "vitest.scripts.config.ts"
+    "vitest.scripts.config.ts",
+    "vite.config.ts",
+    "vitest.browser.config.ts",
+    "vitest.server.config.ts"
   ],
   "compilerOptions": {
     "allowImportingTsExtensions": true,

@@ -137,6 +137,10 @@ inside a scope, including failed and interrupted requests. These tests prove
 local lifetime and representation behaviour, separate from Worker/browser proof.
 
 `test:browser` runs the programmatic TanStack client-route harness in Chromium.
+Its native Effect tests scope the DOM host, React root, router history and
+console spies. Only its fake server-function loader executes an Effect; test
+bodies use the native runner. The browser test configuration is included in
+both the compiler and unused-code inventories.
 It proves success, expected failures, malformed transport and framework error
 boundaries after `Route.useLoaderData`; it does not prove SSR or hydration. Use
 the built app for initial SSR, hydration and real client-navigation proof.
@@ -251,7 +255,10 @@ references, ignored owners, an empty runtime file and file-service failures.
 The default `test` command includes this corpus; `check-types` includes the
 checker, fixtures and their test configuration. These exact files receive the
 canonical strict rules, with only the command entrypoint allowed to execute
-an application. The other docs app migration work remains with DEV-73.
+an application. Canonical rules also cover all docs app source and its Vite,
+server-test and browser-test configurations. The source permits execution only
+at the exact Worker, server-loader, runtime factory and fake browser-loader
+owners. Other docs proof-script migration work remains with DEV-73.
 
 `check-import-boundaries` rejects server-only content, service, generated-source
 and runtime imports from browser-reachable app modules. The docs app has no
@@ -268,8 +275,14 @@ application shutdown hook.
 The Worker entry accepts the exact
 `x-taxkit-docs-runtime-proof: construction-count` opt-in header and returns a
 non-secret construction count plus random isolate identifier. The host callback
-runs the typed read through the application runtime and Schema-encodes it only
-at response-header egress; it owns no counter or randomness itself. This
+runs one native Effect at the Worker entry, normalising the framework's
+`Response | Promise<Response>` result there. It uses the request's abort signal
+for that Effect; this does not establish cancellation inside the framework's
+promise. Ordinary responses do not initialise documentation services. An
+opt-in request acquires the existing application runtime's cached context for
+the typed probe read, and Schema-encodes it at response-header egress. It
+replaces only the two proof headers and preserves other response headers,
+body and status; it owns no counter or randomness itself. This
 temporary deployment-migration channel proves reuse within the observed
 process/isolate across requests; it is not a public API and does not prove a
 singleton across Cloudflare isolates. Review it when the runtime, Worker entry,
@@ -335,6 +348,10 @@ docs change
 - Do not statically import content services, live Layers or the server runtime
   from browser-reachable route modules. Keep execution behind the app-owned
   `.server.ts` server-function implementation.
+- `createServerFn` handlers may refer to named `.server.ts` implementations:
+  the installed Start compiler extracts the handler and removes its unused
+  server imports from browser callers. Source checking, the built bundle and
+  local Worker/browser proof remain separate checks of that boundary.
 - Do not add a browser Effect runtime. Browser routes restore the encoded
   transport value and render canonical values.
 - Keep app-specific MDX components in `src/lib/mdx/components.tsx`.

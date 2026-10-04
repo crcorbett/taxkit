@@ -76,7 +76,8 @@
         "src/routes/**/*.{ts,tsx}",
         "vitest.server.config.ts",
         "vite.config.ts",
-        "vitest.scripts.config.ts"
+        "vitest.scripts.config.ts",
+        "vitest.browser.config.ts"
       ],
       "project": [
         "scripts/**/*.{ts,tsx}",
@@ -84,7 +85,8 @@
         "src/**/*.{ts,tsx}",
         "vitest.server.config.ts",
         "vite.config.ts",
-        "vitest.scripts.config.ts"
+        "vitest.scripts.config.ts",
+        "vitest.browser.config.ts"
       ],
       "ignore": ["examples/**/*.ts", "src/routeTree.gen.ts"],
       "ignoreDependencies": ["@taxkit/tsconfig"]

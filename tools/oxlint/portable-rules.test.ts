@@ -33,6 +33,34 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
+      "apps/docs/src/server.ts",
+      "apps/docs/src/lib/runtime.server.ts",
+      "apps/docs/src/lib/docs/loaders.ts",
+      "apps/docs/src/lib/docs/loaders.server.ts",
+      "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
+      "apps/docs/src/lib/mdx/components.tsx",
+      "apps/docs/src/routes/$.tsx",
+      "apps/docs/vite.config.ts",
+      "apps/docs/vitest.browser.config.ts",
+    ],
+    generated: "apps/docs/src/.generated-app-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
+    accepted: [
       "apps/docs/src/lib/runtime-factory.server.ts",
       "apps/docs/src/lib/runtime-factory.server.test.ts",
       "apps/docs/src/lib/docs/route-boundary.test.ts",
@@ -1040,6 +1068,10 @@ test.effect.each([
 );
 
 test.each([
+  "apps/docs/src/lib/docs/loaders.server.ts",
+  "apps/docs/src/server.ts",
+  "apps/docs/vite.config.ts",
+  "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "apps/api/src/index.ts",
@@ -1078,9 +1110,9 @@ test.each([
       oxlintConfig.overrides ?? [],
       (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
         Array.contains(entry.files ?? [], path) &&
-        Record.has<string>("strict-effect/no-runtime-outside-boundary")(
+        Record.get<string>("strict-effect/no-runtime-outside-boundary")(
           entry.rules ?? {}
-        )
+        ).pipe(Option.exists(Array.isArray))
     )
   ).toEqual([
     {
@@ -1095,8 +1127,10 @@ test.each([
   ]);
 });
 
-test("keeps the plain SDK Promise signature admission exact", () => {
-  const path = "packages/sdk/typescript/src/client.runtime.ts";
+test.each([
+  "packages/sdk/typescript/src/client.runtime.ts",
+  "apps/docs/src/server.ts",
+])("keeps the host Promise result admission exact: %s", (path) => {
   expect(
     Array.filter(
       oxlintConfig.overrides ?? [],

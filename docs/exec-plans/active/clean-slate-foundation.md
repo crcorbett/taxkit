@@ -1416,3 +1416,77 @@ recover. DEV-73 remains unfinished, followed by DEV-74–81; the Medicare decisi
 remains separate and pending. This corrective slice follows local draft #119
 `4cb71a3f49f6125e201603b1b132c569d43d3b2b`; neither parent hosted outcome is
 silently replaced by this later correction.
+
+
+## Local T002 docs app and host migration
+
+All docs app source and the actual Vite/server-test/browser-test configurations
+now receive canonical strict rules. Named server-function handlers replace
+redundant async dynamic-import wrappers; the installed Start compiler extracts
+the handlers and removes unused server imports from browser callers. The exact
+Worker entry normalises the framework's Response or Promise through one native
+request program, with the request abort signal. Ordinary responses do not
+initialise documentation services. Opt-in proof requests acquire the existing
+runtime's cached context, encode its typed probe and replace only two proof
+headers. Body/status and unrelated headers are preserved. This does not prove
+cancellation inside the framework promise. Vite reads its Alchemy signal through
+an owning Config Schema with the original absent default.
+
+The native Chromium harness scopes its DOM host, React root, router history and
+console spies. Its fake server-function loader is its only execution host;
+Schema-owned brands and native Effects replace raw Promise/throwing-codec test
+workflows. Readonly MDX link props preserve aria labels on both routes and
+ordinary anchors. Navigation positioning uses the named DOM scroll operation.
+The compiler and unused-code inventories now include the actual host and test
+configurations. Redundant browser decoding/throwing-codec/encoding permissions
+are removed.
+
+Focused qualification passes the actual app/script compilers, all 19 retained
+server cases, both unused-code profiles, all seven Chromium route cases and
+336 real CLI lint cases. The first Chromium run caught two tuple-callback
+errors; the first strict corpus caught a default-rule/admission distinction.
+Both are corrected without removing assertions and retained in the
+[receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-docs-app-hosts.json).
+The final built local Worker proves SSR/immutable assets 200, direct/client 404,
+zero document reloads during client navigation, three server functions, clean
+diagnostics, one reused context, filesystem isolation and retained accessibility
+checks. Complete repository qualification remains in progress.
+
+Documentation impact: **Change required** for app source/host configuration,
+compiler and unused-code ownership, strict selectors/CLI canaries, app README,
+frontend/testing architecture, T002 ledger, active plan and dated receipt.
+**Preserve** route representations/failure semantics, lazy docs context,
+response contracts, public/generated content, dependency selections, tax
+results, historical evidence and canonical skills. **N/A** Changeset/package
+release notes (private unversioned app; no published contract), operational
+runbooks/CI procedures and provider state. Revert this complete slice to
+recover. Remaining proof-script/web/infrastructure and semantic/readonly work
+keeps DEV-73 unfinished, followed by DEV-74–81. The Medicare decision remains
+separate and pending. Parent draft #120 revision
+`c4d497c2d23262a82c59fd146338e049eafb1259` has separate hosted qualification.
+
+The first complete verification caught two obsolete exact-source architecture
+assertions: they required the prior async fetch/managed-runtime runner/unknown
+encoder. The owning policy now admits exactly one native Worker execution and
+requires lazy cached context, native typed encoding, the abort signal, proof
+header filtering and original response fields. Ten new deliberate bypass cases
+reject recurrence; all 186 deployment-tool cases pass, including the 176 retained
+cases. The tool README and testing owner move with this correction. Complete
+verification is rerun; the failed attempt remains in the receipt.
+
+Parent #120 hosted run `37201707816` passed for exact revision
+`c4d497c2d23262a82c59fd146338e049eafb1259`, read back on 2026-10-04.
+That qualifies the separate Quality deadline correction, not this later app
+worktree. Parent #118/#119 hosted failures remain retained.
+
+Final local qualification passes: unchanged frozen 792-install/1020-package
+graph, actual 336-case root lint corpus, all 23 package test tasks replaying
+matching caches and all 15 build tasks (14 matching caches). Complete
+verification passes all 30 Quality cases/all ten isolated faults/separate
+fresh-source docs, 186 deployment-tool, 21 skill and 16 evaluation cases, both
+unused-code profiles and all 24 compiler tasks (23 matching caches). Unchanged
+SDK/web Chromium results replay matching caches for 24/two cases; the changed
+docs route and built Worker checks executed directly in Chromium. The checked
+lint-selector lookup is native Record/Option. Failed earlier attempts are
+retained in the receipt. This locally qualified app slice leaves DEV-73 and
+DEV-74–81 unfinished.

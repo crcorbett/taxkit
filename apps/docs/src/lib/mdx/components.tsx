@@ -10,11 +10,12 @@ import {
 import { classifyDocsHref } from "./link-destination";
 
 const DocsMdxLink = ({
+  "aria-label": ariaLabel,
   children,
   download,
   href,
   ...props
-}: ComponentPropsWithoutRef<"a">) => {
+}: Readonly<ComponentPropsWithoutRef<"a">>) => {
   const currentPath = useLocation({ select: (location) => location.pathname });
   const destination =
     download === undefined && props.target === undefined
@@ -23,9 +24,7 @@ const DocsMdxLink = ({
 
   return destination.kind === "router" ? (
     <Link
-      {...(props["aria-label"] === undefined
-        ? {}
-        : { "aria-label": props["aria-label"] })}
+      {...(ariaLabel === undefined ? {} : { "aria-label": ariaLabel })}
       {...(props.className === undefined ? {} : { className: props.className })}
       {...(props.id === undefined ? {} : { id: props.id })}
       {...(props.title === undefined ? {} : { title: props.title })}
@@ -38,7 +37,12 @@ const DocsMdxLink = ({
       {children}
     </Link>
   ) : (
-    <a {...props} download={download} href={destination.href}>
+    <a
+      {...props}
+      {...(ariaLabel === undefined ? {} : { "aria-label": ariaLabel })}
+      download={download}
+      href={destination.href}
+    >
       {children}
     </a>
   );

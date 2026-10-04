@@ -290,9 +290,99 @@ describe("strict docs app and deployment architecture", () => {
       const sources = yield* readGovernedSources;
       expect(
         readStrictAppBoundarySource(sources, "apps/docs/src/server.ts")
-      ).toContain("fetch: async (request: Request)");
+      ).toContain("fetch: (request: Request)");
       expect(inspectStrictAppBoundaries(sources)).toEqual([]);
     })
+  );
+  test.effect.each([
+    {
+      from: "docsRuntime.contextEffect",
+      invariant: "runtime-probe",
+      to: "uncheckedContext",
+    },
+    {
+      from: "Effect.provide(context)",
+      invariant: "runtime-probe",
+      to: "Effect.provide(otherContext)",
+    },
+    {
+      from: "Schema.encodeEffect(DocsRuntimeProbeSnapshot)",
+      invariant: "runtime-probe",
+      to: "encodeUncheckedProbe()",
+    },
+    {
+      from: "{ signal: request.signal }",
+      invariant: "runtime-probe",
+      to: "{}",
+    },
+    {
+      from: "name !== runtimeProofResponseHeader",
+      invariant: "runtime-probe",
+      to: "true",
+    },
+    {
+      from: "name !== runtimeProofIsolateHeader",
+      invariant: "runtime-probe",
+      to: "true",
+    },
+    {
+      from: "new Response(response.body",
+      invariant: "runtime-probe",
+      to: "new Response(null",
+    },
+    {
+      from: "status: response.status",
+      invariant: "runtime-probe",
+      to: "status: 200",
+    },
+    {
+      from: "statusText: response.statusText",
+      invariant: "runtime-probe",
+      to: 'statusText: ""',
+    },
+  ] as const)(
+    "rejects a bypassed Worker response contract: $from",
+    ({ from, invariant, to }) =>
+      Effect.gen(function* () {
+        const sources = yield* readGovernedSources;
+        const source = readStrictAppBoundarySource(
+          sources,
+          "apps/docs/src/server.ts"
+        );
+        expect(source).toContain(from);
+        expect(
+          findingInvariants(
+            replaceSource(sources, "apps/docs/src/server.ts", (current) =>
+              current.replace(from, to)
+            )
+          )
+        ).toContain(invariant);
+      })
+  );
+  test.effect(
+    "rejects eager docs context acquisition and extra Worker execution",
+    () =>
+      Effect.gen(function* () {
+        const sources = yield* readGovernedSources;
+        const eager = replaceSource(
+          sources,
+          "apps/docs/src/server.ts",
+          (source) =>
+            source
+              .replace("const context = yield* docsRuntime.contextEffect;", "")
+              .replace(
+                "const response = yield*",
+                "const context = yield* docsRuntime.contextEffect;\nconst response = yield*"
+              )
+        );
+        expect(findingInvariants(eager)).toContain("runtime-probe");
+        const extra = replaceSource(
+          sources,
+          "apps/docs/src/server.ts",
+          (source) => `${source}\nEffect.runPromise(Effect.void);\n`
+        );
+        expect(findingInvariants(extra)).toContain("runtime-owner");
+      })
   );
   test.effect(
     "fails required source ownership when the inspected source is empty",

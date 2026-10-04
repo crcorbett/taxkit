@@ -1,0 +1,267 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "c4d497c2d23262a82c59fd146338e049eafb1259",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR proof separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Canonical strict rules cover all docs app source and actual Vite/server-test/browser-test configurations",
+    "Named server-function implementations replace redundant async/dynamic-import wrappers; installed Start compiler extracts handlers and drops unused server imports from callers",
+    "Worker native Effect normalises Response or Promise at the exact host, passes request abort signal and preserves lazy docs context, response body/status and unrelated headers",
+    "Native Config Schema owns Alchemy injection signal with original absent default; actual compiler checks host and test configurations",
+    "Native Chromium route tests scope DOM/root/history/spies; owning brands and native Effects replace throwing codecs/raw Promise workflows",
+    "Readonly MDX link props retain internal/external aria-label handling; native DOM scrolling preserves navigation positioning",
+    "Unused-code owner includes actual browser-test configuration; decoding/throwing-codec/browser encoding admissions removed",
+    "Exact-source architecture owner admits one Worker execution and requires lazy cached context, native encoding, abort signal, header filtering and preserved response fields; ten new deliberate bypass cases reject recurrence"
+  ],
+  "checks": [
+    {
+      "command": "focused compiler/lint/server tests",
+      "outcome": "pass; actual app and script configurations, 19 retained server cases, both unused-code profiles",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-types-final-source.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-server-tests.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-knip.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-knip-production.log"
+      ]
+    },
+    {
+      "command": "actual strict-rule corpus",
+      "outcome": "pass; 336 = 321 retained + nine accepted paths + neighbouring rejection + four exact runtime selectors + exact Worker Promise-result selector",
+      "log": "/private/tmp/taxkit-local-toolchain/docs-app-hosts-corpus-corrected.log"
+    },
+    {
+      "command": "actual Chromium route harness",
+      "outcome": "pass; all seven cases including success, both expected failures, not-found, malformed response, defect and interruption",
+      "log": "/private/tmp/taxkit-local-toolchain/docs-app-hosts-browser-corrected.log"
+    },
+    {
+      "command": "actual built local Worker/Chromium",
+      "outcome": "pass; SSR/immutable assets 200, direct/client 404, zero document requests during client navigation, three server functions, clean diagnostics, one reused context, filesystem isolation and retained accessibility checks",
+      "log": "/private/tmp/taxkit-local-toolchain/docs-app-hosts-built-final-source.log"
+    },
+    {
+      "command": "focused architecture-owner compiler/lint and deployment-tool corpus",
+      "outcome": "pass; 186 = 176 retained + ten deliberate Worker bypass cases",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-owner-types.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-owner-lint.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-owner-tests.log"
+      ]
+    },
+    {
+      "command": "frozen install and complete tests/build",
+      "outcome": "pass; unchanged 792 installs/1020 packages; final actual 336-case root lint corpus; 23 package test tasks replay matching caches; source-qualified build passes 15 tasks with 14 matching caches",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-install-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-all-tests-final.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-all-build-qualified.log"
+      ]
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass; actual 30 Quality cases/all ten isolated faults/separate fresh-source docs (263.33 seconds); 186 deployment-tool, 21 skill and 16 evaluation cases; all 24 compiler tasks pass (23 matching caches); both unused-code profiles; unchanged SDK/web Chromium replay matching caches for 24/two cases",
+      "log": "/private/tmp/taxkit-local-toolchain/docs-app-hosts-verification-final.log"
+    },
+    {
+      "command": "final docs/runbook/format/Changeset status and diff checks",
+      "outcome": "pass; shared-cache IO warnings non-fatal; no version application",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-final-docs.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-final-runbooks.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-final-format.log",
+        "/private/tmp/taxkit-local-toolchain/docs-app-hosts-final-changesets.log"
+      ]
+    }
+  ],
+  "built_candidate": {
+    "browser": {
+      "name": "Chromium",
+      "version": "153.0.8010.12"
+    },
+    "candidate": {
+      "assetsSha256": "96eb38299fe83d1d4ed5267756fa63cd38af6846801f25e59a445e650718cfd5",
+      "deploymentInputSha256": "26617f31ef188e7359c2e718590ce0ad4000d91ab1c3d856e8b1df7791cf37fe",
+      "sourceCommit": "c4d497c2d23262a82c59fd146338e049eafb1259",
+      "workerModulesSha256": "45d7650bd1fddbcea50e5470708993a8cb450d235816ee3238fe44a31dab97f2",
+      "worktreeQualifiedBeforeCommit": true
+    },
+    "dependencies": {
+      "cloudflareVitePlugin": "1.62.5",
+      "workerd": "1.20261001.1",
+      "wrangler": "4.147.0"
+    },
+    "evidenceClass": "local-workerd",
+    "filesystem": {
+      "isolatedOutputOnlyExecution": true,
+      "nodeFileSystemModules": [
+        "assets/policy-DAVKzKc6.js",
+        "assets/runtime.server-DggjVMoy.js"
+      ],
+      "providerCredentialEnvironmentAllowed": false,
+      "requestTimePolicyImportObserved": false
+    },
+    "limits": {
+      "firstResponseRequestMs": 216.82,
+      "gzipUploadBytes": 572293.12,
+      "localProcessStartToFirstResponseMs": 886.15,
+      "rawServerModuleBytes": 3373988,
+      "rawUploadBytes": 3373987.84,
+      "workerSizeLimitBytes": 3145728
+    },
+    "nonClaims": [
+      "Local workerd does not prove a Cloudflare account, provider deployment, workers.dev URL, remote state, Preview, Production or rollback.",
+      "The startup observation is local workerd evidence; provider startup validation remains required."
+    ],
+    "oracles": {
+      "accessibility": "passed",
+      "assetCacheHeaders": "passed",
+      "assets": "passed",
+      "clientNavigationWithoutDocumentReload": "passed",
+      "clientNotFound": "passed",
+      "concurrentRequestIsolation": "passed",
+      "consoleAndPageErrors": "passed",
+      "directNotFound": "passed",
+      "hydration": "passed",
+      "malformedServerFunction": "passed",
+      "mobileNavigationDisclosure": "passed",
+      "pendingNavigation": "passed",
+      "recoverableError": "passed",
+      "reducedMotion": "passed",
+      "serverFunctionTransport": "passed",
+      "ssr": "passed"
+    },
+    "owner": "DCD-001 local Cloudflare built-app harness",
+    "runtime": {
+      "concurrentRequestsPassed": 9,
+      "observedConstructionCount": 1,
+      "observedDescendantCount": 4,
+      "observedIsolateId": "155wnbgw3wy-14ee3fze11j",
+      "observedWorkerdDescendantCount": 2,
+      "perRequestConstructionPatternAbsent": true
+    },
+    "schemaVersion": 1,
+    "screenshots": []
+  },
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "apps/docs/src/**",
+        "apps/docs/vite.config.ts",
+        "apps/docs/tsconfig.scripts.json",
+        "knip.json",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "apps/docs/README.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "tools/docs-deployment/strict-boundaries.policy.ts",
+        "tools/docs-deployment/strict-boundaries.contract.test.ts",
+        "tools/docs-deployment/README.md"
+      ],
+      "reason": "Actual host/test/compiler/strict ownership and durable explanation move together"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "route transport and failure distinctions",
+        "lazy documentation context",
+        "response body/status/unrelated headers",
+        "public/generated content",
+        "selected dependencies",
+        "tax rules/results",
+        "historical evidence",
+        "canonical skills/digests",
+        "docs/product-specs/clean-slate-foundation.md"
+      ],
+      "reason": "Native host migration retains accepted product contracts"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "Changeset",
+        "package release notes",
+        "operational runbook procedure",
+        "CI workflow",
+        "provider state"
+      ],
+      "reason": "Private unversioned app; no published package/API/content change or consequential operation; request-program abort handling and its limits recorded in app and architecture owners"
+    }
+  ],
+  "recovery": {
+    "attempts": [
+      {
+        "outcome": "failed initial compiler/lint probes, corrected",
+        "observed": "Actual framework handler allows Response or Promise; missing Config.string replaced by installed Config.schema; config files added to real compiler",
+        "logs": [
+          "/private/tmp/taxkit-local-toolchain/docs-app-hosts-types-first.log",
+          "/private/tmp/taxkit-local-toolchain/docs-app-hosts-lint-response.log"
+        ]
+      },
+      {
+        "outcome": "first Chromium run failed two of seven cases; corrected and all seven pass",
+        "observed": "Native effect.each passes each tuple as one argument; destructure pair without removing any assertion",
+        "log": "/private/tmp/taxkit-local-toolchain/docs-app-hosts-browser-first.log"
+      },
+      {
+        "outcome": "first strict corpus failed one of 336; corrected and all 336 pass",
+        "observed": "Exact host assertion counted the required default rule as a permission because Vite path is also explicit in canonical scope; selector now examines every option-bearing admission and retains exact single-file requirement",
+        "log": "/private/tmp/taxkit-local-toolchain/docs-app-hosts-corpus-first.log"
+      },
+      {
+        "outcome": "first full verification failed two of 176 deployment-tool cases, corrected",
+        "observed": "Previous exact-source owner required async fetch, docsRuntime.runPromise and unknown encoding; updated to native host/context/typed encoding with ten additional bypass cases. Full tests/build already passed; complete verification rerun required",
+        "log": "/private/tmp/taxkit-local-toolchain/docs-app-hosts-verification-qualified.log"
+      },
+      {
+        "outcome": "second verification caught an unchecked bracket in the new exact-selector test; corrected",
+        "observed": "Installed native Record.get<string> and Option.exists replace computed bracket access; actual root lint and owning compiler pass. Initial direct Record.get inference included symbol keys and was corrected to explicit string-key owner without a cast",
+        "logs": [
+          "/private/tmp/taxkit-local-toolchain/docs-app-hosts-verification-corrected.log",
+          "/private/tmp/taxkit-local-toolchain/docs-app-hosts-lint-owner-types.log",
+          "/private/tmp/taxkit-local-toolchain/docs-app-hosts-root-lint-corrected.log",
+          "/private/tmp/taxkit-local-toolchain/docs-app-hosts-lint-owner-types-corrected.log"
+        ]
+      }
+    ],
+    "rollback": "Revert complete slice; no provider/version operation"
+  },
+  "limitations": [
+    "Request signal interrupts the native request program; underlying framework promise cancellation is not established",
+    "Built candidate records pre-commit parent plus worktree-qualified flag and actual artifact hashes",
+    "Local Worker is separate from hosted/provider/Preview/Production proof",
+    "Docs built/hosted proof-script, web, infrastructure and semantic/readonly review still unfinished",
+    "Medicare correction requires separate bounded decision",
+    "Default-sandbox docs/runbook/format tasks may report non-fatal shared-cache IO access warnings after success"
+  ],
+  "non_claims": [
+    "No merge, deployment, publication, provider apply or version application",
+    "No hosted qualification of this later worktree",
+    "No completion of DEV-73 or DEV-74–81"
+  ],
+  "parent_hosted_result": {
+    "revision": "c4d497c2d23262a82c59fd146338e049eafb1259",
+    "pr": 120,
+    "run": 37201707816,
+    "outcome": "success",
+    "readback": "2026-10-04 12:30 UTC",
+    "url": "https://github.com/crcorbett/taxkit/actions/runs/37201707816",
+    "limitation": "Qualifies the corrected parent, not this later app worktree; #118/#119 failures remain retained"
+  }
+}

@@ -1,3 +1,4 @@
+import { describe, expect, it as test } from "@effect/vitest";
 import {
   createMemoryHistory,
   createRootRoute,
@@ -10,16 +11,16 @@ import {
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { DocsSourceError } from "@taxkit/docs-content/errors";
 import { DocsNavigation, DocsSourcePath } from "@taxkit/docs-content/schemas";
-import { Effect, Match, Result, Schema } from "effect";
+import { Effect, Match, Result } from "effect";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { describe, expect, test, vi } from "vitest";
+import { vi } from "vitest";
 
 import { DocsContentPreloadError } from "#/lib/docs/errors";
 import { docsHomeRouteBoundary } from "#/lib/docs/route-boundary";
 
 const homeSuccess = {
-  navigation: Schema.decodeUnknownSync(DocsNavigation)({
+  navigation: DocsNavigation.make({
     contentRoot: "packages/docs-content/content",
     primaryNavigation: [],
     status: "published",
@@ -35,32 +36,26 @@ const FrameworkError = ({ error }: ErrorComponentProps) => (
 
 const harnessRoute = createRoute({
   getParentRoute: () => rootRoute,
+  // This is the single fake server-loader bridge required by the Router host.
+  // Native test bodies below do not execute an Effect runtime.
   loader: ({ params }) =>
-    Match.value(params.scenario).pipe(
-      Match.when("success", () =>
-        Effect.runPromise(
+    Effect.runPromise(
+      Match.value(params.scenario).pipe(
+        Match.when("success", () =>
           docsHomeRouteBoundary.encodeExit(Effect.succeed(homeSuccess))
-        )
-      ),
-      Match.when("preload-error", () =>
-        Effect.runPromise(
+        ),
+        Match.when("preload-error", () =>
           docsHomeRouteBoundary.encodeExit(
             Effect.fail(
               new DocsContentPreloadError({
                 message: "Unable to preload docs content",
-                path: Schema.decodeUnknownSync(DocsSourcePath)(
-                  "content/start/index.mdx"
-                ),
+                path: DocsSourcePath.make("content/start/index.mdx"),
               })
             )
           )
-        )
-      ),
-      Match.when("not-found-error", () => {
-        throw notFound();
-      }),
-      Match.when("source-error", () =>
-        Effect.runPromise(
+        ),
+        Match.when("not-found-error", () => Effect.die(notFound())),
+        Match.when("source-error", () =>
           docsHomeRouteBoundary.encodeExit(
             Effect.fail(
               new DocsSourceError({
@@ -69,21 +64,17 @@ const harnessRoute = createRoute({
               })
             )
           )
-        )
-      ),
-      Match.when("malformed", () => ({ malformed: true })),
-      Match.when("defect", () =>
-        Effect.runPromise(
+        ),
+        Match.when("malformed", () => Effect.succeed({ malformed: true })),
+        Match.when("defect", () =>
           docsHomeRouteBoundary.encodeExit(
             Effect.die(new Error("fatal docs loader defect"))
           )
-        )
-      ),
-      Match.when("interruption", () =>
-        Effect.runPromise(docsHomeRouteBoundary.encodeExit(Effect.interrupt))
-      ),
-      Match.orElse((scenario) =>
-        Effect.runPromise(
+        ),
+        Match.when("interruption", () =>
+          docsHomeRouteBoundary.encodeExit(Effect.interrupt)
+        ),
+        Match.orElse((scenario) =>
           docsHomeRouteBoundary.encodeExit(
             Effect.die(new Error(`Unknown browser scenario: ${scenario}`))
           )
@@ -149,47 +140,47 @@ type HarnessRender = Readonly<{
   router: ReturnType<typeof createHarnessRouter>;
 }>;
 
-const withRenderedHarnessRoute = <A,>(
-  path: string,
-  inspect: (render: HarnessRender) => Effect.Effect<A>
-) =>
-  Effect.acquireUseRelease(
-    Effect.sync(() => {
-      const host = document.createElement("div");
-      const root = createRoot(host, { onCaughtError: () => {} });
-      const router = createHarnessRouter(path);
-
-      document.body.replaceChildren(host);
-
-      return {
-        consoleError: vi.spyOn(console, "error").mockImplementation(() => {}),
-        consoleWarn: vi.spyOn(console, "warn").mockImplementation(() => {}),
-        host,
-        root,
-        router,
-      };
-    }),
-    (render) =>
-      Effect.gen(function* renderHarnessRoute() {
-        yield* Effect.promise(() => render.router.load());
-        yield* Effect.sync(() => {
-          flushSync(() => {
-            render.root.render(<RouterProvider router={render.router} />);
-          });
-        });
-        yield* nextAnimationFrame;
-
-        return yield* inspect(render);
-      }),
-    (render) =>
+const acquireRenderedHarnessRoute = (path: string) =>
+  Effect.gen(function* () {
+    const host = yield* Effect.acquireRelease(
       Effect.sync(() => {
-        render.consoleError.mockRestore();
-        render.consoleWarn.mockRestore();
-        render.root.unmount();
-        render.router.history.destroy();
-        document.body.replaceChildren();
-      })
-  );
+        const element = document.createElement("div");
+        document.body.replaceChildren(element);
+        return element;
+      }),
+      (element) => Effect.sync(() => element.remove())
+    );
+    const consoleError = yield* Effect.acquireRelease(
+      Effect.sync(() =>
+        vi.spyOn(console, "error").mockImplementation(() => {})
+      ),
+      (spy) => Effect.sync(() => spy.mockRestore())
+    );
+    const consoleWarn = yield* Effect.acquireRelease(
+      Effect.sync(() => vi.spyOn(console, "warn").mockImplementation(() => {})),
+      (spy) => Effect.sync(() => spy.mockRestore())
+    );
+    const root = yield* Effect.acquireRelease(
+      Effect.sync(() => createRoot(host, { onCaughtError: () => {} })),
+      (reactRoot) => Effect.sync(() => reactRoot.unmount())
+    );
+    const router = yield* Effect.acquireRelease(
+      Effect.sync(() => createHarnessRouter(path)),
+      (harnessRouter) => Effect.sync(() => harnessRouter.history.destroy())
+    );
+    yield* Effect.promise(() => router.load());
+    yield* Effect.sync(() =>
+      flushSync(() => root.render(<RouterProvider router={router} />))
+    );
+    yield* nextAnimationFrame;
+    return {
+      consoleError,
+      consoleWarn,
+      host,
+      root,
+      router,
+    } satisfies HarnessRender;
+  });
 
 const expectCleanConsole = ({
   consoleError,
@@ -200,87 +191,75 @@ const expectCleanConsole = ({
 };
 
 describe("docs route boundary browser harness", () => {
-  test("renders success after direct route-root restoration", () =>
-    Effect.runPromise(
-      withRenderedHarnessRoute("/success", (render) =>
-        Effect.sync(() => {
-          expect(
-            render.host.querySelector('[data-testid="loader-success"]')
-          ).toHaveProperty("textContent", "Docs loaded");
-          expectCleanConsole(render);
-        })
-      )
-    ));
-
-  test.each([
-    ["preload-error", "DocsContentPreloadError"],
-    ["source-error", "DocsSourceError"],
-  ])("renders the %s expected failure in route UI", (scenario, tag) =>
-    Effect.runPromise(
-      withRenderedHarnessRoute(`/${scenario}`, (render) =>
-        Effect.sync(() => {
-          expect(
-            render.host.querySelector('[data-testid="expected-loader-error"]')
-          ).toHaveProperty("textContent", tag);
-          expect(
-            render.host.querySelector('[data-testid="framework-loader-error"]')
-          ).toBeNull();
-          expectCleanConsole(render);
-        })
-      )
-    )
+  test.effect("renders success after direct route-root restoration", () =>
+    Effect.gen(function* () {
+      const render = yield* acquireRenderedHarnessRoute("/success");
+      expect(
+        render.host.querySelector('[data-testid="loader-success"]')
+      ).toHaveProperty("textContent", "Docs loaded");
+      expectCleanConsole(render);
+    }).pipe(Effect.scoped)
   );
 
-  test("routes missing pages to the TanStack not-found component", () =>
-    Effect.runPromise(
-      withRenderedHarnessRoute("/not-found-error", (render) =>
-        Effect.sync(() => {
-          expect(
-            render.host.querySelector('[data-testid="framework-not-found"]')
-          ).toHaveProperty("textContent", "Not found");
-          expect(
-            render.host.querySelector('[data-testid="expected-loader-error"]')
-          ).toBeNull();
-          expectCleanConsole(render);
-        })
-      )
-    ));
+  test.effect.each([
+    ["preload-error", "DocsContentPreloadError"],
+    ["source-error", "DocsSourceError"],
+  ] as const)(
+    "renders the %s expected failure in route UI",
+    ([scenario, tag]) =>
+      Effect.gen(function* () {
+        const render = yield* acquireRenderedHarnessRoute(`/${scenario}`);
+        expect(
+          render.host.querySelector('[data-testid="expected-loader-error"]')
+        ).toHaveProperty("textContent", tag);
+        expect(
+          render.host.querySelector('[data-testid="framework-loader-error"]')
+        ).toBeNull();
+        expectCleanConsole(render);
+      }).pipe(Effect.scoped)
+  );
 
-  test("renders malformed transport in route UI", () =>
-    Effect.runPromise(
-      withRenderedHarnessRoute("/malformed", (render) =>
-        Effect.sync(() => {
-          expect(
-            render.host.querySelector('[data-testid="transport-loader-error"]')
-          ).toHaveProperty("textContent", "DocsRouteTransportError");
-          expect(
-            render.host.querySelector('[data-testid="framework-loader-error"]')
-          ).toBeNull();
-          expectCleanConsole(render);
-        })
-      )
-    ));
+  test.effect("routes missing pages to the TanStack not-found component", () =>
+    Effect.gen(function* () {
+      const render = yield* acquireRenderedHarnessRoute("/not-found-error");
+      expect(
+        render.host.querySelector('[data-testid="framework-not-found"]')
+      ).toHaveProperty("textContent", "Not found");
+      expect(
+        render.host.querySelector('[data-testid="expected-loader-error"]')
+      ).toBeNull();
+      expectCleanConsole(render);
+    }).pipe(Effect.scoped)
+  );
 
-  test.each(["defect", "interruption"])(
+  test.effect("renders malformed transport in route UI", () =>
+    Effect.gen(function* () {
+      const render = yield* acquireRenderedHarnessRoute("/malformed");
+      expect(
+        render.host.querySelector('[data-testid="transport-loader-error"]')
+      ).toHaveProperty("textContent", "DocsRouteTransportError");
+      expect(
+        render.host.querySelector('[data-testid="framework-loader-error"]')
+      ).toBeNull();
+      expectCleanConsole(render);
+    }).pipe(Effect.scoped)
+  );
+
+  test.effect.each(["defect", "interruption"] as const)(
     "routes %s rejection to the TanStack error component",
     (scenario) =>
-      Effect.runPromise(
-        withRenderedHarnessRoute(`/${scenario}`, (render) =>
-          Effect.sync(() => {
-            expect(
-              render.host.querySelector(
-                '[data-testid="framework-loader-error"]'
-              )
-            ).not.toBeNull();
-            expect(
-              render.host.querySelector('[data-testid="loader-success"]')
-            ).toBeNull();
-            expect(render.consoleError).not.toHaveBeenCalled();
-            expect(render.consoleWarn.mock.calls).toEqual([
-              [`Warning: Error in route match: /$scenario/${scenario}`],
-            ]);
-          })
-        )
-      )
+      Effect.gen(function* () {
+        const render = yield* acquireRenderedHarnessRoute(`/${scenario}`);
+        expect(
+          render.host.querySelector('[data-testid="framework-loader-error"]')
+        ).not.toBeNull();
+        expect(
+          render.host.querySelector('[data-testid="loader-success"]')
+        ).toBeNull();
+        expect(render.consoleError).not.toHaveBeenCalled();
+        expect(render.consoleWarn.mock.calls).toEqual([
+          [`Warning: Error in route match: /$scenario/${scenario}`],
+        ]);
+      }).pipe(Effect.scoped)
   );
 });
