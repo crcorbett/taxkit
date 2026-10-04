@@ -1,0 +1,39 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43D1F6F21129Z8TVDT3SDV0",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-73-docs-runtime-tests",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/docs/README.md",
+    "apps/docs/package.json",
+    "apps/docs/src/lib/docs/route-boundary.test.js",
+    "apps/docs/src/lib/docs/route-boundary.test.ts",
+    "apps/docs/src/lib/runtime-factory.server.test.ts",
+    "apps/docs/vitest.server.config.ts",
+    "docs/architecture/frontend.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-04-docs-runtime-tests.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "oxlint.config.ts",
+    "package.json",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 99886,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 5473792,
+    "output_tokens": 24881,
+    "api_call_count": 49
+  }
+}

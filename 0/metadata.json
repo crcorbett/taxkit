@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43D1F6F21129Z8TVDT3SDV0",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T12:08:27.675013Z",
+  "branch": "codex/dev-73-docs-runtime-tests",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/docs/README.md",
+    "apps/docs/package.json",
+    "apps/docs/src/lib/docs/route-boundary.test.js",
+    "apps/docs/src/lib/docs/route-boundary.test.ts",
+    "apps/docs/src/lib/runtime-factory.server.test.ts",
+    "apps/docs/vitest.server.config.ts",
+    "docs/architecture/frontend.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-04-docs-runtime-tests.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "oxlint.config.ts",
+    "package.json",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5cd4f6eeff9c",
+  "checkpoint_transcript_start": 8844,
+  "transcript_lines_at_start": 8844,
+  "compact_transcript_start": 1082,
+  "token_usage": {
+    "input_tokens": 99886,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 5473792,
+    "output_tokens": 24881,
+    "api_call_count": 49
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T12:08:27.116662Z",
+    "agent_lines": 577,
+    "agent_removed": 263,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 577,
+    "total_lines_changed": 840,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
