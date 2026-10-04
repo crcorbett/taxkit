@@ -14,6 +14,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact synthetic register fixture ingress; no command execution admission.
+  "tools/docs-deployment/automation.check.runtime.test.ts",
   "tools/docs-deployment/local-doppler-environment.boundary.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   // Exact synchronous Oxlint rule-options ingress, decoded once and fail-closed.
@@ -67,7 +69,6 @@ const decodingBoundaryFiles = [
   "tools/docs-deployment/input.boundary.ts",
   "tools/docs-deployment/inventory-credentials.boundary.ts",
   "tools/docs-deployment/workflow-check.boundary.ts",
-  "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/automation.policy.test.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/inventory.service.test.ts",
@@ -182,10 +183,14 @@ const portableEffectSourceFiles = [
   "tools/docs-deployment/workflow-plan-projection*.ts",
   "tools/docs-deployment/workflow-plan-check*.ts",
   "tools/docs-deployment/workflow-evidence*.ts",
+  "tools/docs-deployment/automation*.ts",
+  "tools/docs-deployment/workflow-receipts.schemas.ts",
+  "tools/docs-deployment/.generated-automation-strict-rejected.ts",
   "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
 ];
 
 const schemaEncoderEgressFiles = [
+  "tools/docs-deployment/automation.check.runtime.test.ts",
   // Exact saved-plan JSON and synthetic provider fixture representations.
   "tools/docs-deployment/workflow-plan-projection.ts",
   "tools/docs-deployment/workflow-evidence.test.ts",
@@ -274,7 +279,6 @@ const runtimeBoundaryFiles = [
   "tools/governance/policy.test.ts",
   "tools/docs-deployment/check.runtime.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
-  "tools/docs-deployment/automation.policy.test.ts",
   "tools/docs-deployment/doppler-custody.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/inventory.service.test.ts",
@@ -358,7 +362,6 @@ const bunAdapterFiles = [
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/check.runtime.ts",
-  "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
   "tools/docs-deployment/workflow-run-check.runtime.ts",
@@ -465,6 +468,9 @@ export default defineConfig({
         "tools/docs-deployment/workflow-plan-projection*.ts",
         "tools/docs-deployment/workflow-plan-check*.ts",
         "tools/docs-deployment/workflow-evidence*.ts",
+        "tools/docs-deployment/automation*.ts",
+        "tools/docs-deployment/workflow-receipts.schemas.ts",
+        "tools/docs-deployment/.generated-automation-strict-rejected.ts",
         "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
         "tools/docs-deployment/fixtures/fake-doppler*.ts",
         "tools/docs-deployment/.generated-credential-strict-rejected.ts",
@@ -607,6 +613,17 @@ export default defineConfig({
             allowedFiles: [
               "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
             ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/automation.check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: ["tools/docs-deployment/automation.check.runtime.ts"],
           },
         ],
       },

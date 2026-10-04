@@ -869,3 +869,45 @@ procedure edits: root local tools only. Recover by reverting the complete
 slice; no provider, registry or deployment state changes. #108 hosted Quality
 passed at exact `b853070cdc394be6d0facfde4572c806d99d8847`, run 37186826183.
 DEV-73 and downstream tasks remain unfinished.
+
+
+## Local T002 deployment automation receipt policies
+
+Continue from #109 at `0b195427`. The saved-receipt checker uses persistent
+maps/sets, checked selections and pure findings; temporary flags and pushed
+arrays are removed. Exact principal/environment/stage lock, candidate, plan,
+provider/hosted identity, workflow-run and input checks remain. Finding sort
+order retains the original locale comparator. Missing receipt/evidence is an
+explicit optional failure; receipt nulls remain part of the existing contract.
+Provider variants use their owning Schema predicates. Aggregate evidence types
+now derive from a Struct that reuses all owning field Schemas.
+
+The command reuses the qualified file JSON/SHA-256 boundary with its own safe
+input errors. Serial traversal retains receipt/screenshot read order and later
+same-ID map precedence. Nonempty findings use the owning array refinement.
+Eight retained automation cases now use Effect Vitest; missing fixture selections
+fail instead of silently returning. Five added command cases check unchanged
+not-established counts, safe missing/malformed/excess input and the exact finding
+for an incomplete control register. Six adopted files and their rejected
+neighbour receive all eleven strict rules; one executable runtime admission is
+exact, with the former raw Bun/decode and test execution exceptions removed.
+
+Documentation impact: **Change required** for receipt/runtime/test/Schema/config
+owners, README, tooling/testing, this plan/task ledger and the
+[dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-deployment-receipt-policies.json).
+**Preserve** all saved receipt/capture bytes, register authority/identities,
+source-contract oracles, workflows, runbook procedures, package exports, lock,
+canonical assets and retained tax results. **N/A** Changesets, public content
+and operational procedure edits: root checking tools only. Recover by reverting
+this complete slice; no provider, registry or deployment state changes.
+
+Focused types/lint, 142 deployment-tool cases (137 retained, five added), 151
+actual lint-suite cases and the retained-record command have passed. Frozen
+install, complete tests, the 15-task build and full verification passed, including
+21 Quality cases/all ten isolated mutations, 21 skill cases and the fresh
+source-only documentation check. Matching unchanged-input package/build and
+two Chromium check caches were reused. Final documentation checks precede
+commit; hosted proof remains separate. #109 hosted Quality passed at exact
+`0b1954276b335791783e885a238bdd8d294686b6`, run 37187566467. The broader retained
+plan/digest policy, provider inventory service and root checks remain pending,
+as do other T002 owners and DEV-74–81. DEV-73 remains in progress.

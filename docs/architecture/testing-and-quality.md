@@ -730,3 +730,16 @@ safe typed configuration/read/write failures. Real lint fixtures qualify ten
 adopted files plus their rejected neighbour, and three exact runtime assertions.
 All reads are retained source/evidence or scoped synthetic files; these checks
 establish no current provider state or deployment authority.
+
+
+The eight retained automation receipt cases now use Effect Vitest with persistent
+maps and checked fixture selection. Their existing exact authority, plan,
+provider/hosted identity, input and workflow-run assertions remain. Added scoped
+command tests preserve the not-established count, check safe missing/malformed/
+excess-field errors, and require the exact finding for an incomplete control
+register. The actual retained-record command still checks screenshot digests
+through the qualified file input boundary. Its reported establishment count
+belongs to saved receipts and is not a current provider readback. Real lint
+fixtures accept six adopted files, reject their neighbour and check the sole
+exact command runtime admission. The broader retained plan/digest policy and
+provider inventory service remain pending strict migration.

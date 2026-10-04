@@ -1,7 +1,7 @@
 import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import { Schema } from "effect";
 
-import type { DeploymentPlanReceipt } from "./schemas.js";
+import { DeploymentPlanReceipt } from "./schemas.js";
 
 const CommitSha = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
 const Sha256 = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u));
@@ -188,14 +188,18 @@ export const DeploymentWorkflowExternalReceipt = Schema.Struct({
 export type DeploymentWorkflowExternalReceipt =
   typeof DeploymentWorkflowExternalReceipt.Type;
 
-export interface DeploymentWorkflowExternalEvidence {
-  readonly hosted: DeploymentWorkflowHostedProbe | null;
-  readonly plan: DeploymentPlanReceipt | null;
-  readonly provider:
-    | DeploymentWorkflowProviderReadback
-    | DeploymentWorkflowTeardownReadback
-    | null;
-  readonly receipt: DeploymentWorkflowExternalReceipt;
-  readonly workflowInput: DeploymentWorkflowInputReadback | null;
-  readonly workflowRun: DeploymentWorkflowRunReadback | null;
-}
+export const DeploymentWorkflowExternalEvidence = Schema.Struct({
+  hosted: Schema.NullOr(DeploymentWorkflowHostedProbe),
+  plan: Schema.NullOr(DeploymentPlanReceipt),
+  provider: Schema.NullOr(
+    Schema.Union([
+      DeploymentWorkflowProviderReadback,
+      DeploymentWorkflowTeardownReadback,
+    ])
+  ),
+  receipt: DeploymentWorkflowExternalReceipt,
+  workflowInput: Schema.NullOr(DeploymentWorkflowInputReadback),
+  workflowRun: Schema.NullOr(DeploymentWorkflowRunReadback),
+});
+export type DeploymentWorkflowExternalEvidence =
+  typeof DeploymentWorkflowExternalEvidence.Type;

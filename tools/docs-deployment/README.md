@@ -124,7 +124,7 @@ operational authority.
 
 `test:docs-deployment` uses Bun-hosted Vitest with the shared source resolver.
 The upload-file, retained-input, source-contract, credential, workflow-input,
-workflow-source, plan-projection, saved-evidence and native memo tests use
+workflow-source, plan-projection, saved-evidence, automation receipt and native memo tests use
 `@effect/vitest`, scoped FileSystem fixtures and ordered Effect work. The
 remaining suites preserve their existing assertions under Vitest; their full
 strict migration is pending in DEV-73. Local command checks read retained
@@ -159,3 +159,17 @@ at workflow egress. Three executable runtime admissions are exact; ordinary
 sources and tests have none. The original workflow/capture/evidence tests,
 five historical capture digests and eight accepted-finding mappings remain.
 Added negative tests read only scoped synthetic records, with no provider request.
+
+
+The automation receipt checker retains its exact authority, plan and
+provider/hosted/run/input comparisons using pure findings, checked optional
+selection and persistent maps/sets. Its original locale finding order and wire
+nulls remain. Evidence types derive from a Struct reusing the owning field
+Schemas. The command reuses the file JSON/SHA-256 boundary with its own safe
+errors and reads screenshots serially. Its one exact runtime admission grants
+no execution permission to tests or policy files; old raw Bun/decode/test
+permissions are removed. Scoped command fixtures cannot establish external
+state and reject malformed or incomplete registers. The original eight policy
+cases retain their assertions. Saved establishment counts do not prove current
+provider state. Broader retained plan/digest and provider inventory migration
+remain pending in DEV-73.

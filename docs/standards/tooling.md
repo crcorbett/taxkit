@@ -478,3 +478,15 @@ the plan test's runtime and evidence runtime's raw Bun admissions are removed.
 Scoped Effect Vitest preserves the original workflow, historical capture and
 accepted-finding checks. Synthetic provider and plan representations have exact
 Schema encoding permissions only; no provider request is part of these tests.
+
+
+The deployment automation receipt checker now uses persistent HashMaps/HashSets,
+checked optional lookups and pure ordered findings. Its comparison retains the
+original locale ordering, exact authority/plan/provider/host/run/input checks
+and receipt nulls. Its executable reuses the qualified file JSON/SHA-256 input
+boundary with the automation's own safe errors; there is no second hashing or
+JSON parser. The aggregate evidence type now derives from a Struct reusing the
+existing field Schemas. Six adopted files receive all eleven strict rules. The
+command alone has an exact runtime admission; its raw Bun/decode exceptions and
+the policy test's execution admission are removed. Synthetic register encoding
+and decoding permissions apply only to the exact command test.

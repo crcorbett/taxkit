@@ -1,17 +1,25 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Array as EffectArray, Console, Effect, Match, Schema } from "effect";
-import * as FileSystem from "effect/FileSystem";
+import {
+  Array as EffectArray,
+  Console,
+  Effect,
+  HashMap,
+  Match,
+  Option,
+} from "effect";
+import type { Schema } from "effect";
+import type * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
 import { inspectDeploymentAutomationRegisters } from "./automation.policy.js";
-import type { DeploymentAutomation } from "./automation.schemas.js";
 import {
   DeploymentAutomationInputError,
   DeploymentAutomationPolicyError,
   DeploymentAutomationRegister,
   DeploymentControlRegister,
 } from "./automation.schemas.js";
+import { readDeploymentJson, readDeploymentSha256 } from "./input.boundary.js";
 import { DeploymentPlanReceipt } from "./schemas.js";
 import {
   DeploymentWorkflowExternalReceipt,
@@ -25,151 +33,148 @@ import type { DeploymentWorkflowExternalEvidence } from "./workflow-receipts.sch
 
 const repositoryRootUrl = new URL("../..", import.meta.url);
 
-const readJson = <A>(
+const readAutomationJson = <A>(
   repositoryRoot: string,
   target: string,
   schema: Schema.ConstraintDecoder<A>
-): Effect.Effect<
-  A,
-  DeploymentAutomationInputError,
-  FileSystem.FileSystem | Path.Path
-> =>
-  Effect.gen(function* readAutomationJson() {
-    const fileSystem = yield* FileSystem.FileSystem;
-    const path = yield* Path.Path;
-    const source = yield* fileSystem
-      .readFileString(path.join(repositoryRoot, target))
-      .pipe(
-        Effect.mapError(() => new DeploymentAutomationInputError({ target }))
-      );
-    return yield* Schema.decodeUnknownEffect(Schema.fromJsonString(schema), {
-      onExcessProperty: "error",
-    })(source).pipe(
-      Effect.mapError(() => new DeploymentAutomationInputError({ target }))
-    );
-  });
-
-const readSha256 = (
-  repositoryRoot: string,
-  target: string
-): Effect.Effect<
-  string,
-  DeploymentAutomationInputError,
-  FileSystem.FileSystem | Path.Path
-> =>
-  Effect.gen(function* readDeploymentSha256() {
-    const fileSystem = yield* FileSystem.FileSystem;
-    const path = yield* Path.Path;
-    const bytes = yield* fileSystem
-      .readFile(path.join(repositoryRoot, target))
-      .pipe(
-        Effect.mapError(() => new DeploymentAutomationInputError({ target }))
-      );
-    return new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
-  });
+) =>
+  readDeploymentJson(repositoryRoot, target, schema).pipe(
+    Effect.mapError(() => new DeploymentAutomationInputError({ target }))
+  );
 
 export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
   Effect.gen(function* checkDocsDeploymentAutomationProgram() {
     const [automations, controls] = yield* Effect.all([
-      readJson(
+      readAutomationJson(
         repositoryRoot,
         "tools/docs-deployment/automation-register.json",
         DeploymentAutomationRegister
       ),
-      readJson(
+      readAutomationJson(
         repositoryRoot,
         "tools/docs-deployment/controls.json",
         DeploymentControlRegister
       ),
     ]);
-    const externalReceipts = new Map();
-    const externalEvidence = new Map<
-      DeploymentAutomation["id"],
-      DeploymentWorkflowExternalEvidence
-    >();
-    for (const automation of automations) {
+    const entries = yield* Effect.forEach(automations, (automation) => {
+      const receiptPath = automation.externalState.receipt;
       if (
-        automation.externalState.status === "established" &&
-        automation.externalState.receipt !== null
+        automation.externalState.status !== "established" ||
+        receiptPath === null
       ) {
-        const receipt = yield* readJson(
+        return Effect.succeed(Option.none());
+      }
+      return Effect.gen(function* () {
+        const receipt = yield* readAutomationJson(
           repositoryRoot,
-          automation.externalState.receipt,
+          receiptPath,
           DeploymentWorkflowExternalReceipt
         );
         const plan =
           receipt.planPath === null
             ? null
-            : yield* readJson(
+            : yield* readAutomationJson(
                 repositoryRoot,
                 receipt.planPath,
                 DeploymentPlanReceipt
               );
-        let provider: DeploymentWorkflowExternalEvidence["provider"] = null;
-        if (receipt.providerReadbackPath !== null) {
-          // oxlint-disable-next-line unicorn/prefer-ternary -- decoder selection preserves the distinct teardown absence schema
-          if (automation.id === "docs-preview-teardown") {
-            provider = yield* readJson(
-              repositoryRoot,
-              receipt.providerReadbackPath,
-              DeploymentWorkflowTeardownReadback
-            );
-          } else {
-            provider = yield* readJson(
-              repositoryRoot,
-              receipt.providerReadbackPath,
-              DeploymentWorkflowProviderReadback
-            );
-          }
-        }
-        let hosted: DeploymentWorkflowExternalEvidence["hosted"] = null;
-        if (receipt.hostedProofPath !== null) {
-          hosted = yield* readJson(
-            repositoryRoot,
-            receipt.hostedProofPath,
-            DeploymentWorkflowHostedProbe
+        const provider = yield* Option.fromNullishOr(
+          receipt.providerReadbackPath
+        ).pipe(
+          Option.match({
+            onNone: () => Effect.succeed(null),
+            onSome: (
+              providerPath
+            ): Effect.Effect<
+              DeploymentWorkflowExternalEvidence["provider"],
+              DeploymentAutomationInputError,
+              FileSystem.FileSystem | Path.Path
+            > => {
+              if (automation.id === "docs-preview-teardown") {
+                return readAutomationJson(
+                  repositoryRoot,
+                  providerPath,
+                  DeploymentWorkflowTeardownReadback
+                );
+              }
+              return readAutomationJson(
+                repositoryRoot,
+                providerPath,
+                DeploymentWorkflowProviderReadback
+              );
+            },
+          })
+        );
+        const hosted =
+          receipt.hostedProofPath === null
+            ? null
+            : yield* readAutomationJson(
+                repositoryRoot,
+                receipt.hostedProofPath,
+                DeploymentWorkflowHostedProbe
+              );
+        if (hosted !== null) {
+          yield* Effect.forEach(hosted.screenshots, (screenshot) =>
+            readDeploymentSha256(repositoryRoot, screenshot.path).pipe(
+              Effect.mapError(
+                () =>
+                  new DeploymentAutomationInputError({
+                    target: screenshot.path,
+                  })
+              ),
+              Effect.flatMap((digest) =>
+                digest === screenshot.sha256
+                  ? Effect.void
+                  : Effect.fail(
+                      new DeploymentAutomationInputError({
+                        target: `${receipt.hostedProofPath}:${screenshot.path}:sha256`,
+                      })
+                    )
+              )
+            )
           );
-          for (const screenshot of hosted.screenshots) {
-            const digest = yield* readSha256(repositoryRoot, screenshot.path);
-            if (digest !== screenshot.sha256) {
-              return yield* new DeploymentAutomationInputError({
-                target: `${receipt.hostedProofPath}:${screenshot.path}:sha256`,
-              });
-            }
-          }
         }
-        const workflowRun = yield* readJson(
+        const workflowRun = yield* readAutomationJson(
           repositoryRoot,
           receipt.workflowRunPath,
           DeploymentWorkflowRunReadback
         );
-        const workflowInput = yield* readJson(
+        const workflowInput = yield* readAutomationJson(
           repositoryRoot,
           receipt.workflowInputPath,
           DeploymentWorkflowInputReadback
         );
-        externalReceipts.set(automation.id, receipt);
-        externalEvidence.set(automation.id, {
-          hosted,
-          plan,
-          provider,
+        return Option.some([
+          automation.id,
           receipt,
-          workflowInput,
-          workflowRun,
-        });
-      }
-    }
+          { hosted, plan, provider, receipt, workflowInput, workflowRun },
+        ] as const);
+      });
+    });
+    const externalReceipts = HashMap.fromIterable(
+      EffectArray.flatMap(entries, (entry) =>
+        Option.match(entry, {
+          onNone: () => [],
+          onSome: ([id, receipt]) => [[id, receipt] as const],
+        })
+      )
+    );
+    const externalEvidence = HashMap.fromIterable(
+      EffectArray.flatMap(entries, (entry) =>
+        Option.match(entry, {
+          onNone: () => [],
+          onSome: ([id, _receipt, evidence]) => [[id, evidence] as const],
+        })
+      )
+    );
     const findings = inspectDeploymentAutomationRegisters(
       automations,
       controls,
       externalReceipts,
       externalEvidence
     );
-    const [firstFinding, ...remainingFindings] = findings;
-    if (firstFinding !== undefined) {
-      return yield* new DeploymentAutomationPolicyError({
-        findings: [firstFinding, ...remainingFindings],
-      });
+    if (EffectArray.isReadonlyArrayNonEmpty(findings)) {
+      return yield* new DeploymentAutomationPolicyError({ findings });
     }
     return {
       automationCount: automations.length,
@@ -207,6 +212,8 @@ const program = Effect.gen(function* main() {
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(program, { disableErrorReporting: true })
+  ),
   Match.orElse(() => false)
 );
