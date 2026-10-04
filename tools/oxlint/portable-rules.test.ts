@@ -33,6 +33,30 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
+      "apps/docs/src/lib/runtime-factory.server.ts",
+      "apps/docs/src/lib/runtime-factory.server.test.ts",
+      "apps/docs/src/lib/docs/route-boundary.test.ts",
+      "apps/docs/vitest.server.config.ts",
+    ],
+    generated:
+      "apps/docs/src/lib/docs/.generated-native-tests-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
+    accepted: [
       "apps/docs/scripts/check-import-boundaries.runtime.ts",
       "apps/docs/scripts/check-import-boundaries.runtime.test.ts",
       "apps/docs/vitest.scripts.config.ts",
@@ -1016,6 +1040,7 @@ test.effect.each([
 );
 
 test.each([
+  "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "apps/api/src/index.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
@@ -1047,7 +1072,7 @@ test.each([
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
   "tools/docs-deployment/workflow-run-check.runtime.ts",
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
-])("keeps the command runtime admission exact: %s", (path) => {
+])("keeps the execution runtime admission exact: %s", (path) => {
   expect(
     Array.filter(
       oxlintConfig.overrides ?? [],

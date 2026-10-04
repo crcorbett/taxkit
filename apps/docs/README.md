@@ -127,6 +127,15 @@ build. Fumadocs MDX 15 supplies its native plugin array; the old single-plugin
 `buildStart` wrapper is removed. Local build and browser checks qualify this
 generator change separately from any provider artifact. `dev:vite` and `preview` expose the app through portless.
 
+The default docs test command runs the native import-checker fixtures, the
+native route-result and managed-runtime tests, the existing MDX link tests and
+the hosted-proof policy fixtures. The server test configuration resolves both
+ordinary and server imports to package source. Route fixtures use the owning
+Schemas and native Effect encoders; no test-local Promise runner or throwing
+codec is required. Managed-runtime tests acquire and dispose the actual factory
+inside a scope, including failed and interrupted requests. These tests prove
+local lifetime and representation behaviour, separate from Worker/browser proof.
+
 `test:browser` runs the programmatic TanStack client-route harness in Chromium.
 It proves success, expected failures, malformed transport and framework error
 boundaries after `Route.useLoaderData`; it does not prove SSR or hydration. Use

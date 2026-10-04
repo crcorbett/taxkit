@@ -96,9 +96,13 @@ bun run --filter=@taxkit/docs-content test
 
 Run those package-local docs gates whenever MDX content, Fumadocs source
 wiring, docs examples, validation policy or docs rendering changes.
-`test:docs-boundaries` includes a negative browser import audit, native import-checker fixtures, the route
-transport codec corpus and a focused test that reuses one app-owned server
-runtime before the test owner disposes it. The package content test composes
+`test:docs-boundaries` checks browser imports, then invokes the default docs
+test owner once. That owner includes native import-checker fixtures, the typed
+native route-result corpus and tests that reuse one app-owned server runtime.
+The runtime tests use its native context/disposal Effects inside a scope and
+verify release after success, failure and interruption; they need no Promise
+execution permission. The exact private factory retains the runtime creation
+permission, with a neighbouring rejection fixture and an exact-selector test. The package content test composes
 the deterministic `DocsContentService` test Layer over the generic
 `FumadocsSource` test Layer and covers accepted, missing and malformed content.
 

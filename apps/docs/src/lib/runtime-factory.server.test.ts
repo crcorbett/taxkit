@@ -1,9 +1,7 @@
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { describe, expect, it as test } from "@effect/vitest";
 import { DocsContentService } from "@taxkit/docs-content/service";
-import { Effect, Layer } from "effect";
-import { describe, expect, test } from "vitest";
+import { Effect, Exit, FileSystem, Layer, Path, Ref } from "effect";
 
 import {
   createDocsRuntime,
@@ -11,57 +9,113 @@ import {
   readDocsRuntimeProbe,
 } from "./runtime-factory.server";
 
+const contentService = DocsContentService.of({
+  getNavigation: () => Effect.die("not used"),
+  getPage: () => Effect.die("not used"),
+  listPages: () => Effect.die("not used"),
+  validateContent: () => Effect.die("not used"),
+});
+
 describe("docs server runtime ownership", () => {
-  test("owns content and deterministic proof state for the managed lifetime", async () => {
-    const service = DocsContentService.of({
-      getNavigation: () => Effect.die("not used"),
-      getPage: () => Effect.die("not used"),
-      listPages: () => Effect.die("not used"),
-      validateContent: () => Effect.die("not used"),
-    });
-    const runtime = createDocsRuntime(
-      Layer.succeed(DocsContentService, service),
-      createDocsRuntimeProbeLayer(Effect.succeed("deterministic-test-isolate"))
-    );
+  test.effect(
+    "owns content and deterministic proof state for the managed lifetime",
+    () =>
+      Effect.gen(function* () {
+        const constructions = yield* Ref.make(0);
+        const releases = yield* Ref.make(0);
+        yield* Effect.gen(function* () {
+          const runtime = yield* Effect.acquireRelease(
+            Effect.sync(() =>
+              createDocsRuntime(
+                Layer.effect(
+                  DocsContentService,
+                  Effect.acquireRelease(
+                    Ref.update(constructions, (count) => count + 1).pipe(
+                      Effect.as(contentService)
+                    ),
+                    () => Ref.update(releases, (count) => count + 1)
+                  )
+                ),
+                createDocsRuntimeProbeLayer(
+                  Effect.succeed("deterministic-test-isolate")
+                )
+              )
+            ),
+            (ownedRuntime) => ownedRuntime.disposeEffect
+          );
+          const contexts = yield* Effect.all(
+            [runtime.contextEffect, runtime.contextEffect],
+            { concurrency: 2 }
+          );
+          yield* Effect.forEach(contexts, (context) =>
+            Effect.gen(function* () {
+              const service = yield* DocsContentService;
+              const probe = yield* readDocsRuntimeProbe;
+              expect(service).toBe(contentService);
+              expect(probe).toEqual({
+                constructions: 1,
+                isolateId: "deterministic-test-isolate",
+              });
+            }).pipe(Effect.provideContext(context))
+          );
+          expect(yield* Ref.get(constructions)).toBe(1);
+          expect(yield* Ref.get(releases)).toBe(0);
+        }).pipe(Effect.scoped);
+        expect(yield* Ref.get(releases)).toBe(1);
+      })
+  );
 
-    const [firstService, firstProbe, secondService, secondProbe] =
-      await runtime.runPromise(
-        Effect.all(
-          [
-            Effect.service(DocsContentService),
-            readDocsRuntimeProbe,
-            Effect.service(DocsContentService),
-            readDocsRuntimeProbe,
-          ],
-          { concurrency: 4 }
-        )
-      );
+  test.effect.each([
+    { name: "fails", program: Effect.fail("request failed") },
+    { name: "is interrupted", program: Effect.interrupt },
+  ])("releases the managed content when the request $name", ({ program }) =>
+    Effect.gen(function* () {
+      const releases = yield* Ref.make(0);
+      const exit = yield* Effect.gen(function* () {
+        const runtime = yield* Effect.acquireRelease(
+          Effect.sync(() =>
+            createDocsRuntime(
+              Layer.effect(
+                DocsContentService,
+                Effect.acquireRelease(Effect.succeed(contentService), () =>
+                  Ref.update(releases, (count) => count + 1)
+                )
+              ),
+              createDocsRuntimeProbeLayer(
+                Effect.succeed("failed-request-isolate")
+              )
+            )
+          ),
+          (ownedRuntime) => ownedRuntime.disposeEffect
+        );
+        yield* runtime.contextEffect;
+        return yield* program;
+      }).pipe(Effect.scoped, Effect.exit);
+      expect(Exit.isFailure(exit)).toBe(true);
+      expect(yield* Ref.get(releases)).toBe(1);
+    })
+  );
 
-    expect(firstService).toBe(service);
-    expect(secondService).toBe(firstService);
-    expect(firstProbe).toEqual({
-      constructions: 1,
-      isolateId: "deterministic-test-isolate",
-    });
-    expect(secondProbe).toEqual(firstProbe);
-    await runtime.dispose();
-  });
-
-  test("owns one production runtime and one managed probe Layer at module scope", async () => {
-    const runtimeSource = await readFile(
-      fileURLToPath(new URL("runtime.server.ts", import.meta.url)),
-      "utf-8"
-    );
-
-    expect(runtimeSource).toMatch(
-      /export const docsRuntime = createDocsRuntime\(/u
-    );
-    expect(runtimeSource.match(/createDocsRuntime\(/gu)).toHaveLength(1);
-    expect(runtimeSource.match(/createDocsRuntimeProbeLayer\(/gu)).toHaveLength(
-      1
-    );
-    expect(runtimeSource).toContain("Random.nextIntBetween");
-    expect(runtimeSource).not.toContain("globalThis.crypto");
-    expect(runtimeSource).not.toContain("Math.random");
-  });
+  test.effect(
+    "owns one production runtime and one managed probe Layer at module scope",
+    () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+        const file = yield* path.fromFileUrl(
+          new URL("runtime.server.ts", import.meta.url)
+        );
+        const runtimeSource = yield* fs.readFileString(file);
+        expect(runtimeSource).toMatch(
+          /export const docsRuntime = createDocsRuntime\(/u
+        );
+        expect(runtimeSource.match(/createDocsRuntime\(/gu)).toHaveLength(1);
+        expect(
+          runtimeSource.match(/createDocsRuntimeProbeLayer\(/gu)
+        ).toHaveLength(1);
+        expect(runtimeSource).toContain("Random.nextIntBetween");
+        expect(runtimeSource).not.toContain("globalThis.crypto");
+        expect(runtimeSource).not.toContain("Math.random");
+      }).pipe(Effect.provide(BunServices.layer))
+  );
 });

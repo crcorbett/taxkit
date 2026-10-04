@@ -34,7 +34,6 @@ const decodingBoundaryFiles = [
   "apps/docs/src/lib/docs/loaders.server.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.ts",
-  "apps/docs/src/lib/docs/route-boundary.test.js",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
   "packages/infrastructure/src/cloudflare/website.test.ts",
@@ -201,6 +200,8 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  // Exact negative wire fixtures; native encoding only, no decoder/runtime/throwing codec admission.
+  "apps/docs/src/lib/docs/route-boundary.test.ts",
   "apps/api/scripts/smoke-boundaries.test.ts",
   "apps/api/test/config.test.ts",
   "packages/sdk/typescript/scripts/script-boundaries.test.ts",
@@ -239,7 +240,6 @@ const schemaEncoderEgressFiles = [
   "apps/docs/src/server.ts",
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
-  "apps/docs/src/lib/docs/route-boundary.test.js",
   "apps/docs/src/lib/docs/loaders.server.ts",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
@@ -262,7 +262,6 @@ const throwingCodecTestFiles = [
   // Pure policy fixtures encode their Schema-owned accepted record bytes.
   "tools/documentation/policy.test.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
-  "apps/docs/src/lib/docs/route-boundary.test.js",
   "packages/docs-content/src/validation/policy.runtime.test.ts",
   "tools/docs-deployment/workflow-plan-projection.test.ts",
 ];
@@ -275,8 +274,6 @@ const runtimeBoundaryFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
-  "apps/docs/src/lib/docs/route-boundary.test.js",
-  "apps/docs/src/lib/runtime-factory.server.test.ts",
   "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/src/lib/runtime.server.ts",
   "apps/docs/src/server.ts",
@@ -512,6 +509,10 @@ export default defineConfig({
         "apps/docs/scripts/check-import-boundaries.runtime*.ts",
         "apps/docs/scripts/.generated-imports-strict-rejected.ts",
         "apps/docs/vitest.scripts.config.ts",
+        "apps/docs/vitest.server.config.ts",
+        "apps/docs/src/lib/runtime-factory.server*.ts",
+        "apps/docs/src/lib/docs/route-boundary.test.ts",
+        "apps/docs/src/lib/docs/.generated-native-tests-strict-rejected.ts",
         "packages/sdk/typescript/type-tests/**",
         "packages/sdk/typescript/vitest*.config.ts",
         "packages/testing/**",
@@ -546,6 +547,15 @@ export default defineConfig({
               "apps/docs/scripts/check-import-boundaries.runtime.ts",
             ],
           },
+        ],
+      },
+    },
+    {
+      files: ["apps/docs/src/lib/runtime-factory.server.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/docs/src/lib/runtime-factory.server.ts"] },
         ],
       },
     },

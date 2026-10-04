@@ -70,7 +70,11 @@ functions.
 Docs SSR loaders use the same runtime rule. `apps/docs` keeps one module-scoped
 server runtime for `DocsContentServiceLive`, composed over the TaxKit generated
 collection Layer, plus one app-private runtime-probe Layer, and exposes explicit
-disposal for tests and future host lifecycle integration. The probe Layer owns
+disposal for tests and future host lifecycle integration. Native runtime tests
+acquire the actual factory, reuse its cached context and dispose it inside a
+scope; acquired content is released after success, failure and interruption.
+Only the private factory owns runtime creation permission; its tests own none.
+The probe Layer owns
 its construction state in an Effect `Ref`, creates its non-secret identifier
 through Effect `Random`, and admits a deterministic identity Effect in tests.
 The Worker host callback runs the typed probe read through that same runtime

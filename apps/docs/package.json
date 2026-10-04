@@ -15,7 +15,7 @@
     "check-import-boundaries": "bun run ./scripts/check-import-boundaries.runtime.ts",
     "preview": "portless run --name docs.taxkit vite preview",
     "preview:cloudflare": "vite preview",
-    "test": "bun run test:imports && vitest run --config vitest.server.config.ts && bun test ./scripts/cloudflare-hosted-proof.boundary.test.ts",
+    "test": "bun run test:imports && bun --bun vitest run --config vitest.server.config.ts && bun test ./scripts/cloudflare-hosted-proof.boundary.test.ts",
     "test:browser": "vitest run --config vitest.browser.config.ts",
     "test:built": "bun run ./scripts/test-cloudflare-built.tsx",
     "test:cloudflare-built": "bun run ./scripts/test-cloudflare-built.tsx",

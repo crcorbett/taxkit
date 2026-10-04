@@ -1326,3 +1326,52 @@ at `be1fcc43cfd9201f209354b317f8182cc3e9fafd` in draft #117; its hosted run
 `37199271547` passed for that exact API revision and is separate from this
 later checker work. The dated checker receipt records recovered failures and
 proof limits; accepting this local slice does not complete DEV-73.
+
+
+## Local T002 documentation runtime and route tests
+
+The route-result corpus is now a typed native Effect test owner. It retains
+success, both expected error types, malformed transport, standalone/composite
+defects and interruptions, empty/multiple producer failures and invalid decoded
+representations. Owning Schemas construct branded fixtures and native encoders
+create the negative representations. No Promise runner, raw loop, constructor
+identity assertion or throwing-codec admission remains in this test owner.
+
+The runtime tests acquire the actual private factory and release it through its
+native disposal Effect inside a scope. Two concurrent context requests build
+content once; the same service/probe is reused, and acquired content is released
+after success, failure and interruption. Native FileSystem/Path read the actual
+production owner for the retained single-runtime/single-probe assertions. The
+factory alone has exact creation permission; tests have no runtime permission.
+The server config uses package source for both ordinary/server resolution and
+includes the typed route corpus; the root docs test invokes that owner once.
+All 19 focused server cases and 321 actual lint cases pass before final
+repository qualification. Earlier source/compiler tests caught a nonexistent
+TaggedError static predicate and lint caught missing braces/shadowing/a loop;
+Schema.is and native iteration corrected them without weakening assertions.
+The complete test run then caught missing encoding permission for two deliberate
+negative-wire encoders. That exact egress permission is retained; decoder,
+runtime and throwing-codec permissions remain removed. The corrected complete
+test run passes 321 actual lint cases and all 23 test tasks (22 matching caches).
+Frozen install preserves 792 installs/1020 packages. All 15 build tasks pass
+(14 matching caches), and full verification passes all 21 Quality cases/all ten
+isolated faults/fresh source-only docs (217.07 seconds), 176 deployment-tool,
+21 skill and 16 evaluation cases, compiler and both unused-code profiles.
+Unchanged SDK/web Chromium cases replay matching caches (24/two respectively).
+The refreshed installed-CLI inventory reports 400 provisional diagnostics:
+383 app, ten lint-fixture and seven infrastructure cases. These include host
+and fixture classification; they are not 400 confirmed defects. Remaining
+host/source paths and semantic/readonly review are still required.
+
+Documentation impact: **Change required** for the typed test owner, native
+runtime tests, docs/default root command and server configuration, strict
+selectors/CLI canaries, app README, frontend/testing architecture, current T002
+ledger, active plan and receipt. **Preserve** runtime implementation/lifetime,
+route wire representations and failure semantics, public/generated content,
+selected dependencies, tax results, historical evidence and canonical skills.
+**N/A** package Changeset (private unversioned app; test-only change), operational
+runbooks/CI procedures and provider state. Revert this complete slice to recover.
+DEV-73 remains unfinished, followed by DEV-74–81. The separate Medicare decision
+remains pending. Parent draft #118 revision
+`4a1abfc00caf9493d22b1ca8e19eb364c5c4ab14` is locally qualified; its hosted
+run `37200459089` does not qualify this later test revision.
