@@ -1,6 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
   "include": [
+    "scripts/test-cloudflare-built.tsx",
+    "scripts/cloudflare-built-proof.boundary.ts",
+    "scripts/cloudflare-built-proof.live.layer.ts",
+    "scripts/cloudflare-built-proof.live.layer.test.ts",
+    "scripts/cloudflare-built-proof.boundary.test.ts",
+    "scripts/cloudflare-built-browser.live.test.ts",
+    "scripts/cloudflare-built-browser.live.ts",
     "scripts/cloudflare-hosted-proof.boundary.test.ts",
     "scripts/cloudflare-hosted-proof.boundary.ts",
     "scripts/cloudflare-hosted-proof.live.layer.ts",
@@ -18,6 +25,7 @@
     "allowImportingTsExtensions": true,
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "noEmit": true,
+    "jsx": "react-jsx",
     "types": ["bun", "node"]
   }
 }

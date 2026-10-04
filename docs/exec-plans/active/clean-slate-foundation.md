@@ -1633,3 +1633,58 @@ No dependency selection or tax result changed. The
 records local proof, recovery and non-claims. Native built-proof orchestration
 and remaining T002 semantic/enforcement review are next. DEV-73 and DEV-74–81
 remain unfinished; Medicare remains a separate decision.
+
+
+### Native built Worker proof — locally qualified, 2026-10-05
+
+This slice starts from draft #124 revision
+`b2a556c8818a83fdfe97d79709bbda0d89b4b8db`; its exact hosted Quality run
+`37209125848` passed. That parent result does not qualify this later worktree.
+The existing built-proof path now has native Command parsing, a closed named
+service and whole owning receipt/screenshot Schemas. Private native filesystem,
+Crypto, Config, child-process streams, HTTP, monotonic time and scoped browser
+work own orchestration. Output pipes are capped at 1 MiB each, artifact/digest
+reads at 64 MiB and file inventories at 10,000; a growing-file test proves the
+stream limit independently of metadata. The whole operation has a five-minute
+limit and browser work two minutes. Provider credentials remain outside the
+selected child/browser environment. The receipt is saved and read back only
+after cleanup, including rejection of requested screenshot mismatches or a
+late cleanup defect. The compiler owns all adapters, command and tests.
+
+All 24 package test tasks pass (23 matching caches), including 53 docs script
+and 19 server cases and 378 actual CLI lint cases. Forty strict source contract
+cases pass, with fifteen deliberate built-proof bypass controls. All 15 builds
+pass (14 matching caches). Root lint admits 396 files with no warning/error.
+Full verification passes 30 Quality cases, including 11 isolated checks in
+263.91 seconds, 206 deployment-tool cases, both unused-code profiles, all 24
+compiler tasks and matching SDK/web browser checks. Frozen install retains
+792 installs/1020 packages. The generated local Worker/Chromium command passes
+all sixteen observable checks, nine concurrent requests, one shared context,
+three server functions and zero document reloads/diagnostics; both screenshots
+and their manifest are saved. Independent process readback finds no remaining
+task process. All three artifact/input hashes exactly match the prior script.
+
+Controlled Chromium tests retain two browser fetches separately from a malformed
+POST. Reverting Buffer bytes to the old string fails the actual HTTP body
+assertion, observing a quoted JSON string; the adapter is restored. Browser
+console/Queue overflow and real pending-response interruption fail or release
+as expected. The first real-browser failure remains unexplained; temporary
+logging removal and incorrect fixture API/scope/count observations remain in
+the recovery record. They are not silently counted as successful checks.
+
+A fresh actual-CLI scan of 396 Git-owned source paths finds ten contextual
+findings in five deliberately permissive lint inputs and none in application/
+tool workflows. Its exit 1 is retained as inventory evidence. Final canonical
+whole-source scope/fixture containment and the broader T002 semantic review
+remain pending. DEV-73 and DEV-74–81 remain unfinished; Medicare is separate.
+
+Documentation impact: **Change required** for private script/service/Schema,
+compiler/test and enforcement owners, app README, testing architecture, this
+plan, T002 ledger and the
+[dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-native-built-worker-proof.json).
+**Preserve** command aliases, local-only Wrangler arguments, installed manifests,
+digest bytes, all existing observable checks, screenshot/output identities,
+public content, dependency selections, canonical skills/digests, provider state
+and tax results. **N/A** Changeset (private unversioned app), generated/public
+content, new provider operation and release contract. No merge, deployment,
+publication, provider apply or version application.

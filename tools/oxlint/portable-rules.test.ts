@@ -33,6 +33,33 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
+      "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
+      "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+      "apps/docs/scripts/cloudflare-built-proof.live.layer.test.ts",
+      "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
+      "apps/docs/scripts/cloudflare-built-browser.live.ts",
+      "apps/docs/scripts/cloudflare-built-browser.live.test.ts",
+      "apps/docs/scripts/test-cloudflare-built.tsx",
+    ],
+    generated: "apps/docs/scripts/.generated-built-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+
+  {
+    accepted: [
       "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
       "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
       "apps/docs/scripts/cloudflare-hosted-proof.live.layer.test.ts",
@@ -1149,6 +1176,7 @@ test.effect.each([
 );
 
 test.each([
+  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/src/lib/docs/loaders.server.ts",
   "apps/docs/src/server.ts",

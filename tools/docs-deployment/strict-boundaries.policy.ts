@@ -1,6 +1,10 @@
 import { Array as EffectArray, Option, Record, Schema } from "effect";
 
 const strictAppBoundaryPaths = [
+  "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
+  "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+  "apps/docs/scripts/cloudflare-built-browser.live.ts",
+  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
   "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
@@ -33,6 +37,7 @@ export type StrictAppBoundarySources = typeof StrictAppBoundarySources.Type;
 
 export const StrictAppBoundaryFinding = Schema.Struct({
   invariant: Schema.Literals([
+    "built-proof-boundary",
     "credential-boundary",
     "host-ingress",
     "hosted-proof-boundary",
@@ -181,6 +186,103 @@ const inspectHostedProofBoundary = (
   return validBoundary && validLive && validHost
     ? []
     : [finding("hosted-proof-boundary", hostedProofBoundaryPath)];
+};
+
+const inspectBuiltProofBoundary = (
+  sources: StrictAppBoundarySources
+): readonly StrictAppBoundaryFinding[] => {
+  const boundaryPath = "apps/docs/scripts/cloudflare-built-proof.boundary.ts";
+  const boundary = readStrictAppBoundarySource(sources, boundaryPath);
+  const live = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/scripts/cloudflare-built-proof.live.layer.ts"
+  );
+  const browser = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/scripts/cloudflare-built-browser.live.ts"
+  );
+  const host = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/scripts/test-cloudflare-built.tsx"
+  );
+  const valid =
+    includesEvery(boundary, [
+      "Context.Service<",
+      "verifyBuiltDeployment",
+      "BuiltProofReceipt",
+      "BuiltProofResult",
+      "Schema.TaggedError",
+      "HostedProofSha256",
+    ]) &&
+    !includesAny(boundary, ["BrowserHandle", "Promise<", "instanceof"]) &&
+    includesEvery(live, [
+      "Config.schema(LocalEnvironment)",
+      "LocalCloudflareBuiltProof.of",
+      "Effect.context<",
+      "ChildProcess.make(",
+      "Stream.mapAccum(",
+      "1_048_576",
+      "67_108_864",
+      "10_000",
+      "Effect.scoped",
+      'duration: "5 minutes"',
+      "if (Number(exit) !== 0)",
+      "waitForDescendantExit(",
+      "readArtifactBytes(",
+      "Crypto.Crypto",
+      "new Uint8Array([0])",
+      '"--dry-run"',
+      '"--local"',
+      "BuiltProofReceipt.makeEffect(",
+    ]) &&
+    !includesAny(live, [
+      "Bun.spawn",
+      "async ",
+      "JSON.stringify",
+      "process.env",
+      "createHash(",
+    ]) &&
+    includesEvery(browser, [
+      "Effect.acquireRelease(",
+      "chromium.launch(",
+      "value.close()",
+      "Queue.offerUnsafe(",
+      "capacity: 1024",
+      'strategy: "dropping"',
+      "Queue.size(overflow)",
+      "page.off(",
+      "Effect.forkScoped",
+      "Fiber.interrupt(routeWorker)",
+      'data: Buffer.from("{")',
+      'duration: "2 minutes"',
+      "BuiltBrowserObservation.makeEffect(",
+    ]) &&
+    !includesAny(browser, [
+      "async ",
+      "Promise.all",
+      "Effect.runPromise",
+      "Effect.runSync",
+      "createHash(",
+    ]) &&
+    includesEvery(host, [
+      "Command.make(",
+      'Flag.Boolean("screenshots")',
+      "runCloudflareBuiltProof",
+      "BunRuntime.runMain(",
+      "Schema.encodeEffect(",
+      "proof.verifyBuiltDeployment(",
+      "const saved = yield* fs.readFileString(receiptPath)",
+      "if (saved !==",
+      "receipt.screenshots.length !==",
+      "LocalCloudflareBuiltProofLive",
+    ]) &&
+    !includesAny(host, [
+      "chromium.launch(",
+      "process.env",
+      "Bun.file",
+      "JSON.stringify",
+    ]);
+  return valid ? [] : [finding("built-proof-boundary", boundaryPath)];
 };
 
 const inspectWorkflowBoundaries = (
@@ -373,6 +475,7 @@ export const inspectStrictAppBoundaries = (
   ...inspectWorkflowBoundaries(sources),
   ...inspectWorkflowArtifactBoundary(sources),
   ...inspectHostedProofBoundary(sources),
+  ...inspectBuiltProofBoundary(sources),
   ...inspectCredentialBoundary(sources),
   ...inspectLocalDopplerBoundary(sources),
   ...inspectDocsRuntimeBoundary(sources),

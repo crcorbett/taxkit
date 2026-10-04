@@ -130,7 +130,7 @@ generator change separately from any provider artifact. `dev:vite` and `preview`
 
 The default docs test command runs the native import-checker fixtures, the
 native route-result and managed-runtime tests, the existing MDX link tests and
-the hosted-proof policy and real browser adapter fixtures. The server test configuration resolves both
+the built/hosted-proof policy and real browser adapter fixtures. The server test configuration resolves both
 ordinary and server imports to package source. Route fixtures use the owning
 Schemas and native Effect encoders; no test-local Promise runner or throwing
 codec is required. Managed-runtime tests acquire and dispose the actual factory
@@ -156,7 +156,16 @@ not-found behavior and a direct HTTP 404. It also checks the skip link,
 landmarks, labelled/current navigation, mobile disclosure, representative
 contrast, reduced-motion rendering, immutable asset headers, runtime reuse,
 filesystem isolation and compressed upload size. The command owns
-browser/workerd cleanup. `test:cloudflare-built` remains an explicit alias for
+browser/workerd cleanup. Its native Command entry calls the closed
+`LocalCloudflareBuiltProof` service; Playwright objects stay inside its private
+adapter. Config acquires only the existing allowlisted local environment, and
+native filesystem, HTTP, Crypto and child-process streams own the work. Each
+output pipe has a 1 MiB limit; generated artifact reads have a 64 MiB limit and
+10,000-file ceiling. Sorted path/NUL/file bytes/NUL digests retain the previous
+artifact identity. One five-minute deadline covers the entire operation, with
+a two-minute browser limit. Scoped cleanup completes before the whole owning
+receipt Schema is encoded, saved and read back. Requested screenshot cardinality
+and both receipt/manifest readbacks are checked. `test:cloudflare-built` remains an explicit alias for
 the same canonical proof command. Add `-- --screenshots` for the bounded
 candidate-bound desktop/mobile PNG and digest manifest under ignored
 `tmp/docs-cloudflare/`. The desktop capture shows the representative guide;

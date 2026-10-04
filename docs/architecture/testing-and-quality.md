@@ -897,3 +897,30 @@ Native tests read the actual task entries. The initial root test failed before
 browser work because those tasks dropped the installed browser location;
 correcting only those two entries preserves the existing browser cache and
 other test task environments.
+
+
+The local built Worker proof has its own closed `LocalCloudflareBuiltProof`
+service, whole receipt/screenshot Schemas and native Command entry at the
+existing path. Native filesystem, Config, Crypto, HTTP, monotonic time and
+child-process streams own orchestration. Private SDK objects never enter its
+public reply. Both process pipes drain alongside exit, with a 1 MiB cap per
+pipe. Artifact reads stop at 64 MiB even when metadata understates a growing
+file; total artifact/digest size and 10,000-file ceilings bound collection.
+The five-minute operation and two-minute browser deadlines preserve scoped
+cleanup. Recorded child identity must disappear, and browser work completes
+before the receipt is saved and read back.
+
+Native fixtures check exact UTF-8 output limits, real child termination after
+an overflowing pipe, nonzero exit, total timeout, independent path/NUL/opaque
+byte digests, growing artifact limits, whole receipt decoding and readback,
+screenshot cardinality and no writes after a late cleanup defect. Controlled
+Chromium fixtures check the exact malformed JSON body, navigation without a
+document reload, delayed pending state, focus/contrast/mobile/motion,
+screenshots, private diagnostics, event overflow and actual pending-response
+retirement. The controlled fixture has two browser fetches and a separate
+malformed API request; these counts are kept separate. These fixtures do not
+prove the generated Worker or any provider environment. The real built local
+workerd command supplies separate Worker/assets/concurrent-request evidence.
+Actual strict CLI checks cover every adopted source/test/command and a rejected
+neighbour; source counterexamples guard bounds, digests, cleanup, encoding and
+readback. A draft PR and local proof do not finish DEV-73.

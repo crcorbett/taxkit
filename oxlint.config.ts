@@ -35,7 +35,10 @@ const decodingBoundaryFiles = [
   "apps/docs/src/lib/docs/loaders.ts",
   "apps/docs/src/lib/docs/loaders.server.ts",
   "apps/docs/src/lib/docs/route-boundary.ts",
-  "apps/docs/scripts/test-cloudflare-built.tsx",
+  "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+  "apps/docs/scripts/cloudflare-built-browser.live.ts",
+  "apps/docs/scripts/cloudflare-built-browser.live.test.ts",
+  "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
   "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
@@ -205,6 +208,9 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  "apps/docs/scripts/test-cloudflare-built.tsx",
+  "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+  "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
   "apps/web/vite.config.ts",
   "apps/web/src/lib/config.boundary.test.ts",
   // Exact negative wire fixtures; native encoding only, no decoder/runtime/throwing codec admission.
@@ -326,9 +332,7 @@ const runtimeBoundaryFiles = [
 const processBoundaryFiles = [
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
-  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
-  "apps/docs/scripts/test-built.tsx",
   "apps/docs/vitest.browser.config.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
@@ -345,9 +349,7 @@ const processBoundaryFiles = [
 ];
 
 const consoleBoundaryFiles = [
-  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
-  "apps/docs/scripts/test-built.tsx",
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
@@ -373,9 +375,7 @@ const consoleBoundaryFiles = [
 
 const bunAdapterFiles = [
   "apps/api/src/server.ts",
-  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
-  "apps/docs/scripts/test-built.tsx",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
@@ -387,6 +387,7 @@ const bunRuntimeEntrypointFiles = [
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
+  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
@@ -520,6 +521,9 @@ export default defineConfig({
         "apps/web/**",
         "packages/infrastructure/src/.generated-strict-rejected.ts",
         "apps/docs/scripts/check-import-boundaries.runtime*.ts",
+        "apps/docs/scripts/cloudflare-built-*.ts",
+        "apps/docs/scripts/test-cloudflare-built*.{ts,tsx}",
+        "apps/docs/scripts/.generated-built-strict-rejected.ts",
         "apps/docs/scripts/cloudflare-hosted-proof*.ts",
         "apps/docs/scripts/test-cloudflare-hosted*.{ts,tsx}",
         "apps/docs/scripts/.generated-imports-strict-rejected.ts",
@@ -558,8 +562,20 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/docs/scripts/cloudflare-hosted-proof.boundary.ts"],
+      files: [
+        "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
+        "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+      ],
       rules: { "unicorn/throw-new-error": "off" },
+    },
+    {
+      files: ["apps/docs/scripts/test-cloudflare-built.tsx"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/docs/scripts/test-cloudflare-built.tsx"] },
+        ],
+      },
     },
     {
       files: ["apps/docs/scripts/test-cloudflare-hosted.tsx"],

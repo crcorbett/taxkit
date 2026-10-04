@@ -14,6 +14,18 @@ import type {
 const readGovernedSources = Effect.gen(function* () {
   const fileSystem = yield* FileSystem.FileSystem;
   return {
+    "apps/docs/scripts/cloudflare-built-browser.live.ts":
+      yield* fileSystem.readFileString(
+        "apps/docs/scripts/cloudflare-built-browser.live.ts"
+      ),
+    "apps/docs/scripts/cloudflare-built-proof.boundary.ts":
+      yield* fileSystem.readFileString(
+        "apps/docs/scripts/cloudflare-built-proof.boundary.ts"
+      ),
+    "apps/docs/scripts/cloudflare-built-proof.live.layer.ts":
+      yield* fileSystem.readFileString(
+        "apps/docs/scripts/cloudflare-built-proof.live.layer.ts"
+      ),
     "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts":
       yield* fileSystem.readFileString(
         "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts"
@@ -21,6 +33,10 @@ const readGovernedSources = Effect.gen(function* () {
     "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts":
       yield* fileSystem.readFileString(
         "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts"
+      ),
+    "apps/docs/scripts/test-cloudflare-built.tsx":
+      yield* fileSystem.readFileString(
+        "apps/docs/scripts/test-cloudflare-built.tsx"
       ),
     "apps/docs/scripts/test-cloudflare-hosted.tsx":
       yield* fileSystem.readFileString(
@@ -328,6 +344,95 @@ describe("strict docs app and deployment architecture", () => {
           from === "" ? `${source}\n${to}\n` : source.replaceAll(from, to)
         );
         expect(findingInvariants(changed)).toContain("hosted-proof-boundary");
+      })
+  );
+
+  test.effect.each([
+    {
+      from: "verifyBuiltDeployment",
+      path: "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
+      to: "rawSdkCallback",
+    },
+    {
+      from: "Config.schema(LocalEnvironment)",
+      path: "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+      to: "Config.schema(Schema.Unknown)",
+    },
+    {
+      from: "1_048_576",
+      path: "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+      to: "Infinity",
+    },
+    {
+      from: "67_108_864",
+      path: "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+      to: "Infinity",
+    },
+    {
+      from: "10_000",
+      path: "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+      to: "Infinity",
+    },
+    {
+      from: "if (Number(exit) !== 0)",
+      path: "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+      to: "if (false)",
+    },
+    {
+      from: "new Uint8Array([0])",
+      path: "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+      to: "new Uint8Array([])",
+    },
+    {
+      from: 'duration: "5 minutes"',
+      path: "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+      to: 'duration: "100 years"',
+    },
+    {
+      from: 'data: Buffer.from("{")',
+      path: "apps/docs/scripts/cloudflare-built-browser.live.ts",
+      to: 'data: "{"',
+    },
+    {
+      from: "Queue.size(overflow)",
+      path: "apps/docs/scripts/cloudflare-built-browser.live.ts",
+      to: "Effect.succeed(0)",
+    },
+    {
+      from: "value.close()",
+      path: "apps/docs/scripts/cloudflare-built-browser.live.ts",
+      to: "value.version()",
+    },
+    {
+      from: "page.off(",
+      path: "apps/docs/scripts/cloudflare-built-browser.live.ts",
+      to: "page.on(",
+    },
+    {
+      from: "Schema.encodeEffect(",
+      path: "apps/docs/scripts/test-cloudflare-built.tsx",
+      to: "uncheckedJson(",
+    },
+    {
+      from: "if (saved !==",
+      path: "apps/docs/scripts/test-cloudflare-built.tsx",
+      to: "if (saved ===",
+    },
+    {
+      from: "receipt.screenshots.length !==",
+      path: "apps/docs/scripts/test-cloudflare-built.tsx",
+      to: "receipt.screenshots.length ===",
+    },
+  ] as const)(
+    "rejects bypassed local built proof ownership: $from",
+    ({ path, from, to }) =>
+      Effect.gen(function* () {
+        const sources = yield* readGovernedSources;
+        expect(readStrictAppBoundarySource(sources, path)).toContain(from);
+        const changed = replaceSource(sources, path, (source) =>
+          source.replaceAll(from, to)
+        );
+        expect(findingInvariants(changed)).toContain("built-proof-boundary");
       })
   );
 
