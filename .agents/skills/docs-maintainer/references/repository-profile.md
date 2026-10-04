@@ -59,5 +59,6 @@ The complete local skill collection is pinned by
 `tools/skills/canonical-skill-baseline.json` to Commonplace development-workflows
 0.6.1. It includes `linear`, `strict-effect-ts` and `alchemy-iac`, with relative
 Claude links. Use the Linear skill for tracked task status/evidence. The active
-`docs/exec-plans/active/clean-slate-foundation.md` distinguishes skill adoption
-from pending full strict enforcement, Atom integration and application work.
+`docs/exec-plans/active/clean-slate-foundation.md` distinguishes skill adoption, strict enforcement and Atom integration from
+later application work. Use its task receipts for current acceptance; the
+upstream skill receipt alone does not prove runtime behaviour.

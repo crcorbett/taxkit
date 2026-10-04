@@ -107,7 +107,7 @@ const decodingBoundaryFiles = [
   "tools/governance/input.boundary.ts",
   "tools/governance/policy.test.ts",
 
-  // Dynamic dispatch and its transitional repeated scenario decodes.
+  // Heterogeneous catalogue dispatch and public unknown-input scenario boundaries.
   "packages/calculators/src/catalog.ts",
   "packages/calculators/src/errors.ts",
   "packages/rules/au/income-tax/src/calculator/annual-tax.boundary.ts",
@@ -165,47 +165,8 @@ const effectErrorContractFiles = [
   "tools/oxlint/fixtures/.generated-effect-rejected.ts",
 ];
 
-const portableEffectSourceFiles = [
-  "tools/docs-deployment/fixtures/fake-doppler*.ts",
-  "apps/api/**/*.{ts,tsx,js,jsx}",
-  "packages/api/http/**/*.{ts,tsx,js,jsx}",
-  "packages/calculators/**/*.{ts,tsx,js,jsx}",
-  "packages/core/**/*.{ts,tsx,js,jsx}",
-  "packages/docs-content/**/*.{ts,tsx,js,jsx}",
-  "packages/docs-fumadocs/**/*.{ts,tsx,js,jsx}",
-  "packages/rules/au/income-tax/**/*.{ts,tsx,js,jsx}",
-  "packages/rules/au/pay/**/*.{ts,tsx,js,jsx}",
-  "packages/rules/au/stsl/**/*.{ts,tsx,js,jsx}",
-  "packages/scripts/**/*.{ts,tsx,js,jsx}",
-  "packages/sdk/typescript/**/*.{ts,tsx,js,jsx}",
-  "packages/testing/**/*.{ts,tsx,js,jsx}",
-  "tools/effect-language-service/**/*.{ts,tsx,js,jsx}",
-  "tools/documentation/**/*.{ts,tsx,js,jsx}",
-  "tools/oxlint/**/*.{ts,tsx,js,jsx}",
-  "tools/repository-paths/**/*.{ts,tsx,js,jsx}",
-  "tools/skills/**/*.{ts,tsx,js,jsx}",
-  "tools/governance/**/*.{ts,tsx,js,jsx}",
-  "tools/evals/**/*.{ts,tsx,js,jsx}",
-  "tools/docs-deployment/input.boundary*.ts",
-  "tools/docs-deployment/workflow-artifact*.ts",
-  "tools/docs-deployment/strict-boundaries*.ts",
-  "tools/docs-deployment/alchemy-memo.test.ts",
-  "tools/docs-deployment/{doppler-custody*,local-doppler*,inventory-credentials*,workflow-check*,workflow-input-check*}.ts",
-  "tools/docs-deployment/inventory.schemas.ts",
-  "tools/docs-deployment/workflow.contract.test.ts",
-  "tools/docs-deployment/workflow-plan-projection*.ts",
-  "tools/docs-deployment/workflow-plan-check*.ts",
-  "tools/docs-deployment/workflow-evidence*.ts",
-  "tools/docs-deployment/automation*.ts",
-  "tools/docs-deployment/{policy*,check.runtime*,schemas,retained-record*}.ts",
-  "tools/docs-deployment/inventory*.ts",
-  "tools/docs-deployment/workflow-{proof,run,teardown-proof}-check*.ts",
-  "tools/docs-deployment/.generated-inventory-strict-rejected.ts",
-  "tools/docs-deployment/.generated-retained-proof-strict-rejected.ts",
-  "tools/docs-deployment/workflow-receipts.schemas.ts",
-  "tools/docs-deployment/.generated-automation-strict-rejected.ts",
-  "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
-];
+// Inline Promise rejection mapping applies to every owned source extension.
+const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
   "apps/docs/scripts/test-cloudflare-built.tsx",

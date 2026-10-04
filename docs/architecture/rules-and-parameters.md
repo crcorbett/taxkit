@@ -1,140 +1,98 @@
 ---
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-rules-and-parameters-owner
+last_reviewed: 2026-10-05
+review_trigger: rule Layer, descriptor, parameter or rule-pack composition change
 ---
 
-# Rules And Parameters
+# Rules and parameters
 
-Rules are Effect `Layer`s. Metadata describes rules for tooling, but execution is driven by typed Effect dependencies.
+Rules are Effect Layers that produce named facts from other facts and parameter
+services. Descriptors explain that graph; the typed dependencies drive execution.
 
-## Rule Pattern
+## Rule pattern
 
-A rule provides one or more facts and requires facts or services through the `R` channel.
+The current [TaxablePayLive](../../packages/rules/au/pay/src/rules/taxable-pay.ts)
+uses `Layer.effect(TaxablePayFact)(...)` and reads `GrossPayFact` inside its
+Effect. It produces canonical `TaxablePay` with a `TraceNode`. In the retained
+implementation taxable pay equals gross pay: salary sacrifice is not yet part
+of this rule. Do not describe a proposed input as an existing dependency.
 
-```ts
-export const TaxablePayLive: Layer.Layer<
-  TaxablePayFact,
-  CalculationError,
-  GrossPayFact | SalarySacrificeFact
-> = Layer.effect(
-  TaxablePayFact,
-  Effect.gen(function* () {
-    const grossPay = yield* GrossPayFact;
-    const salarySacrifice = yield* SalarySacrificeFact;
+After the rule pack and scenario Layers are supplied, a calculator must have no
+remaining dependencies. A missing fact or parameter remains visible in Effect's
+required service type.
 
-    return deriveTaxablePay(grossPay, salarySacrifice);
-  })
-);
-```
+## Rule descriptors
 
-If a calculator still has `R != never` after rule and scenario layers are provided, the selected world is missing dependencies.
+Reuse `RuleDescriptor` and `makeRuleDescriptor` from `@taxkit/core`.
+The [descriptor owner](../../packages/core/src/rules/descriptor.ts) ties the
+Layer's output, errors and required services to readonly fact/parameter
+descriptors. It owns branded rule IDs, titles, source references and the
+`required` or `not-required` source policy. Do not maintain a second descriptor
+interface or add fields that the owning contract does not expose.
 
-## Rule Descriptor
+Descriptors must match the actual Layer. The core graph validator and owning
+rule-pack tests check missing dependencies, competing providers and source
+requirements; static descriptor metadata alone is not execution proof.
 
-Descriptors are required for graph visualization, validation, explanation, documentation, API metadata and source references.
+## Parameter services
 
-```ts
-export interface RuleDescriptor<ROut, E, RIn> {
-  readonly domain: RuleDomain;
-  readonly id: RuleId;
-  readonly layer: Layer.Layer<ROut, E, RIn>;
-  readonly parameters?: ReadonlyArray<ParameterDescriptor.Any>;
-  readonly provides: ReadonlyArray<FactDescriptor.Any>;
-  readonly requires: ReadonlyArray<FactDescriptor.Any>;
-  readonly sourcePolicy: RuleSourcePolicy;
-  readonly sources: ReadonlyArray<SourceRef>;
-  readonly title: string;
-}
-```
-
-The descriptor must match the actual layer. CI graph validation should catch descriptor drift.
-
-## Parameters Are Services
-
-Parameter tables are services, not imported globals. Algorithms depend on parameter services.
+A parameter table belongs to its own service, separate from the algorithm that
+uses it. The current [Schedule 1 owner](../../packages/rules/au/pay/src/parameters/schedule1.ts)
+defines checked rows, a table Schema and the service:
 
 ```ts
-export class AtoSchedule1Table extends Context.Tag(
-  "taxkit/au/payg/AtoSchedule1Table"
-)<AtoSchedule1Table, Schedule1Table>() {}
-
-export const AtoSchedule1_2025_26_Live = Layer.succeed(
+export class AtoSchedule1Table extends Context.Service<
   AtoSchedule1Table,
-  schedule1_2025_26
+  Schedule1Table
+>()("taxkit/rules-au-pay/parameter/AtoSchedule1Table") {}
+```
+
+This is an excerpt from the owning module. Its `AtoSchedule1_2025_26_Live`
+Layer supplies the canonical table. PAYG algorithms require the service rather
+than reading a year-specific table from a global variable.
+
+Parameter descriptors include source references and the table's effective
+tax-year period. Graph validation reports overlapping periods for different
+descriptors with the same parameter ID, preventing two competing tables from
+silently supplying the same service and year.
+
+## Rule packs
+
+A rule pack composes existing Layers and keeps descriptors, sources and golden
+examples with their owning modules. Reuse the actual public exports; a pack
+does not require a namespace containing duplicate metadata or a made-up graph
+builder.
+
+The current [take-home-pay pack](../../packages/rules/au/pay/src/rule-pack/au-take-home-pay-2025-26.ts)
+composes:
+
+```ts
+export const AuTakeHomePay2025_26_Live = NetPayLive.pipe(
+  Layer.provideMerge(PayWithholdingsLedgerLive),
+  Layer.provideMerge(PaygWithholdingLive),
+  Layer.provideMerge(TaxablePayLive),
+  Layer.provideMerge(AtoSchedule1_2025_26_Live)
 );
 ```
 
-This lets consumers swap tax-year parameters without changing algorithms.
+This excerpt uses the owning module's imports. The caller supplies
+`GrossPayFact` and `TaxFreeThresholdClaimedFact` through its scenario Layer.
+The base withholding ledger includes PAYG only; a pack adding STSL replaces
+that ledger with the owner that requires both components. Compose typed Layers
+rather than using untyped plugin arrays.
 
-Parameter descriptors include the source reference and effective tax-year
-period for the table they describe. Graph validation reports overlapping
-effective periods for different descriptors with the same parameter ID, so a
-rule pack cannot accidentally compose two competing ATO tables for the same
-service and year.
+## Algorithm and data separation
 
-```txt
-PaygWithholdingLive
-  requires TaxablePayFact
-  requires TaxFreeThresholdClaimedFact
-  requires AtoSchedule1Table
-```
+Keep a year's checked parameter data separate from the reusable algorithm.
+A yearly change can then update that data and its source references while
+focused tests check the resulting calculation. Changes to formulas, thresholds,
+rounding or supported inputs still require rule review and golden-result proof.
 
-## Algorithm And Data Separation
-
-Prefer:
-
-```txt
-PaygWithholdingLive
-  + AtoSchedule1_2025_26_Live
-  = AuPayg2025_26.Live
-```
-
-Avoid fusing a year's data table into a single opaque algorithm package.
-
-## Rule Packs
-
-A rule pack exports:
-
-- `Live`: the composed layer
-- `Descriptors`: facts, parameters and rules
-- `Graph`: generated graph metadata
-- `Sources`: source references
-- `GoldenTests`: optional official examples and regression vectors
-
-Example shape:
-
-```ts
-export namespace AuPayg2025_26 {
-  export const Live = PaygWithholdingLive.pipe(
-    Layer.provideMerge(TaxablePayLive),
-    Layer.provideMerge(AtoSchedule1_2025_26_Live)
-  )
-
-  export const Descriptors = [...]
-  export const Graph = makeRuleGraph(Descriptors)
-  export const Sources = [...]
-}
-```
-
-Do not use untyped plugin arrays as the primary composition model. Consumers should compose Effect layers.
-
-## Data-First Rule Builders
-
-Most yearly updates should be data changes plus golden tests. Prefer rule specs for common patterns:
-
-```txt
-marginal rate table
-threshold rate table
-coefficient formula
-phase-in / phase-out
-cap / floor
-gross-up
-annualise / periodise
-loan amortisation
-ledger component adjustment
-aggregation
-```
-
-Official rule updates should use schema-validated data tables and golden tests wherever possible.
+Use schema-checked data tables where they express the actual rule, including
+marginal rates, coefficient formulas, caps and ledger components. Add a shared
+rule builder only when it owns repeated policy and makes the call graph simpler;
+the [abstraction admission owner](../design-docs/abstraction-admission.md)
+defines that review.

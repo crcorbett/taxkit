@@ -214,12 +214,14 @@ const visitHydratedPage = Effect.fnUntraced(function* (
         missingScriptAsset: false,
       }));
       yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new HostedProofExecutionError({ operation: "browser-proof" }),
         try: () =>
           page.goto(`${origin}${target}`, { waitUntil: "domcontentloaded" }),
       });
       const hydration = yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new HostedProofExecutionError({ operation: "browser-proof" }),
         try: () =>
           page.waitForFunction(
             () =>
@@ -261,7 +263,7 @@ const Colors = Schema.Struct({
 const Channels = Schema.Tuple([Schema.Finite, Schema.Finite, Schema.Finite]);
 const computedContrast = Effect.fnUntraced(function* (page: Page) {
   const colors = yield* Effect.tryPromise({
-    catch: browserFailure,
+    catch: () => new HostedProofExecutionError({ operation: "browser-proof" }),
     try: () =>
       page.evaluate(() => ({
         background: getComputedStyle(document.documentElement).backgroundColor,
@@ -344,7 +346,8 @@ export const CloudflareHostedProofLive = Layer.effect(
       )(function* (config) {
         const browser = yield* acquireBrowser;
         const page = yield* Effect.tryPromise({
-          catch: browserFailure,
+          catch: () =>
+            new HostedProofExecutionError({ operation: "browser-proof" }),
           try: () => browser.newPage(),
         });
         const state = yield* observePage(page, config.origin);
@@ -356,7 +359,8 @@ export const CloudflareHostedProofLive = Layer.effect(
           config
         );
         const routerPresent = yield* Effect.tryPromise({
-          catch: browserFailure,
+          catch: () =>
+            new HostedProofExecutionError({ operation: "browser-proof" }),
           try: () => page.evaluate(() => window.__TSR_ROUTER__ !== undefined),
         }).pipe(
           Effect.flatMap(Schema.decodeUnknownEffect(Schema.Boolean)),
@@ -489,7 +493,8 @@ export const CloudflareHostedProofLive = Layer.effect(
           );
 
           const page = yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               browser.newPage({ viewport: { height: 1000, width: 1440 } }),
           });
@@ -502,7 +507,8 @@ export const CloudflareHostedProofLive = Layer.effect(
             propagation
           );
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               page
                 .getByRole("heading", {
@@ -511,21 +517,24 @@ export const CloudflareHostedProofLive = Layer.effect(
                 .waitFor(),
           });
           const landmarks = yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () => page.getByRole("main").count(),
           }).pipe(
             Effect.flatMap(Schema.decodeUnknownEffect(Schema.Int)),
             Effect.mapError(browserFailure)
           );
           const articles = yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () => page.getByRole("article").count(),
           }).pipe(
             Effect.flatMap(Schema.decodeUnknownEffect(Schema.Int)),
             Effect.mapError(browserFailure)
           );
           const navigation = yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               page.getByRole("navigation", { name: "Documentation" }).count(),
           }).pipe(
@@ -538,7 +547,8 @@ export const CloudflareHostedProofLive = Layer.effect(
           const contrastRatio = yield* computedContrast(page);
           const baseline = yield* state.collect;
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               page
                 .getByRole("navigation", { name: "Documentation" })
@@ -547,7 +557,8 @@ export const CloudflareHostedProofLive = Layer.effect(
                 .click(),
           });
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               page
                 .getByRole("heading", { exact: true, name: "Reference" })
@@ -570,7 +581,8 @@ export const CloudflareHostedProofLive = Layer.effect(
             addedResponses
           ).pipe(Effect.fromOption, Effect.mapError(browserFailure));
           const malformedStatus = yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               page.request.fetch(observedServerFunction.url, {
                 data: Buffer.from("{"),
@@ -585,7 +597,8 @@ export const CloudflareHostedProofLive = Layer.effect(
           );
           yield* requireProof(malformedStatus >= 400 && malformedStatus < 500);
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               page.evaluate(
                 (target) => window.__TSR_ROUTER__?.navigate({ to: target }),
@@ -593,7 +606,8 @@ export const CloudflareHostedProofLive = Layer.effect(
               ),
           });
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () => page.getByTestId("route-not-found").waitFor(),
           });
           yield* requireProof(
@@ -608,11 +622,13 @@ export const CloudflareHostedProofLive = Layer.effect(
             propagation
           );
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () => page.keyboard.press("Tab"),
           });
           const skipFocused = yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               page
                 .getByRole("link", { name: "Skip to documentation" })
@@ -623,11 +639,13 @@ export const CloudflareHostedProofLive = Layer.effect(
           );
           yield* requireProof(skipFocused);
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () => page.keyboard.press("Enter"),
           });
           const mainFocused = yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               page.evaluate(() => document.activeElement?.id === "docs-main"),
           }).pipe(
@@ -643,7 +661,8 @@ export const CloudflareHostedProofLive = Layer.effect(
             propagation
           );
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               page
                 .getByRole("heading", {
@@ -654,7 +673,8 @@ export const CloudflareHostedProofLive = Layer.effect(
           const desktopPath = `${config.evidenceDirectory}/${config.environment}-desktop-${config.candidateCommit.slice(0, 7)}.png`;
           const desktopFile = path.join(repositoryRoot, desktopPath);
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () => page.screenshot({ fullPage: true, path: desktopFile }),
           });
           const desktopBytes = yield* fs
@@ -668,7 +688,8 @@ export const CloudflareHostedProofLive = Layer.effect(
               Effect.mapError(browserFailure)
             );
           const mobilePage = yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               browser.newPage({
                 deviceScaleFactor: 1,
@@ -684,14 +705,16 @@ export const CloudflareHostedProofLive = Layer.effect(
             propagation
           );
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               mobilePage
                 .getByRole("button", { name: "Open navigation" })
                 .click(),
           });
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               mobilePage
                 .getByRole("button", { name: "Close navigation" })
@@ -700,7 +723,8 @@ export const CloudflareHostedProofLive = Layer.effect(
           const mobilePath = `${config.evidenceDirectory}/${config.environment}-mobile-${config.candidateCommit.slice(0, 7)}.png`;
           const mobileFile = path.join(repositoryRoot, mobilePath);
           yield* Effect.tryPromise({
-            catch: browserFailure,
+            catch: () =>
+              new HostedProofExecutionError({ operation: "browser-proof" }),
             try: () =>
               mobilePage.screenshot({ fullPage: true, path: mobileFile }),
           });

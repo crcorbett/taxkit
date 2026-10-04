@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-08-28
-source_of_truth: docs
-confidence: medium
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-configuration-owner
+last_reviewed: 2026-10-05
+review_trigger: config Schema, namespace, source selection or secret custody change
 ---
 
 # Configuration
@@ -30,7 +32,7 @@ Doppler is the owner for TaxKit's operator-set credentials and their related
 environment identities. It is not the owner for host-created values, GitHub
 event data, Alchemy-generated state credentials or TaxKit evidence paths.
 
-The current environment map is:
+The repository-defined environment map is:
 
 | Purpose | Config | Values |
 | --- | --- | --- |
@@ -65,80 +67,77 @@ the reviewer-protected Production environment. Preview and Production select
 `taxkit/ci` separately for their exact provider-free Turbo consumers after
 cache saves, while teardown stays local-cache-only and cannot fetch `ci`.
 
-The TaxKit Doppler project/configs and three GitHub bridges are established.
-Direct Turbo and Cloudflare GitHub entries have been removed after merged-main
-replacement proof. No implemented workflow or supported recovery path falls
-back to a direct value.
+The earlier Doppler implementation recorded establishment of the project,
+configs and GitHub bridges, and removal of direct Turbo/Cloudflare entries after
+replacement proof. That is historical provider evidence, not a fresh readback
+from this checkout. Current source has no supported direct-value fallback;
+provider custody and availability require the separate operational readback
+owned by the [authority model](../operations/authority-model.md).
 
-## Pattern
+## Current package and app pattern
 
-Package exports schema, type and a config fragment:
+The [HTTP package config owner](../../packages/api/http/src/config.ts) exports
+`TaxKitHttpApiClientConfigSchema`, its derived type and the keyed server/browser
+config fragments. Its Schema uses `Schema.URLFromString`, so the encoded base
+URL is a string and the canonical value is a `URL`. The fragment reads the
+named URL through native `Config.URL` and constructs the owning Schema value.
+Its `Config.nested` namespaces are `TAXKIT_API` and `VITE_TAXKIT_API`.
 
-```ts
-import { Config, Schema } from "effect";
-
-export const ServiceConfigSchema = Schema.Struct({
-  baseUrl: Schema.URLFromString,
-});
-
-export type ServiceConfig = Schema.Schema.Type<typeof ServiceConfigSchema>;
-
-export interface ServiceConfigFragment {
-  readonly service: ServiceConfig;
-}
-
-export const ServiceConfigFragment = {
-  service: Config.schema(ServiceConfigSchema),
-} satisfies Config.Wrap<ServiceConfigFragment>;
-
-export const ServiceServerEnvConfigFragment = {
-  service: Config.schema(ServiceConfigSchema).pipe(Config.nested("SERVICE")),
-} satisfies Config.Wrap<ServiceConfigFragment>;
-
-export const ServiceViteEnvConfigFragment = {
-  service: Config.schema(ServiceConfigSchema).pipe(
-    Config.nested("VITE_SERVICE")
-  ),
-} satisfies Config.Wrap<ServiceConfigFragment>;
-```
-
-App composes package config fragments into app config:
+The [server app config](../../apps/web/src/lib/config.server.ts) composes the
+package fragment rather than defining the HTTP setting again:
 
 ```ts
-import { ServiceServerEnvConfigFragment } from "@owner/service/config";
-import { Config } from "effect";
-
-export const AppServerConfig = Config.all({
-  ...ServiceServerEnvConfigFragment,
+export const TaxKitWebServerConfig = Config.all({
+  ...TaxKitHttpApiServerEnvConfig,
 });
 ```
 
-Runtime module provides values through a runtime source and generic naming
-convention:
+This excerpt describes package composition; the owning module also maps config
+failure inline to the safe app error. Its native `ConfigProvider.fromEnv()` and
+`ConfigProvider.constantCase` read `TAXKIT_API_BASE_URL` at server runtime.
+`Config.nested`, `Config.Wrap` and `Config.URL` are supported by the installed
+Effect 4 version. Use `typeof ConfigSchema.Type` for new schema-derived type
+examples; the package's existing `Schema.Schema.Type` form remains supported.
+
+## Browser configuration boundary
+
+The [client config module](../../apps/web/src/lib/config.client.ts) composes
+`TaxKitHttpApiViteEnvConfig`. Its provider receives only the build-selected
+public input:
 
 ```ts
-import { ConfigProvider } from "effect";
-
-export const AppServerConfigProviderLive = ConfigProvider.layer(
-  ConfigProvider.fromEnv().pipe(ConfigProvider.constantCase)
-);
-```
-
-This maps a schema key such as `baseUrl` to `SERVICE_BASE_URL`.
-
-For Vite client env, use the same Effect env provider shape over
-`import.meta.env`:
-
-```ts
-export const AppClientConfigProviderLive = ConfigProvider.layer(
-  ConfigProvider.fromEnv({ env: import.meta.env }).pipe(
+export const TaxKitWebClientConfigProviderLive = ConfigProvider.layer(
+  ConfigProvider.fromEnv({ env: __TAXKIT_WEB_CLIENT_INPUT__ }).pipe(
     ConfigProvider.constantCase
   )
 );
 ```
 
-When composed with `ServiceViteEnvConfigFragment`, this maps `baseUrl` to
-`VITE_SERVICE_BASE_URL`.
+The [input owner](../../apps/web/src/lib/config.client-input.ts) defines and
+constructs the checked input containing only optional `VITE_TAXKIT_API_BASE_URL`.
+The [Vite config](../../apps/web/vite.config.ts) loads that input with native
+`Config.schema` and replaces the typed constant during the build. It sets
+`envPrefix: []` so Vite cannot automatically copy other prefixed environment
+values into browser code. The URL is then read through the package-owned config
+fragment. Do not pass the whole `import.meta.env` or process environment to the
+browser provider.
+
+The browser config test and built-bundle sentinel check prove that unrelated
+credential markers do not reach the qualified browser bundle. This is local
+build proof, separate from any hosted environment or provider configuration.
+
+## Schema-owned settings
+
+Use `Config.schema` with the owning Schema when loading semantic settings,
+including provider identities, credentials, stages and checked command inputs.
+[API app config](../../apps/api/src/config.ts) is another current example: the
+host and port are checked by their owners; optional `API_PORT` falls back to
+`PORT` only when absent. An invalid supplied primary value remains an error.
+
+Configuration modules own defaults and selection. Service contracts receive
+canonical checked values. Raw credentials use `Schema.RedactedFromValue` at
+string ingress; unwrap only at final construction of the private provider
+client, never merely for a brand or diagnostic.
 
 ## Guardrails
 
@@ -160,9 +159,8 @@ When composed with `ServiceViteEnvConfigFragment`, this maps `baseUrl` to
   config fragment.
 - Keep one-off config error transformation inline at the runtime callsite.
 - Use Effect `Config`, `ConfigProvider`, `Schema`, `Layer` and platform
-  runtime primitives for configuration. Do not parse `process.env` or
-  `import.meta.env` by hand when an Effect config/schema composition can own
-  the shape.
+  runtime primitives for configuration. Keep representation ingress at its
+  exact config owner, and select only explicitly public keys for browser builds.
 - Provider credentials and other semantic values use owner-named Schemas with
   `Config.schema`; use `Schema.Redacted` or `Schema.RedactedFromValue` according
   to the actual ingress representation. Do not expose primitive config values

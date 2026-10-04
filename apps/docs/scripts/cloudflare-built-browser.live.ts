@@ -205,7 +205,8 @@ const computedContrast = Effect.fnUntraced(function* (
   backgroundSelector: string
 ) {
   const colors = yield* Effect.tryPromise({
-    catch: browserFailure,
+    catch: () =>
+      new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
     try: () =>
       page.evaluate(
         ({ foreground, background }) => ({
@@ -271,7 +272,11 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
     const crypto = yield* Crypto.Crypto;
     const browser = yield* Effect.acquireRelease(
       Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () => chromium.launch({ env: config.environment, headless: true }),
       }),
       (value) =>
@@ -285,17 +290,20 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
         }).pipe(Effect.orDie)
     );
     const page = yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => browser.newPage({ viewport: { height: 1000, width: 1440 } }),
     });
     const state = yield* observePage(page, config.origin);
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.goto(`${config.origin}${knownPath}`, { waitUntil: "networkidle" }),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.waitForFunction(
           () =>
@@ -307,28 +315,32 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
         ),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page
           .getByRole("heading", { name: "Calculate Australian take-home pay" })
           .waitFor(),
     });
     const landmarks = yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.getByRole("main").count(),
     }).pipe(
       Effect.flatMap(Schema.decodeUnknownEffect(Schema.Literal(1))),
       Effect.mapError(browserFailure)
     );
     const articles = yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.getByRole("article").count(),
     }).pipe(
       Effect.flatMap(Schema.decodeUnknownEffect(Schema.Literal(1))),
       Effect.mapError(browserFailure)
     );
     const navigation = yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.getByRole("navigation", { name: "Documentation" }).count(),
     }).pipe(
@@ -337,7 +349,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
     );
     yield* requireProof(landmarks === 1 && articles === 1 && navigation === 1);
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.evaluate(() => document.activeElement === document.body),
     }).pipe(
       Effect.flatMap(Schema.decodeUnknownEffect(Schema.Literal(true))),
@@ -346,7 +359,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
     yield* computedContrast(page, ".docs-article p", ":root");
     const baseline = yield* state.collect;
     const serverResponse = yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.waitForResponse(
           (response) =>
@@ -356,7 +370,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
         ),
     }).pipe(Effect.forkScoped);
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page
           .getByRole("navigation", { name: "Documentation" })
@@ -369,7 +384,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       observedResponse.status()
     ).pipe(Effect.mapError(browserFailure));
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.getByRole("heading", { exact: true, name: "Reference" }).waitFor(),
     });
@@ -393,7 +409,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       Effect.mapError(browserFailure)
     );
     const malformed = yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.request.fetch(firstResponse.url, {
           data: Buffer.from("{"),
@@ -405,7 +422,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       Schema.Int.check(Schema.isBetween({ maximum: 499, minimum: 400 }))
     )(malformed.status()).pipe(Effect.mapError(browserFailure));
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.evaluate(
           (target) => window.__TSR_ROUTER__?.navigate({ to: target }),
@@ -413,7 +431,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
         ),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.getByTestId("route-not-found").waitFor(),
     });
     const missing = yield* state.collect;
@@ -422,16 +441,19 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
         missing.transportRequests > 0
     );
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.goto(`${config.origin}/start`, { waitUntil: "networkidle" }),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.keyboard.press("Tab"),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page
           .getByRole("link", { name: "Skip to documentation" })
@@ -441,11 +463,13 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       Effect.mapError(browserFailure)
     );
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.keyboard.press("Enter"),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.evaluate(() => document.activeElement?.id === "docs-main"),
     }).pipe(
@@ -453,16 +477,19 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       Effect.mapError(browserFailure)
     );
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.setViewportSize({ height: 844, width: 390 }),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.goto(`${config.origin}${knownPath}`, { waitUntil: "networkidle" }),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.waitForFunction(
           () =>
@@ -472,11 +499,13 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
         ),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.getByRole("button", { name: "Open navigation" }).click(),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page
           .getByRole("button", { name: "Close navigation" })
@@ -486,7 +515,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       Effect.mapError(browserFailure)
     );
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page
           .getByRole("navigation", { name: "Documentation" })
@@ -495,20 +525,24 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
     });
     yield* computedContrast(page, ".docs-nav-toggle", ".docs-nav-toggle");
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.setViewportSize({ height: 1000, width: 1440 }),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.emulateMedia({ reducedMotion: "reduce" }),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.goto(`${config.origin}${knownPath}`, { waitUntil: "networkidle" }),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.waitForFunction(
           () =>
@@ -520,7 +554,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
     const motionSelector =
       ".docs-page-layout, .docs-nav, .docs-nav-toggle, .docs-article, .docs-route-state";
     const motionCount = yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.locator(motionSelector).count(),
     }).pipe(
       Effect.flatMap(
@@ -532,7 +567,11 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
     // the host; no native map or imported helper runs in the serialised realm.
     yield* Effect.forEach(EffectArray.range(0, motionCount - 1), (index) =>
       Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () =>
           page
             .locator(motionSelector)
@@ -557,16 +596,19 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       )
     );
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.emulateMedia({ reducedMotion: "no-preference" }),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.goto(`${config.origin}/start`, { waitUntil: "networkidle" }),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.waitForFunction(() => window.__TSR_ROUTER__ !== undefined),
     });
@@ -580,6 +622,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       capacity: 1,
       strategy: "dropping",
     });
+    // Delay only the server-function transport under test. Routing unrelated
+    // script/assets makes their continuation race the removal of interception.
     const enqueueRoute = (route: Route) => {
       if (!Queue.offerUnsafe(routes, route)) {
         Queue.offerUnsafe(routeOverflow, true);
@@ -594,7 +638,11 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
               yield* Effect.sleep(800);
             }
             yield* Effect.tryPromise({
-              catch: browserFailure,
+              catch: () =>
+                new BuiltProofError({
+                  operation: "browser",
+                  reason: "start-or-read",
+                }),
               try: () => route.continue(),
             });
           }),
@@ -608,17 +656,27 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
     );
     yield* Effect.acquireRelease(
       Effect.tryPromise({
-        catch: browserFailure,
-        try: () => page.route("**/*", enqueueRoute),
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
+        try: () => page.route(`${config.origin}/_serverFn/**`, enqueueRoute),
       }),
       () =>
         Effect.tryPromise({
-          catch: browserFailure,
-          try: () => page.unroute("**/*", enqueueRoute),
+          catch: () =>
+            new BuiltProofError({
+              operation: "browser",
+              reason: "start-or-read",
+            }),
+          try: () =>
+            page.unroute(`${config.origin}/_serverFn/**`, enqueueRoute),
         }).pipe(Effect.orDie)
     );
     const pendingNavigation = yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.evaluate(
           (target) => window.__TSR_ROUTER__?.navigate({ to: target }),
@@ -626,19 +684,22 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
         ),
     }).pipe(Effect.forkScoped);
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () => page.getByTestId("route-pending").waitFor(),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page.getByRole("heading", { name: "Loading documentation" }).waitFor(),
     });
     yield* computedContrast(page, ".docs-route-state p", ":root");
     yield* Fiber.join(pendingNavigation);
     yield* Effect.tryPromise({
-      catch: browserFailure,
-      try: () => page.unroute("**/*", enqueueRoute),
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
+      try: () => page.unroute(`${config.origin}/_serverFn/**`, enqueueRoute),
     });
     yield* Fiber.interrupt(routeWorker);
     yield* requireProof((yield* Queue.size(routeOverflow)) === 0);
@@ -647,7 +708,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       onSome: (error) => Effect.fail(error),
     });
     yield* Effect.tryPromise({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         page
           .getByRole("heading", { name: "Calculate Australian take-home pay" })
@@ -658,7 +720,8 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
         pendingBaseline.documentRequests
     );
     const recoverableMarkup = yield* Effect.try({
-      catch: browserFailure,
+      catch: () =>
+        new BuiltProofError({ operation: "browser", reason: "start-or-read" }),
       try: () =>
         renderToStaticMarkup(
           createElement(DocsRecoverableError, {
@@ -675,7 +738,11 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       yield* fs.makeDirectory(config.screenshotDirectory, { recursive: true });
       const desktopFile = path.join(config.screenshotDirectory, "desktop.png");
       yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () => page.screenshot({ fullPage: true, path: desktopFile }),
       });
       yield* requireProof(
@@ -689,7 +756,11 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
           Effect.flatMap(HostedProofSha256.makeEffect)
         );
       const mobile = yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () =>
           browser.newPage({
             deviceScaleFactor: 1,
@@ -698,14 +769,22 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
       });
       const mobileState = yield* observePage(mobile, config.origin);
       yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () =>
           mobile.goto(`${config.origin}${knownPath}`, {
             waitUntil: "networkidle",
           }),
       });
       yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () =>
           mobile.waitForFunction(
             () =>
@@ -715,18 +794,30 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
           ),
       });
       yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () =>
           mobile.getByRole("button", { name: "Open navigation" }).click(),
       });
       yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () =>
           mobile.getByRole("button", { name: "Close navigation" }).waitFor(),
       });
       const mobileFile = path.join(config.screenshotDirectory, "mobile.png");
       yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () => mobile.screenshot({ fullPage: true, path: mobileFile }),
       });
       yield* requireProof(
@@ -743,7 +834,11 @@ export const verifyBuiltBrowser = Effect.fnUntraced(
         (yield* mobileState.collect).diagnostics.length === 0
       );
       yield* Effect.tryPromise({
-        catch: browserFailure,
+        catch: () =>
+          new BuiltProofError({
+            operation: "browser",
+            reason: "start-or-read",
+          }),
         try: () => mobile.close(),
       });
       return [

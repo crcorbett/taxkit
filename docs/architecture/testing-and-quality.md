@@ -623,11 +623,13 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   broad suppressions to simulate that analysis.
 - `effect/no-bare-effect-try-promise` requires direct inline function-valued
   `try` and `catch` properties for canonical `Effect.tryPromise` calls in
-  packages, `apps/api` and repository tools. Its focused binary fixtures cover
+  every owned TypeScript/JavaScript source extension, including both website
+  apps, infrastructure and root config. Its focused binary fixtures cover
   root, namespace and subpath imports, renamed bindings, static
   aliases/destructuring, reassignment, arrow/function/method properties,
   extracted, shorthand, non-function and spread policy, and unrelated shadowed
-  locals. Website applications are not in this rule's current scope.
+  locals. New path canaries require exactly one missing-mapping diagnostic
+  while an inline mapped neighbour remains accepted in the same file.
 - Nullable leakage and hand-rolled `Result`/`Exit` representations remain
   review concerns outside the exact calculator and manual-tag contracts. A
   `null` literal, `Schema.NullOr`, `Option.getOrNull` or domain tag name cannot

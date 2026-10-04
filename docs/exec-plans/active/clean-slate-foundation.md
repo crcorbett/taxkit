@@ -32,12 +32,14 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: migrate the remaining deployment, SDK, app/config and infrastructure paths, then finish readonly
-contract, Schema, helper and lifetime review before downstream acceptance.
-The Bun-hosted Effect test runner and focused lexical gap proof are locally
-qualified; static JavaScript checking remains pending. Domain boundary enforcement is implemented in PR #93. The latest
-stable-v4 adad qualification handoff remains revision
-`59b0a36ff1bc6f95501734ee65d789a4f5a37fcc`; it is not Medicare-correctness proof.
+Next continuation milestone: implement T003's native website and backend
+calculation. T002's installed dependency graph, app/script/SDK/infrastructure
+migrations, six-extension strict scope, fixture containment and final source
+review are complete locally. The [acceptance review](../../documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json)
+records the completed local checks and their limits. The companion adad
+qualification remains exactly `59b0a36ff1bc6f95501734ee65d789a4f5a37fcc`;
+later SDK work has not been qualified there, and neither result is Medicare
+correctness proof.
 
 ## Starting point and retention
 
@@ -70,7 +72,7 @@ records command outcomes and log digests.
 | Task / Linear | State | Evidence and next action |
 | --- | --- | --- |
 | T001 / DEV-72 | Implemented and locally tested | Retention, admission and diagnostic checks pass; draft PR review pending. |
-| T002 / DEV-73 | Qualification in progress | Qualify exact current dependency graph and complete strict enforcement before application changes. |
+| T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
 | T003 / DEV-74 | Pending T002 | First same-stage website/backend calculation. |
 | T004 / DEV-75 | Pending T003 | All three calculators and deliberate public interface changes. |
 | T005 / DEV-76 | Pending T003/T004 | Accepted content, route retention, search and discovery. |
@@ -1728,3 +1730,58 @@ public/generated content, prior evidence, provider state and tax results.
 **N/A** Changeset (repository tooling only), new runbook/provider operation and
 public contract. No merge/deployment/publication/provider apply/version
 application. DEV-73 remains in progress; Medicare separate.
+
+## T002 final source review and Promise mapping
+
+The source review found stale service/config examples and one remaining lint
+scope gap: inline Promise rejection mapping did not cover both website apps,
+infrastructure and every owned source extension. The selector now covers all
+six extensions. Six real CLI path canaries reject a missing mapping while
+accepting an inline mapped operation in the same file. The wider rule correctly
+rejected extracted catch callbacks in the two private Playwright proof adapters;
+those mappings now construct the same safe closed error inline.
+
+The facts/rules/configuration/service guides now use their actual native owners
+and identities. They preserve proposed-feature boundaries: taxable pay currently
+equals gross pay, question inputs have three supported kinds, and the web
+scaffold receives only its checked public config constant. Older Doppler provider
+claims are labelled historical rather than fresh external readback. Materially
+revised legacy guides now carry separate lifecycle and authority metadata.
+
+The dated [review receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json)
+records path evidence for Schema ownership, generic descriptor/continuation
+coupling, helper purpose, deterministic scenario Layers, SDK caller lifetimes,
+app-owned runtimes, readonly state and exact host/fixture containment. T003/T004
+own the deliberately new RPC/calculator/public interfaces; retained pure rule
+Layers are not provider runtime construction. Documentation impact is **Change
+required** for these owners, the enforcement corpus and current plan/tasks;
+**Preserve** for public content, historical proof, canonical skills, package
+contracts and tax results. A Changeset is **N/A** because this slice changes
+private proof scripts, repository enforcement and maintainer guidance only.
+All required local checks pass; the dated receipt retains exact outcomes and
+source identity. Hosted qualification of the new commit remains separate.
+Recover by reverting this complete slice. No provider operation is authorised.
+
+A separate actual built-Worker check exposed interference from intercepting
+unrelated asset requests during the pending-route test. Bounded phase diagnostics
+identified `route.continue` on an already-handled script request; the request was
+not an expected server-function abort. The route handler now matches only the
+same-origin server-function path. It does not suppress errors. Controlled native
+browser cases load a late script asset and cover both screenshot paths, while
+body-interruption cleanup remains checked. All 54 script cases and the native
+compiler/root lint pass. Two local skill profiles now route to current receipts
+without describing already-qualified work as pending; their separate hashes are
+refreshed, with upstream tree identities preserved. Final corrected-candidate
+verification passes all 32 Quality cases, including 13 isolated cases in
+381.59 seconds; all 24 type tasks, both Knip checks, 206 deployment cases, 21
+skill cases, 16 evaluation cases, 24 SDK browser cases and four website browser
+cases pass. Root tests pass all 24 tasks (23 matching caches), including 54
+changed script cases and 19 server cases. The final frozen install checks 792
+installs/1020 packages without changes; the build passes all 15 tasks (14 matching caches).
+Both actual built-Worker commands pass sequentially, with and without captures.
+
+T002 is complete locally. The task ledger records that result; previous partial
+sections remain historical evidence. Cooper review and the new commit's GitHub
+checks remain separate. Linear tracking writes remain blocked by automatic
+approval review, so no changed external status is claimed. Continue T003; the
+end-to-end implementation goal remains active. Medicare is still unresolved.

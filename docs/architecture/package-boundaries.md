@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-14
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-package-boundaries-owner
+last_reviewed: 2026-10-05
+review_trigger: package responsibility, dependency direction or public export change
 ---
 
 # Package Boundaries
@@ -19,8 +21,11 @@ This page is a target architecture, not a list of implemented packages.
 Implemented packages and apps:
 
 - `apps/api`
+- `apps/docs`
 - `apps/web`
 - `packages/calculators`
+- `packages/docs-content`
+- `packages/docs-fumadocs`
 - `packages/core`
 - `packages/api/http`
 - `packages/sdk/typescript`
@@ -121,7 +126,7 @@ Implemented `@taxkit/core` owns:
 - graph metadata types
 - trace and ledger types
 - common tagged errors
-- Effect `Context.Tag` / `Layer` helpers
+- Effect `Context.Service` / `Layer` helpers
 - calculation engine orchestration
 
 Planned `@taxkit/domain-au-*` packages will own:
@@ -185,16 +190,15 @@ Implemented `@taxkit/api-http` owns:
 HTTP API packages should not own calculator catalog transformations or
 calculation business logic when a reusable API service package exists.
 
-Scaffolded `@taxkit/sdk`, published later as `taxkit` or `@taxkit/sdk`,
-owns:
+Implemented private `@taxkit/sdk` owns:
 
 - direct in-process calculation facade
-- plain TypeScript `TaxKit.create(...)` client factory and `TaxKit.{method}` generic helpers
-- Effect-native `taxkit/effect` entrypoint
-- jurisdiction-specific opt-in subpaths such as `taxkit/au`
+- plain TypeScript `TaxKit.createClient(...)`, `TaxKit.calculate(...)` and safe helpers
+- caller-owned client runtimes and explicit disposal; bounded one-shot helpers
+- Effect-native `@taxkit/sdk/effect` entrypoint
+- jurisdiction-specific opt-in `@taxkit/sdk/au` and `@taxkit/sdk/au/effect` subpaths
 - Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
 - typed declarations, provider Layers and bindings shared by plain and Effect entrypoints
-- typed client functions for the public API where needed
 - browser-safe types and schemas
 - SDK examples and compatibility tests
 

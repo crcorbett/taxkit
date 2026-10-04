@@ -998,6 +998,20 @@ test("keeps full source coverage and its five unexecuted fixture exclusions exac
   expect(scope.files, "Owned source extension coverage").toContain(
     "**/*.{ts,tsx,js,jsx,mjs,cjs}"
   );
+  const configuration: OxlintConfig = oxlintConfig;
+  const promiseScope = Array.filter(configuration.overrides ?? [], (entry) =>
+    Record.get<string>("effect/no-bare-effect-try-promise")(
+      entry.rules ?? {}
+    ).pipe(Option.exists((severity) => severity === "error"))
+  );
+  expect(promiseScope).toHaveLength(1);
+  expect(
+    Array.head(promiseScope).pipe(
+      Option.map((entry) => entry.files),
+      Option.getOrUndefined
+    ),
+    "Owned Promise mapping coverage"
+  ).toEqual(["**/*.{cjs,mjs,jsx,js,tsx,ts}"]);
   expect(scope.excludeFiles, "Owned-source fixture exclusions").toEqual([
     "tools/oxlint/fixtures/bun-accepted.ts",
     "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
@@ -1008,6 +1022,33 @@ test("keeps full source coverage and its five unexecuted fixture exclusions exac
 });
 
 describe("portable Oxlint plugins", () => {
+  test.effect.each([
+    "apps/web/src/.generated-promise-mapping.ts",
+    "apps/docs/src/.generated-promise-mapping.tsx",
+    "packages/infrastructure/src/.generated-promise-mapping.ts",
+    ".generated-promise-mapping.js",
+    ".generated-promise-mapping.jsx",
+    ".generated-promise-mapping.mjs",
+  ])("enforces inline Promise error mapping at $name", (path) =>
+    Effect.gen(function* () {
+      yield* writeLintFixture(
+        join(repositoryRoot, path),
+        `import { Effect } from "effect";
+export const rejected = Effect.tryPromise(() => Promise.resolve("bad"));
+export const accepted = Effect.tryPromise({ try: () => Promise.resolve("good"), catch: () => "fixed" });`
+      );
+      const result = yield* runOxlint(path);
+      expect(result.files).toBe(1);
+      expect(result.exitCode).toBe(1);
+      expect(
+        Array.filter(
+          result.codes,
+          (code) => code === "effect(no-bare-effect-try-promise)"
+        )
+      ).toHaveLength(1);
+    }).pipe(Effect.provide(BunServices.layer))
+  );
+
   test.effect.each([
     {
       count: 1,

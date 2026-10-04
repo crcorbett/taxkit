@@ -3,7 +3,7 @@ document_type: architecture-router
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-07-20
+last_reviewed: 2026-10-05
 review_trigger: package ownership, runtime boundary, public contract, or architecture-route change
 ---
 
@@ -66,7 +66,7 @@ verification are added.
 ```txt
 Schema-branded domain values
   -> Schema.TaggedClass / Data.TaggedClass facts
-  -> Context.Tag fact and service providers
+  -> Context.Service fact and service providers
   -> Layer.effect rule derivations
   -> Layer-composed rule packs
   -> typed calculator programs

@@ -39,7 +39,7 @@ main.dataset.tkNavigationInteractive="true";
 window.__TSR_ROUTER__={navigate:({to})=>{
   if(to.includes("missing")){main.innerHTML='<div data-testid="route-not-found">Documentation page not found</div>';return Promise.resolve()}
   main.innerHTML='<div class="docs-route-state" data-testid="route-pending"><h1>Loading documentation</h1><p>Loading fixture.</p></div>';
-  return fetch("/_serverFn/guide").then(()=>{main.innerHTML=article})
+  return fetch("/_serverFn/guide").then(()=>{main.innerHTML=article;const late=document.createElement("script");late.src="/assets/late-ABC123xy.js";document.head.append(late)})
 }};
 document.querySelector("#reference").addEventListener("click",event=>{event.preventDefault();fetch("/_serverFn/reference").then(()=>{main.innerHTML='<h1>Reference</h1>'})});
 document.querySelector("#skip").addEventListener("click",event=>{event.preventDefault();main.focus()});
@@ -50,7 +50,11 @@ const html = `<html><head><style>:root,.docs-nav-toggle{background:rgb(255,255,2
 it.live.each([
   {
     mode: "clean",
-    name: "checks raw malformed JSON, delayed navigation, screenshots and all browser assertions",
+    name: "checks malformed JSON and delayed navigation with late assets, screenshots and cleanup",
+  },
+  {
+    mode: "clean-no-screenshots",
+    name: "keeps late script assets outside delayed RPC routing without screenshot timing",
   },
   {
     mode: "private-console",
@@ -87,10 +91,15 @@ it.live.each([
                 () =>
                   'for(let count=0;count<1100;count++){console.warn("overflow-fixture")}'
               ),
-              Match.when("clean", () => ""),
+              Match.whenOr("clean", "clean-no-screenshots", () => ""),
               Match.exhaustive
             );
             return HttpServerResponse.text(`${script}\n${diagnostics}`, {
+              contentType: "text/javascript",
+            });
+          }
+          if (request.url === "/assets/late-ABC123xy.js") {
+            return HttpServerResponse.text("/* late fixture asset */", {
               contentType: "text/javascript",
             });
           }
@@ -130,13 +139,13 @@ it.live.each([
         screenshotDirectory,
       });
       const result = yield* verifyBuiltBrowser(input).pipe(Effect.result);
-      if (mode === "clean") {
+      if (mode === "clean" || mode === "clean-no-screenshots") {
         expect(yield* Ref.get(malformedBodies)).toEqual(["{"]);
         const observation = yield* Effect.fromResult(result);
         expect(observation.serverFunctionRequests).toBe(2);
         expect(
           Array.map(observation.screenshots, (screenshot) => screenshot.kind)
-        ).toEqual(["desktop", "mobile"]);
+        ).toEqual(mode === "clean" ? ["desktop", "mobile"] : []);
         yield* Effect.forEach(observation.screenshots, (screenshot) =>
           Effect.gen(function* () {
             expect(

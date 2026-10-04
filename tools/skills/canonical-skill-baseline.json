@@ -52,12 +52,12 @@
     {
       "path": ".agents/skills/docs-maintainer/references/repository-profile.md",
       "owner": "taxkit-documentation-owner",
-      "sha256": "e24c6c79c97f15540dd7b87cd0e5b88a65cafd287d2c2e37713507a38cc17c42"
+      "sha256": "cf92b5fb781fda2517adec1af78d507de87c3d44e9cb2ea5cf48b59411709f8c"
     },
     {
       "path": ".agents/skills/package-structure/references/repository-profile.md",
       "owner": "taxkit-package-architecture-owner",
-      "sha256": "a4d0de122bcc759efbbe3369b704d33aeb1fcba4dc6a603245c4af6fe956beb0"
+      "sha256": "de44d7a4524373dfc1b48f3d9cac8d588972eb00342e37168a28ae5efa2aa230"
     }
   ],
   "extras": {

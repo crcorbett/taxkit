@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-effect-services-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
@@ -19,7 +19,7 @@ contracts live with their owning rule packages and should link back here.
 
 ## Service shape
 
-Prefer package-owned `Context.Tag` services with explicit dependencies through
+Prefer package-owned `Context.Service` services with explicit dependencies through
 the Effect `R` channel. Do not hide rule, parameter or runtime dependencies in
 module globals.
 
@@ -123,7 +123,7 @@ Use these six categories:
 At every boundary, record the Schema's `Type` and `Encoded` forms separately.
 Decode an unknown or representation-level value once at ingress, pass the
 canonical `Type` inward, and encode only at an explicit HTTP, provider,
-persistence, route or command egress. `Schema.make` is valid construction for
+persistence, route or command egress. The owning Schema’s `make` is valid construction for
 trusted literals; it is not evidence of runtime validation that the underlying
 Schema does not provide.
 
@@ -143,7 +143,7 @@ fields or allow an SDK result to escape unchecked.
 
 Encode canonical input at provider egress and decode `unknown` provider output
 immediately at provider ingress. Map transport and malformed-response failures
-to safe `Schema.TaggedErrorClass` values at the operation boundary. Do not use
+to safe `Schema.TaggedError` values at the operation boundary. Do not use
 `instanceof`, raw provider tags, exception objects, response bodies or secrets in
 public error contracts. Use decoded literals/tagged unions with `Match` or typed
 Effect handlers.
@@ -177,6 +177,15 @@ explicit disposal operation for focused tests and host lifecycle integration;
 it has no browser Effect runtime. Browser routes restore the schema-encoded
 server-function transport and render canonical values.
 
+The web scaffold owns its server and browser health-client runtimes in the
+[web runtime selection](../../apps/web/src/lib/runtime-selection.ts). Its route context admits only `runPromise` and `runPromiseExit` from the
+native runtime, while route cancellation reaches the health HTTP request
+through Effect interruption. These module-owned runtimes belong to the web
+host; the SDK's caller-owned disposal contract is separate. Browser configuration
+receives only the checked public input selected by the build configuration.
+The SDK owns one runtime per client, with caller disposal and bounded one-shot
+helpers; see the [SDK lifetime owner](api-and-sdk.md#typescript-sdk-facade).
+
 Use `@effect/platform-bun/BunRuntime.runMain(...)` for Bun process entrypoints
 where the root Effect is the process lifecycle. Process entrypoints should
 compose config, platform layers and server layers, then let Effect
@@ -202,7 +211,11 @@ arrow, function or object-method implementations; do not use shorthand,
 extracted callbacks, non-function values or spread policy. Use `Effect.promise`
 only when a Promise rejection is intentionally treated as a defect. The current
 portable lint scope enforces this contract in packages, the API app and
-repository tools; website applications remain outside this rollout.
+repository tools and both website applications. The strict override covers all
+owned TypeScript and JavaScript extensions. Five unexecuted upstream lint-input
+fixtures have exact strict-only exclusions; their neighbouring files still
+receive the full policy. The [testing owner](testing-and-quality.md) records
+the coverage and actual-command rejection proof.
 
 ## Callsite error handling
 
@@ -212,11 +225,7 @@ MUST live directly beside the operation whose failure is being transformed:
 ```ts
 program.pipe(
   Effect.mapError(
-    (cause) =>
-      new BoundaryError({
-        cause,
-        message: `Failed to load boundary config: ${cause.message}`,
-      })
+    () => new BoundaryError({ message: "Boundary settings are invalid" })
   )
 );
 ```
@@ -361,7 +370,7 @@ encoded loader data, call the restore operation or run Effect runtimes.
 
 ## Guardrails
 
-- Use `Effect.Schema` for boundary and persisted values.
+- Use `Schema` from `effect` for boundary and persisted values.
 - Schemas and tagged value shapes MUST live in colocated `schemas.ts` files, or
   in the owning package's public schema module. Exported types MUST be derived
   from those schemas. Runtime and handler files should compose services and

@@ -1,127 +1,83 @@
 ---
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-facts-owner
+last_reviewed: 2026-10-05
+review_trigger: fact Schema, identity, descriptor, authority or question metadata change
 ---
 
 # Facts
 
-Facts are the typed dependency units of the calculation engine. A fact is not just an object shape. It has a schema-backed value, a stable identity and an Effect `Context.Tag` provider.
+A fact is a named value required or produced by a calculation. Its owning rule
+package defines the value Schema, the Effect service identity and the descriptor
+used to check the calculation graph. Consumers reuse those definitions.
 
-## Fact Pattern
+## Fact pattern
 
-Every official fact should define:
-
-- a schema-backed value class
-- a `Context.Tag`
-- a descriptor used by graph tooling
-- an authority policy
-- optional question metadata for data collection
-
-Example:
+The current [pay facts](../../packages/rules/au/pay/src/facts/pay.ts) define
+`GrossPay`, `PayPeriod`, `GrossPayFact` and `GrossPayDescriptor` together.
+`GrossPay` contains canonical `Money` and a checked pay period. The service
+uses the installed Effect 4 form:
 
 ```ts
-export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
-  amount: Money,
-  period: PayPeriod,
-}) {}
-
-export class GrossPayFact extends Context.Tag("taxkit/fact/GrossPay")<
-  GrossPayFact,
-  GrossPay
->() {}
-```
-
-The `_tag` and `Context.Tag` are part of the contract. A structurally similar value does not satisfy a different fact.
-
-## Fact Descriptor
-
-Descriptors are metadata for tools, questions, graph validation and documentation. They do not replace Effect's typed dependency channel.
-
-```ts
-export interface FactDescriptor<A, I, R, Tag> {
-  readonly id: FactId;
-  readonly title: string;
-  readonly schema: Schema.Schema<A, I, R>;
-  readonly tag: Context.Tag<Tag, A>;
-  readonly authority: FactAuthorityPolicy;
-  readonly question?: QuestionDescriptor;
-}
-```
-
-## Authority Levels
-
-Authority must be explicit. TaxKit defines the typed input facts that calculators accept. Callers are responsible for deciding which values to provide to the engine.
-
-```txt
-Input fact
-  Explicit typed input accepted by a TaxKit calculator.
-
-Derived fact
-  Produced by a TaxKit rule layer from other facts or parameter services.
-
-Parameter fact/service
-  Provides tax-year tables, rates and constants.
-```
-
-Callers must convert the selected application values into TaxKit input facts before invoking the engine.
-
-## Date Dimensions
-
-Scenarios and facts must preserve the relevant date dimensions.
-
-```ts
-export interface ScenarioDates {
-  readonly calculationDate: LocalDate;
-  readonly paymentDate?: LocalDate;
-  readonly incomeYear?: IncomeYear;
-  readonly fbtYear?: FbtYear;
-}
-```
-
-PAYG withholding, annual tax, FBT, superannuation and mortgage calculations can all use different effective dates.
-
-## Core Value Rules
-
-Money must use integer minor units or a decimal representation. Do not use JavaScript `number` for final money values.
-
-Rounding must be explicit and traceable:
-
-```ts
-export const RoundingMode = Schema.Literal(
-  "none",
-  "round-to-nearest-cent",
-  "floor-cent",
-  "ceil-cent",
-  "floor-dollar",
-  "ceil-dollar",
-  "ato-withholding-rounding"
-);
-```
-
-Facts should avoid default values that materially alter tax outcomes. Do not default whether a person has HELP/STSL debt, claims the tax-free threshold, has health insurance cover or has a work-use percentage.
-
-## Question Metadata
-
-Fact descriptors may include question metadata so the UI and CLI can ask only for missing facts required by a selected goal.
-
-```ts
-export class QuestionDescriptor extends Schema.TaggedClass<QuestionDescriptor>()(
-  "QuestionDescriptor",
-  {
-    id: QuestionId,
-    label: Schema.String,
-    help: Schema.optional(Schema.String),
-    requiredWhen: Schema.optional(PredicateSpec),
-    inputKind: Schema.Literal(
-      "money",
-      "boolean",
-      "date",
-      "select",
-      "percentage",
-      "text"
-    ),
-  }
+export class GrossPayFact extends Context.Service<GrossPayFact, GrossPay>()(
+  "taxkit/rules-au-pay/fact/GrossPay"
 ) {}
 ```
+
+This is an excerpt from the owning module; its imports and value Schema belong
+there. Keep the service identity stable. Another value with similar fields
+cannot supply a different fact service.
+
+## Descriptors and authority
+
+Import `FactDescriptor` and `makeFactDescriptor` from `@taxkit/core`; do not
+copy their fields into a second interface. The [descriptor owner](../../packages/core/src/facts/descriptor.ts)
+keeps the value Schema and `Context.Key<Self, Value>` tied to the same value
+type. Its readonly fields include a branded fact ID, title, authority and
+optional `FactQuestion`. This generic relation supports graph tools while
+Effect's dependency type still decides what execution needs.
+
+`FactAuthority` admits three values:
+
+- `input`: the caller supplies a typed input accepted by the calculator.
+- `derived`: a rule produces the fact from other facts or parameters.
+- `parameter`: a service supplies a tax-year table, rate or constant.
+
+Callers must construct the selected calculator's canonical input facts before
+running it. Metadata does not supply missing values.
+
+## Dates, money and rounding
+
+Reuse the [core date primitives](../../packages/core/src/primitives/date.ts)
+and the selected calculator's input Schema. Keep calculation dates, payment
+dates and tax years distinct where that calculator supports them. FBT and
+other proposed date dimensions do not establish an implemented calculator
+contract; add them at their owning Schema when that work is accepted.
+
+[Money](../../packages/core/src/primitives/money.ts) uses integer cents. Its
+number representation is checked by the owning Schema; a bare number is not
+canonical money. Keep final amounts in that representation rather than using
+floating-point dollar arithmetic.
+
+Reuse [RoundingMode](../../packages/core/src/primitives/rounding.ts) and the
+owning rounding operations. The closed modes are `none`,
+`round-to-nearest-cent`, `floor-cent`, `ceil-cent`, `floor-dollar`,
+`ceil-dollar` and `ato-withholding-rounding`, defined by `Schema.Literals`.
+Record the chosen policy in calculation trace output.
+
+Do not invent defaults that materially change tax results, such as whether a
+person has study debt, claims the tax-free threshold or has health insurance.
+A supported default must belong to the input Schema or an explicit rule.
+
+## Question metadata
+
+`FactQuestion` is the [core-owned Schema class](../../packages/core/src/facts/descriptor.ts).
+It carries a branded `FactQuestionId`, `prompt`, optional `helpText` and an
+`inputKind` of `money`, `boolean` or `selection`. Reuse this class and the
+fact descriptor's question rather than introducing a competing question type.
+
+Question metadata describes supported input collection. It does not prove that
+a UI or CLI can automatically collect every missing fact; that behaviour needs
+its own application implementation and tests.
