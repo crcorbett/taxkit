@@ -385,8 +385,15 @@ lexical lookup uses HashMap with reference-identity keys. The key wrapper uses
 Effect Hash/Equal without changing host nodes or comparing their cyclic fields.
 Actual CLI tests preserve import/destructuring aliases, shadowing, reassignment
 clearing and direct inline rejection mapping. A JavaScript canary verifies all
-ten applicable strict diagnostics. The larger TaxKit route/decoder policy is
-still pending; this does not establish full JavaScript or whole-T002 coverage.
+ten applicable strict diagnostics. The TaxKit route/decoder policy uses the same
+strict rules and lexical binding tracker. It folds pure route analysis into
+immutable maps/lists; only listener observations use a per-file Ref. Diagnostic
+deduplication uses reference identity, and duplicate-restore warnings retain
+first-consumer order. One owning Schema decodes the exact rule-options ingress;
+missing options fail closed before checking source. The real CLI rejects missing
+options through Oxlint's metadata validator. The listener's defensive fallback
+is not separately claimed as that CLI proof. This does not establish full
+repository or whole-T002 coverage, or static checking of JavaScript policies.
 
 The pinned Turbo version defaults to automatic root AGENTS.md edits when it
 detects an agent. TaxKit opts out with `agentGuidance: false` in `turbo.json`,

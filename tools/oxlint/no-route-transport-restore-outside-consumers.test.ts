@@ -32,6 +32,70 @@ const diagnosticsFor = (output: string, messageId: string) =>
   );
 describe("taxkit/no-route-transport-restore-outside-consumers", () => {
   test.effect(
+    "keeps route observations separate between files in one process",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeUnconfiguredFixture(`
+        import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
+        docsPageRouteBoundary.restore(value);
+      `);
+        const result = yield* runOxlint([
+          "tools/oxlint/fixtures/route-transport-allowed.tsx",
+          fixture,
+        ]);
+        expect(result.exitCode).toBe(1);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "Canonical route transport restore is allowed only"
+          )
+        ).toHaveLength(1);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "The createFileRoute route or component/head binding"
+          )
+        ).toHaveLength(0);
+        expect(result.output).not.toContain("Error running JS plugin");
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+
+  test.effect(
+    "fails closed on missing route policy options through the real binary",
+    () =>
+      Effect.gen(function* () {
+        const configuration = ".generated-route-options.config.ts";
+        yield* writeLintFixture(
+          join(repositoryRoot, configuration),
+          `
+        import base from "./oxlint.config.ts";
+        export default {
+          ...base,
+          rules: {
+            ...base.rules,
+            "taxkit/no-route-transport-restore-outside-consumers": ["error", {}],
+          },
+        };
+      `
+        );
+        const result = yield* runOxlint(
+          ["tools/oxlint/fixtures/route-transport-allowed.tsx"],
+          [],
+          "unix",
+          configuration
+        );
+        expect(result.exitCode).toBe(1);
+        expect(result.output).toContain(
+          "Options validation failed for rule 'taxkit/no-route-transport-restore-outside-consumers'"
+        );
+        expect(result.output).toContain(
+          "required property 'routeTransportBoundaryModules'"
+        );
+        expect(result.output).not.toContain("Error running JS plugin");
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+
+  test.effect(
     "allows direct, immutable binding, named component and head consumers",
     () =>
       Effect.gen(function* () {

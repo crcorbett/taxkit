@@ -504,3 +504,46 @@ Local qualification passed the frozen install, 88 actual CLI cases, all tests,
 Unchanged package/app build, type and Chromium checks reused matching cache
 entries. Final documentation and format checks passed. This establishes the
 five named JavaScript owners only; it does not close T002.
+
+## Local T002 TaxKit JavaScript route and decoder policy
+
+Continue from `abba51b` and draft #101, whose exact hosted Quality run
+`37181078867` passed. Finish strict coverage for `taxkit-rules.js`: use persistent
+static membership, checked syntax reads, immutable parent traversal and folds
+for canonical imports, named consumers, restore calls and warning deduplication.
+Keep pure analysis free of Ref accumulators. Per-file host listeners alone own
+changing observations. Shared reference-identity keys preserve AST/consumer
+identity; preserve first-consumer order for duplicate-restore warnings.
+
+Reuse the lexical binding tracker for Schema imports, declaration/destructuring
+aliases and assignments; retain conservative decoder-name rejection and all
+old negative/positive cases. Add actual-command checks for assigned decoder
+aliases, root namespace aliases and separate file lifetimes in one process.
+The exact rule-options ingress has one owning Schema and a defensive fail-closed
+listener. The malformed-config test confirms Oxlint rejects missing options
+through metadata before constructing that listener; do not attribute that
+early failure to the defensive Schema fallback.
+
+The retained route corpus caught invalid Option selectors in the first rewrite:
+installed Effect 4 Array.filterMap consumes Result. Correct to Result selectors,
+preserving each assertion and diagnostic count. The whole old corpus then passes.
+
+Documentation impact: **Change required** for lint scope/ingress, shared AST
+ownership and CLI corpus, tooling/testing owners, task evidence, this plan and
+dated receipt. **Preserve** canonical skills, existing route/decode adversarial
+oracles, tax/package behaviour and all provider state. **N/A** for Changesets,
+public docs and runbooks: root checking policy only. Recover by reverting this
+complete slice. The [route-policy receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-lint-route-policy.json)
+records qualification and limits. Remaining repository paths, static JavaScript
+qualification and the complete T002 semantic/gap audit remain unfinished;
+continue DEV-74–81 after the accepted dependencies are satisfied.
+
+Local frozen install, all 92 actual CLI tests, complete repository tests,
+15-task build and full verification passed after final test cleanup. Four
+one-operation test generators now return their existing Effects directly.
+The verification graph passed 21 skill cases and all 20 Quality cases, including
+six actual-command mutations. Unchanged package/app and browser tasks reused
+matching caches. Root `test` separately owns the CLI corpus; `verification`
+does not invoke it. The earlier binding receipt's wording about fresh corpus
+proof refers to its separate successful test commands, not an extra invocation
+inside `verification`. Final receipt-only docs/format checks precede commit.

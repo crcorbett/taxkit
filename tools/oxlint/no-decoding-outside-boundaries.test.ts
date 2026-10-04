@@ -22,11 +22,35 @@ const expectReported = (
   });
 describe("taxkit/no-decoding-outside-boundaries", () => {
   test.effect(
+    "keeps tracking decoder assignments through lexical aliases",
+    () =>
+      expectReported(
+        `
+      import { Schema } from "effect";
+      let execute;
+      execute = Schema.decodeUnknownEffect;
+      execute(Schema.String);
+    `,
+        1
+      ).pipe(Effect.provide(BunServices.layer))
+  );
+
+  test.effect("follows a root namespace decoder alias", () =>
+    expectReported(
+      `
+      import * as Root from "effect";
+      const read = Root.Schema.decodeUnknownEffect;
+      read(Root.Schema.String);
+    `,
+      2
+    ).pipe(Effect.provide(BunServices.layer))
+  );
+
+  test.effect(
     "reports Effect Schema decoder families and direct decoder helpers",
     () =>
-      Effect.gen(function* () {
-        yield* expectReported(
-          `
+      expectReported(
+        `
       import { Schema } from "effect";
       import { decodeUnknownEffect as decodeInput } from "effect/Schema";
 
@@ -45,16 +69,14 @@ describe("taxkit/no-decoding-outside-boundaries", () => {
       decodeInput(Schema.String);
       decodeJson("{} ");
     `,
-          14
-        );
-      }).pipe(Effect.provide(BunServices.layer))
+        14
+      ).pipe(Effect.provide(BunServices.layer))
   );
   test.effect(
     "reports renamed, namespace, computed and static alias forms",
     () =>
-      Effect.gen(function* () {
-        yield* expectReported(
-          `
+      expectReported(
+        `
       import { Schema as S } from "effect";
       import * as SchemaNamespace from "effect/Schema";
 
@@ -67,16 +89,14 @@ describe("taxkit/no-decoding-outside-boundaries", () => {
       SchemaNamespace.decodeUnknownExit(S.String);
       Stream.decodeText(stream);
     `,
-          7
-        );
-      }).pipe(Effect.provide(BunServices.layer))
+        7
+      ).pipe(Effect.provide(BunServices.layer))
   );
   test.effect(
     "reports decoder calls inside React components and ordinary hooks",
     () =>
-      Effect.gen(function* () {
-        yield* expectReported(
-          `
+      expectReported(
+        `
         import { Schema } from "effect";
 
         export const Panel = () => {
@@ -86,10 +106,9 @@ describe("taxkit/no-decoding-outside-boundaries", () => {
 
         export const useDecodedValue = () => Schema.decodeUnknownSync(Schema.String)("value");
       `,
-          2,
-          "tsx"
-        );
-      }).pipe(Effect.provide(BunServices.layer))
+        2,
+        "tsx"
+      ).pipe(Effect.provide(BunServices.layer))
   );
   test.effect("permits declarative schema APIs and encoding", () =>
     Effect.gen(function* () {

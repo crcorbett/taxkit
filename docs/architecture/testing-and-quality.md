@@ -442,6 +442,17 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   canonical and namespace imports, renamed bindings, aliases and statically
   known destructuring. Accepted real-binary fixtures prove that unrelated
   shadowed locals with the same names do not report.
+- The six owned JavaScript policy modules use all eleven canonical strict
+  rules. Synchronous Oxlint listener state is per rule/file and Ref-owned;
+  pure analysis uses immutable folds, not Ref accumulators. Shared Hash/Equal
+  keys preserve the host's object identity without modifying syntax nodes.
+  The route/decoder corpus checks exact warning counts, separate observations
+  for two files in one process and lexical decoder assignments/root aliases.
+  Rule options are an exact Schema ingress in `taxkit-rules.js`; the actual CLI
+  rejects missing required options before listener construction. The shared
+  scoped CLI operation accepts a configuration path for this invalid-config
+  fixture. These binary checks do not claim static TypeScript checking of the
+  JavaScript modules or completion of repository-wide strict enforcement.
 - Bun rules keep `Bun.file`, `Bun.write`, `Bun.spawn`, `Bun.serve` and
   `BunRuntime.runMain` in exact adapter/entrypoint files. The MDX rule keeps
   route-local component registries out of route composition. The test-global

@@ -38,6 +38,7 @@ const fixtureCases = [
       "tools/oxlint/effect-rules.js",
       "tools/oxlint/mdx-rules.js",
       "tools/oxlint/package-rules.js",
+      "tools/oxlint/taxkit-rules.js",
     ],
     generated: "tools/oxlint/.generated-strict-bindings.js",
     namespace: "strict-effect",
@@ -482,20 +483,18 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
   test.effect.each(fixtureCases)(
     "$namespace accepts its boundary fixtures ($generated)",
     (fixture) =>
-      Effect.gen(function* () {
-        yield* Effect.forEach(fixture.accepted, (path) =>
-          Effect.gen(function* () {
-            const result = yield* runOxlint(path);
-            expect(result.files).toBe(1);
-            expect(result.exitCode).toBe(0);
-            expect(
-              Array.some(result.codes, (code) =>
-                code.startsWith(`${fixture.namespace}(`)
-              )
-            ).toBe(false);
-          })
-        );
-      }).pipe(Effect.provide(BunServices.layer))
+      Effect.forEach(fixture.accepted, (path) =>
+        Effect.gen(function* () {
+          const result = yield* runOxlint(path);
+          expect(result.files).toBe(1);
+          expect(result.exitCode).toBe(0);
+          expect(
+            Array.some(result.codes, (code) =>
+              code.startsWith(`${fixture.namespace}(`)
+            )
+          ).toBe(false);
+        })
+      ).pipe(Effect.provide(BunServices.layer))
   );
 
   test.effect.each(fixtureCases)(

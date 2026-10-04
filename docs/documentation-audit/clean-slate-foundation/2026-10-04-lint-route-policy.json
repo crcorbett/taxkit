@@ -1,0 +1,111 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "abba51ba253deae3e64a5c0a6f9564d6ea2e9d24",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR checks read-only",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "All eleven canonical rules on TaxKit JavaScript policy with one exact rule-options Schema ingress",
+    "Shared lexical tracker resolves decoder imports, destructuring, assignments and root namespace aliases; conservative decoder-name policy retained",
+    "Pure immutable route/consumer/restore folds and identity-preserving warning deduplication; first-consumer warning order retained",
+    "Per-file synchronous listener observations owned by Ref with immutable updates; no Ref for pure accumulators and no Effect runner",
+    "Shared host syntax-parent traversal and reference-identity keys; checked call arguments, lexical lookups and configuration",
+    "Actual CLI corpus includes the sixth JavaScript owner, assigned/root decoder regressions, two-file lifetime isolation and malformed rule settings",
+    "Flattened four one-operation test generators without changing their retained assertions"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "oxlint.config.ts",
+        "tools/oxlint/**",
+        "docs/standards/tooling.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "reason": "Host identity/state, full JavaScript policy scope, exact config ingress and actual-command proof"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        ".agents/skills/**",
+        "packages/**",
+        "apps/**",
+        "AGENTS.md",
+        ".github/workflows/**"
+      ],
+      "reason": "Canonical assets, tax results, app/package behaviour, old policy oracles and hosted authority stay unchanged"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public docs",
+        "operational runbooks",
+        "provider state"
+      ],
+      "reason": "Root checking policy only; no versioned package or operational procedure change"
+    }
+  ],
+  "verification": [
+    {
+      "command": "bun run test:oxlint:task",
+      "result": "92 passed, preserving all old cases and exact warning counts; includes four new actual-command regressions and sixth JavaScript owner"
+    },
+    {
+      "command": "bun run check:oxlint:types:task",
+      "result": "passed for tests, shared CLI and imported configuration; no static JavaScript claim"
+    },
+    {
+      "command": "hosted Quality run 37181078867",
+      "result": "SUCCESS on exact parent abba51ba253deae3e64a5c0a6f9564d6ea2e9d24 only"
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "result": "passed on pinned Bun 1.4.2; 790 installs checked, no changes"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed after final test cleanup: 92 real CLI cases and 22 successful package/root tasks"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed, 15 tasks; matching caches reused for unchanged package/app inputs"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed: lint, format, docs/runbooks, types, 21 skill cases, 20 Quality cases including all six real-command mutations; unchanged two-test Chromium check reused matching cache. Root test separately owns the 92 CLI cases"
+    },
+    {
+      "command": "final bun run check:docs; bun run format:check; git diff --check",
+      "result": "required after receipt-only finalisation before commit"
+    }
+  ],
+  "recovery_observations": [
+    "The retained route corpus rejected Option selectors in the first rewrite; Effect 4 Array.filterMap consumes Result. Corrected selectors without changing oracles; all 92 cases then passed",
+    "Malformed rule settings are rejected by Oxlint metadata before listener creation. The defensive Schema fallback is not separately claimed as that real-binary failure"
+  ],
+  "limitations": [
+    "DEV-73 and DEV-74\u201381 remain unfinished",
+    "Other owned paths, disabled-rule/exception-broadening negative proof and complete semantic gap review remain pending",
+    "Static JavaScript qualification remains pending; actual CLI host evidence is not a TypeScript typecheck claim",
+    "Medicare correction still awaits Cooper scope decision",
+    "No canonical skill asset changed; no runtime or mutation exception added",
+    "No merge, release, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert this complete root-policy slice; no provider state changed"
+}

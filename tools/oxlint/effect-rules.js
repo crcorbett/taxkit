@@ -12,6 +12,7 @@ import {
   createBindingTracker,
   importSourceValue,
   propertyName,
+  syntaxParents,
 } from "./binding-tracker.js";
 
 const effectImportSemantic = (source, specifierType, imported) => {
@@ -520,13 +521,8 @@ const taggedErrorConstructorSemantics = HashSet.fromIterable([
   "effect.Schema.TaggedError",
 ]);
 
-const parentNodes = (node) =>
-  EffectArray.unfold(node?.parent, (current) =>
-    current ? Option.some([current, current.parent]) : Option.none()
-  );
-
 const hasTaggedErrorCallAncestor = (node, tracker) =>
-  EffectArray.some(parentNodes(node), (current) => {
+  EffectArray.some(syntaxParents(node), (current) => {
     if (current.type === "CallExpression") {
       const semantic =
         current.callee?.type === "CallExpression"
@@ -542,7 +538,7 @@ const hasTaggedErrorCallAncestor = (node, tracker) =>
 const isUnknownCauseProperty = (node) =>
   Option.exists(
     EffectArray.findFirst(
-      parentNodes(node),
+      syntaxParents(node),
       (current) => current.type === "TSPropertySignature"
     ),
     (current) => propertyName(current.key) === "cause"
@@ -752,7 +748,7 @@ const runtimeFunctionNodeTypes = HashSet.fromIterable([
 ]);
 
 const isModuleLevel = (node) => {
-  const ancestors = parentNodes(node);
+  const ancestors = syntaxParents(node);
   return (
     EffectArray.some(ancestors, (current) => current.type === "Program") &&
     !EffectArray.some(

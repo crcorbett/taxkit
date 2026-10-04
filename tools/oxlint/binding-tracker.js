@@ -11,11 +11,16 @@ import { forEach } from "effect/Array";
 
 // Host nodes and lexical variables have identity even when their fields match.
 // Wrap keys without changing or structurally hashing the host object.
-const referenceIdentity = (value) => ({
+export const referenceIdentity = (value) => ({
   [Equal.symbol]: (other) => other.value === value,
   [Hash.symbol]: () => Hash.random(value),
   value,
 });
+
+export const syntaxParents = (node) =>
+  EffectArray.unfold(node?.parent, (current) =>
+    current ? Option.some([current, current.parent]) : Option.none()
+  );
 
 export const propertyName = (node) => {
   if (node?.type === "Identifier" || node?.type === "JSXIdentifier") {

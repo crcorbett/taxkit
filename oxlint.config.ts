@@ -14,6 +14,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact synchronous Oxlint rule-options ingress, decoded once and fail-closed.
+  "tools/oxlint/taxkit-rules.js",
   // Exact fixture ingress: three Schema-owned historical policy corpora.
   "tools/skills/skill-policies.test.ts",
   // Application configuration, executable smoke checks and checked examples.
@@ -418,6 +420,7 @@ export default defineConfig({
         "tools/oxlint/effect-rules.js",
         "tools/oxlint/mdx-rules.js",
         "tools/oxlint/package-rules.js",
+        "tools/oxlint/taxkit-rules.js",
         "tools/oxlint/.generated-strict-bindings.js",
         "tools/repository-paths/**",
         "tools/governance/**",

@@ -13,7 +13,8 @@ const oxlint = fileURLToPath(
 export const lintFiles = Effect.fn("OxlintFixture.lintFiles")(function* (
   paths: readonly string[],
   extraArgs: readonly string[] = [],
-  format: "json" | "unix" = "unix"
+  format: "json" | "unix" = "unix",
+  configuration = "oxlint.config.ts"
 ) {
   const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
   const child = yield* spawner.spawn(
@@ -21,7 +22,7 @@ export const lintFiles = Effect.fn("OxlintFixture.lintFiles")(function* (
       oxlint,
       [
         "-c",
-        "oxlint.config.ts",
+        configuration,
         "--disable-nested-config",
         "--no-error-on-unmatched-pattern",
         `--format=${format}`,

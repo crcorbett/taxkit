@@ -1,8 +1,26 @@
 import nodePath from "node:path";
 
-import { Array as EffectArray } from "effect";
+import {
+  Array as EffectArray,
+  HashMap,
+  HashSet,
+  MutableRef,
+  Option,
+  Ref,
+  Result,
+  Schema,
+} from "effect";
+import { forEach } from "effect/Array";
+
+import {
+  createBindingTracker,
+  referenceIdentity,
+  syntaxParents,
+} from "./binding-tracker.js";
 
 const { resolve } = nodePath;
+const firstArgument = (node) =>
+  Option.getOrUndefined(EffectArray.head(node.arguments ?? []));
 const noTypeof = {
   create(context) {
     return {
@@ -119,7 +137,7 @@ const noNullishComparison = {
     return {
       BinaryExpression(node) {
         if (
-          ["==", "!=", "===", "!=="].includes(node.operator) &&
+          EffectArray.contains(["==", "!=", "===", "!=="], node.operator) &&
           (isNullLiteral(node.left) || isNullLiteral(node.right))
         ) {
           context.report({
@@ -175,7 +193,7 @@ const noConditionalObjectSpread = {
   },
 };
 
-const contextFieldNames = new Set(["jurisdiction", "taxYear"]);
+const contextFieldNames = HashSet.fromIterable(["jurisdiction", "taxYear"]);
 
 const contextFieldName = (node) => {
   if (node?.type !== "MemberExpression") {
@@ -199,7 +217,7 @@ const noContextNullishDefault = {
       LogicalExpression(node) {
         if (
           node.operator === "??" &&
-          contextFieldNames.has(contextFieldName(node.left))
+          HashSet.has(contextFieldNames, contextFieldName(node.left))
         ) {
           context.report({
             messageId: "noContextNullishDefault",
@@ -222,7 +240,7 @@ const noContextNullishDefault = {
   },
 };
 
-const nativeArrayMethods = new Set([
+const nativeArrayMethods = HashSet.fromIterable([
   "concat",
   "every",
   "filter",
@@ -239,7 +257,7 @@ const nativeArrayMethods = new Set([
   "sort",
 ]);
 
-const effectCollectionNamespaces = new Set([
+const effectCollectionNamespaces = HashSet.fromIterable([
   "Array",
   "Chunk",
   "Effect",
@@ -267,7 +285,7 @@ const sourceFileName = (context) =>
 const isEffectCollectionNamespaceCall = (callee) =>
   callee?.type === "MemberExpression" &&
   callee.object?.type === "Identifier" &&
-  effectCollectionNamespaces.has(callee.object.name);
+  HashSet.has(effectCollectionNamespaces, callee.object.name);
 
 const isMemberCall = (node, objectName, methodName) =>
   node?.type === "CallExpression" &&
@@ -283,7 +301,7 @@ const noNativeArrayMethods = {
         if (
           node.callee?.type === "MemberExpression" &&
           !isEffectCollectionNamespaceCall(node.callee) &&
-          nativeArrayMethods.has(propertyName(node.callee.property))
+          HashSet.has(nativeArrayMethods, propertyName(node.callee.property))
         ) {
           context.report({
             messageId: "noNativeArrayMethods",
@@ -338,7 +356,7 @@ const noNestedWrapperCalls = {
   },
 };
 
-const nativeCollectionConstructors = new Set([
+const nativeCollectionConstructors = HashSet.fromIterable([
   "Map",
   "Set",
   "WeakMap",
@@ -351,7 +369,7 @@ const noNativeCollections = {
       NewExpression(node) {
         if (
           node.callee?.type === "Identifier" &&
-          nativeCollectionConstructors.has(node.callee.name)
+          HashSet.has(nativeCollectionConstructors, node.callee.name)
         ) {
           context.report({
             messageId: "noNativeCollections",
@@ -532,7 +550,7 @@ const noAmbientTimeOrRandom = {
   },
 };
 
-const effectSchemaRuntimeDecoderNames = new Set([
+const effectSchemaRuntimeDecoderNames = HashSet.fromIterable([
   "decodeEffect",
   "decodeExit",
   "decodeOption",
@@ -565,168 +583,100 @@ const importName = (node) => {
 const localBindingName = (node) =>
   node?.type === "Identifier" ? node.name : null;
 
-const isEffectSchemaMember = (node, schemaBindings) =>
-  node?.type === "MemberExpression" &&
-  node.object?.type === "Identifier" &&
-  schemaBindings.has(node.object.name) &&
-  effectSchemaRuntimeDecoderNames.has(propertyName(node.property));
-
-const trackSchemaAlias = (node, schemaBindings) => {
-  const bindingName = localBindingName(node.id);
-
-  if (
-    bindingName !== null &&
-    node.init?.type === "Identifier" &&
-    schemaBindings.has(node.init.name)
-  ) {
-    schemaBindings.add(bindingName);
-  }
-};
-
-const trackStaticDecoderAlias = (
-  node,
-  schemaBindings,
-  decoderBindings,
-  report
-) => {
-  const bindingName = localBindingName(node.id);
-
-  if (bindingName === null) {
-    return;
-  }
-
-  if (isEffectSchemaMember(node.init, schemaBindings)) {
-    decoderBindings.add(bindingName);
-    report(node.init);
-    return;
-  }
-
-  if (node.init?.type === "Identifier" && decoderBindings.has(node.init.name)) {
-    decoderBindings.add(bindingName);
-    report(node.init);
-  }
-};
-
-const trackDestructuredDecoderAliases = (
-  node,
-  schemaBindings,
-  decoderBindings,
-  report
-) => {
-  if (
-    node.id?.type !== "ObjectPattern" ||
-    node.init?.type !== "Identifier" ||
-    !schemaBindings.has(node.init.name)
-  ) {
-    return;
-  }
-
-  for (const property of node.id.properties ?? []) {
-    if (property.type !== "Property") {
-      continue;
+const schemaImportSemantic = (source, kind, imported) => {
+  if (source === "effect") {
+    if (kind === "ImportSpecifier" && imported === "Schema") {
+      return "Schema";
     }
-
-    const decoderName = propertyName(property.key);
-    const extractedName = localBindingName(property.value);
-
-    if (
-      extractedName !== null &&
-      effectSchemaRuntimeDecoderNames.has(decoderName)
-    ) {
-      decoderBindings.add(extractedName);
-      report(property);
+    if (kind === "ImportNamespaceSpecifier") {
+      return "effect";
     }
   }
+  if (source === "effect/Schema") {
+    return kind === "ImportSpecifier" && imported
+      ? `Schema.${imported}`
+      : "Schema";
+  }
+  return null;
 };
+
+const isSchemaDecoderSemantic = (semantic) =>
+  Option.exists(
+    EffectArray.findFirst(
+      ["Schema.", "effect.Schema."],
+      (prefix) => semantic?.startsWith(prefix) ?? false
+    ),
+    (prefix) =>
+      HashSet.has(
+        effectSchemaRuntimeDecoderNames,
+        semantic.slice(prefix.length)
+      )
+  );
 
 const noDecodingOutsideBoundaries = {
   create(context) {
-    const schemaBindings = new Set();
-    const decoderBindings = new Set();
-
+    const tracker = createBindingTracker(context.sourceCode);
     const report = (node) =>
-      context.report({
-        messageId: "noDecodingOutsideBoundaries",
-        node,
-      });
-
+      context.report({ messageId: "noDecodingOutsideBoundaries", node });
     return {
+      AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {
         if (node.callee?.type === "Identifier") {
           if (
-            decoderBindings.has(node.callee.name) ||
+            isSchemaDecoderSemantic(tracker.calledSemantic(node)) ||
             isDecoderCallName(node.callee.name)
           ) {
             report(node.callee);
           }
-
           return;
         }
-
         if (node.callee?.type !== "MemberExpression") {
           return;
         }
-
         const memberName = propertyName(node.callee.property);
-
+        const objectSemantic = tracker.semanticOfExpression(node.callee.object);
         if (
           memberName === "decodeTo" &&
-          node.callee.object?.type === "Identifier" &&
-          schemaBindings.has(node.callee.object.name)
+          (objectSemantic === "Schema" || objectSemantic === "effect.Schema")
         ) {
           return;
         }
-
         if (
-          isEffectSchemaMember(node.callee, schemaBindings) ||
+          isSchemaDecoderSemantic(tracker.calledSemantic(node)) ||
           isDecoderCallName(memberName)
         ) {
           report(node.callee.property);
         }
       },
       ImportDeclaration(node) {
-        const source = importName(node.source);
-
-        for (const specifier of node.specifiers ?? []) {
-          const localName = localBindingName(specifier.local);
-
-          if (localName === null) {
-            continue;
-          }
-
-          if (
-            source === "effect" &&
-            specifier.type === "ImportSpecifier" &&
-            importName(specifier.imported) === "Schema"
-          ) {
-            schemaBindings.add(localName);
-          }
-
-          if (source === "effect/Schema") {
-            if (specifier.type === "ImportNamespaceSpecifier") {
-              schemaBindings.add(localName);
-            }
-
-            if (
-              specifier.type === "ImportSpecifier" &&
-              effectSchemaRuntimeDecoderNames.has(
-                importName(specifier.imported)
-              )
-            ) {
-              decoderBindings.add(localName);
-            }
-          }
-        }
+        tracker.trackImport(node, schemaImportSemantic);
       },
       VariableDeclarator(node) {
-        trackSchemaAlias(node, schemaBindings);
-        trackStaticDecoderAlias(node, schemaBindings, decoderBindings, report);
-        trackDestructuredDecoderAliases(
-          node,
-          schemaBindings,
-          decoderBindings,
-          report
-        );
+        const semantic = tracker.semanticOfExpression(node.init);
+        tracker.trackVariable(node);
+        if (
+          node.id?.type === "Identifier" &&
+          isSchemaDecoderSemantic(semantic)
+        ) {
+          report(node.init);
+        }
+        if (
+          node.id?.type === "ObjectPattern" &&
+          (semantic === "Schema" || semantic === "effect.Schema")
+        ) {
+          forEach(node.id.properties ?? [], (property) => {
+            if (
+              property.type === "Property" &&
+              localBindingName(property.value) !== null &&
+              HashSet.has(
+                effectSchemaRuntimeDecoderNames,
+                propertyName(property.key)
+              )
+            ) {
+              report(property);
+            }
+          });
+        }
       },
     };
   },
@@ -743,16 +693,19 @@ const noDecodingOutsideBoundaries = {
   },
 };
 
-const routeConsumerFunctionTypes = new Set([
+const routeConsumerFunctionTypes = HashSet.fromIterable([
   "ArrowFunctionExpression",
   "FunctionDeclaration",
   "FunctionExpression",
 ]);
 
 const routeTransportDeclaredVariable = (sourceCode, node, name) =>
-  sourceCode
-    .getDeclaredVariables(node)
-    .find((variable) => variable.name === name) ?? null;
+  Option.getOrNull(
+    EffectArray.findFirst(
+      sourceCode.getDeclaredVariables(node),
+      (variable) => variable.name === name
+    )
+  );
 
 const isRouteTransportReference = (variable, identifier) =>
   variable !== null &&
@@ -770,19 +723,12 @@ const referencesRouteTransportVariable = (variables, identifier) =>
     isRouteTransportReference(variable, identifier)
   );
 
-const routeConsumerFunction = (node) => {
-  let current = node?.parent;
-
-  while (current !== undefined && current !== null) {
-    if (routeConsumerFunctionTypes.has(current.type)) {
-      return current;
-    }
-
-    current = current.parent;
-  }
-
-  return null;
-};
+const routeConsumerFunction = (node) =>
+  Option.getOrNull(
+    EffectArray.findFirst(syntaxParents(node), (current) =>
+      HashSet.has(routeConsumerFunctionTypes, current.type)
+    )
+  );
 
 const isTopLevelRouteConsumerDeclaration = (node) => {
   const declaration =
@@ -797,7 +743,9 @@ const isTopLevelRouteConsumerDeclaration = (node) => {
 };
 
 const routeDefinitionOptions = (node, canonicalImports) => {
-  const createFileRouteVariable = canonicalImports.get("createFileRoute");
+  const createFileRouteVariable = Option.getOrUndefined(
+    HashMap.get(canonicalImports, "createFileRoute")
+  );
 
   if (
     createFileRouteVariable === undefined ||
@@ -813,46 +761,46 @@ const routeDefinitionOptions = (node, canonicalImports) => {
   return options?.type === "ObjectExpression" ? options : null;
 };
 
-const routeConsumerCanonicalImports = (importDeclarations, sourceCode) => {
-  const canonicalImports = new Map();
-
-  for (const declaration of importDeclarations) {
-    const source = importName(declaration.source);
-
-    for (const specifier of declaration.specifiers ?? []) {
-      if (
-        declaration.importKind === "type" ||
-        specifier.type !== "ImportSpecifier" ||
-        specifier.importKind === "type"
-      ) {
-        continue;
-      }
-
-      const importedName = importName(specifier.imported);
-      const localName = localBindingName(specifier.local);
-
-      if (
-        importedName === localName &&
-        ((source === "@tanstack/react-router" &&
-          importedName === "createFileRoute") ||
-          (source === "effect" &&
-            (importedName === "Option" || importedName === "Result")))
-      ) {
-        const variable = routeTransportDeclaredVariable(
-          sourceCode,
-          specifier,
-          localName
-        );
-
-        if (variable !== null) {
-          canonicalImports.set(importedName, variable);
+const routeConsumerCanonicalImports = (importDeclarations, sourceCode) =>
+  EffectArray.reduce(
+    importDeclarations,
+    HashMap.empty(),
+    (imports, declaration) => {
+      const source = importName(declaration.source);
+      return EffectArray.reduce(
+        declaration.specifiers ?? [],
+        imports,
+        (current, specifier) => {
+          if (
+            declaration.importKind === "type" ||
+            specifier.type !== "ImportSpecifier" ||
+            specifier.importKind === "type"
+          ) {
+            return current;
+          }
+          const importedName = importName(specifier.imported);
+          const localName = localBindingName(specifier.local);
+          if (
+            importedName === localName &&
+            ((source === "@tanstack/react-router" &&
+              importedName === "createFileRoute") ||
+              (source === "effect" &&
+                (importedName === "Option" || importedName === "Result")))
+          ) {
+            const variable = routeTransportDeclaredVariable(
+              sourceCode,
+              specifier,
+              localName
+            );
+            return variable === null
+              ? current
+              : HashMap.set(current, importedName, variable);
+          }
+          return current;
         }
-      }
+      );
     }
-  }
-
-  return canonicalImports;
-};
+  );
 
 const isRouteUseLoaderDataCall = (node, routeVariable) =>
   node?.type === "CallExpression" &&
@@ -864,32 +812,32 @@ const isRouteUseLoaderDataCall = (node, routeVariable) =>
   propertyName(node.callee.property) === "useLoaderData";
 
 const headLoaderDataBinding = (functionNode, sourceCode) => {
-  const [parameter] = functionNode.params ?? [];
-
+  const parameter = Option.getOrUndefined(
+    EffectArray.head(functionNode.params ?? [])
+  );
   if (parameter?.type !== "ObjectPattern") {
     return null;
   }
-
-  for (const property of parameter.properties ?? []) {
-    if (
-      property.type === "Property" &&
-      propertyName(property.key) === "loaderData" &&
-      property.value?.type === "Identifier" &&
-      property.value.name === "loaderData"
-    ) {
-      const variable = routeTransportDeclaredVariable(
-        sourceCode,
-        functionNode,
-        property.value.name
-      );
-
-      return variable === null
-        ? null
-        : { identifier: property.value, variable };
-    }
-  }
-
-  return null;
+  return Option.getOrNull(
+    EffectArray.findFirst(parameter.properties ?? [], (property) => {
+      if (
+        property.type === "Property" &&
+        propertyName(property.key) === "loaderData" &&
+        property.value?.type === "Identifier" &&
+        property.value.name === "loaderData"
+      ) {
+        const variable = routeTransportDeclaredVariable(
+          sourceCode,
+          functionNode,
+          property.value.name
+        );
+        return variable === null
+          ? Option.none()
+          : Option.some({ identifier: property.value, variable });
+      }
+      return Option.none();
+    })
+  );
 };
 
 const isOptionFromUndefinedOrCall = (
@@ -904,8 +852,8 @@ const isOptionFromUndefinedOrCall = (
   isRouteTransportReference(optionVariable, node.callee.object) &&
   propertyName(node.callee.property) === "fromUndefinedOr" &&
   node.arguments.length === 1 &&
-  node.arguments[0]?.type === "Identifier" &&
-  isRouteTransportReference(loaderDataVariable, node.arguments[0]);
+  firstArgument(node)?.type === "Identifier" &&
+  isRouteTransportReference(loaderDataVariable, firstArgument(node));
 
 const isOptionGetOrElseCall = (node, optionVariable) =>
   node?.type === "CallExpression" &&
@@ -921,7 +869,9 @@ const isNormalisedHeadLoaderData = (
   loaderDataVariable,
   canonicalImports
 ) => {
-  const optionVariable = canonicalImports.get("Option");
+  const optionVariable = Option.getOrUndefined(
+    HashMap.get(canonicalImports, "Option")
+  );
 
   return (
     optionVariable !== undefined &&
@@ -935,7 +885,7 @@ const isNormalisedHeadLoaderData = (
       optionVariable
     ) &&
     node.arguments.length === 1 &&
-    isOptionGetOrElseCall(node.arguments[0], optionVariable)
+    isOptionGetOrElseCall(firstArgument(node), optionVariable)
   );
 };
 
@@ -960,7 +910,9 @@ const routeConsumerLocalDeclarator = (
       )
   );
 
-  return matches.length === 1 ? matches[0] : null;
+  return matches.length === 1
+    ? Option.getOrNull(EffectArray.head(matches))
+    : null;
 };
 
 const isResultMatchCallee = (node, resultVariable) =>
@@ -973,28 +925,19 @@ const isResultMatchCallee = (node, resultVariable) =>
 const isResultMatchFor = (node, resultValue, resultBinding, resultVariable) =>
   node?.type === "CallExpression" &&
   isResultMatchCallee(node.callee, resultVariable) &&
-  (node.arguments[0] === resultValue ||
+  (firstArgument(node) === resultValue ||
     (resultValue?.type === "Identifier" &&
-      node.arguments[0]?.type === "Identifier" &&
-      isRouteTransportReference(resultBinding, node.arguments[0])));
+      firstArgument(node)?.type === "Identifier" &&
+      isRouteTransportReference(resultBinding, firstArgument(node))));
 
-const isInsideJsxExpression = (node, functionNode) => {
-  let current = node.parent;
-
-  while (
-    current !== undefined &&
-    current !== null &&
-    current !== functionNode
-  ) {
-    if (current.type === "JSXExpressionContainer") {
-      return true;
-    }
-
-    current = current.parent;
-  }
-
-  return false;
-};
+const isInsideJsxExpression = (node, functionNode) =>
+  EffectArray.some(
+    EffectArray.takeWhile(
+      syntaxParents(node),
+      (current) => current !== functionNode
+    ),
+    (current) => current.type === "JSXExpressionContainer"
+  );
 
 const directRouteBoundaryBinding = (specifier, sourceCode) => {
   if (specifier.type !== "ImportSpecifier") {
@@ -1015,52 +958,42 @@ const routeTransportBoundaryBindings = ({
   report,
   sourceCode,
 }) => {
-  const boundaryBindings = new Set();
-
-  for (const declaration of importDeclarations) {
-    if (!boundaryModules.has(importName(declaration.source))) {
-      continue;
+  const bindings = EffectArray.flatMap(importDeclarations, (declaration) => {
+    if (!HashSet.has(boundaryModules, importName(declaration.source))) {
+      return [];
     }
-
-    for (const specifier of declaration.specifiers ?? []) {
+    return EffectArray.filterMap(declaration.specifiers ?? [], (specifier) => {
       if (
         declaration.importKind === "type" ||
         specifier.importKind === "type"
       ) {
-        continue;
+        return Result.failVoid;
       }
-
-      const boundaryBinding = directRouteBoundaryBinding(specifier, sourceCode);
-
-      if (boundaryBinding === null) {
+      const binding = directRouteBoundaryBinding(specifier, sourceCode);
+      if (binding === null) {
         report("unsupportedBoundaryImport", specifier);
-      } else {
-        boundaryBindings.add(boundaryBinding);
       }
-    }
-  }
-
-  for (const expression of importExpressions) {
-    if (boundaryModules.has(importName(expression.source))) {
+      return binding === null ? Result.failVoid : Result.succeed(binding);
+    });
+  });
+  forEach(importExpressions, (expression) => {
+    if (HashSet.has(boundaryModules, importName(expression.source))) {
       report("unsupportedBoundaryImport", expression);
     }
-  }
-
-  for (const call of callExpressions) {
+  });
+  forEach(callExpressions, (call) => {
     const importsBoundary =
       call.callee?.type === "Import" &&
-      boundaryModules.has(importName(call.arguments[0]));
+      HashSet.has(boundaryModules, importName(firstArgument(call)));
     const requiresBoundary =
       call.callee?.type === "Identifier" &&
       call.callee.name === "require" &&
-      boundaryModules.has(importName(call.arguments[0]));
-
+      HashSet.has(boundaryModules, importName(firstArgument(call)));
     if (importsBoundary || requiresBoundary) {
       report("unsupportedBoundaryImport", call);
     }
-  }
-
-  return boundaryBindings;
+  });
+  return EffectArray.dedupeWith(bindings, (left, right) => left === right);
 };
 
 const isCanonicalRestoreMemberObject = (identifier) =>
@@ -1068,98 +1001,85 @@ const isCanonicalRestoreMemberObject = (identifier) =>
   identifier.parent.object === identifier &&
   propertyName(identifier.parent.property) === "restore";
 
-const isRouteBoundaryTypeQuery = (identifier) => {
-  let current = identifier.parent;
-
-  while (current !== undefined && current !== null) {
-    if (current.type === "TSTypeQuery") {
-      return true;
-    }
-
-    if (
-      current.type === "Program" ||
-      current.type.endsWith("Statement") ||
-      routeConsumerFunctionTypes.has(current.type)
-    ) {
-      return false;
-    }
-
-    current = current.parent;
-  }
-
-  return false;
-};
+const isRouteBoundaryTypeQuery = (identifier) =>
+  Option.exists(
+    EffectArray.findFirst(
+      syntaxParents(identifier),
+      (current) =>
+        current.type === "TSTypeQuery" ||
+        current.type === "Program" ||
+        current.type.endsWith("Statement") ||
+        HashSet.has(routeConsumerFunctionTypes, current.type)
+    ),
+    (current) => current.type === "TSTypeQuery"
+  );
 
 const reportUnsupportedRouteBoundaryReferences = ({
   boundaryBindings,
   report,
-}) => {
-  for (const binding of boundaryBindings) {
-    for (const reference of binding.references) {
+}) =>
+  forEach(boundaryBindings, (binding) =>
+    forEach(binding.references, (reference) => {
       if (
         !isRouteBoundaryTypeQuery(reference.identifier) &&
         !isCanonicalRestoreMemberObject(reference.identifier)
       ) {
         report("indirectRestoreReference", reference.identifier);
       }
-    }
-  }
-};
+    })
+  );
 
 const sameFileRouteConsumerFunctions = ({
   functionDeclarations,
   sourceCode,
   variableDeclarators,
-}) => {
-  const namedFunctions = [];
-
-  for (const declaration of functionDeclarations) {
+}) => [
+  ...EffectArray.filterMap(functionDeclarations, (declaration) => {
     if (
-      declaration.id?.type === "Identifier" &&
-      isTopLevelRouteConsumerDeclaration(declaration)
+      declaration.id?.type !== "Identifier" ||
+      !isTopLevelRouteConsumerDeclaration(declaration)
     ) {
-      const variable = routeTransportDeclaredVariable(
-        sourceCode,
-        declaration,
-        declaration.id.name
-      );
-
-      if (variable !== null) {
-        namedFunctions.push({ functionNode: declaration, variable });
-      }
+      return Result.failVoid;
     }
-  }
-
-  for (const declarator of variableDeclarators) {
+    const variable = routeTransportDeclaredVariable(
+      sourceCode,
+      declaration,
+      declaration.id.name
+    );
+    return variable === null
+      ? Result.failVoid
+      : Result.succeed({ functionNode: declaration, variable });
+  }),
+  ...EffectArray.filterMap(variableDeclarators, (declarator) => {
     if (
-      declarator.id?.type === "Identifier" &&
-      routeConsumerFunctionTypes.has(declarator.init?.type) &&
-      isTopLevelRouteConsumerDeclaration(declarator)
+      declarator.id?.type !== "Identifier" ||
+      !HashSet.has(routeConsumerFunctionTypes, declarator.init?.type) ||
+      !isTopLevelRouteConsumerDeclaration(declarator)
     ) {
-      const variable = routeTransportDeclaredVariable(
-        sourceCode,
-        declarator,
-        declarator.id.name
-      );
-
-      if (variable !== null) {
-        namedFunctions.push({ functionNode: declarator.init, variable });
-      }
+      return Result.failVoid;
     }
-  }
-
-  return namedFunctions;
-};
+    const variable = routeTransportDeclaredVariable(
+      sourceCode,
+      declarator,
+      declarator.id.name
+    );
+    return variable === null
+      ? Result.failVoid
+      : Result.succeed({ functionNode: declarator.init, variable });
+  }),
+];
 
 const routeConsumerPropertyFunction = (property, namedFunctions) => {
-  if (routeConsumerFunctionTypes.has(property.value?.type)) {
+  if (HashSet.has(routeConsumerFunctionTypes, property.value?.type)) {
     return property.value;
   }
 
   if (property.value?.type === "Identifier") {
     return (
-      namedFunctions.find(({ variable }) =>
-        isRouteTransportReference(variable, property.value)
+      Option.getOrUndefined(
+        EffectArray.findFirst(namedFunctions, ({ variable }) =>
+          isRouteTransportReference(variable, property.value)
+        )
       )?.functionNode ?? null
     );
   }
@@ -1175,85 +1095,73 @@ const configuredRouteConsumers = ({
   sourceCode,
   variableDeclarators,
 }) => {
-  const routeConsumers = [];
-  let routeDefinitionCount = 0;
-
   if (!isConfiguredConsumerFile) {
-    return { routeConsumers, routeDefinitionCount };
+    return { routeConsumers: [], routeDefinitionCount: 0 };
   }
-
-  for (const declarator of variableDeclarators) {
-    const optionsNode = routeDefinitionOptions(declarator, canonicalImports);
-
-    if (optionsNode === null) {
-      continue;
-    }
-
-    routeDefinitionCount += 1;
-
-    if (declarator.id?.type !== "Identifier") {
-      report("unresolvedRouteConsumer", declarator.id);
-      continue;
-    }
-
-    const routeVariable = routeTransportDeclaredVariable(
-      sourceCode,
-      declarator,
-      declarator.id.name
-    );
-
-    if (routeVariable === null) {
-      report("unresolvedRouteConsumer", declarator.id);
-      continue;
-    }
-
-    for (const property of optionsNode.properties ?? []) {
-      if (property.type !== "Property") {
-        continue;
+  return EffectArray.reduce(
+    variableDeclarators,
+    { routeConsumers: [], routeDefinitionCount: 0 },
+    (current, declarator) => {
+      const optionsNode = routeDefinitionOptions(declarator, canonicalImports);
+      if (optionsNode === null) {
+        return current;
       }
-
-      const kind = propertyName(property.key);
-      if (kind !== "component" && kind !== "head") {
-        continue;
+      const routeDefinitionCount = current.routeDefinitionCount + 1;
+      if (declarator.id?.type !== "Identifier") {
+        report("unresolvedRouteConsumer", declarator.id);
+        return { ...current, routeDefinitionCount };
       }
-
-      const functionNode = routeConsumerPropertyFunction(
-        property,
-        namedFunctions
+      const routeVariable = routeTransportDeclaredVariable(
+        sourceCode,
+        declarator,
+        declarator.id.name
       );
-
-      if (functionNode === null) {
-        report("unresolvedRouteConsumer", property.value);
-        continue;
+      if (routeVariable === null) {
+        report("unresolvedRouteConsumer", declarator.id);
+        return { ...current, routeDefinitionCount };
       }
-
-      routeConsumers.push({
-        functionNode,
-        kind,
-        routeVariable,
-      });
+      const consumers = EffectArray.filterMap(
+        optionsNode.properties ?? [],
+        (property) => {
+          if (property.type !== "Property") {
+            return Result.failVoid;
+          }
+          const kind = propertyName(property.key);
+          if (kind !== "component" && kind !== "head") {
+            return Result.failVoid;
+          }
+          const functionNode = routeConsumerPropertyFunction(
+            property,
+            namedFunctions
+          );
+          if (functionNode === null) {
+            report("unresolvedRouteConsumer", property.value);
+            return Result.failVoid;
+          }
+          return Result.succeed({ functionNode, kind, routeVariable });
+        }
+      );
+      return {
+        routeConsumers: [...current.routeConsumers, ...consumers],
+        routeDefinitionCount,
+      };
     }
-  }
-
-  return { routeConsumers, routeDefinitionCount };
+  );
 };
 
 const canonicalRouteRestoreCalls = ({
   boundaryBindings,
   memberExpressions,
   report,
-}) => {
-  const directRestoreCalls = [];
-
-  for (const member of memberExpressions) {
+}) =>
+  EffectArray.filterMap(memberExpressions, (member) => {
     if (
       member.object?.type !== "Identifier" ||
-      !referencesRouteTransportVariable([...boundaryBindings], member.object) ||
+      !referencesRouteTransportVariable(boundaryBindings, member.object) ||
       propertyName(member.property) !== "restore"
     ) {
-      continue;
+      return Result.failVoid;
     }
-
     if (
       member.computed ||
       member.optional ||
@@ -1262,14 +1170,10 @@ const canonicalRouteRestoreCalls = ({
       member.parent.callee !== member
     ) {
       report("indirectRestoreReference", member);
-      continue;
+      return Result.failVoid;
     }
-
-    directRestoreCalls.push(member.parent);
-  }
-
-  return directRestoreCalls;
-};
+    return Result.succeed(member.parent);
+  });
 
 const componentRestoreInput = ({
   consumer,
@@ -1388,11 +1292,14 @@ const restoreResultDeclarator = ({
   restoreCall,
   variableDeclarators,
 }) =>
-  variableDeclarators.find(
-    (declarator) =>
-      declarator.init === restoreCall &&
-      declarator.id?.type === "Identifier" &&
-      routeConsumerFunction(declarator) === consumer.functionNode
+  Option.getOrUndefined(
+    EffectArray.findFirst(
+      variableDeclarators,
+      (declarator) =>
+        declarator.init === restoreCall &&
+        declarator.id?.type === "Identifier" &&
+        routeConsumerFunction(declarator) === consumer.functionNode
+    )
   );
 
 const isRestoreResultMatched = ({
@@ -1403,7 +1310,9 @@ const isRestoreResultMatched = ({
   resultVariable,
   resultDeclarator,
 }) => {
-  const resultImportVariable = canonicalImports.get("Result");
+  const resultImportVariable = Option.getOrUndefined(
+    HashMap.get(canonicalImports, "Result")
+  );
 
   if (resultImportVariable === undefined) {
     return false;
@@ -1425,24 +1334,24 @@ const isRouteValueAliasOrAssignment = (identifier) =>
   (identifier.parent?.type === "AssignmentExpression" &&
     identifier.parent.right === identifier);
 
-const isRouteResultCallArgument = (identifier, functionNode) => {
-  let current = identifier;
-
-  while (current.parent !== undefined && current.parent !== functionNode) {
-    const { parent } = current;
-
-    if (
-      parent.type === "CallExpression" &&
-      parent.arguments.includes(current)
-    ) {
-      return { argument: current, call: parent };
-    }
-
-    current = parent;
-  }
-
-  return null;
-};
+const isRouteResultCallArgument = (identifier, functionNode) =>
+  Option.getOrNull(
+    EffectArray.findFirst(
+      EffectArray.takeWhile(
+        [identifier, ...syntaxParents(identifier)],
+        (current) =>
+          current.parent !== undefined && current.parent !== functionNode
+      ),
+      (current) =>
+        current.parent?.type === "CallExpression" &&
+        EffectArray.some(
+          current.parent.arguments,
+          (argument) => argument === current
+        )
+          ? Option.some({ argument: current, call: current.parent })
+          : Option.none()
+    )
+  );
 
 const routeValueForwardingMessage = ({
   canonicalImports,
@@ -1453,8 +1362,10 @@ const routeValueForwardingMessage = ({
   resultDeclarator,
   resultVariable,
 }) => {
-  const forwardingBinding = forwardingBindings.find(({ variable }) =>
-    isRouteTransportReference(variable, identifier)
+  const forwardingBinding = Option.getOrUndefined(
+    EffectArray.findFirst(forwardingBindings, ({ variable }) =>
+      isRouteTransportReference(variable, identifier)
+    )
   );
 
   if (forwardingBinding === undefined) {
@@ -1465,7 +1376,9 @@ const routeValueForwardingMessage = ({
     forwardingBinding.messageId === "forwardedRouteResult"
       ? isRouteResultCallArgument(identifier, consumer.functionNode)
       : null;
-  const resultImportVariable = canonicalImports.get("Result");
+  const resultImportVariable = Option.getOrUndefined(
+    HashMap.get(canonicalImports, "Result")
+  );
   const isAllowedResultMatch =
     resultCallArgument !== null &&
     resultCallArgument.argument === identifier &&
@@ -1501,60 +1414,59 @@ const reportRouteValueForwarding = ({
   resultDeclarator,
   resultVariable,
 }) => {
-  const forwardingBindings = [];
-
-  if (loaderVariable !== null) {
-    forwardingBindings.push({
-      messageId: "forwardedLoaderTransport",
-      variable: loaderVariable,
-    });
-  }
-
-  if (
-    headLoaderDataVariable !== null &&
-    headLoaderDataVariable !== loaderVariable
-  ) {
-    forwardingBindings.push({
-      messageId: "forwardedLoaderTransport",
-      variable: headLoaderDataVariable,
-    });
-  }
-
-  if (resultVariable !== null) {
-    forwardingBindings.push({
-      messageId: "forwardedRouteResult",
-      variable: resultVariable,
-    });
-  }
-
-  for (const identifier of identifiers) {
-    const messageId = routeValueForwardingMessage({
-      canonicalImports,
-      consumer,
-      forwardingBindings,
-      identifier,
-      restoreCall,
-      resultDeclarator,
-      resultVariable,
-    });
-
-    if (messageId !== null && !reportedForwardingNodes.has(identifier)) {
-      reportedForwardingNodes.add(identifier);
-      report(messageId, identifier);
+  const forwardingBindings = EffectArray.filterMap(
+    [
+      { messageId: "forwardedLoaderTransport", variable: loaderVariable },
+      {
+        messageId: "forwardedLoaderTransport",
+        variable:
+          headLoaderDataVariable === loaderVariable
+            ? null
+            : headLoaderDataVariable,
+      },
+      { messageId: "forwardedRouteResult", variable: resultVariable },
+    ],
+    (binding) =>
+      binding.variable === null ? Result.failVoid : Result.succeed(binding)
+  );
+  const reportedIdentifiers = EffectArray.reduce(
+    identifiers,
+    reportedForwardingNodes,
+    (current, identifier) => {
+      const messageId = routeValueForwardingMessage({
+        canonicalImports,
+        consumer,
+        forwardingBindings,
+        identifier,
+        restoreCall,
+        resultDeclarator,
+        resultVariable,
+      });
+      const key = referenceIdentity(identifier);
+      if (messageId !== null && !HashSet.has(current, key)) {
+        report(messageId, identifier);
+        return HashSet.add(current, key);
+      }
+      return current;
     }
-  }
-
-  for (const call of callExpressions) {
-    if (
-      isRouteUseLoaderDataCall(call, consumer.routeVariable) &&
-      restoreCall.arguments[0] !== call &&
-      isInsideJsxExpression(call, consumer.functionNode) &&
-      !reportedForwardingNodes.has(call)
-    ) {
-      reportedForwardingNodes.add(call);
-      report("forwardedLoaderTransport", call);
+  );
+  return EffectArray.reduce(
+    callExpressions,
+    reportedIdentifiers,
+    (current, call) => {
+      const key = referenceIdentity(call);
+      if (
+        isRouteUseLoaderDataCall(call, consumer.routeVariable) &&
+        firstArgument(restoreCall) !== call &&
+        isInsideJsxExpression(call, consumer.functionNode) &&
+        !HashSet.has(current, key)
+      ) {
+        report("forwardedLoaderTransport", call);
+        return HashSet.add(current, key);
+      }
+      return current;
     }
-  }
+  );
 };
 
 const validateDirectRouteRestores = ({
@@ -1569,216 +1481,301 @@ const validateDirectRouteRestores = ({
   sourceCode,
   variableDeclarators,
 }) => {
-  const callsByConsumer = new Map();
-  const reportedForwardingNodes = new Set();
-
-  for (const restoreCall of directRestoreCalls) {
-    const functionNode = routeConsumerFunction(restoreCall);
-    const matchingConsumers = EffectArray.filter(
-      routeConsumers,
-      (consumer) => consumer.functionNode === functionNode
-    );
-
-    if (!isConfiguredConsumerFile) {
-      report("restoreOutsideConsumer", restoreCall);
-      continue;
-    }
-
-    if (routeDefinitionCount === 0) {
-      report("unresolvedRouteConsumer", restoreCall);
-      continue;
-    }
-
-    if (matchingConsumers.length === 0) {
-      report("restoreOutsideConsumer", restoreCall);
-      continue;
-    }
-
-    if (matchingConsumers.length !== 1) {
-      report("unresolvedRouteConsumer", restoreCall);
-      continue;
-    }
-
-    const [consumer] = matchingConsumers;
-    const existingCalls = callsByConsumer.get(consumer) ?? [];
-    existingCalls.push(restoreCall);
-    callsByConsumer.set(consumer, existingCalls);
-
-    const restoreInput =
-      consumer.kind === "component"
-        ? componentRestoreInput({
-            consumer,
-            restoreCall,
-            sourceCode,
-            variableDeclarators,
-          })
-        : headRestoreInput({
-            canonicalImports,
-            consumer,
-            restoreCall,
-            sourceCode,
-            variableDeclarators,
-          });
-
-    if (!restoreInput.valid) {
-      report(
-        consumer.kind === "component"
-          ? "invalidComponentLoaderInput"
-          : "invalidHeadLoaderInput",
-        restoreCall
+  const observations = EffectArray.reduce(
+    directRestoreCalls,
+    {
+      callsByConsumer: HashMap.empty(),
+      consumerOrder: [],
+      reportedForwardingNodes: HashSet.empty(),
+    },
+    (current, restoreCall) => {
+      const functionNode = routeConsumerFunction(restoreCall);
+      const matchingConsumers = EffectArray.filter(
+        routeConsumers,
+        (consumer) => consumer.functionNode === functionNode
       );
-    }
+      if (!isConfiguredConsumerFile) {
+        report("restoreOutsideConsumer", restoreCall);
+        return current;
+      }
+      if (routeDefinitionCount === 0) {
+        report("unresolvedRouteConsumer", restoreCall);
+        return current;
+      }
+      if (matchingConsumers.length === 0) {
+        report("restoreOutsideConsumer", restoreCall);
+        return current;
+      }
+      if (matchingConsumers.length !== 1) {
+        report("unresolvedRouteConsumer", restoreCall);
+        return current;
+      }
+      const consumer = Option.getOrNull(EffectArray.head(matchingConsumers));
+      if (consumer === null) {
+        return current;
+      }
+      const key = referenceIdentity(consumer);
+      const existingCalls = HashMap.get(current.callsByConsumer, key);
+      const callsByConsumer = HashMap.set(
+        current.callsByConsumer,
+        key,
+        EffectArray.append(
+          Option.getOrElse(existingCalls, () => []),
+          restoreCall
+        )
+      );
+      const consumerOrder = Option.isNone(existingCalls)
+        ? EffectArray.append(current.consumerOrder, consumer)
+        : current.consumerOrder;
+      const restoreInput =
+        consumer.kind === "component"
+          ? componentRestoreInput({
+              consumer,
+              restoreCall,
+              sourceCode,
+              variableDeclarators,
+            })
+          : headRestoreInput({
+              canonicalImports,
+              consumer,
+              restoreCall,
+              sourceCode,
+              variableDeclarators,
+            });
 
-    const resultDeclarator = restoreResultDeclarator({
-      consumer,
-      restoreCall,
-      variableDeclarators,
-    });
-    const resultVariable =
-      resultDeclarator?.id?.type === "Identifier"
-        ? routeTransportDeclaredVariable(
-            sourceCode,
-            resultDeclarator,
-            resultDeclarator.id.name
-          )
-        : null;
+      if (!restoreInput.valid) {
+        report(
+          consumer.kind === "component"
+            ? "invalidComponentLoaderInput"
+            : "invalidHeadLoaderInput",
+          restoreCall
+        );
+      }
 
-    if (
-      !isRestoreResultMatched({
+      const resultDeclarator = restoreResultDeclarator({
+        consumer,
+        restoreCall,
+        variableDeclarators,
+      });
+      const resultVariable =
+        resultDeclarator?.id?.type === "Identifier"
+          ? routeTransportDeclaredVariable(
+              sourceCode,
+              resultDeclarator,
+              resultDeclarator.id.name
+            )
+          : null;
+
+      if (
+        !isRestoreResultMatched({
+          callExpressions,
+          canonicalImports,
+          consumer,
+          restoreCall,
+          resultDeclarator,
+          resultVariable,
+        })
+      ) {
+        report("restoreResultNotMatched", restoreCall);
+      }
+
+      const reportedForwardingNodes = reportRouteValueForwarding({
         callExpressions,
         canonicalImports,
         consumer,
+        headLoaderDataVariable: restoreInput.headLoaderDataVariable ?? null,
+        identifiers,
+        loaderVariable: restoreInput.loaderVariable,
+        report,
+        reportedForwardingNodes: current.reportedForwardingNodes,
         restoreCall,
         resultDeclarator,
         resultVariable,
-      })
-    ) {
-      report("restoreResultNotMatched", restoreCall);
+      });
+      return { callsByConsumer, consumerOrder, reportedForwardingNodes };
     }
-
-    reportRouteValueForwarding({
-      callExpressions,
-      canonicalImports,
-      consumer,
-      headLoaderDataVariable: restoreInput.headLoaderDataVariable ?? null,
-      identifiers,
-      loaderVariable: restoreInput.loaderVariable,
-      report,
-      reportedForwardingNodes,
-      restoreCall,
-      resultDeclarator,
-      resultVariable,
-    });
-  }
-
-  for (const restoreCalls of callsByConsumer.values()) {
-    for (const duplicateRestore of restoreCalls.slice(1)) {
-      report("multipleRestores", duplicateRestore);
-    }
-  }
+  );
+  forEach(observations.consumerOrder, (consumer) => {
+    const restoreCalls = Option.getOrElse(
+      HashMap.get(observations.callsByConsumer, referenceIdentity(consumer)),
+      () => []
+    );
+    forEach(EffectArray.drop(restoreCalls, 1), (duplicateRestore) =>
+      report("multipleRestores", duplicateRestore)
+    );
+  });
 };
+
+const RouteConsumerOptions = Schema.Struct({
+  routeTransportBoundaryModules: Schema.NonEmptyArray(Schema.String),
+  routeTransportConsumerFiles: Schema.NonEmptyArray(Schema.String),
+});
 
 const noRouteTransportRestoreOutsideConsumers = {
   create(context) {
-    const [options] = context.options;
-    const { sourceCode } = context;
-    const boundaryModules = new Set(options.routeTransportBoundaryModules);
-    const consumerFiles = new Set(
-      EffectArray.map(options.routeTransportConsumerFiles, (fileName) =>
-        resolve(fileName)
-      )
+    const parsedOptions = EffectArray.head(context.options).pipe(
+      Option.flatMap(Schema.decodeUnknownOption(RouteConsumerOptions))
     );
-    const isConfiguredConsumerFile = consumerFiles.has(
-      resolve(sourceFileName(context))
-    );
-    const importDeclarations = [];
-    const importExpressions = [];
-    const callExpressions = [];
-    const functionDeclarations = [];
-    const identifiers = [];
-    const memberExpressions = [];
-    const variableDeclarators = [];
-
-    const report = (messageId, node) =>
-      context.report({
-        messageId,
-        node,
-      });
-
-    return {
-      CallExpression(node) {
-        callExpressions.push(node);
-      },
-      FunctionDeclaration(node) {
-        functionDeclarations.push(node);
-      },
-      Identifier(node) {
-        identifiers.push(node);
-      },
-      ImportDeclaration(node) {
-        importDeclarations.push(node);
-      },
-      ImportExpression(node) {
-        importExpressions.push(node);
-      },
-      MemberExpression(node) {
-        memberExpressions.push(node);
-      },
-      "Program:exit"() {
-        const canonicalImports = routeConsumerCanonicalImports(
-          importDeclarations,
-          sourceCode
+    return Option.match(parsedOptions, {
+      onNone: () => ({
+        Program: (node) =>
+          context.report({ messageId: "invalidRoutePolicyOptions", node }),
+      }),
+      onSome: (options) => {
+        const { sourceCode } = context;
+        const boundaryModules = HashSet.fromIterable(
+          options.routeTransportBoundaryModules
         );
-        const boundaryBindings = routeTransportBoundaryBindings({
-          boundaryModules,
-          callExpressions,
-          importDeclarations,
-          importExpressions,
-          report,
-          sourceCode,
-        });
-        reportUnsupportedRouteBoundaryReferences({
-          boundaryBindings,
-          report,
+        const consumerFiles = HashSet.fromIterable(
+          EffectArray.map(options.routeTransportConsumerFiles, (fileName) =>
+            resolve(fileName)
+          )
+        );
+        const isConfiguredConsumerFile = HashSet.has(
+          consumerFiles,
+          resolve(sourceFileName(context))
+        );
+        // Oxlint owns one synchronous listener lifetime per source file.
+        const observations = Ref.makeUnsafe({
+          callExpressions: [],
+          functionDeclarations: [],
+          identifiers: [],
+          importDeclarations: [],
+          importExpressions: [],
+          memberExpressions: [],
+          variableDeclarators: [],
         });
 
-        const namedFunctions = sameFileRouteConsumerFunctions({
-          functionDeclarations,
-          sourceCode,
-          variableDeclarators,
-        });
-        const { routeConsumers, routeDefinitionCount } =
-          configuredRouteConsumers({
-            canonicalImports,
-            isConfiguredConsumerFile,
-            namedFunctions,
-            report,
-            sourceCode,
-            variableDeclarators,
+        const report = (messageId, node) =>
+          context.report({
+            messageId,
+            node,
           });
-        const directRestoreCalls = canonicalRouteRestoreCalls({
-          boundaryBindings,
-          memberExpressions,
-          report,
-        });
 
-        validateDirectRouteRestores({
-          callExpressions,
-          canonicalImports,
-          directRestoreCalls,
-          identifiers,
-          isConfiguredConsumerFile,
-          report,
-          routeConsumers,
-          routeDefinitionCount,
-          sourceCode,
-          variableDeclarators,
-        });
+        return {
+          CallExpression(node) {
+            MutableRef.update(observations.ref, (current) => ({
+              ...current,
+              callExpressions: EffectArray.append(
+                current.callExpressions,
+                node
+              ),
+            }));
+          },
+          FunctionDeclaration(node) {
+            MutableRef.update(observations.ref, (current) => ({
+              ...current,
+              functionDeclarations: EffectArray.append(
+                current.functionDeclarations,
+                node
+              ),
+            }));
+          },
+          Identifier(node) {
+            MutableRef.update(observations.ref, (current) => ({
+              ...current,
+              identifiers: EffectArray.append(current.identifiers, node),
+            }));
+          },
+          ImportDeclaration(node) {
+            MutableRef.update(observations.ref, (current) => ({
+              ...current,
+              importDeclarations: EffectArray.append(
+                current.importDeclarations,
+                node
+              ),
+            }));
+          },
+          ImportExpression(node) {
+            MutableRef.update(observations.ref, (current) => ({
+              ...current,
+              importExpressions: EffectArray.append(
+                current.importExpressions,
+                node
+              ),
+            }));
+          },
+          MemberExpression(node) {
+            MutableRef.update(observations.ref, (current) => ({
+              ...current,
+              memberExpressions: EffectArray.append(
+                current.memberExpressions,
+                node
+              ),
+            }));
+          },
+          "Program:exit"() {
+            const {
+              importDeclarations,
+              importExpressions,
+              callExpressions,
+              functionDeclarations,
+              identifiers,
+              memberExpressions,
+              variableDeclarators,
+            } = Ref.getUnsafe(observations);
+            const canonicalImports = routeConsumerCanonicalImports(
+              importDeclarations,
+              sourceCode
+            );
+            const boundaryBindings = routeTransportBoundaryBindings({
+              boundaryModules,
+              callExpressions,
+              importDeclarations,
+              importExpressions,
+              report,
+              sourceCode,
+            });
+            reportUnsupportedRouteBoundaryReferences({
+              boundaryBindings,
+              report,
+            });
+
+            const namedFunctions = sameFileRouteConsumerFunctions({
+              functionDeclarations,
+              sourceCode,
+              variableDeclarators,
+            });
+            const { routeConsumers, routeDefinitionCount } =
+              configuredRouteConsumers({
+                canonicalImports,
+                isConfiguredConsumerFile,
+                namedFunctions,
+                report,
+                sourceCode,
+                variableDeclarators,
+              });
+            const directRestoreCalls = canonicalRouteRestoreCalls({
+              boundaryBindings,
+              memberExpressions,
+              report,
+            });
+
+            validateDirectRouteRestores({
+              callExpressions,
+              canonicalImports,
+              directRestoreCalls,
+              identifiers,
+              isConfiguredConsumerFile,
+              report,
+              routeConsumers,
+              routeDefinitionCount,
+              sourceCode,
+              variableDeclarators,
+            });
+          },
+          VariableDeclarator(node) {
+            MutableRef.update(observations.ref, (current) => ({
+              ...current,
+              variableDeclarators: EffectArray.append(
+                current.variableDeclarators,
+                node
+              ),
+            }));
+          },
+        };
       },
-      VariableDeclarator(node) {
-        variableDeclarators.push(node);
-      },
-    };
+    });
   },
   meta: {
     docs: {
@@ -1796,6 +1793,8 @@ const noRouteTransportRestoreOutsideConsumers = {
         "A route component restore must consume its Route.useLoaderData() call directly or one const local binding initialised directly from that call. getRouteApi, props, context, aliases, reassignment, closures, and forwarded values are not route transport inputs.",
       invalidHeadLoaderInput:
         "A route head restore must consume its loaderData parameter directly or one const local binding normalised from it with Effect Option.fromUndefinedOr and Option.getOrElse.",
+      invalidRoutePolicyOptions:
+        "Route policy options must contain non-empty boundary-module and consumer-file lists; invalid configuration fails closed.",
       multipleRestores:
         "Restore loader transport once per direct route consumer invocation. Remove this additional canonical restore call.",
       restoreOutsideConsumer:
