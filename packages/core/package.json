@@ -59,6 +59,11 @@
       "source": "./src/ledger/index.ts",
       "types": "./dist/ledger/index.d.ts",
       "default": "./dist/ledger/index.js"
+    },
+    "./engine/schemas": {
+      "source": "./src/engine/schemas.ts",
+      "types": "./dist/engine/schemas.d.ts",
+      "default": "./dist/engine/schemas.js"
     }
   },
   "publishConfig": {
@@ -102,6 +107,10 @@
       "./ledger": {
         "types": "./dist/ledger/index.d.ts",
         "default": "./dist/ledger/index.js"
+      },
+      "./engine/schemas": {
+        "types": "./dist/engine/schemas.d.ts",
+        "default": "./dist/engine/schemas.js"
       }
     },
     "access": "public"

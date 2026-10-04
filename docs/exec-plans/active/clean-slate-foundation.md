@@ -73,7 +73,7 @@ records command outcomes and log digests.
 | --- | --- | --- |
 | T001 / DEV-72 | Implemented and locally tested | Retention, admission and diagnostic checks pass; draft PR review pending. |
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
-| T003 / DEV-74 | Pending T002 | First same-stage website/backend calculation. |
+| T003 / DEV-74 | In progress; T002 locally accepted | Native RPC contract first; same-stage website/backend calculation still pending. |
 | T004 / DEV-75 | Pending T003 | All three calculators and deliberate public interface changes. |
 | T005 / DEV-76 | Pending T003/T004 | Accepted content, route retention, search and discovery. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
@@ -1785,3 +1785,49 @@ sections remain historical evidence. Cooper review and the new commit's GitHub
 checks remain separate. Linear tracking writes remain blocked by automatic
 approval review, so no changed external status is claimed. Continue T003; the
 end-to-end implementation goal remains active. Medicare is still unresolved.
+
+## T003 native RPC contract (in progress)
+
+Start T003 from locally accepted foundation commit
+`5d9e9ab21ed7ce5687cea560c1db3ebe658bd375` ([draft 127](https://github.com/crcorbett/taxkit/pull/127)).
+Its GitHub Quality run `37215859846` was in progress at creation; this is not
+hosted acceptance. The new private `packages/api/rpc` is rendered through the
+canonical package tool, then adapted to the actual stable Effect 4 exports and
+TaxKit calculator owners. The template's generic catalogue, RC imports and
+NDJSON do not describe this bounded POST/JSON calculation contract.
+
+The handler calls `PublicCalculatorService.calculate`; request and result
+Schemas remain calculator-owned. A checked native-parser ingress prevents
+unchecked tags/IDs reaching native identity encoding. Per-procedure and global
+native defects use fixed safe encoding. The scoped generated client distinguishes
+expected failures, unavailable transport, invalid replies and one whole-response
+deadline; unrelated adapter defects and earlier interruption retain their
+classification. Focused native tests pass the real calculator and failure/body
+paths. Complete local slice checks pass; the two real app hosts remain pending.
+
+Documentation impact: **Change required** for the new package README/exports,
+transport/package/quality architecture, exact boundary permissions, Knip entries,
+lockfile, Changeset, task ledger and dated receipt. **Preserve** calculators,
+public HTTP/OpenAPI, existing app and provider wiring, canonical skills,
+historical receipts and retained tax outcomes. Provider runbooks are **N/A** for
+this contract-only step because no provider graph or command changes. T003 stays
+in progress until actual API/Website, binding, origin, browser and lifetime proof
+passes. No merge, provider operation or publication is authorised.
+
+A subsequent readback confirms GitHub Quality `37215859846` passed the exact
+foundation commit `5d9e9ab21ed7ce5687cea560c1db3ebe658bd375`. It does not qualify
+this new T003 candidate. The [RPC receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-contract.json)
+records 27 native cases, the observed broad-Schema browser import correction,
+local package/SDK proof and remaining app-host requirements.
+
+The final transport pass has 27 cases. All 25 workspace test tasks pass (25
+matching package caches on the final rerun), alongside 428 fresh actual lint cases. New exact RPC path fixtures
+prove decoding/encoding permission limits and restore real source bytes on all
+outcomes; a neighbouring source file still rejects decoding. Old and narrow
+Schema exports retain the same five object identities in source and built
+consumers. Frozen install checks 793 installs across 1021 packages with no
+changes. Final full verification passes, including 32 Quality cases with 13
+isolated command/failure cases in 376.88 seconds. Both unused-code inventories,
+25 type tasks, 206 deployment cases, 21 skill cases and 16 evaluation cases pass.
+The matching browser results cover 24 SDK and four website cases. This qualifies
+the private contract slice locally; T003 still needs the real app connection.

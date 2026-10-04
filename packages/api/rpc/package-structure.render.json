@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "kind": "rpc",
+  "packageName": "@taxkit/api-rpc",
+  "domainPackage": "@taxkit/calculators",
+  "sourceCondition": "source",
+  "versionSnapshot": {
+    "resolvedAt": "2026-10-05",
+    "sha256": "2938a67efef3b517b5ac520871b39b92027ce10258d62f8c6fd11b94d20988aa"
+  },
+  "officialSources": {
+    "effect": "https://github.com/Effect-TS/effect",
+    "typescript": "https://github.com/microsoft/typescript-go"
+  },
+  "selectedVersions": {
+    "effect": "4.0.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  },
+  "compatibilityDecisions": [
+    {
+      "status": "qualified",
+      "decision": "Use TaxKit installed stable Effect 4.0.0 and native TypeScript 7.0.2, rather than canonical templates rc.117 snapshot",
+      "evidence": "docs/documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json",
+      "limitation": "RPC templates still require adaptation and runtime qualification before acceptance"
+    }
+  ],
+  "configDigests": {
+    "package.json": "8d9c28ace1a255d4e78aa318a702c18f1b1563a43e98b2805c6216f07e281ba0",
+    "tsconfig.json": "d6ff2031891c11e64e335f72ba07787615e93b4ef1e6eb54f07be29b34edd1f9",
+    "tsconfig.build.json": "044f58d619deef8e2416a1fce0a3418879aac27f2aa5d70b245a4c774acac230",
+    "vitest.config.ts": "c81a2a24fc321eaa98816ca4b8e42bd601c6406b7bd48d3e8a5bd450dcc2faeb"
+  },
+  "limitations": [
+    "Structural rendering does not prove installed dependency, declaration, runtime, or packed-consumer behavior."
+  ],
+  "nonClaims": ["Selected versions are not claimed to remain latest."],
+  "originalScaffoldConfigDigests": {
+    "package.json": "529fd22d74c2cadf26524bec9099d8636cbe8b3eef22429977b824197e5e3061",
+    "tsconfig.json": "71596163cd8ffea16eb4950049bc772ec8a8e2db408759c80bc8232aa40a6d99",
+    "tsconfig.build.json": "320b70b4115224df6a42038a8759a444d0feecabb0666c22a519904a1e9b9de9",
+    "vitest.config.ts": "0be6a110349188c59f6651c3e6cc19543b37c18cb1d8b9c4d40666709122798e"
+  },
+  "adaptation": {
+    "date": "2026-10-05",
+    "scope": "Explicit native stable Effect 4 POST/JSON calculation and checked parser/reply hooks, over existing TaxKit Schemas/services",
+    "proof": "Locally qualified: native compiler, canonical lint, 27 actual native transport/lifetime cases, source/default/declaration consumers, browser bundle inspection and full repository verification; see dated native RPC contract receipt",
+    "limitations": "Not real app, browser CORS, hosted Worker, service binding, tracing export or provider proof"
+  }
+}

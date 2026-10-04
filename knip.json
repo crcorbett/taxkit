@@ -200,6 +200,22 @@
     "packages/rules/au/stsl": {
       "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/api/rpc": {
+      "entry": [
+        "src/group.ts",
+        "src/handlers.ts",
+        "src/service.ts",
+        "src/server.ts",
+        "src/live.layer.ts",
+        "src/test.layer.ts",
+        "src/schemas.ts",
+        "src/errors.ts",
+        "src/__testing__/fixtures.ts",
+        "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
     }
   }
 }

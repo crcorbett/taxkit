@@ -942,3 +942,31 @@ stand in for a CommonJS policy test. All six extensions must admit one file and
 reject the named bad constructs through the actual lint binary. Fresh isolated
 copies prove removing that selector or broadening the fixture exclusion fails
 the complete verifier. No host runtime or mutable-operation admission expands.
+
+## Native RPC contract proof
+
+The private `@taxkit/api-rpc` test command uses the actual Effect 4 generated
+client, JSON parser and POST server. Its corpus checks the real retained
+calculator, expected error classes, global/per-procedure native defects, bounded
+and malformed envelopes, unknown tags/IDs, version skew, broken JSON and invalid
+success replies. Private sentinels must be absent from actual native reply bytes
+and captured logs. An independent adapter SchemaError keeps its exact defect
+identity. Deterministic clock/body fixtures prove one deadline through headers
+and complete decoding, earlier interruption and scope cleanup. Operation-policy
+proof observes credential omission and redirect rejection at HttpClient ingress.
+
+This corpus does not prove browser CORS, service binding, Worker origin,
+production app startup or safe exported traces. Those are remaining T003 host
+checks. A browser build of the private client exposed live calculation modules
+through broad Schema imports; narrow canonical diagnostics/report/input exports
+remove those modules. Real Website bundle proof remains required after app
+composition. Existing golden calculator and packed SDK checks protect the old
+exports and report values when these Schema owners move.
+
+The private native RPC package is accepted and rejected by the installed lint
+binary at its own source/test/configuration paths. Exact temporary fixtures at
+the parser and two transport-test files prove the required decoding/encoding
+permissions while rejecting runtime execution and unintended encoding. The
+Effect test scope restores each real owner's original bytes on failure or
+interruption. A neighbouring RPC file still rejects decoding. These fixtures
+qualify lint permissions; they do not prove a real browser or Worker connection.

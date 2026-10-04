@@ -1,52 +1,23 @@
-import { Money } from "@taxkit/core/primitives";
-import { TraceNode } from "@taxkit/core/trace";
-import { Effect, Layer, Schema } from "effect";
+import { Effect, Layer } from "effect";
 
 import {
-  GrossPay,
   GrossPayFact,
   NetPayFact,
-  PayPeriod,
   TaxablePayFact,
   TaxFreeThresholdClaimed,
   TaxFreeThresholdClaimedFact,
 } from "../facts/pay.js";
-import {
-  PayWithholdingsLedger,
-  PayWithholdingsLedgerFact,
-} from "../facts/withholdings.js";
+import { PayWithholdingsLedgerFact } from "../facts/withholdings.js";
+import { PayRulePackVersion, TakeHomePayReport } from "./schemas.js";
+import type { TakeHomeScenarioInput } from "./schemas.js";
+
+export {
+  TakeHomePayReport,
+  TakeHomeScenarioInputSchema,
+  type TakeHomeScenarioInput,
+} from "./schemas.js";
 
 export { PayWithholdingsLedgerFact as CalculatePayWithholdings } from "../facts/withholdings.js";
-
-/**
- * Independent version of the Australian pay ruleset represented by this
- * report.
- *
- * @since 1.0.0
- */
-const PayRulePackVersion = Schema.Literal("rules-au-pay/1.0.0");
-
-/**
- * Take-home pay report for one Australian pay-period scenario.
- *
- * The report preserves gross pay, taxable pay, the withholding ledger,
- * final net pay, and the trace rooted at the net-pay rule.
- *
- * @since 0.1.0
- */
-export class TakeHomePayReport extends Schema.TaggedClass<TakeHomePayReport>()(
-  "TakeHomePayReport",
-  {
-    grossPay: Money,
-    netPay: Money,
-    period: PayPeriod,
-    rulePackVersion: PayRulePackVersion,
-    taxablePay: Money,
-    trace: TraceNode,
-    withholdings: PayWithholdingsLedger,
-    withholdingsTotal: Money,
-  }
-) {}
 
 /**
  * Calculates the take-home pay report from the facts supplied by a rule pack.
@@ -73,32 +44,6 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
     withholdingsTotal: ledger.total,
   });
 });
-
-/**
- * Calculates the pay-period withholding ledger from the standard pay scenario.
- *
- * This is the withholding-specific calculator entrypoint over the same
- * scenario and PAYG ledger facts used by take-home pay.
- *
- * @since 0.1.0
- */
-
-/**
- * Input schema for the standard take-home-pay scenario helper.
- *
- * @since 0.1.0
- */
-export const TakeHomeScenarioInputSchema = Schema.Struct({
-  grossPay: GrossPay,
-  taxFreeThresholdClaimed: Schema.Boolean,
-});
-
-/**
- * Input type for the standard take-home-pay scenario helper.
- *
- * @since 0.1.0
- */
-export type TakeHomeScenarioInput = typeof TakeHomeScenarioInputSchema.Type;
 
 /**
  * Builds the typed scenario layer for gross pay and tax-free-threshold status.

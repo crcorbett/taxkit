@@ -338,7 +338,7 @@
     {
       "id": "CSF-T003",
       "title": "Prove one native API and Website path",
-      "status": "pending",
+      "status": "in_progress",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -396,7 +396,10 @@
         "The same-stage origin/binding and deadline/cancellation claims have runtime evidence.",
         "Website RPC, HTTP and later MCP reuse one checked application operation. Native RPC wire privacy and failure classification have source/version-matched proof, not assumed defaults or handwritten protocol framing."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-contract.json"
+      ]
     },
     {
       "id": "CSF-T004",

@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -28,7 +28,14 @@ Current implemented code lives in:
 - `packages/docs-content`
 - `packages/docs-fumadocs`
 - `packages/api/http`
-- `packages/sdk/typescript`
+- `packages/api/rpc`
+: Private compiled native Effect RPC transport. It owns one versioned calculation
+  procedure, thin calculator-service handler, checked POST/JSON ingress and
+  caller-scoped private client Layers. Calculator/content Schemas remain with
+  their existing owners. Explicit test-only composition is separate; no app
+  runtime or backend fallback belongs here. T003 app-host composition is pending.
+
+`packages/sdk/typescript`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
@@ -117,7 +124,7 @@ calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
 
 `apps/web`
 : Current scaffold app. It proves the runtime boundary and health endpoint
-while a future product workflow is still unscoped.
+while the accepted T003 calculator workflow is being implemented.
 
 `apps/docs`
 : Implemented public documentation app. It owns TanStack Start routes, the

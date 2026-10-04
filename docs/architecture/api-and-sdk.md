@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-api-sdk-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: API or SDK contracts, exports, lifetime or caller composition change
 ---
 
@@ -369,6 +369,34 @@ Both plain paths reuse `calculateReport`; dispatch and output decoding have one
 owner. The Effect interface remains caller-composed and creates no runtime.
 These lifetime changes fulfil part of the accepted fresh interface work; they
 do not establish the later calculator UI, transport limits or whole-task acceptance.
+
+## Native website RPC (T003 in progress)
+
+`@taxkit/api-rpc` now owns one versioned `Calculate` procedure over canonical
+calculator request/result Schemas. Its native server explicitly mounts POST
+`/rpc` with JSON; its handler delegates to `PublicCalculatorService.calculate`.
+The private generated client lives in the caller's Layer scope. Expected
+calculator failures project to fixed reasons, while version disagreement,
+unavailable transport, invalid replies and a complete-response deadline remain
+separate checked failures. Independent adapter defects remain defects.
+
+Native parser ingress checks procedure tags, bounded identities/batches/headers
+and a one-MiB UTF-8 input before dispatch. Native per-procedure and global defect
+encoding use a fixed value. The client marks only the native exit reply decoder;
+it does not classify every SchemaError as an invalid response. Installed Effect
+4.0.0 source and actual wire tests qualify these hooks. RPC APIs remain unstable.
+
+The [package README](../../packages/api/rpc/README.md) owns its explicit exports
+and current proof limits. The existing apps do not consume it yet; T003's real
+Worker/Website binding, browser CORS, origin and tracing qualification remain
+in progress. Public HTTP/OpenAPI still has its existing contract and runtime.
+
+Calculator Schemas use narrow core/rule Schema entrypoints. Diagnostics and
+report/input definitions have separate canonical modules; old entrypoints
+re-export the same definitions. Browser transport imports therefore avoid live
+engine/calculator/rule-pack modules. This changes export ownership, not tax
+rules or retained report values. It does not change the SDK's deliberate local
+calculation composition.
 
 ## Export boundaries
 

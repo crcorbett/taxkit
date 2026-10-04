@@ -32,6 +32,38 @@ const antiSlopRules = [
 
 const fixtureCases = [
   {
+    accepted: [
+      "packages/api/rpc/src/group.ts",
+      "packages/api/rpc/src/handlers.ts",
+      "packages/api/rpc/src/live.layer.ts",
+      "packages/api/rpc/src/schemas.ts",
+      "packages/api/rpc/src/errors.ts",
+      "packages/api/rpc/src/server.ts",
+      "packages/api/rpc/src/server-serialization.boundary.ts",
+      "packages/api/rpc/src/service.ts",
+      "packages/api/rpc/src/test.layer.ts",
+      "packages/api/rpc/src/__testing__/fixtures.ts",
+      "packages/api/rpc/test/handlers.test.ts",
+      "packages/api/rpc/test/deadline.test.ts",
+      "packages/api/rpc/vitest.config.ts",
+    ],
+    generated: "packages/api/rpc/src/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
     accepted: ["tools/oxlint/fixtures/strict-commonjs-accepted.cjs"],
     generated: ".generated-owned-source-rejected.cjs",
     namespace: "strict-effect",
@@ -1372,4 +1404,84 @@ test.each([
       },
     },
   ]);
+});
+
+describe("exact native RPC lint boundaries", () => {
+  test.effect("rejects decoding in a neighbouring RPC source file", () =>
+    Effect.gen(function* () {
+      const path = "packages/api/rpc/src/.generated-decoder-neighbour.ts";
+      yield* writeLintFixture(
+        join(repositoryRoot, path),
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);'
+      );
+      const result = yield* runOxlint(path);
+      expect(result.files).toBe(1);
+      expect(result.exitCode).not.toBe(0);
+      expect(result.codes).toContain("taxkit(no-decoding-outside-boundaries)");
+    }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+  );
+  test.effect.each([
+    {
+      path: "packages/api/rpc/src/server-serialization.boundary.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "packages/api/rpc/src/server-serialization.boundary.ts",
+      rejected: true,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "packages/api/rpc/src/server-serialization.boundary.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
+      path: "packages/api/rpc/test/handlers.test.ts",
+      rejected: false,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String); export const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "packages/api/rpc/test/deadline.test.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "packages/api/rpc/test/deadline.test.ts",
+      rejected: true,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+  ])("keeps $rule exact at $path", ({ path, source, rejected, rule }) =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const target = join(repositoryRoot, path);
+      // The test scope restores the real owner even if the actual CLI assertion
+      // fails; removing an existing source file would corrupt the checkout.
+      yield* Effect.acquireRelease(fs.readFileString(target), (original) =>
+        fs.writeFileString(target, original).pipe(Effect.orDie)
+      );
+      yield* fs.writeFileString(target, source);
+      const result = yield* runOxlint(path);
+      expect(result.files).toBe(1);
+      if (rejected) {
+        expect(result.exitCode).not.toBe(0);
+        expect(result.codes).toContain(rule);
+      } else {
+        expect(result.exitCode).toBe(0);
+        expect(result.codes).not.toContain(rule);
+      }
+    }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+  );
 });

@@ -368,3 +368,7 @@ At audit time, check that:
    source exports and verification exist.
 6. Keep this audit updated when new package roots, docs buckets or public
    surfaces are added.
+
+- [Native RPC contract](clean-slate-foundation/2026-10-05-native-rpc-contract.json): T003
+  native transport/package progress, narrow browser Schema ownership and explicit
+  pending app-host proof.

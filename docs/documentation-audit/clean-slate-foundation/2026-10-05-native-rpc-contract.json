@@ -1,0 +1,183 @@
+{
+  "document_type": "implementation-receipt",
+  "date": "2026-10-05",
+  "task": "CSF-T003",
+  "issue": "DEV-74",
+  "status": "locally-qualified",
+  "parent_revision": "5d9e9ab21ed7ce5687cea560c1db3ebe658bd375",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "repository": "crcorbett/taxkit",
+    "operation": "local implementation, tested commits, pushes and draft PRs",
+    "limit": "No merge, deployment, publication, version application or provider operation"
+  },
+  "implemented": [
+    "Private compiled @taxkit/api-rpc rendered using the canonical package tool and adapted to installed native stable Effect 4 POST/JSON APIs",
+    "One versioned Calculate procedure reuses calculator-owned request/result Schemas and delegates once to PublicCalculatorService.calculate",
+    "Native JSON parser/encoder retained; checked byte/envelope ingress prevents unsafe tags/IDs reaching native identity encoding; one-MiB UTF-8 parser input, at most 16 requests and 32 bounded header pairs",
+    "Supported global defect codec hook bypasses raw defect encoding and returns a fixed value; the per-procedure defect Schema also has a fixed encoding",
+    "Private generated client and test-only in-process Layer; no runtime in the package; checked expected/connection/reply/deadline errors, unrelated adapter defect identity and caller interruption preserved",
+    "One whole-response five-second deadline includes header and body work; operation provides credential omission/redirect rejection",
+    "Actual browser build exposed live modules imported by broad Schema roots; move canonical diagnostics and report/input definitions into narrow public Schema exports, preserving old entrypoints/class identities and retained calculations"
+  ],
+  "proof": [
+    {
+      "command": "native compiler, canonical lint and private package test",
+      "outcome": "pass: 27 native RPC tests in two files, actual POST/JSON handler/client, real calculator net pay 130100 cents at 165400 cents weekly gross, checked errors, pure/mixed defects, malformed JSON/envelopes/tags/IDs, version skew, invalid replies, exact independent SchemaError defect, deadlines/body/root-scope cleanup and operation policy",
+      "logs": [
+        "dev74-rpc-tests.log",
+        "dev74-rpc-types.log"
+      ]
+    },
+    {
+      "command": "bun run build",
+      "outcome": "pass: all 16 tasks; initial run has four matching caches, final run has 15 matching caches and rebuilds the native RPC package",
+      "logs": [
+        "dev74-rpc-root-build.log",
+        "dev74-rpc-root-build-final.log"
+      ]
+    },
+    {
+      "command": "SDK packed artifact and clean downstream consumer",
+      "outcome": "pass: actual packed SDK 46-file import smoke and independent downstream type/runtime/exports/browser bundle; temporary workspaces removed; no adad mutation",
+      "logs": [
+        "dev74-rpc-packed-sdk.log",
+        "dev74-rpc-downstream-sdk.log"
+      ]
+    },
+    {
+      "command": "private client browser build and output metadata inspection",
+      "outcome": "pass: 161118-byte minified browser bundle; no retained live engine/calculator/rule-pack, RPC server, Alchemy, Node/Bun host or authored content modules; core RuleSourcePolicy is a 39-byte Schema definition rather than a live rule",
+      "bundle_sha256": "dfdb72bf8b14f9b47335df3c34601ce10d0fea7a9fd3db9809ae32b20efb258d",
+      "logs": [
+        "dev74-rpc-browser-bundle.log",
+        "dev74-rpc-client-browser.meta.json"
+      ]
+    },
+    {
+      "command": "Oversized-body test with one-MiB parser limit deliberately relaxed to two MiB, then restored",
+      "outcome": "Expected failure: valid oversized JSON reaches real TakeHomePayReport when the limit is relaxed; original source restored in finally; passing test rejects this false green",
+      "logs": [
+        "dev74-rpc-byte-limit-mutation.log"
+      ]
+    },
+    {
+      "command": "All nine private exports: Bun source condition, Node default ESM import and native compiler declaration consumer with source condition disabled",
+      "outcome": "pass: actual source/default imports and emitted declaration resolution; no source-only fallback; private publication is N/A",
+      "logs": [
+        "dev74-rpc-export-proof.log",
+        "dev74-rpc-declaration-resolution.log"
+      ]
+    },
+    {
+      "command": "bun run test",
+      "outcome": "pass: final rerun has 25 workspace tasks and 25 matching package caches; prior run executes the fresh 27 RPC cases; 428 actual lint cases run afresh, including 21 new RPC positive/rejection cases; retained tax results unchanged",
+      "logs": [
+        "dev74-rpc-root-tests-final.log",
+        "dev74-rpc-exact-lint-tests.log",
+        "dev74-rpc-root-tests-final2.log"
+      ]
+    },
+    {
+      "command": "Five old/narrow Schema export identities in source and built default consumers",
+      "outcome": "pass: diagnostics, take-home report/input and annual report/input are the same objects at their old and new entrypoints",
+      "logs": [
+        "dev74-schema-identity.log"
+      ]
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "pass: 793 installs across 1021 packages with no changes; native compiler hash already matches replacement",
+      "logs": [
+        "dev74-rpc-frozen-install.log"
+      ]
+    },
+    {
+      "command": "bun run verification before the additional exact lint fixtures",
+      "outcome": "pass: 32 Quality cases including 13 isolated command/failure cases in 375.73 seconds; 25 type tasks; both unused-code inventories; 206 deployment cases, 21 skill cases and 16 evaluation cases; actual Chromium 24 SDK and four website cases",
+      "logs": [
+        "dev74-rpc-verification.log"
+      ],
+      "limit": "The final run also needs to cover the subsequently added exact lint fixtures"
+    },
+    {
+      "command": "Canonical package validator over unchanged source-only copy",
+      "outcome": "pass: exact config digests and source/export/service separation; ignored dist, node_modules and .turbo outputs excluded from validator input; original caches preserved",
+      "logs": [
+        "dev74-rpc-package-structure.log"
+      ]
+    },
+    {
+      "command": "bun run verification after the additional exact lint fixtures and sorted-key correction",
+      "outcome": "pass: 32 Quality cases including 13 isolated command/failure cases in 376.88 seconds; 25 type tasks; both unused-code inventories; 206 deployment cases, 21 skill cases and 16 evaluation cases; actual Chromium 24 SDK and four website cases with matching cached browser results",
+      "logs": [
+        "dev74-rpc-verification-final2.log"
+      ],
+      "limit": "Local private transport slice only; no connected app, deployed Worker or complete telemetry qualification"
+    }
+  ],
+  "documentation_impact": {
+    "Change required": [
+      "packages/api/rpc/**",
+      "packages/core/src/engine/schemas.ts and narrow export/README",
+      "packages/rules/au/pay and income-tax canonical calculator Schema modules and narrow exports/READMEs",
+      "packages/calculators/src/schemas.ts and README",
+      "docs/architecture/api-and-sdk.md",
+      "docs/architecture/package-ownership.md",
+      "docs/architecture/testing-and-quality.md",
+      "oxlint.config.ts exact decoder/fixture-encoder/class-factory permissions",
+      "knip.json and knip.production.json",
+      "bun.lock",
+      ".changeset/native-calculator-rpc.md",
+      "docs/product-specs/clean-slate-foundation.tasks.json",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/README.md",
+      "tools/oxlint/portable-rules.test.ts"
+    ],
+    "Preserve": [
+      "All tax parameters/results and old public Schema/calculator exports",
+      "Public HTTP/OpenAPI and current Bun API, web scaffold, docs host and provider graph",
+      "Canonical upstream skill trees/digests and host execution permissions",
+      "Historical failed/qualified evidence and release train"
+    ],
+    "N/A": {
+      "provider runbook": "This package-only slice changes no provider command or graph; real host operations remain with later T003 composition",
+      "generated OpenAPI/public MDX": "No HTTP contract or public content changes",
+      "private RPC packing": "Compiled workspace package has no public publication target; source/default/declaration checks remain local"
+    }
+  },
+  "limitations": [
+    "Private contract slice is locally qualified; T003 remains in progress until the real app requirements pass",
+    "Actual app Worker/Website, matching-stage binding/own origin, real browser CORS/navigation/unmount and full trace-field/export qualification remain pending",
+    "Captured native reply/log sentinels do not qualify exported traces or provider telemetry; per-procedure/global replies are qualified on the selected version only",
+    "Parser byte limits prevent parsing oversized input; native request-reader limits belong to the incoming app host and are not yet qualified",
+    "Browser bundle proof covers the private client, not a production Website artifact",
+    "Companion adad qualification remains exactly 59b0a36ff1bc6f95501734ee65d789a4f5a37fcc; no later SDK qualification there",
+    "Linear tracking mutation remains blocked by automatic approval review pending the existing exact user question",
+    "Native RPC tracing is disabled in this candidate; this is containment, not completion of the accepted safe native tracing requirement"
+  ],
+  "recovery": {
+    "failed_observations": [
+      "Canonical renderer first rejected an incomplete version snapshot; no target was created until the existing qualified graph and template-adaptation limit were recorded",
+      "An automated lint suggestion incorrectly added new to a Schema class factory; native compiler/tests rejected it, the constructor was restored and exact class-factory spelling admission added",
+      "The first log fixture blocked waiting for an empty Queue; closing/collecting the owned observation queue after native server scope cleanup fixes the fixture without extending its deadline",
+      "Typed fixture construction required owning branded constructors, and operation policy observation uses serviceOption to preserve the native HttpClient requirement",
+      "Initial client bundle retained live engine/rule-pack imports through broad Schema exports; narrow canonical owners remove them",
+      "The first new lint fixture pass used the wrong encoder rule label and omitted an import blank line; corrected fixture inputs and labels pass without changing lint policy. Existing owners are restored by scoped finalizers on all outcomes",
+      "Running the structural validator over the working package also scanned an ignored Turbo log with a local path; a source-only package copy passes the unchanged canonical validator without deleting caches or weakening the validator",
+      "The first final verification stopped on six unsorted object keys in the new lint fixture table; the automatic fix sorts those keys only and leaves policy unchanged. Failure retained in dev74-rpc-verification-final.log"
+    ],
+    "rollback": "Revert the complete slice to the parent commit and restore its frozen dependency graph"
+  },
+  "previous_hosted_check": {
+    "workflow_run": 37215859846,
+    "head": "5d9e9ab21ed7ce5687cea560c1db3ebe658bd375",
+    "conclusion": "success",
+    "limit": "Foundation draft #127 only; not this uncommitted T003 work"
+  },
+  "non_claims": [
+    "No completed T003 task or connected calculator app",
+    "No Medicare correction",
+    "No provider readback, apply, hosted new Worker or publication"
+  ]
+}

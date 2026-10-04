@@ -1,9 +1,9 @@
 import {
   FactQuestion,
   FactQuestionId,
-  Money,
   makeFactDescriptor,
-} from "@taxkit/core";
+} from "@taxkit/core/facts";
+import { Money } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import { Context, Match, Schema } from "effect";
 

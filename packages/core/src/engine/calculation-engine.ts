@@ -1,6 +1,9 @@
-import { Context, Effect, Layer, Schema } from "effect";
+import { Context, Effect, Layer } from "effect";
 
-import { GraphValidationIssue } from "../graph/rule-graph.js";
+import type { GraphValidationIssue } from "../graph/rule-graph.js";
+import { CalculationDiagnostics } from "./schemas.js";
+
+export { CalculationDiagnostics } from "./schemas.js";
 
 /**
  * Input accepted by the core calculation engine.
@@ -16,18 +19,6 @@ export interface CalculationRequest<A, E, R> {
   readonly layer: Layer.Layer<R, E>;
   readonly validationIssues?: readonly GraphValidationIssue[];
 }
-
-/**
- * Diagnostics returned by the calculation engine.
- *
- * @since 0.1.0
- */
-export class CalculationDiagnostics extends Schema.TaggedClass<CalculationDiagnostics>()(
-  "CalculationDiagnostics",
-  {
-    graphIssues: Schema.Array(GraphValidationIssue),
-  }
-) {}
 
 /**
  * Result envelope returned by the calculation engine.

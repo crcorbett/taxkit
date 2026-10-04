@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-24
-source_of_truth: package-readme
-confidence: medium
+document_type: package-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-calculators-owner
+last_reviewed: 2026-10-05
+review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
 # Calculators
@@ -113,3 +115,9 @@ artifact, public entrypoints and concrete dependency ranges.
 - `docs/architecture/package-boundaries.md`
 - `docs/architecture/effect-services.md`
 - `docs/architecture/api-and-sdk.md`
+
+## Browser Schema entrypoints
+
+`@taxkit/calculators/schemas` consumes narrow core/rule Schema entrypoints and owns no live runtime or rule pack. The RPC contract reuses its existing request and report Schemas; calculation remains with `PublicCalculatorService.calculate`.
+
+The [transport architecture](../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.

@@ -14,6 +14,10 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Native RPC parser unknown envelopes and exact adversarial transport fixtures.
+  "packages/api/rpc/src/server-serialization.boundary.ts",
+  "packages/api/rpc/test/handlers.test.ts",
+  "packages/api/rpc/test/deadline.test.ts",
   // Actual Vite-defined JSON input is decoded once with the owning build-input Schema.
   "apps/web/src/lib/config.boundary.test.ts",
   "apps/api/scripts/routes.ts",
@@ -169,6 +173,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Test-only native request/reply bytes; no production encoder admission.
+  "packages/api/rpc/test/handlers.test.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
   "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
@@ -416,6 +422,9 @@ export default defineConfig({
       files: [
         "apps/docs/scripts/check-import-boundaries.runtime.ts",
         "apps/api/src/config.ts",
+        // Schema.TaggedError is a class factory, not an Error constructor.
+        "packages/api/rpc/src/live.layer.ts",
+        "packages/api/rpc/src/server-serialization.boundary.ts",
         "apps/web/src/lib/config.ts",
         "apps/api/scripts/routes.ts",
         "apps/api/scripts/smoke-public-routes.runtime.ts",

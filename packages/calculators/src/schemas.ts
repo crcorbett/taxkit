@@ -1,23 +1,17 @@
-import {
-  CalculationError,
-  CalculationDiagnostics,
-  FactAuthority,
-  FactId,
-  FactQuestion,
-  GraphValidationIssue,
-  ParameterEffectivePeriod,
-  ParameterId,
-  RuleId,
-  RuleSourcePolicy,
-  SourceRef,
-} from "@taxkit/core";
+import { CalculationDiagnostics } from "@taxkit/core/engine/schemas";
+import { CalculationError } from "@taxkit/core/errors";
+import { FactAuthority, FactId, FactQuestion } from "@taxkit/core/facts";
+import { GraphValidationIssue } from "@taxkit/core/graph";
+import { ParameterEffectivePeriod, ParameterId } from "@taxkit/core/parameters";
+import { RuleSourcePolicy } from "@taxkit/core/rules";
+import { RuleId, SourceRef } from "@taxkit/core/trace";
 import {
   AnnualTaxReport,
   AnnualTaxScenarioInputSchema,
   AuAnnualTaxCalculatorId,
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
-} from "@taxkit/rules-au-income-tax";
+} from "@taxkit/rules-au-income-tax/schemas";
 import {
   AuPayCalculatorId,
   AuPayJurisdiction,
@@ -25,7 +19,7 @@ import {
   PayWithholdingsLedger,
   TakeHomePayReport,
   TakeHomeScenarioInputSchema,
-} from "@taxkit/rules-au-pay";
+} from "@taxkit/rules-au-pay/schemas";
 import { Data, Schema } from "effect";
 
 /**

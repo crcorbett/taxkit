@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: package-readme
-confidence: medium
+document_type: package-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-core-owner
+last_reviewed: 2026-10-05
+review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
 # Core
@@ -74,3 +76,9 @@ artifact and its concrete dependency ranges.
 - `docs/architecture/facts.md`
 - `docs/architecture/rules-and-parameters.md`
 - `docs/architecture/graph-trace-ledgers.md`
+
+## Browser Schema entrypoints
+
+The browser-safe `@taxkit/core/engine/schemas` entrypoint owns `CalculationDiagnostics` without importing the live engine. Existing core/engine/root exports re-export the same class.
+
+The [transport architecture](../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.

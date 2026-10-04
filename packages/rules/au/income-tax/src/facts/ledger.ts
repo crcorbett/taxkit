@@ -1,4 +1,4 @@
-import { makeFactDescriptor } from "@taxkit/core";
+import { makeFactDescriptor } from "@taxkit/core/facts";
 import { LedgerComponent } from "@taxkit/core/ledger";
 import { Money } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";

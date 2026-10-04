@@ -157,6 +157,18 @@
     "packages/testing": {
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.ts!"]
+    },
+    "packages/api/rpc": {
+      "entry": [
+        "src/group.ts!",
+        "src/handlers.ts!",
+        "src/service.ts!",
+        "src/server.ts!",
+        "src/live.layer.ts!",
+        "src/schemas.ts!",
+        "src/errors.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
     }
   }
 }

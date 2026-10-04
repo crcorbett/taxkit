@@ -1,0 +1,450 @@
+import { describe, expect, it } from "@effect/vitest";
+import {
+  Array,
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  Logger,
+  Match,
+  Queue,
+  References,
+  Result,
+  Schema,
+} from "effect";
+import {
+  HttpClient,
+  HttpClientRequest,
+  HttpRouter,
+  HttpServerRequest,
+  HttpServerResponse,
+} from "effect/http";
+import { Rpc, RpcClient, RpcSerialization } from "effect/rpc";
+
+import {
+  CalculationRequest,
+  CalculatorFixture,
+  CalculatorLive,
+  sensitiveSentinel,
+} from "../src/__testing__/fixtures.js";
+import {
+  CalculatorRpcInvalidResponse,
+  CalculatorRpcRejected,
+} from "../src/errors.js";
+import { Calculate, TaxKitRpcGroup } from "../src/group.js";
+import { TaxKitRpcClientLive } from "../src/live.layer.js";
+import { CalculatorRpcOrigin, CalculatorRpcVersion } from "../src/schemas.js";
+import { TaxKitRpcHttpLayer } from "../src/server.js";
+import { TaxKitRpcClient } from "../src/service.js";
+import { TaxKitRpcClientTest } from "../src/test.layer.js";
+
+const origin = Schema.decodeResult(CalculatorRpcOrigin)(
+  "https://api.example.com"
+).pipe(Result.getOrThrowWith(() => new Error("Invalid fixture origin")));
+const JsonFixture = Schema.fromJsonString(Schema.Unknown);
+const NativeRequestFixture = Schema.TaggedStruct("Request", {
+  headers: Schema.Unknown,
+  id: Schema.Unknown,
+  payload: Schema.Unknown,
+  tag: Schema.Unknown,
+});
+const NativeSuccessFixture = Schema.TaggedStruct("Success", {
+  value: Schema.Unknown,
+});
+const NativeExitFixture = Schema.TaggedStruct("Exit", {
+  exit: NativeSuccessFixture,
+  requestId: Schema.Unknown,
+});
+
+const makeHttpTransport = Effect.fnUntraced(function* (
+  mode: "success" | "expected" | "defect" | "mixed"
+) {
+  const handler = yield* HttpRouter.toHttpEffect(
+    TaxKitRpcHttpLayer.pipe(Layer.provide(CalculatorFixture(mode)))
+  );
+  return HttpClient.make((request) =>
+    handler.pipe(
+      Effect.provideService(
+        HttpServerRequest.HttpServerRequest,
+        HttpServerRequest.fromClientRequest(request)
+      ),
+      Effect.map((response) =>
+        HttpServerResponse.toClientResponse(response, { request })
+      ),
+      Effect.orDie,
+      Effect.scoped
+    )
+  );
+});
+
+describe("native calculator RPC", () => {
+  it.effect("rejects an oversized body before native JSON parsing", () =>
+    Effect.gen(function* () {
+      const transport = yield* makeHttpTransport("success");
+      const wire = yield* Schema.encodeEffect(JsonFixture)(
+        NativeRequestFixture.make({
+          headers: [],
+          id: "1",
+          payload: {
+            request: {
+              ...CalculationRequest,
+              payload: {
+                ...CalculationRequest.payload,
+                padding: "x".repeat(1024 * 1024),
+              },
+            },
+            version: CalculatorRpcVersion,
+          },
+          tag: Calculate._tag,
+        })
+      );
+      const response = yield* transport.execute(
+        HttpClientRequest.post(`${origin.origin}/rpc`).pipe(
+          HttpClientRequest.bodyText(wire, "application/json")
+        )
+      );
+      const body = yield* response.text;
+      expect(body).not.toContain(sensitiveSentinel);
+      expect(body).toContain("Calculation service failed");
+      expect(body).not.toContain("TakeHomePayReport");
+    }).pipe(Effect.scoped)
+  );
+
+  it.effect(
+    "remote native defects remain defects with only a fixed safe value",
+    () =>
+      Effect.gen(function* () {
+        const transport = yield* makeHttpTransport("defect");
+        yield* Effect.gen(function* () {
+          const client = yield* TaxKitRpcClient;
+          const exit = yield* client
+            .calculate(CalculationRequest)
+            .pipe(Effect.exit);
+          expect(Exit.isFailure(exit)).toBe(true);
+          if (Exit.isFailure(exit)) {
+            expect(Cause.hasFails(exit.cause)).toBe(false);
+            expect(
+              Result.match(Cause.findDie(exit.cause), {
+                onFailure: () => false,
+                onSuccess: (reason) =>
+                  reason.defect === "Calculation service failed",
+              })
+            ).toBe(true);
+          }
+        }).pipe(
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+      }).pipe(Effect.scoped)
+  );
+
+  it.effect("delegates to the real calculator in the explicit test layer", () =>
+    Effect.gen(function* () {
+      const client = yield* TaxKitRpcClient;
+      const response = yield* client.calculate(CalculationRequest);
+      expect(response.report._tag).toBe("TakeHomePayReport");
+      Match.value(response.report).pipe(
+        Match.tag("TakeHomePayReport", (report) => {
+          expect(report.netPay.cents).toBe(130_100);
+          expect(report.grossPay.cents).toBe(165_400);
+        }),
+        Match.orElse(() => expect.fail("Expected take-home report"))
+      );
+    }).pipe(
+      Effect.provide(TaxKitRpcClientTest.pipe(Layer.provide(CalculatorLive)))
+    )
+  );
+
+  it.effect(
+    "uses native POST and JSON with a checked full calculator result",
+    () =>
+      Effect.gen(function* () {
+        const transport = yield* makeHttpTransport("success");
+        yield* Effect.gen(function* () {
+          const client = yield* TaxKitRpcClient;
+          const response = yield* client.calculate(CalculationRequest);
+          Match.value(response.report).pipe(
+            Match.tag("TakeHomePayReport", (report) =>
+              expect(report.netPay.cents).toBe(130_100)
+            ),
+            Match.orElse(() => expect.fail("Expected take-home report"))
+          );
+        }).pipe(
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+      }).pipe(Effect.scoped)
+  );
+
+  it.effect.each(["expected", "defect", "mixed"] as const)(
+    "keeps %s failure bytes private in native replies and logs",
+    (mode) =>
+      Effect.gen(function* () {
+        const logs = yield* Queue.make<string, Cause.Done>({
+          capacity: 32,
+          strategy: "dropping",
+        });
+        const logger = Logger.make((options) =>
+          Queue.offerUnsafe(logs, Logger.formatJson.log(options))
+        );
+        yield* Effect.gen(function* () {
+          const transport = yield* makeHttpTransport(mode);
+          const input = yield* Schema.encodeEffect(JsonFixture)(
+            NativeRequestFixture.make({
+              headers: [],
+              id: "1",
+              payload: {
+                request: CalculationRequest,
+                version: CalculatorRpcVersion,
+              },
+              tag: Calculate._tag,
+            })
+          );
+          const response = yield* transport.execute(
+            HttpClientRequest.post(`${origin.origin}/rpc`).pipe(
+              HttpClientRequest.bodyText(input, "application/json")
+            )
+          );
+          const wire = yield* response.text;
+          expect(response.status).toBe(200);
+          expect(wire).not.toContain(sensitiveSentinel);
+          const replies = yield* Schema.decodeUnknownEffect(JsonFixture)(wire);
+          expect(replies).toBeDefined();
+          expect(wire).toContain(
+            mode === "expected"
+              ? "CalculatorRpcRejected"
+              : "Calculation service failed"
+          );
+        }).pipe(
+          Effect.scoped,
+          Effect.provide(Logger.layer([logger])),
+          Effect.provideService(References.MinimumLogLevel, "Trace")
+        );
+        yield* Queue.end(logs);
+        const observed = yield* Queue.collect(logs);
+        expect(
+          Array.every(observed, (line) => !line.includes(sensitiveSentinel))
+        ).toBe(true);
+      }).pipe(Effect.scoped)
+  );
+
+  it.effect(
+    "round trips the checked expected error class without its private source fields",
+    () =>
+      Effect.gen(function* () {
+        const transport = yield* makeHttpTransport("expected");
+        yield* Effect.gen(function* () {
+          const client = yield* TaxKitRpcClient;
+          const failure = yield* client
+            .calculate(CalculationRequest)
+            .pipe(Effect.flip);
+          expect(Schema.is(CalculatorRpcRejected)(failure)).toBe(true);
+          expect(failure).toEqual(
+            new CalculatorRpcRejected({ reason: "input" })
+          );
+        }).pipe(
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+      }).pipe(Effect.scoped)
+  );
+
+  it.effect.each([
+    NativeRequestFixture.make({
+      headers: [],
+      id: "1",
+      payload: {},
+      tag: sensitiveSentinel,
+    }),
+    NativeRequestFixture.make({
+      headers: [],
+      id: sensitiveSentinel,
+      payload: {},
+      tag: "Calculate",
+    }),
+    NativeRequestFixture.make({
+      headers: [],
+      id: -1,
+      payload: {},
+      tag: "Calculate",
+    }),
+    Schema.TaggedStruct(sensitiveSentinel, {}).make({}),
+    NativeRequestFixture.make({
+      headers: Array.makeBy(33, () => ["accept", "application/json"]),
+      id: "1",
+      payload: {},
+      tag: "Calculate",
+    }),
+    NativeRequestFixture.make({
+      headers: [["accept", "x".repeat(4097)]],
+      id: "1",
+      payload: {},
+      tag: "Calculate",
+    }),
+    Array.makeBy(17, (index) =>
+      NativeRequestFixture.make({
+        headers: [],
+        id: `${index + 1}`,
+        payload: {},
+        tag: "Calculate",
+      })
+    ),
+    NativeRequestFixture.make({
+      headers: sensitiveSentinel,
+      id: "1",
+      payload: {},
+      tag: "Calculate",
+    }),
+    NativeRequestFixture.make({
+      headers: [],
+      id: "1",
+      payload: { request: sensitiveSentinel },
+      tag: "Calculate",
+    }),
+  ])(
+    "rejects unsafe native envelope case %# without reflecting its input",
+    (fixture) =>
+      Effect.gen(function* () {
+        const transport = yield* makeHttpTransport("success");
+        const wire = yield* Schema.encodeEffect(JsonFixture)(fixture);
+        const response = yield* transport.execute(
+          HttpClientRequest.post(`${origin.origin}/rpc`).pipe(
+            HttpClientRequest.bodyText(wire, "application/json")
+          )
+        );
+        const body = yield* response.text;
+        expect(body).not.toContain(sensitiveSentinel);
+        expect(body).toContain("Calculation service failed");
+        expect(body).not.toContain("TakeHomePayReport");
+      }).pipe(Effect.scoped)
+  );
+
+  it.effect("does not reflect malformed JSON or accept version skew", () =>
+    Effect.gen(function* () {
+      const transport = yield* makeHttpTransport("success");
+      const response = yield* transport.execute(
+        HttpClientRequest.post(`${origin.origin}/rpc`).pipe(
+          HttpClientRequest.bodyText(
+            `{${sensitiveSentinel}`,
+            "application/json"
+          )
+        )
+      );
+      const malformed = yield* response.text;
+      expect(malformed).not.toContain(sensitiveSentinel);
+      expect(malformed).toContain("Calculation service failed");
+      const client = yield* RpcClient.make(TaxKitRpcGroup, {
+        disableTracing: true,
+      }).pipe(
+        Effect.provide(
+          RpcClient.layerProtocolHttp({ url: `${origin.origin}/rpc` }).pipe(
+            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
+            Layer.provide(RpcSerialization.layerJson)
+          )
+        )
+      );
+      const skew = yield* client
+        .Calculate({ request: CalculationRequest, version: "2" })
+        .pipe(Effect.flip);
+      expect(skew._tag).toBe("CalculatorRpcVersionMismatch");
+      expect(Rpc.exitSchema(Calculate).ast).toBe(Rpc.exitSchema(Calculate).ast);
+      expect(Schema.Defect().ast).toBe(Schema.Defect().ast);
+    }).pipe(Effect.scoped)
+  );
+
+  it.effect.each(["json", "schema"] as const)(
+    "classifies a broken %s reply as a checked invalid response",
+    (mode) =>
+      Effect.gen(function* () {
+        const transport = HttpClient.make((request) =>
+          Effect.gen(function* () {
+            const incoming = yield* HttpServerRequest.fromClientRequest(
+              request
+            ).text.pipe(
+              Effect.flatMap(
+                Schema.decodeUnknownEffect(
+                  Schema.fromJsonString(
+                    Schema.Struct({
+                      id: Schema.Union([Schema.String, Schema.Finite]),
+                    })
+                  )
+                )
+              )
+            );
+            const reply =
+              mode === "json"
+                ? "{"
+                : yield* Schema.encodeEffect(JsonFixture)([
+                    NativeExitFixture.make({
+                      exit: NativeSuccessFixture.make({
+                        value: sensitiveSentinel,
+                      }),
+                      requestId: incoming.id,
+                    }),
+                  ]);
+            return HttpServerResponse.toClientResponse(
+              HttpServerResponse.text(reply, {
+                contentType: "application/json",
+              }),
+              { request }
+            );
+          }).pipe(Effect.orDie)
+        );
+        yield* Effect.gen(function* () {
+          const client = yield* TaxKitRpcClient;
+          const error = yield* client
+            .calculate(CalculationRequest)
+            .pipe(Effect.flip);
+          expect(Schema.is(CalculatorRpcInvalidResponse)(error)).toBe(true);
+        }).pipe(
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+      })
+  );
+
+  it.effect(
+    "preserves an unrelated adapter SchemaError by exact defect identity",
+    () =>
+      Effect.gen(function* () {
+        const original = yield* Schema.decodeUnknownEffect(Schema.String)(
+          123
+        ).pipe(Effect.flip);
+        const transport = HttpClient.make(() => Effect.die(original));
+        yield* Effect.gen(function* () {
+          const client = yield* TaxKitRpcClient;
+          const exit = yield* client
+            .calculate(CalculationRequest)
+            .pipe(Effect.exit);
+          expect(Exit.isFailure(exit)).toBe(true);
+          if (Exit.isFailure(exit)) {
+            expect(Cause.hasFails(exit.cause)).toBe(false);
+            expect(
+              Result.match(Cause.findDie(exit.cause), {
+                onFailure: () => false,
+                onSuccess: (reason) => reason.defect === original,
+              })
+            ).toBe(true);
+          }
+        }).pipe(
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+      })
+  );
+});

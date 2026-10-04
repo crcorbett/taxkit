@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: package-readme
-confidence: medium
+document_type: package-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-au-income-tax-owner
+last_reviewed: 2026-10-05
+review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
 # Australian Income Tax Rules
@@ -48,3 +50,9 @@ tarball validated by the SDK-owned strict downstream gate.
 - `docs/architecture/rules-and-parameters.md`
 - `docs/architecture/calculators.md`
 - `docs/standards/code-patterns.md`
+
+## Browser Schema entrypoints
+
+Use `@taxkit/rules-au-income-tax/schemas` for canonical calculator metadata, `AnnualTaxReport` and `AnnualTaxScenarioInputSchema` without live calculator or rule-pack imports. Existing root/calculator exports retain the same definitions and calculation behaviour.
+
+The [transport architecture](../../../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.
