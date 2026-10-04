@@ -54,6 +54,7 @@ const decodingBoundaryFiles = [
   "tools/oxlint/cli-fixture.ts",
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
   "tools/oxlint/portable-rules.test.ts",
+  "tools/oxlint/lexical-policy.test.ts",
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/check.runtime.test.ts",
@@ -432,6 +433,7 @@ export default defineConfig({
         "packages/docs-fumadocs/**",
       ],
       rules: {
+        "effect/no-runtime-references-outside-boundaries": "error",
         "strict-effect/error-constructor-new": "error",
         "strict-effect/no-imperative-collections": "error",
         "strict-effect/no-native-at": "error",
@@ -443,6 +445,8 @@ export default defineConfig({
         "strict-effect/no-unsafe-option-unwrap": "error",
         "strict-effect/runtime-file-convention": "error",
         "strict-effect/tagged-error-name": "error",
+        "taxkit/no-native-collections": "error",
+        "taxkit/no-object-writes": "error",
       },
     },
     {
@@ -637,6 +641,7 @@ export default defineConfig({
       files: runtimeBoundaryFiles,
       rules: {
         "effect/no-runtime-execution-outside-boundaries": "off",
+        "effect/no-runtime-references-outside-boundaries": "off",
       },
     },
     {

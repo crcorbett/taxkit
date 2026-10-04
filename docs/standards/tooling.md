@@ -406,6 +406,19 @@ method must make that verifier fail with its expected failure identity. The
 normal tracked configuration is preserved throughout those copied-workspace
 checks. No canonical plugin asset or production runtime admission changes.
 
+Migrated strict paths also reject native Map/Set/WeakMap/WeakSet constructors
+through lexical aliases and Object/Reflect writes, including escaping writer
+callbacks and forwarded methods. Built-in identity requires
+an unresolved name or a global variable with no local definitions; a same-named
+local stays separate. The shared tracker indexes host Reference objects so read
+uses remain distinct from declarations and write-only identifiers. A separate
+runner-reference rule catches captures, exports and callbacks alongside the
+existing call rule, using the same exact runtime boundaries. Callback/context
+runner variants and Node/Bun runtime imports use the installed API identities.
+Actual CLI cases retain old diagnostic counts and accept persistent collections
+and Ref-owned immutable updates. These additions remain incremental; readonly
+contracts, other paths and static JavaScript qualification are pending.
+
 The pinned Turbo version defaults to automatic root AGENTS.md edits when it
 detects an agent. TaxKit opts out with `agentGuidance: false` in `turbo.json`,
 keeping the canonical task router under maintainer control and preventing a

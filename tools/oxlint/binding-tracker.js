@@ -54,11 +54,11 @@ export const createBindingTracker = (
   // Oxlint owns one synchronous listener lifetime per rule and source file.
   // Ref owns its changing bindings; each update replaces a persistent map.
   const bindingSemantics = Ref.makeUnsafe(HashMap.empty());
-  const referenceVariables = HashMap.fromIterable(
+  const lexicalReferences = HashMap.fromIterable(
     EffectArray.flatMap(sourceCode.scopeManager.scopes, (scope) =>
       EffectArray.map(scope.references, (reference) => [
         referenceIdentity(reference.identifier),
-        reference.resolved ?? null,
+        reference,
       ])
     )
   );
@@ -69,9 +69,14 @@ export const createBindingTracker = (
     }
 
     const variable = Option.getOrUndefined(
-      HashMap.get(referenceVariables, referenceIdentity(node))
+      HashMap.get(lexicalReferences, referenceIdentity(node)).pipe(
+        Option.map((reference) => reference.resolved ?? null)
+      )
     );
     if (variable) {
+      if (variable.scope?.type === "global" && variable.defs.length === 0) {
+        return Option.getOrNull(HashMap.get(globalSemantics, node.name));
+      }
       return Option.getOrNull(
         HashMap.get(
           Ref.getUnsafe(bindingSemantics),
@@ -138,7 +143,9 @@ export const createBindingTracker = (
 
   const setReferencedSemantic = (node, semantic) => {
     const variable = Option.getOrUndefined(
-      HashMap.get(referenceVariables, referenceIdentity(node))
+      HashMap.get(lexicalReferences, referenceIdentity(node)).pipe(
+        Option.map((reference) => reference.resolved ?? null)
+      )
     );
     if (variable && semantic) {
       MutableRef.update(
@@ -187,7 +194,9 @@ export const createBindingTracker = (
   const clearPattern = (pattern) => {
     if (pattern?.type === "Identifier") {
       const variable = Option.getOrUndefined(
-        HashMap.get(referenceVariables, referenceIdentity(pattern))
+        HashMap.get(lexicalReferences, referenceIdentity(pattern)).pipe(
+          Option.map((reference) => reference.resolved ?? null)
+        )
       );
       if (variable) {
         MutableRef.update(
@@ -216,6 +225,11 @@ export const createBindingTracker = (
       node?.type === "CallExpression"
         ? semanticOfExpression(node.callee)
         : null,
+    isReadReference: (node) =>
+      Option.exists(
+        HashMap.get(lexicalReferences, referenceIdentity(node)),
+        (reference) => reference.isRead()
+      ),
     semanticOfExpression,
     semanticOfTypeName,
     trackAssignment(node) {

@@ -32,10 +32,11 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: qualify the Bun-hosted Effect test runner in the
-repository, then migrate remaining app, package, tool, test, config and
-infrastructure workflows to the complete canonical strict policy before
-downstream acceptance. Domain boundary enforcement is implemented in PR #93. The latest
+Next continuation milestone: migrate the remaining documentation/deployment,
+evaluation, SDK, app/config and infrastructure paths, then finish readonly
+contract, Schema, helper and lifetime review before downstream acceptance.
+The Bun-hosted Effect test runner and focused lexical gap proof are locally
+qualified; static JavaScript checking remains pending. Domain boundary enforcement is implemented in PR #93. The latest
 stable-v4 adad qualification handoff remains revision
 `59b0a36ff1bc6f95501734ee65d789a4f5a37fcc`; it is not Medicare-correctness proof.
 
@@ -73,7 +74,7 @@ records command outcomes and log digests.
 | T002 / DEV-73 | Qualification in progress | Qualify exact current dependency graph and complete strict enforcement before application changes. |
 | T003 / DEV-74 | Pending T002 | First same-stage website/backend calculation. |
 | T004 / DEV-75 | Pending T003 | All three calculators and deliberate public interface changes. |
-| T005 / DEV-76 | Pending T003 | Accepted content, route retention, search and discovery. |
+| T005 / DEV-76 | Pending T003/T004 | Accepted content, route retention, search and discovery. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
@@ -591,3 +592,48 @@ tasks reused matching caches. Vitest shortened the first expected rule name;
 a stable assertion message corrected failure identity without changing the
 rule-membership check. Parent #102 hosted Quality passed at exact `9b6860e`
 (run 37181658155). Final receipt-only docs/format checks precede commit.
+
+## Local T002 lexical policy gaps
+
+Continue from `852d246` and draft #103. An actual installed-CLI probe in
+calculator source found no native-collection diagnostic for renamed weak
+constructors, no write diagnostic for Object/Reflect, and no runner-reference
+diagnostic for an exported Effect runner. The file did have unrelated style
+findings; this is evidence of those specific missing checks, not a combined
+baseline acceptance claim.
+
+Retain the canonical skill asset. Extend the existing native-collection rule
+through shared lexical tracking and add focused Object/Reflect write and
+runner-reference owners. Writer captures, callbacks, forwarded methods and
+nested destructured exports stay rejected. One exact new test decoding
+admission owns the external CLI report Schema; no production decoder
+admission changes. Recognise configured built-ins only when unresolved
+or in the host's global scope without local definitions. Read references
+remain distinct from declarations and write-only bindings. Persistent maps
+index the existing host Reference objects; no syntax node is modified.
+The installed Oxlint Scope/Variable/Reference declarations own those fields.
+
+Direct runner calls retain their existing policy. Captures, callback use,
+destructured exports and forwarded function references have a separate
+policy; both share exact existing runtime boundaries. The installed Effect
+runner family includes callback/context-taking variants, and Node runtime
+imports join Bun runtime imports. Apply new native-collection, object-write
+and reference checks to the already migrated strict paths. Other path
+qualification is pending; do not add broad exclusions to make it appear done.
+
+Documentation impact: **Change required** for lint owners/config, CLI corpus,
+tooling/testing owners, this plan, task evidence and dated receipt. **Preserve**
+canonical skills, existing CLI counts, runtime-boundary identity, tax/package
+behaviour and provider state. **N/A** for Changesets, public docs and runbooks:
+root checking policy only. Recover by reverting the complete slice. The
+[lexical gap receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-lexical-policy-gaps.json)
+records proof and limitations. Readonly class/domain contracts, complete path
+migration, static JavaScript checking and semantic review remain unfinished.
+
+Local qualification passed: pinned frozen install, all 126 actual CLI cases,
+complete repository tests, 15-task build and full verification. Quality proof
+retains 21 cases and all ten isolated mutations; 21 skill cases passed.
+Unchanged app/package/browser tasks reused matching caches. Parent #103 hosted
+Quality passed at exact `852d246` (run 37182416078). A duplicate syntax-name
+import was removed after the actual CLI rejected plugin loading; the final
+corpus passed. Final receipt-only docs/format checks precede commit.

@@ -72,9 +72,32 @@ const platformBunImportSemantic = (source, specifierType, imported) => {
   return null;
 };
 
+const platformNodeImportSemantic = (source, specifierType, imported) => {
+  if (
+    source === "@effect/platform-node" &&
+    specifierType === "ImportSpecifier" &&
+    imported === "NodeRuntime"
+  ) {
+    return "NodeRuntime";
+  }
+  if (
+    source === "@effect/platform-node" &&
+    specifierType === "ImportNamespaceSpecifier"
+  ) {
+    return "platform-node";
+  }
+  if (source === "@effect/platform-node/NodeRuntime") {
+    return specifierType === "ImportSpecifier" && imported
+      ? `NodeRuntime.${imported}`
+      : "NodeRuntime";
+  }
+  return null;
+};
+
 const portableImportSemantic = (source, specifierType, imported) =>
   effectImportSemantic(source, specifierType, imported) ??
-  platformBunImportSemantic(source, specifierType, imported);
+  platformBunImportSemantic(source, specifierType, imported) ??
+  platformNodeImportSemantic(source, specifierType, imported);
 
 const noManualTag = {
   create(context) {
@@ -167,11 +190,18 @@ const noLayerExportsInServiceFiles = {
 };
 
 const runtimeMethods = HashSet.fromIterable([
+  "runCallback",
+  "runCallbackWith",
   "runFork",
+  "runForkWith",
   "runPromise",
   "runPromiseExit",
+  "runPromiseExitWith",
+  "runPromiseWith",
   "runSync",
   "runSyncExit",
+  "runSyncExitWith",
+  "runSyncWith",
 ]);
 
 const runtimeExecutionSemantics = HashSet.fromIterable([
@@ -181,9 +211,11 @@ const runtimeExecutionSemantics = HashSet.fromIterable([
     (method) => `effect.Effect.${method}`
   ),
   "BunRuntime.runMain",
+  "NodeRuntime.runMain",
   "ManagedRuntime.make",
   "effect.ManagedRuntime.make",
   "platform-bun.BunRuntime.runMain",
+  "platform-node.NodeRuntime.runMain",
 ]);
 
 const noRuntimeExecutionOutsideBoundaries = {
@@ -216,6 +248,92 @@ const noRuntimeExecutionOutsideBoundaries = {
     messages: {
       noRuntimeExecutionOutsideBoundaries:
         "Do not execute Effects or construct ManagedRuntime in package/service logic. Return Effect values and compose Layers; let an exact app, runtime, server, script, or test boundary execute the program.",
+    },
+    type: "problem",
+  },
+};
+
+// Calls have their existing rule. This owner rejects exporting or handing a
+// runner to another callback before that callback can execute it elsewhere.
+const noRuntimeReferencesOutsideBoundaries = {
+  create(context) {
+    const tracker = createBindingTracker(context.sourceCode);
+    const reportReference = (node) => {
+      if (node.type === "Identifier" && !tracker.isReadReference(node)) {
+        return;
+      }
+      if (
+        node.parent?.type === "CallExpression" &&
+        node.parent.callee === node
+      ) {
+        return;
+      }
+      if (
+        HashSet.has(
+          runtimeExecutionSemantics,
+          tracker.semanticOfExpression(node)
+        )
+      ) {
+        context.report({
+          messageId: "noRuntimeReferencesOutsideBoundaries",
+          node,
+        });
+      }
+    };
+    const reportDestructuredRunner = (pattern, source) => {
+      if (!source) {
+        return;
+      }
+      if (pattern?.type === "Identifier") {
+        if (HashSet.has(runtimeExecutionSemantics, source)) {
+          context.report({
+            messageId: "noRuntimeReferencesOutsideBoundaries",
+            node: pattern,
+          });
+        }
+        return;
+      }
+      if (pattern?.type === "ObjectPattern") {
+        forEach(pattern.properties ?? [], (property) => {
+          if (property.type === "Property") {
+            const member = propertyName(property.key);
+            if (member) {
+              reportDestructuredRunner(property.value, `${source}.${member}`);
+            }
+          }
+        });
+      }
+    };
+    return {
+      AssignmentExpression(node) {
+        const source = tracker.semanticOfExpression(node.right);
+        tracker.trackAssignment(node);
+        if (node.left?.type === "ObjectPattern") {
+          reportDestructuredRunner(node.left, source);
+        }
+      },
+      Identifier: reportReference,
+      ImportDeclaration(node) {
+        tracker.trackImport(node, portableImportSemantic);
+      },
+      MemberExpression: reportReference,
+      VariableDeclarator(node) {
+        const source = tracker.semanticOfExpression(node.init);
+        tracker.trackVariable(node);
+        if (node.id?.type === "ObjectPattern") {
+          reportDestructuredRunner(node.id, source);
+        }
+      },
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Keep Effect runner references inside named runtime boundaries.",
+    },
+    messages: {
+      noRuntimeReferencesOutsideBoundaries:
+        "Return an Effect value. Do not export, capture or pass an Effect runner or ManagedRuntime constructor as a callback outside its named runtime owner.",
     },
     type: "problem",
   },
@@ -800,6 +918,8 @@ export default {
     "no-process-outside-boundaries": noProcessOutsideBoundaries,
     "no-runtime-execution-outside-boundaries":
       noRuntimeExecutionOutsideBoundaries,
+    "no-runtime-references-outside-boundaries":
+      noRuntimeReferencesOutsideBoundaries,
     "no-schema-encoder-outside-egress": noSchemaEncoderOutsideEgress,
     "no-switch": noSwitch,
     "no-throwing-schema-sync-codec": noThrowingSchemaSyncCodec,

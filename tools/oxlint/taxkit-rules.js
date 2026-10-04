@@ -362,14 +362,34 @@ const nativeCollectionConstructors = HashSet.fromIterable([
   "WeakMap",
   "WeakSet",
 ]);
+const nativeCollectionSemantics = HashSet.fromIterable(
+  EffectArray.flatMap([...nativeCollectionConstructors], (name) => [
+    `Native.${name}`,
+    `Global.${name}`,
+  ])
+);
 
 const noNativeCollections = {
   create(context) {
+    const tracker = createBindingTracker(
+      context.sourceCode,
+      HashMap.fromIterable([
+        ...EffectArray.map([...nativeCollectionConstructors], (name) => [
+          name,
+          `Native.${name}`,
+        ]),
+        ["globalThis", "Global"],
+        ["window", "Global"],
+      ])
+    );
     return {
+      AssignmentExpression: tracker.trackAssignment,
       NewExpression(node) {
         if (
-          node.callee?.type === "Identifier" &&
-          HashSet.has(nativeCollectionConstructors, node.callee.name)
+          HashSet.has(
+            nativeCollectionSemantics,
+            tracker.semanticOfExpression(node.callee)
+          )
         ) {
           context.report({
             messageId: "noNativeCollections",
@@ -377,16 +397,113 @@ const noNativeCollections = {
           });
         }
       },
+      VariableDeclarator: tracker.trackVariable,
     };
   },
   meta: {
     docs: {
       description:
-        "Disallow native Map and Set constructors in Effect-native service code.",
+        "Disallow native Map, Set and weak collections, including lexical aliases.",
     },
     messages: {
       noNativeCollections:
-        "Do not use native Map/Set in calculator services. Use Effect HashMap and HashSet so lookups, equality, and absence are typed: HashMap.empty<Key, Value>().pipe(HashMap.set(key, value)); HashMap.get(map, key).pipe(Option.match(...)); HashSet.fromIterable(ids).",
+        "Use persistent Effect HashMap or HashSet instead of native Map, Set, WeakMap or WeakSet. Follow aliases to their actual built-in owner; a same-named local value is separate.",
+    },
+    type: "problem",
+  },
+};
+
+const objectWriteSemantics = HashSet.fromIterable([
+  "Global.Object.assign",
+  "Global.Object.defineProperty",
+  "Global.Object.defineProperties",
+  "Global.Object.setPrototypeOf",
+  "Global.Reflect.set",
+  "Global.Reflect.deleteProperty",
+  "Global.Reflect.defineProperty",
+  "Global.Reflect.setPrototypeOf",
+]);
+
+const noObjectWrites = {
+  create(context) {
+    const tracker = createBindingTracker(
+      context.sourceCode,
+      HashMap.fromIterable([
+        ["Object", "Global.Object"],
+        ["Reflect", "Global.Reflect"],
+        ["globalThis", "Global"],
+        ["window", "Global"],
+      ])
+    );
+    const reportReference = (node) => {
+      if (node.type === "Identifier" && !tracker.isReadReference(node)) {
+        return;
+      }
+      if (
+        node.parent?.type === "CallExpression" &&
+        node.parent.callee === node
+      ) {
+        return;
+      }
+      if (
+        HashSet.has(objectWriteSemantics, tracker.semanticOfExpression(node))
+      ) {
+        context.report({ messageId: "noObjectWrites", node });
+      }
+    };
+    const reportDestructuredWrite = (pattern, source) => {
+      if (!source) {
+        return;
+      }
+      if (pattern?.type === "Identifier") {
+        if (HashSet.has(objectWriteSemantics, source)) {
+          context.report({ messageId: "noObjectWrites", node: pattern });
+        }
+        return;
+      }
+      if (pattern?.type === "ObjectPattern") {
+        forEach(pattern.properties ?? [], (property) => {
+          if (property.type === "Property") {
+            const member = propertyName(property.key);
+            if (member) {
+              reportDestructuredWrite(property.value, `${source}.${member}`);
+            }
+          }
+        });
+      }
+    };
+    return {
+      AssignmentExpression(node) {
+        const source = tracker.semanticOfExpression(node.right);
+        tracker.trackAssignment(node);
+        if (node.left?.type === "ObjectPattern") {
+          reportDestructuredWrite(node.left, source);
+        }
+      },
+      CallExpression(node) {
+        if (HashSet.has(objectWriteSemantics, tracker.calledSemantic(node))) {
+          context.report({ messageId: "noObjectWrites", node: node.callee });
+        }
+      },
+      Identifier: reportReference,
+      MemberExpression: reportReference,
+      VariableDeclarator(node) {
+        const source = tracker.semanticOfExpression(node.init);
+        tracker.trackVariable(node);
+        if (node.id?.type === "ObjectPattern") {
+          reportDestructuredWrite(node.id, source);
+        }
+      },
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Reject Object/Reflect writes and escaping write operations through lexical aliases.",
+    },
+    messages: {
+      noObjectWrites:
+        "Return an immutable value instead of writing with Object or Reflect. Effect-managed state keeps immutable values in its named owner; built-in write aliases do not change this requirement.",
     },
     type: "problem",
   },
@@ -1851,6 +1968,7 @@ export default {
     "no-native-collections": noNativeCollections,
     "no-nested-wrapper-calls": noNestedWrapperCalls,
     "no-nullish-comparison": noNullishComparison,
+    "no-object-writes": noObjectWrites,
     "no-route-transport-restore-outside-consumers":
       noRouteTransportRestoreOutsideConsumers,
     "no-throw": noThrow,

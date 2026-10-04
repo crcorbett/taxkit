@@ -462,6 +462,13 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   order. The runner fixes the target/command, restores copied configuration
   between cases and scopes temporary files/processes. No tracked edits may
   overlap these copy-based checks.
+- Lexical gap CLI cases reject renamed native/weak constructors, Object/Reflect
+  writes and runner captures/callbacks on migrated strict paths. Exact counts
+  distinguish actual built-ins from local names, cleared aliases and declarations
+  from reads. The positive persistent-collection/Ref fixture requires exit zero.
+  Existing runtime-call assertions stay intact; callback/context variants and
+  named/namespace Node runtime calls have additional proof. These checks do not
+  establish readonly contract coverage or full remaining-path qualification.
 - Bun rules keep `Bun.file`, `Bun.write`, `Bun.spawn`, `Bun.serve` and
   `BunRuntime.runMain` in exact adapter/entrypoint files. The MDX rule keeps
   route-local component registries out of route composition. The test-global
