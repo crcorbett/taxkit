@@ -718,3 +718,15 @@ input, malformed scalars, empty token and most-specific token scope in both
 orders. Strict source tests reject bypassing the new environment boundary and
 raw environment reads. Actual lint fixtures qualify all eighteen adopted files
 and one rejected neighbour, plus four exact runtime assertions.
+
+
+Workflow-source, plan-projection and saved-evidence tests now use Effect Vitest.
+The original eighteen workflow cases, eleven plan/capture cases and six evidence
+cases remain, including all five historical capture digests, eight accepted
+finding cross-references and the exact canonical projection JSON. Added tests
+refuse ambiguous/incomplete saved inventories, preserve absent-stage output,
+reject mismatched/extra plan actions, preserve CRLF no-op teardown, and check
+safe typed configuration/read/write failures. Real lint fixtures qualify ten
+adopted files plus their rejected neighbour, and three exact runtime assertions.
+All reads are retained source/evidence or scoped synthetic files; these checks
+establish no current provider state or deployment authority.

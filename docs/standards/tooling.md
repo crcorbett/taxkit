@@ -465,3 +465,16 @@ malformed fallback kept separate from unreadable input. Three executable hosts
 and one checked fake test command each have a separate exact runtime admission.
 Their obsolete raw Bun API permissions are removed. The fake command's argument
 read and Schema receipt encoding are exact test-only representation permissions.
+
+
+Workflow-source, native plan projection and saved-evidence owners now receive
+all eleven strict rules. Plan text uses checked regex-group and resource/summary
+lookups. The JSON writer reuses the receipt's field Schemas in its retained
+canonical field order, so saved SHA-256 comparisons retain their original bytes.
+Saved inventory and deployment selection use checked optional values; absent
+stages become an Option internally and retain the same workflow text at egress.
+Three exact executable admissions remain separate from source and test files;
+the plan test's runtime and evidence runtime's raw Bun admissions are removed.
+Scoped Effect Vitest preserves the original workflow, historical capture and
+accepted-finding checks. Synthetic provider and plan representations have exact
+Schema encoding permissions only; no provider request is part of these tests.

@@ -829,3 +829,43 @@ proof caches were reused. Final documentation checks precede commit. Recover
 by reverting the slice; these changes alter no provider state. #107 hosted
 Quality passed at exact `cc4935b`, run 37185846915. DEV-73 and downstream tasks
 remain unfinished.
+
+
+## Local T002 workflow and saved-evidence checks
+
+Continue from #108 at `b853070`. Workflow-source tests use scoped Effect work,
+checked step lookup and ordered assertions; all eighteen original cases remain.
+The beta.80 text parser uses checked regex-group/resource/summary lookup. Its
+JSON writer reuses the receipt's owning field Schemas in the exact retained
+canonical order, so existing SHA-256 comparisons do not change their bytes.
+The runtime encodes once for writing and hashing, with safe typed configuration,
+read/decode/write failures. The plan verifier and saved-evidence writer consume
+that same checked encoding. Saved inventory/version selection now handles
+missing values explicitly; absent-stage Option becomes the original workflow
+text only at egress. Receipt/protocol nulls, aliases and field order remain.
+
+All eleven strict rules apply to ten adopted files and a rejected neighbour.
+Three executable admissions are exact; the plan test's execution admission and
+evidence runtime's obsolete raw Bun admission are removed. Existing source
+contracts admit only their exact old host call or the exact safe-error-reporting
+variant. All retained workflow, eleven plan/capture and six saved-evidence cases
+remain, including five historical digests and eight accepted cross-references.
+Twelve added cases check ambiguous/missing inventory, absent-stage output,
+mismatched/extra plan actions, CRLF no-op teardown and bounded typed host failures.
+Focused types/lint, 137 deployment-tool cases and 148 actual lint-suite cases
+have passed. Frozen install, complete tests, the 15-task build and full
+verification passed, including 21 Quality cases/all ten isolated mutations,
+21 skill cases and the fresh source-only documentation check. Matching
+unchanged-input package/build and two Chromium check caches were reused.
+Final documentation checks precede commit; hosted proof remains separate.
+
+Documentation impact: **Change required** for code/test/config owners, tool
+README, tooling/testing, this plan/task ledger and the
+[dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-deployment-workflow-checks.json).
+**Preserve** all historical receipt/capture bytes, original oracles,
+resource/workflow/runbook authority, package exports, lock, canonical assets
+and retained tax results. **N/A** Changesets, public content and operational
+procedure edits: root local tools only. Recover by reverting the complete
+slice; no provider, registry or deployment state changes. #108 hosted Quality
+passed at exact `b853070cdc394be6d0facfde4572c806d99d8847`, run 37186826183.
+DEV-73 and downstream tasks remain unfinished.

@@ -1,13 +1,25 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { ConfigProvider, Effect, Match, Result, Schema } from "effect";
+import { describe, expect, it as test } from "@effect/vitest";
+import {
+  Array as EffectArray,
+  ConfigProvider,
+  Effect,
+  Match,
+  Result,
+  Schema,
+} from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import type * as Scope from "effect/Scope";
-import { describe, expect, test } from "vitest";
 
+import { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 import { DeploymentPlanReceipt } from "./schemas.js";
 import { runWorkflowEvidence } from "./workflow-evidence.runtime.js";
-import { WorkflowBootstrapReceipt } from "./workflow-evidence.schemas.js";
+import {
+  WorkflowBootstrapReceipt,
+  WorkflowEvidenceIdentity,
+  WorkflowEvidenceConfigError,
+} from "./workflow-evidence.schemas.js";
 import { DeploymentWorkflowProviderReadback } from "./workflow-receipts.schemas.js";
 
 const candidateCommit = "a".repeat(40);
@@ -55,7 +67,7 @@ const makePlanConfig = (
   ...overrides,
 });
 
-const inventory = {
+const inventory = Schema.decodeUnknownEffect(DocsDeploymentInventoryReport)({
   agreement: "state-provider-agree",
   nonClaims: ["Provider inventory does not prove hosted behaviour."],
   providerWorkers: [
@@ -82,7 +94,7 @@ const inventory = {
     },
   ],
   stateStore: { id: "alchemy-state-store", version: 1 },
-};
+});
 
 const withFixture = <A, E>(
   runFixture: (
@@ -104,50 +116,53 @@ const withFixture = <A, E>(
       "Plan: 1 to create\n[DocsWebsite] create\n"
     );
     return yield* runFixture(directory, repositoryRoot);
-  }).pipe(Effect.scoped, Effect.provide(BunServices.layer), Effect.runPromise);
+  }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
 
 describe("workflow evidence command", () => {
-  test("runs bootstrap and plan modes through Config and writes Schema-owned receipts", () =>
-    withFixture((directory, repositoryRoot) =>
-      Effect.gen(function* planModeFixture() {
-        const bootstrapResult = yield* runWithConfig({
-          TAXKIT_WORKFLOW_EVIDENCE_BOOTSTRAP_PATH: `${directory}/bootstrap.json`,
-          TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT: candidateCommit,
-          TAXKIT_WORKFLOW_EVIDENCE_MODE: "bootstrap",
-          TAXKIT_WORKFLOW_EVIDENCE_RUN_ID: "42",
-          TAXKIT_WORKFLOW_EVIDENCE_STAGE: "pr-24",
-        });
-        const result = yield* runWithConfig(
-          makePlanConfig(repositoryRoot, directory)
-        );
-        expect(Result.isSuccess(bootstrapResult)).toBe(true);
-        expect(Result.isSuccess(result)).toBe(true);
-        const plan = yield* readJson(
-          `${directory}/plan.json`,
-          DeploymentPlanReceipt
-        );
-        const bootstrap = yield* readJson(
-          `${directory}/bootstrap.json`,
-          WorkflowBootstrapReceipt
-        );
-        expect(plan.operation).toBe("preview-plan");
-        expect(plan.projection.logicalResources).toEqual([
-          {
-            action: "create",
-            logicalId: "DocsWebsite",
-            resourceType: "Cloudflare.Worker",
-          },
-        ]);
-        expect(bootstrap.allowedEffects).toEqual([
-          "credential-refresh",
-          "edge-preview-secret-read",
-          "state-store-create-or-upgrade",
-        ]);
-        expect(bootstrap.stateStoreAfter).toBe("not-observed");
-      })
-    ));
+  test.effect(
+    "runs bootstrap and plan modes through Config and writes Schema-owned receipts",
+    () =>
+      withFixture((directory, repositoryRoot) =>
+        Effect.gen(function* planModeFixture() {
+          const bootstrapResult = yield* runWithConfig({
+            TAXKIT_WORKFLOW_EVIDENCE_BOOTSTRAP_PATH: `${directory}/bootstrap.json`,
+            TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT: candidateCommit,
+            TAXKIT_WORKFLOW_EVIDENCE_MODE: "bootstrap",
+            TAXKIT_WORKFLOW_EVIDENCE_RUN_ID: "42",
+            TAXKIT_WORKFLOW_EVIDENCE_STAGE: "pr-24",
+          });
+          const result = yield* runWithConfig(
+            makePlanConfig(repositoryRoot, directory)
+          );
+          expect(Result.isSuccess(bootstrapResult)).toBe(true);
+          expect(Result.isSuccess(result)).toBe(true);
+          const plan = yield* readJson(
+            `${directory}/plan.json`,
+            DeploymentPlanReceipt
+          );
+          const bootstrap = yield* readJson(
+            `${directory}/bootstrap.json`,
+            WorkflowBootstrapReceipt
+          );
+          expect(plan.operation).toBe("preview-plan");
+          expect(plan.projection.logicalResources).toEqual([
+            {
+              action: "create",
+              logicalId: "DocsWebsite",
+              resourceType: "Cloudflare.Worker",
+            },
+          ]);
+          expect(bootstrap.allowedEffects).toEqual([
+            "credential-refresh",
+            "edge-preview-secret-read",
+            "state-store-create-or-upgrade",
+          ]);
+          expect(bootstrap.stateStoreAfter).toBe("not-observed");
+        })
+      )
+  );
 
-  test("runs replan mode and preserves the accepted plan digest", () =>
+  test.effect("runs replan mode and preserves the accepted plan digest", () =>
     withFixture((directory, repositoryRoot) =>
       Effect.gen(function* replanModeFixture() {
         const initial = yield* runWithConfig(
@@ -167,15 +182,320 @@ describe("workflow evidence command", () => {
         expect(receipt.operation).toBe("preview-equal-replan");
         expect(receipt.replanSha256).toBe(receipt.acceptedPlanSha256);
       })
-    ));
+    )
+  );
 
-  test("runs provider before mode and returns only the selected worker", () =>
+  test.effect(
+    "runs provider before mode and returns only the selected worker",
+    () =>
+      withFixture((directory) =>
+        Effect.gen(function* providerBeforeFixture() {
+          const fileSystem = yield* FileSystem.FileSystem;
+          yield* fileSystem.writeFileString(
+            `${directory}/inventory.json`,
+            yield* inventory.pipe(
+              Effect.flatMap(
+                Schema.encodeEffect(
+                  Schema.fromJsonString(DocsDeploymentInventoryReport)
+                )
+              )
+            )
+          );
+          const result = yield* runWithConfig({
+            TAXKIT_WORKFLOW_EVIDENCE_GITHUB_OUTPUT_PATH: `${directory}/github-output.txt`,
+            TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH: `${directory}/inventory.json`,
+            TAXKIT_WORKFLOW_EVIDENCE_MODE: "provider",
+            TAXKIT_WORKFLOW_EVIDENCE_PHASE: "before",
+            TAXKIT_WORKFLOW_EVIDENCE_STAGE: "pr-24",
+          });
+          expect(Result.isSuccess(result)).toBe(true);
+          expect(
+            yield* fileSystem.readFileString(`${directory}/github-output.txt`)
+          ).toBe(
+            "stage_present=true\nprevious_worker_name=taxkit-docs-pr-24\nprevious_version_id=\n"
+          );
+        })
+      )
+  );
+
+  test.effect(
+    "runs provider after mode with deterministic receipt and GitHub output encoding",
+    () =>
+      withFixture((directory) =>
+        Effect.gen(function* providerAfterFixture() {
+          const fileSystem = yield* FileSystem.FileSystem;
+          const identity = {
+            candidateCommit,
+            configSha256: digest,
+            deploymentInputSha256: "d".repeat(64),
+            lockfileSha256: "e".repeat(64),
+            schemaVersion: 1,
+          };
+          const deployments =
+            '[{"id":"deployment-current","ignoredProviderField":"not-trusted","versions":[{"version_id":"version-current"}]}]';
+          yield* Effect.all(
+            [
+              fileSystem.writeFileString(
+                `${directory}/inventory.json`,
+                yield* inventory.pipe(
+                  Effect.flatMap(
+                    Schema.encodeEffect(
+                      Schema.fromJsonString(DocsDeploymentInventoryReport)
+                    )
+                  )
+                )
+              ),
+              fileSystem.writeFileString(
+                `${directory}/identity.json`,
+                yield* Schema.encodeUnknownEffect(
+                  Schema.fromJsonString(WorkflowEvidenceIdentity)
+                )(identity)
+              ),
+              fileSystem.writeFileString(
+                `${directory}/deployments.json`,
+                deployments
+              ),
+            ],
+            { concurrency: 3, discard: true }
+          );
+          const config = {
+            TAXKIT_WORKFLOW_EVIDENCE_ACCEPTED_PLAN_SHA256: digest,
+            TAXKIT_WORKFLOW_EVIDENCE_ACCOUNT_ID: accountId,
+            TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT: candidateCommit,
+            TAXKIT_WORKFLOW_EVIDENCE_CURRENT_DEPLOYMENTS_PATH: `${directory}/deployments.json`,
+            TAXKIT_WORKFLOW_EVIDENCE_ENVIRONMENT: "preview",
+            TAXKIT_WORKFLOW_EVIDENCE_GITHUB_ENV_PATH: `${directory}/github-env-1.txt`,
+            TAXKIT_WORKFLOW_EVIDENCE_IDENTITY_PATH: `${directory}/identity.json`,
+            TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH: `${directory}/inventory.json`,
+            TAXKIT_WORKFLOW_EVIDENCE_MODE: "provider",
+            TAXKIT_WORKFLOW_EVIDENCE_PHASE: "after",
+            TAXKIT_WORKFLOW_EVIDENCE_PREVIEW_PR_NUMBER: "24",
+            TAXKIT_WORKFLOW_EVIDENCE_PROVIDER_READBACK_PATH: `${directory}/provider-1.json`,
+            TAXKIT_WORKFLOW_EVIDENCE_ROLLBACK_IDENTITY: "preview-42",
+            TAXKIT_WORKFLOW_EVIDENCE_RUN_ID: "42",
+            TAXKIT_WORKFLOW_EVIDENCE_STAGE: "pr-24",
+          };
+          const first = yield* runWithConfig(config);
+          const second = yield* runWithConfig({
+            ...config,
+            TAXKIT_WORKFLOW_EVIDENCE_GITHUB_ENV_PATH: `${directory}/github-env-2.txt`,
+            TAXKIT_WORKFLOW_EVIDENCE_PROVIDER_READBACK_PATH: `${directory}/provider-2.json`,
+          });
+          expect(Result.isSuccess(first)).toBe(true);
+          expect(Result.isSuccess(second)).toBe(true);
+          const firstReceipt = yield* fileSystem.readFileString(
+            `${directory}/provider-1.json`
+          );
+          const secondReceipt = yield* fileSystem.readFileString(
+            `${directory}/provider-2.json`
+          );
+          expect(firstReceipt).toBe(secondReceipt);
+          expect(
+            yield* fileSystem.readFileString(`${directory}/github-env-1.txt`)
+          ).toBe(
+            yield* fileSystem.readFileString(`${directory}/github-env-2.txt`)
+          );
+          const receipt = yield* readJson(
+            `${directory}/provider-1.json`,
+            DeploymentWorkflowProviderReadback
+          );
+          expect(receipt.deploymentId).toBe("deployment-current");
+          expect(firstReceipt).not.toContain("ignoredProviderField");
+        })
+      )
+  );
+
+  test.effect(
+    "fails closed for unknown modes without exposing ambient secrets",
+    () =>
+      Effect.gen(function* () {
+        const result = yield* runWithConfig({
+          CLOUDFLARE_API_TOKEN: "forbidden-secret-value",
+          TAXKIT_WORKFLOW_EVIDENCE_MODE: "shell",
+        }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
+        yield* Result.match(result, {
+          onFailure: (error) =>
+            Match.value(error).pipe(
+              Match.tag("WorkflowEvidenceConfigError", (failure) =>
+                Schema.encodeEffect(
+                  Schema.fromJsonString(WorkflowEvidenceConfigError)
+                )(failure).pipe(
+                  Effect.tap((encoded) =>
+                    Effect.sync(() => {
+                      expect(failure._tag).toBe("WorkflowEvidenceConfigError");
+                      expect(encoded).not.toContain("forbidden-secret-value");
+                    })
+                  )
+                )
+              ),
+              Match.orElse(() => Effect.sync(() => expect.unreachable()))
+            ),
+          onSuccess: () => Effect.sync(() => expect.unreachable()),
+        });
+      })
+  );
+
+  test.effect(
+    "uses separate safe tags for read, plan, provider and write failures",
+    () =>
+      withFixture((directory, repositoryRoot) =>
+        Effect.gen(function* taggedFailuresFixture() {
+          const fileSystem = yield* FileSystem.FileSystem;
+          const missingInput = yield* runWithConfig({
+            ...makePlanConfig(repositoryRoot, directory),
+            TAXKIT_WORKFLOW_EVIDENCE_PLAN_TEXT_PATH: `${directory}/missing.txt`,
+          });
+          Result.match(missingInput, {
+            onFailure: (error) =>
+              expect(error._tag).toBe("WorkflowEvidenceInputReadError"),
+            onSuccess: () => expect.unreachable(),
+          });
+
+          yield* fileSystem.writeFileString(
+            `${directory}/alchemy-plan.txt`,
+            "[Unexpected] create\n"
+          );
+          const invalidPlan = yield* runWithConfig(
+            makePlanConfig(repositoryRoot, directory)
+          );
+          Result.match(invalidPlan, {
+            onFailure: (error) => {
+              expect(error._tag).toBe("WorkflowEvidencePlanProjectionError");
+              Match.value(error).pipe(
+                Match.tag("WorkflowEvidencePlanProjectionError", (failure) =>
+                  expect(failure.reason).toBe(
+                    "beta.80 Alchemy plan output must contain exactly one plan summary"
+                  )
+                ),
+                Match.orElse(() => expect.unreachable())
+              );
+            },
+            onSuccess: () => expect.unreachable(),
+          });
+
+          yield* fileSystem.writeFileString(
+            `${directory}/inventory.json`,
+            "not-json"
+          );
+          const invalidProvider = yield* runWithConfig({
+            TAXKIT_WORKFLOW_EVIDENCE_GITHUB_OUTPUT_PATH: `${directory}/github-output.txt`,
+            TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH: `${directory}/inventory.json`,
+            TAXKIT_WORKFLOW_EVIDENCE_MODE: "provider",
+            TAXKIT_WORKFLOW_EVIDENCE_PHASE: "before",
+            TAXKIT_WORKFLOW_EVIDENCE_STAGE: "pr-24",
+          });
+          Result.match(invalidProvider, {
+            onFailure: (error) =>
+              expect(error._tag).toBe("WorkflowEvidenceProviderDecodeError"),
+            onSuccess: () => expect.unreachable(),
+          });
+
+          yield* fileSystem.writeFileString(
+            `${directory}/alchemy-plan.txt`,
+            "Plan: 1 to create\n[DocsWebsite] create\n"
+          );
+          const writeFailure = yield* runWithConfig({
+            ...makePlanConfig(repositoryRoot, directory),
+            TAXKIT_WORKFLOW_EVIDENCE_PLAN_PATH: directory,
+          });
+          Result.match(writeFailure, {
+            onFailure: (error) =>
+              Match.value(error).pipe(
+                Match.tag("WorkflowEvidenceReceiptWriteError", (failure) =>
+                  expect(failure.role).toBe("plan-receipt")
+                ),
+                Match.orElse(() => expect.unreachable())
+              ),
+            onSuccess: () => expect.unreachable(),
+          });
+        })
+      )
+  );
+  test.effect.each([
+    "duplicate-stage",
+    "duplicate-resource",
+    "duplicate-provider",
+    "missing-worker-url",
+  ] as const)(
+    "refuses ambiguous or incomplete saved inventory: %s",
+    (problem) =>
+      withFixture((directory) =>
+        Effect.gen(function* () {
+          const fileSystem = yield* FileSystem.FileSystem;
+          const base = yield* inventory;
+          const malformed = Match.value(problem).pipe(
+            Match.when("duplicate-stage", () => ({
+              ...base,
+              stages: [...base.stages, ...base.stages],
+            })),
+            Match.when("duplicate-resource", () => ({
+              ...base,
+              stages: EffectArray.map(base.stages, (stage) => ({
+                ...stage,
+                resources: [...stage.resources, ...stage.resources],
+              })),
+            })),
+            Match.when("duplicate-provider", () => ({
+              ...base,
+              providerWorkers: [
+                ...base.providerWorkers,
+                ...base.providerWorkers,
+              ],
+            })),
+            Match.when("missing-worker-url", () => ({
+              ...base,
+              stages: EffectArray.map(base.stages, (stage) => ({
+                ...stage,
+                resources: EffectArray.map(
+                  stage.resources,
+                  ({ workerUrl: _removed, ...resource }) => resource
+                ),
+              })),
+            })),
+            Match.exhaustive
+          );
+          yield* fileSystem.writeFileString(
+            `${directory}/inventory.json`,
+            yield* Schema.encodeEffect(
+              Schema.fromJsonString(DocsDeploymentInventoryReport)
+            )(malformed)
+          );
+          const result = yield* runWithConfig({
+            TAXKIT_WORKFLOW_EVIDENCE_GITHUB_OUTPUT_PATH: `${directory}/github-output.txt`,
+            TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH: `${directory}/inventory.json`,
+            TAXKIT_WORKFLOW_EVIDENCE_MODE: "provider",
+            TAXKIT_WORKFLOW_EVIDENCE_PHASE: "before",
+            TAXKIT_WORKFLOW_EVIDENCE_STAGE: "pr-24",
+          });
+          Result.match(result, {
+            onFailure: (error) => {
+              expect(error._tag).toBe("WorkflowEvidenceProviderDecodeError");
+              expect(error).toHaveProperty(
+                "role",
+                problem === "duplicate-provider"
+                  ? "provider-inventory"
+                  : "stage-inventory"
+              );
+            },
+            onSuccess: () => expect.unreachable(),
+          });
+          expect(
+            yield* fileSystem.exists(`${directory}/github-output.txt`)
+          ).toBe(false);
+        })
+      )
+  );
+
+  test.effect("preserves an absent stage's exact before receipt", () =>
     withFixture((directory) =>
-      Effect.gen(function* providerBeforeFixture() {
+      Effect.gen(function* () {
         const fileSystem = yield* FileSystem.FileSystem;
+        const base = yield* inventory;
         yield* fileSystem.writeFileString(
           `${directory}/inventory.json`,
-          JSON.stringify(inventory)
+          yield* Schema.encodeEffect(
+            Schema.fromJsonString(DocsDeploymentInventoryReport)
+          )({ ...base, providerWorkers: [], stages: [] })
         );
         const result = yield* runWithConfig({
           TAXKIT_WORKFLOW_EVIDENCE_GITHUB_OUTPUT_PATH: `${directory}/github-output.txt`,
@@ -188,178 +508,9 @@ describe("workflow evidence command", () => {
         expect(
           yield* fileSystem.readFileString(`${directory}/github-output.txt`)
         ).toBe(
-          "stage_present=true\nprevious_worker_name=taxkit-docs-pr-24\nprevious_version_id=\n"
+          "stage_present=false\nprevious_worker_name=\nprevious_version_id=\n"
         );
       })
-    ));
-
-  test("runs provider after mode with deterministic receipt and GitHub output encoding", () =>
-    withFixture((directory) =>
-      Effect.gen(function* providerAfterFixture() {
-        const fileSystem = yield* FileSystem.FileSystem;
-        const identity = {
-          candidateCommit,
-          configSha256: digest,
-          deploymentInputSha256: "d".repeat(64),
-          lockfileSha256: "e".repeat(64),
-          schemaVersion: 1,
-        };
-        const deployments = [
-          {
-            id: "deployment-current",
-            ignoredProviderField: "not-trusted",
-            versions: [{ version_id: "version-current" }],
-          },
-        ];
-        yield* Effect.all(
-          [
-            fileSystem.writeFileString(
-              `${directory}/inventory.json`,
-              JSON.stringify(inventory)
-            ),
-            fileSystem.writeFileString(
-              `${directory}/identity.json`,
-              JSON.stringify(identity)
-            ),
-            fileSystem.writeFileString(
-              `${directory}/deployments.json`,
-              JSON.stringify(deployments)
-            ),
-          ],
-          { concurrency: 3, discard: true }
-        );
-        const config = {
-          TAXKIT_WORKFLOW_EVIDENCE_ACCEPTED_PLAN_SHA256: digest,
-          TAXKIT_WORKFLOW_EVIDENCE_ACCOUNT_ID: accountId,
-          TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT: candidateCommit,
-          TAXKIT_WORKFLOW_EVIDENCE_CURRENT_DEPLOYMENTS_PATH: `${directory}/deployments.json`,
-          TAXKIT_WORKFLOW_EVIDENCE_ENVIRONMENT: "preview",
-          TAXKIT_WORKFLOW_EVIDENCE_GITHUB_ENV_PATH: `${directory}/github-env-1.txt`,
-          TAXKIT_WORKFLOW_EVIDENCE_IDENTITY_PATH: `${directory}/identity.json`,
-          TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH: `${directory}/inventory.json`,
-          TAXKIT_WORKFLOW_EVIDENCE_MODE: "provider",
-          TAXKIT_WORKFLOW_EVIDENCE_PHASE: "after",
-          TAXKIT_WORKFLOW_EVIDENCE_PREVIEW_PR_NUMBER: "24",
-          TAXKIT_WORKFLOW_EVIDENCE_PROVIDER_READBACK_PATH: `${directory}/provider-1.json`,
-          TAXKIT_WORKFLOW_EVIDENCE_ROLLBACK_IDENTITY: "preview-42",
-          TAXKIT_WORKFLOW_EVIDENCE_RUN_ID: "42",
-          TAXKIT_WORKFLOW_EVIDENCE_STAGE: "pr-24",
-        };
-        const first = yield* runWithConfig(config);
-        const second = yield* runWithConfig({
-          ...config,
-          TAXKIT_WORKFLOW_EVIDENCE_GITHUB_ENV_PATH: `${directory}/github-env-2.txt`,
-          TAXKIT_WORKFLOW_EVIDENCE_PROVIDER_READBACK_PATH: `${directory}/provider-2.json`,
-        });
-        expect(Result.isSuccess(first)).toBe(true);
-        expect(Result.isSuccess(second)).toBe(true);
-        const firstReceipt = yield* fileSystem.readFileString(
-          `${directory}/provider-1.json`
-        );
-        const secondReceipt = yield* fileSystem.readFileString(
-          `${directory}/provider-2.json`
-        );
-        expect(firstReceipt).toBe(secondReceipt);
-        expect(
-          yield* fileSystem.readFileString(`${directory}/github-env-1.txt`)
-        ).toBe(
-          yield* fileSystem.readFileString(`${directory}/github-env-2.txt`)
-        );
-        const receipt = yield* readJson(
-          `${directory}/provider-1.json`,
-          DeploymentWorkflowProviderReadback
-        );
-        expect(receipt.deploymentId).toBe("deployment-current");
-        expect(firstReceipt).not.toContain("ignoredProviderField");
-      })
-    ));
-
-  test("fails closed for unknown modes without exposing ambient secrets", async () => {
-    const result = await runWithConfig({
-      CLOUDFLARE_API_TOKEN: "forbidden-secret-value",
-      TAXKIT_WORKFLOW_EVIDENCE_MODE: "shell",
-    }).pipe(
-      Effect.scoped,
-      Effect.provide(BunServices.layer),
-      Effect.runPromise
-    );
-    Result.match(result, {
-      onFailure: (error) => {
-        expect(error._tag).toBe("WorkflowEvidenceConfigError");
-        expect(JSON.stringify(error)).not.toContain("forbidden-secret-value");
-      },
-      onSuccess: () => expect.unreachable(),
-    });
-  });
-
-  test("uses separate safe tags for read, plan, provider and write failures", () =>
-    withFixture((directory, repositoryRoot) =>
-      Effect.gen(function* taggedFailuresFixture() {
-        const fileSystem = yield* FileSystem.FileSystem;
-        const missingInput = yield* runWithConfig({
-          ...makePlanConfig(repositoryRoot, directory),
-          TAXKIT_WORKFLOW_EVIDENCE_PLAN_TEXT_PATH: `${directory}/missing.txt`,
-        });
-        Result.match(missingInput, {
-          onFailure: (error) =>
-            expect(error._tag).toBe("WorkflowEvidenceInputReadError"),
-          onSuccess: () => expect.unreachable(),
-        });
-
-        yield* fileSystem.writeFileString(
-          `${directory}/alchemy-plan.txt`,
-          "[Unexpected] create\n"
-        );
-        const invalidPlan = yield* runWithConfig(
-          makePlanConfig(repositoryRoot, directory)
-        );
-        Result.match(invalidPlan, {
-          onFailure: (error) => {
-            expect(error._tag).toBe("WorkflowEvidencePlanProjectionError");
-            if (error._tag === "WorkflowEvidencePlanProjectionError") {
-              expect(error.reason).toBe(
-                "beta.80 Alchemy plan output must contain exactly one plan summary"
-              );
-            }
-          },
-          onSuccess: () => expect.unreachable(),
-        });
-
-        yield* fileSystem.writeFileString(
-          `${directory}/inventory.json`,
-          "not-json"
-        );
-        const invalidProvider = yield* runWithConfig({
-          TAXKIT_WORKFLOW_EVIDENCE_GITHUB_OUTPUT_PATH: `${directory}/github-output.txt`,
-          TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH: `${directory}/inventory.json`,
-          TAXKIT_WORKFLOW_EVIDENCE_MODE: "provider",
-          TAXKIT_WORKFLOW_EVIDENCE_PHASE: "before",
-          TAXKIT_WORKFLOW_EVIDENCE_STAGE: "pr-24",
-        });
-        Result.match(invalidProvider, {
-          onFailure: (error) =>
-            expect(error._tag).toBe("WorkflowEvidenceProviderDecodeError"),
-          onSuccess: () => expect.unreachable(),
-        });
-
-        yield* fileSystem.writeFileString(
-          `${directory}/alchemy-plan.txt`,
-          "Plan: 1 to create\n[DocsWebsite] create\n"
-        );
-        const writeFailure = yield* runWithConfig({
-          ...makePlanConfig(repositoryRoot, directory),
-          TAXKIT_WORKFLOW_EVIDENCE_PLAN_PATH: directory,
-        });
-        Result.match(writeFailure, {
-          onFailure: (error) =>
-            Match.value(error).pipe(
-              Match.tag("WorkflowEvidenceReceiptWriteError", (failure) =>
-                expect(failure.role).toBe("plan-receipt")
-              ),
-              Match.orElse(() => expect.unreachable())
-            ),
-          onSuccess: () => expect.unreachable(),
-        });
-      })
-    ));
+    )
+  );
 });

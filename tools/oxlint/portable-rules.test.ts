@@ -291,6 +291,35 @@ const fixtureCases = [
     ],
   },
   {
+    accepted: [
+      "tools/docs-deployment/workflow.contract.test.ts",
+      "tools/docs-deployment/workflow-plan-projection.ts",
+      "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+      "tools/docs-deployment/workflow-plan-projection.runtime.test.ts",
+      "tools/docs-deployment/workflow-plan-projection.test.ts",
+      "tools/docs-deployment/workflow-plan-check.runtime.ts",
+      "tools/docs-deployment/workflow-evidence.ts",
+      "tools/docs-deployment/workflow-evidence.runtime.ts",
+      "tools/docs-deployment/workflow-evidence.schemas.ts",
+      "tools/docs-deployment/workflow-evidence.test.ts",
+    ],
+    generated: "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
     accepted: ["tools/skills/skill-policies.test.ts"],
     generated: "tools/skills/.generated-strict-rejected.ts",
     namespace: "strict-effect",
@@ -760,6 +789,9 @@ test.each([
   "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
+  "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
+  "tools/docs-deployment/workflow-evidence.runtime.ts",
 ])("keeps the command runtime admission exact: %s", (path) => {
   expect(
     Array.filter(

@@ -178,9 +178,17 @@ const portableEffectSourceFiles = [
   "tools/docs-deployment/alchemy-memo.test.ts",
   "tools/docs-deployment/{doppler-custody*,local-doppler*,inventory-credentials*,workflow-check*,workflow-input-check*}.ts",
   "tools/docs-deployment/inventory.schemas.ts",
+  "tools/docs-deployment/workflow.contract.test.ts",
+  "tools/docs-deployment/workflow-plan-projection*.ts",
+  "tools/docs-deployment/workflow-plan-check*.ts",
+  "tools/docs-deployment/workflow-evidence*.ts",
+  "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
 ];
 
 const schemaEncoderEgressFiles = [
+  // Exact saved-plan JSON and synthetic provider fixture representations.
+  "tools/docs-deployment/workflow-plan-projection.ts",
+  "tools/docs-deployment/workflow-evidence.test.ts",
   // Exact credential/YAML/receipt negative-fixture representations only.
   "tools/docs-deployment/doppler-custody.test.ts",
   "tools/docs-deployment/inventory-credentials.boundary.test.ts",
@@ -275,7 +283,6 @@ const runtimeBoundaryFiles = [
   "tools/docs-deployment/workflow-artifact.runtime.ts",
   "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/workflow-plan-projection.runtime.ts",
-  "tools/docs-deployment/workflow-plan-projection.test.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/workflow-run-check.runtime.ts",
@@ -353,7 +360,6 @@ const bunAdapterFiles = [
   "tools/docs-deployment/check.runtime.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
   "tools/docs-deployment/workflow-run-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
@@ -455,6 +461,11 @@ export default defineConfig({
         "tools/docs-deployment/alchemy-memo.test.ts",
         "tools/docs-deployment/{doppler-custody*,local-doppler*,inventory-credentials*,workflow-check*,workflow-input-check*}.ts",
         "tools/docs-deployment/inventory.schemas.ts",
+        "tools/docs-deployment/workflow.contract.test.ts",
+        "tools/docs-deployment/workflow-plan-projection*.ts",
+        "tools/docs-deployment/workflow-plan-check*.ts",
+        "tools/docs-deployment/workflow-evidence*.ts",
+        "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
         "tools/docs-deployment/fixtures/fake-doppler*.ts",
         "tools/docs-deployment/.generated-credential-strict-rejected.ts",
         "tools/docs-deployment/.generated-artifact-strict-rejected.ts",
@@ -595,6 +606,45 @@ export default defineConfig({
           {
             allowedFiles: [
               "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/workflow-evidence.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/docs-deployment/workflow-evidence.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/workflow-plan-projection.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/workflow-plan-check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/docs-deployment/workflow-plan-check.runtime.ts",
             ],
           },
         ],

@@ -1,6 +1,6 @@
-import { Array as EffectArray, Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Option, Record, Schema } from "effect";
 
-import type { DeploymentPlanProjection } from "./schemas.js";
+import { DeploymentPlanProjection } from "./schemas.js";
 
 export const alchemyPlanTextVersion = "2.0.0-beta.80" as const;
 export const alchemyPlanSourceCommit =
@@ -100,22 +100,18 @@ const NativeResource = Schema.Struct({
 });
 type NativeResource = typeof NativeResource.Type;
 
-export const stringifyWorkflowPlanProjection = (
-  projection: DeploymentPlanProjection
-): string =>
-  JSON.stringify({
-    candidate: {
-      deploymentInputSha256: projection.candidate.deploymentInputSha256,
-      exactCommit: projection.candidate.exactCommit,
-      lockfileSha256: projection.candidate.lockfileSha256,
-    },
-    configSha256: projection.configSha256,
-    logicalResources: projection.logicalResources,
-    redaction: projection.redaction,
-    schemaVersion: projection.schemaVersion,
-    stack: projection.stack,
-    stage: projection.stage,
-  });
+// Keep the accepted receipt digest's field order while reusing its owning Schemas.
+const WorkflowPlanProjectionJson = Schema.fromJsonString(
+  Schema.Struct({
+    candidate: DeploymentPlanProjection.fields.candidate,
+    configSha256: DeploymentPlanProjection.fields.configSha256,
+    logicalResources: DeploymentPlanProjection.fields.logicalResources,
+    redaction: DeploymentPlanProjection.fields.redaction,
+    schemaVersion: DeploymentPlanProjection.fields.schemaVersion,
+    stack: DeploymentPlanProjection.fields.stack,
+    stage: DeploymentPlanProjection.fields.stage,
+  })
+);
 
 export const WorkflowPlanProjectionKind = Schema.Literals([
   "deploy",
@@ -124,6 +120,9 @@ export const WorkflowPlanProjectionKind = Schema.Literals([
 export type WorkflowPlanProjectionKind = typeof WorkflowPlanProjectionKind.Type;
 
 export const WorkflowPlanProjectionReason = Schema.Literals([
+  "could not encode the workflow plan projection",
+  "could not write the workflow plan projection",
+  "could not decode the workflow plan projection",
   "workflow plan projection requires the candidate, digest, stage and plan paths",
   "could not read the beta.80 Alchemy plan output",
   "beta.80 Alchemy plan output must contain exactly one plan summary",
@@ -144,6 +143,18 @@ export class WorkflowPlanProjectionError extends Schema.TaggedError<WorkflowPlan
   }
 ) {}
 
+export const stringifyWorkflowPlanProjection = (
+  projection: DeploymentPlanProjection
+) =>
+  Schema.encodeEffect(WorkflowPlanProjectionJson)(projection).pipe(
+    Effect.mapError(
+      () =>
+        new WorkflowPlanProjectionError({
+          reason: "could not encode the workflow plan projection",
+        })
+    )
+  );
+
 // oxlint-disable-next-line eslint/no-control-regex -- ANSI colour is an explicit Alchemy host-output boundary.
 const ansiEscape = /\u001B\[[0-?]*[ -/]*[@-~]/gu;
 const timestampLog = /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] [A-Z]+ /u;
@@ -161,16 +172,19 @@ export const projectAlchemyPlanText = (
   kind: WorkflowPlanProjectionKind
 ) =>
   Effect.gen(function* () {
-    const lines = source
-      .replace(ansiEscape, "")
-      .split(/\r?\n/u)
-      .flatMap((line) => {
-        const planLine = timestampedPlanLine.exec(line)?.groups?.["planLine"];
-        if (planLine !== undefined) {
-          return [planLine];
-        }
-        return timestampLog.test(line) ? [] : [line];
-      });
+    const lines = EffectArray.flatMap(
+      source.replace(ansiEscape, "").split(/\r?\n/u),
+      (line) =>
+        Option.fromNullishOr(timestampedPlanLine.exec(line)).pipe(
+          Option.flatMap((match) => Option.fromNullishOr(match.groups)),
+          Option.flatMap((groups) => Record.get(groups, "planLine")),
+          Option.flatMap(Option.fromNullishOr),
+          Option.match({
+            onNone: () => (timestampLog.test(line) ? [] : [line]),
+            onSome: (planLine) => [planLine],
+          })
+        )
+    );
     const planSummaries = EffectArray.filter(lines, (line) =>
       planSummaryLine.test(line)
     );
@@ -226,10 +240,10 @@ export const projectAlchemyPlanText = (
         "a native deployment plan must contain exactly one DocsWebsite action"
       );
     }
+    const resource = EffectArray.get(resources, 0);
     if (
       kind === "deploy" &&
-      resources[0] !== undefined &&
-      resources[0].action === "delete"
+      Option.exists(resource, (entry) => entry.action === "delete")
     ) {
       return yield* fail(
         "a native deployment plan cannot delete the DocsWebsite resource"
@@ -242,20 +256,26 @@ export const projectAlchemyPlanText = (
     }
     if (
       kind === "destroy" &&
-      resources[0] !== undefined &&
-      resources[0].action !== "delete" &&
-      resources[0].action !== "noop"
+      Option.exists(
+        resource,
+        (entry) => entry.action !== "delete" && entry.action !== "noop"
+      )
     ) {
       return yield* fail(
         "a native teardown plan may only delete or noop the DocsWebsite resource"
       );
     }
 
-    const expectedSummary =
-      resources.length === 0
-        ? "Plan: no resources"
-        : `Plan: 1 to ${resources[0]?.action}`;
-    if (planSummaries[0] !== expectedSummary) {
+    const expectedSummary = Option.match(resource, {
+      onNone: () => "Plan: no resources",
+      onSome: (entry) => `Plan: 1 to ${entry.action}`,
+    });
+    if (
+      !Option.exists(
+        EffectArray.get(planSummaries, 0),
+        (summary) => summary === expectedSummary
+      )
+    ) {
       return yield* fail(
         "beta.80 Alchemy plan summary does not match its native resource action"
       );

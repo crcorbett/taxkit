@@ -1,6 +1,6 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Config, Console, Effect, Match, Schema } from "effect";
+import { Config, Console, Effect, Match, Option, Schema } from "effect";
 
 import {
   writeBootstrapWorkflowEvidence,
@@ -74,7 +74,7 @@ const program = runWorkflowEvidence.pipe(
   ),
   Effect.tapErrorTag("WorkflowEvidenceConfigError", (error) =>
     Console.error(
-      `FAIL [workflow-evidence] config=${error.requirement}; mode=${error.mode ?? "unknown"}`
+      `FAIL [workflow-evidence] config=${error.requirement}; mode=${Option.getOrElse(Option.fromNullishOr(error.mode), () => "unknown")}`
     )
   ),
   Effect.tapErrorTag("WorkflowEvidenceInputReadError", (error) =>
@@ -82,7 +82,7 @@ const program = runWorkflowEvidence.pipe(
   ),
   Effect.tapErrorTag("WorkflowEvidencePlanProjectionError", (error) =>
     Console.error(
-      `FAIL [workflow-evidence] plan=${error.operation} reason=${error.reason ?? "projection-or-receipt"}`
+      `FAIL [workflow-evidence] plan=${error.operation} reason=${Option.getOrElse(Option.fromNullishOr(error.reason), () => "projection-or-receipt")}`
     )
   ),
   Effect.tapErrorTag("WorkflowEvidenceProviderDecodeError", (error) =>
@@ -96,6 +96,8 @@ const program = runWorkflowEvidence.pipe(
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(program, { disableErrorReporting: true })
+  ),
   Match.orElse(() => false)
 );

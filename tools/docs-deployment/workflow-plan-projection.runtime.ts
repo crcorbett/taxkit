@@ -73,24 +73,42 @@ export const projectWorkflowPlan = Effect.gen(function* () {
     schemaVersion: 2,
     stack: "TaxKitDocsCloudflare",
     stage: config.TAXKIT_WORKFLOW_PLAN_STAGE,
-  });
-  yield* fileSystem.writeFileString(
-    config.TAXKIT_WORKFLOW_PLAN_PROJECTION_PATH,
-    stringifyWorkflowPlanProjection(projection)
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new WorkflowPlanProjectionError({
+          reason: "could not decode the workflow plan projection",
+        })
+    )
   );
-  return yield* workflowSha256(
-    check,
-    stringifyWorkflowPlanProjection(projection)
-  );
+  const encoded = yield* stringifyWorkflowPlanProjection(projection);
+  yield* fileSystem
+    .writeFileString(config.TAXKIT_WORKFLOW_PLAN_PROJECTION_PATH, encoded)
+    .pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowPlanProjectionError({
+            reason: "could not write the workflow plan projection",
+          })
+      )
+    );
+  return yield* workflowSha256(check, encoded);
 });
 
 const program = projectWorkflowPlan.pipe(
-  Effect.tapError((error) => Console.error(`FAIL [${check}] ${String(error)}`)),
+  Effect.tapErrorTag("WorkflowPlanProjectionError", (error) =>
+    Console.error(`FAIL [${check}] ${error.reason}`)
+  ),
+  Effect.tapErrorTag("WorkflowCheckReadError", (error) =>
+    Console.error(`FAIL [${check}] ${error.operation}`)
+  ),
   Effect.flatMap((digest) => Console.log(digest)),
   Effect.provide(BunServices.layer)
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(program, { disableErrorReporting: true })
+  ),
   Match.orElse(() => false)
 );

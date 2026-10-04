@@ -151,24 +151,31 @@ const inspectHostedProofBoundary = (
 const inspectWorkflowBoundaries = (
   sources: StrictAppBoundarySources
 ): readonly StrictAppBoundaryFinding[] => {
-  const requiredPatterns = [
-    "Config.schema(",
-    "readWorkflowReceipt(",
-    "BunRuntime.runMain(program)",
-  ] as const;
+  const requiredPatterns = ["Config.schema(", "readWorkflowReceipt("] as const;
 
   return [
     ...EffectArray.flatMap(workflowRuntimePaths, (path) =>
       includesEvery(
         readStrictAppBoundarySource(sources, path),
         requiredPatterns
-      )
+      ) &&
+      includesAny(readStrictAppBoundarySource(sources, path), [
+        "BunRuntime.runMain(program)",
+        "BunRuntime.runMain(program, { disableErrorReporting: true })",
+      ])
         ? []
         : [finding("workflow-boundary", path)]
     ),
     ...(includesEvery(
       readStrictAppBoundarySource(sources, workflowEvidenceRuntimePath),
-      ["Config.schema(", "runWorkflowEvidence", "BunRuntime.runMain(program)"]
+      ["Config.schema(", "runWorkflowEvidence"]
+    ) &&
+    includesAny(
+      readStrictAppBoundarySource(sources, workflowEvidenceRuntimePath),
+      [
+        "BunRuntime.runMain(program)",
+        "BunRuntime.runMain(program, { disableErrorReporting: true })",
+      ]
     )
       ? []
       : [finding("workflow-boundary", workflowEvidenceRuntimePath)]),

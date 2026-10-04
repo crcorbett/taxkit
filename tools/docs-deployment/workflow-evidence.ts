@@ -5,9 +5,11 @@ import {
   Crypto,
   Effect,
   Option,
+  Order,
   Schema,
   Stream,
 } from "effect";
+import { sort as sortArray } from "effect/Array";
 import { Hex } from "effect/encoding";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
@@ -137,10 +139,9 @@ const readTrackedDeploymentInputs = (repositoryRoot: string) =>
           Uint8Array.from(Array.flatMap(stdout, Array.fromIterable))
         ),
     });
-    const files = EffectArray.filter(
-      source.split("\0"),
-      (entry) => entry.length > 0
-    ).toSorted();
+    const files = sortArray(Order.String)(
+      EffectArray.filter(source.split("\0"), (entry) => entry.length > 0)
+    );
     if (files.length === 0) {
       return yield* new WorkflowEvidenceInputReadError({
         role: "tracked-deployment-inputs",
@@ -197,7 +198,7 @@ const readOwnedJson = <A>(
 ) =>
   readText(path, role).pipe(
     Effect.flatMap(
-      Schema.decodeUnknownEffect(Schema.fromJsonString(schema), {
+      Schema.decodeEffect(Schema.fromJsonString(schema), {
         onExcessProperty: "error",
       })
     ),
@@ -212,7 +213,7 @@ const readProviderJson = <A>(
   FileSystem.FileSystem.pipe(
     Effect.flatMap((fileSystem) => fileSystem.readFileString(path)),
     Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role })),
-    Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(schema))),
+    Effect.flatMap(Schema.decodeEffect(Schema.fromJsonString(schema))),
     Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role }))
   );
 
@@ -224,9 +225,9 @@ const encodeAndWrite = <A>(
 ) =>
   Effect.gen(function* encodeAndWriteReceipt() {
     const fileSystem = yield* FileSystem.FileSystem;
-    const encoded = yield* Schema.encodeUnknownEffect(
-      Schema.fromJsonString(schema)
-    )(value).pipe(
+    const encoded = yield* Schema.encodeEffect(Schema.fromJsonString(schema))(
+      value
+    ).pipe(
       Effect.mapError(() => new WorkflowEvidenceReceiptWriteError({ role }))
     );
     yield* fileSystem
@@ -297,10 +298,15 @@ const makeProjection = (
           })
       )
     );
-    const digest = yield* workflowSha256(
-      "workflow-plan",
-      stringifyWorkflowPlanProjection(projection)
-    ).pipe(
+    const encoded = yield* stringifyWorkflowPlanProjection(projection).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidencePlanProjectionError({
+            operation: config.TAXKIT_WORKFLOW_EVIDENCE_OPERATION,
+          })
+      )
+    );
+    const digest = yield* workflowSha256("workflow-plan", encoded).pipe(
       Effect.mapError(
         () =>
           new WorkflowEvidencePlanProjectionError({
@@ -482,27 +488,55 @@ const selectWorker = (
   Effect.gen(function* selectInventoryWorker() {
     const stages = findStage(inventory, stage);
     if (allowAbsent && stages.length === 0) {
-      return null;
+      return Option.none();
     }
     if (stages.length !== 1) {
       return yield* new WorkflowEvidenceProviderDecodeError({
         role: "stage-inventory",
       });
     }
-    const [stageInventory] = stages;
-    if (
-      stageInventory === undefined ||
-      stageInventory.resources.length !== 1 ||
-      stageInventory.resources[0]?.logicalId !== "DocsWebsite" ||
-      stageInventory.resources[0].workerName === undefined ||
-      stageInventory.resources[0].workerUrl === undefined
-    ) {
+    const stageInventory = yield* Effect.fromOption(
+      EffectArray.get(stages, 0)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceProviderDecodeError({ role: "stage-inventory" })
+      )
+    );
+    if (stageInventory.resources.length !== 1) {
       return yield* new WorkflowEvidenceProviderDecodeError({
         role: "stage-inventory",
       });
     }
-    const [resource] = stageInventory.resources;
-    const { workerName, workerUrl } = resource;
+    const resource = yield* Effect.fromOption(
+      EffectArray.get(stageInventory.resources, 0)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceProviderDecodeError({ role: "stage-inventory" })
+      )
+    );
+    if (resource.logicalId !== "DocsWebsite") {
+      return yield* new WorkflowEvidenceProviderDecodeError({
+        role: "stage-inventory",
+      });
+    }
+    const workerName = yield* Effect.fromOption(
+      Option.fromNullishOr(resource.workerName)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceProviderDecodeError({ role: "stage-inventory" })
+      )
+    );
+    const workerUrl = yield* Effect.fromOption(
+      Option.fromNullishOr(resource.workerUrl)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceProviderDecodeError({ role: "stage-inventory" })
+      )
+    );
     const providerWorkers = EffectArray.filter(
       inventory.providerWorkers,
       (worker) =>
@@ -524,18 +558,29 @@ const selectWorker = (
           new WorkflowEvidenceProviderDecodeError({
             role: "stage-inventory",
           })
-      )
+      ),
+      Effect.asSome
     );
   });
 
 const latestDeployment = (deployments: WranglerDeploymentsType, role: string) =>
   Effect.gen(function* selectLatestDeployment() {
-    const latest = Array.last(deployments).pipe(Option.getOrUndefined);
-    const deploymentId = latest?.id ?? latest?.deployment_id;
-    const versionId = latest?.versions[0]?.version_id;
-    if (deploymentId === undefined || versionId === undefined) {
-      return yield* new WorkflowEvidenceProviderDecodeError({ role });
-    }
+    const latest = yield* Effect.fromOption(EffectArray.last(deployments)).pipe(
+      Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role }))
+    );
+    const deploymentId = yield* Effect.fromOption(
+      Option.fromNullishOr(latest.id).pipe(
+        Option.orElse(() => Option.fromNullishOr(latest.deployment_id))
+      )
+    ).pipe(
+      Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role }))
+    );
+    const version = yield* Effect.fromOption(
+      EffectArray.get(latest.versions, 0)
+    ).pipe(
+      Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role }))
+    );
+    const versionId = version.version_id;
     return { deploymentId, versionId };
   });
 
@@ -543,11 +588,11 @@ const requiredAfter = <A>(
   value: A | undefined,
   requirement: string
 ): Effect.Effect<A, WorkflowEvidenceConfigError> =>
-  value === undefined
-    ? Effect.fail(
-        new WorkflowEvidenceConfigError({ mode: "provider", requirement })
-      )
-    : Effect.succeed(value);
+  Effect.fromOption(Option.fromNullishOr(value)).pipe(
+    Effect.mapError(
+      () => new WorkflowEvidenceConfigError({ mode: "provider", requirement })
+    )
+  );
 
 export const writeProviderWorkflowEvidence = (
   config: WorkflowEvidenceProviderConfig
@@ -570,11 +615,13 @@ export const writeProviderWorkflowEvidence = (
       );
       const previousPath =
         config.TAXKIT_WORKFLOW_EVIDENCE_PREVIOUS_DEPLOYMENTS_PATH;
-      const previousVersionId =
-        previousPath === undefined || previousPath === ""
-          ? ""
-          : yield* readProviderJson(
-              previousPath,
+      const previousVersionId = yield* Option.fromNullishOr(previousPath).pipe(
+        Option.filter((value) => value.length > 0),
+        Option.match({
+          onNone: () => Effect.succeed(""),
+          onSome: (previousFile) =>
+            readProviderJson(
+              previousFile,
               "previous-deployments",
               WranglerDeployments
             ).pipe(
@@ -582,13 +629,18 @@ export const writeProviderWorkflowEvidence = (
                 latestDeployment(deployments, "previous-deployments")
               ),
               Effect.map((deployment) => deployment.versionId)
-            );
+            ),
+        })
+      );
       yield* appendWorkflowFile(
         outputPath,
         "github-output",
-        worker === null
-          ? "stage_present=false\nprevious_worker_name=\nprevious_version_id=\n"
-          : `stage_present=true\nprevious_worker_name=${worker.workerName}\nprevious_version_id=${previousVersionId}\n`
+        Option.match(worker, {
+          onNone: () =>
+            "stage_present=false\nprevious_worker_name=\nprevious_version_id=\n",
+          onSome: (selected) =>
+            `stage_present=true\nprevious_worker_name=${selected.workerName}\nprevious_version_id=${previousVersionId}\n`,
+        })
       );
       return;
     }
@@ -597,12 +649,18 @@ export const writeProviderWorkflowEvidence = (
       inventory,
       config.TAXKIT_WORKFLOW_EVIDENCE_STAGE,
       false
+    ).pipe(
+      Effect.flatMap((selected) =>
+        Effect.fromOption(selected).pipe(
+          Effect.mapError(
+            () =>
+              new WorkflowEvidenceProviderDecodeError({
+                role: "stage-inventory",
+              })
+          )
+        )
+      )
     );
-    if (worker === null) {
-      return yield* new WorkflowEvidenceProviderDecodeError({
-        role: "stage-inventory",
-      });
-    }
     const currentDeploymentsPath = yield* requiredAfter(
       config.TAXKIT_WORKFLOW_EVIDENCE_CURRENT_DEPLOYMENTS_PATH,
       "current-deployments-path"
@@ -618,11 +676,13 @@ export const writeProviderWorkflowEvidence = (
     );
     const previousPath =
       config.TAXKIT_WORKFLOW_EVIDENCE_PREVIOUS_DEPLOYMENTS_PATH;
-    const previousVersionId =
-      previousPath === undefined || previousPath === ""
-        ? null
-        : yield* readProviderJson(
-            previousPath,
+    const previousVersionId = yield* Option.fromNullishOr(previousPath).pipe(
+      Option.filter((value) => value.length > 0),
+      Option.match({
+        onNone: () => Effect.succeed(null),
+        onSome: (previousFile) =>
+          readProviderJson(
+            previousFile,
             "previous-deployments",
             WranglerDeployments
           ).pipe(
@@ -630,7 +690,9 @@ export const writeProviderWorkflowEvidence = (
               latestDeployment(deployments, "previous-deployments")
             ),
             Effect.map((deployment) => deployment.versionId)
-          );
+          ),
+      })
+    );
     const identityPath = yield* requiredAfter(
       config.TAXKIT_WORKFLOW_EVIDENCE_IDENTITY_PATH,
       "identity-path"
@@ -674,10 +736,10 @@ export const writeProviderWorkflowEvidence = (
     );
     const previewPrNumberValue =
       config.TAXKIT_WORKFLOW_EVIDENCE_PREVIEW_PR_NUMBER;
-    const previewPrNumber =
-      previewPrNumberValue === undefined || previewPrNumberValue === ""
-        ? null
-        : previewPrNumberValue;
+    const previewPrNumber = Option.fromNullishOr(previewPrNumberValue).pipe(
+      Option.filter((value) => value !== ""),
+      Option.getOrNull
+    );
     if (
       identity.candidateCommit !== candidateCommit ||
       (config.TAXKIT_WORKFLOW_EVIDENCE_STAGE === "prod" &&

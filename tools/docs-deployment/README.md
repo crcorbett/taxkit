@@ -123,8 +123,8 @@ operational authority.
 ## Local checking
 
 `test:docs-deployment` uses Bun-hosted Vitest with the shared source resolver.
-The upload-file, retained-input, source-contract, credential, workflow-input
-and native memo tests use
+The upload-file, retained-input, source-contract, credential, workflow-input,
+workflow-source, plan-projection, saved-evidence and native memo tests use
 `@effect/vitest`, scoped FileSystem fixtures and ordered Effect work. The
 remaining suites preserve their existing assertions under Vitest; their full
 strict migration is pending in DEV-73. Local command checks read retained
@@ -146,3 +146,16 @@ The original negative child-exit assertion now checks the owning typed error.
 Credential tests preserve cached-file precedence, malformed fallback and
 unreadable-input refusal; scope tests preserve the most-specific selection
 regardless of ordering. Other policy/provider adapters remain pending strict work.
+
+
+Workflow-source assertions retain ordered Effect traversal and checked step
+lookup. The plan parser checks optional regex groups, resource selection and
+summary lookup. Its JSON encoder reuses the receipt field Schemas in the exact
+canonical digest order. The projection runtime encodes once for file/hash work
+and returns bounded typed configuration/read/decode/write errors. The plan
+verifier and saved-evidence writer use that encoding. Inventory/version lookups
+are checked; absent stages use Option internally and retain the original text
+at workflow egress. Three executable runtime admissions are exact; ordinary
+sources and tests have none. The original workflow/capture/evidence tests,
+five historical capture digests and eight accepted-finding mappings remain.
+Added negative tests read only scoped synthetic records, with no provider request.
