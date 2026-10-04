@@ -1053,3 +1053,52 @@ package exports, lock, operational procedures and tax results. **N/A** Changeset
 public content and provider operations: root local checking only. Recover by
 reverting this complete slice. DEV-73, remaining release scripts, SDK/app/
 infrastructure and semantic/lifetime review, then DEV-74–81, remain unfinished.
+
+
+## Local T002 release-script boundaries
+
+Continue from #113 `422d8576f2e2f94bb28744f98dead646e509ac70`;
+hosted Quality passed in run 37191992734. The actual installed lint command
+initially reported 78 findings across 17 release-script files; that is a scoped
+observation, not a whole-repository defect count. All eleven rules now apply to
+package source/tests/config. Two exact command-runtime admissions replace no
+other rules. Actual accepted-file tests, a rejected neighbour and exact-selector
+assertions qualify that scope.
+
+The live command Layer captures native process, filesystem, path and Crypto
+services once and exposes named `execute` with no per-call service requirement.
+Each output stream owns a private Ref; pure immutable transitions preserve the
+original marker expression, chunk lookahead, redaction, full detail and bounded
+excerpt behaviour. Sequential Effect accumulation keeps the nine-check order,
+true exit/failure states, last successful step and stops before later commands.
+Raw CLI arguments are decoded once. Native Crypto hashing maps failures to a
+safe named error; Schema-owned artifact/receipt fields, persistent uniqueness,
+checked selections and outbound encoding retain saved bytes and immutable
+attempt/presentation rules. Retained accepted packets cannot become a current
+candidate; historical evidence and all tax results remain unchanged.
+
+All 59 release-script cases pass (42 retained plus 17). All 266 real lint cases
+pass (245 retained plus 18 accepted files, one rejected neighbour and two exact
+runtime selectors). Package compiler, root lint and both unused-code profiles
+pass. Frozen install checked 790 installs/1020 packages with unchanged lock;
+all 22 package test tasks and the 15-task build passed. Final full verification
+passed, including 21 Quality cases/all ten isolated faults, fresh source-only
+documentation, 176 deployment-tool cases, 21 skill cases and 16 evaluation cases.
+Both Chromium suites executed: two web Atom and seven documentation route cases.
+Matching unchanged-input build/type caches reused; final docs/runbook/format/diff
+and Changeset status checks precede commit. The attempted removal of CLI-test
+decoding permission correctly failed its actual acceptance fixture: argument
+and UTF-8 decoding still need that reviewed ingress. Preserve that permission;
+remove only its unused execution admission. Final narrower config passed again. Controlled native-service tests make no provider requests. Full
+qualification is recorded in the
+[release-script receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-release-script-boundaries.json).
+Documentation impact: **Change required** for package source/tests/README,
+strict config/fixtures, narrower production unused-export inventory, tooling,
+testing, this active plan/ledger, receipt and the private-package patch Changeset.
+**Preserve** the nine command arguments/order, three public handoff Schemas,
+package export map, historical evidence, failed attempts, operational procedures,
+canonical skills, dependency lock and calculator results. **N/A** generated public
+content, HTTP contracts and provider state: local command checking only. Recover
+by reverting the entire slice. DEV-73 and SDK/app/config/infrastructure and
+semantic/lifetime review remain unfinished, followed by DEV-74–81. Medicare
+correction still awaits Cooper's bounded scope decision.

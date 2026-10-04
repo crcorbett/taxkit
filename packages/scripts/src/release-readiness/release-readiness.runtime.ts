@@ -1,6 +1,6 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Clock, Console, Effect, Layer } from "effect";
+import { Clock, Console, Effect, Layer, Schema } from "effect";
 import * as Path from "effect/Path";
 
 import { decodeReleaseReadinessCli } from "./cli.js";
@@ -54,10 +54,12 @@ const program = Effect.gen(function* releaseReadinessMain() {
   }
   const evidence = yield* readReleaseEvidence(workspaceRoot);
   if (evidence.packet.lifecycle === "accepted") {
-    return yield* new ReleaseEvidenceDecodeError({
-      evidencePath: "docs/evidence/releases/HGI-203-local.json",
-      operation: "prepare-new-candidate-packet-before-release-attempt",
-    });
+    return yield* Effect.fail(
+      new ReleaseEvidenceDecodeError({
+        evidencePath: "docs/evidence/releases/HGI-203-local.json",
+        operation: "prepare-new-candidate-packet-before-release-attempt",
+      })
+    );
   }
   const acceptedAttempt =
     yield* readReleaseAcceptedAttemptSummary(workspaceRoot);
@@ -70,8 +72,16 @@ const program = Effect.gen(function* releaseReadinessMain() {
     contentManifest: evidence.packet.candidate.contentManifest,
     contentSha256: evidence.packet.candidate.contentSha256,
   };
-  const attemptId = ReleaseAttemptId.make(
+  const attemptId = yield* Schema.decodeUnknownEffect(ReleaseAttemptId)(
     `release-${yield* Clock.currentTimeMillis}`
+  ).pipe(
+    Effect.mapError(
+      () =>
+        new ReleaseEvidenceDecodeError({
+          evidencePath: "tmp/release-readiness",
+          operation: "construct-release-attempt-identity",
+        })
+    )
   );
   const report = yield* runReleaseReadiness(
     createReleaseReadinessPlan(workspaceRoot),
@@ -99,6 +109,9 @@ const program = Effect.gen(function* releaseReadinessMain() {
   return report;
 }).pipe(
   Effect.tapErrorTag("CiReleaseCheckFailedError", (error) =>
+    Console.error(formatReleaseReadinessError(error))
+  ),
+  Effect.tapErrorTag("ReleaseEvidenceDigestError", (error) =>
     Console.error(formatReleaseReadinessError(error))
   ),
   Effect.tapErrorTag("ReleaseEvidenceDecodeError", (error) =>

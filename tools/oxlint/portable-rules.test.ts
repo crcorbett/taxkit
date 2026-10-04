@@ -33,6 +33,45 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
+      "packages/scripts/src/index.ts",
+      "packages/scripts/src/release-readiness/cli.test.ts",
+      "packages/scripts/src/release-readiness/cli.ts",
+      "packages/scripts/src/release-readiness/errors.ts",
+      "packages/scripts/src/release-readiness/evidence.boundary.test.ts",
+      "packages/scripts/src/release-readiness/evidence.boundary.ts",
+      "packages/scripts/src/release-readiness/index.ts",
+      "packages/scripts/src/release-readiness/live.layer.test.ts",
+      "packages/scripts/src/release-readiness/live.layer.ts",
+      "packages/scripts/src/release-readiness/output-redaction.ts",
+      "packages/scripts/src/release-readiness/present.runtime.ts",
+      "packages/scripts/src/release-readiness/program.test.ts",
+      "packages/scripts/src/release-readiness/program.ts",
+      "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
+      "packages/scripts/src/release-readiness/schemas.ts",
+      "packages/scripts/src/release-readiness/service.ts",
+      "packages/scripts/src/release-readiness/test.layer.ts",
+      "packages/scripts/vitest.config.ts",
+    ],
+    generated:
+      "packages/scripts/src/release-readiness/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+
+  {
+    accepted: [
       "tools/oxlint/binding-tracker.ts",
       "tools/oxlint/binding-tracker.test.ts",
       "tools/oxlint/host.types.ts",
@@ -862,6 +901,8 @@ test.effect.each([
 );
 
 test.each([
+  "packages/scripts/src/release-readiness/present.runtime.ts",
+  "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/quality-workflow/check.runtime.ts",

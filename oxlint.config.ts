@@ -104,9 +104,9 @@ const decodingBoundaryFiles = [
   "packages/rules/au/pay/src/calculator/take-home-pay.boundary.ts",
 
   // Release-evidence decoders and their adversarial boundary fixtures.
+  "packages/scripts/src/release-readiness/cli.test.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.test.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
-  "packages/scripts/src/release-readiness/cli.test.ts",
   "packages/scripts/src/release-readiness/cli.ts",
   "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   // Cross-process command output restored by the release-readiness live layer.
@@ -196,6 +196,8 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  "packages/scripts/src/release-readiness/evidence.boundary.test.ts",
+  "packages/scripts/src/release-readiness/live.layer.test.ts",
   "tools/docs-deployment/inventory.report.egress.ts",
   // Canonical JSON bytes used only to bind immutable saved-record fingerprints.
   "tools/docs-deployment/retained-record.egress.ts",
@@ -271,7 +273,6 @@ const runtimeBoundaryFiles = [
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
-  "packages/scripts/src/release-readiness/cli.test.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/src/index.ts",
@@ -477,6 +478,7 @@ export default defineConfig({
         "tools/docs-deployment/fixtures/fake-doppler*.ts",
         "tools/docs-deployment/.generated-credential-strict-rejected.ts",
         "tools/docs-deployment/.generated-artifact-strict-rejected.ts",
+        "packages/scripts/**",
         "packages/testing/**",
         "packages/api/http/**",
         "packages/docs-content/**",
@@ -541,6 +543,34 @@ export default defineConfig({
             allowedFiles: [
               "packages/api/http/src/client/in-process.layer.ts",
               "tools/oxlint/.generated-fetch-host.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["packages/scripts/src/release-readiness/present.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "packages/scripts/src/release-readiness/present.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: [
+        "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
+      ],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
             ],
           },
         ],

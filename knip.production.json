@@ -3,8 +3,7 @@
   "ignoreWorkspaces": ["apps/web", "packages/tsconfig"],
   "ignoreIssues": {
     "packages/api/http/src/client/service.ts": ["duplicates"],
-    "packages/scripts/src/release-readiness/evidence.boundary.ts": ["exports"],
-    "packages/scripts/src/release-readiness/live.layer.ts": ["exports"]
+    "packages/scripts/src/release-readiness/evidence.boundary.ts": ["exports"]
   },
   "workspaces": {
     ".": {

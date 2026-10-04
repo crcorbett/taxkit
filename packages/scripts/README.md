@@ -154,9 +154,11 @@ root release:check
   -> Turbo-backed root and package-owned commands
 ```
 
-`runReleaseReadiness` is the primary linear Effect program. The service
-contract and live layer depend only on the Effect `ChildProcessSpawner`
-capability. The Bun runtime entrypoint resolves the repository root with
+`runReleaseReadiness` is the primary linear Effect program. The service exposes
+one named, closed `execute` Effect. The live Layer captures
+`ChildProcessSpawner`, FileSystem, Path and Crypto at construction; callers do
+not supply those services for each command. The Bun runtime entrypoint resolves
+the repository root with
 `Path.fromFileUrl`, composes `BunServices.layer`, and is the only place that
 provides the host implementation or executes the completed Effect.
 `runCiReleaseReadiness` is the separate report-only program: it uses the command
@@ -181,11 +183,11 @@ reject malformed journeys, incomplete packets, escaping paths, missing files
 and mismatched candidate/detail digests. Run the focused route with `bun run
 test:release-readiness`.
 
-The production Knip profile has exact `exports` exceptions only for
-`evidence.boundary.ts` and `live.layer.ts`: their exported decoder, verifier and
-stream-redactor seams are executed by production code and directly exercised by
-the focused tests, but are intentionally absent from the package public export
-map. The normal Knip graph, package index and focused tests remain the owners for
+The production Knip profile has one exact release-script `exports` exception
+for `evidence.boundary.ts`: its decoder/verifier operations are directly tested
+while the package export map exposes only the three handoff Schemas. The live
+runner and its private `output-redaction.ts` owner have no export exception.
+The normal Knip graph, package index and focused tests remain the owners for
 all other unused exports.
 
 The package root does not expose proof internals or a generic digest helper.
@@ -195,6 +197,21 @@ the consuming filesystem boundary. The subpath carries `bun` and `source`
 live-source conditions plus `types` and `default` build conditions, so
 repository tooling and direct Bun tests resolve live source while built
 consumers resolve declarations and JavaScript.
+
+All eleven canonical strict rules apply to package source, tests and config.
+Only `present.runtime.ts` and `release-readiness.runtime.ts` may execute the
+completed Effect. Real-command fixtures check each admitted file and reject
+neighbouring invalid code; exact configuration assertions protect those two
+runtime paths. The output processor uses a private Ref and pure immutable
+transitions for each stream. It preserves credential/home-path redaction across
+chunks, complete detail files and the separate 4096-character excerpt limit.
+Sequential Effect accumulation preserves the nine-command order and stops at
+the same first failure. Hashing uses Effect Crypto with a safe named error;
+Schema encoding preserves the attempt/presentation representation and immutable
+write policy. Controlled native-service fixtures prove stream/process failures,
+digest errors and interruption cleanup; the existing real process test still
+reads back both complete sanitised streams. Real CLI tests prove invalid
+arguments and retained packet failures return nonzero before any release check.
 
 ## Local proof boundary
 

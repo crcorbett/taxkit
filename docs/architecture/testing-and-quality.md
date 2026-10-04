@@ -222,7 +222,7 @@ The command uses the Effect Platform child-process `Command` model through a
 `ReleaseCommandRunner` service, records schema-backed outcomes, and fails fast
 with tagged execution or non-zero-exit errors. Package-owned command
 implementations remain in their current packages and apps. The live runner
-depends on `ChildProcessSpawner`; only the Bun runtime entrypoint provides
+captures `ChildProcessSpawner`, FileSystem, Path and Crypto; only the Bun runtime entrypoint provides
 `BunServices.layer`, and that same runtime resolves the workspace root through
 Effect `Path.fromFileUrl`.
 
@@ -233,6 +233,16 @@ root release:check
   -> canonical root, app and package commands
   -> schema-backed ordered outcomes or one tagged failure
 ```
+
+Release-script checks also cover exact command-host permissions, independent
+stream state, all original chunk-split redaction cases, long values and complete
+large output. Native-service fixtures preserve true exits and first-failure
+records, close process/stream scopes on interruption, and map native digest or
+filesystem errors without secret text. A reused program starts with an empty
+accumulator each time. Fixed SHA-256 vectors and immutable receipt readbacks
+protect retained representation. The dated
+[release-script receipt](../documentation-audit/clean-slate-foundation/2026-10-04-release-script-boundaries.json)
+records this local qualification separately from hosted checks.
 
 `release:check` is the complete local release-evidence graph, not publication
 approval. Versioning, changelog application and publishing remain explicit

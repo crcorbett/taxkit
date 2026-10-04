@@ -62,6 +62,9 @@ const program = Effect.gen(function* presentReleaseAttempt() {
     ].join("\n")
   );
 }).pipe(
+  Effect.tapErrorTag("ReleaseEvidenceDigestError", (error) =>
+    Console.error(formatReleaseReadinessError(error))
+  ),
   Effect.tapErrorTag("ReleaseEvidenceDecodeError", (error) =>
     Console.error(formatReleaseReadinessError(error))
   ),

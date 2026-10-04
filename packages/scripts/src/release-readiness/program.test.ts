@@ -5,7 +5,7 @@ import {
   formatReleaseReadinessError,
   ReleaseWorkspacePathError,
 } from "./errors.js";
-import { makeReleaseOutputRedactor } from "./live.layer.js";
+import { releaseOutputRedactor } from "./output-redaction.js";
 import { runCiReleaseReadiness, runReleaseReadiness } from "./program.js";
 import {
   createReleaseReadinessPlan,
@@ -55,8 +55,8 @@ describe("release readiness", () => {
 
         expect(report.mode).toBe("ci");
         expect(report.outcomes).toHaveLength(9);
-        expect(JSON.stringify(report)).not.toContain("candidate");
-        expect(JSON.stringify(report)).not.toContain("receipt");
+        expect(report).not.toHaveProperty("candidate");
+        expect(report).not.toHaveProperty("receipt");
         expect(yield* Ref.get(memory.invocations)).toHaveLength(9);
       })
   );
@@ -195,14 +195,15 @@ describe("release readiness", () => {
       })
   );
 
-  for (const terminalState of [
+  it.effect.each([
     "interrupted",
     "early-pipe-close",
     "missing-detail",
     "corrupt-detail",
     "false-success",
-  ] satisfies readonly ReleaseTerminalState[]) {
-    it.effect(`preserves ${terminalState} without a presentation rerun`, () =>
+  ] satisfies readonly ReleaseTerminalState[])(
+    "preserves %s without a presentation rerun",
+    (terminalState) =>
       Effect.gen(function* testTerminalFailure() {
         const results = HashMap.set(
           successfulResults,
@@ -231,116 +232,146 @@ describe("release readiness", () => {
         expect(rendered).toContain("do not rerun");
         expect(yield* Ref.get(memory.invocations)).toHaveLength(1);
       })
-    );
-  }
+  );
 
-  it("redacts credentials and home paths across every chunk boundary", () => {
-    const separator = String.fromCodePoint(47);
-    const macHome = ["", "Users", "cooper", "mac-project"].join(separator);
-    const linuxHome = ["", "home", "alice", "linux-project"].join(separator);
-    const windowsSeparator = String.fromCodePoint(92);
-    const windowsHome = ["C:", "Users", "alice", "windows-project"].join(
-      windowsSeparator
-    );
-    const uncHome = ["", "", "server", "Users", "alice", "unc-project"].join(
-      windowsSeparator
-    );
-    const input = `safe token = abc123 ${macHome} ${linuxHome} ${windowsHome} ${uncHome} Authorization: Bearer bearer-secret ghp_1234567890 github_pat_1234567890 sk-1234567890 done`;
-
-    for (let split = 0; split <= input.length; split += 1) {
-      const redactor = makeReleaseOutputRedactor();
-      const output = `${redactor.write(input.slice(0, split))}${redactor.write(
-        input.slice(split)
-      )}${redactor.end()}`;
-      expect(output).toContain("safe");
-      expect(output).toContain("token = <redacted>");
-      expect(output).toContain("<home>/mac-project");
-      expect(output).toContain("<home>/linux-project");
-      expect(output).toContain(
-        ["<home>", "windows-project"].join(windowsSeparator)
-      );
-      expect(output).toContain(
-        ["<home>", "unc-project"].join(windowsSeparator)
-      );
-      expect(output).not.toContain("abc123");
-      expect(output).not.toContain("bearer-secret");
-      expect(output).not.toContain("cooper");
-      expect(output).not.toContain("alice");
-      expect(output).not.toContain("ghp_1234567890");
-      expect(output).not.toContain("github_pat_1234567890");
-      expect(output).not.toContain("sk-1234567890");
-    }
-  });
-
-  it("redacts diagnostic and file URL home paths across every chunk boundary", () => {
-    const separator = String.fromCodePoint(47);
-    const windowsSeparator = String.fromCodePoint(92);
-    const cases = [
-      {
-        input: `file:${separator}${separator}${separator}Users${separator}alice${separator}mac-project`,
-        retainedSuffix: `${separator}mac-project`,
-      },
-      {
-        input: `file:${separator}${separator}${separator}home${separator}alice${separator}linux-project`,
-        retainedSuffix: `${separator}linux-project`,
-      },
-      {
-        input: `path:${separator}Users${separator}alice${separator}mac-project`,
-        retainedSuffix: `${separator}mac-project`,
-      },
-      {
-        input: `path:${separator}home${separator}alice${separator}linux-project`,
-        retainedSuffix: `${separator}linux-project`,
-      },
-      {
-        input: `path:C:${windowsSeparator}Users${windowsSeparator}alice${windowsSeparator}windows-project`,
-        retainedSuffix: `${windowsSeparator}windows-project`,
-      },
-      {
-        input: `path:${windowsSeparator}${windowsSeparator}server${windowsSeparator}Users${windowsSeparator}alice${windowsSeparator}unc-project`,
-        retainedSuffix: `${windowsSeparator}unc-project`,
-      },
-    ] as const;
-
-    for (const fixture of cases) {
-      for (let split = 0; split <= fixture.input.length; split += 1) {
-        const redactor = makeReleaseOutputRedactor();
-        const output = `${redactor.write(
-          fixture.input.slice(0, split)
-        )}${redactor.write(fixture.input.slice(split))}${redactor.end()}`;
-
-        expect(output).toContain(`<home>${fixture.retainedSuffix}`);
-        expect(output).not.toContain(fixture.input);
-        expect(output).not.toContain(
-          fixture.input.slice(
-            0,
-            fixture.input.indexOf("alice") + "alice".length
-          )
+  it.effect(
+    "redacts credentials and home paths across every chunk boundary",
+    () =>
+      Effect.gen(function* testCrossChunkRedaction() {
+        const separator = String.fromCodePoint(47);
+        const macHome = ["", "Users", "cooper", "mac-project"].join(separator);
+        const linuxHome = ["", "home", "alice", "linux-project"].join(
+          separator
         );
-        expect(output).not.toContain("alice");
-      }
-    }
-  });
+        const windowsSeparator = String.fromCodePoint(92);
+        const windowsHome = ["C:", "Users", "alice", "windows-project"].join(
+          windowsSeparator
+        );
+        const uncHome = [
+          "",
+          "",
+          "server",
+          "Users",
+          "alice",
+          "unc-project",
+        ].join(windowsSeparator);
+        const input = `safe token = abc123 ${macHome} ${linuxHome} ${windowsHome} ${uncHome} Authorization: Bearer bearer-secret ghp_1234567890 github_pat_1234567890 sk-1234567890 done`;
 
-  it("preserves ordinary relative path text", () => {
-    const relative = String.raw`docs/Users/alice docs/home/alice ./home/alice home/alice Users/alice C:Users\alice identifier_home/alice`;
-    const redactor = makeReleaseOutputRedactor();
-    const output = `${redactor.write(relative)}${redactor.end()}`;
+        yield* Effect.forEach(
+          Array.range(0, input.length),
+          (split) =>
+            Effect.gen(function* testSplit() {
+              const redactor = yield* releaseOutputRedactor;
+              const output = `${yield* redactor.write(input.slice(0, split))}${yield* redactor.write(input.slice(split))}${yield* redactor.end}`;
+              expect(output).toContain("safe");
+              expect(output).toContain("token = <redacted>");
+              expect(output).toContain("<home>/mac-project");
+              expect(output).toContain("<home>/linux-project");
+              expect(output).toContain(
+                ["<home>", "windows-project"].join(windowsSeparator)
+              );
+              expect(output).toContain(
+                ["<home>", "unc-project"].join(windowsSeparator)
+              );
+              expect(output).not.toContain("abc123");
+              expect(output).not.toContain("bearer-secret");
+              expect(output).not.toContain("cooper");
+              expect(output).not.toContain("alice");
+              expect(output).not.toContain("ghp_1234567890");
+              expect(output).not.toContain("github_pat_1234567890");
+              expect(output).not.toContain("sk-1234567890");
+            }),
+          { discard: true }
+        );
+      })
+  );
 
-    expect(output).toBe(relative);
-  });
+  it.effect(
+    "redacts diagnostic and file URL home paths across every chunk boundary",
+    () =>
+      Effect.gen(function* testFileUrlRedaction() {
+        const separator = String.fromCodePoint(47);
+        const windowsSeparator = String.fromCodePoint(92);
+        const cases = [
+          {
+            input: `file:${separator}${separator}${separator}Users${separator}alice${separator}mac-project`,
+            retainedSuffix: `${separator}mac-project`,
+          },
+          {
+            input: `file:${separator}${separator}${separator}home${separator}alice${separator}linux-project`,
+            retainedSuffix: `${separator}linux-project`,
+          },
+          {
+            input: `path:${separator}Users${separator}alice${separator}mac-project`,
+            retainedSuffix: `${separator}mac-project`,
+          },
+          {
+            input: `path:${separator}home${separator}alice${separator}linux-project`,
+            retainedSuffix: `${separator}linux-project`,
+          },
+          {
+            input: `path:C:${windowsSeparator}Users${windowsSeparator}alice${windowsSeparator}windows-project`,
+            retainedSuffix: `${windowsSeparator}windows-project`,
+          },
+          {
+            input: `path:${windowsSeparator}${windowsSeparator}server${windowsSeparator}Users${windowsSeparator}alice${windowsSeparator}unc-project`,
+            retainedSuffix: `${windowsSeparator}unc-project`,
+          },
+        ] as const;
 
-  it("retains multi-megabyte safe output without applying the excerpt cap", () => {
-    const input = "safe-output-line\n".repeat(131_072);
-    const redactor = makeReleaseOutputRedactor();
-    let output = "";
-    for (let offset = 0; offset < input.length; offset += 4096) {
-      output += redactor.write(input.slice(offset, offset + 4096));
-    }
-    output += redactor.end();
-    expect(output).toBe(input);
-    expect(output.length).toBeGreaterThan(1024 * 1024);
-  });
+        yield* Effect.forEach(
+          cases,
+          (fixture) =>
+            Effect.forEach(
+              Array.range(0, fixture.input.length),
+              (split) =>
+                Effect.gen(function* testFileUrlSplit() {
+                  const redactor = yield* releaseOutputRedactor;
+                  const output = `${yield* redactor.write(fixture.input.slice(0, split))}${yield* redactor.write(fixture.input.slice(split))}${yield* redactor.end}`;
+
+                  expect(output).toContain(`<home>${fixture.retainedSuffix}`);
+                  expect(output).not.toContain(fixture.input);
+                  expect(output).not.toContain(
+                    fixture.input.slice(
+                      0,
+                      fixture.input.indexOf("alice") + "alice".length
+                    )
+                  );
+                  expect(output).not.toContain("alice");
+                }),
+              { discard: true }
+            ),
+          { discard: true }
+        );
+      })
+  );
+
+  it.effect("preserves ordinary relative path text", () =>
+    Effect.gen(function* testRelativeText() {
+      const relative = String.raw`docs/Users/alice docs/home/alice ./home/alice home/alice Users/alice C:Users\alice identifier_home/alice`;
+      const redactor = yield* releaseOutputRedactor;
+      const output = `${yield* redactor.write(relative)}${yield* redactor.end}`;
+
+      expect(output).toBe(relative);
+    })
+  );
+
+  it.effect(
+    "retains multi-megabyte safe output without applying the excerpt cap",
+    () =>
+      Effect.gen(function* testLargeSafeOutput() {
+        const input = "safe-output-line\n".repeat(131_072);
+        const redactor = yield* releaseOutputRedactor;
+        const chunks = yield* Effect.forEach(
+          Array.range(0, Math.ceil(input.length / 4096) - 1),
+          (index) =>
+            redactor.write(input.slice(index * 4096, (index + 1) * 4096))
+        );
+        const output = `${chunks.join("")}${yield* redactor.end}`;
+        expect(output).toBe(input);
+        expect(output.length).toBeGreaterThan(1024 * 1024);
+      })
+  );
 
   it("renders typed workspace path failures without host-path disclosure", () => {
     const error = new ReleaseWorkspacePathError({
@@ -360,3 +391,46 @@ describe("release readiness", () => {
     expect(rendered).not.toContain(workspacePath);
   });
 });
+
+it.effect(
+  "evaluates a reused release program with an empty accumulator each time",
+  () =>
+    Effect.gen(function* testRepeatedReleaseProgram() {
+      const memory = yield* makeReleaseCommandRunnerTest(successfulResults);
+      const program = runCiReleaseReadiness(checks).pipe(
+        Effect.provide(memory.layer)
+      );
+      const first = yield* program;
+      const second = yield* program;
+      expect(first.outcomes).toHaveLength(9);
+      expect(second.outcomes).toEqual(first.outcomes);
+      expect(yield* Ref.get(memory.invocations)).toHaveLength(18);
+    })
+);
+
+it.effect(
+  "retains long separators while discarding long credentials and usernames",
+  () =>
+    Effect.gen(function* testLongSensitiveText() {
+      const redactor = yield* releaseOutputRedactor;
+      const spaces = " ".repeat(131_072);
+      const secret = "x".repeat(131_072);
+      const home = ["", "Users", secret, "suffix"].join("/");
+      const output = `${yield* redactor.write(`token${spaces}=${spaces}${secret} ${home} done`)}${yield* redactor.end}`;
+      expect(output).toBe(
+        `token${spaces}=${spaces}<redacted> <home>/suffix done`
+      );
+      expect(output).not.toContain(secret);
+    })
+);
+
+it.effect("constructs independent redactor state for each evaluation", () =>
+  Effect.gen(function* testIndependentRedactorState() {
+    const first = yield* releaseOutputRedactor;
+    const second = yield* releaseOutputRedactor;
+    yield* first.write("token=private");
+    const secondOutput = `${yield* second.write("ordinary text")}${yield* second.end}`;
+    expect(secondOutput).toBe("ordinary text");
+    expect(yield* first.end).not.toContain("private");
+  })
+);

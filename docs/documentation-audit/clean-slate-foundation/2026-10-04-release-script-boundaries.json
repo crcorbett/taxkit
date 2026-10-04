@@ -1,0 +1,98 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "422d8576f2e2f94bb28744f98dead646e509ac70",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR readback separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "All eleven canonical rules for release package source/tests/config with two exact runtime owners",
+    "Cold stream-local Ref redaction and pure immutable transitions preserve original secrecy and complete output",
+    "Sequential Effect accumulation preserves nine-command order, first failure, true exit and last successful step",
+    "Immediate argument Schema ingress, owning artifact/receipt types, immutable collections and safe native Crypto hashing",
+    "Closed named command operation captures native services at Layer construction; deterministic native-service substitution",
+    "Production unused-export exception removed for live Layer; patch Changeset for private release package",
+    "Unused CLI-test runtime permission removed; its real argument/UTF-8 decoding permission retained; execution remains with two exact command paths"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "packages/scripts/src/release-readiness/**",
+        "packages/scripts/README.md",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "knip.production.json",
+        "docs/standards/tooling.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        ".changeset/safe-release-output.md"
+      ],
+      "reason": "Local command checking, state/lifetime and safe receipt error handling changed"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "packages/scripts/package.json",
+        "docs/evidence/**",
+        "docs/documentation-audit historical receipts",
+        "docs/runbooks/**",
+        ".agents/skills/**",
+        ".github/workflows/**",
+        "bun.lock",
+        "calculator/rule/API/SDK outputs"
+      ],
+      "reason": "Exact command order/arguments, public Schema exports, historical bytes/identity/authority, operational procedures, dependency graph and tax results unchanged"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "public content",
+        "generated API references",
+        "provider state"
+      ],
+      "reason": "Local release command checks only; no external operation"
+    }
+  ],
+  "baseline_observations": [
+    "Actual installed CLI: 78 findings across 17 files with all canonical rules; host runtime admissions exact before observation"
+  ],
+  "verification": [
+    {
+      "command": "focused package types/lint/tests and actual CLI lint fixtures",
+      "result": "passed: 59 release-script cases (42 retained plus 17), 266 actual lint cases (245 retained plus 18 accepted files, one rejected neighbour and two exact runtime selectors), package types and root lint, normal/production unused-code checks"
+    },
+    {
+      "command": "frozen install, complete tests, build, full verification, final docs/runbook/format/diff checks",
+      "result": "passed on final narrowed configuration: frozen install 790 installs/1020 packages with unchanged lock; complete tests (22 successful tasks, zero cached), 15-task build (nine matching caches); full verification including 21 Quality cases/all ten isolated faults and fresh source-only documentation, 176 deployment-tool cases, 21 skill and 16 evaluation cases, root types/lint/unused-code checks. Both Chromium suites executed: two web Atom cases and seven documentation route cases. Matching unchanged-input build/type caches reused"
+    },
+    {
+      "command": "attempted removal of both CLI-test admissions",
+      "result": "actual accepted-file fixture failed correctly: argument decoder calls and native UTF-8 stream decoding still require the reviewed test ingress permission; retained decoding admission, removed unused runtime admission, requalification required"
+    },
+    {
+      "command": "check:docs, check:runbooks, format:check, changeset:status and git diff --check",
+      "result": "passed before commit; private-package patch Changeset included in the existing pending release status without applying versions"
+    }
+  ],
+  "limitations": [
+    "DEV-73 and downstream tasks unfinished; SDK, app/config/infrastructure and semantic/lifetime review pending",
+    "No release attempt, candidate rewrite or provider requests; controlled services and local commands only",
+    "Medicare correction awaits Cooper scope decision",
+    "No merge, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert the complete slice; retain historical receipts/failed attempts; no provider, registry or deployment state changes"
+}

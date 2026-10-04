@@ -355,6 +355,14 @@ category so local usernames and matched content cannot leak into logs.
 
 ## Incremental clean-slate enforcement
 
+Release-script source, tests and config also use all eleven canonical rules.
+Their only execution admissions are the two exact `.runtime.ts` command files
+under `packages/scripts/src/release-readiness`. Each file has its own real CLI
+acceptance case; invalid neighbouring code and exact selector assertions prevent
+that permission spreading. The package README owns output, receipt, ordered
+command and native-service lifetime behaviour. Historical evidence remains
+unchanged; this scope does not complete DEV-73.
+
 DEV-73 currently configures all eleven canonical strict Effect rules in directly owned lint TypeScript
 files (`tools/oxlint/*.ts`), repository-path and governance tools, and in core,
 rules, calculators, shared testing helpers and the HTTP API, including their tests. Actual Oxlint fixtures assert

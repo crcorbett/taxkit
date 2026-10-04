@@ -56,6 +56,12 @@ export class ReleaseEvidenceDecodeError extends Data.TaggedError(
   readonly operation: string;
 }> {}
 
+export class ReleaseEvidenceDigestError extends Data.TaggedError(
+  "ReleaseEvidenceDigestError"
+)<{
+  readonly operation: "sha256-release-text";
+}> {}
+
 export class ReleaseWorkspacePathError extends Data.TaggedError(
   "ReleaseWorkspacePathError"
 )<{
@@ -69,7 +75,8 @@ export type ReleaseReadinessError =
   | ReleaseCommandExecutionError
   | ReleaseReadinessCliError
   | ReleaseEvidenceDecodeError
-  | ReleaseWorkspacePathError;
+  | ReleaseWorkspacePathError
+  | ReleaseEvidenceDigestError;
 
 export const formatReleaseReadinessError = Match.typeTags<
   ReleaseReadinessError,
@@ -139,6 +146,8 @@ export const formatReleaseReadinessError = Match.typeTags<
       `operation: ${operation}`,
       "recovery: repair the retained packet or inventory; do not infer a release result",
     ].join("\n"),
+  ReleaseEvidenceDigestError: () =>
+    "FAIL [release-evidence] operation=sha256-release-text; recovery=repair the local digest service before starting a new attempt.",
   ReleaseReadinessCliError: () =>
     "FAIL [release-cli] target=release:check arguments; recovery=use no arguments for a candidate attempt or exactly --ci for a report-only CI run.",
   ReleaseWorkspacePathError: ({ target }) =>
