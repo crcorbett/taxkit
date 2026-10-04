@@ -1,0 +1,36 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M42R299FN88DSTKRRHV61ZWC",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-73-lint-route-policy",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/architecture/testing-and-quality.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/standards/tooling.md",
+    "oxlint.config.ts",
+    "tools/oxlint/binding-tracker.js",
+    "tools/oxlint/cli-fixture.ts",
+    "tools/oxlint/effect-rules.js",
+    "tools/oxlint/no-decoding-outside-boundaries.test.ts",
+    "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 67494,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 6387968,
+    "output_tokens": 26780,
+    "api_call_count": 36
+  }
+}
