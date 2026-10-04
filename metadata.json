@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43HTTW8MG15B4VXASW5N03A",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-73-web-app-hosts",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/web/README.md",
+    "apps/web/package.json",
+    "apps/web/src/lib/config.boundary.test.ts",
+    "apps/web/src/lib/config.client-input.ts",
+    "apps/web/src/lib/config.client.ts",
+    "apps/web/src/lib/config.server.ts",
+    "apps/web/src/lib/config.ts",
+    "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+    "apps/web/src/lib/route-context.ts",
+    "apps/web/src/lib/runtime.client.ts",
+    "apps/web/src/lib/runtime.server.ts",
+    "apps/web/src/routes/index.tsx",
+    "apps/web/tsconfig.json",
+    "apps/web/vite.config.ts",
+    "apps/web/vitest.browser.config.ts",
+    "apps/web/vitest.config.ts",
+    "docs/architecture/frontend.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-web-app-hosts.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "knip.json",
+    "oxlint.config.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 108292,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 8818688,
+    "output_tokens": 49184,
+    "api_call_count": 50
+  }
+}
