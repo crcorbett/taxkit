@@ -1,0 +1,36 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M440G6709A6V0H4KHDM976W8",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-74-native-api-host",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/api/src/schemas.ts",
+    "apps/api/src/worker-request.boundary.ts",
+    "apps/api/src/worker-telemetry.layer.ts",
+    "apps/api/src/worker.application.ts",
+    "apps/api/src/worker.config.ts",
+    "apps/api/src/worker.ts",
+    "apps/api/test/worker.boundary.test.ts",
+    "packages/api/http/src/handlers/calculators.ts",
+    "packages/api/http/src/server.ts",
+    "packages/api/http/src/server/live.layer.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 453210,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 22396544,
+    "output_tokens": 91992,
+    "api_call_count": 158
+  }
+}
