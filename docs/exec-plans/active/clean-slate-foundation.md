@@ -32,8 +32,7 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: migrate the remaining documentation/deployment,
-evaluation, SDK, app/config and infrastructure paths, then finish readonly
+Next continuation milestone: migrate the remaining deployment, evaluation, SDK, app/config and infrastructure paths, then finish readonly
 contract, Schema, helper and lifetime review before downstream acceptance.
 The Bun-hosted Effect test runner and focused lexical gap proof are locally
 qualified; static JavaScript checking remains pending. Domain boundary enforcement is implemented in PR #93. The latest
@@ -637,3 +636,44 @@ Unchanged app/package/browser tasks reused matching caches. Parent #103 hosted
 Quality passed at exact `852d246` (run 37182416078). A duplicate syntax-name
 import was removed after the actual CLI rejected plugin loading; the final
 corpus passed. Final receipt-only docs/format checks precede commit.
+
+
+## Local T002 documentation checking tools
+
+Continue from `9fdc16e` and draft #104. Its hosted Quality run 37183144873
+passed at that exact revision. Documentation and runbook inspections now use
+persistent maps/sets, ordered pure collection operations and checked optional
+reads. Optional regular-expression captures are explicitly absent when the
+host returns an undefined value; this preserves unfiltered command checking
+and quoted metadata. Preserve all existing findings and accepted source bytes.
+
+Both executable files use Effect CLI and provide Bun services only at their
+outer execution boundary. Failed policy receipts fail the command after the
+report is written. Hashing remains the same SHA-256 operation, with a named
+safe error at the host Promise boundary. Tests use Effect Vitest and scoped
+platform child processes. The test scope removes its exact generated document
+and temporary runbook copy on completion or interruption. Runtime and Bun API
+permissions formerly used by these tests are removed. Only the two named
+executables receive canonical runtime admissions; exact test record encoding
+and JSON representation admissions do not admit runtime execution.
+
+Documentation impact: **Change required** for root commands, strict selectors,
+tests, tooling/testing owners, the documentation router's command description,
+this plan, task evidence and dated receipt. **Preserve** canonical skill assets,
+the runbook contract, all five runbooks and historical packets, tax/package
+results, dependency lock and provider state. **N/A** for Changesets and public
+content: repository checking tools only. Recover by reverting the complete
+slice. The [documentation-tools receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-documentation-tools.json)
+records qualification and remaining limits. DEV-73 and later tasks remain
+unfinished; continue remaining owned paths and semantic review.
+
+Focused qualification: 41 documentation cases (36 preserved, five added) and
+130 real CLI cases, including all eight documentation source/test files,
+rejecting a neighbouring policy file and exact command admission assertions.
+Actual root JSON and runbook commands passed; five runbooks/eleven commands
+were inspected and no operational command was executed. Unknown options keep
+Effect CLI's bounded usage output and a nonzero exit. Pinned frozen install, complete tests and the 15-task build passed. Full
+verification passed after the optional Boolean default correction: 21 Quality
+cases/all ten isolated mutations and 21 skill cases. Matching unchanged-input
+build/package/browser caches were reused. Final receipt-only docs/runbook,
+format and diff checks precede commit.

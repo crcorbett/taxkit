@@ -1,0 +1,109 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "9fdc16ec3092c765c8dfdfb7a15a143458491015",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR readback separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Persistent documentation and runbook inspection maps/sets and ordered pure findings with checked optional reads",
+    "Effect CLI command options and failure exits; Bun services composed only at each exact executable host",
+    "Schema-typed JSON representation ingress/egress; named safe SHA-256 host error",
+    "Bun-hosted Effect Vitest; scoped child processes and temporary fixtures; obsolete test runtime/Bun API admissions removed",
+    "All eleven canonical rules and three additional lexical gap rules on documentation owner; exact command runtime admissions and record/JSON test representations"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "package.json",
+        "oxlint.config.ts",
+        "tools/documentation/**",
+        "tools/oxlint/portable-rules.test.ts",
+        "docs/README.md",
+        "docs/standards/tooling.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json"
+      ],
+      "reason": "Changed command/test host and strict implementation ownership"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        ".agents/skills/**",
+        "tools/documentation/owner-policy.json",
+        "tools/documentation/runbook-contract.json",
+        "docs/runbooks/**",
+        "docs/evidence/**",
+        "packages/**",
+        "apps/**",
+        "bun.lock"
+      ],
+      "reason": "Canonical assets, exact existing policy/runbook contracts, retained historical packet bytes and tax/package results"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public content",
+        "provider state"
+      ],
+      "reason": "Root checking tools only; no versioned package or external operation"
+    }
+  ],
+  "verification": [
+    {
+      "command": "bun run check:docs:types:task",
+      "result": "passed; visible nonfatal Effect unstable-API warnings retained"
+    },
+    {
+      "command": "bun run test:documentation:task",
+      "result": "41 cases passed: 36 preserved and five added for actual JSON success/failure, unknown options and isolated runbook policy failure"
+    },
+    {
+      "command": "bun run test:oxlint:task",
+      "result": "130 actual CLI cases passed; eight accepted documentation owners and neighbouring rejected source, two exact runtime-selector assertions"
+    },
+    {
+      "command": "actual check:docs:task --json and check:runbooks:task",
+      "result": "passed; five runbooks and eleven commands inspected, zero operations executed"
+    },
+    {
+      "command": "hosted parent Quality run 37183144873",
+      "result": "SUCCESS at exact parent 9fdc16ec3092c765c8dfdfb7a15a143458491015; new draft hosted proof separate"
+    },
+    {
+      "command": "bun install --frozen-lockfile; bun run test; bun run build; bun run verification",
+      "result": "passed on pinned Bun 1.4.2; install unchanged; full test and all 130 CLI cases, 15-task build with unchanged-input matching caches; full verification including 21 Quality cases/all ten isolated mutations and 21 skill cases. Matching two-test Chromium result reused from unchanged app inputs"
+    },
+    {
+      "command": "final docs/runbook/format/diff checks",
+      "result": "required after receipt finalisation before commit"
+    }
+  ],
+  "recovery_observations": [
+    "Optional regular-expression groups can be present with undefined values. Flatten absent host values before looking up filters or quoted metadata; preserved valid baseline test caught this regression",
+    "Effect CLI prints bounded usage on unknown options. Real command test qualifies that actual behaviour along with nonzero exit and safe error output",
+    "Full verification caught that Effect CLI Boolean flags require an explicit false default when absent. Added the default and a real no-options human-output test; then the complete verification passed."
+  ],
+  "limitations": [
+    "DEV-73 and DEV-74\u201381 unfinished; remaining owned paths, readonly contracts, static JavaScript checking and semantic/lifetime review pending",
+    "Medicare correction awaits Cooper scope decision",
+    "No canonical asset, retained tax result or runbook/proof bytes changed",
+    "No merge, release, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert the complete slice; no external state changed"
+}

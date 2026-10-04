@@ -1,16 +1,20 @@
-import { describe, expect, test } from "bun:test";
-
+import { describe, expect, it as test } from "@effect/vitest";
 import {
   ReleaseAcceptedAttemptSummary,
   ReleaseJourneyInventory,
   ReleaseProofPacket,
 } from "@taxkit/scripts/release-readiness";
 import {
-  Array as EffectArray,
+  Array,
   Effect,
+  HashMap,
+  HashSet,
+  Option,
+  Match,
   Record as EffectRecord,
   Schema,
 } from "effect";
+import { forEach } from "effect/Array";
 
 import hgi203ValidationJson from "../../docs/documentation-audit/HGI-203-validation.json";
 import acceptedSummaryJson from "../../docs/evidence/releases/HGI-203-accepted-attempt.json";
@@ -35,99 +39,93 @@ const sectionNames = [
   "Non-claims",
 ] as const;
 
-const decodeContract = (value: typeof Schema.Unknown.Type) =>
-  Effect.runPromise(
-    Schema.decodeUnknownEffect(RunbookContract, {
-      onExcessProperty: "error",
-    })(value)
-  );
-
-const decodeValidation = (value: typeof Schema.Unknown.Type) =>
-  Effect.runPromise(
-    Schema.decodeUnknownEffect(Hgi203ValidationProjection)(value)
-  );
+const decodeContract = Schema.decodeUnknownEffect(RunbookContract, {
+  onExcessProperty: "error",
+});
+const decodeValidation = Schema.decodeUnknownEffect(Hgi203ValidationProjection);
 
 const runbookMarkdown = (
   runbook: RunbookInspection["contract"]["runbooks"][number],
   emptySection?: (typeof sectionNames)[number]
 ) => {
-  const sections = sectionNames.flatMap((section) => {
-    let body = `${section} has an explicit contract.`;
-    if (section === "Preconditions") {
-      body = EffectArray.map(
-        runbook.evidencePaths,
-        (path) => `Required evidence: \`${path}\`.`
-      ).join("\n");
-    } else if (section === "Procedure") {
-      body = EffectArray.map(
-        runbook.commands,
-        (command) => `Run \`${command.invocation}\`.`
-      ).join("\n");
-    } else if (section === "Stop conditions") {
-      body = EffectArray.map(
-        runbook.stopOperations,
-        (operation) => `Stop \`${operation}\`.`
-      ).join("\n");
-    }
+  const sections = Array.flatMap(sectionNames, (section) => {
+    const body = Match.value(section).pipe(
+      Match.when("Preconditions", () =>
+        Array.map(
+          runbook.evidencePaths,
+          (path) => `Required evidence: \`${path}\`.`
+        ).join("\n")
+      ),
+      Match.when("Procedure", () =>
+        Array.map(
+          runbook.commands,
+          (command) => `Run \`${command.invocation}\`.`
+        ).join("\n")
+      ),
+      Match.when("Stop conditions", () =>
+        Array.map(
+          runbook.stopOperations,
+          (operation) => `Stop \`${operation}\`.`
+        ).join("\n")
+      ),
+      Match.orElse(() => `${section} has an explicit contract.`)
+    );
     return [`## ${section}`, section === emptySection ? "" : body];
   });
   return [`Owner: \`${runbook.owner}\``, ...sections].join("\n\n");
 };
 
-const validInspection = async (): Promise<RunbookInspection> => {
+const validInspection = Effect.gen(function* () {
   const [contract, packet, acceptedSummary, hgi203Validation] =
-    await Promise.all([
+    yield* Effect.all([
       decodeContract(contractJson),
-      Effect.runPromise(
-        Schema.decodeUnknownEffect(ReleaseProofPacket)(packetJson)
-      ),
-      Effect.runPromise(
-        Schema.decodeUnknownEffect(ReleaseAcceptedAttemptSummary)(
-          acceptedSummaryJson
-        )
+      Schema.decodeUnknownEffect(ReleaseProofPacket)(packetJson),
+      Schema.decodeUnknownEffect(ReleaseAcceptedAttemptSummary)(
+        acceptedSummaryJson
       ),
       decodeValidation(hgi203ValidationJson),
-      Effect.runPromise(
-        Schema.decodeUnknownEffect(ReleaseJourneyInventory)(
-          historicalJourneyInventoryJson
-        )
+      Schema.decodeUnknownEffect(ReleaseJourneyInventory)(
+        historicalJourneyInventoryJson
       ),
-      Effect.runPromise(
-        Schema.decodeUnknownEffect(ReleaseJourneyInventory)(
-          currentJourneyInventoryJson
-        )
+      Schema.decodeUnknownEffect(ReleaseJourneyInventory)(
+        currentJourneyInventoryJson
       ),
     ]);
-  const files = new Map<string, string>();
-  for (const runbook of contract.runbooks) {
-    files.set(runbook.path, runbookMarkdown(runbook));
-    for (const evidencePath of runbook.evidencePaths) {
-      files.set(evidencePath, "retained evidence");
-    }
-  }
-  files.set(
-    "docs/runbooks/README.md",
-    EffectArray.map(
-      contract.runbooks,
-      (runbook) =>
-        `| \`${runbook.id}\` | \`${runbook.path}\` | \`${runbook.owner}\` |`
-    ).join("\n")
-  );
-  files.set(
-    "docs/operations/authority-model.md",
-    EffectArray.map(
-      contract.authorityStops,
-      (entry) =>
-        `| \`${entry.operation}\` | \`${entry.principal}\` | \`${entry.status}\` | receipt |`
-    ).join("\n")
-  );
-  for (const handoffPath of EffectRecord.values(contract.acceptedHandoff)) {
-    files.set(handoffPath, "retained evidence");
-  }
+  const files = HashMap.fromIterable([
+    ...Array.flatMap(contract.runbooks, (runbook) => [
+      [runbook.path, runbookMarkdown(runbook)] as const,
+      ...Array.map(
+        runbook.evidencePaths,
+        (path) => [path, "retained evidence"] as const
+      ),
+    ]),
+    [
+      "docs/runbooks/README.md",
+      Array.map(
+        contract.runbooks,
+        (runbook) =>
+          `| \`${runbook.id}\` | \`${runbook.path}\` | \`${runbook.owner}\` |`
+      ).join("\n"),
+    ] as const,
+    [
+      "docs/operations/authority-model.md",
+      Array.map(
+        contract.authorityStops,
+        (entry) =>
+          `| \`${entry.operation}\` | \`${entry.principal}\` | \`${entry.status}\` | receipt |`
+      ).join("\n"),
+    ] as const,
+    ...Array.map(
+      EffectRecord.values(contract.acceptedHandoff),
+      (path) => [path, "retained evidence"] as const
+    ),
+  ]);
   return {
     acceptedSummary,
-    acceptedSummarySha256:
-      packet.attempt.detailArtifacts[0]?.sha256 ?? "missing",
+    acceptedSummarySha256: Array.head(packet.attempt.detailArtifacts).pipe(
+      Option.map((artifact) => artifact.sha256),
+      Option.getOrElse(() => "missing")
+    ),
     contentManifestSha256: `sha256:${hgi203Validation.candidate.contentManifestSha256.replace(/^sha256:/u, "")}`,
     contract,
     files,
@@ -135,7 +133,7 @@ const validInspection = async (): Promise<RunbookInspection> => {
     historicalJourneyInventorySha256: packet.journeyInventorySha256,
     packet,
     packetSha256: `sha256:${hgi203Validation.candidate.packetSha256.replace(/^sha256:/u, "")}`,
-    rootScripts: new Set([
+    rootScripts: HashSet.fromIterable([
       "changeset",
       "release:check",
       "release:present",
@@ -146,286 +144,337 @@ const validInspection = async (): Promise<RunbookInspection> => {
     ]),
     runbookPaths: [
       "docs/runbooks/README.md",
-      ...EffectArray.map(contract.runbooks, (runbook) => runbook.path),
+      ...Array.map(contract.runbooks, (runbook) => runbook.path),
     ],
-    workspaceScripts: new Map([
+    workspaceScripts: HashMap.fromIterable([
       [
         "@taxkit/sdk",
-        new Set(["check-packed-artifact", "validate:downstream"]),
+        HashSet.fromIterable(["check-packed-artifact", "validate:downstream"]),
       ],
     ]),
-  };
-};
+  } satisfies RunbookInspection;
+});
 
 describe("runbook policy", () => {
-  test("accepts the strict five-runbook contract and parses a substantive final section", async () => {
-    const inspection = await validInspection();
-    expect(inspectRunbookContract(inspection)).toEqual([]);
-    expect(ReleaseProofPacket).toBeDefined();
-    expect(ReleaseAcceptedAttemptSummary).toBeDefined();
-    expect(ReleaseJourneyInventory).toBeDefined();
-  });
+  test.effect(
+    "accepts the strict five-runbook contract and parses a substantive final section",
+    () =>
+      Effect.gen(function* () {
+        const inspection = yield* validInspection;
+        expect(inspectRunbookContract(inspection)).toEqual([]);
+        expect(ReleaseProofPacket).toBeDefined();
+        expect(ReleaseAcceptedAttemptSummary).toBeDefined();
+        expect(ReleaseJourneyInventory).toBeDefined();
+      })
+  );
 
-  test("rejects unknown-principal authority drift", async () => {
-    const inspection = await validInspection();
-    const contract = await decodeContract({
-      ...contractJson,
-      authorityStops: EffectArray.map(
-        contractJson.authorityStops,
-        (entry, index) =>
-          index === 0
-            ? { ...entry, principal: "unrecorded-person", status: "approved" }
-            : entry
-      ),
-    });
-    const findings = inspectRunbookContract({ ...inspection, contract });
-    expect(findings).toContainEqual(
-      expect.objectContaining({ invariant: "authority-stop" })
-    );
-  });
+  test.effect("rejects unknown-principal authority drift", () =>
+    Effect.gen(function* () {
+      const inspection = yield* validInspection;
+      const contract = yield* decodeContract({
+        ...contractJson,
+        authorityStops: Array.map(
+          contractJson.authorityStops,
+          (entry, index) =>
+            index === 0
+              ? { ...entry, principal: "unrecorded-person", status: "approved" }
+              : entry
+        ),
+      });
+      const findings = inspectRunbookContract({ ...inspection, contract });
+      expect(findings).toContainEqual(
+        expect.objectContaining({ invariant: "authority-stop" })
+      );
+    })
+  );
 
-  test("rejects nonexistent commands with exact target and recovery", async () => {
-    const inspection = await validInspection();
-    const contract = await decodeContract({
-      ...contractJson,
-      runbooks: EffectArray.map(contractJson.runbooks, (runbook, index) =>
-        index === 0
-          ? {
+  test.effect(
+    "rejects nonexistent commands with exact target and recovery",
+    () =>
+      Effect.gen(function* () {
+        const inspection = yield* validInspection;
+        const contract = yield* decodeContract({
+          ...contractJson,
+          runbooks: Array.map(contractJson.runbooks, (runbook, index) =>
+            index === 0
+              ? {
+                  ...runbook,
+                  commands: Array.map(
+                    runbook.commands,
+                    (command, commandIndex) =>
+                      commandIndex === 0
+                        ? {
+                            ...command,
+                            argv: ["bun", "run", "not-a-script"],
+                            invocation: "bun run not-a-script",
+                            script: "not-a-script",
+                          }
+                        : command
+                  ),
+                }
+              : runbook
+          ),
+        });
+        const findings = inspectRunbookContract({ ...inspection, contract });
+        expect(findings).toContainEqual(
+          expect.objectContaining({
+            invariant: "existing-command",
+            recovery: expect.stringContaining("existing root script"),
+            target: expect.stringContaining("not-a-script"),
+          })
+        );
+      })
+  );
+
+  forEach(
+    [
+      ["missing bun run prefix", ["bun", "changeset", "status", "--verbose"]],
+      [
+        "wrong executable prefix",
+        ["npm", "run", "changeset", "status", "--verbose"],
+      ],
+      ["missing documented script arguments", ["bun", "run", "changeset"]],
+    ] as const,
+    ([name, argv]) => {
+      test.effect(`rejects ${name}`, () =>
+        Effect.gen(function* () {
+          const inspection = yield* validInspection;
+          const contract = yield* decodeContract({
+            ...contractJson,
+            runbooks: Array.map(contractJson.runbooks, (runbook) => ({
               ...runbook,
-              commands: EffectArray.map(
-                runbook.commands,
-                (command, commandIndex) =>
-                  commandIndex === 0
-                    ? {
-                        ...command,
-                        argv: ["bun", "run", "not-a-script"],
-                        invocation: "bun run not-a-script",
-                        script: "not-a-script",
-                      }
-                    : command
+              commands: Array.map(runbook.commands, (command) =>
+                command.script === "changeset" ? { ...command, argv } : command
               ),
-            }
-          : runbook
-      ),
-    });
-    const findings = inspectRunbookContract({ ...inspection, contract });
-    expect(findings).toContainEqual(
-      expect.objectContaining({
-        invariant: "existing-command",
-        recovery: expect.stringContaining("existing root script"),
-        target: expect.stringContaining("not-a-script"),
+            })),
+          });
+          expect(
+            inspectRunbookContract({ ...inspection, contract })
+          ).toContainEqual(
+            expect.objectContaining({ invariant: "existing-command" })
+          );
+        })
+      );
+    }
+  );
+
+  test.effect("rejects duplicate owners", () =>
+    Effect.gen(function* () {
+      const inspection = yield* validInspection;
+      const duplicateOwner = Array.head(contractJson.runbooks).pipe(
+        Option.map((runbook) => runbook.owner),
+        Option.getOrElse(() => "missing")
+      );
+      const contract = yield* decodeContract({
+        ...contractJson,
+        runbooks: Array.map(contractJson.runbooks, (runbook, index) =>
+          index === 1 ? { ...runbook, owner: duplicateOwner } : runbook
+        ),
+      });
+      expect(
+        inspectRunbookContract({ ...inspection, contract })
+      ).toContainEqual(expect.objectContaining({ invariant: "unique-owner" }));
+    })
+  );
+
+  forEach(["Rollback", "Escalation"] as const, (missing) => {
+    test.effect(`rejects an empty ${missing.toLowerCase()} section`, () =>
+      Effect.gen(function* () {
+        const inspection = yield* validInspection;
+        const first = Array.head(inspection.contract.runbooks).pipe(
+          Option.getOrElse(() => expect.unreachable())
+        );
+        const files = HashMap.fromIterable([
+          ...inspection.files,
+          [first.path, runbookMarkdown(first, missing)] as const,
+        ]);
+        expect(inspectRunbookContract({ ...inspection, files })).toContainEqual(
+          expect.objectContaining({
+            invariant: "required-section",
+            target: expect.stringContaining(missing.toLowerCase()),
+          })
+        );
       })
     );
   });
 
-  for (const [name, argv] of [
-    ["missing bun run prefix", ["bun", "changeset", "status", "--verbose"]],
-    [
-      "wrong executable prefix",
-      ["npm", "run", "changeset", "status", "--verbose"],
-    ],
-    ["missing documented script arguments", ["bun", "run", "changeset"]],
-  ] as const) {
-    test(`rejects ${name}`, async () => {
-      const inspection = await validInspection();
-      const contract = await decodeContract({
+  test.effect("rejects candidate or tmp proof substitution", () =>
+    Effect.gen(function* () {
+      const inspection = yield* validInspection;
+      const contract = yield* decodeContract({
         ...contractJson,
-        runbooks: EffectArray.map(contractJson.runbooks, (runbook) => ({
-          ...runbook,
-          commands: EffectArray.map(runbook.commands, (command) =>
-            command.script === "changeset" ? { ...command, argv } : command
-          ),
-        })),
+        acceptedHandoff: {
+          ...contractJson.acceptedHandoff,
+          packet: "tmp/HGI-203-candidate.json",
+        },
       });
       expect(
         inspectRunbookContract({ ...inspection, contract })
       ).toContainEqual(
+        expect.objectContaining({ invariant: "accepted-handoff" })
+      );
+    })
+  );
+
+  test.effect("rejects stale or hash-mismatched accepted proof", () =>
+    Effect.gen(function* () {
+      const inspection = yield* validInspection;
+      const hgi203Validation = yield* decodeValidation({
+        ...hgi203ValidationJson,
+        candidate: {
+          ...hgi203ValidationJson.candidate,
+          acceptedSummarySha256: "0".repeat(64),
+        },
+      });
+      expect(
+        inspectRunbookContract({ ...inspection, hgi203Validation })
+      ).toContainEqual(
+        expect.objectContaining({ invariant: "accepted-handoff" })
+      );
+    })
+  );
+
+  test.effect(
+    "rejects substituting the evolving current journey owner for the historical HGI-203 snapshot",
+    () =>
+      Effect.gen(function* () {
+        const inspection = yield* validInspection;
+        expect(
+          inspectRunbookContract({
+            ...inspection,
+            historicalJourneyInventorySha256: `sha256:${"0".repeat(64)}`,
+          })
+        ).toContainEqual(
+          expect.objectContaining({
+            invariant: "accepted-handoff",
+            target: "docs/evidence/releases/HGI-203-local.json",
+          })
+        );
+      })
+  );
+
+  test.effect("rejects sidecar and runbook prose divergence", () =>
+    Effect.gen(function* () {
+      const inspection = yield* validInspection;
+      const first = Array.head(inspection.contract.runbooks).pipe(
+        Option.getOrElse(() => expect.unreachable())
+      );
+      const files = HashMap.fromIterable([
+        ...inspection.files,
+        [
+          first.path,
+          runbookMarkdown(first).replace(
+            `\`${Array.head(first.commands).pipe(
+              Option.map((command) => command.invocation),
+              Option.getOrElse(() => "missing")
+            )}\``,
+            "`bun run contradictory-command`"
+          ),
+        ] as const,
+      ]);
+      expect(inspectRunbookContract({ ...inspection, files })).toContainEqual(
         expect.objectContaining({ invariant: "existing-command" })
       );
-    });
-  }
+    })
+  );
 
-  test("rejects duplicate owners", async () => {
-    const inspection = await validInspection();
-    const duplicateOwner = contractJson.runbooks[0]?.owner ?? "missing";
-    const contract = await decodeContract({
-      ...contractJson,
-      runbooks: EffectArray.map(contractJson.runbooks, (runbook, index) =>
-        index === 1 ? { ...runbook, owner: duplicateOwner } : runbook
-      ),
-    });
-    expect(inspectRunbookContract({ ...inspection, contract })).toContainEqual(
-      expect.objectContaining({ invariant: "unique-owner" })
-    );
-  });
-
-  for (const missing of ["Rollback", "Escalation"] as const) {
-    test(`rejects an empty ${missing.toLowerCase()} section`, async () => {
-      const inspection = await validInspection();
-      const [first] = inspection.contract.runbooks;
-      if (!first) {
-        expect.unreachable();
-      }
-      const files = new Map([
+  test.effect("rejects extra runbook files and extra index routes", () =>
+    Effect.gen(function* () {
+      const inspection = yield* validInspection;
+      const files = HashMap.fromIterable([
         ...inspection.files,
-        [first.path, runbookMarkdown(first, missing)] as const,
+        [
+          "docs/runbooks/README.md",
+          `${HashMap.get(inspection.files, "docs/runbooks/README.md").pipe(Option.getOrElse(() => ""))}\n| \`extra\` | \`docs/runbooks/extra.md\` | \`extra-owner\` |`,
+        ] as const,
+      ]);
+      const findings = inspectRunbookContract({
+        ...inspection,
+        files,
+        runbookPaths: [...inspection.runbookPaths, "docs/runbooks/extra.md"],
+      });
+      expect(
+        Array.filter(
+          findings,
+          (finding) => finding.invariant === "exact-inventory"
+        ).length
+      ).toBeGreaterThanOrEqual(2);
+    })
+  );
+
+  test.effect("rejects swapped authority table fields", () =>
+    Effect.gen(function* () {
+      const inspection = yield* validInspection;
+      const authority = HashMap.get(
+        inspection.files,
+        "docs/operations/authority-model.md"
+      ).pipe(Option.getOrElse(() => ""));
+      const files = HashMap.fromIterable([
+        ...inspection.files,
+        [
+          "docs/operations/authority-model.md",
+          authority.replace(
+            "| `versioning` | `unknown` | `unknown-stop` |",
+            "| `versioning` | `unknown-stop` | `unknown` |"
+          ),
+        ] as const,
       ]);
       expect(inspectRunbookContract({ ...inspection, files })).toContainEqual(
         expect.objectContaining({
-          invariant: "required-section",
-          target: expect.stringContaining(missing.toLowerCase()),
+          invariant: "authority-stop",
+          target: "docs/operations/authority-model.md#versioning",
         })
       );
-    });
-  }
+    })
+  );
 
-  test("rejects candidate or tmp proof substitution", async () => {
-    const inspection = await validInspection();
-    const contract = await decodeContract({
-      ...contractJson,
-      acceptedHandoff: {
-        ...contractJson.acceptedHandoff,
-        packet: "tmp/HGI-203-candidate.json",
-      },
-    });
-    expect(inspectRunbookContract({ ...inspection, contract })).toContainEqual(
-      expect.objectContaining({ invariant: "accepted-handoff" })
-    );
-  });
-
-  test("rejects stale or hash-mismatched accepted proof", async () => {
-    const inspection = await validInspection();
-    const hgi203Validation = await decodeValidation({
-      ...hgi203ValidationJson,
-      candidate: {
-        ...hgi203ValidationJson.candidate,
-        acceptedSummarySha256: "0".repeat(64),
-      },
-    });
-    expect(
-      inspectRunbookContract({ ...inspection, hgi203Validation })
-    ).toContainEqual(
-      expect.objectContaining({ invariant: "accepted-handoff" })
-    );
-  });
-
-  test("rejects substituting the evolving current journey owner for the historical HGI-203 snapshot", async () => {
-    const inspection = await validInspection();
-    expect(
-      inspectRunbookContract({
-        ...inspection,
-        historicalJourneyInventorySha256: `sha256:${"0".repeat(64)}`,
+  test.effect(
+    "rejects downgrading version mutation to local-proof authority",
+    () =>
+      Effect.gen(function* () {
+        const inspection = yield* validInspection;
+        const contract = yield* decodeContract({
+          ...contractJson,
+          runbooks: Array.map(contractJson.runbooks, (runbook) => ({
+            ...runbook,
+            commands: Array.map(runbook.commands, (command) =>
+              command.script === "version-repo"
+                ? { ...command, requiredAuthority: "local-proof" }
+                : command
+            ),
+          })),
+        });
+        expect(
+          inspectRunbookContract({ ...inspection, contract })
+        ).toContainEqual(
+          expect.objectContaining({ invariant: "authority-stop" })
+        );
       })
-    ).toContainEqual(
-      expect.objectContaining({
-        invariant: "accepted-handoff",
-        target: "docs/evidence/releases/HGI-203-local.json",
-      })
-    );
-  });
+  );
 
-  test("rejects sidecar and runbook prose divergence", async () => {
-    const inspection = await validInspection();
-    const [first] = inspection.contract.runbooks;
-    if (!first) {
-      expect.unreachable();
-    }
-    const files = new Map([
-      ...inspection.files,
-      [
-        first.path,
-        runbookMarkdown(first).replace(
-          `\`${first.commands[0]?.invocation}\``,
-          "`bun run contradictory-command`"
+  test.effect("rejects flipped accepted-evidence policy", () =>
+    Effect.gen(function* () {
+      const inspection = yield* validInspection;
+      const contract = yield* decodeContract({
+        ...contractJson,
+        runbooks: Array.map(contractJson.runbooks, (runbook) =>
+          runbook.id === "release-readiness"
+            ? { ...runbook, acceptedEvidenceRequired: false }
+            : runbook
         ),
-      ] as const,
-    ]);
-    expect(inspectRunbookContract({ ...inspection, files })).toContainEqual(
-      expect.objectContaining({ invariant: "existing-command" })
-    );
-  });
+      });
+      expect(
+        inspectRunbookContract({ ...inspection, contract })
+      ).toContainEqual(
+        expect.objectContaining({ invariant: "accepted-handoff" })
+      );
+    })
+  );
 
-  test("rejects extra runbook files and extra index routes", async () => {
-    const inspection = await validInspection();
-    const files = new Map([
-      ...inspection.files,
-      [
-        "docs/runbooks/README.md",
-        `${inspection.files.get("docs/runbooks/README.md")}\n| \`extra\` | \`docs/runbooks/extra.md\` | \`extra-owner\` |`,
-      ] as const,
-    ]);
-    const findings = inspectRunbookContract({
-      ...inspection,
-      files,
-      runbookPaths: [...inspection.runbookPaths, "docs/runbooks/extra.md"],
-    });
-    expect(
-      EffectArray.filter(
-        findings,
-        (finding) => finding.invariant === "exact-inventory"
-      ).length
-    ).toBeGreaterThanOrEqual(2);
-  });
-
-  test("rejects swapped authority table fields", async () => {
-    const inspection = await validInspection();
-    const authority =
-      inspection.files.get("docs/operations/authority-model.md") ?? "";
-    const files = new Map([
-      ...inspection.files,
-      [
-        "docs/operations/authority-model.md",
-        authority.replace(
-          "| `versioning` | `unknown` | `unknown-stop` |",
-          "| `versioning` | `unknown-stop` | `unknown` |"
-        ),
-      ] as const,
-    ]);
-    expect(inspectRunbookContract({ ...inspection, files })).toContainEqual(
-      expect.objectContaining({
-        invariant: "authority-stop",
-        target: "docs/operations/authority-model.md#versioning",
-      })
-    );
-  });
-
-  test("rejects downgrading version mutation to local-proof authority", async () => {
-    const inspection = await validInspection();
-    const contract = await decodeContract({
-      ...contractJson,
-      runbooks: EffectArray.map(contractJson.runbooks, (runbook) => ({
-        ...runbook,
-        commands: EffectArray.map(runbook.commands, (command) =>
-          command.script === "version-repo"
-            ? { ...command, requiredAuthority: "local-proof" }
-            : command
-        ),
-      })),
-    });
-    expect(inspectRunbookContract({ ...inspection, contract })).toContainEqual(
-      expect.objectContaining({ invariant: "authority-stop" })
-    );
-  });
-
-  test("rejects flipped accepted-evidence policy", async () => {
-    const inspection = await validInspection();
-    const contract = await decodeContract({
-      ...contractJson,
-      runbooks: EffectArray.map(contractJson.runbooks, (runbook) =>
-        runbook.id === "release-readiness"
-          ? { ...runbook, acceptedEvidenceRequired: false }
-          : runbook
-      ),
-    });
-    expect(inspectRunbookContract({ ...inspection, contract })).toContainEqual(
-      expect.objectContaining({ invariant: "accepted-handoff" })
-    );
-  });
-
-  test("rejects an extra mutable attempt detail artifact", async () => {
-    const inspection = await validInspection();
-    const packet = await Effect.runPromise(
-      Schema.decodeUnknownEffect(ReleaseProofPacket)({
+  test.effect("rejects an extra mutable attempt detail artifact", () =>
+    Effect.gen(function* () {
+      const inspection = yield* validInspection;
+      const packet = yield* Schema.decodeUnknownEffect(ReleaseProofPacket)({
         ...packetJson,
         attempt: {
           ...packetJson.attempt,
@@ -437,10 +486,10 @@ describe("runbook policy", () => {
             },
           ],
         },
-      })
-    );
-    expect(inspectRunbookContract({ ...inspection, packet })).toContainEqual(
-      expect.objectContaining({ invariant: "accepted-handoff" })
-    );
-  });
+      });
+      expect(inspectRunbookContract({ ...inspection, packet })).toContainEqual(
+        expect.objectContaining({ invariant: "accepted-handoff" })
+      );
+    })
+  );
 });

@@ -1,15 +1,18 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import {
-  Array as EffectArray,
   Array,
   Console,
   Effect,
+  HashMap,
+  HashSet,
+  Option,
   Match,
   Record,
   Schema,
   Stream,
 } from "effect";
+import { Command, Flag } from "effect/cli";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
@@ -30,7 +33,7 @@ const receiptLimit = 20;
 const RepositoryPath = Schema.NonEmptyString.pipe(
   Schema.check(Schema.isPattern(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$)).+$/u))
 );
-export const decodePublicPageAcceptanceRecord = Schema.decodeUnknownEffect(
+export const decodePublicPageAcceptanceRecord = Schema.decodeEffect(
   Schema.fromJsonString(PublicPageAcceptanceRecord),
   { onExcessProperty: "error" }
 );
@@ -69,7 +72,7 @@ const renderHuman = (receipt: DocumentationReceipt): string =>
   ].join("\n");
 
 const encodeReceipt = (receipt: DocumentationReceipt) =>
-  Schema.encodeUnknownEffect(Schema.fromJsonString(DocumentationReceipt))(
+  Schema.encodeEffect(Schema.fromJsonString(DocumentationReceipt))(
     receipt
   ).pipe(
     Effect.mapError(
@@ -118,10 +121,8 @@ export const checkDocumentation = (repositoryRoot: string) =>
           Uint8Array.from(Array.flatMap(stdout, Array.fromIterable))
         ),
     });
-    const inventory = yield* Schema.decodeUnknownEffect(
-      Schema.Array(RepositoryPath)
-    )(
-      EffectArray.filter(rawInventory.split("\0"), (entry) => entry.length > 0)
+    const inventory = yield* Schema.decodeEffect(Schema.Array(RepositoryPath))(
+      Array.filter(rawInventory.split("\0"), (entry) => entry.length > 0)
     ).pipe(
       Effect.mapError(
         () =>
@@ -154,27 +155,33 @@ export const checkDocumentation = (repositoryRoot: string) =>
           () => new DocumentationCheckError({ operation: "read-owner-policy" })
         )
       );
-    const ownerPolicy = yield* Schema.decodeUnknownEffect(
+    const ownerPolicy = yield* Schema.decodeEffect(
       Schema.fromJsonString(OwnerPolicy)
     )(policyText).pipe(
       Effect.mapError(
         () => new DocumentationCheckError({ operation: "decode-owner-policy" })
       )
     );
-    const acceptanceRecords = new Map(
-      yield* Effect.forEach(
-        ownerPolicy.public.statusDecision.acceptanceRecords,
-        (binding) => {
-          const recordFile = files.find((file) => file.path === binding.record);
-          return recordFile
-            ? decodePublicPageAcceptanceRecord(recordFile.text).pipe(
-                Effect.match({
-                  onFailure: () => [binding.record, null] as const,
-                  onSuccess: (record) => [binding.record, record] as const,
-                })
-              )
-            : Effect.succeed([binding.record, null] as const);
-        }
+    const acceptanceRecords = HashMap.fromIterable(
+      Array.flatten(
+        yield* Effect.forEach(
+          ownerPolicy.public.statusDecision.acceptanceRecords,
+          (binding) =>
+            Array.findFirst(files, (file) => file.path === binding.record).pipe(
+              Option.match({
+                onNone: () => Effect.succeed([]),
+                onSome: (recordFile) =>
+                  decodePublicPageAcceptanceRecord(recordFile.text).pipe(
+                    Effect.match({
+                      onFailure: () => [],
+                      onSuccess: (record) => [
+                        [binding.record, record] as const,
+                      ],
+                    })
+                  ),
+              })
+            )
+        )
       )
     );
     const manifests = yield* Effect.forEach(
@@ -184,13 +191,13 @@ export const checkDocumentation = (repositoryRoot: string) =>
       (manifestPath) =>
         fileSystem.readFileString(path.join(repositoryRoot, manifestPath)).pipe(
           Effect.flatMap(
-            Schema.decodeUnknownEffect(
-              Schema.fromJsonString(WorkspacePackageManifest)
-            )
+            Schema.decodeEffect(Schema.fromJsonString(WorkspacePackageManifest))
           ),
           Effect.map((manifest) => {
             const packageSummary = {
-              scripts: new Set(Record.keys(manifest.scripts ?? {})),
+              scripts: HashSet.fromIterable(
+                Record.keys(manifest.scripts ?? {})
+              ),
             };
             const ownedPackageSummary = manifest.name
               ? { ...packageSummary, name: manifest.name }
@@ -214,9 +221,7 @@ export const checkDocumentation = (repositoryRoot: string) =>
       .readFileString(path.join(repositoryRoot, "package.json"))
       .pipe(
         Effect.flatMap(
-          Schema.decodeUnknownEffect(
-            Schema.fromJsonString(WorkspacePackageManifest)
-          )
+          Schema.decodeEffect(Schema.fromJsonString(WorkspacePackageManifest))
         ),
         Effect.mapError(
           () =>
@@ -229,63 +234,83 @@ export const checkDocumentation = (repositoryRoot: string) =>
       acceptanceRecords,
       files,
       ownerPolicy,
-      rootScripts: new Set(Record.keys(rootManifest.scripts ?? {})),
-      workspaceScripts: new Map(manifests),
+      rootScripts: HashSet.fromIterable(
+        Record.keys(rootManifest.scripts ?? {})
+      ),
+      workspaceScripts: HashMap.fromIterable(manifests),
     });
   }).pipe(Effect.scoped);
 
-const program = Effect.gen(function* documentationMain() {
-  const fileSystem = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
-  const root = yield* path
-    .fromFileUrl(repositoryRootUrl)
-    .pipe(
+const program = (json: boolean) =>
+  Effect.gen(function* documentationMain() {
+    const fileSystem = yield* FileSystem.FileSystem;
+    const path = yield* Path.Path;
+    const root = yield* path.fromFileUrl(repositoryRootUrl).pipe(
       Effect.mapError(
         () =>
-          new DocumentationCheckError({ operation: "resolve-repository-root" })
+          new DocumentationCheckError({
+            operation: "resolve-repository-root",
+          })
       )
     );
-  const report = yield* checkDocumentation(root);
-  const receipt = receiptFor(report);
-  const fullReport = yield* encodeReceipt(
-    new DocumentationReceipt({
-      ...receipt,
-      diagnostics: report.diagnostics,
-      omittedDiagnostics: 0,
-    })
-  );
-  yield* fileSystem
-    .makeDirectory(path.join(root, "tmp"), { recursive: true })
-    .pipe(
-      Effect.mapError(
-        () =>
-          new DocumentationCheckError({ operation: "create-report-directory" })
-      )
+    const report = yield* checkDocumentation(root);
+    const receipt = receiptFor(report);
+    const fullReport = yield* encodeReceipt(
+      new DocumentationReceipt({
+        ...receipt,
+        diagnostics: report.diagnostics,
+        omittedDiagnostics: 0,
+      })
     );
-  yield* fileSystem
-    .writeFileString(path.join(root, reportPath), fullReport)
-    .pipe(
-      Effect.mapError(
-        () => new DocumentationCheckError({ operation: "write-full-report" })
-      )
-    );
-  const output = Bun.argv.includes("--json")
-    ? yield* encodeReceipt(receipt)
-    : renderHuman(receipt);
-  yield* Console.info(output);
-  return receipt.ok;
-}).pipe(Effect.scoped, Effect.provide(BunServices.layer));
+    yield* fileSystem
+      .makeDirectory(path.join(root, "tmp"), { recursive: true })
+      .pipe(
+        Effect.mapError(
+          () =>
+            new DocumentationCheckError({
+              operation: "create-report-directory",
+            })
+        )
+      );
+    yield* fileSystem
+      .writeFileString(path.join(root, reportPath), fullReport)
+      .pipe(
+        Effect.mapError(
+          () => new DocumentationCheckError({ operation: "write-full-report" })
+        )
+      );
+    const output = json ? yield* encodeReceipt(receipt) : renderHuman(receipt);
+    yield* Console.info(output);
+    return yield* receipt.ok
+      ? Effect.void
+      : Effect.fail(
+          new DocumentationCheckError({
+            operation: "documentation-policy-violations",
+          })
+        );
+  }).pipe(Effect.scoped);
+
+const command = Command.make(
+  "check-docs",
+  { json: Flag.Boolean("json").pipe(Flag.withDefault(false)) },
+  ({ json }) => program(json)
+);
 
 Match.value(import.meta.main).pipe(
   Match.when(true, () =>
     BunRuntime.runMain(
-      program.pipe(
-        Effect.tap((ok) =>
-          Effect.sync(() => {
-            process.exitCode = ok ? 0 : 1;
-          })
-        )
-      )
+      Command.run(command, {
+        renderErrors: false,
+        version: "repository-local",
+      }).pipe(
+        Effect.tapError(() =>
+          Console.error(
+            "Documentation check could not complete; repair the named repository-local policy or command options and rerun bun run check:docs."
+          )
+        ),
+        Effect.provide(BunServices.layer)
+      ),
+      { disableErrorReporting: true }
     )
   ),
   Match.orElse(() => false)

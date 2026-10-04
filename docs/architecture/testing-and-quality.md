@@ -664,3 +664,16 @@ policy source and tests have a focused `check:quality-workflow:types` project in
 root verification and all eleven canonical strict rules. The executable alone
 has an exact runtime admission. This local test-host qualification does not
 change the hosted workflow or establish publication/deployment.
+
+
+Documentation policy and runbook suites also use Bun-hosted Effect Vitest and
+scoped Effect child processes. Their pure inspections preserve ordered
+findings using persistent collections. Actual command tests verify successful
+JSON output, a failing receipt and saved complete report, unknown-option
+failure and bounded pre-receipt errors. A temporary copy with a missing runbook
+section must fail after writing its receipt while retaining accepted historical
+packet checks and reporting zero operational commands executed. Both command
+files have separate exact canonical runtime admissions. Accepted real CLI
+checks include all eight source/test files; the neighbouring generated policy
+file must reject all ten applicable strict constructs. Root verification checks
+these sources and tests through `check:docs:types`.

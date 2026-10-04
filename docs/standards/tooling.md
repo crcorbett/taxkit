@@ -39,6 +39,13 @@ library with stable package boundaries and predictable bundle behavior.
   receipts, negative fixtures, and machine-readable owner contract.
 - `tools/documentation` also owns the flat sequential, non-executing
   `check:runbooks` validator and its strict prose/sidecar adversarial fixtures.
+- Both documentation commands parse options with Effect CLI, provide the Bun
+  services at their executable boundary and return a nonzero exit on failure.
+  Pure inspections use persistent HashMap/HashSet values and checked optional
+  reads. `test:documentation` runs through Bun-hosted Effect Vitest;
+  `check:docs:types` checks the implementation and tests. All eleven canonical
+  strict rules apply to this owner. Only the two exact command files can run
+  Effects; ordinary policy code and tests have no runtime admission.
 - `tools/governance` owns the Effect-native repository harness gate. It
   Schema-decodes repository-local owners at filesystem ingress and checks the
   accepted HE crosswalk, stable TaxKit profile lifecycle/index owners,

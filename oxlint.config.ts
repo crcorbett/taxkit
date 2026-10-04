@@ -189,6 +189,10 @@ const schemaEncoderEgressFiles = [
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
+  // Exact acceptance-record and command-fixture representation tests.
+  "tools/documentation/policy.test.ts",
+  "tools/documentation/check.runtime.test.ts",
+  "tools/documentation/runbook-check.runtime.test.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
@@ -196,6 +200,8 @@ const schemaEncoderEgressFiles = [
 ];
 
 const throwingCodecTestFiles = [
+  // Pure policy fixtures encode their Schema-owned accepted record bytes.
+  "tools/documentation/policy.test.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.test.js",
   "packages/docs-content/src/validation/policy.runtime.test.ts",
@@ -230,9 +236,7 @@ const runtimeBoundaryFiles = [
   "tools/repository-paths/check.runtime.ts",
   "tools/quality-workflow/check.runtime.ts",
   "tools/documentation/check.runtime.ts",
-  "tools/documentation/check.runtime.test.ts",
   "tools/documentation/runbook-check.runtime.ts",
-  "tools/documentation/runbook-policy.test.ts",
   "tools/evals/hgi-206/check.runtime.ts",
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
@@ -322,9 +326,6 @@ const bunAdapterFiles = [
   "apps/docs/scripts/test-built.tsx",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
-  "tools/documentation/check.runtime.ts",
-  "tools/documentation/runbook-check.runtime.ts",
-  "tools/documentation/runbook-check.runtime.test.ts",
   "tools/evals/hgi-206/check.runtime.ts",
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
@@ -427,6 +428,7 @@ export default defineConfig({
         "tools/governance/**",
         "tools/skills/**",
         "tools/quality-workflow/**",
+        "tools/documentation/**",
         "packages/testing/**",
         "packages/api/http/**",
         "packages/docs-content/**",
@@ -520,6 +522,24 @@ export default defineConfig({
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["tools/governance/check.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/documentation/check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/documentation/check.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/documentation/runbook-check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/documentation/runbook-check.runtime.ts"] },
         ],
       },
     },

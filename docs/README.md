@@ -86,6 +86,8 @@ identity.
 It checks maintainer metadata, links, documented commands, workspace README
 coverage, public/maintainer separation, accepted public-status representation,
 and generated-source edges with bounded diagnostics and a JSON detail receipt.
+The command accepts `--json`; failed checks return a nonzero exit after the
+report is saved. Effect CLI owns option parsing.
 `draft` means authored, locally renderable, visibly labelled candidate content;
 `published` means explicitly accepted current public documentation. Neither
 status proves runtime or external availability.

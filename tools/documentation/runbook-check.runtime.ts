@@ -6,13 +6,17 @@ import {
   ReleaseProofPacket,
 } from "@taxkit/scripts/release-readiness";
 import {
-  Array as EffectArray,
+  Array,
   Console,
   Effect,
+  HashMap,
+  HashSet,
+  Option,
   Match,
   Record,
   Schema,
 } from "effect";
+import { Command } from "effect/cli";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
@@ -29,16 +33,19 @@ const repositoryRootUrl = new URL("../..", import.meta.url);
 const reportPath = "tmp/runbook-validation-report.json" as const;
 const receiptLimit = 20;
 const sha256Text = (value: string) =>
-  Effect.promise(async () => {
-    const digest = await crypto.subtle.digest(
-      "SHA-256",
-      new TextEncoder().encode(value)
-    );
-    return `sha256:${EffectArray.map(
-      EffectArray.fromIterable(new Uint8Array(digest)),
-      (byte) => byte.toString(16).padStart(2, "0")
-    ).join("")}`;
-  });
+  Effect.tryPromise({
+    catch: () =>
+      new RunbookValidationError({ operation: "hash-runbook-evidence" }),
+    try: () => crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)),
+  }).pipe(
+    Effect.map(
+      (digest) =>
+        `sha256:${Array.map(
+          Array.fromIterable(new Uint8Array(digest)),
+          (byte) => byte.toString(16).padStart(2, "0")
+        ).join("")}`
+    )
+  );
 
 const makeProgram = (rootUrl: URL) =>
   Effect.gen(function* runbookValidationMain() {
@@ -63,7 +70,7 @@ const makeProgram = (rootUrl: URL) =>
             new RunbookValidationError({ operation: "read-runbook-contract" })
         )
       );
-    const contract = yield* Schema.decodeUnknownEffect(
+    const contract = yield* Schema.decodeEffect(
       Schema.fromJsonString(RunbookContract),
       { onExcessProperty: "error" }
     )(contractText).pipe(
@@ -73,7 +80,7 @@ const makeProgram = (rootUrl: URL) =>
       )
     );
 
-    const inspectionPaths = EffectArray.dedupe([
+    const inspectionPaths = Array.dedupe([
       "docs/runbooks/README.md",
       "docs/operations/authority-model.md",
       contract.acceptedHandoff.packet,
@@ -82,12 +89,12 @@ const makeProgram = (rootUrl: URL) =>
       contract.acceptedHandoff.acceptedSummary,
       contract.acceptedHandoff.failedProvenance,
       contract.acceptedHandoff.validationReceipt,
-      ...EffectArray.flatMap(contract.runbooks, (runbook) => [
+      ...Array.flatMap(contract.runbooks, (runbook) => [
         runbook.path,
         ...runbook.evidencePaths,
       ]),
     ]);
-    const files = new Map(
+    const files = HashMap.fromIterable(
       yield* Effect.forEach(
         inspectionPaths,
         (relativePath) =>
@@ -110,8 +117,8 @@ const makeProgram = (rootUrl: URL) =>
             new RunbookValidationError({ operation: "inventory-runbook-files" })
         )
       );
-    const runbookPaths = EffectArray.map(
-      EffectArray.filter(runbookEntries, (entry) => entry.endsWith(".md")),
+    const runbookPaths = Array.map(
+      Array.filter(runbookEntries, (entry) => entry.endsWith(".md")),
       (entry) => `docs/runbooks/${entry}`
     );
 
@@ -122,7 +129,7 @@ const makeProgram = (rootUrl: URL) =>
           () => new RunbookValidationError({ operation: "read-root-manifest" })
         )
       );
-    const rootManifest = yield* Schema.decodeUnknownEffect(
+    const rootManifest = yield* Schema.decodeEffect(
       Schema.fromJsonString(WorkspacePackageManifest)
     )(rootManifestText).pipe(
       Effect.mapError(
@@ -138,7 +145,7 @@ const makeProgram = (rootUrl: URL) =>
           () => new RunbookValidationError({ operation: "read-sdk-manifest" })
         )
       );
-    const sdkManifest = yield* Schema.decodeUnknownEffect(
+    const sdkManifest = yield* Schema.decodeEffect(
       Schema.fromJsonString(WorkspacePackageManifest)
     )(sdkManifestText).pipe(
       Effect.mapError(
@@ -146,25 +153,35 @@ const makeProgram = (rootUrl: URL) =>
       )
     );
 
-    const packetText = files.get(contract.acceptedHandoff.packet) ?? "";
-    const historicalJourneyInventoryText =
-      files.get(contract.acceptedHandoff.historicalJourneyInventory) ?? "";
-    const currentJourneyInventoryText =
-      files.get(contract.acceptedHandoff.currentJourneyInventory) ?? "";
-    const acceptedSummaryText =
-      files.get(contract.acceptedHandoff.acceptedSummary) ?? "";
-    const validationText =
-      files.get(contract.acceptedHandoff.validationReceipt) ?? "";
-    const packet = yield* Schema.decodeUnknownEffect(
+    const packetText = HashMap.get(files, contract.acceptedHandoff.packet).pipe(
+      Option.getOrElse(() => "")
+    );
+    const historicalJourneyInventoryText = HashMap.get(
+      files,
+      contract.acceptedHandoff.historicalJourneyInventory
+    ).pipe(Option.getOrElse(() => ""));
+    const currentJourneyInventoryText = HashMap.get(
+      files,
+      contract.acceptedHandoff.currentJourneyInventory
+    ).pipe(Option.getOrElse(() => ""));
+    const acceptedSummaryText = HashMap.get(
+      files,
+      contract.acceptedHandoff.acceptedSummary
+    ).pipe(Option.getOrElse(() => ""));
+    const validationText = HashMap.get(
+      files,
+      contract.acceptedHandoff.validationReceipt
+    ).pipe(Option.getOrElse(() => ""));
+    const packet = yield* Schema.decodeEffect(
       Schema.fromJsonString(ReleaseProofPacket)
     )(packetText).pipe(
       Effect.mapError(
         () => new RunbookValidationError({ operation: "decode-hgi-203-packet" })
       )
     );
-    yield* Schema.decodeUnknownEffect(
-      Schema.fromJsonString(ReleaseJourneyInventory)
-    )(historicalJourneyInventoryText).pipe(
+    yield* Schema.decodeEffect(Schema.fromJsonString(ReleaseJourneyInventory))(
+      historicalJourneyInventoryText
+    ).pipe(
       Effect.mapError(
         () =>
           new RunbookValidationError({
@@ -172,9 +189,9 @@ const makeProgram = (rootUrl: URL) =>
           })
       )
     );
-    yield* Schema.decodeUnknownEffect(
-      Schema.fromJsonString(ReleaseJourneyInventory)
-    )(currentJourneyInventoryText).pipe(
+    yield* Schema.decodeEffect(Schema.fromJsonString(ReleaseJourneyInventory))(
+      currentJourneyInventoryText
+    ).pipe(
       Effect.mapError(
         () =>
           new RunbookValidationError({
@@ -182,7 +199,7 @@ const makeProgram = (rootUrl: URL) =>
           })
       )
     );
-    const acceptedSummary = yield* Schema.decodeUnknownEffect(
+    const acceptedSummary = yield* Schema.decodeEffect(
       Schema.fromJsonString(ReleaseAcceptedAttemptSummary)
     )(acceptedSummaryText).pipe(
       Effect.mapError(
@@ -192,7 +209,7 @@ const makeProgram = (rootUrl: URL) =>
           })
       )
     );
-    const hgi203Validation = yield* Schema.decodeUnknownEffect(
+    const hgi203Validation = yield* Schema.decodeEffect(
       Schema.fromJsonString(Hgi203ValidationProjection)
     )(validationText).pipe(
       Effect.mapError(
@@ -202,20 +219,27 @@ const makeProgram = (rootUrl: URL) =>
           })
       )
     );
-    const contentManifestText =
-      files.get(packet.candidate.contentManifest) ??
-      (yield* fileSystem
-        .readFileString(
-          path.join(repositoryRoot, packet.candidate.contentManifest)
-        )
-        .pipe(
-          Effect.mapError(
-            () =>
-              new RunbookValidationError({
-                operation: "read-hgi-203-content-manifest",
-              })
-          )
-        ));
+    const contentManifestText = yield* HashMap.get(
+      files,
+      packet.candidate.contentManifest
+    ).pipe(
+      Option.match({
+        onNone: () =>
+          fileSystem
+            .readFileString(
+              path.join(repositoryRoot, packet.candidate.contentManifest)
+            )
+            .pipe(
+              Effect.mapError(
+                () =>
+                  new RunbookValidationError({
+                    operation: "read-hgi-203-content-manifest",
+                  })
+              )
+            ),
+        onSome: Effect.succeed,
+      })
+    );
     const diagnostics = inspectRunbookContract({
       acceptedSummary,
       acceptedSummarySha256: yield* sha256Text(acceptedSummaryText),
@@ -228,15 +252,20 @@ const makeProgram = (rootUrl: URL) =>
       ),
       packet,
       packetSha256: yield* sha256Text(packetText),
-      rootScripts: new Set(Record.keys(rootManifest.scripts ?? {})),
+      rootScripts: HashSet.fromIterable(
+        Record.keys(rootManifest.scripts ?? {})
+      ),
       runbookPaths,
-      workspaceScripts: new Map([
-        ["@taxkit/sdk", new Set(Record.keys(sdkManifest.scripts ?? {}))],
+      workspaceScripts: HashMap.fromIterable([
+        [
+          "@taxkit/sdk",
+          HashSet.fromIterable(Record.keys(sdkManifest.scripts ?? {})),
+        ],
       ]),
     });
     const receipt = new RunbookValidationReceipt({
-      diagnostics: EffectArray.take(diagnostics, receiptLimit),
-      inspectedCommands: EffectArray.reduce(
+      diagnostics: Array.take(diagnostics, receiptLimit),
+      inspectedCommands: Array.reduce(
         contract.runbooks,
         0,
         (count, runbook) => count + runbook.commands.length
@@ -252,7 +281,7 @@ const makeProgram = (rootUrl: URL) =>
       taskId: "HGI-204",
       violationCount: diagnostics.length,
     });
-    const encoded = yield* Schema.encodeUnknownEffect(
+    const encoded = yield* Schema.encodeEffect(
       Schema.fromJsonString(RunbookValidationReceipt)
     )(receipt).pipe(
       Effect.mapError(
@@ -284,7 +313,7 @@ const makeProgram = (rootUrl: URL) =>
           ? "Runbook validation passed."
           : "Runbook validation failed.",
         `violations=${receipt.violationCount}; runbooks=${receipt.inspectedRunbooks}; commands=${receipt.inspectedCommands}; executed=0.`,
-        ...EffectArray.map(
+        ...Array.map(
           receipt.diagnostics,
           (finding) =>
             `${finding.target} [${finding.invariant}] owner=${finding.owner}; recovery=${finding.recovery}`
@@ -298,7 +327,6 @@ const makeProgram = (rootUrl: URL) =>
 
 export const runbookValidationOutcome = (rootUrl: URL) =>
   makeProgram(rootUrl).pipe(
-    Effect.provide(BunServices.layer),
     Effect.catchTag("RunbookValidationError", (error) =>
       Console.error(
         `Runbook validation could not complete. operation=${error.operation}; target=repository-local runbook contract; recovery=repair the named boundary and rerun bun run check:runbooks; nonclaim=no documented command or consequential operation was executed.`
@@ -306,18 +334,28 @@ export const runbookValidationOutcome = (rootUrl: URL) =>
     )
   );
 
-const boundedProgram = runbookValidationOutcome(repositoryRootUrl);
+const command = Command.make("check-runbooks", {}, () =>
+  runbookValidationOutcome(repositoryRootUrl).pipe(
+    Effect.flatMap((ok) =>
+      ok
+        ? Effect.void
+        : Effect.fail(
+            new RunbookValidationError({
+              operation: "runbook-policy-violations",
+            })
+          )
+    )
+  )
+);
 
 Match.value(import.meta.main).pipe(
   Match.when(true, () =>
     BunRuntime.runMain(
-      boundedProgram.pipe(
-        Effect.tap((ok) =>
-          Effect.sync(() => {
-            process.exitCode = ok ? 0 : 1;
-          })
-        )
-      )
+      Command.run(command, {
+        renderErrors: false,
+        version: "repository-local",
+      }).pipe(Effect.provide(BunServices.layer)),
+      { disableErrorReporting: true }
     )
   ),
   Match.orElse(() => false)

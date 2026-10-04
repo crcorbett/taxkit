@@ -170,6 +170,33 @@ const fixtureCases = [
     ],
   },
   {
+    accepted: [
+      "tools/documentation/check.runtime.ts",
+      "tools/documentation/runbook-check.runtime.ts",
+      "tools/documentation/policy.ts",
+      "tools/documentation/runbook-policy.ts",
+      "tools/documentation/policy.test.ts",
+      "tools/documentation/runbook-policy.test.ts",
+      "tools/documentation/check.runtime.test.ts",
+      "tools/documentation/runbook-check.runtime.test.ts",
+    ],
+    generated: "tools/documentation/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
     accepted: ["tools/skills/skill-policies.test.ts"],
     generated: "tools/skills/.generated-strict-rejected.ts",
     namespace: "strict-effect",
@@ -630,6 +657,8 @@ test.each([
   "tools/governance/check.runtime.ts",
   "tools/quality-workflow/check.runtime.ts",
   "packages/docs-content/src/validate.runtime.ts",
+  "tools/documentation/check.runtime.ts",
+  "tools/documentation/runbook-check.runtime.ts",
 ])("keeps the command runtime admission exact: %s", (path) => {
   expect(
     Array.filter(
