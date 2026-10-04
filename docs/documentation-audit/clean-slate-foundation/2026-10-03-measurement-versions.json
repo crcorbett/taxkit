@@ -1,0 +1,1463 @@
+{
+  "schema": "taxkit-analytics-telemetry-og-readonly-research-v1",
+  "checkedAtUtc": "2026-10-03T05:14:21.195524+00:00",
+  "status": "provisional-source-and-version-research-not-installed-not-qualified",
+  "packages": {
+    "posthog-js": {
+      "name": "posthog-js",
+      "registryUrl": "https://registry.npmjs.org/posthog-js",
+      "manifestUrl": "https://registry.npmjs.org/posthog-js/1.435.8",
+      "selector": "dist-tags.latest",
+      "version": "1.435.8",
+      "tags": {
+        "beta": "1.8.0-beta.1",
+        "alpha": "1.236.8-alpha.0",
+        "previous": "1.297.4",
+        "latest": "1.435.8"
+      },
+      "publishedAtUtc": "2026-10-02T18:03:12.249Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "react": ">=16.8.0",
+        "@types/react": ">=16.8.0"
+      },
+      "peerDependenciesMeta": {
+        "react": {
+          "optional": true
+        },
+        "@types/react": {
+          "optional": true
+        }
+      },
+      "dependencies": {
+        "fflate": "^0.4.8",
+        "preact": "^10.29.3",
+        "core-js": "^3.49.0",
+        "dompurify": "^3.4.13",
+        "web-vitals": "^6.2.1",
+        "@posthog/core": "^1.55.3",
+        "@posthog/types": "^1.413.0",
+        "web-vitals-soft-navs": "npm:web-vitals@6.2.1",
+        "@posthog/browser-common": "^0.9.1",
+        "query-selector-shadow-dom": "^1.0.1"
+      },
+      "engines": {},
+      "repository": {
+        "url": "https://github.com/PostHog/posthog-js",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "f18315063eaa02b4a7741f4fe9038bd904ce3b67",
+        "tarball": "https://registry.npmjs.org/posthog-js/-/posthog-js-1.435.8.tgz",
+        "fileCount": 819,
+        "integrity": "sha512-rUrv0kKhD72Wfu++pBlupvrpt1Z60uTAgNUChAH232a05bbRBzV0P4JqbuZEAaaUXumhuB3a8r+iFMzm/2l1Ow==",
+        "signatures": [
+          {
+            "sig": "MEUCICteeDOy9Qbd8r1o9h4e23hLZOlOk+4GamQfEDK2AbRlAiEA7IaSCxJBsKYyAQ7R8R3F3X9RFBLryqLXZfZ9dw/psCg=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCIHQd6b5iCEubJ9hjUbHex4Hu4i+C1Yj0tWH/HY8tGjjfAiEArUaud0llikZ/IxP0aznawsXR/tmTa9wyTAvMoF0CxOA="
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/posthog-js@1.435.8",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 26654185
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@distilled.cloud/posthog": {
+      "name": "@distilled.cloud/posthog",
+      "registryUrl": "https://registry.npmjs.org/%40distilled.cloud%2Fposthog",
+      "manifestUrl": "https://registry.npmjs.org/%40distilled.cloud%2Fposthog/1.0.0-rc.13",
+      "selector": "dist-tags.latest",
+      "version": "1.0.0-rc.13",
+      "tags": {
+        "next": "1.0.0-rc.3",
+        "latest": "1.0.0-rc.13"
+      },
+      "publishedAtUtc": "2026-10-02T08:37:35.697Z",
+      "releaseKind": "prerelease",
+      "peerDependencies": {
+        "effect": "^4.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@distilled.cloud/core": "1.0.0-rc.13"
+      },
+      "engines": {},
+      "repository": {
+        "url": "https://github.com/alchemy-run/distilled",
+        "type": "git",
+        "directory": "packages/posthog"
+      },
+      "dist": {
+        "shasum": "6f7cc32926a7660c630f200353e4369e5d82464a",
+        "tarball": "https://registry.npmjs.org/@distilled.cloud/posthog/-/posthog-1.0.0-rc.13.tgz",
+        "fileCount": 898,
+        "integrity": "sha512-pTULtkrZhRXStbyrMUQkjqd3mLNV1hIc3fPg+YwmPa+su3tfKx3JDEOa9m4JoyCCQ0s10IYcj2xZFAKQBpdorw==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDVom0IkX3PGsbBxs96bIh24FDUr0+QfiMPloMM7LBQJAIhAL/WLYKalCyTzWF2nziQ6kq8iXkauLt+uifUz9mm9t4k",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCICMd/XqyYiWe/Oo2Ex2jCPO3I/tLHsEJtH4Yip0fxhw6AiEA8rVZ7HEfVzNGm6k4Fl3Qpha/lB2usL/dbmyYZGS4mbg="
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@distilled.cloud%2fposthog@1.0.0-rc.13",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 35355022
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@distilled.cloud/axiom": {
+      "name": "@distilled.cloud/axiom",
+      "registryUrl": "https://registry.npmjs.org/%40distilled.cloud%2Faxiom",
+      "manifestUrl": "https://registry.npmjs.org/%40distilled.cloud%2Faxiom/1.0.0-rc.13",
+      "selector": "dist-tags.latest",
+      "version": "1.0.0-rc.13",
+      "tags": {
+        "next": "1.0.0-rc.3",
+        "latest": "1.0.0-rc.13"
+      },
+      "publishedAtUtc": "2026-10-02T08:27:13.873Z",
+      "releaseKind": "prerelease",
+      "peerDependencies": {
+        "effect": "^4.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@distilled.cloud/core": "1.0.0-rc.13"
+      },
+      "engines": {},
+      "repository": {
+        "url": "https://github.com/alchemy-run/distilled",
+        "type": "git",
+        "directory": "packages/axiom"
+      },
+      "dist": {
+        "shasum": "615f28f1169ff0192c06fcf2027fa1a21be2a5b4",
+        "tarball": "https://registry.npmjs.org/@distilled.cloud/axiom/-/axiom-1.0.0-rc.13.tgz",
+        "fileCount": 68,
+        "integrity": "sha512-aRoJtvfXgWi5dtfjuJvDwnArRKvv2MPYHCxYeZcxZbqe62IaQA5yu/khft7TJvxeDyJoSDnVXZu3RyJjNmBA4g==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDLDCIH2BVGhckLBmJmSjCwXzTxPxCsWP+sTSyx45twpAIhANJq/uQCP8ZMkWi8Th2bgG+cIWTP5Z4byGs459VTRfjC",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEQCICyf1tRL6n9pMcHxeBbgXYqOQaQZQJ5E/vApnwfgykrKAiBrYcdZGkc51liKerLxyndfx25CcjNtdY4BeqILVNQhkQ=="
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@distilled.cloud%2faxiom@1.0.0-rc.13",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 808175
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@effect/opentelemetry": {
+      "name": "@effect/opentelemetry",
+      "registryUrl": "https://registry.npmjs.org/%40effect%2Fopentelemetry",
+      "manifestUrl": "https://registry.npmjs.org/%40effect%2Fopentelemetry/4.0.0",
+      "selector": "dist-tags.latest",
+      "version": "4.0.0",
+      "tags": {
+        "snapshot": "0.0.0-snapshot-6ebc752baf28354006ca2a0ae783a5bccf5de9ad",
+        "beta": "4.0.0-beta.107",
+        "latest": "4.0.0",
+        "rc": "4.0.0-rc.118"
+      },
+      "publishedAtUtc": "2026-10-01T01:47:07.966Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "effect": "^4.0.0",
+        "@opentelemetry/api": ">=1.9.0 <2.0.0",
+        "@opentelemetry/api-logs": ">=0.203.0 <0.300.0",
+        "@opentelemetry/sdk-logs": ">=0.203.0 <0.300.0",
+        "@opentelemetry/resources": ">=2.0.0 <3.0.0",
+        "@opentelemetry/sdk-metrics": ">=2.0.0 <3.0.0",
+        "@opentelemetry/sdk-trace-web": ">=2.0.0 <3.0.0",
+        "@opentelemetry/sdk-trace-base": ">=2.0.0 <3.0.0",
+        "@opentelemetry/sdk-trace-node": ">=2.0.0 <3.0.0",
+        "@opentelemetry/semantic-conventions": ">=1.33.0 <2.0.0"
+      },
+      "peerDependenciesMeta": {
+        "@opentelemetry/api": {
+          "optional": true
+        },
+        "@opentelemetry/api-logs": {
+          "optional": true
+        },
+        "@opentelemetry/sdk-logs": {
+          "optional": true
+        },
+        "@opentelemetry/resources": {
+          "optional": true
+        },
+        "@opentelemetry/sdk-metrics": {
+          "optional": true
+        },
+        "@opentelemetry/sdk-trace-web": {
+          "optional": true
+        },
+        "@opentelemetry/sdk-trace-base": {
+          "optional": true
+        },
+        "@opentelemetry/sdk-trace-node": {
+          "optional": true
+        }
+      },
+      "dependencies": {},
+      "engines": {
+        "node": ">=18.0.0"
+      },
+      "repository": {
+        "url": "https://github.com/Effect-TS/effect.git",
+        "type": "git",
+        "directory": "packages/opentelemetry"
+      },
+      "dist": {
+        "shasum": "9445bd00c998f76a6427f19db617b5940b572922",
+        "tarball": "https://registry.npmjs.org/@effect/opentelemetry/-/opentelemetry-4.0.0.tgz",
+        "fileCount": 131,
+        "integrity": "sha512-vXVhqlcADHtmKlw2gIqRRlXFve4ms4JJ5ykAqzNe37QQ/5N5A5gJ9VOXkMBORHZC5O4gdHZwxhAzGZb0zvFf/Q==",
+        "signatures": [
+          {
+            "sig": "MEUCIQCVamPgxJlpbKQRaujgB9PK6+huK8Vz5BzORg3JrhFLIwIgFZkoTisySB+R94cxqefPudA+lZ8XJdnJ2pxnYovTU0I=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCIQDvxz5442oKHPRLZRTzJWh6PFTYx/srnAfl4U6fYBSfSgIgbX7gCKEHrck0FnBrVV6IME0SWv4YAgabcYRobIWU1TM="
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@effect%2fopentelemetry@4.0.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 394537
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/api": {
+      "name": "@opentelemetry/api",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fapi",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fapi/1.9.1",
+      "selector": "dist-tags.latest",
+      "version": "1.9.1",
+      "tags": {
+        "canary": "0.17.1-alpha.21",
+        "rc": "1.0.0-rc.1",
+        "next": "1.3.0",
+        "latest": "1.9.1"
+      },
+      "publishedAtUtc": "2026-03-25T15:53:54.092Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "engines": {
+        "node": ">=8.0.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "c1b0346de336ba55af2d5a7970882037baedec05",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/api/-/api-1.9.1.tgz",
+        "fileCount": 588,
+        "integrity": "sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q==",
+        "signatures": [
+          {
+            "sig": "MEUCIFio0nJUiedt1n1rIY+tRL2BBKz0OpMj2EkDyZ+9J1HsAiEA+EpqTsEobKo3KPShMh0ztf3q5WjDkBPD10eSqx5VIXM=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fapi@1.9.1",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 1001329
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/core": {
+      "name": "@opentelemetry/core",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fcore",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fcore/2.11.0",
+      "selector": "dist-tags.latest",
+      "version": "2.11.0",
+      "tags": {
+        "next": "1.8.0",
+        "canary": "3.0.0-development.0",
+        "latest": "2.11.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:40:56.131Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "97849d3808bba652568b7d53e20c9fc38bcb7c49",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.11.0.tgz",
+        "fileCount": 327,
+        "integrity": "sha512-7YP44XH0tV6+Mb54x2YGf84i7yi+31MBZlE8JwvozkxyTvXbSp10X7cI7YE49ChJ3shMJoBmCJF3+1QFBJctGA==",
+        "signatures": [
+          {
+            "sig": "MEUCIELuoQhIQRYTbNU6V4qJDh+S9zA2yc1rF37BGMx0327fAiEAmJuLj8pPD/Vg0Szl+AvVxeHv2L7MuT/9EijRL9glP6I=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEYCIQC8Dg1ALxAc86m2aPgjWaA8yIF2dfrBrVWZXPZ8FH4ipQIhANNZrvKk+HZm5t/v5dTqeLYMh4chBj2j3733AxLAk/+a",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fcore@2.11.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 583971
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/resources": {
+      "name": "@opentelemetry/resources",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fresources",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fresources/2.11.0",
+      "selector": "dist-tags.latest",
+      "version": "2.11.0",
+      "tags": {
+        "next": "1.8.0",
+        "canary": "3.0.0-development.0",
+        "latest": "2.11.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:41:41.160Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/core": "2.11.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "b4e60ba92a4f122dc979f3402aea9713a98eac5b",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.11.0.tgz",
+        "fileCount": 291,
+        "integrity": "sha512-Ie7+8q8MDF4FAEQCKVMTx3ReUvxiIAgIiiW3c9JdmP8+HMcDy20puT+AHjexnExgnbvBxjQ9fjkFDWrikJ2jQA==",
+        "signatures": [
+          {
+            "sig": "MEQCIE7TS2EYdad3xoUcH8+dE5K2HqSKovLw2qgkTh8rfb5gAiBEzQ30S8LzFzCAFCYdgWOYeq/FG5w8rT05pFoUo+zzNQ==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEUCIQCrFYVxcGF4r4baRPcfcXw67oMj03Q+uBkfiZ0mHkjl4wIgTGCGzkMSQNSeIybZBFGDVpoS6SifnNRs8nDOYUVXjKA=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fresources@2.11.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 440928
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/sdk-logs": {
+      "name": "@opentelemetry/sdk-logs",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-logs",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-logs/0.222.0",
+      "selector": "dist-tags.latest",
+      "version": "0.222.0",
+      "tags": {
+        "canary": "0.300.0-development.0",
+        "latest": "0.222.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:42:52.545Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.4.0 <1.10.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/core": "2.11.0",
+        "@opentelemetry/api-logs": "0.222.0",
+        "@opentelemetry/resources": "2.11.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "dc5c65c1c82c9a77c8a7c2c75c8fc20fe8af87cc",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/sdk-logs/-/sdk-logs-0.222.0.tgz",
+        "fileCount": 255,
+        "integrity": "sha512-+19YHODIjaUCArxleaJtuufFZVpz/xvvK+VllQqE+W8hHolxdoRwHfK/s667zezwh1hkx6FFF+oYzetYgqK+Bg==",
+        "signatures": [
+          {
+            "sig": "MEUCIQDexNBFMjflMZ37W7W/NOId7p0K6VWeE+2Tr2XcoOcPYwIgNdsvB+nwMPsbQ5/JC2zBzBX7GaOUQHG1Sth/zfpRqMk=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEYCIQCquDkdCTwNH51ZgX31eY5N97+ZCv02zgn8il7sJcGSjgIhALaeHMBAogr3HTW8KLGxQrwZ8u93R4XLDyzWBLLmVVS1",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fsdk-logs@0.222.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 679622
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/sdk-metrics": {
+      "name": "@opentelemetry/sdk-metrics",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-metrics",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-metrics/2.11.0",
+      "selector": "dist-tags.latest",
+      "version": "2.11.0",
+      "tags": {
+        "next": "1.8.0",
+        "canary": "3.0.0-development.0",
+        "latest": "2.11.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:41:30.260Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.9.0 <1.10.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/core": "2.11.0",
+        "@opentelemetry/resources": "2.11.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "242a88350f8dde266536232738dd643c4ad0c990",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.11.0.tgz",
+        "fileCount": 606,
+        "integrity": "sha512-7GXXcObyHyDUUSG+L+kJoquty01bzm7ivE7+SSgXXJcHuPzGviptxwARmI2c+bnnxjexGQbJnyNlN8HxBP/Y7A==",
+        "signatures": [
+          {
+            "sig": "MEUCIEfQfYXgWDvLzGEtuuvLJwSf8dNJngMATThkPFHmfDibAiEAz518NA9ded5O0A05mxWu1Utmo+K93PS6LuU4NUxljuM=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEUCICDkh8osJ5/TnioNNhrx4VE1su849nP1LTZo2N+7ied5AiEA4mWq8t0Gj+r4+9LRbfYSVXVsq3M7XJk97w5AmhTYza0=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fsdk-metrics@2.11.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 1846700
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/sdk-trace-base": {
+      "name": "@opentelemetry/sdk-trace-base",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-trace-base",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-trace-base/2.11.0",
+      "selector": "dist-tags.latest",
+      "version": "2.11.0",
+      "tags": {
+        "next": "1.8.0",
+        "canary": "3.0.0-development.0",
+        "latest": "2.11.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:42:42.600Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.3.0 <1.10.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/core": "2.11.0",
+        "@opentelemetry/resources": "2.11.0",
+        "@opentelemetry/sdk-trace": "2.11.0",
+        "@opentelemetry/semantic-conventions": "^1.29.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "3f725401fcfb16e5b2335c103cdc9488829632d1",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.11.0.tgz",
+        "fileCount": 75,
+        "integrity": "sha512-H19x/TX/LZdqiYOjM7fqtSxwlplC5pgelavqbQdHbhdq0q/AI/TGkM2dfGuuynTXmJPeF2HoZVoPDu+TGoW78A==",
+        "signatures": [
+          {
+            "sig": "MEQCIHiZXCcGrwgn6s0Lhb1Rs96MLtD76lsu10sccfHp0HcUAiBKYIIL3FTfExbN5yPrKXJuGVD70JuK8sOGHSYt2iQCyA==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEUCIQCDHd6RXWiEEe2fZF3KGKPIr7rlMi+ARaG1n3zRIhxGxAIgeoVxH9Y2DbnWFMYTxJY6DEV6u+1X3pwtIFEQVJ7AU7o=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fsdk-trace-base@2.11.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 123728
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/exporter-logs-otlp-http": {
+      "name": "@opentelemetry/exporter-logs-otlp-http",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fexporter-logs-otlp-http",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fexporter-logs-otlp-http/0.222.0",
+      "selector": "dist-tags.latest",
+      "version": "0.222.0",
+      "tags": {
+        "canary": "0.300.0-development.0",
+        "latest": "0.222.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:46:54.464Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": "^1.3.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/sdk-logs": "0.222.0",
+        "@opentelemetry/otlp-transformer": "0.222.0",
+        "@opentelemetry/otlp-exporter-base": "0.222.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "eb075676fe3d450f77b7df2aae9539b604ddc0a4",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/exporter-logs-otlp-http/-/exporter-logs-otlp-http-0.222.0.tgz",
+        "fileCount": 75,
+        "integrity": "sha512-GqwLZohJTf/sttYlOpT1oFTJ9ScYaKnk0sOx4Qe/+KmXYVOa+v94cfnkUkFKDuvTODWhCL50Hz3gvsZD6ngQpg==",
+        "signatures": [
+          {
+            "sig": "MEYCIQC8/MMcOm1nXR85CO4BQjcMj6OEaWNsZDd2FWE7PRcFdAIhAOAED7uhldWSqFCHKxKfMpynn6jbVDY2Sj0ii+LixtXK",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEUCIQC82FXmVQwTt0UbGVP9SgWCUYoT9vZqJAakJmHVLQX98gIgD+3aRbsOiNdXexqd33pelNtvgCo9+dtON1nR/LOxArU=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fexporter-logs-otlp-http@0.222.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 57110
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/exporter-metrics-otlp-proto": {
+      "name": "@opentelemetry/exporter-metrics-otlp-proto",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fexporter-metrics-otlp-proto",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fexporter-metrics-otlp-proto/0.222.0",
+      "selector": "dist-tags.latest",
+      "version": "0.222.0",
+      "tags": {
+        "next": "0.34.0",
+        "canary": "0.300.0-development.0",
+        "latest": "0.222.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:43:50.826Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": "^1.3.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/otlp-transformer": "0.222.0",
+        "@opentelemetry/otlp-exporter-base": "0.222.0",
+        "@opentelemetry/exporter-metrics-otlp-http": "0.222.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "6bcf8907ab74ad59b3ca2212774978ae1d209a37",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/exporter-metrics-otlp-proto/-/exporter-metrics-otlp-proto-0.222.0.tgz",
+        "fileCount": 75,
+        "integrity": "sha512-s1ZPwS8Ig7cpRmL3kCobPaFbemM81dJ03LNPrsuN32h3mCDvNF2NQ1pRHruOju0P0o1TZ24LkZA685rtQal1KA==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCp9pdumY1hsGXbJAH5Co3aVWaXKblso1yFmHmQeKPF3gIhAM/+3OcHy/J5aN3jDi/zoJFd4314c9vSbzEseLKf3BjH",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEQCIG9/nwAWEGTDFTd27xyUpDK1eMT/VaybHuQcCpmYnJX/AiAYzY+wG/t2jL96uh0sR+46N6ONDFX3fG4ripMpifSQDQ==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fexporter-metrics-otlp-proto@0.222.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 68736
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/exporter-trace-otlp-http": {
+      "name": "@opentelemetry/exporter-trace-otlp-http",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fexporter-trace-otlp-http",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fexporter-trace-otlp-http/0.222.0",
+      "selector": "dist-tags.latest",
+      "version": "0.222.0",
+      "tags": {
+        "next": "0.34.0",
+        "canary": "0.300.0-development.0",
+        "latest": "0.222.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:44:01.362Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": "^1.3.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/sdk-trace": "2.11.0",
+        "@opentelemetry/otlp-transformer": "0.222.0",
+        "@opentelemetry/otlp-exporter-base": "0.222.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "b7666d80f22a87cd0544f7164ea058dd4524bcf5",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/exporter-trace-otlp-http/-/exporter-trace-otlp-http-0.222.0.tgz",
+        "fileCount": 75,
+        "integrity": "sha512-RCnPWcHppwiquQ+cV3nWvNwdf0MG1w26e5jewW2T83nTZOlXgcg88sY9ulCVgagGHcq1mj0L0GP6YHgzk2v8oA==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCcgX/zvI3Xuo8SfSIu32AvS01J0LaJX4gWFAYaANg3+gIhAK/dEHbUG2XJ3X9SlYdfQfcvwzUn0l5E6OxC2D8JXJzu",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEYCIQCoyOjOTiqtBRHXmSzXJ5XDcu/cAu34e8ZSZYOyHy6c1wIhALlJcCeLo0hXl8QB90QNtrnohIZgy2thiGn9cQYRxZ+p",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fexporter-trace-otlp-http@0.222.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 59648
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@opentelemetry/semantic-conventions": {
+      "name": "@opentelemetry/semantic-conventions",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsemantic-conventions",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsemantic-conventions/1.43.0",
+      "selector": "dist-tags.latest",
+      "version": "1.43.0",
+      "tags": {
+        "canary": "0.25.1-alpha.13",
+        "next": "1.8.0",
+        "latest": "1.43.0"
+      },
+      "publishedAtUtc": "2026-07-09T20:06:28.122Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "engines": {
+        "node": ">=14"
+      },
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+      },
+      "dist": {
+        "integrity": "sha512-eSYWTm620tTk45EKSedaUL8MFYI8hW164hIXsgIHyxu3VobUB3fFCu5t0hQby6OoWRPsG1KkKUG2M5UadiLiVg==",
+        "shasum": "f3f467e36c27332f0e735ec86cdcd78dd6f27865",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.43.0.tgz",
+        "fileCount": 129,
+        "unpackedSize": 12006437,
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fsemantic-conventions@1.43.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "signatures": [
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEQCIA871w+BEacK8pg+0DD2yI5QqAxguFFUMd0jKHCD7ruIAiA7A0S2ewp7LFOE60M6gLHFM1BRRAaE1hrtEWhF5NFMeQ=="
+          }
+        ]
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@takumi-rs/wasm": {
+      "name": "@takumi-rs/wasm",
+      "registryUrl": "https://registry.npmjs.org/%40takumi-rs%2Fwasm",
+      "manifestUrl": "https://registry.npmjs.org/%40takumi-rs%2Fwasm/2.14.0",
+      "selector": "dist-tags.latest",
+      "version": "2.14.0",
+      "tags": {
+        "beta": "2.0.0-beta.14",
+        "rc": "2.0.0-rc.16",
+        "latest": "2.14.0"
+      },
+      "publishedAtUtc": "2026-09-15T07:04:41.410Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "csstype": "*"
+      },
+      "peerDependenciesMeta": {
+        "csstype": {
+          "optional": true
+        }
+      },
+      "dependencies": {
+        "@takumi-rs/helpers": "2.14.0"
+      },
+      "engines": {
+        "node": ">=20.19"
+      },
+      "repository": {
+        "url": "git+https://github.com/kane50613/takumi.git"
+      },
+      "dist": {
+        "integrity": "sha512-ncaNPVl9CL47g5eOyQp1kMPzc0GsUDbQdxRURvNBzMpUC2u6ImeMwJN6ZXiu3tqfSVgYZP1aU0Ntkg+q1S2d4g==",
+        "shasum": "ee05b3e08df03744deae14f8e3206fa6f6d9b652",
+        "tarball": "https://registry.npmjs.org/@takumi-rs/wasm/-/wasm-2.14.0.tgz",
+        "fileCount": 24,
+        "unpackedSize": 3893089,
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@takumi-rs%2fwasm@2.14.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "signatures": [
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCIQDV30LqeUQCaFvG3HIPblBSuA27hQXXu3i7FVi+jKaxqAIgG15rXOOwT8rjfx7VVSUx5gD9VmohDC2IPK7uLfeP5t0="
+          }
+        ]
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "takumi-js": {
+      "name": "takumi-js",
+      "registryUrl": "https://registry.npmjs.org/takumi-js",
+      "manifestUrl": "https://registry.npmjs.org/takumi-js/2.14.0",
+      "selector": "dist-tags.latest",
+      "version": "2.14.0",
+      "tags": {
+        "beta": "2.0.0-beta.14",
+        "rc": "2.0.0-rc.16",
+        "latest": "2.14.0"
+      },
+      "publishedAtUtc": "2026-09-15T07:08:55.649Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@takumi-rs/core": "2.14.0",
+        "@takumi-rs/wasm": "2.14.0",
+        "@takumi-rs/helpers": "2.14.0"
+      },
+      "engines": {
+        "node": ">=20.19"
+      },
+      "repository": {
+        "url": "git+https://github.com/kane50613/takumi.git",
+        "type": "git",
+        "directory": "takumi-js"
+      },
+      "dist": {
+        "shasum": "510606cb736269425e2cd96f34984c4cb26785f8",
+        "tarball": "https://registry.npmjs.org/takumi-js/-/takumi-js-2.14.0.tgz",
+        "fileCount": 61,
+        "integrity": "sha512-dZHMrK9KI2T8uKjFa+tid3KK5HOlk8Nb08Uoq321Y6ISkUkZRFQ69acQUdFGeQjEinenzt1qAkXP/62AjmL7hg==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCAXG4bBzkkqH5s2LrmLkptpKJJs5Lew6mJIg4yaXZw0wIhAKlrUUt9Nvt14SykRu7qSJIb9C/6DLB52ea1ywg4ODT6",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCIE8WWqZF2zBElDZ+7fAs3BxWtg9vbh3EyGIde47v9g4jAiEAuE2JwPjL5BH3zAndEJRdqZAmBegn2BtlUq97Y50s3TI="
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/takumi-js@2.14.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 64964
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@fontsource-variable/geist-mono": {
+      "name": "@fontsource-variable/geist-mono",
+      "registryUrl": "https://registry.npmjs.org/%40fontsource-variable%2Fgeist-mono",
+      "manifestUrl": "https://registry.npmjs.org/%40fontsource-variable%2Fgeist-mono/5.3.0",
+      "selector": "dist-tags.latest",
+      "version": "5.3.0",
+      "tags": {
+        "latest": "5.3.0"
+      },
+      "publishedAtUtc": "2026-07-19T03:50:13.385Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "engines": {},
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fontsource/font-files.git",
+        "directory": "fonts/variable/geist-mono"
+      },
+      "dist": {
+        "integrity": "sha512-vBbuwDEo9AkrqADMXOrlAR3DFcJi4/JxeuU43FoiQERnNwsfXNnvxvReZG02cQKmyk4DZkZdBZX3oTDvy2zBAw==",
+        "shasum": "ef4ce98a5d7485a4944ead6f799346dc33eddc63",
+        "tarball": "https://registry.npmjs.org/@fontsource-variable/geist-mono/-/geist-mono-5.3.0.tgz",
+        "fileCount": 24,
+        "unpackedSize": 172241,
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@fontsource-variable%2fgeist-mono@5.3.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "signatures": [
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEQCIE9UwXLfItbM91o7zaEtp1PrwtDACqNqWsJb0SRffws7AiBM8z3+vdS8AIlu4W4t5OM7pTrnJfpdxIsNTTtgZe4CYQ=="
+          }
+        ]
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@effect/tsgo": {
+      "name": "@effect/tsgo",
+      "registryUrl": "https://registry.npmjs.org/%40effect%2Ftsgo",
+      "manifestUrl": "https://registry.npmjs.org/%40effect%2Ftsgo/0.48.0",
+      "selector": "dist-tags.latest",
+      "version": "0.48.0",
+      "tags": {
+        "latest": "0.48.0"
+      },
+      "publishedAtUtc": "2026-10-02T15:02:20.691Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "engines": {},
+      "repository": {
+        "url": "git+https://github.com/Effect-TS/tsgo.git",
+        "type": "git",
+        "directory": "_packages/tsgo"
+      },
+      "dist": {
+        "shasum": "6cb1241b12b3eff74141c26b2e82b802a157f949",
+        "tarball": "https://registry.npmjs.org/@effect/tsgo/-/tsgo-0.48.0.tgz",
+        "fileCount": 16,
+        "integrity": "sha512-802nDQDmDxT/zGtGqJp+AVvhMMHfnHNxdAK92612hDU1ba1fWrXlxY2ayuTi3iACIP94NCIdSaFRaTcqw/FEnw==",
+        "signatures": [
+          {
+            "sig": "MEQCIH2T8eV0W7a5Bu1U+3dCukhajg3X1/GoKvo5/1SXJZP4AiA820HvHiy6bqJN1shAk430NqE+GQMKEx9/bPdKNIY+WQ==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCIQCKbPukLja5EirCZcdLnW1ZK1QzwCmh7+2RAeMPgyAQrwIgd/TAwJgfwi7aQsqNNdU6u+CGhwQzQU8bZhsK6CQRY00="
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@effect%2ftsgo@0.48.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 11023864
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "oxlint-tsgolint": {
+      "name": "oxlint-tsgolint",
+      "registryUrl": "https://registry.npmjs.org/oxlint-tsgolint",
+      "manifestUrl": "https://registry.npmjs.org/oxlint-tsgolint/7.0.2003",
+      "selector": "dist-tags.latest",
+      "version": "7.0.2003",
+      "tags": {
+        "latest": "7.0.2003"
+      },
+      "publishedAtUtc": "2026-09-24T15:18:41.730Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "engines": {},
+      "repository": {
+        "url": "github:oxc-project/tsgolint",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "ad35592d0fde9ffd279c9befe3275a81a787573f",
+        "tarball": "https://registry.npmjs.org/oxlint-tsgolint/-/oxlint-tsgolint-7.0.2003.tgz",
+        "fileCount": 4,
+        "integrity": "sha512-VnK4zlqgmgq/7ZcjzCk/WpN8kKFsYGcB85Io9qT3wL4K8Un3RKmJkp793crNETieMusPMKOA4a+Mw2wbteI6TQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIBZFSwUcg2iQNMhHU/fH/DO42p4cHSoY4a1EEY2y/WhEAiEAxAXE8dPpQDLpmLefPHPCCl9nxWKGz+tt9Oxvan/kyZk=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEYCIQCgXmoRi5EKtGeRQ6MXP7sVlyqaRyneuyuWjdllT4BfywIhAK5TNVeQI5T1HAgKp0KO1q44pAHhlzfbcM/zhpkpFRQp"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/oxlint-tsgolint@7.0.2003",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 15912
+      },
+      "selectionState": "observed-current-candidate-not-qualified"
+    },
+    "@posthog/types": {
+      "name": "@posthog/types",
+      "registryUrl": "https://registry.npmjs.org/%40posthog%2Ftypes",
+      "manifestUrl": "https://registry.npmjs.org/%40posthog%2Ftypes/1.413.0",
+      "selector": "dist-tags.latest",
+      "version": "1.413.0",
+      "tags": {
+        "latest": "1.413.0"
+      },
+      "publishedAtUtc": "2026-09-29T19:42:57.120Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "engines": {},
+      "repository": {
+        "url": "https://github.com/PostHog/posthog-js.git",
+        "type": "git",
+        "directory": "packages/types"
+      },
+      "dist": {
+        "shasum": "5ba7ea6162685567c254e036130e5785f794bd53",
+        "tarball": "https://registry.npmjs.org/@posthog/types/-/types-1.413.0.tgz",
+        "fileCount": 78,
+        "integrity": "sha512-tYAVzNojWckuG/wxBB0fwE70sFruQQq4xbhkci7eH2ARU3mMfUTkvpN1HwBMpm0AtbxidLiH0IFvagmdJ8opPw==",
+        "signatures": [
+          {
+            "sig": "MEUCIQCfj8A8G+37Fa2/fV2W8uJMAxRbQSZgFFv+GZbmsSoVkQIgNyA+wbPl3rsoIbROv4QTb94QUcyj+MAaolwF4fXrOZQ=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEQCIE2E5Y6hKQJ4RDu9peFxXRp7rD82DGUNoXrdYsEM2cCAAiA+iGWdpufQegKqJXoNMC943hKGrQxeGe+vG9gRHDYxLQ=="
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@posthog%2ftypes@1.413.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 421760
+      },
+      "selectionState": "observed-support-not-selected-direct-not-qualified"
+    },
+    "@posthog/core": {
+      "name": "@posthog/core",
+      "registryUrl": "https://registry.npmjs.org/%40posthog%2Fcore",
+      "manifestUrl": "https://registry.npmjs.org/%40posthog%2Fcore/1.55.3",
+      "selector": "dist-tags.latest",
+      "version": "1.55.3",
+      "tags": {
+        "previous": "1.5.7",
+        "latest": "1.55.3"
+      },
+      "publishedAtUtc": "2026-10-01T08:46:47.980Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@posthog/types": "^1.413.0"
+      },
+      "engines": {},
+      "repository": {
+        "url": "https://github.com/PostHog/posthog-js.git",
+        "type": "git",
+        "directory": "packages/core"
+      },
+      "dist": {
+        "shasum": "28d3682bf6b2ba86f36b1a94d7beaea5dc2cd38d",
+        "tarball": "https://registry.npmjs.org/@posthog/core/-/core-1.55.3.tgz",
+        "fileCount": 443,
+        "integrity": "sha512-XnmG9jo7WlxTeN4oCNWH4ESLQHR6ZPZ+mcq+8JxU62k5i1BAe3BSrybnmXHjqKp7e3rUvLK2bOzGZGSlfHvlNA==",
+        "signatures": [
+          {
+            "sig": "MEUCIBuWGgNTIudlMhLk8Ep5xUyrD6alpNSXyfjx4KxCfbuoAiEA0ttpjq6hieWCrIKlX3qskJlKgFGhdpcST4VswMqg/R4=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEYCIQCRyqnAt8TyW1/g3XFNVrM719npyEi3xxZDBzHc29LphAIhAOXFtFdtfp9rFpASrczRDQE0eeB3d8FCf0ITkeB1Kv3u"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@posthog%2fcore@1.55.3",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 2251547
+      },
+      "selectionState": "observed-support-not-selected-direct-not-qualified"
+    },
+    "@posthog/browser-common": {
+      "name": "@posthog/browser-common",
+      "registryUrl": "https://registry.npmjs.org/%40posthog%2Fbrowser-common",
+      "manifestUrl": "https://registry.npmjs.org/%40posthog%2Fbrowser-common/0.9.1",
+      "selector": "dist-tags.latest",
+      "version": "0.9.1",
+      "tags": {
+        "latest": "0.9.1"
+      },
+      "publishedAtUtc": "2026-10-01T08:46:20.867Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@posthog/core": "^1.55.3",
+        "@posthog/types": "^1.413.0"
+      },
+      "engines": {},
+      "repository": {
+        "url": "git+https://github.com/PostHog/posthog-js.git",
+        "type": "git",
+        "directory": "packages/browser-common"
+      },
+      "dist": {
+        "shasum": "e6eeb281d3fea46ec3dede6be28fa224b3dfdc3f",
+        "tarball": "https://registry.npmjs.org/@posthog/browser-common/-/browser-common-0.9.1.tgz",
+        "fileCount": 121,
+        "integrity": "sha512-Dl8uV2OZAxfHfWyC7K0Y3HtT7ld+WGLbXIwgCgAGziOMGDIa/bepCRrCxy7IxsEzqY1HOrq/VDdcoNN7hBTSQQ==",
+        "signatures": [
+          {
+            "sig": "MEUCICXfqWTy2qgOyDn2GaHro1iDaFcMKbXwHSQbolu0tqBCAiEAgcHj16OnejttjJf/G/SsD2lcwyoToAGwuNl4xAMA3qU=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEYCIQC+r0kk6rX3TAHC+liExWO3ORMllxqNgJCaDlLfKuk26wIhAOPdM2rtBcZBmPLmvkw8+IeEAfaePx22uvx9CHMArC/8"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@posthog%2fbrowser-common@0.9.1",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 256264
+      },
+      "selectionState": "observed-support-not-selected-direct-not-qualified"
+    },
+    "@takumi-rs/core": {
+      "name": "@takumi-rs/core",
+      "registryUrl": "https://registry.npmjs.org/%40takumi-rs%2Fcore",
+      "manifestUrl": "https://registry.npmjs.org/%40takumi-rs%2Fcore/2.14.0",
+      "selector": "dist-tags.latest",
+      "version": "2.14.0",
+      "tags": {
+        "beta": "2.0.0-beta.14",
+        "rc": "2.0.0-rc.16",
+        "latest": "2.14.0"
+      },
+      "publishedAtUtc": "2026-09-15T07:07:09.006Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "csstype": "*"
+      },
+      "peerDependenciesMeta": {
+        "csstype": {
+          "optional": true
+        }
+      },
+      "dependencies": {
+        "@takumi-rs/helpers": "2.14.0"
+      },
+      "engines": {
+        "node": ">=18"
+      },
+      "repository": {
+        "url": "git+https://github.com/kane50613/takumi.git",
+        "type": "git",
+        "directory": "takumi-napi"
+      },
+      "dist": {
+        "shasum": "4d725fe82c76fd92ece54f3d15ff9c0828322fcd",
+        "tarball": "https://registry.npmjs.org/@takumi-rs/core/-/core-2.14.0.tgz",
+        "fileCount": 8,
+        "integrity": "sha512-PGgLdS+A1xaxPhJtYy/d+k5GYw9MOcwcLMs2zT4RGNkw28FxN+WWHvR1+nnn34rdyD6sG6K2W+50oQZtQV1h/g==",
+        "signatures": [
+          {
+            "sig": "MEQCIEDi5n24FfEgH6rmU/lzMpfWcWZQTU3OXWs8pePWzhr0AiAYhvgBFQ2wU2bklNdbo4QHGoOGJ0TdKHNfw9nP1Py3ng==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEQCIFSrG0o5Z/ZVHnqvorZShX7U7KKzp8vrGNsexmpjqZP9AiAtlwCjf0jLqbx1oEqHFNmWOhrJTJYUnn7EdJO5La+cPA=="
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@takumi-rs%2fcore@2.14.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 101384
+      },
+      "selectionState": "observed-support-not-selected-direct-not-qualified"
+    },
+    "@takumi-rs/helpers": {
+      "name": "@takumi-rs/helpers",
+      "registryUrl": "https://registry.npmjs.org/%40takumi-rs%2Fhelpers",
+      "manifestUrl": "https://registry.npmjs.org/%40takumi-rs%2Fhelpers/2.14.0",
+      "selector": "dist-tags.latest",
+      "version": "2.14.0",
+      "tags": {
+        "beta": "2.0.0-beta.14",
+        "rc": "2.0.0-rc.16",
+        "latest": "2.14.0"
+      },
+      "publishedAtUtc": "2026-09-15T07:04:34.026Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "preact": "^10.0.0",
+        "react": "^18.0.0 || ^19.0.0"
+      },
+      "peerDependenciesMeta": {
+        "preact": {
+          "optional": true
+        },
+        "react": {
+          "optional": true
+        }
+      },
+      "dependencies": {},
+      "engines": {
+        "node": ">=18"
+      },
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kane50613/takumi.git",
+        "directory": "takumi-helpers"
+      },
+      "dist": {
+        "integrity": "sha512-jFIpuWfBMAxlULx3tEk2V+FCs1CLOMo2/c7h3I2P+eNzMmxwE9TJ/BtwJVghnLlFW1M88QW/ZOY/E7MqXACWJA==",
+        "shasum": "1e5747dffa35d4ed32276b63974d8ed463022fcb",
+        "tarball": "https://registry.npmjs.org/@takumi-rs/helpers/-/helpers-2.14.0.tgz",
+        "fileCount": 32,
+        "unpackedSize": 230932,
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@takumi-rs%2fhelpers@2.14.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "signatures": [
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCIFgkP5xUdqUMAJtJBUJdjl25PZ0boKzoBBxJc2UN561HAiEAjnfEgYAxVJ19fN+eyxeWamKxqrW8ide7YcM17trU+Ok="
+          }
+        ]
+      },
+      "selectionState": "observed-support-not-selected-direct-not-qualified"
+    },
+    "csstype": {
+      "name": "csstype",
+      "registryUrl": "https://registry.npmjs.org/csstype",
+      "manifestUrl": "https://registry.npmjs.org/csstype/3.2.3",
+      "selector": "dist-tags.latest",
+      "version": "3.2.3",
+      "tags": {
+        "version-2": "2.6.21",
+        "latest": "3.2.3"
+      },
+      "publishedAtUtc": "2025-11-17T11:42:27.045Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "engines": {},
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/frenic/csstype.git"
+      },
+      "dist": {
+        "integrity": "sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==",
+        "shasum": "ec48c0f3e993e50648c86da559e2610995cf989a",
+        "tarball": "https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz",
+        "fileCount": 5,
+        "unpackedSize": 1253449,
+        "signatures": [
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCIQCW+CNKJwot6/l093k7h2clXR0Ucofwk9ZTjRiRC02OjwIgAYsOZV+Mfm2Bj8yEH7GbF3VGBDmDxQtNVg0JE6wj8mo="
+          }
+        ]
+      },
+      "selectionState": "observed-support-not-selected-direct-not-qualified"
+    },
+    "@opentelemetry/api-logs": {
+      "name": "@opentelemetry/api-logs",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fapi-logs",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fapi-logs/0.222.0",
+      "selector": "dist-tags.latest",
+      "version": "0.222.0",
+      "tags": {
+        "next": "0.34.0",
+        "canary": "0.300.0-development.0",
+        "latest": "0.222.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:41:56.826Z",
+      "releaseKind": "stable",
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/api": "^1.3.0"
+      },
+      "engines": {
+        "node": ">=8.0.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "317519a857d01e16e1b0731e23f118c843023457",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/api-logs/-/api-logs-0.222.0.tgz",
+        "fileCount": 120,
+        "integrity": "sha512-9mb1If+IF6u0ZVXkHQ6ogEae5HwA6ajIVUgpSDQyRASxft6BSXHvBvPooRle3yFN/fKnCdSOnuu0OC3PLcF6+g==",
+        "signatures": [
+          {
+            "sig": "MEUCIG5RqtV4qRzy+XahdASDzvqGNfG+FBYZLkbq5DUBGXu/AiEA5v0UdXLSeJG5e4b9dgATcOoUg69OaAs1pHLOYDfYkpA=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEQCIG0yRJL+f4NFeH3lflM28e+3A/atdsTn5ML7G0LKnYh0AiA9uy8oBtk0hKdlw6OtZKcipTU9HFijUfucmVbnKnJvKQ==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fapi-logs@0.222.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 136913
+      },
+      "selectionState": "observed-support-not-selected-direct-not-qualified"
+    },
+    "@opentelemetry/sdk-trace-web": {
+      "name": "@opentelemetry/sdk-trace-web",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-trace-web",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-trace-web/2.11.0",
+      "selector": "dist-tags.latest",
+      "version": "2.11.0",
+      "tags": {
+        "next": "1.8.0",
+        "canary": "3.0.0-development.0",
+        "latest": "2.11.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:42:40.029Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/core": "2.11.0",
+        "@opentelemetry/sdk-trace-base": "2.11.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "97c73c28431278c2950d9ec7dcb3582942fa1df0",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/sdk-trace-web/-/sdk-trace-web-2.11.0.tgz",
+        "fileCount": 75,
+        "integrity": "sha512-8hgLI437x8VRKzgUr+WRcHFp9AeaHmveKRsPIMNele9tethgCKprakRRqZCWyt41ilALHATfspUMl1An0OTMUQ==",
+        "signatures": [
+          {
+            "sig": "MEQCIA83aeePT+gt0uEVkWajfgVMNZm0OqCUfXV/O7ynwR10AiAw5d6mZS92emtlfLKUQu+vjdyC4SR76jaCfftTaJ2fPw==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEYCIQDqnjXTcKhWUxyz5PSHM4Cw7s0Q9a3maqw+nCVaBBGbqQIhAPPoiGA3yEfvbjU3MfIbHMhIye3YOdDzpLtRZUlcS/dP",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fsdk-trace-web@2.11.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 232161
+      },
+      "selectionState": "observed-support-not-selected-direct-not-qualified"
+    },
+    "@opentelemetry/sdk-trace-node": {
+      "name": "@opentelemetry/sdk-trace-node",
+      "registryUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-trace-node",
+      "manifestUrl": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-trace-node/2.11.0",
+      "selector": "dist-tags.latest",
+      "version": "2.11.0",
+      "tags": {
+        "next": "1.8.0",
+        "latest": "2.11.0",
+        "canary": "2.11.0-development.0"
+      },
+      "publishedAtUtc": "2026-08-31T16:42:33.539Z",
+      "releaseKind": "stable",
+      "peerDependencies": {
+        "@opentelemetry/api": ">=1.0.0 <1.10.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@opentelemetry/core": "2.11.0",
+        "@opentelemetry/sdk-trace-base": "2.11.0",
+        "@opentelemetry/context-async-hooks": "2.11.0"
+      },
+      "engines": {
+        "node": "^18.19.0 || >=20.6.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "3e123eff2dfda3da8f5c93a7c42b185edfed7bc3",
+        "tarball": "https://registry.npmjs.org/@opentelemetry/sdk-trace-node/-/sdk-trace-node-2.11.0.tgz",
+        "fileCount": 15,
+        "integrity": "sha512-CuvCMJmZxswhNLlM2LfuLOW3h3fZujA4hsG4B+Sz4dX2zvaXO8Ng74cnDHWD64gLszTlhiG3c0iNUjj4g+0/sA==",
+        "signatures": [
+          {
+            "sig": "MEUCIC3MsSM6DE+mS/bRh6a6aq3SsetMXh2rBoYoWJy4dtp1AiEAnZrxMmjwcdHlJs/zJ1qbbLDjoL8kP8YJFPHU/JXgS+A=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCIQD+IjMWYI9RTOQiXCM63R81fbMQCTsEM9WYCM/PZ3X9vQIgB1kST5w3A8rTKicdqLpKFV/N1NQnqIMKL+seC0y+KCM="
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@opentelemetry%2fsdk-trace-node@2.11.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 32087
+      },
+      "selectionState": "observed-support-not-selected-direct-not-qualified"
+    }
+  },
+  "limitations": [
+    "No installs, builds, typechecks or runtime qualification",
+    "No provider calls or credential access",
+    "Future direct dependencies remain for root design selection; OpenTelemetry SDK entries are observations not a recommendation to introduce a second tracing runtime",
+    "Current npm latest deliberately separated from stale next/beta/RC tags"
+  ]
+}

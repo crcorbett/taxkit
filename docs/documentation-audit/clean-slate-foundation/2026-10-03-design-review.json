@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1",
+  "kind": "proposed-design-review",
+  "observedOn": "2026-10-03",
+  "repository": "taxkit",
+  "targetRevision": "35c0cc02f75ef1d95a6cd01e9e35388064499a0c",
+  "branch": "main",
+  "approval": "Final shared understanding pending; no implementation or provider apply admitted by this receipt.",
+  "actor": "Primary Codex owner with a fresh independent read-only specification review",
+  "artifacts": [
+    {
+      "path": "docs/product-specs/clean-slate-foundation.md",
+      "sha256": "24ec42e8a64d725a65f1932ad96efef7883d6ea1ad18a59fd32bcfe6a4662810"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "289dd8a8ef97592989139753cc7bb07928dae6bf7fcc203f10975297337671d8"
+    }
+  ],
+  "review": [
+    {
+      "id": "CSF-REVIEW-CONTENT",
+      "disposition": "Applied to proposal",
+      "postcondition": "Website HTML/browser-safe generated presentation is separate from backend dynamic source/search/Markdown/image operations; static files need no new API."
+    },
+    {
+      "id": "CSF-REVIEW-MCP",
+      "disposition": "Applied to proposal",
+      "postcondition": "Current stateless and prior stateful adapters named; version-specific metadata/session/CORS/cancellation/expiry proof required."
+    },
+    {
+      "id": "CSF-REVIEW-REMOVAL",
+      "disposition": "Applied to proposal",
+      "postcondition": "The removal slice names quality-workflow/cache, release-readiness command and current harness-profile consumers."
+    },
+    {
+      "id": "CSF-REVIEW-TRACING",
+      "disposition": "Applied to proposal",
+      "postcondition": "Native URL suppression/safe-span capability remains a qualification prerequisite; unsafe tracing stays disabled and the requirement unmet if qualification fails."
+    },
+    {
+      "id": "CSF-REVIEW-SIGNALS",
+      "disposition": "Applied to proposal",
+      "postcondition": "Minimum safe logs/spans/counters/histograms have defined fields, units and request/calculation timing boundaries."
+    }
+  ],
+  "checks": [
+    {
+      "command": "bun run check:docs",
+      "outcome": "passed",
+      "postcondition": "zero documentation-policy violations; final observed scan 1260 files, 178 maintainer and 62 public",
+      "limitations": "Mechanical owner/status checks, not runtime/publication proof."
+    },
+    {
+      "command": "Schema.decodeUnknownSync(Schema.fromJsonString(ProductSpecTaskPlan)) on sibling tasks",
+      "outcome": "passed",
+      "postcondition": "proposed status and 10 tasks satisfy the installed repository task Schema",
+      "limitations": "Existing installed Schema validates planning shape; new dependency graph is unqualified."
+    },
+    {
+      "command": "Task dependency/requirement/impact and new-file path inspection",
+      "outcome": "passed",
+      "postcondition": "unique ordered acyclic task IDs; all ten requirements covered; required impacts mapped; new artifacts contain no machine-local checkout/temp paths",
+      "limitations": "Source consistency only."
+    },
+    {
+      "command": "bun run check:runbooks",
+      "outcome": "passed",
+      "postcondition": "zero violations; five existing runbooks and eleven command contracts, no operations executed",
+      "limitations": "Existing procedures remain unchanged; future replacements still need checks."
+    },
+    {
+      "command": "bun run check:repository-paths",
+      "outcome": "passed",
+      "postcondition": "tracked-file portability check passed for 1252 files",
+      "limitations": "New untracked artifacts were checked separately; no cloud/release proof."
+    },
+    {
+      "command": "oxfmt -c oxfmt.config.ts --check CONTEXT.md",
+      "outcome": "passed",
+      "postcondition": "root glossary formatting passes",
+      "limitations": "Current formatter excludes docs/**; proposed Markdown was inspected directly."
+    },
+    {
+      "command": "git diff --check",
+      "outcome": "passed",
+      "postcondition": "no tracked diff whitespace errors",
+      "limitations": "New files were separately inspected."
+    },
+    {
+      "command": "bun run verification (earlier in the same design interview)",
+      "outcome": "failed",
+      "postcondition": "Stopped at tools/quality-workflow/release-boundary.test.ts:97, temporary offline frozen install exited 1",
+      "limitations": "Cause not established; no manifest/lock changed. Later planning edits got focused checks, not a claimed full pass.",
+      "recovery": "CSF-T001/CSF-T002 must expose the diagnostic and resolve or requalify the failed boundary."
+    }
+  ],
+  "research": {
+    "earlierAuditCorpus": "531 docs/README text files and 441 planning/history/evidence text entries were read for accounting at the retained audit revision; history was not exhaustively semantically re-audited. Current affected owners were read directly. Dependency trees, generated output, vendored repositories, .git, binaries and secret/env files were excluded from text review.",
+    "upstream": "Official versioned package metadata/source and primary provider specifications; secondary DeepWiki through Executor reconciled against exact archives.",
+    "liveProviderState": "Not queried by this design review."
+  },
+  "nonClaims": [
+    "No app/package/manifest/lock/lint/CI changes have been implemented.",
+    "No dependency install or current-version runtime compatibility has been proved.",
+    "No provider/credential/DNS/deployment/publication operation has been performed.",
+    "No consent-law or exact unique-person/exactly-once delivery claim is made."
+  ],
+  "recovery": "Obtain final shared understanding, start the active plan, then carry the listed qualification and reviewed-provider-plan tasks to their real boundaries."
+}

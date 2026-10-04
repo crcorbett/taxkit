@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-01
+last_reviewed: 2026-10-03
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -12,6 +12,25 @@ review_trigger: documentation-audit receipt, evidence class, corpus inventory, o
 This route owns dated audit and corpus-accounting evidence, not current
 maintainer policy. Lifecycle and semantic ownership are defined by
 [`../README.md`](../README.md).
+
+Clean slate design research:
+
+- [2026-10-03 provisional package versions](clean-slate-foundation/2026-10-03-versions.json)
+- [2026-10-03 analytics, telemetry and image package observations](clean-slate-foundation/2026-10-03-measurement-versions.json)
+- [2026-10-03 earlier proposed design review and local checks](clean-slate-foundation/2026-10-03-design-review.json)
+- [2026-10-03 reopened RPC and functional Effect review](clean-slate-foundation/2026-10-03-rpc-functional-review.json)
+- [2026-10-03 settled Q1–Q13 and current skill baseline review](clean-slate-foundation/2026-10-03-settled-design-review.json)
+
+These dated official-registry observations support the proposed website/API
+rebuild. They record unresolved compatibility qualification and optional
+dependency choices; they prove no install, build, package compatibility,
+provider change or deployment. The original observation is retained separately
+from the later measurement/image research.
+The latest review binds the current proposal, all settled Q1–Q13 answers and
+the installed 0.6.0 skill baseline. Q14 final shared understanding remains
+pending before implementation. Earlier reviews remain unchanged for their
+original drafts, digests and then-current baseline; they do not prove the
+current proposal or installed enforcement.
 
 Entire session history setup evidence:
 

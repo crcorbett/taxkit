@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "1",
+  "kind": "settled-design-review",
+  "observedOn": "2026-10-03",
+  "repository": "taxkit",
+  "targetRevision": "35c0cc02f75ef1d95a6cd01e9e35388064499a0c",
+  "branch": "main",
+  "authority": "Planning only. Q1-Q13 are settled; Q14 final shared understanding remains pending before implementation. A concrete provider plan and its authority remain separate.",
+  "actor": "Primary Codex owner with bounded factual reviews required by the grilling skill",
+  "predecessor": {
+    "path": "docs/documentation-audit/clean-slate-foundation/2026-10-03-rpc-functional-review.json",
+    "sha256": "5e19fc19f5aaf1b9cdc3c10f18ed29cd4e29134a8d19cb44f31d8fc86050a90d",
+    "relationship": "Retained unchanged for the earlier proposal and then-pending Q9-Q13. Its digests and 0.5.1 baseline observations do not prove this updated proposal."
+  },
+  "artifacts": [
+    {
+      "path": "docs/product-specs/clean-slate-foundation.md",
+      "sha256": "acaf66b9d3479caa3d69fceb28f797656bf8d09f2da47ca1bc44333c58a2a4ac"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "d92f32028567ba0a69fb6b72798c6af4a5da82e31e1be87e5aada224250ac838"
+    },
+    {
+      "path": "docs/adr/0001-separate-website-and-api.md",
+      "sha256": "22d5e955780d161723b6264abc5fbfd38f735d3e1b65a05a770789dc2afee50e"
+    },
+    {
+      "path": "docs/adr/0002-reuse-shared-telemetry-datasets.md",
+      "sha256": "496fac9df07b266ee0e3ec98fa829caac139aa8eb4bad8ecd01eb5d128a2677a"
+    },
+    {
+      "path": "CONTEXT.md",
+      "sha256": "598fa86005914cbccb10b8122865e9cc2de5396c497c2a3e952e58879645b1f5"
+    },
+    {
+      "path": "docs/product-specs/index.md",
+      "sha256": "65b7ad1342383791d72505ca8f97c32470e2ad6139c25c8ff4cc937d6cb9aa31"
+    }
+  ],
+  "userDirection": {
+    "settled": "Q1-Q13; no unresolved first-release product branch remains. The user requires immutable values and declarative Effect workflows across every owned code scope.",
+    "latestAnswers": [
+      {
+        "id": "Q9",
+        "answer": "Yes",
+        "decision": "Native Effect RPC for the website to its same-stage backend."
+      },
+      {
+        "id": "Q10",
+        "answer": "Button",
+        "decision": "Explicit Calculate; edits mark the old answer stale and cancel old work."
+      },
+      {
+        "id": "Q11",
+        "answer": "OK",
+        "decision": "Main answer with expandable existing breakdown, assumptions, supported year and sources."
+      },
+      {
+        "id": "Q12",
+        "answer": "OK",
+        "decision": "Calculator-first homepage with clear developer and agent routes."
+      },
+      {
+        "id": "Q13",
+        "answer": "OK",
+        "decision": "Accepted public Markdown only; no personal report download in this release."
+      }
+    ],
+    "openQuestions": [
+      {
+        "id": "Q14",
+        "decision": "Confirm final shared understanding of the complete proposal before starting implementation."
+      }
+    ]
+  },
+  "review": [
+    {
+      "id": "CSF-SETTLED-DECISIONS",
+      "disposition": "Recorded in proposal and task plan",
+      "postcondition": "Q9-Q13 are no longer conditional or reopened. ADR 0001 records the agreed website RPC choice and trade-off; no new domain term was invented."
+    },
+    {
+      "id": "CSF-CURRENT-SKILL-BASELINE",
+      "disposition": "Implementation qualification required in T002",
+      "postcondition": "The formerly linked 0.5.1 cache is absent; installed successor 0.6.0 supplies the eleven-rule baseline including no-imperative-collections. Adopt complete canonical skill trees/profiles/receipts, including the required Linear skill/link without provider writes."
+    },
+    {
+      "id": "CSF-FUNCTIONAL-BASELINE",
+      "disposition": "Reuse the canonical rule",
+      "postcondition": "Basic loops, let/var, writes/update/delete, native array traversal/mutators/constructors, transient collection modes, switch and direct tag checks are supplied by 0.6.0. No duplicate basic mutation/loop rules are proposed."
+    },
+    {
+      "id": "CSF-FUNCTIONAL-GAPS",
+      "disposition": "Focused qualification required in T002",
+      "postcondition": "Retain actual-command fixtures, exact exception controls, readonly contracts and all owned extension coverage. Check demonstrated local/destructured aliases, weak collections, Object/Reflect writers, class/contract values and runtime callback/reference escapes. Computed member access is already covered by no-unchecked-index; helper purpose remains structural review."
+    },
+    {
+      "id": "CSF-SCHEMA-STATE",
+      "disposition": "Recorded in proposal/tasks",
+      "postcondition": "One owning Schema and whole-record checks, fallible construction, no re-decoding checked internal values, historical codecs preserved, pure immutable scoped state and structured Equal/Hash public-content cache keys where needed."
+    },
+    {
+      "id": "CSF-NATIVE-ORIGINS",
+      "disposition": "Qualification required in T003/T007",
+      "postcondition": "Each host binds its own native Cloudflare.Worker.URL; another host address comes from native resource Outputs with application-ingress Schema checks. No hard-coded/concatenated app origin or guessed missing address. Qualify local, Preview and custom-domain behaviour."
+    },
+    {
+      "id": "CSF-REFERENCE-TRANSPORT",
+      "disposition": "Source comparison only",
+      "postcondition": "The inspected reference has separate website/backend apps and native RPC support, but its website currently uses checked HTTP clients. TaxKit deliberately selects native RPC for website calls; no hosted reference behaviour is inferred."
+    },
+    {
+      "id": "CSF-RPC-PRIVACY",
+      "disposition": "Still requires actual qualification in T003",
+      "postcondition": "Protocol/global defect paths, malformed envelopes/unknown tags/invalid IDs, safe wire/log/trace reporting, semantic errors, version agreement, complete response deadlines and cancellation retain explicit proof tasks; no safe installed RPC behaviour is claimed."
+    }
+  ],
+  "sourceEvidence": [
+    {
+      "source": "development-workflows 0.6.0 strict-effect-ts",
+      "owner": "strict-effect-ts/assets/oxlint/effect-policy.ts",
+      "observations": "Eleven portable rules; new immutable/functional collection policy; import/lexical checks are not full type or alias analysis."
+    },
+    {
+      "source": "development-workflows 0.6.0 state and Schema guidance",
+      "owners": [
+        "strict-effect-ts/references/state/state-collections-and-caches.md",
+        "strict-effect-ts/references/modeling/schemas-and-brands.md"
+      ],
+      "observations": "No total-leaf mutation allowance; scoped pure state updates; canonical checked values and semantic cache keys."
+    },
+    {
+      "source": "development-workflows 0.6.0 repository template",
+      "owners": [
+        "repo-structure/assets/repository/oxlint.config.ts.tmpl",
+        "repo-structure/assets/repository/tools/oxlint/policy.test.ts.tmpl"
+      ],
+      "observations": "Actual-command fixtures are supplied; TaxKit still qualifies all owned paths/extensions and precise exception controls."
+    },
+    {
+      "source": "development-workflows 0.6.0 Alchemy guidance",
+      "owner": "alchemy-iac/references/providers/cloudflare.md",
+      "observations": "Own-host native URL binding and cross-host resource Outputs, rather than duplicate application origins."
+    }
+  ],
+  "checks": [
+    {
+      "command": "bun run check:docs before adding this receipt",
+      "outcome": "passed",
+      "postcondition": "Zero violations; 1261 files inspected, 178 maintainer and 62 public.",
+      "limitations": "Mechanical planning-document proof only; final receipt/index linkage receives a fresh check."
+    },
+    {
+      "command": "ProductSpecTaskPlan Schema decode using installed Effect",
+      "outcome": "passed",
+      "postcondition": "Proposed plan with ten tasks.",
+      "limitations": "Planning shape, not latest dependency compatibility."
+    },
+    {
+      "command": "Task/requirement/impact/path integrity inspection",
+      "outcome": "passed",
+      "postcondition": "Ten pending tasks with ordered dependencies, ten requirements covered, required impacts mapped, Q1-Q13 settled and portable planning paths.",
+      "limitations": "Planning consistency, not code enforcement."
+    },
+    {
+      "command": "git diff --check and untracked-owner whitespace inspection",
+      "outcome": "passed",
+      "postcondition": "No observed whitespace errors.",
+      "limitations": "No implementation or runtime proof."
+    },
+    {
+      "command": "Final bun run check:docs after receipt/index linkage",
+      "outcome": "passed",
+      "postcondition": "Zero policy violations; 1262 files inspected, 178 maintainer and 62 public.",
+      "limitations": "Mechanical planning-document proof, not implementation or installed enforcement."
+    },
+    {
+      "command": "Current receipt artifact/predecessor digests, settled-choice and source-owner inspection",
+      "outcome": "passed",
+      "postcondition": "Every bound artifact digest matches; predecessor retained; Q9-Q13 settled with only Q14 open; portable receipt paths and current skill source owners checked.",
+      "limitations": "Source identity and planning consistency, not runtime or provider proof."
+    }
+  ],
+  "retainedFailure": {
+    "command": "bun run verification from the preceding design round",
+    "outcome": "failed",
+    "observation": "Temporary offline frozen install exited 1 at tools/quality-workflow/release-boundary.test.ts:97; cause remains unestablished.",
+    "recovery": "T001/T002 retain the diagnostic and recovery task. Full verification was not rerun for this planning-only answer round."
+  },
+  "nonClaims": [
+    "No app/package/manifest/lock/lint/CI implementation changed or dependency was installed.",
+    "No new rule is enforced or actual-command bad/valid fixture qualification claimed in TaxKit.",
+    "No Worker/browser compatibility, complete RPC redaction, hosted reference behaviour or latest dependency graph is proved.",
+    "No live provider/credential/DNS/deployment/publication/Linear or external messaging operation was performed.",
+    "Necessary React/Effect/vendor/host internal state is not described as absent; immutable owned values and scoped state remain the contract."
+  ],
+  "recovery": "Obtain Q14 final shared understanding, start the accepted active plan, retain the existing Alchemy handover and perform ordered implementation qualification."
+}

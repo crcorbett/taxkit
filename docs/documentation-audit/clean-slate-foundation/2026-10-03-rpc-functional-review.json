@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "1",
+  "kind": "proposed-design-review",
+  "observedOn": "2026-10-03",
+  "repository": "taxkit",
+  "targetRevision": "35c0cc02f75ef1d95a6cd01e9e35388064499a0c",
+  "branch": "main",
+  "authority": "Planning only. Q9-Q13 and final shared understanding remain pending; no implementation or provider apply is admitted.",
+  "actor": "Primary Codex owner with two bounded independent factual reviews required by the grilling skill",
+  "predecessor": {
+    "path": "docs/documentation-audit/clean-slate-foundation/2026-10-03-design-review.json",
+    "sha256": "7eb6d8d9fe78ce38595224be0bf30ee49adf26df678d689e6bc813948af8ec05",
+    "relationship": "Retained unchanged as evidence for the earlier proposal. Its original artifact digests do not bind this revised proposal."
+  },
+  "artifacts": [
+    {
+      "path": "docs/product-specs/clean-slate-foundation.md",
+      "sha256": "fee9c022c49f45738144b0ccf5248261e1c547b211dd9d94f73d0783f136d7ab"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "166b52da5b8a3eb58b3da260fd784a109c5ced48aa0d48cb0754c25f4589ab6d"
+    }
+  ],
+  "userDirection": {
+    "settled": "Q1-Q8 remain settled; immutable/declarative functional Effect code across all owned scopes is explicit further user direction.",
+    "openQuestions": [
+      {
+        "id": "Q9",
+        "decision": "Website RPC/backend connection",
+        "recommendation": "Native Effect JSON-over-POST RPC to the same-stage backend; retain public HTTP/OpenAPI and MCP adapters."
+      },
+      {
+        "id": "Q10",
+        "decision": "Calculation trigger",
+        "recommendation": "Explicit Calculate; edits invalidate the old answer and interrupt stale work."
+      },
+      {
+        "id": "Q11",
+        "decision": "Result detail",
+        "recommendation": "Main answer with expandable existing breakdown, assumptions, supported year and sources."
+      },
+      {
+        "id": "Q12",
+        "decision": "Homepage priority",
+        "recommendation": "Calculator-first with clear developer and agent routes."
+      },
+      {
+        "id": "Q13",
+        "decision": "Markdown scope",
+        "recommendation": "Accepted public pages/reference content only; no personal report downloads in the proposed first release."
+      }
+    ]
+  },
+  "review": [
+    {
+      "id": "CSF-RPC-OWNER",
+      "disposition": "Applied to proposal; Q9 pending",
+      "postcondition": "packages/api/rpc owns native declarations/thin handlers/private clients; every transport reuses one named application operation."
+    },
+    {
+      "id": "CSF-RPC-NATIVE",
+      "disposition": "Applied to proposal",
+      "postcondition": "Explicit HTTP protocol + native JSON codec, checked browser URL/server binding, one response deadline, interruption, version skew and actual native-client proof required."
+    },
+    {
+      "id": "CSF-RPC-PRIVACY",
+      "disposition": "Qualification required in T003",
+      "postcondition": "Default defect schemas are not redaction. codecFor is supported but unknown-tag/invalid-envelope paths and native Cause reporting need independent safe wire/log/trace proof; no complete correction is claimed."
+    },
+    {
+      "id": "CSF-FUNCTIONAL-BASELINE",
+      "disposition": "Applied to proposal",
+      "postcondition": "Portable ten-rule baseline is not described as banning local mutation or loops. New TaxKit-owned rules/fixtures and readonly types are required; helper purpose remains structural review."
+    },
+    {
+      "id": "CSF-FUNCTIONAL-SCOPE",
+      "disposition": "Applied to proposal",
+      "postcondition": "Owned TS/TSX/JS/JSX/MJS/CJS, retained policy tools, tests, config and infrastructure covered; executable MDX stays with the content owner."
+    },
+    {
+      "id": "CSF-FUNCTIONAL-ESCAPES",
+      "disposition": "Applied to proposal",
+      "postcondition": "Assignments/delete/class state/native mutators/weak collections/loops/forEach, aliases and runtime references covered. Exact Promise bridge is not async/await or whole-file permission."
+    }
+  ],
+  "sourceEvidence": [
+    {
+      "source": "development-workflows 0.5.1 strict-effect-ts portable policy",
+      "owner": "strict-effect-ts/assets/oxlint/effect-policy.ts",
+      "observations": "Ten rules; no local mutation/loop rule; promise workflow and native work rules; runtime call matching needs stronger qualified alias/reference policy."
+    },
+    {
+      "source": "development-workflows 0.5.1 state policy",
+      "owner": "strict-effect-ts/references/state/state-collections-and-caches.md",
+      "observations": "Skill allows contained native mutation in some leaves/implementations; TaxKit proposal declines that allowance for owned logic."
+    },
+    {
+      "source": "development-workflows 0.5.1 repository template",
+      "owner": "repo-structure/assets/repository/oxlint.config.ts.tmpl",
+      "observations": "Strict template override is TypeScript-only; TaxKit needs explicit retained JavaScript coverage."
+    },
+    {
+      "source": "Effect 4.0.0 native RPC server",
+      "url": "https://github.com/Effect-TS/effect/blob/effect%404.0.0/packages/effect/src/rpc/RpcServer.ts",
+      "observations": "HTTP must be explicitly selected; native request cleanup; default/global defect encoders; unknown-procedure identity encoding and native Cause reporting need qualification."
+    },
+    {
+      "source": "Effect 4.0.0 native RPC client",
+      "url": "https://github.com/Effect-TS/effect/blob/effect%404.0.0/packages/effect/src/rpc/RpcClient.ts",
+      "observations": "HTTP POST/full-body read; valid JSON with a wrong reply Schema can become a defect; preserve unrelated defects and interruption."
+    },
+    {
+      "source": "Effect 4.0.0 native RPC serialisation",
+      "url": "https://github.com/Effect-TS/effect/blob/effect%404.0.0/packages/effect/src/rpc/RpcSerialization.ts",
+      "observations": "Native JSON codec and public codecFor hook; no complete safe-wire implementation has been proved."
+    }
+  ],
+  "checks": [
+    {
+      "command": "bun run check:docs",
+      "outcome": "passed",
+      "postcondition": "zero policy violations for revised SPEC/task/index owners; 1260 files inspected before adding this receipt",
+      "limitations": "Mechanical documentation proof only. New evidence linkage receives a final documentation check."
+    },
+    {
+      "command": "ProductSpecTaskPlan Schema decode using installed Effect",
+      "outcome": "passed",
+      "postcondition": "proposed plan; ten tasks",
+      "limitations": "Validates planning shape, not the latest candidate graph."
+    },
+    {
+      "command": "Task/requirement/impact/path integrity inspection",
+      "outcome": "passed",
+      "postcondition": "ten pending tasks; ordered dependencies; all ten requirements covered; explicit required impacts; no machine-local paths in proposed owners",
+      "limitations": "Source planning consistency only."
+    },
+    {
+      "command": "git diff --check and untracked-owner whitespace inspection",
+      "outcome": "passed",
+      "postcondition": "no observed whitespace errors",
+      "limitations": "No app or lint/runtime implementation proved."
+    },
+    {
+      "command": "Final bun run check:docs after linking this receipt",
+      "outcome": "passed",
+      "postcondition": "zero policy violations; 1261 files inspected, 178 maintainer and 62 public",
+      "limitations": "Mechanical planning-document proof, not installed enforcement or RPC/runtime/provider compatibility."
+    },
+    {
+      "command": "Current receipt source/predecessor digest and pending-choice validation",
+      "outcome": "passed",
+      "postcondition": "Both current proposal digests match; predecessor receipt unchanged; all five choices remain pending; receipt has portable paths",
+      "limitations": "Source identity and planning consistency only."
+    }
+  ],
+  "retainedFailure": {
+    "command": "bun run verification from the preceding design round",
+    "outcome": "failed",
+    "observation": "Temporary offline frozen install exited 1 at tools/quality-workflow/release-boundary.test.ts:97; diagnostic cause remains unestablished.",
+    "recovery": "T001/T002 must expose the diagnostic and resolve/requalify it; full verification was not rerun for these planning-only changes."
+  },
+  "nonClaims": [
+    "No app/package/manifest/lock/lint/CI implementation changed.",
+    "No new rule is installed or actual lint fixture qualification claimed.",
+    "No package installation, RPC Worker/browser compatibility or complete wire-redaction implementation is proved.",
+    "No live provider, credential, DNS, deployment, package publication or external messaging action was performed.",
+    "Necessary React/Effect/vendor/host internal state is not represented as absent; owned immutable values and scoped state are the required policy."
+  ],
+  "recovery": "Resolve Q9-Q13, reconcile any opened branches, obtain final shared understanding, then start the accepted active plan and actual implementation qualification."
+}

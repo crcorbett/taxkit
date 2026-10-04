@@ -1,0 +1,809 @@
+{
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/clean-slate-foundation.md",
+  "title": "Clean slate TaxKit foundation — proposed implementation slices",
+  "status": "proposed",
+  "last_reviewed": "2026-10-03",
+  "authority": "Planning only; final shared understanding is required before implementation. External mutation needs the separate concrete authority envelope.",
+  "principles": [
+    "Retain tax rules/results and their proof while replacing application foundations.",
+    "Use immutable Schema-derived values and declarative, pipe-first Effect workflows across all owned apps/packages/tests/scripts/infrastructure; no local mutation, imperative loops or helper sprawl. Necessary state has a scoped React/Effect owner and pure updates.",
+    "One primary owner integrates and accepts whole slices; agent or test counts do not establish proof.",
+    "Every required owning document, README, rule, export, generated source, skill and runbook changes within the affected slice.",
+    "Use current qualified exact dependencies; no silent downgrade, broad exception or unproved peer override.",
+    "Each task is pending until its actual postconditions and applicable checks pass. Proposed tasks do not authorise cloud changes."
+  ],
+  "globalVerification": {
+    "commitPolicy": "Commit only coherent passed slices; do not publish, merge, version-release or deploy from this planning authority.",
+    "requiredBeforeFinalPR": [
+      "bun run verification",
+      "bun run test",
+      "bun run build",
+      "bun run sdk:check-packed-artifact",
+      "bun run sdk:validate-downstream",
+      "bun run release:check",
+      "bun run changeset:status",
+      "git diff --check"
+    ],
+    "evidenceRequired": [
+      "Final current/target/test call graph and exact candidate/version/configuration identity.",
+      "Actual-command rejection/acceptance fixtures for the complete 0.6.0 portable Effect baseline and evidenced gap corrections under every owned path group; readonly type proof, exact exception inventory and structural call-graph review remain distinct.",
+      "Path-evidenced documentation, README, lint, skill, export, generated, CI and operational impact decisions.",
+      "Changeset and fixed release-train impact, or an evidenced no-Changeset rationale.",
+      "Bounded receipts: repository/cwd, command/procedure owner, expected/observed postcondition, authority, outcome, limitations, recovery and explicit non-claims.",
+      "Local, Preview, provider indexing, DNS/TLS, Production and publication are separate proof boundaries."
+    ]
+  },
+  "downstreamArtifactImpact": [
+    {
+      "surface": "Domain and public package contracts",
+      "decision": "Change required",
+      "paths": [
+        "packages/core/**",
+        "packages/calculators/**",
+        "packages/rules/au/*/**",
+        "packages/api/http/**",
+        "packages/api/rpc/**",
+        "packages/sdk/typescript/**"
+      ],
+      "tasks": [
+        "CSF-T002",
+        "CSF-T003",
+        "CSF-T004"
+      ]
+    },
+    {
+      "surface": "App lifetimes and frontend/agents/content",
+      "decision": "Change required",
+      "paths": [
+        "apps/api/**",
+        "apps/web/**",
+        "apps/docs/**",
+        "packages/docs-content/**",
+        "packages/docs-fumadocs/**"
+      ],
+      "tasks": [
+        "CSF-T003",
+        "CSF-T004",
+        "CSF-T005",
+        "CSF-T006"
+      ]
+    },
+    {
+      "surface": "Version/tooling/lint/skills/CI and exact exports",
+      "decision": "Change required",
+      "paths": [
+        "package.json",
+        "bun.lock",
+        "turbo.json",
+        "oxlint.config.ts",
+        "oxfmt.config.ts",
+        "tsconfig*",
+        "knip*.json",
+        "tools/oxlint/**",
+        "tools/skills/**",
+        ".agents/skills/**",
+        "AGENTS.md",
+        ".github/workflows/**",
+        "tools/quality-workflow/**"
+      ],
+      "tasks": [
+        "CSF-T002",
+        "CSF-T003",
+        "CSF-T005",
+        "CSF-T007"
+      ]
+    },
+    {
+      "surface": "Alchemy/secrets/domain/analytics/telemetry resources",
+      "decision": "Change required",
+      "paths": [
+        "alchemy.run.ts",
+        "packages/infrastructure/**",
+        "tools/docs-deployment/**"
+      ],
+      "tasks": [
+        "CSF-T003",
+        "CSF-T007",
+        "CSF-T008",
+        "CSF-T009"
+      ]
+    },
+    {
+      "surface": "Semantic documentation, READMEs, generated/public status, runbooks and journeys",
+      "decision": "Change required",
+      "paths": [
+        "README.md",
+        "docs/README.md",
+        "docs/architecture/**",
+        "docs/standards/**",
+        "docs/runbooks/**",
+        "docs/operations/authority-model.md",
+        "docs/verification/critical-journeys.json",
+        "tools/documentation/owner-policy.json",
+        "tools/documentation/runbook-contract.json",
+        "Affected app/package README.md",
+        "docs/verification/repository-harness-profile.json"
+      ],
+      "tasks": [
+        "CSF-T001",
+        "CSF-T002",
+        "CSF-T003",
+        "CSF-T004",
+        "CSF-T005",
+        "CSF-T006",
+        "CSF-T007",
+        "CSF-T008",
+        "CSF-T009",
+        "CSF-T010"
+      ]
+    },
+    {
+      "surface": "Package versioning and consumer/release proof",
+      "decision": "Change required",
+      "paths": [
+        ".changeset/config.json",
+        ".changeset/*.md",
+        "packages/scripts/src/release-readiness/**",
+        "packages/sdk/typescript/scripts/**"
+      ],
+      "tasks": [
+        "CSF-T002",
+        "CSF-T004",
+        "CSF-T005",
+        "CSF-T010"
+      ]
+    },
+    {
+      "surface": "History, binary evidence, unrelated work and shared provider datasets",
+      "decision": "Preserve",
+      "paths": [
+        "docs/exec-plans/completed/**",
+        "docs/evidence/**",
+        "docs/documentation-audit/**",
+        "Site-owned shared datasets and foreign stack outputs"
+      ],
+      "tasks": [
+        "CSF-T001",
+        "CSF-T007",
+        "CSF-T009",
+        "CSF-T010"
+      ]
+    },
+    {
+      "surface": "New tax rates/years, accounts, persisted figures, paid features and continuous agents",
+      "decision": "N/A",
+      "reason": "Not requested; current supported tax scope and temporary calculations remain the release contract.",
+      "tasks": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "CSF-T001",
+      "title": "Record the handover, retained work and baseline",
+      "status": "pending",
+      "type": "foundation",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-001",
+        "CSF-010"
+      ],
+      "dependsOn": [],
+      "goal": "Every planned removal has an addressable retained source/evidence/rollback owner.",
+      "scope": [
+        "Confirm the exact branch/source and incorporate the completed Alchemy/Doppler work without overwriting another chat's changes.",
+        "Inventory retained tax packages, authored content, historical/binary evidence, deployment IDs, existing public URLs and rollback artifacts. Record each removal/replacement disposition before deleting wiring.",
+        "Create the active execution plan only after final shared understanding. Record current golden outputs, supported scope and the failed offline frozen-install proof; establish its actual diagnostic and recovery."
+      ],
+      "outputs": [
+        "docs/exec-plans/active/clean-slate-foundation.md and its active index entry",
+        "docs/documentation-audit/clean-slate-foundation/retention-manifest.json and baseline receipt",
+        "Updated SPEC/task status and explicit infrastructure handover identity"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun run check:docs",
+        "bun run check:runbooks",
+        "bun run --filter=@taxkit/core test",
+        "bun run --filter=@taxkit/calculators test",
+        "bun run test:quality-workflow",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "Every planned removal has an addressable retained source/evidence/rollback owner.",
+        "Other work is integrated or explicitly outside the write scope; cloud ownership is not inferred from local Git.",
+        "The previous install failure is diagnosed or remains a named prerequisite; no green closeout claim hides it."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CSF-T002",
+      "title": "Qualify current versions, exports and strict enforcement",
+      "status": "pending",
+      "type": "foundation",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-001",
+        "CSF-002",
+        "CSF-010"
+      ],
+      "dependsOn": [
+        "CSF-T001"
+      ],
+      "goal": "The selected graph is actually installed and built; provisional research is not presented as compatibility proof.",
+      "scope": [
+        "Resolve current official releases, including stable Effect module paths, then qualify one exact Bun/TypeScript/React/Atom/Alchemy/tooling graph in a fresh scratch fixture before integrating it.",
+        "Qualify the proposed exact Scheduler peer-metadata correction, or use a newer upstream fix. Preserve valid tax outputs; update package exports/types/imports and versioning consequences deliberately.",
+        "Adopt the complete canonical 0.6.0 repository skills and declared TaxKit profiles/receipts, including the required Linear skill folder and Claude link without creating provider projects/issues. Merge all eleven portable strict Effect rules, including no-imperative-collections, and workspace-export direction into the actual lint config across source/tests/tools/config/infrastructure. Reuse baseline mutation/loop/collection checks; add only evidenced gaps and readonly-value checks. Exact Promise-returning/runtime host exceptions do not exempt other constructs.",
+        "Extend actual-command positive/negative fixtures under moved paths; assert admitted file counts, exit codes and expected rules. Prove removing/disabling required rules or broadening exact assignment/method exceptions fails the verifier. Refresh Turbo read/input/cache ownership, Knip inventories and CI commands; keep explicit generated/vendor exclusions.",
+        "Qualify canonical rejection of let/var, assignments/writes/delete/updates, loops, native array traversal including forEach and mutators/constructors, transient Effect collection modes, switch and manual tag checks. Use existing restrictions and focused corrections for Object/Reflect writes, mutable class/contract values, WeakMap/WeakSet and demonstrated destructured/local aliases. Computed member access is already rejected by no-unchecked-index. Accept persistent collections, pure immutable Effect-managed state and qualified Alchemy Output operations. Preserve/qualify stronger lexical runtime callback/reference checks outside exact hosts. Review helper purpose, Schema ownership and pipe/flat-program call graphs separately; lint alone is not semantic proof.",
+        "Cover owned .ts/.tsx/.js/.jsx/.mjs/.cjs files, including retained JavaScript policy tools, in actual lint scope; convert to checked TypeScript where necessary instead of treating the scaffold TypeScript-only override as complete. Executable MDX expressions/imports remain with the existing content-policy owner."
+      ],
+      "outputs": [
+        "package.json, bun.lock, turbo.json, tsconfig*, oxlint.config.ts, oxfmt.config.ts, Knip config and .github/workflows/quality.yml",
+        "tools/oxlint/** policy/fixtures, tools/effect-language-service/** and tools/skills/canonical-skill-baseline.json",
+        "Canonical .agents/skills/** copies with explicit local profiles; AGENTS.md, README.md and affected package READMEs",
+        "Qualified version receipt, any exact-version patches/**, applicable .changeset/*.md and owning standards/architecture"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun install --frozen-lockfile",
+        "bun run format:check",
+        "bun run lint",
+        "bun run test:oxlint",
+        "bun run check:effect-language-service",
+        "bun run test:skills",
+        "bun run check:harness-governance",
+        "bun run check-types",
+        "bun run test",
+        "bun run build",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [
+        "Qualify Atom server rendering/hydration, scheduled/cancelled updates, rapid input changes, strict-mode remount and final disposal on the selected React/Scheduler graph."
+      ],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "The selected graph is actually installed and built; provisional research is not presented as compatibility proof.",
+        "Deliberate bad fixtures fail with the expected rule in every owned path group, and documented valid adapters pass.",
+        "Retained valid calculations produce unchanged golden results; breaking interfaces have an appropriate Changeset.",
+        "No owned application, domain, test, script or infrastructure workflow retains forbidden mutation or imperative loops. Every necessary host construct has an exact owner/containment/test/removal record; copied reference templates do not provide an escape for executable owned code."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CSF-T003",
+      "title": "Prove one native API and Website path",
+      "status": "pending",
+      "type": "vertical-slice",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-003",
+        "CSF-004",
+        "CSF-007"
+      ],
+      "dependsOn": [
+        "CSF-T002"
+      ],
+      "goal": "A real calculator works through the separate apps; no frontend backend fallback exists.",
+      "scope": [
+        "Rebuild apps/api as a native Alchemy Worker and apps/web as a standard TanStack Website using one real existing calculator.",
+        "Implement the Q9-agreed native Effect RPC in packages/api/rpc with shared calculator/content Schemas, thin handlers and private generated client Layers. Use native JSON serialisation and explicitly select HTTP POST rather than the native server WebSocket default. Keep the public HTTP adapter separate and call the same named application operation.",
+        "Qualify checked semantic client errors, malformed-reply handling, safe RPC expected/defect/protocol replies, contract version agreement, credential/redirect/origin policy, one whole-response deadline and earlier caller interruption. Recheck every native fatal/global defect path and unknown-tag/invalid-envelope bypass as well as per-procedure encoding; an outer HTTP reporter, custom procedure defect Schema or codecFor hook alone is insufficient privacy proof. Qualify supported ingress treatment or an exact reviewed native correction where required.",
+        "Use native instance/request lifetimes, matching-stage service binding/public address, one Website server runner and a React-owned browser Atom graph; no extra backend runner or Effect Context through TanStack. Bind each host's own origin from native Cloudflare.Worker.URL and cross-host addresses from native resource Outputs, decoded once at application ingress. Missing Outputs fail checked configuration without guessed or concatenated addresses.",
+        "Select native Stack.secrets/Doppler at the infrastructure root with explicit stage/precedence; qualify bindings without applying a cloud plan."
+      ],
+      "outputs": [
+        "apps/api/src/**, apps/web/src/**, packages/api/rpc/**, packages/api/http/src/** and packages/infrastructure/src/** native composition",
+        "alchemy.run.ts and exact stage/secret configuration owners",
+        "apps/api/README.md, apps/web/README.md, packages/api/rpc/README.md, packages/api/http/README.md, packages/infrastructure/README.md and affected architecture",
+        "Focused client/Worker/lifetime tests and a local two-app receipt"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun run --filter=@taxkit/api-http test",
+        "bun run api:smoke",
+        "bun run check-types",
+        "bun run build",
+        "bun run test:oxlint",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [
+        "Exercise initial render and client navigation against the matching local API.",
+        "Check actual post-initialisation Worker startup, browser CORS, full response decoding, slow headers/stalled bodies, abort, route change and unmount.",
+        "Inspect the production browser bundle for server/Alchemy/provider credentials or live domain implementations.",
+        "Use the actual generated RPC client and native POST/JSON server through browser URL and private server binding. Prove expected error/hydration round-trip, bad valid-JSON reply, unrelated adapter defect, version skew, malformed envelopes/unknown tags/invalid IDs, sensitive sentinels in all native reply/log/trace paths, and abort during complete body decoding."
+      ],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "A real calculator works through the separate apps; no frontend backend fallback exists.",
+        "No package/app domain code constructs a runtime or builds a live Layer mid-operation.",
+        "The same-stage origin/binding and deadline/cancellation claims have runtime evidence.",
+        "Website RPC, HTTP and later MCP reuse one checked application operation. Native RPC wire privacy and failure classification have source/version-matched proof, not assumed defaults or handwritten protocol framing."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CSF-T004",
+      "title": "Finish calculator pages and the fresh package interface",
+      "status": "pending",
+      "type": "vertical-slice",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-001",
+        "CSF-004",
+        "CSF-005"
+      ],
+      "dependsOn": [
+        "CSF-T003"
+      ],
+      "goal": "Every existing calculator is usable and returns the retained result for the same valid inputs.",
+      "scope": [
+        "Implement every existing catalogue calculator with immutable temporary input/report state, retaining tax rules/results and explicit 2025-26/PAYG limits. Use the Q10-Q12 choices: an explicit Calculate button; edits mark the old answer stale and cancel old work; a main answer with expandable existing breakdown, assumptions, supported year and sources; a calculator-first homepage with clear developer and agent routes.",
+        "Give the SDK an explicit caller-owned lifetime at its plain Promise boundary and an Effect interface; remove the package-global runtime and generic client escapes.",
+        "Complete named RPC and public HTTP/OpenAPI operations, bounded body/work/concurrency/rate policy and checked expected failures. Limits and the same safe application owner apply to every transport and caller.",
+        "Update package examples, generated snapshots, export/consumer fixtures, supported-scope public copy and Changesets with the new interface.",
+        "Tighten retained core/rule/calculator code to the accepted immutable/declarative policy, including one owning Schema and its whole-record checks, fallible constrained constructors, Option for semantic absence with historical codecs preserved, checked configuration, persistent collections, closed named services and flat piping. Do not re-decode checked internal values or use JSON cache keys. Preserve all valid known results; remove only unjustified helper wrappers and keep semantic operation owners."
+      ],
+      "outputs": [
+        "apps/web calculator routes/feature containers/leaves and apps/api application operations",
+        "packages/calculators/**, packages/core/**, packages/rules/au/*/**, packages/api/rpc/**, packages/api/http/** and packages/sdk/typescript/** owning contracts/exports/tests/examples",
+        "Owning package/app READMEs, docs/architecture/api-and-sdk.md, frontend.md, effect-services.md and appropriate .changeset/*.md",
+        "Local calculator/RPC/HTTP/OpenAPI/SDK consumer and privacy receipts"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun run --filter=@taxkit/calculators test",
+        "bun run --filter=@taxkit/api-http test",
+        "bun run sdk:check-packed-artifact",
+        "bun run sdk:validate-downstream",
+        "bun run api:smoke",
+        "bun run test",
+        "bun run changeset:status",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [
+        "Exercise each supported calculator with representative valid and invalid values, all states, keyboard/focus and accessible result announcements.",
+        "Check latest-input-wins, cancelled calculations, navigation/unmount cleanup, no saved figures and no figures in URL/history/share metadata.",
+        "Prove explicit Calculate, stale-answer indication and cancellation on edits, accessible expandable breakdown/assumptions/sources and supported-year visibility, without exporting input or trace values to telemetry."
+      ],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "Every existing calculator is usable and returns the retained result for the same valid inputs.",
+        "Unsupported years and expected failures have checked visible outcomes; UI copy does not imply wider tax support.",
+        "Packed consumers use only public exports and dispose the new caller-owned client; fresh interfaces are versioned deliberately."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CSF-T005",
+      "title": "Replace public docs and all discovery representations",
+      "status": "pending",
+      "type": "vertical-slice",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-006",
+        "CSF-010"
+      ],
+      "dependsOn": [
+        "CSF-T003",
+        "CSF-T004"
+      ],
+      "goal": "All representations use the same accepted catalogue; no parallel hand-maintained index or fake published status exists.",
+      "scope": [
+        "Review the retained authored pages and navigation for finished content and source fidelity, recording exact publication acceptance and excluding unfinished drafts from public search.",
+        "Implement one accepted content/page catalogue. Website owns HTML and browser-safe generated presentation exports; dynamic page/navigation/source/search/Markdown/image services belong to the backend and checked client contract. Generated static sitemap/robots/agent indexes/Markdown/OG assets need no extra API.",
+        "Generate useful deterministic 1200x630 page OG images from checked public page metadata with the selected current Takumi/font graph; never incorporate calculation values.",
+        "Retire apps/docs and replaced rendering/build paths once equivalent local journeys and retained source/artifact identities are proved; update current owners and preserve addressability of history/old useful URLs.",
+        "Replace hard-coded apps/docs browser/cache/quality paths in tools/quality-workflow/** and .github/workflows/quality.yml; update the docs browser command in packages/scripts/src/release-readiness/schemas.ts and current owners in docs/verification/repository-harness-profile.json.",
+        "Apply Q13: processed Markdown exposes only accepted public pages/reference content. Personal report downloads are outside this release; calculation answers remain temporary and visible on screen or through the agreed agent tools. Any public-content cache uses an owned readonly structured key with installed Equal/Hash semantics, not JSON; prove equivalent reconstructed keys, distinct address fields and last-reader cancellation cleanup where a shared cache is needed."
+      ],
+      "outputs": [
+        "packages/docs-content/** authored/status/navigation/generated owners and any justified retained docs-fumadocs bridge",
+        "apps/web HTML/docs presentation, generated static discovery/image assets and old-route redirect map",
+        "apps/api dynamic page/navigation/search/processed-Markdown/image services and packages/api/http checked contracts/clients; owning content package preserves prose, links, tables and examples",
+        "tools/documentation/owner-policy.json exact public acceptance records and generated edges",
+        "Public/app/package READMEs, docs/architecture/frontend.md, content-and-posts.md, package-ownership.md and applicable runbook/command pointers",
+        "tools/quality-workflow/**, .github/workflows/quality.yml, package.json/Turbo command wiring, packages/scripts/src/release-readiness/schemas.ts and docs/verification/repository-harness-profile.json"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun run docs:validate",
+        "bun run check:docs",
+        "bun run check:runbooks",
+        "bun run build",
+        "bun run check-types",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [
+        "Verify public docs/navigation, search, Markdown negotiation/explicit links, crawler-readable rendering, canonicals and share previews on actual local routes.",
+        "Check draft exclusion, no raw JSX/imports in processed Markdown, valid image output/size/cache, mobile/keyboard behaviour and old useful URL redirects."
+      ],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "All representations use the same accepted catalogue; no parallel hand-maintained index or fake published status exists.",
+        "The Website imports only browser-safe compiled presentation/contract exports; dynamic content machine routes and authored source/live Layers belong to the backend.",
+        "Quality/cache/release/profile owners admit the replacement app and no longer depend on a removed apps/docs path; new commands exist and are proved before obsolete commands are removed.",
+        "Finished pages are explicitly accepted, unfinished pages do not enter public discovery, and valid public content retains source attribution.",
+        "The replacement covers the retired app's useful journeys and historical evidence remains addressable."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CSF-T006",
+      "title": "Add remote MCP and visible browser agent tools",
+      "status": "pending",
+      "type": "vertical-slice",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-005",
+        "CSF-006"
+      ],
+      "dependsOn": [
+        "CSF-T004",
+        "CSF-T005"
+      ],
+      "goal": "Tool names, schemas and descriptions reflect current catalogue/content and use the same calculation owner.",
+      "scope": [
+        "Add native Effect remote MCP for catalogue/docs discovery, checked calculator inputs, execution and results, reusing the same named operations and accepted Markdown.",
+        "Select and qualify native Effect v2026_07_28 stateless and v2025_11_25 stateful adapters before advertising them. Apply anonymous request limits, allowed origins, bounded request/stream lifetimes, cancellation, typed errors and safe tool descriptions; publish discovery and setup docs.",
+        "Register feature-detected page-owned WebMCP tools for find/read/fill/calculate/read-result. Reuse visible website commands and the checked RPC client; unregister/cancel on route change or unmount. Do not add direct SDK/backend calls or a duplicate calculation/event owner.",
+        "Document actual browser support and distinguish protocol/schema registration from a real agent journey; ordinary browser use must keep working."
+      ],
+      "outputs": [
+        "apps/api native MCP adapter and justified contract exports at the existing package owners",
+        "apps/web page-owned WebMCP registration/command owner and cleanup tests",
+        "Public agent setup/Markdown docs, app/package READMEs, owning architecture and critical-journey updates",
+        "HTTP/MCP/WebMCP equality, origin/rate/cancellation and browser evidence"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun run test",
+        "bun run test:oxlint",
+        "bun run check-types",
+        "bun run build",
+        "bun run check:docs",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [
+        "Exercise browser tools with the supported experimental browser/agent when available, including visible form changes and results.",
+        "Verify fallback in an unsupported browser, cleanup after navigation, cancellation and equivalent results to manual UI/API.",
+        "Run a real MCP client for each advertised adapter: current-version per-request metadata/list/read/call; older-version initialise/session/list/read/call. Prove version/header agreement, unsupported versions, origins/rates, real Worker session routing/expiry, streaming cancellation and cleanup; persist no tax figures in session metadata."
+      ],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "Tool names, schemas and descriptions reflect current catalogue/content and use the same calculation owner.",
+        "Remote and browser tools have actual caller evidence; lack of a supported browser is recorded as a proof gap, never a passed agent journey.",
+        "Anonymous access has bounded work and no required account or stored calculation."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CSF-T007",
+      "title": "Prepare DNS, domain and secret provider plans",
+      "status": "pending",
+      "type": "vertical-slice",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-007",
+        "CSF-010"
+      ],
+      "dependsOn": [
+        "CSF-T003",
+        "CSF-T005"
+      ],
+      "goal": "The reviewed plan names exact resources/account/stage and never creates or edits Production DNS for a Preview.",
+      "scope": [
+        "Read actual taxkit.dev zone/account, records, domain/registrar and DNSSEC state; classify existing state and preserve unrelated mail/verification records.",
+        "Declare adopted retained Production zone/settings and native taxkit.dev Website plus www redirect and api.taxkit.dev backend domain attachments; keep Preview away from Production DNS. Derive each host's own origin from native Cloudflare.Worker.URL and cross-host addresses from native resource Outputs, with application-ingress Schema checks and checked failure for absent Outputs. Qualify local, Preview and custom-domain behaviour; domains are infrastructure inputs, not duplicated application-origin configuration.",
+        "Complete native Doppler stage selection, shell-source policy, named runtime bindings and distinct deploy/query/Turbo credentials; remove stale --env-file wrappers only with equivalent behaviour.",
+        "Produce version-matched no-apply plans and authority/rollback/readback procedures. Replace graph validators/workflow projection assumptions that admit only one DocsWebsite without adding a bespoke parallel deployment framework."
+      ],
+      "outputs": [
+        "packages/infrastructure native zone/domain/stage/secrets graph and root alchemy entries",
+        "tools/docs-deployment/** owning admission/secret/workflow replacements, relevant workflows and Turbo inputs",
+        "docs/runbooks/docs-deployment.md, recovery.md, operations/authority-model.md and tools/documentation/runbook-contract.json",
+        "Redacted exact-resource plans, retention and DNS/secret readback procedures"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun run check:docs-deployment:types",
+        "bun run check:docs-deployment-tools:types",
+        "bun run check:docs-deployment",
+        "bun run test:docs-deployment",
+        "bun run check:runbooks",
+        "bun run check:repository-paths",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "The reviewed plan names exact resources/account/stage and never creates or edits Production DNS for a Preview.",
+        "Doppler precedence, runtime binding and separate credential purposes have checked proof without secret values in output.",
+        "All cloud mutations remain unexecuted until the concrete plan has the required named authority; DNS/TLS/registrar readback is separate from apply success."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CSF-T008",
+      "title": "Implement minimal PostHog traffic and calculator analytics",
+      "status": "pending",
+      "type": "vertical-slice",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-008"
+      ],
+      "dependsOn": [
+        "CSF-T004",
+        "CSF-T005",
+        "CSF-T006"
+      ],
+      "goal": "Only the documented events and fields leave the app; no persistent browser identity or consent dialogue is introduced.",
+      "scope": [
+        "Manage retained TaxKit Production and shared Preview projects through a private Alchemy Resource/Provider and current Distilled PostHog, with checked organisation/region/ownership and safe management failures.",
+        "Implement explicit pageviews in a private React-owned browser service and one successful hosted-calculation event owner in the backend application; honour a checked browser opt-out without linking identities.",
+        "Use a synchronous final-enrichment allowlist, memory-only persistence, explicit DNT and disabled automatic/replay/person features. Local and ordinary Preview capture stay off; no consent dialog.",
+        "Implement the bounded same-origin event relay and native backend capture through owned Effect HTTP. Qualify actual current SDK transport/disposal and no duplicate events; retain best-effort delivery limits."
+      ],
+      "outputs": [
+        "apps/web analytics service/live adapter/consumer/relay and route event ownership",
+        "apps/api application successful-use capture and checked collection policy",
+        "packages/infrastructure PostHog provider/resources/bindings and qualified optional provider fixes",
+        "Analytics tests, app/infra READMEs, privacy/public copy and deployment/recovery runbook sections"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun run test",
+        "bun run test:oxlint",
+        "bun run check-types",
+        "bun run build",
+        "bun run check:docs",
+        "bun run check:runbooks",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [
+        "Inspect actual latest-SDK batches for only accepted page/calculator properties, no amounts/results/queries and no extra SDK endpoints.",
+        "Prove initial/client navigation counts including A-to-B-to-A, one successful-use event per action across UI/WebMCP/API/MCP, no event on failure/cancellation, and backend browser opt-out.",
+        "Check denied storage, DNT before/after acquisition, ordinary Preview/development off, cleanup and relay size/deadline/status/redirect failures."
+      ],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "Only the documented events and fields leave the app; no persistent browser identity or consent dialogue is introduced.",
+        "One backend owner emits each successful hosted calculator use; pure packages/local SDK calculations send no analytics.",
+        "An event delivery response is transport proof only; exact provider UUID readback remains a separately authorised Preview journey."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CSF-T009",
+      "title": "Implement shared Axiom logs, traces, metrics and dashboards",
+      "status": "pending",
+      "type": "vertical-slice",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-009"
+      ],
+      "dependsOn": [
+        "CSF-T003",
+        "CSF-T004",
+        "CSF-T006"
+      ],
+      "goal": "Exactly the three existing datasets are used; no retained foreign resource or retention setting is changed.",
+      "scope": [
+        "Reference Site's three retained dataset outputs from CooperCorbettSiteCloudflare/prod, never declare/adopt/change them; provision only TaxKit-owned retained ingest token, destination and dashboards under a reviewed plan.",
+        "Use one canonical TaxKit identity/query owner and explicit native Worker mapping; separate logs/traces revision/request fields from bounded metric labels. Implement the SPEC's minimum request/calculation logs, named service spans, request/calculation counters and millisecond histograms with the stated boundaries; never label root-span/flush duration visitor response time.",
+        "Keep one qualified native trace owner and event-scoped native Effect log/metric exporters with correct endpoints/Protobuf/header, bounded host completion and safe warning projections.",
+        "Prove a closed safe field policy across application and automatic traces. Qualify URL-field suppression or the candidate safe-native-span fallback on the exact version, including inbound/outbound spans, Axiom and retained Cloudflare storage. If privacy cannot be met, keep that path disabled, record CSF-009 as unmet and resolve a reviewed design change; do not claim safe native spans survived or silently add a competing exporter."
+      ],
+      "outputs": [
+        "packages/infrastructure observability identities, references, tokens/destinations/dashboards and query owners",
+        "apps/api and apps/web native signal/lifetime bindings and safe event projection",
+        "Signal/privacy/cleanup tests, filtered dashboard/query definitions and controlled Preview readback procedures",
+        "Infrastructure/app READMEs, owning architecture and deployment/recovery runbook/contract updates"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun run test",
+        "bun run test:oxlint",
+        "bun run check-types",
+        "bun run build",
+        "bun run check:runbooks",
+        "bun run check:docs",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [
+        "Check actual request/render/response/cancellation lifetime and flush ownership without delaying or failing normal pages for telemetry.",
+        "Send synthetic marker figures through valid POSTs, rejected URLs/queries and upstream failures; inspect all signal payloads for leaks.",
+        "Reconcile sequential and burst logs/metrics, parented safe spans and exact project/app/stage filters; record sampling/series/delivery limits."
+      ],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "Exactly the three existing datasets are used; no retained foreign resource or retention setting is changed.",
+        "Each signal has one owner, actual safe payload evidence and version-matched flush/encoding/identity checks.",
+        "No privacy claim is accepted on application allowlisting alone; provider indexing is separately proved for an authorised Preview.",
+        "Required safe tracing has actual capability evidence. Disabling unsafe traces is containment, not completion of the requested tracing requirement; unresolved native privacy constraints need a reviewed design change."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "CSF-T010",
+      "title": "Complete replacement proof, versioning and operational delivery",
+      "status": "pending",
+      "type": "vertical-slice",
+      "acceptedFindingIds": [],
+      "requirementIds": [
+        "CSF-001",
+        "CSF-002",
+        "CSF-003",
+        "CSF-004",
+        "CSF-005",
+        "CSF-006",
+        "CSF-007",
+        "CSF-008",
+        "CSF-009",
+        "CSF-010"
+      ],
+      "dependsOn": [
+        "CSF-T007",
+        "CSF-T008",
+        "CSF-T009"
+      ],
+      "goal": "Final accepted requirements, impacted owners, versioning and retained historical identities are reconciled without hidden failed checks.",
+      "scope": [
+        "Resolve remaining owner/pointer contradictions and remove only qualified obsolete app/wiring/tool paths listed in the retention manifest; preserve source history, binary evidence, deployed recovery identity and unrelated work.",
+        "Finish changed package Changesets and nine-package fixed-train implications; retain local packed/downstream/release evidence without publishing packages.",
+        "Update current journey inventory for each calculator path, docs/discovery, SDK consumer, remote/browser agents and analytics/telemetry privacy. Obtain one fresh independent review and reconcile material findings.",
+        "Run complete local checks and deliver a concrete version-matched provider plan for final approval. Once separately authorised, apply controlled Preview, read back exact artifacts/events/signals/domains and teardown safely before a separately approved Production cutover.",
+        "Retain safe bounded receipts for accepted/failed/no-op outcomes and a rollback to the recorded previous artifact. Close the active plan only when its accepted outcome is actually achieved."
+      ],
+      "outputs": [
+        "Current README/architecture/standards/skill/command/workflow pointers reconciled in their owning slices",
+        "docs/verification/critical-journeys.json, applicable .changeset/*.md and local release/consumer proof",
+        "Dated bounded closeout/Preview/Production receipts only for operations actually performed",
+        "Completed execution plan or an explicit incomplete state with recovery and non-claims"
+      ],
+      "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
+      "mandatoryVerification": [
+        "bun run check:docs",
+        "bun run check:runbooks",
+        "bun run check:repository-paths",
+        "bun run test:skills",
+        "bun run format:check",
+        "bun run lint",
+        "bun run check-types",
+        "bun run test",
+        "bun run build",
+        "bun run sdk:check-packed-artifact",
+        "bun run sdk:validate-downstream",
+        "bun run release:check",
+        "bun run changeset:status",
+        "git diff --check",
+        "bun run verification",
+        "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
+      ],
+      "browserVerification": [
+        "Run all accepted local journeys on the final source/artifact, including crawler-visible docs, calculator forms, MCP/WebMCP and analytics privacy.",
+        "After explicit provider authority, verify exact Preview artifact identity and independent PostHog/Axiom readback; verify DNS/TLS/canonical www/API behaviour after any approved domain apply.",
+        "Keep Production, package publication and future returning-visitor accuracy outside any local-only proof."
+      ],
+      "qualityAudits": [
+        "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
+        "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
+        "Check applicable route/container/leaf composition, browser-safe imports, interruption/resource disposal and bounded safe telemetry.",
+        "Apply the SPEC's path-evidenced downstream-impact rows to this slice; required docs/README/skill/lint/config/CI/runbook changes cannot be deferred to closeout."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Primary owner reviews the diff, named outcomes, focused and complete checks, applicable real journeys, source evidence and affected owner/pointer changes.",
+        "recovery": "Correct or re-scope a proved defect. Seek a decision only for a material unresolved product choice or consequential operation without authority; keep incomplete proof identifiable."
+      },
+      "completionCriteria": [
+        "Final accepted requirements, impacted owners, versioning and retained historical identities are reconciled without hidden failed checks.",
+        "Provider/release claims have exact authority and independent boundary readback; unexecuted operations remain explicitly unproved.",
+        "The user receives the reviewable implementation and proof limits; local success is never presented as Production success."
+      ],
+      "commitAfterPassing": true
+    }
+  ]
+}
