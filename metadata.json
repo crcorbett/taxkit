@@ -1,0 +1,51 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M42WYM76BSTHC8NS0GEAA2W1",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-73-deployment-artifacts",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-04-deployment-artifacts.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/standards/tooling.md",
+    "oxlint.config.ts",
+    "package.json",
+    "tools/docs-deployment/README.md",
+    "tools/docs-deployment/alchemy-memo.test.ts",
+    "tools/docs-deployment/automation.policy.test.ts",
+    "tools/docs-deployment/doppler-custody.test.ts",
+    "tools/docs-deployment/input.boundary.test.ts",
+    "tools/docs-deployment/input.boundary.ts",
+    "tools/docs-deployment/inventory-credentials.boundary.test.ts",
+    "tools/docs-deployment/inventory.service.test.ts",
+    "tools/docs-deployment/local-doppler.test.ts",
+    "tools/docs-deployment/policy.test.ts",
+    "tools/docs-deployment/strict-boundaries.contract.test.ts",
+    "tools/docs-deployment/strict-boundaries.policy.ts",
+    "tools/docs-deployment/workflow-artifact.test.ts",
+    "tools/docs-deployment/workflow-artifact.ts",
+    "tools/docs-deployment/workflow-check.boundary.test.ts",
+    "tools/docs-deployment/workflow-evidence.test.ts",
+    "tools/docs-deployment/workflow-plan-projection.test.ts",
+    "tools/docs-deployment/workflow.contract.test.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 210613,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 3724672,
+    "output_tokens": 26228,
+    "api_call_count": 34
+  }
+}
