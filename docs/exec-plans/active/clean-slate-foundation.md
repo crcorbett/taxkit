@@ -17,6 +17,26 @@ Final provider-plan approval is a separate boundary. The
 [task ledger](../../product-specs/clean-slate-foundation.tasks.json) own scope,
 dependencies and acceptance; this plan owns execution evidence.
 
+## Persistent implementation goal
+
+Cooper explicitly confirmed on 4 October 2026: complete DEV-73's enforced
+dependency/Effect and host proof gates, then implement DEV-74–81's approved
+rebuild through reviewable, tested draft PRs. Continue until implementation is
+finished and verified, or a concrete external blocker prevents every remaining
+safe action. A draft PR, checkpoint or completed slice is not the terminal goal.
+
+This runtime exposes no native persistent-goal capability. This active plan and
+the task ledger are the durable continuation record; the task plan mirrors it.
+Medicare result changes remain gated on Cooper's concrete decision. Continue all
+independent work. No merge, deployment, publication or provider apply authority
+is added. Keep Linear activity, status and evidence aligned with actual results.
+
+Next continuation milestone: finish domain boundary enforcement, then migrate
+remaining app, package, tool, test, config and infrastructure host workflows to
+the complete canonical strict policy before downstream acceptance. The latest
+stable-v4 adad qualification handoff remains revision
+`59b0a36ff1bc6f95501734ee65d789a4f5a37fcc`; it is not Medicare-correctness proof.
+
 ## Starting point and retention
 
 Clean source `8ed03f0e1a96d2cc258b68935b9f9be443666e1b`, verified against remote
@@ -196,3 +216,32 @@ Verification on 4 October: frozen install, root tests (including all three
 retained calculator golden suites and 46 Oxlint tests), type checks, build and
 full verification passed. Existing visible upstream diagnostic warnings remain
 non-fatal. No snapshots, tax tables or source artifact records were changed.
+
+## T002 domain boundary enforcement
+
+Configure all eleven canonical rules across core/rules/calculators. Remove the
+remaining direct date lookup, consolidate date invariants in their canonical
+Schemas, and remove redundant currency guards over checked AUD-only Money.
+The DateInterval whole-record invariant now also applies to direct decoding,
+closing its previous constructor-only validation gap. Convenience constructor
+failure formatting follows owning Schema diagnostics. Valid dates and all tax
+results remain unchanged; no Medicare threshold change is included.
+
+Use owning Schema encoders in the exact report-determinism and secret-negative
+error representation tests. These two egress admissions grant no exception from
+strict rules. Real Oxlint fixtures check admitted file count, exit code and ten
+applicable domain diagnostics; web runtime filename coverage remains with web
+migration. Ordinary source/test type checks and behavioural regressions remain
+necessary alongside syntactic policy.
+
+Documentation impact: **Change required** for core README, validation tests,
+strict configuration, tooling standard, fixture proof and a core Changeset.
+**Preserve** tax results, source provenance and existing public representations.
+This is partial T002 progress; app/tool/config/infrastructure migration and
+remaining semantic audits are unfinished. Revert the whole slice for recovery.
+
+Domain-boundary verification on 4 October: 16 core date tests, all repository
+tests, full verification and build passed. The real-binary portable fixture
+suite passed 17 cases with admitted-file and rule assertions. No tax snapshots
+or parameter tables changed. Prior frozen graph proof remains applicable; this
+slice does not edit dependency manifests or the lockfile.

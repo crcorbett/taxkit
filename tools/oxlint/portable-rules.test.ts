@@ -2,6 +2,8 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { rm } from "node:fs/promises";
 import nodePath from "node:path";
 
+import { Result, Schema } from "effect";
+
 import oxlintConfig from "../../oxlint.config.ts";
 
 const { join } = nodePath;
@@ -43,14 +45,36 @@ const fixtureCases = [
     generated: "packages/core/src/.generated-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: ["no-imperative-collections"],
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
   },
   {
     accepted: ["packages/rules/au/pay/test/rule-graph.test.ts"],
     generated: "packages/rules/au/pay/test/.generated-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: ["no-imperative-collections"],
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
   },
   {
     accepted: [
@@ -59,7 +83,18 @@ const fixtureCases = [
     generated: "packages/calculators/__tests__/.generated-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: ["no-imperative-collections"],
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
   },
   {
     accepted: [
@@ -128,6 +163,7 @@ const runOxlintCommand = (args: readonly string[]) => {
       "oxlint.config.ts",
       "--disable-nested-config",
       "--no-error-on-unmatched-pattern",
+      "--format=json",
       ...args,
     ],
     cwd: repositoryRoot,
@@ -135,8 +171,22 @@ const runOxlintCommand = (args: readonly string[]) => {
     stdout: "pipe",
   });
 
+  const report = Schema.decodeUnknownResult(
+    Schema.fromJsonString(
+      Schema.Struct({
+        number_of_files: Schema.Int,
+      })
+    )
+  )(new TextDecoder().decode(result.stdout));
+  expect(Result.isSuccess(report)).toBe(true);
+  const files = Result.match(report, {
+    onFailure: () => 0,
+    onSuccess: (value) => value.number_of_files,
+  });
+
   return {
     exitCode: result.exitCode,
+    files,
     output: `${new TextDecoder().decode(result.stdout)}${new TextDecoder().decode(result.stderr)}`,
   };
 };
@@ -166,6 +216,7 @@ describe("portable Oxlint plugins", () => {
       for (const path of fixture.accepted) {
         const result = runOxlint(path);
 
+        expect(result.files).toBe(1);
         expect(result.exitCode).toBe(0);
         expect(result.output).not.toContain(`${fixture.namespace}(`);
       }
@@ -179,6 +230,7 @@ describe("portable Oxlint plugins", () => {
 
       const result = runOxlint(fixture.generated);
 
+      expect(result.files).toBe(1);
       expect(result.exitCode).toBe(1);
       for (const rule of fixture.rules) {
         expect(result.output).toContain(`${fixture.namespace}(${rule})`);

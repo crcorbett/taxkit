@@ -10,13 +10,14 @@ import {
   PaygWithholdingComponentId,
   PaygWithholdingRuleId,
   PayWithholdingsLedgerRuleId,
+  TakeHomePayReport,
   TakeHomeScenarioLive,
   TakeHomeScenarioLiveFromInput,
   TaxablePayRuleId,
 } from "@taxkit/rules-au-pay";
 import type { TakeHomeScenarioInput } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
-import { Array as EffectArray, Effect, Exit, Layer } from "effect";
+import { Array as EffectArray, Effect, Exit, Layer, Schema } from "effect";
 
 const runScenario = (
   pack: typeof AuTakeHomePay2025_26_Live,
@@ -166,7 +167,13 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         taxFreeThresholdClaimed: true,
       });
 
-      expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+      const first = yield* Schema.encodeEffect(
+        Schema.fromJsonString(TakeHomePayReport)
+      )(a);
+      const second = yield* Schema.encodeEffect(
+        Schema.fromJsonString(TakeHomePayReport)
+      )(b);
+      expect(first).toBe(second);
     })
   );
 

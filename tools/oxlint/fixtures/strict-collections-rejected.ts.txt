@@ -3,3 +3,15 @@ export const total = (values: readonly number[]) => {
   for (const value of values) { result += value; }
   return values.map((value) => value + result);
 };
+
+import { Effect, Option, Schema } from "effect";
+const values = [1];
+export const unchecked = values[0];
+export const last = values.at(-1);
+export const encoded = JSON.stringify(values);
+export const run = Effect.runSync(Effect.succeed(1));
+export const failure = Error("bad");
+export class Wrong extends Schema.TaggedError<Wrong>()("Mismatched", {}) {}
+export async function workflow() { return await Promise.resolve(1); }
+export const unwrapped = Option.getOrThrow(Option.none());
+export const currentTime = Date.now();

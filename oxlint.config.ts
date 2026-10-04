@@ -164,6 +164,9 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  // Exact representation-boundary tests: deterministic report bytes and secret-negative error JSON.
+  "packages/rules/au/pay/test/take-home-pay.test.ts",
+  "packages/calculators/__tests__/public-calculator-service.test.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/docs/src/server.ts",
   "apps/docs/src/lib/docs/route-boundary.ts",
@@ -401,14 +404,26 @@ export default defineConfig({
   ],
   overrides: [
     {
-      // DEV-73 incremental adoption: immutable domain construction and tests.
-      // Remaining strict rules and owned paths stay explicitly pending in T002.
+      // DEV-73 incremental adoption: canonical strict rules for domain packages/tests.
+      // Remaining owned app/tool/config paths stay explicitly pending in T002.
       files: [
         "packages/core/**",
         "packages/rules/**",
         "packages/calculators/**",
       ],
-      rules: { "strict-effect/no-imperative-collections": "error" },
+      rules: {
+        "strict-effect/error-constructor-new": "error",
+        "strict-effect/no-imperative-collections": "error",
+        "strict-effect/no-native-at": "error",
+        "strict-effect/no-native-work": "error",
+        "strict-effect/no-promise-workflow": "error",
+        "strict-effect/no-runtime-outside-boundary": "error",
+        "strict-effect/no-unchecked-index": "error",
+        "strict-effect/no-unchecked-json": "error",
+        "strict-effect/no-unsafe-option-unwrap": "error",
+        "strict-effect/runtime-file-convention": "error",
+        "strict-effect/tagged-error-name": "error",
+      },
     },
     {
       files: ["**/*.{ts,tsx,mts,cts}"],

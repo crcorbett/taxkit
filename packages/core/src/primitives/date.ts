@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Array, Option, Schema } from "effect";
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/u;
 const standardDaysInMonth = [
@@ -15,7 +15,11 @@ const isRealIsoDate = (value: string): boolean => {
   const day = Number(value.slice(8, 10));
   const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
   const monthLength =
-    month === 2 && leapYear ? 29 : (standardDaysInMonth[month - 1] ?? 0);
+    month === 2 && leapYear
+      ? 29
+      : Array.get(standardDaysInMonth, month - 1).pipe(
+          Option.getOrElse(() => 0)
+        );
 
   return (
     year > 0 && month >= 1 && month <= 12 && day >= 1 && day <= monthLength
@@ -55,7 +59,12 @@ export type IsoDate = typeof IsoDate.Type;
 export const DateInterval = Schema.Struct({
   from: IsoDate,
   toExclusive: Schema.optional(IsoDate),
-});
+}).check(
+  Schema.makeFilter(
+    ({ from, toExclusive }) => toExclusive === undefined || from < toExclusive,
+    { expected: "interval start before end" }
+  )
+);
 
 /**
  * Half-open date interval `[from, toExclusive)`.
@@ -69,15 +78,7 @@ export type DateInterval = typeof DateInterval.Type;
  *
  * @since 0.1.0
  */
-export const isoDate = (value: string): IsoDate => {
-  if (!isRealIsoDate(value)) {
-    throw new TypeError(
-      `taxkit/core: expected a real Gregorian calendar date in YYYY-MM-DD form, got ${value}`
-    );
-  }
-
-  return IsoDate.make(value);
-};
+export const isoDate = (value: string): IsoDate => IsoDate.make(value);
 
 const optionalIsoDate = (
   value: string | IsoDate | undefined
@@ -95,12 +96,6 @@ export const dateInterval = (args: {
 }): DateInterval => {
   const from = isoDate(String(args.from));
   const toExclusive = optionalIsoDate(args.toExclusive);
-
-  if (toExclusive !== undefined && String(from) >= String(toExclusive)) {
-    throw new Error(
-      `taxkit/core: expected interval start ${from} before end ${toExclusive}`
-    );
-  }
 
   return DateInterval.make(
     toExclusive === undefined ? { from } : { from, toExclusive }
@@ -126,10 +121,7 @@ export const dateIntervalsOverlap = (
  * @since 0.1.0
  */
 export const australianTaxYearInterval = (year: string): DateInterval => {
-  const startYear = Math.trunc(Number(year.slice(0, 4)));
-  if (!Number.isInteger(startYear)) {
-    throw new TypeError(`taxkit/core: invalid Australian tax year ${year}`);
-  }
+  const startYear = Schema.Int.make(Math.trunc(Number(year.slice(0, 4))));
 
   return dateInterval({
     from: `${startYear}-07-01`,

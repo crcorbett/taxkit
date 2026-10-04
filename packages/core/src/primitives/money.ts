@@ -69,30 +69,18 @@ export const audDollars = (dollars: number): Money =>
   aud(Math.round(dollars * 100));
 
 /**
- * Adds two money values after checking they use the same currency.
+ * Adds two checked AUD money values.
  *
  * @since 0.1.0
  */
-export const moneyAdd = (a: Money, b: Money): Money => {
-  if (a.currency !== b.currency) {
-    throw new Error("taxkit/core: cannot add money with different currencies");
-  }
-  return aud(a.cents + b.cents);
-};
+export const moneyAdd = (a: Money, b: Money): Money => aud(a.cents + b.cents);
 
 /**
- * Subtracts one money value from another after checking currency equality.
+ * Subtracts one checked AUD money value from another.
  *
  * @since 0.1.0
  */
-export const moneySub = (a: Money, b: Money): Money => {
-  if (a.currency !== b.currency) {
-    throw new Error(
-      "taxkit/core: cannot subtract money with different currencies"
-    );
-  }
-  return aud(a.cents - b.cents);
-};
+export const moneySub = (a: Money, b: Money): Money => aud(a.cents - b.cents);
 
 /**
  * Tests money values for exact cent and currency equality.

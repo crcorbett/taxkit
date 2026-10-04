@@ -59,9 +59,7 @@ describe("IsoDate", () => {
     "0000-01-01",
   ])("rejects malformed or impossible date %s", (value) => {
     expect(Schema.is(IsoDate)(value)).toBe(false);
-    expect(() => isoDate(value)).toThrow(
-      "expected a real Gregorian calendar date in YYYY-MM-DD form"
-    );
+    expect(() => isoDate(value)).toThrow("Schema validation failed");
   });
 
   it("enforces the invariant inside DateInterval", () => {
@@ -73,7 +71,25 @@ describe("IsoDate", () => {
     ).toBe(false);
     expect(() =>
       dateInterval({ from: "2026-02-29", toExclusive: "2026-07-01" })
-    ).toThrow("expected a real Gregorian calendar date");
+    ).toThrow("Schema validation failed");
+  });
+
+  it.each([
+    { from: "2026-07-01", toExclusive: "2026-07-01" },
+    { from: "2026-07-01", toExclusive: "2025-07-01" },
+  ])(
+    "rejects empty and reversed intervals at the Schema boundary",
+    (interval) => {
+      expect(Schema.is(DateInterval)(interval)).toBe(false);
+      expect(() => dateInterval(interval)).toThrow("Schema validation failed");
+    }
+  );
+
+  it("accepts increasing and open-ended intervals through the same Schema", () => {
+    expect(
+      Schema.is(DateInterval)({ from: "2025-07-01", toExclusive: "2026-07-01" })
+    ).toBe(true);
+    expect(Schema.is(DateInterval)({ from: "2025-07-01" })).toBe(true);
   });
 
   it("enforces the invariant inside SourceArtifact", () => {

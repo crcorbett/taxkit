@@ -7,9 +7,17 @@ import {
   GrossPay,
 } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
-import { Array as EffectArray, Cause, Effect, Exit, Layer } from "effect";
+import {
+  Array as EffectArray,
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  Schema,
+} from "effect";
 
 import { PublicCalculatorServiceLive } from "../src/live.layer.js";
+import { CalculatorInputDecodeError } from "../src/schemas.js";
 import { PublicCalculatorService } from "../src/service.js";
 
 const ServiceLive = PublicCalculatorServiceLive.pipe(
@@ -234,7 +242,9 @@ describe("PublicCalculatorService", () => {
             EffectArray.filter(exit.cause.reasons, Cause.isFailReason),
             0
           );
-          const rendered = JSON.stringify(failure.error);
+          const rendered = yield* Schema.encodeEffect(
+            Schema.fromJsonString(CalculatorInputDecodeError)
+          )(failure.error);
 
           expect(failure.error._tag).toBe("CalculatorInputDecodeError");
           expect(expectAt(failure.error.issues, 0).path).toEqual(["grossPay"]);

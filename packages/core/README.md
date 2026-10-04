@@ -43,6 +43,12 @@ HTTP handlers or filesystem adapters.
 - Use `IsoDate` and `isoDate` for effective-period and source-retrieval dates.
   Both paths enforce one real Gregorian-calendar `YYYY-MM-DD` invariant;
   malformed dates and impossible dates such as `2026-02-29` are rejected.
+  `DateInterval` owns the whole-record start-before-end check, so direct Schema
+  decoding and the convenience constructor both reject empty/reversed intervals.
+  Existing synchronous convenience constructors use owning Schema validation;
+  untrusted ingress should use the corresponding fallible Schema decoder.
+- `Money` admits AUD only. Arithmetic consumes checked Money values; currency
+  admission belongs to that Schema rather than a duplicate arithmetic guard.
 - Use package-owned descriptors and tagged errors.
 - Keep engine inputs separate from application state.
 - Add tests and explicit package exports with each new public subpath.
