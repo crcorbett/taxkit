@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M423XBC652H49JQ3G4Q3G8BV",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "CONTEXT.md",
+    "docs/adr/0001-separate-website-and-api.md",
+    "docs/adr/0002-reuse-shared-telemetry-datasets.md",
+    "docs/documentation-audit/README.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-03-design-review.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-03-measurement-versions.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-03-rpc-functional-review.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-03-settled-design-review.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-03-versions.json",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/product-specs/index.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 311091,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 7923712,
+    "output_tokens": 65443,
+    "api_call_count": 75,
+    "subagent_tokens": {
+      "input_tokens": 738732,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 7450240,
+      "output_tokens": 35872,
+      "api_call_count": 61
+    },
+    "subagent_tokens_complete": true
+  }
+}

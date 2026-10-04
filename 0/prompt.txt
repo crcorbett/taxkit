@@ -1,0 +1,67 @@
+codex://threads/01a0cd32-ebb7-7b83-b8f7-9a9163ee513f is already running to add Doppler and some better Alchemy practices to taxkit.
+
+I want you to further review compliance against [$development-workflows:repo-structure](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.0/skills/repo-structure/SKILL.md) [$development-workflows:alchemy-iac](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.0/skills/alchemy-iac/SKILL.md) [$development-workflows:strict-effect-ts](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.0/skills/strict-effect-ts/SKILL.md) and identify improvements.
+
+Things like a split backend/frontend, better mcp support, AEO/SEO, better Effect TS patterns and enforcement via lint rules. And what else?
+
+\~/Projects/daw is a good reference implementation
+
+---
+
+Would it be easier to remove the existing site + wiring (excl the actual taxkit packages) and start fresh on the better foundations in [$development-workflows:repo-structure](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.0/skills/repo-structure/SKILL.md) ?
+
+---
+
+Ok [$development-workflows:grill-with-docs](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.1/skills/grill-with-docs/SKILL.md) we're going to start with a clean slate.
+I want [$development-workflows:repo-structure](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.1/skills/repo-structure/SKILL.md) [$development-workflows:alchemy-iac](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.1/skills/alchemy-iac/SKILL.md) [$development-workflows:strict-effect-ts](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.1/skills/strict-effect-ts/SKILL.md) and all the patterns/rules/lint/structure they suggest.
+I want the latest versions of all packages. I want the split backend/frontend, mcp, browser mcp, aeo, seo, og images, markdown.&#x20;
+I also want the new Secrets / Doppler stuff in Alchemy from the latest version
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_Uhu1otnAHeTm8hPslWugRefW\",0]","question":"❓ Q1 — First release: what should a visitor be able to do on the rebuilt site? ➡️ I recommend keeping the existing docs and adding a simple interface for every calculator already supported by the packages.","answer":"Docs and all existing calculators"}]
+</send_user_message_question_reply>
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_Uhu1otnAHeTm8hPslWugRefW\",1]","question":"❓ Q2 — Public access: should people and agents be able to use the API and remote MCP without signing in? ➡️ I recommend anonymous access with request limits, with no accounts, payments or saved tax details in this first rebuild.","answer":"Anonymous access with limits"}]
+</send_user_message_question_reply>
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_Uhu1otnAHeTm8hPslWugRefW\",2]","question":"❓ Q3 — Package interfaces: while keeping the tax rules and results, may we change the SDK and package interfaces to meet the strict Effect rules? ➡️ I recommend preserving existing public interfaces where practical, with explicit breaking changes only where the new rules require them.","answer":"Allow a fresh package interface"}]
+</send_user_message_question_reply>
+
+---
+
+Q4 - temp only is fine
+Q5 - allow all
+Q6 - Ok
+
+---
+
+q7 - yes ok. We need to handle the DNS, Domain etc with Alchemy like in \~/Projects/common-practice. The domain here is taxkit.dev
+q8 - yes ok
+
+I also want posthog and axiom added to track product analytics and visits, traces, logs etc
+
+We need to re-use the existing datasets in axiom because we're limited to 3, see how we manage this in \~/Projects/site and \~/Projects/common-practice. We have all events going to those 3 datasets, and then we filter based on app/project, stage etc.
+
+Posthog I want basic traffic analytics, and calculator usage analytics. I dont need calculator details, but what one was used. We dont need consent dialogs. [$development-workflows:repo-structure](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.1/skills/repo-structure/SKILL.md) describes posthog in more detail.
+
+---
+
+What else? Do we use RPC for the website? Any other design decisions? [$development-workflows:grill-with-docs](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.5.1/skills/grill-with-docs/SKILL.md) \
+\
+Have you ensured extrem,e effect tightening, with Effect and no imperative/mutable, instead declarative,immutable, functional style with services,layers,piping, no helper sprawl etc
+
+---
+
+Q9 - yes, is this how it works in common practice repo?
+10 - button
+11 - ok 
+12 - ok
+13 - ok
