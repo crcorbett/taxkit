@@ -1,0 +1,42 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "c8affdc99f5eb155cec1af7793ef8cb8f2feb4cc",
+  "implemented": {
+    "test_host": "Bun-hosted Vitest and @effect/vitest for four actual-command Oxlint suites",
+    "resource_owner": "Scoped Effect FileSystem and ChildProcessSpawner; process-byte decoding in cli-fixture.ts",
+    "enforcement": "All eleven canonical rules for tools/oxlint/*.ts; four obsolete Bun adapter exceptions removed",
+    "type_check": "check:oxlint:types in root verification checks tests and imported configuration"
+  },
+  "evidence": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "result": "passed; 800 installs across 1020 packages, no changes"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed; 57 lint tests including three cleanup outcomes and admitted-file/exit/rule assertions, all retained calculator suites"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed including types, docs, runbooks, lint, format, skills, quality workflow, Knip and Chromium Atom proof"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed, 15 tasks"
+    }
+  ],
+  "retained_failure": {
+    "boundary": "tryPromise lint admission is repository-relative",
+    "failure": "Moving fixture to default temporary directory bypassed this scoped rule",
+    "correction": "Scoped fixture accepts an explicit directory; preserve repository tools admission and exact negative assertions"
+  },
+  "limitations": [
+    "Other tool/app/config/infrastructure strict migration remains open",
+    "Existing unstable API warnings remain visible",
+    "No calculator result, Medicare parameter, tax snapshot or production contract changed",
+    "No merge, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert complete slice; no external provider state changed"
+}

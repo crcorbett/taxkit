@@ -1,28 +1,15 @@
-import { afterEach, describe, expect, test } from "bun:test";
-import { rm } from "node:fs/promises";
 import nodePath from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { Result, Schema } from "effect";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { describe, expect, it as test } from "@effect/vitest";
+import { Array, Effect, FileSystem, Option, Record, Schema } from "effect";
 
-import oxlintConfig from "../../oxlint.config.ts";
+import oxlintConfig from "../../oxlint.config.js";
+import { lintFiles, writeLintFixture } from "./cli-fixture.js";
 
 const { join } = nodePath;
-const repositoryRoot = join(import.meta.dir, "../..");
-const oxlint = join(repositoryRoot, "node_modules/.bin/oxlint");
-
-const generatedFixtures = [
-  "tools/oxlint/fixtures/.generated-effect-rejected.ts",
-  "tools/oxlint/fixtures/.generated-bun-rejected.ts",
-  "tools/oxlint/fixtures/.generated-mdx-rejected.tsx",
-  "tools/oxlint/fixtures/.generated-anti-slop-effect-rejected.ts",
-  "apps/web/src/.generated-package-rejected.ts",
-  "packages/core/src/.generated-strict-rejected.ts",
-  "packages/rules/au/pay/test/.generated-strict-rejected.ts",
-  "packages/calculators/__tests__/.generated-strict-rejected.ts",
-  "apps/web/src/lib/.generated-strict-runtime.ts",
-  "tools/oxlint/fixtures/.generated-strict-global-rejected.js",
-  ".generated-strict.config.ts",
-] as const;
+const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 
 const antiSlopRules = [
   "no-chained-type-assertions",
@@ -78,6 +65,24 @@ const fixtureCases = [
       "tagged-error-name",
       "error-constructor-new",
       "no-unsafe-option-unwrap",
+    ],
+  },
+  {
+    accepted: ["tools/oxlint/cli-fixture.ts"],
+    generated: "tools/oxlint/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
     ],
   },
   {
@@ -141,7 +146,7 @@ const fixtureCases = [
       "tools/oxlint/fixtures/effect-accepted.ts",
       "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
     ],
-    generated: generatedFixtures[0],
+    generated: "tools/oxlint/fixtures/.generated-effect-rejected.ts",
     namespace: "effect",
     rejected: "tools/oxlint/fixtures/effect-rejected.ts.txt",
     rules: [
@@ -167,114 +172,111 @@ const fixtureCases = [
       "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
       "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
     ],
-    generated: generatedFixtures[1],
+    generated: "tools/oxlint/fixtures/.generated-bun-rejected.ts",
     namespace: "bun",
     rejected: "tools/oxlint/fixtures/bun-rejected.ts.txt",
     rules: ["no-host-api-outside-adapters", "no-runtime-outside-entrypoints"],
   },
   {
     accepted: ["tools/oxlint/fixtures/mdx-accepted.tsx"],
-    generated: generatedFixtures[2],
+    generated: "tools/oxlint/fixtures/.generated-mdx-rejected.tsx",
     namespace: "mdx",
     rejected: "tools/oxlint/fixtures/mdx-rejected.tsx.txt",
     rules: ["no-route-local-component-registry"],
   },
   {
     accepted: ["tools/oxlint/fixtures/anti-slop-effect-accepted.test.ts"],
-    generated: generatedFixtures[3],
+    generated: "tools/oxlint/fixtures/.generated-anti-slop-effect-rejected.ts",
     namespace: "anti-slop-effect",
     rejected: "tools/oxlint/fixtures/anti-slop-effect-rejected.ts.txt",
     rules: ["no-service-constructor-imports"],
   },
   {
     accepted: ["tools/oxlint/fixtures/package-accepted.ts"],
-    generated: generatedFixtures[4],
+    generated: "apps/web/src/.generated-package-rejected.ts",
     namespace: "package",
     rejected: "tools/oxlint/fixtures/package-rejected.ts.txt",
     rules: ["no-cross-package-source-imports"],
   },
 ] as const;
 
-const runOxlintCommand = (args: readonly string[]) => {
-  const result = Bun.spawnSync({
-    cmd: [
-      oxlint,
-      "-c",
-      "oxlint.config.ts",
-      "--disable-nested-config",
-      "--no-error-on-unmatched-pattern",
-      "--format=json",
-      ...args,
-    ],
-    cwd: repositoryRoot,
-    stderr: "pipe",
-    stdout: "pipe",
+const runOxlint = (path: string) =>
+  Effect.gen(function* () {
+    const result = yield* lintFiles([path], [], "json");
+    const report = yield* Schema.decodeEffect(
+      Schema.fromJsonString(
+        Schema.Struct({
+          diagnostics: Schema.Array(Schema.Struct({ code: Schema.String })),
+          number_of_files: Schema.Int,
+        })
+      )
+    )(result.stdout);
+    return {
+      codes: Array.map(report.diagnostics, (diagnostic) => diagnostic.code),
+      exitCode: result.exitCode,
+      files: report.number_of_files,
+    };
   });
-
-  const report = Schema.decodeUnknownResult(
-    Schema.fromJsonString(
-      Schema.Struct({
-        number_of_files: Schema.Int,
-      })
-    )
-  )(new TextDecoder().decode(result.stdout));
-  expect(Result.isSuccess(report)).toBe(true);
-  const files = Result.match(report, {
-    onFailure: () => 0,
-    onSuccess: (value) => value.number_of_files,
-  });
-
-  return {
-    exitCode: result.exitCode,
-    files,
-    output: `${new TextDecoder().decode(result.stdout)}${new TextDecoder().decode(result.stderr)}`,
-  };
-};
-
-const runOxlint = (path: string) => runOxlintCommand([path]);
-
-afterEach(async () => {
-  await Promise.all(
-    generatedFixtures.map((path) =>
-      rm(join(repositoryRoot, path), { force: true })
-    )
-  );
-});
 
 describe("portable Oxlint plugins", () => {
-  test("enables every anti-slop rule at error severity", () => {
-    for (const rule of antiSlopRules) {
-      expect(oxlintConfig.rules?.[`anti-slop/${rule}`]).toBe("error");
-    }
-    expect(
-      oxlintConfig.rules?.["anti-slop-effect/no-service-constructor-imports"]
-    ).toBe("error");
-  });
+  test.effect("enables every anti-slop rule at error severity", () =>
+    Effect.gen(function* () {
+      yield* Effect.forEach(antiSlopRules, (rule) =>
+        Effect.sync(() => {
+          expect(
+            Record.get(`anti-slop/${rule}`)(oxlintConfig.rules ?? {}).pipe(
+              Option.getOrUndefined
+            )
+          ).toBe("error");
+        })
+      );
+      expect(
+        Record.get("anti-slop-effect/no-service-constructor-imports")(
+          oxlintConfig.rules ?? {}
+        ).pipe(Option.getOrUndefined)
+      ).toBe("error");
+    })
+  );
 
-  for (const fixture of fixtureCases) {
-    test(`${fixture.namespace} rules accept boundary and unrelated-local fixtures`, () => {
-      for (const path of fixture.accepted) {
-        const result = runOxlint(path);
+  test.effect.each(fixtureCases)(
+    "$namespace accepts its boundary fixtures ($generated)",
+    (fixture) =>
+      Effect.gen(function* () {
+        yield* Effect.forEach(fixture.accepted, (path) =>
+          Effect.gen(function* () {
+            const result = yield* runOxlint(path);
+            expect(result.files).toBe(1);
+            expect(result.exitCode).toBe(0);
+            expect(
+              Array.some(result.codes, (code) =>
+                code.startsWith(`${fixture.namespace}(`)
+              )
+            ).toBe(false);
+          })
+        );
+      }).pipe(Effect.provide(BunServices.layer))
+  );
 
+  test.effect.each(fixtureCases)(
+    "$namespace rejects invalid code through the real binary ($generated)",
+    (fixture) =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const source = yield* fs.readFileString(
+          join(repositoryRoot, fixture.rejected)
+        );
+        yield* writeLintFixture(
+          join(repositoryRoot, fixture.generated),
+          source
+        );
+        const result = yield* runOxlint(fixture.generated);
         expect(result.files).toBe(1);
-        expect(result.exitCode).toBe(0);
-        expect(result.output).not.toContain(`${fixture.namespace}(`);
-      }
-    });
-
-    test(`${fixture.namespace} rules reject invalid code through the real binary`, async () => {
-      const source = await Bun.file(
-        join(repositoryRoot, fixture.rejected)
-      ).text();
-      await Bun.write(join(repositoryRoot, fixture.generated), source);
-
-      const result = runOxlint(fixture.generated);
-
-      expect(result.files).toBe(1);
-      expect(result.exitCode).toBe(1);
-      for (const rule of fixture.rules) {
-        expect(result.output).toContain(`${fixture.namespace}(${rule})`);
-      }
-    });
-  }
+        expect(result.exitCode).toBe(1);
+        yield* Effect.forEach(fixture.rules, (rule) =>
+          Effect.sync(() => {
+            expect(result.codes).toContain(`${fixture.namespace}(${rule})`);
+          })
+        );
+      }).pipe(Effect.provide(BunServices.layer))
+  );
 });

@@ -283,3 +283,27 @@ browser-realm correction. The final local workerd proof passed SSR, immutable
 assets, missing-route status, client navigation and diagnostic cleanliness.
 The isolated Bun-hosted @effect/vitest experiment also passed; repository test
 runner adoption is the next continuation milestone, not completed by that spike.
+
+## T002 Effect-native lint test host
+
+Move the four actual-command lint suites to Bun-hosted Vitest and
+`@effect/vitest`. A shared fixture boundary owns scoped FileSystem writes and
+ChildProcessSpawner execution, decoding process bytes once. Preserve fixture
+admission paths: the tryPromise policy requires repository tools paths, while
+other negative cases deliberately exercise external or exact consumer paths.
+Remove the four obsolete Bun adapter exceptions. Enable all eleven canonical
+rules for the directly owned lint TypeScript files and cover this scope with
+real CLI accepted/rejected cases. Cleanup tests exercise success, failure and
+interruption. Add the test TypeScript project to root verification, including
+its imported lint configuration; declaration output is disabled for this
+non-emitting test project.
+
+Documentation impact: **Change required** for test-host and decoding ownership,
+root verification, strict fixture admission and this active plan. **Preserve**
+all production contracts, tax results, provider authority and existing receipts.
+**N/A** for a package Changeset: only root development dependencies and tooling
+tests change; no versioned package surface changes. The lockfile rehoists the
+already pinned runner dependencies. Recover by reverting the complete slice.
+The [tooling-test receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-effect-tooling-tests.json)
+records passing frozen install, all tests (57 lint cases), full verification
+and build. This is not completion of DEV-73.

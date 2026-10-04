@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["bun"],
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["./*.ts"]
+}

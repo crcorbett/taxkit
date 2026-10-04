@@ -345,7 +345,8 @@ category so local usernames and matched content cannot leak into logs.
 
 ## Incremental clean-slate enforcement
 
-DEV-73 currently configures all eleven canonical strict Effect rules in core,
+DEV-73 currently configures all eleven canonical strict Effect rules in directly owned lint TypeScript
+files (`tools/oxlint/*.ts`) and in core,
 rules and calculators, including their tests. Actual Oxlint fixtures assert
 one admitted file, exit code and each of the ten applicable domain diagnostics;
 the web-runtime filename rule applies when web scope is migrated. Lint and

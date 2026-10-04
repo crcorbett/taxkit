@@ -106,6 +106,7 @@
     },
     "//#check:docs-deployment:types:task": { "outputs": [] },
     "//#check:docs-deployment-tools:types:task": { "outputs": [] },
+    "//#check:oxlint:types:task": { "outputs": [] },
     "//#check:docs:types:task": { "outputs": [] },
     "//#check:effect-language-service:task": { "outputs": [] },
     "//#check:harness-governance:task": { "outputs": [] },

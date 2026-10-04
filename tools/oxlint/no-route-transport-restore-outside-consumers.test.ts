@@ -1,62 +1,26 @@
-import { afterEach, describe, expect, test } from "bun:test";
-import { rm } from "node:fs/promises";
 import nodePath from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { Array as EffectArray } from "effect";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { describe, expect, it as test } from "@effect/vitest";
+import { Array as EffectArray, Effect } from "effect";
+
+import {
+  lintFiles as runOxlint,
+  writeLintFixture,
+  writeTemporaryLintFixture,
+} from "./cli-fixture.js";
 
 const { join } = nodePath;
-const repositoryRoot = join(import.meta.dir, "../..");
-const oxlint = join(repositoryRoot, "node_modules/.bin/oxlint");
+const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 const generatedConsumer = join(
   repositoryRoot,
   "tools/oxlint/fixtures/.generated-route-transport-consumer.tsx"
 );
-const temporaryFiles: string[] = [];
-const runOxlint = (
-  paths: readonly string[],
-  extraArgs: readonly string[] = []
-) => {
-  const result = Bun.spawnSync({
-    cmd: [
-      oxlint,
-      "-c",
-      "oxlint.config.ts",
-      "--disable-nested-config",
-      "--no-error-on-unmatched-pattern",
-      "--format=unix",
-      ...extraArgs,
-      ...paths,
-    ],
-    cwd: repositoryRoot,
-    stderr: "pipe",
-    stdout: "pipe",
-  });
-
-  return {
-    exitCode: result.exitCode,
-    output: `${new TextDecoder().decode(result.stdout)}${new TextDecoder().decode(result.stderr)}`,
-  };
-};
-
-const writeConfiguredConsumer = async (source: string) => {
-  temporaryFiles.push(generatedConsumer);
-  await Bun.write(generatedConsumer, source);
-
-  return generatedConsumer;
-};
-
-const writeUnconfiguredFixture = async (source: string, extension = "tsx") => {
-  const path = join(
-    "/tmp",
-    `taxkit-route-transport-${crypto.randomUUID()}.${extension}`
-  );
-
-  temporaryFiles.push(path);
-  await Bun.write(path, source);
-
-  return path;
-};
-
+const writeConfiguredConsumer = (source: string) =>
+  writeLintFixture(generatedConsumer, source);
+const writeUnconfiguredFixture = (source: string, extension = "tsx") =>
+  writeTemporaryLintFixture(source, extension);
 const diagnosticsFor = (output: string, messageId: string) =>
   EffectArray.filter(
     output.split("\n"),
@@ -66,29 +30,23 @@ const diagnosticsFor = (output: string, messageId: string) =>
         "[Error/taxkit(no-route-transport-restore-outside-consumers)]"
       )
   );
-
-afterEach(async () => {
-  await Promise.all(
-    EffectArray.map(temporaryFiles.splice(0), (path) =>
-      rm(path, { force: true })
-    )
-  );
-});
-
 describe("taxkit/no-route-transport-restore-outside-consumers", () => {
-  test("allows direct, immutable binding, named component and head consumers", () => {
-    const result = runOxlint([
-      "tools/oxlint/fixtures/route-transport-allowed.tsx",
-    ]);
-
-    expect(result.exitCode).toBe(0);
-    expect(result.output).not.toContain(
-      "taxkit(no-route-transport-restore-outside-consumers)"
-    );
-  });
-
-  test("fails closed for an unresolved named route component", async () => {
-    const fixture = await writeConfiguredConsumer(`
+  test.effect(
+    "allows direct, immutable binding, named component and head consumers",
+    () =>
+      Effect.gen(function* () {
+        const result = yield* runOxlint([
+          "tools/oxlint/fixtures/route-transport-allowed.tsx",
+        ]);
+        expect(result.exitCode).toBe(0);
+        expect(result.output).not.toContain(
+          "taxkit(no-route-transport-restore-outside-consumers)"
+        );
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect("fails closed for an unresolved named route component", () =>
+    Effect.gen(function* () {
+      const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute } from "@tanstack/react-router";
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 
@@ -100,14 +58,18 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
 
       docsPageRouteBoundary.restore(Route.useLoaderData());
     `);
-    const result = runOxlint([fixture]);
-
-    expect(result.exitCode).toBe(1);
-    expect(result.output).toContain("binding could not be resolved statically");
-  });
-
-  test("fails closed when createFileRoute is not the direct TanStack import", async () => {
-    const fixture = await writeConfiguredConsumer(`
+      const result = yield* runOxlint([fixture]);
+      expect(result.exitCode).toBe(1);
+      expect(result.output).toContain(
+        "binding could not be resolved statically"
+      );
+    }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "fails closed when createFileRoute is not the direct TanStack import",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeConfiguredConsumer(`
       import { Result } from "effect";
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 
@@ -123,34 +85,36 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         component: RouteComponent,
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(
-        result.output,
-        "The createFileRoute route or component/head binding"
-      )
-    ).toHaveLength(1);
-  });
-
-  test("rejects direct restoration in an unconfigured file", async () => {
-    const fixture = await writeUnconfiguredFixture(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "The createFileRoute route or component/head binding"
+          )
+        ).toHaveLength(1);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect("rejects direct restoration in an unconfigured file", () =>
+    Effect.gen(function* () {
+      const fixture = yield* writeUnconfiguredFixture(`
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 
       docsPageRouteBoundary.restore(value);
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(
-        result.output,
-        "Canonical route transport restore is allowed only"
-      )
-    ).toHaveLength(1);
-  });
-
-  test("rejects route-local leaves, hooks, helpers, callbacks and providers", async () => {
-    const fixture = await writeConfiguredConsumer(`
+      const result = yield* runOxlint([fixture]);
+      expect(
+        diagnosticsFor(
+          result.output,
+          "Canonical route transport restore is allowed only"
+        )
+      ).toHaveLength(1);
+    }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "rejects route-local leaves, hooks, helpers, callbacks and providers",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute } from "@tanstack/react-router";
       import { Result } from "effect";
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
@@ -177,18 +141,20 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         },
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(
-        result.output,
-        "Canonical route transport restore is allowed only"
-      )
-    ).toHaveLength(5);
-  });
-
-  test("rejects namespace, default, aliased, dynamic and CommonJS imports", async () => {
-    const fixture = await writeUnconfiguredFixture(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "Canonical route transport restore is allowed only"
+          )
+        ).toHaveLength(5);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "rejects namespace, default, aliased, dynamic and CommonJS imports",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeUnconfiguredFixture(`
       import boundaries from "#/lib/docs/route-boundary";
       import * as routeBoundaries from "#/lib/docs/route-boundary";
       import { docsPageRouteBoundary as pageBoundary } from "#/lib/docs/route-boundary";
@@ -199,15 +165,17 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
       void import("#/lib/docs/route-boundary");
       void require("#/lib/docs/route-boundary");
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "Import canonical route boundaries")
-    ).toHaveLength(5);
-  });
-
-  test("rejects restore aliases, destructuring, computed access, callback passing and call/apply/bind", async () => {
-    const fixture = await writeUnconfiguredFixture(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(result.output, "Import canonical route boundaries")
+        ).toHaveLength(5);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "rejects restore aliases, destructuring, computed access, callback passing and call/apply/bind",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeUnconfiguredFixture(`
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 
       const boundaryAlias = docsPageRouteBoundary;
@@ -222,15 +190,20 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
       docsPageRouteBoundary.restore?.(value);
       void [boundaryAlias, restoreAlias, restore];
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "Canonical route transport restore must be")
-    ).toHaveLength(10);
-  });
-
-  test("rejects assignment aliases of the canonical boundary object", async () => {
-    const fixture = await writeConfiguredConsumer(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "Canonical route transport restore must be"
+          )
+        ).toHaveLength(10);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "rejects assignment aliases of the canonical boundary object",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute } from "@tanstack/react-router";
       import { Result } from "effect";
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
@@ -251,15 +224,18 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         },
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "Canonical route transport restore must be")
-    ).toHaveLength(1);
-  });
-
-  test("rejects whole-boundary argument and storage forwarding", async () => {
-    const fixture = await writeUnconfiguredFixture(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "Canonical route transport restore must be"
+          )
+        ).toHaveLength(1);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect("rejects whole-boundary argument and storage forwarding", () =>
+    Effect.gen(function* () {
+      const fixture = yield* writeUnconfiguredFixture(`
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 
       consume(docsPageRouteBoundary);
@@ -268,15 +244,20 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
       const callback = () => docsPageRouteBoundary;
       void [storedObject, storedArray, callback];
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "Canonical route transport restore must be")
-    ).toHaveLength(4);
-  });
-
-  test("rejects reassignment, getRouteApi, prop and context loader sources", async () => {
-    const fixture = await writeConfiguredConsumer(`
+      const result = yield* runOxlint([fixture]);
+      expect(
+        diagnosticsFor(
+          result.output,
+          "Canonical route transport restore must be"
+        )
+      ).toHaveLength(4);
+    }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "rejects reassignment, getRouteApi, prop and context loader sources",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute, getRouteApi } from "@tanstack/react-router";
       import { createContext, useContext } from "react";
       import { Result } from "effect";
@@ -327,18 +308,23 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         },
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "A route component restore must consume")
-    ).toHaveLength(4);
-    expect(
-      diagnosticsFor(result.output, "A route head restore must consume")
-    ).toHaveLength(1);
-  });
-
-  test("rejects closure loader sources and shadowed route bindings", async () => {
-    const fixture = await writeConfiguredConsumer(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "A route component restore must consume"
+          )
+        ).toHaveLength(4);
+        expect(
+          diagnosticsFor(result.output, "A route head restore must consume")
+        ).toHaveLength(1);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "rejects closure loader sources and shadowed route bindings",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute } from "@tanstack/react-router";
       import { Result } from "effect";
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
@@ -361,15 +347,18 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         },
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "A route component restore must consume")
-    ).toHaveLength(2);
-  });
-
-  test("rejects closure capture and multiple restores", async () => {
-    const fixture = await writeConfiguredConsumer(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "A route component restore must consume"
+          )
+        ).toHaveLength(2);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect("rejects closure capture and multiple restores", () =>
+    Effect.gen(function* () {
+      const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute } from "@tanstack/react-router";
       import { Result } from "effect";
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
@@ -388,21 +377,23 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         },
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "Restore loader transport once")
-    ).toHaveLength(1);
-    expect(
-      diagnosticsFor(
-        result.output,
-        "Canonical route transport restore is allowed only"
-      )
-    ).toHaveLength(1);
-  });
-
-  test("rejects encoded loader data and restored Result forwarded to children", async () => {
-    const fixture = await writeConfiguredConsumer(`
+      const result = yield* runOxlint([fixture]);
+      expect(
+        diagnosticsFor(result.output, "Restore loader transport once")
+      ).toHaveLength(1);
+      expect(
+        diagnosticsFor(
+          result.output,
+          "Canonical route transport restore is allowed only"
+        )
+      ).toHaveLength(1);
+    }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "rejects encoded loader data and restored Result forwarded to children",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute } from "@tanstack/react-router";
       import { Result } from "effect";
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
@@ -420,18 +411,26 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         },
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "Do not forward encoded loader transport")
-    ).toHaveLength(1);
-    expect(
-      diagnosticsFor(result.output, "Do not forward the restored route Result")
-    ).toHaveLength(1);
-  });
-
-  test("rejects loader and Result aliases used to forward route state", async () => {
-    const fixture = await writeConfiguredConsumer(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "Do not forward encoded loader transport"
+          )
+        ).toHaveLength(1);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "Do not forward the restored route Result"
+          )
+        ).toHaveLength(1);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "rejects loader and Result aliases used to forward route state",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute } from "@tanstack/react-router";
       import { Result } from "effect";
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
@@ -452,18 +451,26 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         },
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "Do not forward encoded loader transport")
-    ).toHaveLength(1);
-    expect(
-      diagnosticsFor(result.output, "Do not forward the restored route Result")
-    ).toHaveLength(1);
-  });
-
-  test("requires the restored Result to be matched in the same consumer", async () => {
-    const fixture = await writeConfiguredConsumer(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "Do not forward encoded loader transport"
+          )
+        ).toHaveLength(1);
+        expect(
+          diagnosticsFor(
+            result.output,
+            "Do not forward the restored route Result"
+          )
+        ).toHaveLength(1);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "requires the restored Result to be matched in the same consumer",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute } from "@tanstack/react-router";
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 
@@ -474,15 +481,17 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         },
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(
-      diagnosticsFor(result.output, "Match the restored Result")
-    ).toHaveLength(1);
-  });
-
-  test("keeps direct Schema decoding prohibited in route consumers", async () => {
-    const fixture = await writeConfiguredConsumer(`
+        const result = yield* runOxlint([fixture]);
+        expect(
+          diagnosticsFor(result.output, "Match the restored Result")
+        ).toHaveLength(1);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "keeps direct Schema decoding prohibited in route consumers",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeConfiguredConsumer(`
       import { createFileRoute } from "@tanstack/react-router";
       import { Schema } from "effect";
 
@@ -493,14 +502,16 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         },
       });
     `);
-    const result = runOxlint([fixture]);
-
-    expect(result.output).toContain("taxkit(no-decoding-outside-boundaries)");
-  });
-
-  test("rejects inline disable directives for both boundary rules", async () => {
-    const fixture = await writeUnconfiguredFixture(
-      `
+        const result = yield* runOxlint([fixture]);
+        expect(result.output).toContain(
+          "taxkit(no-decoding-outside-boundaries)"
+        );
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect("rejects inline disable directives for both boundary rules", () =>
+    Effect.gen(function* () {
+      const fixture = yield* writeUnconfiguredFixture(
+        `
         /* eslint-disable taxkit/no-decoding-outside-boundaries */
         /* oxlint-disable taxkit/no-decoding-outside-boundaries */
         // eslint-disable-next-line taxkit/no-decoding-outside-boundaries
@@ -520,40 +531,42 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
         const eighth = 8; // oxlint-disable-line taxkit/no-route-transport-restore-outside-consumers
         void [first, second, third, fourth, fifth, sixth, seventh, eighth];
       `,
-      "ts"
-    );
-    const result = runOxlint(
-      [fixture],
-      [
-        "--allow=taxkit/no-decoding-outside-boundaries",
-        "--allow=taxkit/no-route-transport-restore-outside-consumers",
-        "--report-unused-disable-directives-severity=error",
-      ]
-    );
-
-    expect(result.exitCode).toBe(1);
-    expect(result.output).toContain("Unused eslint-disable directive");
-    expect(result.output).toContain("Unused oxlint-disable directive");
-  });
-
-  test("does not report unrelated restore methods", async () => {
-    const fixture = await writeUnconfiguredFixture(
-      `
+        "ts"
+      );
+      const result = yield* runOxlint(
+        [fixture],
+        [
+          "--allow=taxkit/no-decoding-outside-boundaries",
+          "--allow=taxkit/no-route-transport-restore-outside-consumers",
+          "--report-unused-disable-directives-severity=error",
+        ]
+      );
+      expect(result.exitCode).toBe(1);
+      expect(result.output).toContain("Unused eslint-disable directive");
+      expect(result.output).toContain("Unused oxlint-disable directive");
+    }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect("does not report unrelated restore methods", () =>
+    Effect.gen(function* () {
+      const fixture = yield* writeUnconfiguredFixture(
+        `
       const cache = { restore: (value) => value };
       cache.restore("value");
     `,
-      "ts"
-    );
-    const result = runOxlint([fixture]);
-
-    expect(result.output).not.toContain(
-      "taxkit(no-route-transport-restore-outside-consumers)"
-    );
-  });
-
-  test("does not mistake a shadowed canonical import for a boundary", async () => {
-    const fixture = await writeUnconfiguredFixture(
-      `
+        "ts"
+      );
+      const result = yield* runOxlint([fixture]);
+      expect(result.output).not.toContain(
+        "taxkit(no-route-transport-restore-outside-consumers)"
+      );
+    }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "does not mistake a shadowed canonical import for a boundary",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeUnconfiguredFixture(
+          `
       import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 
       const restoreUnrelated = () => {
@@ -563,12 +576,12 @@ describe("taxkit/no-route-transport-restore-outside-consumers", () => {
 
       void restoreUnrelated;
     `,
-      "ts"
-    );
-    const result = runOxlint([fixture]);
-
-    expect(result.output).not.toContain(
-      "taxkit(no-route-transport-restore-outside-consumers)"
-    );
-  });
+          "ts"
+        );
+        const result = yield* runOxlint([fixture]);
+        expect(result.output).not.toContain(
+          "taxkit(no-route-transport-restore-outside-consumers)"
+        );
+      }).pipe(Effect.provide(BunServices.layer))
+  );
 });

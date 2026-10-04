@@ -496,6 +496,12 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   negative cases for encoding and `Schema.decodeTo`, and real Oxlint CLI
   fixtures for both a prohibited file and an exact allowlisted file. Run those
   fixture commands with `--disable-nested-config`.
+- The Oxlint CLI suites run through Bun-hosted Vitest with `@effect/vitest`.
+  Effect scopes own fixture cleanup and child processes; the shared
+  `tools/oxlint/cli-fixture.ts` boundary decodes process bytes.
+  `check:oxlint:types` checks the tests and their imported lint configuration.
+  Success, failure and interruption must remove generated fixtures. Intentional
+  source fixtures are excluded from test discovery, not from real CLI coverage.
 - Every enabled portable custom rule must also have accepted and rejected
   fixtures executed through the installed Oxlint binary with
   `--disable-nested-config`. Direct visitor-unit tests alone are not acceptance

@@ -3,7 +3,7 @@ import core from "ultracite/oxlint/core";
 import react from "ultracite/oxlint/react";
 import remix from "ultracite/oxlint/remix";
 
-const taxkitReact = {
+const taxkitReact = defineConfig({
   ...react,
   rules: {
     ...react.rules,
@@ -11,7 +11,7 @@ const taxkitReact = {
     // stateful React components. Keep the rule for actual nested components.
     "react/no-unstable-nested-components": ["error", { allowAsProps: true }],
   },
-};
+});
 
 const decodingBoundaryFiles = [
   // Application configuration, executable smoke checks and checked examples.
@@ -47,6 +47,7 @@ const decodingBoundaryFiles = [
   "packages/api/http/__tests__/public-calculation-api.test.ts",
 
   // Focused lint integration test: CLI output is decoded at the process boundary.
+  "tools/oxlint/cli-fixture.ts",
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
   "tools/oxlint/portable-rules.test.ts",
   "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
@@ -311,10 +312,6 @@ const bunAdapterFiles = [
   "apps/docs/scripts/test-built.tsx",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
-  "tools/oxlint/no-bare-effect-try-promise.test.ts",
-  "tools/oxlint/no-decoding-outside-boundaries.test.ts",
-  "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
-  "tools/oxlint/portable-rules.test.ts",
   "tools/quality-workflow/release-boundary.test.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
@@ -404,12 +401,13 @@ export default defineConfig({
   ],
   overrides: [
     {
-      // DEV-73 incremental adoption: canonical strict rules for domain packages/tests.
+      // DEV-73 incremental adoption: canonical rules for domain and migrated lint tests.
       // Remaining owned app/tool/config paths stay explicitly pending in T002.
       files: [
         "packages/core/**",
         "packages/rules/**",
         "packages/calculators/**",
+        "tools/oxlint/*.ts",
       ],
       rules: {
         "strict-effect/error-constructor-new": "error",

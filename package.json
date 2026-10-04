@@ -60,6 +60,8 @@
     "check:doppler-custody": "bun --no-env-file run tools/docs-deployment/doppler-custody.runtime.ts",
     "check:docs-deployment-tools:types": "turbo run //#check:docs-deployment-tools:types:task",
     "check:docs-deployment-tools:types:task": "tsc --noEmit -p tools/docs-deployment/tsconfig.json",
+    "check:oxlint:types": "turbo run //#check:oxlint:types:task",
+    "check:oxlint:types:task": "tsc --noEmit -p tools/oxlint/tsconfig.json",
     "check:docs:types": "turbo run //#check:docs:types:task",
     "check:docs:types:task": "tsc --noEmit -p tools/documentation/tsconfig.json",
     "check:effect-language-service": "turbo run //#check:effect-language-service:task",
@@ -110,7 +112,7 @@
     "test:hgi-206": "bun test tools/evals/hgi-206",
     "test:harness-governance": "bun --conditions=source test tools/governance",
     "test:oxlint": "turbo run //#test:oxlint:task",
-    "test:oxlint:task": "bun test tools/oxlint",
+    "test:oxlint:task": "bun --bun vitest run --config tools/vitest.config.ts tools/oxlint",
     "test:repository-paths": "turbo run //#test:repository-paths:task",
     "test:repository-paths:task": "bun test tools/repository-paths",
     "test:quality-workflow": "turbo run //#test:quality-workflow:task",
@@ -124,7 +126,7 @@
     "docs:test:browser": "turbo run test:browser --filter=docs",
     "changeset:status": "turbo run //#changeset:status:task",
     "changeset:status:task": "changeset status --verbose",
-    "verification": "bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow && bun run check:docs:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run check:docs-deployment:types && bun run check:docs-deployment-tools:types && bun run check:docs-deployment && bun run check:docs-deployment-automation && bun run test:docs-deployment && bun run lint && bun run format:check && bun run test:skills && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types && bun run web:test:browser",
+    "verification": "bun run check:oxlint:types && bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow && bun run check:docs:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run check:docs-deployment:types && bun run check:docs-deployment-tools:types && bun run check:docs-deployment && bun run check:docs-deployment-automation && bun run test:docs-deployment && bun run lint && bun run format:check && bun run test:skills && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types && bun run web:test:browser",
     "version-packages": "changeset version",
     "version-repo": "changeset version",
     "web:test:browser": "turbo run test:browser --filter=web"
@@ -138,6 +140,7 @@
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
     "@effect/tsgo": "0.48.0",
+    "@effect/vitest": "catalog:",
     "@oxlint/plugins": "1.86.0",
     "@taxkit/scripts": "workspace:*",
     "@types/bun": "catalog:",
@@ -150,6 +153,8 @@
     "turbo": "2.11.7",
     "typescript": "7.0.2",
     "ultracite": "7.12.2",
+    "vite": "catalog:",
+    "vitest": "catalog:",
     "yaml": "2.9.1"
   },
   "overrides": {
