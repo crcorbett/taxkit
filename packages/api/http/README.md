@@ -319,3 +319,17 @@ actual API tarball and imports all JavaScript public entrypoints.
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/testing-and-quality.md`
 - `docs/product-specs/documentation-improvement-roadmap.md`
+
+## Contract verification boundaries
+
+The OpenAPI snapshot test uses Effect FileSystem and the owning JSON Schema
+codec; the committed normalized snapshot remains the wire-contract oracle.
+The secret-negative HTTP test encodes its error with CalculatorApiErrorEnvelope.
+Both test files are checked by `tsconfig.test.json` in `check-types`, including
+canonical branded identities and explicit Match narrowing of report/error unions.
+
+The in-process Fetch adapter retains its required Promise return signature in
+one exact lint admission. It contains no async orchestration or Effect runner.
+Real CLI fixtures prove adjacent files reject the signature and the admitted
+file still rejects async/await. This preserves the current host bridge pending
+the separate native app composition task; it is not native Worker lifetime proof.

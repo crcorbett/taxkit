@@ -307,3 +307,27 @@ already pinned runner dependencies. Recover by reverting the complete slice.
 The [tooling-test receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-effect-tooling-tests.json)
 records passing frozen install, all tests (57 lint cases), full verification
 and build. This is not completion of DEV-73.
+
+## T002 HTTP and shared assertion boundaries
+
+Extend all eleven canonical rules to HTTP API and shared testing source/tests.
+Use checked Array/Option access and framework failure for expectAt, with tests
+for identity, null, false, absent and undefined entries. Replace raw OpenAPI
+filesystem/JSON handling with Effect FileSystem and owning Schema codecs;
+encode the HTTP secret-negative error via CalculatorApiErrorEnvelope. Retain
+one exact Fetch Promise type admission, prove neighbouring files reject it and
+prove async/await is still rejected at the host itself via an exact real CLI fixture.
+
+Add TypeScript test projects to both package gates. This exposed previously
+unverified raw context strings and union-property reads in HTTP tests; use
+canonical calculation identities and explicit Match narrowing. Do not broaden
+types or silence errors. The existing snapshot and calculator results stay
+unchanged. Native HTTP lifetime composition remains a subsequent task.
+
+Documentation impact: **Change required** for package test commands/READMEs,
+serialization and host ownership, strict enforcement, fixtures, this plan and
+the shared testing Changeset. **Preserve** public API contract/OpenAPI snapshot,
+tax results and source provenance. **N/A** for provider operations. Revert the
+complete slice for recovery. The [API/test-boundary receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-api-test-boundaries.json)
+records passing frozen install, all tests (64 lint, five API and five assertion
+cases), full verification and build.

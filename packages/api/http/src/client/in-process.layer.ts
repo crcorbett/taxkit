@@ -5,6 +5,10 @@ import * as FetchHttpClient from "effect/http/FetchHttpClient";
 import { TaxKitApi } from "../api.js";
 import { TaxKitHttpApiService } from "./service.js";
 
+// Fetch requires a Promise-returning host signature. This adapter only forwards
+// the request; it owns no Promise orchestration or Effect execution. HTTP
+// integration tests exercise this bridge; native app composition replaces it
+// in the clean-slate migration.
 export type InProcessTaxKitApiHandler = (request: Request) => Promise<Response>;
 
 const makeInProcessFetch = (handler: InProcessTaxKitApiHandler) => {

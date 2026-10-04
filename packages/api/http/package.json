@@ -99,7 +99,7 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
     "test": "vitest run",
     "test:openapi": "vitest run __tests__/openapi-snapshot.test.ts",
     "update-openapi-snapshot": "UPDATE_TAXKIT_OPENAPI_SNAPSHOT=true vitest run __tests__/openapi-snapshot.test.ts",
@@ -112,6 +112,7 @@
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
     "@taxkit/rules-au-pay": "workspace:*",
     "@taxkit/testing": "workspace:*",

@@ -1,11 +1,13 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
+import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import { describe, expect, it } from "@effect/vitest";
 import {
   Array as EffectArray,
   Config,
   ConfigProvider,
   Effect,
+  FileSystem,
   Match,
   Option,
   Order,
@@ -60,21 +62,23 @@ const normalizedTaxKitOpenApiSpec = normalizeOpenApiSpec(taxKitOpenApiSpec);
 
 const formatOpenApiSnapshot = (spec: OpenApi.OpenAPISpec) =>
   normalizeOpenApiSpec(spec).pipe(
-    Effect.map((normalized) => `${JSON.stringify(normalized, null, 2)}\n`)
+    Effect.flatMap(
+      Schema.encodeEffect(Schema.fromJsonString(Schema.Json, { space: 2 }))
+    ),
+    Effect.map((encoded) => `${encoded}\n`)
   );
 
-const readOpenApiSnapshot = Effect.promise(() =>
-  readFile(snapshotUrl, "utf-8")
-).pipe(
-  Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(Schema.Json)))
-);
+const readOpenApiSnapshot = Effect.gen(function* () {
+  const fs = yield* FileSystem.FileSystem;
+  const source = yield* fs.readFileString(fileURLToPath(snapshotUrl));
+  return yield* Schema.decodeEffect(Schema.fromJsonString(Schema.Json))(source);
+});
 
-const writeOpenApiSnapshot = formatOpenApiSnapshot(taxKitOpenApiSpec).pipe(
-  Effect.flatMap((snapshot) =>
-    Effect.promise(() => writeFile(snapshotUrl, snapshot))
-  ),
-  Effect.asVoid
-);
+const writeOpenApiSnapshot = Effect.gen(function* () {
+  const fs = yield* FileSystem.FileSystem;
+  const snapshot = yield* formatOpenApiSnapshot(taxKitOpenApiSpec);
+  yield* fs.writeFileString(fileURLToPath(snapshotUrl), snapshot);
+});
 
 describe("TaxKit OpenAPI snapshot", () => {
   it.effect("matches the committed normalized OpenAPI contract snapshot", () =>
@@ -96,6 +100,6 @@ describe("TaxKit OpenAPI snapshot", () => {
           )
         )
       );
-    })
+    }).pipe(Effect.provide(NodeFileSystem.layer))
   );
 });

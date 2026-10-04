@@ -110,6 +110,7 @@
         "effect": "catalog:",
       },
       "devDependencies": {
+        "@effect/platform-node": "catalog:",
         "@effect/vitest": "catalog:",
         "@taxkit/rules-au-pay": "workspace:*",
         "@taxkit/testing": "workspace:*",

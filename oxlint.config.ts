@@ -165,6 +165,8 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  "packages/api/http/__tests__/openapi-snapshot.test.ts",
+  "packages/api/http/__tests__/public-calculation-api.test.ts",
   // Exact representation-boundary tests: deterministic report bytes and secret-negative error JSON.
   "packages/rules/au/pay/test/take-home-pay.test.ts",
   "packages/calculators/__tests__/public-calculator-service.test.ts",
@@ -408,6 +410,8 @@ export default defineConfig({
         "packages/rules/**",
         "packages/calculators/**",
         "tools/oxlint/*.ts",
+        "packages/testing/**",
+        "packages/api/http/**",
       ],
       rules: {
         "strict-effect/error-constructor-new": "error",
@@ -421,6 +425,25 @@ export default defineConfig({
         "strict-effect/no-unsafe-option-unwrap": "error",
         "strict-effect/runtime-file-convention": "error",
         "strict-effect/tagged-error-name": "error",
+      },
+    },
+    {
+      // Fetch's Promise result is a host signature, not workflow orchestration.
+      // The second exact path is its scoped negative/positive CLI fixture.
+      files: [
+        "packages/api/http/src/client/in-process.layer.ts",
+        "tools/oxlint/.generated-fetch-host.ts",
+      ],
+      rules: {
+        "strict-effect/no-promise-workflow": [
+          "error",
+          {
+            allowedFiles: [
+              "packages/api/http/src/client/in-process.layer.ts",
+              "tools/oxlint/.generated-fetch-host.ts",
+            ],
+          },
+        ],
       },
     },
     {

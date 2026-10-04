@@ -502,6 +502,12 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   `check:oxlint:types` checks the tests and their imported lint configuration.
   Success, failure and interruption must remove generated fixtures. Intentional
   source fixtures are excluded from test discovery, not from real CLI coverage.
+- HTTP contract and shared testing-helper suites have explicit TypeScript test
+  projects in their package `check-types` commands. Framework assertions do not
+  narrow tagged unions: fixtures use canonical brands and Effect Match.
+  OpenAPI filesystem and error representation tests own their exact Schema
+  egress admissions. The Fetch signature admission is tested through an exact admitted CLI fixture and a neighbouring canary,
+  without overwriting production source. Oxlint does not support stdin.
 - Every enabled portable custom rule must also have accepted and rejected
   fixtures executed through the installed Oxlint binary with
   `--disable-nested-config`. Direct visitor-unit tests alone are not acceptance

@@ -86,6 +86,42 @@ const fixtureCases = [
     ],
   },
   {
+    accepted: ["packages/testing/src/index.ts"],
+    generated: "packages/testing/src/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
+    accepted: ["packages/api/http/src/client/in-process.layer.ts"],
+    generated: "packages/api/http/src/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
     accepted: ["packages/core/src/graph/rule-graph.ts"],
     generated: "packages/core/src/.generated-strict-rejected.ts",
     namespace: "strict-effect",
@@ -280,3 +316,34 @@ describe("portable Oxlint plugins", () => {
       }).pipe(Effect.provide(BunServices.layer))
   );
 });
+
+// Oxlint has no stdin mode; use one exact admitted fixture and a neighbouring canary.
+test.effect.each([
+  {
+    name: "admits the Fetch result type only at its exact host",
+    path: "tools/oxlint/.generated-fetch-host.ts",
+    rejected: false,
+    source: "export type Handler = (request: Request) => Promise<Response>;",
+  },
+  {
+    name: "rejects an adjacent Promise signature",
+    path: "tools/oxlint/.generated-ordinary.ts",
+    rejected: true,
+    source: "export type Handler = (request: Request) => Promise<Response>;",
+  },
+  {
+    name: "rejects async orchestration even at the Fetch host",
+    path: "tools/oxlint/.generated-fetch-host.ts",
+    rejected: true,
+    source: "export const handler = async () => await Promise.resolve(1);",
+  },
+])("$name", ({ path, source, rejected }) =>
+  Effect.gen(function* () {
+    yield* writeLintFixture(join(repositoryRoot, path), source);
+    const result = yield* lintFiles([path]);
+    expect(result.output.includes("strict-effect(no-promise-workflow)")).toBe(
+      rejected
+    );
+    expect(result.exitCode).toBe(rejected ? 1 : 0);
+  }).pipe(Effect.provide(BunServices.layer))
+);

@@ -15,7 +15,16 @@ import {
 } from "@taxkit/sdk/au/effect";
 import { calculateRunRequest as calculateSdkRunRequest } from "@taxkit/sdk/effect";
 import { expectAt } from "@taxkit/testing";
-import { Array, Cause, Effect, Exit, Layer, Option, Schema } from "effect";
+import {
+  Array,
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  Match,
+  Option,
+  Schema,
+} from "effect";
 
 import { TaxKitApiInProcessClientLive } from "../src/client/server.layer.js";
 import { TaxKitHttpApiService } from "../src/client/service.js";
@@ -108,8 +117,8 @@ describe("TaxKit public calculation HTTP API", () => {
         },
         payload: {
           facts,
-          jurisdiction: "AU",
-          taxYear: "2025-26",
+          jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+          taxYear: AuPayTakeHomeCalculation.taxYear,
         },
         query: {
           help: "errors",
@@ -120,8 +129,8 @@ describe("TaxKit public calculation HTTP API", () => {
         {
           payload: {
             facts,
-            jurisdiction: "AU",
-            taxYear: "2025-26",
+            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+            taxYear: AuPayTakeHomeCalculation.taxYear,
           },
         }
       );
@@ -129,13 +138,17 @@ describe("TaxKit public calculation HTTP API", () => {
         response
       );
 
+      const takeHomeReport = Match.value(response.report).pipe(
+        Match.tag("TakeHomePayReport", (report) => report),
+        Match.orElse(() => expect.fail("Expected take-home report"))
+      );
       expect(response.calculator.calculatorId).toBe("au.pay.take-home");
       expect(response.report._tag).toBe("TakeHomePayReport");
-      expect(response.report.rulePackVersion).toBe("rules-au-pay/1.0.0");
+      expect(takeHomeReport.rulePackVersion).toBe("rules-au-pay/1.0.0");
       expect(decoded).toEqual(sdkResponse);
       expect(response).toEqual(sdkResponse);
-      expect(response.report.withholdingsTotal.cents).toBe(75_600);
-      expect(response.report.netPay.cents).toBe(270_600);
+      expect(takeHomeReport.withholdingsTotal.cents).toBe(75_600);
+      expect(takeHomeReport.netPay.cents).toBe(270_600);
       expect(response.diagnostics.graphIssues.length).toBe(0);
 
       const annualTaxResponse = yield* client.calculatorApi.calculate({
@@ -144,16 +157,18 @@ describe("TaxKit public calculation HTTP API", () => {
         },
         payload: {
           facts: { taxableIncome: aud(9_000_000) },
-          jurisdiction: "AU",
-          taxYear: "2025-26",
+          jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+          taxYear: AuPayTakeHomeCalculation.taxYear,
         },
         query: {},
       });
 
-      expect(annualTaxResponse.report._tag).toBe("AnnualTaxReport");
-      expect(annualTaxResponse.report.rulePackVersion).toBe(
-        "rules-au-income-tax/1.0.0"
+      const annualReport = Match.value(annualTaxResponse.report).pipe(
+        Match.tag("AnnualTaxReport", (report) => report),
+        Match.orElse(() => expect.fail("Expected annual tax report"))
       );
+      expect(annualTaxResponse.report._tag).toBe("AnnualTaxReport");
+      expect(annualReport.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
     }).pipe(Effect.provide(TestLive))
   );
 
@@ -174,8 +189,8 @@ describe("TaxKit public calculation HTTP API", () => {
             },
             payload: {
               facts: invalidFacts,
-              jurisdiction: "AU",
-              taxYear: "2025-26",
+              jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+              taxYear: AuPayTakeHomeCalculation.taxYear,
             },
             query: {
               help: "errors",
@@ -189,8 +204,8 @@ describe("TaxKit public calculation HTTP API", () => {
             payload: {
               // @ts-expect-error runtime parity covers invalid external input after the typed boundary is bypassed.
               facts: invalidFacts,
-              jurisdiction: "AU",
-              taxYear: "2025-26",
+              jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+              taxYear: AuPayTakeHomeCalculation.taxYear,
             },
           }
         ).pipe(Effect.exit);
@@ -200,8 +215,8 @@ describe("TaxKit public calculation HTTP API", () => {
             help: "errors",
             payload: {
               facts: invalidFacts,
-              jurisdiction: "AU",
-              taxYear: "2025-26",
+              jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+              taxYear: AuPayTakeHomeCalculation.taxYear,
             },
           })
           .pipe(Effect.exit);
@@ -240,9 +255,13 @@ describe("TaxKit public calculation HTTP API", () => {
         const envelope = yield* Schema.decodeUnknownEffect(
           CalculatorApiErrorEnvelope
         )(failure.error);
-        const calculatorError = yield* Schema.decodeUnknownEffect(
+        const decodedCalculatorError = yield* Schema.decodeUnknownEffect(
           CalculatorServiceError
         )(envelope.error);
+        const calculatorError = Match.value(decodedCalculatorError).pipe(
+          Match.tag("CalculatorInputDecodeError", (error) => error),
+          Match.orElse(() => expect.fail("Expected calculator input error"))
+        );
         const inputHelp = Option.fromNullishOr(calculatorError.help).pipe(
           Option.match({
             onNone: Array.empty,
@@ -261,8 +280,11 @@ describe("TaxKit public calculation HTTP API", () => {
           "Invalid calculator input value"
         );
         expect(expectAt(inputHelp, 0).factId).toBe(GrossPayDescriptor.id);
-        expect(JSON.stringify(envelope)).not.toContain(secretSentinel);
-        expect(JSON.stringify(envelope)).not.toContain(privatePathSentinel);
+        const serializedEnvelope = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CalculatorApiErrorEnvelope)
+        )(envelope);
+        expect(serializedEnvelope).not.toContain(secretSentinel);
+        expect(serializedEnvelope).not.toContain(privatePathSentinel);
       }).pipe(Effect.provide(TestLive))
   );
 });
