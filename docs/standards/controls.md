@@ -38,8 +38,13 @@ The same scoped runner also executes four clean-slate enforcement mutations
 from `fixtures/strict-enforcement-defects.json`. Each changes only the copied
 lint configuration and runs the real `test:oxlint:task` verifier. Removed/disabled
 required rules and broadened synthetic assignment/method admissions must fail.
-The fixture Schema admits exactly the four named modes; the test asserts the
-complete ordered corpus. The target and command are fixed in code. Synthetic
+The fixture Schema admits exactly the four named modes; each named test asserts
+the complete ordered corpus and selects exactly one fixture. All ten deliberate
+faults have independent scoped repository copies, results and finite five-minute
+test deadlines. The source-only documentation check is a separate named test,
+with a temporary Git index and no package build before or after its command.
+Grouping a growing lint corpus under one shared deadline previously timed out
+on the hosted runner; the deadline length and all rejection assertions remain. The target and command are fixed in code. Synthetic
 canary exceptions admit no production source. Retain the existing five-control
 register and six release-boundary oracles; this adds attached T002 proof.
 

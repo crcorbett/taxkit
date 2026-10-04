@@ -211,34 +211,15 @@ const expected = {
 } as const;
 
 describe("HGI-205 isolated release-boundary mutations", () => {
+  // Each deliberate fault gets the existing finite deadline. A larger lint
+  // corpus must not make later faults share an already spent test deadline.
   test.effect(
-    "rejects removed rules and broadened collection admissions with the real verifier",
+    "runs documentation tools in a fresh source-only checkout",
     () =>
       Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
         const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
-        const fixtures = yield* fs
-          .readFileString(
-            path.join(
-              repositoryRoot,
-              "tools/quality-workflow/fixtures/strict-enforcement-defects.json"
-            )
-          )
-          .pipe(
-            Effect.flatMap(
-              Schema.decodeEffect(
-                Schema.fromJsonString(StrictEnforcementFixtureCorpus),
-                { onExcessProperty: "error" }
-              )
-            )
-          );
-        expect(EffectArray.map(fixtures, (fixture) => fixture.id)).toEqual([
-          "required-rule-removed",
-          "required-rule-disabled",
-          "assignment-admission-broadened",
-          "method-admission-broadened",
-        ]);
         const workspace = yield* prepareWorkspace(repositoryRoot);
         // A fresh source-only copy must run tool tests before any package build.
         // Documentation command fixtures need only this temporary local Git index.
@@ -267,9 +248,55 @@ describe("HGI-205 isolated release-boundary mutations", () => {
           sourceTests.exitCode,
           `${sourceTests.stderr}\n${sourceTests.stdout}`
         ).toBe(0);
+        expect(
+          yield* fs.exists(path.join(workspace, "packages/scripts/dist"))
+        ).toBe(false);
+      }).pipe(Effect.provide(BunServices.layer)),
+    300_000
+  );
+
+  test.effect.each([
+    "required-rule-removed",
+    "required-rule-disabled",
+    "assignment-admission-broadened",
+    "method-admission-broadened",
+  ] as const)(
+    "rejects %s with the real verifier",
+    (fixtureId) =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+        const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
+        const fixtures = yield* fs
+          .readFileString(
+            path.join(
+              repositoryRoot,
+              "tools/quality-workflow/fixtures/strict-enforcement-defects.json"
+            )
+          )
+          .pipe(
+            Effect.flatMap(
+              Schema.decodeEffect(
+                Schema.fromJsonString(StrictEnforcementFixtureCorpus),
+                { onExcessProperty: "error" }
+              )
+            )
+          );
+        expect(EffectArray.map(fixtures, (fixture) => fixture.id)).toEqual([
+          "required-rule-removed",
+          "required-rule-disabled",
+          "assignment-admission-broadened",
+          "method-admission-broadened",
+        ]);
+        const workspace = yield* prepareWorkspace(repositoryRoot);
+        const selected = EffectArray.filter(
+          fixtures,
+          (fixture) => fixture.id === fixtureId
+        );
+        expect(selected).toHaveLength(1);
         const target = path.join(workspace, "oxlint.config.ts");
         const source = yield* fs.readFileString(target);
-        yield* Effect.forEach(fixtures, (fixture) =>
+        yield* Effect.forEach(selected, (fixture) =>
           Effect.gen(function* () {
             expect(source.split(fixture.mutation.search)).toHaveLength(2);
             yield* fs.writeFileString(
@@ -294,9 +321,16 @@ describe("HGI-205 isolated release-boundary mutations", () => {
     300_000
   );
 
-  test.effect(
-    "executes every real owning command and retains exact failure identity",
-    () =>
+  test.effect.each([
+    "api-contract",
+    "packed-sdk",
+    "public-docs-manifest",
+    "public-export",
+    "release-script",
+    "workflow-semantics",
+  ] as const)(
+    "executes the real %s command and retains exact failure identity",
+    (fixtureId) =>
       Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
@@ -316,7 +350,20 @@ describe("HGI-205 isolated release-boundary mutations", () => {
               )
             )
           );
-        yield* Effect.forEach(fixtures, (fixture) =>
+        expect(EffectArray.map(fixtures, (fixture) => fixture.id)).toEqual([
+          "public-export",
+          "packed-sdk",
+          "api-contract",
+          "public-docs-manifest",
+          "workflow-semantics",
+          "release-script",
+        ]);
+        const selected = EffectArray.filter(
+          fixtures,
+          (fixture) => fixture.id === fixtureId
+        );
+        expect(selected).toHaveLength(1);
+        yield* Effect.forEach(selected, (fixture) =>
           Effect.gen(function* () {
             const workspace = yield* prepareWorkspace(repositoryRoot);
             const contract = Match.value(fixture.id).pipe(

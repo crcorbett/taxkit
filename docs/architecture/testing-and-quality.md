@@ -696,7 +696,10 @@ verification. A readLink assertion proves the actual canonical symlink target.
 
 The Quality-workflow test owner uses Bun-hosted Effect Vitest, Effect FileSystem,
 and scoped platform child processes. Its isolated release-boundary suite runs
-all six retained owning commands from temporary repository copies, preserves
+all six retained owning commands and four strict-enforcement mutations as
+independent named tests with their existing five-minute deadlines and scoped
+temporary repository copies. A separate test proves documentation tools work
+before any package build in a fresh source-only copy. The suite preserves
 relative links and removes each copy on completion or interruption. The native
 Effect Bun HTTP server owns the short-lived loopback-port reservation. Its
 policy source and tests have a focused `check:quality-workflow:types` project in

@@ -1375,3 +1375,44 @@ DEV-73 remains unfinished, followed by DEV-74–81. The separate Medicare decisi
 remains pending. Parent draft #118 revision
 `4a1abfc00caf9493d22b1ca8e19eb364c5c4ab14` is locally qualified; its hosted
 run `37200459089` does not qualify this later test revision.
+
+
+## Local T002 isolated Quality fixture deadlines
+
+The exact #118 checker revision `4a1abfc00caf9493d22b1ca8e19eb364c5c4ab14`
+failed hosted run `37200459089`: the four strict mutation cases and fresh-source
+documentation command shared one 300000ms test deadline; it expired at 301225ms.
+Twenty of 21 Quality cases passed, including the other six real-command defects.
+Local #118 and #119 qualification passed; neither local pass establishes hosted
+success. The runner log reported a deadline expiry, not a rejection assertion. The
+unchanged grouped owner also timed out for #119 run `37201123414`, exact
+revision `4cb71a3f49f6125e201603b1b132c569d43d3b2b`, at 301155ms with 20/21
+Quality cases passing. Both failures are retained in the corrective receipt.
+
+Every one of the ten deliberate faults now gets an independent named native
+test, scoped copy and the same finite 300000ms deadline. A separate named test
+proves documentation tools work in a fresh source-only copy, with a temporary
+Git index and no package build before or after the command. Each mutation still
+requires the owning command to fail with its exact recorded oracle. Complete
+ordered corpora and exactly-one selected fixture are asserted in every test;
+mutation bytes, owning commands, failure oracles and recovery are unchanged.
+The Quality suite now has 30 cases (19 policy plus eleven isolated tests).
+Final local qualification passes: frozen unchanged 792-install/1020-package
+graph, actual 321-case root lint corpus, complete 23-task package tests and
+15-task build replaying matching caches, and full verification with all 30
+Quality cases/all ten isolated faults/separate fresh-source docs (257.01 seconds).
+The four strict cases each take 43.934–44.871 seconds locally. Deployment-tool,
+skill and evaluation cases pass (176/21/16), as do both unused-code profiles.
+Compiler and unchanged SDK/web Chromium replay matching caches. Hosted
+qualification of this later correction remains separate and pending.
+
+Documentation impact: **Change required** for the Quality test owner, controls
+standard, testing architecture, T002 ledger, active plan and dated receipt.
+**Preserve** all ten mutation contracts, historical HGI proof, command/CI/cache
+policy, canonical skills/digests, package selections/exports and tax results.
+**N/A** Changeset (internal repository test only), app/public/generated content,
+operational runbook procedure and provider state. Revert the complete slice to
+recover. DEV-73 remains unfinished, followed by DEV-74–81; the Medicare decision
+remains separate and pending. This corrective slice follows local draft #119
+`4cb71a3f49f6125e201603b1b132c569d43d3b2b`; neither parent hosted outcome is
+silently replaced by this later correction.
