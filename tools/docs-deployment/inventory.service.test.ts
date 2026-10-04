@@ -1,5 +1,5 @@
-import { Effect, Schema } from "effect";
-import { describe, expect, test } from "vitest";
+import { describe, expect, it as test } from "@effect/vitest";
+import { Effect, Result, Schema } from "effect";
 
 import { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 import { requireDocsDeploymentInventoryAgreement } from "./inventory.service.js";
@@ -38,45 +38,47 @@ const rawReport = {
 };
 
 const decodeReport = (input: typeof Schema.Unknown.Type) =>
-  Effect.runPromise(
-    Schema.decodeUnknownEffect(DocsDeploymentInventoryReport)(input)
-  );
+  Schema.decodeUnknownEffect(DocsDeploymentInventoryReport)(input);
 
 describe("docs deployment state/provider inventory", () => {
-  test("accepts the exact TaxKit stack when state and provider agree", async () => {
-    const report = await decodeReport(rawReport);
-    await expect(
-      Effect.runPromise(
-        requireDocsDeploymentInventoryAgreement(
-          report.stages,
-          report.providerWorkers
-        )
-      )
-    ).resolves.toBeUndefined();
-  });
+  test.effect(
+    "accepts the exact TaxKit stack when state and provider agree",
+    () =>
+      Effect.gen(function* () {
+        const report = yield* decodeReport(rawReport);
+        expect(
+          yield* requireDocsDeploymentInventoryAgreement(
+            report.stages,
+            report.providerWorkers
+          )
+        ).toBeUndefined();
+      })
+  );
 
-  test("rejects state and provider Worker disagreement", async () => {
-    const report = await decodeReport(rawReport);
-    const contaminated = await decodeReport({
-      ...rawReport,
-      providerWorkers: [
-        {
-          logicalId: "DocsWebsite",
-          stage: "prod",
-          workerName: "taxkitdocscloudflare-docswebsite-prod-provider-only",
-        },
-      ],
-    });
-    await expect(
-      Effect.runPromise(
-        requireDocsDeploymentInventoryAgreement(
-          report.stages,
-          contaminated.providerWorkers
-        )
-      )
-    ).rejects.toHaveProperty(
-      "_tag",
-      "DocsDeploymentInventoryDisagreementError"
-    );
-  });
+  test.effect("rejects state and provider Worker disagreement", () =>
+    Effect.gen(function* () {
+      const report = yield* decodeReport(rawReport);
+      const contaminated = yield* decodeReport({
+        ...rawReport,
+        providerWorkers: [
+          {
+            logicalId: "DocsWebsite",
+            stage: "prod",
+            workerName: "taxkitdocscloudflare-docswebsite-prod-provider-only",
+          },
+        ],
+      });
+      const result = yield* requireDocsDeploymentInventoryAgreement(
+        report.stages,
+        contaminated.providerWorkers
+      ).pipe(Effect.result);
+      expect(Result.isFailure(result)).toBe(true);
+      Result.match(result, {
+        onFailure: (error) =>
+          expect(error._tag).toBe("DocsDeploymentInventoryDisagreementError"),
+        onSuccess: () =>
+          expect.fail("Mismatched Workers must remain a failure."),
+      });
+    })
+  );
 });

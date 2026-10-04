@@ -297,10 +297,10 @@ describe("docs deployment workflow admission", () => {
         '"passThroughEnv": ["ALCHEMY_PROFILE", "CLOUDFLARE_*", "TAXKIT_*"]'
       );
       expect(inventoryRuntime).toContain(
-        '"TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT"'
+        "config.TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT"
       );
-      expect(inventoryRuntime).toContain(
-        "fileSystem.writeFileString(path, output)"
+      expect(inventoryRuntime.replaceAll(/\s+/gu, "")).toContain(
+        "fileSystem.writeFileString(path,output)"
       );
       yield* Effect.forEach(workflows, (workflow) =>
         Effect.sync(() => {

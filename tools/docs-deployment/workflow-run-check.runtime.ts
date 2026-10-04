@@ -12,29 +12,6 @@ import { DeploymentWorkflowRunReadback } from "./workflow-receipts.schemas.js";
 
 const check = "workflow-run" as const;
 
-const isTeardownPath = (workflowPath: string) =>
-  workflowPath.endsWith("docs-preview-teardown.yml");
-
-const isAllowedEvent = (workflowPath: string, workflowEvent: string) => {
-  if (isTeardownPath(workflowPath)) {
-    return (
-      workflowEvent === "pull_request" || workflowEvent === "workflow_dispatch"
-    );
-  }
-  return workflowEvent === "workflow_dispatch";
-};
-
-const hasSourceIdentityMismatch = (
-  workflowPath: string,
-  workflowEvent: string,
-  workflowHeadBranch: string,
-  workflowHeadSha: string,
-  workflowCommit: string
-) =>
-  !isAllowedEvent(workflowPath, workflowEvent) ||
-  (!isTeardownPath(workflowPath) &&
-    (workflowHeadBranch !== "main" || workflowHeadSha !== workflowCommit));
-
 export const checkWorkflowRun = Effect.gen(function* workflowRunCheck() {
   const config = yield* Config.schema(WorkflowRunCheckConfig).pipe(
     Effect.mapError(
@@ -61,25 +38,34 @@ export const checkWorkflowRun = Effect.gen(function* workflowRunCheck() {
     receipt.status !== "completed" ||
     receipt.conclusion !== "success"
   ) {
-    return yield* new WorkflowCheckMismatchError({
-      check,
-      invariant: "completed-source-run",
-    });
+    return yield* Effect.fail(
+      new WorkflowCheckMismatchError({
+        check,
+        invariant: "completed-source-run",
+      })
+    );
   }
 
+  const teardown = config.TAXKIT_WORKFLOW_RUN_WORKFLOW_PATH.endsWith(
+    "docs-preview-teardown.yml"
+  );
+  const allowedEvent = teardown
+    ? config.TAXKIT_WORKFLOW_RUN_EVENT === "pull_request" ||
+      config.TAXKIT_WORKFLOW_RUN_EVENT === "workflow_dispatch"
+    : config.TAXKIT_WORKFLOW_RUN_EVENT === "workflow_dispatch";
   if (
-    hasSourceIdentityMismatch(
-      config.TAXKIT_WORKFLOW_RUN_WORKFLOW_PATH,
-      config.TAXKIT_WORKFLOW_RUN_EVENT,
-      config.TAXKIT_WORKFLOW_RUN_HEAD_BRANCH,
-      config.TAXKIT_WORKFLOW_RUN_HEAD_SHA,
-      config.TAXKIT_WORKFLOW_RUN_WORKFLOW_COMMIT
-    )
+    !allowedEvent ||
+    (!teardown &&
+      (config.TAXKIT_WORKFLOW_RUN_HEAD_BRANCH !== "main" ||
+        config.TAXKIT_WORKFLOW_RUN_HEAD_SHA !==
+          config.TAXKIT_WORKFLOW_RUN_WORKFLOW_COMMIT))
   ) {
-    return yield* new WorkflowCheckMismatchError({
-      check,
-      invariant: "allowed-source-event-identity",
-    });
+    return yield* Effect.fail(
+      new WorkflowCheckMismatchError({
+        check,
+        invariant: "allowed-source-event-identity",
+      })
+    );
   }
 
   yield* Console.log(
@@ -101,6 +87,8 @@ const program = checkWorkflowRun.pipe(
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(program, { disableErrorReporting: true })
+  ),
   Match.orElse(() => false)
 );

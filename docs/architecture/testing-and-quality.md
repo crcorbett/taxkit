@@ -760,3 +760,15 @@ Crypto errors. Three changed-provider examples vary deployment ID, version ID
 and state-bundle digest while outer identities still agree, proving that Schema
 field equality protects the complete provider record. Real lint fixtures cover
 six adopted files, their rejected neighbour and the exact command admission.
+
+
+Inventory tests use native synthetic Alchemy State/Worker services and a separate
+checked-report test Layer. They preserve the old agreement assertions and check
+named stack/resource requests, invalid replies, safe read/write failures, exact
+pretty report bytes, Config defaults and explicitly empty settings, other-stack
+filtering and first matching ownership tags. Interrupting the inventory operation
+cleans up all three unfinished initial reads. Actual lint tests qualify the eleven
+adopted inventory/workflow files, reject their neighbour and check four exact
+command runtime admissions. Source checks still require credential decoding and
+cache-safe workflow output, following the owning Config Schema and ignoring only
+formatting whitespace. Saved receipts remain distinct from current provider proof.

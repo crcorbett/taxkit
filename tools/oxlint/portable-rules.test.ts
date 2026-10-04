@@ -371,6 +371,36 @@ const fixtureCases = [
     ],
   },
   {
+    accepted: [
+      "tools/docs-deployment/inventory.service.ts",
+      "tools/docs-deployment/inventory.service.test.ts",
+      "tools/docs-deployment/inventory.live.layer.ts",
+      "tools/docs-deployment/inventory.live.layer.test.ts",
+      "tools/docs-deployment/inventory.test.layer.ts",
+      "tools/docs-deployment/inventory.report.egress.ts",
+      "tools/docs-deployment/inventory.runtime.ts",
+      "tools/docs-deployment/inventory.runtime.test.ts",
+      "tools/docs-deployment/workflow-proof-check.runtime.ts",
+      "tools/docs-deployment/workflow-run-check.runtime.ts",
+      "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
+    ],
+    generated: "tools/docs-deployment/.generated-inventory-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
     accepted: ["tools/skills/skill-policies.test.ts"],
     generated: "tools/skills/.generated-strict-rejected.ts",
     namespace: "strict-effect",
@@ -848,6 +878,10 @@ test.each([
   "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/check.runtime.ts",
+  "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-run-check.runtime.ts",
+  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ])("keeps the command runtime admission exact: %s", (path) => {
   expect(
     Array.filter(

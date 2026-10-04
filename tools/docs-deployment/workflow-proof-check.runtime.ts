@@ -7,6 +7,7 @@ import {
   Effect,
   HashSet,
   Match,
+  Option,
 } from "effect";
 import * as Path from "effect/Path";
 
@@ -102,17 +103,23 @@ export const checkWorkflowProof = Effect.gen(function* workflowProofCheck() {
         !HashSet.has(screenshotKinds, "mobile"),
       EffectArray.some(
         hosted.screenshots,
-        (screenshot, index) => screenshot.sha256 !== screenshotDigests[index]
+        (screenshot, index) =>
+          !Option.exists(
+            EffectArray.get(screenshotDigests, index),
+            (digest) => screenshot.sha256 === digest
+          )
       ),
     ],
     Boolean
   );
 
   if (mismatch) {
-    return yield* new WorkflowCheckMismatchError({
-      check,
-      invariant: "provider-hosted-identity-diagnostics-screenshots",
-    });
+    return yield* Effect.fail(
+      new WorkflowCheckMismatchError({
+        check,
+        invariant: "provider-hosted-identity-diagnostics-screenshots",
+      })
+    );
   }
 
   yield* Console.log(
@@ -134,6 +141,8 @@ const program = checkWorkflowProof.pipe(
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(program, { disableErrorReporting: true })
+  ),
   Match.orElse(() => false)
 );

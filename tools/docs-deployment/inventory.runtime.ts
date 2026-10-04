@@ -17,7 +17,6 @@ import {
   Match,
   Option,
   Redacted,
-  Schema,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
@@ -26,26 +25,19 @@ import {
   readDocsDeploymentStateStoreCredentials,
   requireDocsDeploymentStateStoreAccount,
 } from "./inventory-credentials.boundary.js";
+import { DocsDeploymentInventoryLive } from "./inventory.live.layer.js";
+import { encodeDocsDeploymentInventoryReport } from "./inventory.report.egress.js";
 import type { DocsDeploymentStateStoreCredentials } from "./inventory.schemas.js";
 import {
   DocsDeploymentInventoryInputError,
-  DocsDeploymentInventoryReport,
+  DocsDeploymentInventoryOutputError,
+  DocsDeploymentInventoryRuntimeConfig,
 } from "./inventory.schemas.js";
-import {
-  DocsDeploymentInventory,
-  DocsDeploymentInventoryLive,
-} from "./inventory.service.js";
+import { DocsDeploymentInventory } from "./inventory.service.js";
 
-const InventoryRuntimeConfig = Config.unwrap({
-  ci: Config.schema(Schema.Literals(["1", "true"]), "CI"),
-  profile: Config.String("ALCHEMY_PROFILE").pipe(Config.withDefault("default")),
-  reportPath: Config.String("TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT").pipe(
-    Config.option
-  ),
-  stateCredentialsJson: Config.Redacted(
-    "ALCHEMY_STATE_STORE_CREDENTIALS_JSON"
-  ).pipe(Config.option),
-});
+const InventoryRuntimeConfig = Config.schema(
+  DocsDeploymentInventoryRuntimeConfig
+);
 
 const deploymentStack = {
   actions: {},
@@ -91,30 +83,35 @@ const makeReadOnlyStateLayer = (
   );
 
 const makeInventoryLayer = (credentials: DocsDeploymentStateStoreCredentials) =>
-  Layer.merge(
-    DocsDeploymentInventoryLive,
-    Layer.merge(
-      makeReadOnlyStateLayer(credentials),
-      Cloudflare.Workers.LiveWorkerProvider().pipe(
-        Layer.provideMerge(cloudflareApiLayer)
+  DocsDeploymentInventoryLive.pipe(
+    Layer.provideMerge(
+      Layer.merge(
+        makeReadOnlyStateLayer(credentials),
+        Cloudflare.Workers.LiveWorkerProvider().pipe(
+          Layer.provideMerge(cloudflareApiLayer)
+        )
       )
     )
   );
 
-const readInventoryProgram = (reportPath: Option.Option<string>) =>
+export const readInventoryProgram = (reportPath: Option.Option<string>) =>
   Effect.gen(function* readInventory() {
     const inventory = yield* DocsDeploymentInventory;
-    const report = yield* inventory.read();
-    const encoded = yield* Schema.encodeUnknownEffect(
-      DocsDeploymentInventoryReport
-    )(report);
-    const output = `${JSON.stringify(encoded, null, 2)}\n`;
+    const report = yield* inventory.read;
+    const output = yield* encodeDocsDeploymentInventoryReport(report);
     yield* Option.match(reportPath, {
       onNone: () => Console.log(output.trimEnd()),
       onSome: (path) =>
         FileSystem.FileSystem.pipe(
           Effect.flatMap((fileSystem) =>
-            fileSystem.writeFileString(path, output)
+            fileSystem
+              .writeFileString(path, output)
+              .pipe(
+                Effect.mapError(
+                  () =>
+                    new DocsDeploymentInventoryOutputError({ reason: "write" })
+                )
+              )
           )
         ),
     });
@@ -131,16 +128,16 @@ const program = Effect.gen(function* inventoryProgram() {
   );
   const decodedStateCredentials =
     yield* readDocsDeploymentStateStoreCredentials(
-      credentialsFilePath(config.profile, "cloudflare-state-store"),
-      config.stateCredentialsJson
+      credentialsFilePath(config.ALCHEMY_PROFILE, "cloudflare-state-store"),
+      config.ALCHEMY_STATE_STORE_CREDENTIALS_JSON
     );
   yield* requireDocsDeploymentStateStoreAccount(
     currentEnvironment.accountId,
     decodedStateCredentials
   );
-  return yield* readInventoryProgram(config.reportPath).pipe(
-    Effect.provide(makeInventoryLayer(decodedStateCredentials))
-  );
+  return yield* readInventoryProgram(
+    config.TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT
+  ).pipe(Effect.provide(makeInventoryLayer(decodedStateCredentials)));
 }).pipe(
   Effect.tapErrorTag("DocsDeploymentInventoryInputError", (error) =>
     Console.error(
@@ -157,11 +154,16 @@ const program = Effect.gen(function* inventoryProgram() {
   Effect.tapErrorTag("DocsDeploymentInventoryDisagreementError", (error) =>
     Console.error(`FAIL [inventory-disagreement] ${error.findings.join("; ")}`)
   ),
+  Effect.tapErrorTag("DocsDeploymentInventoryOutputError", (error) =>
+    Console.error(`FAIL [inventory-output] reason=${error.reason}`)
+  ),
   Effect.provide(cloudflareApiLayer),
   Effect.scoped
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(program, { disableErrorReporting: true })
+  ),
   Match.orElse(() => false)
 );

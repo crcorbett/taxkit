@@ -980,3 +980,42 @@ and retained tax results. **N/A** Changesets, public content and operations:
 root local checks only. Recover by reverting the complete slice; provider and
 registry state are unchanged. Full qualification and hosted proof are separate.
 Provider inventory and other T002 owners, then DEV-74–81, remain unfinished.
+
+
+## Local T002 inventory and remaining workflow checks
+
+Continue from #111 `391d513158f0a40c9922858a614a573d2779e68a`;
+its hosted Quality passed in run 37189852276. The inventory service now exposes
+one checked named read. Native State/Worker services are private to the live
+Layer and acquired once. Each external reply is checked beside its read with
+safe named failures. Preserve bounded concurrency, stack filtering, the first
+matching ownership tag, exact agreement findings and saved report bytes.
+A test Layer substitutes a checked report. Configuration has one owning Schema;
+report JSON encoding and safe write failure have explicit owners. The remaining
+workflow proof/run/teardown commands use checked selections, explicit typed
+failures and bounded runtime reporting, retaining original receipt guards.
+
+Eleven adopted files receive the full strict policy, their rejected neighbour
+fails, and four commands alone have exact runtime admissions. Remove obsolete
+Bun/process and historical inventory-test execution permissions. The existing
+155 deployment-tool cases remain; 21 added cases cover native service ingress,
+provider failure redaction, named requests, other stacks/first tag semantics,
+parallel interruption cleanup, exact pretty JSON, test-Layer substitution,
+write refusal and Schema-backed Config/default/empty/CI behaviour. Focused
+176 tool cases, 241 actual lint cases and type/lint checks pass. Frozen install
+(790 installs/1020 packages, unchanged lock), complete tests, the 15-task build
+and full verification passed. All 21 Quality cases/ten deliberate faults, fresh
+source-only documentation, 21 skill cases, 16 evaluation cases and both Chromium
+suites passed. Matching package/build/browser caches were reused. Final docs,
+runbook, formatting and diff checks precede commit; hosted proof is separate.
+
+Documentation impact: **Change required** for inventory service/live/test/egress/
+Schema/runtime, workflow command/source checks, lint config/fixtures, README,
+tooling/testing, this plan/task ledger and the dated inventory receipt.
+**Preserve** saved receipts/capture bytes, report representation, original guard
+and finding order, workflow/register/runbook authority, package exports, lock,
+canonical skills/assets and retained tax results. **N/A** Changesets, public
+content and provider operations: local root tools only. Recover by reverting
+this complete slice. DEV-73 and DEV-74–81 remain unfinished; other root scripts,
+checked JavaScript, SDK/app/infrastructure and readonly/Schema/helper/lifetime
+review remain. No inventory command or current provider read has been run.

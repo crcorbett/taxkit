@@ -70,9 +70,10 @@ const decodingBoundaryFiles = [
   "tools/docs-deployment/inventory-credentials.boundary.ts",
   "tools/docs-deployment/workflow-check.boundary.ts",
   "tools/docs-deployment/automation.policy.test.ts",
-  "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/inventory.service.test.ts",
-  "tools/docs-deployment/inventory.service.ts",
+  // Synthetic report ingress for the inventory caller and output boundary.
+  "tools/docs-deployment/inventory.runtime.test.ts",
+  "tools/docs-deployment/inventory.live.layer.ts",
   "tools/docs-deployment/policy.test.ts",
   "tools/docs-deployment/workflow-evidence.test.ts",
   "tools/docs-deployment/workflow-evidence.ts",
@@ -185,6 +186,9 @@ const portableEffectSourceFiles = [
   "tools/docs-deployment/workflow-evidence*.ts",
   "tools/docs-deployment/automation*.ts",
   "tools/docs-deployment/{policy*,check.runtime*,schemas,retained-record*}.ts",
+  "tools/docs-deployment/inventory*.ts",
+  "tools/docs-deployment/workflow-{proof,run,teardown-proof}-check*.ts",
+  "tools/docs-deployment/.generated-inventory-strict-rejected.ts",
   "tools/docs-deployment/.generated-retained-proof-strict-rejected.ts",
   "tools/docs-deployment/workflow-receipts.schemas.ts",
   "tools/docs-deployment/.generated-automation-strict-rejected.ts",
@@ -192,6 +196,7 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  "tools/docs-deployment/inventory.report.egress.ts",
   // Canonical JSON bytes used only to bind immutable saved-record fingerprints.
   "tools/docs-deployment/retained-record.egress.ts",
   "tools/docs-deployment/automation.check.runtime.test.ts",
@@ -285,7 +290,6 @@ const runtimeBoundaryFiles = [
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/doppler-custody.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/inventory.service.test.ts",
   "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/workflow-artifact.runtime.ts",
   "tools/docs-deployment/workflow-evidence.runtime.ts",
@@ -313,15 +317,11 @@ const processBoundaryFiles = [
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
-  "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/local-doppler.test.ts",
   "tools/docs-deployment/workflow-evidence.runtime.ts",
-  "tools/docs-deployment/workflow-proof-check.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
-  "tools/docs-deployment/workflow-run-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
-  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 const consoleBoundaryFiles = [
@@ -363,11 +363,7 @@ const bunAdapterFiles = [
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/governance/check.runtime.ts",
-  "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/workflow-proof-check.runtime.ts",
-  "tools/docs-deployment/workflow-run-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
-  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
@@ -471,6 +467,9 @@ export default defineConfig({
         "tools/docs-deployment/workflow-evidence*.ts",
         "tools/docs-deployment/automation*.ts",
         "tools/docs-deployment/{policy*,check.runtime*,schemas,retained-record*}.ts",
+        "tools/docs-deployment/inventory*.ts",
+        "tools/docs-deployment/workflow-{proof,run,teardown-proof}-check*.ts",
+        "tools/docs-deployment/.generated-inventory-strict-rejected.ts",
         "tools/docs-deployment/.generated-retained-proof-strict-rejected.ts",
         "tools/docs-deployment/workflow-receipts.schemas.ts",
         "tools/docs-deployment/.generated-automation-strict-rejected.ts",
@@ -615,6 +614,54 @@ export default defineConfig({
           {
             allowedFiles: [
               "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/inventory.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/docs-deployment/inventory.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/workflow-proof-check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/docs-deployment/workflow-proof-check.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/workflow-run-check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/docs-deployment/workflow-run-check.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/workflow-teardown-proof-check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
             ],
           },
         ],

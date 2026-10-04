@@ -54,8 +54,15 @@ operator procedure and authority live in
   Its command has one exact strict runtime admission; ordinary files and tests
   have none. Raw Alchemy output, stderr,
   inventories and hosted diagnostics remain in the runner work directory.
-- `inventory.runtime.ts` is the provider/state readback composition owner. It
-  remains read-only unless a separately authorized workflow owns mutation.
+- `inventory.service.ts` exposes the checked `read` operation and pure agreement
+  policy. `inventory.live.layer.ts` privately captures Alchemy State and Worker
+  services once, checks each actual reply beside its read, and preserves the
+  original bounded concurrency and first matching ownership tags. The test
+  Layer substitutes a checked report without provider access.
+- `inventory.runtime.ts` composes the live provider/state services and the owning
+  configuration Schema. `inventory.report.egress.ts` encodes the saved pretty
+  JSON and newline; encoding/write failures have closed safe reasons. The
+  report-only command performs no mutations and prints no underlying errors.
 - `local-doppler-environment.boundary.ts` restores the full flat environment
   through Effect ConfigProvider, preserving empty values and underscored names.
   Its typed errors reveal no environment values; the runtime composes the live
@@ -184,3 +191,14 @@ The historical tests use Effect Vitest; fixed fingerprints and failure examples
 check numeric/nested keys, insertion/array order, non-finite values and safe
 service errors. The command alone has an exact execution admission and reports
 bounded failures. Its operation counts describe retained records only.
+
+Inventory and workflow proof/run/teardown check files receive the strict policy
+with actual accepted/rejected lint fixtures. Only their four named commands have
+exact runtime admissions. Unused raw Bun/process permissions and the old inventory
+test's runtime permission are removed. Workflow receipt guards and finding order
+remain; one-use source-event helpers now read as local checked values. Synthetic
+native service tests cover named reads, invalid version/stage/resource/attributes/
+worker/tag replies, safe provider failures, other stacks, original first-tag
+selection and cancellation cleanup. Caller tests cover test-Layer substitution,
+exact saved JSON bytes, write refusal, Config defaults/empty values and CI refusal.
+These tests make no current provider request. Other DEV-73 owners remain pending.

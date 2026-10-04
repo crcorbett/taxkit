@@ -506,3 +506,12 @@ and the historical test's execution permission are removed. Canonical saved
 record JSON encoding is admitted only in `retained-record.egress.ts`. It retains
 the original key ordering for stored SHA-256 proof. Internal provider equality
 uses the owning Schema's field comparison; it does not serialise records.
+
+
+Inventory service/live/test/report-egress and workflow proof/run/teardown command
+files now receive all eleven strict rules. Actual lint fixtures accept each
+adopted file and reject its generated neighbour. Only the four named commands
+have exact runtime admission. Unused Bun/process and inventory-test execution
+permissions are removed; report encoding and synthetic report ingress have exact
+reviewed owners. Native SDK services remain private to the live Layer and runtime
+composition. Configuration uses its owning Schema; callers receive checked reports.

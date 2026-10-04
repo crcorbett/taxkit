@@ -224,7 +224,8 @@ const inspectCredentialBoundary = (
     'onExcessProperty: "error"',
   ] as const;
   const runtimeRequirements = [
-    "Config.unwrap(",
+    "Config.schema(",
+    "DocsDeploymentInventoryRuntimeConfig",
     "readDocsDeploymentStateStoreCredentials(",
   ] as const;
 
