@@ -1,4 +1,4 @@
-import { Array as EffectArray } from "effect";
+import { Array as EffectArray, HashMap, HashSet } from "effect";
 
 import { createBindingTracker, propertyName } from "./binding-tracker.js";
 
@@ -27,7 +27,7 @@ const bunImportSemantic = (source, specifierType, imported) => {
   return null;
 };
 
-const bunHostMethods = new Set([
+const bunHostMethods = HashSet.fromIterable([
   "file",
   "serve",
   "spawn",
@@ -35,7 +35,7 @@ const bunHostMethods = new Set([
   "write",
 ]);
 
-const bunRuntimeSemantics = new Set([
+const bunRuntimeSemantics = HashSet.fromIterable([
   "BunRuntime.runMain",
   "platform-bun.BunRuntime.runMain",
 ]);
@@ -47,18 +47,18 @@ const destructuresBunHostMethod = (pattern) =>
     (property) =>
       property.type === "Property" &&
       (!property.computed || property.key?.type === "Literal") &&
-      bunHostMethods.has(propertyName(property.key))
+      HashSet.has(bunHostMethods, propertyName(property.key))
   );
 
 const isHostMethod = (semantic) =>
   semantic?.startsWith("Global.Bun.") &&
-  bunHostMethods.has(semantic.slice("Global.Bun.".length));
+  HashSet.has(bunHostMethods, semantic.slice("Global.Bun.".length));
 
 const noHostApiOutsideAdapters = {
   create(context) {
     const tracker = createBindingTracker(
       context.sourceCode,
-      new Map([["Bun", "Global.Bun"]])
+      HashMap.make(["Bun", "Global.Bun"])
     );
 
     return {
@@ -117,7 +117,7 @@ const noRuntimeOutsideEntrypoints = {
     return {
       AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {
-        if (bunRuntimeSemantics.has(tracker.calledSemantic(node))) {
+        if (HashSet.has(bunRuntimeSemantics, tracker.calledSemantic(node))) {
           context.report({
             messageId: "noRuntimeOutsideEntrypoints",
             node: node.callee,

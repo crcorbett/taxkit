@@ -1,4 +1,4 @@
-import { Array as EffectArray, Option } from "effect";
+import { Array as EffectArray, HashSet, Option } from "effect";
 
 const propertyName = (node) => {
   if (node?.type === "Identifier" || node?.type === "JSXIdentifier") {
@@ -10,7 +10,7 @@ const propertyName = (node) => {
   return null;
 };
 
-const mdxElementKeys = new Set([
+const mdxElementKeys = HashSet.fromIterable([
   "a",
   "blockquote",
   "code",
@@ -31,7 +31,7 @@ const hasMdxElementKey = (node) =>
   Option.fromNullishOr(node.properties).pipe(
     Option.map((properties) =>
       EffectArray.some(properties, (property) =>
-        mdxElementKeys.has(propertyName(property.key) ?? "")
+        HashSet.has(mdxElementKeys, propertyName(property.key) ?? "")
       )
     ),
     Option.getOrUndefined

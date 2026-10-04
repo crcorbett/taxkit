@@ -466,3 +466,41 @@ cases, all repository tests, 20 Quality tests (including the six real-command
 mutations), full verification, 21 skill tests, two Chromium Atom lifecycle tests
 and the 15-task build. The canonical AGENTS router remains unchanged after
 those checks. No package, tax result, canonical skill or hosted workflow changed.
+
+## Local T002 JavaScript lint binding policies
+
+Continue from `b3e2aaf`; hosted Quality run `37180562303` passed on that exact
+draft #100 revision. Migrate the binding tracker and Bun, Effect, MDX and
+package policies to persistent membership/maps, checked reads and immutable
+walks. Oxlint owns a separate synchronous listener for each rule and source
+file. A Ref owns genuine changing bindings or import observations; synchronous
+MutableRef updates replace immutable values without executing an Effect.
+
+Effect 4 structurally hashes ordinary objects. The first direct HashMap
+experiment over the host's cyclic AST did not finish promptly and was stopped.
+Use a local Hash/Equal identity wrapper around syntax-node and lexical-variable
+keys instead. It preserves the old native Map identity contract without
+modifying host objects or structurally comparing their fields. The actual
+CLI tests now check exact warning counts for import aliases, destructuring,
+same-named local parameters, clearing reassigned bindings and inline try/catch
+callbacks. Correct HashSet size through its public accessor. Normalise optional
+predicate results to booleans: installed Effect findFirst also accepts Option
+selectors and an undefined predicate result is invalid.
+
+Enable all eleven canonical rules for those exact JavaScript policy files and
+their scoped canary; no new runtime or mutation exception is added. The larger
+TaxKit route/decoder policy and remaining owned paths stay pending in T002.
+
+Documentation impact: **Change required** for lint configuration/corpus,
+tooling standards, task evidence, this plan and its dated receipt. **Preserve**
+tax/package behaviour, all old adversarial cases, canonical skill fingerprints,
+workflow permissions and provider state. **N/A** for Changesets, public docs
+and runbooks: only root checking policy changes. Recover by reverting this
+complete slice. The [binding-policy receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-lint-binding-policies.json)
+records checks and limits; DEV-73–81 remain active and unfinished.
+
+Local qualification passed the frozen install, 88 actual CLI cases, all tests,
+15-task build and full verification, including all six isolated release mutations.
+Unchanged package/app build, type and Chromium checks reused matching cache
+entries. Final documentation and format checks passed. This establishes the
+five named JavaScript owners only; it does not close T002.

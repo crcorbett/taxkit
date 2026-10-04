@@ -376,6 +376,18 @@ relative symbolic links; only an ordinary-file `readLink` EINVAL permits the
 copy-file fallback. Other filesystem errors fail the test. The six isolated
 release-boundary mutations still execute their actual owning commands.
 
+The binding tracker and Bun, Effect, MDX and package JavaScript lint policies
+also use all eleven canonical rules. Their host is Oxlint's synchronous
+listener lifecycle: each rule creates its own Ref for one source file and uses
+pure persistent updates through the installed Ref's MutableRef field. They
+do not execute Effects or construct a runtime. Static membership uses HashSet;
+lexical lookup uses HashMap with reference-identity keys. The key wrapper uses
+Effect Hash/Equal without changing host nodes or comparing their cyclic fields.
+Actual CLI tests preserve import/destructuring aliases, shadowing, reassignment
+clearing and direct inline rejection mapping. A JavaScript canary verifies all
+ten applicable strict diagnostics. The larger TaxKit route/decoder policy is
+still pending; this does not establish full JavaScript or whole-T002 coverage.
+
 The pinned Turbo version defaults to automatic root AGENTS.md edits when it
 detects an agent. TaxKit opts out with `agentGuidance: false` in `turbo.json`,
 keeping the canonical task router under maintainer control and preventing a

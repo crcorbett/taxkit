@@ -1,0 +1,110 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "b3e2aaf5bc09dc0fae72a4f70cc1c398de4a1da9",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR checks read-only",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Persistent membership and lexical maps in binding tracker and Bun/Effect/MDX/package JavaScript policies",
+    "Per-rule per-file Ref state with pure immutable synchronous host updates, no Effect runner",
+    "Local Effect Hash/Equal wrapper preserves host-object reference identity without modifying AST or comparing cyclic fields",
+    "Immutable parent traversal and path folding; checked argument, capture and type-parameter reads",
+    "All eleven canonical rules on five exact JavaScript owners; scoped JavaScript canary and six exact-count lexical/rejection regressions"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "tools/oxlint/fixtures/strict-bindings-rejected.js.txt",
+        "docs/standards/tooling.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "reason": "Host ownership, policy scope and actual CLI evidence"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        ".agents/skills/**",
+        "packages/**",
+        "AGENTS.md",
+        ".github/workflows/**"
+      ],
+      "reason": "Canonical assets, tax results, package contracts and hosted authority are unchanged"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public docs",
+        "operational runbooks",
+        "provider state"
+      ],
+      "reason": "Root checking code only; no versioned package or operational procedure changes"
+    }
+  ],
+  "verification": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "result": "passed on pinned Bun 1.4.2; 790 installs checked, no changes; tempdir sandbox denial recovered through same approved command"
+    },
+    {
+      "command": "actual installed Oxlint over the five migrated JavaScript policy owners",
+      "result": "passed"
+    },
+    {
+      "command": "bun run test:oxlint:task",
+      "result": "88 passed, including JavaScript scope canary, six exact-count regressions and all prior corpora"
+    },
+    {
+      "command": "hosted Quality run 37180562303",
+      "result": "SUCCESS at exact parent b3e2aaf5bc09dc0fae72a4f70cc1c398de4a1da9; does not prove this later slice"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed, 22 tasks; 88 lint command cases in root tests"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed, 15 tasks with valid cache reuse; package/app sources unchanged"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed: fresh lint/corpus and 20 Quality tests including six real-command mutations; 21 skill cases; package type checks and two unchanged Chromium lifecycle checks reused matching caches"
+    },
+    {
+      "command": "bun run check:docs; bun run format:check; git diff --check",
+      "result": "passed in verification; final receipt-only docs/format checks required before commit"
+    }
+  ],
+  "recovery_observations": [
+    "Direct structural hashing of cyclic host AST was stopped before acceptance; local identity wrapper restored the native Map contract",
+    "Checked CLI exposed HashSet size accessor and optional boolean predicate mistakes; both corrected and all 88 command cases passed",
+    "Root verification caught unsorted keys in new test data; corrected without changing assertions, full verification then passed",
+    "Initial build omitted the provisioned Playwright path; reran with the pinned browser location and passed"
+  ],
+  "limitations": [
+    "Whole DEV-73 and DEV-74\u201381 remain unfinished",
+    "The larger TaxKit route/decoder JavaScript policy and other remaining owned paths are pending",
+    "Synchronous listener host proof is through actual CLI tests, not a claim of static TypeScript checking of JavaScript",
+    "No canonical skill asset changed; no new runtime or mutation exception",
+    "Medicare correction still awaits Cooper scope decision",
+    "Local and draft proof does not establish merge, release, deployment or provider apply"
+  ],
+  "recovery": "Revert the complete root-lint slice; no provider state changed"
+}

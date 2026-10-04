@@ -1,3 +1,5 @@
+import { Array as EffectArray, Option } from "effect";
+
 const sourceFileName = (context) =>
   (context.filename ?? context.getFilename?.() ?? "").replaceAll("\\", "/");
 
@@ -7,14 +9,19 @@ const stringValue = (node) =>
     : undefined;
 
 const resolveRelative = (fileName, specifier) => {
-  const segments = fileName.split("/").slice(0, -1);
-  for (const segment of specifier.split("/")) {
-    if (segment === "..") {
-      segments.pop();
-    } else if (segment !== "." && segment.length > 0) {
-      segments.push(segment);
+  const segments = EffectArray.reduce(
+    specifier.split("/"),
+    EffectArray.dropRight(fileName.split("/"), 1),
+    (current, segment) => {
+      if (segment === "..") {
+        return EffectArray.dropRight(current, 1);
+      }
+      if (segment !== "." && segment.length > 0) {
+        return EffectArray.append(current, segment);
+      }
+      return current;
     }
-  }
+  );
   return segments.join("/");
 };
 
@@ -22,7 +29,12 @@ const workspaceSourceRoot = (fileName) => {
   const match = fileName.match(
     /\/(?:apps|packages)\/(?:[^/]+\/)+?src(?:\/|$)/u
   );
-  return match?.[0]?.replace(/\/$/u, "");
+  return Option.getOrUndefined(
+    Option.fromNullishOr(match).pipe(
+      Option.flatMap(EffectArray.head),
+      Option.map((value) => value.replace(/\/$/u, ""))
+    )
+  );
 };
 
 const isPrivatePackageAlias = (specifier) =>

@@ -1,3 +1,22 @@
+import {
+  Array as EffectArray,
+  Equal,
+  Hash,
+  HashMap,
+  MutableRef,
+  Option,
+  Ref,
+} from "effect";
+import { forEach } from "effect/Array";
+
+// Host nodes and lexical variables have identity even when their fields match.
+// Wrap keys without changing or structurally hashing the host object.
+const referenceIdentity = (value) => ({
+  [Equal.symbol]: (other) => other.value === value,
+  [Hash.symbol]: () => Hash.random(value),
+  value,
+});
+
 export const propertyName = (node) => {
   if (node?.type === "Identifier" || node?.type === "JSXIdentifier") {
     return node.name;
@@ -16,34 +35,49 @@ export const importSourceValue = (node) => {
 };
 
 const declaredVariable = (sourceCode, node, name) =>
-  sourceCode
-    .getDeclaredVariables(node)
-    .find((variable) => variable.name === name) ?? null;
+  Option.getOrNull(
+    EffectArray.findFirst(
+      sourceCode.getDeclaredVariables(node),
+      (variable) => variable.name === name
+    )
+  );
 
 export const createBindingTracker = (
   sourceCode,
-  globalSemantics = new Map()
+  globalSemantics = HashMap.empty()
 ) => {
-  const bindingSemantics = new Map();
-  const referenceVariables = new Map();
-
-  for (const scope of sourceCode.scopeManager.scopes) {
-    for (const reference of scope.references) {
-      referenceVariables.set(reference.identifier, reference.resolved ?? null);
-    }
-  }
+  // Oxlint owns one synchronous listener lifetime per rule and source file.
+  // Ref owns its changing bindings; each update replaces a persistent map.
+  const bindingSemantics = Ref.makeUnsafe(HashMap.empty());
+  const referenceVariables = HashMap.fromIterable(
+    EffectArray.flatMap(sourceCode.scopeManager.scopes, (scope) =>
+      EffectArray.map(scope.references, (reference) => [
+        referenceIdentity(reference.identifier),
+        reference.resolved ?? null,
+      ])
+    )
+  );
 
   const semanticOfIdentifier = (node) => {
     if (node?.type !== "Identifier") {
       return null;
     }
 
-    const variable = referenceVariables.get(node);
+    const variable = Option.getOrUndefined(
+      HashMap.get(referenceVariables, referenceIdentity(node))
+    );
     if (variable) {
-      return bindingSemantics.get(variable) ?? null;
+      return Option.getOrNull(
+        HashMap.get(
+          Ref.getUnsafe(bindingSemantics),
+          referenceIdentity(variable)
+        )
+      );
     }
 
-    return variable === null ? (globalSemantics.get(node.name) ?? null) : null;
+    return variable === null
+      ? Option.getOrNull(HashMap.get(globalSemantics, node.name))
+      : null;
   };
 
   const semanticOfExpression = (node) => {
@@ -90,14 +124,22 @@ export const createBindingTracker = (
   const setDeclaredSemantic = (node, name, semantic) => {
     const variable = declaredVariable(sourceCode, node, name);
     if (variable && semantic) {
-      bindingSemantics.set(variable, semantic);
+      MutableRef.update(
+        bindingSemantics.ref,
+        HashMap.set(referenceIdentity(variable), semantic)
+      );
     }
   };
 
   const setReferencedSemantic = (node, semantic) => {
-    const variable = referenceVariables.get(node);
+    const variable = Option.getOrUndefined(
+      HashMap.get(referenceVariables, referenceIdentity(node))
+    );
     if (variable && semantic) {
-      bindingSemantics.set(variable, semantic);
+      MutableRef.update(
+        bindingSemantics.ref,
+        HashMap.set(referenceIdentity(variable), semantic)
+      );
     }
   };
 
@@ -119,14 +161,14 @@ export const createBindingTracker = (
       return;
     }
 
-    for (const property of pattern.properties ?? []) {
+    forEach(pattern.properties ?? [], (property) => {
       if (property.type !== "Property") {
-        continue;
+        return;
       }
 
       const member = propertyName(property.key);
       if (!member) {
-        continue;
+        return;
       }
 
       const target =
@@ -134,20 +176,25 @@ export const createBindingTracker = (
           ? property.value.left
           : property.value;
       trackPattern(target, `${sourceSemantic}.${member}`, declarationNode);
-    }
+    });
   };
 
   const clearPattern = (pattern) => {
     if (pattern?.type === "Identifier") {
-      const variable = referenceVariables.get(pattern);
+      const variable = Option.getOrUndefined(
+        HashMap.get(referenceVariables, referenceIdentity(pattern))
+      );
       if (variable) {
-        bindingSemantics.delete(variable);
+        MutableRef.update(
+          bindingSemantics.ref,
+          HashMap.remove(referenceIdentity(variable))
+        );
       }
       return;
     }
 
     if (pattern?.type === "ObjectPattern") {
-      for (const property of pattern.properties ?? []) {
+      forEach(pattern.properties ?? [], (property) => {
         if (property.type === "Property") {
           clearPattern(
             property.value?.type === "AssignmentPattern"
@@ -155,7 +202,7 @@ export const createBindingTracker = (
               : property.value
           );
         }
-      }
+      });
     }
   };
 
@@ -178,7 +225,7 @@ export const createBindingTracker = (
     },
     trackImport(node, importSemantic) {
       const source = importSourceValue(node);
-      for (const specifier of node.specifiers ?? []) {
+      forEach(node.specifiers ?? [], (specifier) => {
         const imported =
           specifier.type === "ImportSpecifier"
             ? propertyName(specifier.imported)
@@ -187,7 +234,7 @@ export const createBindingTracker = (
         if (semantic && specifier.local?.type === "Identifier") {
           setDeclaredSemantic(specifier, specifier.local.name, semantic);
         }
-      }
+      });
     },
     trackVariable(node) {
       trackPattern(node.id, semanticOfExpression(node.init), node);

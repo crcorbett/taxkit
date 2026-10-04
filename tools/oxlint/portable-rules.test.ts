@@ -32,6 +32,30 @@ const antiSlopRules = [
 
 const fixtureCases = [
   {
+    accepted: [
+      "tools/oxlint/binding-tracker.js",
+      "tools/oxlint/bun-rules.js",
+      "tools/oxlint/effect-rules.js",
+      "tools/oxlint/mdx-rules.js",
+      "tools/oxlint/package-rules.js",
+    ],
+    generated: "tools/oxlint/.generated-strict-bindings.js",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-bindings-rejected.js.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
     accepted: ["apps/web/src/lib/runtime.server.ts"],
     generated: "apps/web/src/lib/.generated-strict-runtime.ts",
     namespace: "strict-effect",
@@ -371,6 +395,71 @@ const runOxlint = (path: string) =>
   });
 
 describe("portable Oxlint plugins", () => {
+  test.effect.each([
+    {
+      count: 1,
+      name: "keeps an imported runner separate from a same-named local runner",
+      rule: "effect(no-runtime-execution-outside-boundaries)",
+      source: `import { Effect } from "effect";
+export const imported = Effect.runSync(Effect.void);
+export const local = (Effect) => Effect.runSync("local");`,
+    },
+    {
+      count: 1,
+      name: "follows a runner through import and destructuring aliases",
+      rule: "effect(no-runtime-execution-outside-boundaries)",
+      source: `import { Effect as Fx } from "effect";
+const { runSync: execute } = Fx;
+export const value = execute(Fx.void);`,
+    },
+    {
+      count: 0,
+      name: "clears an assigned runner when its source becomes unrelated",
+      rule: "effect(no-runtime-execution-outside-boundaries)",
+      source: `import { Effect } from "effect";
+let execute = Effect.runSync;
+execute = (value) => value;
+export const value = execute("local");`,
+    },
+    {
+      count: 2,
+      name: "resolves a Bun host alias without confusing a local parameter",
+      rule: "bun(no-host-api-outside-adapters)",
+      source: `const { file: open } = Bun;
+export const host = open("package.json");
+export const local = (Bun) => Bun.file("local");`,
+    },
+    {
+      count: 0,
+      name: "accepts direct inline try and catch callbacks after aliasing",
+      rule: "effect(no-bare-effect-try-promise)",
+      source: `import { Effect as Fx } from "effect";
+const { tryPromise: attempt } = Fx;
+export const value = attempt({ try: () => Promise.resolve(1), catch: () => "failed" });`,
+    },
+    {
+      count: 1,
+      name: "rejects a missing catch callback after aliasing",
+      rule: "effect(no-bare-effect-try-promise)",
+      source: `import { Effect as Fx } from "effect";
+const { tryPromise: attempt } = Fx;
+export const value = attempt({ try: () => Promise.resolve(1) });`,
+    },
+  ])("$name", ({ source, rule, count }) =>
+    Effect.gen(function* () {
+      const path = "tools/oxlint/.generated-binding-policy.ts";
+      yield* writeLintFixture(join(repositoryRoot, path), source);
+      const result = yield* runOxlint(path);
+      expect(result.files).toBe(1);
+      expect(Array.filter(result.codes, (code) => code === rule)).toHaveLength(
+        count
+      );
+      expect(Array.some(result.codes, (code) => code.includes("plugin"))).toBe(
+        false
+      );
+    }).pipe(Effect.provide(BunServices.layer))
+  );
+
   test.effect("enables every anti-slop rule at error severity", () =>
     Effect.gen(function* () {
       yield* Effect.forEach(antiSlopRules, (rule) =>

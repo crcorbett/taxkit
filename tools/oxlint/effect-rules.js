@@ -1,4 +1,12 @@
-import { Array as EffectArray } from "effect";
+import {
+  Array as EffectArray,
+  HashMap,
+  HashSet,
+  MutableRef,
+  Option,
+  Ref,
+} from "effect";
+import { forEach } from "effect/Array";
 
 import {
   createBindingTracker,
@@ -13,7 +21,8 @@ const effectImportSemantic = (source, specifierType, imported) => {
     }
 
     if (specifierType === "ImportSpecifier") {
-      return new Set(["Data", "Effect", "ManagedRuntime", "Schema"]).has(
+      return HashSet.has(
+        HashSet.fromIterable(["Data", "Effect", "ManagedRuntime", "Schema"]),
         imported
       )
         ? imported
@@ -21,13 +30,13 @@ const effectImportSemantic = (source, specifierType, imported) => {
     }
   }
 
-  const moduleSemantics = new Map([
+  const moduleSemantics = HashMap.fromIterable([
     ["effect/Data", "Data"],
     ["effect/Effect", "Effect"],
     ["effect/ManagedRuntime", "ManagedRuntime"],
     ["effect/Schema", "Schema"],
   ]);
-  const moduleSemantic = moduleSemantics.get(source);
+  const moduleSemantic = Option.getOrNull(HashMap.get(moduleSemantics, source));
   if (!moduleSemantic) {
     return null;
   }
@@ -127,19 +136,19 @@ const noLayerExportsInServiceFiles = {
       },
       ExportNamedDeclaration(node) {
         if (node.declaration?.type === "VariableDeclaration") {
-          for (const declarator of node.declaration.declarations) {
-            reportName(declarator.id);
-          }
+          forEach(node.declaration.declarations, (declarator) =>
+            reportName(declarator.id)
+          );
         } else {
           reportName(node.declaration?.id);
         }
 
-        for (const specifier of node.specifiers ?? []) {
+        forEach(node.specifiers ?? [], (specifier) => {
           reportName(specifier.local);
           if (specifier.exported?.name !== specifier.local?.name) {
             reportName(specifier.exported);
           }
-        }
+        });
       },
     };
   },
@@ -156,7 +165,7 @@ const noLayerExportsInServiceFiles = {
   },
 };
 
-const runtimeMethods = new Set([
+const runtimeMethods = HashSet.fromIterable([
   "runFork",
   "runPromise",
   "runPromiseExit",
@@ -164,7 +173,7 @@ const runtimeMethods = new Set([
   "runSyncExit",
 ]);
 
-const runtimeExecutionSemantics = new Set([
+const runtimeExecutionSemantics = HashSet.fromIterable([
   ...EffectArray.map([...runtimeMethods], (method) => `Effect.${method}`),
   ...EffectArray.map(
     [...runtimeMethods],
@@ -183,7 +192,9 @@ const noRuntimeExecutionOutsideBoundaries = {
     return {
       AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {
-        if (runtimeExecutionSemantics.has(tracker.calledSemantic(node))) {
+        if (
+          HashSet.has(runtimeExecutionSemantics, tracker.calledSemantic(node))
+        ) {
           context.report({
             messageId: "noRuntimeExecutionOutsideBoundaries",
             node: node.callee,
@@ -213,7 +224,7 @@ const noConsoleOutsideRuntime = {
   create(context) {
     const tracker = createBindingTracker(
       context.sourceCode,
-      new Map([["console", "Global.console"]])
+      HashMap.fromIterable([["console", "Global.console"]])
     );
 
     return {
@@ -261,27 +272,32 @@ const noConsoleOutsideRuntime = {
   },
 };
 
-const processBoundaryMembers = new Set(["argv", "env", "exit", "exitCode"]);
+const processBoundaryMembers = HashSet.fromIterable([
+  "argv",
+  "env",
+  "exit",
+  "exitCode",
+]);
 
 const noProcessOutsideBoundaries = {
   create(context) {
     const tracker = createBindingTracker(
       context.sourceCode,
-      new Map([["process", "Global.process"]])
+      HashMap.fromIterable([["process", "Global.process"]])
     );
     const reportDestructuredMembers = (pattern, source, node) => {
       if (pattern?.type !== "ObjectPattern" || source !== "Global.process") {
         return;
       }
 
-      for (const property of pattern.properties ?? []) {
+      forEach(pattern.properties ?? [], (property) => {
         if (
           property.type === "Property" &&
-          processBoundaryMembers.has(propertyName(property.key))
+          HashSet.has(processBoundaryMembers, propertyName(property.key))
         ) {
           context.report({ messageId: "noProcessOutsideBoundaries", node });
         }
-      }
+      });
     };
 
     return {
@@ -295,7 +311,10 @@ const noProcessOutsideBoundaries = {
         if (
           node.callee?.type === "Identifier" &&
           semantic?.startsWith("Global.process.") &&
-          processBoundaryMembers.has(semantic.slice("Global.process.".length))
+          HashSet.has(
+            processBoundaryMembers,
+            semantic.slice("Global.process.".length)
+          )
         ) {
           context.report({ messageId: "noProcessOutsideBoundaries", node });
         }
@@ -304,7 +323,10 @@ const noProcessOutsideBoundaries = {
         const semantic = tracker.semanticOfExpression(node);
         if (
           semantic?.startsWith("Global.process.") &&
-          processBoundaryMembers.has(semantic.slice("Global.process.".length))
+          HashSet.has(
+            processBoundaryMembers,
+            semantic.slice("Global.process.".length)
+          )
         ) {
           context.report({ messageId: "noProcessOutsideBoundaries", node });
         }
@@ -373,12 +395,12 @@ const schemaCodecRule = ({ description, message, messageId, matches }) => ({
       AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {
         const semantic = tracker.calledSemantic(node);
-        let method = null;
-        if (semantic?.startsWith("Schema.")) {
-          method = semantic.slice("Schema.".length);
-        } else if (semantic?.startsWith("effect.Schema.")) {
-          method = semantic.slice("effect.Schema.".length);
-        }
+        const method = Option.getOrNull(
+          EffectArray.findFirst(
+            ["Schema.", "effect.Schema."],
+            (prefix) => semantic?.startsWith(prefix) ?? false
+          ).pipe(Option.map((prefix) => semantic.slice(prefix.length)))
+        );
         if (method && matches(method)) {
           context.report({ messageId, node: node.callee });
         }
@@ -413,7 +435,7 @@ const noThrowingSchemaSyncCodec = schemaCodecRule({
   messageId: "noThrowingSchemaSyncCodec",
 });
 
-const tryPromiseSemantics = new Set([
+const tryPromiseSemantics = HashSet.fromIterable([
   "Effect.tryPromise",
   "effect.Effect.tryPromise",
 ]);
@@ -425,11 +447,13 @@ const noBareEffectTryPromise = {
     return {
       AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {
-        if (!tryPromiseSemantics.has(tracker.calledSemantic(node))) {
+        if (!HashSet.has(tryPromiseSemantics, tracker.calledSemantic(node))) {
           return;
         }
 
-        const options = node.arguments?.[0];
+        const options = Option.getOrUndefined(
+          EffectArray.head(node.arguments ?? [])
+        );
         const optionProperties =
           options?.type === "ObjectExpression"
             ? EffectArray.filter(
@@ -440,7 +464,7 @@ const noBareEffectTryPromise = {
                     propertyName(property.key) === "catch")
               )
             : [];
-        const inlineFunctionKeys = new Set(
+        const inlineFunctionKeys = HashSet.fromIterable(
           EffectArray.map(
             EffectArray.filter(
               optionProperties,
@@ -461,7 +485,7 @@ const noBareEffectTryPromise = {
 
         if (
           optionProperties.length !== 2 ||
-          inlineFunctionKeys.size !== 2 ||
+          HashSet.size(inlineFunctionKeys) !== 2 ||
           hasDynamicSpread
         ) {
           context.report({
@@ -489,46 +513,42 @@ const noBareEffectTryPromise = {
   },
 };
 
-const taggedErrorConstructorSemantics = new Set([
+const taggedErrorConstructorSemantics = HashSet.fromIterable([
   "Data.TaggedError",
   "Schema.TaggedError",
   "effect.Data.TaggedError",
   "effect.Schema.TaggedError",
 ]);
 
-const hasTaggedErrorCallAncestor = (node, tracker) => {
-  let current = node?.parent;
+const parentNodes = (node) =>
+  EffectArray.unfold(node?.parent, (current) =>
+    current ? Option.some([current, current.parent]) : Option.none()
+  );
 
-  while (current) {
+const hasTaggedErrorCallAncestor = (node, tracker) =>
+  EffectArray.some(parentNodes(node), (current) => {
     if (current.type === "CallExpression") {
       const semantic =
         current.callee?.type === "CallExpression"
           ? tracker.calledSemantic(current.callee)
           : tracker.calledSemantic(current);
-      if (taggedErrorConstructorSemantics.has(semantic)) {
+      if (HashSet.has(taggedErrorConstructorSemantics, semantic)) {
         return true;
       }
     }
-    current = current.parent;
-  }
+    return false;
+  });
 
-  return false;
-};
-
-const isUnknownCauseProperty = (node) => {
-  let current = node?.parent;
-
-  while (current && current.type !== "TSPropertySignature") {
-    current = current.parent;
-  }
-
-  return (
-    current?.type === "TSPropertySignature" &&
-    propertyName(current.key) === "cause"
+const isUnknownCauseProperty = (node) =>
+  Option.exists(
+    EffectArray.findFirst(
+      parentNodes(node),
+      (current) => current.type === "TSPropertySignature"
+    ),
+    (current) => propertyName(current.key) === "cause"
   );
-};
 
-const unknownSchemaSemantics = new Set([
+const unknownSchemaSemantics = HashSet.fromIterable([
   "Schema.Unknown",
   "effect.Schema.Unknown",
 ]);
@@ -545,7 +565,8 @@ const noUnknownTaggedErrorCause = {
       Property(node) {
         if (
           propertyName(node.key) === "cause" &&
-          unknownSchemaSemantics.has(
+          HashSet.has(
+            unknownSchemaSemantics,
             tracker.semanticOfExpression(node.value)
           ) &&
           hasTaggedErrorCallAncestor(node, tracker)
@@ -577,7 +598,7 @@ const noUnknownTaggedErrorCause = {
   },
 };
 
-const functionNodeTypes = new Set([
+const functionNodeTypes = HashSet.fromIterable([
   "ArrowFunctionExpression",
   "FunctionDeclaration",
   "FunctionExpression",
@@ -592,11 +613,14 @@ const isUnknownFunctionParameter = (node) => {
   return (
     annotation?.type === "TSTypeAnnotation" &&
     parameter !== undefined &&
-    functionNodeTypes.has(parameter.parent?.type)
+    HashSet.has(functionNodeTypes, parameter.parent?.type)
   );
 };
 
-const effectTypeSemantics = new Set(["Effect.Effect", "effect.Effect.Effect"]);
+const effectTypeSemantics = HashSet.fromIterable([
+  "Effect.Effect",
+  "effect.Effect.Effect",
+]);
 
 const isUnknownEffectError = (node, tracker) => {
   const parameters = node.parent;
@@ -604,8 +628,11 @@ const isUnknownEffectError = (node, tracker) => {
   return (
     parameters?.type === "TSTypeParameterInstantiation" &&
     reference?.type === "TSTypeReference" &&
-    effectTypeSemantics.has(tracker.semanticOfTypeName(reference.typeName)) &&
-    parameters.params?.[1] === node
+    HashSet.has(
+      effectTypeSemantics,
+      tracker.semanticOfTypeName(reference.typeName)
+    ) &&
+    Option.contains(EffectArray.get(parameters.params ?? [], 1), node)
   );
 };
 
@@ -653,15 +680,24 @@ const localName = (specifier) =>
 const hasUnaliasedImport = (node, names) =>
   EffectArray.some(node.specifiers ?? [], (specifier) => {
     const name = importedName(specifier);
-    return name !== null && names.has(name) && localName(specifier) === name;
+    return (
+      name !== null && HashSet.has(names, name) && localName(specifier) === name
+    );
   });
 
-const effectVitestSharedGlobals = new Set(["describe", "expect", "it", "test"]);
+const effectVitestSharedGlobals = HashSet.fromIterable([
+  "describe",
+  "expect",
+  "it",
+  "test",
+]);
 
 const noEffectTestGlobalMix = {
   create(context) {
-    let effectTestImport = null;
-    let vitestGlobalImport = null;
+    const imports = Ref.makeUnsafe({
+      effectTestImport: null,
+      vitestGlobalImport: null,
+    });
 
     return {
       ImportDeclaration(node) {
@@ -670,16 +706,23 @@ const noEffectTestGlobalMix = {
           source === "@effect/vitest" &&
           hasUnaliasedImport(node, effectVitestSharedGlobals)
         ) {
-          effectTestImport = node;
+          MutableRef.update(imports.ref, (current) => ({
+            ...current,
+            effectTestImport: node,
+          }));
         }
         if (
           source === "vitest" &&
           hasUnaliasedImport(node, effectVitestSharedGlobals)
         ) {
-          vitestGlobalImport = node;
+          MutableRef.update(imports.ref, (current) => ({
+            ...current,
+            vitestGlobalImport: node,
+          }));
         }
       },
       "Program:exit"() {
+        const { effectTestImport, vitestGlobalImport } = Ref.getUnsafe(imports);
         if (effectTestImport && vitestGlobalImport) {
           context.report({
             messageId: "noEffectTestGlobalMix",
@@ -702,27 +745,24 @@ const noEffectTestGlobalMix = {
   },
 };
 
-const runtimeFunctionNodeTypes = new Set([
+const runtimeFunctionNodeTypes = HashSet.fromIterable([
   "ArrowFunctionExpression",
   "FunctionDeclaration",
   "FunctionExpression",
 ]);
 
 const isModuleLevel = (node) => {
-  let current = node.parent;
-  while (current && current.type !== "Program") {
-    if (runtimeFunctionNodeTypes.has(current.type)) {
-      return false;
-    }
-    if (
-      current.type === "TSModuleDeclaration" &&
-      (current.declare || current.global || current.id?.name === "global")
-    ) {
-      return false;
-    }
-    current = current.parent;
-  }
-  return current?.type === "Program";
+  const ancestors = parentNodes(node);
+  return (
+    EffectArray.some(ancestors, (current) => current.type === "Program") &&
+    !EffectArray.some(
+      EffectArray.takeWhile(ancestors, (current) => current.type !== "Program"),
+      (current) =>
+        HashSet.has(runtimeFunctionNodeTypes, current.type) ||
+        (current.type === "TSModuleDeclaration" &&
+          (current.declare || current.global || current.id?.name === "global"))
+    )
+  );
 };
 
 const noModuleLevelMutableTestState = {
