@@ -36,7 +36,9 @@
         "docs/standards/tooling.md",
         "docs/architecture/testing-and-quality.md",
         "docs/exec-plans/active/clean-slate-foundation.md",
-        "docs/product-specs/clean-slate-foundation.tasks.json"
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "tools/vitest.config.ts",
+        "tools/quality-workflow/release-boundary.test.ts"
       ],
       "reason": "Changed command/test host and strict implementation ownership"
     },
@@ -105,5 +107,16 @@
     "No canonical asset, retained tax result or runbook/proof bytes changed",
     "No merge, release, publication, deployment or provider apply"
   ],
-  "recovery": "Revert the complete slice; no external state changed"
+  "recovery": "Revert the complete slice; no external state changed",
+  "hosted_recovery": {
+    "run": "37184339726",
+    "head": "09415cf023aaf3b666e9dccd315f6e38e0d5bee8",
+    "result": "FAILURE",
+    "failure": "Fresh hosted Vitest could not resolve @taxkit/scripts/release-readiness before its dist export existed",
+    "earliest_owner": "tools/vitest.config.ts server source export conditions",
+    "local_proof_ceiling": "Earlier local checks used existing ignored dist files and did not prove fresh source loading",
+    "correction": "Set Vite server source conditions; retained package exports and source boundaries; initial package inlining attempt did not solve resolution and was removed",
+    "regression_prevention": "Existing isolated Quality source copy now first runs all documentation tests without scripts/dist; only temporary Git metadata is created for inventory tests",
+    "qualification": "Fresh frozen offline copy passed all 41 documentation tests without scripts/dist. Complete tests, 15-task build and full verification passed, including the strengthened 21-case Quality suite/all ten mutations and 21 skill cases. Matching unchanged-input package/build/browser caches reused. New hosted result remains separate."
+  }
 }

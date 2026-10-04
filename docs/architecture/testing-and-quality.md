@@ -677,3 +677,10 @@ files have separate exact canonical runtime admissions. Accepted real CLI
 checks include all eight source/test files; the neighbouring generated policy
 file must reject all ten applicable strict constructs. Root verification checks
 these sources and tests through `check:docs:types`.
+
+
+The shared tool Vitest configuration explicitly selects workspace source exports
+in Vite's server resolver. The isolated Quality copy runs all documentation
+tests before `packages/scripts/dist` exists, creating only temporary Git
+metadata for the command inventory. This checks fresh source loading rather
+than relying on local ignored build files; package exports stay unchanged.

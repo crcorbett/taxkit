@@ -677,3 +677,30 @@ verification passed after the optional Boolean default correction: 21 Quality
 cases/all ten isolated mutations and 21 skill cases. Matching unchanged-input
 build/package/browser caches were reused. Final receipt-only docs/runbook,
 format and diff checks precede commit.
+
+
+### Documentation-tools hosted recovery
+
+Draft #105's first hosted Quality run 37184339726 failed at exact `09415cf`:
+Vitest could not load `@taxkit/scripts/release-readiness` before the ignored
+package build existed. Local prebuilt files hid that requirement. Reopen this
+slice's host qualification without changing its document/runbook rules.
+The earliest owner is `tools/vitest.config.ts`: Vite's server resolver requires
+its own `source` export conditions. A package-inlining attempt did not solve
+the failure and was removed. A fresh archived copy with frozen offline install
+and no scripts dist passed all 41 documentation tests after that correction.
+The existing isolated Quality source-copy test now runs those documentation
+tests before any build, using only temporary local Git metadata for inventory.
+This prevents the same false local acceptance from relying on prebuilt files.
+**Change required** for test configuration, the existing Quality owner, testing
+and tooling pointers, this plan and reopened receipt. Historical provider
+records and package exports remain **Preserve**. Final requalification precedes
+an additional tested commit on #105; no force push or external operation.
+
+
+Hosted-recovery local requalification passed: complete tests, the 15-task build
+and full verification, including 21 Quality cases/all ten isolated mutations
+and the fresh source-only documentation check. Matching unchanged-input
+package/build/browser caches were reused. The initial hosted failure remains
+recorded; the successor hosted result is separate. Final receipt-only
+checks precede the corrective commit on the same draft.

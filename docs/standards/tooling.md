@@ -46,6 +46,9 @@ library with stable package boundaries and predictable bundle behavior.
   `check:docs:types` checks the implementation and tests. All eleven canonical
   strict rules apply to this owner. Only the two exact command files can run
   Effects; ordinary policy code and tests have no runtime admission.
+  Vite's server resolver has separate `source` export conditions; the existing
+  isolated Quality source copy runs documentation tests before scripts build
+  output exists. A local prebuilt package is not fresh-checkout evidence.
 - `tools/governance` owns the Effect-native repository harness gate. It
   Schema-decodes repository-local owners at filesystem ingress and checks the
   accepted HE crosswalk, stable TaxKit profile lifecycle/index owners,

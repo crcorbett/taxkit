@@ -234,6 +234,33 @@ describe("HGI-205 isolated release-boundary mutations", () => {
           "method-admission-broadened",
         ]);
         const workspace = yield* prepareWorkspace(repositoryRoot);
+        // A fresh source-only copy must run tool tests before any package build.
+        // Documentation command fixtures need only this temporary local Git index.
+        expect(
+          yield* fs.exists(path.join(workspace, "packages/scripts/dist"))
+        ).toBe(false);
+        yield* Effect.forEach(
+          [
+            ["init", "--quiet"],
+            ["add", "."],
+          ],
+          (args) =>
+            runBoundaryCommand(workspace, "git", args).pipe(
+              Effect.tap((result) =>
+                Effect.sync(() =>
+                  expect(result.exitCode, result.stderr).toBe(0)
+                )
+              )
+            )
+        );
+        const sourceTests = yield* runBoundaryCommand(workspace, "bun", [
+          "run",
+          "test:documentation:task",
+        ]);
+        expect(
+          sourceTests.exitCode,
+          `${sourceTests.stderr}\n${sourceTests.stdout}`
+        ).toBe(0);
         const target = path.join(workspace, "oxlint.config.ts");
         const source = yield* fs.readFileString(target);
         yield* Effect.forEach(fixtures, (fixture) =>
