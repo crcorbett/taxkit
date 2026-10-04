@@ -30,7 +30,21 @@
   "properties": {
     "schemaVersion": { "const": "1" },
     "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9-]+$" },
-    "kind": { "enum": ["schema", "type", "api", "lint", "test", "fixture", "generator", "tool", "runbook", "policy", "automation"] },
+    "kind": {
+      "enum": [
+        "schema",
+        "type",
+        "api",
+        "lint",
+        "test",
+        "fixture",
+        "generator",
+        "tool",
+        "runbook",
+        "policy",
+        "automation"
+      ]
+    },
     "failureClass": { "$ref": "#/$defs/nonEmptyString" },
     "evidence": { "$ref": "#/$defs/nonEmptyStrings" },
     "earliestOwner": { "$ref": "#/$defs/nonEmptyString" },

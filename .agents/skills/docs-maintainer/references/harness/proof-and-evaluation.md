@@ -17,6 +17,24 @@ Keep source consistency, unit behavior, consumer behavior, preview,
 production, provider configuration, public behavior, publication, deployment,
 and release as separate claims.
 
+For every material normative requirement, including each `must`, `required`,
+`never`, and accepted audit finding, maintain a requirement-to-proof crosswalk
+with:
+
+- the owning task;
+- a direct observable and expected postcondition;
+- a plausible false green that the oracle rejects;
+- the focused command or procedure owner;
+- the evidence owner and receipt path; and
+- limitations and non-claims.
+
+Reject proof by proxy. Broad suite coverage, successful construction, source
+layout, or a neighbouring assertion does not establish the named behavior.
+Decompose compound policy into separately observable properties. For example,
+retry proof distinguishes eligibility, bounded attempts, backoff, jitter,
+idempotent reads, uncertain writes, and observation after timeout when those
+properties apply.
+
 ## Delivery identity
 
 Prefer delivering the immutable artifact already proved. If a privileged stage
@@ -57,3 +75,10 @@ Every job ends as `accepted`, `failed`, `blocked`, `deferred`, `no_op`,
 last successful step, observed state, receipts, owner, escalation, recovery or
 resume trigger, smallest unresolved choice, successor, and non-claims. Retain
 the evidence outside the default retrieval route.
+
+When review finds a gap after task acceptance, reopen the owning task and
+invalidate affected downstream acceptance, candidate identity, rollback
+identity, and receipts. Refresh focused proof before restoring acceptance. A
+SPEC-required terminal audit runs once after every implementation dependency is
+terminal. Any later implementation invalidates that terminal status and
+requires one fresh final audit on the exact receipt-bearing state.

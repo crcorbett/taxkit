@@ -155,6 +155,11 @@ evidence cannot supply a field; never silently omit it.
 - Keep boundary encoding/decoding, Effect service ownership, error contracts,
   client wrappers, React composition, commands, and public API examples aligned
   with the repository's installed versions and enforced patterns.
+- When an example changes, update its canonical template too. Check generated
+  code against the selected dependency snapshot, including renamed Schema APIs,
+  named public operations, private untraced helpers and Layer construction.
+  Extend existing qualification checks; do not create parallel suites for the
+  same claim. A cached result must include every changed file the check reads.
 - Update owning docs during each implementation slice, before the slice can be
   accepted. Do not defer accumulated documentation work to a final sweep.
 - Record unresolved product or authority decisions as blockers in active task
@@ -162,6 +167,15 @@ evidence cannot supply a field; never silently omit it.
 - When a change adds or revises a critical journey, retain a stable journey ID,
   procedure owner, observable oracle against plausible imitation, environment,
   and receipt route rather than expanding the inventory into every test.
+- When review or a terminal audit finds an issue, record why the prior SPEC,
+  task, implementation check, or receipt allowed the false green. Promote the
+  prevention to the earliest durable owner: domain contract, direct test
+  oracle, task verification, lint/tooling control, or lifecycle rule. Retain
+  the dated finding as evidence rather than adding another audit reminder.
+- Any correction after task acceptance reopens the owning task and refreshes
+  affected proof, candidate identity, rollback identity, and lifecycle
+  receipts. A terminal audit runs only after the complete SPEC is terminal;
+  later implementation invalidates its terminal status.
 
 ## Verify the claim
 

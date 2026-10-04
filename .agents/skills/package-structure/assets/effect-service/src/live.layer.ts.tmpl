@@ -1,18 +1,20 @@
-import { Effect, Layer, Option } from "effect";
+import { Array, Effect, Layer } from "effect";
 
-import { __SYMBOL__NotFoundError } from "./errors";
-import type { __SYMBOL__Item } from "./schemas";
-import { __SYMBOL__Service } from "./service";
+import { __SYMBOL__NotFoundError } from "./errors.js";
+import type { __SYMBOL__Id, __SYMBOL__Item } from "./schemas.js";
+import { __SYMBOL__Service } from "./service.js";
 
 const items: readonly __SYMBOL__Item[] = [];
 
-export const __SYMBOL__Live = Layer.succeed(__SYMBOL__Service, {
-  get: (id) =>
-    Option.fromUndefinedOr(items.find((item) => item.id === id)).pipe(
-      Option.match({
-        onNone: () => Effect.fail(new __SYMBOL__NotFoundError({ id })),
-        onSome: Effect.succeed,
-      }),
+export const __SYMBOL__Live = Layer.succeed(
+  __SYMBOL__Service,
+  __SYMBOL__Service.of({
+    get: Effect.fn("__SYMBOL__Service.get")((id: __SYMBOL__Id) =>
+      Array.findFirst(items, (item) => item.id === id).pipe(
+        Effect.fromOption,
+        Effect.mapError(() => new __SYMBOL__NotFoundError({ id })),
+      ),
     ),
-  list: () => Effect.succeed(items),
-});
+    list: Effect.fn("__SYMBOL__Service.list")(() => Effect.succeed(items)),
+  }),
+);

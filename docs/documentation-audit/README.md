@@ -38,6 +38,7 @@ Clean slate implementation evidence:
 - [4 October baseline checks](clean-slate-foundation/2026-10-04-baseline.json)
 - [4 October version observations](clean-slate-foundation/2026-10-04-version-observations.json)
 - [4 October partial dependency qualification](clean-slate-foundation/2026-10-04-stable-dependency-qualification.json)
+- [4 October canonical skill adoption and provisional strict-policy inventory](clean-slate-foundation/2026-10-04-canonical-skills.json)
 - [4 October Medicare scope conflict](clean-slate-foundation/2026-10-04-medicare-scope-conflict.json)
 
 The baseline preserves tax results and historical provider proof. The Medicare

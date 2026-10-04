@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-04",
+  "ownerIssue": "DEV-73",
+  "repository": "crcorbett/taxkit",
+  "baseCommit": "59b0a36ff1bc6f95501734ee65d789a4f5a37fcc",
+  "authority": "Cooper implementation request; local changes, commits and draft review only",
+  "source": {
+    "repository": "https://github.com/crcorbett/commonplace-plugins",
+    "revision": "91a47d9fdde8aad214a0ab12742517cce344b709",
+    "plugin": "development-workflows",
+    "version": "0.6.1"
+  },
+  "postconditions": [
+    "Nine complete canonical source trees, two separately hashed TaxKit overlays and eleven relative Claude links",
+    "Linear, Alchemy and strict-Effect skills available repository-locally",
+    "One shared canonical inventory for policy and filesystem observation",
+    "Negative checks reject missing newly required skills",
+    "TaxKit stable Effect version selection explicitly outranks canonical template snapshot examples"
+  ],
+  "checks": [
+    {
+      "command": "bun run verification",
+      "exitCode": 0,
+      "sha256": "635ee947427ed0725eaef3d86997e8f07815d65cf8e88ed0fd63965869041b7d",
+      "log": "/tmp/taxkit-t002-skills-verification2.log"
+    },
+    {
+      "command": "bun run test:harness-governance",
+      "exitCode": 0,
+      "sha256": "596f6e83dfed194828bd2568a6a1a195f3e0f8cb42a8e9b2969d4a26e4c6e638",
+      "log": "/tmp/taxkit-t002-skills-policy-tests.log"
+    },
+    {
+      "command": "bun run test:skills",
+      "exitCode": 0,
+      "sha256": "5792028e916f80996a7814899c7e8861fc4d376e604c04279dd9ef021459cc27",
+      "log": "/tmp/taxkit-t002-skills-tests.log"
+    }
+  ],
+  "strictPolicyInventory": {
+    "classification": "provisional unfiltered diagnostics before exact host-exception reconciliation; not 2155 accepted defects",
+    "command": "bunx oxlint -c .clean-slate-inventory.config.ts apps packages tools alchemy.run.ts oxlint.config.ts oxfmt.config.ts --disable-nested-config --format=json",
+    "configuration": "Temporary root config extends actual root config/overrides/exclusions, registers canonical strict-effect asset and enables all eleven rules as errors; removed after scan",
+    "files": 341,
+    "diagnostics": 2155,
+    "byRule": {
+      "strict-effect(no-runtime-outside-boundary)": 115,
+      "strict-effect(no-unchecked-index)": 213,
+      "strict-effect(no-unchecked-json)": 84,
+      "strict-effect(no-promise-workflow)": 758,
+      "strict-effect(no-imperative-collections)": 946,
+      "strict-effect(no-native-work)": 35,
+      "strict-effect(no-native-at)": 2,
+      "strict-effect(runtime-file-convention)": 2
+    },
+    "byPathGroup": {
+      "packages": 280,
+      "tools": 1415,
+      "apps": 460
+    },
+    "logSha256": "0288aef1589eaf87e76f1125b187e241aced11a49d398e225a7de6d04d0c78a5",
+    "outcome": "not accepted; migration and exact host exception proof remain required"
+  },
+  "documentationImpact": {
+    "changeRequired": [
+      "complete canonical skills",
+      "two repository profiles",
+      "AGENTS task routes",
+      "governance inventory and tests",
+      "SPEC/tasks/active plan",
+      "tooling standard"
+    ],
+    "preserve": [
+      "tax/package/app runtime",
+      "historical skill receipts/evidence",
+      "provider/release authority"
+    ],
+    "changeset": "N/A: repository instructions and governance verification only"
+  },
+  "limitations": [
+    "No global general-purpose skill validator was available; the package skill validator plus local complete-tree/reference/link/governance checks ran",
+    "Unmodified task results may use local Turbo cache",
+    "Full strict-policy integration and Atom repository qualification remain incomplete"
+  ],
+  "recovery": "Revert the complete skill/receipt/profile/governance slice to its parent source",
+  "nonClaims": [
+    "Not completion of DEV-73",
+    "No DEV-74\u201381 application improvements",
+    "No new tax results, Medicare correction, merge, deploy, publication or provider apply"
+  ]
+}

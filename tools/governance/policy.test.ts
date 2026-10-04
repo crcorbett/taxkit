@@ -142,6 +142,24 @@ describe("harness governance policy", () => {
     );
   });
 
+  it.each(["alchemy-iac", "linear", "strict-effect-ts"])(
+    "rejects a missing clean-slate canonical skill: %s",
+    async (skillId) => {
+      const inputs = await loadAcceptedInputs();
+      expectInvariant(
+        {
+          ...inputs,
+          observations: replaceCanonicalTree(
+            inputs.observations,
+            skillId,
+            null
+          ),
+        },
+        "canonical-skill-tree"
+      );
+    }
+  );
+
   it("rejects partial and stale skill trees", async () => {
     const inputs = await loadAcceptedInputs();
     const observed = inputs.observations.canonicalTrees["prd-writer"];

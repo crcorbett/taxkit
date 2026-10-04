@@ -43,7 +43,12 @@ library with stable package boundaries and predictable bundle behavior.
   Schema-decodes repository-local owners at filesystem ingress and checks the
   accepted HE crosswalk, stable TaxKit profile lifecycle/index owners,
   canonical skill receipt and overlays, Claude links, portable references,
-  critical journeys, and external non-claims.
+  critical journeys, and external non-claims. Its canonical inventory contains
+  nine complete Commonplace skills (including Linear, strict Effect and Alchemy),
+  two TaxKit profile overlays and two declared local extras. The receipt binds
+  the upstream commit; governance validates all eleven Claude links. Canonical
+  template versions do not override TaxKit's installed graph. Skill adoption
+  alone does not prove the pending clean-slate strict-enforcement migration.
 - `tools/evals/harness-foundation` owns the target-specific epoch verifier. It
   hashes both complete validator closures and reconciles the immutable Git
   target, canonical skill/journey projections, receipts, retained failures,

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Strict Effect TypeScript"
+  short_description: "Enforce Effect-first TypeScript architecture"
+  default_prompt: "Use $strict-effect-ts to implement or review this TypeScript capability with strict Effect conventions."

@@ -9,6 +9,8 @@ import re
 import sys
 from pathlib import Path
 
+from render_package import validate_source_condition
+
 
 FORBIDDEN_SOURCE = {
     "generic SDK callback": re.compile(r"readonly\s+(use|withClient)\s*[:(]"),
@@ -17,6 +19,7 @@ FORBIDDEN_SOURCE = {
     "package-local runtime execution": re.compile(r"Effect\.run(?:Promise|Sync)\b"),
 }
 PERSONAL_ROOT = "/" + "Users" + "/"
+RELATIVE_IMPORT = re.compile(r'''(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)["'](\.[^"']*)["']''')
 
 
 def fail(message: str) -> None:
@@ -41,12 +44,16 @@ render_path = root / "package-structure.render.json"
 if not render_path.is_file():
     fail("missing package-structure.render.json")
 render = json.loads(render_path.read_text())
+try:
+    source_condition = validate_source_condition(render.get("sourceCondition", ""))
+except (TypeError, ValueError) as error:
+    fail(str(error))
 kind = render.get("kind")
 required_by_kind = {
     "effect-service": {
         "src/schemas.ts", "src/errors.ts", "src/service.ts", "src/live.layer.ts",
         "src/test.layer.ts", "src/__testing__/fixtures.ts",
-        "src/__testing__/observations.ts", "test/service.test.ts",
+        "src/__testing__/observations.ts", "test/service.test.ts", "test/schemas.test.ts",
     },
     "rpc": {
         "src/group.ts", "src/handlers.ts", "src/service.ts", "src/server.ts",
@@ -55,7 +62,7 @@ required_by_kind = {
     "http-api": {
         "src/api.ts", "src/group.ts", "src/handlers.ts", "src/server.ts",
         "src/client/service.ts", "src/client/browser.layer.ts",
-        "src/client/in-process.layer.ts",
+        "src/client/live.layer.ts",
     },
 }
 if kind not in required_by_kind:
@@ -93,6 +100,11 @@ for name, value in exports.items():
     if not isinstance(value, dict):
         fail(f"export {name} must be an object")
     keys = list(value)
+    if not keys or keys[0] != source_condition:
+        fail(f"export {name} must place recorded source condition first: {source_condition}")
+    source_target = value[source_condition]
+    if not isinstance(source_target, str) or not source_target.startswith("./src/") or not (root / source_target).is_file():
+        fail(f"export {name} recorded source condition must target an existing source file")
     conditions = [key for key in keys if key not in {"types", "default", "import"}]
     source_conditions.update(conditions)
     for condition in conditions:
@@ -107,6 +119,11 @@ for name, value in exports.items():
 for value in publish.values() if isinstance(publish, dict) else []:
     if isinstance(value, dict) and source_conditions.intersection(value):
         fail("publish exports must omit repository source conditions")
+for directory in ("src", "test"):
+    for path in (root / directory).rglob("*.ts"):
+        for specifier in RELATIVE_IMPORT.findall(path.read_text()):
+            if not specifier.endswith(".js"):
+                fail(f"{path.relative_to(root)} relative import must use an explicit .js suffix: {specifier}")
 for path in (root / "src").rglob("*.ts"):
     text = path.read_text()
     for label, pattern in FORBIDDEN_SOURCE.items():
@@ -122,7 +139,7 @@ for path in (root / "src").rglob("*"):
 service = root / "src/service.ts"
 if service.is_file():
     text = service.read_text()
-    if "Context.Service" not in text:
+    if "Context.Service" not in text and not (kind == "rpc" and re.search(r"export \{ \w+Service as \w+Client \} from", text)):
         fail("service.ts must define Context.Service")
     if "Layer." in text:
         fail("service.ts must not define a Layer")

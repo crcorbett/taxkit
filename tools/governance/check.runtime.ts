@@ -5,7 +5,11 @@ import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
 import { readGovernanceJson, repositoryRootFromUrl } from "./input.boundary.js";
-import { inspectGovernance, portableTreeMode } from "./policy.js";
+import {
+  canonicalSkillIds,
+  inspectGovernance,
+  portableTreeMode,
+} from "./policy.js";
 import type {
   GovernanceObservations,
   LinkObservation,
@@ -26,14 +30,6 @@ import {
 } from "./schemas.js";
 
 const repositoryRootUrl = new URL("../..", import.meta.url);
-const canonicalSkillIds = [
-  "docs-maintainer",
-  "effect-client-wrapper",
-  "package-structure",
-  "prd-implementer",
-  "prd-review",
-  "prd-writer",
-];
 const extraSkillIds = ["docs-writer", "portless"];
 const overlayBySkill = new Map([
   ["docs-maintainer", "references/repository-profile.md"],

@@ -13,9 +13,9 @@ narrow `./testing/*` entries.
 ## RPC
 
 RPC depends inward on an existing domain service. Keep separate modules for RPC
-group/schema, handlers, application client service, HTTP server Layer, browser
-client Layer, and in-process test client. Required exports are `./group`,
-`./handlers`, `./service`, `./server`, `./live`, `./test`, and `./testing`.
+group/schema, handlers, application client service, HTTP server Layer,
+host-supplied client Layer, and in-process test client. Required exports are
+`./group`, `./handlers`, `./service`, `./server`, `./live`, and `./test`.
 
 Handler tests prove typed success/failure. A transport integration test proves
 serialization and HTTP mounting. Do not duplicate domain policy in handlers.
@@ -24,12 +24,16 @@ serialization and HTTP mounting. Do not duplicate domain policy in handlers.
 
 HTTP API depends inward on the same domain service. Keep API/group/schema,
 status mapping, handlers, server routes, contract-only client service, browser
-Fetch Layer, and server in-process Layer separate. Required exports are
+Fetch Layer, and host-supplied server client Layer separate. Required exports are
 `./api`, `./group`, `./handlers`, `./server`, `./client/service`,
-`./client/browser`, `./client/in-process`, and `./testing`.
+`./client/browser` and `./client/live`.
 
-Server loaders use the in-process client and never loop back over deployed HTTP.
-Integration tests cover in-process and real HTTP transports.
+In the separate Website/API design, frontend server loaders supply the native
+client with a private service-binding HttpClient to the same-stage API. Browser
+clients supply the checked public API address. No frontend client imports the
+domain live Layer or server handlers. In-process transport belongs to tests,
+not a Website backend fallback. Integration tests cover native HTTP/RPC error
+round-trips, full-read deadlines and browser preflight headers.
 
 ## Build policies
 

@@ -21,11 +21,11 @@ historical status, or executable contracts into weaker owners.
 
 Every material job uses three phases:
 
-| Phase | Required context | Forbidden shortcut |
-|---|---|---|
-| Ground | Target identity, worktree, root router, local profile, current task, directly affected owners | Inferring policy from a completed plan |
-| Investigate | Only evidence needed to resolve named questions, including code, config, history, provider readback, or upstream libraries | Loading all archives as default context |
-| Land | Full affected-surface accounting, contradiction reconciliation, proof, lifecycle, and pointers | Updating one document while leaving a competing current owner |
+| Phase       | Required context                                                                                                           | Forbidden shortcut                                            |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Ground      | Target identity, worktree, root router, local profile, current task, directly affected owners                              | Inferring policy from a completed plan                        |
+| Investigate | Only evidence needed to resolve named questions, including code, config, history, provider readback, or upstream libraries | Loading all archives as default context                       |
+| Land        | Full affected-surface accounting, contradiction reconciliation, proof, lifecycle, and pointers                             | Updating one document while leaving a competing current owner |
 
 Repository-wide audits inventory all readable repository-owned `docs/**` and
 `README*`, but deeply read only current, canonical, affected, contradictory,

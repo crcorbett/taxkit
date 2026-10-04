@@ -1,7 +1,8 @@
-import type { __SYMBOL__Item } from "../schemas";
-import { __SYMBOL__Id } from "../schemas";
+import { Schema } from "effect";
+import { __SYMBOL__Item } from "../schemas.js";
 
-export const example__SYMBOL__ = {
-  id: __SYMBOL__Id.make("example"),
+// Controlled raw fixture input is checked once, then follows the same service type.
+export const example__SYMBOL__ = Schema.decodeUnknownEffect(__SYMBOL__Item)({
+  id: "example",
   name: "Example",
-} satisfies __SYMBOL__Item;
+});

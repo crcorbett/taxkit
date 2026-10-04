@@ -3,7 +3,7 @@ document_type: agent-router
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-07-21
+last_reviewed: 2026-10-04
 ---
 
 # TaxKit repository guide
@@ -62,6 +62,12 @@ attached implementation authority names the reviewer and publisher.
   [`docs/operations/authority-model.md`](docs/operations/authority-model.md).
 - References and audits: [`docs/references/README.md`](docs/references/README.md)
   and [`docs/documentation-audit/README.md`](docs/documentation-audit/README.md).
+
+Use the repository-owned [Linear skill](.agents/skills/linear/SKILL.md) when
+work is tracked in Linear. The [strict Effect skill](.agents/skills/strict-effect-ts/SKILL.md)
+and [Alchemy skill](.agents/skills/alchemy-iac/SKILL.md) supply methods; local
+profiles and the installed dependency graph own TaxKit compatibility. Skill
+installation does not imply that the clean-slate enforcement migration is complete.
 
 ## Engineering guardrails
 

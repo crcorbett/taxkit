@@ -94,7 +94,16 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "invariantId", "replacement", "rationale", "owner", "evidence", "reviewTrigger", "retirementCondition"],
+        "required": [
+          "id",
+          "invariantId",
+          "replacement",
+          "rationale",
+          "owner",
+          "evidence",
+          "reviewTrigger",
+          "retirementCondition"
+        ],
         "properties": {
           "id": { "$ref": "#/$defs/id" },
           "invariantId": { "type": "string", "pattern": "^HC-[A-Z]+-[0-9]{3}$" },

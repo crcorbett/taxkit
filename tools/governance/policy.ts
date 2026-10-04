@@ -13,13 +13,16 @@ import type {
 } from "./schemas.js";
 
 const expectedFindingIds = ["HE-001", "HE-002", "HE-003", "HE-004"];
-const expectedSkillIds = [
+export const canonicalSkillIds = [
+  "alchemy-iac",
   "docs-maintainer",
   "effect-client-wrapper",
+  "linear",
   "package-structure",
   "prd-implementer",
   "prd-review",
   "prd-writer",
+  "strict-effect-ts",
 ];
 const expectedExtraIds = ["docs-writer", "portless"];
 const expectedJourneyIds = [
@@ -187,8 +190,8 @@ const inspectTrees = (
 ): readonly GovernanceFinding[] => {
   const receiptSkillIds = Record.keys(receipt.skills);
   const canonicalMismatch =
-    !hasExactMembers(receiptSkillIds, expectedSkillIds) ||
-    expectedSkillIds.some((id) => {
+    !hasExactMembers(receiptSkillIds, canonicalSkillIds) ||
+    canonicalSkillIds.some((id) => {
       const expected = receipt.skills[id];
       const actual = observations.canonicalTrees[id];
       return (
@@ -223,7 +226,7 @@ const inspectTrees = (
         finding(
           "canonical-skill-tree",
           "tools/skills/canonical-skill-baseline.json",
-          "Restore the complete receipted six-skill baseline and declared local extras."
+          "Restore the complete receipted nine-skill baseline and declared local extras."
         ),
       ]
     : [];

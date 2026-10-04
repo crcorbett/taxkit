@@ -75,7 +75,7 @@ preloading or rewriting it as current guidance.
 
 ## Research upstream libraries with DeepWiki
 
-Use the Executor MCP's `deepwiki_mcp` integration to research third-party packages and libraries implicated by the SPEC, such as Effect, effect-smol, React, framework packages, or lint and build tooling. Do not use DeepWiki to analyze the current codebase; derive local architecture and conventions from the current checkout, its documentation, and its configuration.
+Use the Executor MCP's `deepwiki_mcp` integration to research third-party packages and libraries implicated by the SPEC, such as Effect, React, framework packages, or lint and build tooling. Do not use DeepWiki to analyze the current codebase; derive local architecture and conventions from the current checkout, its documentation, and its configuration.
 
 First load the Executor `execute` guidance, then discover the DeepWiki tool schemas instead of guessing them. Identify relevant dependency names and installed versions from manifests, lockfiles, imports, and package metadata. Resolve each package to its upstream `owner/repo`; do not use the current repository's Git remote as the DeepWiki target.
 
@@ -155,6 +155,18 @@ Prefer updating the canonical source and its necessary pointers over duplicating
 
 Do not stop at describing an evidence-backed improvement. Apply it to the SPEC and every in-scope task artifact as soon as the relevant evidence pass is complete.
 
+- Build a requirement-to-proof crosswalk for every material `must`, `required`,
+  `never`, and accepted finding. Each row names the owning task, direct
+  observable, expected postcondition, plausible false green rejected, focused
+  command or procedure owner, evidence owner, receipt path, limitations, and
+  non-claims. Reject proof by proxy: broad suite coverage, successful
+  construction, source layout, or a neighbouring assertion does not establish
+  the named behavior.
+- Review compound policies property by property. Retry requirements separately
+  cover eligibility, bounded attempts, backoff, jitter, idempotent reads,
+  uncertain writes, and observation after timeout when applicable. Isolation,
+  substitution, and composition-root requirements directly assert the semantic
+  result from every relevant root.
 - Rewrite vague or incorrect requirements as concrete constraints, patterns, failure cases, and observable acceptance criteria.
 - Synchronize implementation tasks with the revised design, including dependencies, ordering, ownership boundaries, validation commands, and completion evidence.
 - Add concrete tasks for every downstream artifact marked `Change required`; link each task to the SPEC requirement that caused it.
@@ -252,6 +264,10 @@ Do not invent command names. If the repository lacks a needed rule, state the ru
    repository checks, applicable journeys, and one fresh independent review.
    Do not require comparative evaluation unless the SPEC makes a general
    harness-effect claim.
+10. When the SPEC requires a terminal audit, confirm it appears once after all
+    implementation dependencies. Any later implementation invalidates that
+    terminal status, reopens the owning task, and requires one fresh final audit
+    plus full verification on the exact receipt-bearing state.
 
 Finish with a concise report containing:
 

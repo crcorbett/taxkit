@@ -126,3 +126,30 @@ recovery. Full application improvements DEV-74–81 remain unimplemented.
 
 The [partial qualification receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-stable-dependency-qualification.json)
 records the exact graph, command evidence, retained failures and pending work.
+
+## T002 canonical skill refresh
+
+Adopt all nine complete repository skills from Commonplace development-workflows
+0.6.1, commit `91a47d9fdde8aad214a0ab12742517cce344b709`. This is the current
+successor of the design's 0.6.0 reference. The two existing local profiles are
+retained and updated with TaxKit's stable-v4 compatibility precedence. Linear,
+strict Effect and Alchemy now have local folders and relative Claude links.
+The receipt binds canonical tree hashes separately from the two overlays;
+existing local extras and historical evidence remain preserved. Runtime and
+policy share one canonical inventory to avoid divergent tree/link admission.
+
+Documentation impact: **Change required** for complete skill trees, receipt,
+profile overlays, AGENTS route, governance inventory/negative tests and tooling
+standard. **Preserve** package contracts/results, historical baseline evidence,
+provider/release authority and all runtime wiring. **N/A** for a Changeset:
+this slice changes repository instructions and their verification only. Full
+portable-policy integration remains pending; no strict-compliance claim follows
+from copying its asset. Recover by reverting this entire slice, including its
+receipt and profiles, to the previous immutable skill collection.
+
+The [skill adoption receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-canonical-skills.json)
+records full verification and the actual-command provisional strict-rule scan:
+341 files, 2,155 diagnostics before exact host-exception reconciliation. These
+are not all adjudicated defects. The root's existing gate remains green; the
+stronger clean-slate policy is not yet integrated or accepted. DEV-74 remains
+blocked by that unfinished DEV-73 requirement.

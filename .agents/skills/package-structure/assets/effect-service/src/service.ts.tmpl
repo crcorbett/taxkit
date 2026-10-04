@@ -1,12 +1,12 @@
 import { Context } from "effect";
 import type { Effect } from "effect";
 
-import type { __SYMBOL__NotFoundError } from "./errors";
-import type { __SYMBOL__Id, __SYMBOL__Item } from "./schemas";
+import type { __SYMBOL__AccessError } from "./errors.js";
+import type { __SYMBOL__Id, __SYMBOL__Item } from "./schemas.js";
 
 export interface I__SYMBOL__Service {
-  readonly get: (id: __SYMBOL__Id) => Effect.Effect<__SYMBOL__Item, __SYMBOL__NotFoundError>;
-  readonly list: () => Effect.Effect<readonly __SYMBOL__Item[]>;
+  readonly get: (id: __SYMBOL__Id) => Effect.Effect<__SYMBOL__Item, __SYMBOL__AccessError>;
+  readonly list: () => Effect.Effect<readonly __SYMBOL__Item[], __SYMBOL__AccessError>;
 }
 
 export class __SYMBOL__Service extends Context.Service<__SYMBOL__Service, I__SYMBOL__Service>()(

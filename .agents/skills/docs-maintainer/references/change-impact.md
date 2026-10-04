@@ -4,21 +4,21 @@ Use this matrix as prompts for an evidence-backed decision, not as a demand to
 edit every row. Record `Change required`, `Preserve`, or `N/A` for affected
 surfaces.
 
-| Change | Inspect and usually update | Additional proof |
-| --- | --- | --- |
-| Command, script, env var, setup | Owning README, contributor/setup reference, runbook if operational | Command help/output and focused execution |
-| Public export or package path | Package README, public API reference, examples, generated export/reference owner | Packed or consumer journey |
-| HTTP, RPC, event, or Schema boundary | API/reference source, generated output, architecture boundary, migration guidance | Encode/decode and consumer journey |
-| Effect service, Layer, error, client wrapper | Architecture/standard, package README when consumer-visible, test-layer guidance | Focused typed failure and boundary tests |
-| React route or user-visible behavior | Product/route owner, accessibility states, critical journey | Browser/runtime journey, not snapshots alone |
-| Config, lint, formatter, typecheck | Standards, contributor commands, CI contract, exceptions | Focused negative fixture and canonical check |
-| CI/workflow/release | Authority model, runbook, artifact identity, rollback, proof schema | Workflow receipt and environment readback |
-| Infrastructure/provider/cache | Desired-state architecture, authority matrix, target runbooks, observability, recovery | Dated provider readback and public journey |
-| Secret/credential/auth | Authority/custody owner and runbook; never secret values | Principal, resource, environment, duration/revocation receipt |
-| Database/data model/migration | Schema/data architecture, migration/recovery runbook, API consumer docs | Migration and rollback/postcondition proof |
-| Skill/agent instruction | Owning skill, metadata, mirrors, local profile, skill policy | Validator plus fresh-context behavior |
-| SPEC/task/decision | Active SPEC/tasks, index/lifecycle pointers, downstream artifact ledger | Task validator and claim-matched acceptance |
-| Incident or repeated review finding | Earliest enforceable owner plus evidence archive | Negative then positive regression proof |
+| Change                                       | Inspect and usually update                                                             | Additional proof                                              |
+| -------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Command, script, env var, setup              | Owning README, contributor/setup reference, runbook if operational                     | Command help/output and focused execution                     |
+| Public export or package path                | Package README, public API reference, examples, generated export/reference owner       | Packed or consumer journey                                    |
+| HTTP, RPC, event, or Schema boundary         | API/reference source, generated output, architecture boundary, migration guidance      | Encode/decode and consumer journey                            |
+| Effect service, Layer, error, client wrapper | Architecture/standard, package README when consumer-visible, test-layer guidance       | Focused typed failure and boundary tests                      |
+| React route or user-visible behavior         | Product/route owner, accessibility states, critical journey                            | Browser/runtime journey, not snapshots alone                  |
+| Config, lint, formatter, typecheck           | Standards, contributor commands, CI contract, exceptions                               | Focused negative fixture and canonical check                  |
+| CI/workflow/release                          | Authority model, runbook, artifact identity, rollback, proof schema                    | Workflow receipt and environment readback                     |
+| Infrastructure/provider/cache                | Desired-state architecture, authority matrix, target runbooks, observability, recovery | Dated provider readback and public journey                    |
+| Secret/credential/auth                       | Authority/custody owner and runbook; never secret values                               | Principal, resource, environment, duration/revocation receipt |
+| Database/data model/migration                | Schema/data architecture, migration/recovery runbook, API consumer docs                | Migration and rollback/postcondition proof                    |
+| Skill/agent instruction                      | Owning skill, metadata, mirrors, local profile, skill policy                           | Validator plus fresh-context behavior                         |
+| SPEC/task/decision                           | Active SPEC/tasks, index/lifecycle pointers, downstream artifact ledger                | Task validator and claim-matched acceptance                   |
+| Incident or repeated review finding          | Earliest enforceable owner plus evidence archive                                       | Negative then positive regression proof                       |
 
 ## Repository-profile interface
 

@@ -22,7 +22,8 @@ publication or provider apply. Final provider-plan approval remains separate.
 Keep the TaxKit calculation packages, tax rules and calculation results. Rebuild
 the website and application wiring using the repository structure, Alchemy and
 strict Effect TypeScript skill requirements originally requested from
-development-workflows 0.5.1. The installed successor is now 0.6.0; use its
+development-workflows 0.5.1. The current adopted successor is 0.6.1 at commit
+`91a47d9fdde8aad214a0ab12742517cce344b709`; use its
 complete canonical baseline and qualify its stricter rules with TaxKit's
 existing checks. Earlier dated research retains its original skill version.
 Keeping packages allows edits needed for current dependencies. Cooper allowed
@@ -352,7 +353,7 @@ decoding, mapping, error projection and matching inline. Ban dumping-ground
 `helpers`, `utils`, `common` and `shared` modules; naming a wrapper as a service
 does not give it semantic weight. Review the actual call graph in every slice.
 
-Adopt the installed 0.6.0 portable strict Effect policy at its repository-owned
+Adopt the current 0.6.1 portable strict Effect policy at its repository-owned
 canonical skill asset. Merge into `oxlint.config.ts` and retain useful existing TaxKit,
 MDX and workspace checks. Enable `strict-effect/no-unchecked-index`,
 `no-native-at`, `runtime-file-convention`, `tagged-error-name`,

@@ -17,6 +17,14 @@ from pathlib import Path
 SKILL = Path(__file__).resolve().parent.parent
 KINDS = {"effect-service", "rpc", "http-api"}
 PACKAGE = re.compile(r"^@[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*$")
+SOURCE_CONDITION = re.compile(r"^@?[a-z0-9][a-z0-9._-]*(?:/[a-z0-9][a-z0-9._-]*)?$")
+RESERVED_CONDITIONS = {"types", "default", "import", "require", "node", "node-addons", "module-sync", "browser", "development", "production"}
+
+
+def validate_source_condition(value: str) -> str:
+    if not SOURCE_CONDITION.fullmatch(value) or value.isdecimal() or value in RESERVED_CONDITIONS:
+        raise ValueError("source-condition must be a custom name, not a reserved export condition")
+    return value
 
 
 def symbol(name: str) -> str:
@@ -27,11 +35,11 @@ def safe_target(raw: str) -> Path:
     candidate = Path(raw)
     if not candidate.is_absolute() or ".." in candidate.parts:
         raise ValueError("target must be an absolute path without '..'")
+    if any(parent.is_symlink() for parent in (candidate.parent, *candidate.parent.parents)):
+        raise ValueError("target parent and ancestors must not be symlinks")
     resolved_parent = candidate.parent.resolve(strict=True)
     if candidate.exists() or candidate.is_symlink():
         raise ValueError("target must not already exist")
-    if resolved_parent.is_symlink():
-        raise ValueError("target parent must not be a symlink")
     forbidden = {Path("/"), Path.home().resolve(), resolved_parent.anchor}
     if candidate.resolve(strict=False) in forbidden:
         raise ValueError("refusing a filesystem, home, or repository root target")
@@ -43,8 +51,8 @@ def load_versions(path: Path) -> dict[str, str]:
     if not isinstance(data.get("resolvedAt"), str):
         raise ValueError("version snapshot needs resolvedAt")
     effect = data.get("packages", {}).get("effect")
-    if not isinstance(effect, str) or not re.fullmatch(r"4\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?", effect):
-        raise ValueError("version snapshot needs an exact Effect v4 version")
+    if not isinstance(effect, str) or not re.fullmatch(r"4\.\d+\.\d+(?:-rc\.\d+)?", effect):
+        raise ValueError("version snapshot needs an exact current Effect v4 RC or stable version")
     if any(not isinstance(value, str) or value.lower() == "latest" for value in data["packages"].values()):
         raise ValueError("version snapshot needs exact selected versions, never latest")
     if not isinstance(data.get("sources"), dict) or not data["sources"]:
@@ -56,6 +64,7 @@ def load_versions(path: Path) -> dict[str, str]:
 
 
 def render(args: argparse.Namespace) -> Path:
+    validate_source_condition(args.source_condition)
     if args.kind not in KINDS:
         raise ValueError(f"unknown kind: {args.kind}")
     if not PACKAGE.fullmatch(args.package_name):

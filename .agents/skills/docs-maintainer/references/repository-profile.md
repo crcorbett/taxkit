@@ -47,3 +47,17 @@ check:docs`, `bun run check:runbooks`, `bun run check:repository-paths`.
 For each check, state its observable postcondition and what it does not prove.
 Keep background freshness reports as candidates until an attached implementation
 authority, responsible reviewer and separately named publisher accept them.
+
+## Clean-slate compatibility and implementation
+
+The local root manifest and lockfile select stable Effect 4.0.0 and TypeScript
+7.0.2. Canonical skill templates may retain their upstream rc.117 qualification;
+that reference snapshot does not downgrade TaxKit or prove an app/provider
+migration. Check installed exports and the active clean-slate plan before use.
+
+The complete local skill collection is pinned by
+`tools/skills/canonical-skill-baseline.json` to Commonplace development-workflows
+0.6.1. It includes `linear`, `strict-effect-ts` and `alchemy-iac`, with relative
+Claude links. Use the Linear skill for tracked task status/evidence. The active
+`docs/exec-plans/active/clean-slate-foundation.md` distinguishes skill adoption
+from pending full strict enforcement, Atom integration and application work.

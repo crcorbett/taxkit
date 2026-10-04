@@ -15,6 +15,13 @@ Documentation validators prove structure or policy only. Unit tests prove their
 bounded code behavior. Local simulations do not prove preview or production,
 and provider configuration does not prove public behavior.
 
+For agent tool interfaces, distinguish a controlled browser host, registration
+after hydration, a discovery scan, a server protocol call and native browser
+tool execution. Finding a tool name proves less than calling it successfully.
+For hosted telemetry, separate configuration, transport response, stored signal
+and rendered dashboard result; record cache status, sampling and indexing delay.
+Use a small existing journey rather than another permanent proof framework.
+
 ## Separate capability from authority
 
 Before a consequential operation, record identity, operation, resource,

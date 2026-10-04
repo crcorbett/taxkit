@@ -1,18 +1,14 @@
+import type { __DOMAIN_SYMBOL__ApiOrigin } from "__DOMAIN_PACKAGE__/schemas";
 import { Effect, Layer } from "effect";
-import { FetchHttpClient } from "effect/unstable/http";
-import { HttpApiClient as EffectHttpApiClient } from "effect/unstable/httpapi";
+import { FetchHttpClient, HttpClient } from "effect/unstable/http";
+import { __SYMBOL__ClientLive } from "./live.layer.js";
 
-import { __SYMBOL__Api } from "../api";
-import { __SYMBOL__ClientService } from "./service";
-
-export const __SYMBOL__ClientBrowserLive = Layer.effect(
-  __SYMBOL__ClientService,
-  EffectHttpApiClient.make(__SYMBOL__Api).pipe(
-    Effect.map((client) =>
-      __SYMBOL__ClientService.of({
-        get: (id) => client.domain.get({ params: { id } }),
-        list: () => client.domain.list({}),
-      }),
-    ),
-  ),
+// Set public-read policy when executing, where the native Fetch client reads it.
+const publicHttpClient = Layer.effect(HttpClient.HttpClient,
+  HttpClient.HttpClient.pipe(Effect.map(HttpClient.transform((read) =>
+    read.pipe(Effect.provideService(FetchHttpClient.RequestInit, { credentials: "omit", redirect: "error" })),
+  ))),
 ).pipe(Layer.provide(FetchHttpClient.layer));
+
+export const __SYMBOL__ClientBrowserLive = (baseUrl: __DOMAIN_SYMBOL__ApiOrigin) =>
+  __SYMBOL__ClientLive({ baseUrl }).pipe(Layer.provide(publicHttpClient));

@@ -7,13 +7,13 @@ exceptions.
 
 ## Required loading
 
-| Work | Load |
-|---|---|
-| Localized documentation change | `document-classes.md`, `change-impact.md`, and the local repository profile |
-| Material implementation or PRD | `invariant-register.md`, `context-and-ownership.md`, `proof-and-evaluation.md`, and the local profile |
-| Operational, provider, release, or automation work | Add `operations-and-authority.md` |
-| Repository-wide audit | All files in this table plus the `repo-structure` audit references |
-| New repository or profile change | Add `repository-variation.md` and validate the profile |
+| Work                                               | Load                                                                                                  |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Localized documentation change                     | `document-classes.md`, `change-impact.md`, and the local repository profile                           |
+| Material implementation or PRD                     | `invariant-register.md`, `context-and-ownership.md`, `proof-and-evaluation.md`, and the local profile |
+| Operational, provider, release, or automation work | Add `operations-and-authority.md`                                                                     |
+| Repository-wide audit                              | All files in this table plus the `repo-structure` audit references                                    |
+| New repository or profile change                   | Add `repository-variation.md` and validate the profile                                                |
 
 ## Fixed lifecycle
 

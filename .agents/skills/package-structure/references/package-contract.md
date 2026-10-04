@@ -6,8 +6,11 @@ Name the capability, its callers, its untrusted boundaries, its runtime owner,
 and why an existing package cannot own it. A package is justified by a stable
 semantic boundary, not by file count.
 
-Compiled packages use `tsc -p tsconfig.build.json`, relative internal imports,
-and explicit exports. Root exports are absent by default; an intentional root
+Compiled packages use `tsc -p tsconfig.build.json`, relative internal imports
+with explicit `.js` endings, and explicit exports. Use the same endings in
+tests; TypeScript and the source consumer resolve them to the matching `.ts`
+files, while ordinary ESM consumers load the emitted `.js` files. Root exports
+are absent by default; an intentional root
 must remain contract-only. The source condition maps to `src`, `types` to
 declarations, and `default` to `dist`. `publishConfig.exports` omits the source
 condition. Source-only packages point both development/default resolution at
@@ -34,6 +37,16 @@ Each package README names the semantic owner, public/live/test export paths,
 downstream architecture/proof impact, runbook applicability, and explicit
 non-claims. Repository profiles—not this global contract—name exact local
 commands and document paths.
+
+## Separate source, domain and transport owners
+
+Authored content may live in a source-only package. It exports files and source
+inventory; the domain package owns the validation Schemas and source loader,
+service, named errors and live/test Layers. Apps supply bundler/host adapters.
+Do not give the source package another runtime or duplicate domain definitions.
+HTTP, RPC and MCP reuse explicit domain exports. Client exports must resolve
+without importing handlers, the live source loader, renderer or MCP server.
+Check the actual browser bundle as well as the export map.
 
 ## Export proof
 

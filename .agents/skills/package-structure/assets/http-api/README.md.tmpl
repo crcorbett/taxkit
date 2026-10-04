@@ -1,7 +1,7 @@
 # `__PACKAGE_NAME__`
 
 Effect HTTP API transport over `__DOMAIN_PACKAGE__`. Browser clients use Fetch;
-server loaders compose the in-process client and never loop back over HTTP.
+server loaders compose the host-supplied client and never loop back over HTTP.
 
 ## Exports
 
@@ -11,7 +11,7 @@ server loaders compose the in-process client and never loop back over HTTP.
 - `./server`: server route composition.
 - `./client/service`: public client service contract.
 - `./client/browser`: browser Fetch Layer.
-- `./client/in-process`: in-process server-loader Layer.
+- `./client/live`: host-supplied server-loader Layer.
 
 ## Documentation impact
 
@@ -27,3 +27,10 @@ update a target-owned runbook only when an operation or deployment changes.
 
 This package makes no deployment, provider-state, external-route, or
 packed-publisher claim.
+
+The client Layer implements the domain service, keeps the native client private
+and bounds headers plus decoded body by the domain client deadline. Website
+servers supply a same-stage private binding; browsers supply the public URL.
+The public-read browser Layer omits credentials and rejects redirects. It
+provides native Fetch RequestInit options at execution time, where that client
+reads them; providing options only during Layer construction is insufficient.

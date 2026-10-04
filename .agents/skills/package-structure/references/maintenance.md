@@ -20,10 +20,19 @@ When Effect or transport APIs change:
 
 1. research the upstream library through DeepWiki/official versioned sources;
 2. update the appropriate canonical asset and reference;
+   remove outdated examples and compatibility branches rather than retaining
+   several API generations;
 3. render every variant from a provisional snapshot;
 4. install, resolve exports, typecheck, test, and build all variants;
 5. replace the snapshot only after compatibility passes;
 6. rerun structural validation and fresh-context scenarios.
+
+Use the existing renderers and contract checks for this qualification. Compile
+generated code, not only the asset text. Exercise representative success and
+typed absence/failure through the same service contract and keep the same
+public trace names in live/test implementations. Do not add a suite for every
+template token, constant or deterministic forwarding method. Describe which
+API/version combinations were actually checked and retain unqualified limits.
 
 Do not copy templates into repository-local overlays. Update a local profile
 only when that repository's facts changed.

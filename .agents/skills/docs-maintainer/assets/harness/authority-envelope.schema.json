@@ -42,7 +42,10 @@
   },
   "allOf": [
     {
-      "if": { "properties": { "externalAccess": { "const": "none" } }, "required": ["externalAccess"] },
+      "if": {
+        "properties": { "externalAccess": { "const": "none" } },
+        "required": ["externalAccess"]
+      },
       "then": {
         "properties": {
           "operations": { "maxItems": 0 },
@@ -52,7 +55,10 @@
       }
     },
     {
-      "if": { "properties": { "externalAccess": { "const": "mutation" } }, "required": ["externalAccess"] },
+      "if": {
+        "properties": { "externalAccess": { "const": "mutation" } },
+        "required": ["externalAccess"]
+      },
       "then": {
         "properties": {
           "approvalRequired": { "const": true },

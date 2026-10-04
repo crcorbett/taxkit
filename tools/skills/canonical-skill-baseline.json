@@ -1,38 +1,50 @@
 {
   "schemaVersion": "1",
-  "observedAt": "2026-07-24T21:35:00Z",
+  "observedAt": "2026-10-04T01:55:00Z",
   "source": {
-    "kind": "content-addressed-installed-skill-collection",
-    "owner": "repo-structure canonical repository-skill baseline",
-    "aggregateDigest": "55e15d59d8320fdaa06af6d6a55d8b6148b2c5ea327399bb77eec19cd7260577",
-    "originalObservedAggregateDigest": "f10de9106d54869d7d674e097ef3d492c165daaf1386de5d23d787dcfa0b2230",
-    "repositoryRevision": null,
-    "identityLimitation": "The installed canonical collection has no available Git revision. The original observed aggregate is retained; the enforceable aggregate and per-tree SHA-256 digests normalize regular-file permissions to Git-portable 0644/0755 semantics."
+    "kind": "immutable-git-canonical-skill-collection",
+    "owner": "commonplace-plugins development-workflows 0.6.1",
+    "aggregateDigest": "7a7633e5c279cec550b3fe7ae6ddfce29b4bff1aa40cb712dbf4d5f4510aebc6",
+    "originalObservedAggregateDigest": "55e15d59d8320fdaa06af6d6a55d8b6148b2c5ea327399bb77eec19cd7260577",
+    "repositoryRevision": "91a47d9fdde8aad214a0ab12742517cce344b709",
+    "identityLimitation": "Exact authorised upstream Git revision. Canonical template rc.117 dependency examples are reference inputs, not TaxKit version selections; TaxKit profiles and package.json own stable Effect 4.0.0 compatibility."
   },
   "skills": {
+    "alchemy-iac": {
+      "entryCount": 23,
+      "treeDigest": "cd8bd63906d2ccb0d211e8bf97adc25ca2a351ad00ceb4b2ee4af531260112bf"
+    },
     "docs-maintainer": {
       "entryCount": 18,
-      "treeDigest": "c53229490b34ff4397f2cc37ed632b91c76a39581fcd8a43477affb6789062a9"
+      "treeDigest": "f989b01a2bb273dad7851e055bead439685b6a5317173863a69ad3fe1925157f"
     },
     "effect-client-wrapper": {
-      "entryCount": 2,
-      "treeDigest": "12b2550b49572248fd04723a2666c8e78abc77989e02b25cbb0145ac11f4263a"
+      "entryCount": 3,
+      "treeDigest": "84cc8d6242393f735fd0f31c4245ad6a3a22f60cfe2634d2183d5e201addee3d"
+    },
+    "linear": {
+      "entryCount": 5,
+      "treeDigest": "4de07fafbe1c0949e96e9ecc5acf65f7e30b1a5806cba2a6e2fa694f65303427"
     },
     "package-structure": {
-      "entryCount": 50,
-      "treeDigest": "3885b3fae6da0f98e6f8f1ea6e1e61e92763895eb78b3471f2f8a9afd30a8a46"
+      "entryCount": 53,
+      "treeDigest": "1231686e06f7607b135eaa15f8c756cb76b022d766f239cfc3394cc2c33b7e4d"
     },
     "prd-implementer": {
       "entryCount": 2,
-      "treeDigest": "7a3d465d7a450cbfab3da5bd8010bd2b79b32c9505714a649987aeaa473aeaca"
+      "treeDigest": "1b644ce72b5f706d937593a2295be0b024eafc2bb406fb2fa830a61a965dfe92"
     },
     "prd-review": {
       "entryCount": 2,
-      "treeDigest": "8eab7f953d324f79afe14bf246133d24752fbb8ad129e285b24de0c1e8c3188d"
+      "treeDigest": "bfa60430d1a6eedbbd8fd286358afcf5e777bdb22cb37b475452ed2fcce5f621"
     },
     "prd-writer": {
       "entryCount": 2,
-      "treeDigest": "20ee18b840b67eee66ceeb2e4808bf9a9c2cbd021132a48be2f3ddbb53637f81"
+      "treeDigest": "417d02394e00c3216ff3f60ba0879b07df862318ae1053e4f51e9a44c0f3bcf6"
+    },
+    "strict-effect-ts": {
+      "entryCount": 31,
+      "treeDigest": "956276b8fd46f514167f8edda159081057794ad0a43d30d1ec07142276e900d3"
     }
   },
   "treeDigestAlgorithm": "sha256(canonical-json(sorted relative entries)); regular file mode normalized to Git-portable 0644 or 0755; allowed overlays excluded and hashed separately",
@@ -40,12 +52,12 @@
     {
       "path": ".agents/skills/docs-maintainer/references/repository-profile.md",
       "owner": "taxkit-documentation-owner",
-      "sha256": "6f834258c997523dc9a020852555bbd363c03b11140a86492769168fa96c97d9"
+      "sha256": "e24c6c79c97f15540dd7b87cd0e5b88a65cafd287d2c2e37713507a38cc17c42"
     },
     {
       "path": ".agents/skills/package-structure/references/repository-profile.md",
       "owner": "taxkit-package-architecture-owner",
-      "sha256": "c0f6f6583a4eb38b4055bacc63d792f90322ee9620af211a35bbe7ed0236addd"
+      "sha256": "a4d0de122bcc759efbbe3369b704d33aeb1fcba4dc6a603245c4af6fe956beb0"
     }
   ],
   "extras": {
@@ -65,12 +77,15 @@
     }
   },
   "claudeLinks": {
+    "alchemy-iac": "../../.agents/skills/alchemy-iac",
     "docs-maintainer": "../../.agents/skills/docs-maintainer",
     "effect-client-wrapper": "../../.agents/skills/effect-client-wrapper",
+    "linear": "../../.agents/skills/linear",
     "package-structure": "../../.agents/skills/package-structure",
     "prd-implementer": "../../.agents/skills/prd-implementer",
     "prd-review": "../../.agents/skills/prd-review",
     "prd-writer": "../../.agents/skills/prd-writer",
+    "strict-effect-ts": "../../.agents/skills/strict-effect-ts",
     "docs-writer": "../../.agents/skills/docs-writer",
     "portless": "../../.agents/skills/portless"
   },
@@ -78,9 +93,10 @@
   "reviewTrigger": "Intentional canonical skill refresh, repository-profile change, extra-skill ownership change, Claude-link change, validator change, or repository path-portability failure.",
   "retirementCondition": "Retire this receipt only when a successor content-addressed baseline and migration receipt are accepted together.",
   "limitations": [
-    "The receipt binds the canonical source observed on 2026-07-24 and does not claim compatibility with future source trees.",
-    "The two repository-profile overlays are excluded from baseline tree comparison and are independently hashed.",
-    "The source collection contained host-specific non-executable permissions that Git cannot retain; receipt modes intentionally preserve only Git's executable-bit distinction."
+    "Complete canonical nine-skill collection; template reference code is not TaxKit runtime or proof of the complete strict policy.",
+    "The two repository-profile overlays are excluded from canonical tree comparison and independently hashed.",
+    "Git-portable mode normalization preserves the executable-bit distinction.",
+    "Skill adoption does not finish DEV-73; actual-command strict enforcement and Atom integration remain required."
   ],
   "nonClaims": [
     "No global skill installation is required or qualified at repository runtime.",

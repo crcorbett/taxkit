@@ -251,7 +251,7 @@
       "scope": [
         "Resolve current official releases, including stable Effect module paths, then qualify one exact Bun/TypeScript/React/Atom/Alchemy/tooling graph in a fresh scratch fixture before integrating it.",
         "Qualify the proposed exact Scheduler peer-metadata correction, or use a newer upstream fix. Preserve valid tax outputs; update package exports/types/imports and versioning consequences deliberately.",
-        "Adopt the complete canonical 0.6.0 repository skills and declared TaxKit profiles/receipts, including the required Linear skill folder and Claude link without creating provider projects/issues. Merge all eleven portable strict Effect rules, including no-imperative-collections, and workspace-export direction into the actual lint config across source/tests/tools/config/infrastructure. Reuse baseline mutation/loop/collection checks; add only evidenced gaps and readonly-value checks. Exact Promise-returning/runtime host exceptions do not exempt other constructs.",
+        "Adopt the complete canonical current repository skills (0.6.1 successor of the designed 0.6.0 baseline) and declared TaxKit profiles/receipts, including the required Linear skill folder and Claude link without creating provider projects/issues. Merge all eleven portable strict Effect rules, including no-imperative-collections, and workspace-export direction into the actual lint config across source/tests/tools/config/infrastructure. Reuse baseline mutation/loop/collection checks; add only evidenced gaps and readonly-value checks. Exact Promise-returning/runtime host exceptions do not exempt other constructs.",
         "Extend actual-command positive/negative fixtures under moved paths; assert admitted file counts, exit codes and expected rules. Prove removing/disabling required rules or broadening exact assignment/method exceptions fails the verifier. Refresh Turbo read/input/cache ownership, Knip inventories and CI commands; keep explicit generated/vendor exclusions.",
         "Qualify canonical rejection of let/var, assignments/writes/delete/updates, loops, native array traversal including forEach and mutators/constructors, transient Effect collection modes, switch and manual tag checks. Use existing restrictions and focused corrections for Object/Reflect writes, mutable class/contract values, WeakMap/WeakSet and demonstrated destructured/local aliases. Computed member access is already rejected by no-unchecked-index. Accept persistent collections, pure immutable Effect-managed state and qualified Alchemy Output operations. Preserve/qualify stronger lexical runtime callback/reference checks outside exact hosts. Review helper purpose, Schema ownership and pipe/flat-program call graphs separately; lint alone is not semantic proof.",
         "Cover owned .ts/.tsx/.js/.jsx/.mjs/.cjs files, including retained JavaScript policy tools, in actual lint scope; convert to checked TypeScript where necessary instead of treating the scaffold TypeScript-only override as complete. Executable MDX expressions/imports remain with the existing content-policy owner."
@@ -301,7 +301,8 @@
       "evidence": [
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-stable-dependency-qualification.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-version-observations.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-04-medicare-scope-conflict.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-medicare-scope-conflict.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-canonical-skills.json"
       ]
     },
     {

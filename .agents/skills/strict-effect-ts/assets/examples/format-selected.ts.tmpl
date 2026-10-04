@@ -1,0 +1,57 @@
+import { Effect, Record, Schema } from "effect";
+
+export const PageId = Schema.Trimmed.check(Schema.isMinLength(1)).pipe(Schema.brand("PageId"));
+export type PageId = typeof PageId.Type;
+export const PageTitle = Schema.Trimmed.check(Schema.isMinLength(1)).pipe(Schema.brand("PageTitle"));
+export const MarkdownText = Schema.String.check(Schema.isMinLength(1)).pipe(Schema.brand("MarkdownText"));
+export const PageFormat = Schema.Literals(["data", "markdown"]);
+export type PageFormat = typeof PageFormat.Type;
+export const PageRequest = Schema.Struct({
+  id: PageId,
+  format: PageFormat.annotate({ default: "data" }).pipe(Schema.withDecodingDefaultKey(Effect.succeed("data"))),
+});
+export type PageInput = Readonly<{ id: PageId; format?: PageFormat }>;
+export const PageResponse = Schema.Union([
+  Schema.Struct({ format: Schema.Literal("data"), page: Schema.Struct({ id: PageId, title: PageTitle }) }),
+  Schema.Struct({ format: Schema.Literal("markdown"), markdown: MarkdownText }),
+]).pipe(Schema.toTaggedUnion("format"));
+export type PageResponse = typeof PageResponse.Type;
+
+export class PageUnavailableError extends Schema.TaggedError<PageUnavailableError>()("PageUnavailableError", {}) {}
+export class InvalidPageRequestError extends Schema.TaggedError<InvalidPageRequestError>()("InvalidPageRequestError", {}) {}
+export class InvalidPageResponseError extends Schema.TaggedError<InvalidPageResponseError>()("InvalidPageResponseError", {}) {}
+export const PageAccessError = Schema.Union([PageUnavailableError, InvalidPageRequestError, InvalidPageResponseError]);
+export type PageAccessError = typeof PageAccessError.Type;
+
+export interface GetPage {
+  (input: Readonly<{ id: PageId; format?: never }>): Effect.Effect<typeof PageResponse.cases.data.Type, PageAccessError>;
+  <const F extends PageFormat>(input: Readonly<{ id: PageId; format: F }>): Effect.Effect<(typeof PageResponse.cases)[F]["Type"], PageAccessError>;
+  (input: PageInput): Effect.Effect<PageResponse, PageAccessError>;
+}
+
+const responseSchemas: Readonly<Record<PageFormat, (typeof PageResponse.cases)[PageFormat]>> = PageResponse.cases;
+
+// This named page operation accepts no raw client and cannot choose a generic output.
+export const checkedGetPage = (operation: {
+  readonly getPage: (input: typeof PageRequest.Type) => Effect.Effect<unknown, PageAccessError>;
+}): GetPage => {
+  function getPage(input: Readonly<{ id: PageId; format?: never }>): Effect.Effect<typeof PageResponse.cases.data.Type, PageAccessError>;
+  function getPage<const F extends PageFormat>(input: Readonly<{ id: PageId; format: F }>): Effect.Effect<(typeof PageResponse.cases)[F]["Type"], PageAccessError>;
+  function getPage(input: PageInput): Effect.Effect<PageResponse, PageAccessError>;
+  function getPage(input: PageInput): Effect.Effect<PageResponse, PageAccessError> {
+    return Effect.gen(function* () {
+      const request = yield* Schema.decodeEffect(PageRequest)(input).pipe(
+        Effect.mapError(() => new InvalidPageRequestError()),
+      );
+      const response = yield* operation.getPage(request);
+      const schema = yield* Record.get(responseSchemas, request.format).pipe(
+        Effect.fromOption,
+        Effect.mapError(() => new InvalidPageResponseError()),
+      );
+      return yield* Schema.decodeUnknownEffect(Schema.toType(schema))(response).pipe(
+        Effect.mapError(() => new InvalidPageResponseError()),
+      );
+    }).pipe(Effect.withSpan("Content.getPage"));
+  }
+  return getPage;
+};
