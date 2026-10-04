@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: docs
-confidence: medium
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-effect-services-owner
+last_reviewed: 2026-10-04
+review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
 # Effect services
@@ -276,8 +278,11 @@ context, then continue with the typed value in one readable `pipe` or
 `Effect.gen` program. Preserve unrelated typed errors; do not use broad
 `Effect.catchAll`, `Effect.orDie`, raw Promise control flow or nested runtime
 execution to bridge a decoder. An app entrypoint, route loader or plain SDK
-facade may run a completed Effect through its existing module-scoped runtime at
-the outer edge only.
+facade may execute a completed Effect only at its exact outer host. The plain
+SDK host has a caller-owned runtime for each client and a temporary scope for
+one-shot helpers; it has no package-global runtime. The
+[SDK lifetime owner](api-and-sdk.md#typescript-sdk-facade) explains closing,
+interruption, bounded outcomes and the separate Effect interface.
 
 Do not extract one-use fragments such as `decodePayload`, `mapDecodeError`,
 `runDecoder`, `withDecodedInput` or generic `decodeOrFail`. A shared helper is

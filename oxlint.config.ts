@@ -112,11 +112,12 @@ const decodingBoundaryFiles = [
   // Cross-process command output restored by the release-readiness live layer.
   "packages/scripts/src/release-readiness/live.layer.ts",
 
-  // SDK type-erasure dispatch and downstream process boundaries.
+  // SDK rejected Promise ingress and descriptor/process boundaries.
+  "packages/sdk/typescript/src/index.test.ts",
+  "packages/sdk/typescript/src/client-lifetime.test.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/src/effect.ts",
-  "packages/sdk/typescript/src/index.ts",
   "packages/sdk/typescript/src/types.ts",
 ];
 
@@ -196,6 +197,10 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  // Plain Promise rejection and calculator error representations: secret-negative tests only.
+  "packages/sdk/typescript/src/index.test.ts",
+  "packages/sdk/typescript/src/effect.test.ts",
+  "packages/sdk/typescript/src/client-lifetime.test.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.test.ts",
   "packages/scripts/src/release-readiness/live.layer.test.ts",
   "tools/docs-deployment/inventory.report.egress.ts",
@@ -255,6 +260,7 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  "packages/sdk/typescript/src/client.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
@@ -275,7 +281,6 @@ const runtimeBoundaryFiles = [
   "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
-  "packages/sdk/typescript/src/index.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/repository-paths/check.runtime.test.ts",
@@ -479,6 +484,9 @@ export default defineConfig({
         "tools/docs-deployment/.generated-credential-strict-rejected.ts",
         "tools/docs-deployment/.generated-artifact-strict-rejected.ts",
         "packages/scripts/**",
+        "packages/sdk/typescript/src/**",
+        "packages/sdk/typescript/type-tests/**",
+        "packages/sdk/typescript/vitest*.config.ts",
         "packages/testing/**",
         "packages/api/http/**",
         "packages/docs-content/**",
@@ -545,6 +553,25 @@ export default defineConfig({
               "tools/oxlint/.generated-fetch-host.ts",
             ],
           },
+        ],
+      },
+    },
+    {
+      // Accepted plain SDK signatures only; client.runtime owns caller lifetime.
+      files: ["packages/sdk/typescript/src/client.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["packages/sdk/typescript/src/client.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["packages/sdk/typescript/src/client.runtime.ts"],
+      rules: {
+        "strict-effect/no-promise-workflow": [
+          "error",
+          { allowedFiles: ["packages/sdk/typescript/src/client.runtime.ts"] },
         ],
       },
     },
@@ -825,6 +852,8 @@ export default defineConfig({
       // mistakes its class declaration for an Error thrown without `new`.
       files: [
         "**/errors.ts",
+        "packages/sdk/typescript/src/index.test.ts",
+        "packages/sdk/typescript/src/client-lifetime.test.ts",
         "packages/docs-content/examples/node-server.ts",
         "**/errors/*.ts",
         "**/schemas.ts",

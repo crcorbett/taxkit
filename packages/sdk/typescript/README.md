@@ -1,8 +1,10 @@
 ---
-status: implemented
-last_reviewed: 2026-05-24
-source_of_truth: package-readme
-confidence: medium
+document_type: package-guide
+lifecycle: current
+authority: canonical
+owner: taxkit-sdk-owner
+last_reviewed: 2026-10-04
+review_trigger: SDK contracts, lifetime, exports, examples or consumer validation change
 ---
 
 # TypeScript SDK
@@ -11,7 +13,7 @@ Public TaxKit TypeScript SDK package.
 
 ## Scope
 
-`packages/sdk/typescript` owns the planned TypeScript SDK facade for
+`packages/sdk/typescript` owns the TypeScript SDK facade for
 in-process TaxKit calculations, schema exports and typed module composition.
 The package is private while the SDK surface is implemented and downstream
 consumer validation is recorded.
@@ -87,11 +89,30 @@ const payReport = await au.pay.takeHomePay({
 });
 
 const client = au.createClient();
-const annualTax = await client.calculations.calculate(
-  au.calculations.annualIncomeTax,
-  { taxableIncome }
-);
+try {
+  const annualTax = await client.calculations.calculate(
+    au.calculations.annualIncomeTax,
+    { taxableIncome }
+  );
+} finally {
+  await client.dispose();
+}
 ```
+
+Each plain client owns an independent, lazily started lifetime. Await
+`client.dispose()` when finished. Closing stops pending calculations and startup,
+then waits for finalisers. Repeated and overlapping calls wait for the same
+cleanup result. Calls after closing return `TaxKitClientDisposedError` inside
+`TaxKitFailure`, or reject with `TaxKitCalculationError` in the normal method.
+A cleanup defect rejects with the safe `TaxKitClientDisposeError`. None of these
+errors include raw private failure details.
+
+`TaxKit.calculate`, `TaxKit.safe.calculate` and direct AU helpers own a temporary
+scope for each call and clean up before settling. They leave no package-global
+runtime. The Effect interface continues to use its caller's services and scope.
+The private `client.runtime.ts` owns the plain Promise bridge; no raw runtime,
+provider client or arbitrary execution callback is exported. Module selection
+still limits descriptor types; it does not construct a different runtime catalog.
 
 AU helpers are thin wrappers over the same generic SDK descriptors. Type tests
 prove wrong calculator/module pairings and incompatible facts fail at compile
@@ -149,7 +170,8 @@ convenience:
 
 It also exports SDK-owned safe-result and error schemas such as
 `TaxKitCalculationError`, `TaxKitCalculationErrorDetail`,
-`TaxKitSchemaDecodeError` and `TaxKitUnexpectedError`.
+`TaxKitSchemaDecodeError`, `TaxKitUnexpectedError`,
+`TaxKitClientDisposedError` and `TaxKitClientDisposeError`.
 
 ## Publication Readiness
 
@@ -190,6 +212,7 @@ bun run --filter=@taxkit/sdk validate:downstream
 bun run --filter=@taxkit/sdk check-boundaries
 bun run --filter=@taxkit/sdk test-types
 bun run --filter=@taxkit/sdk test
+bun run --filter=@taxkit/sdk test:browser
 bun run --filter=@taxkit/sdk build
 ```
 
@@ -211,6 +234,7 @@ workspace tests and the focused SDK tarball check do not replace it.
 
 ```sh
 bun run --filter=@taxkit/sdk test
+bun run --filter=@taxkit/sdk test:browser
 bun run --filter=@taxkit/sdk check-types
 bun run --filter=@taxkit/sdk build
 bun run --filter=@taxkit/sdk test-types

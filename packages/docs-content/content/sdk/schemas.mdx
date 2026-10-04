@@ -41,6 +41,8 @@ The SDK also exports safe-result and error schemas:
 
 ```ts
 import {
+  TaxKitClientDisposedError,
+  TaxKitClientDisposeError,
   TaxKitFailure,
   TaxKitSchemaDecodeError,
   TaxKitSuccess,
@@ -48,7 +50,9 @@ import {
 ```
 
 Use these when you persist, inspect or validate results returned by
-`TaxKit.safe.calculate`.
+`TaxKit.safe.calculate`. `TaxKitClientDisposedError` describes calculation calls
+after a client closes. `TaxKitClientDisposeError` describes a safe cleanup failure
+from `dispose()`.
 
 ## Related pages
 

@@ -130,10 +130,11 @@
     "docs:test:browser": "turbo run test:browser --filter=docs",
     "changeset:status": "turbo run //#changeset:status:task",
     "changeset:status:task": "changeset status --verbose",
-    "verification": "bun run check:skills:types && bun run check:oxlint:types && bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow:types && bun run check:quality-workflow && bun run check:docs:types && bun run check:harness-foundation-epoch:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run check:docs-deployment:types && bun run check:docs-deployment-tools:types && bun run check:docs-deployment && bun run check:docs-deployment-automation && bun run test:docs-deployment && bun run lint && bun run format:check && bun run test:skills && bun run test:hgi-206 && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types && bun run web:test:browser",
+    "verification": "bun run check:skills:types && bun run check:oxlint:types && bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow:types && bun run check:quality-workflow && bun run check:docs:types && bun run check:harness-foundation-epoch:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run check:docs-deployment:types && bun run check:docs-deployment-tools:types && bun run check:docs-deployment && bun run check:docs-deployment-automation && bun run test:docs-deployment && bun run lint && bun run format:check && bun run test:skills && bun run test:hgi-206 && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types && bun run sdk:test:browser && bun run web:test:browser",
     "version-packages": "changeset version",
     "version-repo": "changeset version",
-    "web:test:browser": "turbo run test:browser --filter=web"
+    "web:test:browser": "turbo run test:browser --filter=web",
+    "sdk:test:browser": "turbo run test:browser --filter=@taxkit/sdk"
   },
   "dependencies": {
     "@taxkit/infrastructure": "workspace:*",

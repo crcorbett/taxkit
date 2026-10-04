@@ -43,14 +43,24 @@ import { au } from "@taxkit/sdk/au";
 
 const client = au.createClient();
 
-const report = await client.calculations.calculate(
-  au.calculations.annualIncomeTax,
-  { taxableIncome: aud(9_000_000) }
-);
+try {
+  const report = await client.calculations.calculate(
+    au.calculations.annualIncomeTax,
+    { taxableIncome: aud(9_000_000) }
+  );
+} finally {
+  await client.dispose();
+}
 ```
 
 Module-scoped clients keep the selected calculator modules explicit. Type tests
 cover incompatible calculator/module pairs.
+
+Each client owns its resources. Await `dispose()` when you finish, including
+when a calculation fails. Closing stops pending calculations and waits for
+cleanup. You can safely call it again. Closing one client leaves other clients
+usable. Calls on a closed client fail with `TaxKitClientDisposedError` detail.
+The direct helpers above handle their own cleanup before returning.
 
 ## When to use another surface
 

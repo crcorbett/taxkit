@@ -1102,3 +1102,47 @@ content, HTTP contracts and provider state: local command checking only. Recover
 by reverting the entire slice. DEV-73 and SDK/app/config/infrastructure and
 semantic/lifetime review remain unfinished, followed by DEV-74–81. Medicare
 correction still awaits Cooper's bounded scope decision.
+
+
+## Local T002 SDK caller-owned lifetime
+
+The accepted T004 caller-lifetime requirement is implemented alongside T002
+strict SDK source enforcement. The plain entrypoint no longer constructs a
+package-global runtime. Each plain client has a private lazy runtime, a closed
+Ref and a shared Deferred for cleanup completion. `dispose()` interrupts
+startup/calculation work, waits for finalisers and shares its result with
+repeated/overlapping callers. Its public Promise signatures contain no runtime
+or arbitrary execution callback. One-shot helpers own a temporary Effect scope;
+both paths reuse the existing `calculateReport` operation.
+
+The exact private `client.runtime.ts` admits required Promise signatures and
+execution, with separate exact selectors. SDK source, type fixtures and both
+Vitest configs receive all canonical rules. Native Promise rejection tests use
+owning Schema ingress; error-byte tests use exact egress permissions. Canonical
+error-constructor policy remains enforced when replacing the inaccurate native
+factory rule in two exact tests. Directly imported core is now a production
+dependency; the lockfile records that classification and browser-test hosts.
+
+The package README, API/SDK architecture, draft client/error examples and
+packed/downstream fixtures own the new lifetime contract. The current packed
+journey includes all three retained results and actual client closing. The
+major SDK Changeset records the caller's new cleanup responsibility; docs-content
+has a patch Changeset. No version application or publication is authorised.
+A package-owned Chromium suite executes the same SDK source/lifetime tests;
+full verification includes it. Packed installation and browser bundling remain
+separate from that browser execution proof.
+
+Qualification passed: 24 SDK tests in Bun and actual Chromium; 288 real lint
+cases; frozen 793-install/1020-package graph; complete package test/build tasks;
+actual SDK and nine-package downstream tarballs with retained results and
+closing; full verification with all ten isolated faults and fresh source-only
+checks; web/docs Chromium suites; docs/runbook/format checks; and Changeset
+inspection. Matching unchanged-input caches were reused where reported. The
+initial build environment and both Knip inventory findings were corrected;
+no unused-file/export exception was added. Exact observations are in the
+[SDK lifetime receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-sdk-client-lifetime.json).
+T002 remains in progress; T004 remains pending because its dependencies, UI and
+transport-limit work are unfinished. SDK command migration, other app/config/
+infrastructure owners and the complete semantic/readonly review remain next.
+Retained results and historical evidence remain unchanged; Medicare correction
+still awaits its separate bounded decision.

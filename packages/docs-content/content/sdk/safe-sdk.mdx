@@ -47,7 +47,9 @@ const result = await au.incomeTax.safe.annual({
 
 Use the safe facade when your application already models expected failures as
 data, or when you want to handle schema decode errors in the same branch as
-calculation failures.
+calculation failures. A client that has been closed returns `TaxKitFailure` with
+`TaxKitClientDisposedError` in `result.error.error`. Await `client.dispose()` when
+finished; the [Plain SDK](./plain-sdk.mdx) shows a `try`/`finally` example.
 
 Use `TaxKit.calculate` when rejected Promises fit your existing control flow.
 

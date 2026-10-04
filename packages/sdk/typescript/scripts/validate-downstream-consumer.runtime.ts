@@ -463,7 +463,7 @@ const writeConsumerFiles = (
         fs.writeFileString(
           path.join(workspacePath, "src/typecheck.ts"),
           `import type { CalculationInput } from "@taxkit/sdk";
-import { TaxKit } from "@taxkit/sdk";
+import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
 import { auEffect } from "@taxkit/sdk/au/effect";
@@ -487,6 +487,13 @@ const takeHomeFacts: CalculationInput<typeof au.calculations.takeHomePay> = {
 
 TaxKit.calculate(au.calculations.takeHomePay, takeHomeFacts);
 TaxKit.safe.calculate(au.calculations.takeHomePay, takeHomeFacts);
+const plainClient = TaxKit.createClient(au.modules.pay2025_26);
+const clientReport: Promise<typeof au.calculations.takeHomePay.outputSchema.Type> = plainClient.calculations.calculate(au.calculations.takeHomePay, takeHomeFacts);
+const clientClosed: Promise<void> = plainClient.dispose();
+void clientReport;
+void clientClosed;
+// @ts-expect-error annual tax is outside this plain client's selected module.
+plainClient.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: aud(9_000_000) });
 au.pay.takeHomePay(takeHomeFacts);
 au.pay.safe.withholdings(takeHomeFacts);
 calculateReport(au.calculations.takeHomePay, takeHomeFacts);
@@ -512,8 +519,8 @@ au.pay.takeHomePay({
 import { CalculationEngineLive } from "@taxkit/core";
 import { aud } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
-import { Effect, Layer } from "effect";
-import { TaxKit } from "@taxkit/sdk";
+import { Effect, Layer, Schema } from "effect";
+import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
 
@@ -570,7 +577,28 @@ if (effectAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.0") {
   throw new Error("Effect SDK downstream calculation returned the wrong income-tax ruleset version.");
 }
 
-console.log("Downstream SDK runtime examples passed.");
+const client = au.createClient();
+const clientReport = await client.calculations.calculate(au.calculations.takeHomePay, takeHomeFacts);
+const clientAnnual = await client.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: aud(9_000_000) });
+const clientWithholdings = await client.calculations.calculate(au.calculations.payWithholdings, takeHomeFacts);
+if (clientReport.netPay.cents !== 130_100 || clientAnnual.liability.cents !== 1_958_800 || clientWithholdings.total.cents !== 35_300) {
+  throw new Error("Caller-owned SDK client changed retained calculator results.");
+}
+await client.dispose();
+await client.dispose();
+const closed = await client.calculations.safe.calculate(au.calculations.takeHomePay, takeHomeFacts);
+if (closed._tag !== "TaxKitFailure" || closed.error.error._tag !== "TaxKitClientDisposedError") {
+  throw new Error("Disposed SDK client returned the wrong safe failure.");
+}
+try {
+  await client.calculations.calculate(au.calculations.takeHomePay, takeHomeFacts);
+  throw new Error("Disposed SDK client succeeded.");
+} catch (error) {
+  if (!Schema.is(TaxKitCalculationError)(error) || error.error._tag !== "TaxKitClientDisposedError") {
+    throw new Error("Disposed SDK client rejected without its stable public error.");
+  }
+}
+console.log("Downstream SDK runtime examples passed, including three caller-owned calculations and disposal.");
 `
         ),
         fs.writeFileString(

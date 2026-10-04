@@ -355,6 +355,17 @@ category so local usernames and matched content cannot leak into logs.
 
 ## Incremental clean-slate enforcement
 
+SDK source, type fixtures and Vitest config use all eleven canonical rules.
+`packages/sdk/typescript/src/client.runtime.ts` alone admits the plain API's
+Promise signatures and execution. These are separate exact overrides; neither
+admits async/await, Promise chains, mutation or arbitrary callbacks. Real CLI
+acceptance, rejected neighbouring code and exact selectors cover this ownership.
+Three exact representation tests encode secret-negative error bytes; two also
+decode actual native Promise rejections. Their Schema error factories use the
+canonical Error-constructor rule instead of Oxlint's inaccurate native rule.
+SDK command scripts remain pending in DEV-73.
+
+
 Release-script source, tests and config also use all eleven canonical rules.
 Their only execution admissions are the two exact `.runtime.ts` command files
 under `packages/scripts/src/release-readiness`. Each file has its own real CLI

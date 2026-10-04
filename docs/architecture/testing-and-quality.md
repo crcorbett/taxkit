@@ -116,7 +116,14 @@ release closure, materializes each declared dist-only
 `publishConfig.exports` view, Bun-packs it, rejects source/protocol leakage,
 installs all tarballs in a clean external workspace, typechecks and runs SDK
 examples, imports every JavaScript public entrypoint and browser-bundles the
-browser-safe SDK surface. It has no audit-only success mode.
+browser-safe SDK surface. It also executes the installed caller-owned client
+for all three supported calculators, awaits disposal and checks subsequent
+safe/normal failures. It has no audit-only success mode.
+
+`bun run sdk:test:browser` executes the SDK's source and controlled lifetime
+suite in Chromium, including startup, interruption, independent clients and
+cleanup failures. Full verification includes this browser suite. It establishes
+browser execution separately from the packed consumer's browser bundle.
 
 The docs browser command runs a programmatic client-side TanStack route harness
 in Chromium. It may prove direct `Route.useLoaderData` restoration, recoverable

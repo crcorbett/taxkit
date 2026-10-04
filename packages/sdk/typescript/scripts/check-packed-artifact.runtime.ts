@@ -284,6 +284,15 @@ assert.ok(schemas.CalculatorRunRequest, "schemas request import");
 assert.ok(schemas.CalculatorServiceError, "schemas service error import");
 assert.ok(schemas.TaxKitCalculationError, "schemas SDK error import");
 assert.ok(testing.AuPayTakeHomeCalculation, "testing import");
+assert.ok(schemas.TaxKitClientDisposedError, "closed-client error import");
+assert.ok(schemas.TaxKitClientDisposeError, "disposal error import");
+const client = TaxKit.createClient(au.modules.pay2025_26);
+assert.equal(typeof client.dispose, "function", "caller-owned disposal");
+await client.dispose();
+await client.dispose();
+const closed = await client.calculations.safe.calculate(testing.AuPayTakeHomeCalculation, {});
+assert.equal(closed._tag, "TaxKitFailure", "closed client safe result");
+assert.equal(closed.error.error._tag, "TaxKitClientDisposedError", "closed client error");
 `
   );
   yield* runCommand(

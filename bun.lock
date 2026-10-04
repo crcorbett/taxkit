@@ -269,6 +269,7 @@
       "version": "1.0.0",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
+        "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-income-tax": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
         "effect": "catalog:",
@@ -276,10 +277,11 @@
       "devDependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/vitest": "catalog:",
-        "@taxkit/core": "workspace:*",
         "@taxkit/testing": "workspace:*",
         "@types/bun": "catalog:",
+        "@vitest/browser-playwright": "5.0.3",
         "typescript": "catalog:",
+        "vite": "catalog:",
         "vitest": "catalog:",
       },
     },

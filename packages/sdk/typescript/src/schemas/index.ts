@@ -9,6 +9,8 @@ export {
 } from "@taxkit/calculators/schemas";
 export {
   TaxKitCalculationError,
+  TaxKitClientDisposedError,
+  TaxKitClientDisposeError,
   TaxKitFailure,
   TaxKitSchemaDecodeError,
   TaxKitSuccess,

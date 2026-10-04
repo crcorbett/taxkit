@@ -319,7 +319,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-retained-deployment-proof.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-deployment-inventory-checks.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-typed-lint-policies.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-04-release-script-boundaries.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-release-script-boundaries.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-sdk-client-lifetime.json"
       ]
     },
     {
@@ -446,7 +447,10 @@
         "Unsupported years and expected failures have checked visible outcomes; UI copy does not imply wider tax support.",
         "Packed consumers use only public exports and dispose the new caller-owned client; fresh interfaces are versioned deliberately."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-sdk-client-lifetime.json"
+      ]
     },
     {
       "id": "CSF-T005",

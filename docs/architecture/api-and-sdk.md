@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-06-25
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-api-sdk-owner
+last_reviewed: 2026-10-04
+review_trigger: API or SDK contracts, exports, lifetime or caller composition change
 ---
 
 # API and SDK
@@ -316,7 +318,7 @@ If the unscoped package name is unavailable at first publish, continue with
 It owns:
 
 - direct in-process calculation facade
-- plain TypeScript `TaxKit.create(...)` client factory and
+- plain TypeScript `TaxKit.createClient(...)` client factory and
   `TaxKit.{method}` generic helpers
 - Effect-native `./effect` entrypoint
 - jurisdiction-specific opt-in subpaths such as `./au`
@@ -338,6 +340,23 @@ unexpected defects into stable SDK-owned messages. It preserves a typed
 `Cause.pretty` text, rejected values or private paths into either safe results
 or rejected Promises. Effect consumers continue to receive the typed error
 channel directly.
+
+Plain clients have caller-owned lifetimes. `createClient` creates one private,
+lazy ManagedRuntime per client, and `dispose(): Promise<void>` interrupts pending
+work/startup and awaits finalisation. An Effect Ref marks the client closed;
+an Effect Deferred shares cleanup completion with repeated or overlapping
+calls. Closing one client does not close another. Closed calculation calls have
+checked `TaxKitClientDisposedError` detail; cleanup defects produce the safe
+`TaxKitClientDisposeError`. The private `client.runtime.ts` is the exact Promise
+and execution host. Actual work is interruptible inside its client scope; public
+outcome conversion is protected so raw interruption errors do not escape.
+
+One-shot generic and AU helpers provide the calculator Layer in a temporary
+Effect scope and clean up before settling. They do not create a ManagedRuntime.
+Both plain paths reuse `calculateReport`; dispatch and output decoding have one
+owner. The Effect interface remains caller-composed and creates no runtime.
+These lifetime changes fulfil part of the accepted fresh interface work; they
+do not establish the later calculator UI, transport limits or whole-task acceptance.
 
 ## Export boundaries
 
@@ -388,8 +407,11 @@ tarball manifest, clean installation and public-entrypoint imports.
 `.` should expose the plain, jurisdiction-neutral `TaxKit` facade. `./effect`
 should expose the Effect-native `TaxKit` facade used by HTTP handlers.
 Jurisdiction subpaths such as `./au` and `./au/effect` should expose local
-Layer-backed modules, calculation descriptors and thin convenience clients
-without making the root bundle import those rules. `./schemas` must be
+typed modules, calculation descriptors and thin convenience clients. The current
+plain root uses the default public calculator catalog, which includes the AU
+rules through the calculator live Layer. The root does not directly import AU
+descriptors; module selection limits client types rather than removing unselected
+rules from that default catalog or proving a smaller bundle. `./schemas` must be
 browser-safe and re-export calculator-owned `CalculatorRun*` schemas and
 `CalculatorServiceError` without duplicating them. `./testing` may expose
 test-only descriptors and helpers for consumers validating type behaviour.

@@ -33,6 +33,45 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
+      "packages/sdk/typescript/src/au.test.ts",
+      "packages/sdk/typescript/src/au.ts",
+      "packages/sdk/typescript/src/au-effect.ts",
+      "packages/sdk/typescript/src/client-lifetime.test.ts",
+      "packages/sdk/typescript/src/client.runtime.ts",
+      "packages/sdk/typescript/src/effect.test.ts",
+      "packages/sdk/typescript/src/effect.ts",
+      "packages/sdk/typescript/src/errors.ts",
+      "packages/sdk/typescript/src/index.test.ts",
+      "packages/sdk/typescript/src/index.ts",
+      "packages/sdk/typescript/src/internal/au-descriptors.ts",
+      "packages/sdk/typescript/src/live.layer.ts",
+      "packages/sdk/typescript/src/schemas/index.ts",
+      "packages/sdk/typescript/src/testing/index.ts",
+      "packages/sdk/typescript/src/types.ts",
+      "packages/sdk/typescript/type-tests/plain-client.test.ts",
+      "packages/sdk/typescript/type-tests/effect-client.test.ts",
+      "packages/sdk/typescript/vitest.config.ts",
+      "packages/sdk/typescript/vitest.browser.config.ts",
+    ],
+    generated: "packages/sdk/typescript/src/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+
+  {
+    accepted: [
       "packages/scripts/src/index.ts",
       "packages/scripts/src/release-readiness/cli.test.ts",
       "packages/scripts/src/release-readiness/cli.ts",
@@ -901,6 +940,7 @@ test.effect.each([
 );
 
 test.each([
+  "packages/sdk/typescript/src/client.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
@@ -940,6 +980,30 @@ test.each([
       files: [path],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: [path] },
+        ],
+      },
+    },
+  ]);
+});
+
+test("keeps the plain SDK Promise signature admission exact", () => {
+  const path = "packages/sdk/typescript/src/client.runtime.ts";
+  expect(
+    Array.filter(
+      oxlintConfig.overrides ?? [],
+      (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
+        Array.contains(entry.files ?? [], path) &&
+        Record.has<string>("strict-effect/no-promise-workflow")(
+          entry.rules ?? {}
+        )
+    )
+  ).toEqual([
+    {
+      files: [path],
+      rules: {
+        "strict-effect/no-promise-workflow": [
           "error",
           { allowedFiles: [path] },
         ],

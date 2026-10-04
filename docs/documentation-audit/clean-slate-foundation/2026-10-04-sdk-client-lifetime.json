@@ -1,0 +1,194 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "8f29c2e714b435b6b15dd91b2bf036ed6a901091",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR readback separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Caller-owned lazy plain client runtime and awaitable disposal; repeated/overlapping close completion shared",
+    "Interruptible startup/calculation with protected safe outcome conversion and bounded errors",
+    "One-shot helpers use native scoped Layer provision; reuse Effect calculateReport without global runtime",
+    "Canonical strict rules for SDK source/type fixtures/config; exact runtime and Promise signature owners",
+    "SDK core dependency corrected from dev-only to runtime, browser host dependencies declared",
+    "Private SDK major and docs-content patch Changeset; packed consumer exercises retained results and closing",
+    "Default calculator Live Layer composition separate from the private caller-lifetime host and public typed factory; constructor used in production and controlled tests without unused-export exceptions"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "packages/sdk/typescript/**",
+        "package.json",
+        "bun.lock",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "knip.json",
+        "packages/docs-content/content/sdk/{plain-sdk,safe-sdk,schemas}.mdx",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/standards/tooling.md",
+        "docs/verification/critical-journeys.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        ".changeset/caller-owned-sdk-clients.md",
+        "docs/architecture/effect-services.md"
+      ],
+      "reason": "Plain client lifetime, checks, installed consumer and examples changed"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "docs/product-specs/clean-slate-foundation.md",
+        "packages/rules/**",
+        "packages/calculators/**",
+        "packages/api/http/**",
+        "docs/evidence/**",
+        ".agents/skills/**",
+        "AGENTS.md",
+        "docs/runbooks/**",
+        "docs/operations/authority-model.md"
+      ],
+      "reason": "Accepted caller-owned requirement implemented in overlap with T002; retained tax semantics, host operations and pinned skills unchanged"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "apps/**",
+        "packages/infrastructure/**"
+      ],
+      "reason": "No app UI, provider, deployment or API contract change in this slice"
+    }
+  ],
+  "source_qualification": {
+    "installed_effect": "4.0.0",
+    "apis": [
+      "ManagedRuntime.contextEffect/scope/disposeEffect",
+      "Fiber.runIn",
+      "Ref.makeUnsafe/getUnsafe/getAndSet",
+      "Deferred.makeUnsafe/done/await",
+      "Effect.interruptible/runPromise uninterruptible option"
+    ],
+    "observations": [
+      "Native runtime Promise context provision happens outside nested operation catch, so the host catches the complete startup/calculation operation",
+      "Interruptible root Promise exposes a raw interrupt despite inner exit mapping; protected outer outcome execution with explicitly interruptible work is required",
+      "Native repeated Scope.close alone does not share in-progress cleanup completion; closed Deferred records the first close result"
+    ]
+  },
+  "verification": [
+    {
+      "command": "bun install --frozen-lockfile --ignore-scripts",
+      "outcome": "passed",
+      "postcondition": "793 installs across 1020 packages; updated lock dependency classifications and existing browser host versions match; no new selected package version",
+      "log": "sdk-client-lifetime-frozen.log"
+    },
+    {
+      "command": "SDK check-types, test-types and test",
+      "outcome": "passed",
+      "postcondition": "24 SDK tests: 14 retained and 10 caller-lifetime cases; module mismatch and descriptor-specific report type proof",
+      "log": "SDK direct command outputs and sdk-client-lifetime-test.log"
+    },
+    {
+      "command": "bun run test:oxlint:task",
+      "outcome": "passed",
+      "postcondition": "288 cases = 266 retained + 19 SDK source/type/config acceptance + 1 rejected neighbour + 2 exact runtime/Promise selectors; all strict rules retained",
+      "log": "sdk-client-lifetime-oxlint-qualified.log"
+    },
+    {
+      "command": "bun run test",
+      "outcome": "passed",
+      "postcondition": "All 22 workspace test tasks successful; 6 matching unchanged-input cache hits; documentation/paths/docs/lint tool suites passed. Later constructor composition correction separately requalified by all 24 SDK tests, consumer/build/full verification/browser checks.",
+      "log": "sdk-client-lifetime-test.log"
+    },
+    {
+      "command": "bun run build",
+      "outcome": "passed",
+      "postcondition": "All 15 tasks successful, 9 matching unchanged-input cache hits; final SDK composition and revised draft MDX compiled",
+      "log": "sdk-client-lifetime-build-final.log"
+    },
+    {
+      "command": "bun run sdk:check-packed-artifact",
+      "outcome": "passed",
+      "postcondition": "Actual SDK tarball (46 files) public imports, new error schemas and repeated/closed client operations; temporary workspace removed",
+      "log": "sdk-client-lifetime-packed-final.log"
+    },
+    {
+      "command": "bun run sdk:validate-downstream",
+      "outcome": "passed",
+      "postcondition": "All nine actual dist-only tarballs installed externally; types, all three retained results, awaitable/repeated closing, safe and normal subsequent failures, every JS public export and browser bundle passed; no protocol blockers; temp workspace removed",
+      "log": "sdk-client-lifetime-downstream-final.log"
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "passed",
+      "postcondition": "Final source passed complete verification: all 21 Quality cases, all ten isolated faults, fresh source-only documentation checks before build (223.53 seconds); compiler/language/skills/16 evaluations/176 deployment tools/lint/format/both Knips/types; actual SDK Chromium 24 cases and web Chromium 2 cases. Matching unchanged-input caches reused where reported.",
+      "log": "sdk-client-lifetime-verification-final.log"
+    },
+    {
+      "command": "bun run docs:test:browser",
+      "outcome": "passed",
+      "postcondition": "All seven route/transport cases actually executed in Chromium (98ms); built-app dependencies unchanged-input cache hits",
+      "log": "sdk-client-lifetime-docs-browser.log"
+    },
+    {
+      "command": "bun run changeset:status",
+      "outcome": "passed",
+      "postcondition": "SDK major and docs-content patch Changeset recognised; fixed nine-package train pending 2.0.0; no version application",
+      "log": "sdk-client-lifetime-changeset.log"
+    },
+    {
+      "command": "check:docs, check:runbooks, format:check, git diff --check",
+      "outcome": "passed after final receipt and plan notes",
+      "postcondition": "Current owner links/metadata, authored formatting and retained runbook packet valid after receipt closeout; no procedure executed",
+      "log": "sdk-client-lifetime-closeout-docs.log / sdk-client-lifetime-closeout-runbooks.log / sdk-client-lifetime-closeout-format.log"
+    }
+  ],
+  "non_claims": [
+    "Whole DEV-73 or T004 acceptance",
+    "SDK command-script strict migration",
+    "Full semantic/readonly review",
+    "Medicare correctness decision",
+    "Companion adad qualification of the new interface",
+    "Merge, deployment, provider apply, version application or publication"
+  ],
+  "rollback": "Revert this slice as a whole, including lifetime examples, dependency classification, browser-check owner and Changeset; previous parent revision retains the old global-runtime behaviour",
+  "next_owner": "Continue SDK command migration and remaining T002 owners, then DEV-74\u201381 in accepted order",
+  "recovery_observations": [
+    {
+      "outcome": "corrected-local-invocation",
+      "observation": "Initial full build omitted the temporary Chromium folder for docs diagrams; docs build failed while 14 other tasks passed. Retried with PLAYWRIGHT_BROWSERS_PATH, and all 15 passed (9 unchanged-input cache hits).",
+      "log": "sdk-client-lifetime-build.log / sdk-client-lifetime-build-recovery.log"
+    },
+    {
+      "outcome": "corrected-inventory",
+      "observation": "Full verification passed all 21 Quality cases and isolated faults, then Knip identified the newly inventoried two SDK type fixtures as missing entries. Added actual type-test command inputs as entrypoints. Production Knip then identified a test-only factory export; separated the default Live Layer and public factory so the private constructor has real production and test consumers. No unused-file/export exclusion added. Final full verification passed after both corrections.",
+      "log": "sdk-client-lifetime-verification.log"
+    },
+    {
+      "outcome": "corrected-configuration",
+      "observation": "Browser-playwright is pinned directly at 5.0.3 in the apps rather than in the catalogue. Its first catalogue lookup failed; used that existing exact version without changing selected versions. Frozen installation passed."
+    },
+    {
+      "outcome": "corrected-factory-policy",
+      "observation": "Native Unicorn Error-constructor autofix incorrectly inserted new before two Schema.TaggedError factories. Removed the invalid edits and replaced that native rule at two exact tests with the already enforced canonical constructor rule."
+    },
+    {
+      "outcome": "clarified-host-factory",
+      "observation": "The actual acceptance fixture rejected importing makeClientWithLayer as a service-Layer constructor. The private function constructs a caller-owned plain client rather than a service or Layer; named it createPlainClient and kept its runtime-file containment, production consumer and controlled tests. No rule or scope exception added.",
+      "log": "sdk-client-lifetime-oxlint-final.log"
+    }
+  ],
+  "raw_log_location": "Task-local sdk-client-lifetime-* logs under the temporary toolchain directory; no raw logs or secrets committed."
+}

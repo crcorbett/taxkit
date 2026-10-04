@@ -1,11 +1,20 @@
 import { describe, expect, it } from "@effect/vitest";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { CalculatorServiceError } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
 import { aud } from "@taxkit/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
-import { Array as EffectArray, Cause, Effect, Exit, Layer } from "effect";
+import {
+  Array as EffectArray,
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  Match,
+  Schema,
+} from "effect";
 
 import { calculateReport, calculateRunRequest } from "./effect.js";
 import {
@@ -116,10 +125,18 @@ describe("Effect SDK facade", () => {
 
         expect(sdkFailure.error).toEqual(serviceFailure.error);
         expect(sdkFailure.error._tag).toBe("CalculatorInputDecodeError");
-        expect(JSON.stringify(sdkFailure.error)).not.toContain(secretSentinel);
-        expect(JSON.stringify(sdkFailure.error)).not.toContain(
-          privatePathSentinel
+        const encodedError = yield* Match.value(sdkFailure.error).pipe(
+          Match.tag("SchemaError", () =>
+            Effect.sync(() => expect.fail("Expected calculator input error"))
+          ),
+          Match.orElse((error) =>
+            Schema.encodeEffect(Schema.toCodecJson(CalculatorServiceError))(
+              error
+            )
+          )
         );
+        expect(encodedError).not.toContain(secretSentinel);
+        expect(encodedError).not.toContain(privatePathSentinel);
       }
     }).pipe(Effect.provide(ServiceLive))
   );

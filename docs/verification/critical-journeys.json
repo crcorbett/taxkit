@@ -26,7 +26,7 @@
       "startingState": "Clean checkout with SDK build inputs available.",
       "inputs": ["Packed SDK artifact", "Clean downstream consumer workspace"],
       "stepsOrProcedureOwner": "bun run --filter=@taxkit/sdk check-packed-artifact then bun run --filter=@taxkit/sdk validate:downstream",
-      "expectedBehavior": ["The dist-only tarball installs and every supported public entrypoint imports in the downstream consumer."],
+      "expectedBehavior": ["The dist-only tarball installs and every supported public entrypoint imports in the downstream consumer.", "The installed plain client retains all three supported calculator results, closes its caller-owned lifetime and returns checked errors for later calls."],
       "expectedSideEffects": ["Transient tarballs and a command-owned temporary consumer workspace."],
       "preservedInvariants": ["Tarballs are deleted by their owning command and are never durable release evidence."],
       "oracle": "The consumer installs the actual packed artifact rather than importing workspace source.",

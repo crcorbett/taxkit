@@ -43,3 +43,17 @@ au.pay.takeHomePay({
   // @ts-expect-error annual-tax facts cannot be submitted to take-home pay.
   taxableIncome: aud(9_000_000),
 });
+
+const payClosed = payClient.dispose();
+const auClosed = auClient.dispose();
+void payClosed;
+void auClosed;
+
+// Selected descriptors retain their specific report fields on client methods.
+const takeHome = payClient.calculations.calculate(
+  au.calculations.takeHomePay,
+  takeHomeFacts
+);
+type TakeHome = Awaited<typeof takeHome>;
+const takeHomeCents = (report: TakeHome) => report.netPay.cents;
+void takeHomeCents;
