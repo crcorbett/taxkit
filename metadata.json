@@ -1,0 +1,33 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43B4H5V43BJ3XZZSCZ0DTNC",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-73-api-app-boundaries",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/api/scripts/routes.ts",
+    "apps/api/scripts/schemas.ts",
+    "apps/api/scripts/smoke-boundaries.test.ts",
+    "apps/api/scripts/smoke-public-routes.runtime.ts",
+    "apps/api/test/config.test.ts",
+    "apps/api/vitest.config.ts",
+    "packages/api/http/src/groups/health.ts",
+    "packages/api/http/src/index.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 302321,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 11064576,
+    "output_tokens": 55827,
+    "api_call_count": 81
+  }
+}
