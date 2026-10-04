@@ -342,11 +342,7 @@ const EpochSkill = Schema.Struct({
   sourceRevision: NonEmpty,
 });
 
-export const expectedEpochSkills: readonly {
-  readonly sha256: string;
-  readonly sourceId: string;
-  readonly sourceRevision: string;
-}[] = [
+export const expectedEpochSkills: readonly (typeof EpochSkill.Type)[] = [
   {
     sha256: "6f2028152fd4c16f882f604b53d2906b06c336597113de67a778fbe9b9236016",
     sourceId: "codex-global:prd-implementer",

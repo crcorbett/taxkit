@@ -684,3 +684,14 @@ in Vite's server resolver. The isolated Quality copy runs all documentation
 tests before `packages/scripts/dist` exists, creating only temporary Git
 metadata for the command inventory. This checks fresh source loading rather
 than relying on local ignored build files; package exports stay unchanged.
+
+
+Retained evaluation-tool tests run through Bun-hosted Effect Vitest. Known
+SHA-256 text/byte vectors, including UTF-8 text, preserve digest bytes. Pure
+policy fixtures use declared retained hashes and qualify the complete accepted
+bindings, missing source/detail hashes and duplicate observations. They are
+explicitly distinct from real source hashing. Actual child-process cases retain
+the two existing historical verifier failures and reject unknown options with
+bounded output. Full verification typechecks both owners and runs these focused
+tests. Real lint fixtures qualify all ten source/test files and a rejected
+neighbour, plus exact assertions for the two runtime admissions.

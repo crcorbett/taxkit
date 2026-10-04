@@ -197,6 +197,35 @@ const fixtureCases = [
     ],
   },
   {
+    accepted: [
+      "tools/evals/hgi-206/check.runtime.ts",
+      "tools/evals/hgi-206/check.runtime.test.ts",
+      "tools/evals/hgi-206/input.boundary.ts",
+      "tools/evals/hgi-206/input.boundary.test.ts",
+      "tools/evals/hgi-206/schemas.ts",
+      "tools/evals/hgi-206/service.ts",
+      "tools/evals/hgi-206/service.test.ts",
+      "tools/evals/harness-foundation/check.runtime.ts",
+      "tools/evals/harness-foundation/input.boundary.ts",
+      "tools/evals/harness-foundation/schemas.ts",
+    ],
+    generated: "tools/evals/hgi-206/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
     accepted: ["tools/skills/skill-policies.test.ts"],
     generated: "tools/skills/.generated-strict-rejected.ts",
     namespace: "strict-effect",
@@ -659,6 +688,8 @@ test.each([
   "packages/docs-content/src/validate.runtime.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
+  "tools/evals/hgi-206/check.runtime.ts",
+  "tools/evals/harness-foundation/check.runtime.ts",
 ])("keeps the command runtime admission exact: %s", (path) => {
   expect(
     Array.filter(

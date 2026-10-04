@@ -85,6 +85,8 @@ const decodingBoundaryFiles = [
   "tools/quality-workflow/policy.ts",
   "tools/quality-workflow/release-boundary.test.ts",
   "tools/evals/hgi-206/input.boundary.ts",
+  // Exact child-process UTF-8 output boundary; no runtime admission.
+  "tools/evals/hgi-206/check.runtime.test.ts",
   "tools/evals/harness-foundation/input.boundary.ts",
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/foundation.test.ts",
@@ -166,7 +168,7 @@ const portableEffectSourceFiles = [
   "tools/repository-paths/**/*.{ts,tsx,js,jsx}",
   "tools/skills/**/*.{ts,tsx,js,jsx}",
   "tools/governance/**/*.{ts,tsx,js,jsx}",
-  "tools/evals/harness-foundation/**/*.{ts,tsx,js,jsx}",
+  "tools/evals/**/*.{ts,tsx,js,jsx}",
 ];
 
 const schemaEncoderEgressFiles = [
@@ -175,6 +177,8 @@ const schemaEncoderEgressFiles = [
   "packages/docs-fumadocs/src/service.test.ts",
   "packages/docs-content/examples/node-server.ts",
   "tools/governance/check.runtime.ts",
+  // Exact historical skill representation test uses the Candidate-owned Schema.
+  "tools/evals/hgi-206/service.test.ts",
   "packages/api/http/__tests__/openapi-snapshot.test.ts",
   "packages/api/http/__tests__/public-calculation-api.test.ts",
   // Exact representation-boundary tests: deterministic report bytes and secret-negative error JSON.
@@ -326,8 +330,6 @@ const bunAdapterFiles = [
   "apps/docs/scripts/test-built.tsx",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
-  "tools/evals/hgi-206/check.runtime.ts",
-  "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/check.runtime.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
@@ -429,6 +431,7 @@ export default defineConfig({
         "tools/skills/**",
         "tools/quality-workflow/**",
         "tools/documentation/**",
+        "tools/evals/**",
         "packages/testing/**",
         "packages/api/http/**",
         "packages/docs-content/**",
@@ -540,6 +543,24 @@ export default defineConfig({
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["tools/documentation/runbook-check.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/evals/hgi-206/check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/evals/hgi-206/check.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/evals/harness-foundation/check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/evals/harness-foundation/check.runtime.ts"] },
         ],
       },
     },

@@ -1,0 +1,103 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "adc79d2a3319a45453f9ceb782e3f0a1048f8811",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR readback separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Persistent checked evidence maps/sets and Effect array operations; ASCII equality without JSON internal comparisons",
+    "Missing source hash fails before aggregate rendering; absence remains Option-owned in policy checks",
+    "Historical skill constant types derive from the existing Schema; declared identities/digests preserved",
+    "Two named text/byte SHA-256 input operations with safe typed errors; no mutable Bun hash builders",
+    "Effect CLI and outer Bun services only at two exact executables; no raw error stacks after bounded repair messages",
+    "Bun-hosted Effect Vitest and focused types/tests in root verification; all eleven canonical rules on both owners, exact runtime admissions and test-only representation/byte restoration"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "tools/evals/**/*.ts",
+        "package.json",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "docs/README.md",
+        "docs/verification/harness-epochs.md",
+        "docs/standards/tooling.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json"
+      ],
+      "reason": "Changed implementation/test/command ownership; historical proof ceiling clarified"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        ".agents/skills/**",
+        "tools/evals/*.json",
+        "docs/documentation-audit/HGI-206*.json",
+        "docs/documentation-audit/hgi-206/**",
+        "docs/documentation-audit/harness-foundation/**",
+        "docs/evidence/**",
+        "packages/**",
+        "apps/**",
+        "bun.lock"
+      ],
+      "reason": "Saved candidate/scenario/skill identities and proof bytes, exports and tax/package results"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public content",
+        "operational runbook procedures",
+        "provider state"
+      ],
+      "reason": "Root checking tools only; no versioned package or external operation"
+    }
+  ],
+  "baseline_observations": [
+    "Actual incremental strict scope produced 27 findings over eight source/test files before edits. This is a scoped configuration observation, not a trend or whole-repository defect count",
+    "HGI-206 already failed at missing docs/exec-plans/active/harness-governance-documentation.md; foundation epoch already failed at skill-receipt-projection",
+    "Initial local probing with CLI severity flags produced no custom findings and was not accepted as scope proof. Actual reviewed configuration activation supplied the baseline"
+  ],
+  "verification": [
+    {
+      "command": "bun run check:harness-foundation-epoch:types",
+      "result": "passed; existing nonfatal unstable-API warnings and numeric Schema suggestions visible"
+    },
+    {
+      "command": "bun run test:hgi-206",
+      "result": "16 passed: three retained and thirteen added. Policy-only declared-hash fixtures are not current source acceptance"
+    },
+    {
+      "command": "bun run test:oxlint:task",
+      "result": "134 lint-suite cases passed; actual CLI accepted/rejected files and exact runtime config assertions"
+    },
+    {
+      "command": "frozen install, complete tests, build and verification",
+      "result": "passed: frozen install (790 installs, 1020 packages, unchanged lock), complete tests, 15-task build and full verification; 21 Quality cases/all ten isolated mutations, 21 skill cases and fresh source-only documentation check passed. Matching unchanged-input package/build and two Chromium checks reused recorded caches"
+    }
+  ],
+  "limitations": [
+    "DEV-73 and DEV-74\u201381 unfinished; remaining owned paths, checked JavaScript and readonly/Schema/lifetime review pending",
+    "Historical verifier failures remain nonzero; no new accepted harness epoch or independent review is claimed",
+    "Whole current source hashes, hosted result and external state are separate proof",
+    "Medicare correction awaits Cooper scope decision",
+    "No canonical asset, retained tax result or historical receipt bytes changed",
+    "No merge, release, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert the complete slice; exact saved WIP stash 1901d2f was retained during #105 recovery; no external state changed"
+}

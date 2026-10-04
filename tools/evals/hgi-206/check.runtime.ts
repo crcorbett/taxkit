@@ -1,18 +1,14 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import {
-  Array as EffectArray,
-  Array,
-  Console,
-  Effect,
-  Match,
-  Stream,
-} from "effect";
+import { Array, Console, Effect, HashMap, Order, Match, Stream } from "effect";
+import { sort } from "effect/Array";
+import { Command } from "effect/cli";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
 import {
+  hashHgi206Text,
   readHgi206Json,
   repositoryRootFromUrl,
   restoreChangedPaths,
@@ -44,11 +40,6 @@ import {
 
 const repositoryRootUrl = new URL("../../..", import.meta.url);
 
-const sha256 = (source: string) =>
-  Effect.sync(() =>
-    new Bun.CryptoHasher("sha256").update(source).digest("hex")
-  );
-
 const readHash = (repositoryRoot: string, target: string) =>
   Effect.gen(function* readHgi206Hash() {
     const fileSystem = yield* FileSystem.FileSystem;
@@ -60,7 +51,7 @@ const readHash = (repositoryRoot: string, target: string) =>
       .readFileString(resolvedTarget)
       .pipe(Effect.mapError(() => new Hgi206InputError({ target })));
 
-    return yield* sha256(source);
+    return yield* hashHgi206Text(source);
   });
 
 const listChangedPaths = (repositoryRoot: string) =>
@@ -110,7 +101,7 @@ const listChangedPaths = (repositoryRoot: string) =>
       { concurrency: 1 }
     );
 
-    return [...new Set(inventories.flat())].toSorted();
+    return sort(Array.dedupe(Array.flatten(inventories)), Order.String);
   }).pipe(Effect.scoped);
 
 export const checkHgi206 = (repositoryRoot: string) =>
@@ -172,17 +163,18 @@ export const checkHgi206 = (repositoryRoot: string) =>
         ),
       { concurrency: 1 }
     );
-    const hashPaths = [
-      ...new Set([
-        ...EffectArray.map(manifest.files, (member) => member.path),
+    const hashPaths = sort(
+      Array.dedupe([
+        ...Array.map(manifest.files, (member) => member.path),
         hgi206Paths.failed,
         hgi206Paths.fixtures,
         hgi206Paths.observations,
         hgi206Paths.results,
         ...receiptPaths,
-        ...EffectArray.map(receipts, ([, receipt]) => receipt.detailPath),
+        ...Array.map(receipts, ([, receipt]) => receipt.detailPath),
       ]),
-    ].toSorted();
+      Order.String
+    );
     const hashes = yield* Effect.forEach(
       hashPaths,
       (target) =>
@@ -191,13 +183,15 @@ export const checkHgi206 = (repositoryRoot: string) =>
         ),
       { concurrency: 1 }
     );
-    const hashMap = new Map(hashes);
+    const hashMap = HashMap.fromIterable(hashes);
     const changedPaths = yield* listChangedPaths(repositoryRoot);
-    const manifestAggregate = yield* sha256(
-      renderManifestAggregateSource(manifest.files, hashMap)
+    const manifestAggregate = yield* hashHgi206Text(
+      yield* renderManifestAggregateSource(manifest.files, hashMap)
     );
-    const changedPathDigest = yield* sha256(
-      EffectArray.map(changedPaths.toSorted(), (path) => `${path}\n`).join("")
+    const changedPathDigest = yield* hashHgi206Text(
+      Array.map(sort(changedPaths, Order.String), (path) => `${path}\n`).join(
+        ""
+      )
     );
 
     return yield* validateHgi206Evidence({
@@ -207,11 +201,11 @@ export const checkHgi206 = (repositoryRoot: string) =>
       failed,
       fixtures,
       hashes: hashMap,
-      journeyDetails: new Map(details),
+      journeyDetails: HashMap.fromIterable(details),
       manifest,
       manifestAggregate,
       observations,
-      receipts: new Map(receipts),
+      receipts: HashMap.fromIterable(receipts),
       results,
       scenarios,
     });
@@ -239,11 +233,20 @@ const program = Effect.gen(function* hgi206Main() {
       `FAIL [${error.invariant}] target=${error.target}; recovery=${error.recovery}; details=${error.detailsPath}; postcondition=${error.postcondition}.`
     )
   ),
-  Effect.scoped,
-  Effect.provide(BunServices.layer)
+  Effect.scoped
 );
 
+const command = Command.make("check-hgi-206", {}, () => program);
+
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(
+      Command.run(command, {
+        renderErrors: false,
+        version: "repository-local",
+      }).pipe(Effect.provide(BunServices.layer)),
+      { disableErrorReporting: true }
+    )
+  ),
   Match.orElse(() => false)
 );

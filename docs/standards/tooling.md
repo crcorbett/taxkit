@@ -435,3 +435,12 @@ keeping the canonical task router under maintainer control and preventing a
 checking command from changing tracked source during isolated-clone tests.
 Read the installed Turbo package's `docs/README.md` and applicable reference
 before changing its task configuration.
+
+
+The retained `tools/evals` owners use all eleven canonical strict rules and
+persistent checked collections. Each of their two executable files has its own
+exact runtime admission; former Bun hasher admissions are removed. SHA-256 text
+and byte operations belong to their named input boundaries and use safe typed
+errors. `check:harness-foundation-epoch:types` and Bun-hosted `test:hgi-206` run
+inside root verification. Root verification runs focused policy/host tests;
+it does not assert that either saved historical epoch qualifies today's graph.

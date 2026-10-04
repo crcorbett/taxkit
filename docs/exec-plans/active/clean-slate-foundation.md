@@ -32,7 +32,7 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: migrate the remaining deployment, evaluation, SDK, app/config and infrastructure paths, then finish readonly
+Next continuation milestone: migrate the remaining deployment, SDK, app/config and infrastructure paths, then finish readonly
 contract, Schema, helper and lifetime review before downstream acceptance.
 The Bun-hosted Effect test runner and focused lexical gap proof are locally
 qualified; static JavaScript checking remains pending. Domain boundary enforcement is implemented in PR #93. The latest
@@ -704,3 +704,43 @@ and the fresh source-only documentation check. Matching unchanged-input
 package/build/browser caches were reused. The initial hosted failure remains
 recorded; the successor hosted result is separate. Final receipt-only
 checks precede the corrective commit on the same draft.
+
+
+## Local T002 retained evaluation tools
+
+Continue from corrected #105 at `adc79d2`. Both evaluation owners now use
+persistent maps/sets, checked optional values and Effect array operations.
+Array equality retains ASCII sorting without unchecked JSON comparisons.
+Missing aggregate hashes now fail with the owning error before text is rendered.
+Historical skill constants derive their type from the owning Schema.
+SHA-256 host work moves to two named input operations with safe typed errors;
+known text/byte vectors preserve empty, ASCII and UTF-8 digests. CLI composition
+and Bun services stay at the two separately admitted executables. Raw error
+stacks are suppressed after the existing bounded repair message. Ordinary
+source/test files receive no runtime permission.
+
+Before migration, HGI-206 stopped at its missing historical active-owner source;
+the foundation epoch stopped at its canonical skill receipt projection. Those
+nonzero failures remain expected. Historical evidence is not rewritten to make
+it accept the clean-slate graph. Policy-only fixtures decode retained records
+and use declared hashes to check complete accepted bindings and three owning
+failure identities. They do not claim fresh source or accepted current-epoch
+proof. The earliest durable epoch owner now makes that distinction explicit.
+
+Documentation impact: **Change required** for checking code, root focused
+commands/verification, strict selectors and test-only representation/byte
+admissions, tooling/testing and epoch/router owners, this plan, task evidence
+and dated receipt. **Preserve** canonical skills, all historical evidence JSON,
+scenario/candidate IDs, tax/package results, package exports, lock and provider
+state. **N/A** for Changesets, public content and operational procedures:
+repository checking tools only. Recover by reverting the complete slice.
+The [evaluation-tools receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-evaluation-tools.json)
+records checks and limits. DEV-73 and downstream tasks remain unfinished.
+
+Focused checks passed: 16 evaluation cases (three retained, thirteen added)
+and 134 lint-suite cases using actual CLI fixtures and configuration assertions.
+Frozen install, complete tests, the 15-task build and full verification passed.
+This includes 21 Quality cases/all ten isolated mutations, 21 skill cases and
+the fresh source-only documentation check. Matching unchanged-input package,
+build and two Chromium check caches were reused. Final docs/runbook checks
+precede commit; hosted proof remains separate.
