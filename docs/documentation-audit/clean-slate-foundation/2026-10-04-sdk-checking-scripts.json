@@ -1,0 +1,193 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "72c32864039779b0a51ee671cec69cbdf5e60487",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR readback separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Canonical strict rules cover all SDK checking scripts and controlled test fixtures; three exact runtime admissions only",
+    "Immediate Schema-owned manifest ingress, Option optional keys and checked field selections",
+    "One staged manifest decode preserves uninterpreted metadata through owning Schema egress; no raw JSON or competing DTOs",
+    "Native FileSystem and scoped command services replace raw Bun/Promise import checking; failed searches fail closed",
+    "Each private command closes before the next operation; collected stdout limited to 1048576 bytes and stderr drained without retention",
+    "Operational errors retain the named step and available exit code, without native error or captured-output payloads",
+    "Failed cleanup fails successful work; error mapping and reporting before final scope close retain simultaneous work and cleanup failures",
+    "SDK check-types includes the new scripts project; native tests include scripts and browser tests retain only browser-compatible SDK source"
+  ],
+  "checks": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "pass; 793 installs/1020 packages; no lock change",
+      "log": "/private/tmp/taxkit-local-toolchain/sdk-scripts-install-qualified.log"
+    },
+    {
+      "command": "SDK compiler and native tests",
+      "outcome": "pass; script project included; 56 cases (24 retained and 32 new)",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-types-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-tests-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-all-tests-qualified.log"
+      ]
+    },
+    {
+      "command": "real lint corpus",
+      "outcome": "pass; 297 cases = 288 retained + five accepted script/test files + one rejected script neighbour + three exact runtime selectors",
+      "log": "/private/tmp/taxkit-local-toolchain/sdk-scripts-lint-final.log"
+    },
+    {
+      "command": "root tests and build",
+      "outcome": "pass; 22 test tasks (15 cached on first run, all matching caches on final unchanged-input run); 15 build tasks (12 matching caches)",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-all-tests-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-all-tests-final.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-build-qualified.log"
+      ]
+    },
+    {
+      "command": "actual SDK boundaries, packed artifact and downstream consumer",
+      "outcome": "pass; 46-file SDK tarball; nine-package concrete-range installation, types, three retained calculator results/client disposal, every JavaScript public import and browser bundle; temporary folders removed",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-imports-final.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-packed-final.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-downstream-final.log"
+      ]
+    },
+    {
+      "command": "first full verification",
+      "outcome": "failed at outdated raw public-export oracle; exact SDK build step/exit 2 remained failed; 20/21 Quality cases passed",
+      "log": "/private/tmp/taxkit-local-toolchain/sdk-scripts-verification-qualified.log"
+    },
+    {
+      "command": "six owning command faults after oracle correction",
+      "outcome": "pass; all six fault procedures executed in isolated source copies",
+      "log": "/private/tmp/taxkit-local-toolchain/sdk-scripts-six-faults-qualified.log"
+    },
+    {
+      "command": "final full verification",
+      "outcome": "pass; all 21 Quality cases and all ten isolated faults; fresh source-only documentation checks; 176 deployment-tool cases; 21 skill cases; 16 evaluation cases; compiler/language/lint/format and both unused-code profiles",
+      "log": "/private/tmp/taxkit-local-toolchain/sdk-scripts-verification-final.log",
+      "quality_duration_seconds": 213.42
+    },
+    {
+      "command": "actual Chromium suites",
+      "outcome": "pass; 24 SDK source/lifetime cases, two web Atom cases and seven docs route cases; Bun-only script fixtures excluded from browser ownership",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-verification-final.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-docs-browser-final.log"
+      ]
+    },
+    {
+      "command": "docs/runbooks/format/diff/Changeset inspection",
+      "outcome": "pass; appropriate SDK patch pending with existing version graph; no version application",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-docs-final.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-runbooks-final.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-format-final.log",
+        "/private/tmp/taxkit-local-toolchain/sdk-scripts-changesets-final.log"
+      ]
+    },
+    {
+      "command": "expanded canonical inventory probe",
+      "outcome": "452 provisional diagnostics across 376 owned source arguments; exact admissions preserved; includes current fixture/host cases, not confirmed defects",
+      "log": "/private/tmp/taxkit-local-toolchain/sdk-scripts-owned-strict-inventory.json",
+      "limits": "Preliminary temporary relative-path config and CLI --deny attempts did not establish the intended full inventory. Owned source argument list and absolute override paths corrected the probe."
+    }
+  ],
+  "impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "packages/sdk/typescript/scripts",
+        "packages/sdk/typescript/package.json",
+        "packages/sdk/typescript/vitest.config.ts",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "knip.json",
+        "packages/sdk/typescript/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/runbooks/packed-consumer-proof.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        ".changeset/checked-sdk-command-scripts.md",
+        "tools/quality-workflow/fixtures/release-boundary-defects.json",
+        "tools/quality-workflow/release-boundary.test.ts"
+      ],
+      "reason": "Command types, manifest representation, local errors, cleanup and strict checks changed together"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "SDK public exports/lifetime",
+        "nine-package release closure",
+        "current packed-consumer journey oracles",
+        "historical proof and failed attempts",
+        "canonical skills and digests",
+        "dependency versions and lock",
+        "docs/product-specs/clean-slate-foundation.md",
+        "retained tax results"
+      ],
+      "reason": "Local script migration preserves the accepted product scope and tax results; no protocol relaxation or package publication"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "generated/public content",
+        "HTTP contracts",
+        "provider/registry/deployment state"
+      ],
+      "reason": "No public API or external-state change"
+    }
+  ],
+  "compatibility": {
+    "effect": "4.0.0 installed API checked",
+    "typescript": "7.0.2",
+    "bun": "1.4.2",
+    "optional_keys": "Absent dependency keys decode to None and encode as absent; explicit null rejected",
+    "staged_manifest": "Unknown metadata retained; JSON field order may change; no old tarball byte claim",
+    "private_commands": "Helpers own reusable process I/O only; no generic SDK callback or raw provider client exported"
+  },
+  "recovery": {
+    "baseline_findings": "Actual script type project found obsolete three-parameter Schema signature and unchecked service requirement; actual canonical CLI baseline found 31 diagnostics",
+    "attempts": [
+      "First codec-byte test correctly showed field order changes; assertion now proves preservation of metadata and absent dependency/source keys",
+      "Simultaneous work/cleanup fixture showed post-scope error mapping discarded the cleanup cause; move mapping/reporting before final scope close, then prove both failures",
+      "Initial selected-API prototypes rejected TaggedErrorClass/orDieWith and mapAccum eager seed/single output; corrected against installed stable source and checked by compiler/tests",
+      "Old public-export oracle required raw compiler TaxKit text after safe output migration. Bind exact SDK build stage/exit 2 and independently fix all six current oracles to command/target/recovery; no failure or historical packet removed."
+    ],
+    "last_successful_step": "Final full local verification, actual browser suites and documentation/Changeset checks",
+    "rollback": "Revert this complete local script slice; retained parent revision remains available",
+    "resume_owner": "TaxKit implementation owner"
+  },
+  "non_claims": [
+    "DEV-73/T002 completion",
+    "DEV-74 through DEV-81 implementation",
+    "Cooper review or acceptance",
+    "merge",
+    "deployment",
+    "publication",
+    "version application",
+    "provider apply",
+    "current-law Medicare correction",
+    "qualification of later companion adad dependencies",
+    "unchanged staged-manifest key order or tarball bytes"
+  ],
+  "limitations": [
+    "Pipe/start/exit-read/output-limit failures report no confirmed exit code; a completely collected nonzero command retains its reported exit code",
+    "Staged manifest metadata and missing keys are preserved; JSON key order and old tarball bytes are not guaranteed",
+    "Native process module APIs remain labelled unstable by installed Effect; no dependency upgrade or warning suppression"
+  ]
+}

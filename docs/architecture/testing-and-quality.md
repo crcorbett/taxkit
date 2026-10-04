@@ -120,6 +120,14 @@ browser-safe SDK surface. It also executes the installed caller-owned client
 for all three supported calculators, awaits disposal and checks subsequent
 safe/normal failures. It has no audit-only success mode.
 
+The SDK's `check-types` command also checks its script project. The native SDK
+test command includes controlled FileSystem/process fixtures, including failed
+reads, malformed manifests, failed searches, pipe/exit failures, stdout limits,
+interruption and cleanup. Script source and tests have the same canonical
+strict rules as SDK source, with execution admitted only in the three exact
+command runtime files. The owning package README describes their output and
+manifest-preservation contract.
+
 `bun run sdk:test:browser` executes the SDK's source and controlled lifetime
 suite in Chromium, including startup, interruption, independent clients and
 cleanup failures. Full verification includes this browser suite. It establishes
@@ -803,3 +811,10 @@ matching-looking host objects to remain separate map keys, repeat reads of the
 same object to find its binding, and unrelated equality objects to be refused.
 Actual CLI fixtures accept all eight adopted policy/type/test files and reject
 the neighbouring JavaScript fixture; compiler, runtime and lint proof are distinct.
+
+The isolated release-boundary corpus binds each failure oracle to its command,
+target and recovery. Removing the SDK's public `TaxKit` export must fail the
+real downstream command at `build @taxkit/sdk` with child exit 2. The exact
+bounded step/exit diagnostic is the current oracle; raw compiler text is not
+required or retained by the SDK command. The historical HGI packets keep the
+observations they originally qualified.

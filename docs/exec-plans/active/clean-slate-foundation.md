@@ -1146,3 +1146,74 @@ transport-limit work are unfinished. SDK command migration, other app/config/
 infrastructure owners and the complete semantic/readonly review remain next.
 Retained results and historical evidence remain unchanged; Medicare correction
 still awaits its separate bounded decision.
+
+
+## Local T002 SDK checking scripts
+
+The three SDK command scripts now receive all canonical strict rules. The
+import checker uses Effect FileSystem and child-process services, immediate
+manifest decoding, immutable findings and an exact command runtime. It removes
+its raw Bun, Promise, console and process-exit permissions. Ripgrep exit 0 is a
+match, exit 1 is absence and other exits are operational failures. This retains
+the direct-reference claim, separate from the packed/browser graph checks.
+
+The packed and downstream commands use shared manifest Schemas, Schema-derived
+records and checked field selections. Staged metadata is decoded once and
+encoded through its owning Schema, preserving unrelated fields and absent
+optional dependency keys; no JSON-key-order or retained-tarball-byte claim is
+made. One-use mapping was inlined. Command scopes close before the next command;
+stdout is bounded to 1 MiB and stderr is drained without retention. Operational
+errors retain the named step and available exit code without raw native errors
+or captured output. Failed folder cleanup fails otherwise successful work and
+remains alongside an earlier work failure. Expected-error mapping and reporting
+run before closing the folder scope, preserving both causes.
+
+`check-types` now includes the scripts project; its first run found the old
+three-parameter Schema type and its unchecked requirement. The obsolete generic
+JSON decoder was removed. Native SDK tests include command fixtures, while the
+Chromium suite retains its browser-compatible source/lifetime scope. Focused
+local compiler, strict lint and all 56 SDK tests pass (24 retained plus 32 new
+script cases). The real nine-package consumer and 46-file SDK artifact passed;
+final source/full qualification passed after the failure-oracle correction. The previous lifetime
+revision `72c32864039779b0a51ee671cec69cbdf5e60487` passed hosted Quality run
+`37195752724`; that does not qualify this later script revision.
+
+Documentation impact: **Change required** for SDK scripts/project/command and
+native test ownership, exact strict selectors and real CLI fixtures, package
+README, API/SDK and testing architecture, packed-consumer runbook, active
+plan/T002 ledger, dated receipt and the private SDK patch Changeset. **Preserve**
+SDK public exports and lifetime, nine-package closure, concrete packed ranges,
+current journey oracles, historical receipts and failed attempts, canonical
+skills, dependency versions/lock and all retained tax results. **N/A** generated
+public content, HTTP changes and provider state: local checking only. Revert
+this complete slice to recover. DEV-73 and app/config/infrastructure and full
+semantic/readonly review remain unfinished, followed by DEV-74–81. Medicare
+correction still awaits Cooper's separate bounded decision.
+
+
+The first full verification stopped at the isolated public-export mutation:
+removing `TaxKit` still failed the SDK build with exit 2, but the old oracle
+expected raw compiler text that the safe command report intentionally omits.
+The current corpus now binds the exact `build @taxkit/sdk`/exit-2 diagnostic;
+its runner independently fixes all six oracles to their command/target/recovery
+contracts. This prevents an edited fixture from weakening its own expected
+failure. Historical HGI observations remain unchanged. The failed attempt is
+retained in the SDK-script receipt; full requalification follows the correction.
+
+
+Final qualification passed: frozen 793-install/1020-package graph with unchanged
+lock; all 297 real lint cases; 56 native SDK cases; complete 22-task tests and
+15-task build; final 46-file SDK and nine-package downstream proof; all 21
+Quality cases/all ten isolated faults (213.42 seconds), including fresh
+source-only documentation tests; full verification; actual Chromium's 24 SDK,
+two web and seven docs cases; both unused-code profiles; docs/runbook/format/diff
+and Changeset inspection. Matching unchanged-input caches were reused where
+reported. Two unnecessary local Schema exports were made private after Knip
+reported them; no unused-code exclusion was added. The
+[SDK checking-script receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-sdk-checking-scripts.json)
+retains the failed full attempt and corrected oracle evidence. T002 remains in
+progress. A fresh expanded canonical probe reports 452 provisional diagnostics
+across 376 owned source arguments, with exact permissions preserved; existing
+fixture/host cases remain to be qualified and this is not a confirmed defect
+count. Continue with API app, documentation app, web and infrastructure paths,
+then complete the semantic/readonly review and DEV-74–81 implementation.

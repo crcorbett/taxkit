@@ -14,6 +14,7 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  "packages/sdk/typescript/scripts/script-boundaries.test.ts",
   // Exact synthetic register fixture ingress; no command execution admission.
   "tools/docs-deployment/automation.check.runtime.test.ts",
   "tools/docs-deployment/local-doppler-environment.boundary.ts",
@@ -115,6 +116,7 @@ const decodingBoundaryFiles = [
   // SDK rejected Promise ingress and descriptor/process boundaries.
   "packages/sdk/typescript/src/index.test.ts",
   "packages/sdk/typescript/src/client-lifetime.test.ts",
+  "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/src/effect.ts",
@@ -197,6 +199,8 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  "packages/sdk/typescript/scripts/script-boundaries.test.ts",
+  "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   // Plain Promise rejection and calculator error representations: secret-negative tests only.
   "packages/sdk/typescript/src/index.test.ts",
   "packages/sdk/typescript/src/effect.test.ts",
@@ -260,6 +264,7 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
@@ -315,7 +320,6 @@ const processBoundaryFiles = [
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/scripts/test-built.tsx",
   "apps/docs/vitest.browser.config.ts",
-  "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
@@ -338,7 +342,6 @@ const consoleBoundaryFiles = [
   "apps/docs/scripts/test-built.tsx",
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
-  "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
@@ -366,13 +369,13 @@ const bunAdapterFiles = [
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/scripts/test-built.tsx",
-  "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
+  "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
@@ -440,6 +443,14 @@ export default defineConfig({
   ],
   overrides: [
     {
+      files: [
+        "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
+        "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+        "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+      ],
+      rules: { "unicorn/throw-new-error": "off" },
+    },
+    {
       // DEV-73 incremental adoption: canonical rules for domain and migrated lint tests.
       // Remaining owned app/tool/config paths stay explicitly pending in T002.
       files: [
@@ -485,6 +496,7 @@ export default defineConfig({
         "tools/docs-deployment/.generated-artifact-strict-rejected.ts",
         "packages/scripts/**",
         "packages/sdk/typescript/src/**",
+        "packages/sdk/typescript/scripts/**",
         "packages/sdk/typescript/type-tests/**",
         "packages/sdk/typescript/vitest*.config.ts",
         "packages/testing/**",
@@ -507,6 +519,51 @@ export default defineConfig({
         "strict-effect/tagged-error-name": "error",
         "taxkit/no-native-collections": "error",
         "taxkit/no-object-writes": "error",
+      },
+    },
+    {
+      files: [
+        "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
+      ],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: [
+        "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+      ],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: [
+        "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+      ],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+            ],
+          },
+        ],
       },
     },
     {

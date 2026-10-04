@@ -33,6 +33,31 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
+      "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
+      "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+      "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+      "packages/sdk/typescript/scripts/schemas.ts",
+      "packages/sdk/typescript/scripts/script-boundaries.test.ts",
+    ],
+    generated: "packages/sdk/typescript/scripts/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+
+  {
+    accepted: [
       "packages/sdk/typescript/src/au.test.ts",
       "packages/sdk/typescript/src/au.ts",
       "packages/sdk/typescript/src/au-effect.ts",
@@ -940,6 +965,9 @@ test.effect.each([
 );
 
 test.each([
+  "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
+  "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+  "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/scripts/src/release-readiness/release-readiness.runtime.ts",

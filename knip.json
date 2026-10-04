@@ -145,7 +145,8 @@
         "src/au-effect.ts",
         "src/schemas/index.ts",
         "src/testing/index.ts",
-        "scripts/check-import-boundaries.ts",
+        "scripts/check-import-boundaries.runtime.ts",
+        "scripts/**/*.test.ts",
         "src/**/*.test.ts",
         "vitest*.config.ts",
         "type-tests/**/*.ts"

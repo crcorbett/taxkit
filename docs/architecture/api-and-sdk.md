@@ -371,7 +371,12 @@ targets and `files` limits the tarball. Because Bun resolves workspace and
 catalogue dependency protocols during packing but does not apply
 `publishConfig.exports`, the SDK-owned strict validator stages that declared
 publication view and Bun-packs it again. Acceptance is based on the final
-tarball manifest, clean installation and public-entrypoint imports.
+tarball manifest, clean installation and public-entrypoint imports. The
+validator decodes the staged manifest once through a Schema that preserves
+uninterpreted metadata, then encodes the declared publication view. Optional
+dependency keys remain absent when originally absent; staged JSON key order is
+not an artifact-byte guarantee. Each process has a scope, bounded stdout and
+safe operational failures. A failed cleanup also fails validation.
 
 ```json
 {

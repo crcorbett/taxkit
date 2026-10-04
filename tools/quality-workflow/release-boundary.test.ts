@@ -162,6 +162,7 @@ const expected = {
   apiContract: {
     check: "api-smoke",
     command: ["bun", "run", "--filter=api", "smoke"],
+    failureOracle: "OpenAPI document did not include the calculate route",
     recovery:
       "Restore the schema-derived OpenAPI document and rerun api-smoke.",
     target: "packages/api/http/src/openapi.ts",
@@ -169,6 +170,7 @@ const expected = {
   packedSdk: {
     check: "packed-artifact",
     command: ["bun", "run", "--filter=@taxkit/sdk", "check-packed-artifact"],
+    failureOracle: "missing-fixture.js",
     recovery:
       "Restore the packed root export target and rerun packed-artifact.",
     target: "packages/sdk/typescript/package.json",
@@ -176,6 +178,7 @@ const expected = {
   publicDocsManifest: {
     check: "docs-validation",
     command: ["bun", "run", "docs:validate"],
+    failureOracle: "navigation source missing",
     recovery:
       "Restore the authored navigation source and rerun docs-validation.",
     target: "packages/docs-content/navigation.json",
@@ -183,6 +186,7 @@ const expected = {
   publicExport: {
     check: "downstream-consumer",
     command: ["bun", "run", "--filter=@taxkit/sdk", "validate:downstream"],
+    failureOracle: "Command failed: build @taxkit/sdk (exit; exitCode: 2).",
     recovery:
       "Restore the documented browser-safe TaxKit export and rerun downstream-consumer.",
     target: "packages/sdk/typescript/src/index.ts",
@@ -190,6 +194,7 @@ const expected = {
   releaseScript: {
     check: "quality-workflow",
     command: ["bun", "run", "check:quality-workflow"],
+    failureOracle: "release-runtime-boundary",
     recovery:
       "Remove candidate evidence reads from CI mode and rerun quality-workflow.",
     target:
@@ -198,6 +203,7 @@ const expected = {
   workflowSemantics: {
     check: "quality-workflow",
     command: ["bun", "run", "check:quality-workflow"],
+    failureOracle: "canonical-release-graph",
     recovery:
       "Restore the decoded canonical release command in the actual quality job.",
     target: ".github/workflows/quality.yml",
@@ -328,6 +334,7 @@ describe("HGI-205 isolated release-boundary mutations", () => {
               ),
               Match.exhaustive
             );
+            expect(fixture.failureOracle).toBe(contract.failureOracle);
             expect(fixture.expectedFailedCheck).toBe(contract.check);
             expect(fixture.target).toBe(contract.target);
             expect(fixture.recovery).toBe(contract.recovery);

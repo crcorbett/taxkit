@@ -199,6 +199,25 @@ rejects source files, missing export targets or unresolved `workspace:*` and
 consumer outside the repo, typechecks and runs SDK examples, imports every
 JavaScript public entrypoint and bundles the browser-safe SDK surface.
 
+All three SDK checking scripts use Effect FileSystem and scoped child
+processes. Manifests are decoded once with the shared script Schemas; staged
+publication manifests keep unrelated package metadata and missing dependency
+keys. JSON field order may change when the staged manifest is encoded, but
+package fields and declared publication targets are preserved. Each command
+closes its process before continuing. Collected stdout is limited to 1 MiB;
+stderr is drained without retaining or printing its contents. Failure reports
+name the step and retain an available exit code, without copying native errors
+or captured command output. A cleanup failure fails the check; if work has
+already failed, both failures remain available.
+
+`check-boundaries` checks package dependency direction and direct source
+references. Only ripgrep exit 1 means no match; a failed search fails the check.
+It does not prove the full browser dependency graph. Packed installation,
+browser bundling and the Chromium suite provide their own separate evidence.
+`check-types` checks both SDK source and the scripts' TypeScript project. The
+native `test` suite includes controlled script failures; `test:browser` keeps
+these Bun-only command fixtures out of the browser suite.
+
 The command is always strict. Consumer-only file overrides connect unpublished
 internal tarballs without changing their concrete registry-ready dependency
 ranges. Any manifest or consumer regression prints evidence and exits nonzero;

@@ -320,7 +320,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-deployment-inventory-checks.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-typed-lint-policies.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-release-script-boundaries.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-04-sdk-client-lifetime.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-sdk-client-lifetime.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-sdk-checking-scripts.json"
       ]
     },
     {

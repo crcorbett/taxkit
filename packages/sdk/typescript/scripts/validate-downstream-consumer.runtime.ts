@@ -3,7 +3,6 @@ import * as BunServices from "@effect/platform-bun/BunServices";
 import {
   Array as EffectArray,
   Console,
-  Data,
   Effect,
   HashSet,
   Match,
@@ -16,113 +15,90 @@ import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import { ChildProcess } from "effect/process";
 
-interface PackageClosureItem {
-  readonly build: boolean;
-  readonly packageName: string;
-  readonly relativeRoot: string;
-}
+import {
+  DependencyRecord,
+  DependencySectionName,
+  PackedPackageManifest,
+  RootPackageManifest,
+} from "./schemas.js";
 
-interface CommandResult {
-  readonly commandLine: string;
-  readonly cwd: string;
-  readonly exitCode: number;
-  readonly stderr: string;
-  readonly stdout: string;
-}
-
-interface PackedPackageEvidence {
-  readonly manifest: PackedPackageManifest;
-  readonly packageName: string;
-  readonly packedFileCount: number;
-  readonly publicEntrypoints: readonly string[];
-  readonly rootPath: string;
-  readonly tarballFile: string;
-  readonly tarballPath: string;
-}
-
-interface ManifestProtocolFinding {
-  readonly dependencyName: string;
-  readonly packageName: string;
-  readonly protocol: "catalog:" | "workspace:";
-  readonly range: string;
-  readonly section: DependencySectionName;
-}
-
-interface DownstreamValidationEvidence {
-  readonly artifactsPath: string;
-  readonly browserBundleResult: string;
-  readonly cleanupResult: string;
-  readonly devDiagnostics: readonly ManifestProtocolFinding[];
-  readonly installResult: string;
-  readonly installStrategy: string;
-  readonly packedArtifacts: readonly string[];
-  readonly releaseBlockers: readonly ManifestProtocolFinding[];
-  readonly runtimeSdkResult: string;
-  readonly tempWorkspacePath: string;
-  readonly typecheckResult: string;
-}
-
-type DependencySectionName =
-  | "dependencies"
-  | "devDependencies"
-  | "optionalDependencies"
-  | "peerDependencies";
-
-class DownstreamCommandError extends Data.TaggedError(
-  "DownstreamCommandError"
-)<{
-  readonly result: CommandResult;
-}> {}
-
-class DownstreamReleaseBlockerError extends Data.TaggedError(
-  "DownstreamReleaseBlockerError"
-)<{
-  readonly evidence: DownstreamValidationEvidence;
-}> {}
-
-class DownstreamValidationError extends Data.TaggedError(
-  "DownstreamValidationError"
-)<{
-  readonly message: string;
-}> {}
-
-const DependencyRecord = Schema.Record(Schema.String, Schema.String);
-
-const ConditionalPackageExportTarget = Schema.Struct({
-  default: Schema.optional(Schema.String),
-  source: Schema.optional(Schema.String),
-  types: Schema.optional(Schema.String),
+const PackageClosureItem = Schema.Struct({
+  build: Schema.Boolean,
+  packageName: Schema.String,
+  relativeRoot: Schema.String,
 });
+type PackageClosureItem = typeof PackageClosureItem.Type;
 
-const PackageExportTarget = Schema.Union([
-  Schema.String,
-  ConditionalPackageExportTarget,
-]);
-
-const PackageExports = Schema.Record(Schema.String, PackageExportTarget);
-
-const PackageJsonRecord = Schema.Record(Schema.String, Schema.Unknown);
-
-const PackedPackageManifest = Schema.Struct({
-  dependencies: Schema.optional(DependencyRecord),
-  devDependencies: Schema.optional(DependencyRecord),
-  exports: PackageExports,
-  files: Schema.Array(Schema.String),
-  name: Schema.String,
-  optionalDependencies: Schema.optional(DependencyRecord),
-  peerDependencies: Schema.optional(DependencyRecord),
-  publishConfig: Schema.Struct({
-    exports: PackageExports,
-  }),
-  version: Schema.String,
+const PackedPackageEvidence = Schema.Struct({
+  manifest: Schema.toType(PackedPackageManifest),
+  packageName: Schema.String,
+  packedFileCount: Schema.Finite,
+  publicEntrypoints: Schema.Array(Schema.String),
+  rootPath: Schema.String,
+  tarballFile: Schema.String,
+  tarballPath: Schema.String,
 });
+type PackedPackageEvidence = typeof PackedPackageEvidence.Type;
+const ManifestProtocolFinding = Schema.Struct({
+  dependencyName: Schema.String,
+  packageName: Schema.String,
+  protocol: Schema.Literals(["catalog:", "workspace:"]),
+  range: Schema.String,
+  section: DependencySectionName,
+});
+type ManifestProtocolFinding = typeof ManifestProtocolFinding.Type;
+const DownstreamValidationEvidence = Schema.Struct({
+  artifactsPath: Schema.String,
+  browserBundleResult: Schema.String,
+  cleanupResult: Schema.String,
+  devDiagnostics: Schema.Array(ManifestProtocolFinding),
+  installResult: Schema.String,
+  installStrategy: Schema.String,
+  packedArtifacts: Schema.Array(Schema.String),
+  releaseBlockers: Schema.Array(ManifestProtocolFinding),
+  runtimeSdkResult: Schema.String,
+  tempWorkspacePath: Schema.String,
+  typecheckResult: Schema.String,
+});
+type DownstreamValidationEvidence = typeof DownstreamValidationEvidence.Type;
 
-type PackedPackageManifest = typeof PackedPackageManifest.Type;
+class DownstreamCommandError extends Schema.TaggedError<DownstreamCommandError>()(
+  "DownstreamCommandError",
+  {
+    exitCode: Schema.Option(Schema.Finite),
+    reason: Schema.Literals(["start-or-read", "exit", "output-limit"]),
+    stage: Schema.String,
+  }
+) {}
+class DownstreamReleaseBlockerError extends Schema.TaggedError<DownstreamReleaseBlockerError>()(
+  "DownstreamReleaseBlockerError",
+  { evidence: DownstreamValidationEvidence }
+) {}
+class DownstreamValidationError extends Schema.TaggedError<DownstreamValidationError>()(
+  "DownstreamValidationError",
+  { message: Schema.String }
+) {}
 
-const RootPackageManifest = Schema.Struct({
-  workspaces: Schema.Struct({
-    catalog: DependencyRecord,
+const ConsumerTsConfig = Schema.Struct({
+  compilerOptions: Schema.Struct({
+    lib: Schema.Array(Schema.String),
+    module: Schema.String,
+    moduleResolution: Schema.String,
+    noEmit: Schema.Boolean,
+    strict: Schema.Boolean,
+    target: Schema.String,
+    types: Schema.Array(Schema.String),
   }),
+  include: Schema.Array(Schema.String),
+});
+const ConsumerPackageManifest = Schema.Struct({
+  dependencies: DependencyRecord,
+  devDependencies: DependencyRecord,
+  name: Schema.Literal("taxkit-sdk-downstream-consumer"),
+  overrides: DependencyRecord,
+  private: Schema.Literal(true),
+  scripts: DependencyRecord,
+  type: Schema.Literal("module"),
 });
 
 const packageClosure = [
@@ -207,10 +183,31 @@ const runCommand = (
         stdin: "ignore",
         stdout: "pipe",
       });
-      const [stdout, stderr, exitCode] = yield* Effect.all(
+      const [stdout, , exitCode] = yield* Effect.all(
         [
-          Stream.mkString(Stream.decodeText(handle.stdout)),
-          Stream.mkString(Stream.decodeText(handle.stderr)),
+          handle.stdout.pipe(
+            Stream.mapAccum(
+              () => 0,
+              (previousBytes, chunk) => {
+                const bytes = previousBytes + chunk.byteLength;
+                return [bytes, [{ bytes, chunk }]] as const;
+              }
+            ),
+            Stream.mapEffect(({ bytes, chunk }) =>
+              bytes > 1_048_576
+                ? Effect.fail(
+                    new DownstreamCommandError({
+                      exitCode: Option.none(),
+                      reason: "output-limit",
+                      stage: label,
+                    })
+                  )
+                : Effect.succeed(chunk)
+            ),
+            Stream.decodeText,
+            Stream.mkString
+          ),
+          Stream.runDrain(handle.stderr),
           handle.exitCode,
         ],
         { concurrency: "unbounded" }
@@ -220,21 +217,21 @@ const runCommand = (
         commandLine: commandLine(command, args),
         cwd,
         exitCode: Number(exitCode),
-        stderr,
         stdout,
-      } satisfies CommandResult;
+      };
     }).pipe(
-      Effect.mapError(
-        (cause) =>
-          new DownstreamCommandError({
-            result: {
-              commandLine: `${label}: ${commandLine(command, args)}`,
-              cwd,
-              exitCode: 1,
-              stderr: String(cause),
-              stdout: "",
-            },
-          })
+      Effect.mapError((failure) =>
+        Match.value(failure).pipe(
+          Match.tag("DownstreamCommandError", (error) => error),
+          Match.orElse(
+            () =>
+              new DownstreamCommandError({
+                exitCode: Option.none(),
+                reason: "start-or-read",
+                stage: label,
+              })
+          )
+        )
       )
     );
 
@@ -243,29 +240,17 @@ const runCommand = (
       Match.orElse(() =>
         Effect.fail(
           new DownstreamCommandError({
-            result,
+            exitCode: Option.some(result.exitCode),
+            reason: "exit",
+            stage: label,
           })
         )
       )
     );
-  });
-
-const decodeJson = <A, I, R>(
-  label: string,
-  schema: Schema.Schema<A, I, R>,
-  value: string
-) =>
-  Schema.decodeUnknownEffect(Schema.fromJsonString(schema))(value).pipe(
-    Effect.mapError(
-      (cause) =>
-        new DownstreamValidationError({
-          message: `Failed to decode ${label}: ${cause.message}`,
-        })
-    )
-  );
+  }).pipe(Effect.scoped);
 
 const tarballPathFromPackOutput = (packageName: string, output: string) =>
-  Schema.decodeUnknownEffect(Schema.NonEmptyString)(output.trim()).pipe(
+  Schema.decodeEffect(Schema.NonEmptyString)(output.trim()).pipe(
     Effect.mapError(
       () =>
         new DownstreamValidationError({
@@ -280,7 +265,7 @@ const publicEntrypointsFromManifest = (manifest: PackedPackageManifest) =>
     ([subpath, target]) =>
       Schema.is(Schema.String)(target)
         ? []
-        : Option.fromNullishOr(target.default).pipe(
+        : target.default.pipe(
             Option.filter((defaultTarget) => defaultTarget.endsWith(".js")),
             Option.match({
               onNone: () => [],
@@ -314,28 +299,30 @@ const packedSurfaceFailures = (
         ),
         Match.orElse((targetValue) =>
           EffectArray.flatMap(["types", "default"] as const, (condition) =>
-            Option.fromNullishOr(targetValue[condition]).pipe(
-              Option.match({
-                onNone: () => [
-                  `${manifest.name} ${subpath} is missing its ${condition} publication target.`,
-                ],
-                onSome: (value) =>
-                  HashSet.has(
-                    packedFileSet,
-                    `package/${value.replace(/^\.\//u, "")}`
-                  )
-                    ? []
-                    : [
-                        `${manifest.name} ${subpath} ${condition} target ${value} is absent from the tarball.`,
-                      ],
-              })
-            )
+            EffectRecord.get(targetValue, condition)
+              .pipe(Option.flatten)
+              .pipe(
+                Option.match({
+                  onNone: () => [
+                    `${manifest.name} ${subpath} is missing its ${condition} publication target.`,
+                  ],
+                  onSome: (value) =>
+                    HashSet.has(
+                      packedFileSet,
+                      `package/${value.replace(/^\.\//u, "")}`
+                    )
+                      ? []
+                      : [
+                          `${manifest.name} ${subpath} ${condition} target ${value} is absent from the tarball.`,
+                        ],
+                })
+              )
           )
         )
       );
       const sourceFailures = Schema.is(Schema.String)(target)
         ? []
-        : Option.fromNullishOr(target.source).pipe(
+        : target.source.pipe(
             Option.match({
               onNone: () => [],
               onSome: (source) => [
@@ -383,39 +370,44 @@ const dependencyFindingsForSections = (
   sections: readonly DependencySectionName[]
 ): readonly ManifestProtocolFinding[] =>
   EffectArray.flatMap(sections, (section) =>
-    Option.fromNullishOr(manifest[section]).pipe(
-      Option.match({
-        onNone: () => [],
-        onSome: (dependencies) =>
-          EffectArray.flatMap(
-            EffectRecord.toEntries(dependencies),
-            ([dependencyName, range]) =>
-              unsupportedProtocol(range).pipe(
-                Option.match({
-                  onNone: () => [],
-                  onSome: (protocol) => [
-                    {
-                      dependencyName,
-                      packageName,
-                      protocol,
-                      range,
-                      section,
-                    } satisfies ManifestProtocolFinding,
-                  ],
-                })
-              )
-          ),
-      })
+    EffectRecord.get(
+      {
+        dependencies: manifest.dependencies,
+        devDependencies: manifest.devDependencies,
+        optionalDependencies: manifest.optionalDependencies,
+        peerDependencies: manifest.peerDependencies,
+      },
+      section
     )
+      .pipe(Option.flatten)
+      .pipe(
+        Option.match({
+          onNone: () => [],
+          onSome: (dependencies) =>
+            EffectArray.flatMap(
+              EffectRecord.toEntries(dependencies),
+              ([dependencyName, range]) =>
+                unsupportedProtocol(range).pipe(
+                  Option.match({
+                    onNone: () => [],
+                    onSome: (protocol) => [
+                      {
+                        dependencyName,
+                        packageName,
+                        protocol,
+                        range,
+                        section,
+                      } satisfies ManifestProtocolFinding,
+                    ],
+                  })
+                )
+            ),
+        })
+      )
   );
 
-const relativeFileDependency =
-  (path: Path.Path, workspacePath: string) =>
-  (packedPackage: PackedPackageEvidence) =>
-    `file:./${path.relative(workspacePath, packedPackage.tarballPath)}`;
-
 const catalogVersion = (
-  catalog: Readonly<Record<string, string>>,
+  catalog: typeof DependencyRecord.Type,
   packageName: string
 ) =>
   EffectRecord.get(catalog, packageName).pipe(
@@ -439,26 +431,32 @@ const writeConsumerFiles = (
     yield* fs.makeDirectory(path.join(workspacePath, "src"), {
       recursive: true,
     });
+    const tsconfigJson = yield* Schema.encodeEffect(
+      Schema.fromJsonString(ConsumerTsConfig, { space: 2 })
+    )({
+      compilerOptions: {
+        lib: ["DOM", "ES2022", "ESNext.Disposable"],
+        module: "NodeNext",
+        moduleResolution: "NodeNext",
+        noEmit: true,
+        strict: true,
+        target: "ES2022",
+        types: [],
+      },
+      include: ["src/**/*.ts"],
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new DownstreamValidationError({
+            message: "Failed to encode downstream tsconfig.json.",
+          })
+      )
+    );
     yield* Effect.all(
       [
         fs.writeFileString(
           path.join(workspacePath, "tsconfig.json"),
-          `${JSON.stringify(
-            {
-              compilerOptions: {
-                lib: ["DOM", "ES2022", "ESNext.Disposable"],
-                module: "NodeNext",
-                moduleResolution: "NodeNext",
-                noEmit: true,
-                strict: true,
-                target: "ES2022",
-                types: [],
-              },
-              include: ["src/**/*.ts"],
-            },
-            null,
-            2
-          )}\n`
+          `${tsconfigJson}\n`
         ),
         fs.writeFileString(
           path.join(workspacePath, "src/typecheck.ts"),
@@ -625,16 +623,25 @@ const writePublicEntrypointSmoke = (
   workspacePath: string,
   packedPackages: readonly PackedPackageEvidence[]
 ) =>
-  fs.writeFileString(
-    path.join(workspacePath, "src/public-entrypoints.ts"),
-    `const publicEntrypoints = ${JSON.stringify(
+  Effect.gen(function* writePublicImports() {
+    const entrypointsJson = yield* Schema.encodeEffect(
+      Schema.fromJsonString(Schema.Array(Schema.String), { space: 2 })
+    )(
       EffectArray.flatMap(
         packedPackages,
         (packedPackage) => packedPackage.publicEntrypoints
-      ),
-      null,
-      2
-    )} as const;
+      )
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new DownstreamValidationError({
+            message: "Failed to encode public entrypoint fixture.",
+          })
+      )
+    );
+    yield* fs.writeFileString(
+      path.join(workspacePath, "src/public-entrypoints.ts"),
+      `const publicEntrypoints = ${entrypointsJson} as const;
 
 for (const publicEntrypoint of publicEntrypoints) {
   await import(publicEntrypoint);
@@ -642,54 +649,60 @@ for (const publicEntrypoint of publicEntrypoints) {
 
 console.log(\`Imported \${publicEntrypoints.length} packed public entrypoints.\`);
 `
-  );
+    );
+  });
 
 const writeConsumerPackageManifest = (
   fs: FileSystem.FileSystem,
   path: Path.Path,
   workspacePath: string,
-  catalog: Readonly<Record<string, string>>,
+  catalog: typeof DependencyRecord.Type,
   packedPackages: readonly PackedPackageEvidence[]
 ) =>
   Effect.gen(function* writePackageManifest() {
     const effectVersion = yield* catalogVersion(catalog, "effect");
     const typescriptVersion = yield* catalogVersion(catalog, "typescript");
     const bunTypesVersion = yield* catalogVersion(catalog, "@types/bun");
-    const fileDependencyFor = relativeFileDependency(path, workspacePath);
     const taxkitDependencies = EffectRecord.fromEntries(
       EffectArray.map(packedPackages, (packedPackage) => [
         packedPackage.packageName,
-        fileDependencyFor(packedPackage),
+        `file:./${path.relative(workspacePath, packedPackage.tarballPath)}`,
       ])
     );
 
+    const manifestJson = yield* Schema.encodeEffect(
+      Schema.fromJsonString(ConsumerPackageManifest, { space: 2 })
+    )({
+      dependencies: {
+        ...taxkitDependencies,
+        effect: effectVersion,
+      },
+      devDependencies: {
+        "@types/bun": bunTypesVersion,
+        typescript: typescriptVersion,
+      },
+      name: "taxkit-sdk-downstream-consumer",
+      overrides: taxkitDependencies,
+      private: true,
+      scripts: {
+        "bundle:browser":
+          "bun build src/browser-entry.ts --target=browser --format=esm --outdir=dist-browser",
+        runtime: "bun src/runtime.ts",
+        "runtime:exports": "bun src/public-entrypoints.ts",
+        typecheck: "tsc -p tsconfig.json --noEmit",
+      },
+      type: "module",
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new DownstreamValidationError({
+            message: "Failed to encode downstream package.json.",
+          })
+      )
+    );
     yield* fs.writeFileString(
       path.join(workspacePath, "package.json"),
-      `${JSON.stringify(
-        {
-          dependencies: {
-            ...taxkitDependencies,
-            effect: effectVersion,
-          },
-          devDependencies: {
-            "@types/bun": bunTypesVersion,
-            typescript: typescriptVersion,
-          },
-          name: "taxkit-sdk-downstream-consumer",
-          overrides: taxkitDependencies,
-          private: true,
-          scripts: {
-            "bundle:browser":
-              "bun build src/browser-entry.ts --target=browser --format=esm --outdir=dist-browser",
-            runtime: "bun src/runtime.ts",
-            "runtime:exports": "bun src/public-entrypoints.ts",
-            typecheck: "tsc -p tsconfig.json --noEmit",
-          },
-          type: "module",
-        },
-        null,
-        2
-      )}\n`
+      `${manifestJson}\n`
     );
   });
 
@@ -731,33 +744,30 @@ const packPackage = (
     const stagedRootPath = path.join(unpackedPath, "package");
     const stagedManifestPath = path.join(stagedRootPath, "package.json");
     const stagedManifestJson = yield* fs.readFileString(stagedManifestPath);
-    const [workspacePackedManifest, packageJsonRecord] = yield* Effect.all(
-      [
-        decodeJson(
-          `${packageItem.packageName} workspace packed package.json`,
-          PackedPackageManifest,
-          stagedManifestJson
-        ),
-        decodeJson(
-          `${packageItem.packageName} structured package.json`,
-          PackageJsonRecord,
-          stagedManifestJson
-        ),
-      ],
-      { concurrency: "unbounded" }
+    const workspacePackedManifest = yield* Schema.decodeEffect(
+      Schema.fromJsonString(PackedPackageManifest)
+    )(stagedManifestJson).pipe(
+      Effect.mapError(
+        () =>
+          new DownstreamValidationError({
+            message: "Failed to decode workspace packed package.json.",
+          })
+      )
     );
-    yield* fs.writeFileString(
-      stagedManifestPath,
-      `${JSON.stringify(
-        EffectRecord.set(
-          packageJsonRecord,
-          "exports",
-          workspacePackedManifest.publishConfig.exports
-        ),
-        null,
-        2
-      )}\n`
+    const stagedPublicationJson = yield* Schema.encodeEffect(
+      Schema.fromJsonString(PackedPackageManifest, { space: 2 })
+    )({
+      ...workspacePackedManifest,
+      exports: workspacePackedManifest.publishConfig.exports,
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new DownstreamValidationError({
+            message: "Failed to encode staged publication package.json.",
+          })
+      )
     );
+    yield* fs.writeFileString(stagedManifestPath, `${stagedPublicationJson}\n`);
 
     const releasePackOutput = yield* runCommand(
       `pack publication manifest for ${packageItem.packageName}`,
@@ -777,10 +787,15 @@ const packPackage = (
       artifactPath
     ).pipe(
       Effect.flatMap((result) =>
-        decodeJson(
-          `${packageItem.packageName} packed package.json`,
-          PackedPackageManifest,
+        Schema.decodeEffect(Schema.fromJsonString(PackedPackageManifest))(
           result.stdout
+        ).pipe(
+          Effect.mapError(
+            () =>
+              new DownstreamValidationError({
+                message: "Failed to decode publication packed package.json.",
+              })
+          )
         )
       )
     );
@@ -882,177 +897,207 @@ const validateWorkspaceLocation = (
   );
 };
 
-const DownstreamProgram = Effect.gen(function* validateDownstreamConsumer() {
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
-  const repoRootPath = yield* path.fromFileUrl(repoRootUrl);
-  const sdkRootPath = yield* path.fromFileUrl(sdkRootUrl);
-  const rootPackageManifest = yield* fs
-    .readFileString(path.join(repoRootPath, "package.json"))
-    .pipe(
-      Effect.flatMap((contents) =>
-        decodeJson("root package.json", RootPackageManifest, contents)
+export const checkDownstreamConsumer = Effect.gen(
+  function* validateDownstreamConsumer() {
+    const fs = yield* FileSystem.FileSystem;
+    const path = yield* Path.Path;
+    const repoRootPath = yield* path.fromFileUrl(repoRootUrl);
+    const sdkRootPath = yield* path.fromFileUrl(sdkRootUrl);
+    const rootPackageManifest = yield* fs
+      .readFileString(path.join(repoRootPath, "package.json"))
+      .pipe(
+        Effect.flatMap((contents) =>
+          Schema.decodeEffect(Schema.fromJsonString(RootPackageManifest))(
+            contents
+          ).pipe(
+            Effect.mapError(
+              () =>
+                new DownstreamValidationError({
+                  message: "Failed to decode root package.json.",
+                })
+            )
+          )
+        )
+      );
+
+    yield* Console.info("Building SDK downstream runtime package closure.");
+    yield* Effect.forEach(
+      EffectArray.filter(packageClosure, (packageItem) => packageItem.build),
+      (packageItem) =>
+        runCommand(
+          `build ${packageItem.packageName}`,
+          "bun",
+          ["run", "--filter", packageItem.packageName, "build"],
+          repoRootPath
+        ),
+      { concurrency: 1 }
+    );
+
+    const workspacePath = yield* Effect.acquireRelease(
+      fs.makeTempDirectory({
+        prefix: "taxkit-sdk-downstream-",
+      }),
+      (tempPath) =>
+        fs.remove(tempPath, { force: true, recursive: true }).pipe(
+          Effect.tap(() => Console.info(`Cleanup result: removed ${tempPath}`)),
+          Effect.catchCause(() =>
+            Effect.die(
+              new DownstreamValidationError({
+                message: "Failed to remove the temporary SDK check folder.",
+              })
+            )
+          )
+        )
+    );
+    yield* validateWorkspaceLocation(path, repoRootPath, workspacePath);
+    const artifactPath = path.join(workspacePath, "artifacts");
+    const stagingRootPath = path.join(workspacePath, "pack-staging");
+
+    yield* Console.info(
+      `Created temp downstream workspace at ${workspacePath}`
+    );
+    yield* fs.makeDirectory(artifactPath, { recursive: true });
+    yield* fs.makeDirectory(stagingRootPath, { recursive: true });
+    yield* writeConsumerFiles(fs, path, workspacePath);
+
+    const packedPackages = yield* Effect.forEach(
+      packageClosure,
+      (packageItem) =>
+        packPackage(
+          path,
+          artifactPath,
+          repoRootPath,
+          stagingRootPath,
+          packageItem
+        ),
+      { concurrency: 1 }
+    );
+    yield* writePublicEntrypointSmoke(fs, path, workspacePath, packedPackages);
+    yield* writeConsumerPackageManifest(
+      fs,
+      path,
+      workspacePath,
+      rootPackageManifest.workspaces.catalog,
+      packedPackages
+    );
+
+    const releaseBlockers = EffectArray.flatMap(
+      packedPackages,
+      (packedPackage) =>
+        dependencyFindingsForSections(
+          packedPackage.packageName,
+          packedPackage.manifest,
+          runtimeDependencySections
+        )
+    );
+    const devDiagnostics = EffectArray.flatMap(
+      packedPackages,
+      (packedPackage) =>
+        dependencyFindingsForSections(
+          packedPackage.packageName,
+          packedPackage.manifest,
+          devDependencySections
+        )
+    );
+    const blockerEvidence = {
+      artifactsPath: artifactPath,
+      browserBundleResult: "skipped: release blockers found before install",
+      cleanupResult: "scope-managed cleanup will remove the temp workspace",
+      devDiagnostics,
+      installResult: "skipped: packed manifests contain unresolved protocols",
+      installStrategy:
+        "strict manifest-diagnostic mode; packed dependency closure uses local file: references only after manifests are clean",
+      packedArtifacts: EffectArray.map(
+        packedPackages,
+        (packedPackage) =>
+          `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
+      ),
+      releaseBlockers,
+      runtimeSdkResult: "skipped: release blockers found before install",
+      tempWorkspacePath: workspacePath,
+      typecheckResult: "skipped: release blockers found before install",
+    } satisfies DownstreamValidationEvidence;
+
+    yield* Match.value(releaseBlockers.length).pipe(
+      Match.when(0, () => Effect.void),
+      Match.orElse(() =>
+        printEvidence(blockerEvidence).pipe(
+          Effect.flatMap(() =>
+            Effect.fail(
+              new DownstreamReleaseBlockerError({
+                evidence: blockerEvidence,
+              })
+            )
+          )
+        )
       )
     );
 
-  yield* Console.info("Building SDK downstream runtime package closure.");
-  yield* Effect.forEach(
-    EffectArray.filter(packageClosure, (packageItem) => packageItem.build),
-    (packageItem) =>
-      runCommand(
-        `build ${packageItem.packageName}`,
-        "bun",
-        ["run", "--filter", packageItem.packageName, "build"],
-        repoRootPath
+    yield* runCommand(
+      "install downstream package closure",
+      "bun",
+      ["install"],
+      workspacePath
+    );
+    const typecheck = yield* runCommand(
+      "typecheck downstream SDK examples",
+      "bun",
+      ["run", "typecheck"],
+      workspacePath
+    );
+    const runtime = yield* runCommand(
+      "run downstream SDK examples",
+      "bun",
+      ["run", "runtime"],
+      workspacePath
+    );
+    const publicExports = yield* runCommand(
+      "import packed public entrypoints",
+      "bun",
+      ["run", "runtime:exports"],
+      workspacePath
+    );
+    const browser = yield* runCommand(
+      "bundle downstream browser-safe SDK entrypoints",
+      "bun",
+      ["run", "bundle:browser"],
+      workspacePath
+    );
+    const successEvidence = {
+      artifactsPath: artifactPath,
+      browserBundleResult: `passed: ${browser.commandLine}`,
+      cleanupResult: "scope-managed cleanup will remove the temp workspace",
+      devDiagnostics,
+      installResult: "passed: bun install",
+      installStrategy:
+        "packed dependency closure installed through local file: references",
+      packedArtifacts: EffectArray.map(
+        packedPackages,
+        (packedPackage) =>
+          `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
       ),
-    { concurrency: 1 }
-  );
+      releaseBlockers,
+      runtimeSdkResult: `passed: ${runtime.commandLine}; ${publicExports.commandLine}`,
+      tempWorkspacePath: workspacePath,
+      typecheckResult: `passed: ${typecheck.commandLine}`,
+    } satisfies DownstreamValidationEvidence;
 
-  const workspacePath = yield* Effect.acquireRelease(
-    fs.makeTempDirectory({
-      prefix: "taxkit-sdk-downstream-",
-    }),
-    (tempPath) =>
-      fs.remove(tempPath, { force: true, recursive: true }).pipe(
-        Effect.tap(() => Console.info(`Cleanup result: removed ${tempPath}`)),
-        Effect.catchCause((cause) =>
-          Console.error(
-            `Cleanup result: failed to remove ${tempPath}: ${String(cause)}`
-          )
-        )
-      )
-  );
-  yield* validateWorkspaceLocation(path, repoRootPath, workspacePath);
-  const artifactPath = path.join(workspacePath, "artifacts");
-  const stagingRootPath = path.join(workspacePath, "pack-staging");
-
-  yield* Console.info(`Created temp downstream workspace at ${workspacePath}`);
-  yield* fs.makeDirectory(artifactPath, { recursive: true });
-  yield* fs.makeDirectory(stagingRootPath, { recursive: true });
-  yield* writeConsumerFiles(fs, path, workspacePath);
-
-  const packedPackages = yield* Effect.forEach(
-    packageClosure,
-    (packageItem) =>
-      packPackage(
-        path,
-        artifactPath,
-        repoRootPath,
-        stagingRootPath,
-        packageItem
+    yield* printEvidence(successEvidence);
+    yield* Console.info(`SDK root validated from ${sdkRootPath}`);
+  }
+).pipe(
+  Effect.mapError((error) =>
+    Match.value(error).pipe(
+      Match.tag(
+        "PlatformError",
+        () =>
+          new DownstreamValidationError({
+            message: "SDK check filesystem operation failed.",
+          })
       ),
-    { concurrency: 1 }
-  );
-  yield* writePublicEntrypointSmoke(fs, path, workspacePath, packedPackages);
-  yield* writeConsumerPackageManifest(
-    fs,
-    path,
-    workspacePath,
-    rootPackageManifest.workspaces.catalog,
-    packedPackages
-  );
-
-  const releaseBlockers = EffectArray.flatMap(packedPackages, (packedPackage) =>
-    dependencyFindingsForSections(
-      packedPackage.packageName,
-      packedPackage.manifest,
-      runtimeDependencySections
+      Match.orElse((failure) => failure)
     )
-  );
-  const devDiagnostics = EffectArray.flatMap(packedPackages, (packedPackage) =>
-    dependencyFindingsForSections(
-      packedPackage.packageName,
-      packedPackage.manifest,
-      devDependencySections
-    )
-  );
-  const blockerEvidence = {
-    artifactsPath: artifactPath,
-    browserBundleResult: "skipped: release blockers found before install",
-    cleanupResult: "scope-managed cleanup will remove the temp workspace",
-    devDiagnostics,
-    installResult: "skipped: packed manifests contain unresolved protocols",
-    installStrategy:
-      "strict manifest-diagnostic mode; packed dependency closure uses local file: references only after manifests are clean",
-    packedArtifacts: EffectArray.map(
-      packedPackages,
-      (packedPackage) =>
-        `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
-    ),
-    releaseBlockers,
-    runtimeSdkResult: "skipped: release blockers found before install",
-    tempWorkspacePath: workspacePath,
-    typecheckResult: "skipped: release blockers found before install",
-  } satisfies DownstreamValidationEvidence;
-
-  yield* Match.value(releaseBlockers.length).pipe(
-    Match.when(0, () => Effect.void),
-    Match.orElse(() =>
-      printEvidence(blockerEvidence).pipe(
-        Effect.flatMap(() =>
-          Effect.fail(
-            new DownstreamReleaseBlockerError({
-              evidence: blockerEvidence,
-            })
-          )
-        )
-      )
-    )
-  );
-
-  yield* runCommand(
-    "install downstream package closure",
-    "bun",
-    ["install"],
-    workspacePath
-  );
-  const typecheck = yield* runCommand(
-    "typecheck downstream SDK examples",
-    "bun",
-    ["run", "typecheck"],
-    workspacePath
-  );
-  const runtime = yield* runCommand(
-    "run downstream SDK examples",
-    "bun",
-    ["run", "runtime"],
-    workspacePath
-  );
-  const publicExports = yield* runCommand(
-    "import packed public entrypoints",
-    "bun",
-    ["run", "runtime:exports"],
-    workspacePath
-  );
-  const browser = yield* runCommand(
-    "bundle downstream browser-safe SDK entrypoints",
-    "bun",
-    ["run", "bundle:browser"],
-    workspacePath
-  );
-  const successEvidence = {
-    artifactsPath: artifactPath,
-    browserBundleResult: `passed: ${browser.commandLine}`,
-    cleanupResult: "scope-managed cleanup will remove the temp workspace",
-    devDiagnostics,
-    installResult: "passed: bun install",
-    installStrategy:
-      "packed dependency closure installed through local file: references",
-    packedArtifacts: EffectArray.map(
-      packedPackages,
-      (packedPackage) =>
-        `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
-    ),
-    releaseBlockers,
-    runtimeSdkResult: `passed: ${runtime.commandLine}; ${publicExports.commandLine}`,
-    tempWorkspacePath: workspacePath,
-    typecheckResult: `passed: ${typecheck.commandLine}`,
-  } satisfies DownstreamValidationEvidence;
-
-  yield* printEvidence(successEvidence);
-  yield* Console.info(`SDK root validated from ${sdkRootPath}`);
-}).pipe(
-  Effect.scoped,
+  ),
   Effect.tapErrorTag("DownstreamReleaseBlockerError", (error) =>
     Console.error(
       [
@@ -1063,18 +1108,17 @@ const DownstreamProgram = Effect.gen(function* validateDownstreamConsumer() {
   ),
   Effect.tapErrorTag("DownstreamCommandError", (error) =>
     Console.error(
-      [
-        `Command failed: ${error.result.commandLine}`,
-        `cwd: ${error.result.cwd}`,
-        `exitCode: ${error.result.exitCode}`,
-        error.result.stdout,
-        error.result.stderr,
-      ].join("\n")
+      `Command failed: ${error.stage} (${error.reason}; exitCode: ${error.exitCode.pipe(Option.match({ onNone: () => "unavailable", onSome: String }))}).`
     )
   ),
   Effect.tapErrorTag("DownstreamValidationError", (error) =>
     Console.error(error.message)
-  )
+  ),
+  Effect.scoped
 );
 
-BunRuntime.runMain(DownstreamProgram.pipe(Effect.provide(BunServices.layer)));
+if (import.meta.main) {
+  BunRuntime.runMain(
+    checkDownstreamConsumer.pipe(Effect.provide(BunServices.layer))
+  );
+}

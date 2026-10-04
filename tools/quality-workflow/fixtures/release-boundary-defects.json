@@ -13,7 +13,7 @@
     },
     "runner": "tools/quality-workflow/release-boundary.test.ts",
     "expectedFailedCheck": "downstream-consumer",
-    "failureOracle": "TaxKit",
+    "failureOracle": "Command failed: build @taxkit/sdk (exit; exitCode: 2).",
     "recovery": "Restore the documented browser-safe TaxKit export and rerun downstream-consumer."
   },
   {
@@ -58,7 +58,10 @@
       "search": "content/start/overview.mdx",
       "replacement": "content/start/missing-fixture.mdx"
     },
-    "command": { "executable": "bun", "args": ["run", "docs:validate"] },
+    "command": {
+      "executable": "bun",
+      "args": ["run", "docs:validate"]
+    },
     "runner": "tools/quality-workflow/release-boundary.test.ts",
     "expectedFailedCheck": "docs-validation",
     "failureOracle": "navigation source missing",
