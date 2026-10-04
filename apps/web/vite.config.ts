@@ -4,6 +4,8 @@ import viteReact from "@vitejs/plugin-react";
 import { Config, Effect, Schema } from "effect";
 import { defineConfig } from "vite";
 
+import { WebsiteServerFunctionBase } from "./src/lib/config.ts";
+
 export default defineConfig(() => {
   const alchemyOwnsCloudflareVite = Effect.runSync(
     Config.schema(Schema.String, "ALCHEMY_CLOUDFLARE_VITE_INJECTED").pipe(
@@ -17,7 +19,10 @@ export default defineConfig(() => {
       ...(alchemyOwnsCloudflareVite
         ? []
         : [cloudflare({ viteEnvironment: { name: "ssr" } })]),
-      tanstackStart({ server: { entry: "server" } }),
+      tanstackStart({
+        server: { entry: "server" },
+        serverFns: { base: WebsiteServerFunctionBase },
+      }),
       viteReact(),
     ],
     resolve: { conditions: ["source"], tsconfigPaths: true },

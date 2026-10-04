@@ -181,6 +181,7 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  "apps/web/test/native-settings-failure.boundary.test.ts",
   "apps/web/test/native-pair.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
   // Test-only native request/reply bytes; no production encoder admission.

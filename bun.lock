@@ -107,6 +107,7 @@
         "@types/react-dom": "catalog:",
         "@vitejs/plugin-react": "catalog:",
         "@vitest/browser-playwright": "5.0.3",
+        "api": "workspace:*",
         "miniflare": "5.20261001.0-alpha",
         "playwright": "1.63.0",
         "scheduler": "0.28.0",

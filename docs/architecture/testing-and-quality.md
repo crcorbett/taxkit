@@ -1052,3 +1052,20 @@ The scripts owner explicitly separates `CurrentReleaseJourneyInventory` from
 the exact retained five-journey `ReleaseJourneyInventory` used by HGI-203. The
 runbook reader checks each against its own Schema. A current inventory change
 must not loosen the historical packet or attribute new proof to that attempt.
+
+The native Website journey derives the settings function identity from the real
+generated resolver. It proves data-free GET success and empty 400/405 rejection
+before framework parsing. Use short privacy markers: a long marker can be
+truncated by the native JSON error preview and falsely pass an absence check.
+The source builder scopes an exact settings-operation defect, copies that
+actual native artifact to ignored proof output, restores the source and builds
+the ordinary pair. Its fault test requires injected code, empty 500, positive
+fixed reporting and no marker. A boundary-removal run fails on real response
+reflection; restoration passes. These checks do not qualify every native
+framework error, exported tracing, provider logs or complete cancellation.
+
+The real native Website journey also tests unknown function IDs, extra path
+parts and missing IDs against the function's generated URL. A short marker
+appeared in native framework logs before the exact-address check. Removal
+proof must inspect actual native logs as well as the saved 404 assertion, then
+restore exact source and rebuild both ordinary/fault artifacts.

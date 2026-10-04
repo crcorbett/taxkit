@@ -388,3 +388,5 @@ At audit time, check that:
   real private binding and direct browser RPC, idle/repeated request correction,
   form/hydration/cleanup and built import proof. T003 and full exported tracing
   remain unfinished; local tests do not establish deployment.
+
+The [native Website settings-failure candidate](clean-slate-foundation/2026-10-05-native-website-failures.json) records short-marker ingress proof, controlled native internal failure, source restoration and remaining T003 limits.

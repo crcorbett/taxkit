@@ -172,6 +172,7 @@ const fixtureCases = [
       "apps/web/src/lib/calculator.boundary.browser.test.tsx",
       "apps/web/scripts/native-pair-build.runtime.ts",
       "apps/web/test/native-pair.boundary.test.ts",
+      "apps/web/test/native-settings-failure.boundary.test.ts",
       "apps/web/vitest.native.config.ts",
       "apps/web/src/lib/form.boundary.ts",
       "apps/web/src/lib/loaders.server.ts",
@@ -1444,6 +1445,20 @@ describe("exact native RPC lint boundaries", () => {
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
   test.effect.each([
+    {
+      path: "apps/web/test/native-settings-failure.boundary.test.ts",
+      rejected: false,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/test/native-settings-failure.boundary.test.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
     {
       path: "apps/web/src/lib/config.server.ts",
       rejected: false,

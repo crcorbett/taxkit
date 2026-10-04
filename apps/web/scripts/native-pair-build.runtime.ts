@@ -33,6 +33,53 @@ const program = Effect.gen(function* () {
       )
       .pipe(Effect.provide(apiArtifacts));
     const websiteProps = { compatibility, vite: { rootDir: "apps/web" } };
+    // Build one controlled internal settings defect through the same native
+    // compiler. The scoped source replacement is restored before the ordinary
+    // build; no production test flag, alternate handler or protocol is added.
+    yield* Effect.gen(function* nativeSettingsDefectBuild() {
+      const owner = path.join(root, "apps/web/src/lib/live.server.layer.ts");
+      const original = yield* Effect.acquireRelease(
+        fs.readFileString(owner),
+        (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
+      );
+      const injected = original.replace(
+        /settings: Effect\.succeed\(\s*WebsitePublicSettings\.make\(\{ apiOrigin: settings\.apiOrigin \}\)\s*\)/u,
+        'settings: Effect.die("PRIVATE9")'
+      );
+      if (injected === original) {
+        return yield* Effect.die(
+          "Native settings defect fixture no longer matches its source owner"
+        );
+      }
+      yield* fs.writeFileString(owner, injected);
+      const defectArtifacts = scopedArtifacts("TaxKitWebsiteSettingsDefect");
+      const defectSource = yield* resolveSource(websiteProps).pipe(
+        Effect.provide(defectArtifacts)
+      );
+      yield* defectSource
+        .build(
+          makeSourceContext({
+            compatibility,
+            dotAlchemy: output,
+            fqn: "TaxKitWebsiteSettingsDefect",
+            id: "TaxKitWebsiteSettingsDefect",
+            props: websiteProps,
+            stack: { name: "TaxKitAppsLocalProof", stage: "dev_native_pair" },
+            workerName: "taxkit-website-local-settings-defect",
+          })
+        )
+        .pipe(Effect.provide(defectArtifacts));
+      const defectOutput = path.join(output, "settings-defect");
+      // This exact ignored fixture output is command-owned. Fresh modules keep
+      // an older unreachable defect chunk from satisfying the artifact oracle.
+      yield* fs.remove(defectOutput, { force: true, recursive: true });
+      yield* fs.makeDirectory(defectOutput, { recursive: true });
+      yield* fs.copy(
+        path.join(root, "apps/web/dist/server"),
+        path.join(defectOutput, "server"),
+        { overwrite: true }
+      );
+    }).pipe(Effect.scoped);
     const websiteArtifacts = scopedArtifacts("TaxKitWebsite");
     const websiteSource = yield* resolveSource(websiteProps).pipe(
       Effect.provide(websiteArtifacts)

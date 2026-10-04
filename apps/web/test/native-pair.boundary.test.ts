@@ -1,6 +1,15 @@
 import { NodeServices } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
-import { Array, Effect, FileSystem, Path, Queue, Record, Schema } from "effect";
+import {
+  Array,
+  Effect,
+  FileSystem,
+  Option,
+  Path,
+  Queue,
+  Record,
+  Schema,
+} from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
@@ -189,6 +198,97 @@ describe("built native API and Website", () => {
         yield* Effect.logInfo("native-pair: waiting for website");
         yield* Effect.promise(() => website.ready).pipe(
           Effect.timeout("10 seconds")
+        );
+        const settingsFunctionId = Array.findFirst(
+          Record.values(websiteModules),
+          (module) =>
+            module.contents.includes(
+              'functionName: "websiteSettings_createServerFn_handler"'
+            )
+        ).pipe(
+          Option.flatMap((module) =>
+            Option.fromNullishOr(
+              module.contents.match(
+                /"(?<functionId>[a-f0-9]{64})":\s*\{\s*functionName:\s*"websiteSettings_createServerFn_handler"/u
+              )?.groups
+            ).pipe(Option.flatMap(Record.get("functionId")))
+          ),
+          Option.getOrElse(() =>
+            expect.fail("Missing native generated settings function identity")
+          )
+        );
+        const frameworkSentinel = "PRIVATE9";
+        const nativeSettings = yield* Effect.promise(() =>
+          website.dispatchFetch(
+            `${websiteOrigin}/_serverFn/${settingsFunctionId}`,
+            {
+              headers: {
+                origin: websiteOrigin,
+                "sec-fetch-site": "same-origin",
+                "x-tsr-serverFn": "true",
+              },
+            }
+          )
+        );
+        expect(nativeSettings.status).toBe(200);
+        expect(yield* Effect.promise(() => nativeSettings.text())).toContain(
+          apiOrigin
+        );
+        const malformedSettings = yield* Effect.promise(() =>
+          website.dispatchFetch(
+            `${websiteOrigin}/_serverFn/${settingsFunctionId}?payload=${frameworkSentinel}`,
+            {
+              headers: {
+                origin: websiteOrigin,
+                "sec-fetch-site": "same-origin",
+                "x-tsr-serverFn": "true",
+              },
+            }
+          )
+        );
+        const malformedSettingsBody = yield* Effect.promise(() =>
+          malformedSettings.text()
+        );
+        expect(malformedSettings.status).toBe(400);
+        expect(malformedSettingsBody).toBe("");
+        expect(malformedSettingsBody.includes(frameworkSentinel)).toBe(false);
+        const unexpectedMethod = yield* Effect.promise(() =>
+          website.dispatchFetch(
+            `${websiteOrigin}/_serverFn/${settingsFunctionId}`,
+            {
+              body: frameworkSentinel,
+              headers: { "content-type": "application/json" },
+              method: "POST",
+            }
+          )
+        );
+        expect(unexpectedMethod.status).toBe(405);
+        expect(unexpectedMethod.headers.get("allow")).toBe("GET");
+        expect(yield* Effect.promise(() => unexpectedMethod.text())).toBe("");
+        yield* Effect.forEach(
+          [
+            frameworkSentinel,
+            "0".repeat(64),
+            `${settingsFunctionId}/${frameworkSentinel}`,
+            "",
+          ],
+          (unknownPath) =>
+            Effect.gen(function* () {
+              const response = yield* Effect.promise(() =>
+                website.dispatchFetch(
+                  `${websiteOrigin}/_serverFn/${unknownPath}`,
+                  {
+                    headers: {
+                      origin: websiteOrigin,
+                      "sec-fetch-site": "same-origin",
+                      "x-tsr-serverFn": "true",
+                    },
+                  }
+                )
+              );
+              expect(response.status).toBe(404);
+              expect(yield* Effect.promise(() => response.text())).toBe("");
+            })
         );
         yield* Effect.logInfo("native-pair: initial page");
         const initial = yield* Effect.promise(() =>
@@ -389,6 +489,7 @@ describe("built native API and Website", () => {
         const logText = yield* Schema.encodeEffect(Json)(
           yield* Queue.clear(logs)
         );
+        expect(logText.includes(frameworkSentinel)).toBe(false);
         expect(logText).not.toContain("1654");
         expect(logText).not.toContain("130100");
       }).pipe(

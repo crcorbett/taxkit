@@ -69,7 +69,10 @@ bun run --filter=web test:native-pair
 ```
 
 `build:native-pair` first builds compiled RPC dependencies, then uses Alchemy's
-public native source builders for both apps. It acquires no cloud provider,
+public native source builders for both apps. The Website declares `api` as a
+workspace development dependency because this local builder resolves
+`api/worker`; a stray root link cannot stand in for that declaration.
+It acquires no cloud provider,
 state, plan, credentials or apply. The API output is ignored under
 `.alchemy/native-pair`; the native Website output is `dist/server/server.js`.
 A standalone Cloudflare Vite build instead produces `dist/server/index.js`.
@@ -107,3 +110,18 @@ remain active clean-slate work.
 Retained 2025–26 results are unchanged. The Medicare decision, remaining
 calculator pages, full native failure/privacy qualification and safe exported
 telemetry remain separate unfinished tasks.
+
+The settings server function accepts GET without query data or client Context.
+The shared explicit route base is configured in Vite and checked at Worker
+ingress. The native function's generated URL is the exact admitted address;
+unknown IDs, extra path parts and missing IDs get empty 404 before framework
+lookup/logging. Unexpected payloads get empty 400 responses; unsupported methods get
+empty 405 with `Allow: GET`. Unexpected internal settings failures pass through
+the native HTTP matcher and fixed host reporter before TanStack serialisation.
+
+The native builder also compiles a controlled `PRIVATE9` settings defect into
+ignored `.alchemy/native-pair/settings-defect/server`. An Effect scope restores
+the source byte-for-byte before rebuilding the ordinary pair. Do not run this
+builder concurrently with source scans or tests that replace source files.
+The fault test requires the injected operation in the actual artifact, empty
+500 response, positive fixed log event and no marker in logs or replies.

@@ -143,6 +143,13 @@ source loader, RPC server or backend fallback. Calculator facts go only in
 bounded bodies; reports live only in the current calculation/page state.
 Credentials are omitted and unexpected redirects rejected for public browser
 calls. Actual native request headers determine the tested CORS allowlist.
+The Website's native settings server function is a GET with no data or client
+Context. Its explicit build/ingress route uses the native generated function
+URL and rejects unknown or extended addresses with empty 404 before native
+lookup/logging. It rejects query payloads and unsupported methods before parsing; calculations remain body-only form/RPC requests.
+Expected settings errors keep their checked result. Unexpected settings failures
+use the native HTTP failure matcher and safe host reporter, then return the
+native empty response before TanStack can log or serialise an arbitrary error.
 
 Version the RPC contract and qualify a checked compatibility boundary so
 independently activated Website/API Workers fail safely during version skew.
@@ -154,9 +161,12 @@ establishes any existing public consumer/version before selecting its successor.
 Private client Layers distinguish expected calculation errors, unavailable
 transport, incompatible contract and malformed replies. Keep one total budget
 through headers and decoded body; preserve earlier caller interruption and
-close abandoned bodies. Root-owned RPC/client resources survive individual
-request cleanup and are released at their actual host/browser lifetime. Native
-API handlers run in the incoming Effect fibre with no extra ManagedRuntime.
+close abandoned bodies. Host-owned protocol configuration remains available
+across requests. Each native RPC call acquires and releases its receive loop in
+its own scope; retaining a busy fibre from an earlier Worker request can stall
+later calls. The server runner and React registry own the named client service
+and its configuration; no calculation constructs a Layer or another runner.
+Native API handlers run in the incoming Effect fibre with no extra ManagedRuntime.
 
 Exact Effect 4.0.0 exports RPC at `effect/rpc`, while the RPC source still marks
 the APIs unstable. Requalify the older skill's invalid-reply decoder workaround,

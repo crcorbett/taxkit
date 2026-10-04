@@ -282,3 +282,16 @@ before a second application needs it.
 - [API and SDK](./api-and-sdk.md)
 - [Package ownership](./package-ownership.md)
 - [Content and posts](./content-and-posts.md)
+
+The Website settings function takes no data or client Context. Its build-owned
+route base and Worker ingress share `WebsiteServerFunctionBase`; query payloads
+and non-GET methods are rejected before TanStack's parser. Expected settings
+errors remain encoded checked results. Unexpected settings failures use native
+HTTP matching/reporting and a native Response, bypassing error serialisation.
+This qualifies that named path only; other framework/fatal/trace paths remain
+with the active T003 work.
+
+Native settings ingress admits the function's own generated URL, without
+copying its build ID. Unknown IDs, extra path parts and missing IDs get empty
+404 responses before TanStack lookup; its native lookup otherwise logs unknown
+IDs even when the response body hides them.

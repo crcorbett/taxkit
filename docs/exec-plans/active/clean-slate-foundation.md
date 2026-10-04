@@ -1989,3 +1989,63 @@ checks for that exact generated file, preserving the generator's bytes. A
 temporary ordinary source fixture still fails `git diff --check` and is restored
 byte-for-byte; the staged generated output passes. Generated type checking and
 post-receipt docs/runbook checks remain required before committing.
+
+## T003 native Website settings failure qualification
+
+Continue from Website draft #131, commit
+`3e15c9f919cf275cff95b6061939d71f6e6fe4cb`, on
+`codex/dev-74-native-failure-paths`. The real built settings function reflected
+a short malformed-JSON marker. A long marker had falsely passed because the
+native error preview truncated it. The named data-free GET transport now rejects
+query inputs and unsupported methods before native parsing. Its unexpected
+internal failure uses the native HTTP matcher/reporter and Response before
+TanStack serialises errors. Expected checked errors are preserved.
+
+The native builder scopes a temporary settings-operation defect, copies its
+actual output, restores source bytes, then rebuilds the ordinary pair. Both real
+Worker journeys pass; removing the settings failure boundary reflects the marker
+and fails the saved test, while restoring it passes. Focused lint/types pass.
+Full repository closeout and remaining native global/fatal/trace/cancellation
+proof are pending; T003 remains in progress. The source build must run alone
+from source scans and other source-replacement tests. No provider operation.
+
+Documentation impact: **Change required** for Website configuration/host/reply,
+source/test builder, exact encoder admission/canaries, README, frontend/quality
+architecture, current journey, SPEC lifetime/transport clarification and active
+task/evidence pointers. **Preserve** public HTTP/RPC wire, all historical HGI/HFI
+records, retained results, canonical skills and existing docs operations.
+**N/A** public-package Changeset and provider proof: this is private Website
+application/test work only.
+
+Draft #131 hosted Quality failed while resolving `api/worker`: its Website test
+builder used an undeclared package, hidden locally by an existing root link.
+The Website now declares the API as a workspace development dependency, with
+no version changes. A fresh isolated checkout installs 742 packages, passes
+frozen installation and both native Worker tests. The preceding full local
+check passed 455 actual CLI cases, all 27 package/app test tasks, all 16 builds
+and full verification. Final full closeout of the dependency correction is
+pending; no hosted success is attributed to the failed #131 revision.
+Documentation impact also covers the Website manifest and lockfile; the private
+test dependency requires no public-package Changeset.
+
+After the dependency correction passed full verification, a real native
+unknown-function request exposed a separate framework log leak (response did
+not reflect the marker). The Website now compares the request path to the
+function's native generated URL before lookup. Known settings still succeed;
+unknown/extended/missing IDs return empty 404, with safe native logs. This is
+part of the same private Website failure sub-slice. Final closeout is rerun
+after its removal oracle; no complete native failure-path acceptance is claimed.
+
+The complete local Website settings failure sub-slice passes final frozen
+installation, 455 actual CLI cases, all 27 root test tasks, all 16 builds, local
+HTTP consumer smoke and full verification. Final verification includes 32
+Quality cases, both unused-code inventories, all compiler tasks, Chromium
+24 SDK/eight Website cases, genuine Wrangler declarations and both freshly
+source-built normal/internal-defect Worker journeys. Exact-address removal
+restores the real native log marker and fails the saved 404 test; the internal
+reply-boundary removal restores response reflection. Both restore byte-for-byte
+and pass. An omitted Chromium path caused the repeated root tests/docs build
+to fail; the configured reruns pass. Only post-check receipt/plan text changes
+remain, checked through docs/runbooks and the staged whitespace check.
+T003 remains in progress; safe exported telemetry, further API native failure
+and complete cancellation/development pair proof remain unfinished.
