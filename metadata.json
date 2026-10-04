@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43MRM8J2DM5RPHG8FTRSRBR",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-73-hosted-docs-native-proof",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/docs/README.md",
+    "apps/docs/package.json",
+    "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
+    "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+    "apps/docs/scripts/cloudflare-hosted-proof.live.layer.test.ts",
+    "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+    "apps/docs/scripts/test-cloudflare-built.tsx",
+    "apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts",
+    "apps/docs/scripts/test-cloudflare-hosted.tsx",
+    "apps/docs/tsconfig.scripts.json",
+    "apps/docs/vitest.scripts.config.ts",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-hosted-docs-native-proof.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "oxlint.config.ts",
+    "tools/docs-deployment/strict-boundaries.contract.test.ts",
+    "tools/docs-deployment/strict-boundaries.policy.ts",
+    "tools/oxlint/portable-rules.test.ts",
+    "turbo.json"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 507862,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 21211520,
+    "output_tokens": 91698,
+    "api_call_count": 148
+  }
+}
