@@ -1,0 +1,55 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43EZ21R1A3P7DZMQAC5NWXF",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T12:42:05.999746Z",
+  "branch": "codex/dev-73-docs-app-hosts",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/docs/README.md",
+    "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
+    "apps/docs/src/server.ts",
+    "docs/architecture/frontend.md",
+    "docs/architecture/testing-and-quality.md",
+    "oxlint.config.ts",
+    "tools/docs-deployment/README.md",
+    "tools/docs-deployment/strict-boundaries.contract.test.ts",
+    "tools/docs-deployment/strict-boundaries.policy.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "b7d70ba853ae",
+  "checkpoint_transcript_start": 9416,
+  "transcript_lines_at_start": 9416,
+  "compact_transcript_start": 1159,
+  "token_usage": {
+    "input_tokens": 241733,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 10206208,
+    "output_tokens": 42518,
+    "api_call_count": 75
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T12:42:05.411223Z",
+    "agent_lines": 423,
+    "agent_removed": 195,
+    "human_added": 384,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 807,
+    "total_lines_changed": 1038,
+    "agent_percentage": 59.53757225433526,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}
