@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M42XXPN19M9MC3WA96G2Q315",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-73-deployment-credentials",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-04-deployment-credentials.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/standards/tooling.md",
+    "oxlint.config.ts",
+    "tools/docs-deployment/README.md",
+    "tools/docs-deployment/doppler-custody.boundary.ts",
+    "tools/docs-deployment/doppler-custody.test.ts",
+    "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
+    "tools/docs-deployment/fixtures/fake-doppler.schemas.ts",
+    "tools/docs-deployment/inventory-credentials.boundary.test.ts",
+    "tools/docs-deployment/inventory-credentials.boundary.ts",
+    "tools/docs-deployment/local-doppler-environment.boundary.test.ts",
+    "tools/docs-deployment/local-doppler-environment.boundary.ts",
+    "tools/docs-deployment/local-doppler.runtime.ts",
+    "tools/docs-deployment/local-doppler.schemas.ts",
+    "tools/docs-deployment/local-doppler.test.ts",
+    "tools/docs-deployment/local-doppler.ts",
+    "tools/docs-deployment/strict-boundaries.contract.test.ts",
+    "tools/docs-deployment/strict-boundaries.policy.ts",
+    "tools/docs-deployment/workflow-check.boundary.test.ts",
+    "tools/docs-deployment/workflow-check.boundary.ts",
+    "tools/docs-deployment/workflow-input-check.runtime.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 75380,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 6395648,
+    "output_tokens": 38856,
+    "api_call_count": 31
+  }
+}
