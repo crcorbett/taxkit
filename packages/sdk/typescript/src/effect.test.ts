@@ -5,7 +5,7 @@ import { CalculationEngineLive } from "@taxkit/core";
 import { aud } from "@taxkit/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
-import { Cause, Effect, Exit, Layer } from "effect";
+import { Array as EffectArray, Cause, Effect, Exit, Layer } from "effect";
 
 import { calculateReport, calculateRunRequest } from "./effect.js";
 import {
@@ -106,11 +106,11 @@ describe("Effect SDK facade", () => {
 
       if (Exit.isFailure(sdkExit) && Exit.isFailure(serviceExit)) {
         const sdkFailure = expectAt(
-          sdkExit.cause.reasons.filter(Cause.isFailReason),
+          EffectArray.filter(sdkExit.cause.reasons, Cause.isFailReason),
           0
         );
         const serviceFailure = expectAt(
-          serviceExit.cause.reasons.filter(Cause.isFailReason),
+          EffectArray.filter(serviceExit.cause.reasons, Cause.isFailReason),
           0
         );
 

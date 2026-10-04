@@ -13,7 +13,7 @@ import {
 import { tmpdir } from "node:os";
 import nodePath from "node:path";
 
-import { Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema } from "effect";
 
 import { ReleaseBoundaryFixtureCorpus } from "./schemas.js";
 
@@ -74,11 +74,12 @@ const prepareWorkspace = async () => {
   ]);
   expect(inventory.exitCode).toBe(0);
   await Promise.all(
-    inventory.stdout
-      .trim()
-      .split("\n")
-      .filter((relativePath) => relativePath.length > 0)
-      .map(async (relativePath) => {
+    EffectArray.map(
+      EffectArray.filter(
+        inventory.stdout.trim().split("\n"),
+        (relativePath) => relativePath.length > 0
+      ),
+      async (relativePath) => {
         const destination = join(workspace, relativePath);
         await mkdir(dirname(destination), { recursive: true });
         const source = join(repositoryRoot, relativePath);
@@ -86,7 +87,8 @@ const prepareWorkspace = async () => {
         await (sourceStat.isSymbolicLink()
           ? readlink(source).then((link) => symlink(link, destination))
           : copyFile(source, destination));
-      })
+      }
+    )
   );
   const install = await run(workspace, "bun", [
     "install",
@@ -113,7 +115,7 @@ const prepareWorkspace = async () => {
   const scope = join(workspace, "node_modules", "@taxkit");
   await mkdir(scope, { recursive: true });
   await Promise.all(
-    workspacePackages.map(async ([name, packageRoot]) => {
+    EffectArray.map(workspacePackages, async ([name, packageRoot]) => {
       const alias = join(scope, name);
       await rm(alias, { force: true, recursive: true });
       await symlink(join("..", "..", packageRoot), alias, "dir");
@@ -122,7 +124,7 @@ const prepareWorkspace = async () => {
   const apiScope = join(workspace, "apps", "api", "node_modules", "@taxkit");
   await mkdir(apiScope, { recursive: true });
   await Promise.all(
-    workspacePackages.map(async ([name, packageRoot]) => {
+    EffectArray.map(workspacePackages, async ([name, packageRoot]) => {
       const alias = join(apiScope, name);
       await rm(alias, { force: true, recursive: true });
       await symlink(join("..", "..", "..", "..", packageRoot), alias, "dir");

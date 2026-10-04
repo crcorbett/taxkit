@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { Array, Option } from "effect";
+import { Array as EffectArray, Array, Option } from "effect";
 
 import {
   decodeReadableRepositoryText,
@@ -67,7 +67,9 @@ describe("repository path policy", () => {
     expect(Array.map(findings, (finding) => finding.line)).toEqual([
       1, 2, 3, 4, 5,
     ]);
-    expect(findings.every((finding) => !("match" in finding))).toBe(true);
+    expect(
+      EffectArray.every(findings, (finding) => !("match" in finding))
+    ).toBe(true);
   });
 
   test("accepts portable references and ordinary prose", () => {

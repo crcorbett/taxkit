@@ -34,9 +34,10 @@ const sha256Text = (value: string) =>
       "SHA-256",
       new TextEncoder().encode(value)
     );
-    return `sha256:${EffectArray.fromIterable(new Uint8Array(digest))
-      .map((byte) => byte.toString(16).padStart(2, "0"))
-      .join("")}`;
+    return `sha256:${EffectArray.map(
+      EffectArray.fromIterable(new Uint8Array(digest)),
+      (byte) => byte.toString(16).padStart(2, "0")
+    ).join("")}`;
   });
 
 const makeProgram = (rootUrl: URL) =>

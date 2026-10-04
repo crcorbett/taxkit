@@ -5,7 +5,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
-import type { RouterContext } from "#/lib/route-runtime";
+import type { RouterContext } from "#/lib/route-context";
 
 import "../styles.css";
 

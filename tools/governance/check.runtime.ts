@@ -1,6 +1,13 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Array, Console, Effect, Match, Record as EffectRecord } from "effect";
+import {
+  Array as EffectArray,
+  Array,
+  Console,
+  Effect,
+  Match,
+  Record as EffectRecord,
+} from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
@@ -110,11 +117,10 @@ const inspectTree = (
     const retained = entries.flatMap((entry) =>
       entry === null ? [] : [entry]
     );
-    const source = `{${retained
-      .map(
-        ([relativePath, value]) => `${JSON.stringify(relativePath)}:${value}`
-      )
-      .join(",")}}`;
+    const source = `{${EffectArray.map(
+      retained,
+      ([relativePath, value]) => `${JSON.stringify(relativePath)}:${value}`
+    ).join(",")}}`;
     return {
       entryCount: retained.length,
       treeDigest: yield* sha256(source),
@@ -160,18 +166,24 @@ const inspectLink = (repositoryRoot: string, name: string) =>
   });
 
 const markdownTargets = (source: string) =>
-  Array.fromIterable(source.matchAll(markdownLink))
-    .map((match) => match.groups?.["target"] ?? "")
-    .map((target) => target.replaceAll(/^<|>$/gu, "").split(/\s+/u)[0] ?? "")
-    .map((target) => target.split("#")[0] ?? "")
-    .filter(
-      (target) =>
-        target.length > 0 &&
-        !target.startsWith("/") &&
-        !target.startsWith("http://") &&
-        !target.startsWith("https://") &&
-        !target.startsWith("mailto:")
-    );
+  EffectArray.filter(
+    EffectArray.map(
+      EffectArray.map(
+        EffectArray.map(
+          Array.fromIterable(source.matchAll(markdownLink)),
+          (match) => match.groups?.["target"] ?? ""
+        ),
+        (target) => target.replaceAll(/^<|>$/gu, "").split(/\s+/u)[0] ?? ""
+      ),
+      (target) => target.split("#")[0] ?? ""
+    ),
+    (target) =>
+      target.length > 0 &&
+      !target.startsWith("/") &&
+      !target.startsWith("http://") &&
+      !target.startsWith("https://") &&
+      !target.startsWith("mailto:")
+  );
 
 const inspectSkillReferences = (repositoryRoot: string) =>
   Effect.gen(function* inspectLocalSkillReferences() {
@@ -185,7 +197,7 @@ const inspectSkillReferences = (repositoryRoot: string) =>
           const members = yield* fileSystem.readDirectory(root, {
             recursive: true,
           });
-          const markdownFiles = members.filter((member) =>
+          const markdownFiles = EffectArray.filter(members, (member) =>
             member.endsWith(".md")
           );
           return yield* Effect.forEach(
@@ -213,9 +225,8 @@ const inspectSkillReferences = (repositoryRoot: string) =>
                     }),
                   { concurrency: 16 }
                 );
-                const personalPaths = Array.fromIterable(
-                  source.matchAll(absoluteUserPath)
-                ).map(
+                const personalPaths = EffectArray.map(
+                  Array.fromIterable(source.matchAll(absoluteUserPath)),
                   (match) =>
                     ({
                       source: sourcePath,
@@ -223,7 +234,8 @@ const inspectSkillReferences = (repositoryRoot: string) =>
                     }) satisfies ReferenceObservation
                 );
                 return {
-                  missing: references.filter(
+                  missing: EffectArray.filter(
+                    references,
                     (reference): reference is ReferenceObservation =>
                       reference !== null
                   ),

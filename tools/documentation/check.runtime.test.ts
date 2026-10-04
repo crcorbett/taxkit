@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { Effect } from "effect";
+import { Array as EffectArray, Effect } from "effect";
 
 import { decodePublicPageAcceptanceRecord } from "./check.runtime.js";
 import { classifyDocumentationPath } from "./policy.js";
@@ -77,36 +77,39 @@ describe("documentation checker path classes", () => {
       })
     );
     await Promise.all(
-      [
-        '{"state":"accepted"}',
-        JSON.stringify({
-          observedAt: "not-a-timestamp",
-          owner: "product-owner",
-          schemaVersion: 1,
-          state: "accepted",
-          targetPath: "packages/docs-content/content/guide.mdx",
-        }),
-        JSON.stringify({
-          observedAt: "2026-07-21T22:30:00Z",
-          owner: "product-owner",
-          schemaVersion: 1,
-          state: "draft",
-          targetPath: "packages/docs-content/content/guide.mdx",
-        }),
-        JSON.stringify({
-          extra: true,
-          observedAt: "2026-07-21T22:30:00Z",
-          owner: "product-owner",
-          schemaVersion: 1,
-          state: "accepted",
-          targetPath: "packages/docs-content/content/guide.mdx",
-        }),
-      ].map(async (invalid) => {
-        const exit = await Effect.runPromiseExit(
-          decodePublicPageAcceptanceRecord(invalid)
-        );
-        expect(exit._tag).toBe("Failure");
-      })
+      EffectArray.map(
+        [
+          '{"state":"accepted"}',
+          JSON.stringify({
+            observedAt: "not-a-timestamp",
+            owner: "product-owner",
+            schemaVersion: 1,
+            state: "accepted",
+            targetPath: "packages/docs-content/content/guide.mdx",
+          }),
+          JSON.stringify({
+            observedAt: "2026-07-21T22:30:00Z",
+            owner: "product-owner",
+            schemaVersion: 1,
+            state: "draft",
+            targetPath: "packages/docs-content/content/guide.mdx",
+          }),
+          JSON.stringify({
+            extra: true,
+            observedAt: "2026-07-21T22:30:00Z",
+            owner: "product-owner",
+            schemaVersion: 1,
+            state: "accepted",
+            targetPath: "packages/docs-content/content/guide.mdx",
+          }),
+        ],
+        async (invalid) => {
+          const exit = await Effect.runPromiseExit(
+            decodePublicPageAcceptanceRecord(invalid)
+          );
+          expect(exit._tag).toBe("Failure");
+        }
+      )
     );
   });
 

@@ -1,4 +1,4 @@
-import { HashSet } from "effect";
+import { Array as EffectArray, HashSet } from "effect";
 
 import type {
   DeploymentAutomation,
@@ -38,7 +38,7 @@ const finding = (
 const hasExactIds = (actual: readonly string[], expected: readonly string[]) =>
   actual.length === expected.length &&
   HashSet.size(HashSet.fromIterable(actual)) === expected.length &&
-  expected.every((id) => actual.includes(id));
+  EffectArray.every(expected, (id) => actual.includes(id));
 
 const hasExactStrings = (
   actual: readonly string[],
@@ -46,7 +46,7 @@ const hasExactStrings = (
 ) =>
   actual.length === expected.length &&
   HashSet.size(HashSet.fromIterable(actual)) === expected.length &&
-  expected.every((value) => actual.includes(value));
+  EffectArray.every(expected, (value) => actual.includes(value));
 
 const previewMutationGroup = ["taxkit-docs-preview-", "$", "{stage}"].join("");
 
@@ -118,21 +118,24 @@ const inspectMutation = (
         "separately dispatched exact candidate after accepted Preview evidence",
     },
   }[automation.id];
-  const lockMismatch = ![
-    automation.environment.id === expected.environment,
-    automation.authority.environment === expected.environment,
-    automation.signal.kind === expected.signal,
-    automation.lock.group === expected.group,
-    automation.lock.scope === "stage",
-    automation.lock.cancelInProgress === false,
-    automation.cancellation === expected.cancellation,
-    hasExactStrings(
-      automation.authority.operations,
-      automation.id === "docs-production-delivery"
-        ? ["production-deploy", "production-rollback"]
-        : [expected.operation]
-    ),
-  ].every(Boolean);
+  const lockMismatch = !EffectArray.every(
+    [
+      automation.environment.id === expected.environment,
+      automation.authority.environment === expected.environment,
+      automation.signal.kind === expected.signal,
+      automation.lock.group === expected.group,
+      automation.lock.scope === "stage",
+      automation.lock.cancelInProgress === false,
+      automation.cancellation === expected.cancellation,
+      hasExactStrings(
+        automation.authority.operations,
+        automation.id === "docs-production-delivery"
+          ? ["production-deploy", "production-rollback"]
+          : [expected.operation]
+      ),
+    ],
+    Boolean
+  );
   const findings = lockMismatch
     ? [
         finding(
@@ -147,18 +150,21 @@ const inspectMutation = (
     automation.failure.stopConditions.includes(
       "quality result is absent or belongs to another commit"
     );
-  const candidateMismatch = ![
-    automation.authority.principal === expected.principal,
-    automation.environment.trigger === expected.trigger,
-    automation.signal.revisionSource === expected.revisionSource,
-    hasExactStrings(
-      automation.authority.credentialIdentities,
-      expected.credentials
-    ),
-    hasExactStrings(automation.authority.resources, expected.resources),
-    hasExactStrings(automation.authority.denied, expected.denied),
-    hasCandidateQualityStop,
-  ].every(Boolean);
+  const candidateMismatch = !EffectArray.every(
+    [
+      automation.authority.principal === expected.principal,
+      automation.environment.trigger === expected.trigger,
+      automation.signal.revisionSource === expected.revisionSource,
+      hasExactStrings(
+        automation.authority.credentialIdentities,
+        expected.credentials
+      ),
+      hasExactStrings(automation.authority.resources, expected.resources),
+      hasExactStrings(automation.authority.denied, expected.denied),
+      hasCandidateQualityStop,
+    ],
+    Boolean
+  );
   if (candidateMismatch) {
     findings.push(
       finding(
@@ -200,7 +206,7 @@ export const inspectDeploymentAutomationRegisters = (
   const findings: DeploymentAutomationFinding[] = [];
   if (
     !hasExactIds(
-      automations.map((entry) => entry.id),
+      EffectArray.map(automations, (entry) => entry.id),
       expectedAutomationIds
     )
   ) {
@@ -214,7 +220,7 @@ export const inspectDeploymentAutomationRegisters = (
   }
   if (
     !hasExactIds(
-      controls.map((entry) => entry.id),
+      EffectArray.map(controls, (entry) => entry.id),
       expectedControlIds
     )
   ) {
@@ -336,17 +342,20 @@ export const inspectDeploymentAutomationRegisters = (
         receipt?.operation === "preview-destroy" &&
         plan !== null &&
         !(
-          plan.projection.logicalResources.every(
+          EffectArray.every(
+            plan.projection.logicalResources,
             ({ action }) => action === "delete"
           ) ||
-          plan.projection.logicalResources.every(
+          EffectArray.every(
+            plan.projection.logicalResources,
             ({ action }) => action === "noop"
           )
         );
       const deployActionMismatch =
         receipt?.operation !== "preview-destroy" &&
         plan !== null &&
-        plan.projection.logicalResources.some(
+        EffectArray.some(
+          plan.projection.logicalResources,
           ({ action }) => action === "delete"
         );
       const planContractMismatch =
@@ -383,37 +392,40 @@ export const inspectDeploymentAutomationRegisters = (
           expectedHostedEnvironment = "production";
         }
         const screenshotKinds = new Set(
-          hosted.screenshots.map(({ kind }) => kind)
+          EffectArray.map(hosted.screenshots, ({ kind }) => kind)
         );
-        hostedIdentityMismatch = [
-          hosted.accountId !== workflowProvider.accountId,
-          hosted.stateStoreId !== workflowProvider.stateStoreId,
-          hosted.candidateCommit !== receipt.candidateCommit,
-          hosted.stage !== workflowProvider.stage,
-          hosted.acceptedPlanSha256 !== workflowProvider.acceptedPlanSha256,
-          hosted.configSha256 !== workflowProvider.configSha256,
-          hosted.deploymentInputSha256 !==
-            workflowProvider.deploymentInputSha256,
-          hosted.lockfileSha256 !== workflowProvider.lockfileSha256,
-          hosted.previousVersionId !== workflowProvider.previousVersionId,
-          hosted.previewPrNumber !== workflowProvider.previewPrNumber,
-          hosted.rollbackRecoveryIdentity !==
-            workflowProvider.rollbackRecoveryIdentity,
-          receipt.operation === "production-rollback" &&
-            (workflowProvider.previousVersionId === null ||
-              workflowProvider.versionId ===
-                workflowProvider.previousVersionId),
-          hosted.deploymentId !== workflowProvider.deploymentId,
-          hosted.versionId !== workflowProvider.versionId,
-          hosted.workerName !== workflowProvider.workerName,
-          hosted.url !== workflowProvider.url,
-          hosted.diagnostics.length !== 0,
-          hosted.environment !== expectedHostedEnvironment,
-          hosted.screenshots.length !== 2,
-          screenshotKinds.size !== 2,
-          !screenshotKinds.has("desktop"),
-          !screenshotKinds.has("mobile"),
-        ].some(Boolean);
+        hostedIdentityMismatch = EffectArray.some(
+          [
+            hosted.accountId !== workflowProvider.accountId,
+            hosted.stateStoreId !== workflowProvider.stateStoreId,
+            hosted.candidateCommit !== receipt.candidateCommit,
+            hosted.stage !== workflowProvider.stage,
+            hosted.acceptedPlanSha256 !== workflowProvider.acceptedPlanSha256,
+            hosted.configSha256 !== workflowProvider.configSha256,
+            hosted.deploymentInputSha256 !==
+              workflowProvider.deploymentInputSha256,
+            hosted.lockfileSha256 !== workflowProvider.lockfileSha256,
+            hosted.previousVersionId !== workflowProvider.previousVersionId,
+            hosted.previewPrNumber !== workflowProvider.previewPrNumber,
+            hosted.rollbackRecoveryIdentity !==
+              workflowProvider.rollbackRecoveryIdentity,
+            receipt.operation === "production-rollback" &&
+              (workflowProvider.previousVersionId === null ||
+                workflowProvider.versionId ===
+                  workflowProvider.previousVersionId),
+            hosted.deploymentId !== workflowProvider.deploymentId,
+            hosted.versionId !== workflowProvider.versionId,
+            hosted.workerName !== workflowProvider.workerName,
+            hosted.url !== workflowProvider.url,
+            hosted.diagnostics.length !== 0,
+            hosted.environment !== expectedHostedEnvironment,
+            hosted.screenshots.length !== 2,
+            screenshotKinds.size !== 2,
+            !screenshotKinds.has("desktop"),
+            !screenshotKinds.has("mobile"),
+          ],
+          Boolean
+        );
       }
       let workflowRunMismatch = workflowRun === null || receipt === undefined;
       if (
@@ -520,7 +532,7 @@ export const inspectDeploymentAutomationRegisters = (
     teardown === undefined ||
     teardown.signal.revisionSource !==
       "reviewed-default-branch-workflow-commit-plus-closed-pr-number" ||
-    !teardown.failure.stopConditions.some((condition) =>
+    !EffectArray.some(teardown.failure.stopConditions, (condition) =>
       condition.includes("pull-request head")
     )
   ) {

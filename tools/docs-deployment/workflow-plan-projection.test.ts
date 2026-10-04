@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
-import { Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema } from "effect";
 
 import { DeploymentPlanProjection } from "./schemas.js";
 import {
@@ -116,7 +116,7 @@ describe("Alchemy plan projection and historical capture custody", () => {
     const seen = new Set<string>();
 
     const captures = await Promise.all(
-      manifest.captures.map(async (capture) => {
+      EffectArray.map(manifest.captures, async (capture) => {
         const source = await readFile(
           `${fixtureRoot}/${capture.fixture}`,
           "utf-8"
@@ -185,7 +185,9 @@ describe("Alchemy plan projection and historical capture custody", () => {
     const taskLedger = Schema.decodeUnknownSync(
       Schema.fromJsonString(TaskLedger)
     )(taskSource);
-    const taskIds = new Set(taskLedger.tasks.map((task) => task.id));
+    const taskIds = new Set(
+      EffectArray.map(taskLedger.tasks, (task) => task.id)
+    );
     const expected = new Map<string, ExpectedCrosswalk>([
       [
         "ALC-AUD-001",
@@ -355,12 +357,13 @@ describe("Alchemy plan projection and historical capture custody", () => {
       ],
     ]);
 
-    expect(new Set(accepted.entries.map((entry) => entry.findingId)).size).toBe(
-      8
-    );
+    expect(
+      new Set(EffectArray.map(accepted.entries, (entry) => entry.findingId))
+        .size
+    ).toBe(8);
     await Promise.all(
       accepted.entries.flatMap((entry) =>
-        entry.proof.map((proofPath) =>
+        EffectArray.map(entry.proof, (proofPath) =>
           expect(readFile(proofPath, "utf-8")).resolves.not.toHaveLength(0)
         )
       )
@@ -437,54 +440,58 @@ describe("Alchemy plan projection and historical capture custody", () => {
 
   test("rejects unknown actions, resources and replacement-like output", async () => {
     await Promise.all(
-      [
-        "Plan: 1 to replace\n[DocsWebsite] replace\n",
-        "Plan: 1 to create\n[Unexpected] create\n",
-        "Plan: 2 changes\n[DocsWebsite] delete\n[DocsWebsite] create\n",
-      ].map((source) =>
-        expect(project(source, "deploy")).rejects.toHaveProperty(
-          "_tag",
-          "WorkflowPlanProjectionError"
-        )
+      EffectArray.map(
+        [
+          "Plan: 1 to replace\n[DocsWebsite] replace\n",
+          "Plan: 1 to create\n[Unexpected] create\n",
+          "Plan: 2 changes\n[DocsWebsite] delete\n[DocsWebsite] create\n",
+        ],
+        (source) =>
+          expect(project(source, "deploy")).rejects.toHaveProperty(
+            "_tag",
+            "WorkflowPlanProjectionError"
+          )
       )
     );
   });
 
   test("rejects malformed resource lines and wrong operation actions", async () => {
     await Promise.all(
-      (
+      EffectArray.map(
         [
           ["Plan: 1 to update\n[DocsWebsite] update extra\n", "deploy"],
           ["Plan: 1 to create\n[DocsWebsite create\n", "deploy"],
           ["Plan: 1 to delete\n[DocsWebsite] delete\n", "deploy"],
           ["Plan: 1 to update\n[DocsWebsite] update\n", "destroy"],
-        ] as const
-      ).map(([source, kind]) =>
-        expect(project(source, kind)).rejects.toHaveProperty(
-          "_tag",
-          "WorkflowPlanProjectionError"
-        )
+        ] as const,
+        ([source, kind]) =>
+          expect(project(source, kind)).rejects.toHaveProperty(
+            "_tag",
+            "WorkflowPlanProjectionError"
+          )
       )
     );
   });
 
   test("rejects missing, malformed and inconsistent destroy summaries", async () => {
     await Promise.all(
-      [
-        "",
-        "completely changed provider output\n",
-        "[DocsWebsite create\n",
-        "Plan: no changes\n[Unexpected create\n",
-        "Plan: no changes\nchanged trailing output\n",
-        "Plan: no changes\n[DocsWebsite] delete\n",
-        "Plan: 1 to delete\n",
-        "Plan: no changes\nPlan: no changes\n",
-        "Plan: no changes\n",
-      ].map((source) =>
-        expect(project(source, "destroy")).rejects.toHaveProperty(
-          "_tag",
-          "WorkflowPlanProjectionError"
-        )
+      EffectArray.map(
+        [
+          "",
+          "completely changed provider output\n",
+          "[DocsWebsite create\n",
+          "Plan: no changes\n[Unexpected create\n",
+          "Plan: no changes\nchanged trailing output\n",
+          "Plan: no changes\n[DocsWebsite] delete\n",
+          "Plan: 1 to delete\n",
+          "Plan: no changes\nPlan: no changes\n",
+          "Plan: no changes\n",
+        ],
+        (source) =>
+          expect(project(source, "destroy")).rejects.toHaveProperty(
+            "_tag",
+            "WorkflowPlanProjectionError"
+          )
       )
     );
   });

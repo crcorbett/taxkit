@@ -1,7 +1,14 @@
 import { describe, expect, test } from "bun:test";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Array, Effect, FileSystem, Path, Record } from "effect";
+import {
+  Array as EffectArray,
+  Array,
+  Effect,
+  FileSystem,
+  Path,
+  Record,
+} from "effect";
 
 import { prepareWorkflowArtifact } from "./workflow-artifact.js";
 
@@ -32,7 +39,7 @@ const runFixture = (
       .readDirectory(upload, { recursive: true })
       .pipe(Effect.orElseSucceed(() => []));
     const inspected = yield* Effect.all(
-      uploadedMembers.map((member) =>
+      EffectArray.map(uploadedMembers, (member) =>
         fileSystem
           .stat(path.join(upload, member))
           .pipe(Effect.map((info) => (info.type === "File" ? member : null)))

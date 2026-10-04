@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Array as EffectArray, Effect } from "effect";
 
 import {
   canonicalSourcePaths,
@@ -32,8 +32,8 @@ export const renderManifestAggregateSource = (
   members: readonly Artifact[],
   hashes: ReadonlyMap<string, string>
 ) =>
-  members
-    .toSorted((left, right) => {
+  EffectArray.map(
+    members.toSorted((left, right) => {
       if (left.path < right.path) {
         return -1;
       }
@@ -41,9 +41,9 @@ export const renderManifestAggregateSource = (
         return 1;
       }
       return 0;
-    })
-    .map((member) => `${hashes.get(member.path)}  ${member.path}\n`)
-    .join("");
+    }),
+    (member) => `${hashes.get(member.path)}  ${member.path}\n`
+  ).join("");
 
 export interface Hgi206Evidence {
   readonly candidate: Candidate;
@@ -129,8 +129,11 @@ const contradictionPredicates: readonly ContradictionPredicate[] = [
 ];
 
 export const isTypedForbiddenClaim = (fixture: Fixture) =>
-  contradictionPredicates.some((predicate) => predicate(fixture)) &&
-  forbiddenClaims.some(
+  EffectArray.some(contradictionPredicates, (predicate) =>
+    predicate(fixture)
+  ) &&
+  EffectArray.some(
+    forbiddenClaims,
     (claim) =>
       claim.claim === fixture.claim &&
       claim.id === fixture.id &&
@@ -165,14 +168,19 @@ const isSorted = (values: readonly string[]) =>
   JSON.stringify(values) === JSON.stringify(sorted(values));
 
 const validateManifest = (evidence: Hgi206Evidence) => {
-  const membersMatch = evidence.manifest.files.every(
+  const membersMatch = EffectArray.every(
+    evidence.manifest.files,
     (member) => evidence.hashes.get(member.path) === member.sha256
   );
-  const memberPaths = evidence.manifest.files.map((member) => member.path);
+  const memberPaths = EffectArray.map(
+    evidence.manifest.files,
+    (member) => member.path
+  );
   const exclusionsMatch =
     evidence.manifest.exclusions.length === derivedExclusions.length &&
-    evidence.manifest.exclusions.every((exclusion) =>
-      derivedExclusions.some(
+    EffectArray.every(evidence.manifest.exclusions, (exclusion) =>
+      EffectArray.some(
+        derivedExclusions,
         (expected) =>
           expected.path === exclusion.path &&
           expected.reason === exclusion.reason
@@ -201,7 +209,8 @@ const validateChangedPaths = (evidence: Hgi206Evidence) => {
   const ledgerPaths = evidence.candidate.impactLedger.flatMap(
     (entry) => entry.paths
   );
-  const ledgerSurfaces = evidence.candidate.impactLedger.map(
+  const ledgerSurfaces = EffectArray.map(
+    evidence.candidate.impactLedger,
     (entry) => entry.surface
   );
 
@@ -276,30 +285,39 @@ const validateContradictions = (evidence: Hgi206Evidence) => {
     evidence.observations.observations.length === 15 &&
     evidence.results.results.length === 15 &&
     forbiddenClaims.length === 15;
-  const fixtureIds = evidence.fixtures.fixtures.map((fixture) => fixture.id);
-  const observationIds = evidence.observations.observations.map(
+  const fixtureIds = EffectArray.map(
+    evidence.fixtures.fixtures,
+    (fixture) => fixture.id
+  );
+  const observationIds = EffectArray.map(
+    evidence.observations.observations,
     (observation) => observation.fixtureId
   );
-  const resultIds = evidence.results.results.map((result) => result.id);
+  const resultIds = EffectArray.map(
+    evidence.results.results,
+    (result) => result.id
+  );
   const uniqueCoverage =
     new Set(fixtureIds).size === 15 &&
     new Set(observationIds).size === 15 &&
     new Set(resultIds).size === 15 &&
     samePaths(
       fixtureIds,
-      forbiddenClaims.map((fixture) => fixture.id)
+      EffectArray.map(forbiddenClaims, (fixture) => fixture.id)
     ) &&
     samePaths(observationIds, fixtureIds) &&
     samePaths(resultIds, fixtureIds);
-  const allObserved = evidence.fixtures.fixtures.every((fixture) =>
-    validateObservation(
-      fixture,
-      evidence.results.results.find((result) => result.id === fixture.id),
-      evidence.observations.observations.find(
-        (observation) => observation.fixtureId === fixture.id
-      ),
-      observationHash
-    )
+  const allObserved = EffectArray.every(
+    evidence.fixtures.fixtures,
+    (fixture) =>
+      validateObservation(
+        fixture,
+        evidence.results.results.find((result) => result.id === fixture.id),
+        evidence.observations.observations.find(
+          (observation) => observation.fixtureId === fixture.id
+        ),
+        observationHash
+      ) === true
   );
 
   return hasExactCoverage && uniqueCoverage && allObserved
@@ -315,10 +333,12 @@ const validateContradictions = (evidence: Hgi206Evidence) => {
 
 const validateCandidateEvidence = (evidence: Hgi206Evidence) => {
   const { candidate } = evidence;
-  const receiptBindings = candidate.evidence.receipts.every(
+  const receiptBindings = EffectArray.every(
+    candidate.evidence.receipts,
     (receipt) => evidence.hashes.get(receipt.path) === receipt.sha256
   );
-  const candidateReceiptPaths = candidate.evidence.receipts.map(
+  const candidateReceiptPaths = EffectArray.map(
+    candidate.evidence.receipts,
     (receipt) => receipt.path
   );
   const sourceDigest = evidence.manifest.digest;
@@ -382,10 +402,12 @@ const validateJourneys = (evidence: Hgi206Evidence) => {
     evidence.receipts.size === 5 &&
     evidence.scenarios.journeys.length === 5 &&
     evidence.candidate.evidence.receipts.length === 5;
-  const journeyReceiptPaths = evidence.scenarios.journeys.map(
+  const journeyReceiptPaths = EffectArray.map(
+    evidence.scenarios.journeys,
     (journey) => journey.receipt
   );
-  const receiptDetailPaths = [...evidence.receipts.values()].map(
+  const receiptDetailPaths = EffectArray.map(
+    [...evidence.receipts.values()],
     (receipt) => receipt.detailPath
   );
   const exactPaths =
@@ -393,23 +415,28 @@ const validateJourneys = (evidence: Hgi206Evidence) => {
     journeyReceiptPaths.length === receiptPaths.length &&
     samePaths(receiptDetailPaths, detailPaths) &&
     receiptDetailPaths.length === detailPaths.length;
-  const allJourneysBind = evidence.scenarios.journeys.every((journey) => {
-    const receipt = evidence.receipts.get(journey.receipt);
-    const detail = receipt
-      ? evidence.journeyDetails.get(receipt.detailPath)
-      : undefined;
-    const detailHash = receipt
-      ? evidence.hashes.get(receipt.detailPath)
-      : undefined;
+  const allJourneysBind = EffectArray.every(
+    evidence.scenarios.journeys,
+    (journey) => {
+      const receipt = evidence.receipts.get(journey.receipt);
+      const detail = receipt
+        ? evidence.journeyDetails.get(receipt.detailPath)
+        : undefined;
+      const detailHash = receipt
+        ? evidence.hashes.get(receipt.detailPath)
+        : undefined;
 
-    return validateJourney(
-      journey,
-      receipt,
-      detail,
-      detailHash,
-      evidence.manifest.digest
-    );
-  });
+      return (
+        validateJourney(
+          journey,
+          receipt,
+          detail,
+          detailHash,
+          evidence.manifest.digest
+        ) === true
+      );
+    }
+  );
 
   return hasFiveReceipts && exactPaths && allJourneysBind
     ? Effect.void
@@ -429,23 +456,32 @@ const validateHonestEpoch = (evidence: Hgi206Evidence) => {
     evidence.candidate.clocks.workerFeedback,
     evidence.candidate.clocks.workerWallClock,
   ];
-  const allClocksAreNull = clocks.every((clock) => clock.value === null);
-  const clockReasonsAreHonest = clocks.every((clock) =>
+  const allClocksAreNull = EffectArray.every(
+    clocks,
+    (clock) => clock.value === null
+  );
+  const clockReasonsAreHonest = EffectArray.every(clocks, (clock) =>
     clock.reason.includes("not directly measured")
   );
-  const skillSourceIds = evidence.candidate.epoch.skills.map(
+  const skillSourceIds = EffectArray.map(
+    evidence.candidate.epoch.skills,
     (skill) => skill.sourceId
   );
-  const toolNames = evidence.candidate.epoch.tools.map((tool) => tool.name);
-  const runtimeNames = evidence.candidate.epoch.runtime.map(
+  const toolNames = EffectArray.map(
+    evidence.candidate.epoch.tools,
+    (tool) => tool.name
+  );
+  const runtimeNames = EffectArray.map(
+    evidence.candidate.epoch.runtime,
     (runtime) => runtime.name
   );
   const hasEpochEvidence =
     evidence.candidate.epoch.worker !==
       evidence.candidate.epoch.integrationOwner &&
     evidence.candidate.epoch.skills.length === expectedEpochSkills.length &&
-    evidence.candidate.epoch.skills.every((skill) =>
-      expectedEpochSkills.some(
+    EffectArray.every(evidence.candidate.epoch.skills, (skill) =>
+      EffectArray.some(
+        expectedEpochSkills,
         (expected) =>
           expected.sha256 === skill.sha256 &&
           expected.sourceId === skill.sourceId &&
@@ -454,7 +490,7 @@ const validateHonestEpoch = (evidence: Hgi206Evidence) => {
     ) &&
     samePaths(
       skillSourceIds,
-      expectedEpochSkills.map((skill) => skill.sourceId)
+      EffectArray.map(expectedEpochSkills, (skill) => skill.sourceId)
     ) &&
     evidence.hashes.get(".agents/skills/docs-maintainer/SKILL.md") ===
       expectedEpochSkills.find((skill) =>

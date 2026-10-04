@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Console, Effect, Match } from "effect";
+import { Array as EffectArray, Option, Console, Effect, Match } from "effect";
 import { chromium } from "playwright";
 import type {
   Browser,
@@ -36,22 +36,24 @@ const runtimeProofHeaders = {
 };
 
 const parseRgb = (value: string): readonly [number, number, number] => {
-  const channels = value.match(/\d+(?:\.\d+)?/gu)?.map(Number);
+  const channels = Option.fromNullishOr(value.match(/\d+(?:\.\d+)?/gu)).pipe(
+    Option.map((matches) => EffectArray.map(matches, Number)),
+    Option.getOrUndefined
+  );
   assert.ok(channels !== undefined && channels.length >= 3);
   return [channels[0] ?? 0, channels[1] ?? 0, channels[2] ?? 0];
 };
 
 const relativeLuminance = (color: readonly [number, number, number]) =>
-  color
-    .map((channel) => channel / 255)
-    .map((channel) =>
+  EffectArray.map(
+    EffectArray.map(color, (channel) => channel / 255),
+    (channel) =>
       channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
-    )
-    .reduce(
-      (luminance, channel, index) =>
-        luminance + channel * ([0.2126, 0.7152, 0.0722][index] ?? 0),
-      0
-    );
+  ).reduce(
+    (luminance, channel, index) =>
+      luminance + channel * ([0.2126, 0.7152, 0.0722][index] ?? 0),
+    0
+  );
 
 const assertComputedContrast = async (page: Page) => {
   const colors = await page.evaluate(() => {
@@ -367,9 +369,10 @@ const playwrightHostedProofHost = {
       serverFunctionResponses.length > navigationServerFunctionBaseline
     );
     assert.ok(
-      serverFunctionResponses
-        .slice(navigationServerFunctionBaseline)
-        .every(({ status }) => status === 200)
+      EffectArray.every(
+        serverFunctionResponses.slice(navigationServerFunctionBaseline),
+        ({ status }) => status === 200
+      )
     );
 
     const observedServerFunction =

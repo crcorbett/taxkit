@@ -1,4 +1,4 @@
-import { Record } from "effect";
+import { Array as EffectArray, Record } from "effect";
 
 import { GovernanceFinding } from "./schemas.js";
 import type {
@@ -107,7 +107,7 @@ const hasExactMembers = (
   expected: readonly string[]
 ) =>
   actual.length === expected.length &&
-  expected.every((member) => actual.includes(member));
+  EffectArray.every(expected, (member) => actual.includes(member));
 
 const inspectAuditCrosswalk = ({
   accepted,
@@ -118,17 +118,22 @@ const inspectAuditCrosswalk = ({
   GovernanceInputs,
   "accepted" | "findings" | "specSource" | "tasks"
 >): readonly GovernanceFinding[] => {
-  const findingIds = findings.findings.map((entry) => entry.id);
-  const acceptedIds = accepted.entries.map((entry) => entry.findingId);
-  const taskIds = new Set(tasks.tasks.map((task) => task.id));
-  const invalidEntries = accepted.entries.filter(
+  const findingIds = EffectArray.map(findings.findings, (entry) => entry.id);
+  const acceptedIds = EffectArray.map(
+    accepted.entries,
+    (entry) => entry.findingId
+  );
+  const taskIds = new Set(EffectArray.map(tasks.tasks, (task) => task.id));
+  const invalidEntries = EffectArray.filter(
+    accepted.entries,
     (entry) =>
-      !entry.requirementIds.every((id) =>
+      !EffectArray.every(entry.requirementIds, (id) =>
         specSource.includes(`### \`${id}\``)
       ) ||
-      !entry.taskIds.every((id) => taskIds.has(id)) ||
-      !entry.taskIds.every((id) =>
-        tasks.tasks.some(
+      !EffectArray.every(entry.taskIds, (id) => taskIds.has(id)) ||
+      !EffectArray.every(entry.taskIds, (id) =>
+        EffectArray.some(
+          tasks.tasks,
           (task) =>
             task.id === id && task.acceptedFindingIds.includes(entry.findingId)
         )
@@ -164,14 +169,15 @@ const inspectProfile = (
     profile.criticalJourneyOwner ===
       "docs/verification/critical-journeys.json" &&
     profile.representativeJobs.length === expectedJourneyIds.length &&
-    expectedJourneyIds.every((id) =>
-      profile.representativeJobs.some((job) =>
-        job.owningPaths.some((owner) => owner.endsWith(`#${id}`))
+    EffectArray.every(expectedJourneyIds, (id) =>
+      EffectArray.some(profile.representativeJobs, (job) =>
+        EffectArray.some(job.owningPaths, (owner) => owner.endsWith(`#${id}`))
       )
     ) &&
     commandValues.includes("bun run check:harness-governance") &&
     profile.owners.skills.includes(".agents/skills/") &&
-    profile.exclusions.some(
+    EffectArray.some(
+      profile.exclusions,
       (entry) => entry.includes("public") && entry.includes("copy")
     )
     ? []
@@ -191,7 +197,7 @@ const inspectTrees = (
   const receiptSkillIds = Record.keys(receipt.skills);
   const canonicalMismatch =
     !hasExactMembers(receiptSkillIds, canonicalSkillIds) ||
-    canonicalSkillIds.some((id) => {
+    EffectArray.some(canonicalSkillIds, (id) => {
       const expected = receipt.skills[id];
       const actual = observations.canonicalTrees[id];
       return (
@@ -211,7 +217,7 @@ const inspectTrees = (
     docsWriter.owner !== "taxkit-documentation-owner" ||
     !docsWriter.scope.includes("Public-copy wording only") ||
     portless?.classification !== "taxkit-local-development-tool-extra" ||
-    expectedExtraIds.some((id) => {
+    EffectArray.some(expectedExtraIds, (id) => {
       const expected = receipt.extras[id];
       const actual = observations.extraTrees[id];
       return (
@@ -236,12 +242,16 @@ const inspectOverlays = (
   receipt: CanonicalSkillBaseline,
   observations: GovernanceObservations
 ): readonly GovernanceFinding[] => {
-  const receiptPaths = receipt.allowedOverlays.map((entry) => entry.path);
+  const receiptPaths = EffectArray.map(
+    receipt.allowedOverlays,
+    (entry) => entry.path
+  );
   const validReceiptPaths = hasExactMembers(receiptPaths, allowedOverlayPaths);
   const validObserved =
     observations.overlays.length === receipt.allowedOverlays.length &&
-    observations.overlays.every((actual) =>
-      receipt.allowedOverlays.some(
+    EffectArray.every(observations.overlays, (actual) =>
+      EffectArray.some(
+        receipt.allowedOverlays,
         (expected) =>
           actual.path === expected.path && actual.sha256 === expected.sha256
       )
@@ -264,8 +274,9 @@ const inspectLinks = (
   const expectedNames = Record.keys(receipt.claudeLinks);
   const valid =
     expectedNames.length === observations.links.length &&
-    expectedNames.every((name) =>
-      observations.links.some(
+    EffectArray.every(expectedNames, (name) =>
+      EffectArray.some(
+        observations.links,
         (link) =>
           link.name === name &&
           link.type === "SymbolicLink" &&
@@ -315,7 +326,7 @@ const inspectExternalClaims = ({
   "profile" | "receipt"
 >): readonly GovernanceFinding[] => {
   const source = [...profile.nonClaims, ...receipt.nonClaims].join(" ");
-  return requiredExternalBoundaries.every((boundary) =>
+  return EffectArray.every(requiredExternalBoundaries, (boundary) =>
     source.toLowerCase().includes(boundary.toLowerCase())
   )
     ? []
@@ -331,8 +342,9 @@ const inspectExternalClaims = ({
 const inspectJourneys = (
   journeys: CriticalJourneyInventory
 ): readonly GovernanceFinding[] => {
-  const ids = journeys.journeys.map((journey) => journey.id);
-  const invalid = journeys.journeys.some(
+  const ids = EffectArray.map(journeys.journeys, (journey) => journey.id);
+  const invalid = EffectArray.some(
+    journeys.journeys,
     (journey) =>
       journey.authority !== "none" ||
       journey.oracle.length === 0 ||

@@ -1,7 +1,7 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 
-import type { RouterContext } from "#/lib/route-runtime";
-import { getAppRuntime } from "#/lib/runtime";
+import type { RouterContext } from "#/lib/route-context";
+import { getAppRuntime } from "#/lib/runtime-selection";
 
 import { routeTree } from "./routeTree.gen";
 

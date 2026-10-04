@@ -1,7 +1,15 @@
 import { describe, expect, test } from "bun:test";
 
 import { DocsSourceError } from "@taxkit/docs-content/errors";
-import { Cause, Effect, Equal, Exit, Result, Schema } from "effect";
+import {
+  Array as EffectArray,
+  Cause,
+  Effect,
+  Equal,
+  Exit,
+  Result,
+  Schema,
+} from "effect";
 
 import { DocsContentPreloadError, DocsRouteTransportError } from "./errors";
 import { docsHomeRouteBoundary } from "./route-boundary";
@@ -55,7 +63,7 @@ describe("docs route boundary", () => {
 
   test("round-trips every expected docs failure", async () => {
     const cases = await Promise.all(
-      expectedErrors.map(async (error) => {
+      EffectArray.map(expectedErrors, async (error) => {
         const encoded = await Effect.runPromise(
           docsHomeRouteBoundary.encodeExit(Effect.fail(error))
         );
@@ -91,7 +99,7 @@ describe("docs route boundary", () => {
     ];
 
     const exits = await Promise.all(
-      causes.map(async (cause) => ({
+      EffectArray.map(causes, async (cause) => ({
         cause,
         exit: await Effect.runPromiseExit(
           docsHomeRouteBoundary.encodeExit(Effect.failCause(cause))
@@ -133,7 +141,7 @@ describe("docs route boundary", () => {
     ];
 
     const exits = await Promise.all(
-      invalidCauses.map(async ({ cause, message }) => ({
+      EffectArray.map(invalidCauses, async ({ cause, message }) => ({
         exit: await Effect.runPromiseExit(
           docsHomeRouteBoundary.encodeExit(Effect.failCause(cause))
         ),

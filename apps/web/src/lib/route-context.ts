@@ -3,7 +3,7 @@ import type { Effect, Exit } from "effect";
 
 import type { TaxKitWebConfigError } from "./config";
 
-export interface TaxKitRouteRuntime {
+interface TaxKitRouteRuntime {
   readonly runPromise: <A, E>(
     effect: Effect.Effect<A, E, TaxKitHttpApiService>
   ) => Promise<A>;

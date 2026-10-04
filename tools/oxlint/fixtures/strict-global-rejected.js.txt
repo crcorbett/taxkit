@@ -1,0 +1,5 @@
+import { Option, Schema } from "effect";
+export class WrongError extends Schema.TaggedError()("MismatchedError", {}) {}
+export const failure = Error("bad");
+export const unwrapped = Option.getOrThrow(Option.none());
+export const last = [1].at(-1);

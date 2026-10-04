@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema } from "effect";
 // These fixtures are immutable historical deployment evidence. They are
 // decoded through the explicitly historical plan Schemas and do not test
 // current workflow admission.
@@ -110,7 +110,7 @@ describe("docs deployment policy", () => {
     const inventory = await Effect.runPromise(
       Schema.decodeUnknownEffect(DeploymentJourneyInventory)({
         ...inventoryJson,
-        journeys: inventoryJson.journeys.map((journey, index) =>
+        journeys: EffectArray.map(inventoryJson.journeys, (journey, index) =>
           index === 1 ? { ...journey, id: "taxkit-docs-workerd" } : journey
         ),
       })
@@ -289,7 +289,7 @@ const decodeProviderContracts = async () => {
       limitations: ["Synthetic hosted browser observation."],
       nonClaims: ["No Production claim."],
       observedAt: "2026-07-30T04:04:00Z",
-      oracles: oracleIds.map((id) => ({
+      oracles: EffectArray.map(oracleIds, (id) => ({
         expected: "accepted state",
         id,
         observed: "accepted state",

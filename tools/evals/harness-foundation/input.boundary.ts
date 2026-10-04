@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
@@ -28,7 +28,7 @@ export const restoreChangedPaths = (bytes: Uint8Array) =>
     try: () => new TextDecoder("utf-8", { fatal: true }).decode(bytes),
   }).pipe(
     Effect.map((source) =>
-      source.split("\0").filter((entry) => entry.length > 0)
+      EffectArray.filter(source.split("\0"), (entry) => entry.length > 0)
     ),
     Effect.flatMap(Schema.decodeUnknownEffect(ChangedPaths)),
     Effect.mapError(() => new EpochInputError({ target: "git-changed-paths" }))

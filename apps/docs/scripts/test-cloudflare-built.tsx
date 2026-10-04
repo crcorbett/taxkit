@@ -5,7 +5,13 @@ import { tmpdir } from "node:os";
 import nodePath from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { Effect, Record as EffectRecord, Schema } from "effect";
+import {
+  Array as EffectArray,
+  Option,
+  Effect,
+  Record as EffectRecord,
+  Schema,
+} from "effect";
 import { chromium } from "playwright";
 import type { Browser, Page, Request } from "playwright";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -87,15 +93,15 @@ const sha256Directory = async (
   );
   const hash = createHash("sha256");
   const entries = await Promise.all(
-    files
-      .filter(include)
-      .toSorted()
-      .map(async (path) => ({
+    EffectArray.map(
+      EffectArray.filter(files, include).toSorted(),
+      async (path) => ({
         bytes: new Uint8Array(
           await Bun.file(new URL(path, directory)).arrayBuffer()
         ),
         path,
-      }))
+      })
+    )
   );
 
   for (const { bytes, path } of entries) {
@@ -109,7 +115,10 @@ const sha256Directory = async (
 };
 
 const parseRgb = (value: string): readonly [number, number, number] => {
-  const channels = value.match(/\d+(?:\.\d+)?/gu)?.map(Number);
+  const channels = Option.fromNullishOr(value.match(/\d+(?:\.\d+)?/gu)).pipe(
+    Option.map((matches) => EffectArray.map(matches, Number)),
+    Option.getOrUndefined
+  );
 
   assert.ok(channels !== undefined && channels.length >= 3);
 
@@ -117,16 +126,15 @@ const parseRgb = (value: string): readonly [number, number, number] => {
 };
 
 const relativeLuminance = (color: readonly [number, number, number]) =>
-  color
-    .map((channel) => channel / 255)
-    .map((channel) =>
+  EffectArray.map(
+    EffectArray.map(color, (channel) => channel / 255),
+    (channel) =>
       channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
-    )
-    .reduce(
-      (luminance, channel, index) =>
-        luminance + channel * ([0.2126, 0.7152, 0.0722][index] ?? 0),
-      0
-    );
+  ).reduce(
+    (luminance, channel, index) =>
+      luminance + channel * ([0.2126, 0.7152, 0.0722][index] ?? 0),
+    0
+  );
 
 const assertComputedContrast = async (
   page: Page,
@@ -277,10 +285,12 @@ const waitForDescendantExit = async (
   attempts: number
 ): Promise<readonly ProcessEntry[]> => {
   const processTable = await readProcessTable();
-  const remaining = processTable.filter(
+  const remaining = EffectArray.filter(
+    processTable,
     (entry) =>
       !entry.state.startsWith("Z") &&
-      observed.some(
+      EffectArray.some(
+        observed,
         (child) => child.pid === entry.pid && child.command === entry.command
       )
   );
@@ -346,24 +356,30 @@ const serverModules = await globalThis.Array.fromAsync(
     onlyFiles: true,
   })
 );
-const serverModuleBytes = serverModules
-  .map((path) => Bun.file(new URL(path, serverRoot)).size)
-  .reduce((total, size) => total + size, 0);
+const serverModuleBytes = EffectArray.map(
+  serverModules,
+  (path) => Bun.file(new URL(path, serverRoot)).size
+).reduce((total, size) => total + size, 0);
 
 const serverJavaScriptSources = await Promise.all(
-  serverModules
-    .filter((path) => path.endsWith(".js") || path.endsWith(".mjs"))
-    .map(async (path) => ({
+  EffectArray.map(
+    EffectArray.filter(
+      serverModules,
+      (path) => path.endsWith(".js") || path.endsWith(".mjs")
+    ),
+    async (path) => ({
       path,
       source: await Bun.file(new URL(path, serverRoot)).text(),
-    }))
+    })
+  )
 );
-const modulesWithNodeFileSystem = serverJavaScriptSources.filter(({ source }) =>
-  /(?:node:fs|node:fs\/promises)/u.test(source)
+const modulesWithNodeFileSystem = EffectArray.filter(
+  serverJavaScriptSources,
+  ({ source }) => /(?:node:fs|node:fs\/promises)/u.test(source)
 );
 
 assert.ok(
-  modulesWithNodeFileSystem.every(({ path }) =>
+  EffectArray.every(modulesWithNodeFileSystem, ({ path }) =>
     /^assets\/(?:loaders\.server|runtime\.server|policy)-[A-Za-z0-9_-]+\.js$/u.test(
       path
     )
@@ -372,7 +388,8 @@ assert.ok(
 );
 assert.equal(modulesWithNodeFileSystem.length, 2);
 assert.ok(
-  modulesWithNodeFileSystem.every(
+  EffectArray.every(
+    modulesWithNodeFileSystem,
     ({ source }) => !source.includes(fileURLToPath(repositoryRoot))
   ),
   "Filesystem-bearing Worker modules must not retain an absolute checkout path."
@@ -392,9 +409,10 @@ assert.match(
   /if\s*\(type\s*===\s*"raw"\)[\s\S]*?import\("node:fs\/promises"\)/u
 );
 assert.match(contentRuntimeModule, /getText\("processed"\)/u);
-const emittedServerSource = serverJavaScriptSources
-  .map(({ source }) => source)
-  .join("\n");
+const emittedServerSource = EffectArray.map(
+  serverJavaScriptSources,
+  ({ source }) => source
+).join("\n");
 
 assert.doesNotMatch(
   emittedServerSource,
@@ -424,7 +442,7 @@ const builtFiles = await Array.fromAsync(
 );
 
 const builtSources = await Promise.all(
-  builtFiles.map(async (path) => ({
+  EffectArray.map(builtFiles, async (path) => ({
     path,
     source: await Bun.file(new URL(path, builtRoot)).text(),
   }))
@@ -436,7 +454,7 @@ for (const forbiddenName of [
   "CLOUDFLARE_ACCOUNT_ID",
   "GITHUB_TOKEN",
 ]) {
-  const containsForbiddenName = builtSources.some(({ source }) =>
+  const containsForbiddenName = EffectArray.some(builtSources, ({ source }) =>
     source.includes(forbiddenName)
   );
 
@@ -581,8 +599,10 @@ try {
     observedDescendants.length > 0,
     "The proof process did not observe Wrangler's local workerd descendant."
   );
-  const observedWorkerdDescendants = observedDescendants.filter(({ command }) =>
-    /(?:^|\/)workerd(?:@1\.20260722\.1)?(?:\/|\s|$)/u.test(command)
+  const observedWorkerdDescendants = EffectArray.filter(
+    observedDescendants,
+    ({ command }) =>
+      /(?:^|\/)workerd(?:@1\.20260722\.1)?(?:\/|\s|$)/u.test(command)
   );
   assert.ok(
     observedWorkerdDescendants.length > 0,
@@ -768,14 +788,13 @@ try {
     "The exact client navigation did not add a server-function response."
   );
   assert.ok(
-    serverFunctionResponses
-      .slice(navigationServerFunctionBaseline)
-      .every(
-        ({ status, url }) =>
-          status === 200 &&
-          new URL(url).origin === origin &&
-          new URL(url).pathname.startsWith("/_serverFn/")
-      ),
+    EffectArray.every(
+      serverFunctionResponses.slice(navigationServerFunctionBaseline),
+      ({ status, url }) =>
+        status === 200 &&
+        new URL(url).origin === origin &&
+        new URL(url).pathname.startsWith("/_serverFn/")
+    ),
     "The client navigation server-function responses were not successful same-origin transport calls."
   );
   const observedServerFunction =
@@ -847,6 +866,9 @@ try {
     .locator(
       ".docs-page-layout, .docs-nav, .docs-nav-toggle, .docs-article, .docs-route-state"
     )
+    // Playwright serializes this callback into the browser realm. Host imports
+    // are unavailable there. Preserve the existing DOM projection until the
+    // DEV-73 host migration moves traversal outside that serialized callback.
     .evaluateAll((elements) =>
       elements.map((element) => {
         const style = getComputedStyle(element);
@@ -859,7 +881,8 @@ try {
     );
   assert.ok(
     motionStyles.length > 0 &&
-      motionStyles.every(
+      EffectArray.every(
+        motionStyles,
         (style) =>
           style.animationName === "none" && style.transitionDuration === "0s"
       ),
@@ -1010,7 +1033,10 @@ try {
     evidenceClass: "local-workerd",
     filesystem: {
       isolatedOutputOnlyExecution: true,
-      nodeFileSystemModules: modulesWithNodeFileSystem.map(({ path }) => path),
+      nodeFileSystemModules: EffectArray.map(
+        modulesWithNodeFileSystem,
+        ({ path }) => path
+      ),
       providerCredentialEnvironmentAllowed: false,
       requestTimePolicyImportObserved: false,
     },
@@ -1066,7 +1092,7 @@ try {
   );
   if (captureScreenshots) {
     assert.deepEqual(
-      screenshots.map(({ kind }) => kind),
+      EffectArray.map(screenshots, ({ kind }) => kind),
       ["desktop", "mobile"]
     );
     await Bun.write(

@@ -1,4 +1,4 @@
-import { Array, Order, Record } from "effect";
+import { Array as EffectArray, Array, Option, Order, Record } from "effect";
 
 import {
   DocumentationDiagnostic,
@@ -99,9 +99,10 @@ const localScriptsFor = (
   workspaceScripts: ReadonlyMap<string, WorkspaceScripts>,
   path: string
 ): ReadonlySet<string> => {
-  const [matchingRoot] = globalThis.Array.from(workspaceScripts.keys())
-    .filter((root) => isUnder(path, root))
-    .toSorted((left, right) => right.length - left.length);
+  const [matchingRoot] = EffectArray.filter(
+    globalThis.Array.from(workspaceScripts.keys()),
+    (root) => isUnder(path, root)
+  ).toSorted((left, right) => right.length - left.length);
   return matchingRoot
     ? (workspaceScripts.get(matchingRoot)?.scripts ?? new Set<string>())
     : new Set<string>();
@@ -120,7 +121,8 @@ const filteredScriptsFor = (
   }
   const selected = globalThis.Array.from(workspaceScripts.entries()).find(
     ([root, workspace]) =>
-      workspace.name === filter || root.split("/").at(-1) === filter
+      workspace.name === filter ||
+      Array.last(root.split("/")).pipe(Option.contains(filter))
   );
   return selected?.[1].scripts ?? new Set<string>();
 };
@@ -193,12 +195,12 @@ export const classifyDocumentationPath = (
     return DocumentationPathClass.make("workspace-manifest");
   }
   if (
-    policy.public.roots.some((root) => isUnder(path, root)) ||
+    EffectArray.some(policy.public.roots, (root) => isUnder(path, root)) ||
     path === policy.public.navigation.path
   ) {
     return DocumentationPathClass.make("public");
   }
-  if (policy.sdkDocs.roots.some((root) => isUnder(path, root))) {
+  if (EffectArray.some(policy.sdkDocs.roots, (root) => isUnder(path, root))) {
     return DocumentationPathClass.make("authored-sdk");
   }
   if (
@@ -209,7 +211,7 @@ export const classifyDocumentationPath = (
   }
   if (
     policy.maintainer.rootEntrypoints.includes(path) ||
-    (policy.maintainer.roots.some((root) => isUnder(path, root)) &&
+    (EffectArray.some(policy.maintainer.roots, (root) => isUnder(path, root)) &&
       /\.(?:md|html)$/u.test(path)) ||
     (/(?:^|\/)README\.md$/u.test(path) && !policy.sdkDocs.roots.includes(path))
   ) {
@@ -226,7 +228,8 @@ const inspectMaintainer = (
   const result: DocumentationDiagnostic[] = [];
   const fields = metadata(file.text);
   if (
-    inspection.ownerPolicy.maintainer.snapshotExemptions.some(
+    EffectArray.some(
+      inspection.ownerPolicy.maintainer.snapshotExemptions,
       (item) => item.path === file.path
     )
   ) {
@@ -363,10 +366,12 @@ const inspectPublicStatus = (
   const navigation = inspection.files.find(
     (file) => file.path === policy.public.navigation.path
   );
-  const publicFiles = inspection.files.filter(
+  const publicFiles = EffectArray.filter(
+    inspection.files,
     (file) =>
-      policy.public.roots.some((root) => isUnder(file.path, root)) &&
-      file.path.endsWith(".mdx")
+      EffectArray.some(policy.public.roots, (root) =>
+        isUnder(file.path, root)
+      ) && file.path.endsWith(".mdx")
   );
   const acceptedRecords = new Map<string, string>();
   const recordPaths = new Set<string>();

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema } from "effect";
 
 import automationJson from "./automation-register.json";
 import controlsJson from "./controls.json";
@@ -111,9 +111,9 @@ describe("quality workflow policy", () => {
         "git fetch origin main"
       ),
     ]) {
-      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
-        "workflow-mutation-step"
-      );
+      expect(
+        EffectArray.map(findingsFor(workflow), (item) => item.invariant)
+      ).toContain("workflow-mutation-step");
     }
   });
 
@@ -132,9 +132,9 @@ describe("quality workflow policy", () => {
         "$GITHUB_WORKSPACE/.cache/ms-playwright"
       ),
     ]) {
-      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
-        "workflow-mutation-step"
-      );
+      expect(
+        EffectArray.map(findingsFor(workflow), (item) => item.invariant)
+      ).toContain("workflow-mutation-step");
     }
   });
 
@@ -154,9 +154,9 @@ describe("quality workflow policy", () => {
         ""
       ),
     ]) {
-      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
-        "workflow-mutation-step"
-      );
+      expect(
+        EffectArray.map(findingsFor(workflow), (item) => item.invariant)
+      ).toContain("workflow-mutation-step");
     }
   });
 
@@ -177,9 +177,9 @@ describe("quality workflow policy", () => {
         ].join("")
       ),
     ]) {
-      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
-        "workflow-mutation-step"
-      );
+      expect(
+        EffectArray.map(findingsFor(workflow), (item) => item.invariant)
+      ).toContain("workflow-mutation-step");
     }
   });
 
@@ -195,20 +195,23 @@ describe("quality workflow policy", () => {
         "      - uses: actions/cache/save@"
       ),
     ]) {
-      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
-        "workflow-mutation-step"
-      );
+      expect(
+        EffectArray.map(findingsFor(workflow), (item) => item.invariant)
+      ).toContain("workflow-mutation-step");
     }
   });
 
   test("rejects a floating action, authority expansion and bypassed graph in the actual job", () => {
     expect(
-      findingsFor(
-        acceptedWorkflow
-          .replace("contents: read", "contents: write")
-          .replace("@3d3c42e5aac5ba805825da76410c181273ba90b1", "@v7")
-          .replaceAll("bun run release:check -- --ci", "bun run verification")
-      ).map((item) => item.invariant)
+      EffectArray.map(
+        findingsFor(
+          acceptedWorkflow
+            .replace("contents: read", "contents: write")
+            .replace("@3d3c42e5aac5ba805825da76410c181273ba90b1", "@v7")
+            .replaceAll("bun run release:check -- --ci", "bun run verification")
+        ),
+        (item) => item.invariant
+      )
     ).toEqual([
       "canonical-release-graph",
       "workflow-action-pin",
@@ -219,17 +222,20 @@ describe("quality workflow policy", () => {
 
   test("rejects comment and other-job spoofing instead of scanning text", () => {
     expect(
-      findingsFor(
-        acceptedWorkflow
-          .replaceAll(
-            "        run: bun run release:check -- --ci",
-            "        run: bun run verification # bun run release:check -- --ci"
-          )
-          .replace(
-            "jobs:\n  quality:",
-            "jobs:\n  spoof:\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - run: bun run release:check -- --ci\n  quality:"
-          )
-      ).map((item) => item.invariant)
+      EffectArray.map(
+        findingsFor(
+          acceptedWorkflow
+            .replaceAll(
+              "        run: bun run release:check -- --ci",
+              "        run: bun run verification # bun run release:check -- --ci"
+            )
+            .replace(
+              "jobs:\n  quality:",
+              "jobs:\n  spoof:\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - run: bun run release:check -- --ci\n  quality:"
+            )
+        ),
+        (item) => item.invariant
+      )
     ).toContain("canonical-release-graph");
   });
 
@@ -240,46 +246,58 @@ describe("quality workflow policy", () => {
       "    paths-ignore:\n      - docs/**\n",
     ]) {
       expect(
-        findingsFor(
-          acceptedWorkflow.replace(
-            "    branches:\n",
-            `${filter}    branches:\n`
-          )
-        ).map((item) => item.invariant)
+        EffectArray.map(
+          findingsFor(
+            acceptedWorkflow.replace(
+              "    branches:\n",
+              `${filter}    branches:\n`
+            )
+          ),
+          (item) => item.invariant
+        )
       ).toContain("workflow-triggers");
     }
   });
 
   test("rejects pull_request_target so forks cannot receive the cache token", () => {
     expect(
-      findingsFor(
-        acceptedWorkflow.replace(
-          "  pull_request:\n",
-          "  pull_request_target:\n"
-        )
-      ).map((item) => item.invariant)
+      EffectArray.map(
+        findingsFor(
+          acceptedWorkflow.replace(
+            "  pull_request:\n",
+            "  pull_request_target:\n"
+          )
+        ),
+        (item) => item.invariant
+      )
     ).toContain("workflow-triggers");
   });
 
   test("rejects branch pushes that duplicate pull-request coverage", () => {
     expect(
-      findingsFor(
-        acceptedWorkflow.replace(
-          "    branches:\n      - main\n",
-          '    branches:\n      - main\n      - "codex/**"\n'
-        )
-      ).map((item) => item.invariant)
+      EffectArray.map(
+        findingsFor(
+          acceptedWorkflow.replace(
+            "    branches:\n      - main\n",
+            '    branches:\n      - main\n      - "codex/**"\n'
+          )
+        ),
+        (item) => item.invariant
+      )
     ).toContain("workflow-triggers");
   });
 
   test("rejects missing action owner, timeout and cancellation semantics", () => {
     expect(
-      findingsFor(
-        acceptedWorkflow
-          .replace("taxkit-ci-release-maintainer", "unowned")
-          .replace("timeout-minutes: 30", "timeout-minutes: 120")
-          .replace("cancel-in-progress: true", "cancel-in-progress: false")
-      ).map((item) => item.invariant)
+      EffectArray.map(
+        findingsFor(
+          acceptedWorkflow
+            .replace("taxkit-ci-release-maintainer", "unowned")
+            .replace("timeout-minutes: 30", "timeout-minutes: 120")
+            .replace("cancel-in-progress: true", "cancel-in-progress: false")
+        ),
+        (item) => item.invariant
+      )
     ).toEqual([
       "workflow-concurrency",
       "workflow-pin-update-owner",
@@ -326,9 +344,9 @@ describe("quality workflow policy", () => {
         'test "$DOPPLER_CONFIG" = "prd"'
       ),
     ]) {
-      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
-        "workflow-mutation-step"
-      );
+      expect(
+        EffectArray.map(findingsFor(workflow), (item) => item.invariant)
+      ).toContain("workflow-mutation-step");
     }
   });
 
@@ -344,7 +362,7 @@ describe("quality workflow policy", () => {
           `    runs-on: ubuntu-latest\n${permissions}`
         )
       );
-      expect(findings.map((item) => item.target)).toContain(
+      expect(EffectArray.map(findings, (item) => item.target)).toContain(
         ".github/workflows/quality.yml:jobs.quality.permissions"
       );
     }
@@ -378,12 +396,12 @@ describe("quality workflow policy", () => {
     );
     expect(inspectGovernanceRegisters(controls, automations)).toEqual([]);
 
-    const unsafeControls = controls.map((control) =>
+    const unsafeControls = EffectArray.map(controls, (control) =>
       control.id === "canonical-release-graph"
         ? { ...control, evidence: "bun run test" }
         : control
     );
-    const unsafeAutomations = automations.map((automation) =>
+    const unsafeAutomations = EffectArray.map(automations, (automation) =>
       automation.id === "documentation-context-freshness" &&
       automation.candidate !== undefined
         ? {
@@ -398,19 +416,23 @@ describe("quality workflow policy", () => {
         : automation
     );
     expect(
-      inspectGovernanceRegisters(unsafeControls, unsafeAutomations).map(
+      EffectArray.map(
+        inspectGovernanceRegisters(unsafeControls, unsafeAutomations),
         (item) => item.invariant
       )
     ).toEqual(["control-register", "automation-register"]);
 
     expect(
-      inspectGovernanceRegisters(
-        [...controls, { ...controls[0], id: "extra-control" }],
-        automations
-      ).map((item) => item.invariant)
+      EffectArray.map(
+        inspectGovernanceRegisters(
+          [...controls, { ...controls[0], id: "extra-control" }],
+          automations
+        ),
+        (item) => item.invariant
+      )
     ).toContain("control-register");
 
-    const unsafeControlContract = controls.map((control) => ({
+    const unsafeControlContract = EffectArray.map(controls, (control) => ({
       ...control,
       preventedFailure: "x",
       recovery: "x",
@@ -419,14 +441,15 @@ describe("quality workflow policy", () => {
       signal: "x",
     }));
     expect(
-      inspectGovernanceRegisters(unsafeControlContract, automations).map(
+      EffectArray.map(
+        inspectGovernanceRegisters(unsafeControlContract, automations),
         (item) => item.invariant
       )
     ).toContain("control-register");
 
     const longNonsense =
       "This sentence is deliberately long but carries no governance meaning whatsoever.";
-    const meaningless = automations.map((automation) => ({
+    const meaningless = EffectArray.map(automations, (automation) => ({
       ...automation,
       authority: { ...automation.authority, principal: longNonsense },
       proof: { ...automation.proof, command: longNonsense },
@@ -443,7 +466,8 @@ describe("quality workflow policy", () => {
       },
     }));
     expect(
-      inspectGovernanceRegisters(controls, meaningless).filter(
+      EffectArray.filter(
+        inspectGovernanceRegisters(controls, meaningless),
         (item) => item.invariant === "automation-register"
       ).length
     ).toBeGreaterThanOrEqual(2);
@@ -482,7 +506,10 @@ describe("quality workflow policy", () => {
       ),
     ]) {
       expect(
-        inspectReleaseRuntime(contaminated).map((item) => item.invariant)
+        EffectArray.map(
+          inspectReleaseRuntime(contaminated),
+          (item) => item.invariant
+        )
       ).toEqual(["release-runtime-boundary"]);
     }
   });

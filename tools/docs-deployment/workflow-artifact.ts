@@ -1,3 +1,4 @@
+import { Array as EffectArray } from "effect";
 import * as Array from "effect/Array";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
@@ -111,7 +112,7 @@ export const prepareWorkflowArtifact = (
       .readDirectory(sourceRoot, { recursive: true })
       .pipe(Effect.mapError(() => fail("artifact-source", "file-read")));
     const inspected = yield* Effect.all(
-      members.toSorted().map((member) =>
+      EffectArray.map(members.toSorted(), (member) =>
         fileSystem.stat(path.join(sourceRoot, member)).pipe(
           Effect.map((info) => (info.type === "File" ? member : null)),
           Effect.mapError(() => fail(member, "file-read"))
@@ -139,7 +140,7 @@ export const prepareWorkflowArtifact = (
       .makeDirectory(uploadRoot, { recursive: true })
       .pipe(Effect.mapError(() => fail("artifact-upload", "file-write")));
     yield* Effect.all(
-      admitted.map((relativePath) =>
+      EffectArray.map(admitted, (relativePath) =>
         Effect.gen(function* copyAdmittedArtifact() {
           const sourcePath = path.join(sourceRoot, relativePath);
           const realSourcePath = yield* fileSystem
@@ -152,7 +153,11 @@ export const prepareWorkflowArtifact = (
             const contents = yield* fileSystem
               .readFileString(realSourcePath)
               .pipe(Effect.mapError(() => fail(relativePath, "file-read")));
-            if (forbiddenText.some((pattern) => pattern.test(contents))) {
+            if (
+              EffectArray.some(forbiddenText, (pattern) =>
+                pattern.test(contents)
+              )
+            ) {
               return yield* fail(relativePath, "content");
             }
           }

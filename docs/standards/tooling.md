@@ -349,8 +349,11 @@ DEV-73 currently configures all eleven canonical strict Effect rules in core,
 rules and calculators, including their tests. Actual Oxlint fixtures assert
 one admitted file, exit code and each of the ten applicable domain diagnostics;
 the web-runtime filename rule applies when web scope is migrated. Lint and
-fixture caches explicitly include the canonical plugin asset. Remaining owned
-app/tool/config/infrastructure paths and semantic audits are pending in T002.
+fixture caches explicitly include the canonical plugin asset. Five rules now apply globally to owned code: native `.at` rejection, safe Option
+handling, tagged-error identity, `new` for Error construction and web runtime
+filename conventions. Actual-command fixtures additionally cover web source,
+JavaScript tools and root configuration. Remaining rules outside domain packages
+and semantic audits are pending in T002.
 Existing repository rules continue to apply; this partial adoption is not
 repository-wide strict-compliance evidence. Exact report/error serialization
 tests may invoke owning Schema encoders as their representation boundary;

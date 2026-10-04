@@ -1,6 +1,7 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import {
+  Array as EffectArray,
   Array,
   Console,
   Effect,
@@ -171,7 +172,7 @@ const hasExactMembers = (
   expected: readonly string[]
 ) =>
   actual.length === expected.length &&
-  expected.every((member) => actual.includes(member));
+  EffectArray.every(expected, (member) => actual.includes(member));
 
 const manifestMatchesSkillReceipt = (
   manifest: SourceManifest,
@@ -182,8 +183,9 @@ const manifestMatchesSkillReceipt = (
   const extras = EffectRecord.toEntries(receipt.extras);
   return (
     manifest.skills.length === skills.length &&
-    skills.every(([id, expected]) =>
-      manifest.skills.some(
+    EffectArray.every(skills, ([id, expected]) =>
+      EffectArray.some(
+        manifest.skills,
         (actual) =>
           actual.id === id &&
           actual.entryCount === expected.entryCount &&
@@ -191,15 +193,17 @@ const manifestMatchesSkillReceipt = (
       )
     ) &&
     manifest.overlays.length === overlays.length &&
-    overlays.every((expected) =>
-      manifest.overlays.some(
+    EffectArray.every(overlays, (expected) =>
+      EffectArray.some(
+        manifest.overlays,
         (actual) =>
           actual.path === expected.path && actual.sha256 === expected.sha256
       )
     ) &&
     manifest.extras.length === extras.length &&
-    extras.every(([id, expected]) =>
-      manifest.extras.some(
+    EffectArray.every(extras, ([id, expected]) =>
+      EffectArray.some(
+        manifest.extras,
         (actual) =>
           actual.id === id &&
           actual.classification === expected.classification &&
@@ -215,10 +219,10 @@ const scenariosMatchCriticalJourneys = (
   inventory: CriticalJourneyInventory
 ) =>
   hasExactMembers(
-    inventory.journeys.map((journey) => journey.id),
+    EffectArray.map(inventory.journeys, (journey) => journey.id),
     requiredJourneyIds
   ) &&
-  scenarios.journeys.every((scenario) => {
+  EffectArray.every(scenarios.journeys, (scenario) => {
     const canonical = inventory.journeys.find(
       (journey) => journey.id === scenario.id
     );
@@ -227,7 +231,8 @@ const scenariosMatchCriticalJourneys = (
       scenario.command === expectedJourneyCommands[scenario.id] &&
       scenario.owner === `${criticalJourneyOwnerPath}#${scenario.id}` &&
       scenario.oracle === canonical.oracle &&
-      canonical.nonClaims.some(
+      EffectArray.some(
+        canonical.nonClaims,
         (nonClaim) => nonClaim.trim() === scenario.nonClaim.trim()
       )
     );
@@ -311,8 +316,9 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       "Recompute the NUL-delimited migration path inventory from Git and refresh the candidate evidence."
     );
     yield* requireInvariant(
-      !changedPaths.some((target) =>
-        forbiddenMigrationPrefixes.some(
+      !EffectArray.some(changedPaths, (target) =>
+        EffectArray.some(
+          forbiddenMigrationPrefixes,
           (prefix) => target === prefix || target.startsWith(prefix)
         )
       ),
@@ -322,7 +328,7 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
     );
     yield* requireInvariant(
       hasExactMembers(
-        manifest.artifacts.map((artifact) => artifact.path),
+        EffectArray.map(manifest.artifacts, (artifact) => artifact.path),
         requiredSourceArtifacts
       ),
       "source-artifact-coverage",
@@ -345,7 +351,8 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       { concurrency: 4 }
     );
     yield* requireInvariant(
-      manifestArtifactHashes.every(
+      EffectArray.every(
+        manifestArtifactHashes,
         ({ actual, artifact }) => actual === artifact.sha256
       ),
       "source-artifact-identity",
@@ -353,7 +360,10 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       "Restore every profile, receipt, validator, journey, and scenario artifact to its recorded digest."
     );
 
-    const scenarioJourneyIds = scenarios.journeys.map((journey) => journey.id);
+    const scenarioJourneyIds = EffectArray.map(
+      scenarios.journeys,
+      (journey) => journey.id
+    );
     yield* requireInvariant(
       hasExactMembers(scenarioJourneyIds, requiredJourneyIds),
       "scenario-coverage",
@@ -369,11 +379,12 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
     yield* requireInvariant(
       receipts.length === scenarios.journeys.length &&
         hasExactMembers(
-          receipts.map(({ receipt }) => receipt.journeyId),
+          EffectArray.map(receipts, ({ receipt }) => receipt.journeyId),
           requiredJourneyIds
         ) &&
-        receipts.every(({ receipt, target }) =>
-          scenarios.journeys.some(
+        EffectArray.every(receipts, ({ receipt, target }) =>
+          EffectArray.some(
+            scenarios.journeys,
             (journey) =>
               journey.id === receipt.journeyId &&
               journey.command === receipt.command &&
@@ -422,8 +433,9 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
         candidate.scenario.path === epochPaths.scenarios &&
         candidate.scenario.sha256 === scenarioHash &&
         candidate.failedAttempts.length === failedHashes.length &&
-        failedHashes.every((actual) =>
-          candidate.failedAttempts.some(
+        EffectArray.every(failedHashes, (actual) =>
+          EffectArray.some(
+            candidate.failedAttempts,
             (expected) =>
               expected.path === actual.path && expected.sha256 === actual.sha256
           )
@@ -431,8 +443,9 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
         candidate.independentReview.path === epochPaths.independentReview &&
         candidate.independentReview.sha256 === reviewHash &&
         candidate.receipts.length === receiptHashes.length &&
-        receiptHashes.every((actual) =>
-          candidate.receipts.some(
+        EffectArray.every(receiptHashes, (actual) =>
+          EffectArray.some(
+            candidate.receipts,
             (expected) =>
               expected.journeyId === actual.journeyId &&
               expected.path === actual.path &&
@@ -448,12 +461,13 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
         review.candidateCommit === candidateCommit &&
         review.findings.length === 0 &&
         hasExactMembers(
-          review.checks.map((check) => check.name),
+          EffectArray.map(review.checks, (check) => check.name),
           independentReviewCheckNames
         ) &&
         review.reviewer.identity !== manifest.epoch.worker &&
         review.reviewer.workerIndependentOf.includes(manifest.epoch.worker) &&
-        receipts.every(
+        EffectArray.every(
+          receipts,
           ({ receipt }) =>
             Date.parse(receipt.observedAt) <= Date.parse(review.observedAt)
         ) &&
@@ -480,10 +494,10 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       ...candidate.nonClaims,
       ...review.nonClaims,
       ...validation.nonClaims,
-      ...receipts.map(({ receipt }) => receipt.nonClaim),
+      ...EffectArray.map(receipts, ({ receipt }) => receipt.nonClaim),
     ].join(" ");
     yield* requireInvariant(
-      externalBoundaries.every((boundary) =>
+      EffectArray.every(externalBoundaries, (boundary) =>
         nonClaimSource.toLowerCase().includes(boundary.toLowerCase())
       ),
       "external-non-claims",
@@ -496,7 +510,7 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
         validation.candidate.path === epochPaths.candidate &&
         validation.candidate.sha256 === candidateHash &&
         hasExactMembers(
-          validation.checks.map((check) => check.name),
+          EffectArray.map(validation.checks, (check) => check.name),
           validationCheckNames
         ) &&
         validation.noChangeset.includes(
@@ -509,7 +523,10 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
 
     return {
       changedPaths: changedPaths.length,
-      journeyIds: receipts.map(({ receipt }): JourneyId => receipt.journeyId),
+      journeyIds: EffectArray.map(
+        receipts,
+        ({ receipt }): JourneyId => receipt.journeyId
+      ),
       sourceManifestHash,
     };
   });

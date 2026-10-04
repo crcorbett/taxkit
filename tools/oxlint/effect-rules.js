@@ -1,3 +1,5 @@
+import { Array as EffectArray } from "effect";
+
 import {
   createBindingTracker,
   importSourceValue,
@@ -163,8 +165,11 @@ const runtimeMethods = new Set([
 ]);
 
 const runtimeExecutionSemantics = new Set([
-  ...[...runtimeMethods].map((method) => `Effect.${method}`),
-  ...[...runtimeMethods].map((method) => `effect.Effect.${method}`),
+  ...EffectArray.map([...runtimeMethods], (method) => `Effect.${method}`),
+  ...EffectArray.map(
+    [...runtimeMethods],
+    (method) => `effect.Effect.${method}`
+  ),
   "BunRuntime.runMain",
   "ManagedRuntime.make",
   "effect.ManagedRuntime.make",
@@ -427,7 +432,8 @@ const noBareEffectTryPromise = {
         const options = node.arguments?.[0];
         const optionProperties =
           options?.type === "ObjectExpression"
-            ? options.properties.filter(
+            ? EffectArray.filter(
+                options.properties,
                 (property) =>
                   property.type === "Property" &&
                   (propertyName(property.key) === "try" ||
@@ -435,18 +441,21 @@ const noBareEffectTryPromise = {
               )
             : [];
         const inlineFunctionKeys = new Set(
-          optionProperties
-            .filter(
+          EffectArray.map(
+            EffectArray.filter(
+              optionProperties,
               (property) =>
                 property.kind === "init" &&
                 (property.value?.type === "ArrowFunctionExpression" ||
                   property.value?.type === "FunctionExpression")
-            )
-            .map((property) => propertyName(property.key))
+            ),
+            (property) => propertyName(property.key)
+          )
         );
         const hasDynamicSpread =
           options?.type === "ObjectExpression" &&
-          options.properties.some(
+          EffectArray.some(
+            options.properties,
             (property) => property.type === "SpreadElement"
           );
 
@@ -642,7 +651,7 @@ const localName = (specifier) =>
   specifier?.local?.type === "Identifier" ? specifier.local.name : null;
 
 const hasUnaliasedImport = (node, names) =>
-  (node.specifiers ?? []).some((specifier) => {
+  EffectArray.some(node.specifiers ?? [], (specifier) => {
     const name = importedName(specifier);
     return name !== null && names.has(name) && localName(specifier) === name;
   });

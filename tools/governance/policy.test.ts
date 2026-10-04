@@ -37,7 +37,8 @@ const expectInvariant = (
   expectedInvariant: string
 ) => {
   expect(
-    inspectGovernance(inputs).some(
+    EffectArray.some(
+      inspectGovernance(inputs),
       (finding) => finding.invariant === expectedInvariant
     )
   ).toBe(true);
@@ -292,7 +293,9 @@ describe("harness governance policy", () => {
   });
 
   it("covers every declared adversarial fixture", () => {
-    expect(adversarialFixture.cases.map((entry) => entry.id)).toEqual([
+    expect(
+      EffectArray.map(adversarialFixture.cases, (entry) => entry.id)
+    ).toEqual([
       "missing-he-mapping",
       "invalid-profile",
       "partial-skill-tree",

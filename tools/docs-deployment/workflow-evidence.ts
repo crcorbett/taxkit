@@ -1,4 +1,13 @@
-import { Array, Clock, Crypto, Effect, Schema, Stream } from "effect";
+import {
+  Array as EffectArray,
+  Array,
+  Clock,
+  Crypto,
+  Effect,
+  Option,
+  Schema,
+  Stream,
+} from "effect";
 import { Hex } from "effect/encoding";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
@@ -128,10 +137,10 @@ const readTrackedDeploymentInputs = (repositoryRoot: string) =>
           Uint8Array.from(Array.flatMap(stdout, Array.fromIterable))
         ),
     });
-    const files = source
-      .split("\0")
-      .filter((entry) => entry.length > 0)
-      .toSorted();
+    const files = EffectArray.filter(
+      source.split("\0"),
+      (entry) => entry.length > 0
+    ).toSorted();
     if (files.length === 0) {
       return yield* new WorkflowEvidenceInputReadError({
         role: "tracked-deployment-inputs",
@@ -458,7 +467,7 @@ export const writeReplanWorkflowEvidence = (
 const findStage = (
   inventory: DocsDeploymentInventoryReport,
   stage: WorkflowEvidenceProviderConfig["TAXKIT_WORKFLOW_EVIDENCE_STAGE"]
-) => inventory.stages.filter((entry) => entry.stage === stage);
+) => EffectArray.filter(inventory.stages, (entry) => entry.stage === stage);
 
 const SelectedWorkflowWorker = Schema.Struct({
   url: Schema.URL,
@@ -494,7 +503,8 @@ const selectWorker = (
     }
     const [resource] = stageInventory.resources;
     const { workerName, workerUrl } = resource;
-    const providerWorkers = inventory.providerWorkers.filter(
+    const providerWorkers = EffectArray.filter(
+      inventory.providerWorkers,
       (worker) =>
         worker.stage === stage &&
         worker.logicalId === "DocsWebsite" &&
@@ -520,7 +530,7 @@ const selectWorker = (
 
 const latestDeployment = (deployments: WranglerDeploymentsType, role: string) =>
   Effect.gen(function* selectLatestDeployment() {
-    const latest = deployments.at(-1);
+    const latest = Array.last(deployments).pipe(Option.getOrUndefined);
     const deploymentId = latest?.id ?? latest?.deployment_id;
     const versionId = latest?.versions[0]?.version_id;
     if (deploymentId === undefined || versionId === undefined) {

@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { lstatSync, readFileSync, readlinkSync } from "node:fs";
 import nodePath from "node:path";
 
+import { Array as EffectArray } from "effect";
+
 const { resolve } = nodePath;
 const root = resolve(import.meta.dir, "../..");
 
@@ -76,65 +78,69 @@ const readDocumentationImpactFixture = (
   );
 
 const classifyProviderBoundarySource = (source: string) =>
-  [
-    /\buse\s*:/u.test(source) || /\.use\s*\(/u.test(source)
-      ? "generic-sdk-use-callback"
-      : null,
-    /\b(?:id|[A-Za-z][A-Za-z0-9]*Id)\s*:\s*string\b/u.test(source)
-      ? "raw-string-id"
-      : null,
-    /Config\.(?:string|nonEmptyString|redacted)\s*\(/u.test(source)
-      ? "primitive-config"
-      : null,
-    /\binstanceof\b/u.test(source) ? "instanceof-policy" : null,
-    /Effect\.tryPromise/u.test(source) &&
-    !/Schema\.decodeUnknownEffect\([^)]*\)\([\s\n]*rawResponse[\s\n]*\)/u.test(
-      source
-    )
-      ? "unchecked-sdk-output"
-      : null,
-  ].filter((reason): reason is string => reason !== null);
+  EffectArray.filter(
+    [
+      /\buse\s*:/u.test(source) || /\.use\s*\(/u.test(source)
+        ? "generic-sdk-use-callback"
+        : null,
+      /\b(?:id|[A-Za-z][A-Za-z0-9]*Id)\s*:\s*string\b/u.test(source)
+        ? "raw-string-id"
+        : null,
+      /Config\.(?:string|nonEmptyString|redacted)\s*\(/u.test(source)
+        ? "primitive-config"
+        : null,
+      /\binstanceof\b/u.test(source) ? "instanceof-policy" : null,
+      /Effect\.tryPromise/u.test(source) &&
+      !/Schema\.decodeUnknownEffect\([^)]*\)\([\s\n]*rawResponse[\s\n]*\)/u.test(
+        source
+      )
+        ? "unchecked-sdk-output"
+        : null,
+    ],
+    (reason): reason is string => reason !== null
+  );
 
 const affirmativeLeafSentences = (source: string) =>
-  source
-    .split(/[.!?]\s*|\n+/u)
-    .filter((sentence) =>
+  EffectArray.filter(
+    EffectArray.filter(source.split(/[.!?]\s*|\n+/u), (sentence) =>
       /\b(?:presentation\s+)?lea(?:f|ves)\b/iu.test(sentence)
-    )
-    .filter(
-      (sentence) =>
-        !/\b(?:must not|do not|does not|never|forbid|forbids|reject|rejects)\b/iu.test(
-          sentence
-        )
-    );
+    ),
+    (sentence) =>
+      !/\b(?:must not|do not|does not|never|forbid|forbids|reject|rejects)\b/iu.test(
+        sentence
+      )
+  );
 
 const classifyReactLeafBoundarySource = (source: string) => {
   const sentences = affirmativeLeafSentences(source);
   const matches = (pattern: RegExp) =>
-    sentences.some((sentence) => pattern.test(sentence));
+    EffectArray.some(sentences, (sentence) => pattern.test(sentence));
 
-  return [
-    matches(
-      /\b(?:owns?|handles?|manages?)\b[^.!?\n]*\b(?:data\s+loading|boundary\s+data|fetch(?:ing)?|quer(?:y|ies|ying))\b|\b(?:loads?\s+(?:their\s+own\s+)?(?:boundary\s+)?data|fetch(?:es)?|quer(?:y|ies))\b|\b(?:uses?|calls?|invokes?|runs?|executes?)\b[^.!?\n]*\buse(?:Suspense|Infinite)?Quer(?:y|ies)\b/iu
-    )
-      ? "leaf-owned-data-loading"
-      : null,
-    matches(
-      /\b(?:owns?|handles?|manages?|acquires?|uses?|runs?|calls?|invokes?|executes?|performs?)\b[^.!?\n]*\b(?:Effect|services?|runtimes?|RPC)\b/iu
-    )
-      ? "leaf-owned-effect-service-rpc"
-      : null,
-    matches(
-      /\b(?:owns?|handles?|manages?|runs?|calls?|invokes?|executes?|performs?)\b[^.!?\n]*\b(?:remote|domain)?\s*(?:mutations?|commands?)\b|\b(?:uses?|calls?|invokes?|runs?|executes?)\b[^.!?\n]*\buseMutation\b/iu
-    )
-      ? "leaf-owned-mutation-command"
-      : null,
-    matches(
-      /\b(?:owns?|handles?|manages?|runs?|coordinates?|orchestrates?)\b[^.!?\n]*\b(?:shared\s+workflows?|workflow\s+orchestration|error\s+policy)\b/iu
-    )
-      ? "leaf-owned-shared-workflow-policy"
-      : null,
-  ].filter((reason): reason is string => reason !== null);
+  return EffectArray.filter(
+    [
+      matches(
+        /\b(?:owns?|handles?|manages?)\b[^.!?\n]*\b(?:data\s+loading|boundary\s+data|fetch(?:ing)?|quer(?:y|ies|ying))\b|\b(?:loads?\s+(?:their\s+own\s+)?(?:boundary\s+)?data|fetch(?:es)?|quer(?:y|ies))\b|\b(?:uses?|calls?|invokes?|runs?|executes?)\b[^.!?\n]*\buse(?:Suspense|Infinite)?Quer(?:y|ies)\b/iu
+      )
+        ? "leaf-owned-data-loading"
+        : null,
+      matches(
+        /\b(?:owns?|handles?|manages?|acquires?|uses?|runs?|calls?|invokes?|executes?|performs?)\b[^.!?\n]*\b(?:Effect|services?|runtimes?|RPC)\b/iu
+      )
+        ? "leaf-owned-effect-service-rpc"
+        : null,
+      matches(
+        /\b(?:owns?|handles?|manages?|runs?|calls?|invokes?|executes?|performs?)\b[^.!?\n]*\b(?:remote|domain)?\s*(?:mutations?|commands?)\b|\b(?:uses?|calls?|invokes?|runs?|executes?)\b[^.!?\n]*\buseMutation\b/iu
+      )
+        ? "leaf-owned-mutation-command"
+        : null,
+      matches(
+        /\b(?:owns?|handles?|manages?|runs?|coordinates?|orchestrates?)\b[^.!?\n]*\b(?:shared\s+workflows?|workflow\s+orchestration|error\s+policy)\b/iu
+      )
+        ? "leaf-owned-shared-workflow-policy"
+        : null,
+    ],
+    (reason): reason is string => reason !== null
+  );
 };
 
 const requiredDocumentationImpactClassifications = [
@@ -155,9 +161,13 @@ const classifyDocumentationImpactFixture = (
 ) => {
   const classifications = new Set(fixture.classifications);
 
-  return requiredDocumentationImpactClassifications
-    .filter((classification) => !classifications.has(classification))
-    .map((classification) => `missing-${classification.replaceAll(" ", "-")}`);
+  return EffectArray.map(
+    EffectArray.filter(
+      requiredDocumentationImpactClassifications,
+      (classification) => !classifications.has(classification)
+    ),
+    (classification) => `missing-${classification.replaceAll(" ", "-")}`
+  );
 };
 
 const classifyCoordinationPolicy = (
@@ -178,16 +188,19 @@ const classifyCoordinationPolicy = (
       fixture.workflow.acceptance.fixedAuditPassCount === null &&
       hasDelegationRationale &&
       hasSemanticEvidence,
-    reasons: [
-      fixture.workflow.delegation.requiredWorkerCount === null
-        ? null
-        : "fixed-worker-count",
-      fixture.workflow.acceptance.fixedAuditPassCount === null
-        ? null
-        : "fixed-audit-count",
-      hasDelegationRationale ? null : "missing-delegation-rationale",
-      hasSemanticEvidence ? null : "missing-semantic-evidence",
-    ].filter((reason): reason is string => reason !== null),
+    reasons: EffectArray.filter(
+      [
+        fixture.workflow.delegation.requiredWorkerCount === null
+          ? null
+          : "fixed-worker-count",
+        fixture.workflow.acceptance.fixedAuditPassCount === null
+          ? null
+          : "fixed-audit-count",
+        hasDelegationRationale ? null : "missing-delegation-rationale",
+        hasSemanticEvidence ? null : "missing-semantic-evidence",
+      ],
+      (reason): reason is string => reason !== null
+    ),
   };
 };
 
@@ -218,16 +231,19 @@ const readHgi208Fixture = (name: string): Hgi208Fixture => {
 };
 
 const classifyHgi208Fixture = (fixture: Hgi208Fixture) =>
-  [
-    fixture.impactLedger === "complete" ? null : "missing-impact",
-    fixture.maintenanceOwners.join(",") === "docs-maintainer"
-      ? null
-      : "competing-maintenance-skill",
-    fixture.generated === "source-and-check" ? null : "stale-generated-docs",
-    fixture.lifecycle === "accepted-record-and-binding" ? null : "lifecycle",
-    fixture.mirror === "valid" ? null : "mirror",
-    fixture.portable ? null : "personal-path-dependency",
-  ].filter((reason): reason is string => reason !== null);
+  EffectArray.filter(
+    [
+      fixture.impactLedger === "complete" ? null : "missing-impact",
+      fixture.maintenanceOwners.join(",") === "docs-maintainer"
+        ? null
+        : "competing-maintenance-skill",
+      fixture.generated === "source-and-check" ? null : "stale-generated-docs",
+      fixture.lifecycle === "accepted-record-and-binding" ? null : "lifecycle",
+      fixture.mirror === "valid" ? null : "mirror",
+      fixture.portable ? null : "personal-path-dependency",
+    ],
+    (reason): reason is string => reason !== null
+  );
 
 describe("repo-owned skill policy", () => {
   test("prd skills require edit-first path-evidenced impact ledgers", () => {
@@ -352,7 +368,8 @@ describe("repo-owned skill policy", () => {
   });
 
   test("current PRD skills and frontend docs preserve the route-container-leaf boundary", () => {
-    const prdSkills = ["prd-writer", "prd-review", "prd-implementer"].map(
+    const prdSkills = EffectArray.map(
+      ["prd-writer", "prd-review", "prd-implementer"],
       readSkill
     );
     const frontend = readFileSync(

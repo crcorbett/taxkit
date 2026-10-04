@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 
+import { Array as EffectArray } from "effect";
+
 import { inspectStrictAppBoundaries } from "./strict-boundaries.policy.js";
 import type {
   StrictAppBoundaryPath,
@@ -78,7 +80,10 @@ const replaceSource = (
 });
 
 const findingInvariants = (sources: StrictAppBoundarySources) =>
-  inspectStrictAppBoundaries(sources).map(({ invariant }) => invariant);
+  EffectArray.map(
+    inspectStrictAppBoundaries(sources),
+    ({ invariant }) => invariant
+  );
 
 describe("strict docs app and deployment architecture", () => {
   test("accepts the exact governed Effect and host boundaries", async () => {

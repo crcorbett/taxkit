@@ -21,7 +21,8 @@ request handling.
 - `src/routes/`: TanStack Router routes
 - `src/lib/runtime.server.ts`: server `ManagedRuntime`
 - `src/lib/runtime.client.ts`: client `ManagedRuntime`
-- `src/lib/route-runtime.ts`: route runtime selection
+- `src/lib/route-context.ts`: route runtime contract and context selection
+- `src/lib/runtime-selection.ts`: isomorphic selection of the server/client runtime
 - `src/server.ts`: server entrypoint
 
 ## Runtime Shape

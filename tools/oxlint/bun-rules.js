@@ -1,3 +1,5 @@
+import { Array as EffectArray } from "effect";
+
 import { createBindingTracker, propertyName } from "./binding-tracker.js";
 
 const bunImportSemantic = (source, specifierType, imported) => {
@@ -40,7 +42,8 @@ const bunRuntimeSemantics = new Set([
 
 const destructuresBunHostMethod = (pattern) =>
   pattern?.type === "ObjectPattern" &&
-  pattern.properties.some(
+  EffectArray.some(
+    pattern.properties,
     (property) =>
       property.type === "Property" &&
       (!property.computed || property.key?.type === "Literal") &&

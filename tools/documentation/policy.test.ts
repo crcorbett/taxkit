@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
+import { Array as EffectArray } from "effect";
+
 import { inspectDocumentation } from "./policy.js";
 import { PublicPageAcceptanceRecord } from "./schemas.js";
 import type { OwnerPolicy } from "./schemas.js";
@@ -160,20 +162,23 @@ describe("documentation policy", () => {
       ]),
     });
     expect(
-      report.diagnostics.some(
+      EffectArray.some(
+        report.diagnostics,
         (item) =>
           item.invariant === "owner-policy" && item.owner === "api-owner"
       )
     ).toBe(true);
     expect(
-      report.diagnostics.some(
+      EffectArray.some(
+        report.diagnostics,
         (item) =>
           item.invariant === "lifecycle-successor" &&
           item.target === "docs/old.md"
       )
     ).toBe(true);
     expect(
-      report.diagnostics.every(
+      EffectArray.every(
+        report.diagnostics,
         (item) =>
           item.owner.length > 0 &&
           item.target.length > 0 &&
@@ -231,19 +236,22 @@ describe("documentation policy", () => {
     });
     expect(report.public).toBe(2);
     expect(
-      report.diagnostics.some(
+      EffectArray.some(
+        report.diagnostics,
         (item) =>
           item.target === "apps/docs/package.json" &&
           item.invariant === "workspace-readme"
       )
     ).toBe(true);
     expect(
-      report.diagnostics.some(
+      EffectArray.some(
+        report.diagnostics,
         (item) => item.target === "packages/docs-content/content/reference.mdx"
       )
     ).toBe(false);
     expect(
-      report.diagnostics.every(
+      EffectArray.every(
+        report.diagnostics,
         (item) =>
           item.invariant !== "maintainer-metadata" ||
           item.target !== "packages/docs-content/content/reference.mdx"
@@ -289,7 +297,8 @@ describe("documentation policy", () => {
         ],
       ]),
       files: [
-        ...completeOwnerFiles.filter(
+        ...EffectArray.filter(
+          completeOwnerFiles,
           (file) => file.path !== "packages/docs-content/navigation.json"
         ),
         {
@@ -344,7 +353,10 @@ describe("documentation policy", () => {
       ]),
     });
     expect(
-      report.diagnostics.filter((item) => item.invariant === "owner-policy")
+      EffectArray.filter(
+        report.diagnostics,
+        (item) => item.invariant === "owner-policy"
+      )
     ).toEqual([]);
   });
 
@@ -660,7 +672,8 @@ describe("documentation policy", () => {
       ]),
     });
     expect(
-      report.diagnostics.filter(
+      EffectArray.filter(
+        report.diagnostics,
         (item) => item.invariant === "local-bun-command"
       )
     ).toEqual([
@@ -669,7 +682,10 @@ describe("documentation policy", () => {
       }),
     ]);
     expect(
-      report.diagnostics.some((item) => item.invariant === "relative-link")
+      EffectArray.some(
+        report.diagnostics,
+        (item) => item.invariant === "relative-link"
+      )
     ).toBe(false);
   });
 
@@ -692,7 +708,8 @@ describe("documentation policy", () => {
       ]),
     });
     expect(
-      report.diagnostics.filter(
+      EffectArray.filter(
+        report.diagnostics,
         (item) => item.invariant === "local-bun-command"
       )
     ).toEqual([

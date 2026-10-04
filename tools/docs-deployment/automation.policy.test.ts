@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema } from "effect";
 
 import automationJson from "./automation-register.json";
 import { inspectDeploymentAutomationRegisters } from "./automation.policy.js";
@@ -26,7 +26,7 @@ const decodeRegisters = () =>
   Effect.runPromise(
     Effect.all([
       Schema.decodeUnknownEffect(DeploymentAutomationRegister)(
-        automationJson.map((entry) => ({
+        EffectArray.map(automationJson, (entry) => ({
           ...entry,
           externalState: { receipt: null, status: "not-established" },
         }))
@@ -42,7 +42,8 @@ describe("docs deployment automation admission", () => {
       []
     );
     expect(
-      automations.every(
+      EffectArray.every(
+        automations,
         (entry) => entry.externalState.status === "not-established"
       )
     ).toBe(true);
@@ -51,7 +52,7 @@ describe("docs deployment automation admission", () => {
   test("rejects a cancellable or weakly bound mutation", async () => {
     const [automations, controls] = await decodeRegisters();
     const contaminated = await decodeAutomations(
-      automations.map((entry) =>
+      EffectArray.map(automations, (entry) =>
         entry.id === "docs-preview-delivery"
           ? {
               ...entry,
@@ -69,7 +70,8 @@ describe("docs deployment automation admission", () => {
       )
     );
     expect(
-      inspectDeploymentAutomationRegisters(contaminated, controls).map(
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(contaminated, controls),
         (item) => item.invariant
       )
     ).toEqual(["mutation-lock", "plan-equality"]);
@@ -78,7 +80,7 @@ describe("docs deployment automation admission", () => {
   test("rejects additive credentials, resources and weakened candidate ownership", async () => {
     const [automations, controls] = await decodeRegisters();
     const contaminated = await decodeAutomations(
-      automations.map((entry) =>
+      EffectArray.map(automations, (entry) =>
         entry.id === "docs-production-delivery"
           ? {
               ...entry,
@@ -95,7 +97,8 @@ describe("docs deployment automation admission", () => {
               },
               failure: {
                 ...entry.failure,
-                stopConditions: entry.failure.stopConditions.filter(
+                stopConditions: EffectArray.filter(
+                  entry.failure.stopConditions,
                   (condition) =>
                     condition !==
                     "quality result is absent or belongs to another commit"
@@ -110,7 +113,8 @@ describe("docs deployment automation admission", () => {
       )
     );
     expect(
-      inspectDeploymentAutomationRegisters(contaminated, controls).map(
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(contaminated, controls),
         (item) => item.invariant
       )
     ).toEqual(["candidate-trust"]);
@@ -119,7 +123,7 @@ describe("docs deployment automation admission", () => {
   test("requires the Production authority to admit normal rollback explicitly", async () => {
     const [automations, controls] = await decodeRegisters();
     const contaminated = await decodeAutomations(
-      automations.map((entry) =>
+      EffectArray.map(automations, (entry) =>
         entry.id === "docs-production-delivery"
           ? {
               ...entry,
@@ -132,7 +136,8 @@ describe("docs deployment automation admission", () => {
       )
     );
     expect(
-      inspectDeploymentAutomationRegisters(contaminated, controls).map(
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(contaminated, controls),
         (item) => item.invariant
       )
     ).toContain("mutation-lock");
@@ -141,7 +146,7 @@ describe("docs deployment automation admission", () => {
   test("rejects pull-request-head teardown code", async () => {
     const [automations, controls] = await decodeRegisters();
     const contaminated = await decodeAutomations(
-      automations.map((entry) =>
+      EffectArray.map(automations, (entry) =>
         entry.id === "docs-preview-teardown"
           ? {
               ...entry,
@@ -154,7 +159,8 @@ describe("docs deployment automation admission", () => {
       )
     );
     expect(
-      inspectDeploymentAutomationRegisters(contaminated, controls).map(
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(contaminated, controls),
         (item) => item.invariant
       )
     ).toContain("teardown-safety");
@@ -163,7 +169,7 @@ describe("docs deployment automation admission", () => {
   test("rejects every external-state establishment until hosted receipt admission exists", async () => {
     const [automations, controls] = await decodeRegisters();
     const contaminated = await decodeAutomations(
-      automations.map((entry) =>
+      EffectArray.map(automations, (entry) =>
         entry.id === "docs-preview-delivery"
           ? {
               ...entry,
@@ -180,17 +186,20 @@ describe("docs deployment automation admission", () => {
     if (firstControl === undefined) {
       return;
     }
-    const findings = inspectDeploymentAutomationRegisters(contaminated, [
-      ...controls,
-      firstControl,
-    ]).map((item) => item.invariant);
+    const findings = EffectArray.map(
+      inspectDeploymentAutomationRegisters(contaminated, [
+        ...controls,
+        firstControl,
+      ]),
+      (item) => item.invariant
+    );
     expect(findings).toEqual(["control-register", "external-proof"]);
   });
 
   test("rejects a hidden external receipt on a not-established entry", async () => {
     const [automations, controls] = await decodeRegisters();
     const contaminated = await decodeAutomations(
-      automations.map((entry) =>
+      EffectArray.map(automations, (entry) =>
         entry.id === "docs-preview-delivery"
           ? {
               ...entry,
@@ -203,7 +212,8 @@ describe("docs deployment automation admission", () => {
       )
     );
     expect(
-      inspectDeploymentAutomationRegisters(contaminated, controls).map(
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(contaminated, controls),
         (item) => item.invariant
       )
     ).toContain("external-proof");
@@ -372,7 +382,7 @@ describe("docs deployment automation admission", () => {
       workflowPath: receipt.workflowPath,
       workflowRunId: receipt.workflowRunId,
     };
-    const established = automations.map((entry) =>
+    const established = EffectArray.map(automations, (entry) =>
       entry.id === preview.id
         ? {
             ...entry,
@@ -405,150 +415,168 @@ describe("docs deployment automation admission", () => {
     ).toEqual([]);
 
     expect(
-      inspectDeploymentAutomationRegisters(
-        established,
-        controls,
-        new Map([[preview.id, receipt]]),
-        new Map([
-          [
-            preview.id,
-            {
-              hosted,
-              plan,
-              provider,
-              receipt,
-              workflowInput,
-              workflowRun: { ...workflowRun, headSha: "d".repeat(40) },
-            },
-          ],
-        ])
-      ).map((item) => item.invariant)
-    ).toContain("external-proof");
-
-    expect(
-      inspectDeploymentAutomationRegisters(
-        established,
-        controls,
-        new Map([[preview.id, receipt]]),
-        new Map([
-          [
-            preview.id,
-            {
-              hosted,
-              plan,
-              provider,
-              receipt,
-              workflowInput: {
-                ...workflowInput,
-                candidateCommit: "d".repeat(40),
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(
+          established,
+          controls,
+          new Map([[preview.id, receipt]]),
+          new Map([
+            [
+              preview.id,
+              {
+                hosted,
+                plan,
+                provider,
+                receipt,
+                workflowInput,
+                workflowRun: { ...workflowRun, headSha: "d".repeat(40) },
               },
-              workflowRun,
-            },
-          ],
-        ])
-      ).map((item) => item.invariant)
+            ],
+          ])
+        ),
+        (item) => item.invariant
+      )
     ).toContain("external-proof");
 
     expect(
-      inspectDeploymentAutomationRegisters(
-        established,
-        controls,
-        new Map([[preview.id, receipt]]),
-        new Map([
-          [
-            preview.id,
-            {
-              hosted,
-              plan: {
-                ...plan,
-                projection: {
-                  ...plan.projection,
-                  logicalResources: [
-                    {
-                      ...plan.projection.logicalResources[0],
-                      action: "delete" as const,
-                    },
-                  ],
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(
+          established,
+          controls,
+          new Map([[preview.id, receipt]]),
+          new Map([
+            [
+              preview.id,
+              {
+                hosted,
+                plan,
+                provider,
+                receipt,
+                workflowInput: {
+                  ...workflowInput,
+                  candidateCommit: "d".repeat(40),
+                },
+                workflowRun,
+              },
+            ],
+          ])
+        ),
+        (item) => item.invariant
+      )
+    ).toContain("external-proof");
+
+    expect(
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(
+          established,
+          controls,
+          new Map([[preview.id, receipt]]),
+          new Map([
+            [
+              preview.id,
+              {
+                hosted,
+                plan: {
+                  ...plan,
+                  projection: {
+                    ...plan.projection,
+                    logicalResources: [
+                      {
+                        ...plan.projection.logicalResources[0],
+                        action: "delete" as const,
+                      },
+                    ],
+                  },
+                },
+                provider,
+                receipt,
+                workflowInput,
+                workflowRun,
+              },
+            ],
+          ])
+        ),
+        (item) => item.invariant
+      )
+    ).toContain("external-proof");
+
+    expect(
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(
+          established,
+          controls,
+          new Map([[preview.id, receipt]]),
+          new Map([
+            [
+              preview.id,
+              {
+                hosted,
+                plan: { ...plan, replanSha256: null },
+                provider,
+                receipt,
+                workflowInput,
+                workflowRun,
+              },
+            ],
+          ])
+        ),
+        (item) => item.invariant
+      )
+    ).toContain("external-proof");
+
+    expect(
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(
+          established,
+          controls,
+          new Map([[preview.id, receipt]]),
+          new Map([
+            [
+              preview.id,
+              {
+                hosted,
+                plan,
+                provider,
+                receipt,
+                workflowInput,
+                workflowRun: {
+                  ...workflowRun,
+                  candidateCommit: "d".repeat(40),
                 },
               },
-              provider,
-              receipt,
-              workflowInput,
-              workflowRun,
-            },
-          ],
-        ])
-      ).map((item) => item.invariant)
+            ],
+          ])
+        ),
+        (item) => item.invariant
+      )
     ).toContain("external-proof");
 
     expect(
-      inspectDeploymentAutomationRegisters(
-        established,
-        controls,
-        new Map([[preview.id, receipt]]),
-        new Map([
-          [
-            preview.id,
-            {
-              hosted,
-              plan: { ...plan, replanSha256: null },
-              provider,
-              receipt,
-              workflowInput,
-              workflowRun,
-            },
-          ],
-        ])
-      ).map((item) => item.invariant)
-    ).toContain("external-proof");
-
-    expect(
-      inspectDeploymentAutomationRegisters(
-        established,
-        controls,
-        new Map([[preview.id, receipt]]),
-        new Map([
-          [
-            preview.id,
-            {
-              hosted,
-              plan,
-              provider,
-              receipt,
-              workflowInput,
-              workflowRun: {
-                ...workflowRun,
-                candidateCommit: "d".repeat(40),
+      EffectArray.map(
+        inspectDeploymentAutomationRegisters(
+          established,
+          controls,
+          new Map([[preview.id, receipt]]),
+          new Map([
+            [
+              preview.id,
+              {
+                hosted: {
+                  ...hosted,
+                  environment: "production",
+                  screenshots: [hosted.screenshots[0], hosted.screenshots[0]],
+                },
+                plan,
+                provider,
+                receipt,
+                workflowInput,
+                workflowRun,
               },
-            },
-          ],
-        ])
-      ).map((item) => item.invariant)
-    ).toContain("external-proof");
-
-    expect(
-      inspectDeploymentAutomationRegisters(
-        established,
-        controls,
-        new Map([[preview.id, receipt]]),
-        new Map([
-          [
-            preview.id,
-            {
-              hosted: {
-                ...hosted,
-                environment: "production",
-                screenshots: [hosted.screenshots[0], hosted.screenshots[0]],
-              },
-              plan,
-              provider,
-              receipt,
-              workflowInput,
-              workflowRun,
-            },
-          ],
-        ])
-      ).map((item) => item.invariant)
+            ],
+          ])
+        ),
+        (item) => item.invariant
+      )
     ).toContain("external-proof");
   });
 });

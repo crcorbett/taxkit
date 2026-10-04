@@ -19,6 +19,9 @@ const generatedFixtures = [
   "packages/core/src/.generated-strict-rejected.ts",
   "packages/rules/au/pay/test/.generated-strict-rejected.ts",
   "packages/calculators/__tests__/.generated-strict-rejected.ts",
+  "apps/web/src/lib/.generated-strict-runtime.ts",
+  "tools/oxlint/fixtures/.generated-strict-global-rejected.js",
+  ".generated-strict.config.ts",
 ] as const;
 
 const antiSlopRules = [
@@ -40,6 +43,43 @@ const antiSlopRules = [
 ] as const;
 
 const fixtureCases = [
+  {
+    accepted: ["apps/web/src/lib/runtime.server.ts"],
+    generated: "apps/web/src/lib/.generated-strict-runtime.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-native-at",
+      "runtime-file-convention",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-unsafe-option-unwrap",
+    ],
+  },
+  {
+    accepted: ["tools/oxlint/fixtures/strict-global-accepted.js"],
+    generated: "tools/oxlint/fixtures/.generated-strict-global-rejected.js",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-global-rejected.js.txt",
+    rules: [
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-unsafe-option-unwrap",
+    ],
+  },
+  {
+    accepted: ["oxlint.config.ts"],
+    generated: ".generated-strict.config.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-unsafe-option-unwrap",
+    ],
+  },
   {
     accepted: ["packages/core/src/graph/rule-graph.ts"],
     generated: "packages/core/src/.generated-strict-rejected.ts",

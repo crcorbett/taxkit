@@ -2,7 +2,7 @@ import type {
   ReleaseAcceptedAttemptSummary,
   ReleaseProofPacket,
 } from "@taxkit/scripts/release-readiness";
-import { Array, HashSet, Record } from "effect";
+import { Array as EffectArray, Array, HashSet, Record } from "effect";
 
 import { RunbookDiagnostic } from "./schemas.js";
 import type {
@@ -353,9 +353,9 @@ export const inspectRunbookContract = (
   }
 
   const runbookIndex = inspection.files.get("docs/runbooks/README.md") ?? "";
-  const indexRows = runbookIndex
-    .split("\n")
-    .filter((line) => /^\| `[^`]+` \|/u.test(line));
+  const indexRows = EffectArray.filter(runbookIndex.split("\n"), (line) =>
+    /^\| `[^`]+` \|/u.test(line)
+  );
   if (indexRows.length !== requiredRunbooks.length) {
     findings.push(
       diagnostic(
@@ -386,9 +386,9 @@ export const inspectRunbookContract = (
   );
   const authorityModel =
     inspection.files.get("docs/operations/authority-model.md") ?? "";
-  const authorityRows = authorityModel
-    .split("\n")
-    .filter((line) => /^\| `[^`]+` \|/u.test(line));
+  const authorityRows = EffectArray.filter(authorityModel.split("\n"), (line) =>
+    /^\| `[^`]+` \|/u.test(line)
+  );
   if (authorityRows.length !== requiredStops.length) {
     findings.push(
       diagnostic(
@@ -421,7 +421,11 @@ export const inspectRunbookContract = (
       );
     }
     const expectedRowPrefix = `| \`${entry.operation}\` | \`${entry.principal}\` | \`${entry.status}\` |`;
-    if (!authorityRows.some((row) => row.startsWith(expectedRowPrefix))) {
+    if (
+      !EffectArray.some(authorityRows, (row) =>
+        row.startsWith(expectedRowPrefix)
+      )
+    ) {
       findings.push(
         diagnostic(
           "authority-stop",

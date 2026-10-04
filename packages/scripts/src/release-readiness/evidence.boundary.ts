@@ -173,10 +173,12 @@ export const verifyCandidateContentManifest = (
 ) =>
   Effect.gen(function* verifyChangedContentManifest() {
     const manifest = yield* verifyRetainedArtifact(workspaceRoot, artifact);
-    const entries = manifest
-      .split("\n")
-      .filter((line) => line.length > 0 && !line.startsWith("#"))
-      .map((line) => {
+    const entries = EffectArray.map(
+      EffectArray.filter(
+        manifest.split("\n"),
+        (line) => line.length > 0 && !line.startsWith("#")
+      ),
+      (line) => {
         const match = /^(?<sha256>[a-f0-9]{64}) {2}(?<path>.+)$/u.exec(line);
         return match === null
           ? null
@@ -184,9 +186,11 @@ export const verifyCandidateContentManifest = (
               path: match.groups?.["path"] ?? "",
               sha256: `sha256:${match.groups?.["sha256"] ?? ""}`,
             };
-      });
-    const malformed = entries.some((entry) => entry === null);
-    const parsedArtifacts = entries.filter(
+      }
+    );
+    const malformed = EffectArray.some(entries, (entry) => entry === null);
+    const parsedArtifacts = EffectArray.filter(
+      entries,
       (entry): entry is { readonly path: string; readonly sha256: string } =>
         entry !== null
     );
@@ -204,14 +208,14 @@ export const verifyCandidateContentManifest = (
         ),
       { concurrency: 1 }
     );
-    const paths = artifacts.map(({ path }) => path);
+    const paths = EffectArray.map(artifacts, ({ path }) => path);
     const sortedPaths = EffectArray.sort(paths, Order.String);
 
     if (
       malformed ||
       artifacts.length === 0 ||
       new Set(paths).size !== paths.length ||
-      paths.some((entry, index) => entry !== sortedPaths[index])
+      EffectArray.some(paths, (entry, index) => entry !== sortedPaths[index])
     ) {
       return yield* new ReleaseEvidenceDecodeError({
         evidencePath: artifact.path,
@@ -379,7 +383,10 @@ export const verifyAcceptedAttempt = (
       packet.packedConsumerEvidence,
       packet.apiEvidence,
       packet.docsEvidence,
-      ...packet.journeyResults.map((journey) => journey.evidencePath),
+      ...EffectArray.map(
+        packet.journeyResults,
+        (journey) => journey.evidencePath
+      ),
     ];
 
     if (
@@ -391,8 +398,12 @@ export const verifyAcceptedAttempt = (
         packet.candidate.contentSha256 ||
       summary.attemptId !== packet.attempt.attemptId ||
       summary.terminalState !== packet.attempt.terminalState ||
-      packet.journeyResults.some((journey) => journey.status !== "passed") ||
-      packetEvidencePaths.some(
+      EffectArray.some(
+        packet.journeyResults,
+        (journey) => journey.status !== "passed"
+      ) ||
+      EffectArray.some(
+        packetEvidencePaths,
         (evidencePath) => evidencePath !== acceptedAttemptPath
       )
     ) {
@@ -477,7 +488,8 @@ export const verifyReleaseEvidence = (
     if (
       packet.candidate.exclusions.length !==
         candidateEvidenceExclusions.length ||
-      packet.candidate.exclusions.some(
+      EffectArray.some(
+        packet.candidate.exclusions,
         (entry, index) => entry !== candidateEvidenceExclusions[index]
       )
     ) {

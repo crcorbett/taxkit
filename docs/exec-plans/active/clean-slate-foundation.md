@@ -31,9 +31,10 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: finish domain boundary enforcement, then migrate
-remaining app, package, tool, test, config and infrastructure host workflows to
-the complete canonical strict policy before downstream acceptance. The latest
+Next continuation milestone: qualify the Bun-hosted Effect test runner in the
+repository, then migrate remaining app, package, tool, test, config and
+infrastructure workflows to the complete canonical strict policy before
+downstream acceptance. Domain boundary enforcement is implemented in PR #93. The latest
 stable-v4 adad qualification handoff remains revision
 `59b0a36ff1bc6f95501734ee65d789a4f5a37fcc`; it is not Medicare-correctness proof.
 
@@ -245,3 +246,40 @@ tests, full verification and build passed. The real-binary portable fixture
 suite passed 17 cases with admitted-file and rule assertions. No tax snapshots
 or parameter tables changed. Prior frozen graph proof remains applicable; this
 slice does not edit dependency manifests or the lockfile.
+
+## T002 owned collection and global policy migration
+
+Replace native map/filter/some/every traversal in owned deployment,
+documentation, quality, governance, evaluation, lint, SDK proof and release
+readiness code with Effect Array operations. Preserve absent optional-chain
+results explicitly and require Boolean predicates where native traversal
+previously accepted truthy optional values. Existing validators, evidence
+formats and failure classifications remain the behavioural oracle. The real
+workerd proof caught one Playwright evaluateAll callback that cannot access a
+host Effect import after browser serialization. Retain that original native DOM
+projection for the upcoming host workflow migration; no exemption or complete
+strictness claim is made for it.
+
+Enable five canonical rules globally: no-native-at, no-unsafe-option-unwrap,
+tagged-error-name, error-constructor-new and runtime-file-convention. Replace
+the remaining two native `.at` reads with checked Option lookup. Name web
+context/selection modules for their actual role; server/client modules retain
+runtime ownership. CLI fixtures now cover web, JavaScript tooling and root
+configuration in addition to domain source/tests, including admitted file count.
+No new broad exception or disabled existing rule is introduced.
+
+Documentation impact: **Change required** for global enforcement, web README
+and import pointers, removal of its obsolete Knip exception/internal type export,
+tooling standard, actual-command fixtures, this evidence
+owner and the private scripts Changeset. **Preserve** operational commands,
+provider authority, prior receipts, wire formats, tax tables/results and public
+copy. The remaining six policy families outside domain packages and semantic
+contract/state/lifetime audits remain unfinished T002 work. Recover by reverting
+this slice; provider state is unchanged.
+
+The [owned-collection receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-owned-collections.json)
+records 370 traversal conversions, global rule fixtures, validation and the
+browser-realm correction. The final local workerd proof passed SSR, immutable
+assets, missing-route status, client navigation and diagnostic cleanliness.
+The isolated Bun-hosted @effect/vitest experiment also passed; repository test
+runner adoption is the next continuation milestone, not completed by that spike.

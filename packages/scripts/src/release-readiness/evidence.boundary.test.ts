@@ -1,6 +1,6 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, FileSystem } from "effect";
+import { Array as EffectArray, Effect, FileSystem } from "effect";
 import * as Path from "effect/Path";
 
 import {
@@ -234,7 +234,8 @@ describe("release evidence boundary", () => {
         ...packet,
         attempt: {
           ...packet.attempt,
-          detailArtifacts: packet.attempt.detailArtifacts.map(
+          detailArtifacts: EffectArray.map(
+            packet.attempt.detailArtifacts,
             (artifact, index) =>
               index === 0 ? { ...artifact, sha256: zeroSha256 } : artifact
           ),
@@ -329,28 +330,31 @@ describe("release evidence boundary", () => {
           limitation: "Synthetic clone-safety fixture.",
           nonClaim: "No external operation.",
           observedExitCode: 0,
-          outcomes: [
-            "verification",
-            "test",
-            "build",
-            "docs-validation",
-            "packed-artifact",
-            "downstream-consumer",
-            "api-smoke",
-            "docs-browser",
-            "changeset-status",
-          ].map((check) => ({
-            check,
-            exitCode: 0,
-            stderr: {
-              path: `tmp/release-readiness/${check}-stderr.log`,
-              sha256: zeroSha256,
-            },
-            stdout: {
-              path: `tmp/release-readiness/${check}-stdout.log`,
-              sha256: zeroSha256,
-            },
-          })),
+          outcomes: EffectArray.map(
+            [
+              "verification",
+              "test",
+              "build",
+              "docs-validation",
+              "packed-artifact",
+              "downstream-consumer",
+              "api-smoke",
+              "docs-browser",
+              "changeset-status",
+            ],
+            (check) => ({
+              check,
+              exitCode: 0,
+              stderr: {
+                path: `tmp/release-readiness/${check}-stderr.log`,
+                sha256: zeroSha256,
+              },
+              stdout: {
+                path: `tmp/release-readiness/${check}-stdout.log`,
+                sha256: zeroSha256,
+              },
+            })
+          ),
           postcondition: "The durable summary remains readable.",
           receiptPath: "tmp/release-readiness/missing-receipt.json",
           receiptSha256: zeroSha256,

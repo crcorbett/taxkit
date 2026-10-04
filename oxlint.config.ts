@@ -628,6 +628,11 @@ export default defineConfig({
     // Effect pipelines intentionally use callback combinators like
     // Effect.mapError/Effect.flatMap instead of async/await.
     "promise/prefer-await-to-callbacks": "off",
+    "strict-effect/error-constructor-new": "error",
+    "strict-effect/no-native-at": "error",
+    "strict-effect/no-unsafe-option-unwrap": "error",
+    "strict-effect/runtime-file-convention": "error",
+    "strict-effect/tagged-error-name": "error",
     "taxkit/no-decoding-outside-boundaries": "error",
     "taxkit/no-route-transport-restore-outside-consumers": [
       "error",

@@ -1,6 +1,15 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Array, Console, Effect, Match, Record, Schema, Stream } from "effect";
+import {
+  Array as EffectArray,
+  Array,
+  Console,
+  Effect,
+  Match,
+  Record,
+  Schema,
+  Stream,
+} from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
@@ -111,7 +120,9 @@ export const checkDocumentation = (repositoryRoot: string) =>
     });
     const inventory = yield* Schema.decodeUnknownEffect(
       Schema.Array(RepositoryPath)
-    )(rawInventory.split("\0").filter((entry) => entry.length > 0)).pipe(
+    )(
+      EffectArray.filter(rawInventory.split("\0"), (entry) => entry.length > 0)
+    ).pipe(
       Effect.mapError(
         () =>
           new DocumentationCheckError({ operation: "decode-file-inventory" })

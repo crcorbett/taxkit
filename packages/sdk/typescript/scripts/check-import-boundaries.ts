@@ -1,3 +1,5 @@
+import { Array as EffectArray } from "effect";
+
 interface PackageManifest {
   readonly dependencies?: Readonly<Record<string, string>>;
   readonly devDependencies?: Readonly<Record<string, string>>;
@@ -41,7 +43,8 @@ const failures: string[] = [];
 
 for (const packageName of blockedHttpApiPackageNames) {
   if (
-    dependencySections.some(
+    EffectArray.some(
+      dependencySections,
       (dependencies) => dependencies?.[packageName] !== undefined
     )
   ) {
@@ -50,7 +53,8 @@ for (const packageName of blockedHttpApiPackageNames) {
 }
 
 if (
-  !httpApiDependencySections.some(
+  !EffectArray.some(
+    httpApiDependencySections,
     (dependencies) => dependencies?.["@taxkit/sdk"] !== undefined
   )
 ) {
@@ -60,7 +64,7 @@ if (
 }
 
 const blockedImportFailures = await Promise.all(
-  blockedHttpApiPackageNames.map(async (packageName) => {
+  EffectArray.map(blockedHttpApiPackageNames, async (packageName) => {
     const httpApiImports =
       await Bun.$`rg -n --fixed-strings ${packageName} ${sourceRoot}`
         .quiet()
@@ -71,7 +75,9 @@ const blockedImportFailures = await Promise.all(
       : null;
   })
 );
-failures.push(...blockedImportFailures.filter((failure) => failure !== null));
+failures.push(
+  ...EffectArray.filter(blockedImportFailures, (failure) => failure !== null)
+);
 
 const rootSource = await Bun.file(rootEntrypoint).text();
 
@@ -80,7 +86,7 @@ if (rootSource.includes("@taxkit/rules-au-") || rootSource.includes("./au")) {
 }
 
 const browserImportFailures = await Promise.all(
-  browserEntrypoints.map(async (entrypoint) => {
+  EffectArray.map(browserEntrypoints, async (entrypoint) => {
     const source = await Bun.file(entrypoint).text();
     return source.includes("node:") ||
       source.includes("bun:") ||
@@ -90,7 +96,9 @@ const browserImportFailures = await Promise.all(
       : null;
   })
 );
-failures.push(...browserImportFailures.filter((failure) => failure !== null));
+failures.push(
+  ...EffectArray.filter(browserImportFailures, (failure) => failure !== null)
+);
 
 if (failures.length > 0) {
   for (const failure of failures) {

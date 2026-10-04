@@ -1,3 +1,5 @@
+import { Array as EffectArray } from "effect";
+
 const strictAppBoundaryPaths = [
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
@@ -47,7 +49,8 @@ const hostedProofHostPath =
   "apps/docs/scripts/test-cloudflare-hosted.tsx" as const;
 const localDopplerRuntimePath =
   "tools/docs-deployment/local-doppler.runtime.ts" as const;
-const workflowRuntimePaths = strictAppBoundaryPaths.filter(
+const workflowRuntimePaths = EffectArray.filter(
+  strictAppBoundaryPaths,
   (path) =>
     path.includes("workflow-") &&
     path !== workflowEvidenceRuntimePath &&
@@ -61,10 +64,10 @@ const finding = (
 ): StrictAppBoundaryFinding => ({ invariant, path });
 
 const includesAny = (source: string, values: readonly string[]): boolean =>
-  values.some((value) => source.includes(value));
+  EffectArray.some(values, (value) => source.includes(value));
 
 const includesEvery = (source: string, values: readonly string[]): boolean =>
-  values.every((value) => source.includes(value));
+  EffectArray.every(values, (value) => source.includes(value));
 
 const inspectGenericBoundaries = (
   sources: StrictAppBoundarySources
@@ -88,7 +91,8 @@ const inspectGenericBoundaries = (
 
   for (const path of strictAppBoundaryPaths) {
     const source = sources[path];
-    const applicableHostIngressPatterns = hostIngressPatterns.filter(
+    const applicableHostIngressPatterns = EffectArray.filter(
+      hostIngressPatterns,
       (pattern) =>
         !(
           (path === hostedProofHostPath && pattern.includes("node:fs")) ||

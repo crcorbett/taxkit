@@ -1,5 +1,5 @@
 import ts from "@typescript/typescript6";
-import { Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema } from "effect";
 import { parseDocument } from "yaml";
 
 import {
@@ -135,7 +135,7 @@ const asRecord = (value: UntrustedWorkflowValue): WorkflowRecord | null =>
 
 const hasOnly = (record: WorkflowRecord, expected: string[]) =>
   Reflect.ownKeys(record).length === expected.length &&
-  expected.every((key) => key in record);
+  EffectArray.every(expected, (key) => key in record);
 
 const unwrapExpression = (expression: ts.Expression): ts.Expression => {
   if (ts.isParenthesizedExpression(expression)) {
@@ -175,14 +175,16 @@ const hasNamedImport = (
   moduleName: string,
   importedName: string
 ) =>
-  file.statements.some(
+  EffectArray.some(
+    file.statements,
     (statement) =>
       ts.isImportDeclaration(statement) &&
       ts.isStringLiteral(statement.moduleSpecifier) &&
       statement.moduleSpecifier.text === moduleName &&
       statement.importClause?.namedBindings !== undefined &&
       ts.isNamedImports(statement.importClause.namedBindings) &&
-      statement.importClause.namedBindings.elements.some(
+      EffectArray.some(
+        statement.importClause.namedBindings.elements,
         (element) =>
           element.name.text === importedName &&
           (element.propertyName?.text ?? element.name.text) === importedName
@@ -262,33 +264,36 @@ const inspectSteps = (
       ),
     ];
   }
-  const actionSteps = steps
-    .map(asRecord)
-    .filter((step): step is WorkflowRecord => step !== null)
-    .flatMap((step) =>
-      Schema.is(Schema.String)(step.uses) ? [step.uses] : []
-    );
-  const runSteps = steps
-    .map(asRecord)
-    .filter((step): step is WorkflowRecord => step !== null)
-    .flatMap((step) => (Schema.is(Schema.String)(step.run) ? [step.run] : []));
+  const actionSteps = EffectArray.filter(
+    EffectArray.map(steps, asRecord),
+    (step): step is WorkflowRecord => step !== null
+  ).flatMap((step) => (Schema.is(Schema.String)(step.uses) ? [step.uses] : []));
+  const runSteps = EffectArray.filter(
+    EffectArray.map(steps, asRecord),
+    (step): step is WorkflowRecord => step !== null
+  ).flatMap((step) => (Schema.is(Schema.String)(step.run) ? [step.run] : []));
   const validActionSteps =
     actionSteps.length === expectedActionSteps.length &&
-    actionSteps.every(
+    EffectArray.every(
+      actionSteps,
       (step) => actionPin.test(step) && expectedActionSteps.includes(step)
     ) &&
-    expectedActionSteps.every(
+    EffectArray.every(
+      expectedActionSteps,
       (step) =>
-        actionSteps.filter((actual) => actual === step).length ===
-        expectedActionSteps.filter((expected) => expected === step).length
+        EffectArray.filter(actionSteps, (actual) => actual === step).length ===
+        EffectArray.filter(expectedActionSteps, (expected) => expected === step)
+          .length
     );
   const validRunSteps =
     runSteps.length === expectedRunSteps.length &&
-    runSteps.every((step) => expectedRunSteps.includes(step)) &&
-    expectedRunSteps.every(
+    EffectArray.every(runSteps, (step) => expectedRunSteps.includes(step)) &&
+    EffectArray.every(
+      expectedRunSteps,
       (step) =>
-        runSteps.filter((actual) => actual === step).length ===
-        expectedRunSteps.filter((expected) => expected === step).length
+        EffectArray.filter(runSteps, (actual) => actual === step).length ===
+        EffectArray.filter(expectedRunSteps, (expected) => expected === step)
+          .length
     );
   const checkoutStep = asRecord(steps[0]);
   const checkoutWith = asRecord(checkoutStep?.with);
@@ -499,7 +504,8 @@ const hasExactWorkflowCredentialPolicy = (
     workflow.env !== undefined &&
     hasOnly(workflow.env, ["TAXKIT_ACTION_PIN_UPDATE_OWNER"]) &&
     stepEnvironments.length === 3 &&
-    stepEnvironments.every(
+    EffectArray.every(
+      stepEnvironments,
       (environment) =>
         !Reflect.has(environment, "DOPPLER_CI_TOKEN") &&
         !Reflect.has(environment, "CLOUDFLARE_API_TOKEN") &&
@@ -621,7 +627,9 @@ export const inspectReleaseRuntime = (source: string) => {
   findCiBranch(file);
   const calls =
     ciBranch === undefined ? [] : callExpressions(ciBranch.thenStatement);
-  const identities = calls.map((call) => callIdentity(call.expression));
+  const identities = EffectArray.map(calls, (call) =>
+    callIdentity(call.expression)
+  );
   const releaseCall = calls.find(
     (call) => callIdentity(call.expression) === "runCiReleaseReadiness"
   );
@@ -643,11 +651,16 @@ export const inspectReleaseRuntime = (source: string) => {
     !hasShadowedReservedCallBinding(file);
   return ciBranch !== undefined &&
     identities.length === 3 &&
-    identities.filter((identity) => identity === "runCiReleaseReadiness")
+    EffectArray.filter(
+      identities,
+      (identity) => identity === "runCiReleaseReadiness"
+    ).length === 1 &&
+    EffectArray.filter(
+      identities,
+      (identity) => identity === "createReleaseReadinessPlan"
+    ).length === 1 &&
+    EffectArray.filter(identities, (identity) => identity === "Console.info")
       .length === 1 &&
-    identities.filter((identity) => identity === "createReleaseReadinessPlan")
-      .length === 1 &&
-    identities.filter((identity) => identity === "Console.info").length === 1 &&
     exactReleasePlan &&
     exactBindings
     ? []
@@ -672,7 +685,7 @@ export const inspectReleaseBoundaryFixtures = (
     "release-script",
   ] as const;
   return expected.flatMap((id) =>
-    fixtures.filter((fixture) => fixture.id === id).length === 1
+    EffectArray.filter(fixtures, (fixture) => fixture.id === id).length === 1
       ? []
       : [
           finding(
@@ -793,7 +806,10 @@ const inspectControls = (controls: readonly ControlRegisterEntry[]) => [
       ]),
   ...expectedControlIds.flatMap((id) => {
     const expected = expectedControls[id];
-    const matches = controls.filter((control) => control.id === id);
+    const matches = EffectArray.filter(
+      controls,
+      (control) => control.id === id
+    );
     return matches.length === 1 &&
       matches[0] !== undefined &&
       matchesControlContract(matches[0], expected)
@@ -813,7 +829,7 @@ const hasExactMembers = (
   expected: readonly string[]
 ) =>
   actual.length === expected.length &&
-  expected.every((item) => actual.includes(item));
+  EffectArray.every(expected, (item) => actual.includes(item));
 
 const deniedExternalMutation = [
   "credential-write",
@@ -856,7 +872,10 @@ const hasAutomationRelations = (automation: AutomationRegisterEntry) =>
 const inspectAutomationIds = (
   automations: readonly AutomationRegisterEntry[]
 ) => {
-  const automationIds = automations.map((automation) => automation.id);
+  const automationIds = EffectArray.map(
+    automations,
+    (automation) => automation.id
+  );
   return automationIds.length !== 2 ||
     !automationIds.includes("quality-ci") ||
     !automationIds.includes("documentation-context-freshness")
@@ -1042,11 +1061,10 @@ export const renderQualityWorkflowReport = (
     ? "Quality workflow policy passed: decoded immutable, bounded, content-addressed ref-scoped cache and canonical release graph."
     : [
         `Quality workflow policy failed with ${findings.length} finding(s):`,
-        ...findings
-          .slice(0, 12)
-          .map(
-            (item) =>
-              `${item.invariant}; target=${item.target}; recovery=${item.recovery}`
-          ),
+        ...EffectArray.map(
+          findings.slice(0, 12),
+          (item) =>
+            `${item.invariant}; target=${item.target}; recovery=${item.recovery}`
+        ),
         `omitted=${Math.max(0, findings.length - 12)}; detail=.github/workflows/quality.yml.`,
       ].join("\n");

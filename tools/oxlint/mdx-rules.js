@@ -1,3 +1,5 @@
+import { Array as EffectArray, Option } from "effect";
+
 const propertyName = (node) => {
   if (node?.type === "Identifier" || node?.type === "JSXIdentifier") {
     return node.name;
@@ -26,8 +28,13 @@ const mdxElementKeys = new Set([
 
 const hasMdxElementKey = (node) =>
   node?.type === "ObjectExpression" &&
-  node.properties?.some((property) =>
-    mdxElementKeys.has(propertyName(property.key) ?? "")
+  Option.fromNullishOr(node.properties).pipe(
+    Option.map((properties) =>
+      EffectArray.some(properties, (property) =>
+        mdxElementKeys.has(propertyName(property.key) ?? "")
+      )
+    ),
+    Option.getOrUndefined
   );
 
 const noRouteLocalComponentRegistry = {

@@ -1,5 +1,7 @@
 import nodePath from "node:path";
 
+import { Array as EffectArray } from "effect";
+
 const { resolve } = nodePath;
 const noTypeof = {
   create(context) {
@@ -310,7 +312,10 @@ const noNestedWrapperCalls = {
       CallExpression(node) {
         if (
           node.callee?.type === "Identifier" &&
-          node.arguments.some((argument) => argument?.type === "CallExpression")
+          EffectArray.some(
+            node.arguments,
+            (argument) => argument?.type === "CallExpression"
+          )
         ) {
           context.report({
             messageId: "noNestedWrapperCalls",
@@ -752,13 +757,18 @@ const routeTransportDeclaredVariable = (sourceCode, node, name) =>
 const isRouteTransportReference = (variable, identifier) =>
   variable !== null &&
   identifier?.type === "Identifier" &&
-  variable.references.some((reference) => reference.identifier === identifier);
+  EffectArray.some(
+    variable.references,
+    (reference) => reference.identifier === identifier
+  );
 
 const isReassignedRouteTransportVariable = (variable) =>
-  variable.references.some((reference) => reference.isWrite?.());
+  EffectArray.some(variable.references, (reference) => reference.isWrite?.());
 
 const referencesRouteTransportVariable = (variables, identifier) =>
-  variables.some((variable) => isRouteTransportReference(variable, identifier));
+  EffectArray.some(variables, (variable) =>
+    isRouteTransportReference(variable, identifier)
+  );
 
 const routeConsumerFunction = (node) => {
   let current = node?.parent;
@@ -935,7 +945,8 @@ const routeConsumerLocalDeclarator = (
   sourceCode,
   variableDeclarators
 ) => {
-  const matches = variableDeclarators.filter(
+  const matches = EffectArray.filter(
+    variableDeclarators,
     (declarator) =>
       declarator.id?.type === "Identifier" &&
       routeConsumerFunction(declarator) === functionNode &&
@@ -1400,7 +1411,8 @@ const isRestoreResultMatched = ({
 
   const resultValue = resultDeclarator?.id ?? restoreCall;
 
-  return callExpressions.some(
+  return EffectArray.some(
+    callExpressions,
     (call) =>
       routeConsumerFunction(call) === consumer.functionNode &&
       isResultMatchFor(call, resultValue, resultVariable, resultImportVariable)
@@ -1562,7 +1574,8 @@ const validateDirectRouteRestores = ({
 
   for (const restoreCall of directRestoreCalls) {
     const functionNode = routeConsumerFunction(restoreCall);
-    const matchingConsumers = routeConsumers.filter(
+    const matchingConsumers = EffectArray.filter(
+      routeConsumers,
       (consumer) => consumer.functionNode === functionNode
     );
 
@@ -1671,7 +1684,9 @@ const noRouteTransportRestoreOutsideConsumers = {
     const { sourceCode } = context;
     const boundaryModules = new Set(options.routeTransportBoundaryModules);
     const consumerFiles = new Set(
-      options.routeTransportConsumerFiles.map((fileName) => resolve(fileName))
+      EffectArray.map(options.routeTransportConsumerFiles, (fileName) =>
+        resolve(fileName)
+      )
     );
     const isConfiguredConsumerFile = consumerFiles.has(
       resolve(sourceFileName(context))

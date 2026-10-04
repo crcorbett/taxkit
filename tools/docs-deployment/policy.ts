@@ -1,4 +1,4 @@
-import { Array, HashSet, Record, Schema } from "effect";
+import { Array as EffectArray, Array, HashSet, Record, Schema } from "effect";
 
 import type {
   DeploymentAuthorityPreflightReceipt,
@@ -29,7 +29,7 @@ const hasExactStrings = (
 ): boolean =>
   actual.length === expected.length &&
   new Set(actual).size === expected.length &&
-  expected.every((value) => actual.includes(value));
+  EffectArray.every(expected, (value) => actual.includes(value));
 
 export const inspectAuthorityCapabilityReceipt = (
   receipt: DeploymentAuthorityCapabilityReceipt
@@ -51,7 +51,8 @@ export const inspectAuthorityCapabilityReceipt = (
   }
   if (
     receipt.github.environments.length !== expectedEnvironmentIds.size ||
-    receipt.github.environments.some(
+    EffectArray.some(
+      receipt.github.environments,
       (environment) =>
         !expectedEnvironmentIds.has(environment.id) ||
         environment.status !== "absent"
@@ -103,13 +104,18 @@ export const inspectCredentialCapabilityReceipt = (
     "Secrets Store Read",
   ] as const;
   const findings: string[] = [];
-  const environmentIds = receipt.github.environments.map(
+  const environmentIds = EffectArray.map(
+    receipt.github.environments,
     (environment) => environment.id
   );
   if (
     environmentIds.length !== expectedEnvironmentIds.length ||
-    expectedEnvironmentIds.some((id) => !environmentIds.includes(id)) ||
-    receipt.github.environments.some(
+    EffectArray.some(
+      expectedEnvironmentIds,
+      (id) => !environmentIds.includes(id)
+    ) ||
+    EffectArray.some(
+      receipt.github.environments,
       (environment) =>
         environment.status !== "protected" ||
         environment.reviewerLogin !== "crcorbett" ||
@@ -150,10 +156,12 @@ export const inspectCredentialCapabilityReceipt = (
       "credential-capability-secrets: protected environment inventories must contain only the named, direction-specific secret names and no values"
     );
   }
-  const mutationGroups = receipt.cloudflare.mutation.permissionGroups.map(
+  const mutationGroups = EffectArray.map(
+    receipt.cloudflare.mutation.permissionGroups,
     (group) => group.name
   );
-  const readGroups = receipt.cloudflare.readOnly.permissionGroups.map(
+  const readGroups = EffectArray.map(
+    receipt.cloudflare.readOnly.permissionGroups,
     (group) => group.name
   );
   const expectedResourceScope = `com.cloudflare.api.account.${receipt.cloudflare.accountId}:*`;
@@ -211,13 +219,15 @@ const JsonArray = Schema.Array(Schema.Json);
 
 const canonicalJson = (value: Schema.Json): string => {
   if (Schema.is(JsonArray)(value)) {
-    return `[${value.map(canonicalJson).join(",")}]`;
+    return `[${EffectArray.map(value, canonicalJson).join(",")}]`;
   }
   if (Schema.is(JsonObject)(value)) {
-    return `{${Record.toEntries<string, Schema.Json>(value)
-      .toSorted(([left], [right]) => left.localeCompare(right))
-      .map(([key, child]) => `${JSON.stringify(key)}:${canonicalJson(child)}`)
-      .join(",")}}`;
+    return `{${EffectArray.map(
+      Record.toEntries<string, Schema.Json>(value).toSorted(([left], [right]) =>
+        left.localeCompare(right)
+      ),
+      ([key, child]) => `${JSON.stringify(key)}:${canonicalJson(child)}`
+    ).join(",")}}`;
   }
   return JSON.stringify(value);
 };
@@ -384,7 +394,7 @@ export const inspectPreviewEvidenceChain = (
     screenshots.length !== 2 ||
     HashSet.size(
       HashSet.fromIterable(
-        screenshots.map((manifest) => manifest.viewport.kind)
+        EffectArray.map(screenshots, (manifest) => manifest.viewport.kind)
       )
     ) !== 2 ||
     Array.some(screenshots, (manifest) => manifest.environment !== "preview")
@@ -426,7 +436,7 @@ export const inspectPreviewHostedEvidenceChain = (
     screenshots.length !== 2 ||
     HashSet.size(
       HashSet.fromIterable(
-        screenshots.map((manifest) => manifest.viewport.kind)
+        EffectArray.map(screenshots, (manifest) => manifest.viewport.kind)
       )
     ) !== 2 ||
     Array.some(screenshots, (manifest) => manifest.environment !== "preview")
@@ -472,7 +482,7 @@ export const inspectProductionEvidenceChain = (
     screenshots.length !== 2 ||
     HashSet.size(
       HashSet.fromIterable(
-        screenshots.map((manifest) => manifest.viewport.kind)
+        EffectArray.map(screenshots, (manifest) => manifest.viewport.kind)
       )
     ) !== 2 ||
     Array.some(screenshots, (manifest) => {
@@ -502,54 +512,57 @@ export const inspectInitialProductionPreflight = (
   credentialReadback: DeploymentPreviewCredentialReadbackReceipt,
   resultingProvider: DeploymentProviderReadback
 ): readonly string[] => {
-  const mismatch = [
-    inspectHistoricalDeploymentPlanActions(plan, "create").length > 0,
-    receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
-    receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
-    receipt.candidate.deploymentInputSha256 !==
-      plan.projection.candidate.deploymentInputSha256,
-    receipt.candidate.lockfileSha256 !==
-      plan.projection.candidate.lockfileSha256,
-    receipt.candidate.sourceConfigSha256 !== plan.projection.configSha256,
-    receipt.acceptedPreview.candidateCommit !==
-      acceptedPreviewProvider.candidateCommit,
-    receipt.acceptedPreview.candidateCommit !==
-      acceptedPreviewHosted.candidateCommit,
-    receipt.acceptedPreview.candidateCommit !==
-      acceptedPreviewTeardown.candidateCommit,
-    receipt.acceptedPreview.deploymentInputSha256 !==
-      acceptedPreviewProvider.deploymentInputSha256,
-    receipt.acceptedPreview.lockfileSha256 !==
-      acceptedPreviewProvider.lockfileSha256,
-    receipt.acceptedPreview.sourceConfigSha256 !==
-      acceptedPreviewProvider.configSha256,
-    receipt.lastKnownGood.candidateCommit !==
-      acceptedPreviewProvider.candidateCommit,
-    receipt.candidate.exactCommit !== acceptedPreviewProvider.candidateCommit,
-    receipt.candidate.exactCommit !== resultingProvider.candidateCommit,
-    receipt.account.accountId !== acceptedPreviewProvider.accountId,
-    receipt.account.accountId !== resultingProvider.accountId,
-    receipt.credentials.accountId !== credentialReadback.accountId,
-    receipt.credentials.accountId !== resultingProvider.accountId,
-    receipt.credentials.scopeSetSha256 !== credentialReadback.scopeSetSha256,
-    receipt.credentials.expiresAt !== credentialReadback.expiresAt,
-    receipt.credentials.profile !== credentialReadback.profile,
-    receipt.candidate.exactCommit !== credentialReadback.candidateCommit,
-    credentialReadback.observedAt > receipt.observedAt,
-    receipt.observedAt >= receipt.credentials.expiresAt,
-    !resultingProvider.physicalWorkerName.startsWith(
-      receipt.provider.workerPrefix
-    ),
-    !resultingProvider.url.endsWith(
-      `.${receipt.account.workersSubdomain}.workers.dev`
-    ),
-    receipt.stage !== "prod",
-    plan.projection.stage !== "prod",
-    resultingProvider.stage !== "prod",
-    receipt.provider.matchingWorkerCount !== 0,
-    receipt.state.stagePresent,
-    receipt.state.resources.length !== 0,
-  ].some(Boolean);
+  const mismatch = EffectArray.some(
+    [
+      inspectHistoricalDeploymentPlanActions(plan, "create").length > 0,
+      receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
+      receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
+      receipt.candidate.deploymentInputSha256 !==
+        plan.projection.candidate.deploymentInputSha256,
+      receipt.candidate.lockfileSha256 !==
+        plan.projection.candidate.lockfileSha256,
+      receipt.candidate.sourceConfigSha256 !== plan.projection.configSha256,
+      receipt.acceptedPreview.candidateCommit !==
+        acceptedPreviewProvider.candidateCommit,
+      receipt.acceptedPreview.candidateCommit !==
+        acceptedPreviewHosted.candidateCommit,
+      receipt.acceptedPreview.candidateCommit !==
+        acceptedPreviewTeardown.candidateCommit,
+      receipt.acceptedPreview.deploymentInputSha256 !==
+        acceptedPreviewProvider.deploymentInputSha256,
+      receipt.acceptedPreview.lockfileSha256 !==
+        acceptedPreviewProvider.lockfileSha256,
+      receipt.acceptedPreview.sourceConfigSha256 !==
+        acceptedPreviewProvider.configSha256,
+      receipt.lastKnownGood.candidateCommit !==
+        acceptedPreviewProvider.candidateCommit,
+      receipt.candidate.exactCommit !== acceptedPreviewProvider.candidateCommit,
+      receipt.candidate.exactCommit !== resultingProvider.candidateCommit,
+      receipt.account.accountId !== acceptedPreviewProvider.accountId,
+      receipt.account.accountId !== resultingProvider.accountId,
+      receipt.credentials.accountId !== credentialReadback.accountId,
+      receipt.credentials.accountId !== resultingProvider.accountId,
+      receipt.credentials.scopeSetSha256 !== credentialReadback.scopeSetSha256,
+      receipt.credentials.expiresAt !== credentialReadback.expiresAt,
+      receipt.credentials.profile !== credentialReadback.profile,
+      receipt.candidate.exactCommit !== credentialReadback.candidateCommit,
+      credentialReadback.observedAt > receipt.observedAt,
+      receipt.observedAt >= receipt.credentials.expiresAt,
+      !resultingProvider.physicalWorkerName.startsWith(
+        receipt.provider.workerPrefix
+      ),
+      !resultingProvider.url.endsWith(
+        `.${receipt.account.workersSubdomain}.workers.dev`
+      ),
+      receipt.stage !== "prod",
+      plan.projection.stage !== "prod",
+      resultingProvider.stage !== "prod",
+      receipt.provider.matchingWorkerCount !== 0,
+      receipt.state.stagePresent,
+      receipt.state.resources.length !== 0,
+    ],
+    Boolean
+  );
   return mismatch
     ? [
         "production-initial-preflight: accepted Preview, equal Production plan, credential, empty fixed stage and candidate inputs must agree before first deploy",
@@ -568,46 +581,51 @@ export const inspectProductionMutationPreflight = (
     receipt.operation === "production-deploy-preflight"
       ? currentProvider.candidateCommit
       : resultingProvider.candidateCommit;
-  const mismatch = [
-    inspectHistoricalDeploymentPlanActions(plan, "update").length > 0,
-    receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
-    receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
-    receipt.candidate.deploymentInputSha256 !==
-      plan.projection.candidate.deploymentInputSha256,
-    receipt.candidate.lockfileSha256 !==
-      plan.projection.candidate.lockfileSha256,
-    receipt.candidate.sourceConfigSha256 !== plan.projection.configSha256,
-    receipt.credentials.accountId !== currentProvider.accountId,
-    receipt.credentials.accountId !== resultingProvider.accountId,
-    receipt.credentials.accountId !== credentialReadback.accountId,
-    receipt.credentials.scopeSetSha256 !== credentialReadback.scopeSetSha256,
-    receipt.credentials.expiresAt !== credentialReadback.expiresAt,
-    receipt.credentials.profile !== credentialReadback.profile,
-    receipt.candidate.exactCommit !== credentialReadback.candidateCommit,
-    credentialReadback.observedAt > receipt.observedAt,
-    receipt.observedAt >= receipt.credentials.expiresAt,
-    receipt.currentProduction.candidateCommit !==
-      currentProvider.candidateCommit,
-    receipt.currentProduction.provider.deploymentId !==
-      currentProvider.deploymentId,
-    receipt.currentProduction.provider.versionId !== currentProvider.versionId,
-    receipt.currentProduction.provider.physicalWorkerName !==
-      currentProvider.physicalWorkerName,
-    receipt.currentProduction.provider.url !== currentProvider.url,
-    receipt.rollbackTarget.candidateCommit !== expectedRollbackTarget,
-    receipt.authority.operation !==
-      (receipt.operation === "production-deploy-preflight"
-        ? "production-deploy"
-        : "production-rollback-redeploy"),
-    receipt.candidate.exactCommit !== resultingProvider.candidateCommit,
-    currentProvider.physicalWorkerName !== resultingProvider.physicalWorkerName,
-    currentProvider.url !== resultingProvider.url,
-    currentProvider.state.instanceId !== resultingProvider.state.instanceId,
-    receipt.stage !== "prod",
-    plan.projection.stage !== "prod",
-    resultingProvider.stage !== "prod",
-    !receipt.state.workerIdentityAgreement,
-  ].some(Boolean);
+  const mismatch = EffectArray.some(
+    [
+      inspectHistoricalDeploymentPlanActions(plan, "update").length > 0,
+      receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
+      receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
+      receipt.candidate.deploymentInputSha256 !==
+        plan.projection.candidate.deploymentInputSha256,
+      receipt.candidate.lockfileSha256 !==
+        plan.projection.candidate.lockfileSha256,
+      receipt.candidate.sourceConfigSha256 !== plan.projection.configSha256,
+      receipt.credentials.accountId !== currentProvider.accountId,
+      receipt.credentials.accountId !== resultingProvider.accountId,
+      receipt.credentials.accountId !== credentialReadback.accountId,
+      receipt.credentials.scopeSetSha256 !== credentialReadback.scopeSetSha256,
+      receipt.credentials.expiresAt !== credentialReadback.expiresAt,
+      receipt.credentials.profile !== credentialReadback.profile,
+      receipt.candidate.exactCommit !== credentialReadback.candidateCommit,
+      credentialReadback.observedAt > receipt.observedAt,
+      receipt.observedAt >= receipt.credentials.expiresAt,
+      receipt.currentProduction.candidateCommit !==
+        currentProvider.candidateCommit,
+      receipt.currentProduction.provider.deploymentId !==
+        currentProvider.deploymentId,
+      receipt.currentProduction.provider.versionId !==
+        currentProvider.versionId,
+      receipt.currentProduction.provider.physicalWorkerName !==
+        currentProvider.physicalWorkerName,
+      receipt.currentProduction.provider.url !== currentProvider.url,
+      receipt.rollbackTarget.candidateCommit !== expectedRollbackTarget,
+      receipt.authority.operation !==
+        (receipt.operation === "production-deploy-preflight"
+          ? "production-deploy"
+          : "production-rollback-redeploy"),
+      receipt.candidate.exactCommit !== resultingProvider.candidateCommit,
+      currentProvider.physicalWorkerName !==
+        resultingProvider.physicalWorkerName,
+      currentProvider.url !== resultingProvider.url,
+      currentProvider.state.instanceId !== resultingProvider.state.instanceId,
+      receipt.stage !== "prod",
+      plan.projection.stage !== "prod",
+      resultingProvider.stage !== "prod",
+      !receipt.state.workerIdentityAgreement,
+    ],
+    Boolean
+  );
   return mismatch
     ? [
         "production-mutation-preflight: current provider/state identity, rollback target, equal plan and resulting fixed Worker must agree",
@@ -651,90 +669,95 @@ export const inspectProductionRollbackReceipt = (
         (initial.imagePath !== restored.imagePath ||
           (initial.imageSha256 === restored.imageSha256 &&
             initial.imagePath.includes(initial.imageSha256.slice(0, 12)) &&
-            initial.limitations.some((limitation) =>
+            EffectArray.some(initial.limitations, (limitation) =>
               limitation.includes("content-addressed")
             ) &&
-            restored.limitations.some((limitation) =>
+            EffectArray.some(restored.limitations, (limitation) =>
               limitation.includes("content-addressed")
             )))
       );
     });
-  const mismatch = [
-    initialProvider.physicalWorkerName !== successorProvider.physicalWorkerName,
-    successorProvider.physicalWorkerName !==
-      restoredProvider.physicalWorkerName,
-    initialProvider.url !== successorProvider.url,
-    successorProvider.url !== restoredProvider.url,
-    initialProvider.state.instanceId !== successorProvider.state.instanceId,
-    successorProvider.state.instanceId !== restoredProvider.state.instanceId,
-    initialProvider.deploymentId === successorProvider.deploymentId,
-    successorProvider.deploymentId === restoredProvider.deploymentId,
-    initialProvider.versionId === successorProvider.versionId,
-    successorProvider.versionId === restoredProvider.versionId,
-    receipt.acceptedPlanSha256 !== restoredProvider.acceptedPlanSha256,
-    receipt.initialProduction.candidateCommit !==
-      initialProvider.candidateCommit,
-    receipt.initialProduction.deploymentId !== initialProvider.deploymentId,
-    receipt.initialProduction.versionId !== initialProvider.versionId,
-    receipt.initialProduction.stateBundleSha256 !==
-      initialProvider.state.bundleSha256,
-    receipt.successor.candidateCommit !== successorProvider.candidateCommit,
-    receipt.successor.candidateCommit !==
-      successorPreviewProvider.candidateCommit,
-    receipt.successor.deploymentId !== successorProvider.deploymentId,
-    receipt.successor.versionId !== successorProvider.versionId,
-    receipt.successor.stateBundleSha256 !==
-      successorProvider.state.bundleSha256,
-    receipt.restoredProduction.candidateCommit !==
-      restoredProvider.candidateCommit,
-    receipt.restoredProduction.deploymentId !== restoredProvider.deploymentId,
-    receipt.restoredProduction.versionId !== restoredProvider.versionId,
-    receipt.restoredProduction.stateBundleSha256 !==
-      restoredProvider.state.bundleSha256,
-    receipt.stableIdentity.physicalWorkerName !==
-      restoredProvider.physicalWorkerName,
-    receipt.stableIdentity.url !== restoredProvider.url,
-    receipt.stableIdentity.stateInstanceId !==
-      restoredProvider.state.instanceId,
-    initialProvider.state.bundleSha256 !== restoredProvider.state.bundleSha256,
-    initialProvider.candidateCommit !== restoredProvider.candidateCommit,
-    successorPreviewTeardown.candidateCommit !==
-      successorPreviewProvider.candidateCommit,
-    successorPreviewTeardown.physicalWorkerName !==
-      successorPreviewProvider.physicalWorkerName,
-    successorPreviewTeardown.state.stagePresent,
-    successorPreviewTeardown.provider.matchingWorkerCount !== 0,
-    receipt.initialProduction.providerReadbackPath !==
-      expectedPaths.initialProviderReadbackPath,
-    receipt.successor.providerReadbackPath !==
-      expectedPaths.successorProviderReadbackPath,
-    receipt.successor.hostedProofPath !==
-      expectedPaths.successorHostedProofPath,
-    receipt.successor.previewProviderReadbackPath !==
-      expectedPaths.successorPreviewProviderReadbackPath,
-    receipt.successor.previewHostedProofPath !==
-      expectedPaths.successorPreviewHostedProofPath,
-    receipt.successor.previewTeardownPath !==
-      expectedPaths.successorPreviewTeardownPath,
-    !Array.every(
-      receipt.successor.screenshotManifestPaths,
-      (path, index) =>
-        path === expectedPaths.successorScreenshotManifestPaths[index]
-    ),
-    receipt.restoredProduction.providerReadbackPath !==
-      expectedPaths.restoredProviderReadbackPath,
-    receipt.restoredProduction.hostedProofPath !==
-      expectedPaths.restoredHostedProofPath,
-    receipt.restoredProduction.planPath !== expectedPaths.restoredPlanPath,
-    receipt.restoredProduction.preflightPath !==
-      expectedPaths.restoredPreflightPath,
-    !Array.every(
-      receipt.restoredProduction.screenshotManifestPaths,
-      (path, index) =>
-        path === expectedPaths.restoredScreenshotManifestPaths[index]
-    ),
-    !screenshotEpochsValid,
-  ].some(Boolean);
+  const mismatch = EffectArray.some(
+    [
+      initialProvider.physicalWorkerName !==
+        successorProvider.physicalWorkerName,
+      successorProvider.physicalWorkerName !==
+        restoredProvider.physicalWorkerName,
+      initialProvider.url !== successorProvider.url,
+      successorProvider.url !== restoredProvider.url,
+      initialProvider.state.instanceId !== successorProvider.state.instanceId,
+      successorProvider.state.instanceId !== restoredProvider.state.instanceId,
+      initialProvider.deploymentId === successorProvider.deploymentId,
+      successorProvider.deploymentId === restoredProvider.deploymentId,
+      initialProvider.versionId === successorProvider.versionId,
+      successorProvider.versionId === restoredProvider.versionId,
+      receipt.acceptedPlanSha256 !== restoredProvider.acceptedPlanSha256,
+      receipt.initialProduction.candidateCommit !==
+        initialProvider.candidateCommit,
+      receipt.initialProduction.deploymentId !== initialProvider.deploymentId,
+      receipt.initialProduction.versionId !== initialProvider.versionId,
+      receipt.initialProduction.stateBundleSha256 !==
+        initialProvider.state.bundleSha256,
+      receipt.successor.candidateCommit !== successorProvider.candidateCommit,
+      receipt.successor.candidateCommit !==
+        successorPreviewProvider.candidateCommit,
+      receipt.successor.deploymentId !== successorProvider.deploymentId,
+      receipt.successor.versionId !== successorProvider.versionId,
+      receipt.successor.stateBundleSha256 !==
+        successorProvider.state.bundleSha256,
+      receipt.restoredProduction.candidateCommit !==
+        restoredProvider.candidateCommit,
+      receipt.restoredProduction.deploymentId !== restoredProvider.deploymentId,
+      receipt.restoredProduction.versionId !== restoredProvider.versionId,
+      receipt.restoredProduction.stateBundleSha256 !==
+        restoredProvider.state.bundleSha256,
+      receipt.stableIdentity.physicalWorkerName !==
+        restoredProvider.physicalWorkerName,
+      receipt.stableIdentity.url !== restoredProvider.url,
+      receipt.stableIdentity.stateInstanceId !==
+        restoredProvider.state.instanceId,
+      initialProvider.state.bundleSha256 !==
+        restoredProvider.state.bundleSha256,
+      initialProvider.candidateCommit !== restoredProvider.candidateCommit,
+      successorPreviewTeardown.candidateCommit !==
+        successorPreviewProvider.candidateCommit,
+      successorPreviewTeardown.physicalWorkerName !==
+        successorPreviewProvider.physicalWorkerName,
+      successorPreviewTeardown.state.stagePresent,
+      successorPreviewTeardown.provider.matchingWorkerCount !== 0,
+      receipt.initialProduction.providerReadbackPath !==
+        expectedPaths.initialProviderReadbackPath,
+      receipt.successor.providerReadbackPath !==
+        expectedPaths.successorProviderReadbackPath,
+      receipt.successor.hostedProofPath !==
+        expectedPaths.successorHostedProofPath,
+      receipt.successor.previewProviderReadbackPath !==
+        expectedPaths.successorPreviewProviderReadbackPath,
+      receipt.successor.previewHostedProofPath !==
+        expectedPaths.successorPreviewHostedProofPath,
+      receipt.successor.previewTeardownPath !==
+        expectedPaths.successorPreviewTeardownPath,
+      !Array.every(
+        receipt.successor.screenshotManifestPaths,
+        (path, index) =>
+          path === expectedPaths.successorScreenshotManifestPaths[index]
+      ),
+      receipt.restoredProduction.providerReadbackPath !==
+        expectedPaths.restoredProviderReadbackPath,
+      receipt.restoredProduction.hostedProofPath !==
+        expectedPaths.restoredHostedProofPath,
+      receipt.restoredProduction.planPath !== expectedPaths.restoredPlanPath,
+      receipt.restoredProduction.preflightPath !==
+        expectedPaths.restoredPreflightPath,
+      !Array.every(
+        receipt.restoredProduction.screenshotManifestPaths,
+        (path, index) =>
+          path === expectedPaths.restoredScreenshotManifestPaths[index]
+      ),
+      !screenshotEpochsValid,
+    ],
+    Boolean
+  );
   return mismatch
     ? [
         "production-rollback-binding: qualified successor Preview, fixed Production identity, distinct transitions, restored source bundle and Preview absence must agree",
@@ -756,59 +779,68 @@ export const inspectPreviewMutationPreflight = (
       receipt.operation === "preview-deploy-preflight" ? "create" : "delete"
     ),
   ];
-  const commonMismatch = [
-    receipt.candidate.exactCommit !== gitReadback.pullRequest.headSha,
-    receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
-    receipt.candidate.lockfileSha256 !==
-      plan.projection.candidate.lockfileSha256,
-    receipt.candidate.deploymentInputSha256 !==
-      plan.projection.candidate.deploymentInputSha256,
-    receipt.candidate.sourceConfigSha256 !== plan.projection.configSha256,
-    receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
-    receipt.stage !== gitReadback.stage,
-    receipt.stage !== plan.projection.stage,
-    receipt.credentials.accountId !== authority.provider.accountId,
-    receipt.credentials.accountId !== credentialReadback.accountId,
-    receipt.credentials.scopeSetSha256 !== credentialReadback.scopeSetSha256,
-    receipt.credentials.expiresAt !== credentialReadback.expiresAt,
-    receipt.credentials.profile !== credentialReadback.profile,
-    receipt.candidate.exactCommit !== credentialReadback.candidateCommit,
-    receipt.stage !== credentialReadback.stage,
-    credentialReadback.observedAt > receipt.observedAt,
-    receipt.observedAt >= receipt.credentials.expiresAt,
-    providerAfterApply !== undefined &&
-      receipt.credentials.accountId !== providerAfterApply.accountId,
-    !receipt.limitations.some((limitation) =>
-      limitation.includes("broad existing OAuth scope set")
-    ),
-  ].some(Boolean);
+  const commonMismatch = EffectArray.some(
+    [
+      receipt.candidate.exactCommit !== gitReadback.pullRequest.headSha,
+      receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
+      receipt.candidate.lockfileSha256 !==
+        plan.projection.candidate.lockfileSha256,
+      receipt.candidate.deploymentInputSha256 !==
+        plan.projection.candidate.deploymentInputSha256,
+      receipt.candidate.sourceConfigSha256 !== plan.projection.configSha256,
+      receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
+      receipt.stage !== gitReadback.stage,
+      receipt.stage !== plan.projection.stage,
+      receipt.credentials.accountId !== authority.provider.accountId,
+      receipt.credentials.accountId !== credentialReadback.accountId,
+      receipt.credentials.scopeSetSha256 !== credentialReadback.scopeSetSha256,
+      receipt.credentials.expiresAt !== credentialReadback.expiresAt,
+      receipt.credentials.profile !== credentialReadback.profile,
+      receipt.candidate.exactCommit !== credentialReadback.candidateCommit,
+      receipt.stage !== credentialReadback.stage,
+      credentialReadback.observedAt > receipt.observedAt,
+      receipt.observedAt >= receipt.credentials.expiresAt,
+      providerAfterApply !== undefined &&
+        receipt.credentials.accountId !== providerAfterApply.accountId,
+      !EffectArray.some(receipt.limitations, (limitation) =>
+        limitation.includes("broad existing OAuth scope set")
+      ),
+    ],
+    Boolean
+  );
   const deployMismatch =
     receipt.operation === "preview-deploy-preflight" &&
-    [
-      receipt.postcondition !== "exact-stage-absent-and-safe-to-create",
-      receipt.provider.matchingWorkerCount !== 0,
-      receipt.provider.identity !== null,
-      receipt.state.stagePresent,
-      receipt.state.resources.length !== 0,
-      receipt.state.workerIdentityAgreement,
-    ].some(Boolean);
+    EffectArray.some(
+      [
+        receipt.postcondition !== "exact-stage-absent-and-safe-to-create",
+        receipt.provider.matchingWorkerCount !== 0,
+        receipt.provider.identity !== null,
+        receipt.state.stagePresent,
+        receipt.state.resources.length !== 0,
+        receipt.state.workerIdentityAgreement,
+      ],
+      Boolean
+    );
   const destroyIdentity = receipt.provider.identity;
   const destroyMismatch =
     receipt.operation === "preview-destroy-preflight" &&
-    [
-      receipt.postcondition !== "exact-stage-present-and-safe-to-destroy",
-      receipt.provider.matchingWorkerCount !== 1,
-      destroyIdentity === null,
-      !receipt.state.stagePresent,
-      receipt.state.resources.length !== 2,
-      !receipt.state.workerIdentityAgreement,
-      providerAfterApply === undefined,
-      destroyIdentity?.physicalWorkerName !==
-        providerAfterApply?.physicalWorkerName,
-      destroyIdentity?.deploymentId !== providerAfterApply?.deploymentId,
-      destroyIdentity?.versionId !== providerAfterApply?.versionId,
-      destroyIdentity?.url !== providerAfterApply?.url,
-    ].some(Boolean);
+    EffectArray.some(
+      [
+        receipt.postcondition !== "exact-stage-present-and-safe-to-destroy",
+        receipt.provider.matchingWorkerCount !== 1,
+        destroyIdentity === null,
+        !receipt.state.stagePresent,
+        receipt.state.resources.length !== 2,
+        !receipt.state.workerIdentityAgreement,
+        providerAfterApply === undefined,
+        destroyIdentity?.physicalWorkerName !==
+          providerAfterApply?.physicalWorkerName,
+        destroyIdentity?.deploymentId !== providerAfterApply?.deploymentId,
+        destroyIdentity?.versionId !== providerAfterApply?.versionId,
+        destroyIdentity?.url !== providerAfterApply?.url,
+      ],
+      Boolean
+    );
   if (commonMismatch || deployMismatch || destroyMismatch) {
     findings.push(
       "preview-mutation-preflight: candidate, credential scope, plan, provider and state identities must prove the exact deploy or destroy target before mutation"
@@ -1000,11 +1032,13 @@ export const inspectProviderPreflightReceipt = (
       "partial-taxkit-state-and-provider-absence-confirmed" &&
     receipt.provider.taxkitWorkerCount === 0 &&
     receipt.state.resources.length === 2 &&
-    receipt.state.resources.some(
+    EffectArray.some(
+      receipt.state.resources,
       (resource) =>
         resource.logicalId === "DocsBuild" && resource.status === "created"
     ) &&
-    receipt.state.resources.some(
+    EffectArray.some(
+      receipt.state.resources,
       (resource) =>
         resource.logicalId === "DocsWebsite" && resource.status === "creating"
     );
@@ -1020,7 +1054,7 @@ export const inspectProviderPreflightReceipt = (
   }
   if (
     receipt.provider.billingSubscriptionReadback === "forbidden-403" &&
-    !receipt.limitations.some((limitation) =>
+    !EffectArray.some(receipt.limitations, (limitation) =>
       limitation.includes("not the billing subscription")
     )
   ) {

@@ -1,0 +1,65 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "0b58ab548f1b76d46baf0e65fa5eaacc97f7cb69",
+  "implemented": {
+    "native_traversals_replaced": 370,
+    "initial_affected_files": 54,
+    "global_rules": [
+      "error-constructor-new",
+      "no-native-at",
+      "no-unsafe-option-unwrap",
+      "runtime-file-convention",
+      "tagged-error-name"
+    ],
+    "domain_policy": "All eleven canonical rules remain configured for core, rules and calculators",
+    "web_context": "Rename selection/context modules to their role; remove unused internal type export and obsolete Knip exception"
+  },
+  "evidence": [
+    {
+      "command": "bun run test",
+      "result": "passed, including actual Oxlint fixtures and retained calculator tests"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed before final browser-realm projection restoration; lint, formatting and docs rechecked after correction"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed"
+    },
+    {
+      "command": "bun test tools/oxlint/portable-rules.test.ts",
+      "result": "23 cases passed; source, tests, web, JavaScript tooling and root configuration have admitted-file/exit/rule assertions"
+    },
+    {
+      "command": "bun run test:harness-governance",
+      "result": "15 tests passed"
+    },
+    {
+      "command": "bun --conditions=source test tools/evals/hgi-206/service.test.ts",
+      "result": "3 tests passed"
+    },
+    {
+      "command": "bun run check:harness-governance:types && bun run check:harness-foundation-epoch:types",
+      "result": "passed; existing suggestions remain visible"
+    },
+    {
+      "command": "bun run --filter=docs test:cloudflare-built",
+      "result": "passed after browser-realm correction: SSR=200, immutable asset=200, missing=404, client-navigation documents=0, server functions=3, diagnostics=0"
+    }
+  ],
+  "retained_failure": {
+    "boundary": "Playwright evaluateAll serializes its callback into a separate browser realm",
+    "failure": "EffectArray import is unavailable in that realm",
+    "correction": "Restore original DOM projection and track traversal relocation with remaining host migration; no rule disabled or exception granted"
+  },
+  "limitations": [
+    "Six strict policy families remain incomplete outside domain packages",
+    "Full readonly/Schema/state/lifetime semantic review remains open",
+    "No Medicare parameter, tax snapshot or result change",
+    "No provider apply, merge, publication or deployment"
+  ],
+  "recovery": "Revert the complete slice; no provider state changed"
+}

@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema } from "effect";
 
 import type { DeploymentPlanProjection } from "./schemas.js";
 
@@ -171,14 +171,17 @@ export const projectAlchemyPlanText = (
         }
         return timestampLog.test(line) ? [] : [line];
       });
-    const planSummaries = lines.filter((line) => planSummaryLine.test(line));
+    const planSummaries = EffectArray.filter(lines, (line) =>
+      planSummaryLine.test(line)
+    );
     if (planSummaries.length !== 1) {
       return yield* fail(
         "beta.80 Alchemy plan output must contain exactly one plan summary"
       );
     }
     if (
-      lines.some(
+      EffectArray.some(
+        lines,
         (line) =>
           line.length > 0 &&
           !planSummaryLine.test(line) &&
@@ -188,8 +191,11 @@ export const projectAlchemyPlanText = (
       return yield* fail("unsupported beta.80 Alchemy plan output line");
     }
 
-    const resourceLines = lines.filter((line) => resourceLine.test(line));
-    const unexpected = resourceLines.filter(
+    const resourceLines = EffectArray.filter(lines, (line) =>
+      resourceLine.test(line)
+    );
+    const unexpected = EffectArray.filter(
+      resourceLines,
       (line) => !nativeResourceLine.test(line)
     );
     if (unexpected.length > 0) {
@@ -197,7 +203,7 @@ export const projectAlchemyPlanText = (
     }
 
     const resources = yield* Effect.all(
-      resourceLines.map((line) =>
+      EffectArray.map(resourceLines, (line) =>
         Schema.decodeUnknownEffect(ResourceAction)(
           line.slice("[DocsWebsite] ".length)
         ).pipe(

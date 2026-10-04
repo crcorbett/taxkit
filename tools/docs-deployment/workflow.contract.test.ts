@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 
+import { Array as EffectArray } from "effect";
+
 const workflowPaths = {
   preview: ".github/workflows/docs-preview.yml",
   production: ".github/workflows/docs-production.yml",
@@ -47,11 +49,14 @@ const stepNamesWithBinding = (source: string, binding: string) =>
 describe("docs deployment workflow admission", () => {
   test("keeps every deployment workflow exact-SHA and pinned", async () => {
     const sources = await Promise.all(
-      [
-        workflowPaths.preview,
-        workflowPaths.production,
-        workflowPaths.teardown,
-      ].map(readWorkflow)
+      EffectArray.map(
+        [
+          workflowPaths.preview,
+          workflowPaths.production,
+          workflowPaths.teardown,
+        ],
+        readWorkflow
+      )
     );
     for (const source of sources) {
       expect(source).not.toContain("pull_request_target");
@@ -69,11 +74,14 @@ describe("docs deployment workflow admission", () => {
 
   test("installs the browser needed by the docs build before provider mutation", async () => {
     const sources = await Promise.all(
-      [
-        workflowPaths.preview,
-        workflowPaths.production,
-        workflowPaths.teardown,
-      ].map(readWorkflow)
+      EffectArray.map(
+        [
+          workflowPaths.preview,
+          workflowPaths.production,
+          workflowPaths.teardown,
+        ],
+        readWorkflow
+      )
     );
     for (const source of sources) {
       expect(source).toContain(
@@ -210,11 +218,14 @@ describe("docs deployment workflow admission", () => {
         readFile("package.json", "utf-8"),
         readFile("turbo.json", "utf-8"),
         readFile("tools/docs-deployment/inventory.runtime.ts", "utf-8"),
-        ...[
-          workflowPaths.preview,
-          workflowPaths.production,
-          workflowPaths.teardown,
-        ].map(readWorkflow),
+        ...EffectArray.map(
+          [
+            workflowPaths.preview,
+            workflowPaths.production,
+            workflowPaths.teardown,
+          ],
+          readWorkflow
+        ),
       ]);
     expect(packageSource).toContain(
       '"docs:build": "turbo run build --filter=docs"'
@@ -251,11 +262,14 @@ describe("docs deployment workflow admission", () => {
 
   test("runs the supported mutation-capable state-store bootstrap before inventory", async () => {
     const sources = await Promise.all(
-      [
-        workflowPaths.preview,
-        workflowPaths.production,
-        workflowPaths.teardown,
-      ].map(readWorkflow)
+      EffectArray.map(
+        [
+          workflowPaths.preview,
+          workflowPaths.production,
+          workflowPaths.teardown,
+        ],
+        readWorkflow
+      )
     );
     for (const source of sources) {
       expect(source).toContain(
@@ -271,7 +285,10 @@ describe("docs deployment workflow admission", () => {
       "tools/docs-deployment/workflow-evidence.ts"
     );
     const sources = await Promise.all(
-      [workflowPaths.preview, workflowPaths.production].map(readWorkflow)
+      EffectArray.map(
+        [workflowPaths.preview, workflowPaths.production],
+        readWorkflow
+      )
     );
     for (const source of sources) {
       expect(source).toContain("run: bun run docs:build");
@@ -288,7 +305,10 @@ describe("docs deployment workflow admission", () => {
 
   test("keeps every stage operation behind its exact non-cancellable lock", async () => {
     const sources = await Promise.all(
-      [workflowPaths.preview, workflowPaths.production].map(readWorkflow)
+      EffectArray.map(
+        [workflowPaths.preview, workflowPaths.production],
+        readWorkflow
+      )
     );
     for (const source of sources) {
       expect(source).toContain("checks: read");
@@ -432,7 +452,7 @@ describe("docs deployment workflow admission", () => {
     ] as const;
 
     const workflowSources = await Promise.all(
-      workflows.map(async (workflow) => ({
+      EffectArray.map(workflows, async (workflow) => ({
         ...workflow,
         source: await readWorkflow(workflow.path),
       }))
@@ -687,7 +707,7 @@ describe("docs deployment workflow admission", () => {
       "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
     ];
     const runtimes = await Promise.all(
-      runtimePaths.map((path) => readFile(path, "utf-8"))
+      EffectArray.map(runtimePaths, (path) => readFile(path, "utf-8"))
     );
 
     for (const source of runtimes) {

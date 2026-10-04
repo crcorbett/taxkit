@@ -1,7 +1,7 @@
-import "@tanstack/react-start/server-only";
 import { DocsGeneratedFumadocsSourceLive } from "@taxkit/docs-content/generated-source";
+import "@tanstack/react-start/server-only";
 import { DocsContentServiceLive } from "@taxkit/docs-content/live";
-import { Effect, Layer, Random } from "effect";
+import { Array as EffectArray, Effect, Layer, Random } from "effect";
 
 import {
   createDocsRuntime,
@@ -17,7 +17,7 @@ const docsRuntimeProbeLive = createDocsRuntimeProbeLayer(
     { concurrency: 2 }
   ).pipe(
     Effect.map((segments) =>
-      segments.map((segment) => segment.toString(36)).join("-")
+      EffectArray.map(segments, (segment) => segment.toString(36)).join("-")
     )
   )
 );

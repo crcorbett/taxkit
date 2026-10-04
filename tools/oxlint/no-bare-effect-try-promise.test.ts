@@ -3,6 +3,8 @@ import { Buffer } from "node:buffer";
 import { rm } from "node:fs/promises";
 import nodePath from "node:path";
 
+import { Array as EffectArray } from "effect";
+
 const { join } = nodePath;
 const repositoryRoot = join(import.meta.dir, "../..");
 const oxlint = join(repositoryRoot, "node_modules/.bin/oxlint");
@@ -46,7 +48,9 @@ const diagnostics = (output: string) =>
 
 afterEach(async () => {
   await Promise.all(
-    temporaryFiles.splice(0).map((path) => rm(path, { force: true }))
+    EffectArray.map(temporaryFiles.splice(0), (path) =>
+      rm(path, { force: true })
+    )
   );
 });
 

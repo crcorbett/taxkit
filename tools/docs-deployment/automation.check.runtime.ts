@@ -1,6 +1,6 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Console, Effect, Match, Schema } from "effect";
+import { Array as EffectArray, Console, Effect, Match, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
@@ -174,7 +174,8 @@ export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
     return {
       automationCount: automations.length,
       controlCount: controls.length,
-      externalStateEstablished: automations.filter(
+      externalStateEstablished: EffectArray.filter(
+        automations,
         (entry) => entry.externalState.status === "established"
       ).length,
     };
@@ -195,12 +196,11 @@ const program = Effect.gen(function* main() {
   ),
   Effect.tapErrorTag("DeploymentAutomationPolicyError", (error) =>
     Console.error(
-      error.findings
-        .map(
-          (item) =>
-            `FAIL [${item.invariant}] target=${item.target}; recovery=${item.recovery}`
-        )
-        .join("\n")
+      EffectArray.map(
+        error.findings,
+        (item) =>
+          `FAIL [${item.invariant}] target=${item.target}; recovery=${item.recovery}`
+      ).join("\n")
     )
   ),
   Effect.provide(BunServices.layer)

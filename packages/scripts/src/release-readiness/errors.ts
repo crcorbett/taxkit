@@ -1,4 +1,4 @@
-import { Data, Match } from "effect";
+import { Array as EffectArray, Data, Match } from "effect";
 
 import type {
   ReleaseAttemptReceipt,
@@ -100,7 +100,8 @@ export const formatReleaseReadinessError = Match.typeTags<
       `target: ${attempt.target}`,
       `exitCode: ${attempt.observedExitCode ?? "unavailable"}`,
       `last successful check: ${attempt.lastSuccessfulCheck ?? "none"}`,
-      ...attempt.detailArtifacts.map(
+      ...EffectArray.map(
+        attempt.detailArtifacts,
         (artifact) => `detail: ${artifact.path} (${artifact.sha256})`
       ),
       `provenance: ${attempt.provenance}`,

@@ -2,7 +2,14 @@ import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import { docsCloudflareStackName } from "@taxkit/infrastructure/website";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { State } from "alchemy/State";
-import { Context, Effect, HashSet, Layer, Schema } from "effect";
+import {
+  Array as EffectArray,
+  Context,
+  Effect,
+  HashSet,
+  Layer,
+  Schema,
+} from "effect";
 
 import type { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 import {
@@ -47,12 +54,14 @@ export const requireDocsDeploymentInventoryAgreement = (
     )
   );
   const stateIdentities = HashSet.fromIterable(
-    stateWorkers.map(
+    EffectArray.map(
+      stateWorkers,
       (worker) => `${worker.stage}:${worker.logicalId}:${worker.workerName}`
     )
   );
   const providerIdentities = HashSet.fromIterable(
-    taxkitProviderWorkers.map(
+    EffectArray.map(
+      taxkitProviderWorkers,
       (worker) => `${worker.stage}:${worker.logicalId}:${worker.workerName}`
     )
   );
@@ -123,7 +132,10 @@ const readInventory = Effect.fn("DocsDeploymentInventory.read")(function* () {
     "cloudflare-worker-list"
   );
   const taxkitProviderWorkers = yield* Effect.forEach(
-    providerWorkers.filter((worker) => worker.tags?.includes(stackTag)),
+    EffectArray.filter(
+      providerWorkers,
+      (worker) => worker.tags?.includes(stackTag) === true
+    ),
     (worker) =>
       Effect.gen(function* () {
         const stageTag = worker.tags?.find((tag) =>

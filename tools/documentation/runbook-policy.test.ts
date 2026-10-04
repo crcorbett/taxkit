@@ -5,7 +5,12 @@ import {
   ReleaseJourneyInventory,
   ReleaseProofPacket,
 } from "@taxkit/scripts/release-readiness";
-import { Effect, Record as EffectRecord, Schema } from "effect";
+import {
+  Array as EffectArray,
+  Effect,
+  Record as EffectRecord,
+  Schema,
+} from "effect";
 
 import hgi203ValidationJson from "../../docs/documentation-audit/HGI-203-validation.json";
 import acceptedSummaryJson from "../../docs/evidence/releases/HGI-203-accepted-attempt.json";
@@ -49,17 +54,20 @@ const runbookMarkdown = (
   const sections = sectionNames.flatMap((section) => {
     let body = `${section} has an explicit contract.`;
     if (section === "Preconditions") {
-      body = runbook.evidencePaths
-        .map((path) => `Required evidence: \`${path}\`.`)
-        .join("\n");
+      body = EffectArray.map(
+        runbook.evidencePaths,
+        (path) => `Required evidence: \`${path}\`.`
+      ).join("\n");
     } else if (section === "Procedure") {
-      body = runbook.commands
-        .map((command) => `Run \`${command.invocation}\`.`)
-        .join("\n");
+      body = EffectArray.map(
+        runbook.commands,
+        (command) => `Run \`${command.invocation}\`.`
+      ).join("\n");
     } else if (section === "Stop conditions") {
-      body = runbook.stopOperations
-        .map((operation) => `Stop \`${operation}\`.`)
-        .join("\n");
+      body = EffectArray.map(
+        runbook.stopOperations,
+        (operation) => `Stop \`${operation}\`.`
+      ).join("\n");
     }
     return [`## ${section}`, section === emptySection ? "" : body];
   });
@@ -99,21 +107,19 @@ const validInspection = async (): Promise<RunbookInspection> => {
   }
   files.set(
     "docs/runbooks/README.md",
-    contract.runbooks
-      .map(
-        (runbook) =>
-          `| \`${runbook.id}\` | \`${runbook.path}\` | \`${runbook.owner}\` |`
-      )
-      .join("\n")
+    EffectArray.map(
+      contract.runbooks,
+      (runbook) =>
+        `| \`${runbook.id}\` | \`${runbook.path}\` | \`${runbook.owner}\` |`
+    ).join("\n")
   );
   files.set(
     "docs/operations/authority-model.md",
-    contract.authorityStops
-      .map(
-        (entry) =>
-          `| \`${entry.operation}\` | \`${entry.principal}\` | \`${entry.status}\` | receipt |`
-      )
-      .join("\n")
+    EffectArray.map(
+      contract.authorityStops,
+      (entry) =>
+        `| \`${entry.operation}\` | \`${entry.principal}\` | \`${entry.status}\` | receipt |`
+    ).join("\n")
   );
   for (const handoffPath of EffectRecord.values(contract.acceptedHandoff)) {
     files.set(handoffPath, "retained evidence");
@@ -140,7 +146,7 @@ const validInspection = async (): Promise<RunbookInspection> => {
     ]),
     runbookPaths: [
       "docs/runbooks/README.md",
-      ...contract.runbooks.map((runbook) => runbook.path),
+      ...EffectArray.map(contract.runbooks, (runbook) => runbook.path),
     ],
     workspaceScripts: new Map([
       [
@@ -164,10 +170,12 @@ describe("runbook policy", () => {
     const inspection = await validInspection();
     const contract = await decodeContract({
       ...contractJson,
-      authorityStops: contractJson.authorityStops.map((entry, index) =>
-        index === 0
-          ? { ...entry, principal: "unrecorded-person", status: "approved" }
-          : entry
+      authorityStops: EffectArray.map(
+        contractJson.authorityStops,
+        (entry, index) =>
+          index === 0
+            ? { ...entry, principal: "unrecorded-person", status: "approved" }
+            : entry
       ),
     });
     const findings = inspectRunbookContract({ ...inspection, contract });
@@ -180,19 +188,21 @@ describe("runbook policy", () => {
     const inspection = await validInspection();
     const contract = await decodeContract({
       ...contractJson,
-      runbooks: contractJson.runbooks.map((runbook, index) =>
+      runbooks: EffectArray.map(contractJson.runbooks, (runbook, index) =>
         index === 0
           ? {
               ...runbook,
-              commands: runbook.commands.map((command, commandIndex) =>
-                commandIndex === 0
-                  ? {
-                      ...command,
-                      argv: ["bun", "run", "not-a-script"],
-                      invocation: "bun run not-a-script",
-                      script: "not-a-script",
-                    }
-                  : command
+              commands: EffectArray.map(
+                runbook.commands,
+                (command, commandIndex) =>
+                  commandIndex === 0
+                    ? {
+                        ...command,
+                        argv: ["bun", "run", "not-a-script"],
+                        invocation: "bun run not-a-script",
+                        script: "not-a-script",
+                      }
+                    : command
               ),
             }
           : runbook
@@ -220,9 +230,9 @@ describe("runbook policy", () => {
       const inspection = await validInspection();
       const contract = await decodeContract({
         ...contractJson,
-        runbooks: contractJson.runbooks.map((runbook) => ({
+        runbooks: EffectArray.map(contractJson.runbooks, (runbook) => ({
           ...runbook,
-          commands: runbook.commands.map((command) =>
+          commands: EffectArray.map(runbook.commands, (command) =>
             command.script === "changeset" ? { ...command, argv } : command
           ),
         })),
@@ -240,7 +250,7 @@ describe("runbook policy", () => {
     const duplicateOwner = contractJson.runbooks[0]?.owner ?? "missing";
     const contract = await decodeContract({
       ...contractJson,
-      runbooks: contractJson.runbooks.map((runbook, index) =>
+      runbooks: EffectArray.map(contractJson.runbooks, (runbook, index) =>
         index === 1 ? { ...runbook, owner: duplicateOwner } : runbook
       ),
     });
@@ -350,8 +360,10 @@ describe("runbook policy", () => {
       runbookPaths: [...inspection.runbookPaths, "docs/runbooks/extra.md"],
     });
     expect(
-      findings.filter((finding) => finding.invariant === "exact-inventory")
-        .length
+      EffectArray.filter(
+        findings,
+        (finding) => finding.invariant === "exact-inventory"
+      ).length
     ).toBeGreaterThanOrEqual(2);
   });
 
@@ -381,9 +393,9 @@ describe("runbook policy", () => {
     const inspection = await validInspection();
     const contract = await decodeContract({
       ...contractJson,
-      runbooks: contractJson.runbooks.map((runbook) => ({
+      runbooks: EffectArray.map(contractJson.runbooks, (runbook) => ({
         ...runbook,
-        commands: runbook.commands.map((command) =>
+        commands: EffectArray.map(runbook.commands, (command) =>
           command.script === "version-repo"
             ? { ...command, requiredAuthority: "local-proof" }
             : command
@@ -399,7 +411,7 @@ describe("runbook policy", () => {
     const inspection = await validInspection();
     const contract = await decodeContract({
       ...contractJson,
-      runbooks: contractJson.runbooks.map((runbook) =>
+      runbooks: EffectArray.map(contractJson.runbooks, (runbook) =>
         runbook.id === "release-readiness"
           ? { ...runbook, acceptedEvidenceRequired: false }
           : runbook

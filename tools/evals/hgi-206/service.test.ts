@@ -1,5 +1,7 @@
 import { expect, test } from "bun:test";
 
+import { Array as EffectArray } from "effect";
+
 import {
   expectedEpochSkills,
   forbiddenClaims,
@@ -12,7 +14,7 @@ import {
 
 test("HGI-206 exposes fifteen typed forbidden claims", () => {
   expect(forbiddenClaims).toHaveLength(15);
-  expect(forbiddenClaims.every(isTypedForbiddenClaim)).toBe(true);
+  expect(EffectArray.every(forbiddenClaims, isTypedForbiddenClaim)).toBe(true);
 });
 
 test("HGI-206 source aggregate sorts by ASCII path before rendering hashes", () => {
@@ -34,7 +36,7 @@ test("HGI-206 source aggregate sorts by ASCII path before rendering hashes", () 
 
 test("HGI-206 epoch skill identities are portable logical IDs", () => {
   expect(
-    expectedEpochSkills.every((skill) =>
+    EffectArray.every(expectedEpochSkills, (skill) =>
       isPortableSkillSourceId(skill.sourceId)
     )
   ).toBe(true);

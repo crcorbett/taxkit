@@ -1,6 +1,13 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Array, Console, Effect, Match, Stream } from "effect";
+import {
+  Array as EffectArray,
+  Array,
+  Console,
+  Effect,
+  Match,
+  Stream,
+} from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
@@ -167,13 +174,13 @@ export const checkHgi206 = (repositoryRoot: string) =>
     );
     const hashPaths = [
       ...new Set([
-        ...manifest.files.map((member) => member.path),
+        ...EffectArray.map(manifest.files, (member) => member.path),
         hgi206Paths.failed,
         hgi206Paths.fixtures,
         hgi206Paths.observations,
         hgi206Paths.results,
         ...receiptPaths,
-        ...receipts.map(([, receipt]) => receipt.detailPath),
+        ...EffectArray.map(receipts, ([, receipt]) => receipt.detailPath),
       ]),
     ].toSorted();
     const hashes = yield* Effect.forEach(
@@ -190,10 +197,7 @@ export const checkHgi206 = (repositoryRoot: string) =>
       renderManifestAggregateSource(manifest.files, hashMap)
     );
     const changedPathDigest = yield* sha256(
-      changedPaths
-        .toSorted()
-        .map((path) => `${path}\n`)
-        .join("")
+      EffectArray.map(changedPaths.toSorted(), (path) => `${path}\n`).join("")
     );
 
     return yield* validateHgi206Evidence({
