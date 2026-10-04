@@ -260,6 +260,8 @@ describe("HGI-205 isolated release-boundary mutations", () => {
     "required-rule-disabled",
     "assignment-admission-broadened",
     "method-admission-broadened",
+    "source-coverage-removed",
+    "fixture-exclusion-broadened",
   ] as const)(
     "rejects %s with the real verifier",
     (fixtureId) =>
@@ -287,6 +289,8 @@ describe("HGI-205 isolated release-boundary mutations", () => {
           "required-rule-disabled",
           "assignment-admission-broadened",
           "method-admission-broadened",
+          "source-coverage-removed",
+          "fixture-exclusion-broadened",
         ]);
         const workspace = yield* prepareWorkspace(repositoryRoot);
         const selected = EffectArray.filter(

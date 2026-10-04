@@ -1688,3 +1688,43 @@ public content, dependency selections, canonical skills/digests, provider state
 and tax results. **N/A** Changeset (private unversioned app), generated/public
 content, new provider operation and release contract. No merge, deployment,
 publication, provider apply or version application.
+
+
+### Whole-source strict coverage — locally qualified, 2026-10-05
+
+This slice follows draft #125 revision
+`cd5b2a8dec1fdd53375486852485a898215d9ede`. Its hosted Quality run
+`37212184618` passed at that exact revision; it qualifies the parent draft only.
+Local qualification of this later source-coverage work is separate. The canonical override covers all six owned source
+extensions, including future root/app/config/tool files. Exactly five named,
+unexecuted lint inputs retain their isolated rule contexts; directories and
+neighbours remain strict, and other rules still inspect those inputs. Existing
+runtime/codec/assignment/method admissions and generated/vendor exclusions are
+unchanged. These inputs sit outside the policy compiler's ./*.ts ownership and
+are read as source bytes, never executed as app/tool workflows.
+
+Actual CLI checks cover all six extensions and five fixture neighbours, with
+one-file admission, nonzero exit and named rules. The first CommonJS input used
+ES-module syntax and failed before the intended rules; valid CommonJS positive/
+negative inputs correct that oracle. All 401 lint cases pass after correction.
+Two new independent repository-copy checks remove whole-source coverage or
+broaden fixture exclusions and must fail the complete real verifier. The six
+strict and six retained release-boundary mutations keep their five-minute
+limits. All 24 package tests pass (23 matching caches), with 401 real CLI cases and
+53/19 docs script/server cases. All 15 builds replay matching caches. Root lint
+and an explicit canonical inventory admit all 397 owned source paths with zero
+findings. Complete verification passes 32 Quality cases, including 13 isolated
+checks in 360.78 seconds; removing coverage and broadening the fixture exclusion
+fail the real verifier at their expected messages. Both unused-code profiles,
+all 24 compiler tasks, 206 deployment-tool cases and matching SDK/web browser
+checks pass. Frozen install retains 792 installs/1020 packages. Final T002
+semantic/acceptance review remains pending before the task closes.
+
+Documentation impact: **Change required** for lint/test/Quality owners, testing
+architecture, controls standard, this plan/T002 and the
+[receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-owned-source-coverage.json).
+**Preserve** canonical rules/skills/digests, exact host admissions, dependencies,
+public/generated content, prior evidence, provider state and tax results.
+**N/A** Changeset (repository tooling only), new runbook/provider operation and
+public contract. No merge/deployment/publication/provider apply/version
+application. DEV-73 remains in progress; Medicare separate.

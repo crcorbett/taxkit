@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -34,12 +34,15 @@ uses immutable traversal and checked record/array access. The root verification
 also runs `bun run check:quality-workflow:types`, covering the policy and tests.
 This changes local checking, not CI permissions or provider authority.
 
-The same scoped runner also executes four clean-slate enforcement mutations
+The same scoped runner also executes six clean-slate enforcement mutations
 from `fixtures/strict-enforcement-defects.json`. Each changes only the copied
 lint configuration and runs the real `test:oxlint:task` verifier. Removed/disabled
-required rules and broadened synthetic assignment/method admissions must fail.
-The fixture Schema admits exactly the four named modes; each named test asserts
-the complete ordered corpus and selects exactly one fixture. All ten deliberate
+required rules, broadened synthetic assignment/method admissions, a removed
+whole-source selector and a wildcard fixture exclusion must fail. The latter
+two changes run the same real verifier and retain their exact scope/exclusion
+failure messages.
+The fixture Schema admits exactly the six named modes; each named test asserts
+the complete ordered corpus and selects exactly one fixture. All twelve deliberate
 faults have independent scoped repository copies, results and finite five-minute
 test deadlines. The source-only documentation check is a separate named test,
 with a temporary Git index and no package build before or after its command.

@@ -32,6 +32,51 @@ const antiSlopRules = [
 
 const fixtureCases = [
   {
+    accepted: ["tools/oxlint/fixtures/strict-commonjs-accepted.cjs"],
+    generated: ".generated-owned-source-rejected.cjs",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-commonjs-rejected.cjs.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "error-constructor-new",
+    ],
+  },
+  ...Array.map(
+    [
+      "bun-accepted",
+      "bun-global-non-host-accepted",
+      "bun-unrelated-accepted",
+      "effect-accepted",
+      "effect-unrelated-accepted",
+    ] as const,
+    (name) => ({
+      accepted: ["tools/oxlint/fixtures/strict-global-accepted.js"],
+      generated: `tools/oxlint/fixtures/.generated-${name}-neighbour.ts`,
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-global-rejected.js.txt",
+      rules: [
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-unsafe-option-unwrap",
+      ],
+    })
+  ),
+  ...Array.map(["ts", "tsx", "js", "jsx", "mjs"] as const, (extension) => ({
+    accepted: ["tools/oxlint/fixtures/strict-global-accepted.js"],
+    generated: `.generated-owned-source-rejected.${extension}`,
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-global-rejected.js.txt",
+    rules: [
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-unsafe-option-unwrap",
+    ],
+  })),
+  {
     accepted: [
       "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
       "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
@@ -941,6 +986,26 @@ const runOxlint = (path: string) =>
       files: report.number_of_files,
     };
   });
+
+test("keeps full source coverage and its five unexecuted fixture exclusions exact", () => {
+  const strict = Array.filter(oxlintConfig.overrides ?? [], (entry) =>
+    Array.contains(entry.files ?? [], "packages/core/**")
+  );
+  expect(strict).toHaveLength(1);
+  const scope = Array.head(strict).pipe(
+    Option.getOrElse(() => ({ excludeFiles: [], files: [] }))
+  );
+  expect(scope.files, "Owned source extension coverage").toContain(
+    "**/*.{ts,tsx,js,jsx,mjs,cjs}"
+  );
+  expect(scope.excludeFiles, "Owned-source fixture exclusions").toEqual([
+    "tools/oxlint/fixtures/bun-accepted.ts",
+    "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
+    "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
+    "tools/oxlint/fixtures/effect-accepted.ts",
+    "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
+  ]);
+});
 
 describe("portable Oxlint plugins", () => {
   test.effect.each([

@@ -727,7 +727,7 @@ verification. A readLink assertion proves the actual canonical symlink target.
 
 The Quality-workflow test owner uses Bun-hosted Effect Vitest, Effect FileSystem,
 and scoped platform child processes. Its isolated release-boundary suite runs
-all six retained owning commands and four strict-enforcement mutations as
+all six retained owning commands and six strict-enforcement mutations as
 independent named tests with their existing five-minute deadlines and scoped
 temporary repository copies. A separate test proves documentation tools work
 before any package build in a fresh source-only copy. The suite preserves
@@ -924,3 +924,19 @@ workerd command supplies separate Worker/assets/concurrent-request evidence.
 Actual strict CLI checks cover every adopted source/test/command and a rejected
 neighbour; source counterexamples guard bounds, digests, cleanup, encoding and
 readback. A draft PR and local proof do not finish DEV-73.
+
+
+Canonical strict coverage includes every owned `.ts`, `.tsx`, `.js`, `.jsx`,
+`.mjs` and `.cjs` path, including newly added root/config/app/tool files. The
+existing explicit generated/vendor exclusions remain. Exactly five unexecuted
+inputs under `tools/oxlint/fixtures/` retain their intentionally isolated Effect
+and Bun rule contexts. Other rules still inspect them; they are read as lint
+input bytes, outside the owning TypeScript project and application execution.
+Their purpose ends when those focused binding/host-rule cases are retired.
+Actual CLI neighbours reject each exclusion spreading to a directory wildcard.
+Native checks also assert the exact exclusion list and whole-source selector.
+Valid CommonJS has its own positive and negative input; ES-module syntax cannot
+stand in for a CommonJS policy test. All six extensions must admit one file and
+reject the named bad constructs through the actual lint binary. Fresh isolated
+copies prove removing that selector or broadening the fixture exclusion fails
+the complete verifier. No host runtime or mutable-operation admission expands.

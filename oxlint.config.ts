@@ -470,9 +470,18 @@ export default defineConfig({
       rules: { "unicorn/throw-new-error": "off" },
     },
     {
-      // DEV-73 incremental adoption: canonical rules for domain and migrated lint tests.
-      // Remaining owned app/tool/config paths stay explicitly pending in T002.
+      // All owned source extensions are strict, including future app/tool/config paths.
+      // Five unexecuted inputs intentionally exercise other rules in isolation.
+      // Their neighbours remain strict; these are fixture inputs, never workflow hosts.
+      excludeFiles: [
+        "tools/oxlint/fixtures/bun-accepted.ts",
+        "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
+        "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
+        "tools/oxlint/fixtures/effect-accepted.ts",
+        "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
+      ],
       files: [
+        "**/*.{ts,tsx,js,jsx,mjs,cjs}",
         "packages/core/**",
         "packages/rules/**",
         "packages/calculators/**",

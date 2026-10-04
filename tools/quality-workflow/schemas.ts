@@ -97,6 +97,8 @@ export const StrictEnforcementFixtureCorpus = Schema.NonEmptyArray(
       "required-rule-disabled",
       "assignment-admission-broadened",
       "method-admission-broadened",
+      "source-coverage-removed",
+      "fixture-exclusion-broadened",
     ]),
     mutation: Schema.Struct({
       replacement: Schema.String,

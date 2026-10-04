@@ -1,0 +1,8 @@
+const values = [1];
+Error("bad");
+values.at(-1);
+for (const value of values) {
+  values.push(value);
+}
+const lookedUp = values[0];
+Number.isFinite(lookedUp);
