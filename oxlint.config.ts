@@ -184,12 +184,16 @@ const portableEffectSourceFiles = [
   "tools/docs-deployment/workflow-plan-check*.ts",
   "tools/docs-deployment/workflow-evidence*.ts",
   "tools/docs-deployment/automation*.ts",
+  "tools/docs-deployment/{policy*,check.runtime*,schemas,retained-record*}.ts",
+  "tools/docs-deployment/.generated-retained-proof-strict-rejected.ts",
   "tools/docs-deployment/workflow-receipts.schemas.ts",
   "tools/docs-deployment/.generated-automation-strict-rejected.ts",
   "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
 ];
 
 const schemaEncoderEgressFiles = [
+  // Canonical JSON bytes used only to bind immutable saved-record fingerprints.
+  "tools/docs-deployment/retained-record.egress.ts",
   "tools/docs-deployment/automation.check.runtime.test.ts",
   // Exact saved-plan JSON and synthetic provider fixture representations.
   "tools/docs-deployment/workflow-plan-projection.ts",
@@ -282,7 +286,6 @@ const runtimeBoundaryFiles = [
   "tools/docs-deployment/doppler-custody.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/inventory.service.test.ts",
-  "tools/docs-deployment/policy.test.ts",
   "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/workflow-artifact.runtime.ts",
   "tools/docs-deployment/workflow-evidence.runtime.ts",
@@ -309,7 +312,6 @@ const processBoundaryFiles = [
   "tools/evals/hgi-206/check.runtime.ts",
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
-  "tools/docs-deployment/check.runtime.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/local-doppler.runtime.ts",
@@ -361,7 +363,6 @@ const bunAdapterFiles = [
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/governance/check.runtime.ts",
-  "tools/docs-deployment/check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
   "tools/docs-deployment/workflow-run-check.runtime.ts",
@@ -469,6 +470,8 @@ export default defineConfig({
         "tools/docs-deployment/workflow-plan-check*.ts",
         "tools/docs-deployment/workflow-evidence*.ts",
         "tools/docs-deployment/automation*.ts",
+        "tools/docs-deployment/{policy*,check.runtime*,schemas,retained-record*}.ts",
+        "tools/docs-deployment/.generated-retained-proof-strict-rejected.ts",
         "tools/docs-deployment/workflow-receipts.schemas.ts",
         "tools/docs-deployment/.generated-automation-strict-rejected.ts",
         "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
@@ -614,6 +617,15 @@ export default defineConfig({
               "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
             ],
           },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/docs-deployment/check.runtime.ts"] },
         ],
       },
     },

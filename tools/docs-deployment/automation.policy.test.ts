@@ -1,3 +1,4 @@
+import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it as test } from "@effect/vitest";
 import { Array as EffectArray, Effect, HashMap, Option, Schema } from "effect";
 
@@ -37,7 +38,7 @@ describe("docs deployment automation admission", () => {
       Effect.gen(function* () {
         const [automations, controls] = yield* decodeRegisters();
         expect(
-          inspectDeploymentAutomationRegisters(automations, controls)
+          yield* inspectDeploymentAutomationRegisters(automations, controls)
         ).toEqual([]);
         expect(
           EffectArray.every(
@@ -45,7 +46,7 @@ describe("docs deployment automation admission", () => {
             (entry) => entry.externalState.status === "not-established"
           )
         ).toBe(true);
-      })
+      }).pipe(Effect.provide(BunServices.layer))
   );
 
   test.effect("rejects a cancellable or weakly bound mutation", () =>
@@ -71,11 +72,11 @@ describe("docs deployment automation admission", () => {
       );
       expect(
         EffectArray.map(
-          inspectDeploymentAutomationRegisters(contaminated, controls),
+          yield* inspectDeploymentAutomationRegisters(contaminated, controls),
           (item) => item.invariant
         )
       ).toEqual(["mutation-lock", "plan-equality"]);
-    })
+    }).pipe(Effect.provide(BunServices.layer))
   );
 
   test.effect(
@@ -118,11 +119,11 @@ describe("docs deployment automation admission", () => {
         );
         expect(
           EffectArray.map(
-            inspectDeploymentAutomationRegisters(contaminated, controls),
+            yield* inspectDeploymentAutomationRegisters(contaminated, controls),
             (item) => item.invariant
           )
         ).toEqual(["candidate-trust"]);
-      })
+      }).pipe(Effect.provide(BunServices.layer))
   );
 
   test.effect(
@@ -145,11 +146,11 @@ describe("docs deployment automation admission", () => {
         );
         expect(
           EffectArray.map(
-            inspectDeploymentAutomationRegisters(contaminated, controls),
+            yield* inspectDeploymentAutomationRegisters(contaminated, controls),
             (item) => item.invariant
           )
         ).toContain("mutation-lock");
-      })
+      }).pipe(Effect.provide(BunServices.layer))
   );
 
   test.effect("rejects pull-request-head teardown code", () =>
@@ -170,11 +171,11 @@ describe("docs deployment automation admission", () => {
       );
       expect(
         EffectArray.map(
-          inspectDeploymentAutomationRegisters(contaminated, controls),
+          yield* inspectDeploymentAutomationRegisters(contaminated, controls),
           (item) => item.invariant
         )
       ).toContain("teardown-safety");
-    })
+    }).pipe(Effect.provide(BunServices.layer))
   );
 
   test.effect(
@@ -199,14 +200,14 @@ describe("docs deployment automation admission", () => {
         expect(Option.isSome(firstControlOption)).toBe(true);
         const firstControl = yield* Effect.fromOption(firstControlOption);
         const findings = EffectArray.map(
-          inspectDeploymentAutomationRegisters(contaminated, [
+          yield* inspectDeploymentAutomationRegisters(contaminated, [
             ...controls,
             firstControl,
           ]),
           (item) => item.invariant
         );
         expect(findings).toEqual(["control-register", "external-proof"]);
-      })
+      }).pipe(Effect.provide(BunServices.layer))
   );
 
   test.effect(
@@ -229,11 +230,11 @@ describe("docs deployment automation admission", () => {
         );
         expect(
           EffectArray.map(
-            inspectDeploymentAutomationRegisters(contaminated, controls),
+            yield* inspectDeploymentAutomationRegisters(contaminated, controls),
             (item) => item.invariant
           )
         ).toContain("external-proof");
-      })
+      }).pipe(Effect.provide(BunServices.layer))
   );
 
   test.effect(
@@ -277,7 +278,7 @@ describe("docs deployment automation admission", () => {
           stack: "TaxKitDocsCloudflare" as const,
           stage,
         };
-        const acceptedPlanSha256 = deploymentRecordDigest(projection);
+        const acceptedPlanSha256 = yield* deploymentRecordDigest(projection);
         const receipt = yield* Schema.decodeUnknownEffect(
           DeploymentWorkflowExternalReceipt
         )({
@@ -421,7 +422,7 @@ describe("docs deployment automation admission", () => {
             : entry
         );
         expect(
-          inspectDeploymentAutomationRegisters(
+          yield* inspectDeploymentAutomationRegisters(
             established,
             controls,
             HashMap.fromIterable([[preview.id, receipt]]),
@@ -443,7 +444,7 @@ describe("docs deployment automation admission", () => {
 
         expect(
           EffectArray.map(
-            inspectDeploymentAutomationRegisters(
+            yield* inspectDeploymentAutomationRegisters(
               established,
               controls,
               HashMap.fromIterable([[preview.id, receipt]]),
@@ -467,7 +468,7 @@ describe("docs deployment automation admission", () => {
 
         expect(
           EffectArray.map(
-            inspectDeploymentAutomationRegisters(
+            yield* inspectDeploymentAutomationRegisters(
               established,
               controls,
               HashMap.fromIterable([[preview.id, receipt]]),
@@ -494,7 +495,7 @@ describe("docs deployment automation admission", () => {
 
         expect(
           EffectArray.map(
-            inspectDeploymentAutomationRegisters(
+            yield* inspectDeploymentAutomationRegisters(
               established,
               controls,
               HashMap.fromIterable([[preview.id, receipt]]),
@@ -529,7 +530,7 @@ describe("docs deployment automation admission", () => {
 
         expect(
           EffectArray.map(
-            inspectDeploymentAutomationRegisters(
+            yield* inspectDeploymentAutomationRegisters(
               established,
               controls,
               HashMap.fromIterable([[preview.id, receipt]]),
@@ -553,7 +554,7 @@ describe("docs deployment automation admission", () => {
 
         expect(
           EffectArray.map(
-            inspectDeploymentAutomationRegisters(
+            yield* inspectDeploymentAutomationRegisters(
               established,
               controls,
               HashMap.fromIterable([[preview.id, receipt]]),
@@ -580,7 +581,7 @@ describe("docs deployment automation admission", () => {
 
         expect(
           EffectArray.map(
-            inspectDeploymentAutomationRegisters(
+            yield* inspectDeploymentAutomationRegisters(
               established,
               controls,
               HashMap.fromIterable([[preview.id, receipt]]),
@@ -605,6 +606,6 @@ describe("docs deployment automation admission", () => {
             (item) => item.invariant
           )
         ).toContain("external-proof");
-      })
+      }).pipe(Effect.provide(BunServices.layer))
   );
 });

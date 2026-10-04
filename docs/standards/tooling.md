@@ -497,3 +497,12 @@ deadline. A growing group of files must not share a five-second deadline across
 multiple real command processes. Each test still requires exactly one admitted
 file, exit code zero and no finding from its required rule namespace. Rejected
 fixtures and disabled-rule/broadened-permission checks retain their assertions.
+
+
+Retained deployment policy, Schema, command and canonical record-egress files
+receive all eleven strict rules, with actual accepted/rejected lint fixtures.
+The command alone has an exact runtime admission; its old raw Bun permission
+and the historical test's execution permission are removed. Canonical saved
+record JSON encoding is admitted only in `retained-record.egress.ts`. It retains
+the original key ordering for stored SHA-256 proof. Internal provider equality
+uses the owning Schema's field comparison; it does not serialise records.

@@ -1258,3 +1258,8 @@ export class DocsDeploymentPolicyError extends Schema.TaggedError<DocsDeployment
   "DocsDeploymentPolicyError",
   { findings: Schema.NonEmptyArray(Schema.NonEmptyString) }
 ) {}
+
+export class DocsDeploymentRecordDigestError extends Schema.TaggedError<DocsDeploymentRecordDigestError>()(
+  "DocsDeploymentRecordDigestError",
+  { reason: Schema.Literals(["encode", "digest"]) }
+) {}

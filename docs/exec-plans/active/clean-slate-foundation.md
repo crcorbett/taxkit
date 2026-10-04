@@ -940,3 +940,43 @@ this plan/task ledger and the
 package exports, lock, historical receipts and tax results. **N/A** Changesets,
 public content and runbook/provider procedures: root test scheduling only.
 Recover by reverting this slice. DEV-73 and DEV-74–81 remain unfinished.
+
+
+## Local T002 retained deployment record proof
+
+Continue from the corrected #110 at
+`a82922496d94a24670d08faa02f6a1584a143406`.
+The broader receipt policy now uses persistent collections, checked selections
+and ordered pure findings. All original authority, candidate, plan, provider,
+hosted, screenshot, teardown and rollback guards remain. Expected path types
+come from the owning rollback receipt representation. Internal provider equality
+uses the owning Schema rather than temporary serialised fingerprints. Actual
+saved-record proof uses one exact JSON egress and controlled Crypto, preserving
+the original locale key order, numeric keys and JSON primitive/array bytes.
+Encoding/digest failures carry safe closed reasons. Callers sequence those
+Effects, retaining receipt and finding order; the command reports bounded errors.
+
+Historical policy tests use Effect Vitest. The existing 142 tool cases
+remain; thirteen added cases check fixed fingerprints, object/array order,
+non-finite input, safe Crypto failure and provider mismatches that outer fields
+alone would miss. Six adopted files and a rejected neighbour receive all eleven
+strict rules; the command has its sole exact runtime admission. Its obsolete raw
+Bun permission and the policy test's execution permission are removed.
+The first local qualification passed with 155 tool cases, 154 grouped lint cases
+and full verification. After restoring this work onto the corrected parent,
+qualification passed with 155 tool cases, 225 per-file lint cases, frozen install
+(790 installs/1020 packages, unchanged lock), complete tests, the 15-task build
+and full verification. All 21 Quality cases/ten deliberate faults, fresh
+source-only documentation, 21 skill cases, 16 evaluation cases and both local
+Chromium suites passed. Matching package/build/browser caches were reused.
+Final docs/runbook/format/diff checks precede commit; hosted proof is separate.
+
+Documentation impact: **Change required** for policy/Schema/runtime/test/egress,
+lint config/fixtures, README, tooling/testing, this plan/task ledger and the
+[dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-retained-deployment-proof.json).
+**Preserve** historical receipt/capture bytes and original guard/finding order,
+workflow/register/runbook authority, package exports, lock, canonical assets
+and retained tax results. **N/A** Changesets, public content and operations:
+root local checks only. Recover by reverting the complete slice; provider and
+registry state are unchanged. Full qualification and hosted proof are separate.
+Provider inventory and other T002 owners, then DEV-74–81, remain unfinished.

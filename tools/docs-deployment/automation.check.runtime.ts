@@ -167,7 +167,7 @@ export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
         })
       )
     );
-    const findings = inspectDeploymentAutomationRegisters(
+    const findings = yield* inspectDeploymentAutomationRegisters(
       automations,
       controls,
       externalReceipts,

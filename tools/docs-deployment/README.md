@@ -124,7 +124,7 @@ operational authority.
 
 `test:docs-deployment` uses Bun-hosted Vitest with the shared source resolver.
 The upload-file, retained-input, source-contract, credential, workflow-input,
-workflow-source, plan-projection, saved-evidence, automation receipt and native memo tests use
+workflow-source, plan-projection, saved-evidence, automation receipt, retained-record policy and native memo tests use
 `@effect/vitest`, scoped FileSystem fixtures and ordered Effect work. The
 remaining suites preserve their existing assertions under Vitest; their full
 strict migration is pending in DEV-73. Local command checks read retained
@@ -171,5 +171,16 @@ no execution permission to tests or policy files; old raw Bun/decode/test
 permissions are removed. Scoped command fixtures cannot establish external
 state and reject malformed or incomplete registers. The original eight policy
 cases retain their assertions. Saved establishment counts do not prove current
-provider state. Broader retained plan/digest and provider inventory migration
-remain pending in DEV-73.
+provider state. Provider inventory migration remains pending in DEV-73.
+
+
+Retained-record policies use persistent collections, checked selections and
+ordered pure findings. Saved-plan and receipt fingerprints are computed through
+the controlled Crypto service. The exact JSON egress keeps the original locale
+key order, numeric-key handling and primitive/array representation, so historical
+fingerprints remain valid. Ordinary provider comparisons use the provider
+Schema's field equality rules rather than making temporary JSON fingerprints.
+The historical tests use Effect Vitest; fixed fingerprints and failure examples
+check numeric/nested keys, insertion/array order, non-finite values and safe
+service errors. The command alone has an exact execution admission and reports
+bounded failures. Its operation counts describe retained records only.

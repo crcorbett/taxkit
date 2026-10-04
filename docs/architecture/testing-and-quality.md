@@ -741,8 +741,8 @@ register. The actual retained-record command still checks screenshot digests
 through the qualified file input boundary. Its reported establishment count
 belongs to saved receipts and is not a current provider readback. Real lint
 fixtures accept six adopted files, reject their neighbour and check the sole
-exact command runtime admission. The broader retained plan/digest policy and
-provider inventory service remain pending strict migration.
+exact command runtime admission. The provider inventory service remains pending
+strict migration.
 
 
 Each accepted lint-fixture file runs as an individual Effect test with the
@@ -750,3 +750,13 @@ ordinary test deadline. This retains the existing exact file-count, exit-code
 and namespace checks while keeping process startup for one file separate from
 the other files. The scoped process owner still interrupts and releases an
 unfinished child; no global deadline or assertion is weakened.
+
+
+Retained deployment-policy tests now use Effect Vitest with controlled Crypto.
+All previous policy assertions and historical receipt fingerprints remain.
+Fixed SHA-256 examples cover primitives, escaped/Unicode text, numeric keys,
+nested objects and array order; failure cases check non-finite input and safe
+Crypto errors. Three changed-provider examples vary deployment ID, version ID
+and state-bundle digest while outer identities still agree, proving that Schema
+field equality protects the complete provider record. Real lint fixtures cover
+six adopted files, their rejected neighbour and the exact command admission.
