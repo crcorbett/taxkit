@@ -94,7 +94,10 @@ const prepareWorkspace = async () => {
     "--frozen-lockfile",
     "--linker=hoisted",
   ]);
-  expect(install.exitCode).toBe(0);
+  expect(
+    install.exitCode,
+    `Offline frozen fixture install failed in ${workspace}:\n${install.stderr}\n${install.stdout}`
+  ).toBe(0);
   const workspacePackages = [
     ["api-http", "packages/api/http"],
     ["calculators", "packages/calculators"],

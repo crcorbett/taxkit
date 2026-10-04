@@ -1,10 +1,10 @@
 {
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/clean-slate-foundation.md",
-  "title": "Clean slate TaxKit foundation — proposed implementation slices",
-  "status": "proposed",
-  "last_reviewed": "2026-10-03",
-  "authority": "Planning only; final shared understanding is required before implementation. External mutation needs the separate concrete authority envelope.",
+  "title": "Clean slate TaxKit foundation \u2014 implementation slices",
+  "status": "in_progress",
+  "last_reviewed": "2026-10-04",
+  "authority": "Cooper explicitly authorised implementation, reviewable commits and draft PRs on 2026-10-04. No merge, deploy or publication; provider-plan approval remains separate.",
   "principles": [
     "Retain tax rules/results and their proof while replacing application foundations.",
     "Use immutable Schema-derived values and declarative, pipe-first Effect workflows across all owned apps/packages/tests/scripts/infrastructure; no local mutation, imperative loops or helper sprawl. Necessary state has a scoped React/Effect owner and pure updates.",
@@ -14,7 +14,7 @@
     "Each task is pending until its actual postconditions and applicable checks pass. Proposed tasks do not authorise cloud changes."
   ],
   "globalVerification": {
-    "commitPolicy": "Commit only coherent passed slices; do not publish, merge, version-release or deploy from this planning authority.",
+    "commitPolicy": "Commit coherent passed slices and prepare draft PRs under the 2026-10-04 implementation request. Do not merge, version-release, publish or deploy.",
     "requiredBeforeFinalPR": [
       "bun run verification",
       "bun run test",
@@ -181,7 +181,7 @@
     {
       "id": "CSF-T001",
       "title": "Record the handover, retained work and baseline",
-      "status": "pending",
+      "status": "completed",
       "type": "foundation",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -227,12 +227,16 @@
         "Other work is integrated or explicitly outside the write scope; cloud ownership is not inferred from local Git.",
         "The previous install failure is diagnosed or remains a named prerequisite; no green closeout claim hides it."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/retention-manifest.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-baseline.json"
+      ]
     },
     {
       "id": "CSF-T002",
       "title": "Qualify current versions, exports and strict enforcement",
-      "status": "pending",
+      "status": "in_progress",
       "type": "foundation",
       "acceptedFindingIds": [],
       "requirementIds": [

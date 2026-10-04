@@ -11,6 +11,9 @@ tombstone: false
 
 # Active exec plans
 
+The [Clean slate foundation](./clean-slate-foundation.md) implements the accepted
+website/API rebuild in dependency order; provider apply remains separately gated.
+
 The completed [Entire session history setup](../completed/entire-session-history.md)
 retains recording, import and hosted publication proof.
 

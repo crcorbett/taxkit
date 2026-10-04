@@ -1,18 +1,21 @@
 ---
 document_type: product-spec
-lifecycle: proposed
+lifecycle: current
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-10-03
+last_reviewed: 2026-10-04
 review_trigger: rebuild scope, interview answer, version selection, or implementation admission
 ---
 
 # Clean slate for the TaxKit website and API
 
-This is the proposed rebuild contract and design interview record. It records
-the requested direction, decisions and ordered acceptance checks. It awaits the
-grilling skill's final shared-understanding confirmation; it is not deployment
-approval. The [sibling tasks](./clean-slate-foundation.tasks.json) remain proposed.
+This is the accepted implementation contract and design interview record.
+Cooper explicitly requested implementation on 4 October 2026, superseding the
+prior whole-design Q14 admission hold. Q1–Q13 remain settled. The
+[sibling tasks](./clean-slate-foundation.tasks.json) and
+[active plan](../exec-plans/active/clean-slate-foundation.md) track actual progress.
+This authority includes reviewable commits and draft PRs, but no merge, deploy,
+publication or provider apply. Final provider-plan approval remains separate.
 
 ## Agreed direction
 
@@ -204,11 +207,10 @@ implementation checks; selecting the design does not prove them.
 Q1–Q13 are settled. The broader analytics request supersedes the earlier
 technical-health-only Q8 recommendation. Existing supported tax years stay
 explicit; unsupported years fail rather than silently falling back to another
-year. Share images describe public pages and never a person's figures. Final
-shared understanding remains the design admission boundary.
+year. Share images describe public pages and never a person's figures. The 4 October implementation request admits the settled design.
 Cooper reopened the interview and has now accepted Q9–Q13. There are no further
-unresolved product branches in this first-release design. Q14 asks for final
-shared understanding of the complete contract before implementation. The
+unresolved product branches in this first-release design. The 4 October implementation request supersedes the former Q14
+whole-design confirmation hold. The
 stronger functional Effect requirement is already explicit user direction,
 not another permission question.
 
@@ -739,7 +741,7 @@ must retain and resolve this failed proof step.
 
 | Surface | Decision | Reason and owner |
 | --- | --- | --- |
-| Proposed intent, tasks, glossary and architectural decisions | Change required | This SPEC/tasks, root CONTEXT.md, ADRs 0001/0002 and the product-spec index record all settled Q1–Q13 answers and the complete 0.6.0 functional baseline. ADR 0001 includes the agreed website RPC choice and trade-off. The glossary has no new domain term to add. Final Q14 shared understanding remains pending. |
+| Proposed intent, tasks, glossary and architectural decisions | Change required | This SPEC/tasks, root CONTEXT.md, ADRs 0001/0002 and the product-spec index record all settled Q1–Q13 answers and the complete 0.6.0 functional baseline. ADR 0001 includes the agreed website RPC choice and trade-off. The glossary has no new domain term to add. Cooper admitted implementation on 4 October; provider-plan approval remains separate. |
 | Current architecture, app/package READMEs and public docs | Preserve | Implementation has not changed. Update their earliest owners with each accepted replacement slice. |
 | Tax packages, SDK/HTTP exports, schemas, tests, examples and generated references | Preserve | No package behaviour changed during the interview. Q3 allows a fresh interface during the accepted implementation, with its required versioning and consumer proof. |
 | Commands, lint, skills, CI and runbooks | Preserve | Record desired requirements here; do not present them as installed or enforced yet. |

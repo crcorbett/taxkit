@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-04",
+  "repository": "crcorbett/taxkit",
+  "cwd": "/workspace/taxkit",
+  "baseCommit": "8ed03f0e1a96d2cc258b68935b9f9be443666e1b",
+  "candidate": "T001 tracked diff and retention/active-plan additions; no tax/package/lock changes",
+  "runtime": {
+    "bun": "1.3.14",
+    "node": "24.16.0"
+  },
+  "authority": "Cooper implementation request, no merge/deploy/provider changes",
+  "checks": [
+    {
+      "command": "bun run --filter=@taxkit/core test",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-core-baseline.log",
+      "sha256": "06a7e9348f82242f06cb79e887e73877cfe2ab5408b946b55647c5f23fbb3b32"
+    },
+    {
+      "command": "bun run --filter=@taxkit/calculators test",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-calculators-baseline.log",
+      "sha256": "8b54d743790478704a2c949a1e0b9c447c8b5351e7867a1470dcd7d9a11421ea"
+    },
+    {
+      "command": "bun run check:docs",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t001-docs.log",
+      "sha256": "d2b338813b686587e5b1da55dceb233a91ecf1a8d36a8b37aef0ff9db9cb0693"
+    },
+    {
+      "command": "bun run check:runbooks",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t001-runbooks.log",
+      "sha256": "fdc9be5829aff523e3f8c4368129866a2ddbda1ea7eb30ff33b95179be1cb48c"
+    },
+    {
+      "command": "bun run test:quality-workflow",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t001-quality.log",
+      "sha256": "e5f389b115aa97e45027a29ad5d5d01ab55c140bb4bd1ffeede015f816179654"
+    },
+    {
+      "command": "bun run verification",
+      "exitCode": 0,
+      "log": "/tmp/taxkit-t001-verification.log",
+      "sha256": "c77baade8e865ca1da080ca0d05b859f9af397f17d4d55149c0e86ce8737df25"
+    }
+  ],
+  "postconditions": [
+    "Core and all three calculator known-result journeys pass",
+    "19 quality-workflow tests pass, including offline frozen hoisted installation and real mutation checks",
+    "Repository verification passes; unchanged Turbo tasks may reuse local cache",
+    "Retention manifest binds original source trees and historical recovery identities"
+  ],
+  "previousFailure": {
+    "diagnosis": "Prior local environment tempdir EPERM, recorded in DEV-72 comment 4233b4f3-86c0-43b9-a9a6-41994d202d85",
+    "currentObservation": "Same prescribed quality test passes in named cloud environment; no manifest/lock modification",
+    "correction": "Failing fixture install assertion now includes captured stdout and stderr"
+  },
+  "recovery": "Revert this slice locally; retained provider recovery requires separate approved runbook execution.",
+  "nonClaims": [
+    "No new dependency set qualified",
+    "No new application functionality",
+    "No CI, merge, deployment, publication or new external consumer qualification",
+    "Temporary raw command logs are environment-local; durable receipt retains bounded outcome and hashes"
+  ]
+}
