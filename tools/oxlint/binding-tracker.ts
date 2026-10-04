@@ -5,24 +5,34 @@ import {
   HashMap,
   MutableRef,
   Option,
+  Predicate,
   Ref,
 } from "effect";
 import { forEach } from "effect/Array";
 
+import type {
+  ImportSemantic,
+  OxlintSourceCode,
+  SyntaxKind,
+  SyntaxNode,
+  SyntaxVariable,
+} from "./host.types.js";
+
 // Host nodes and lexical variables have identity even when their fields match.
 // Wrap keys without changing or structurally hashing the host object.
-export const referenceIdentity = (value) => ({
-  [Equal.symbol]: (other) => other.value === value,
+export const referenceIdentity = <Value extends object>(value: Value) => ({
+  [Equal.symbol]: (other: Parameters<Equal.Equal[typeof Equal.symbol]>[0]) =>
+    Predicate.hasProperty(other, "value") && other.value === value,
   [Hash.symbol]: () => Hash.random(value),
   value,
 });
 
-export const syntaxParents = (node) =>
+export const syntaxParents = (node: SyntaxNode | null | undefined) =>
   EffectArray.unfold(node?.parent, (current) =>
     current ? Option.some([current, current.parent]) : Option.none()
   );
 
-export const propertyName = (node) => {
+export const propertyName = (node: SyntaxNode | null | undefined) => {
   if (node?.type === "Identifier" || node?.type === "JSXIdentifier") {
     return node.name;
   }
@@ -34,12 +44,16 @@ export const propertyName = (node) => {
   return null;
 };
 
-export const importSourceValue = (node) => {
+export const importSourceValue = (node: SyntaxKind<"ImportDeclaration">) => {
   const value = node?.source?.value;
   return String(value) === value ? value : "";
 };
 
-const declaredVariable = (sourceCode, node, name) =>
+const declaredVariable = (
+  sourceCode: OxlintSourceCode,
+  node: SyntaxNode,
+  name: string
+) =>
   Option.getOrNull(
     EffectArray.findFirst(
       sourceCode.getDeclaredVariables(node),
@@ -48,22 +62,29 @@ const declaredVariable = (sourceCode, node, name) =>
   );
 
 export const createBindingTracker = (
-  sourceCode,
-  globalSemantics = HashMap.empty()
+  sourceCode: OxlintSourceCode,
+  globalSemantics: HashMap.HashMap<string, string> = HashMap.empty()
 ) => {
   // Oxlint owns one synchronous listener lifetime per rule and source file.
   // Ref owns its changing bindings; each update replaces a persistent map.
-  const bindingSemantics = Ref.makeUnsafe(HashMap.empty());
+  const bindingSemantics = Ref.makeUnsafe(
+    HashMap.empty<
+      ReturnType<typeof referenceIdentity<SyntaxVariable>>,
+      string
+    >()
+  );
   const lexicalReferences = HashMap.fromIterable(
     EffectArray.flatMap(sourceCode.scopeManager.scopes, (scope) =>
       EffectArray.map(scope.references, (reference) => [
-        referenceIdentity(reference.identifier),
+        referenceIdentity<SyntaxNode>(reference.identifier),
         reference,
       ])
     )
   );
 
-  const semanticOfIdentifier = (node) => {
+  const semanticOfIdentifier = (
+    node: SyntaxNode | null | undefined
+  ): string | null => {
     if (node?.type !== "Identifier") {
       return null;
     }
@@ -90,7 +111,9 @@ export const createBindingTracker = (
       : null;
   };
 
-  const semanticOfExpression = (node) => {
+  const semanticOfExpression = (
+    node: SyntaxNode | null | undefined
+  ): string | null => {
     if (node?.type === "Identifier") {
       return semanticOfIdentifier(node);
     }
@@ -117,7 +140,9 @@ export const createBindingTracker = (
     return null;
   };
 
-  const semanticOfTypeName = (node) => {
+  const semanticOfTypeName = (
+    node: SyntaxNode | null | undefined
+  ): string | null => {
     if (node?.type === "Identifier") {
       return semanticOfIdentifier(node);
     }
@@ -131,7 +156,11 @@ export const createBindingTracker = (
     return null;
   };
 
-  const setDeclaredSemantic = (node, name, semantic) => {
+  const setDeclaredSemantic = (
+    node: SyntaxNode,
+    name: string,
+    semantic: string | null
+  ) => {
     const variable = declaredVariable(sourceCode, node, name);
     if (variable && semantic) {
       MutableRef.update(
@@ -141,7 +170,7 @@ export const createBindingTracker = (
     }
   };
 
-  const setReferencedSemantic = (node, semantic) => {
+  const setReferencedSemantic = (node: SyntaxNode, semantic: string | null) => {
     const variable = Option.getOrUndefined(
       HashMap.get(lexicalReferences, referenceIdentity(node)).pipe(
         Option.map((reference) => reference.resolved ?? null)
@@ -155,7 +184,11 @@ export const createBindingTracker = (
     }
   };
 
-  const trackPattern = (pattern, sourceSemantic, declarationNode = null) => {
+  const trackPattern = (
+    pattern: SyntaxNode | null | undefined,
+    sourceSemantic: string | null,
+    declarationNode: SyntaxNode | null = null
+  ): void => {
     if (!sourceSemantic) {
       return;
     }
@@ -173,25 +206,28 @@ export const createBindingTracker = (
       return;
     }
 
-    forEach(pattern.properties ?? [], (property) => {
-      if (property.type !== "Property") {
-        return;
-      }
+    forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+      pattern.properties ?? [],
+      (property) => {
+        if (property.type !== "Property") {
+          return;
+        }
 
-      const member = propertyName(property.key);
-      if (!member) {
-        return;
-      }
+        const member = propertyName(property.key);
+        if (!member) {
+          return;
+        }
 
-      const target =
-        property.value?.type === "AssignmentPattern"
-          ? property.value.left
-          : property.value;
-      trackPattern(target, `${sourceSemantic}.${member}`, declarationNode);
-    });
+        const target =
+          property.value?.type === "AssignmentPattern"
+            ? property.value.left
+            : property.value;
+        trackPattern(target, `${sourceSemantic}.${member}`, declarationNode);
+      }
+    );
   };
 
-  const clearPattern = (pattern) => {
+  const clearPattern = (pattern: SyntaxNode | null | undefined): void => {
     if (pattern?.type === "Identifier") {
       const variable = Option.getOrUndefined(
         HashMap.get(lexicalReferences, referenceIdentity(pattern)).pipe(
@@ -208,31 +244,34 @@ export const createBindingTracker = (
     }
 
     if (pattern?.type === "ObjectPattern") {
-      forEach(pattern.properties ?? [], (property) => {
-        if (property.type === "Property") {
-          clearPattern(
-            property.value?.type === "AssignmentPattern"
-              ? property.value.left
-              : property.value
-          );
+      forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+        pattern.properties ?? [],
+        (property) => {
+          if (property.type === "Property") {
+            clearPattern(
+              property.value?.type === "AssignmentPattern"
+                ? property.value.left
+                : property.value
+            );
+          }
         }
-      });
+      );
     }
   };
 
   return {
-    calledSemantic: (node) =>
+    calledSemantic: (node: SyntaxNode | null | undefined) =>
       node?.type === "CallExpression"
         ? semanticOfExpression(node.callee)
         : null,
-    isReadReference: (node) =>
+    isReadReference: (node: SyntaxNode) =>
       Option.exists(
         HashMap.get(lexicalReferences, referenceIdentity(node)),
         (reference) => reference.isRead()
       ),
     semanticOfExpression,
     semanticOfTypeName,
-    trackAssignment(node) {
+    trackAssignment(node: SyntaxKind<"AssignmentExpression">) {
       if (node.operator === "=") {
         const semantic = semanticOfExpression(node.right);
         if (semantic) {
@@ -242,7 +281,10 @@ export const createBindingTracker = (
         }
       }
     },
-    trackImport(node, importSemantic) {
+    trackImport(
+      node: SyntaxKind<"ImportDeclaration">,
+      importSemantic: ImportSemantic
+    ) {
       const source = importSourceValue(node);
       forEach(node.specifiers ?? [], (specifier) => {
         const imported =
@@ -255,7 +297,7 @@ export const createBindingTracker = (
         }
       });
     },
-    trackVariable(node) {
+    trackVariable(node: SyntaxKind<"VariableDeclarator">) {
       trackPattern(node.id, semanticOfExpression(node.init), node);
     },
   };

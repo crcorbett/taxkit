@@ -1,14 +1,21 @@
 import { Array as EffectArray, Option } from "effect";
 
-const sourceFileName = (context) =>
+import type {
+  OxlintContext,
+  OxlintRule,
+  SyntaxKind,
+  SyntaxNode,
+} from "./host.types.js";
+
+const sourceFileName = (context: OxlintContext) =>
   (context.filename ?? context.getFilename?.() ?? "").replaceAll("\\", "/");
 
-const stringValue = (node) =>
+const stringValue = (node: SyntaxNode | null | undefined) =>
   node?.type === "Literal" && String(node.value) === node.value
     ? node.value
     : undefined;
 
-const resolveRelative = (fileName, specifier) => {
+const resolveRelative = (fileName: string, specifier: string) => {
   const segments = EffectArray.reduce(
     specifier.split("/"),
     EffectArray.dropRight(fileName.split("/"), 1),
@@ -25,7 +32,7 @@ const resolveRelative = (fileName, specifier) => {
   return segments.join("/");
 };
 
-const workspaceSourceRoot = (fileName) => {
+const workspaceSourceRoot = (fileName: string) => {
   const match = fileName.match(
     /\/(?:apps|packages)\/(?:[^/]+\/)+?src(?:\/|$)/u
   );
@@ -37,10 +44,10 @@ const workspaceSourceRoot = (fileName) => {
   );
 };
 
-const isPrivatePackageAlias = (specifier) =>
+const isPrivatePackageAlias = (specifier: string) =>
   /^@[^/]+\/[^/]+\/src(?:\/|$)/u.test(specifier);
 
-const isCrossWorkspaceSourcePath = (fileName, specifier) => {
+const isCrossWorkspaceSourcePath = (fileName: string, specifier: string) => {
   if (!specifier.startsWith(".")) {
     return false;
   }
@@ -54,10 +61,17 @@ const isCrossWorkspaceSourcePath = (fileName, specifier) => {
   );
 };
 
-const noCrossPackageSourceImports = {
+const noCrossPackageSourceImports: OxlintRule = {
   create(context) {
     const fileName = sourceFileName(context);
-    const inspect = (node) => {
+    const inspect = (
+      node: SyntaxKind<
+        | "ExportAllDeclaration"
+        | "ExportNamedDeclaration"
+        | "ImportDeclaration"
+        | "ImportExpression"
+      >
+    ) => {
       const specifier = stringValue(node.source);
       if (
         specifier !== undefined &&
@@ -66,7 +80,7 @@ const noCrossPackageSourceImports = {
       ) {
         context.report({
           messageId: "noCrossPackageSourceImports",
-          node: node.source,
+          node: node.source ?? node,
         });
       }
     };

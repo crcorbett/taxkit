@@ -33,12 +33,14 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
-      "tools/oxlint/binding-tracker.js",
-      "tools/oxlint/bun-rules.js",
-      "tools/oxlint/effect-rules.js",
-      "tools/oxlint/mdx-rules.js",
-      "tools/oxlint/package-rules.js",
-      "tools/oxlint/taxkit-rules.js",
+      "tools/oxlint/binding-tracker.ts",
+      "tools/oxlint/binding-tracker.test.ts",
+      "tools/oxlint/host.types.ts",
+      "tools/oxlint/bun-rules.ts",
+      "tools/oxlint/effect-rules.ts",
+      "tools/oxlint/mdx-rules.ts",
+      "tools/oxlint/package-rules.ts",
+      "tools/oxlint/taxkit-rules.ts",
     ],
     generated: "tools/oxlint/.generated-strict-bindings.js",
     namespace: "strict-effect",

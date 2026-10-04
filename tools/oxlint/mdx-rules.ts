@@ -1,6 +1,8 @@
 import { Array as EffectArray, HashSet, Option } from "effect";
 
-const propertyName = (node) => {
+import type { OxlintRule, SyntaxNode } from "./host.types.js";
+
+const propertyName = (node: SyntaxNode | null | undefined) => {
   if (node?.type === "Identifier" || node?.type === "JSXIdentifier") {
     return node.name;
   }
@@ -26,22 +28,31 @@ const mdxElementKeys = HashSet.fromIterable([
   "ul",
 ]);
 
-const hasMdxElementKey = (node) =>
+const hasMdxElementKey = (node: SyntaxNode | null | undefined) =>
   node?.type === "ObjectExpression" &&
   Option.fromNullishOr(node.properties).pipe(
     Option.map((properties) =>
       EffectArray.some(properties, (property) =>
-        HashSet.has(mdxElementKeys, propertyName(property.key) ?? "")
+        HashSet.has(
+          mdxElementKeys,
+          propertyName(
+            property.type === "Property" ? property.key : undefined
+          ) ?? ""
+        )
       )
     ),
     Option.getOrUndefined
   );
 
-const noRouteLocalComponentRegistry = {
+const noRouteLocalComponentRegistry: OxlintRule = {
   create(context) {
     return {
       JSXAttribute(node) {
-        const elementName = propertyName(node.parent?.name);
+        const elementName = propertyName(
+          node.parent?.type === "JSXOpeningElement"
+            ? node.parent.name
+            : undefined
+        );
         if (
           propertyName(node.name) === "components" &&
           elementName === "MDX" &&

@@ -13,9 +13,19 @@ import {
   importSourceValue,
   propertyName,
   syntaxParents,
-} from "./binding-tracker.js";
+} from "./binding-tracker.ts";
+import type {
+  ImportSemantic,
+  OxlintRule,
+  SyntaxKind,
+  SyntaxNode,
+} from "./host.types.js";
 
-const effectImportSemantic = (source, specifierType, imported) => {
+const effectImportSemantic: ImportSemantic = (
+  source,
+  specifierType,
+  imported
+) => {
   if (source === "effect") {
     if (specifierType === "ImportNamespaceSpecifier") {
       return "effect";
@@ -24,7 +34,7 @@ const effectImportSemantic = (source, specifierType, imported) => {
     if (specifierType === "ImportSpecifier") {
       return HashSet.has(
         HashSet.fromIterable(["Data", "Effect", "ManagedRuntime", "Schema"]),
-        imported
+        imported ?? ""
       )
         ? imported
         : null;
@@ -47,7 +57,11 @@ const effectImportSemantic = (source, specifierType, imported) => {
     : moduleSemantic;
 };
 
-const platformBunImportSemantic = (source, specifierType, imported) => {
+const platformBunImportSemantic: ImportSemantic = (
+  source,
+  specifierType,
+  imported
+) => {
   if (
     source === "@effect/platform-bun" &&
     specifierType === "ImportSpecifier" &&
@@ -72,7 +86,11 @@ const platformBunImportSemantic = (source, specifierType, imported) => {
   return null;
 };
 
-const platformNodeImportSemantic = (source, specifierType, imported) => {
+const platformNodeImportSemantic: ImportSemantic = (
+  source,
+  specifierType,
+  imported
+) => {
   if (
     source === "@effect/platform-node" &&
     specifierType === "ImportSpecifier" &&
@@ -94,12 +112,16 @@ const platformNodeImportSemantic = (source, specifierType, imported) => {
   return null;
 };
 
-const portableImportSemantic = (source, specifierType, imported) =>
+const portableImportSemantic: ImportSemantic = (
+  source,
+  specifierType,
+  imported
+) =>
   effectImportSemantic(source, specifierType, imported) ??
   platformBunImportSemantic(source, specifierType, imported) ??
   platformNodeImportSemantic(source, specifierType, imported);
 
-const noManualTag = {
+const noManualTag: OxlintRule = {
   create(context) {
     return {
       Property(node) {
@@ -122,7 +144,7 @@ const noManualTag = {
   },
 };
 
-const noSwitch = {
+const noSwitch: OxlintRule = {
   create(context) {
     return {
       SwitchStatement(node) {
@@ -142,9 +164,9 @@ const noSwitch = {
 
 const layerExportNamePattern = /(?:Live|Mock|Test|TestLive)$/u;
 
-const noLayerExportsInServiceFiles = {
+const noLayerExportsInServiceFiles: OxlintRule = {
   create(context) {
-    const reportName = (node) => {
+    const reportName = (node: SyntaxNode | null | undefined) => {
       if (
         node?.type === "Identifier" &&
         layerExportNamePattern.test(node.name)
@@ -156,7 +178,11 @@ const noLayerExportsInServiceFiles = {
     return {
       ExportDefaultDeclaration(node) {
         reportName(node.declaration);
-        reportName(node.declaration?.id);
+        reportName(
+          node.declaration && "id" in node.declaration
+            ? node.declaration.id
+            : undefined
+        );
       },
       ExportNamedDeclaration(node) {
         if (node.declaration?.type === "VariableDeclaration") {
@@ -164,12 +190,18 @@ const noLayerExportsInServiceFiles = {
             reportName(declarator.id)
           );
         } else {
-          reportName(node.declaration?.id);
+          reportName(
+            node.declaration && "id" in node.declaration
+              ? node.declaration.id
+              : undefined
+          );
         }
 
         forEach(node.specifiers ?? [], (specifier) => {
           reportName(specifier.local);
-          if (specifier.exported?.name !== specifier.local?.name) {
+          if (
+            propertyName(specifier.exported) !== propertyName(specifier.local)
+          ) {
             reportName(specifier.exported);
           }
         });
@@ -218,7 +250,7 @@ const runtimeExecutionSemantics = HashSet.fromIterable([
   "platform-node.NodeRuntime.runMain",
 ]);
 
-const noRuntimeExecutionOutsideBoundaries = {
+const noRuntimeExecutionOutsideBoundaries: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
 
@@ -255,10 +287,10 @@ const noRuntimeExecutionOutsideBoundaries = {
 
 // Calls have their existing rule. This owner rejects exporting or handing a
 // runner to another callback before that callback can execute it elsewhere.
-const noRuntimeReferencesOutsideBoundaries = {
+const noRuntimeReferencesOutsideBoundaries: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
-    const reportReference = (node) => {
+    const reportReference = (node: SyntaxNode) => {
       if (node.type === "Identifier" && !tracker.isReadReference(node)) {
         return;
       }
@@ -271,7 +303,7 @@ const noRuntimeReferencesOutsideBoundaries = {
       if (
         HashSet.has(
           runtimeExecutionSemantics,
-          tracker.semanticOfExpression(node)
+          tracker.semanticOfExpression(node) ?? ""
         )
       ) {
         context.report({
@@ -280,7 +312,10 @@ const noRuntimeReferencesOutsideBoundaries = {
         });
       }
     };
-    const reportDestructuredRunner = (pattern, source) => {
+    const reportDestructuredRunner = (
+      pattern: SyntaxNode | null | undefined,
+      source: string | null
+    ): void => {
       if (!source) {
         return;
       }
@@ -294,14 +329,17 @@ const noRuntimeReferencesOutsideBoundaries = {
         return;
       }
       if (pattern?.type === "ObjectPattern") {
-        forEach(pattern.properties ?? [], (property) => {
-          if (property.type === "Property") {
-            const member = propertyName(property.key);
-            if (member) {
-              reportDestructuredRunner(property.value, `${source}.${member}`);
+        forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+          pattern.properties ?? [],
+          (property) => {
+            if (property.type === "Property") {
+              const member = propertyName(property.key);
+              if (member) {
+                reportDestructuredRunner(property.value, `${source}.${member}`);
+              }
             }
           }
-        });
+        );
       }
     };
     return {
@@ -339,7 +377,7 @@ const noRuntimeReferencesOutsideBoundaries = {
   },
 };
 
-const noConsoleOutsideRuntime = {
+const noConsoleOutsideRuntime: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(
       context.sourceCode,
@@ -398,25 +436,35 @@ const processBoundaryMembers = HashSet.fromIterable([
   "exitCode",
 ]);
 
-const noProcessOutsideBoundaries = {
+const noProcessOutsideBoundaries: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(
       context.sourceCode,
       HashMap.fromIterable([["process", "Global.process"]])
     );
-    const reportDestructuredMembers = (pattern, source, node) => {
+    const reportDestructuredMembers = (
+      pattern: SyntaxNode | null | undefined,
+      source: string | null,
+      node: SyntaxNode
+    ) => {
       if (pattern?.type !== "ObjectPattern" || source !== "Global.process") {
         return;
       }
 
-      forEach(pattern.properties ?? [], (property) => {
-        if (
-          property.type === "Property" &&
-          HashSet.has(processBoundaryMembers, propertyName(property.key))
-        ) {
-          context.report({ messageId: "noProcessOutsideBoundaries", node });
+      forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+        pattern.properties ?? [],
+        (property) => {
+          if (
+            property.type === "Property" &&
+            HashSet.has(
+              processBoundaryMembers,
+              propertyName(property.key) ?? ""
+            )
+          ) {
+            context.report({ messageId: "noProcessOutsideBoundaries", node });
+          }
         }
-      });
+      );
     };
 
     return {
@@ -472,14 +520,14 @@ const noProcessOutsideBoundaries = {
   },
 };
 
-const isHostImport = (source) =>
+const isHostImport = (source: string) =>
   source.startsWith("node:") ||
   source === "bun" ||
   source.startsWith("bun:") ||
   source.startsWith("@effect/platform-bun") ||
   source.startsWith("@effect/platform-node");
 
-const noHostImportsInContracts = {
+const noHostImportsInContracts: OxlintRule = {
   create(context) {
     return {
       ImportDeclaration(node) {
@@ -506,7 +554,17 @@ const schemaEncoderMethodPattern = /^encode(?!To)[A-Za-z]*$/u;
 const throwingSchemaSyncCodecPattern =
   /^(?:decode|encode)(?!To)[A-Za-z]*Sync$/u;
 
-const schemaCodecRule = ({ description, message, messageId, matches }) => ({
+const schemaCodecRule = ({
+  description,
+  message,
+  messageId,
+  matches,
+}: {
+  readonly description: string;
+  readonly message: string;
+  readonly messageId: string;
+  readonly matches: (method: string) => boolean;
+}): OxlintRule => ({
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
 
@@ -518,7 +576,7 @@ const schemaCodecRule = ({ description, message, messageId, matches }) => ({
           EffectArray.findFirst(
             ["Schema.", "effect.Schema."],
             (prefix) => semantic?.startsWith(prefix) ?? false
-          ).pipe(Option.map((prefix) => semantic.slice(prefix.length)))
+          ).pipe(Option.map((prefix) => semantic?.slice(prefix.length)))
         );
         if (method && matches(method)) {
           context.report({ messageId, node: node.callee });
@@ -559,7 +617,7 @@ const tryPromiseSemantics = HashSet.fromIterable([
   "effect.Effect.tryPromise",
 ]);
 
-const noBareEffectTryPromise = {
+const noBareEffectTryPromise: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
 
@@ -588,11 +646,15 @@ const noBareEffectTryPromise = {
             EffectArray.filter(
               optionProperties,
               (property) =>
+                property.type === "Property" &&
                 property.kind === "init" &&
                 (property.value?.type === "ArrowFunctionExpression" ||
                   property.value?.type === "FunctionExpression")
             ),
-            (property) => propertyName(property.key)
+            (property) =>
+              propertyName(
+                property.type === "Property" ? property.key : undefined
+              )
           )
         );
         const hasDynamicSpread =
@@ -639,27 +701,32 @@ const taggedErrorConstructorSemantics = HashSet.fromIterable([
   "effect.Schema.TaggedError",
 ]);
 
-const hasTaggedErrorCallAncestor = (node, tracker) =>
+const hasTaggedErrorCallAncestor = (
+  node: SyntaxNode,
+  tracker: ReturnType<typeof createBindingTracker>
+) =>
   EffectArray.some(syntaxParents(node), (current) => {
     if (current.type === "CallExpression") {
       const semantic =
         current.callee?.type === "CallExpression"
           ? tracker.calledSemantic(current.callee)
           : tracker.calledSemantic(current);
-      if (HashSet.has(taggedErrorConstructorSemantics, semantic)) {
+      if (HashSet.has(taggedErrorConstructorSemantics, semantic ?? "")) {
         return true;
       }
     }
     return false;
   });
 
-const isUnknownCauseProperty = (node) =>
+const isUnknownCauseProperty = (node: SyntaxNode) =>
   Option.exists(
     EffectArray.findFirst(
       syntaxParents(node),
       (current) => current.type === "TSPropertySignature"
     ),
-    (current) => propertyName(current.key) === "cause"
+    (current) =>
+      current.type === "TSPropertySignature" &&
+      propertyName(current.key) === "cause"
   );
 
 const unknownSchemaSemantics = HashSet.fromIterable([
@@ -667,7 +734,7 @@ const unknownSchemaSemantics = HashSet.fromIterable([
   "effect.Schema.Unknown",
 ]);
 
-const noUnknownTaggedErrorCause = {
+const noUnknownTaggedErrorCause: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
 
@@ -721,13 +788,13 @@ const functionNodeTypes = HashSet.fromIterable([
   "TSMethodSignature",
 ]);
 
-const isUnknownFunctionParameter = (node) => {
+const isUnknownFunctionParameter = (node: SyntaxNode) => {
   const annotation = node.parent;
   const parameter = annotation?.parent;
   return (
     annotation?.type === "TSTypeAnnotation" &&
     parameter !== undefined &&
-    HashSet.has(functionNodeTypes, parameter.parent?.type)
+    HashSet.has(functionNodeTypes, parameter?.parent?.type ?? "")
   );
 };
 
@@ -736,7 +803,10 @@ const effectTypeSemantics = HashSet.fromIterable([
   "effect.Effect.Effect",
 ]);
 
-const isUnknownEffectError = (node, tracker) => {
+const isUnknownEffectError = (
+  node: SyntaxNode,
+  tracker: ReturnType<typeof createBindingTracker>
+) => {
   const parameters = node.parent;
   const reference = parameters?.parent;
   return (
@@ -750,7 +820,7 @@ const isUnknownEffectError = (node, tracker) => {
   );
 };
 
-const noUnknownServiceContract = {
+const noUnknownServiceContract: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
 
@@ -783,15 +853,21 @@ const noUnknownServiceContract = {
   },
 };
 
-const importedName = (specifier) =>
+const importedName = (
+  specifier: SyntaxKind<"ImportDeclaration">["specifiers"][number]
+) =>
   specifier?.type === "ImportSpecifier"
     ? propertyName(specifier.imported)
     : null;
 
-const localName = (specifier) =>
-  specifier?.local?.type === "Identifier" ? specifier.local.name : null;
+const localName = (
+  specifier: SyntaxKind<"ImportDeclaration">["specifiers"][number]
+) => (specifier?.local?.type === "Identifier" ? specifier.local.name : null);
 
-const hasUnaliasedImport = (node, names) =>
+const hasUnaliasedImport = (
+  node: SyntaxKind<"ImportDeclaration">,
+  names: HashSet.HashSet<string>
+) =>
   EffectArray.some(node.specifiers ?? [], (specifier) => {
     const name = importedName(specifier);
     return (
@@ -806,9 +882,12 @@ const effectVitestSharedGlobals = HashSet.fromIterable([
   "test",
 ]);
 
-const noEffectTestGlobalMix = {
+const noEffectTestGlobalMix: OxlintRule = {
   create(context) {
-    const imports = Ref.makeUnsafe({
+    const imports = Ref.makeUnsafe<{
+      readonly effectTestImport: SyntaxKind<"ImportDeclaration"> | null;
+      readonly vitestGlobalImport: SyntaxKind<"ImportDeclaration"> | null;
+    }>({
       effectTestImport: null,
       vitestGlobalImport: null,
     });
@@ -865,7 +944,7 @@ const runtimeFunctionNodeTypes = HashSet.fromIterable([
   "FunctionExpression",
 ]);
 
-const isModuleLevel = (node) => {
+const isModuleLevel = (node: SyntaxNode) => {
   const ancestors = syntaxParents(node);
   return (
     EffectArray.some(ancestors, (current) => current.type === "Program") &&
@@ -874,12 +953,14 @@ const isModuleLevel = (node) => {
       (current) =>
         HashSet.has(runtimeFunctionNodeTypes, current.type) ||
         (current.type === "TSModuleDeclaration" &&
-          (current.declare || current.global || current.id?.name === "global"))
+          (current.declare ||
+            current.global ||
+            propertyName(current.id) === "global"))
     )
   );
 };
 
-const noModuleLevelMutableTestState = {
+const noModuleLevelMutableTestState: OxlintRule = {
   create(context) {
     return {
       VariableDeclaration(node) {

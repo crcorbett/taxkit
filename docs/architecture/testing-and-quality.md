@@ -424,8 +424,8 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   helpers, but it does not currently provide a safe built-in rule for banning
   functions below a minimum line count. Prefer review and architecture guidance
   for tiny one-off wrapper or mapper helpers.
-- `tools/oxlint/effect-rules.js`, `bun-rules.js` and `mdx-rules.js` own
-  domain-neutral contracts. `taxkit-rules.js` owns tax/calculator policy plus
+- `tools/oxlint/effect-rules.ts`, `bun-rules.ts` and `mdx-rules.ts` own
+  domain-neutral contracts. `taxkit-rules.ts` owns tax/calculator policy plus
   decoder and route-transport rules. Do not put package names or tax defaults
   into a portable rule message.
 - `tools/oxlint/anti-slop/**` is a separately installed generic rule owner.
@@ -442,17 +442,17 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   canonical and namespace imports, renamed bindings, aliases and statically
   known destructuring. Accepted real-binary fixtures prove that unrelated
   shadowed locals with the same names do not report.
-- The six owned JavaScript policy modules use all eleven canonical strict
+- The six owned TypeScript policy modules use all eleven canonical strict
   rules. Synchronous Oxlint listener state is per rule/file and Ref-owned;
   pure analysis uses immutable folds, not Ref accumulators. Shared Hash/Equal
   keys preserve the host's object identity without modifying syntax nodes.
   The route/decoder corpus checks exact warning counts, separate observations
   for two files in one process and lexical decoder assignments/root aliases.
-  Rule options are an exact Schema ingress in `taxkit-rules.js`; the actual CLI
+  Rule options are an exact Schema ingress in `taxkit-rules.ts`; the actual CLI
   rejects missing required options before listener construction. The shared
   scoped CLI operation accepts a configuration path for this invalid-config
-  fixture. These binary checks do not claim static TypeScript checking of the
-  JavaScript modules or completion of repository-wide strict enforcement.
+  fixture. Binary checks remain distinct from compiler checking and do not establish
+  completion of repository-wide strict enforcement.
 - Eight collection-host CLI canaries test exact file, assignment target,
   method and receiver containment while retaining loop rejection. The admitted
   source is generated test-only code. Four additional isolated configuration
@@ -772,3 +772,17 @@ adopted inventory/workflow files, reject their neighbour and check four exact
 command runtime admissions. Source checks still require credential decoding and
 cache-safe workflow output, following the owning Config Schema and ignoring only
 formatting whitespace. Saved receipts remain distinct from current provider proof.
+
+
+All six owned lint files, including the shared binding tracker, now compile as
+TypeScript. Their host types derive from Oxlint's exported RuleTester contract,
+including the actual source-code nodes and lexical variables. They do not copy
+an AST model. The loader reads the TypeScript source directly; the local no-emit
+compiler allows those explicit source imports. Immutable route observations use
+native node types and scoped Ref updates. Narrowing checks precede variant-only
+fields, and dynamic imports follow the native ImportExpression listener.
+Original lexical/route/metadata checks remain. Separate identity tests require
+matching-looking host objects to remain separate map keys, repeat reads of the
+same object to find its binding, and unrelated equality objects to be refused.
+Actual CLI fixtures accept all eight adopted policy/type/test files and reject
+the neighbouring JavaScript fixture; compiler, runtime and lint proof are distinct.

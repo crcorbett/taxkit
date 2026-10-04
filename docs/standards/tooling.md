@@ -386,7 +386,7 @@ relative symbolic links; only an ordinary-file `readLink` EINVAL permits the
 copy-file fallback. Other filesystem errors fail the test. The six isolated
 release-boundary mutations still execute their actual owning commands.
 
-The binding tracker and Bun, Effect, MDX and package JavaScript lint policies
+The binding tracker and Bun, Effect, MDX and package TypeScript lint policies
 also use all eleven canonical rules. Their host is Oxlint's synchronous
 listener lifecycle: each rule creates its own Ref for one source file and uses
 pure persistent updates through the installed Ref's MutableRef field. They
@@ -402,8 +402,8 @@ deduplication uses reference identity, and duplicate-restore warnings retain
 first-consumer order. One owning Schema decodes the exact rule-options ingress;
 missing options fail closed before checking source. The real CLI rejects missing
 options through Oxlint's metadata validator. The listener's defensive fallback
-is not separately claimed as that CLI proof. This does not establish full
-repository or whole-T002 coverage, or static checking of JavaScript policies.
+is not separately claimed as that CLI proof. Binary checking and compiler
+checking are distinct; neither establishes full repository or whole-T002 coverage.
 
 Two exact generated TypeScript paths qualify canonical collection-exception
 behaviour. Only the synthetic host admits `host.value` assignment and
@@ -515,3 +515,14 @@ have exact runtime admission. Unused Bun/process and inventory-test execution
 permissions are removed; report encoding and synthetic report ingress have exact
 reviewed owners. Native SDK services remain private to the live Layer and runtime
 composition. Configuration uses its owning Schema; callers receive checked reports.
+
+
+All six owned lint implementation files now use TypeScript and participate in
+`check:oxlint:types`. `host.types.ts` derives rule, context, source-code, node and
+variable types from Oxlint 1.86.0's exported RuleTester contract. The synchronous
+host owns each listener lifetime; scoped Ref/persistent collection ownership and
+reference identity remain. `allowImportingTsExtensions` is limited to the no-emit
+lint-tool project because Oxlint directly loads these source files. Plugin paths,
+exact options-decoding admission and actual CLI fixtures follow the `.ts` owners.
+Completed earlier SPEC/task records and dated evidence retain their historical
+JavaScript paths; this current tooling owner records their TypeScript successors.

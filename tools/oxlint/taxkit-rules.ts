@@ -16,12 +16,21 @@ import {
   createBindingTracker,
   referenceIdentity,
   syntaxParents,
-} from "./binding-tracker.js";
+} from "./binding-tracker.ts";
+import type {
+  ImportSemantic,
+  OxlintContext,
+  OxlintRule,
+  OxlintSourceCode,
+  SyntaxKind,
+  SyntaxNode,
+  SyntaxVariable,
+} from "./host.types.js";
 
 const { resolve } = nodePath;
-const firstArgument = (node) =>
+const firstArgument = (node: SyntaxKind<"CallExpression" | "NewExpression">) =>
   Option.getOrUndefined(EffectArray.head(node.arguments ?? []));
-const noTypeof = {
+const noTypeof: OxlintRule = {
   create(context) {
     return {
       UnaryExpression(node) {
@@ -46,7 +55,7 @@ const noTypeof = {
   },
 };
 
-const noInstanceof = {
+const noInstanceof: OxlintRule = {
   create(context) {
     return {
       BinaryExpression(node) {
@@ -71,7 +80,7 @@ const noInstanceof = {
   },
 };
 
-const noInOperator = {
+const noInOperator: OxlintRule = {
   create(context) {
     return {
       BinaryExpression(node) {
@@ -97,12 +106,13 @@ const noInOperator = {
   },
 };
 
-const isUndefinedIdentifier = (node) =>
+const isUndefinedIdentifier = (node: SyntaxNode | null | undefined) =>
   node?.type === "Identifier" && node.name === "undefined";
 
-const isNullLiteral = (node) => node?.type === "Literal" && node.value === null;
+const isNullLiteral = (node: SyntaxNode | null | undefined) =>
+  node?.type === "Literal" && node.value === null;
 
-const noUndefinedComparison = {
+const noUndefinedComparison: OxlintRule = {
   create(context) {
     return {
       BinaryExpression(node) {
@@ -132,7 +142,7 @@ const noUndefinedComparison = {
   },
 };
 
-const noNullishComparison = {
+const noNullishComparison: OxlintRule = {
   create(context) {
     return {
       BinaryExpression(node) {
@@ -161,10 +171,10 @@ const noNullishComparison = {
   },
 };
 
-const isConditionalObjectSpread = (node) =>
+const isConditionalObjectSpread = (node: SyntaxNode | null | undefined) =>
   node?.type === "ConditionalExpression" || node?.type === "LogicalExpression";
 
-const noConditionalObjectSpread = {
+const noConditionalObjectSpread: OxlintRule = {
   create(context) {
     return {
       SpreadElement(node) {
@@ -195,7 +205,7 @@ const noConditionalObjectSpread = {
 
 const contextFieldNames = HashSet.fromIterable(["jurisdiction", "taxYear"]);
 
-const contextFieldName = (node) => {
+const contextFieldName = (node: SyntaxNode | null | undefined) => {
   if (node?.type !== "MemberExpression") {
     return null;
   }
@@ -211,7 +221,7 @@ const contextFieldName = (node) => {
   return null;
 };
 
-const noContextNullishDefault = {
+const noContextNullishDefault: OxlintRule = {
   create(context) {
     return {
       LogicalExpression(node) {
@@ -267,7 +277,7 @@ const effectCollectionNamespaces = HashSet.fromIterable([
   "Record",
 ]);
 
-const propertyName = (node) => {
+const propertyName = (node: SyntaxNode | null | undefined) => {
   if (node?.type === "Identifier") {
     return node.name;
   }
@@ -279,22 +289,28 @@ const propertyName = (node) => {
   return null;
 };
 
-const sourceFileName = (context) =>
+const sourceFileName = (context: OxlintContext) =>
   context.filename ?? context.getFilename?.() ?? "";
 
-const isEffectCollectionNamespaceCall = (callee) =>
+const isEffectCollectionNamespaceCall = (
+  callee: SyntaxNode | null | undefined
+) =>
   callee?.type === "MemberExpression" &&
   callee.object?.type === "Identifier" &&
   HashSet.has(effectCollectionNamespaces, callee.object.name);
 
-const isMemberCall = (node, objectName, methodName) =>
+const isMemberCall = (
+  node: SyntaxNode | null | undefined,
+  objectName: string,
+  methodName: string
+) =>
   node?.type === "CallExpression" &&
   node.callee?.type === "MemberExpression" &&
   node.callee.object?.type === "Identifier" &&
   node.callee.object.name === objectName &&
   propertyName(node.callee.property) === methodName;
 
-const noNativeArrayMethods = {
+const noNativeArrayMethods: OxlintRule = {
   create(context) {
     return {
       CallExpression(node) {
@@ -324,7 +340,7 @@ const noNativeArrayMethods = {
   },
 };
 
-const noNestedWrapperCalls = {
+const noNestedWrapperCalls: OxlintRule = {
   create(context) {
     return {
       CallExpression(node) {
@@ -369,15 +385,15 @@ const nativeCollectionSemantics = HashSet.fromIterable(
   ])
 );
 
-const noNativeCollections = {
+const noNativeCollections: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(
       context.sourceCode,
       HashMap.fromIterable([
-        ...EffectArray.map([...nativeCollectionConstructors], (name) => [
-          name,
-          `Native.${name}`,
-        ]),
+        ...EffectArray.map(
+          [...nativeCollectionConstructors],
+          (name) => [name, `Native.${name}`] as const
+        ),
         ["globalThis", "Global"],
         ["window", "Global"],
       ])
@@ -424,7 +440,7 @@ const objectWriteSemantics = HashSet.fromIterable([
   "Global.Reflect.setPrototypeOf",
 ]);
 
-const noObjectWrites = {
+const noObjectWrites: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(
       context.sourceCode,
@@ -435,7 +451,7 @@ const noObjectWrites = {
         ["window", "Global"],
       ])
     );
-    const reportReference = (node) => {
+    const reportReference = (node: SyntaxNode) => {
       if (node.type === "Identifier" && !tracker.isReadReference(node)) {
         return;
       }
@@ -451,7 +467,10 @@ const noObjectWrites = {
         context.report({ messageId: "noObjectWrites", node });
       }
     };
-    const reportDestructuredWrite = (pattern, source) => {
+    const reportDestructuredWrite = (
+      pattern: SyntaxNode | null | undefined,
+      source: string | null
+    ): void => {
       if (!source) {
         return;
       }
@@ -462,14 +481,17 @@ const noObjectWrites = {
         return;
       }
       if (pattern?.type === "ObjectPattern") {
-        forEach(pattern.properties ?? [], (property) => {
-          if (property.type === "Property") {
-            const member = propertyName(property.key);
-            if (member) {
-              reportDestructuredWrite(property.value, `${source}.${member}`);
+        forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+          pattern.properties ?? [],
+          (property) => {
+            if (property.type === "Property") {
+              const member = propertyName(property.key);
+              if (member) {
+                reportDestructuredWrite(property.value, `${source}.${member}`);
+              }
             }
           }
-        });
+        );
       }
     };
     return {
@@ -509,7 +531,7 @@ const noObjectWrites = {
   },
 };
 
-const noThrow = {
+const noThrow: OxlintRule = {
   create(context) {
     return {
       ThrowStatement(node) {
@@ -532,7 +554,7 @@ const noThrow = {
   },
 };
 
-const noAsyncAwaitPromise = {
+const noAsyncAwaitPromise: OxlintRule = {
   create(context) {
     return {
       AwaitExpression(node) {
@@ -587,7 +609,7 @@ const noAsyncAwaitPromise = {
   },
 };
 
-const noJsonParseStringify = {
+const noJsonParseStringify: OxlintRule = {
   create(context) {
     return {
       CallExpression(node) {
@@ -622,7 +644,7 @@ const noJsonParseStringify = {
   },
 };
 
-const noAmbientTimeOrRandom = {
+const noAmbientTimeOrRandom: OxlintRule = {
   create(context) {
     return {
       CallExpression(node) {
@@ -682,10 +704,10 @@ const effectSchemaRuntimeDecoderNames = HashSet.fromIterable([
   "decodeUnknownSync",
 ]);
 
-const isDecoderCallName = (name) =>
+const isDecoderCallName = (name: string) =>
   name === "decode" || /^decode[A-Z]/u.test(name ?? "");
 
-const importName = (node) => {
+const importName = (node: SyntaxNode | null | undefined) => {
   if (node?.type === "Identifier") {
     return node.name;
   }
@@ -697,10 +719,10 @@ const importName = (node) => {
   return null;
 };
 
-const localBindingName = (node) =>
+const localBindingName = (node: SyntaxNode | null | undefined) =>
   node?.type === "Identifier" ? node.name : null;
 
-const schemaImportSemantic = (source, kind, imported) => {
+const schemaImportSemantic: ImportSemantic = (source, kind, imported) => {
   if (source === "effect") {
     if (kind === "ImportSpecifier" && imported === "Schema") {
       return "Schema";
@@ -717,7 +739,7 @@ const schemaImportSemantic = (source, kind, imported) => {
   return null;
 };
 
-const isSchemaDecoderSemantic = (semantic) =>
+const isSchemaDecoderSemantic = (semantic: string | null) =>
   Option.exists(
     EffectArray.findFirst(
       ["Schema.", "effect.Schema."],
@@ -726,14 +748,14 @@ const isSchemaDecoderSemantic = (semantic) =>
     (prefix) =>
       HashSet.has(
         effectSchemaRuntimeDecoderNames,
-        semantic.slice(prefix.length)
+        semantic?.slice(prefix.length) ?? ""
       )
   );
 
-const noDecodingOutsideBoundaries = {
+const noDecodingOutsideBoundaries: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
-    const report = (node) =>
+    const report = (node: SyntaxNode) =>
       context.report({ messageId: "noDecodingOutsideBoundaries", node });
     return {
       AssignmentExpression: tracker.trackAssignment,
@@ -760,7 +782,7 @@ const noDecodingOutsideBoundaries = {
         }
         if (
           isSchemaDecoderSemantic(tracker.calledSemantic(node)) ||
-          isDecoderCallName(memberName)
+          isDecoderCallName(memberName ?? "")
         ) {
           report(node.callee.property);
         }
@@ -775,7 +797,7 @@ const noDecodingOutsideBoundaries = {
           node.id?.type === "Identifier" &&
           isSchemaDecoderSemantic(semantic)
         ) {
-          report(node.init);
+          report(node.init ?? node);
         }
         if (
           node.id?.type === "ObjectPattern" &&
@@ -810,13 +832,72 @@ const noDecodingOutsideBoundaries = {
   },
 };
 
-const routeConsumerFunctionTypes = HashSet.fromIterable([
-  "ArrowFunctionExpression",
-  "FunctionDeclaration",
-  "FunctionExpression",
-]);
+type RouteFunction = Extract<SyntaxNode, { params: readonly SyntaxNode[] }> & {
+  readonly type:
+    | "ArrowFunctionExpression"
+    | "FunctionDeclaration"
+    | "FunctionExpression";
+};
+interface RouteConsumer {
+  readonly functionNode: RouteFunction;
+  readonly kind: "component" | "head";
+  readonly routeVariable: SyntaxVariable;
+}
+interface NamedRouteFunction {
+  readonly functionNode: RouteFunction;
+  readonly variable: SyntaxVariable;
+}
+interface RouteSyntaxObservations {
+  readonly callExpressions: readonly SyntaxKind<"CallExpression">[];
+  readonly functionDeclarations: readonly Extract<
+    SyntaxNode,
+    { params: readonly SyntaxNode[] }
+  >[];
+  readonly identifiers: readonly SyntaxKind<"Identifier">[];
+  readonly importDeclarations: readonly SyntaxKind<"ImportDeclaration">[];
+  readonly importExpressions: readonly SyntaxKind<"ImportExpression">[];
+  readonly memberExpressions: readonly SyntaxKind<"MemberExpression">[];
+  readonly variableDeclarators: readonly SyntaxKind<"VariableDeclarator">[];
+}
+type RoutePolicyInput = RouteSyntaxObservations & {
+  readonly boundaryBindings: readonly SyntaxVariable[];
+  readonly boundaryModules: HashSet.HashSet<string>;
+  readonly canonicalImports: HashMap.HashMap<string, SyntaxVariable>;
+  readonly consumer: RouteConsumer;
+  readonly directRestoreCalls: readonly SyntaxKind<"CallExpression">[];
+  readonly forwardingBindings: readonly {
+    readonly messageId: string;
+    readonly variable: SyntaxVariable | null;
+  }[];
+  readonly headLoaderDataVariable: SyntaxVariable | null;
+  readonly identifier: SyntaxKind<"Identifier">;
+  readonly isConfiguredConsumerFile: boolean;
+  readonly loaderVariable: SyntaxVariable | null;
+  readonly namedFunctions: readonly NamedRouteFunction[];
+  readonly report: (messageId: string, node: SyntaxNode) => void;
+  readonly reportedForwardingNodes: HashSet.HashSet<
+    ReturnType<typeof referenceIdentity<SyntaxNode>>
+  >;
+  readonly restoreCall: SyntaxKind<"CallExpression">;
+  readonly resultDeclarator: SyntaxKind<"VariableDeclarator"> | undefined;
+  readonly resultVariable: SyntaxVariable | null;
+  readonly routeConsumers: readonly RouteConsumer[];
+  readonly routeDefinitionCount: number;
+  readonly sourceCode: OxlintSourceCode;
+};
 
-const routeTransportDeclaredVariable = (sourceCode, node, name) =>
+const isRouteConsumerFunction = (
+  node: SyntaxNode | null | undefined
+): node is RouteFunction =>
+  node?.type === "ArrowFunctionExpression" ||
+  node?.type === "FunctionDeclaration" ||
+  node?.type === "FunctionExpression";
+
+const routeTransportDeclaredVariable = (
+  sourceCode: OxlintSourceCode,
+  node: SyntaxNode,
+  name: string
+) =>
   Option.getOrNull(
     EffectArray.findFirst(
       sourceCode.getDeclaredVariables(node),
@@ -824,30 +905,37 @@ const routeTransportDeclaredVariable = (sourceCode, node, name) =>
     )
   );
 
-const isRouteTransportReference = (variable, identifier) =>
+const isRouteTransportReference = (
+  variable: SyntaxVariable | null | undefined,
+  identifier: SyntaxNode | null | undefined
+) =>
   variable !== null &&
+  variable !== undefined &&
   identifier?.type === "Identifier" &&
   EffectArray.some(
     variable.references,
     (reference) => reference.identifier === identifier
   );
 
-const isReassignedRouteTransportVariable = (variable) =>
+const isReassignedRouteTransportVariable = (variable: SyntaxVariable) =>
   EffectArray.some(variable.references, (reference) => reference.isWrite?.());
 
-const referencesRouteTransportVariable = (variables, identifier) =>
+const referencesRouteTransportVariable = (
+  variables: readonly SyntaxVariable[],
+  identifier: SyntaxNode | null | undefined
+) =>
   EffectArray.some(variables, (variable) =>
     isRouteTransportReference(variable, identifier)
   );
 
-const routeConsumerFunction = (node) =>
+const routeConsumerFunction = (node: SyntaxNode) =>
   Option.getOrNull(
     EffectArray.findFirst(syntaxParents(node), (current) =>
-      HashSet.has(routeConsumerFunctionTypes, current.type)
+      isRouteConsumerFunction(current)
     )
   );
 
-const isTopLevelRouteConsumerDeclaration = (node) => {
+const isTopLevelRouteConsumerDeclaration = (node: SyntaxNode) => {
   const declaration =
     node.parent?.type === "VariableDeclaration" ? node.parent : node;
   const owner = declaration.parent;
@@ -859,7 +947,10 @@ const isTopLevelRouteConsumerDeclaration = (node) => {
   );
 };
 
-const routeDefinitionOptions = (node, canonicalImports) => {
+const routeDefinitionOptions = (
+  node: SyntaxKind<"VariableDeclarator">,
+  canonicalImports: HashMap.HashMap<string, SyntaxVariable>
+) => {
   const createFileRouteVariable = Option.getOrUndefined(
     HashMap.get(canonicalImports, "createFileRoute")
   );
@@ -878,10 +969,13 @@ const routeDefinitionOptions = (node, canonicalImports) => {
   return options?.type === "ObjectExpression" ? options : null;
 };
 
-const routeConsumerCanonicalImports = (importDeclarations, sourceCode) =>
+const routeConsumerCanonicalImports = (
+  importDeclarations: readonly SyntaxKind<"ImportDeclaration">[],
+  sourceCode: OxlintSourceCode
+) =>
   EffectArray.reduce(
     importDeclarations,
-    HashMap.empty(),
+    HashMap.empty<string, SyntaxVariable>(),
     (imports, declaration) => {
       const source = importName(declaration.source);
       return EffectArray.reduce(
@@ -898,6 +992,7 @@ const routeConsumerCanonicalImports = (importDeclarations, sourceCode) =>
           const importedName = importName(specifier.imported);
           const localName = localBindingName(specifier.local);
           if (
+            localName !== null &&
             importedName === localName &&
             ((source === "@tanstack/react-router" &&
               importedName === "createFileRoute") ||
@@ -919,7 +1014,10 @@ const routeConsumerCanonicalImports = (importDeclarations, sourceCode) =>
     }
   );
 
-const isRouteUseLoaderDataCall = (node, routeVariable) =>
+const isRouteUseLoaderDataCall = (
+  node: SyntaxNode | null | undefined,
+  routeVariable: SyntaxVariable | null
+) =>
   node?.type === "CallExpression" &&
   node.arguments.length === 0 &&
   node.callee?.type === "MemberExpression" &&
@@ -928,7 +1026,10 @@ const isRouteUseLoaderDataCall = (node, routeVariable) =>
   isRouteTransportReference(routeVariable, node.callee.object) &&
   propertyName(node.callee.property) === "useLoaderData";
 
-const headLoaderDataBinding = (functionNode, sourceCode) => {
+const headLoaderDataBinding = (
+  functionNode: RouteFunction,
+  sourceCode: OxlintSourceCode
+) => {
   const parameter = Option.getOrUndefined(
     EffectArray.head(functionNode.params ?? [])
   );
@@ -958,9 +1059,9 @@ const headLoaderDataBinding = (functionNode, sourceCode) => {
 };
 
 const isOptionFromUndefinedOrCall = (
-  node,
-  loaderDataVariable,
-  optionVariable
+  node: SyntaxNode | null | undefined,
+  loaderDataVariable: SyntaxVariable,
+  optionVariable: SyntaxVariable
 ) =>
   node?.type === "CallExpression" &&
   node.callee?.type === "MemberExpression" &&
@@ -972,7 +1073,10 @@ const isOptionFromUndefinedOrCall = (
   firstArgument(node)?.type === "Identifier" &&
   isRouteTransportReference(loaderDataVariable, firstArgument(node));
 
-const isOptionGetOrElseCall = (node, optionVariable) =>
+const isOptionGetOrElseCall = (
+  node: SyntaxNode | null | undefined,
+  optionVariable: SyntaxVariable
+) =>
   node?.type === "CallExpression" &&
   node.callee?.type === "MemberExpression" &&
   !node.callee.computed &&
@@ -982,9 +1086,9 @@ const isOptionGetOrElseCall = (node, optionVariable) =>
   node.arguments.length === 1;
 
 const isNormalisedHeadLoaderData = (
-  node,
-  loaderDataVariable,
-  canonicalImports
+  node: SyntaxNode | null | undefined,
+  loaderDataVariable: SyntaxVariable,
+  canonicalImports: HashMap.HashMap<string, SyntaxVariable>
 ) => {
   const optionVariable = Option.getOrUndefined(
     HashMap.get(canonicalImports, "Option")
@@ -1007,10 +1111,10 @@ const isNormalisedHeadLoaderData = (
 };
 
 const routeConsumerLocalDeclarator = (
-  identifier,
-  functionNode,
-  sourceCode,
-  variableDeclarators
+  identifier: SyntaxNode,
+  functionNode: RouteFunction,
+  sourceCode: OxlintSourceCode,
+  variableDeclarators: readonly SyntaxKind<"VariableDeclarator">[]
 ) => {
   const matches = EffectArray.filter(
     variableDeclarators,
@@ -1032,14 +1136,22 @@ const routeConsumerLocalDeclarator = (
     : null;
 };
 
-const isResultMatchCallee = (node, resultVariable) =>
+const isResultMatchCallee = (
+  node: SyntaxNode | null | undefined,
+  resultVariable: SyntaxVariable
+) =>
   node?.type === "MemberExpression" &&
   !node.computed &&
   node.object?.type === "Identifier" &&
   isRouteTransportReference(resultVariable, node.object) &&
   propertyName(node.property) === "match";
 
-const isResultMatchFor = (node, resultValue, resultBinding, resultVariable) =>
+const isResultMatchFor = (
+  node: SyntaxNode,
+  resultValue: SyntaxNode,
+  resultBinding: SyntaxVariable | null,
+  resultVariable: SyntaxVariable
+) =>
   node?.type === "CallExpression" &&
   isResultMatchCallee(node.callee, resultVariable) &&
   (firstArgument(node) === resultValue ||
@@ -1047,7 +1159,7 @@ const isResultMatchFor = (node, resultValue, resultBinding, resultVariable) =>
       firstArgument(node)?.type === "Identifier" &&
       isRouteTransportReference(resultBinding, firstArgument(node))));
 
-const isInsideJsxExpression = (node, functionNode) =>
+const isInsideJsxExpression = (node: SyntaxNode, functionNode: SyntaxNode) =>
   EffectArray.some(
     EffectArray.takeWhile(
       syntaxParents(node),
@@ -1056,14 +1168,17 @@ const isInsideJsxExpression = (node, functionNode) =>
     (current) => current.type === "JSXExpressionContainer"
   );
 
-const directRouteBoundaryBinding = (specifier, sourceCode) => {
+const directRouteBoundaryBinding = (
+  specifier: SyntaxKind<"ImportDeclaration">["specifiers"][number],
+  sourceCode: OxlintSourceCode
+) => {
   if (specifier.type !== "ImportSpecifier") {
     return null;
   }
 
   const localName = localBindingName(specifier.local);
   return importName(specifier.imported) === localName
-    ? routeTransportDeclaredVariable(sourceCode, specifier, localName)
+    ? routeTransportDeclaredVariable(sourceCode, specifier, localName ?? "")
     : null;
 };
 
@@ -1074,15 +1189,24 @@ const routeTransportBoundaryBindings = ({
   importExpressions,
   report,
   sourceCode,
-}) => {
+}: Pick<
+  RoutePolicyInput,
+  | "boundaryModules"
+  | "callExpressions"
+  | "importDeclarations"
+  | "importExpressions"
+  | "report"
+  | "sourceCode"
+>) => {
   const bindings = EffectArray.flatMap(importDeclarations, (declaration) => {
-    if (!HashSet.has(boundaryModules, importName(declaration.source))) {
+    if (!HashSet.has(boundaryModules, importName(declaration.source) ?? "")) {
       return [];
     }
     return EffectArray.filterMap(declaration.specifiers ?? [], (specifier) => {
       if (
         declaration.importKind === "type" ||
-        specifier.importKind === "type"
+        (specifier.type === "ImportSpecifier" &&
+          specifier.importKind === "type")
       ) {
         return Result.failVoid;
       }
@@ -1094,31 +1218,28 @@ const routeTransportBoundaryBindings = ({
     });
   });
   forEach(importExpressions, (expression) => {
-    if (HashSet.has(boundaryModules, importName(expression.source))) {
+    if (HashSet.has(boundaryModules, importName(expression.source) ?? "")) {
       report("unsupportedBoundaryImport", expression);
     }
   });
   forEach(callExpressions, (call) => {
-    const importsBoundary =
-      call.callee?.type === "Import" &&
-      HashSet.has(boundaryModules, importName(firstArgument(call)));
     const requiresBoundary =
       call.callee?.type === "Identifier" &&
       call.callee.name === "require" &&
-      HashSet.has(boundaryModules, importName(firstArgument(call)));
-    if (importsBoundary || requiresBoundary) {
+      HashSet.has(boundaryModules, importName(firstArgument(call)) ?? "");
+    if (requiresBoundary) {
       report("unsupportedBoundaryImport", call);
     }
   });
   return EffectArray.dedupeWith(bindings, (left, right) => left === right);
 };
 
-const isCanonicalRestoreMemberObject = (identifier) =>
+const isCanonicalRestoreMemberObject = (identifier: SyntaxNode) =>
   identifier.parent?.type === "MemberExpression" &&
   identifier.parent.object === identifier &&
   propertyName(identifier.parent.property) === "restore";
 
-const isRouteBoundaryTypeQuery = (identifier) =>
+const isRouteBoundaryTypeQuery = (identifier: SyntaxNode) =>
   Option.exists(
     EffectArray.findFirst(
       syntaxParents(identifier),
@@ -1126,7 +1247,7 @@ const isRouteBoundaryTypeQuery = (identifier) =>
         current.type === "TSTypeQuery" ||
         current.type === "Program" ||
         current.type.endsWith("Statement") ||
-        HashSet.has(routeConsumerFunctionTypes, current.type)
+        isRouteConsumerFunction(current)
     ),
     (current) => current.type === "TSTypeQuery"
   );
@@ -1134,7 +1255,7 @@ const isRouteBoundaryTypeQuery = (identifier) =>
 const reportUnsupportedRouteBoundaryReferences = ({
   boundaryBindings,
   report,
-}) =>
+}: Pick<RoutePolicyInput, "boundaryBindings" | "report">) =>
   forEach(boundaryBindings, (binding) =>
     forEach(binding.references, (reference) => {
       if (
@@ -1150,9 +1271,13 @@ const sameFileRouteConsumerFunctions = ({
   functionDeclarations,
   sourceCode,
   variableDeclarators,
-}) => [
+}: Pick<
+  RoutePolicyInput,
+  "functionDeclarations" | "sourceCode" | "variableDeclarators"
+>) => [
   ...EffectArray.filterMap(functionDeclarations, (declaration) => {
     if (
+      !isRouteConsumerFunction(declaration) ||
       declaration.id?.type !== "Identifier" ||
       !isTopLevelRouteConsumerDeclaration(declaration)
     ) {
@@ -1170,7 +1295,7 @@ const sameFileRouteConsumerFunctions = ({
   ...EffectArray.filterMap(variableDeclarators, (declarator) => {
     if (
       declarator.id?.type !== "Identifier" ||
-      !HashSet.has(routeConsumerFunctionTypes, declarator.init?.type) ||
+      !isRouteConsumerFunction(declarator.init) ||
       !isTopLevelRouteConsumerDeclaration(declarator)
     ) {
       return Result.failVoid;
@@ -1186,8 +1311,13 @@ const sameFileRouteConsumerFunctions = ({
   }),
 ];
 
-const routeConsumerPropertyFunction = (property, namedFunctions) => {
-  if (HashSet.has(routeConsumerFunctionTypes, property.value?.type)) {
+const routeConsumerPropertyFunction = (
+  property: SyntaxKind<"ObjectExpression">["properties"][number] & {
+    readonly type: "Property";
+  },
+  namedFunctions: readonly NamedRouteFunction[]
+) => {
+  if (isRouteConsumerFunction(property.value)) {
     return property.value;
   }
 
@@ -1211,13 +1341,24 @@ const configuredRouteConsumers = ({
   report,
   sourceCode,
   variableDeclarators,
-}) => {
+}: Pick<
+  RoutePolicyInput,
+  | "canonicalImports"
+  | "isConfiguredConsumerFile"
+  | "namedFunctions"
+  | "report"
+  | "sourceCode"
+  | "variableDeclarators"
+>) => {
   if (!isConfiguredConsumerFile) {
     return { routeConsumers: [], routeDefinitionCount: 0 };
   }
   return EffectArray.reduce(
     variableDeclarators,
-    { routeConsumers: [], routeDefinitionCount: 0 },
+    {
+      routeConsumers: EffectArray.empty<RouteConsumer>(),
+      routeDefinitionCount: 0,
+    },
     (current, declarator) => {
       const optionsNode = routeDefinitionOptions(declarator, canonicalImports);
       if (optionsNode === null) {
@@ -1255,7 +1396,11 @@ const configuredRouteConsumers = ({
             report("unresolvedRouteConsumer", property.value);
             return Result.failVoid;
           }
-          return Result.succeed({ functionNode, kind, routeVariable });
+          return Result.succeed({
+            functionNode,
+            kind,
+            routeVariable,
+          } satisfies RouteConsumer);
         }
       );
       return {
@@ -1270,7 +1415,10 @@ const canonicalRouteRestoreCalls = ({
   boundaryBindings,
   memberExpressions,
   report,
-}) =>
+}: Pick<
+  RoutePolicyInput,
+  "boundaryBindings" | "memberExpressions" | "report"
+>) =>
   EffectArray.filterMap(memberExpressions, (member) => {
     if (
       member.object?.type !== "Identifier" ||
@@ -1297,21 +1445,24 @@ const componentRestoreInput = ({
   restoreCall,
   sourceCode,
   variableDeclarators,
-}) => {
+}: Pick<
+  RoutePolicyInput,
+  "consumer" | "restoreCall" | "sourceCode" | "variableDeclarators"
+>) => {
   const [restoreInput] = restoreCall.arguments;
 
   if (
     restoreCall.arguments.length === 1 &&
     isRouteUseLoaderDataCall(restoreInput, consumer.routeVariable)
   ) {
-    return { loaderVariable: null, valid: true };
+    return { headLoaderDataVariable: null, loaderVariable: null, valid: true };
   }
 
   if (
     restoreCall.arguments.length !== 1 ||
     restoreInput?.type !== "Identifier"
   ) {
-    return { loaderVariable: null, valid: false };
+    return { headLoaderDataVariable: null, loaderVariable: null, valid: false };
   }
 
   const loaderDeclarator = routeConsumerLocalDeclarator(
@@ -1321,18 +1472,22 @@ const componentRestoreInput = ({
     variableDeclarators
   );
   const valid =
-    loaderDeclarator?.parent?.kind === "const" &&
+    loaderDeclarator?.parent?.type === "VariableDeclaration" &&
+    loaderDeclarator.parent.kind === "const" &&
+    loaderDeclarator.id.type === "Identifier" &&
     isRouteUseLoaderDataCall(loaderDeclarator.init, consumer.routeVariable);
 
-  const loaderVariable = valid
-    ? routeTransportDeclaredVariable(
-        sourceCode,
-        loaderDeclarator,
-        loaderDeclarator.id.name
-      )
-    : null;
+  const loaderVariable =
+    valid && loaderDeclarator?.id.type === "Identifier"
+      ? routeTransportDeclaredVariable(
+          sourceCode,
+          loaderDeclarator,
+          loaderDeclarator.id.name
+        )
+      : null;
 
   return {
+    headLoaderDataVariable: null,
     loaderVariable,
     valid,
   };
@@ -1344,7 +1499,14 @@ const headRestoreInput = ({
   restoreCall,
   sourceCode,
   variableDeclarators,
-}) => {
+}: Pick<
+  RoutePolicyInput,
+  | "canonicalImports"
+  | "consumer"
+  | "restoreCall"
+  | "sourceCode"
+  | "variableDeclarators"
+>) => {
   const [restoreInput] = restoreCall.arguments;
   const headLoaderData = headLoaderDataBinding(
     consumer.functionNode,
@@ -1381,7 +1543,9 @@ const headRestoreInput = ({
     variableDeclarators
   );
   const valid =
-    loaderDeclarator?.parent?.kind === "const" &&
+    loaderDeclarator?.parent?.type === "VariableDeclaration" &&
+    loaderDeclarator.parent.kind === "const" &&
+    loaderDeclarator.id.type === "Identifier" &&
     !isReassignedRouteTransportVariable(headLoaderData.variable) &&
     isNormalisedHeadLoaderData(
       loaderDeclarator.init,
@@ -1389,13 +1553,14 @@ const headRestoreInput = ({
       canonicalImports
     );
 
-  const loaderVariable = valid
-    ? routeTransportDeclaredVariable(
-        sourceCode,
-        loaderDeclarator,
-        loaderDeclarator.id.name
-      )
-    : null;
+  const loaderVariable =
+    valid && loaderDeclarator?.id.type === "Identifier"
+      ? routeTransportDeclaredVariable(
+          sourceCode,
+          loaderDeclarator,
+          loaderDeclarator.id.name
+        )
+      : null;
 
   return {
     headLoaderDataVariable: headLoaderData.variable,
@@ -1408,7 +1573,10 @@ const restoreResultDeclarator = ({
   consumer,
   restoreCall,
   variableDeclarators,
-}) =>
+}: Pick<
+  RoutePolicyInput,
+  "consumer" | "restoreCall" | "variableDeclarators"
+>) =>
   Option.getOrUndefined(
     EffectArray.findFirst(
       variableDeclarators,
@@ -1426,7 +1594,15 @@ const isRestoreResultMatched = ({
   restoreCall,
   resultVariable,
   resultDeclarator,
-}) => {
+}: Pick<
+  RoutePolicyInput,
+  | "callExpressions"
+  | "canonicalImports"
+  | "consumer"
+  | "restoreCall"
+  | "resultVariable"
+  | "resultDeclarator"
+>) => {
   const resultImportVariable = Option.getOrUndefined(
     HashMap.get(canonicalImports, "Result")
   );
@@ -1445,13 +1621,16 @@ const isRestoreResultMatched = ({
   );
 };
 
-const isRouteValueAliasOrAssignment = (identifier) =>
+const isRouteValueAliasOrAssignment = (identifier: SyntaxNode) =>
   (identifier.parent?.type === "VariableDeclarator" &&
     identifier.parent.init === identifier) ||
   (identifier.parent?.type === "AssignmentExpression" &&
     identifier.parent.right === identifier);
 
-const isRouteResultCallArgument = (identifier, functionNode) =>
+const isRouteResultCallArgument = (
+  identifier: SyntaxNode,
+  functionNode: RouteFunction
+) =>
   Option.getOrNull(
     EffectArray.findFirst(
       EffectArray.takeWhile(
@@ -1478,7 +1657,16 @@ const routeValueForwardingMessage = ({
   restoreCall,
   resultDeclarator,
   resultVariable,
-}) => {
+}: Pick<
+  RoutePolicyInput,
+  | "canonicalImports"
+  | "consumer"
+  | "forwardingBindings"
+  | "identifier"
+  | "restoreCall"
+  | "resultDeclarator"
+  | "resultVariable"
+>) => {
   const forwardingBinding = Option.getOrUndefined(
     EffectArray.findFirst(forwardingBindings, ({ variable }) =>
       isRouteTransportReference(variable, identifier)
@@ -1530,7 +1718,20 @@ const reportRouteValueForwarding = ({
   restoreCall,
   resultDeclarator,
   resultVariable,
-}) => {
+}: Pick<
+  RoutePolicyInput,
+  | "callExpressions"
+  | "canonicalImports"
+  | "consumer"
+  | "headLoaderDataVariable"
+  | "identifiers"
+  | "loaderVariable"
+  | "report"
+  | "reportedForwardingNodes"
+  | "restoreCall"
+  | "resultDeclarator"
+  | "resultVariable"
+>) => {
   const forwardingBindings = EffectArray.filterMap(
     [
       { messageId: "forwardedLoaderTransport", variable: loaderVariable },
@@ -1597,13 +1798,29 @@ const validateDirectRouteRestores = ({
   routeDefinitionCount,
   sourceCode,
   variableDeclarators,
-}) => {
+}: Pick<
+  RoutePolicyInput,
+  | "callExpressions"
+  | "canonicalImports"
+  | "directRestoreCalls"
+  | "identifiers"
+  | "isConfiguredConsumerFile"
+  | "report"
+  | "routeConsumers"
+  | "routeDefinitionCount"
+  | "sourceCode"
+  | "variableDeclarators"
+>) => {
   const observations = EffectArray.reduce(
     directRestoreCalls,
     {
-      callsByConsumer: HashMap.empty(),
-      consumerOrder: [],
-      reportedForwardingNodes: HashSet.empty(),
+      callsByConsumer: HashMap.empty<
+        ReturnType<typeof referenceIdentity<RouteConsumer>>,
+        readonly SyntaxKind<"CallExpression">[]
+      >(),
+      consumerOrder: EffectArray.empty<RouteConsumer>(),
+      reportedForwardingNodes:
+        HashSet.empty<ReturnType<typeof referenceIdentity<SyntaxNode>>>(),
     },
     (current, restoreCall) => {
       const functionNode = routeConsumerFunction(restoreCall);
@@ -1728,7 +1945,7 @@ const RouteConsumerOptions = Schema.Struct({
   routeTransportConsumerFiles: Schema.NonEmptyArray(Schema.String),
 });
 
-const noRouteTransportRestoreOutsideConsumers = {
+const noRouteTransportRestoreOutsideConsumers: OxlintRule = {
   create(context) {
     const parsedOptions = EffectArray.head(context.options).pipe(
       Option.flatMap(Schema.decodeUnknownOption(RouteConsumerOptions))
@@ -1753,7 +1970,7 @@ const noRouteTransportRestoreOutsideConsumers = {
           resolve(sourceFileName(context))
         );
         // Oxlint owns one synchronous listener lifetime per source file.
-        const observations = Ref.makeUnsafe({
+        const observations = Ref.makeUnsafe<RouteSyntaxObservations>({
           callExpressions: [],
           functionDeclarations: [],
           identifiers: [],
@@ -1763,7 +1980,7 @@ const noRouteTransportRestoreOutsideConsumers = {
           variableDeclarators: [],
         });
 
-        const report = (messageId, node) =>
+        const report: RoutePolicyInput["report"] = (messageId, node) =>
           context.report({
             messageId,
             node,

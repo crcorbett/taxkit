@@ -1019,3 +1019,37 @@ content and provider operations: local root tools only. Recover by reverting
 this complete slice. DEV-73 and DEV-74–81 remain unfinished; other root scripts,
 checked JavaScript, SDK/app/infrastructure and readonly/Schema/helper/lifetime
 review remain. No inventory command or current provider read has been run.
+
+
+## Local T002 compiler-checked lint implementation
+
+Continue from #112 `ae8279c899e93246cbb4f7e3289ffec274bec3b2`;
+its hosted Quality passed in run 37190926549. The six owned JavaScript policy
+files now use TypeScript and the existing compiler check. A shared type owner
+derives native listener/context/source/node/variable types from Oxlint's public
+RuleTester contract. Keep host object identity, readonly route observations,
+scoped Ref updates and persistent collections. Source imports use the actual
+`.ts` files; the lint-tool no-emit project admits those imports. The loader,
+strict selector, options-decoding admission and CLI fixtures follow the new paths.
+Type narrowing handles node variants, optional source fields and native dynamic
+imports. Original required rules, host containment, error messages, alias/shadow,
+route, metadata and negative fixtures remain. Added map/equality tests protect
+reference identity for matching-looking and unrelated host objects.
+
+Compiler, focused/root lint and all 245 actual lint tests pass (including
+two identity cases and two added accepted files). Frozen install (790 installs/
+1020 packages, unchanged lock), complete tests and the 15-task build passed.
+The initial full check correctly failed because Git still tracked the old deleted
+JavaScript paths. Record the renames in the local index; no checker permission
+changed. Full verification then passed, including 21 Quality cases/all ten
+isolated faults, fresh source-only documentation, 21 skill cases, 16 evaluation
+cases and both Chromium suites. Matching package/build/browser caches reused.
+Final docs/runbook/format/diff checks precede commit; hosted proof is separate. No package interface,
+canonical skill or tax result changes. Documentation impact: **Change required**
+for the implementation/type/test/config owners, tooling/testing, this plan/task
+ledger and the dated typed-lint receipt. **Preserve** completed SPEC/tasks and
+historical evidence with their qualified JavaScript paths, canonical skills,
+package exports, lock, operational procedures and tax results. **N/A** Changesets,
+public content and provider operations: root local checking only. Recover by
+reverting this complete slice. DEV-73, remaining release scripts, SDK/app/
+infrastructure and semantic/lifetime review, then DEV-74–81, remain unfinished.
