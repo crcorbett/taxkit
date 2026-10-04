@@ -1,0 +1,163 @@
+{
+  "document_type": "implementation-receipt",
+  "date": "2026-10-05",
+  "task": "CSF-T003",
+  "issue": "DEV-74",
+  "status": "locally-qualified",
+  "parent_revision": "876b4855dcba79ad5ecdbfd945a8a38875e39b85",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "repository": "crcorbett/taxkit",
+    "operation": "local implementation, tested commits, pushes and draft PRs",
+    "limit": "No merge, deployment, publication, version application or provider operation"
+  },
+  "implemented": [
+    "Native Alchemy Worker entry composes one calculator service and router in the native instance scope; native request scope and incoming request context remain intact",
+    "HTTP calculation calls PublicCalculatorService.calculate directly, sharing the operation with RPC; SDK is a test-only comparison dependency; host-supplied route Layer preserves existing Bun consumers",
+    "Checked native Config defers bound origin reads until first use, caches the checked result once, and returns empty 503 on absent or invalid origins without retaining the rejected value",
+    "Native request stream is bounded to one MiB and five seconds before materialisation and native JSON parsing; safe empty 413/408 responses retain allowed CORS headers",
+    "Native CORS predicate allows exactly the checked website origin without credentials; fixed logger and ErrorReporter output drops arbitrary messages, Causes, annotations and span labels before console egress"
+  ],
+  "artifact": {
+    "builder": "Installed Alchemy 2.0.0-beta.80 WorkerBundle with native generated Effect bridge",
+    "bundle_hash": "43dd44d03e6afdc67fe58e5cfee0ac984a96c80338279a20616470904ee28a7d",
+    "main_sha256": "88498b821dd32e4f84af12866c2fd5af893ff1ea06469c685d6180c2cd51416e",
+    "main_bytes": 3518862,
+    "javascript_bytes": 4746630,
+    "files": 39,
+    "entry": "apps/api/src/worker.ts",
+    "compatibility_date": "2026-10-04",
+    "compatibility_flags": [
+      "nodejs_compat"
+    ],
+    "runtime": "Installed Miniflare 5.20261001.0-alpha with workerd 1.20261001.1; direct proof uses Node 24.16.0",
+    "limit": "Actual native local artifact only; native bundler retains lazy build/Node chunks; no Website bundle or cloud deployment claim"
+  },
+  "proof": [
+    {
+      "command": "bun run --filter=api test and check-types; canonical focused lint",
+      "outcome": "pass: 57 API cases including 12 actual native entry/application cases; compiler and lint pass",
+      "logs": [
+        "dev74-api-host-tests-current.log",
+        "dev74-api-host-types-current.log",
+        "dev74-api-host-lint-current.log"
+      ]
+    },
+    {
+      "command": "Actual local native WorkerBundle then installed Miniflare dispatchFetch",
+      "outcome": "pass: actual health 200; HTTP and native RPC real TakeHomePayReport with net pay 130100 cents; matching preflight 204 with exact origin/no credentials, other origin has no permission header; malformed JSON, unknown tag and invalid ID return fixed safe native global defect; one-MiB-plus-one completed upload returns empty 413 with matching CORS",
+      "logs": [
+        "dev74-api-native-bundle-current.log",
+        "dev74-api-direct-current.log",
+        "dev74-api-direct-current-observations.json"
+      ]
+    },
+    {
+      "command": "Actual direct native Worker with unfinished body",
+      "outcome": "pass: empty 408 after 5011 milliseconds with matching CORS",
+      "logs": [
+        "dev74-api-direct-stalled-observation.json"
+      ],
+      "limit": "Miniflare caller retains its unfinished upload (sourceCancelled=false); this does not prove caller upload cancellation. Native unit/source proof separately establishes server-owned source closure."
+    },
+    {
+      "command": "One-MiB limit deliberately relaxed to two MiB, then restored in finally",
+      "outcome": "expected failure: oversized request returns 200 rather than required 413; original source restored",
+      "logs": [
+        "dev74-api-body-limit-mutation.log"
+      ]
+    },
+    {
+      "command": "Actual CLI lint fixture corpus for portable-rules.test.ts",
+      "outcome": "pass: 367 cases; three added API fixture cases admit encoding only and reject decoding/runtime execution at the same actual path; original bytes restored by scoped finalizers",
+      "logs": [
+        "dev74-api-host-exact-lint.log"
+      ]
+    },
+    {
+      "command": "HTTP package tests, existing public API smoke and both unused-code inventories",
+      "outcome": "pass: five HTTP cases, actual Bun/external consumer smoke and both inventories; native Worker is an exact production entry rather than an ignored export",
+      "logs": [
+        "dev74-api-host-http-tests.log",
+        "dev74-api-host-public-smoke.log",
+        "dev74-api-host-knip-final.log",
+        "dev74-api-host-knip-production-final.log"
+      ]
+    },
+    {
+      "command": "Frozen install, full root build/test and bun run verification",
+      "outcome": "pass: frozen 794-install/1021-package graph; all 16 builds (10 matching caches); all 26 workspace test tasks (20 matching caches), fresh actual lint corpus; 32 Quality cases including 13 isolated command/failure cases in 381.355 seconds; both unused-code inventories, workspace type tasks, 206 deployment cases, 21 skill cases, 16 evaluation cases, actual Chromium 24 SDK and four website cases",
+      "logs": [
+        "dev74-api-host-frozen.log",
+        "dev74-api-host-root-build.log",
+        "dev74-api-host-root-tests.log",
+        "dev74-api-host-verification.log"
+      ],
+      "limit": "Local API host sub-slice only; retained scaffold browser checks do not qualify the later connected Website"
+    }
+  ],
+  "documentation_impact": {
+    "Change required": [
+      "apps/api/README.md",
+      "packages/api/http/README.md",
+      "docs/architecture/api-and-sdk.md",
+      "docs/architecture/configuration.md",
+      "docs/architecture/effect-services.md",
+      "docs/architecture/package-ownership.md",
+      "docs/architecture/testing-and-quality.md",
+      "apps/api/package.json",
+      "packages/api/http/package.json",
+      "bun.lock",
+      "knip.json",
+      "knip.production.json",
+      "oxlint.config.ts",
+      "tools/oxlint/portable-rules.test.ts",
+      ".changeset/native-api-shared-operation.md",
+      "docs/product-specs/clean-slate-foundation.tasks.json",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/README.md"
+    ],
+    "Preserve": [
+      "Tax parameters and retained results",
+      "Public HTTP JSON/OpenAPI and existing Bun consumers",
+      "Canonical skills and historical proof",
+      "Existing Docs provider graph and website scaffold"
+    ],
+    "N/A": {
+      "provider runbooks": "No provider graph, command or apply changes in this candidate",
+      "generated/public content": "No public MDX, navigation or OpenAPI contract changes"
+    }
+  },
+  "limitations": [
+    "T003 remains in progress: real Website, matching-stage binding/resource Outputs, native root secret precedence and connected browser journeys remain pending",
+    "Safe per-procedure/global wire and console paths are bounded to the observed native version; complete native fatal/global protocol and exported trace paths remain pending",
+    "Native RPC tracing is disabled as containment; safe native tracing and exporter behaviour are not qualified",
+    "Native Worker instance lifetime is not a global singleton or isolate teardown guarantee",
+    "Direct stalled-body proof does not demonstrate cancellation of the test caller upload; incomplete chunked requests through the Wrangler front proxy timed out before the server response could be observed",
+    "Earlier Wrangler proof uses Node 25.8.2; the current direct local artifact proof uses selected Node 24.16.0",
+    "Linear mutation remains blocked by automatic approval review pending the existing exact user question",
+    "Companion adad qualification remains exactly 59b0a36ff1bc6f95501734ee65d789a4f5a37fcc; no new mutation/qualification there"
+  ],
+  "recovery": {
+    "failed_observations": [
+      "Native CORS with a single allowed-origin array emitted that origin for other callers; supported native predicate corrects the policy and actual other-origin proof passes",
+      "Native selected web request reader does not use MaxBodySize; bounded stream proof replaces a false reference-only size claim",
+      "Initial Knip run rejected three unused exports; private schema/logger definitions are local and live composition is owned by the actual Worker entry",
+      "Wrangler front proxy did not complete the unfinished chunked-body observation within the bounded deadline; retain as inconclusive rather than infer remote cancellation",
+      "Initial current-runtime fixture used a guessed HTTP path and primitive money representation; corrected to the owning public route and actual canonical fixture; failed observation retained in prior transcript"
+    ],
+    "rollback": "Revert the complete candidate to its parent and restore the frozen dependency graph"
+  },
+  "previous_hosted_check": {
+    "workflow_run": 37218849773,
+    "head": "876b4855dcba79ad5ecdbfd945a8a38875e39b85",
+    "conclusion": "success",
+    "limit": "Private RPC draft #128 only; no hosted qualification for this API host candidate"
+  },
+  "non_claims": [
+    "No completed T003 or connected calculator Website",
+    "No Medicare correction",
+    "No cloud apply, provider readback, hosted new Worker, merge or publication"
+  ],
+  "raw_detail_root": "Task-specific ignored local toolchain logs; no secrets captured"
+}

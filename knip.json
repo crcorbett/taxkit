@@ -42,6 +42,7 @@
     "apps/api": {
       "entry": [
         "src/index.ts",
+        "src/worker.ts",
         "scripts/smoke-public-routes.runtime.ts",
         "scripts/**/*.test.ts",
         "test/**/*.test.ts",

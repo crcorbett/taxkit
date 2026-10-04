@@ -191,6 +191,23 @@ where the root Effect is the process lifecycle. Process entrypoints should
 compose config, platform layers and server layers, then let Effect
 interruption/scopes release resources.
 
+### Native API instance and request ownership
+
+The DEV-74 API candidate uses the native Alchemy Worker class and `.make`.
+`ApiWorkerApplication` constructs its router in the native instance scope and
+receives one calculator service for HTTP and RPC. It creates no ManagedRuntime.
+Each handler runs in the incoming native fibre and request scope; tests observe
+both request paths and the corresponding finalisers. The selected native
+workerd instance scope has no teardown hook, so no isolate-finaliser claim is
+made; request-coupled I/O belongs inside incoming dispatch.
+
+Origins stay deferred during native planning. A cached native Config effect
+decodes bound addresses on first incoming runtime use. Request handling builds
+no live Layer. The native body stream has bounded accumulation, total read
+time and scoped cancellation. Safe logger/reporter context is built at instance
+initialisation and supplied to both native router construction and dispatch;
+complete native trace/export qualification remains with the active plan.
+
 ## Promise boundaries
 
 Fallible Promise and SDK calls enter Effect with an explicit inline rejection

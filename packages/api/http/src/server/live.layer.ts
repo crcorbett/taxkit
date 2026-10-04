@@ -13,10 +13,7 @@ import { taxKitOpenApiSpec } from "../openapi.js";
 
 const ApiRoutes = HttpApiBuilder.layer(TaxKitApi).pipe(
   Layer.provide(CalculatorApiHandlerLive),
-  Layer.provide(HealthHandlerLive),
-  HttpRouter.provideRequest(
-    PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
-  )
+  Layer.provide(HealthHandlerLive)
 );
 
 const DocsRouteLayer = HttpApiScalar.layer(TaxKitApi, {
@@ -29,11 +26,17 @@ const OpenApiRouteLayer = HttpRouter.add(
   Effect.succeed(HttpServerResponse.jsonUnsafe(taxKitOpenApiSpec))
 );
 
-export const ApiRoutesLive = Layer.mergeAll(
+// Hosts supply their shared application service and origin policy. Retain the
+// existing standalone Layer below for existing Bun and in-process consumers.
+export const ApiRoutesLayer = Layer.mergeAll(
   ApiRoutes,
   DocsRouteLayer,
   OpenApiRouteLayer
-).pipe(
-  Layer.provide(HttpServer.layerServices),
+).pipe(Layer.provide(HttpServer.layerServices));
+
+export const ApiRoutesLive = ApiRoutesLayer.pipe(
+  HttpRouter.provideRequest(
+    PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
+  ),
   Layer.provide(HttpRouter.cors())
 );

@@ -3,19 +3,52 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-app-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: API app settings, startup, smoke command or shutdown change
 ---
 
 # API App
 
-Standalone Bun process for the TaxKit Effect HTTP API.
+API application with the retained standalone Bun process and a native Alchemy
+Worker candidate for the active DEV-74 work.
 
 ## Scope
 
 `apps/api` owns process config, Bun server startup, request dispatch to
 `@taxkit/api-http/server` and graceful shutdown. API contracts, handlers,
 schemas, generated OpenAPI and docs routes stay in `packages/api/http`.
+
+## Native Worker candidate
+
+`src/worker.ts` declares native `TaxKitApiWorker` with the standard Alchemy
+class and `.make` entry. `src/worker.application.ts` constructs one router and
+shared `PublicCalculatorService` in the native instance scope. HTTP and
+POST `/rpc` delegate to that same operation. Native requests keep their own
+fibre and cleanup scope; the app constructs no backend ManagedRuntime.
+
+The Worker checks `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` with the
+canonical RPC origin policy. Its own origin comes from native `Worker.URL`;
+the future stack composition must supply the matching website resource Output.
+Absent or invalid settings return a fixed native Config error without the
+rejected value. CORS allows the checked website origin and `content-type`,
+with credentials disabled. Other origins receive no allow-origin header.
+Planning leaves those resource addresses deferred. On first incoming use, the
+app decodes and caches the bound runtime values; missing or invalid values
+produce an empty 503 response, without a guessed address.
+
+Every POST body is limited to one MiB before JSON parsing, with a total
+five-second read deadline. The native stream stops at the limit and its reader
+is closed on rejection, timeout or cancellation. Oversized requests return an
+empty 413; stalled bodies return an empty 408. CORS applies to those responses.
+
+The app's native logger and error reporter emit only a fixed event name, time
+and severity. Arbitrary messages, Causes, annotations and span labels are
+discarded before console output. This is bounded containment; full safe native
+tracing and exporter qualification remains required by the active plan.
+
+The Worker is not yet wired into the infrastructure root. Local construction
+and transport tests do not prove a deployment or completion of DEV-74. The Bun
+commands and public contract stay available during this work.
 
 ## Runtime Shape
 

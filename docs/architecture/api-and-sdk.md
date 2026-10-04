@@ -123,22 +123,15 @@ The final calculate-route production graph is:
 ```ts
 Production: HTTP calculate
 
-apps/api Bun process
-  -> TaxKitServerLayer
+API host (retained Bun or native Worker candidate)
+  -> TaxKitApiRoutesLayer
     -> CalculatorApiHandlerLive
-      -> sdkCalculationFor(params.calculatorId)
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorService.calculate
-          -> selected CalculatorCatalogEntry.inputSchema decode
-          -> constructor-closed typed scenario continuation
-          -> CalculationEngine
-            -> rule package scenario layer
-            -> official rule pack layer
-            -> calculator program
-          -> CalculatorRunResponseData
-        -> descriptor output decode for response.report
-        -> typed CalculatorRunResponse with narrowed report
-      -> CalculatorApiErrorEnvelope on CalculatorServiceError
+      -> PublicCalculatorService.calculate({ calculatorId, payload, ...query })
+        -> selected CalculatorCatalogEntry.inputSchema decode
+        -> constructor-closed typed scenario continuation
+        -> CalculationEngine and owning rule/scenario Layers
+        -> CalculatorRunResponseData
+      -> existing CalculatorApiErrorEnvelope on expected service failure
 ```
 
 Metadata routes stay direct service adapters until a broader SDK catalog
@@ -177,14 +170,13 @@ Report-only helpers
 The matching test graph is:
 
 ```ts
-Tests: HTTP over SDK
+Tests: HTTP compared with SDK
 
 HTTP API tests
   -> TaxKitApiInProcessClientLive
     -> CalculatorApiHandlerLive
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorServiceLive
-          -> CalculationEngineLive
+      -> PublicCalculatorServiceLive
+        -> CalculationEngineLive
   -> success response equals SDK full-run response
   -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
 ```
@@ -304,6 +296,38 @@ client guidance. Help output should be generated from canonical schemas, fact
 descriptors, rule descriptors, graph diagnostics and source references instead
 of hand-written route-specific DTOs.
 
+## Native API Worker candidate
+
+The active DEV-74 change adds `apps/api/src/worker.ts`, a native Alchemy
+Worker class and `.make` entry. Its instance initialisation constructs one
+router and acquires one calculator service for both `TaxKitApiRoutesLayer`
+and `TaxKitRpcHttpLayer`. `HttpRouter.toHttpEffect` returns the incoming
+request Effect; it does not create a backend ManagedRuntime.
+
+The host leaves resource addresses deferred during native planning and
+decodes/caches their bound values through Config on first incoming use.
+Absent or invalid origins return an empty 503; no address is invented. Native
+`Worker.URL` supplies its own address; infrastructure composition must supply
+the matching website Output before the app graph is accepted. Native CORS
+uses its supported origin predicate: the selected version's single-element
+array form emits a fixed allow-origin value even for unrelated origins.
+The predicate omits that header for an unrelated request. Only `content-type`
+is allowed for the current JSON client, with credentials disabled.
+
+POST bodies are read through the native Effect stream with a one-MiB limit
+and a total five-second read deadline, before native JSON decoding. Oversized
+and stalled requests return empty 413/408 responses with the same CORS policy.
+The selected native web-request reader does not use `MaxBodySize`, so merely
+providing that reference would not enforce this limit. Native request
+conversion retains headers, method, path and remote address.
+
+The root installs a closed logger and error reporter before router construction
+and incoming dispatch. Console egress contains a fixed event, time and severity;
+raw native messages, Causes and arbitrary annotations do not escape this
+adapter. Full native trace/export proof remains pending. The native Worker
+candidate does not establish deployed availability or complete DEV-74; the
+retained Bun entry and public HTTP/OpenAPI contract remain available.
+
 ## TypeScript SDK facade
 
 The current private SDK package lives under:
@@ -343,8 +367,9 @@ It owns:
 The SDK must not import `@taxkit/api-http`, server handlers or Node-only
 modules from browser-safe entrypoints. It also must not expose Effect runtime
 types from the plain TypeScript entrypoint. HTTP clients and OpenAPI transport
-helpers stay in `@taxkit/api-http`, which depends on the SDK rather than the
-reverse.
+helpers stay in `@taxkit/api-http`. The SDK is a test-only comparison
+dependency of the HTTP package; the production HTTP adapter calls the owning
+calculator service directly.
 
 The plain facade maps typed calculator failures, output Schema failures and
 unexpected defects into stable SDK-owned messages. It preserves a typed

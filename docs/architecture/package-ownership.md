@@ -117,7 +117,8 @@ packed-artifact checks. Its strict downstream validator may orchestrate the
 nine-package release closure and materialize package-declared publication
 exports in temporary tarballs, but package manifests and exports remain owned
 by their packages. It must not depend on `@taxkit/api-http`; HTTP
-transports consume the SDK rather than the reverse. Its Effect entrypoint owns
+transports call the calculator service directly; the SDK is a test-only
+comparison dependency of the HTTP package. Its Effect entrypoint owns
 request-preserving calculator helpers such as `calculateRunRequest`,
 `calculateReportRequest` and `calculateReport`, while reusing
 calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
@@ -160,8 +161,11 @@ Root `alchemy.run.ts`
   current validator performs no provider operation.
 
 `apps/api`
-: Current standalone Bun API runtime. It owns process config, startup,
-shutdown and platform serving for the implemented API app.
+: API application owner. It retains standalone Bun config/startup/shutdown
+and adds the native Alchemy Worker candidate for active DEV-74. The native
+instance owns one router and calculator service; incoming requests own body
+limits, dispatch and cleanup. HTTP and RPC share the named calculator operation.
+The stack/website connection remains pending in the active plan.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs
@@ -218,9 +222,8 @@ belongs in apps or explicitly server-only package exports.
   call package-owned services, but reusable calculator lookup, metadata
   transformation, graph assembly, calculation dispatch and expected error
   shaping belong in service packages such as `packages/calculators`. The
-  current calculate handler is thinner still: it selects the SDK descriptor for
-  the route calculator id, calls `@taxkit/sdk/effect` `calculateRunRequest`
-  once, and maps only transport envelopes.
+  current calculate handler supplies the checked route ID, body and query to
+  `PublicCalculatorService.calculate` once and maps only transport envelopes.
 
 ## Related docs
 

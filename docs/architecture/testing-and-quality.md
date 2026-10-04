@@ -970,3 +970,22 @@ permissions while rejecting runtime execution and unintended encoding. The
 Effect test scope restores each real owner's original bytes on failure or
 interruption. A neighbouring RPC file still rejects decoding. These fixtures
 qualify lint permissions; they do not prove a real browser or Worker connection.
+
+### Native API host candidate proof
+
+`apps/api/test/worker.boundary.test.ts` exercises shared HTTP/native RPC
+dispatch, one supplied calculator construction, incoming request paths and
+request finalisers. It checks deferred address reads, one checked runtime
+configuration read, absent settings, CORS origins, bounded streaming reads,
+whole-body timeout and earlier interruption. Positive console/reporting
+fixtures contain sensitive messages, annotations and Causes; native malformed
+JSON/tag/ID paths have fixed replies and no console egress on the selected
+version. No exported-trace claim follows from an empty log observation.
+
+The API app owns the fixed native logger/reporter and body ingress adapter.
+Only this exact fixture receives Schema encoding permission; no decoder,
+runtime, host-work or throwing-codec exception follows. Local built Worker
+experiments establish one artifact's workerd startup/HTTP/RPC/error behaviour.
+They do not qualify cloud deployment, real Website wiring, complete fatal
+protocol paths or exported telemetry; the active task and receipt retain those
+limits and the local proxy/upload observations.

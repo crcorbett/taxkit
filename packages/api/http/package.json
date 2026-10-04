@@ -108,13 +108,13 @@
   "dependencies": {
     "@taxkit/calculators": "workspace:*",
     "@taxkit/core": "workspace:*",
-    "@taxkit/sdk": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
     "@taxkit/rules-au-pay": "workspace:*",
+    "@taxkit/sdk": "workspace:*",
     "@taxkit/testing": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:",

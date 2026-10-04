@@ -1463,6 +1463,27 @@ describe("exact native RPC lint boundaries", () => {
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
+    {
+      path: "apps/api/test/worker.boundary.test.ts",
+      rejected: false,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "apps/api/test/worker.boundary.test.ts",
+      rejected: true,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/api/test/worker.boundary.test.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
   ])("keeps $rule exact at $path", ({ path, source, rejected, rule }) =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;

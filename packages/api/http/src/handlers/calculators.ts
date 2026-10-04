@@ -1,41 +1,9 @@
 import { PublicCalculatorService } from "@taxkit/calculators";
-import type { CalculatorId } from "@taxkit/calculators";
-import {
-  AuAnnualIncomeTaxCalculation,
-  AuPayTakeHomeCalculation,
-  AuPayWithholdingsCalculation,
-} from "@taxkit/sdk/au/effect";
-import { calculateRunRequest as calculateSdkRunRequest } from "@taxkit/sdk/effect";
-import type { AnySdkCalculation } from "@taxkit/sdk/effect";
-import { Array, Effect, HashMap, Option, Schema } from "effect";
+import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/http-api";
 
 import { TaxKitApi } from "../api.js";
 import { CalculatorApiErrorEnvelopeData } from "../groups/calculators.js";
-
-const SdkCalculations = [
-  AuPayTakeHomeCalculation,
-  AuPayWithholdingsCalculation,
-  AuAnnualIncomeTaxCalculation,
-] as const;
-
-const sdkCalculationsById = HashMap.fromIterable(
-  Array.map(
-    SdkCalculations,
-    (calculation): readonly [CalculatorId, AnySdkCalculation] => [
-      calculation.calculatorId,
-      calculation,
-    ]
-  )
-);
-
-const sdkCalculationFor = (calculatorId: CalculatorId): AnySdkCalculation =>
-  sdkCalculationsById.pipe(
-    HashMap.get(calculatorId),
-    Option.getOrThrowWith(
-      () => new Error(`Missing SDK calculation for ${calculatorId}`)
-    )
-  );
 
 export const CalculatorApiHandlerLive = HttpApiBuilder.group(
   TaxKitApi,
@@ -111,11 +79,12 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
         )
         .handle("calculate", ({ params, payload, query }) =>
           Effect.gen(function* () {
-            const sdkCalculation = sdkCalculationFor(params.calculatorId);
-            return yield* calculateSdkRunRequest(sdkCalculation, {
+            const service = yield* PublicCalculatorService;
+            return yield* service.calculate({
+              calculatorId: params.calculatorId,
               payload,
               ...query,
-            }).pipe(Effect.catchIf(Schema.isSchemaError, Effect.die));
+            });
           }).pipe(
             Effect.mapError(
               (error) =>

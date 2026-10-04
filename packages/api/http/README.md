@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-http-api-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
@@ -41,28 +41,29 @@ The implemented API surface is:
 - `GET /api/v1/facts`
 - `GET /api/v1/rules`
 
-The public calculation API routes expose the reusable calculator catalog,
-canonical fact descriptors, canonical rule descriptors and graph validation
-diagnostics from `@taxkit/calculators`. Metadata handlers pass route params
-and query values to `PublicCalculatorService`. The calculate handler delegates
-one full run to `@taxkit/sdk/effect` `calculateRunRequest`, then maps tagged
-service failures into route-owned HTTP error envelopes.
+The public calculation API routes use the reusable calculator catalogue,
+fact and rule descriptors and graph diagnostics from `@taxkit/calculators`.
+Every handler, including Calculate, calls `PublicCalculatorService` directly.
+The HTTP Calculate route supplies its checked route ID, body and query to the
+same named `calculate` operation used by native RPC. Expected service failures
+keep the existing HTTP envelope; public JSON and OpenAPI remain unchanged.
+The SDK is a test-only comparison dependency, rather than a server dependency.
+
+`@taxkit/api-http/server` exports `TaxKitApiRoutesLayer` for application-owned
+service and CORS composition. It also retains `TaxKitServerLayer` with the
+existing calculator engine and CORS defaults for Bun and in-process consumers.
+The native API host supplies its shared service instance to HTTP and RPC.
 
 ```ts
-Production: HTTP calculate
+HTTP calculate
 
-apps/api Bun process
-  -> TaxKitServerLayer
+API host
+  -> TaxKitApiRoutesLayer
     -> CalculatorApiHandlerLive
-      -> sdkCalculationFor(params.calculatorId)
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorService.calculate
-          -> CalculatorCatalogEntry.inputSchema decode
-          -> CalculationEngine
-          -> CalculatorRunResponseData
-        -> descriptor output decode for response.report
-        -> typed CalculatorRunResponse with narrowed report
-      -> CalculatorApiErrorEnvelope on CalculatorServiceError
+      -> PublicCalculatorService.calculate({ calculatorId, payload, ...query })
+        -> selected calculator input decode and CalculationEngine
+        -> CalculatorRunResponseData
+      -> existing CalculatorApiErrorEnvelope on expected failure
 ```
 
 ```ts
@@ -71,9 +72,8 @@ Tests: in-process HTTP client
 HTTP API tests
   -> TaxKitApiInProcessClientLive
     -> CalculatorApiHandlerLive
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorServiceLive
-          -> CalculationEngineLive
+      -> PublicCalculatorServiceLive
+        -> CalculationEngineLive
   -> success response equals SDK full-run response
   -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
 ```

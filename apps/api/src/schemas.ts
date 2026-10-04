@@ -1,4 +1,5 @@
-import { Schema } from "effect";
+import { CalculatorRpcOrigin } from "@taxkit/api-rpc/schemas";
+import { ByteSize, Duration, Schema } from "effect";
 
 const ApiServerHostSchema = Schema.NonEmptyString;
 
@@ -30,4 +31,24 @@ export type ApiServerConfigService = Schema.Schema.Type<
 export class ApiServerConfigError extends Schema.TaggedError<ApiServerConfigError>()(
   "ApiServerConfigError",
   { operation: Schema.Literal("settings") }
+) {}
+
+// Reuse the checked origin policy, with a distinct identity for the website.
+const ApiWebsiteOrigin = CalculatorRpcOrigin.pipe(
+  Schema.brand("ApiWebsiteOrigin")
+);
+
+export const ApiWorkerSettings = Schema.Struct({
+  apiOrigin: CalculatorRpcOrigin,
+  websiteOrigin: ApiWebsiteOrigin,
+});
+
+export type ApiWorkerSettings = typeof ApiWorkerSettings.Type;
+
+export const ApiRequestBodyLimit = ByteSize.mebibytes(1);
+export const ApiRequestBodyDeadline = Duration.seconds(5);
+
+export class ApiRequestBodyRejected extends Schema.TaggedError<ApiRequestBodyRejected>()(
+  "ApiRequestBodyRejected",
+  { reason: Schema.Literals(["size", "deadline"]) }
 ) {}

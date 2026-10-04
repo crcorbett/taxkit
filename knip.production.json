@@ -26,7 +26,7 @@
       "vite": false
     },
     "apps/api": {
-      "entry": ["src/index.ts!"],
+      "entry": ["src/index.ts!", "src/worker.ts!"],
       "project": ["src/**/*.ts!"]
     },
     "packages/api/http": {

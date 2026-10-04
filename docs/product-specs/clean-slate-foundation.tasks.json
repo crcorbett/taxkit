@@ -398,7 +398,8 @@
       ],
       "commitAfterPassing": true,
       "evidence": [
-        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-contract.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-contract.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-api-host.json"
       ]
     },
     {

@@ -36,12 +36,14 @@
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@taxkit/api-http": "workspace:*",
+        "@taxkit/api-rpc": "workspace:*",
+        "@taxkit/calculators": "workspace:*",
+        "@taxkit/core": "workspace:*",
+        "alchemy": "catalog:",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
-        "@taxkit/calculators": "workspace:*",
-        "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
         "@taxkit/tsconfig": "workspace:*",
         "@types/bun": "catalog:",
@@ -113,13 +115,13 @@
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/core": "workspace:*",
-        "@taxkit/sdk": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/platform-node": "catalog:",
         "@effect/vitest": "catalog:",
         "@taxkit/rules-au-pay": "workspace:*",
+        "@taxkit/sdk": "workspace:*",
         "@taxkit/testing": "workspace:*",
         "@types/node": "catalog:",
         "typescript": "catalog:",

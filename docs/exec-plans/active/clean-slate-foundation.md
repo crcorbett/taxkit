@@ -1831,3 +1831,44 @@ isolated command/failure cases in 376.88 seconds. Both unused-code inventories,
 25 type tasks, 206 deployment cases, 21 skill cases and 16 evaluation cases pass.
 The matching browser results cover 24 SDK and four website cases. This qualifies
 the private contract slice locally; T003 still needs the real app connection.
+
+## T003 native API host candidate
+
+Continue above RPC draft #128 at
+`876b4855dcba79ad5ecdbfd945a8a38875e39b85`. The API candidate uses the native
+Alchemy Worker entry and constructs its router once. HTTP now calls the same
+`PublicCalculatorService.calculate` operation as RPC directly; the SDK is a
+test-only comparison dependency. Public HTTP JSON and OpenAPI are preserved.
+A host-supplied route Layer keeps service and CORS policy at the app root while
+preserving existing Bun/in-process consumers.
+
+Documentation impact is **Change required** for API/HTTP READMEs and transport,
+lifetime, configuration and quality owners, task evidence, candidate receipt,
+package dependencies, exact fixture encoding permission and Changeset.
+**Preserve** retained tax results, canonical skills, HTTP/OpenAPI, Bun smoke and
+all historical evidence. Provider procedures are **N/A** until a graph or
+command changes; no cloud apply is authorised. Full native Worker artifact,
+request lifetimes, safe log/reporter output and browser/CORS proof must pass
+before accepting this candidate. T003 remains in progress.
+
+The [native API receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-native-api-host.json)
+records 57 API cases, exact fixture permission canaries, five HTTP cases and
+existing Bun consumer smoke. The actual native generated Worker runs in the
+installed local Cloudflare runtime using Node 24.16.0. HTTP and RPC retain net
+pay of 130100 cents; exact-origin preflight, fixed malformed/tag/ID replies,
+empty 413 and a stalled-body 408 at 5011 milliseconds pass. The native request
+tests separately prove finalisers and earlier interruption. The direct test
+caller retains its unfinished upload; Wrangler's front-proxy observation of
+incomplete chunked requests is inconclusive. Neither result proves cancellation
+of the caller upload. Both unused-code inventories pass with the native entry
+explicitly owned. Full repository candidate checks pass: frozen install, all 16 builds and 26
+workspace test tasks, both unused-code inventories, compiler tasks, 32 Quality
+cases (13 isolated cases in 381.355 seconds), 206 deployment cases, 21 skill
+cases, 16 evaluation cases and actual Chromium SDK/website checks. This accepts
+the API host sub-slice locally; it does not complete T003.
+
+Readback confirms GitHub Quality run `37218849773` passed the exact RPC draft
+#128 commit `876b4855dcba79ad5ecdbfd945a8a38875e39b85`. That hosted result does
+not qualify the current API host candidate. T003 remains in progress for the
+Website, native binding/origin graph, root secret precedence, real browser
+journeys and complete native fatal/log/trace paths.

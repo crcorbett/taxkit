@@ -372,3 +372,7 @@ At audit time, check that:
 - [Native RPC contract](clean-slate-foundation/2026-10-05-native-rpc-contract.json): T003
   native transport/package progress, narrow browser Schema ownership and explicit
   pending app-host proof.
+
+- [Native API host candidate](clean-slate-foundation/2026-10-05-native-api-host.json):
+  actual native local Worker, shared HTTP/RPC calculation, origin/body policy and
+  request cleanup proof; connected Website and complete tracing remain pending.

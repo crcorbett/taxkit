@@ -134,6 +134,14 @@ including provider identities, credentials, stages and checked command inputs.
 host and port are checked by their owners; optional `API_PORT` falls back to
 `PORT` only when absent. An invalid supplied primary value remains an error.
 
+The native API Worker candidate uses `apps/api/src/worker.config.ts` and the
+origin Schemas in the app's `schemas.ts`. Native planning leaves resource
+addresses deferred; first incoming runtime use decodes and caches the bound
+API/website origins once. Own origin is bound by native `Worker.URL`, while the
+website origin must be a matching resource Output. Missing or invalid values
+produce a fixed Config error and an empty unavailable response. No fallback
+address, extra backend runtime or request-time Layer construction is used.
+
 Configuration modules own defaults and selection. Service contracts receive
 canonical checked values. Raw credentials use `Schema.RedactedFromValue` at
 string ingress; unwrap only at final construction of the private provider

@@ -173,6 +173,7 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  "apps/api/test/worker.boundary.test.ts",
   // Test-only native request/reply bytes; no production encoder admission.
   "packages/api/rpc/test/handlers.test.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
