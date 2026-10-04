@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M44AS6XB55QKSQ94SH8RZ4RN",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T20:48:17.425348Z",
+  "branch": "codex/dev-74-native-failure-paths",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/web/scripts/native-pair-build.runtime.ts",
+    "apps/web/src/lib/config.ts",
+    "apps/web/src/lib/loaders.server.ts",
+    "apps/web/src/server.ts",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "apps/web/test/native-settings-failure.boundary.test.ts",
+    "apps/web/vite.config.ts",
+    "apps/web/vitest.native.config.ts",
+    "oxlint.config.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "b7d70ba853ae",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 7599363,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 394146560,
+    "output_tokens": 1767498,
+    "api_call_count": 2622
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T20:48:16.295391Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 746,
+    "human_modified": 68,
+    "human_removed": 0,
+    "total_committed": 746,
+    "total_lines_changed": 822,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M44AS6XB55QKSQ94SH8RZ4RN",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-74-native-failure-paths",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/web/scripts/native-pair-build.runtime.ts",
+    "apps/web/src/lib/config.ts",
+    "apps/web/src/lib/loaders.server.ts",
+    "apps/web/src/server.ts",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "apps/web/test/native-settings-failure.boundary.test.ts",
+    "apps/web/vite.config.ts",
+    "apps/web/vitest.native.config.ts",
+    "oxlint.config.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 7599363,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 394146560,
+    "output_tokens": 1767498,
+    "api_call_count": 2622
+  }
+}
