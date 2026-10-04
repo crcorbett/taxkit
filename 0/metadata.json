@@ -1,0 +1,42 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M43DMR2C59G4Y7GDNCSMWTMB",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T12:18:59.775276Z",
+  "branch": "codex/dev-73-quality-fixture-deadlines",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-04-quality-fixture-deadlines.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/standards/controls.md",
+    "tools/quality-workflow/release-boundary.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5cd4f6eeff9c",
+  "checkpoint_transcript_start": 9207,
+  "transcript_lines_at_start": 9207,
+  "compact_transcript_start": 1132,
+  "token_usage": {
+    "input_tokens": 43486,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 4596992,
+    "output_tokens": 18530,
+    "api_call_count": 26
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T12:18:59.173397Z",
+    "agent_lines": 258,
+    "agent_removed": 31,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 258,
+    "total_lines_changed": 289,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
