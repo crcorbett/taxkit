@@ -34,6 +34,15 @@ uses immutable traversal and checked record/array access. The root verification
 also runs `bun run check:quality-workflow:types`, covering the policy and tests.
 This changes local checking, not CI permissions or provider authority.
 
+The same scoped runner also executes four clean-slate enforcement mutations
+from `fixtures/strict-enforcement-defects.json`. Each changes only the copied
+lint configuration and runs the real `test:oxlint:task` verifier. Removed/disabled
+required rules and broadened synthetic assignment/method admissions must fail.
+The fixture Schema admits exactly the four named modes; the test asserts the
+complete ordered corpus. The target and command are fixed in code. Synthetic
+canary exceptions admit no production source. Retain the existing five-control
+register and six release-boundary oracles; this adds attached T002 proof.
+
 Every eligible deterministic command under that graph is a Turbo task. Quality
 binds the Vercel team cache as read/write on all configured events.
 Same-repository pull requests and `main` receive the existing team-scoped

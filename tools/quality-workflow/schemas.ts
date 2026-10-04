@@ -89,6 +89,23 @@ export const ReleaseBoundaryFixtureCorpus = Schema.Array(
   ReleaseBoundaryFixture
 );
 
+export const StrictEnforcementFixtureCorpus = Schema.NonEmptyArray(
+  Schema.Struct({
+    failureOracle: Schema.NonEmptyString,
+    id: Schema.Literals([
+      "required-rule-removed",
+      "required-rule-disabled",
+      "assignment-admission-broadened",
+      "method-admission-broadened",
+    ]),
+    mutation: Schema.Struct({
+      replacement: Schema.String,
+      search: Schema.NonEmptyString,
+    }),
+    recovery: Schema.NonEmptyString,
+  })
+);
+
 const ControlRegisterEntry = Schema.Struct({
   evidence: Schema.NonEmptyString,
   fixture: Schema.NonEmptyString,

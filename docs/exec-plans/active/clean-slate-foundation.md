@@ -25,8 +25,9 @@ rebuild through reviewable, tested draft PRs. Continue until implementation is
 finished and verified, or a concrete external blocker prevents every remaining
 safe action. A draft PR, checkpoint or completed slice is not the terminal goal.
 
-This runtime exposes no native persistent-goal capability. This active plan and
-the task ledger are the durable continuation record; the task plan mirrors it.
+The local continuation also records this objective in the runtime's native goal
+manager. This active plan and the task ledger remain the durable repository
+continuation record.
 Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
@@ -547,3 +548,46 @@ matching caches. Root `test` separately owns the CLI corpus; `verification`
 does not invoke it. The earlier binding receipt's wording about fresh corpus
 proof refers to its separate successful test commands, not an extra invocation
 inside `verification`. Final receipt-only docs/format checks precede commit.
+
+## Local T002 enforcement canaries and verifier mutations
+
+Continue from `9b6860e` and draft #102. The provisional installed-CLI inventory
+with current exact admissions preserved reports 1,295 strict diagnostics across
+remaining owned paths. It includes legacy hosts and fixtures, is not a defect
+count and is not directly comparable with the earlier inventory configuration.
+
+Qualify canonical assignment/method exceptions with eight actual CLI canaries.
+Only one generated synthetic host may assign `host.value` or call `host.push`;
+its neighbour and other targets/methods/receivers stay rejected, as do loops.
+These test-only exceptions grant no production mutation authority. Fixture
+callbacks avoid Unicorn's separate immediate-mutation restriction rather than
+turning it off. Keep every other rule active.
+
+Add four isolated mutations of copied `oxlint.config.ts` and run the real whole
+`test:oxlint:task` verifier for each: required rule removed, rule disabled,
+assignment target broadened, method broadened. A separate non-empty owning
+Schema admits only named modes; assert all four occur once in order. Fix the
+target and command in the runner, preserve exact mutation searches, expected
+failure identity and recovery. Restore the copied config between cases and
+scope all temporary files/processes. Do not edit tracked source while these
+copy-based checks run. Preserve all six old release mutation oracles and the
+existing five-control registry.
+
+Documentation impact: **Change required** for lint config/corpus, strict mutation
+Schema/runner, tooling/controls/testing owners, task evidence, this plan and
+dated receipt. **Preserve** production admissions, canonical skill hashes,
+existing control/release corpora, tax/package behaviour and provider state.
+**N/A** for Changesets, public docs and operational runbooks: root checking
+proof only, with no new provider/release procedure. Recover by reverting this
+complete slice. The [enforcement receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-enforcement-canaries.json)
+records proof and limitations. Remaining path migrations, static JavaScript
+qualification and semantic/gap review remain pending; DEV-73–81 stay active.
+
+Local qualification: pinned frozen install, 100 actual CLI tests, complete
+repository tests, 15-task build and full verification passed. Quality proof
+contains 21 cases and ten isolated failure mutations (six retained release,
+four strict settings); 21 skill cases passed. Unchanged app/package/browser
+tasks reused matching caches. Vitest shortened the first expected rule name;
+a stable assertion message corrected failure identity without changing the
+rule-membership check. Parent #102 hosted Quality passed at exact `9b6860e`
+(run 37181658155). Final receipt-only docs/format checks precede commit.

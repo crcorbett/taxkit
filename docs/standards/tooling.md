@@ -395,6 +395,17 @@ options through Oxlint's metadata validator. The listener's defensive fallback
 is not separately claimed as that CLI proof. This does not establish full
 repository or whole-T002 coverage, or static checking of JavaScript policies.
 
+Two exact generated TypeScript paths qualify canonical collection-exception
+behaviour. Only the synthetic host admits `host.value` assignment and
+`host.push`; its neighbouring file, other target/method/receiver and loops
+remain strict. These are scoped test fixtures, not production mutation owners.
+The eight real CLI cases verify both admitted and rejected code. Four isolated
+config mutations then run `test:oxlint:task` itself: removing or disabling the
+required collection rule, adding another assignment target, and adding another
+method must make that verifier fail with its expected failure identity. The
+normal tracked configuration is preserved throughout those copied-workspace
+checks. No canonical plugin asset or production runtime admission changes.
+
 The pinned Turbo version defaults to automatic root AGENTS.md edits when it
 detects an agent. TaxKit opts out with `agentGuidance: false` in `turbo.json`,
 keeping the canonical task router under maintainer control and preventing a

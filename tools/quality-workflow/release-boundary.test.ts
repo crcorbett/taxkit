@@ -13,7 +13,10 @@ import {
 } from "effect";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
-import { ReleaseBoundaryFixtureCorpus } from "./schemas.js";
+import {
+  ReleaseBoundaryFixtureCorpus,
+  StrictEnforcementFixtureCorpus,
+} from "./schemas.js";
 
 const repositoryRootUrl = new URL("../..", import.meta.url);
 
@@ -202,6 +205,62 @@ const expected = {
 } as const;
 
 describe("HGI-205 isolated release-boundary mutations", () => {
+  test.effect(
+    "rejects removed rules and broadened collection admissions with the real verifier",
+    () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+        const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
+        const fixtures = yield* fs
+          .readFileString(
+            path.join(
+              repositoryRoot,
+              "tools/quality-workflow/fixtures/strict-enforcement-defects.json"
+            )
+          )
+          .pipe(
+            Effect.flatMap(
+              Schema.decodeEffect(
+                Schema.fromJsonString(StrictEnforcementFixtureCorpus),
+                { onExcessProperty: "error" }
+              )
+            )
+          );
+        expect(EffectArray.map(fixtures, (fixture) => fixture.id)).toEqual([
+          "required-rule-removed",
+          "required-rule-disabled",
+          "assignment-admission-broadened",
+          "method-admission-broadened",
+        ]);
+        const workspace = yield* prepareWorkspace(repositoryRoot);
+        const target = path.join(workspace, "oxlint.config.ts");
+        const source = yield* fs.readFileString(target);
+        yield* Effect.forEach(fixtures, (fixture) =>
+          Effect.gen(function* () {
+            expect(source.split(fixture.mutation.search)).toHaveLength(2);
+            yield* fs.writeFileString(
+              target,
+              source.replace(
+                fixture.mutation.search,
+                fixture.mutation.replacement
+              )
+            );
+            const result = yield* runBoundaryCommand(workspace, "bun", [
+              "run",
+              "test:oxlint:task",
+            ]);
+            yield* fs.writeFileString(target, source);
+            expect(result.exitCode, fixture.id).not.toBe(0);
+            expect(`${result.stdout}\n${result.stderr}`, fixture.id).toContain(
+              fixture.failureOracle
+            );
+          })
+        );
+      }).pipe(Effect.provide(BunServices.layer)),
+    300_000
+  );
+
   test.effect(
     "executes every real owning command and retains exact failure identity",
     () =>

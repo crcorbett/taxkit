@@ -1,0 +1,114 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "9b6860ec84f96f609ea5ba6f07521a66e4263258",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR checks read-only",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Eight actual CLI cases qualify exact test-only assignment/method file, target and receiver containment and retained loop rejection",
+    "Four isolated copied-config mutations run the real entire CLI verifier: required rule removed/disabled and assignment/method admissions broadened",
+    "Separate non-empty owning Schema accepts only four named modes; runner asserts all occur once in order and fixes config target and child command",
+    "Existing scoped workspace/process helper is reused, copied configuration restored between cases, six release-boundary oracles and five-control register retained"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "tools/quality-workflow/schemas.ts",
+        "tools/quality-workflow/release-boundary.test.ts",
+        "tools/quality-workflow/fixtures/strict-enforcement-defects.json",
+        "docs/standards/tooling.md",
+        "docs/standards/controls.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "reason": "Exact synthetic canary containment and actual verifier failure proof"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        ".agents/skills/**",
+        "tools/quality-workflow/controls.json",
+        "tools/quality-workflow/fixtures/release-boundary-defects.json",
+        "packages/**",
+        "apps/**",
+        "AGENTS.md",
+        ".github/workflows/**"
+      ],
+      "reason": "Canonical assets, existing control/oracle identity, tax results and hosted authority unchanged"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public docs",
+        "operational runbooks",
+        "provider state"
+      ],
+      "reason": "Root checking proof only; no versioned package or provider/release operation"
+    }
+  ],
+  "verification": [
+    {
+      "command": "actual installed Oxlint inventory across owned paths with current exact admissions preserved",
+      "result": "1,295 provisional strict diagnostics after route slice; includes legacy hosts/fixtures, not a defect count or directly comparable trend"
+    },
+    {
+      "command": "focused real-verifier mutation test",
+      "result": "passed all four copied-config mutations; normal tracked configuration preserved"
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "result": "passed on pinned Bun 1.4.2; no lockfile or dependency change"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed: 100 actual CLI cases, all retained tax/package tests and 22 successful package tasks; unchanged tasks reused matching caches"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed, 15 successful tasks with matching unchanged-input caches"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed: docs/runbooks, format, lint, types, 21 skill cases and 21 Quality cases including all six retained release mutations and four new strict-setting mutations; unchanged two-test Chromium check reused matching cache"
+    },
+    {
+      "command": "hosted Quality run 37181658155",
+      "result": "SUCCESS at exact parent 9b6860ec84f96f609ea5ba6f07521a66e4263258; new draft hosted proof remains separate"
+    },
+    {
+      "command": "final docs/format/diff checks",
+      "result": "required after receipt-only finalisation before commit"
+    }
+  ],
+  "recovery_observations": [
+    "Initial positive canaries hit Unicorn immediate-mutation restriction; model the synthetic host callback without disabling that independent rule",
+    "First removed-rule proof failed only because Vitest shortened its expected rule text. Added a stable required-rule assertion message; preserved rule membership checks and verified all four mutation cases then pass."
+  ],
+  "limitations": [
+    "DEV-73 and DEV-74\u201381 remain unfinished",
+    "Other owned paths, static JavaScript qualification and complete semantic/gap review remain pending",
+    "Synthetic host exceptions apply only to generated test paths and are not production mutation owners",
+    "Medicare correction still awaits Cooper scope decision",
+    "No canonical skill asset or production runtime admission changed",
+    "No merge, release, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert this complete root-checking slice; no provider state changed"
+}

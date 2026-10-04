@@ -453,6 +453,15 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   scoped CLI operation accepts a configuration path for this invalid-config
   fixture. These binary checks do not claim static TypeScript checking of the
   JavaScript modules or completion of repository-wide strict enforcement.
+- Eight collection-host CLI canaries test exact file, assignment target,
+  method and receiver containment while retaining loop rejection. The admitted
+  source is generated test-only code. Four additional isolated configuration
+  mutations run the whole real CLI verifier and require its expected failure:
+  removed/disabled required rule, broader assignment target and broader method.
+  Their non-empty Schema-decoded corpus must contain every named case once in
+  order. The runner fixes the target/command, restores copied configuration
+  between cases and scopes temporary files/processes. No tracked edits may
+  overlap these copy-based checks.
 - Bun rules keep `Bun.file`, `Bun.write`, `Bun.spawn`, `Bun.serve` and
   `BunRuntime.runMain` in exact adapter/entrypoint files. The MDX rule keeps
   route-local component registries out of route composition. The test-global

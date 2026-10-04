@@ -514,7 +514,10 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
         expect(result.exitCode).toBe(1);
         yield* Effect.forEach(fixture.rules, (rule) =>
           Effect.sync(() => {
-            expect(result.codes).toContain(`${fixture.namespace}(${rule})`);
+            expect(
+              result.codes,
+              `Required lint rule: ${fixture.namespace}/${rule}`
+            ).toContain(`${fixture.namespace}(${rule})`);
           })
         );
       }).pipe(Effect.provide(BunServices.layer))
@@ -553,6 +556,75 @@ test.effect.each([
 );
 
 // Policy changes must review both the filename selector and the canonical admission.
+test.effect.each([
+  {
+    name: "admits an assignment only at the exact synthetic host target",
+    path: "tools/oxlint/.generated-collection-host.ts",
+    rejected: false,
+    source:
+      "const host = { value: 0 }; export const onHostEvent = () => { host.value = 1; };",
+  },
+  {
+    name: "rejects that assignment in the neighbouring file",
+    path: "tools/oxlint/.generated-collection-neighbour.ts",
+    rejected: true,
+    source:
+      "const host = { value: 0 }; export const onHostEvent = () => { host.value = 1; };",
+  },
+  {
+    name: "rejects an unrelated assignment target at the synthetic host",
+    path: "tools/oxlint/.generated-collection-host.ts",
+    rejected: true,
+    source:
+      "const host = { other: 0, value: 0 }; export const onHostEvent = () => { host.other = 1; };",
+  },
+  {
+    name: "admits one method only at the exact synthetic host receiver",
+    path: "tools/oxlint/.generated-collection-host.ts",
+    rejected: false,
+    source:
+      "const host: number[] = []; export const onHostEvent = () => { host.push(1); };",
+  },
+  {
+    name: "rejects that method in the neighbouring file",
+    path: "tools/oxlint/.generated-collection-neighbour.ts",
+    rejected: true,
+    source:
+      "const host: number[] = []; export const onHostEvent = () => { host.push(1); };",
+  },
+  {
+    name: "rejects an unrelated method at the synthetic host",
+    path: "tools/oxlint/.generated-collection-host.ts",
+    rejected: true,
+    source:
+      "const host = [1]; export const onHostEvent = () => host.map((value) => value + 1);",
+  },
+  {
+    name: "rejects a different receiver at the synthetic host",
+    path: "tools/oxlint/.generated-collection-host.ts",
+    rejected: true,
+    source:
+      "const other: number[] = []; export const onHostEvent = () => { other.push(1); };",
+  },
+  {
+    name: "rejects loops even at the admitted synthetic host",
+    path: "tools/oxlint/.generated-collection-host.ts",
+    rejected: true,
+    source: "for (const value of [1]) { void value; }",
+  },
+])("$name", ({ path, rejected, source }) =>
+  Effect.gen(function* () {
+    yield* writeLintFixture(join(repositoryRoot, path), source);
+    const result = yield* runOxlint(path);
+    expect(result.files).toBe(1);
+    expect(
+      Array.contains(result.codes, "strict-effect(no-imperative-collections)"),
+      "Strict collection admission canary"
+    ).toBe(rejected);
+    expect(result.exitCode).toBe(rejected ? 1 : 0);
+  }).pipe(Effect.provide(BunServices.layer))
+);
+
 test.each([
   "tools/repository-paths/check.runtime.ts",
   "tools/governance/check.runtime.ts",

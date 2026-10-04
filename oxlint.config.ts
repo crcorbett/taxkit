@@ -446,6 +446,34 @@ export default defineConfig({
       },
     },
     {
+      // Synthetic synchronous-host canaries only. They do not admit production
+      // mutation; neighbouring paths and unrelated targets/methods stay strict.
+      files: [
+        "tools/oxlint/.generated-collection-host.ts",
+        "tools/oxlint/.generated-collection-neighbour.ts",
+      ],
+      rules: {
+        "strict-effect/no-imperative-collections": [
+          "error",
+          {
+            allowedAssignments: [
+              {
+                file: "tools/oxlint/.generated-collection-host.ts",
+                target: "host.value",
+              },
+            ],
+            allowedMethods: [
+              {
+                file: "tools/oxlint/.generated-collection-host.ts",
+                method: "push",
+                receiver: "host",
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
       // Fetch's Promise result is a host signature, not workflow orchestration.
       // The second exact path is its scoped negative/positive CLI fixture.
       files: [
