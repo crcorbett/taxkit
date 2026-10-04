@@ -743,3 +743,10 @@ belongs to saved receipts and is not a current provider readback. Real lint
 fixtures accept six adopted files, reject their neighbour and check the sole
 exact command runtime admission. The broader retained plan/digest policy and
 provider inventory service remain pending strict migration.
+
+
+Each accepted lint-fixture file runs as an individual Effect test with the
+ordinary test deadline. This retains the existing exact file-count, exit-code
+and namespace checks while keeping process startup for one file separate from
+the other files. The scoped process owner still interrupts and releases an
+unfinished child; no global deadline or assertion is weakened.

@@ -490,3 +490,10 @@ existing field Schemas. Six adopted files receive all eleven strict rules. The
 command alone has an exact runtime admission; its raw Bun/decode exceptions and
 the policy test's execution admission are removed. Synthetic register encoding
 and decoding permissions apply only to the exact command test.
+
+
+Actual lint acceptance checks give each source file its own ordinary test
+deadline. A growing group of files must not share a five-second deadline across
+multiple real command processes. Each test still requires exactly one admitted
+file, exit code zero and no finding from its required rule namespace. Rejected
+fixtures and disabled-rule/broadened-permission checks retain their assertions.

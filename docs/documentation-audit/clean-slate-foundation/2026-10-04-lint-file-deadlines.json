@@ -1,0 +1,88 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "1d65240dc148069eab52f9d7232973499401c4c6",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR readback separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Accepted lint source paths each run as an individual Effect test with the ordinary per-test deadline",
+    "Exact admitted-file count, zero exit code and required namespace assertions remain; negative fixtures and deliberate verifier fault checks are unchanged",
+    "Scoped command lifetime retains interruption and child cleanup; no global test deadline is extended"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "tools/oxlint/portable-rules.test.ts",
+        "docs/standards/tooling.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json"
+      ],
+      "reason": "Actual acceptance test scheduling and its proof boundary changed"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        ".agents/skills/**",
+        "docs/evidence/**",
+        "docs/documentation-audit historical receipts",
+        "tools/docs-deployment/*register.json",
+        "tools/docs-deployment/controls.json",
+        "tools/docs-deployment/fixtures/**",
+        ".github/workflows/**",
+        "docs/runbooks/**",
+        "packages/**",
+        "apps/**",
+        "bun.lock"
+      ],
+      "reason": "Saved bytes, original authority/identities/oracles, exports, tax results and operational procedures"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public content",
+        "provider state"
+      ],
+      "reason": "Root local tools only; no package-facing or provider operation"
+    }
+  ],
+  "baseline_observations": [
+    "Hosted Quality run 37188315652 failed at parent_revision: eighteen real lint commands shared a five-second accepted-group deadline; 150 other lint-suite cases passed"
+  ],
+  "verification": [
+    {
+      "command": "focused actual lint fixtures",
+      "result": "passed: 217 cases, including each accepted file independently, all rejected fixtures and exact command admissions; existing assertions retained"
+    },
+    {
+      "command": "frozen install, complete tests, build, verification and both local Chromium suites",
+      "result": "passed: 790 installs/1020 packages with unchanged lock, 142 deployment-tool cases, complete tests, 15-task build and full verification; 21 Quality cases/all ten isolated deliberate faults, fresh source-only documentation, 21 skill cases and 16 evaluation cases. Matching unchanged-input package/build and both Chromium check caches reused"
+    },
+    {
+      "command": "check:docs, check:runbooks, format:check and git diff --check",
+      "result": "passed before commit"
+    }
+  ],
+  "limitations": [
+    "DEV-73 and DEV-74\u201381 unfinished; hosted proof for the recovery remains separate",
+    "Synthetic tests and saved receipt checks make no provider requests; establishment counts describe saved records only",
+    "Medicare correction awaits Cooper scope decision",
+    "No merge, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert the complete slice; no provider, registry or deployment state changes"
+}

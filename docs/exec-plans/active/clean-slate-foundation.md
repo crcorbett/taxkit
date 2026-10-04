@@ -911,3 +911,32 @@ commit; hosted proof remains separate. #109 hosted Quality passed at exact
 `0b1954276b335791783e885a238bdd8d294686b6`, run 37187566467. The broader retained
 plan/digest policy, provider inventory service and root checks remain pending,
 as do other T002 owners and DEV-74–81. DEV-73 remains in progress.
+
+
+## T002 hosted lint-fixture timing recovery
+
+Hosted #110 Quality failed at `1d65240dc148069eab52f9d7232973499401c4c6`,
+[run 37188315652](https://github.com/crcorbett/taxkit/actions/runs/37188315652).
+The accepted credential group launched eighteen actual lint processes within
+one ordinary five-second test deadline; the other 150 lint cases passed.
+The retained-record work was saved in local stash
+`48c8d05ce87b60843ae70c53426a9129b515fc18` before updating #110.
+
+Accepted source files now run as separate Effect tests, each retaining the
+ordinary deadline and exact one-file/exit-code/namespace assertions. Required
+negative fixtures and deliberate verifier faults retain their original checks.
+The scoped child process still owns cleanup after interruption. All 217 lint
+cases pass. Frozen install (790 installs/1020 packages, unchanged lock), complete
+tests, the 15-task build and full verification passed, including 142 deployment
+tool cases, 21 Quality cases/all ten deliberate faults, fresh source-only
+documentation, 21 skill cases and 16 evaluation cases. Matching package/build
+and both local Chromium check caches were reused. Documentation, runbook,
+formatting and diff checks passed; updated hosted proof remains separate.
+
+Documentation impact: **Change required** for the fixture owner, tooling/testing,
+this plan/task ledger and the
+[dated timing receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-lint-file-deadlines.json).
+**Preserve** all lint policies and assertions, rejected-fixture/fault coverage,
+package exports, lock, historical receipts and tax results. **N/A** Changesets,
+public content and runbook/provider procedures: root test scheduling only.
+Recover by reverting this slice. DEV-73 and DEV-74–81 remain unfinished.

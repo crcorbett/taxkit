@@ -655,21 +655,24 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
     })
   );
 
-  test.effect.each(fixtureCases)(
-    "$namespace accepts its boundary fixtures ($generated)",
-    (fixture) =>
-      Effect.forEach(fixture.accepted, (path) =>
-        Effect.gen(function* () {
-          const result = yield* runOxlint(path);
-          expect(result.files).toBe(1);
-          expect(result.exitCode).toBe(0);
-          expect(
-            Array.some(result.codes, (code) =>
-              code.startsWith(`${fixture.namespace}(`)
-            )
-          ).toBe(false);
-        })
-      ).pipe(Effect.provide(BunServices.layer))
+  // Each path starts a real process. Give each file its own ordinary test
+  // deadline rather than sharing one deadline across a growing file group.
+  test.effect.each(
+    Array.flatMap(fixtureCases, (fixture) =>
+      Array.map(fixture.accepted, (path) => ({
+        namespace: fixture.namespace,
+        path,
+      }))
+    )
+  )("$namespace accepts its boundary fixture ($path)", ({ namespace, path }) =>
+    Effect.gen(function* () {
+      const result = yield* runOxlint(path);
+      expect(result.files).toBe(1);
+      expect(result.exitCode).toBe(0);
+      expect(
+        Array.some(result.codes, (code) => code.startsWith(`${namespace}(`))
+      ).toBe(false);
+    }).pipe(Effect.provide(BunServices.layer))
   );
 
   test.effect.each(fixtureCases)(
