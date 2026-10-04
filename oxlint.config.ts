@@ -14,6 +14,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  "tools/docs-deployment/local-doppler-environment.boundary.ts",
+  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   // Exact synchronous Oxlint rule-options ingress, decoded once and fail-closed.
   "tools/oxlint/taxkit-rules.js",
   // Exact fixture ingress: three Schema-owned historical policy corpora.
@@ -150,6 +152,7 @@ const effectErrorContractFiles = [
 ];
 
 const portableEffectSourceFiles = [
+  "tools/docs-deployment/fixtures/fake-doppler*.ts",
   "apps/api/**/*.{ts,tsx,js,jsx}",
   "packages/api/http/**/*.{ts,tsx,js,jsx}",
   "packages/calculators/**/*.{ts,tsx,js,jsx}",
@@ -173,9 +176,16 @@ const portableEffectSourceFiles = [
   "tools/docs-deployment/workflow-artifact*.ts",
   "tools/docs-deployment/strict-boundaries*.ts",
   "tools/docs-deployment/alchemy-memo.test.ts",
+  "tools/docs-deployment/{doppler-custody*,local-doppler*,inventory-credentials*,workflow-check*,workflow-input-check*}.ts",
+  "tools/docs-deployment/inventory.schemas.ts",
 ];
 
 const schemaEncoderEgressFiles = [
+  // Exact credential/YAML/receipt negative-fixture representations only.
+  "tools/docs-deployment/doppler-custody.test.ts",
+  "tools/docs-deployment/inventory-credentials.boundary.test.ts",
+  "tools/docs-deployment/workflow-check.boundary.test.ts",
+  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "packages/docs-content/src/service.test.ts",
   "packages/docs-content/src/generated-page.boundary.test.ts",
   "packages/docs-fumadocs/src/service.test.ts",
@@ -208,6 +218,10 @@ const schemaEncoderEgressFiles = [
 ];
 
 const throwingCodecTestFiles = [
+  "tools/docs-deployment/doppler-custody.test.ts",
+  "tools/docs-deployment/inventory-credentials.boundary.test.ts",
+  "tools/docs-deployment/workflow-check.boundary.test.ts",
+
   // Pure policy fixtures encode their Schema-owned accepted record bytes.
   "tools/documentation/policy.test.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
@@ -217,6 +231,7 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
@@ -269,6 +284,7 @@ const runtimeBoundaryFiles = [
 ];
 
 const processBoundaryFiles = [
+  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
@@ -336,18 +352,16 @@ const bunAdapterFiles = [
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/check.runtime.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
-  "tools/docs-deployment/doppler-custody.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
-  "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/workflow-run-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
+  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
@@ -439,6 +453,10 @@ export default defineConfig({
         "tools/docs-deployment/workflow-artifact*.ts",
         "tools/docs-deployment/strict-boundaries*.ts",
         "tools/docs-deployment/alchemy-memo.test.ts",
+        "tools/docs-deployment/{doppler-custody*,local-doppler*,inventory-credentials*,workflow-check*,workflow-input-check*}.ts",
+        "tools/docs-deployment/inventory.schemas.ts",
+        "tools/docs-deployment/fixtures/fake-doppler*.ts",
+        "tools/docs-deployment/.generated-credential-strict-rejected.ts",
         "tools/docs-deployment/.generated-artifact-strict-rejected.ts",
         "packages/testing/**",
         "packages/api/http/**",
@@ -533,6 +551,52 @@ export default defineConfig({
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["tools/governance/check.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/doppler-custody.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: ["tools/docs-deployment/doppler-custody.runtime.ts"],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/local-doppler.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/docs-deployment/local-doppler.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/workflow-input-check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/docs-deployment/workflow-input-check.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/fixtures/fake-doppler.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
+            ],
+          },
         ],
       },
     },

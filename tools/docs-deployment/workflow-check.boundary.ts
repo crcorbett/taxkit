@@ -30,7 +30,7 @@ export const readWorkflowReceipt = <A>(
       )
     );
 
-    return yield* Schema.decodeUnknownEffect(Schema.fromJsonString(schema), {
+    return yield* Schema.decodeEffect(Schema.fromJsonString(schema), {
       onExcessProperty: "error",
     })(source).pipe(
       Effect.mapError(

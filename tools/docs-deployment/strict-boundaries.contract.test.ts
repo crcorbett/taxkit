@@ -220,6 +220,21 @@ describe("strict docs app and deployment architecture", () => {
       expect(findingInvariants(bypassedCustody)).toContain(
         "local-doppler-boundary"
       );
+      const bypassedEnvironment = replaceSource(
+        sources,
+        "tools/docs-deployment/local-doppler.runtime.ts",
+        (source) =>
+          source.replace("readLocalDopplerEnvironment(", "readRawEnvironment(")
+      );
+      expect(findingInvariants(bypassedEnvironment)).toContain(
+        "local-doppler-boundary"
+      );
+      const ambientRuntime = replaceSource(
+        sources,
+        "tools/docs-deployment/local-doppler.runtime.ts",
+        (source) => `${source}\nconst ambient = process.env;\n`
+      );
+      expect(findingInvariants(ambientRuntime)).toContain("host-ingress");
     })
   );
 

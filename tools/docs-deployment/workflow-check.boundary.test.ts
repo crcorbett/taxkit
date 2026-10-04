@@ -1,8 +1,7 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { ConfigProvider, Effect, Match, Result } from "effect";
-import type { Schema } from "effect";
+import { describe, expect, it as test } from "@effect/vitest";
+import { ConfigProvider, Effect, Match, Result, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
-import { describe, expect, test } from "vitest";
 
 import { readWorkflowSha256 } from "./workflow-check.boundary.js";
 import { checkWorkflowInput } from "./workflow-input-check.runtime.js";
@@ -23,7 +22,10 @@ const runInputCheck = (
       prefix: "taxkit-workflow-check-",
     });
     const receiptPath = `${directory}/workflow-input.json`;
-    yield* fileSystem.writeFileString(receiptPath, JSON.stringify(receipt));
+    yield* fileSystem.writeFileString(
+      receiptPath,
+      Schema.encodeSync(Schema.fromJsonString(Schema.Unknown))(receipt)
+    );
     const configProvider = ConfigProvider.fromUnknown({
       TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT: candidateCommit,
       TAXKIT_WORKFLOW_INPUT_OPERATION: "deploy",
@@ -39,7 +41,7 @@ const runInputCheck = (
       Effect.provideService(ConfigProvider.ConfigProvider, configProvider),
       Effect.result
     );
-  }).pipe(Effect.scoped, Effect.provide(BunServices.layer), Effect.runPromise);
+  }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
 
 const validReceipt = {
   candidateCommit,
@@ -53,98 +55,112 @@ const validReceipt = {
 };
 
 describe("workflow check boundary", () => {
-  test("accepts a Schema-owned Config and exact receipt", async () => {
-    const result = await runInputCheck(validReceipt);
-    expect(Result.isSuccess(result)).toBe(true);
-  });
+  test.effect("accepts a Schema-owned Config and exact receipt", () =>
+    Effect.gen(function* () {
+      const result = yield* runInputCheck(validReceipt);
+      expect(Result.isSuccess(result)).toBe(true);
+    })
+  );
 
-  test("rejects an excess receipt property at JSON ingress", async () => {
-    const result = await runInputCheck({
-      ...validReceipt,
-      secret: "forbidden",
-    });
-    Result.match(result, {
-      onFailure: (error) =>
-        Match.value(error).pipe(
-          Match.tag("WorkflowCheckInputError", (failure) => {
-            expect(failure.check).toBe("workflow-input");
-            expect(failure.target).toBe("input-receipt");
-          }),
-          Match.orElse(() => expect.unreachable())
-        ),
-      onSuccess: () => expect.unreachable(),
-    });
-  });
-
-  test("distinguishes a typed identity mismatch from malformed input", async () => {
-    const result = await runInputCheck({
-      ...validReceipt,
-      candidateCommit: "c".repeat(40),
-    });
-    Result.match(result, {
-      onFailure: (error) =>
-        Match.value(error).pipe(
-          Match.tag("WorkflowCheckMismatchError", (failure) => {
-            expect(failure.invariant).toBe("source-run-operation-candidate");
-          }),
-          Match.orElse(() => expect.unreachable())
-        ),
-      onSuccess: () => expect.unreachable(),
-    });
-  });
-
-  test("maps missing Config to a safe input error", async () => {
-    const result = await runInputCheck(validReceipt, {
-      TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT: undefined,
-    });
-    Result.match(result, {
-      onFailure: (error) =>
-        Match.value(error).pipe(
-          Match.tag("WorkflowCheckInputError", (failure) => {
-            expect(failure.target).toBe("environment");
-          }),
-          Match.orElse(() => expect.unreachable())
-        ),
-      onSuccess: () => expect.unreachable(),
-    });
-  });
-
-  test("hashes screenshot bytes through Effect Crypto and maps missing bytes", async () => {
-    const [digest, missing] = await Effect.gen(function* screenshotFixture() {
-      const fileSystem = yield* FileSystem.FileSystem;
-      const directory = yield* fileSystem.makeTempDirectoryScoped({
-        prefix: "taxkit-workflow-screenshot-",
+  test.effect("rejects an excess receipt property at JSON ingress", () =>
+    Effect.gen(function* () {
+      const result = yield* runInputCheck({
+        ...validReceipt,
+        secret: "forbidden",
       });
-      const screenshotPath = `${directory}/desktop.png`;
-      yield* fileSystem.writeFileString(screenshotPath, "abc");
+      Result.match(result, {
+        onFailure: (error) =>
+          Match.value(error).pipe(
+            Match.tag("WorkflowCheckInputError", (failure) => {
+              expect(failure.check).toBe("workflow-input");
+              expect(failure.target).toBe("input-receipt");
+            }),
+            Match.orElse(() => expect.unreachable())
+          ),
+        onSuccess: () => expect.unreachable(),
+      });
+    })
+  );
 
-      return yield* Effect.all([
-        readWorkflowSha256(
-          "workflow-proof",
-          screenshotPath,
-          "screenshot-desktop"
-        ),
-        readWorkflowSha256(
-          "workflow-proof",
-          `${directory}/missing.png`,
-          "screenshot-mobile"
-        ).pipe(Effect.result),
-      ]);
-    }).pipe(
-      Effect.scoped,
-      Effect.provide(BunServices.layer),
-      Effect.runPromise
-    );
+  test.effect(
+    "distinguishes a typed identity mismatch from malformed input",
+    () =>
+      Effect.gen(function* () {
+        const result = yield* runInputCheck({
+          ...validReceipt,
+          candidateCommit: "c".repeat(40),
+        });
+        Result.match(result, {
+          onFailure: (error) =>
+            Match.value(error).pipe(
+              Match.tag("WorkflowCheckMismatchError", (failure) => {
+                expect(failure.invariant).toBe(
+                  "source-run-operation-candidate"
+                );
+              }),
+              Match.orElse(() => expect.unreachable())
+            ),
+          onSuccess: () => expect.unreachable(),
+        });
+      })
+  );
 
-    expect(digest).toBe(
-      "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
-    );
-    Result.match(missing, {
-      onFailure: (error) => {
-        expect(error.check).toBe("workflow-proof");
-        expect(error.operation).toBe("read-screenshot-mobile");
-      },
-      onSuccess: () => expect.unreachable(),
-    });
-  });
+  test.effect("maps missing Config to a safe input error", () =>
+    Effect.gen(function* () {
+      const result = yield* runInputCheck(validReceipt, {
+        TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT: undefined,
+      });
+      Result.match(result, {
+        onFailure: (error) =>
+          Match.value(error).pipe(
+            Match.tag("WorkflowCheckInputError", (failure) => {
+              expect(failure.target).toBe("environment");
+            }),
+            Match.orElse(() => expect.unreachable())
+          ),
+        onSuccess: () => expect.unreachable(),
+      });
+    })
+  );
+
+  test.effect(
+    "hashes screenshot bytes through Effect Crypto and maps missing bytes",
+    () =>
+      Effect.gen(function* () {
+        const [digest, missing] = yield* Effect.gen(
+          function* screenshotFixture() {
+            const fileSystem = yield* FileSystem.FileSystem;
+            const directory = yield* fileSystem.makeTempDirectoryScoped({
+              prefix: "taxkit-workflow-screenshot-",
+            });
+            const screenshotPath = `${directory}/desktop.png`;
+            yield* fileSystem.writeFileString(screenshotPath, "abc");
+
+            return yield* Effect.all([
+              readWorkflowSha256(
+                "workflow-proof",
+                screenshotPath,
+                "screenshot-desktop"
+              ),
+              readWorkflowSha256(
+                "workflow-proof",
+                `${directory}/missing.png`,
+                "screenshot-mobile"
+              ).pipe(Effect.result),
+            ]);
+          }
+        ).pipe(Effect.scoped, Effect.provide(BunServices.layer));
+
+        expect(digest).toBe(
+          "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+        Result.match(missing, {
+          onFailure: (error) => {
+            expect(error.check).toBe("workflow-proof");
+            expect(error.operation).toBe("read-screenshot-mobile");
+          },
+          onSuccess: () => expect.unreachable(),
+        });
+      })
+  );
 });

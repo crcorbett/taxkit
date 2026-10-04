@@ -28,3 +28,8 @@ export const DopplerUserConfig = Schema.Struct({
   scoped: Schema.Record(Schema.String, DopplerScopedConfig),
 });
 export type DopplerUserConfig = typeof DopplerUserConfig.Type;
+
+export class LocalDopplerEnvironmentError extends Schema.TaggedError<LocalDopplerEnvironmentError>()(
+  "LocalDopplerEnvironmentError",
+  { reason: Schema.Literals(["environment-read", "environment-shape"]) }
+) {}

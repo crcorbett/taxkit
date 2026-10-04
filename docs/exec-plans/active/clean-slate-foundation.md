@@ -783,3 +783,49 @@ complete tests, the 15-task build and full verification passed, including
 source-only documentation check. Matching unchanged-input package/build and
 two Chromium proof caches were reused. Final documentation checks precede commit. #105's corrected hosted Quality passed at
 `adc79d2` (run 37184994613); #106 hosted proof remains separate.
+
+
+## Local T002 deployment credential and workflow-input tools
+
+Continue from #107 at `cc4935b`. Credential file JSON is restored once, then
+checked by the existing owning Schema; malformed cache fallback and unreadable
+input retain separate safe outcomes. Token selection uses checked optional
+values and preserves most-specific scope independently of iteration order.
+Child-environment filtering uses persistent checked entries. Workflow-input
+JSON and optional PR restore use typed Schema/Option ingress.
+
+The local host restores the complete flat environment through Effect
+ConfigProvider, including empty values and repeated underscores, and emits
+safe typed read/shape errors. The former raw environment exception in the
+source-contract checker is removed. Three exact executable runtimes are admitted;
+their obsolete raw Bun permissions are removed. Four more suites use scoped
+`@effect/vitest`. The generated raw fake Doppler program is replaced by a tracked
+checked executable and owning receipt/config Schemas. Tests invoke it through a
+scoped symlink with synthetic values and env-file loading disabled. Its argument
+read and runtime permission are exact test-only admissions. No Doppler/provider
+command is run. A negative child exit must produce the owning process-exit error.
+
+Before edits, the actual added strict scope reported 50 findings; this is a
+scoped observation, not a whole-repository count or trend. Existing assertions
+remain, including malformed cache fallback, account matching, hidden raw token,
+fixed child arguments and unrelated-env retention. Added tests check environment
+restoration/errors, cached precedence, unreadable input, scalar JSON, empty token
+and most-specific scope in both orders. Actual CLI fixtures cover the eighteen
+adopted files, their rejected neighbour and four exact runtime admissions.
+
+Documentation impact: **Change required** for boundary/test/fixture/code/config
+owners, tool README, testing/tooling, this plan/task ledger and the
+[dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-deployment-credentials.json).
+**Preserve** credential formats, original cache precedence and scope rules,
+resource/workflow/runbook authority, all saved evidence/capture bytes, package
+exports, lock, canonical assets and retained tax results. **N/A** Changesets,
+public content and operational-procedure edits: root local tools only.
+Focused types/lint passed, with 125 deployment-tool cases (108 retained from
+#107, seventeen added) and 143 lint-suite cases. Frozen install, complete
+tests, the 15-task build and full verification passed, including 21 Quality
+cases/all ten isolated mutations, 21 skill cases and the fresh source-only
+documentation check. Matching unchanged-input package/build and two Chromium
+proof caches were reused. Final documentation checks precede commit. Recover
+by reverting the slice; these changes alter no provider state. #107 hosted
+Quality passed at exact `cc4935b`, run 37185846915. DEV-73 and downstream tasks
+remain unfinished.

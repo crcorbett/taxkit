@@ -705,3 +705,16 @@ source, overlapping upload directories and an admitted symlink leaving the
 source directory. Actual lint fixtures accept each of the nine migrated files,
 reject a neighbouring generated file and check the one exact runtime admission.
 These tests run no provider command; other deployment-tool strict work is pending.
+
+
+Credential and workflow-input tests now use scoped Effect Vitest. The old
+runtime calls and generated raw fake command are removed. The tracked fake
+command runs through a scoped symlink with synthetic environment and no env-file
+loading, writes its Schema-owned receipt, and returns a typed failure for the
+negative child-exit case. The existing exact argument and stripped-credential
+assertions remain. Added cases cover full environment-name/empty-value restore,
+provider absence/shape/read errors, cached credential precedence, unreadable
+input, malformed scalars, empty token and most-specific token scope in both
+orders. Strict source tests reject bypassing the new environment boundary and
+raw environment reads. Actual lint fixtures qualify all eighteen adopted files
+and one rejected neighbour, plus four exact runtime assertions.

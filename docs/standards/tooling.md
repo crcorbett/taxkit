@@ -454,3 +454,14 @@ hashing uses Effect Crypto; typed file JSON is decoded once at ingress.
 The rest of this directory remains explicitly pending for strict migration.
 The existing deployment test command uses Bun-hosted Vitest and shared source
 resolution; its assertions still read local fixtures and saved records.
+
+
+Migrated deployment credential and workflow-input owners receive the same strict
+rules. The local host reads its full environment through ConfigProvider and a
+named restoration boundary, preserving empty values and underscored names.
+Checked optional lookup owns command-environment filtering and scope selection;
+workflow JSON uses typed ingress. Cached credential JSON is parsed once, with
+malformed fallback kept separate from unreadable input. Three executable hosts
+and one checked fake test command each have a separate exact runtime admission.
+Their obsolete raw Bun API permissions are removed. The fake command's argument
+read and Schema receipt encoding are exact test-only representation permissions.

@@ -104,10 +104,7 @@ const inspectGenericBoundaries = (
     const applicableHostIngressPatterns = EffectArray.filter(
       hostIngressPatterns,
       (pattern) =>
-        !(
-          (path === hostedProofHostPath && pattern.includes("node:fs")) ||
-          (path === localDopplerRuntimePath && pattern === "process.env")
-        )
+        !(path === hostedProofHostPath && pattern.includes("node:fs"))
     );
     return [
       ...(includesAny(source, applicableHostIngressPatterns)
@@ -268,7 +265,9 @@ const inspectLocalDopplerBoundary = (
     !command.includes("process.env") &&
     includesEvery(runtime, [
       "checkDopplerCustody(",
-      'runLocalDocsWithDoppler("doppler", process.env)',
+      'runLocalDocsWithDoppler("doppler", environment)',
+      "readLocalDopplerEnvironment(",
+      "ConfigProvider.fromEnv(",
       "disableErrorReporting: true",
     ]);
 
