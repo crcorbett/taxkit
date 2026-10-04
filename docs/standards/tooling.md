@@ -346,7 +346,7 @@ category so local usernames and matched content cannot leak into logs.
 ## Incremental clean-slate enforcement
 
 DEV-73 currently configures all eleven canonical strict Effect rules in directly owned lint TypeScript
-files (`tools/oxlint/*.ts`) and in core,
+files (`tools/oxlint/*.ts`), repository-path and governance tools, and in core,
 rules, calculators, shared testing helpers and the HTTP API, including their tests. Actual Oxlint fixtures assert
 one admitted file, exit code and each of the ten applicable domain diagnostics;
 the web-runtime filename rule applies when web scope is migrated. Lint and
@@ -359,3 +359,9 @@ Existing repository rules continue to apply; this partial adoption is not
 repository-wide strict-compliance evidence. Exact report/error serialization
 tests may invoke owning Schema encoders as their representation boundary;
 this grants no runtime or other strict-policy exemption.
+
+The repository-path and governance commands have exact canonical runtime admissions at
+`tools/repository-paths/check.runtime.ts` and `tools/governance/check.runtime.ts`; ordinary tools and tests cannot run
+Effects themselves. Its real-command accepted/rejected fixtures and exact
+configuration assertion reject missing enforcement or a widened command selector.
+Repository-path and governance tests use the Bun-hosted Effect Vitest runner.

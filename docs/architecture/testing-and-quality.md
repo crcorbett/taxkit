@@ -496,7 +496,7 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   negative cases for encoding and `Schema.decodeTo`, and real Oxlint CLI
   fixtures for both a prohibited file and an exact allowlisted file. Run those
   fixture commands with `--disable-nested-config`.
-- The Oxlint CLI suites run through Bun-hosted Vitest with `@effect/vitest`.
+- The Oxlint CLI, repository-path and governance suites run through Bun-hosted Vitest with `@effect/vitest`.
   Effect scopes own fixture cleanup and child processes; the shared
   `tools/oxlint/cli-fixture.ts` boundary decodes process bytes.
   `check:oxlint:types` checks the tests and their imported lint configuration.

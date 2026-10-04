@@ -331,3 +331,29 @@ tax results and source provenance. **N/A** for provider operations. Revert the
 complete slice for recovery. The [API/test-boundary receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-api-test-boundaries.json)
 records passing frozen install, all tests (64 lint, five API and five assertion
 cases), full verification and build.
+
+## T002 repository-tool test and command boundaries
+
+Run repository-path and governance tests through Bun-hosted Effect Vitest.
+Remove raw async/Promise execution wrappers; use test-owned Effects and the
+existing scoped platform services. Governance fixture trees use immutable Record
+updates; checked Option access replaces unchecked indexed findings and trees.
+Enable all eleven canonical rules for repository-path and governance tools,
+including tests. The repository-path executable retains one exact runtime admission,
+with real CLI fixtures and a configuration assertion protecting its selector.
+The governance runtime also has one exact admission. Its traversal, collection
+construction and checked lookups are functional; Option owns missing tree/reference
+entries. Schema string encoding preserves the original sorted digest byte format
+and existing receipt hashes, without replacing them with a new canonicalization.
+
+Documentation impact: **Change required** for test-host commands, strict scope,
+exact runtime admission, real-command fixtures and this progress owner.
+**Preserve** repository path redaction, governance semantics and all product
+contracts/results. **N/A** for a Changeset: this slice changes root tooling only.
+Revert the complete slice for recovery; no external state changes.
+
+The [tool-runtime receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-tool-runtime-boundaries.json)
+records passing focused tests (11 path, 15 governance), 70 real CLI lint cases,
+all repository tests, full verification and build. The refreshed provisional
+inventory reports 1,550 strict diagnostics before additional host/fixture
+qualification; this is not a confirmed defect count or whole-repository acceptance.

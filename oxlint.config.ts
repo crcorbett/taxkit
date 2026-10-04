@@ -165,6 +165,7 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  "tools/governance/check.runtime.ts",
   "packages/api/http/__tests__/openapi-snapshot.test.ts",
   "packages/api/http/__tests__/public-calculation-api.test.ts",
   // Exact representation-boundary tests: deterministic report bytes and secret-negative error JSON.
@@ -410,6 +411,8 @@ export default defineConfig({
         "packages/rules/**",
         "packages/calculators/**",
         "tools/oxlint/*.ts",
+        "tools/repository-paths/**",
+        "tools/governance/**",
         "packages/testing/**",
         "packages/api/http/**",
       ],
@@ -443,6 +446,24 @@ export default defineConfig({
               "tools/oxlint/.generated-fetch-host.ts",
             ],
           },
+        ],
+      },
+    },
+    {
+      files: ["tools/repository-paths/check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/repository-paths/check.runtime.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["tools/governance/check.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/governance/check.runtime.ts"] },
         ],
       },
     },

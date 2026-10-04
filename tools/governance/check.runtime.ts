@@ -6,6 +6,9 @@ import {
   Console,
   Effect,
   Match,
+  Option,
+  Order,
+  Schema,
   Record as EffectRecord,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
@@ -38,10 +41,10 @@ import {
 
 const repositoryRootUrl = new URL("../..", import.meta.url);
 const extraSkillIds = ["docs-writer", "portless"];
-const overlayBySkill = new Map([
-  ["docs-maintainer", "references/repository-profile.md"],
-  ["package-structure", "references/repository-profile.md"],
-]);
+const overlayBySkill = {
+  "docs-maintainer": "references/repository-profile.md",
+  "package-structure": "references/repository-profile.md",
+};
 const referenceSkillIds = [...canonicalSkillIds, "docs-writer"];
 const markdownLink = /\[[^\]]*\]\((?<target>[^)]+)\)/gu;
 const absoluteUserPath = /(?:file:\/\/)?\/(?:Users|home)\/[^/\s)]+\//gu;
@@ -80,30 +83,30 @@ const inspectTree = (
         )
       );
     const entries = yield* Effect.forEach(
-      members.toSorted(),
+      Array.sort(members, Order.String),
       (relativePath) =>
         Effect.gen(function* inspectSkillTreeMember() {
           if (relativePath === excludedRelativePath) {
-            return null;
+            return Option.none();
           }
           const absolutePath = path.join(root, relativePath);
           const info = yield* fileSystem.stat(absolutePath);
           if (info.type === "File") {
             const bytes = yield* fileSystem.readFile(absolutePath);
             const hash = yield* sha256(bytes);
-            return [
+            return Option.some([
               relativePath,
               `{"kind":"file","mode":${portableTreeMode(info.mode)},"sha256":"${hash}"}`,
-            ] as const;
+            ] as const);
           }
           if (info.type === "SymbolicLink") {
             const target = yield* fileSystem.readLink(absolutePath);
-            return [
+            return Option.some([
               relativePath,
-              `{"kind":"symlink","target":${JSON.stringify(target)}}`,
-            ] as const;
+              `{"kind":"symlink","target":${yield* Schema.encodeEffect(Schema.fromJsonString(Schema.String))(target)}}`,
+            ] as const);
           }
-          return null;
+          return Option.none();
         }).pipe(
           Effect.mapError(
             () =>
@@ -114,13 +117,19 @@ const inspectTree = (
         ),
       { concurrency: 16 }
     );
-    const retained = entries.flatMap((entry) =>
-      entry === null ? [] : [entry]
+    const retained = Array.getSomes(entries);
+    const fragments = yield* Effect.forEach(retained, ([relativePath, value]) =>
+      Schema.encodeEffect(Schema.fromJsonString(Schema.String))(
+        relativePath
+      ).pipe(
+        Effect.map((encodedPath) => `${encodedPath}:${value}`),
+        Effect.mapError(
+          () =>
+            new GovernanceInputError({ target: `.agents/skills/${skillId}` })
+        )
+      )
     );
-    const source = `{${EffectArray.map(
-      retained,
-      ([relativePath, value]) => `${JSON.stringify(relativePath)}:${value}`
-    ).join(",")}}`;
+    const source = `{${fragments.join(",")}}`;
     return {
       entryCount: retained.length,
       treeDigest: yield* sha256(source),
@@ -171,11 +180,17 @@ const markdownTargets = (source: string) =>
       EffectArray.map(
         EffectArray.map(
           Array.fromIterable(source.matchAll(markdownLink)),
-          (match) => match.groups?.["target"] ?? ""
+          (match) =>
+            EffectRecord.get(match.groups ?? {}, "target").pipe(
+              Option.getOrElse(() => "")
+            )
         ),
-        (target) => target.replaceAll(/^<|>$/gu, "").split(/\s+/u)[0] ?? ""
+        (target) =>
+          Array.head(target.replaceAll(/^<|>$/gu, "").split(/\s+/u)).pipe(
+            Option.getOrElse(() => "")
+          )
       ),
-      (target) => target.split("#")[0] ?? ""
+      (target) => Array.head(target.split("#")).pipe(Option.getOrElse(() => ""))
     ),
     (target) =>
       target.length > 0 &&
@@ -217,8 +232,8 @@ const inspectSkillReferences = (repositoryRoot: string) =>
                       );
                       const exists = yield* fileSystem.exists(resolved);
                       return exists
-                        ? null
-                        : ({
+                        ? Option.none()
+                        : Option.some({
                             source: sourcePath,
                             target,
                           } satisfies ReferenceObservation);
@@ -230,15 +245,13 @@ const inspectSkillReferences = (repositoryRoot: string) =>
                   (match) =>
                     ({
                       source: sourcePath,
-                      target: match[0],
+                      target: Array.head(match).pipe(
+                        Option.getOrElse(() => "")
+                      ),
                     }) satisfies ReferenceObservation
                 );
                 return {
-                  missing: EffectArray.filter(
-                    references,
-                    (reference): reference is ReferenceObservation =>
-                      reference !== null
-                  ),
+                  missing: Array.getSomes(references),
                   personalPaths,
                 };
               }),
@@ -255,11 +268,11 @@ const inspectSkillReferences = (repositoryRoot: string) =>
       { concurrency: 4 }
     );
     return {
-      missingReferences: observations.flatMap((tree) =>
-        tree.flatMap((file) => file.missing)
+      missingReferences: Array.flatMap(observations, (tree) =>
+        Array.flatMap(tree, (file) => file.missing)
       ),
-      portablePathFindings: observations.flatMap((tree) =>
-        tree.flatMap((file) => file.personalPaths)
+      portablePathFindings: Array.flatMap(observations, (tree) =>
+        Array.flatMap(tree, (file) => file.personalPaths)
       ),
     };
   });
@@ -308,9 +321,17 @@ export const checkHarnessGovernance = (repositoryRoot: string) =>
     const canonicalTreePairs = yield* Effect.forEach(
       canonicalSkillIds,
       (skillId) =>
-        inspectTree(repositoryRoot, skillId, overlayBySkill.get(skillId)).pipe(
-          Effect.map((observation) => [skillId, observation] as const)
-        ),
+        inspectTree(
+          repositoryRoot,
+          skillId,
+          Array.findFirst(
+            EffectRecord.toEntries(overlayBySkill),
+            ([id]) => id === skillId
+          ).pipe(
+            Option.map(([, target]) => target),
+            Option.getOrUndefined
+          )
+        ).pipe(Effect.map((observation) => [skillId, observation] as const)),
       { concurrency: 4 }
     );
     const extraTreePairs = yield* Effect.forEach(
@@ -327,19 +348,13 @@ export const checkHarnessGovernance = (repositoryRoot: string) =>
       { concurrency: 2 }
     );
     const links = yield* Effect.forEach(
-      EffectRecord.keys(receipt.claudeLinks).toSorted(),
+      Array.sort(EffectRecord.keys(receipt.claudeLinks), Order.String),
       (name) => inspectLink(repositoryRoot, name),
       { concurrency: 8 }
     );
     const references = yield* inspectSkillReferences(repositoryRoot);
-    const canonicalTrees: Record<string, TreeObservation> = {};
-    for (const [skillId, observation] of canonicalTreePairs) {
-      canonicalTrees[skillId] = observation;
-    }
-    const extraTrees: Record<string, TreeObservation> = {};
-    for (const [skillId, observation] of extraTreePairs) {
-      extraTrees[skillId] = observation;
-    }
+    const canonicalTrees = EffectRecord.fromEntries(canonicalTreePairs);
+    const extraTrees = EffectRecord.fromEntries(extraTreePairs);
     const observations = {
       canonicalTrees,
       extraTrees,

@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it as test } from "@effect/vitest";
 import { Array, Effect, FileSystem, Option, Record, Schema } from "effect";
+import type { OxlintConfig } from "oxlint";
 
 import oxlintConfig from "../../oxlint.config.js";
 import { lintFiles, writeLintFixture } from "./cli-fixture.js";
@@ -106,6 +107,45 @@ const fixtureCases = [
   {
     accepted: ["packages/api/http/src/client/in-process.layer.ts"],
     generated: "packages/api/http/src/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
+    accepted: ["tools/repository-paths/check.runtime.ts"],
+    generated: "tools/repository-paths/.generated-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
+    accepted: [
+      "tools/governance/policy.test.ts",
+      "tools/governance/check.runtime.ts",
+    ],
+    generated: "tools/governance/.generated-strict-rejected.test.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -347,3 +387,30 @@ test.effect.each([
     expect(result.exitCode).toBe(rejected ? 1 : 0);
   }).pipe(Effect.provide(BunServices.layer))
 );
+
+// Policy changes must review both the filename selector and the canonical admission.
+test.each([
+  "tools/repository-paths/check.runtime.ts",
+  "tools/governance/check.runtime.ts",
+])("keeps the command runtime admission exact: %s", (path) => {
+  expect(
+    Array.filter(
+      oxlintConfig.overrides ?? [],
+      (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
+        Array.contains(entry.files ?? [], path) &&
+        Record.has<string>("strict-effect/no-runtime-outside-boundary")(
+          entry.rules ?? {}
+        )
+    )
+  ).toEqual([
+    {
+      files: [path],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: [path] },
+        ],
+      },
+    },
+  ]);
+});

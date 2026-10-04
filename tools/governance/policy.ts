@@ -1,4 +1,4 @@
-import { Array as EffectArray, Record } from "effect";
+import { Array as EffectArray, HashSet, Option, Order, Record } from "effect";
 
 import { GovernanceFinding } from "./schemas.js";
 import type {
@@ -123,14 +123,16 @@ const inspectAuditCrosswalk = ({
     accepted.entries,
     (entry) => entry.findingId
   );
-  const taskIds = new Set(EffectArray.map(tasks.tasks, (task) => task.id));
+  const taskIds = HashSet.fromIterable(
+    EffectArray.map(tasks.tasks, (task) => task.id)
+  );
   const invalidEntries = EffectArray.filter(
     accepted.entries,
     (entry) =>
       !EffectArray.every(entry.requirementIds, (id) =>
         specSource.includes(`### \`${id}\``)
       ) ||
-      !EffectArray.every(entry.taskIds, (id) => taskIds.has(id)) ||
+      !EffectArray.every(entry.taskIds, (id) => HashSet.has(taskIds, id)) ||
       !EffectArray.every(entry.taskIds, (id) =>
         EffectArray.some(
           tasks.tasks,
@@ -197,16 +199,15 @@ const inspectTrees = (
   const receiptSkillIds = Record.keys(receipt.skills);
   const canonicalMismatch =
     !hasExactMembers(receiptSkillIds, canonicalSkillIds) ||
-    EffectArray.some(canonicalSkillIds, (id) => {
-      const expected = receipt.skills[id];
-      const actual = observations.canonicalTrees[id];
-      return (
-        expected === undefined ||
-        actual === undefined ||
-        expected.entryCount !== actual.entryCount ||
-        expected.treeDigest !== actual.treeDigest
-      );
-    });
+    EffectArray.some(canonicalSkillIds, (id) =>
+      Option.zipWith(
+        Record.get(receipt.skills, id),
+        Record.get(observations.canonicalTrees, id),
+        (expected, actual) =>
+          expected.entryCount !== actual.entryCount ||
+          expected.treeDigest !== actual.treeDigest
+      ).pipe(Option.getOrElse(() => true))
+    );
   const receiptExtraIds = Record.keys(receipt.extras);
   const { "docs-writer": docsWriter, portless } = receipt.extras;
   const extraMismatch =
@@ -217,16 +218,15 @@ const inspectTrees = (
     docsWriter.owner !== "taxkit-documentation-owner" ||
     !docsWriter.scope.includes("Public-copy wording only") ||
     portless?.classification !== "taxkit-local-development-tool-extra" ||
-    EffectArray.some(expectedExtraIds, (id) => {
-      const expected = receipt.extras[id];
-      const actual = observations.extraTrees[id];
-      return (
-        expected === undefined ||
-        actual === undefined ||
-        expected.entryCount !== actual.entryCount ||
-        expected.treeDigest !== actual.treeDigest
-      );
-    });
+    EffectArray.some(expectedExtraIds, (id) =>
+      Option.zipWith(
+        Record.get(receipt.extras, id),
+        Record.get(observations.extraTrees, id),
+        (expected, actual) =>
+          expected.entryCount !== actual.entryCount ||
+          expected.treeDigest !== actual.treeDigest
+      ).pipe(Option.getOrElse(() => true))
+    );
   return canonicalMismatch || extraMismatch
     ? [
         finding(
@@ -281,7 +281,7 @@ const inspectLinks = (
           link.name === name &&
           link.type === "SymbolicLink" &&
           !link.target.startsWith("/") &&
-          link.target === receipt.claudeLinks[name]
+          Option.contains(Record.get(receipt.claudeLinks, name), link.target)
       )
     );
   return valid
@@ -303,7 +303,10 @@ const inspectReferences = (
     : [
         finding(
           "skill-reference" as const,
-          observations.missingReferences[0]?.source ?? ".agents/skills",
+          EffectArray.head(observations.missingReferences).pipe(
+            Option.map((entry) => entry.source),
+            Option.getOrElse(() => ".agents/skills")
+          ),
           "Restore the referenced repository-local skill member or repair its link."
         ),
       ]),
@@ -312,7 +315,10 @@ const inspectReferences = (
     : [
         finding(
           "portable-runtime" as const,
-          observations.portablePathFindings[0]?.source ?? ".agents/skills",
+          EffectArray.head(observations.portablePathFindings).pipe(
+            Option.map((entry) => entry.source),
+            Option.getOrElse(() => ".agents/skills")
+          ),
           "Remove user-specific absolute runtime dependencies from the local skill."
         ),
       ]),
@@ -364,12 +370,18 @@ const inspectJourneys = (
 const inspectVerificationGraph = (
   manifest: RootPackageManifest
 ): readonly GovernanceFinding[] => {
-  const verification = manifest.scripts["verification"] ?? "";
+  const verification = Record.get(manifest.scripts, "verification").pipe(
+    Option.getOrElse(() => "")
+  );
   const occurrences =
     verification.split("bun run check:harness-governance").length - 1;
-  return manifest.scripts["check:harness-governance"] !== undefined &&
-    manifest.scripts["test:harness-governance"] !== undefined &&
-    manifest.scripts["check:harness-governance:types"] !== undefined &&
+  return Option.isSome(
+    Record.get(manifest.scripts, "check:harness-governance")
+  ) &&
+    Option.isSome(Record.get(manifest.scripts, "test:harness-governance")) &&
+    Option.isSome(
+      Record.get(manifest.scripts, "check:harness-governance:types")
+    ) &&
     occurrences === 1
     ? []
     : [
@@ -384,18 +396,25 @@ const inspectVerificationGraph = (
 export const inspectGovernance = (
   inputs: GovernanceInputs
 ): readonly GovernanceFinding[] =>
-  [
-    ...inspectAuditCrosswalk(inputs),
-    ...inspectProfile(inputs.profile),
-    ...inspectTrees(inputs.receipt, inputs.observations),
-    ...inspectOverlays(inputs.receipt, inputs.observations),
-    ...inspectLinks(inputs.receipt, inputs.observations),
-    ...inspectReferences(inputs.observations),
-    ...inspectExternalClaims(inputs),
-    ...inspectJourneys(inputs.journeys),
-    ...inspectVerificationGraph(inputs.manifest),
-  ].toSorted((left, right) =>
-    `${left.invariant}:${left.target}`.localeCompare(
-      `${right.invariant}:${right.target}`
-    )
+  EffectArray.sort(
+    [
+      ...inspectAuditCrosswalk(inputs),
+      ...inspectProfile(inputs.profile),
+      ...inspectTrees(inputs.receipt, inputs.observations),
+      ...inspectOverlays(inputs.receipt, inputs.observations),
+      ...inspectLinks(inputs.receipt, inputs.observations),
+      ...inspectReferences(inputs.observations),
+      ...inspectExternalClaims(inputs),
+      ...inspectJourneys(inputs.journeys),
+      ...inspectVerificationGraph(inputs.manifest),
+    ],
+    Order.make<GovernanceFinding>((left, right) => {
+      const comparison = `${left.invariant}:${left.target}`.localeCompare(
+        `${right.invariant}:${right.target}`
+      );
+      if (comparison < 0) {
+        return -1;
+      }
+      return comparison > 0 ? 1 : 0;
+    })
   );

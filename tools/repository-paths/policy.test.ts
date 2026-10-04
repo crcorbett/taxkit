@@ -1,5 +1,4 @@
-import { describe, expect, test } from "bun:test";
-
+import { describe, expect, it as test } from "@effect/vitest";
 import { Array as EffectArray, Array, Option } from "effect";
 
 import {
@@ -98,9 +97,12 @@ describe("repository path policy", () => {
     );
 
     expect(findings).toHaveLength(1);
-    expect(findings[0]?.file).toBe(RepositoryRelativeFile.make(file));
-    expect(findings[0]?.line).toBe(2);
-    expect(findings[0]?.category).toBe("tilde-checkout-path");
+    const finding = Array.head(findings).pipe(
+      Option.getOrElse(() => expect.fail("Expected a path finding"))
+    );
+    expect(finding.file).toBe(RepositoryRelativeFile.make(file));
+    expect(finding.line).toBe(2);
+    expect(finding.category).toBe("tilde-checkout-path");
   });
 
   test("treats NUL-containing and malformed UTF-8 payloads as binary", () => {

@@ -1,5 +1,4 @@
-import { describe, expect, it } from "bun:test";
-
+import { describe, expect, it } from "@effect/vitest";
 import { Array as EffectArray, Result, Schema } from "effect";
 
 import acceptedJson from "../../docs/documentation-audit/harness-foundation/accepted-findings.json";
