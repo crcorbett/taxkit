@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-09-09
+last_reviewed: 2026-10-04
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -141,6 +141,10 @@ Root `alchemy.run.ts`
   resource policy. Its outputs remain Alchemy Outputs until the deployment
   boundary resolves them. The docs app has no runtime dependency on it;
   app-local proof scripts independently assert expected built settings.
+  Shared memo inputs are readonly; the stack makes fresh array copies at the
+  Alchemy input. Native provider-free tests and compiler controls qualify stage,
+  header, logging and readonly contracts separately from any provider graph or
+  deployment proof.
 
 `tools/docs-deployment`
 : Repository-local Schema, policy and command boundary for docs deployment

@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-release-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-10-04
 review_trigger: Changesets, release train, package publication, or version command change
 ---
 
@@ -17,7 +17,7 @@ changelog for humans reading the repository as one product.
 
 ## Release Train Policy
 
-All `@taxkit/*` packages are in one fixed version group:
+The nine release-artifact packages share one fixed version group:
 
 - `@taxkit/core`
 - `@taxkit/api-http`
@@ -32,6 +32,8 @@ All `@taxkit/*` packages are in one fixed version group:
 When any package in this group is released, every package in the group receives
 the same version. This follows the Effect-style release train model: packages
 are tested, documented, and consumed as one compatible set.
+Other versioned private packages, including source-only infrastructure, use
+their own Changesets. Their versions are outside that fixed group.
 
 Apps are not part of the package release train and do not have independently
 managed npm package versions. Public apps can still maintain app-level

@@ -1,4 +1,5 @@
 import * as Cloudflare from "alchemy/Cloudflare";
+import * as Array from "effect/Array";
 import * as Effect from "effect/Effect";
 
 import {
@@ -32,7 +33,15 @@ export const declareDocsStack = ({
         date: docsWorkerCompatibilityDate,
         flags: [...docsWorkerCompatibilityFlags],
       },
-      memo: docsWorkerMemo,
+      // Alchemy's input requires mutable arrays; give it fresh boundary copies.
+      memo: {
+        ...docsWorkerMemo,
+        include: Array.fromIterable(docsWorkerMemo.include),
+        workspaces: Array.map(docsWorkerMemo.workspaces, (workspace) => ({
+          ...workspace,
+          include: Array.fromIterable(workspace.include),
+        })),
+      },
       observability: docsWorkerObservability,
       rootDir: "apps/docs",
       workersDev: true,

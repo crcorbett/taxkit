@@ -1490,3 +1490,43 @@ docs route and built Worker checks executed directly in Chromium. The checked
 lint-selector lookup is native Record/Option. Failed earlier attempts are
 retained in the receipt. This locally qualified app slice leaves DEV-73 and
 DEV-74–81 unfinished.
+
+
+## Local T002 native infrastructure policy and readonly memo
+
+Canonical rules now cover all source/tests in the existing private source-only
+infrastructure package. All 17 retained stage/log/header policy cases use the
+native runner; file/path services inspect the real app asset-header input. The
+test runtime admission is removed. Shared exported memo settings, including
+nested arrays, are readonly. The installed Alchemy input requires writable
+arrays, so the stack supplies fresh copies with identical values. The actual
+installed-Alchemy invalidation test still observes both sibling docs workspaces.
+
+Two compiler controls use the provider's include type and native Array/Option
+restoration. A reversible weakening probe removes readonly and requires both
+controls to fail with unused expected-error directives; it passes after an
+initial unsuitable generic-resource/undefined-tuple probe was corrected.
+Original source is restored, and the final compiler/lint and all 18 local cases
+pass. All 341 real CLI lint cases pass (336 retained plus four accepted files
+and a rejected neighbour); all 186 deployment-tool cases pass. Manifest/lock
+metadata adds two already selected native test dependencies without selecting
+new versions. Frozen install, all 23 package test tasks, all 15 builds and full
+verification pass. The 30 Quality cases include all 11 isolated fixtures
+(269.95 seconds); compiler, both Knip inventories, SDK Chromium (24) and web
+Chromium (2) pass. The earlier unexplained test-runner exit and restricted
+Chromium startup failure are retained separately in the receipt; retries pass.
+
+Documentation impact: **Change required** for test/memo/stack ownership,
+manifest/lock metadata, installed memo test, strict config/canaries, package
+README, package/testing architecture, versioning standard, major Changeset,
+T002 ledger, active plan and
+[receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-infrastructure-native-tests.json).
+The incompatible readonly export is recorded for standalone private
+infrastructure, outside the fixed nine-package train. No version is applied.
+**Preserve** resource values/identity/stages, provider/state composition, cache
+inputs/invalidation, asset/log/trace settings, explicit source-only exports,
+selected dependencies, tax results, historical proof and canonical skills.
+**N/A** renderer/shape validator (existing source-only profile exception),
+app/public/generated content, runbook/CI procedure and provider state. Revert
+the complete slice to recover. No provider graph/plan/apply/readback is claimed.
+DEV-73 remains unfinished, followed by DEV-74–81; Medicare remains separate.

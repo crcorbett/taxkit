@@ -33,7 +33,7 @@ describe("native Alchemy docs memo", () => {
             const before = yield* hashDirectory({
               cwd: workspaceRoot,
               memo: {
-                include: workspace.include,
+                include: [...workspace.include],
                 lockfile: workspace.lockfile,
               },
             });
@@ -41,7 +41,7 @@ describe("native Alchemy docs memo", () => {
             const after = yield* hashDirectory({
               cwd: workspaceRoot,
               memo: {
-                include: workspace.include,
+                include: [...workspace.include],
                 lockfile: workspace.lockfile,
               },
             });

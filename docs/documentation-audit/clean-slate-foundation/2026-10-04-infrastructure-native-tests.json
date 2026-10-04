@@ -1,0 +1,173 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "751fe00b6d6dfa24e9d7e4f087ef306013db1bf5",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR proof separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "All infrastructure source/tests receive canonical strict rules; four actual accepted files and a rejected neighbour",
+    "All 17 retained policy cases use the native runner/file/path services; exact test runtime admission removed",
+    "Shared exported memo record and nested arrays are readonly; stack passes fresh provider-input arrays with unchanged values",
+    "Two compiler controls use installed provider-owned include types; removing readonly makes both fail with unused expected-error directives",
+    "Existing installed-Alchemy hash invalidation test uses fresh include arrays and still proves both sibling-workspace invalidations",
+    "Two already selected native test dependencies recorded in manifest/lock metadata; no dependency selections changed",
+    "Changeset major records incompatible readonly contract for standalone private infrastructure; fixed nine-package train unchanged"
+  ],
+  "checks": [
+    {
+      "command": "focused compiler/tests/lint",
+      "outcome": "pass; 18 cases including 17 retained policies and compiler-controlled readonly case",
+      "logs": [
+        "infrastructure-native-types-controls.log",
+        "infrastructure-native-tests-controls.log",
+        "infrastructure-native-lint-controls.log"
+      ]
+    },
+    {
+      "command": "actual lint corpus",
+      "outcome": "pass; 341 = 336 retained + four actual accepted infrastructure files + rejected neighbour",
+      "log": "infrastructure-native-corpus-first.log"
+    },
+    {
+      "command": "deployment-tool corpus",
+      "outcome": "pass; all 186 cases including actual installed-Alchemy memo invalidation for both sibling docs workspaces",
+      "log": "infrastructure-native-deployment-tests.log"
+    },
+    {
+      "command": "actual readonly weakening control",
+      "outcome": "expected rejection; compiler fails both direct provider-owned array controls when readonly is removed; original source restored; final compiler passes",
+      "log": "infrastructure-native-readonly-control-corrected.log"
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "pass; 792 installs across 1020 packages, no selected graph change",
+      "log": "infrastructure-native-install-qualified.log"
+    },
+    {
+      "command": "bun run test",
+      "outcome": "pass; all 23 package tasks and full real CLI corpus; independent final corpus passes 341 cases",
+      "logs": [
+        "infrastructure-native-all-tests-retry.log",
+        "infrastructure-native-corpus-after-runner-exit.log"
+      ]
+    },
+    {
+      "command": "bun run build",
+      "outcome": "pass; all 15 tasks with pinned Chromium host access; no source or dependency weakening",
+      "log": "infrastructure-native-all-build-host.log"
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass; all 30 Quality cases including 11 isolated fixtures (269.95 seconds), 186 deployment-tool cases, 21 skill cases, 16 evaluation cases, both Knip inventories, complete compiler tasks, 24 SDK Chromium and 2 web Chromium cases",
+      "log": "infrastructure-native-verification-qualified.log"
+    },
+    {
+      "command": "final documentation/runbook/format/Changeset/diff checks",
+      "outcome": "pass; canonical documentation, runbooks, formatting, pending standalone infrastructure major and fixed-group intent, whitespace",
+      "log": "infrastructure-native-closeout.log"
+    }
+  ],
+  "log_root": "task-local qualification logs outside repository; basenames retained without absolute runner paths",
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "packages/infrastructure/src/cloudflare/website.test.ts",
+        "packages/infrastructure/src/cloudflare/website.ts",
+        "packages/infrastructure/src/stack.ts",
+        "packages/infrastructure/package.json",
+        "bun.lock",
+        "tools/docs-deployment/alchemy-memo.test.ts",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "packages/infrastructure/README.md",
+        "docs/architecture/package-ownership.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/standards/versioning.md",
+        ".changeset/readonly-infrastructure-memo.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "reason": "Native test ownership and incompatible readonly export move with provider copies, release intent and durable explanation"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "resource values/identities/stages",
+        "provider/state composition",
+        "memo source selection/invalidation",
+        "asset-header/log/trace settings",
+        "explicit source-only exports",
+        "fixed nine-package train",
+        "selected dependencies",
+        "tax rules/results",
+        "historical evidence",
+        "canonical skills/digests",
+        "docs/product-specs/clean-slate-foundation.md"
+      ],
+      "reason": "No resource or calculation change"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "template renderer/shape validator",
+        "app/public/generated content",
+        "runbook procedure",
+        "CI workflow",
+        "provider state"
+      ],
+      "reason": "Existing source-only deployment package is an explicit profile exception, not a rendered effect-service/RPC/HTTP package; local policy/testing only; no consequential operation"
+    }
+  ],
+  "recovery": {
+    "attempts": [
+      {
+        "outcome": "first focused compiler failed; corrected with fresh provider-input copies",
+        "observed": "Installed Alchemy MemoOptions include field expects mutable string arrays; readonly shared settings cannot be passed directly",
+        "log": "infrastructure-native-types-first.log"
+      },
+      {
+        "outcome": "first readonly weakening probe did not isolate all claimed controls; corrected",
+        "observed": "Generic Resource parameter control and possibly-undefined tuple read were unsuitable. Two direct provider-owned include controls now use native Array/Option restoration; weakening fails both controls without unrelated undefined errors",
+        "log": "infrastructure-native-readonly-control.log"
+      },
+      {
+        "outcome": "First full test runner exited 101 without a failed assertion or completed suite; independent exact lint corpus rerun passed all 341 cases",
+        "observed": "Disk had 271 MiB available during investigation. This is a separate capacity observation; no cause of the runner exit is established. Only replaceable dependencies in three verified inactive temporary test copies were removed, preserving sources and records. Full qualification is retried.",
+        "logs": [
+          "infrastructure-native-all-tests-qualified.log",
+          "infrastructure-native-corpus-after-runner-exit.log"
+        ]
+      },
+      {
+        "outcome": "Full tests passed all 23 tasks; first build failed at docs diagram browser startup under the restricted runner",
+        "observed": "Chromium reported MachPortRendezvousServer Permission denied (1100). This is a concrete runner permission failure, separate from the earlier test exit and disk observation; same pinned source/toolchain is retried with browser host access.",
+        "log": "infrastructure-native-all-build-qualified.log"
+      }
+    ],
+    "rollback": "Revert complete source/test/config/metadata/Changeset slice; no provider operation"
+  },
+  "limitations": [
+    "Static policy/native unit/compiler/cache tests are local; no provider graph, plan, apply, readback or deployment proof",
+    "Major Changeset is pending intent only; no version applied",
+    "Remaining docs proof-script/web and semantic/readonly work keeps DEV-73 incomplete",
+    "Medicare correction needs separate bounded decision"
+  ],
+  "non_claims": [
+    "No merge, deployment, publication, provider apply or version application",
+    "No completion of DEV-73 or DEV-74\u201381"
+  ]
+}

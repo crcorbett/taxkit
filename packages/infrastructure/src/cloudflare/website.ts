@@ -32,7 +32,7 @@ export const docsWorkerMemo = {
       lockfile: false,
     },
   ],
-};
+} as const;
 
 export const decodeDocsCloudflareStackStage = (
   value: typeof Schema.Unknown.Type

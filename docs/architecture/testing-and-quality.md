@@ -115,6 +115,15 @@ real CLI canaries accept named hosts and reject a neighbouring source file.
 The built local Worker separately checks extracted server functions, hydration,
 navigation, immutable asset headers and one reused docs runtime context.
 
+The source-only infrastructure package uses Bun-hosted Vitest and native Effect
+tests. It checks stage policy and reads the real docs asset-header input through
+native file/path services, with no test execution exception. The compiler checks
+that shared memo arrays cannot be passed directly to Alchemy's writable include
+fields; top-level and nested arrays need fresh boundary copies. Removing their
+readonly definition makes both expected-error controls fail. The separate
+installed-Alchemy memo test still checks cache invalidation for both sibling
+docs workspaces. These checks make no provider-state or apply claim.
+
 Release-facing package work must also prove actual tarballs rather than
 workspace imports or dry-run file lists:
 
