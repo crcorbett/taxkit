@@ -10,7 +10,8 @@
     "build": "vite build",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf .output .tanstack .turbo node_modules/.vite",
-    "test:browser": "vitest run --config vitest.browser.config.ts"
+    "test:browser": "vitest run --config vitest.browser.config.ts",
+    "test": "bun --bun vitest run"
   },
   "dependencies": {
     "@tanstack/react-router": "catalog:",

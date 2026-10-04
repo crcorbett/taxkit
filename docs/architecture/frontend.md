@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: frontend runtime, transport, rendering, build adapter, or composition change
 ---
 
@@ -61,6 +61,26 @@ fragments that use `Config.nested(...)`, then provide runtime env sources with
 `ConfigProvider.fromEnv(...)` and `ConfigProvider.constantCase`. Local dev
 scripts inject them from `portless get api.taxkit`; deployed environments
 should set them explicitly.
+
+The exact Vite configuration host selects only the existing public browser
+input through installed Vite `loadEnv` file/environment precedence and native
+Config, then Schema-encodes a typed build constant. Automatic public-prefix
+exposure is disabled while Vite's mode/SSR metadata remains native. Browser ConfigProvider
+consumes that constant; the HTTP owner still validates its URL at runtime.
+Absence and invalid raw values retain runtime failure timing. Browser source
+has no ambient environment read. The app's Schema-owned settings error contains
+only the runtime kind, settings operation and a fixed safe message.
+
+The existing web root loader directly calls its runtime's named health
+operation with the Router abort signal and returns readonly health fields.
+Its context contract selects the actual native ManagedRuntime methods, instead
+of mirroring Promise signatures. The module runtimes, loader, Vite host and
+browser test's fake execution host have exact execution admissions. All web
+source/tests/configurations receive canonical strict rules; generated route
+output remains owned by TanStack. Native Chromium tests use the actual file
+route and generated HTTP client with a fake HTTP transport, prove health
+decoding and interruption/HTTP-signal abortion when its preload is retired.
+This does not establish every navigation/unmount path or remote cancellation.
 
 Web SSR and browser runtimes should use module-scoped
 `ManagedRuntime.make(...)` values from fully provided layers. Do not create

@@ -60,9 +60,17 @@
         "src/router.tsx",
         "src/server.ts",
         "src/routes/**/*.{ts,tsx}",
-        "vite.config.ts"
+        "vite.config.ts",
+        "src/**/*.test.ts",
+        "vitest.config.ts",
+        "vitest.browser.config.ts"
       ],
-      "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "vite.config.ts",
+        "vitest.config.ts",
+        "vitest.browser.config.ts"
+      ],
       "ignoreDependencies": ["@tanstack/router-plugin", "@taxkit/tsconfig"]
     },
     "apps/docs": {

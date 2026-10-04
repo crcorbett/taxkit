@@ -2,8 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TaxKitHttpApiService } from "@taxkit/api-http/client";
 import { Effect } from "effect";
 
-import { getRouteRuntime } from "#/lib/route-context";
-
 export const Route = createFileRoute("/")({
   component: function HomeRoute() {
     const health = Route.useLoaderData();
@@ -21,18 +19,13 @@ export const Route = createFileRoute("/")({
       </section>
     );
   },
-  loader: async (loaderContext) => {
-    const runtime = getRouteRuntime(loaderContext);
-    const health = await runtime.runPromise(
-      Effect.gen(function* loadHealth() {
+  loader: ({ context, abortController }) =>
+    context.api.runPromise(
+      Effect.gen(function* () {
         const api = yield* TaxKitHttpApiService;
-        return yield* api.health.getHealth();
-      })
-    );
-
-    return {
-      service: health.service,
-      status: health.status,
-    };
-  },
+        const health = yield* api.health.getHealth();
+        return { service: health.service, status: health.status } as const;
+      }),
+      { signal: abortController.signal }
+    ),
 });

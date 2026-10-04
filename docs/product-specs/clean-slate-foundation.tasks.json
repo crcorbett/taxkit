@@ -1,7 +1,7 @@
 {
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/clean-slate-foundation.md",
-  "title": "Clean slate TaxKit foundation — implementation slices",
+  "title": "Clean slate TaxKit foundation \u2014 implementation slices",
   "status": "in_progress",
   "last_reviewed": "2026-10-04",
   "authority": "Cooper explicitly authorised implementation, reviewable commits and draft PRs on 2026-10-04. No merge, deploy or publication; provider-plan approval remains separate.",
@@ -327,7 +327,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-docs-runtime-tests.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-quality-fixture-deadlines.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-docs-app-hosts.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-04-infrastructure-native-tests.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-infrastructure-native-tests.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-web-app-hosts.json"
       ]
     },
     {

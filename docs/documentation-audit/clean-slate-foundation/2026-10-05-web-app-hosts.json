@@ -1,0 +1,218 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-05",
+  "issue": "DEV-73",
+  "parent_revision": "053123486198714db07f25bb0b5591ddb4fdc245",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes and draft PRs",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS with pinned Bun/Chromium; hosted proof separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Canonical strict rules cover all web source/tests/configurations with generated route output explicitly retained under its generator",
+    "Native ManagedRuntime method types replace manually mirrored Promise contracts and a one-use runtime wrapper",
+    "Actual root loader forwards the Router abort signal and returns readonly health fields through the existing generated HTTP client",
+    "Schema-owned safe settings errors contain only runtime kind, fixed message and settings operation; no raw cause",
+    "Exact Vite host selects the sole existing public API setting through native Config and installed loadEnv precedence, then encodes the owning build-input Schema",
+    "Typed browser build input replaces ambient browser environment reads; automatic public-prefix exposure disabled while Vite mode/SSR metadata remains native",
+    "Absence and invalid raw URLs retain runtime validation; HTTP package owns the URL contract",
+    "Native test command/configurations included in compiler and development Knip; exact runtime host selectors qualified",
+    "Native settings/build-owner tests and real file-route browser tests retain actual HTTP client decoding and interruption proof"
+  ],
+  "checks": [
+    {
+      "command": "focused web compiler/settings/lint",
+      "outcome": "pass; compiler, all 16 native cases and final lint; exact actual Vite JSON representation ingress admitted only at its reviewed boundary test",
+      "logs": [
+        "web-native-types-qualified.log",
+        "web-native-tests-qualified.log",
+        "web-native-lint-qualified.log"
+      ]
+    },
+    {
+      "command": "real CLI lint corpus",
+      "outcome": "pass; final complete repository test executes all 361 real CLI cases including actual web/config/native test owners, rejected neighbour and five exact execution selectors",
+      "log": "web-native-all-tests-qualified.log"
+    },
+    {
+      "command": "web Chromium",
+      "outcome": "pass all four cases: two retained Atom cases plus actual file-route/generated-client health and preload retirement; native HTTP work interrupted and signal observed aborted",
+      "log": "web-native-browser-loader-prebundle.log"
+    },
+    {
+      "command": "local built output and actual API/browser",
+      "outcome": "pass corrected generated Vercel-preset output in local Bun/Vite preview; SSR health 200, browser refresh actual HTTP health 200, restored loader fields, no console/page errors; servers stopped and ports independently closed",
+      "browser_observation": {
+        "browser": "153.0.8010.12",
+        "documentStatus": 200,
+        "serverRenderedHealth": true,
+        "clientApiStatus": 200,
+        "clientLoaderData": {
+          "service": "taxkit",
+          "status": "ok"
+        },
+        "consoleAndPageErrors": []
+      },
+      "browser_graph": {
+        "files": 2,
+        "byte_size": 554633,
+        "unexpected_markers": {},
+        "contains_public_local_api_input": true,
+        "sha256": [
+          {
+            "file": "index-CL4gNMIx.js",
+            "sha256": "f1c9b53ac03b2ba551cc3daf13a7d7fc1303506b727d340742a26d3359c0611c"
+          },
+          {
+            "file": "routes-D5YmdRN1.js",
+            "sha256": "5a0658d895ddeeef58bf5ea7691423f158225b83ba12b8893b67459af0f096b0"
+          }
+        ]
+      },
+      "log": "web-native-build-public-input-corrected.log",
+      "worktreeQualified": true
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "pass; 792 installs across 1020 packages, no changes",
+      "log": "web-native-install-qualified.log"
+    },
+    {
+      "command": "bun run test",
+      "outcome": "pass; all 24 tasks including native web settings/build-owner cases, retained calculators and complete real CLI lint corpus",
+      "log": "web-native-all-tests-qualified.log"
+    },
+    {
+      "command": "bun run build",
+      "outcome": "pass; all 15 tasks; final ordinary build has no guessed browser URL and keeps missing input a runtime failure",
+      "log": "web-native-all-build-qualified.log"
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass; all 30 Quality cases including 11 isolated fixtures (253.58 seconds), 186 deployment-tool cases, 21 skill cases, 16 evaluation cases, both Knip inventories, complete compiler tasks, 24 SDK Chromium and all four web Chromium cases",
+      "log": "web-native-verification-qualified.log"
+    },
+    {
+      "command": "final documentation/runbook/format/Changeset/diff",
+      "outcome": "pass; documentation, runbooks, formatting, pending Changeset intent and whitespace; no Changeset for private unversioned app",
+      "log": "web-native-closeout.log"
+    }
+  ],
+  "recovery": {
+    "attempts": [
+      {
+        "outcome": "First compiler failed after previously unchecked Vite configuration was included",
+        "observed": "Explicit undefined optional resolution properties rejected by exact optional typing; corrected with native config objects omitting absent properties. Missing environment test uses Option restoration instead of undefined environment values.",
+        "logs": [
+          "web-native-types-first.log",
+          "web-native-types-tests.log"
+        ]
+      },
+      {
+        "outcome": "First new browser iframe failed to initialise before assertions",
+        "observed": "Vite dynamically optimised new dependencies and reloaded the test iframe; explicit observed dependency pre-optimisation corrected it. Four final Chromium cases pass.",
+        "logs": [
+          "web-native-browser-loader-first.log",
+          "web-native-browser-loader-prebundle.log"
+        ]
+      },
+      {
+        "outcome": "First built browser graph unexpectedly contained the unrelated public-prefix test sentinel",
+        "observed": "Native Vite still exposed other public-prefix settings independently of the explicit input. Disabling automatic prefix exposure preserves native mode/SSR metadata and the explicit API input; both unrelated public/private test sentinels absent from corrected generated output. Two actual Vite mode tests guard this boundary.",
+        "logs": [
+          "web-native-build-local-api.log",
+          "web-native-build-public-input-corrected.log"
+        ]
+      },
+      {
+        "outcome": "Final focused lint required exact decoder admission",
+        "observed": "Test restores the actual Vite-defined JSON representation using the owning input Schema; exact reviewed test path added to decodingBoundaryFiles. No runtime/throwing decoder permission added.",
+        "log": "web-native-lint-build-owner.log"
+      }
+    ],
+    "rollback": "Revert entire app/config/test/enforcement/documentation slice; no provider change"
+  },
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "apps/web/src/lib/config.ts",
+        "apps/web/src/lib/config.client-input.ts",
+        "apps/web/src/lib/config.client.ts",
+        "apps/web/src/lib/config.server.ts",
+        "apps/web/src/lib/route-context.ts",
+        "apps/web/src/lib/runtime.client.ts",
+        "apps/web/src/lib/runtime.server.ts",
+        "apps/web/src/routes/index.tsx",
+        "apps/web/src/lib/config.boundary.test.ts",
+        "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+        "apps/web/vite.config.ts",
+        "apps/web/vitest.config.ts",
+        "apps/web/vitest.browser.config.ts",
+        "apps/web/tsconfig.json",
+        "apps/web/package.json",
+        "apps/web/README.md",
+        "knip.json",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "reason": "Runtime type/cancellation, checked public build input, native safe configuration errors and qualified host/test ownership move with durable explanation"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "HTTP URL and health Schema ownership",
+        "valid health data/page shell",
+        "existing module runtimes and SSR/browser split",
+        "Vercel Node 22 preset",
+        "native Vite mode/SSR metadata",
+        "public API setting and file/environment precedence",
+        "runtime URL validation timing",
+        "retained Atom/Scheduler cases",
+        "selected dependency graph",
+        "generated route ownership",
+        "canonical skills/digests",
+        "tax rules/results",
+        "historical receipts",
+        "docs/product-specs/clean-slate-foundation.md"
+      ],
+      "reason": "No application/provider redesign or tax change"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "Changeset",
+        "runbook procedure",
+        "public MDX/navigation",
+        "CI workflow",
+        "provider state"
+      ],
+      "reason": "Private unversioned app has no published package contract; local host/config/test ownership only"
+    }
+  ],
+  "limitations": [
+    "Real-route browser transport fixture proves tested preload retirement only, not every navigation/unmount or remote provider cancellation",
+    "Local built Bun/Vite preview does not qualify the configured Production Node 22 provider runtime or any deployed environment",
+    "Marker scan establishes the named negative checks in the recorded generated files, not universal credential absence",
+    "Remaining docs proof-script, fixture classification and semantic/readonly work keeps DEV-73 unfinished",
+    "Medicare correction still requires its separate decision"
+  ],
+  "non_claims": [
+    "No merge/deployment/publication/provider apply/version application",
+    "No completion of DEV-73 or DEV-74\u201381",
+    "No companion qualification of this later revision"
+  ]
+}

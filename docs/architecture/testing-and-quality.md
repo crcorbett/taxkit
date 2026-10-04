@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
@@ -39,7 +39,16 @@ bun run test:skills
 ```
 
 Root verification includes lint, format, both Knip graphs and workspace type
-checks. The development-aware graph covers repository tooling, tests and
+checks. Web compiler checking also includes Vite and both Vitest
+configuration owners. Its native package tests cover settings, safe error
+serialization and public build-input selection. Chromium retains two Atom
+cases and adds two actual file-route/generated-client cases: successful health
+decoding and preload retirement that interrupts HTTP work and aborts its
+signal. The fake transport is bounded browser-test proof; it is separate from
+a built application or provider journey. The browser config pre-optimises the
+observed imports so first-run dependency discovery cannot reload the test
+iframe before assertions.
+ The development-aware graph covers repository tooling, tests and
 current application scaffolds. The production graph separately proves the
 eight code-bearing packages in the nine-artifact release closure,
 `@taxkit/scripts` exports and commands, and the standalone API runtime without

@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 source_of_truth: package-readme
 confidence: high
 ---
@@ -29,15 +29,26 @@ request handling.
 
 The root route loads `@taxkit/api-http/client` through the route runtime and
 renders API health status from the standalone API service over HTTP.
-Server-only API exports must stay out of browser code.
+Server-only API exports must stay out of browser code. The root loader uses
+the native runtime contract and passes the Router abort signal to its existing
+HTTP operation. It returns readonly health fields without a hand-written
+Promise interface or a one-use runtime wrapper.
 
 The web runtime reads the API origin from:
 
 - `TAXKIT_API_BASE_URL` on the server
 - `VITE_TAXKIT_API_BASE_URL` in the browser
 
-Both are required runtime config values and are validated with Effect Config and
-Effect Schema. `bun run --filter=web dev` injects both from
+Both are required runtime config values and are validated with the HTTP
+package's Effect Config and URL Schema. The exact Vite host reads only the
+public browser input using Vite's normal file/environment precedence, then
+Schema-encodes it into a typed build constant. Automatic public-prefix
+exposure is disabled; Vite still supplies its standard mode/SSR metadata.
+Browser modules do not read
+`import.meta.env`. Missing or invalid raw URLs still fail at runtime; the build
+does not guess a URL or change that validation timing. Settings failures expose
+only the client/server identity, settings operation and fixed safe message.
+`bun run --filter=web dev` injects both from
 `portless get api.taxkit`. Do not include `/api` in the base URL; the typed
 API client owns route prefixes.
 
@@ -61,6 +72,8 @@ API client owns route prefixes.
 bun run --filter=api dev
 bun run --filter=web dev
 bun run --filter=web check-types
+bun run --filter=web test
+bun run --filter=web test:browser
 bun run --filter=web build
 ```
 
@@ -101,3 +114,22 @@ The browser test config extends Vite's browser conditions with `source`; replaci
 the defaults with only `source` selects the Node renderer and is not a valid
 browser hydration test. The test imports the actual browser renderer and waits
 for hydration before issuing updates.
+
+## Strict and route proof
+
+Canonical strict rules cover source, tests and all Vite/Vitest configuration.
+Only the two existing runtime composition modules, root loader, Vite host and
+fake browser-test runtime have exact execution permissions. They retain all
+other rules; no async workflow or raw settings exception is admitted. The
+compiler and development Knip graph include both test configurations and Vite.
+The package test command uses Bun-hosted Vitest and native Effect tests.
+
+Settings tests cover valid, missing and invalid server/browser inputs, exact
+secret-negative error bytes, public build-input selection and absent compiled
+browser settings. The real file-route Chromium tests call the actual generated
+HTTP client through a fake HTTP transport. They prove health decoding and
+interruption of pending HTTP work when the Router retires its preload. The
+HTTP abort signal is observed as aborted. This proves the tested preload
+retirement, not all navigation/unmount paths or remote provider cancellation.
+Both retained Atom/Scheduler cases still run. Browser dependencies are listed
+for optimisation so Vite does not reload tests while they start.

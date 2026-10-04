@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-implementation-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: task progress, dependency qualification, acceptance evidence or authority change
 ---
 
@@ -1530,3 +1530,53 @@ selected dependencies, tax results, historical proof and canonical skills.
 app/public/generated content, runbook/CI procedure and provider state. Revert
 the complete slice to recover. No provider graph/plan/apply/readback is claimed.
 DEV-73 remains unfinished, followed by DEV-74–81; Medicare remains separate.
+
+
+### Web application host qualification — 2026-10-05
+
+All web source, native tests and Vite/Vitest configurations receive canonical
+strict rules. Native ManagedRuntime method types replace the copied Promise
+contract and one-use runtime helper. The actual root loader forwards its Router
+abort signal and returns readonly health fields. Module runtime ownership and
+the existing separate HTTP API remain intact. Schema-owned configuration errors
+carry only runtime identity, settings operation and a fixed safe message.
+
+Vite selects the existing public API input through native Config and its
+installed file/environment precedence, then encodes the owning Schema into a
+typed browser constant. The HTTP owner still validates URLs at runtime; missing
+and invalid inputs preserve that timing. An actual build showed an unrelated
+public-prefix sentinel in the browser output despite the explicit selection.
+Automatic prefix exposure is now disabled while Vite's mode/SSR metadata stays
+native. Two actual build/serve configuration tests guard that correction.
+
+The 16 native settings/build-owner tests and compiler pass. Chromium passes
+the two retained Atom cases and two actual file-route/generated-client cases:
+health decoding and preload retirement that interrupts HTTP work and aborts
+its signal. The first iframe failed before assertions during dependency
+re-optimisation; explicit observed imports correct it. An initial 361 real CLI
+cases pass. Frozen install, all 24 package test tasks, all 15 builds and full
+verification pass. The 30 Quality cases include all 11 isolated fixtures;
+186 deployment-tool, 21 skill and 16 evaluation cases, both Knip inventories,
+complete compiler tasks, SDK Chromium (24) and all four web Chromium cases
+pass. Final lint admits actual Vite JSON restoration only at its exact
+reviewed boundary test, without runtime or throwing-codec permission.
+
+Corrected generated output is exercised through local Bun/Vite preview and
+the actual separate API. SSR health and browser refresh HTTP health both
+return 200; loader data restores and console/page errors are empty. Recorded
+browser asset hashes contain the public API input and no named server/provider
+markers or unrelated public/private test sentinels. Both processes are stopped
+and their ports independently verified closed. This is local proof, not
+qualification of the configured Vercel Node 22 runtime or deployment.
+
+Documentation impact: **Change required** for app configuration/types/runtime/
+loader/test owners, compiler/Knip/strict inputs and exact host canaries, app
+README, frontend/testing architecture, T002 ledger, active plan and
+[receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-web-app-hosts.json).
+**Preserve** HTTP URL/health ownership, valid health data/shell, module lifetime,
+SSR/browser split, public API setting/precedence/runtime validation, provider
+preset, retained Atom cases, selected dependencies, generator ownership,
+canonical skills/digests, tax outputs and history. **N/A** Changeset (private
+unversioned app), runbook/public-content/CI procedure and provider state.
+Revert the complete slice to recover. No merge/deployment/publication/apply
+or version application. DEV-73 remains incomplete; Medicare stays separate.

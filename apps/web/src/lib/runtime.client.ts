@@ -2,7 +2,6 @@ import { createTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
 
-import { TaxKitWebConfigError } from "./config";
 import {
   TaxKitWebClientConfig,
   TaxKitWebClientConfigProviderLive,
@@ -12,15 +11,7 @@ const TaxKitApiClientLive = Layer.unwrap(
   Effect.gen(function* makeTaxKitApiClientLive() {
     const config = yield* TaxKitWebClientConfig;
     return createTaxKitApiClientLayer({ baseUrl: config.httpApi.baseUrl });
-  }).pipe(
-    Effect.mapError(
-      (cause) =>
-        new TaxKitWebConfigError({
-          cause,
-          message: `Invalid TaxKit web client config: ${cause.message}`,
-        })
-    )
-  )
+  })
 ).pipe(
   Layer.provide(FetchHttpClient.layer),
   Layer.provide(TaxKitWebClientConfigProviderLive)

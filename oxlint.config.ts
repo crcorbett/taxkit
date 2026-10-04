@@ -14,6 +14,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Actual Vite-defined JSON input is decoded once with the owning build-input Schema.
+  "apps/web/src/lib/config.boundary.test.ts",
   "apps/api/scripts/routes.ts",
   "apps/api/test/config.test.ts",
   "packages/sdk/typescript/scripts/script-boundaries.test.ts",
@@ -199,6 +201,8 @@ const portableEffectSourceFiles = [
 ];
 
 const schemaEncoderEgressFiles = [
+  "apps/web/vite.config.ts",
+  "apps/web/src/lib/config.boundary.test.ts",
   // Exact negative wire fixtures; native encoding only, no decoder/runtime/throwing codec admission.
   "apps/docs/src/lib/docs/route-boundary.test.ts",
   "apps/api/scripts/smoke-boundaries.test.ts",
@@ -277,6 +281,9 @@ const runtimeBoundaryFiles = [
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/vite.config.ts",
+  "apps/web/vite.config.ts",
+  "apps/web/src/routes/index.tsx",
+  "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/runtime.server.ts",
   "packages/docs-content/src/validate.runtime.ts",
@@ -441,6 +448,7 @@ export default defineConfig({
       files: [
         "apps/docs/scripts/check-import-boundaries.runtime.ts",
         "apps/api/src/config.ts",
+        "apps/web/src/lib/config.ts",
         "apps/api/scripts/routes.ts",
         "apps/api/scripts/smoke-public-routes.runtime.ts",
       ],
@@ -503,6 +511,7 @@ export default defineConfig({
         "packages/sdk/typescript/scripts/**",
         "apps/api/**",
         "packages/infrastructure/**",
+        "apps/web/**",
         "packages/infrastructure/src/.generated-strict-rejected.ts",
         "apps/docs/scripts/check-import-boundaries.runtime*.ts",
         "apps/docs/scripts/.generated-imports-strict-rejected.ts",
@@ -549,6 +558,55 @@ export default defineConfig({
               "apps/docs/scripts/check-import-boundaries.runtime.ts",
             ],
           },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/src/lib/runtime.client.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/src/lib/runtime.client.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/src/lib/runtime.server.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/src/lib/runtime.server.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/src/lib/health-loader.boundary.browser.test.tsx"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/src/routes/index.tsx"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/src/routes/index.tsx"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/vite.config.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/vite.config.ts"] },
         ],
       },
     },
