@@ -3,6 +3,9 @@
   "include": [
     "scripts/cloudflare-hosted-proof.boundary.test.ts",
     "scripts/cloudflare-hosted-proof.boundary.ts",
+    "scripts/cloudflare-hosted-proof.live.layer.ts",
+    "scripts/cloudflare-hosted-proof.live.layer.test.ts",
+    "scripts/test-cloudflare-hosted.propagation.test.ts",
     "scripts/test-cloudflare-hosted.tsx",
     "scripts/check-import-boundaries.runtime.ts",
     "scripts/check-import-boundaries.runtime.test.ts",

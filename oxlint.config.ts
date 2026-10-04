@@ -37,6 +37,10 @@ const decodingBoundaryFiles = [
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+  "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+  "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
+  "apps/docs/scripts/cloudflare-hosted-proof.live.layer.test.ts",
+  "apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts",
   "packages/infrastructure/src/cloudflare/website.test.ts",
   "packages/infrastructure/src/cloudflare/website.ts",
   "apps/docs/src/lib/build/docs-build-target.ts",
@@ -244,6 +248,8 @@ const schemaEncoderEgressFiles = [
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/src/lib/docs/loaders.server.ts",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+  "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
+  "apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   // Exact acceptance-record and command-fixture representation tests.
@@ -514,7 +520,10 @@ export default defineConfig({
         "apps/web/**",
         "packages/infrastructure/src/.generated-strict-rejected.ts",
         "apps/docs/scripts/check-import-boundaries.runtime*.ts",
+        "apps/docs/scripts/cloudflare-hosted-proof*.ts",
+        "apps/docs/scripts/test-cloudflare-hosted*.{ts,tsx}",
         "apps/docs/scripts/.generated-imports-strict-rejected.ts",
+        "apps/docs/scripts/.generated-hosted-strict-rejected.ts",
         "apps/docs/vitest.scripts.config.ts",
         "apps/docs/vitest.server.config.ts",
         "apps/docs/vitest.browser.config.ts",
@@ -546,6 +555,19 @@ export default defineConfig({
         "strict-effect/tagged-error-name": "error",
         "taxkit/no-native-collections": "error",
         "taxkit/no-object-writes": "error",
+      },
+    },
+    {
+      files: ["apps/docs/scripts/cloudflare-hosted-proof.boundary.ts"],
+      rules: { "unicorn/throw-new-error": "off" },
+    },
+    {
+      files: ["apps/docs/scripts/test-cloudflare-hosted.tsx"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/docs/scripts/test-cloudflare-hosted.tsx"] },
+        ],
       },
     },
     {

@@ -2,6 +2,7 @@ import { Array as EffectArray, Option, Record, Schema } from "effect";
 
 const strictAppBoundaryPaths = [
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+  "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/src/lib/runtime.server.ts",
@@ -105,13 +106,8 @@ const inspectGenericBoundaries = (
       path === "apps/docs/src/server.ts" &&
       source.match(/\bEffect\.runPromise\(/gu)?.length === 1 &&
       !source.includes("Effect.runSync");
-    const applicableHostIngressPatterns = EffectArray.filter(
-      hostIngressPatterns,
-      (pattern) =>
-        !(path === hostedProofHostPath && pattern.includes("node:fs"))
-    );
     return [
-      ...(includesAny(source, applicableHostIngressPatterns)
+      ...(includesAny(source, hostIngressPatterns)
         ? [finding("host-ingress", path)]
         : []),
       ...(includesAny(source, runtimeExecutionPatterns) &&
@@ -133,22 +129,56 @@ const inspectHostedProofBoundary = (
     hostedProofBoundaryPath
   );
   const host = readStrictAppBoundarySource(sources, hostedProofHostPath);
-  const validBoundary = includesEvery(boundary, [
-    "Config.schema(",
-    "Effect.acquireRelease(",
-    "Effect.tryPromise({",
-    "HostedProofConfigurationError",
-    "HostedProofExecutionError",
-    "HostedProofEvidenceError",
-  ]);
+  const live = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts"
+  );
+  const validBoundary =
+    includesEvery(boundary, [
+      "Config.schema(",
+      "Context.Service<",
+      "verifyHostedDeployment",
+      "Schema.encodeEffect(",
+      "HostedProofConfigurationError",
+      "HostedProofExecutionError",
+      "HostedProofEvidenceError",
+    ]) &&
+    !includesAny(boundary, [
+      "CloudflareHostedProofHost",
+      "BrowserHandle",
+      "instanceof",
+      "Promise<",
+    ]);
+  const validLive =
+    includesEvery(live, [
+      "const acquireBrowser = Effect.acquireRelease(",
+      "Effect.tryPromise({",
+      "chromium.launch(",
+      "CloudflareHostedProofLive",
+      "Layer.effect(",
+      "verifyHostedDeployment:",
+      "verifyAssetPropagation:",
+      "Queue.offerUnsafe(",
+      "Ref.update",
+      "HostedProofProbe.makeEffect(",
+    ]) &&
+    !includesAny(live, [
+      "Promise.all",
+      "async ",
+      "instanceof",
+      "CloudflareHostedProofHost",
+      "Effect.runPromise",
+      "Effect.runSync",
+    ]);
   const validHost =
     includesEvery(host, [
-      "runCloudflareHostedProof(",
-      "chromium.launch(",
+      "runCloudflareHostedProof.pipe(",
+      "CloudflareHostedProofLive",
       "BunRuntime.runMain(program)",
-    ]) && !includesAny(host, ["process.env", "Number.parseInt("]);
+    ]) &&
+    !includesAny(host, ["process.env", "Number.parseInt(", "chromium.launch("]);
 
-  return validBoundary && validHost
+  return validBoundary && validLive && validHost
     ? []
     : [finding("hosted-proof-boundary", hostedProofBoundaryPath)];
 };

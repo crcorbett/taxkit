@@ -15,12 +15,13 @@
     "check-import-boundaries": "bun run ./scripts/check-import-boundaries.runtime.ts",
     "preview": "portless run --name docs.taxkit vite preview",
     "preview:cloudflare": "vite preview",
-    "test": "bun run test:imports && bun --bun vitest run --config vitest.server.config.ts && bun test ./scripts/cloudflare-hosted-proof.boundary.test.ts",
+    "test": "bun run test:scripts && bun --bun vitest run --config vitest.server.config.ts",
     "test:browser": "vitest run --config vitest.browser.config.ts",
     "test:built": "bun run ./scripts/test-cloudflare-built.tsx",
     "test:cloudflare-built": "bun run ./scripts/test-cloudflare-built.tsx",
     "test:cloudflare-hosted": "bun run ./scripts/test-cloudflare-hosted.tsx",
-    "test:imports": "bun --bun vitest run --config vitest.scripts.config.ts"
+    "test:imports": "bun --bun vitest run --config vitest.scripts.config.ts scripts/check-import-boundaries.runtime.test.ts",
+    "test:scripts": "bun --bun vitest run --config vitest.scripts.config.ts"
   },
   "dependencies": {
     "@tanstack/react-router": "catalog:",

@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-app-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: docs route, content boundary, build target, runtime, credential source, proof or deployment ownership change
 ---
 
@@ -88,6 +88,7 @@ bun run --filter=docs test:browser
 bun run --filter=docs test:built
 bun run --filter=docs test:cloudflare-built
 bun run --filter=docs test:cloudflare-hosted
+bun run --filter=docs test:scripts
 bun run --filter=docs build:cloudflare
 bun run --filter=docs check-types
 bun run --filter=docs build
@@ -129,7 +130,7 @@ generator change separately from any provider artifact. `dev:vite` and `preview`
 
 The default docs test command runs the native import-checker fixtures, the
 native route-result and managed-runtime tests, the existing MDX link tests and
-the hosted-proof policy fixtures. The server test configuration resolves both
+the hosted-proof policy and real browser adapter fixtures. The server test configuration resolves both
 ordinary and server imports to package source. Route fixtures use the owning
 Schemas and native Effect encoders; no test-local Promise runner or throwing
 codec is required. Managed-runtime tests acquire and dispose the actual factory
@@ -215,16 +216,39 @@ identity. Effect Config and the owning Schemas decode those values plus the
 whole-number retry count and delay before Chromium starts. Preview must pair
 `pr-N` with the same positive PR number; Production and rollback must pair
 `prod` with no PR number. Missing, empty, partial-number, unsafe-path and
-secret-bearing URL input fails with a value-free tagged error. Chromium is one
-focused host adapter acquired and closed through an Effect Scope, including on
-failure or interruption. Provider-free boundary tests prove those local input
-and cleanup rules only; they do not prove a hosted deployment. The harness
-writes candidate-qualified desktop/mobile PNGs and emits the behavioural
-observation used to build Schema-decoded receipts. The hosted check retries a
-page load only when Chromium sees a 404 for a same-site hashed JavaScript
-asset during hydration. It records how many such retries were needed and
-fails with a bounded asset-propagation reason if they are
-exhausted. Other browser failures still stop immediately. The separate
+secret-bearing URL input fails with a value-free tagged error. Checked account,
+provider, stage, evidence-directory, URL, commit and hash values have distinct
+Schema-owned branded types; their encoded text stays unchanged. The named `CloudflareHostedProof` service keeps Playwright objects private in
+its live Layer. The command validates Workers URLs and deployment metadata
+before starting a browser; controlled adapter tests additionally use an exact
+loopback origin. Its native operations own browser and listener cleanup,
+HTTP/body reads, filesystem and Crypto. Optional input becomes Option internally
+and retains the historical null JSON fields. The complete observation has an
+owning Schema, separate from the workflow's required-field admission projection.
+
+The docs package test task and root docs-boundary test task both retain and
+hash `PLAYWRIGHT_BROWSERS_PATH` through Turbo. A native check reads the actual
+task settings so direct and full-graph tests use the same installed browser.
+The hosted operation has one five-minute deadline. Browser event callbacks only
+write to a bounded native Queue; overflow fails the proof rather than dropping
+warnings silently. Scoped Ref updates keep immutable observations. A hydration
+retry still requires an observed same-site 404 for a hashed JavaScript asset,
+retains the configured attempt limit and clears only that failed attempt's
+diagnostics. Other browser failures stop immediately. The command writes the
+same candidate-qualified desktop/mobile PNGs and emits the same identity and
+behaviour fields. Malformed server-function input uses raw bytes: Playwright
+JSON-encodes a string when its content type is JSON, which would otherwise send
+a valid JSON string instead of broken JSON.
+
+Native policy tests cover invalid settings, stage identity, success/failure/
+interruption cleanup, safe errors, complete output and absent optional metadata.
+Real Chromium fixtures cover temporary/permanent missing assets, unrelated
+private diagnostics, missing hydration, Queue overflow, and interruption of a
+pending streaming response. A controlled HTTP/DOM fixture exercises the complete
+named operation, navigation, readable text, focus, mobile menu, actual screenshot
+files and malformed request bytes. These are local adapter checks; the fixture's
+runtime headers and HTML do not establish Worker or hosted behaviour.
+The separate
 credential-free Production hosted verification workflow can recheck an
 already deployed Worker using reviewed, dated evidence; it does not apply or
 roll back a Worker.

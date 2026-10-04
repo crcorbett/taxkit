@@ -1580,3 +1580,56 @@ canonical skills/digests, tax outputs and history. **N/A** Changeset (private
 unversioned app), runbook/public-content/CI procedure and provider state.
 Revert the complete slice to recover. No merge/deployment/publication/apply
 or version application. DEV-73 remains incomplete; Medicare stays separate.
+
+
+### Hosted docs proof migration — 2026-10-05
+
+Implementation replaces the generic browser callback contract and raw Promise
+workflow with the named `CloudflareHostedProof` service and a private live Layer.
+Config/Schema owns checked input and branded identities, Option owns absence
+internally, and the full
+producer Schema preserves historical identity/null/output fields. Native HTTP,
+FS/Crypto, scoped Chromium/listeners, immutable Ref observations and a bounded
+Queue own work and cleanup. Queue overflow fails safely. The complete hosted
+operation has one five-minute deadline. Same-site missing hashed-asset retries
+retain their attempt/delay settings and clear only failed-attempt diagnostics.
+
+Real Chromium retry/private-error/overflow tests pass, and interruption retires
+an actual pending streaming response. The first pending-handler fixture did not
+observe request retirement; the streaming fixture tests the browser's actual
+unfinished response and retains that earlier failed observation. A controlled
+HTTP/DOM fixture exercises the complete operation and screenshot files. It
+showed that Playwright sends JSON-string quotes around `data: "{"`; raw Buffer
+bytes now send the intended malformed JSON. The built proof receives the same
+single request correction. Reverting the live request to the old string form
+fails the full fixture at the 4xx assertion; exact source is restored. Fixture
+HTML/runtime headers do not establish real Worker or hosted behaviour.
+
+Documentation impact: **Change required** for script/service/Schema/test owners,
+compiler/native test inputs, canonical strict selectors/actual CLI fixtures,
+source counterexamples, app README, testing architecture, T002 ledger and dated
+receipt. **Preserve** command paths, workflow/authority/receipt identities,
+provider state, runtime behaviour, public content, installed dependencies,
+canonical skills/digests and tax results. **N/A** Changeset (private unversioned
+app with no published package contract), generated content, deployment/CI
+procedure and new provider authority. Revert the complete slice for recovery.
+The first root test failed at browser launch because the two docs test tasks
+dropped the installed browser location. Their exact Turbo environment/hash
+inputs are now checked by a native read of the actual configuration. Full
+repository qualification passes: all 24 package test tasks, all 15 builds,
+369 real CLI lint cases, 191 deployment-tool cases and all 30 Quality cases
+(including 11 isolated checks, 269.67 seconds). Both unused-code profiles and
+all 24 compiler tasks pass. Unchanged SDK/web Chromium checks replay matching
+caches for 24/four cases. All 37 docs scripts (including seven actual Chromium
+cases) and 19 docs server cases pass. The real built local Worker retains SSR,
+immutable assets, direct/client 404s, three server functions, nine concurrent
+requests, one shared context, no document reloads/diagnostics and accessibility
+checks, including the corrected raw malformed JSON. The final repeat build
+first omitted the local browser path; restoring it passes, and that failed
+invocation remains in the receipt. Branded identities preserve saved text;
+native Option.flatMap retains an already checked previous-version identity.
+No dependency selection or tax result changed. The
+[receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-hosted-docs-native-proof.json)
+records local proof, recovery and non-claims. Native built-proof orchestration
+and remaining T002 semantic/enforcement review are next. DEV-73 and DEV-74–81
+remain unfinished; Medicare remains a separate decision.

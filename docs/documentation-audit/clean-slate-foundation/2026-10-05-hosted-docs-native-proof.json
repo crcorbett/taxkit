@@ -1,0 +1,237 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-05",
+  "issue": "DEV-73",
+  "parent_revision": "683c63cb2576405eb8a50ff69d3981a27ef3e09c",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes and draft PRs",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS with pinned Bun and Chromium; no provider operation",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Closed named hosted verification and asset-propagation service; private Playwright live Layer, no generic browser callback",
+    "Schema-derived configuration/errors/full observation; branded account/provider/stage/evidence/URL/commit/hash identities; Option internally and historical null JSON output",
+    "Native HTTP/filesystem/Crypto, Scope-owned browser/listener release and bounded Queue with fail-closed overflow; immutable Ref observations",
+    "Five-minute whole hosted-operation deadline; configured same-site hashed JavaScript asset retry limit/delay preserved",
+    "Native configuration/lifetime/output fixtures plus actual Chromium retry/private-error/overflow/interruption/full-operation fixtures",
+    "Actual malformed JSON Buffer bytes in hosted and built proofs; installed Playwright string input had sent valid JSON-string quotes",
+    "Canonical strict source selectors, exact command runtime/codec admissions, actual CLI/source counterexamples, native script compiler/test ownership"
+  ],
+  "checks": [
+    {
+      "command": "focused native scripts compiler",
+      "outcome": "pass after brand preservation uses native Option.flatMap; no assertion or repeated internal decoding",
+      "logs": [
+        "hosted-native-brand-types-corrected.log"
+      ]
+    },
+    {
+      "command": "bun run lint",
+      "outcome": "pass: 390 owned files; zero warnings/errors; restricted cache-write warning retained",
+      "logs": [
+        "hosted-native-brand-lint.log"
+      ]
+    },
+    {
+      "command": "bun run test",
+      "outcome": "pass: all 24 package tasks, 23 matching caches; 37 docs script cases (12 imports, 17 boundary, six propagation/privacy/cleanup Chromium cases, one complete Chromium operation, one actual Turbo environment input check), 19 docs server cases and 369 actual CLI lint cases",
+      "logs": [
+        "hosted-native-root-tests-qualified.log",
+        "hosted-native-brand-root-tests.log"
+      ]
+    },
+    {
+      "command": "native deployment strict source contracts",
+      "outcome": "25 cases pass, including five new deliberate bypass controls",
+      "logs": [
+        "hosted-native-source-contracts-qualified.log"
+      ]
+    },
+    {
+      "command": "reversible actual browser request mutation",
+      "outcome": "old data string fails the full fixture at the 4xx assertion; exact native source restored",
+      "logs": [
+        "hosted-native-valid-json-mutation.log"
+      ]
+    },
+    {
+      "command": "bun run build",
+      "outcome": "pass: all 15 tasks, 14 matching caches, changed docs built; repeat after restoring the installed browser environment input omitted from the preceding invocation",
+      "logs": [
+        "hosted-native-root-build.log",
+        "hosted-native-brand-root-build.log",
+        "hosted-native-brand-root-build-corrected.log"
+      ]
+    },
+    {
+      "command": "bun run --filter=docs test:cloudflare-built",
+      "outcome": "pass: real local workerd/Chromium, corrected raw malformed JSON, SSR/immutable asset 200, both 404s, three server functions, zero document reloads/diagnostics, nine concurrent requests, reused context and filesystem isolation",
+      "logs": [
+        "hosted-native-built-worker-proof.log"
+      ]
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass: all 30 Quality cases including 11 isolated checks in 269.67 seconds; 191 deployment-tool, 21 skill and 16 evaluation cases; both unused-code profiles; all 24 compiler tasks (23 matching caches); SDK Chromium 24 and web Chromium four replay matching caches; docs/runbooks/lint/format pass",
+      "logs": [
+        "hosted-native-full-verification.log"
+      ]
+    }
+  ],
+  "dependency_contract": {
+    "Bun": "1.4.2",
+    "Effect": "4.0.0",
+    "TypeScript": "7.0.2",
+    "effect_tsgo": "0.48.0",
+    "Playwright": "1.63.0",
+    "Chromium": "153.0.8010.12",
+    "dependency_changes": "none"
+  },
+  "documentation_impact": {
+    "Change required": [
+      "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+      "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+      "apps/docs/scripts/cloudflare-hosted-proof.live.layer.test.ts",
+      "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
+      "apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts",
+      "apps/docs/scripts/test-cloudflare-hosted.tsx",
+      "apps/docs/scripts/test-cloudflare-built.tsx",
+      "apps/docs/package.json",
+      "apps/docs/tsconfig.scripts.json",
+      "apps/docs/vitest.scripts.config.ts",
+      "oxlint.config.ts",
+      "tools/oxlint/portable-rules.test.ts",
+      "tools/docs-deployment/strict-boundaries.policy.ts",
+      "tools/docs-deployment/strict-boundaries.contract.test.ts",
+      "apps/docs/README.md",
+      "docs/architecture/testing-and-quality.md",
+      "docs/product-specs/clean-slate-foundation.tasks.json",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "turbo.json"
+    ],
+    "Preserve": [
+      "strict Workers URL/environment/stage admission",
+      "command entry paths/workflow identities/required-field receipt projection",
+      "public content/runtime and provider configuration",
+      "selected dependencies, canonical skills/digests, historical receipts and tax results",
+      "docs/product-specs/clean-slate-foundation.md"
+    ],
+    "N/A": {
+      "Changeset": "private unversioned app; no published package contract",
+      "generated content": "no authored/generated public content change",
+      "deployment/runbook/CI procedure": "same entry paths and approval boundary; no provider procedure executed",
+      "new critical journey": "existing hosted-proof journey; stronger local adapter oracle"
+    }
+  },
+  "recovery": {
+    "failed_observations": [
+      "initial incorrect installed Schema.isBetween signature and Unicode regex corrected",
+      "initial readonly/brand/provider Headers lookup errors corrected using owning Schemas/native Headers",
+      "first pending-handler fixture did not observe retirement; streaming-response fixture proves actual pending-body interruption",
+      "initial valid JSON-string payload failed exact-body fixture; raw Buffer bytes correct it",
+      "initial source scope counterexample removed listener acquisition while browser scope remained; exact named browser acquisition now guarded",
+      "initial root lint and three CLI positives rejected unsorted newly added keys; corrected before qualification",
+      "initial root test: both docs test tasks stripped PLAYWRIGHT_BROWSERS_PATH and Chromium launch failed; exact Turbo retained/hashed inputs added with actual-file native checks",
+      "initial extra runtime assertion placed in a different fixture corpus; typed compiler and actual CLI rejected it, corrected to existing exact runtime assertion corpus",
+      "initial branded optional previous-version mapping retained empty-string type; native Option.flatMap preserves the already checked identity and original null output",
+      "final repeat build invocation omitted PLAYWRIGHT_BROWSERS_PATH and selected the missing default Chromium cache; identical build with the installed pinned path passes all 15 tasks"
+    ],
+    "rollback": "revert the complete slice to parent revision",
+    "resume_trigger": "continue native built-proof orchestration and remaining T002 semantic/enforcement review; DEV-74\u201381 follow the accepted dependency order",
+    "next_owner": "TaxKit implementation owner"
+  },
+  "limitations": [
+    "Local controlled HTTP/DOM fixtures do not establish Worker or hosted provider behaviour",
+    "No live Workers URL, provider plan/apply, deployment, merge, publication or version application",
+    "Playwright has no AbortSignal input; awaiting-Effect interruption alone does not establish SDK/provider cancellation; scoped browser closure is separately tested against a streaming response",
+    "Historical malformed-server-function labels only established their observed status; the old string payload did not establish malformed JSON syntax rejection",
+    "Built proof orchestration remains pending native migration; this slice changes only its malformed input bytes",
+    "Other DEV-73 semantic enforcement and DEV-74\u201381 remain pending; Medicare separate"
+  ],
+  "postconditions": [
+    "No raw Browser/Page in public service operations; named decoded replies and safe error vocabulary",
+    "Invalid environment input precedes browser acquisition",
+    "Browser/observer cleanup on success, failure and interruption; event overflow cannot silently produce a clean observation",
+    "Complete producer retains candidate-qualified screenshot paths and historical output fields",
+    "All mandatory local qualification passes; no hosted provider or publication claim"
+  ],
+  "logs_location": "Task-local pinned-toolchain directory; portable log basenames above, no secret values retained",
+  "local_worker_observation": {
+    "browser": {
+      "name": "Chromium",
+      "version": "153.0.8010.12"
+    },
+    "candidate": {
+      "assetsSha256": "96eb38299fe83d1d4ed5267756fa63cd38af6846801f25e59a445e650718cfd5",
+      "deploymentInputSha256": "26617f31ef188e7359c2e718590ce0ad4000d91ab1c3d856e8b1df7791cf37fe",
+      "sourceCommit": "683c63cb2576405eb8a50ff69d3981a27ef3e09c",
+      "workerModulesSha256": "45d7650bd1fddbcea50e5470708993a8cb450d235816ee3238fe44a31dab97f2",
+      "worktreeQualifiedBeforeCommit": true
+    },
+    "dependencies": {
+      "cloudflareVitePlugin": "1.62.5",
+      "workerd": "1.20261001.1",
+      "wrangler": "4.147.0"
+    },
+    "evidenceClass": "local-workerd",
+    "filesystem": {
+      "isolatedOutputOnlyExecution": true,
+      "nodeFileSystemModules": [
+        "assets/policy-DAVKzKc6.js",
+        "assets/runtime.server-DggjVMoy.js"
+      ],
+      "providerCredentialEnvironmentAllowed": false,
+      "requestTimePolicyImportObserved": false
+    },
+    "limits": {
+      "firstResponseRequestMs": 176.13,
+      "gzipUploadBytes": 572293.12,
+      "localProcessStartToFirstResponseMs": 799.59,
+      "rawServerModuleBytes": 3373988,
+      "rawUploadBytes": 3373987.84,
+      "workerSizeLimitBytes": 3145728
+    },
+    "nonClaims": [
+      "Local workerd does not prove a Cloudflare account, provider deployment, workers.dev URL, remote state, Preview, Production or rollback.",
+      "The startup observation is local workerd evidence; provider startup validation remains required."
+    ],
+    "oracles": {
+      "accessibility": "passed",
+      "assetCacheHeaders": "passed",
+      "assets": "passed",
+      "clientNavigationWithoutDocumentReload": "passed",
+      "clientNotFound": "passed",
+      "concurrentRequestIsolation": "passed",
+      "consoleAndPageErrors": "passed",
+      "directNotFound": "passed",
+      "hydration": "passed",
+      "malformedServerFunction": "passed",
+      "mobileNavigationDisclosure": "passed",
+      "pendingNavigation": "passed",
+      "recoverableError": "passed",
+      "reducedMotion": "passed",
+      "serverFunctionTransport": "passed",
+      "ssr": "passed"
+    },
+    "owner": "DCD-001 local Cloudflare built-app harness",
+    "runtime": {
+      "concurrentRequestsPassed": 9,
+      "observedConstructionCount": 1,
+      "observedDescendantCount": 4,
+      "observedIsolateId": "iirgw2kbqp-1dxqoj8ho40",
+      "observedWorkerdDescendantCount": 2,
+      "perRequestConstructionPatternAbsent": true
+    },
+    "schemaVersion": 1,
+    "screenshots": []
+  }
+}

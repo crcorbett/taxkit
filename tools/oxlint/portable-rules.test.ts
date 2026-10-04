@@ -33,6 +33,31 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
+      "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+      "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+      "apps/docs/scripts/cloudflare-hosted-proof.live.layer.test.ts",
+      "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
+      "apps/docs/scripts/test-cloudflare-hosted.tsx",
+      "apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts",
+    ],
+    generated: "apps/docs/scripts/.generated-hosted-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
+    accepted: [
       "apps/web/src/lib/config.ts",
       "apps/web/src/lib/config.client.ts",
       "apps/web/src/lib/config.client-input.ts",
@@ -1124,6 +1149,7 @@ test.effect.each([
 );
 
 test.each([
+  "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/src/lib/docs/loaders.server.ts",
   "apps/docs/src/server.ts",
   "apps/docs/vite.config.ts",

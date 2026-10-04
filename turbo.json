@@ -39,6 +39,11 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
+    "docs#test": {
+      "dependsOn": ["^build"],
+      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
+      "outputs": []
+    },
     "test": {
       "dependsOn": ["^build"],
       "outputs": []
@@ -125,7 +130,10 @@
     },
     "//#test:documentation:task": { "outputs": [] },
     "//#test:docs-deployment:task": { "outputs": [] },
-    "//#test:docs-boundaries:task": { "outputs": [] },
+    "//#test:docs-boundaries:task": {
+      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
+      "outputs": []
+    },
     "//#test:oxlint:task": {
       "inputs": [
         "$TURBO_DEFAULT$",

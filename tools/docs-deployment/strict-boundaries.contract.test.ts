@@ -18,6 +18,10 @@ const readGovernedSources = Effect.gen(function* () {
       yield* fileSystem.readFileString(
         "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts"
       ),
+    "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts":
+      yield* fileSystem.readFileString(
+        "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts"
+      ),
     "apps/docs/scripts/test-cloudflare-hosted.tsx":
       yield* fileSystem.readFileString(
         "apps/docs/scripts/test-cloudflare-hosted.tsx"
@@ -264,8 +268,12 @@ describe("strict docs app and deployment architecture", () => {
         );
         const withoutScope = replaceSource(
           sources,
-          "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
-          (source) => source.replace("Effect.acquireRelease(", "launchBrowser(")
+          "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+          (source) =>
+            source.replace(
+              "const acquireBrowser = Effect.acquireRelease(",
+              "const acquireBrowser = launchBrowser("
+            )
         );
         const rawHostEnvironment = replaceSource(
           sources,
@@ -282,6 +290,44 @@ describe("strict docs app and deployment architecture", () => {
         expect(findingInvariants(rawHostEnvironment)).toEqual(
           expect.arrayContaining(["host-ingress", "hosted-proof-boundary"])
         );
+      })
+  );
+
+  test.effect.each([
+    {
+      from: "verifyHostedDeployment",
+      path: "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+      to: "useRawBrowser",
+    },
+    {
+      from: "Schema.encodeEffect(",
+      path: "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+      to: "writeUncheckedJson(",
+    },
+    {
+      from: "HostedProofProbe.makeEffect(",
+      path: "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+      to: "uncheckedBrowserResult(",
+    },
+    {
+      from: "Queue.offerUnsafe(",
+      path: "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+      to: "events.push(",
+    },
+    {
+      from: "",
+      path: "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+      to: "export interface CloudflareHostedProofHost<BrowserHandle> {}",
+    },
+  ] as const)(
+    "rejects a bypassed named hosted-proof boundary: $to",
+    ({ path, from, to }) =>
+      Effect.gen(function* () {
+        const sources = yield* readGovernedSources;
+        const changed = replaceSource(sources, path, (source) =>
+          from === "" ? `${source}\n${to}\n` : source.replaceAll(from, to)
+        );
+        expect(findingInvariants(changed)).toContain("hosted-proof-boundary");
       })
   );
 

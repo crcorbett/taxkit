@@ -806,7 +806,7 @@ try {
   const malformedServerFunctionResponse = await page.request.fetch(
     observedServerFunction.url,
     {
-      data: "{",
+      data: Buffer.from("{"),
       headers: { "content-type": "application/json" },
       method: "POST",
     }

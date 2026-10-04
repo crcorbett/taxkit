@@ -1,14 +1,24 @@
-import { describe, expect, test } from "bun:test";
-
-import { ConfigProvider, Effect, Fiber, Match, Result } from "effect";
+import { expect, it } from "@effect/vitest";
+import {
+  ConfigProvider,
+  Deferred,
+  Effect,
+  Fiber,
+  Layer,
+  Match,
+  Ref,
+  Result,
+  Schema,
+} from "effect";
 
 import {
-  HostedProofAssetPropagationError,
+  CloudflareHostedProof,
+  HostedProofConfigurationError,
+  HostedProofEvidenceError,
+  HostedProofExecutionError,
+  HostedProofProbe,
   runCloudflareHostedProof,
 } from "./cloudflare-hosted-proof.boundary.js";
-import type { CloudflareHostedProofHost } from "./cloudflare-hosted-proof.boundary.js";
-
-type TestConfig = Readonly<Record<string, string | undefined>>;
 
 const validConfig = {
   TAXKIT_DOCS_ACCOUNT_ID: "b".repeat(32),
@@ -30,58 +40,149 @@ const validConfig = {
   TAXKIT_DOCS_STATE_STORE_ID: "alchemy-state-store",
   TAXKIT_DOCS_VERSION_ID: "version-pr-24",
   TAXKIT_DOCS_WORKER_NAME: "taxkit-docs-pr-24",
-} satisfies TestConfig;
+} as const;
 
-const browser = { fixture: "browser" };
-type TestBrowser = typeof browser;
-interface TestHostFixture {
-  readonly counts: { closed: number; launched: number; ran: number };
-  readonly host: CloudflareHostedProofHost<TestBrowser>;
-}
+const Input = Schema.Record(Schema.String, Schema.UndefinedOr(Schema.String));
+const Counts = Schema.Struct({
+  closed: Schema.Int,
+  launched: Schema.Int,
+  ran: Schema.Int,
+});
+const Outcome = Schema.Literals([
+  "success",
+  "failure",
+  "asset-propagation",
+  "interruption",
+  "invalid-evidence",
+]);
 
-const makeHost = (
-  overrides: Partial<CloudflareHostedProofHost<TestBrowser>> = {}
-): TestHostFixture => {
-  const counts = { closed: 0, launched: 0, ran: 0 };
-  return {
-    counts,
-    host: {
-      close: () => {
-        counts.closed += 1;
-        return Promise.resolve();
-      },
-      launch: () => {
-        counts.launched += 1;
-        return Promise.resolve(browser);
-      },
-      run: () => {
-        counts.ran += 1;
-        return Promise.resolve({ status: "passed" });
-      },
-      ...overrides,
+const probe = Schema.decodeEffect(HostedProofProbe)({
+  accessibility: {
+    contrastRatio: 7,
+    labelledArticle: true,
+    labelledMain: true,
+    labelledNavigation: true,
+    skipLinkFocus: true,
+  },
+  asset: {
+    cacheControl: "public, max-age=31536000, immutable",
+    contentType: "text/javascript",
+    etagPresent: true,
+    path: "/assets/route-ABC123xy.js",
+    status: 200,
+  },
+  assetPropagationRetries: 0,
+  browser: { name: "chromium", version: "controlled-fixture" },
+  diagnostics: [],
+  direct404: 404,
+  initialSsr: 200,
+  malformedServerFunctionStatus: 400,
+  navigation: {
+    client404WithoutDocumentReload: true,
+    documentRequestsAdded: 0,
+    serverFunctionResponses: 1,
+  },
+  runtime: {
+    constructionCounts: [1, 1],
+    firstIsolate: "fixture-isolate",
+    sameObservedIsolate: true,
+    secondIsolate: "fixture-isolate",
+  },
+  screenshots: [
+    {
+      kind: "desktop",
+      path: "docs/evidence/deployments/preview-pr-24/preview-desktop-aaaaaaa.png",
+      sha256: "a".repeat(64),
+      viewport: { deviceScaleFactor: 1, height: 1000, width: 1440 },
     },
-  };
-};
+    {
+      kind: "mobile",
+      path: "docs/evidence/deployments/preview-pr-24/preview-mobile-aaaaaaa.png",
+      sha256: "b".repeat(64),
+      viewport: { deviceScaleFactor: 1, height: 844, width: 390 },
+    },
+  ],
+} as const);
+
+// The test Layer has the same closed operations as the live browser adapter.
+// Its explicit outcomes exercise configuration, scope and egress behaviour.
+const makeFixture = Effect.fnUntraced(function* (
+  outcome: typeof Outcome.Type = "success"
+) {
+  const counts = yield* Ref.make<typeof Counts.Type>({
+    closed: 0,
+    launched: 0,
+    ran: 0,
+  });
+  const started = yield* Deferred.make<boolean>();
+  const checkedProbe = yield* probe;
+  const layer = Layer.succeed(
+    CloudflareHostedProof,
+    CloudflareHostedProof.of({
+      verifyAssetPropagation: () =>
+        Effect.fail(
+          new HostedProofExecutionError({ operation: "browser-proof" })
+        ),
+      verifyHostedDeployment: () =>
+        Effect.gen(function* () {
+          yield* Effect.acquireRelease(
+            Ref.update(counts, (value) => ({
+              ...value,
+              launched: value.launched + 1,
+            })),
+            () =>
+              Ref.update(counts, (value) => ({
+                ...value,
+                closed: value.closed + 1,
+              }))
+          );
+          yield* Ref.update(counts, (value) => ({
+            ...value,
+            ran: value.ran + 1,
+          }));
+          yield* Deferred.succeed(started, true);
+          return yield* Match.value(outcome).pipe(
+            Match.when("failure", () =>
+              Effect.fail(
+                new HostedProofExecutionError({ operation: "browser-proof" })
+              )
+            ),
+            Match.when("asset-propagation", () =>
+              Effect.fail(
+                new HostedProofExecutionError({
+                  operation: "asset-propagation",
+                })
+              )
+            ),
+            Match.when("interruption", () => Effect.never),
+            Match.when("invalid-evidence", () =>
+              Effect.succeed({
+                ...checkedProbe,
+                accessibility: {
+                  ...checkedProbe.accessibility,
+                  contrastRatio: Number.NaN,
+                },
+              })
+            ),
+            Match.when("success", () => Effect.succeed(checkedProbe)),
+            Match.exhaustive
+          );
+        }).pipe(Effect.scoped),
+    })
+  );
+  return { counts, layer, started } as const;
+});
 
 const configured = (
-  host: CloudflareHostedProofHost<TestBrowser>,
-  config: TestConfig = validConfig
+  layer: Layer.Layer<CloudflareHostedProof>,
+  config: typeof Input.Type = validConfig
 ) =>
-  runCloudflareHostedProof(host).pipe(
+  runCloudflareHostedProof.pipe(
+    Effect.provide(layer),
     Effect.provideService(
       ConfigProvider.ConfigProvider,
       ConfigProvider.fromUnknown(config)
     )
-  );
-
-const runResult = (
-  host: CloudflareHostedProofHost<TestBrowser>,
-  config: TestConfig = validConfig
-) =>
-  configured(host, config).pipe(
-    Effect.scoped,
-    Effect.result,
-    Effect.runPromise
   );
 
 const invalidInputs = [
@@ -105,144 +206,164 @@ const invalidInputs = [
   ],
 ] as const;
 
-describe("Cloudflare hosted proof boundary", () => {
-  for (const [name, override] of invalidInputs) {
-    test(`rejects ${name} before browser acquisition`, async () => {
-      const { counts, host } = makeHost();
-      const result = await runResult(host, { ...validConfig, ...override });
-
-      expect(counts).toEqual({ closed: 0, launched: 0, ran: 0 });
-      Result.match(result, {
-        onFailure: (error) =>
-          Match.value(error).pipe(
-            Match.tag("HostedProofConfigurationError", (failure) =>
-              expect(failure.requirement).toBe("environment-input")
-            ),
-            Match.orElse(() => expect.unreachable())
-          ),
-        onSuccess: () => expect.unreachable(),
+it.effect.each(invalidInputs)(
+  "rejects %s before browser acquisition",
+  ([, override]) =>
+    Effect.gen(function* () {
+      const fixture = yield* makeFixture();
+      const result = yield* configured(fixture.layer, {
+        ...validConfig,
+        ...override,
+      }).pipe(Effect.result);
+      expect(yield* Ref.get(fixture.counts)).toEqual({
+        closed: 0,
+        launched: 0,
+        ran: 0,
       });
-    });
-  }
-
-  test("rejects a mismatched environment and stage before browser acquisition", async () => {
-    const { counts, host } = makeHost();
-    const result = await runResult(host, {
-      ...validConfig,
-      TAXKIT_DOCS_ENVIRONMENT: "production",
-    });
-
-    expect(counts.launched).toBe(0);
-    Result.match(result, {
-      onFailure: (error) =>
-        Match.value(error).pipe(
-          Match.tag("HostedProofConfigurationError", (failure) =>
-            expect(failure.requirement).toBe("environment-stage-identity")
-          ),
-          Match.orElse(() => expect.unreachable())
-        ),
-      onSuccess: () => expect.unreachable(),
-    });
-  });
-
-  test("closes the browser after success", async () => {
-    const { counts, host } = makeHost();
-    const result = await runResult(host);
-
-    expect(Result.isSuccess(result)).toBe(true);
-    expect(counts).toEqual({ closed: 1, launched: 1, ran: 1 });
-  });
-
-  test("closes the browser after an expected execution failure", async () => {
-    const { counts, host } = makeHost({
-      run: () => {
-        counts.ran += 1;
-        return Promise.reject(new Error("private-upstream-value"));
-      },
-    });
-    const result = await runResult(host);
-
-    expect(counts.closed).toBe(1);
-    Result.match(result, {
-      onFailure: (error) => {
-        expect(error._tag).toBe("HostedProofExecutionError");
-        expect(JSON.stringify(error)).not.toContain("private-upstream-value");
-      },
-      onSuccess: () => expect.unreachable(),
-    });
-  });
-
-  test("reports a bounded asset propagation failure without raw browser data", async () => {
-    const { counts, host } = makeHost({
-      run: () =>
-        Promise.reject(
-          new HostedProofAssetPropagationError({
-            reason: "missing-script-asset",
+      expect(result).toEqual(
+        Result.fail(
+          new HostedProofConfigurationError({
+            requirement: "environment-input",
           })
-        ),
-    });
-    const result = await runResult(host);
-
-    expect(counts.closed).toBe(1);
-    Result.match(result, {
-      onFailure: (error) => {
-        expect(error._tag).toBe("HostedProofExecutionError");
-        if (error._tag === "HostedProofExecutionError") {
-          expect(error.operation).toBe("asset-propagation");
-        }
-      },
-      onSuccess: () => expect.unreachable(),
-    });
-  });
-
-  test("closes the browser after interruption", async () => {
-    const pending = Promise.withResolvers<unknown>();
-    const started = Promise.withResolvers<boolean>();
-    const { counts, host } = makeHost({
-      run: () => {
-        counts.ran += 1;
-        started.resolve(true);
-        return pending.promise;
-      },
-    });
-
-    await Effect.gen(function* interruptionFixture() {
-      const fiber = yield* configured(host).pipe(
-        Effect.scoped,
-        Effect.forkChild({ startImmediately: true })
+        )
       );
-      expect(yield* Effect.promise(() => started.promise)).toBe(true);
-      yield* Fiber.interrupt(fiber);
-    }).pipe(Effect.runPromise);
+    })
+);
 
-    expect(counts).toEqual({ closed: 1, launched: 1, ran: 1 });
-  });
-
-  test("keeps configuration, execution and evidence errors secret-negative", async () => {
+it.effect(
+  "rejects a mismatched environment and stage before browser acquisition",
+  () =>
+    Effect.gen(function* () {
+      const fixture = yield* makeFixture();
+      const result = yield* configured(fixture.layer, {
+        ...validConfig,
+        TAXKIT_DOCS_ENVIRONMENT: "production",
+      }).pipe(Effect.result);
+      expect(yield* Ref.get(fixture.counts)).toEqual({
+        closed: 0,
+        launched: 0,
+        ran: 0,
+      });
+      expect(result).toEqual(
+        Result.fail(
+          new HostedProofConfigurationError({
+            requirement: "environment-stage-identity",
+          })
+        )
+      );
+    })
+);
+it.effect(
+  "closes the browser after success and preserves the complete observation",
+  () =>
+    Effect.gen(function* () {
+      const fixture = yield* makeFixture();
+      const encoded = yield* configured(fixture.layer);
+      const observation = yield* Schema.decodeEffect(
+        Schema.fromJsonString(Schema.Record(Schema.String, Schema.Json))
+      )(encoded);
+      expect(observation).toMatchObject({
+        candidateCommit: validConfig.TAXKIT_DOCS_CANDIDATE_COMMIT,
+        previewPrNumber: 24,
+        previousVersionId: "previous-version",
+        ...(yield* probe),
+      });
+      expect(yield* Ref.get(fixture.counts)).toEqual({
+        closed: 1,
+        launched: 1,
+        ran: 1,
+      });
+    })
+);
+it.effect.each(["failure", "asset-propagation"] as const)(
+  "closes the browser after %s",
+  (outcome) =>
+    Effect.gen(function* () {
+      const fixture = yield* makeFixture(outcome);
+      const result = yield* configured(fixture.layer).pipe(Effect.result);
+      expect(yield* Ref.get(fixture.counts)).toEqual({
+        closed: 1,
+        launched: 1,
+        ran: 1,
+      });
+      expect(result).toEqual(
+        Result.fail(
+          new HostedProofExecutionError({
+            operation:
+              outcome === "failure" ? "browser-proof" : "asset-propagation",
+          })
+        )
+      );
+    })
+);
+it.effect("closes the browser after interruption", () =>
+  Effect.gen(function* () {
+    const fixture = yield* makeFixture("interruption");
+    const fiber = yield* configured(fixture.layer).pipe(
+      Effect.forkChild({ startImmediately: true })
+    );
+    yield* Deferred.await(fixture.started);
+    yield* Fiber.interrupt(fiber);
+    expect(yield* Ref.get(fixture.counts)).toEqual({
+      closed: 1,
+      launched: 1,
+      ran: 1,
+    });
+  })
+);
+it.effect("keeps configuration and evidence errors secret-negative", () =>
+  Effect.gen(function* () {
     const secret = "private-token-value";
-    const invalid = makeHost();
-    const invalidResult = await runResult(invalid.host, {
+    const invalid = yield* makeFixture();
+    const invalidResult = yield* configured(invalid.layer, {
       ...validConfig,
       TAXKIT_DOCS_HOSTED_URL: `https://taxkit-docs-pr-24.workers.dev/?token=${secret}`,
+    }).pipe(Effect.result);
+    const invalidJson = yield* Schema.encodeEffect(
+      Schema.fromJsonString(Schema.Unknown)
+    )(invalidResult);
+    expect(invalidJson).not.toContain(secret);
+    const evidence = yield* makeFixture("invalid-evidence");
+    const result = yield* configured(evidence.layer).pipe(Effect.result);
+    expect(result).toEqual(
+      Result.fail(
+        new HostedProofEvidenceError({ operation: "encode-observation" })
+      )
+    );
+    expect(yield* Ref.get(evidence.counts)).toEqual({
+      closed: 1,
+      launched: 1,
+      ran: 1,
     });
-    expect(JSON.stringify(invalidResult)).not.toContain(secret);
+  })
+);
 
-    const execution = makeHost({
-      run: () => Promise.reject(new Error(secret)),
-    });
-    const executionResult = await runResult(execution.host);
-    expect(JSON.stringify(executionResult)).not.toContain(secret);
-
-    const evidence = makeHost({
-      run: () => Promise.resolve({ invalid: 1n }),
-    });
-    const evidenceResult = await runResult(evidence.host);
-    Result.match(evidenceResult, {
-      onFailure: (error) => {
-        expect(error._tag).toBe("HostedProofEvidenceError");
-        expect(JSON.stringify(error)).not.toContain(secret);
-      },
-      onSuccess: () => expect.unreachable(),
-    });
-  });
-});
+it.effect.each(["production", "rollback"] as const)(
+  "keeps absent optional metadata as historical null values for %s",
+  (environment) =>
+    Effect.gen(function* () {
+      const fixture = yield* makeFixture();
+      const encoded = yield* configured(fixture.layer, {
+        ...validConfig,
+        TAXKIT_DOCS_ENVIRONMENT: environment,
+        TAXKIT_DOCS_PREVIEW_PR_NUMBER: undefined,
+        TAXKIT_DOCS_PREVIOUS_VERSION_ID:
+          environment === "production" ? undefined : "",
+        TAXKIT_DOCS_STAGE: "prod",
+      });
+      const observation = yield* Schema.decodeEffect(
+        Schema.fromJsonString(Schema.Record(Schema.String, Schema.Json))
+      )(encoded);
+      expect(observation).toMatchObject({
+        environment,
+        previewPrNumber: null,
+        previousVersionId: null,
+        stage: "prod",
+      });
+      expect(yield* Ref.get(fixture.counts)).toEqual({
+        closed: 1,
+        launched: 1,
+        ran: 1,
+      });
+    })
+);

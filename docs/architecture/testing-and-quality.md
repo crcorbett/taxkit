@@ -866,3 +866,34 @@ real downstream command at `build @taxkit/sdk` with child exit 2. The exact
 bounded step/exit diagnostic is the current oracle; raw compiler text is not
 required or retained by the SDK command. The historical HGI packets keep the
 observations they originally qualified.
+
+
+The hosted docs proof uses a closed native service with private Playwright
+objects, scoped browser/listener cleanup, native HTTP/FS/Crypto, immutable Ref
+observations and a bounded callback Queue. Overflow fails safely. The command's
+Config boundary still requires Workers URLs, exact stage identity and bounded
+retry metadata before browser launch; controlled adapter tests use loopback only.
+One five-minute deadline bounds the complete hosted operation. Optional values
+become Option internally and preserve null fields at the JSON output boundary.
+The producer owns the full observation Schema; workflow admission retains its
+separate required-field projection.
+
+Native fixtures retain configuration, error and lifetime checks. Real Chromium
+checks qualify asset propagation, unexpected diagnostics, Queue overflow and
+browser interruption that retires an actual pending streaming response. A
+controlled HTTP/DOM host qualifies the complete browser operation, navigation,
+contrast/focus/mobile controls, actual screenshots and their output identities.
+Its headers and DOM are fixtures, not Worker or hosted readback. The malformed
+server-function oracle checks the actual body and JSON content type: raw Buffer
+bytes send broken JSON, whereas the previous Playwright string input sent a
+valid JSON string. Reverting that request to the old form fails the real-browser
+fixture at the expected 4xx assertion. The built proof uses the same correction.
+Actual strict CLI fixtures and source counterexamples guard the named service,
+codec, event Queue, browser scope and sole exact command runtime admission.
+
+The package `docs#test` and root `//#test:docs-boundaries:task` include the exact
+`PLAYWRIGHT_BROWSERS_PATH` input in Turbo's retained and hashed environment.
+Native tests read the actual task entries. The initial root test failed before
+browser work because those tasks dropped the installed browser location;
+correcting only those two entries preserves the existing browser cache and
+other test task environments.
