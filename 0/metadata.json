@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M42SV3KFM35XJKYSBD7H7E6H",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-04T06:32:54.904709Z",
+  "branch": "codex/dev-73-lexical-policy-gaps",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/architecture/testing-and-quality.md",
+    "docs/standards/tooling.md",
+    "oxlint.config.ts",
+    "tools/oxlint/binding-tracker.js",
+    "tools/oxlint/effect-rules.js",
+    "tools/oxlint/lexical-policy.test.ts",
+    "tools/oxlint/taxkit-rules.js"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5cd4f6eeff9c",
+  "checkpoint_transcript_start": 1611,
+  "transcript_lines_at_start": 1611,
+  "compact_transcript_start": 196,
+  "token_usage": {
+    "input_tokens": 152593,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 6231936,
+    "output_tokens": 34344,
+    "api_call_count": 40
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-04T06:32:54.768724Z",
+    "agent_lines": 553,
+    "agent_removed": 10,
+    "human_added": 175,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 728,
+    "total_lines_changed": 744,
+    "agent_percentage": 75.67204301075269,
+    "metric_version": 2
+  }
+}
