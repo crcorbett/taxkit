@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-app-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-10-04
 review_trigger: docs route, content boundary, build target, runtime, credential source, proof or deployment ownership change
 ---
 
@@ -83,6 +83,7 @@ bun run --filter=docs dev
 bun run --filter=docs dev:vite
 bun run --filter=docs check-import-boundaries
 bun run --filter=docs test
+bun run --filter=docs test:imports
 bun run --filter=docs test:browser
 bun run --filter=docs test:built
 bun run --filter=docs test:cloudflare-built
@@ -227,6 +228,21 @@ dated Production readback observed one stable Worker URL and restored
 source-bound state; it does not establish timeless availability. This does not
 claim byte promotion, recovery from known broken content, a custom domain/DNS
 route, a paid plan or release/publication.
+
+The import checker runs through its exact Bun command entrypoint and native
+Effect FileSystem/Path services. It lists source files, skips server/test/generated
+owners and non-file entries, inspects direct static imports/exports with the
+pinned TypeScript 6 compatibility parser, and rejects browser runtime use or
+a `runtime.client.ts` file. Read/list/stat failures fail the command with safe
+operation labels. This source check is separate from the built browser bundle
+and Worker checks; it does not establish the complete transitive import graph.
+
+`test:imports` runs native Effect fixtures for browser-safe source, forbidden
+references, ignored owners, an empty runtime file and file-service failures.
+The default `test` command includes this corpus; `check-types` includes the
+checker, fixtures and their test configuration. These exact files receive the
+canonical strict rules, with only the command entrypoint allowed to execute
+an application. The other docs app migration work remains with DEV-73.
 
 `check-import-boundaries` rejects server-only content, service, generated-source
 and runtime imports from browser-reachable app modules. The docs app has no

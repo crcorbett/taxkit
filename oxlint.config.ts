@@ -268,6 +268,7 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
@@ -319,7 +320,6 @@ const runtimeBoundaryFiles = [
 const processBoundaryFiles = [
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
-  "apps/docs/scripts/check-import-boundaries.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/scripts/test-built.tsx",
@@ -339,7 +339,6 @@ const processBoundaryFiles = [
 ];
 
 const consoleBoundaryFiles = [
-  "apps/docs/scripts/check-import-boundaries.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/scripts/test-built.tsx",
@@ -368,7 +367,6 @@ const consoleBoundaryFiles = [
 
 const bunAdapterFiles = [
   "apps/api/src/server.ts",
-  "apps/docs/scripts/check-import-boundaries.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/scripts/test-built.tsx",
@@ -378,6 +376,7 @@ const bunAdapterFiles = [
 ];
 
 const bunRuntimeEntrypointFiles = [
+  "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
@@ -447,6 +446,7 @@ export default defineConfig({
   overrides: [
     {
       files: [
+        "apps/docs/scripts/check-import-boundaries.runtime.ts",
         "apps/api/src/config.ts",
         "apps/api/scripts/routes.ts",
         "apps/api/scripts/smoke-public-routes.runtime.ts",
@@ -509,6 +509,9 @@ export default defineConfig({
         "packages/sdk/typescript/src/**",
         "packages/sdk/typescript/scripts/**",
         "apps/api/**",
+        "apps/docs/scripts/check-import-boundaries.runtime*.ts",
+        "apps/docs/scripts/.generated-imports-strict-rejected.ts",
+        "apps/docs/vitest.scripts.config.ts",
         "packages/sdk/typescript/type-tests/**",
         "packages/sdk/typescript/vitest*.config.ts",
         "packages/testing/**",
@@ -531,6 +534,19 @@ export default defineConfig({
         "strict-effect/tagged-error-name": "error",
         "taxkit/no-native-collections": "error",
         "taxkit/no-object-writes": "error",
+      },
+    },
+    {
+      files: ["apps/docs/scripts/check-import-boundaries.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "apps/docs/scripts/check-import-boundaries.runtime.ts",
+            ],
+          },
+        ],
       },
     },
     {

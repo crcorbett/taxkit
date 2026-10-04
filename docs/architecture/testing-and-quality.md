@@ -96,7 +96,7 @@ bun run --filter=@taxkit/docs-content test
 
 Run those package-local docs gates whenever MDX content, Fumadocs source
 wiring, docs examples, validation policy or docs rendering changes.
-`test:docs-boundaries` includes a negative browser import audit, the route
+`test:docs-boundaries` includes a negative browser import audit, native import-checker fixtures, the route
 transport codec corpus and a focused test that reuses one app-owned server
 runtime before the test owner disposes it. The package content test composes
 the deterministic `DocsContentService` test Layer over the generic

@@ -3,7 +3,10 @@
   "include": [
     "scripts/cloudflare-hosted-proof.boundary.test.ts",
     "scripts/cloudflare-hosted-proof.boundary.ts",
-    "scripts/test-cloudflare-hosted.tsx"
+    "scripts/test-cloudflare-hosted.tsx",
+    "scripts/check-import-boundaries.runtime.ts",
+    "scripts/check-import-boundaries.runtime.test.ts",
+    "vitest.scripts.config.ts"
   ],
   "compilerOptions": {
     "allowImportingTsExtensions": true,

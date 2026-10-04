@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-10-04
 review_trigger: frontend runtime, transport, rendering, build adapter, or composition change
 ---
 
@@ -84,6 +84,14 @@ routes should not read `packages/docs-content/content` files,
 `@taxkit/docs-content` bundles the authored navigation representation and
 decodes it with the canonical navigation schema, so built server functions do
 not depend on a source-relative filesystem path.
+
+The docs import checker uses native Effect file/path services and one exact
+Bun command entrypoint. The pinned TypeScript 6 compatibility parser owns
+its direct static source inspection; TypeScript 7 still owns compilation.
+It ignores server, test and generated owners and non-file directory entries,
+rejects browser runtime execution/file presence, and fails closed on file-service
+errors. Native fixtures and real CLI strict-rule canaries qualify this checker
+separately from transitive browser-bundle and local Worker behaviour.
 
 The opt-in proof response establishes one construction and stable identity only
 for the observed process/isolate. It does not establish a global singleton

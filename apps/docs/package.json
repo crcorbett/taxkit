@@ -12,14 +12,15 @@
     "build:cloudflare": "vite build",
     "check-types": "bun run --filter=@taxkit/docs-fumadocs build && tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "clean": "rm -rf .tanstack .turbo .wrangler dist node_modules/.vite",
-    "check-import-boundaries": "bun run ./scripts/check-import-boundaries.ts",
+    "check-import-boundaries": "bun run ./scripts/check-import-boundaries.runtime.ts",
     "preview": "portless run --name docs.taxkit vite preview",
     "preview:cloudflare": "vite preview",
-    "test": "vitest run --config vitest.server.config.ts && bun test ./scripts/cloudflare-hosted-proof.boundary.test.ts",
+    "test": "bun run test:imports && vitest run --config vitest.server.config.ts && bun test ./scripts/cloudflare-hosted-proof.boundary.test.ts",
     "test:browser": "vitest run --config vitest.browser.config.ts",
     "test:built": "bun run ./scripts/test-cloudflare-built.tsx",
     "test:cloudflare-built": "bun run ./scripts/test-cloudflare-built.tsx",
-    "test:cloudflare-hosted": "bun run ./scripts/test-cloudflare-hosted.tsx"
+    "test:cloudflare-hosted": "bun run ./scripts/test-cloudflare-hosted.tsx",
+    "test:imports": "bun --bun vitest run --config vitest.scripts.config.ts"
   },
   "dependencies": {
     "@tanstack/react-router": "catalog:",
@@ -32,6 +33,9 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",
+    "@effect/platform-bun": "catalog:",
+    "@effect/vitest": "catalog:",
+    "@types/bun": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

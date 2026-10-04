@@ -1283,3 +1283,46 @@ the HTTP patch remains pending with the existing major fixed train. The
 [API app receipt](../../documentation-audit/clean-slate-foundation/2026-10-04-api-app-boundaries.json)
 records failures, recovery and the proof limits. This accepts only this local
 API slice; DEV-73 and the overall continuation goal remain unfinished.
+
+
+## Local T002 documentation import checker
+
+The docs source import checker now uses native FileSystem/Path services, pure
+inline TypeScript compatibility-parser inspection, immutable findings and one
+exact Bun command runtime. It removes raw Bun/Promise workflows, mutable
+findings, direct process exit and raw console permissions. Native list/stat/read
+and existence failures have safe closed operation labels. Server/test/generated
+owners and non-file entries remain excluded; an empty browser-runtime file is
+still rejected. Direct static references and the existing runtime-expression
+pattern remain a source-only claim, separate from transitive bundle proof.
+
+The docs test command includes twelve native Effect checker cases. Its compiler
+project includes the checker, fixtures and test configuration. Three adopted
+files receive the complete canonical rules, with a rejected neighbour and exact
+execution selector. The first 315-case lint run caught a missing negative-fixture
+selector and duplicated unrelated builtin-rule setting in the runtime selector.
+The corrected configuration preserves all assertions and passes all 315 cases
+(310 retained, three accepted files, one rejected neighbour, one exact runtime).
+Focused compiler, actual source command, native tests and both unused-code
+profiles pass. Final frozen install, all 23 test tasks (21 matching caches), all
+15 build tasks (13 matching caches) and full verification pass. All 21 Quality
+cases include all ten isolated faults and fresh source-only docs (234.05 seconds).
+Verification also passes 176 deployment-tool, 21 skill and 16 evaluation cases,
+all 24 compiler tasks (22 matching caches), both unused-code profiles and matching
+unchanged-input Chromium caches for 24 SDK and two web cases. The frozen graph
+reports 792 installs/1020 packages; selected dependency versions are unchanged.
+
+Documentation impact: **Change required** for command/test/compiler ownership,
+three pinned-tool declarations and lock metadata, exact lint selectors/CLI
+fixtures, docs README, frontend/testing architecture, current T002 ledger,
+active plan and dated receipt. **Preserve** source-policy semantics, TypeScript 7
+compiler/TypeScript 6 parser selections, route/runtime/bundle behaviour,
+public/generated content, tax results, historical evidence and canonical
+skills/digests. **N/A** package Changeset (the private docs app is unversioned),
+operational runbook/CI procedures and provider state. Revert this complete slice
+to recover. DEV-73 remains unfinished, followed by DEV-74–81; Medicare correction
+still awaits the separate bounded decision. The API parent is qualified locally
+at `be1fcc43cfd9201f209354b317f8182cc3e9fafd` in draft #117; its hosted run
+`37199271547` passed for that exact API revision and is separate from this
+later checker work. The dated checker receipt records recovered failures and
+proof limits; accepting this local slice does not complete DEV-73.

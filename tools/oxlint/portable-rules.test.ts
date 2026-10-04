@@ -33,6 +33,28 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
+      "apps/docs/scripts/check-import-boundaries.runtime.ts",
+      "apps/docs/scripts/check-import-boundaries.runtime.test.ts",
+      "apps/docs/vitest.scripts.config.ts",
+    ],
+    generated: "apps/docs/scripts/.generated-imports-strict-rejected.ts",
+    namespace: "strict-effect",
+    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+    rules: [
+      "no-imperative-collections",
+      "no-unchecked-index",
+      "no-native-at",
+      "tagged-error-name",
+      "error-constructor-new",
+      "no-promise-workflow",
+      "no-unsafe-option-unwrap",
+      "no-unchecked-json",
+      "no-runtime-outside-boundary",
+      "no-native-work",
+    ],
+  },
+  {
+    accepted: [
       "apps/api/src/config.ts",
       "apps/api/src/schemas.ts",
       "apps/api/src/server.ts",
@@ -994,6 +1016,7 @@ test.effect.each([
 );
 
 test.each([
+  "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "apps/api/src/index.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
