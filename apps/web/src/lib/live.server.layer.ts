@@ -1,5 +1,6 @@
 import "@tanstack/react-start/server-only";
 import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
+import { MetadataQuery } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
 import { fromCloudflareFetcher } from "alchemy/Cloudflare/Bridge";
 import { Effect, Layer } from "effect";
@@ -26,6 +27,7 @@ export const WebsiteServerLive = (
           Effect.map(TaxKitRpcClient, (client) =>
             WebsiteServerApplication.of({
               calculate: client.calculate,
+              catalogue: client.listCalculators(MetadataQuery.make({})),
               settings: Effect.succeed(
                 WebsitePublicSettings.make({ apiOrigin: settings.apiOrigin })
               ),
@@ -45,6 +47,7 @@ export const WebsiteServerLive = (
             WebsiteServerApplication,
             WebsiteServerApplication.of({
               calculate: () => Effect.fail(error),
+              catalogue: Effect.fail(error),
               settings: Effect.fail(error),
             })
           )

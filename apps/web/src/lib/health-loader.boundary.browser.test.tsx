@@ -4,7 +4,11 @@ import { Array, Effect, Fiber, Option, Result, Schema } from "effect";
 import { vi } from "vitest";
 
 import { routeTree } from "../routeTree.gen";
-import { WebsitePublicSettings, WebsiteSettingsTransport } from "./schemas";
+import {
+  WebsiteCatalogueTransport,
+  WebsitePublicSettings,
+  WebsiteSettingsTransport,
+} from "./schemas";
 
 describe("actual website settings loader", () => {
   it.effect("loads plain transport data through the real root route", () =>
@@ -15,9 +19,16 @@ describe("actual website settings loader", () => {
       const encoded = yield* Schema.encodeEffect(WebsiteSettingsTransport)(
         Result.succeed(WebsitePublicSettings.make({ apiOrigin }))
       );
+      const catalogue = yield* Schema.encodeEffect(WebsiteCatalogueTransport)(
+        Result.succeed({ calculators: [] })
+      );
       const loadSettings = vi.fn(() =>
         Effect.runPromise(
-          Effect.succeed({ settings: encoded, submission: undefined })
+          Effect.succeed({
+            catalogue,
+            settings: encoded,
+            submission: undefined,
+          })
         )
       );
       const router = yield* Effect.acquireRelease(
@@ -39,6 +50,7 @@ describe("actual website settings loader", () => {
       );
       expect(match.status).toBe("success");
       expect(match.loaderData).toEqual({
+        catalogue,
         settings: encoded,
         submission: undefined,
       });

@@ -1,5 +1,6 @@
 import type { CalculatorRpcClientError } from "@taxkit/api-rpc/errors";
 import type {
+  CalculatorCatalogResponse,
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
 } from "@taxkit/api-rpc/schemas";
@@ -10,6 +11,10 @@ import type { TaxKitWebConfigError } from "./config";
 import type { WebsitePublicSettings } from "./schemas";
 
 export interface WebsiteServerApplicationContract {
+  readonly catalogue: Effect.Effect<
+    CalculatorCatalogResponse,
+    CalculatorRpcClientError | TaxKitWebConfigError
+  >;
   readonly settings: Effect.Effect<WebsitePublicSettings, TaxKitWebConfigError>;
   readonly calculate: (
     request: CalculatorRunServiceRequest

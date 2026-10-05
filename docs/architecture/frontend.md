@@ -337,3 +337,32 @@ A remembered failure or interruption in AsyncResult is not the outcome of a
 new request while `waiting` is true. The policy container therefore hides old
 request errors during waiting and displays the finished new failure only.
 Form validation errors still appear immediately without sending a request.
+
+
+The root Website bootstrap also restores the checked API catalogue. Navigation
+uses its titles, identities and context rather than a parallel local list.
+The additional calculator route selects only its own successful report; the
+container receives that checked report and owns form/work/error policy. Each
+calculator's description group is retained by React while mounted because
+`Atom.family` uses weak references. The registry owns the group's transient
+values and execution. Saved submission admission checks calculator identity,
+form shape and successful report shape together. No personal figure reaches
+navigation, page metadata, browser storage or a query string.
+
+The standard HTML submission routes select their canonical calculator by the
+closed page address. Both extra pages display report-owned ledger explanation
+and sources. The annual page explains the unresolved retained Medicare limit.
+The developer link and `/agents` route lead to actual API documentation,
+OpenAPI and calculator metadata; they do not imply finished remote MCP or
+content discovery.
+
+
+The registry provider seeds public settings only. Each feature container uses
+`useAtomInitialValues` for its checked saved form before reading form state.
+The route still owns transport restoration and result selection; this hook
+adds no decoder or transport. Provider options apply only on its first render,
+so saved form restoration must not depend on re-supplying those options.
+The native fixture uses different saved figures from initial examples and
+checks server HTML, hydrated fields, retained reports and no replay.
+The Website also has a keyboard skip link, one main landmark, current-page
+navigation, spaced controls and visible keyboard focus.

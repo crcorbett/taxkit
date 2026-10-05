@@ -2,17 +2,20 @@ import { RegistryProvider } from "@effect/atom-react";
 import {
   createRootRouteWithContext,
   HeadContent,
+  Link,
   Outlet,
   Scripts,
   useLoaderData,
 } from "@tanstack/react-router";
-import { Option, Result, Schema } from "effect";
+import type { CalculatorCatalogResponse } from "@taxkit/api-rpc/schemas";
+import { Array, Option, Result, Schema } from "effect";
 import { createContext, useMemo } from "react";
 
-import { publicSettingsAtom, takeHomeFormAtom } from "#/lib/calculator.atoms";
+import { publicSettingsAtom } from "#/lib/calculator.atoms";
 import type { RouterContext } from "#/lib/route-context";
 import {
   WebsiteSettingsTransport,
+  WebsiteCatalogueTransport,
   WebsiteSubmissionTransport,
 } from "#/lib/schemas";
 import type { WebsiteSubmission } from "#/lib/schemas";
@@ -22,6 +25,9 @@ import "../styles.css";
 // Only the root route restores this transport. Children receive checked values.
 export const WebsiteSubmissionContext = createContext<
   Option.Option<typeof WebsiteSubmission.Type>
+>(Option.none());
+export const WebsiteCatalogueContext = createContext<
+  Option.Option<typeof CalculatorCatalogResponse.Type>
 >(Option.none());
 
 const RootShell = ({ children }: { readonly children: React.ReactNode }) => (
@@ -50,7 +56,18 @@ const RootComponent = () => {
           ),
     [data.submission]
   );
-  const submittedForm = submission.pipe(Option.map((value) => value.form));
+  const catalogue = useMemo(
+    () =>
+      Schema.decodeUnknownResult(WebsiteCatalogueTransport)(
+        data.catalogue
+      ).pipe(
+        Result.match({
+          onFailure: () => Option.none<typeof CalculatorCatalogResponse.Type>(),
+          onSuccess: Result.getSuccess,
+        })
+      ),
+    [data.catalogue]
+  );
   if (Result.isFailure(settings) || Result.isFailure(settings.success)) {
     return (
       <main className="home">
@@ -65,18 +82,55 @@ const RootComponent = () => {
   return (
     <RegistryProvider
       key={checked.apiOrigin.href}
-      initialValues={Option.match(submittedForm, {
-        onNone: () => [[publicSettingsAtom, Option.some(checked)]],
-        onSome: (form) => [
-          [publicSettingsAtom, Option.some(checked)],
-          [takeHomeFormAtom, form],
-        ],
-      })}
+      initialValues={[[publicSettingsAtom, Option.some(checked)]]}
     >
       <WebsiteSubmissionContext.Provider value={submission}>
-        <main className="app-shell">
-          <Outlet />
-        </main>
+        <WebsiteCatalogueContext.Provider value={catalogue}>
+          <div className="app-shell">
+            <a className="skip-link" href="#main-content">
+              Skip to calculator
+            </a>
+            <nav aria-label="Calculators">
+              {Option.match(catalogue, {
+                onNone: () => (
+                  <p>
+                    The calculator list could not load. Please reload this page.
+                  </p>
+                ),
+                onSome: (value) => (
+                  <ul>
+                    {Array.map(value.calculators, (calculator) => (
+                      <li key={calculator.calculatorId}>
+                        {calculator.calculatorId === "au.pay.take-home" ? (
+                          <Link activeProps={{ "aria-current": "page" }} to="/">
+                            {calculator.title}
+                          </Link>
+                        ) : (
+                          <Link
+                            activeProps={{ "aria-current": "page" }}
+                            to="/calculators/$calculatorId"
+                            params={{ calculatorId: calculator.calculatorId }}
+                          >
+                            {calculator.title}
+                          </Link>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ),
+              })}
+              <a href={new URL("/api/docs", checked.apiOrigin).href}>
+                For developers: API documentation
+              </a>
+              <Link activeProps={{ "aria-current": "page" }} to="/agents">
+                For agents: API access
+              </Link>
+            </nav>
+            <main id="main-content" tabIndex={-1}>
+              <Outlet />
+            </main>
+          </div>
+        </WebsiteCatalogueContext.Provider>
       </WebsiteSubmissionContext.Provider>
     </RegistryProvider>
   );
@@ -88,7 +142,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { charSet: "utf-8" },
       { content: "width=device-width, initial-scale=1", name: "viewport" },
       { title: "TaxKit" },
-      { content: "Calculate Australian take-home pay.", name: "description" },
+      {
+        content:
+          "Australian take-home pay, pay withholding and annual income tax calculators for 2025–26.",
+        name: "description",
+      },
     ],
   }),
   loader: ({ context, abortController, serverContext }) =>

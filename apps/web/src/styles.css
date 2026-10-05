@@ -27,12 +27,97 @@ a {
   min-height: 100vh;
 }
 
+.app-shell nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem clamp(2rem, 6vw, 5rem);
+  border-bottom: 1px solid #d6dde7;
+}
+
+.app-shell nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .home {
   display: grid;
   min-height: 100vh;
   align-content: center;
   gap: 1.5rem;
   padding: clamp(2rem, 6vw, 5rem);
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  transform: translateY(-150%);
+  background: #ffffff;
+  padding: 0.75rem;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.home form {
+  display: grid;
+  gap: 1.25rem;
+  width: min(100%, 32rem);
+}
+
+.home form label {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.home form label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.home input:not([type="checkbox"]),
+.home select,
+.home button {
+  min-height: 2.75rem;
+  border: 1px solid #94a3b8;
+  border-radius: 0.375rem;
+  background: #ffffff;
+  padding: 0.625rem 0.75rem;
+  color: inherit;
+  font: inherit;
+}
+
+.home input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+}
+
+.home button {
+  justify-self: start;
+  background: #172033;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.home button:disabled {
+  opacity: 0.7;
+}
+
+a:focus-visible,
+.home input:focus-visible,
+.home select:focus-visible,
+.home button:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 0.25rem;
 }
 
 .home h1 {

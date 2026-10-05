@@ -158,7 +158,9 @@
       "startingState": "Selected Node and Chromium are available; local ports 4196\u20134203 used by the native fixtures are available.",
       "inputs": [
         "Native Alchemy source-built API and Website",
-        "Retained take-home example: 1654 dollars weekly, threshold claimed"
+        "Retained take-home example: 1654 dollars weekly, threshold claimed",
+        "Retained withholding example: 9500 dollars monthly, threshold not claimed",
+        "Retained annual example: 67000 dollars taxable income"
       ],
       "stepsOrProcedureOwner": "bun run web:test:native-pair",
       "expectedBehavior": [
@@ -170,7 +172,9 @@
         "Controlled slow headers and an unfinished actual reply reach the five-second deadline; browser requests abort after the deadline, editing and browser Back leaving the form.",
         "Real native CLI local development supplies both addresses/bindings, reloads API and Website source, restores exact sources and closes app ports on scoped shutdown.",
         "Both actual saved local resources have explicitly disabled platform log/trace collection and zero sampling; source restoration uses the non-polling watcher and requires both visible page updates.",
-        "Take-home explanation opens with the keyboard without calculation; breakdown, recorded threshold and rule sources remain attached to the old report after form edits."
+        "Take-home explanation opens with the keyboard without calculation; breakdown, recorded threshold and rule sources remain attached to the old report after form edits.",
+        "Catalogue-backed navigation offers all three calculators; withholding and annual pages start with their own empty result and return the retained 2756 and 12228 dollar answers through real browser RPC and standard HTML POST without JavaScript.",
+        "The new pages retain their own report and explanation after edits without another request; the annual Medicare limitation stays visible and the agent route links to actual API descriptions."
       ],
       "expectedSideEffects": [
         "Ignored native build files, scoped local Workers and Chromium only."
@@ -179,7 +183,7 @@
         "Retained tax results and existing docs operations stay unchanged.",
         "No provider, state, credentials, deployment or publication operation."
       ],
-      "oracle": "Actual native built artifacts run in workerd; real Chromium independently confirms the exact RPC endpoint, no initial/replayed call, no trace/cookie headers and the retained answer. The API artifact contains the engine marker while browser artifacts must not. The generated native settings identity, short request marker and source-built internal defect require actual responses and positive fixed reporting; removing the owning failure boundary makes marker reflection fail the saved test. Unknown native function-address requests must return empty 404 and must omit the short request marker from actual native logs; removing exact-address admission restores that log leak. Actual built API global/procedure/fatal replies use fixed safe values; expected/version errors retain checked identity. A source-built damaged valid-JSON reply must restore a checked error through the genuine Website binding, with real Chromium editing and no replay. Positive fixed host logs omit the marker and pay values. Removal of each native encoder or the owned reply decoder must fail the saved test, followed by exact restoration and fresh dependency/artifact builds. Controlled API roots retain the real calculation/encoding and delay headers or the remaining body for eight seconds. Actual generated clients must hit the five-second deadline; Chromium must observe request abort after deadline, editing and actual Back route departure. Removing deadline or edit interruption fails the saved test; exact restoration and fresh builds pass. Pay-value checks inspect emitted log messages; private text checks inspect the whole record. Actual native mock-plan properties and saved real CLI state must contain the disabled collection policy; removing the API graph property fails the saved state Schema after runtime checks. These are declared-state checks, not cloud upload or exported-row proof. An actual successful browser answer survives edits, controlled unavailable retry and invalid form without being presented as current. Reverting figures makes no request and still needs one explicit real RPC to clear the stale message. Actual Worker-generated successful submission HTML hydrates without replay and retains its answer through editing and failed retry.",
+      "oracle": "Actual native built artifacts run in workerd; real Chromium independently confirms the exact RPC endpoint, no initial/replayed call, no trace/cookie headers and the retained answer. The API artifact contains the engine marker while browser artifacts must not. The generated native settings identity, short request marker and source-built internal defect require actual responses and positive fixed reporting; removing the owning failure boundary makes marker reflection fail the saved test. Unknown native function-address requests must return empty 404 and must omit the short request marker from actual native logs; removing exact-address admission restores that log leak. Actual built API global/procedure/fatal replies use fixed safe values; expected/version errors retain checked identity. A source-built damaged valid-JSON reply must restore a checked error through the genuine Website binding, with real Chromium editing and no replay. Positive fixed host logs omit the marker and pay values. Removal of each native encoder or the owned reply decoder must fail the saved test, followed by exact restoration and fresh dependency/artifact builds. Controlled API roots retain the real calculation/encoding and delay headers or the remaining body for eight seconds. Actual generated clients must hit the five-second deadline; Chromium must observe request abort after deadline, editing and actual Back route departure. Removing deadline or edit interruption fails the saved test; exact restoration and fresh builds pass. Pay-value checks inspect emitted log messages; private text checks inspect the whole record. Actual native mock-plan properties and saved real CLI state must contain the disabled collection policy; removing the API graph property fails the saved state Schema after runtime checks. These are declared-state checks, not cloud upload or exported-row proof. An actual successful browser answer survives edits, controlled unavailable retry and invalid form without being presented as current. Reverting figures makes no request and still needs one explicit real RPC to clear the stale message. Actual Worker-generated successful submission HTML hydrates without replay and retains its answer through editing and failed retry. The additional pages must independently return both known results via real API artifacts; no calculation fixture supplies them. Each page starts without the previous calculator's answer. Saved forms and report identity are checked together. Exact browser locator fill admissions have actual CLI positive and neighbouring-application negative fixtures.",
       "environment": "Local TaxKit checkout, native workerd and Chromium",
       "authority": "none",
       "evidence": [
@@ -189,7 +193,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-trace-containment.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-stale-calculator-answer.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-take-home-explanation.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculator-catalogue-rpc.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculator-catalogue-rpc.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculator-pages.json"
       ],
       "nonClaims": [
         "No cloud provider, deployed endpoint or trace-export proof; controlled native fatal/privacy paths are qualified only by the named local tests.",

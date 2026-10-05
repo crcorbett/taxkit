@@ -32,8 +32,9 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: begin T004's calculator pages after T003's locally
-accepted connection/containment qualification. T002's
+Next continuation milestone: finish T004's three calculator pages, then its
+complete package, transport and domain qualification. T003's connection/containment
+qualification is locally accepted. T002's
 installed dependency graph, app/script/SDK/infrastructure
 migrations, six-extension strict scope, fixture containment and final source
 review are complete locally. The [acceptance review](../../documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json)
@@ -2468,3 +2469,69 @@ Post-check changes are confined to this plan and the dated receipt. Exact
 source and built artifact identities are retained there; hosted candidate
 proof and draft review remain separate. T004 still requires actual catalogue
 consumption, other pages and complete package/transport/domain qualification.
+
+
+## T004 calculator pages candidate
+
+Parent draft #139 at `cd03dd81694098d79a214650727ad3ee69f70f8d`
+passes hosted Quality run `37267118835`, job `111626168020`, completed
+`2026-10-05T05:37:20Z`. Continue on `codex/dev-75-calculator-pages`.
+The root bootstrap consumes that checked catalogue for navigation. Independent
+withholding and annual pages use the existing backend and report-owned
+explanations; standard HTML forms use the same private operation. Saved forms
+check identity/form/report correlation. The annual page preserves the tax
+figures and states the unresolved Medicare limitation. Developer and agent
+routes link to real native API descriptions, without claiming later MCP.
+
+Documentation impact: **Change required** for Website source, dependency/lock,
+TanStack-generated route tree, app README, frontend/effect/testing/tooling
+owners, exact host lint admissions/actual CLI fixtures, active task/plan,
+journey and dated evidence. **Preserve** tax rules/results, public HTTP/OpenAPI,
+SDK, MDX, infrastructure, skills, CI and runbooks. A package Changeset is **N/A**
+for private Website presentation/dependency and focused test-lint admission;
+no public package interface changes or version operation occur.
+
+Initial app/type/browser checks pass. The native new-page oracle exposes an
+empty result after Calculate. Mounted React consumers now hold their atom-family
+description group; native qualification is still pending. Lint simplification
+and initial test-fixture placement errors are corrected without broad policy
+exceptions. Linear readback returns `Could not find referenced Issue` for both
+DEV-75's saved UUID and identifier; no tracking mutation is attempted.
+T004 remains in progress for complete page and package/transport/domain proof.
+
+
+Stronger native proof uses different saved values from the initial examples.
+The first version returns correct server HTML but hydration resets the amount
+to the page example. Retaining the grouping object alone does not fix that
+restoration. Move checked form seeding to each feature's supported
+`useAtomInitialValues` hook before its form read; root registry settings remain
+the sole provider seed. Fresh native build and the strengthened focused
+journey pass in 9.76 seconds. Do not treat the earlier default-only pass as
+proof of arbitrary saved-form restoration. Native screenshots are inspected;
+form controls are spaced and the single main landmark has a keyboard skip link.
+Final failed/invalid retry, keyboard and complete qualification follow.
+
+Calculator-page closeout passes: root tests include 473 fresh actual CLI lint
+cases (409 portable) in 82.92 seconds and 27 app/package tasks (one fresh,
+26 cached). The changed Website's nine ordinary tests pass freshly; its 12
+browser checks pass freshly before and during full verification. Root build
+and API smoke pass with one fresh task each. The unchanged packed SDK and
+downstream checks reuse valid cached results; this is not new consumer proof.
+
+Full verification exits zero: 32 fresh Quality checks, including 13 isolated
+copies, in 581.05 seconds; both unused-code checks; 27 type tasks (one fresh,
+26 cached); actual Worker declarations; fresh native builds and all six native
+tests in 50.96 seconds. The stronger page journey also proves failed/invalid
+attempts retain the previous answer, keyboard commands and no calculation
+replay. All four native screenshots are inspected after the final build.
+Post-check edits are confined to this plan and its dated receipt, with exact
+source and built-artifact identities recorded there. Hosted candidate checks
+and draft review remain separate.
+
+T004 remains in progress. Next, qualify the accepted 64 KiB request policy and
+checked size/deadline failures across the actual public HTTP and native RPC
+connections. Remaining work includes the common operation budget, concurrency
+and trusted non-exported rate identity, ten-second complete-response client
+deadline, bounded metadata responses, complete named operations and retained
+domain/package qualification. Preserve the existing annual Medicare figures
+and visible limitation pending Cooper's scope decision.

@@ -545,3 +545,11 @@ lint-tool project because Oxlint directly loads these source files. Plugin paths
 exact options-decoding admission and actual CLI fixtures follow the `.ts` owners.
 Completed earlier SPEC/task records and dated evidence retain their historical
 JavaScript paths; this current tooling owner records their TypeScript successors.
+
+
+The native calculator-page browser test has exact Playwright `fill` admissions
+for `calculatorInput` and `plainCalculatorInput` in
+`apps/web/test/native-pair.boundary.test.ts`. These are typed browser locators,
+not array mutation. Actual CLI fixtures admit both names only at that test
+path, reject the same operation in the nearby application leaf, and retain the
+unrelated-receiver rejection. No portable strict rule is disabled.

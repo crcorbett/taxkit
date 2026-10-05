@@ -3,7 +3,9 @@ import {
   defaultStreamHandler,
 } from "@tanstack/react-start/server";
 import { withCalculatorRequestBodyLimit } from "@taxkit/api-rpc/request-boundary";
-import { Effect, ErrorReporter, Schema } from "effect";
+import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax/schemas";
+import { AuPayCalculatorId } from "@taxkit/rules-au-pay/schemas";
+import { Effect, ErrorReporter, Match, Schema } from "effect";
 import {
   HttpServerError,
   HttpServerRequest,
@@ -13,9 +15,12 @@ import {
 import { WebsiteServerFunctionBase } from "./lib/config";
 import {
   takeHomeRequestFromForm,
+  annualTaxRequestFromForm,
+  AnnualTaxForm,
   TakeHomeForm,
   WebsiteInputError,
 } from "./lib/form.boundary";
+import type { WebsiteCalculatorForm } from "./lib/form.boundary";
 import { WebsiteSettingsFunctionPath } from "./lib/loaders";
 import { appRuntime } from "./lib/runtime.server";
 import { WebsiteSubmission, WebsiteSubmissionTransport } from "./lib/schemas";
@@ -34,6 +39,16 @@ export default {
     appRuntime.runPromise(
       Effect.gen(function* websiteRequest() {
         const url = new URL(request.url);
+        const calculatorId = Match.value(url.pathname).pipe(
+          Match.when("/calculators/au.income-tax.annual", () =>
+            AuAnnualTaxCalculatorId.make("au.income-tax.annual")
+          ),
+          Match.when("/calculators/au.pay.withholdings", () =>
+            AuPayCalculatorId.make("au.pay.withholdings")
+          ),
+          Match.when("/", () => AuPayCalculatorId.make("au.pay.take-home")),
+          Match.orElse(() => null)
+        );
         if (url.pathname.startsWith(`${WebsiteServerFunctionBase}/`)) {
           if (url.pathname !== WebsiteSettingsFunctionPath) {
             return HttpServerResponse.empty({ status: 404 });
@@ -51,7 +66,10 @@ export default {
             return HttpServerResponse.empty({ status: 400 });
           }
         }
-        return yield* request.method !== "POST" || url.pathname !== "/"
+        if (request.method === "POST" && calculatorId === null) {
+          return HttpServerResponse.empty({ status: 404 });
+        }
+        return yield* request.method !== "POST" || calculatorId === null
           ? Effect.promise(() =>
               Promise.resolve(render(request, { context: {} }))
             ).pipe(Effect.map(HttpServerResponse.fromWeb))
@@ -68,12 +86,21 @@ export default {
                     }),
                   try: () => bounded.formData(),
                 });
-                const form = yield* Schema.decodeUnknownEffect(TakeHomeForm)({
-                  grossDollars: data.get("grossDollars"),
-                  period: data.get("period"),
-                  taxFreeThresholdClaimed:
-                    data.get("taxFreeThresholdClaimed") === "on",
-                }).pipe(
+                const decodedForm: Effect.Effect<
+                  WebsiteCalculatorForm,
+                  Schema.SchemaError
+                > =
+                  calculatorId === "au.income-tax.annual"
+                    ? Schema.decodeUnknownEffect(AnnualTaxForm)({
+                        taxableDollars: data.get("taxableDollars"),
+                      })
+                    : Schema.decodeUnknownEffect(TakeHomeForm)({
+                        grossDollars: data.get("grossDollars"),
+                        period: data.get("period"),
+                        taxFreeThresholdClaimed:
+                          data.get("taxFreeThresholdClaimed") === "on",
+                      });
+                const form = yield* decodedForm.pipe(
                   Effect.mapError(
                     () =>
                       new WebsiteInputError({
@@ -81,7 +108,18 @@ export default {
                       })
                   )
                 );
-                const result = yield* takeHomeRequestFromForm(form).pipe(
+                const result = yield* (
+                  Schema.is(AnnualTaxForm)(form)
+                    ? annualTaxRequestFromForm(form)
+                    : takeHomeRequestFromForm(
+                        form,
+                        AuPayCalculatorId.make(
+                          calculatorId === "au.pay.withholdings"
+                            ? "au.pay.withholdings"
+                            : "au.pay.take-home"
+                        )
+                      )
+                ).pipe(
                   Effect.fromResult,
                   Effect.flatMap((input) =>
                     WebsiteServerApplication.pipe(
@@ -94,7 +132,9 @@ export default {
                 );
                 const submission = yield* Schema.encodeEffect(
                   WebsiteSubmissionTransport
-                )(WebsiteSubmission.make({ form, result })).pipe(Effect.orDie);
+                )(WebsiteSubmission.make({ calculatorId, form, result })).pipe(
+                  Effect.orDie
+                );
                 const headers = new Headers(request.headers);
                 headers.delete("content-length");
                 headers.delete("content-type");

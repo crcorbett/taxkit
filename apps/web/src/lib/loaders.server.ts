@@ -4,15 +4,25 @@ import { Effect, ErrorReporter, Schema } from "effect";
 import { HttpServerError, HttpServerResponse } from "effect/http";
 
 import { appRuntime } from "./runtime.server";
-import { WebsiteSettingsTransport } from "./schemas";
+import { WebsiteCatalogueTransport, WebsiteSettingsTransport } from "./schemas";
 import { WebsiteServerApplication } from "./service.server";
 
 export const loadWebsiteSettingsServer = () =>
   appRuntime.runPromise(
     WebsiteServerApplication.pipe(
-      Effect.flatMap((application) => application.settings),
-      Effect.result,
-      Effect.flatMap(Schema.encodeEffect(WebsiteSettingsTransport)),
+      Effect.flatMap((application) =>
+        Effect.gen(function* () {
+          const settings = yield* application.settings.pipe(
+            Effect.result,
+            Effect.flatMap(Schema.encodeEffect(WebsiteSettingsTransport))
+          );
+          const catalogue = yield* application.catalogue.pipe(
+            Effect.result,
+            Effect.flatMap(Schema.encodeEffect(WebsiteCatalogueTransport))
+          );
+          return { catalogue, settings };
+        })
+      ),
       Effect.orDie,
       // Expected settings errors remain checked values. An unexpected failure
       // reaches the host reporter and native empty response before TanStack can

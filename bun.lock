@@ -91,6 +91,7 @@
         "@tanstack/react-start": "catalog:",
         "@taxkit/api-rpc": "workspace:*",
         "@taxkit/core": "workspace:*",
+        "@taxkit/rules-au-income-tax": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
         "alchemy": "catalog:",
         "effect": "catalog:",

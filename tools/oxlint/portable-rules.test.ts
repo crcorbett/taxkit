@@ -1453,6 +1453,27 @@ describe("exact native RPC lint boundaries", () => {
       rejected: false,
       rule: "strict-effect(no-imperative-collections)",
       source:
+        'declare const calculatorInput: { readonly fill: (value: string) => void };\nexport const filled = calculatorInput.fill("67000");',
+    },
+    {
+      path: "apps/web/test/native-pair.boundary.test.ts",
+      rejected: false,
+      rule: "strict-effect(no-imperative-collections)",
+      source:
+        'declare const plainCalculatorInput: { readonly fill: (value: string) => void };\nexport const filled = plainCalculatorInput.fill("67000");',
+    },
+    {
+      path: "apps/web/src/lib/calculator-page.view.tsx",
+      rejected: true,
+      rule: "strict-effect(no-imperative-collections)",
+      source:
+        'declare const calculatorInput: { readonly fill: (value: string) => void };\nexport const filled = calculatorInput.fill("67000");',
+    },
+    {
+      path: "apps/web/test/native-pair.boundary.test.ts",
+      rejected: false,
+      rule: "strict-effect(no-imperative-collections)",
+      source:
         'declare const savedPayInput: { readonly fill: (value: string) => void };\nexport const filled = savedPayInput.fill("2000");',
     },
     {

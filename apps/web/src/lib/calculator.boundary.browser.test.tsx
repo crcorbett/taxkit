@@ -6,6 +6,7 @@ import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import { aud } from "@taxkit/core/primitives";
 import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
 import {
+  AuPayCalculatorId,
   PayWithholdingsLedger,
   TakeHomePayReport,
 } from "@taxkit/rules-au-pay/schemas";
@@ -207,6 +208,7 @@ describe("browser calculator lifetime", () => {
           WebsiteSubmissionTransport
         )(
           WebsiteSubmission.make({
+            calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
             form: initialTakeHomeForm,
             result: Result.fail(new CalculatorRpcUnavailable()),
           })

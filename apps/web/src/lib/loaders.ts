@@ -18,7 +18,11 @@ export const loadWebsiteSettings = (options: {
 }) =>
   Effect.runPromise(
     Effect.promise(() => websiteSettings({ signal: options.signal })).pipe(
-      Effect.map((settings) => ({ settings, submission: options.submission }))
+      Effect.map((bootstrap) => ({
+        catalogue: "catalogue" in bootstrap ? bootstrap.catalogue : undefined,
+        settings: "settings" in bootstrap ? bootstrap.settings : undefined,
+        submission: options.submission,
+      }))
     ),
     { signal: options.signal }
   );

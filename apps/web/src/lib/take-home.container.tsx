@@ -1,4 +1,8 @@
-import { useAtomSet, useAtomValue } from "@effect/atom-react";
+import {
+  useAtomInitialValues,
+  useAtomSet,
+  useAtomValue,
+} from "@effect/atom-react";
 import { TakeHomePayReport } from "@taxkit/rules-au-pay/schemas";
 import { Option, Result, Schema } from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
@@ -14,6 +18,7 @@ import {
   submitTakeHomeAtom,
   takeHomeFormAtom,
 } from "./calculator.atoms";
+import { TakeHomeForm } from "./form.boundary";
 import type { WebsiteSubmission } from "./schemas";
 import { TakeHomeFormView } from "./take-home.view";
 
@@ -22,7 +27,19 @@ export const TakeHomeCalculator = ({
 }: {
   readonly submission: Option.Option<typeof WebsiteSubmission.Type>;
 }) => {
-  const saved = submission;
+  const saved = submission.pipe(
+    Option.filter((value) => value.calculatorId === "au.pay.take-home")
+  );
+  useAtomInitialValues(
+    saved.pipe(
+      Option.map((value) => value.form),
+      Option.filter(Schema.is(TakeHomeForm)),
+      Option.match({
+        onNone: () => [],
+        onSome: (form) => [[takeHomeFormAtom, form]],
+      })
+    )
+  );
   const form = useAtomValue(takeHomeFormAtom);
   const calculation = useAtomValue(calculateAtom);
   const showServerResult = useAtomValue(showServerResultAtom);

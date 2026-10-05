@@ -687,6 +687,16 @@ export default defineConfig({
                 method: "fill",
                 receiver: "savedPayInput",
               },
+              {
+                file: "apps/web/test/native-pair.boundary.test.ts",
+                method: "fill",
+                receiver: "calculatorInput",
+              },
+              {
+                file: "apps/web/test/native-pair.boundary.test.ts",
+                method: "fill",
+                receiver: "plainCalculatorInput",
+              },
             ],
           },
         ],

@@ -9,14 +9,14 @@ review_trigger: website rendering, settings, transport, form, generated types or
 
 # Website app
 
-`apps/web` is the native TanStack Start Website candidate. Its first form uses
-native Effect RPC to calculate Australian take-home pay. Tax calculation stays
+`apps/web` is the native TanStack Start Website candidate. Its calculator pages use
+native Effect RPC for the three supported Australian 2025–26 calculators. Tax calculation stays
 in the separate API app. The current public docs app remains `apps/docs`.
 
 ## What runs where
 
 The server has one `ManagedRuntime` in `src/lib/runtime.server.ts`. Its checked
-`WebsiteServerApplication` exposes settings and calculation only. The private
+`WebsiteServerApplication` exposes settings, the supported catalogue and calculation. The private
 `TAXKIT_API` service binding supplies the server connection. The native Alchemy
 Fetcher adapter keeps the binding's receiver attached.
 
@@ -25,7 +25,7 @@ registry. `calculator.atoms.ts` describes the browser connection and commands;
 it creates no browser runner. Checked settings stay alive for that registry's
 lifetime, including time spent waiting before the first click. The browser calls
 the checked `API_PUBLIC_ORIGIN` directly at POST `/rpc`. The server function
-transports settings only. No calculation runs when the page loads.
+transports settings and the checked catalogue. No calculation runs when the page loads.
 
 Calculate sends the existing canonical request. Editing interrupts unfinished
 work and keeps the previous successful answer with an out-of-date message.
@@ -129,7 +129,7 @@ empty profile directory, reads its actual addresses, checks browser validation
 before live edits, restores both sources exactly, and verifies calculations
 with and without JavaScript plus closed app ports after shutdown. Do not run
 it beside another development process in this checkout: both watch the same
-sources. Full exported telemetry and all calculator pages remain active work.
+sources. Full exported telemetry and complete package/transport qualification remain active work.
 
 ## Related owners
 
@@ -139,8 +139,8 @@ sources. Full exported telemetry and all calculator pages remain active work.
 - [Native apps graph](../../packages/infrastructure/README.md)
 - [Active execution plan](../../docs/exec-plans/active/clean-slate-foundation.md)
 
-Retained 2025–26 results are unchanged. The Medicare decision, remaining
-calculator pages and safe exported telemetry remain separate unfinished tasks.
+Retained 2025–26 results are unchanged. The Medicare decision, complete package/transport
+qualification and safe exported telemetry remain separate unfinished tasks.
 T003's local connection, failure/cancellation and disabled-platform acceptance
 is recorded in the [acceptance review](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json).
 
@@ -202,3 +202,34 @@ It separates the first visible page edit from exact source restoration by
 100 milliseconds because the pinned Vite watcher suppresses repeat file-change
 events within 50 milliseconds. It still requires both visible page updates;
 the original 15-second observation deadlines remain unchanged.
+
+
+## Calculator routes
+
+The root takes its navigation names, identities and year from the API catalogue.
+Take-home pay stays at `/`; `/calculators/au.pay.withholdings` and
+`/calculators/au.income-tax.annual` have independent form and answer state.
+The root restores only encoded transport. The additional route selects the
+expected checked report and saved form for its calculator;
+the container seeds the checked saved form once with `useAtomInitialValues`
+and owns commands/cancellation. Focused readonly leaves show the form/report.
+The root registry seeds settings only; a later form restoration must not depend
+on its first-render-only initial values. A saved submission checks its identity, form and successful
+report together before restoration. Standard HTML POST uses the selected
+canonical calculator and same private connection at each page address.
+
+The React page retains its atom-family description while mounted.
+Controls have visible keyboard focus and a skip link to the single main landmark. That family
+uses weak references; holding only one member does not retain its grouping
+object. It describes state and work only, without a cached client or answer.
+The registry still owns values and execution.
+
+The withholding and annual explanations use returned ledger components and
+sources. Annual subtractive offsets are labelled as reducing the total; the
+zero minimum is shown separately. Annual pages visibly state that retained
+Medicare thresholds await Cooper's correction decision. No tax rule changes
+or current-law correctness claim is made.
+
+The developer link opens the native API documentation. `/agents` links to the
+actual OpenAPI description and calculator list. Remote MCP, discovery content
+and accepted publication remain later tasks; this page does not claim they exist.

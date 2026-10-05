@@ -1235,3 +1235,34 @@ it does not claim homepage consumption, new calculator pages, rate/concurrency
 policy, provider state or deployment. The
 [dated catalogue receipt](../documentation-audit/clean-slate-foundation/2026-10-05-calculator-catalogue-rpc.json)
 owns exact candidate and qualification outcomes.
+
+
+### Catalogue-backed calculator pages
+
+The native pair journey checks catalogue navigation in actual rendered HTML,
+then uses both additional pages with real browser RPC and ordinary HTML POST
+without JavaScript. The retained monthly 9500-dollar unclaimed withholding
+answer is 2756 dollars; the 67000-dollar annual answer is 12228 dollars. Route
+changes start with an empty result for the new calculator; editing retains its
+own answer visibly out of date, without another request. Explanations and source
+links belong to the checked returned report. The agent route links to actual
+native OpenAPI output.
+
+Form boundary checks reject invalid annual numbers and identity/form mismatch
+in saved submissions. Exact Playwright `fill` admissions for `calculatorInput`
+and `plainCalculatorInput` belong only to the native pair test. Actual CLI
+fixtures qualify both receivers and reject the same operation in the nearby
+application leaf; existing unrelated-receiver rejection remains enforced.
+The [dated page receipt](../documentation-audit/clean-slate-foundation/2026-10-05-calculator-pages.json)
+records candidate qualification and remaining T004 work. Local known results
+are retained behaviour, not current-law Medicare or deployment proof.
+
+
+The page fixture additionally uses distinct actual private POST submissions:
+1654 weekly with threshold claimed returns 353 withheld; 30000 annual taxable
+income retains 1465.80 liability. Server HTML and hydrated input values must
+agree, with no browser calculation replay. Default-example-only assertions
+would allow broken form restoration to pass; these distinct inputs prevent it.
+Both additional pages retain the old answer through a controlled 503 retry and
+invalid input, without automatic or invalid-input requests. Native disclosure
+and Calculate also work with the keyboard.

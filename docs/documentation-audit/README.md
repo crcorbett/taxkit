@@ -428,3 +428,9 @@ The [calculator catalogue RPC candidate](clean-slate-foundation/2026-10-05-calcu
 records the named catalogue connection, canonical query/result ownership and
 operation-specific codec/lifetime checks. Homepage consumption, remaining
 calculator pages and complete T004 qualification remain open.
+
+
+The [catalogue-backed calculator pages candidate](clean-slate-foundation/2026-10-05-calculator-pages.json)
+records separate withholding/annual page state, checked catalogue navigation,
+real native/browser/HTML-form results and the visible retained Medicare limit.
+Complete T004 package/transport/domain qualification remains open.

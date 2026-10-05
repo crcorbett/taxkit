@@ -178,7 +178,7 @@ it has no browser Effect runtime. Browser routes restore the schema-encoded
 server-function transport and render canonical values.
 
 The Website candidate owns one server runner and a React Atom registry in the
-browser. Its route context contains one named framework settings transport,
+browser. Its route context contains one named framework settings/catalogue transport,
 never an Effect runtime or Context. The root restores encoded values and passes
 checked submission state through ordinary React context. The container owns
 commands; focused leaves render readonly values. Editing and form unmount

@@ -330,6 +330,13 @@ describe("built native API and Website", () => {
         const initialHtml = yield* Effect.promise(() => initial.text());
         expect(initial.status).toBe(200);
         expect(initialHtml).toContain("Pay before tax");
+        expect(initialHtml).toContain(
+          'href="/calculators/au.pay.withholdings"'
+        );
+        expect(initialHtml).toContain(
+          'href="/calculators/au.income-tax.annual"'
+        );
+        expect(initialHtml).toContain('href="/agents"');
         expect(initialHtml).not.toContain("Take-home pay:");
         yield* Effect.logInfo("native-pair: private binding calculation");
         const server = yield* Effect.promise(() =>
@@ -829,6 +836,260 @@ describe("built native API and Website", () => {
             .getByText("$1,301.00", { exact: true })
             .waitFor({ timeout: 5000 })
         );
+        // Both remaining pages consume the same real backend catalogue and
+        // calculators. No browser fixture can supply these known answers.
+        yield* Effect.forEach(
+          [
+            {
+              amount: "9500",
+              answer: "$2,756.00",
+              breakdown: "Withholding breakdown",
+              error: "Enter a valid pay amount and pay period.",
+              id: "au.pay.withholdings",
+              label: "Pay before tax ($)",
+              savedAmount: "1654",
+              savedAnswer: "$353.00",
+              savedForm: form,
+              title: "AU pay withholdings",
+            },
+            {
+              amount: "67000",
+              answer: "$12,228.00",
+              breakdown: "Annual tax breakdown",
+              error: "Enter a valid annual taxable income.",
+              id: "au.income-tax.annual",
+              label: "Annual taxable income ($)",
+              savedAmount: "30000",
+              savedAnswer: "$1,465.80",
+              savedForm: "taxableDollars=30000",
+              title: "AU annual income tax",
+            },
+          ] as const,
+          (calculator) =>
+            Effect.gen(function* () {
+              yield* Effect.promise(() => page.unroute(`${apiOrigin}/rpc`));
+              yield* Effect.promise(() =>
+                page
+                  .locator(`nav a[href="/calculators/${calculator.id}"]`)
+                  .click()
+              );
+              yield* Effect.promise(() =>
+                page
+                  .getByRole("heading", { exact: true, name: calculator.title })
+                  .waitFor({ timeout: 5000 })
+              );
+              expect(
+                yield* Effect.promise(() =>
+                  page
+                    .getByRole("status", { name: "Calculation result" })
+                    .textContent()
+                )
+              ).toBe("");
+              const calculatorInput = page.getByLabel(calculator.label);
+              yield* Effect.promise(() =>
+                calculatorInput.fill(calculator.amount)
+              );
+              expect(yield* Queue.clear(calls)).toEqual([]);
+              yield* Effect.promise(() =>
+                page
+                  .getByRole("button", { exact: true, name: "Calculate" })
+                  .click()
+              );
+              yield* Effect.promise(() =>
+                page
+                  .getByRole("status", { name: "Calculation result" })
+                  .getByText(calculator.answer, { exact: true })
+                  .waitFor({ timeout: 5000 })
+              );
+              expect(yield* Queue.clear(calls)).toHaveLength(1);
+              yield* Effect.promise(() =>
+                page
+                  .getByText("How this answer was worked out", { exact: true })
+                  .focus()
+              );
+              yield* Effect.promise(() => page.keyboard.press("Enter"));
+              yield* Effect.promise(() =>
+                page
+                  .getByRole("heading", {
+                    exact: true,
+                    name: calculator.breakdown,
+                  })
+                  .waitFor({ timeout: 5000 })
+              );
+              expect(
+                yield* Effect.promise(() =>
+                  page
+                    .locator(".calculation-details a[href^='https://']")
+                    .count()
+                )
+              ).toBeGreaterThan(0);
+              yield* Effect.promise(() =>
+                page.screenshot({
+                  fullPage: true,
+                  path: `/private/tmp/dev75-pages-${calculator.id}.png`,
+                })
+              );
+              yield* Effect.promise(() => calculatorInput.fill("30000"));
+              expect(
+                yield* Effect.promise(() =>
+                  page
+                    .getByRole("status", { name: "Calculation result" })
+                    .textContent()
+                )
+              ).toContain(calculator.answer);
+              expect(
+                yield* Effect.promise(() =>
+                  page
+                    .getByRole("status", { name: "Calculation result" })
+                    .textContent()
+                )
+              ).toContain("This answer is out of date.");
+              expect(yield* Queue.clear(calls)).toEqual([]);
+              yield* Effect.promise(() =>
+                page.route(
+                  `${apiOrigin}/rpc`,
+                  (route) => route.fulfill({ body: "", status: 503 }),
+                  { times: 1 }
+                )
+              );
+              yield* Effect.promise(() =>
+                page
+                  .getByRole("button", { exact: true, name: "Calculate" })
+                  .click()
+              );
+              yield* Effect.promise(() =>
+                page.getByRole("alert").waitFor({ timeout: 5000 })
+              );
+              expect(
+                yield* Effect.promise(() =>
+                  page
+                    .getByRole("status", { name: "Calculation result" })
+                    .textContent()
+                )
+              ).toContain(calculator.answer);
+              expect(yield* Queue.clear(calls)).toHaveLength(1);
+              yield* Effect.promise(() => calculatorInput.fill("invalid"));
+              yield* Effect.promise(() =>
+                page
+                  .getByRole("button", { exact: true, name: "Calculate" })
+                  .focus()
+              );
+              yield* Effect.promise(() => page.keyboard.press("Enter"));
+              yield* Effect.promise(() =>
+                page
+                  .getByText(calculator.error, { exact: true })
+                  .waitFor({ timeout: 5000 })
+              );
+              expect(
+                yield* Effect.promise(() =>
+                  page
+                    .getByRole("status", { name: "Calculation result" })
+                    .textContent()
+                )
+              ).toContain(calculator.answer);
+              expect(yield* Queue.clear(calls)).toEqual([]);
+              yield* Effect.promise(() =>
+                plainPage.goto(`${websiteOrigin}/calculators/${calculator.id}`)
+              );
+              const plainCalculatorInput = plainPage.getByLabel(
+                calculator.label
+              );
+              yield* Effect.promise(() =>
+                plainCalculatorInput.fill(calculator.amount)
+              );
+              yield* Effect.promise(() =>
+                plainPage
+                  .getByRole("button", { exact: true, name: "Calculate" })
+                  .click()
+              );
+              yield* Effect.promise(() =>
+                plainPage
+                  .getByRole("status", { name: "Calculation result" })
+                  .getByText(calculator.answer, { exact: true })
+                  .waitFor({ timeout: 5000 })
+              );
+              expect(
+                yield* Effect.promise(() =>
+                  plainPage.getByLabel(calculator.label).inputValue()
+                )
+              ).toBe(calculator.amount);
+              expect(plainPage.url()).toBe(
+                `${websiteOrigin}/calculators/${calculator.id}`
+              );
+              // A different actual private submission proves restoration cannot
+              // be imitated by each page's initial example.
+              yield* Effect.promise(() =>
+                savedPage.route(
+                  `${websiteOrigin}/calculators/${calculator.id}`,
+                  (route) =>
+                    route.continue({
+                      headers: {
+                        ...route.request().headers(),
+                        "content-type": "application/x-www-form-urlencoded",
+                        origin: websiteOrigin,
+                      },
+                      method: "POST",
+                      postData: calculator.savedForm,
+                    }),
+                  { times: 1 }
+                )
+              );
+              const restoredResponse = yield* Effect.promise(() =>
+                savedPage.goto(`${websiteOrigin}/calculators/${calculator.id}`)
+              );
+              yield* Effect.promise(() =>
+                savedPage.waitForLoadState("networkidle")
+              );
+              if (restoredResponse === null) {
+                return yield* Effect.die("Missing native form document reply");
+              }
+              const restoredHtml = yield* Effect.promise(() =>
+                restoredResponse.text()
+              );
+              expect(
+                restoredHtml.includes(`value="${calculator.savedAmount}"`)
+              ).toBe(true);
+              expect(restoredHtml.includes(calculator.savedAnswer)).toBe(true);
+              yield* Effect.promise(() =>
+                savedPage.screenshot({
+                  fullPage: true,
+                  path: `/private/tmp/dev75-pages-restored-${calculator.id}.png`,
+                })
+              );
+              expect(
+                yield* Effect.promise(() =>
+                  savedPage.getByLabel(calculator.label).inputValue()
+                )
+              ).toBe(calculator.savedAmount);
+              expect(
+                yield* Effect.promise(() =>
+                  savedPage
+                    .getByRole("status", { name: "Calculation result" })
+                    .textContent()
+                )
+              ).toContain(calculator.savedAnswer);
+              expect(yield* Queue.clear(calls)).toEqual([]);
+            })
+        );
+        yield* Effect.promise(() =>
+          page
+            .getByRole("link", { exact: true, name: "For agents: API access" })
+            .click()
+        );
+        yield* Effect.promise(() =>
+          page
+            .getByRole("heading", { exact: true, name: "TaxKit for agents" })
+            .waitFor({ timeout: 5000 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .getByRole("link", {
+                name: "API description for software (OpenAPI)",
+              })
+              .getAttribute("href")
+          )
+        ).toBe(`${apiOrigin}/api/docs/openapi.json`);
         expect(yield* Queue.clear(exceptions)).toEqual([]);
         const capturedLogs = yield* Queue.clear(logs);
         const logText = yield* Schema.encodeEffect(Json)(capturedLogs);
