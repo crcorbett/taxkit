@@ -404,7 +404,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website-failures.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-failures.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-local-development.json"
       ]
     },
     {

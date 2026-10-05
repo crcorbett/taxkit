@@ -1106,3 +1106,26 @@ Log-message pay checks exclude unrelated numeric timestamp metadata; private
 text markers remain checked across the whole record. Controlled capture checks
 must tolerate pay-like timestamps and reject pay values added to a message.
 These observations are bounded by the [dated receipt](../documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json).
+
+### Native local development qualification
+
+The existing native Website suite also owns `native-local-development.boundary.test.ts`.
+It launches the real public Alchemy CLI with the separate local root, scrubbed
+environment, owned empty env file, source selection inherited by children, and
+a scoped empty profile directory. It reads actual CLI resource addresses rather
+than assuming available ports. Both saved resource modes must be local; the
+API resource must select its source entry. An empty default profile directory
+is native SDK bookkeeping, not credential custody.
+
+The browser first proves client-only validation and editing before modifying
+source; otherwise a source edit during hydration can cause a false mismatch.
+The test observes a changed and restored heading with no calculation replay,
+an exact browser RPC and a JavaScript-free private-binding calculation. A
+scoped actual API source edit adds a fixed response header, and the current
+local health response must gain then lose it after exact restoration. Reload
+polling admits temporary socket closure but requires an actual successful
+response for each observation. The child process scope sends SIGINT and
+releases descendants; both actual app ports must stop serving afterwards.
+Run this test alone with respect to source scans and other development watchers.
+It establishes local development only; cloud state, login, provider writes,
+deployment and exported tracing remain separate claims.

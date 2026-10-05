@@ -398,21 +398,23 @@ migration checks alone still establish none of those provider results.
 
 ## Local runtime shape
 
-Run the API, web app and docs app as separate local processes:
+The native API and Website develop together through the root `bun run dev`
+command. Its separate `alchemy.apps.local.run.ts` composition uses local state,
+local native providers and the same matching resource graph as the app
+candidate. It rejects other operations/modes/stages before resource declaration.
+Native resource URLs supply the browser origin and private binding; no Vite
+browser origin constant or guessed production address is used. The root keeps
+its profile directory separate and passes source selection through native child
+processes. The API dependency graph builds first; shared-package changes need
+an owning rebuild. The [Website README](../../apps/web/README.md) owns setup.
 
-```sh
-bun run --filter=api dev
-bun run --filter=web dev
-bun run --filter=docs dev
-```
-
-`apps/api` dev runs through portless as `https://api.taxkit.localhost`.
-`apps/web` dev injects that URL into `TAXKIT_API_BASE_URL` and
-`VITE_TAXKIT_API_BASE_URL` before serving through portless as
-`https://taxkit.localhost`. `apps/docs dev` runs the Alchemy-managed Cloudflare
-lifecycle. Use `bun run --filter=docs dev:vite` for the infrastructure-free
-portless app at `https://docs.taxkit.localhost`. Production deployment should provide
-equivalent API base URL environment values explicitly.
+The retained `bun run --filter=api dev` runs the separate Bun HTTP process
+through portless. `bun run --filter=web dev` is the standalone Website fixture
+and needs its native binding. Neither stands in for the matching development
+pair. Docs development remains separately owned: `bun run --filter=docs dev`
+uses its Alchemy-managed lifecycle, while `bun run --filter=docs dev:vite`
+uses the credential-free portless app. No docs deployment procedure is
+redirected to the local apps root.
 
 The focused Cloudflare candidate proof is:
 

@@ -7,7 +7,11 @@
   },
   "workspaces": {
     ".": {
-      "entry": ["alchemy.run.ts!", "alchemy.apps.run.ts!"],
+      "entry": [
+        "alchemy.run.ts!",
+        "alchemy.apps.run.ts!",
+        "alchemy.apps.local.run.ts!"
+      ],
       "project": ["alchemy.run.ts!"]
     },
     "apps/docs": {

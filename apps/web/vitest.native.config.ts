@@ -8,6 +8,7 @@ export default defineConfig({
       "test/native-rpc-failures.boundary.test.ts",
       "test/native-cancellation.boundary.test.ts",
       "test/native-settings-failure.boundary.test.ts",
+      "test/native-local-development.boundary.test.ts",
     ],
     testTimeout: 30_000,
   },

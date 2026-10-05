@@ -1,5 +1,5 @@
 import "@tanstack/react-start/server-only";
-import type { fromCloudflareFetcher } from "alchemy/Cloudflare";
+import type { fromCloudflareFetcher } from "alchemy/Cloudflare/Bridge";
 import { Config, Effect, Predicate, Schema } from "effect";
 
 import { TaxKitWebConfigError } from "./config";

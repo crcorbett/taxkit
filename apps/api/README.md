@@ -51,6 +51,16 @@ and their matching resource bindings. Local plans and transport tests do not
 prove deployment or completion of DEV-74. The Bun commands and public contract
 stay available during this work.
 
+## Local native pair
+
+Run `bun run dev` from the repository root for the native API and Website
+pair. Alchemy owns both local addresses and the private binding; no cloud login
+is required. The root builds the API dependency graph first and passes Bun's
+source selection through the native launcher. API app source edits reload in
+the current local Worker. Shared-package edits need that package's build because
+native API bundling selects compiled package exports. Ctrl-C releases the pair.
+See the [Website setup](../web/README.md) for the saved browser and shutdown checks.
+
 ## Runtime Shape
 
 The process entrypoint is an Effect program run with
@@ -132,8 +142,8 @@ bun run --filter=api dev
 This command serves the public API through portless at
 `https://api.taxkit.localhost`. The native Website needs a matching native API
 service for its private binding; this Bun process alone cannot provide it. The
-complete development pair remains active work. The Website README owns the
-local native build and test commands.
+root `bun run dev` supplies the matching native pair. The Website README owns
+its local setup, build and test commands.
 
 ## Public-route smoke
 

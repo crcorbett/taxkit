@@ -2132,3 +2132,43 @@ health-scaffold description. Post-check docs and runbook validation qualify
 these wording changes and the bounded receipt.
 T003 remains in progress for development and safe exported telemetry;
 DEV-75–81 and the separate Medicare decision remain unfinished.
+
+## T003 native local development candidate
+
+Continue from cancellation draft #134 at
+`554ee3c10fefaaa943ba157841edba8d62ae942b` on
+`codex/dev-74-native-local-dev`. The exact parent hosted Quality run
+37250859036 / job 111577989697 passed at 2026-10-05T01:35:21Z.
+This qualifies the parent only.
+
+The separate local Alchemy root uses the same native app graph with local state,
+no Doppler composition and a named development stage check before declaration.
+The root development command builds the API dependencies and inherits source
+selection through launcher children. Actual local use exposed stale Vite flag
+reads, a development-tool barrel in Worker SSR, an older SDK Worker engine and
+launcher source flags being dropped. The fixes use a fresh ConfigProvider,
+the supported runtime-only Bridge export, the root workerd override matching
+the existing app compatibility date, and inherited Bun options respectively.
+No additional SDK patch is introduced.
+
+The saved existing native suite qualifies actual CLI startup, browser/private
+calculations, both live source edits with exact restoration, local resource
+readback and process shutdown. The first saved attempts retained an incorrect
+profile-directory expectation, a hydration/edit race and a transient reload
+socket closure; these are failed attempts, not accepted proof.
+
+Documentation impact: **Change required** for root/local command configuration,
+API/Website/infrastructure READMEs, deployment/frontend/testing owners, exact
+lint fixture permissions, current journey and T003 receipt. **Preserve** tax
+rules/goldens, SDK/HTTP/OpenAPI and public docs content, cloud/docs provider
+composition, canonical skills and release procedures. **N/A** public Changeset:
+this slice changes private app development/configuration and local fixtures.
+Local closeout passed: 467 actual CLI lint cases (403 portable), all 27
+package/app test tasks freshly executed, all 16 builds (11 unchanged cached),
+fresh standalone HTTP/consumer smoke, and full verification including all six
+fresh native tests in 35.94 seconds. The exact root `bun run dev` command also
+passed API health, HTML, private and actual Chromium RPC calculations, with no
+browser errors or initial replay, then stopped with both ports refused.
+Post-receipt docs checks remain required. This accepts the local development
+sub-slice only. T003 remains in progress for safe exported telemetry;
+DEV-75–81 remain later work.

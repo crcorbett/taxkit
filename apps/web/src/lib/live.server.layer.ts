@@ -1,7 +1,7 @@
 import "@tanstack/react-start/server-only";
 import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
-import { fromCloudflareFetcher } from "alchemy/Cloudflare";
+import { fromCloudflareFetcher } from "alchemy/Cloudflare/Bridge";
 import { Effect, Layer } from "effect";
 import { HttpClient } from "effect/http";
 

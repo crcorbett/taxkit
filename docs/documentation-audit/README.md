@@ -397,3 +397,8 @@ The [native cancellation candidate](clean-slate-foundation/2026-10-05-native-can
 records complete headers/body deadlines, actual browser abort on editing and
 route departure, removal checks and numeric log-metadata correction. Upstream
 cancellation, the development pair and safe exported tracing remain unproved.
+
+The [native local development candidate](clean-slate-foundation/2026-10-05-native-local-development.json)
+records actual CLI startup, local matching bindings, source reload/restoration,
+browser/private calculations and shutdown. T003 remains active for safe exported
+telemetry; local development is not provider or deployment proof.

@@ -186,3 +186,13 @@ ambient suppression, not Doppler download or credential access. Native Stack
 also rejects `--env-file` when the root declares secrets. The existing docs
 fetch bridge and its empty env-file remain their own operating contract; no
 current docs command selects the candidate app root.
+
+The separate `alchemy.apps.local.run.ts` root selects only disposable local
+app development, without the cloud secret stack. Its owned comment-only env
+file prevents loading ambient `.env` application values. The root command sets
+an isolated local `ALCHEMY_HOME` and passes source/no-env options through native
+Bun children. The saved test instead scrubs the process environment and scopes
+an empty profile directory. Alchemy creates an empty default profile directory
+but no credential JSON. These local bookkeeping files do not establish cloud
+credential custody. The [Website README](../../apps/web/README.md) owns setup;
+the current docs secret bridge remains separate.

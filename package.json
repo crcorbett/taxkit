@@ -85,7 +85,7 @@
     "check:quality-workflow:types": "turbo run //#check:quality-workflow:types:task",
     "check:quality-workflow:types:task": "tsc --noEmit -p tools/quality-workflow/tsconfig.json",
     "clean": "turbo run clean",
-    "dev": "portless proxy start --https && turbo run dev --filter=api --filter=web",
+    "dev": "turbo run build --filter=api && CI=1 ALCHEMY_HOME=.alchemy/native-apps-auth ALCHEMY_TELEMETRY_DISABLED=1 BUN_OPTIONS=\"--conditions=source --no-env-file\" bun run node_modules/alchemy/bin/cli.js dev --config alchemy.apps.local.run.ts --env-file tools/apps-local/no-local-env --stage dev_native_apps",
     "docs:build": "turbo run build --filter=docs",
     "docs:dev:cloudflare": "bun --no-env-file run tools/docs-deployment/local-doppler.runtime.ts",
     "docs:dev:cloudflare:internal": "alchemy dev --env-file tools/docs-deployment/no-local-env",
@@ -165,7 +165,8 @@
   "overrides": {
     "@effect/platform-node-shared": "4.0.0",
     "@effect/sql-d1": "4.0.0",
-    "@effect/sql-sqlite-do": "4.0.0"
+    "@effect/sql-sqlite-do": "4.0.0",
+    "workerd": "1.20261001.1"
   },
   "engines": {
     "bun": ">=1.4.2",

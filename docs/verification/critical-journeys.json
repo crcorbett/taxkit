@@ -154,7 +154,7 @@
     {
       "id": "taxkit-native-website",
       "actorOrConsumer": "Calculator Website visitor",
-      "boundary": "Built native Website/private API binding/direct browser RPC",
+      "boundary": "Built and live native Website/private API binding/direct browser RPC",
       "startingState": "Selected Node and Chromium are available; local ports 4196\u20134203 used by the native fixtures are available.",
       "inputs": [
         "Native Alchemy source-built API and Website",
@@ -167,7 +167,8 @@
         "Checked errors restore safely in the browser; native request limits and production import boundaries hold.",
         "Data-free native settings GET succeeds; unexpected query/method input is rejected before framework parsing; an actual internal settings defect returns empty 500 and fixed safe logs.",
         "Unknown, extended or missing native settings function addresses return empty 404 before framework lookup/logging; native generated URL owns identity.",
-        "Controlled slow headers and an unfinished actual reply reach the five-second deadline; browser requests abort after the deadline, editing and browser Back leaving the form."
+        "Controlled slow headers and an unfinished actual reply reach the five-second deadline; browser requests abort after the deadline, editing and browser Back leaving the form.",
+        "Real native CLI local development supplies both addresses/bindings, reloads API and Website source, restores exact sources and closes app ports on scoped shutdown."
       ],
       "expectedSideEffects": [
         "Ignored native build files, scoped local Workers and Chromium only."
@@ -181,7 +182,8 @@
       "authority": "none",
       "evidence": [
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website-failures.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website-failures.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-local-development.json"
       ],
       "nonClaims": [
         "No cloud provider, deployed endpoint, complete native fatal/privacy path or trace-export proof.",

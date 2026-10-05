@@ -28,7 +28,8 @@
         "tools/docs-deployment/local-doppler.runtime.ts",
         "tools/docs-deployment/workflow-artifact.runtime.ts",
         "tools/docs-deployment/*.test.ts",
-        "alchemy.apps.run.ts"
+        "alchemy.apps.run.ts",
+        "alchemy.apps.local.run.ts"
       ],
       "project": [
         "*.json",

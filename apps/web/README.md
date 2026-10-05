@@ -94,10 +94,30 @@ fixture cleanup. Exact lint admissions cover required execution, encoding,
 native binding input and Playwright's `fill` operation; nearby application
 files retain the restrictions. Both Knip graphs include the Website.
 
-`dev` runs the standalone native Website fixture. A matching native API service
-must also be registered for its private binding; the retained Bun HTTP process
-alone cannot supply it. The complete development pair and all calculator pages
-remain active clean-slate work.
+From the repository root, `bun run dev` starts the native API and Website
+pair. `alchemy.apps.local.run.ts` admits only local development at the named
+`dev_native_apps` stage (and `dev_native_apps_proof` for the saved test).
+Alchemy prints the two addresses, binds the private API and supplies the public
+origins. It uses local state and `.alchemy/native-apps-auth`, without an ambient
+env file or cloud login. Ctrl-C stops the pair. Source changes in either app
+reload automatically; shared-package changes require the owning package build
+because the API bundler reads compiled dependency exports.
+
+The Website Vite config reads a fresh ConfigProvider when Alchemy injects its
+native plugin flag, so it does not add a second Cloudflare plugin. Server code
+imports the supported runtime-only `alchemy/Cloudflare/Bridge` export, keeping
+SDK development tools out of the Worker bundle. Bun's inherited source options
+select the API source across Alchemy launcher processes. The root pins workerd
+at the app-compatible version for both the native SDK and standalone fixtures.
+
+`bun run --filter=web dev` remains the standalone Website fixture. It needs a
+matching native API binding; the separate Bun HTTP process cannot supply that
+binding. The saved native suite also starts the real CLI pair with an isolated
+empty profile directory, reads its actual addresses, checks browser validation
+before live edits, restores both sources exactly, and verifies calculations
+with and without JavaScript plus closed app ports after shutdown. Do not run
+it beside another development process in this checkout: both watch the same
+sources. Full exported telemetry and all calculator pages remain active work.
 
 ## Related owners
 
@@ -155,5 +175,5 @@ The native log checks compare pay values against emitted messages. Numeric
 Worker timestamps can coincidentally contain a pay value; they are metadata,
 not an emitted pay message. Private text markers remain checked across the
 whole log record. The [dated cancellation receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json)
-records source-removal checks, restoration and the remaining development and
+records source-removal checks, restoration and the remaining
 exported-telemetry work.

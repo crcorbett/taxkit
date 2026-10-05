@@ -77,3 +77,16 @@ private peer resource, self URLs, fresh Output evaluation, absent addresses and
 secret precedence with a fixture replacing Doppler. They do not establish real
 Cloudflare diff convergence, Doppler retrieval, cloud state or deployment.
 See the [dated graph receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-app-graph.json).
+
+## Disposable local apps
+
+`alchemy.apps.local.run.ts` uses the same `declareNativeAppsStack` resource
+graph with `Alchemy.localState()`. Its native context check rejects operations
+other than development, remote provider mode and stages outside
+`dev_native_apps` / `dev_native_apps_proof` before declaring either resource.
+The root `dev` command supplies an empty owned env file and an isolated
+`ALCHEMY_HOME`; it does not construct the cloud stack or Doppler secrets.
+Native resources own the addresses, bindings and local Worker/Vite lifetimes.
+The [Website README](../../apps/web/README.md) owns contributor setup and the
+saved real-CLI development test. Local state is disposable development evidence,
+not cloud provider or deployment proof.

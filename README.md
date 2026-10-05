@@ -3,7 +3,7 @@ document_type: repository-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-repository-maintainers
-last_reviewed: 2026-10-01
+last_reviewed: 2026-10-05
 review_trigger: contributor setup, repository entry points, or supported commands change
 ---
 
@@ -131,6 +131,7 @@ and the [setup spec](./docs/product-specs/entire-session-history.md).
 
 ```sh
 bun install
+bun run dev
 bun run --filter=api dev
 bun run --filter=web dev
 bun run --filter=docs dev
@@ -147,12 +148,19 @@ bun run changeset
 bun run version-repo
 ```
 
-`bun run --filter=api dev` serves the API through portless at
-`https://api.taxkit.localhost`. The native Website requires its matching private
-Worker binding; the retained Bun process alone cannot supply it. Use `bun run
-web:test:native-pair` for the saved local native API/Website/Chromium journey.
-The [Website README](./apps/web/README.md) owns its standalone development
-fixture, generated types and native build commands. `bun run --filter=docs dev`
+`bun run dev` builds the API dependencies, then starts the native API and
+Website together using `alchemy.apps.local.run.ts`. Alchemy prints both local
+addresses and supplies the matching browser origin and private server binding.
+It uses local state and an isolated local profile directory; it requires no
+Cloudflare or Doppler login. App source edits reload automatically. After
+editing a shared package, rebuild that package before expecting its compiled
+API exports to change. Stop the pair with Ctrl-C.
+
+`bun run --filter=api dev` retains the separate Bun HTTP process through
+portless at `https://api.taxkit.localhost`. The [Website README](./apps/web/README.md)
+owns its standalone fixture, generated types and native checks. Use `bun run
+web:test:native-pair` for the saved built and live development journeys.
+`bun run --filter=docs dev`
 is the credentialed, Alchemy-managed Cloudflare development path. It requires a
 repository-scoped Doppler login and an authorised `taxkit/dev` config, runs the
 pass/fail-only `bun run check:doppler-custody` check first during onboarding,

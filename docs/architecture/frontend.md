@@ -97,6 +97,14 @@ leaving the form. It observes caller cancellation; the upstream artificial
 stream can continue. Full exported telemetry and all calculator pages remain
 active work.
 
+The root local development command starts both native apps from the same graph.
+Native local resource outputs own the public origins and private binding. The
+Website imports its Fetcher adapter through `alchemy/Cloudflare/Bridge`, the
+SDK's supported runtime-only export, avoiding development-tool code in Worker
+SSR. Vite reads the injected plugin flag with a fresh ConfigProvider at its
+configuration boundary. The [Website README](../../apps/web/README.md) owns
+setup, source reload and the saved real-CLI check; docs development is separate.
+
 Docs SSR loaders retain their existing module-scoped runtime rule. `apps/docs` keeps one module-scoped
 server runtime for `DocsContentServiceLive`, composed over the TaxKit generated
 collection Layer, plus one app-private runtime-probe Layer, and exposes explicit
