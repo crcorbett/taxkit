@@ -17,7 +17,8 @@ gaps are routed by [`../README.md`](../README.md). The legacy
 [`../architecture.md`](../architecture.md) path is a tombstone to this file.
 
 TaxKit is the open-source engine repository. Today it contains a standalone
-Bun API app, a TanStack Start web scaffold, a Fumadocs-backed docs app, the
+Bun API app, a native API/Website candidate with a take-home-pay form, a
+Fumadocs-backed docs app, the
 `@taxkit/api-http` package with health, generated docs, metadata and public
 calculation endpoints, the `@taxkit/calculators` service package,
 deterministic core engine primitives, Australian pay, income-tax and STSL rule
@@ -30,10 +31,14 @@ documentation.
 
 Implemented surfaces:
 
-- `apps/api`: standalone Bun API runtime for the current API surface.
+- `apps/api`: retained standalone Bun API and native Worker candidate sharing
+  the public HTTP contract and calculator service.
 - `apps/docs`: TanStack Start public docs runtime over MDX content,
   `@taxkit/docs-content` and `@taxkit/docs-fumadocs`.
-- `apps/web`: TanStack Start scaffold that loads the health endpoint.
+- `apps/web`: native TanStack Website candidate; its take-home-pay form uses
+  private API binding for server calculation and direct browser RPC. The
+  complete development pair and safe exported telemetry remain T003 work.
+- `packages/api/rpc`: private native calculation transport over the same service.
 - `packages/api/http`: Effect HTTP API package for health, generated docs,
   OpenAPI JSON, public calculator metadata and public calculation routes.
 - `packages/calculators`: reusable calculator catalog, metadata, graph,

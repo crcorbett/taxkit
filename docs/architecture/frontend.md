@@ -90,8 +90,12 @@ generated Wrangler declarations and the distinction between standalone and
 Alchemy-native build output. The native RPC failure test also checks fixed global/procedure/fatal replies,
 a damaged valid-JSON result through the genuine private binding, and restored
 error editing in Chromium without replay. Positive fixed log events omit pay
-values and the short marker. Full exported telemetry, cancellation and all
-calculator pages remain active work.
+values in emitted messages and the short marker across complete records. The
+native cancellation test requires the five-second headers/body deadline and
+actual browser request abort after the deadline, editing and browser Back
+leaving the form. It observes caller cancellation; the upstream artificial
+stream can continue. Full exported telemetry and all calculator pages remain
+active work.
 
 Docs SSR loaders retain their existing module-scoped runtime rule. `apps/docs` keeps one module-scoped
 server runtime for `DocsContentServiceLive`, composed over the TaxKit generated

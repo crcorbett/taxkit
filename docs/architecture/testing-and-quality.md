@@ -1088,3 +1088,21 @@ disabled, then rebuild restored dependencies and artifacts. Procedure removal
 loses the fixed reply value; it does not establish marker reflection. Only
 exact fixture decoding, encoding and named Playwright input filling are admitted;
 actual CLI canaries still reject runtime execution at that fixture path.
+
+The cancellation fixture keeps the actual calculation, encoder and response
+bytes. Its controlled API roots delay headers or send a real first body byte
+before delaying the remainder. Identity content encoding prevents compression
+from buffering that first byte and masking the unfinished-body check. Both
+paths must hit the complete five-second client deadline. Browser checks require
+actual `requestfailed` abort observations on deadline, editing and same-document
+browser Back leaving the form. A hard document replacement can lose the old
+page's observation and is not a substitute for the route-cleanup check.
+
+Removing the deadline makes the saved native test fail on the eight-second
+successful result; removing explicit edit interruption fails browser abort
+observation. Exact source restoration, compiled dependencies and all four native
+tests must then pass. Caller abort does not establish upstream cancellation.
+Log-message pay checks exclude unrelated numeric timestamp metadata; private
+text markers remain checked across the whole record. Controlled capture checks
+must tolerate pay-like timestamps and reject pay values added to a message.
+These observations are bounded by the [dated receipt](../documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json).

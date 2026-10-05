@@ -254,12 +254,14 @@
             </p>
           </div>
           <div class="item">
-            <span class="status done">Completed</span>
-            <h3>Web runtime proof</h3>
+            <span class="status partial">Local candidate</span>
+            <h3>Native Website proof</h3>
             <p>
-              <code>apps/web</code> is a TanStack Start app with separate
-              server and client managed runtimes that call the standalone API
-              over HTTP.
+              <code>apps/web</code> has one server runner and a browser-owned
+              Atom registry. Its take-home-pay form calls the native API through
+              a private server binding or direct browser RPC. Local Worker and
+              Chromium checks pass; development and safe exported tracing remain
+              active work. No API/Website deployment is claimed.
             </p>
           </div>
           <div class="item">
@@ -281,18 +283,11 @@
           <div class="item">
             <h3>Runtime flow</h3>
             <ul>
-              <li>The root route in <code>apps/web</code> loads health data.</li>
-              <li>
-                It resolves the route runtime and yields
-                <code>TaxKitHttpApiService</code>.
-              </li>
-              <li>
-                The service calls <code>api.health.getHealth()</code> through
-                the browser-safe client boundary against <code>apps/api</code>.
-              </li>
-              <li>
-                The page renders the returned <code>ok</code> status.
-              </li>
+              <li>The root route in <code>apps/web</code> restores checked settings.</li>
+              <li>The browser registry owns form commands and cancellation.</li>
+              <li>Explicit Calculate calls native <code>POST /rpc</code>; page load makes no calculation.</li>
+              <li>The separate API owns calculation and returns a checked result.</li>
+              <li>The server HTML form uses the private API binding and also works without JavaScript.</li>
             </ul>
           </div>
           <div class="item">
@@ -341,7 +336,7 @@
             <tr>
               <td>Web integration</td>
               <td>Done</td>
-              <td>The root page calls the standalone API through the route runtime and displays health status.</td>
+              <td>The native Website candidate calculates take-home pay through the separate API. Fresh local Worker/browser checks cover replies, deadlines and browser cancellation; full T003 work remains in progress.</td>
             </tr>
             <tr>
               <td>Docs runtime</td>
@@ -356,7 +351,7 @@
             <tr>
               <td>Repository foundation</td>
               <td>Done</td>
-              <td>The workspace uses the Effect 4 beta.98 family and Effect language service. CI reads <code>.bun-version</code>, <code>CLAUDE.md</code> resolves to <code>AGENTS.md</code>, package builds clean output, and publication manifests expose dist-only exports.</td>
+              <td>The workspace selects stable Effect 4.0.0 and Effect language service. CI reads <code>.bun-version</code>, <code>CLAUDE.md</code> resolves to <code>AGENTS.md</code>, package builds clean output, and publication manifests expose dist-only exports.</td>
             </tr>
             <tr>
               <td>Static architecture rules</td>
@@ -426,9 +421,10 @@
             <span class="status partial">Partial</span>
             <h3>Deployment</h3>
             <p>
-              Local dev surfaces exist. A real hosting target, deployment
-              checks, SEO metadata and docs-app production routing still need
-              a future decision.
+              Docs has target-owned deployment and recovery procedures.
+              The native API/Website candidates have local proof only;
+              cloud apply needs separate authority. Local success does not
+              establish deployed availability.
             </p>
           </div>
           <div class="item">
@@ -455,7 +451,7 @@
       <section>
         <h2>Current development priority</h2>
         <ol>
-          <li>Choose the next user-facing slice: deploy the docs and API, or build a real calculation workflow in <code>apps/web</code>.</li>
+          <li>Finish the approved native API/Website development pair and safe tracing, then continue the accepted SDK, content and calculator-page tasks. Keep deployment separately authorised.</li>
           <li>Define package naming, registry, provenance and publish verification before approving npm publication.</li>
           <li>Keep <code>packages/ui</code> planned until real consumers satisfy the abstraction-admission contract.</li>
           <li>Keep specs, task lists, completed execution plans and this manual snapshot aligned after material changes.</li>

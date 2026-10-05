@@ -92,7 +92,10 @@ fatal replies, checked service/version errors, and a damaged valid-JSON reply
 through the Website binding and Chromium form. Separate removal checks disable
 the native global/procedure encoder or reply decoder and require the saved test
 to fail, then restore source and compiled dependencies. This does not complete
-trace-export or cancellation proof. Retained tax results remain unchanged; Medicare correction
+trace-export proof. The native cancellation test separately qualifies the complete
+five-second headers/body budget and browser abort after a deadline, editing or
+browser Back leaving the form. Its upstream artificial stream can continue;
+remote-operation cancellation is not established. Retained tax results remain unchanged; Medicare correction
 is a separate unresolved decision. The canonical render receipt records its
 original scaffold and explicit stable-version adaptation; structural validation
 alone does not prove runtime behaviour.

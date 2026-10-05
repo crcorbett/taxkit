@@ -13,8 +13,8 @@ TaxKit is the public monorepo for the open-source tax engine, API, SDK and
 documentation site.
 
 The repo is early, but the main public integration surfaces now exist. The
-implemented surface is a standalone Bun API app, a TanStack Start web scaffold
-that calls that API, a Fumadocs-backed docs app, an Effect HTTP API package
+implemented surface includes the retained standalone Bun API and a native
+API/Website candidate with a take-home-pay form, a Fumadocs-backed docs app, an Effect HTTP API package
 with health, generated docs, metadata and public calculation endpoints, a
 reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, a private

@@ -146,6 +146,96 @@ const program = Effect.gen(function* () {
         )
         .pipe(Effect.provide(artifacts));
     }).pipe(Effect.scoped);
+    // The native JSON RPC encoder returns an owned byte body. Delay either
+    // headers or the remaining bytes after real encoding; keep its framing.
+    yield* Effect.forEach(["body", "headers"] as const, (phase) =>
+      Effect.gen(function* nativeStalledReplyBuild() {
+        const owner = path.join(root, "apps/api/src/worker.ts");
+        const original = yield* Effect.acquireRelease(
+          fs.readFileString(owner),
+          (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
+        );
+        const declaration =
+          "export const ApiWorkerInit = ApiWorkerApplication.pipe(";
+        const imports = 'import { Effect, Layer } from "effect";';
+        if (!original.includes(declaration) || !original.includes(imports)) {
+          return yield* Effect.die(
+            "Native stalled-reply fixture no longer matches its source owner"
+          );
+        }
+        const reply =
+          phase === "body"
+            ? `response.body._tag === "Uint8Array"
+            ? HttpServerResponse.stream(
+                Stream.make(response.body.body.subarray(0, 1)).pipe(
+                  Stream.concat(Stream.fromEffect(
+                    Effect.logWarning("PRIVATE9 started").pipe(
+                      Effect.andThen(Effect.sleep("8 seconds")),
+                      Effect.as(response.body.body.subarray(1))
+                    )
+                  )),
+                  Stream.ensuring(Effect.logInfo("PRIVATE9 released")),
+                  Stream.provideContext(telemetry)
+                ),
+                {
+                  contentType: "application/json",
+                  headers: Headers.set(Headers.remove(response.headers, "content-length"), "content-encoding", "identity"),
+                  status: response.status,
+                }
+              )
+            : response`
+            : `response`;
+        const operation =
+          phase === "body"
+            ? `Effect.map((response) => ${reply})`
+            : `Effect.flatMap((response) => Effect.logWarning("PRIVATE9 headers").pipe(
+              Effect.andThen(Effect.sleep("8 seconds")),
+              Effect.as(response),
+              Effect.provideContext(telemetry)
+            ))`;
+        const injected = original
+          .replace(
+            imports,
+            'import { Effect, Layer, Stream } from "effect";\nimport { Headers, HttpServerResponse } from "effect/http";\nimport { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";'
+          )
+          .replace(
+            declaration,
+            `${declaration}
+          Effect.flatMap((application) => Effect.gen(function* () {
+            const telemetry = yield* Layer.build(ApiSafeTelemetryLive);
+            return { fetch: application.fetch.pipe(${operation}) };
+          })),`
+          );
+        yield* fs.writeFileString(owner, injected);
+        const fixtureId =
+          phase === "body" ? "TaxKitApiStalledBody" : "TaxKitApiStalledHeaders";
+        yield* fs.remove(path.join(output, "bundles", fixtureId), {
+          force: true,
+          recursive: true,
+        });
+        const props = {
+          compatibility,
+          main: import.meta.resolve("api/worker"),
+        };
+        const artifacts = scopedArtifacts(fixtureId);
+        const source = yield* resolveSource(props).pipe(
+          Effect.provide(artifacts)
+        );
+        yield* source
+          .build(
+            makeSourceContext({
+              compatibility,
+              dotAlchemy: output,
+              fqn: fixtureId,
+              id: fixtureId,
+              props,
+              stack: { name: "TaxKitAppsLocalProof", stage: "dev_native_pair" },
+              workerName: `taxkit-api-local-stalled-${phase}`,
+            })
+          )
+          .pipe(Effect.provide(artifacts));
+      }).pipe(Effect.scoped)
+    );
     const apiProps = { compatibility, main: import.meta.resolve("api/worker") };
     const apiArtifacts = scopedArtifacts("TaxKitApi");
     const apiSource = yield* resolveSource(apiProps).pipe(

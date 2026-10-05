@@ -420,8 +420,12 @@ The saved native RPC failure check also runs malformed envelopes, procedure
 decoding, expected/version errors and an injected fatal operation in actual
 Workers. A damaged valid-JSON reply crosses the real private binding and
 restores a checked error in Chromium without replay. Fixed host log events are
-required as positive controls. Safe exported tracing and complete native
-cancellation qualification remain in progress.
+required as positive controls. The native cancellation test runs the real
+calculation/encoder before controlled eight-second header/body delays. The
+generated client must hit its five-second deadline; Chromium must abort on the
+deadline, editing and browser Back leaving the form. This establishes caller
+cancellation, with no upstream Worker cancellation claim. Safe exported tracing
+and the development pair remain in progress.
 Public HTTP/OpenAPI keeps its existing contract and shared application operation.
 
 Calculator Schemas use narrow core/rule Schema entrypoints. Diagnostics and

@@ -240,3 +240,10 @@ limit; the app keeps its compatibility alias. `@taxkit/api-rpc/host-telemetry`
 owns the same fixed logging/reporting policy used by the Website. Existing API
 proof remains applicable through its focused regression tests; this reuse does
 not qualify native trace export or every framework logging path.
+
+The Website's native cancellation fixture uses the real API calculation and
+reply encoder before delaying headers or the remainder of the encoded body.
+This qualifies the client's complete five-second wait and browser request abort,
+not cancellation of upstream Worker work. The [Website README](../web/README.md)
+owns its local commands and [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json)
+records the bounded observations.

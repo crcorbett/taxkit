@@ -2090,3 +2090,45 @@ The dated RPC failure receipt binds exact changed source and all ordinary/fault
 artifacts. Only receipt and plan closeout text follow those checks; docs/runbooks,
 Changeset status and staged whitespace checks validate that final record.
 T003 remains in progress for cancellation, development and exported telemetry.
+
+## T003 native cancellation qualification
+
+The parent RPC-failure revision `29a96d6313a88e33354b8a57287d4ad124dc3efe`
+passed hosted Quality run 37246990555, job 111566708865. That result belongs to
+PR #133 and does not qualify the current cancellation candidate.
+
+The current branch `codex/dev-74-native-cancellation` adds two controlled API
+roots to the existing source builder. Each runs the actual calculation and
+encoder first. One delays headers; the other sends one actual encoded body byte
+then delays the rest, with identity encoding to prevent compression buffering.
+The generated client reaches its complete five-second deadline for both.
+Chromium observes actual aborted requests after the deadline, editing, and
+browser Back leaving the form. The upstream artificial stream can continue;
+remote-operation cancellation is not established.
+
+Removing the deadline makes the saved test fail on the eight-second successful
+report. Removing explicit edit interruption fails its actual browser abort
+check. Exact source restoration, rebuilt compiled dependencies and all four
+native tests pass. Failed hard-navigation and compressed-body experiments are
+retained in the [dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json).
+A speculative dependency change was restored and is not part of this candidate.
+
+A numeric Worker timestamp coincidentally contained the sample pay amount.
+The native privacy checks now inspect emitted messages for pay values, while
+private text remains checked across complete records. Controlled log capture
+checks must accept pay-like numeric metadata and reject pay values added to a
+message. This is a test-observation correction, not relaxed production reporting.
+
+Documentation impact: **Change required** for the builder, saved native tests,
+exact permissions and real CLI canaries, owning READMEs, architecture, current
+journey and T003 evidence. **Preserve** production API/RPC/form code, HTTP/OpenAPI,
+retained tax results, canonical skills, runbooks and historical proof. **N/A**
+Changeset: private test/command/docs changes only. Complete local closeout
+passes, including all 463 actual lint cases, 27 package/app test tasks, the
+build, public API smoke and full verification. Its 32 isolated quality cases
+pass in 423.02 seconds; all four fresh native tests pass in 24.30 seconds.
+The root/architecture overviews and status outline also retire the stale
+health-scaffold description. Post-check docs and runbook validation qualify
+these wording changes and the bounded receipt.
+T003 remains in progress for development and safe exported telemetry;
+DEV-75–81 and the separate Medicare decision remain unfinished.

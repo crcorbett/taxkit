@@ -141,5 +141,19 @@ A damaged valid-JSON reply becomes the checked invalid-response error. Its real
 Worker-produced HTML loads in Chromium; editing clears the restored error
 without replaying a calculation, proving the browser has taken over the form.
 Actual fixed API/Website log events must be present and omit the short marker
-and pay values. These are local observations; exported telemetry and complete
-cancellation remain unfinished.
+and pay values. These are local observations; exported telemetry remains unfinished.
+
+The native cancellation test uses ports 4201–4203. Two controlled API artifacts
+first run the real calculation and native reply encoder, then delay headers or
+the rest of that same reply for eight seconds. The generated client must reach
+its five-second deadline in both cases. Chromium must abort its unfinished
+request after the deadline, on editing, and when browser Back leaves the form.
+These checks establish caller and browser cancellation. They do not establish
+that the upstream Worker stops its artificial delayed response.
+
+The native log checks compare pay values against emitted messages. Numeric
+Worker timestamps can coincidentally contain a pay value; they are metadata,
+not an emitted pay message. Private text markers remain checked across the
+whole log record. The [dated cancellation receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json)
+records source-removal checks, restoration and the remaining development and
+exported-telemetry work.

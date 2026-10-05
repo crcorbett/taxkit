@@ -413,14 +413,16 @@ it.live(
         page.getByRole("alert").waitFor({ state: "hidden", timeout: 5000 })
       );
       expect(yield* Queue.clear(calls)).toEqual([]);
-      const logText = yield* Schema.encodeEffect(Json)(
-        yield* Queue.clear(logs)
+      const capturedLogs = yield* Queue.clear(logs);
+      const logText = yield* Schema.encodeEffect(Json)(capturedLogs);
+      const messageText = yield* Schema.encodeEffect(Json)(
+        Array.map(capturedLogs, (log) => log.message)
       );
       expect(logText).toContain("api.runtime.event");
       expect(logText).toContain("website.runtime.event");
       expect(logText).not.toContain(sentinel);
-      expect(logText).not.toContain("1654");
-      expect(logText).not.toContain("130100");
+      expect(messageText).not.toContain("1654");
+      expect(messageText).not.toContain("130100");
       expect(yield* Queue.clear(exceptions)).toEqual([]);
     }).pipe(
       Effect.timeout("20 seconds"),

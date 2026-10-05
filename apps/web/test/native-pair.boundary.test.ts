@@ -486,12 +486,14 @@ describe("built native API and Website", () => {
             .waitFor({ timeout: 5000 })
         );
         expect(yield* Queue.clear(exceptions)).toEqual([]);
-        const logText = yield* Schema.encodeEffect(Json)(
-          yield* Queue.clear(logs)
+        const capturedLogs = yield* Queue.clear(logs);
+        const logText = yield* Schema.encodeEffect(Json)(capturedLogs);
+        const messageText = yield* Schema.encodeEffect(Json)(
+          Array.map(capturedLogs, (log) => log.message)
         );
         expect(logText.includes(frameworkSentinel)).toBe(false);
-        expect(logText).not.toContain("1654");
-        expect(logText).not.toContain("130100");
+        expect(messageText).not.toContain("1654");
+        expect(messageText).not.toContain("130100");
       }).pipe(
         Effect.timeout("25 seconds"),
         Effect.scoped,
