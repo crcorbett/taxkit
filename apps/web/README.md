@@ -28,7 +28,9 @@ the checked `API_PUBLIC_ORIGIN` directly at POST `/rpc`. The server function
 transports settings only. No calculation runs when the page loads.
 
 Calculate sends the existing canonical request. Editing interrupts unfinished
-work and clears the previous answer. Leaving the form interrupts its operation;
+work and keeps the previous successful answer with an out-of-date message.
+A failed retry or invalid form keeps that answer visibly out of date; only a
+successful explicit calculation updates it. Leaving the form interrupts its operation;
 disposing the registry releases its resources. The standard HTML POST form also
 works without JavaScript, using the private binding and the same API operation.
 Server submissions use an encoded checked result when TanStack loads the page

@@ -1449,6 +1449,27 @@ describe("exact native RPC lint boundaries", () => {
   );
   test.effect.each([
     {
+      path: "apps/web/test/native-pair.boundary.test.ts",
+      rejected: false,
+      rule: "strict-effect(no-imperative-collections)",
+      source:
+        'declare const savedPayInput: { readonly fill: (value: string) => void };\nexport const filled = savedPayInput.fill("2000");',
+    },
+    {
+      path: "apps/web/test/native-pair.boundary.test.ts",
+      rejected: true,
+      rule: "strict-effect(no-imperative-collections)",
+      source:
+        'declare const unrelatedInput: { readonly fill: (value: string) => void };\nexport const filled = unrelatedInput.fill("2000");',
+    },
+    {
+      path: "apps/web/src/lib/take-home.view.tsx",
+      rejected: true,
+      rule: "strict-effect(no-imperative-collections)",
+      source:
+        'declare const savedPayInput: { readonly fill: (value: string) => void };\nexport const filled = savedPayInput.fill("2000");',
+    },
+    {
       path: "apps/web/test/native-local-development.boundary.test.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",

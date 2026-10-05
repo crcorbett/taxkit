@@ -415,12 +415,101 @@ describe("built native API and Website", () => {
         ).toBe(true);
         const payInput = page.getByLabel("Pay before tax ($)");
         yield* Effect.promise(() => payInput.fill("2000"));
+        yield* Effect.promise(() =>
+          page
+            .getByText(
+              "This answer is out of date. Calculate again to update it.",
+              {
+                exact: true,
+              }
+            )
+            .waitFor({ timeout: 5000 })
+        );
         expect(
           yield* Effect.promise(() =>
             page.getByText("$1,301.00", { exact: true }).count()
           )
-        ).toBe(0);
+        ).toBe(1);
+        expect(yield* Queue.clear(calls)).toEqual([]);
         expect(page.url()).toBe(`${websiteOrigin}/`);
+        // Restoring the original figures still needs an explicit calculation.
+        yield* Effect.promise(() => payInput.fill("1654"));
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .getByText(
+                "This answer is out of date. Calculate again to update it.",
+                {
+                  exact: true,
+                }
+              )
+              .count()
+          )
+        ).toBe(1);
+        expect(yield* Queue.clear(calls)).toEqual([]);
+        yield* Effect.promise(() =>
+          page.getByRole("button", { exact: true, name: "Calculate" }).click()
+        );
+        yield* Effect.promise(() =>
+          page
+            .getByText(
+              "This answer is out of date. Calculate again to update it.",
+              {
+                exact: true,
+              }
+            )
+            .waitFor({ state: "hidden", timeout: 5000 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            page.getByText("$1,301.00", { exact: true }).count()
+          )
+        ).toBe(1);
+        expect(yield* Queue.clear(calls)).toHaveLength(1);
+        yield* Effect.promise(() =>
+          page.route(`${apiOrigin}/rpc`, (route) =>
+            route.fulfill({ body: "", status: 503 })
+          )
+        );
+        yield* Effect.promise(() => payInput.fill("2000"));
+        yield* Effect.promise(() =>
+          page.getByRole("button", { exact: true, name: "Calculate" }).click()
+        );
+        yield* Effect.promise(() =>
+          page.getByRole("alert").waitFor({ timeout: 5000 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .getByRole("status", { name: "Calculation result" })
+              .textContent()
+          )
+        ).toContain("$1,301.00");
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .getByRole("status", { name: "Calculation result" })
+              .textContent()
+          )
+        ).toContain("This answer is out of date.");
+        expect(yield* Queue.clear(calls)).toHaveLength(1);
+        yield* Effect.promise(() => payInput.fill("invalid"));
+        yield* Effect.promise(() =>
+          page.getByRole("button", { exact: true, name: "Calculate" }).click()
+        );
+        yield* Effect.promise(() =>
+          page
+            .getByText("Enter a valid pay amount and pay period.", {
+              exact: true,
+            })
+            .waitFor({ timeout: 5000 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            page.getByText("$1,301.00", { exact: true }).count()
+          )
+        ).toBe(1);
+        expect(yield* Queue.clear(calls)).toEqual([]);
         const errorContext = yield* Effect.acquireRelease(
           Effect.promise(() => browser.newContext()),
           (value) => Effect.promise(() => value.close())
@@ -466,6 +555,75 @@ describe("built native API and Website", () => {
             .waitFor({ state: "hidden", timeout: 5000 })
         );
         expect(yield* Queue.clear(calls)).toEqual([]);
+        const savedContext = yield* Effect.acquireRelease(
+          Effect.promise(() => browser.newContext()),
+          (value) => Effect.promise(() => value.close())
+        );
+        const savedPage = yield* Effect.promise(() => savedContext.newPage());
+        savedPage.on("pageerror", (error) => {
+          Queue.offerUnsafe(exceptions, error.message);
+        });
+        savedPage.on("request", (request) => {
+          if (new URL(request.url()).pathname.startsWith("/rpc")) {
+            Queue.offerUnsafe(calls, {
+              headers: request.headers(),
+              method: request.method(),
+              url: request.url(),
+            });
+          }
+        });
+        yield* Effect.promise(() =>
+          savedPage.route(`${websiteOrigin}/`, (route) =>
+            route.fulfill({
+              body: serverHtml,
+              contentType: "text/html",
+              status: 200,
+            })
+          )
+        );
+        yield* Effect.promise(() => savedPage.goto(websiteOrigin));
+        yield* Effect.promise(() => savedPage.waitForLoadState("networkidle"));
+        expect(yield* Queue.clear(calls)).toEqual([]);
+        const savedPayInput = savedPage.getByLabel("Pay before tax ($)");
+        yield* Effect.promise(() => savedPayInput.fill("2000"));
+        yield* Effect.promise(() =>
+          savedPage
+            .getByText(
+              "This answer is out of date. Calculate again to update it.",
+              {
+                exact: true,
+              }
+            )
+            .waitFor({ timeout: 5000 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            savedPage.getByText("$1,301.00", { exact: true }).count()
+          )
+        ).toBe(1);
+        expect(yield* Queue.clear(calls)).toEqual([]);
+        yield* Effect.promise(() =>
+          savedPage.route(`${apiOrigin}/rpc`, (route) =>
+            route.fulfill({ body: "", status: 503 })
+          )
+        );
+        yield* Effect.promise(() =>
+          savedPage
+            .getByRole("button", { exact: true, name: "Calculate" })
+            .click()
+        );
+        yield* Effect.promise(() =>
+          savedPage.getByRole("alert").waitFor({ timeout: 5000 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            savedPage
+              .getByRole("status", { name: "Calculation result" })
+              .textContent()
+          )
+        ).toContain("$1,301.00");
+        expect(yield* Queue.clear(calls)).toHaveLength(1);
+        expect(savedPage.url()).toBe(`${websiteOrigin}/`);
         yield* Effect.logInfo("native-pair: no JavaScript");
         const noJavaScript = yield* Effect.acquireRelease(
           Effect.promise(() =>

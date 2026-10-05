@@ -1,0 +1,327 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "previous calculator answer, stale state, submit/edit lifetime or native browser oracle changes",
+  "outcome": "local stale-answer slice qualified; T004 in progress; hosted candidate and draft review pending",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native Workers and Chromium",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-stale-calculator-answer",
+    "baseCommit": "ab145823ac7a83afb55daf8978d8c03e6a4e9bed",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "files": [
+        {
+          "path": "apps/web/README.md",
+          "sha256": "df4eaf0f0e30ec6fe53e9761cfaf561c982f2ae153f488b63d0b8b9b54c8c7ba"
+        },
+        {
+          "path": "apps/web/src/lib/calculator.atoms.ts",
+          "sha256": "b83712cc3cef97a11076e3e2e028da9309015923617350e04874a994e93d6f7c"
+        },
+        {
+          "path": "apps/web/src/lib/take-home.container.tsx",
+          "sha256": "6a93493544b6a5c5b576b2b985c2028b457be1ec75fa2bd604bccfbbf22d6b32"
+        },
+        {
+          "path": "apps/web/src/lib/take-home.view.tsx",
+          "sha256": "5a56111d10be9ff69bc7da9529f3df0926335aa7250a45acddcd6e84d9d0eed8"
+        },
+        {
+          "path": "apps/web/src/styles.css",
+          "sha256": "83ffc99afa613d49257c557c8ebfe07ef8a37b12cc3ed7d3c17f0685a921c647"
+        },
+        {
+          "path": "apps/web/test/native-pair.boundary.test.ts",
+          "sha256": "b1eddeca33a7ebd184e71bb8c97721a531f9d58fe9d130863e636d20ddd622c6"
+        },
+        {
+          "path": "docs/architecture/frontend.md",
+          "sha256": "e346dd0d15758a07fe2e294b7bc68cc19bf9d800c56c8d3ceca7bc13aabcecd4"
+        },
+        {
+          "path": "docs/architecture/testing-and-quality.md",
+          "sha256": "86c70480a2b38e99f7fad54bd47be27b5ad44c898b4c2e932c20b666f55ce3e7"
+        },
+        {
+          "path": "docs/documentation-audit/README.md",
+          "sha256": "7cae5f3d7cc742a4e67e11fb93f7b1b849c4036371497ec16ea5f8148e11b11f"
+        },
+        {
+          "path": "docs/exec-plans/active/clean-slate-foundation.md",
+          "sha256": "b5ce6d88b1d118a6c2f88ac3d46b2098b52f835b4a289efff813ca0407a27f93"
+        },
+        {
+          "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+          "sha256": "7942d4ba11619710994f45910e3b1b51f688c1b71846fee0db766aff8ae8edab"
+        },
+        {
+          "path": "docs/verification/critical-journeys.json",
+          "sha256": "6745883456490c580d637f4357411772fd213ce26f505eb67c999ec285fcdac4"
+        },
+        {
+          "path": "oxlint.config.ts",
+          "sha256": "0a2310d5528d80bfcf73cc753771223323c28ccde6318b01f9b3b8aa26bb3a61"
+        },
+        {
+          "path": "tools/oxlint/portable-rules.test.ts",
+          "sha256": "0500756a90854c50b0b4b639479dd2786560c4b3180a27b2f3904705b1ea8180"
+        }
+      ],
+      "sha256": "c0d920e68e554d2a1f0352ce71df7d82ef6743bb109c82e006a2734b223315a9",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed repository-relative path and file sha256; excludes this receipt to avoid self hashing."
+    }
+  },
+  "parentHostedProof": {
+    "pullRequest": 136,
+    "headCommit": "ab145823ac7a83afb55daf8978d8c03e6a4e9bed",
+    "runId": 37257851322,
+    "jobId": 111598645867,
+    "outcome": "success",
+    "limitation": "Exact parent head passed; this candidate is not yet pushed. Failed #135 remains failed.",
+    "completedAt": "2026-10-05T03:19:58Z"
+  },
+  "environment": {
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "node": "v24.16.0",
+    "bun": "1.4.2",
+    "browser": "provisioned Chromium via PLAYWRIGHT_BROWSERS_PATH"
+  },
+  "implementation": [
+    "Native AsyncResult.value selects current or previous success through refresh/failure/interruption; submit no longer resets that history.",
+    "Policy container retains checked server-submission success until browser success and derives current/out-of-date state; leaf receives readonly values and renders named semantic output with atomic polite announcements.",
+    "Edits cancel unfinished work and make no request; reverting figures still needs Calculate. Failed/invalid retries retain the previous answer as out of date.",
+    "Existing native fixture tests actual browser reply and actual successful Worker-generated submission HTML, no replay, stale editing/reverting, explicit fresh RPC, controlled unavailable reply and invalid form.",
+    "Exact savedPayInput.fill permission is limited to the existing native fixture; actual CLI canaries admit only that named receiver/path and reject unrelated receiver/same receiver at leaf."
+  ],
+  "proof": [
+    {
+      "command": "focused Website typecheck",
+      "outcome": "Pass."
+    },
+    {
+      "command": "bun run web:test:native-pair after first implementation",
+      "outcome": "Pass: all six native tests in 39.71s; deadlines/cancellation/private/no-JavaScript and actual CLI development stay valid."
+    },
+    {
+      "command": "expanded saved native-pair test",
+      "outcome": "Pass in 5.45s: direct and server-restored previous answers, stale editing/reverting, explicit refresh and failed/invalid retries."
+    },
+    {
+      "command": "bun run test:oxlint",
+      "outcome": "Pass: 470 actual CLI cases including 406 portable cases; named fixture input admitted, unrelated receiver and same receiver at leaf rejected."
+    },
+    {
+      "command": "remove previous-success reading, rebuild native artifacts and run saved browser fixture",
+      "outcome": "Actual browser out-of-date observation times out after edit because remembered answer is missing."
+    },
+    {
+      "command": "restore old submit reset, rebuild native artifacts and run saved browser fixture",
+      "outcome": "Actual invalid form submission loses the previous answer; saved 1301-dollar count is zero instead of one. This is an invalid-form removal failure, not an asserted unavailable-retry failure."
+    },
+    {
+      "command": "exact source restoration, fresh native artifact build and saved browser fixture",
+      "outcome": "Pass in 4.15 seconds; both source files restored exactly."
+    },
+    {
+      "command": "bun run test",
+      "outcome": "Pass: 470 actual CLI lint cases including 406 portable in 44.307s; 27 app/package tasks, 4 fresh and 23 cached."
+    },
+    {
+      "command": "bun run build",
+      "outcome": "Pass: 16 tasks, 1 fresh and 15 cached in 666ms; existing infrastructure no-output warning retained."
+    },
+    {
+      "command": "bun run api:smoke",
+      "outcome": "Pass: fresh real HTTP/temporary consumer/cleanup operation with 11 cached prerequisites in 607ms."
+    },
+    {
+      "command": "bun run web:test:browser",
+      "outcome": "Pass: eight fresh browser checks in 2.67s; 13 tasks, 10 cached prerequisites and 3 fresh."
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "Pass, exit 0. Fresh 32 Quality cases including 13 isolated copies in 485.30s, both Knip checks, type tasks (4 fresh, 23 cached), actual Worker declarations and six native tests in 41.83s. SDK 24 and Website 8 browser checks are cache replays in this command, not fresh executions."
+    },
+    {
+      "command": "post-check docs/runbooks/root format/Changeset status/whitespace",
+      "outcome": "Pass; only active plan/receipt changed after complete verification, executable sources unchanged."
+    }
+  ],
+  "failedAttempts": [
+    {
+      "stage": "first focused lint",
+      "observed": "Status role on div rejected; semantic output required.",
+      "recovery": "Use output with phrasing children and preserved result spacing; native suite passes."
+    },
+    {
+      "stage": "expanded native fixture lint",
+      "observed": "New named server-restored Playwright input fill rejected.",
+      "recovery": "Admit only savedPayInput.fill at exact fixture; qualify accepted/rejected CLI cases before acceptance."
+    },
+    {
+      "stage": "invalid-form reset removal qualification",
+      "observed": "The reset mutation fails specifically on missing previous answer after invalid form submission; the positive unavailable-retry check passes.",
+      "recovery": "Record the exact failed assertion separately; restore source and freshly build/test successfully."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "surface": "private Website behaviour and actual browser qualification",
+      "owners": [
+        "apps/web/src/lib/calculator.atoms.ts",
+        "apps/web/src/lib/take-home.container.tsx",
+        "apps/web/src/lib/take-home.view.tsx",
+        "apps/web/src/styles.css",
+        "apps/web/test/native-pair.boundary.test.ts"
+      ],
+      "postcondition": "Previous successful answer survives edit/retry and is visibly out of date; exact explicit success restores current state."
+    },
+    {
+      "decision": "Change required",
+      "surface": "native test exception and enforcement",
+      "owners": [
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts"
+      ],
+      "postcondition": "Only named native Playwright method allowed; unrelated receiver and leaf still rejected."
+    },
+    {
+      "decision": "Change required",
+      "surface": "current owners and task/proof routes",
+      "owners": [
+        "apps/web/README.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/verification/critical-journeys.json",
+        "docs/documentation-audit/README.md"
+      ],
+      "postcondition": "Agreed stale-answer behaviour replaces the earlier clearing behaviour; T004 remains in progress."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "retained results and public contracts",
+      "owners": [
+        "packages/core",
+        "packages/rules",
+        "packages/calculators",
+        "packages/api/rpc",
+        "packages/api/http",
+        "packages/sdk/typescript",
+        "packages/docs-content"
+      ],
+      "reason": "No fact, rule, result, RPC/HTTP/OpenAPI, SDK/export or public content contract change."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "provider configuration, operations and canonical skills",
+      "owners": [
+        "apps/api",
+        "apps/docs",
+        "packages/infrastructure",
+        "alchemy.apps.run.ts",
+        "alchemy.apps.local.run.ts",
+        "docs/runbooks",
+        "docs/operations",
+        ".agents/skills",
+        ".github/workflows"
+      ],
+      "reason": "Disabled platform policy, native lifetime/config, docs operations, shared datasets and authority stay unchanged."
+    },
+    {
+      "decision": "N/A",
+      "surface": "Changeset",
+      "reason": "Private app display/state and qualification only; no published package interface."
+    }
+  ],
+  "limitations": [
+    "T004 remains in progress for other calculator pages, breakdown/assumptions/sources, complete interface and transport-limit qualification.",
+    "Only local browser/native behaviour qualified; no provider, deployment or publication proof.",
+    "Controlled unavailable browser reply qualifies client display behaviour, not a new upstream failure implementation.",
+    "Safe exported native tracing remains unmet in T009; caller cancellation does not establish upstream cancellation.",
+    "Medicare decision unresolved; retained results unchanged."
+  ],
+  "rollback": {
+    "identity": "ab145823ac7a83afb55daf8978d8c03e6a4e9bed",
+    "action": "Revert this private Website slice; exact source fixtures/scoped processes restore/stop locally. No provider recovery action authorised."
+  },
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for bounded previous-answer slice; whole T004 incomplete",
+    "observations": [
+      "Use native retained-success state; no additional browser storage/history or duplicate cache.",
+      "Positive actual answer and no-request editing/reverting checks prevent fake stale state from passing.",
+      "Both browser and actual Worker-generated server submissions retain answers on retry failures.",
+      "Errors still clear on edit and unfinished operations still interrupt; native suite verifies preserved journeys."
+    ],
+    "remaining": "Hosted candidate proof, draft review, remaining T004 pages/interface/transport requirements and DEV-76–81."
+  },
+  "postCheckChanges": {
+    "scope": "Active plan and dated receipt only after full verification; executable sources unchanged.",
+    "verification": "Pass: docs/runbooks/root format/Changeset status and whitespace after plan/receipt updates; receipt-only docs repeated before commit."
+  },
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 71,
+      "sha256": "2e99e6d704cc14caccebf0d63663d5e0b8acfe31582c1944ebb4be5bbe498534"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 14,
+      "sha256": "e22a1e44c7e995f51d8541bd3fbd74ef7ce918d52b5ab3f45adde6c2823a1542"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 3,
+      "sha256": "711daf55c21f020783b51416378c5b72fb5be560780a89ba34472a0a4379ff54"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 14,
+      "sha256": "3662688a4a8d3f4c5d42dc2cb23465609f305637cc6d457d960475ff82af5c50"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "57f03295bccc40314378c9061fc283be52538eab75efc52673510734cf27a8a7"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "4cd8c58b7fe7940c7169d1924aaabd60c63f85b8708bcbfe0d02524f69f008b2"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "c13962c1c74969daef0aff2948c50569ddeec9ef94c3f677e0387e473bdb0044"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "5c602294c0630779e8b37405b1fa20479f391ad8f162bb37365582d30f2f280a"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular file under each named root."
+}

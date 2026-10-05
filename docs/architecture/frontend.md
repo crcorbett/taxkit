@@ -67,7 +67,8 @@ its operation on unmount; the leaf renders readonly values and callbacks.
 Explicit Calculate reaches POST `/rpc` directly in the browser and uses the
 native private Fetcher binding for a standard server HTML form. Both calls
 reach the API's shared named operation. Neither initial rendering nor editing
-calculates. Editing interrupts work and removes a previous answer. The form
+calculates. Editing interrupts work and retains the last successful answer,
+visibly marked out of date until a successful explicit calculation. The form
 works without JavaScript. Schema-encoded submissions restore checked outcomes
 through TanStack's native server request context; no Effect Context or native
 binding crosses into loader data.
@@ -311,3 +312,11 @@ Native settings ingress admits the function's own generated URL, without
 copying its build ID. Unknown IDs, extra path parts and missing IDs get empty
 404 responses before TanStack lookup; its native lookup otherwise logs unknown
 IDs even when the response body hides them.
+
+The answer container uses native `AsyncResult.value` to retain the last success
+through refresh, failure and interruption. Submit does not reset that history.
+A checked server-submitted answer supplies the fallback before the first browser
+success. The readonly leaf renders a named semantic `output` with an atomic
+polite announcement for both answer and out-of-date state. This state stays in
+the current React registry/checked submission; it is not browser storage or a
+URL. Expected errors still clear on editing and unfinished work still cancels.

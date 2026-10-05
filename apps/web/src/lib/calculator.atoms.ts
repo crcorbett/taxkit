@@ -60,7 +60,8 @@ export const editTakeHomeAtom = Atom.fnSync<TakeHomeForm>()((form, get) => {
 });
 export const submitTakeHomeAtom = Atom.fnSync<"calculate">()((_, get) => {
   const request = takeHomeRequestFromForm(get(takeHomeFormAtom));
-  get.set(calculateAtom, Atom.Reset);
+  // Native AsyncResult retains the last success during refresh/failure.
+  // Reset would erase that answer when invalid input prevents a new request.
   get.set(showCalculationAtom, true);
   get.set(showServerResultAtom, false);
   if (Result.isFailure(request)) {

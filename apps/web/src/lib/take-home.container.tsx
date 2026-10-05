@@ -35,22 +35,27 @@ export const TakeHomeCalculator = ({
     () => () => controlCalculation(Atom.Interrupt),
     [controlCalculation]
   );
-  const report = useMemo(() => {
-    if (showCalculation) {
-      return AsyncResult.isSuccess(calculation)
-        ? Option.some(calculation.value.report).pipe(
-            Option.filter(Schema.is(TakeHomePayReport))
+  const report = useMemo(
+    () =>
+      AsyncResult.value(calculation).pipe(
+        Option.map((value) => value.report),
+        Option.orElse(() =>
+          saved.pipe(
+            Option.flatMap((value) => Result.getSuccess(value.result)),
+            Option.map((value) => value.report)
           )
-        : Option.none();
-    }
-    return showServerResult
-      ? saved.pipe(
-          Option.flatMap((value) => Result.getSuccess(value.result)),
-          Option.map((value) => value.report),
-          Option.filter(Schema.is(TakeHomePayReport))
-        )
-      : Option.none();
-  }, [showCalculation, showServerResult, calculation, saved]);
+        ),
+        Option.filter(Schema.is(TakeHomePayReport))
+      ),
+    [calculation, saved]
+  );
+  const stale =
+    Option.isSome(report) &&
+    !showServerResult &&
+    (!showCalculation ||
+      calculation.waiting ||
+      !AsyncResult.isSuccess(calculation) ||
+      Option.isSome(formError));
   const message = useMemo(() => {
     if (Option.isSome(formError)) {
       return formError;
@@ -86,6 +91,7 @@ export const TakeHomeCalculator = ({
       busy={showCalculation && calculation.waiting}
       message={Option.getOrUndefined(message)}
       report={report}
+      stale={stale}
       onEdit={edit}
       onCalculate={() => submit("calculate")}
     />

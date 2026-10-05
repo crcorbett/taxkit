@@ -1147,3 +1147,25 @@ because the pinned Vite watcher suppresses repeat file-change events within
 The dated receipt retains the original hosted restoration timeout and the
 direct watcher reproduction; a locally passing run does not turn that failed
 hosted attempt into a success.
+
+
+### Previous calculator answer qualification
+
+The native pair fixture also checks T004's deliberate answer behaviour. After
+an actual successful browser calculation, editing retains the answer with an
+out-of-date message and makes no request. Returning to the original figures
+still requires Calculate; one new real RPC clears the stale message and returns
+the retained answer. A controlled unavailable reply and an invalid form must
+keep the previous answer visible and out of date. A fresh Chromium context
+hydrates the actual Worker-generated successful submission HTML, makes no
+replayed calculation, and retains that answer after editing and a failed retry.
+The semantic `output` has a name and atomic polite announcements.
+
+The server-restored browser input's named Playwright `fill` call is admitted
+only at the existing native fixture. Actual CLI cases admit that receiver there,
+reject a different receiver there, and reject the same receiver at the leaf.
+Runtime and other collection permissions remain unchanged. The existing
+interruption/route cleanup and private JavaScript-free paths must still pass.
+The [dated receipt](../documentation-audit/clean-slate-foundation/2026-10-05-stale-calculator-answer.json)
+owns candidate and removal/restoration observations. This does not complete
+T004's other calculators, breakdown/sources, package interface or transport limits.

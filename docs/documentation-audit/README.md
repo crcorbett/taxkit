@@ -412,3 +412,8 @@ The [native connection acceptance review](clean-slate-foundation/2026-10-05-nati
 accepts T003 locally against its named criteria and bounded source/runtime
 proof. T009 safe exports, exact candidate hosted correction and DEV-75–81 remain
 separate unfinished work.
+
+The [previous calculator answer candidate](clean-slate-foundation/2026-10-05-stale-calculator-answer.json)
+records T004's visible out-of-date answer, explicit recalculation, failed/invalid
+retry and server-submission hydration behaviour. Other calculator pages and
+T004's remaining interface/transport work remain unfinished.

@@ -8,6 +8,7 @@ export const TakeHomeFormView = ({
   busy,
   message,
   report,
+  stale,
   onEdit,
   onCalculate,
 }: {
@@ -15,6 +16,7 @@ export const TakeHomeFormView = ({
   readonly busy: boolean;
   readonly message: string | undefined;
   readonly report: Option.Option<TakeHomePayReport>;
+  readonly stale: boolean;
   readonly onEdit: (form: TakeHomeForm) => void;
   readonly onCalculate: () => void;
 }) => (
@@ -74,9 +76,16 @@ export const TakeHomeFormView = ({
       </button>
     </form>
     {message && <p role="alert">{message}</p>}
-    <div aria-live="polite">
+    <output
+      aria-atomic="true"
+      aria-label="Calculation result"
+      aria-live="polite"
+    >
+      {Option.isSome(report) && stale && (
+        <span>This answer is out of date. Calculate again to update it.</span>
+      )}
       {Option.isSome(report) && (
-        <p>
+        <span>
           Take-home pay:{" "}
           <strong>
             {new Intl.NumberFormat("en-AU", {
@@ -84,8 +93,8 @@ export const TakeHomeFormView = ({
               style: "currency",
             }).format(report.value.netPay.cents / 100)}
           </strong>
-        </p>
+        </span>
       )}
-    </div>
+    </output>
   </section>
 );

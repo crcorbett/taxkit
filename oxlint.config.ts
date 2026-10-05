@@ -682,6 +682,11 @@ export default defineConfig({
                 method: "fill",
                 receiver: "errorPayInput",
               },
+              {
+                file: "apps/web/test/native-pair.boundary.test.ts",
+                method: "fill",
+                receiver: "savedPayInput",
+              },
             ],
           },
         ],

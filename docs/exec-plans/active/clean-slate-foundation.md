@@ -74,8 +74,8 @@ records command outcomes and log digests.
 | --- | --- | --- |
 | T001 / DEV-72 | Implemented and locally tested | Retention, admission and diagnostic checks pass; draft PR review pending. |
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
-| T003 / DEV-74 | Complete locally; review/hosted readback outstanding | Native RPC, matching API/Website, failure/cancellation, development and explicit platform containment pass. T009 exported tracing remains unmet. Linear state unchanged. |
-| T004 / DEV-75 | Ready after local T003 acceptance | All three calculators and deliberate public interface changes. |
+| T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
+| T004 / DEV-75 | In progress after local T003 acceptance | Previous answer/stale-state candidate first; remaining calculator pages, breakdown/sources and transport/interface qualification follow. |
 | T005 / DEV-76 | Pending T003/T004 | Accepted content, route retention, search and discovery. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
@@ -2256,3 +2256,63 @@ separate. T009 still owns CSF-009 safe exported tracing and remains unmet;
 DEV-75–81, provider delivery and the Medicare choice remain unfinished. Begin
 T004 without treating a draft or this task milestone as the persistent goal's
 completion.
+
+
+## T004 previous calculator answer candidate
+
+Continue from containment draft #136 at
+`ab145823ac7a83afb55daf8978d8c03e6a4e9bed` on
+`codex/dev-75-stale-calculator-answer`. Its exact hosted Quality run
+`37257851322`, job `111598645867`, succeeds at that exact parent head, completed
+`2026-10-05T03:19:58Z`. This also qualifies the hosted source-restoration
+correction; failed #135 stays failed. Current T004 candidate proof is separate.
+
+Implement the agreed Q10–Q12 answer behaviour before expanding other pages.
+Native AsyncResult already retains the last success through refresh, failure
+and interruption. Remove the submit reset, derive the retained report in the
+policy container, keep checked server-submission success as its fallback, and
+render it in the readonly leaf with a visible out-of-date message and named
+semantic output. Editing still interrupts; initial rendering/editing/reverting
+figures still calculate nothing. A successful explicit calculation clears the
+message; failed/invalid retries retain it. No new browser storage or URL state.
+
+Documentation impact: **Change required** for Website atom/container/leaf/style,
+existing actual native fixture, exact named server-restored Playwright input
+permission and CLI canaries, app/frontend/testing owners, task/journey/evidence.
+**Preserve** canonical tax facts/results, SDK/RPC/HTTP contracts, cancellation,
+fixed reports/disabled platform policy, docs resources/content, skills,
+provider authority and runbooks. **N/A** Changeset: private app behaviour only.
+
+First full native suite passes all six tests in 39.71 seconds. The expanded
+native pair check then passes in 5.45 seconds: actual browser success, stale
+editing/reverting, one successful fresh RPC, unavailable/invalid retry, plus
+actual successful server-submission HTML hydration and failed retry. The first
+lint attempt required semantic `output` rather than a status role on a div;
+that correction passes the real native suite. The expanded lint attempt also
+rejects the new named server-restored input's native `fill` method. Admit only
+that exact receiver/path and qualify accepted/rejected CLI cases; do not widen
+runtime or general collection permissions. Removal proof and repository
+closeout pass below. T004 remains in progress; all three pages and complete
+later requirements are not claimed.
+
+
+All 470 actual CLI lint cases pass, including 406 portable cases. The new named
+fixture call is accepted; an unrelated receiver there and the same receiver
+at the leaf are rejected. Removing previous-success reading and rebuilding the
+native artifacts fails the actual stale-answer browser observation after an
+edit. Restoring the old submit reset and rebuilding fails the invalid-form
+assertion: the previous answer disappears. The unavailable-retry positive check
+still passes in that mutation, so do not mislabel the removal failure. Exact
+source restoration, fresh artifacts and the saved native browser test pass in
+4.15 seconds.
+
+Repository closeout passes: 470 CLI lint cases (406 portable), 27 app/package
+test tasks (4 fresh, 23 cached), 16 build tasks (1 fresh, 15 cached), fresh API
+smoke with cached prerequisites, and full verification. Verification freshly
+runs 32 Quality cases including 13 isolated copies in 485.30 seconds, both
+unused-code checks, four changed type tasks (23 cached), actual Worker type
+checks and all six native tests in 41.83 seconds. SDK's 24 browser checks and
+the Website's eight browser checks are replayed from cache in that command;
+the Website checks were freshly run for this slice in 2.67 seconds. This is
+local proof for the stale-answer slice, with exact source/artifact identities
+in the dated receipt. Hosted candidate proof and draft review remain pending.

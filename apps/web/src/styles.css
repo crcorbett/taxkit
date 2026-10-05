@@ -56,3 +56,10 @@ a {
   background: #ffffff;
   padding: 0.15rem 0.35rem;
 }
+
+.home output {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
