@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4506CFCZAFAM39NZDGDXYV3",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-74-native-trace-containment",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/api/README.md",
+    "apps/api/src/worker.ts",
+    "apps/web/README.md",
+    "apps/web/test/native-local-development.boundary.test.ts",
+    "apps/web/wrangler.jsonc",
+    "docs/architecture/configuration.md",
+    "docs/architecture/deployment.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "packages/infrastructure/README.md",
+    "packages/infrastructure/src/apps-stack.test.ts",
+    "packages/infrastructure/src/apps-stack.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 8907335,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 459047936,
+    "output_tokens": 2038080,
+    "api_call_count": 3064
+  }
+}

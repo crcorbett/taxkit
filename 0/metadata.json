@@ -1,0 +1,36 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4506CFCZAFAM39NZDGDXYV3",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-05T03:02:30.089954Z",
+  "branch": "codex/dev-74-native-trace-containment",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/api/README.md",
+    "apps/api/src/worker.ts",
+    "apps/web/README.md",
+    "apps/web/test/native-local-development.boundary.test.ts",
+    "apps/web/wrangler.jsonc",
+    "docs/architecture/configuration.md",
+    "docs/architecture/deployment.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "packages/infrastructure/README.md",
+    "packages/infrastructure/src/apps-stack.test.ts",
+    "packages/infrastructure/src/apps-stack.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "b7d70ba853ae",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 8907335,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 459047936,
+    "output_tokens": 2038080,
+    "api_call_count": 3064
+  }
+}
