@@ -12,36 +12,6 @@
       "mutation": "Restore the volatile active-migration lifecycle and specific active SPEC/task/plan paths that would stale at closeout."
     },
     {
-      "id": "partial-skill-tree",
-      "expectedInvariant": "canonical-skill-tree",
-      "mutation": "Remove one canonical skill-tree entry."
-    },
-    {
-      "id": "stale-skill-tree",
-      "expectedInvariant": "canonical-skill-tree",
-      "mutation": "Change a canonical skill without updating its receipt."
-    },
-    {
-      "id": "unexpected-overlay",
-      "expectedInvariant": "skill-overlay",
-      "mutation": "Add a local canonical-tree difference outside the two permitted profiles."
-    },
-    {
-      "id": "copied-claude-link",
-      "expectedInvariant": "claude-link",
-      "mutation": "Replace a relative Claude symlink with a copied folder."
-    },
-    {
-      "id": "absolute-claude-link",
-      "expectedInvariant": "claude-link",
-      "mutation": "Point a Claude link at an absolute filesystem path."
-    },
-    {
-      "id": "missing-reference",
-      "expectedInvariant": "skill-reference",
-      "mutation": "Remove a Markdown-linked local skill member."
-    },
-    {
       "id": "false-external-claim",
       "expectedInvariant": "external-claim",
       "mutation": "Claim hosted or external success from the local gate."

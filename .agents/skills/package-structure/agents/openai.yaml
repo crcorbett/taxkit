@@ -1,4 +1,0 @@
-interface:
-  display_name: "Package Structure"
-  short_description: "Scaffold and audit strict Effect package boundaries"
-  default_prompt: "Use $package-structure to scaffold or audit an Effect package with explicit exports, deterministic Layers, and repository-local source conditions."

@@ -59,7 +59,7 @@ retaining HGI-206 as the previous route, and preserving every terminal receipt.
 
 DCD-002 intentionally changes the docs-maintainer repository-profile overlay,
 repository harness profile, runbook inventory and deployment proof route. The
-current overlay digest in `tools/skills/canonical-skill-baseline.json` is
+historical overlay digest in the candidate's `tools/skills/canonical-skill-baseline.json` was
 refreshed together with the exact current six-skill tree readback. That
 readback also reconciles the repository's previously unreceipted
 `prd-implementer` goal-language change; prior HFI receipts and HGI evidence

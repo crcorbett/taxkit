@@ -34,8 +34,7 @@ The current repository baseline is canonical root verification:
 
 ```bash
 bun run verification
-bun run knip:production
-bun run test:skills
+
 ```
 
 Root verification includes lint, format, both Knip graphs and workspace type
@@ -53,24 +52,14 @@ graph by ownership. Root verification also typechecks and executes
 the root repository-path gate, which scans
 Git-tracked readable text and safely reports only repository-relative file,
 positive line and closed finding category. Binary files are identified by a
-NUL byte or failed strict UTF-8 decode and skipped. For skill governance it
-also runs `test:skills`, which validates required policy language and rejects
-stale provider-wrapper examples. The root graph also runs
-`check:harness-governance` exactly once. That Effect-native gate decodes the
-TaxKit profile, structured HE findings/crosswalk, canonical skill receipt, and
-critical-journey inventory at filesystem ingress, then checks local skill-tree
-digests, the two permitted profile overlays, the two declared extras, eight
-relative Claude links, the maintained lifecycle with stable spec/plan index
-owners, self-contained references, portable runtime paths, and external
-non-claims. Its positive and adversarial corpus is owned by
-`tools/governance/`; focused type and test commands are
+NUL byte or failed strict UTF-8 decode and skipped. Shared skills come from the latest plugin through `docs/skills.md`; checks
+for copied skill text, tree digests, overlays and aliases have been removed.
+The root graph runs `check:harness-governance` exactly once. It checks the
+TaxKit profile, accepted findings and task mappings, critical journeys and
+external non-claims. Its focused type and test commands remain
 `check:harness-governance:types` and `test:harness-governance`.
-Target-specific requalification is separately owned by
-`check:harness-foundation-epoch` and its focused TypeScript check. That command
-binds one immutable candidate to complete validator sources, the canonical
-skill and journey projections, retained failures, five receipts, fresh
-independent review, clocks, limitations and non-claims. It is a closeout check,
-not another root-verification or Quality-workflow edge.
+The retained HFI and HGI evaluation records describe their original candidate
+only; they do not select or validate the current plugin version.
 For docs, `apps/docs` type checking also
 typechecks checked examples,
 and dependent package builds run before type checks through Turbo.
@@ -571,7 +560,7 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   values from neutral fragments so the checker and its tests remain inside the
   policy they prove. Reports must never include matched text, usernames,
   process stderr or surrounding content.
-- Repo-owned skill changes must pass `bun run test:skills` and the skill
+- Repo-owned skill changes must pass the skill
   validator. Canonical baseline or repository-profile changes must also pass
   `bun run check:harness-governance`, which compares only repository-local
   paths with the content-addressed receipt and never reads a user home or

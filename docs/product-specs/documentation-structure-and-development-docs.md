@@ -91,7 +91,7 @@ future work is implementation debt, spec debt or stale planning.
 
 ## Acceptance criteria
 
-- `.agents/skills/prd-writer` and `.agents/skills/prd-implementer` exist and
+- `development-workflows:prd-writer` and `development-workflows:prd-implementer` exist and
   route to TaxKit docs.
 - `docs/design-docs/`, `docs/exec-plans/`, `docs/product-specs/` and
   `docs/references/` have canonical entrypoints.

@@ -161,7 +161,7 @@ output plus promise and throw handling, and emits safe tagged errors.
 generic value into its canonical content Schemas. Neither package executes a
 runtime; `apps/docs` composes the Layers and runs the server Effect.
 
-Use [the repo-owned effect client wrapper skill](../../.agents/skills/effect-client-wrapper/SKILL.md)
+Use [the repo-owned effect client wrapper skill](https://github.com/crcorbett/commonplace-plugins/blob/main/plugins/development-workflows/skills/effect-client-wrapper/SKILL.md)
 when introducing or reviewing a provider adapter. Its canonical example and
 stale-pattern audit are acceptance requirements, not an optional template.
 

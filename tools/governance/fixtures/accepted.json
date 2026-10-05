@@ -2,29 +2,6 @@
   "schemaVersion": "1",
   "expected": {
     "findings": ["HE-001", "HE-002", "HE-003", "HE-004"],
-    "skills": [
-      "docs-maintainer",
-      "effect-client-wrapper",
-      "package-structure",
-      "prd-implementer",
-      "prd-review",
-      "prd-writer"
-    ],
-    "overlays": [
-      ".agents/skills/docs-maintainer/references/repository-profile.md",
-      ".agents/skills/package-structure/references/repository-profile.md"
-    ],
-    "extras": ["docs-writer", "portless"],
-    "claudeLinks": [
-      "docs-maintainer",
-      "effect-client-wrapper",
-      "package-structure",
-      "prd-implementer",
-      "prd-review",
-      "prd-writer",
-      "docs-writer",
-      "portless"
-    ],
     "journeys": [
       "taxkit-calculator-direct",
       "taxkit-sdk-packed",

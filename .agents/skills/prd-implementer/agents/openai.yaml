@@ -1,4 +1,0 @@
-interface:
-  display_name: "PRD Implementer"
-  short_description: "Implement specs in verified sequential slices"
-  default_prompt: "Use $prd-implementer to execute this SPEC task by task with repository-specific verification."

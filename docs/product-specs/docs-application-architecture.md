@@ -623,8 +623,7 @@ bun run docs:build
 bun run --filter=docs test:browser
 bun run --filter=docs test:built
 bun run knip
-bun run knip:production
-bun run test:skills
+
 bun run check:docs
 bun run check:repository-paths
 bun run verification
@@ -749,7 +748,7 @@ only.
 | Architecture and standards | Change required | `docs/architecture/{package-ownership,package-boundaries,effect-services,frontend,content-and-posts,testing-and-quality}.md`, `docs/standards/{code-patterns,tooling}.md` | Architecture owners change; standards are preserved unless a focused rule needs clarification. `DOCS-APP-001` through `DOCS-APP-006`. |
 | Runbooks and operations | Change required | `docs/runbooks/README.md`, `docs/runbooks/release-readiness.md`, `tools/documentation/runbook-contract.json`, `tools/documentation/runbook-{check.runtime,policy}.ts` | Apply only the approved `DOCS-APP-004` journey-epoch amendment: bind immutable HGI-203 to `docs/evidence/releases/HGI-203-critical-journeys.json`, schema-validate the evolving current owner independently, and preserve every original packet/receipt byte. No operational command, environment, credential, deployment, recovery or authority-stop change. |
 | Proof and evidence | Change required | `docs/verification/critical-journeys.json`, `docs/evidence/releases/HGI-203-critical-journeys.json`, immutable HGI-203 packet/receipts, `docs/architecture/testing-and-quality.md`, current app browser harness, future execution-plan screenshot directory | Preserve the original HGI-203 evidence unchanged while retaining its exact journey snapshot; correct the current docs journey oracle and add built-app evidence ownership in `DOCS-APP-004` through `DOCS-APP-006`. The only committed browser artifacts are the bounded `DAR-013` manifest/PNG set carried by the evidence-only closeout commit and moved with the plan from active to completed; transient builds, videos, traces, logs and unbounded/raw browser output are not committed. |
-| Skills, AGENTS and metadata | Change required | `.agents/skills/docs-maintainer/references/repository-profile.md`, `AGENTS.md`, `.claude/skills/docs-maintainer` | Update the local docs-maintainer profile paths/commands in `DOCS-APP-001` and `DOCS-APP-006`. Preserve `AGENTS.md`, skill implementation and relative instruction links; no skill baseline migration. |
+| Skills, AGENTS and metadata | Change required | `docs/skill-profiles/docs-maintainer.md`, `AGENTS.md`, `development-workflows:docs-maintainer` | Update the local docs-maintainer profile paths/commands in `DOCS-APP-001` and `DOCS-APP-006`. Preserve `AGENTS.md`, skill implementation and relative instruction links; no skill baseline migration. |
 | Lint, config and CI | Change required | `knip.json`, `knip.production.json`, `turbo.json`, `oxlint.config.ts`, `package.json`, `.github/workflows/quality.yml` | Model generation, docs workspaces and the verified app-owned built-app harness invocation in `DOCS-APP-004` and `DOCS-APP-006`. Existing Quality workflow inherits canonical verification; no new deployment job. |
 | SPEC, tasks and lifecycle | Change required | this SPEC, sibling tasks, `docs/product-specs/index.md`, `docs/exec-plans/{active,completed}/README.md` | The implemented SPEC/tasks/index and historical plan agree; the bounded evidence moved with the plan only after all `DOCS-APP-006` proof passed. |
 | Tests and fixtures | Change required | current docs-content validation tests, docs-fumadocs tests, app route-boundary tests and browser config | Add deterministic live/test substitution, malformed/missing fixtures, import audits and built-app journeys in `DOCS-APP-001` through `DOCS-APP-006`. |

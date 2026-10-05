@@ -1,7 +1,0 @@
-import { assert, describe, it } from "@effect/vitest";
-import { Effect } from "effect";
-import { __SYMBOL__Api } from "../src/api";
-
-describe("__SYMBOL__ HTTP API", () => {
-  it.effect("owns one API contract", () => Effect.sync(() => assert.ok(__SYMBOL__Api)));
-});

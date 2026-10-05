@@ -116,8 +116,6 @@
     "test:repository-paths:task": "bun test tools/repository-paths",
     "test:quality-workflow": "turbo run //#test:quality-workflow:task",
     "test:quality-workflow:task": "bun test tools/quality-workflow",
-    "test:skills": "turbo run //#test:skills:task",
-    "test:skills:task": "bun test tools/skills",
     "test:release-readiness": "bun run --filter=@taxkit/scripts test -- release-readiness",
     "sdk:check-packed-artifact": "turbo run check-packed-artifact --filter=@taxkit/sdk",
     "sdk:validate-downstream": "turbo run validate:downstream --filter=@taxkit/sdk",
@@ -125,7 +123,7 @@
     "docs:test:browser": "turbo run test:browser --filter=docs",
     "changeset:status": "turbo run //#changeset:status:task",
     "changeset:status:task": "changeset status --verbose",
-    "verification": "bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow && bun run check:docs:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run check:docs-deployment:types && bun run check:docs-deployment-tools:types && bun run check:docs-deployment && bun run check:docs-deployment-automation && bun run test:docs-deployment && bun run lint && bun run format:check && bun run test:skills && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types",
+    "verification": "bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow && bun run check:docs:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run check:docs-deployment:types && bun run check:docs-deployment-tools:types && bun run check:docs-deployment && bun run check:docs-deployment-automation && bun run test:docs-deployment && bun run lint && bun run format:check && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types",
     "version-packages": "changeset version",
     "version-repo": "changeset version"
   },

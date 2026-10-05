@@ -1,23 +1,13 @@
 import { describe, expect, it } from "bun:test";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
-import {
-  Array as EffectArray,
-  Effect,
-  Record as EffectRecord,
-  Result,
-  Schema,
-} from "effect";
+import { Array as EffectArray, Effect, Result, Schema } from "effect";
 
 import { checkHarnessGovernance } from "./check.runtime.js";
 import acceptedFixture from "./fixtures/accepted.json";
 import adversarialFixture from "./fixtures/adversarial.json";
-import { inspectGovernance, portableTreeMode } from "./policy.js";
-import type {
-  GovernanceInputs,
-  GovernanceObservations,
-  TreeObservation,
-} from "./policy.js";
+import { inspectGovernance } from "./policy.js";
+import type { GovernanceInputs } from "./policy.js";
 import {
   GovernanceFixtureCorpus,
   RepositoryHarnessProfile,
@@ -43,36 +33,7 @@ const expectInvariant = (
   ).toBe(true);
 };
 
-const replaceCanonicalTree = (
-  observations: GovernanceObservations,
-  skillId: string,
-  tree: TreeObservation | null
-): GovernanceObservations => {
-  const canonicalTrees: Record<string, TreeObservation> = {};
-  for (const id of EffectRecord.keys(observations.canonicalTrees)) {
-    if (id !== skillId) {
-      const observation = observations.canonicalTrees[id];
-      if (observation !== undefined) {
-        canonicalTrees[id] = observation;
-      }
-    }
-  }
-  if (tree !== null) {
-    canonicalTrees[skillId] = tree;
-  }
-  return { ...observations, canonicalTrees };
-};
-
 describe("harness governance policy", () => {
-  it("normalizes host permissions to Git-portable tree modes", () => {
-    expect(portableTreeMode(0o600)).toBe(0o644);
-    expect(portableTreeMode(0o644)).toBe(0o644);
-    expect(portableTreeMode(0o654)).toBe(0o644);
-    expect(portableTreeMode(0o700)).toBe(0o755);
-    expect(portableTreeMode(0o744)).toBe(0o755);
-    expect(portableTreeMode(0o755)).toBe(0o755);
-  });
-
   it("accepts the repository and decodes the fixture corpus", async () => {
     const inputs = await loadAcceptedInputs();
     expect(inspectGovernance(inputs)).toEqual([]);
@@ -142,132 +103,12 @@ describe("harness governance policy", () => {
     );
   });
 
-  it("rejects partial and stale skill trees", async () => {
-    const inputs = await loadAcceptedInputs();
-    const observed = inputs.observations.canonicalTrees["prd-writer"];
-    expect(observed).toBeDefined();
-    expectInvariant(
-      {
-        ...inputs,
-        observations: replaceCanonicalTree(
-          inputs.observations,
-          "prd-writer",
-          null
-        ),
-      },
-      "canonical-skill-tree"
-    );
-    expectInvariant(
-      {
-        ...inputs,
-        observations: replaceCanonicalTree(
-          inputs.observations,
-          "prd-writer",
-          observed === undefined ? null : { ...observed, treeDigest: "stale" }
-        ),
-      },
-      "canonical-skill-tree"
-    );
-  });
-
-  it("rejects an unexpected or stale overlay", async () => {
-    const inputs = await loadAcceptedInputs();
-    expectInvariant(
-      {
-        ...inputs,
-        observations: {
-          ...inputs.observations,
-          overlays: [
-            ...inputs.observations.overlays,
-            {
-              path: ".agents/skills/prd-writer/SKILL.md",
-              sha256: "unexpected",
-            },
-          ],
-        },
-      },
-      "skill-overlay"
-    );
-  });
-
-  it("rejects copied and absolute Claude links", async () => {
-    const inputs = await loadAcceptedInputs();
-    const [first, ...rest] = inputs.observations.links;
-    const absoluteSkillPath = ["", "Users", "example", "skill"].join("/");
-    expect(first).toBeDefined();
-    if (first === undefined) {
-      return;
-    }
-    expectInvariant(
-      {
-        ...inputs,
-        observations: {
-          ...inputs.observations,
-          links: [{ ...first, type: "Directory" }, ...rest],
-        },
-      },
-      "claude-link"
-    );
-    expectInvariant(
-      {
-        ...inputs,
-        observations: {
-          ...inputs.observations,
-          links: [{ ...first, target: absoluteSkillPath }, ...rest],
-        },
-      },
-      "claude-link"
-    );
-  });
-
-  it("rejects broken references and user-specific runtime paths", async () => {
-    const inputs = await loadAcceptedInputs();
-    const personalSkillPath = [
-      "",
-      "Users",
-      "example",
-      ".agents",
-      "skills",
-    ].join("/");
-    expectInvariant(
-      {
-        ...inputs,
-        observations: {
-          ...inputs.observations,
-          missingReferences: [
-            {
-              source: ".agents/skills/docs-maintainer/SKILL.md",
-              target: "references/missing.md",
-            },
-          ],
-        },
-      },
-      "skill-reference"
-    );
-    expectInvariant(
-      {
-        ...inputs,
-        observations: {
-          ...inputs.observations,
-          portablePathFindings: [
-            {
-              source: ".agents/skills/docs-maintainer/SKILL.md",
-              target: personalSkillPath,
-            },
-          ],
-        },
-      },
-      "portable-runtime"
-    );
-  });
-
   it("rejects false external-state claims", async () => {
     const inputs = await loadAcceptedInputs();
     expectInvariant(
       {
         ...inputs,
         profile: { ...inputs.profile, nonClaims: ["Local checks passed."] },
-        receipt: { ...inputs.receipt, nonClaims: ["Local checks passed."] },
       },
       "external-claim"
     );
@@ -277,12 +118,6 @@ describe("harness governance policy", () => {
     expect(adversarialFixture.cases.map((entry) => entry.id)).toEqual([
       "missing-he-mapping",
       "invalid-profile",
-      "partial-skill-tree",
-      "stale-skill-tree",
-      "unexpected-overlay",
-      "copied-claude-link",
-      "absolute-claude-link",
-      "missing-reference",
       "false-external-claim",
     ]);
   });

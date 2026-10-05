@@ -78,8 +78,12 @@
       "dependsOn": ["@taxkit/docs-content#build"],
       "outputs": []
     },
-    "//#check:docs-deployment:task": { "outputs": [] },
-    "//#check:docs-deployment-automation:task": { "outputs": [] },
+    "//#check:docs-deployment:task": {
+      "outputs": []
+    },
+    "//#check:docs-deployment-automation:task": {
+      "outputs": []
+    },
     "//#check:docs-deployment-inventory:task": {
       "cache": false,
       "passThroughEnv": ["ALCHEMY_PROFILE", "CLOUDFLARE_*", "TAXKIT_*"]
@@ -104,24 +108,57 @@
       "cache": false,
       "passThroughEnv": ["TAXKIT_*"]
     },
-    "//#check:docs-deployment:types:task": { "outputs": [] },
-    "//#check:docs-deployment-tools:types:task": { "outputs": [] },
-    "//#check:docs:types:task": { "outputs": [] },
-    "//#check:effect-language-service:task": { "outputs": [] },
-    "//#check:harness-governance:task": { "outputs": [] },
-    "//#check:repository-paths:task": { "outputs": [] },
-    "//#check:repository-paths:types:task": { "outputs": [] },
-    "//#check:quality-workflow:task": { "outputs": [] },
-    "//#format:check:task": { "outputs": [] },
-    "//#lint:task": { "outputs": [] },
-    "//#test:documentation:task": { "outputs": [] },
-    "//#test:docs-deployment:task": { "outputs": [] },
-    "//#test:docs-boundaries:task": { "outputs": [] },
-    "//#test:oxlint:task": { "outputs": [] },
-    "//#test:repository-paths:task": { "outputs": [] },
-    "//#test:quality-workflow:task": { "outputs": [] },
-    "//#test:skills:task": { "outputs": [] },
-    "//#changeset:status:task": { "outputs": [] },
+    "//#check:docs-deployment:types:task": {
+      "outputs": []
+    },
+    "//#check:docs-deployment-tools:types:task": {
+      "outputs": []
+    },
+    "//#check:docs:types:task": {
+      "outputs": []
+    },
+    "//#check:effect-language-service:task": {
+      "outputs": []
+    },
+    "//#check:harness-governance:task": {
+      "outputs": []
+    },
+    "//#check:repository-paths:task": {
+      "outputs": []
+    },
+    "//#check:repository-paths:types:task": {
+      "outputs": []
+    },
+    "//#check:quality-workflow:task": {
+      "outputs": []
+    },
+    "//#format:check:task": {
+      "outputs": []
+    },
+    "//#lint:task": {
+      "outputs": []
+    },
+    "//#test:documentation:task": {
+      "outputs": []
+    },
+    "//#test:docs-deployment:task": {
+      "outputs": []
+    },
+    "//#test:docs-boundaries:task": {
+      "outputs": []
+    },
+    "//#test:oxlint:task": {
+      "outputs": []
+    },
+    "//#test:repository-paths:task": {
+      "outputs": []
+    },
+    "//#test:quality-workflow:task": {
+      "outputs": []
+    },
+    "//#changeset:status:task": {
+      "outputs": []
+    },
     "dev": {
       "cache": false,
       "persistent": true
