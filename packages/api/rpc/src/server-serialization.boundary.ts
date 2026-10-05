@@ -1,7 +1,16 @@
-import { ByteSize, Effect, Layer, Match, Option, Result, Schema } from "effect";
+import {
+  Array,
+  ByteSize,
+  Effect,
+  Layer,
+  Match,
+  Option,
+  Result,
+  Schema,
+} from "effect";
 import { RpcSerialization } from "effect/rpc";
 
-import { Calculate, ListCalculators } from "./group.js";
+import { TaxKitRpcGroup } from "./group.js";
 import { CalculatorRequestBodyLimit } from "./request-boundary.js";
 
 // Validate the native JSON parser's unknown envelopes before the native server
@@ -22,7 +31,12 @@ const RequestEnvelope = Schema.TaggedStruct("Request", {
   ).check(Schema.isMaxLength(32)),
   id: RequestIdentity,
   payload: Schema.Unknown,
-  tag: Schema.Literals([Calculate._tag, ListCalculators._tag]),
+  tag: Schema.Literals(
+    Array.map(
+      Array.fromIterable(TaxKitRpcGroup.requests.values()),
+      (procedure) => procedure._tag
+    )
+  ),
 });
 const RequestBytes = Schema.Union([Schema.String, Schema.Uint8Array]).check(
   Schema.makeFilter((bytes) =>

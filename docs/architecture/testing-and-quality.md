@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
@@ -1318,3 +1318,18 @@ owns candidate outcomes, failures, exact source/artifact identity and limits.
 Timers cannot force CPU pre-emption, and local proof does not establish provider
 or deployed behaviour. No broader decoder/encoder/Playwright lint exception is
 introduced: tests use existing exact transport boundaries and qualified receivers.
+
+
+### Complete named RPC qualification
+
+The existing RPC corpus now runs the reply-size/status/decoder/lifetime tests
+against all nine named operations. Valid complete replies exactly at 2 MiB
+succeed; crossing streams stop before their tail. Every operation tests stalled
+headers/body, earlier interruption, caller scope closure, credential/redirect
+policy, malformed JSON/result shapes and both older revisions. Controlled
+metadata failures prove fixed expected guidance and fixed remote defect values.
+The existing native pair test also calls all seven new metadata operations
+through the real built API Worker. Rule-list membership is compared without
+assuming the existing immutable collection's iteration order. The dated
+[receipt](../documentation-audit/clean-slate-foundation/2026-10-06-closed-rpc-operations.json)
+records qualification and remaining T004 limitations.

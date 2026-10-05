@@ -2,7 +2,13 @@ import { NodeServices } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
 import { CalculatorRpcRequestTooLarge } from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
-import { CalculatorRpcOrigin, MetadataQuery } from "@taxkit/api-rpc/schemas";
+import {
+  CalculatorRpcOrigin,
+  DescriptorFilterQuery,
+  GetCalculatorGraphRequest,
+  GetCalculatorRequest,
+  MetadataQuery,
+} from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
 import {
   Array,
@@ -237,6 +243,55 @@ describe("built native API and Website", () => {
               ])
             );
           })
+        );
+        // Exercise the seven additional checked calls against the real built Worker.
+        yield* Effect.gen(function* () {
+          const client = yield* TaxKitRpcClient;
+          const catalogue = yield* client.listCalculators(
+            MetadataQuery.make({})
+          );
+          const pay = Array.findFirst(
+            catalogue.calculators,
+            (calculator) => calculator.calculatorId === "au.pay.take-home"
+          ).pipe(
+            Option.getOrElse(() => expect.fail("Missing retained calculator"))
+          );
+          const request = GetCalculatorRequest.make({
+            calculatorId: pay.calculatorId,
+          });
+          expect(yield* client.getCalculator(request)).toEqual(pay);
+          const schema = yield* client.getCalculatorSchema(request);
+          expect(schema.calculator).toEqual(pay);
+          expect(schema.inputFacts.length).toBeGreaterThan(0);
+          const graph = yield* client.getCalculatorGraph(
+            GetCalculatorGraphRequest.make({ calculatorId: pay.calculatorId })
+          );
+          expect(graph.calculator).toEqual(pay);
+          expect(graph.edges.length).toBeGreaterThan(0);
+          expect(graph.validationIssues).toEqual([]);
+          const facts = yield* client.listFacts(
+            DescriptorFilterQuery.make({ calculator: pay.calculatorId })
+          );
+          expect(facts.facts.length).toBeGreaterThan(0);
+          const rules = yield* client.listRules(
+            DescriptorFilterQuery.make({ calculator: pay.calculatorId })
+          );
+          expect(rules.rules).toEqual(
+            expect.arrayContaining(Array.fromIterable(schema.rules))
+          );
+          expect(rules.rules).toHaveLength(schema.rules.length);
+          expect(yield* client.listJurisdictions()).toEqual({
+            jurisdictions: [{ code: "AU", title: "Australia" }],
+          });
+          expect(yield* client.listTaxYears(MetadataQuery.make({}))).toEqual({
+            taxYears: [{ jurisdiction: "AU", taxYear: "2025-26" }],
+          });
+        }).pipe(
+          Effect.provide(
+            TaxKitRpcClientLive(catalogueOrigin).pipe(
+              Layer.provide(FetchHttpClient.layer)
+            )
+          )
         );
         // Deliberately oversize only this controlled transport's encoded body;
         // preserve the actual native API and the checked catalogue operation.

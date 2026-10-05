@@ -450,3 +450,9 @@ The [shared calculation work candidate](clean-slate-foundation/2026-10-05-calcul
 records the eight-calculation pool and five-second operation policy, checked
 HTTP/RPC failures, native/browser/SDK proof and remaining T004 limits. It does
 not establish rate identity, MCP, deployment or publication.
+
+
+The [complete closed RPC candidate](clean-slate-foundation/2026-10-06-closed-rpc-operations.json)
+records the nine named canonical operations, shared reply/lifetime policy, old
+revision rejection and native metadata proof. Whole T004 and later tasks remain
+active; this record establishes no provider or public release state.

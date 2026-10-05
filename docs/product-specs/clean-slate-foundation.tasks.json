@@ -3,7 +3,7 @@
   "spec": "docs/product-specs/clean-slate-foundation.md",
   "title": "Clean slate TaxKit foundation \u2014 implementation slices",
   "status": "in_progress",
-  "last_reviewed": "2026-10-05",
+  "last_reviewed": "2026-10-06",
   "authority": "Cooper explicitly authorised implementation, reviewable commits and draft PRs on 2026-10-04. No merge, deploy or publication; provider-plan approval remains separate.",
   "principles": [
     "Retain tax rules/results and their proof while replacing application foundations.",
@@ -482,7 +482,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculator-pages.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-request-body-policy.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-client-response-policy.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculation-work-policy.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculation-work-policy.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-closed-rpc-operations.json"
       ]
     },
     {

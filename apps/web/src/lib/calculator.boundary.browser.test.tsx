@@ -103,8 +103,18 @@ describe("browser calculator lifetime", () => {
               Effect.onInterrupt(() => Effect.sync(cancelled))
             )
           ),
+          getCalculator: () => Effect.die("Metadata not used by this fixture"),
+          getCalculatorGraph: () =>
+            Effect.die("Metadata not used by this fixture"),
+          getCalculatorSchema: () =>
+            Effect.die("Metadata not used by this fixture"),
           listCalculators: () =>
             Effect.die("Catalogue not used by this fixture"),
+          listFacts: () => Effect.die("Metadata not used by this fixture"),
+          listJurisdictions: () =>
+            Effect.die("Metadata not used by this fixture"),
+          listRules: () => Effect.die("Metadata not used by this fixture"),
+          listTaxYears: () => Effect.die("Metadata not used by this fixture"),
         })
       );
       const registry = yield* Effect.acquireRelease(
@@ -147,8 +157,19 @@ describe("browser calculator lifetime", () => {
                 Effect.onInterrupt(() => Effect.sync(cancelled))
               )
             ),
+            getCalculator: () =>
+              Effect.die("Metadata not used by this fixture"),
+            getCalculatorGraph: () =>
+              Effect.die("Metadata not used by this fixture"),
+            getCalculatorSchema: () =>
+              Effect.die("Metadata not used by this fixture"),
             listCalculators: () =>
               Effect.die("Catalogue not used by this fixture"),
+            listFacts: () => Effect.die("Metadata not used by this fixture"),
+            listJurisdictions: () =>
+              Effect.die("Metadata not used by this fixture"),
+            listRules: () => Effect.die("Metadata not used by this fixture"),
+            listTaxYears: () => Effect.die("Metadata not used by this fixture"),
           })
         );
         const registry = yield* Effect.acquireRelease(
@@ -228,8 +249,19 @@ describe("browser calculator lifetime", () => {
             calculate: Effect.fn("TaxKitRpcClient.calculate")(() =>
               Effect.sync(called).pipe(Effect.andThen(Effect.fail(error)))
             ),
+            getCalculator: () =>
+              Effect.die("Metadata not used by this fixture"),
+            getCalculatorGraph: () =>
+              Effect.die("Metadata not used by this fixture"),
+            getCalculatorSchema: () =>
+              Effect.die("Metadata not used by this fixture"),
             listCalculators: () =>
               Effect.die("Catalogue not used by this fixture"),
+            listFacts: () => Effect.die("Metadata not used by this fixture"),
+            listJurisdictions: () =>
+              Effect.die("Metadata not used by this fixture"),
+            listRules: () => Effect.die("Metadata not used by this fixture"),
+            listTaxYears: () => Effect.die("Metadata not used by this fixture"),
           })
         );
         const submission = yield* Schema.encodeEffect(
@@ -301,8 +333,18 @@ describe("browser calculator lifetime", () => {
               )
             )
           ),
+          getCalculator: () => Effect.die("Metadata not used by this fixture"),
+          getCalculatorGraph: () =>
+            Effect.die("Metadata not used by this fixture"),
+          getCalculatorSchema: () =>
+            Effect.die("Metadata not used by this fixture"),
           listCalculators: () =>
             Effect.die("Catalogue not used by this fixture"),
+          listFacts: () => Effect.die("Metadata not used by this fixture"),
+          listJurisdictions: () =>
+            Effect.die("Metadata not used by this fixture"),
+          listRules: () => Effect.die("Metadata not used by this fixture"),
+          listTaxYears: () => Effect.die("Metadata not used by this fixture"),
         })
       );
       const registry = yield* Effect.acquireRelease(

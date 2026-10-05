@@ -62,7 +62,7 @@ export const calculatorRpcTransportFailure = (
     Match.orElse(() => new CalculatorRpcUnavailable())
   );
 
-// One concrete private HTTP adapter for both closed native operations. Keep
+// One concrete private HTTP adapter for all closed native operations. Keep
 // the native Protocol/parser/exit Schemas; count bytes before materialisation.
 export const boundedCalculatorRpcHttpClient = (client: HttpClient.HttpClient) =>
   client.pipe(

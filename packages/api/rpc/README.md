@@ -3,26 +3,26 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-rpc-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: RPC contracts, native codecs, clients, handlers, exports or transport proof change
 ---
 
 # `@taxkit/api-rpc`
 
 Private compiled Effect 4 RPC transport over the existing calculator service.
-It owns versioned calculation and catalogue operations, thin handlers and checked clients.
+It owns the complete nine named calculator-service operations, their revision agreement, thin handlers and checked clients.
 Tax definitions and calculation remain with `@taxkit/calculators` and rule
 packages. Both native app candidates now consume it. T003's bounded local
 connection acceptance is complete; T009 still owns safe exported tracing.
 
 ## Exports
 
-- `./group`: native `Calculate` and `ListCalculators` procedures and `TaxKitRpcGroup`.
+- `./group`: all nine native procedures and `TaxKitRpcGroup`.
 - `./schemas`: calculator-owned request/result/catalogue/query and content-owned navigation/path
   Schemas, checked API origin, contract version and ten-second deadline.
 - `./errors`: bounded expected, unavailable, invalid-response and deadline errors.
 - `./handlers`: handler Layer calling the corresponding named calculator service operation once.
-- `./service`: closed `TaxKitRpcClient.calculate` and `listCalculators` client contract.
+- `./service`: closed named client matching the existing calculator service.
 - `./server`: native POST `/rpc` Layer with JSON serialisation and checked ingress.
 - `./live`: configured protocol Layer with a native client scope per named operation;
   the app supplies its HttpClient.
@@ -47,7 +47,7 @@ payload failures use the procedure defect encoder.
 A supported codec hook replaces that path's encoding with a fixed safe value;
 the procedure also declares a safe defect Schema. No message framing is invented.
 
-The private reply codec marks only failures decoding either declared native operation exit.
+The private reply codec marks only failures decoding any declared native operation exit.
 Bad JSON and invalid result shapes become `CalculatorRpcInvalidResponse`.
 An unrelated adapter defect retains its identity; defects remain defects.
 The native exit/defect Schema identities and these paths are qualified on
@@ -56,7 +56,7 @@ Effect 4.0.0, whose RPC APIs remain marked unstable. Requalify on upgrades.
 A single ten-second budget includes headers and complete body decoding. Earlier
 caller interruption releases pending body work. Client resources belong to the
 operation scope; the protocol configuration belongs to the caller Layer.
-This package creates no runtime or Layer during either operation. A native Worker
+This package creates no runtime or Layer during any operation. A native Worker
 can suspend between requests, so a receive loop acquired by an earlier request
 must not be retained for later calls. Public calls omit credentials and reject
 redirects. The native HTTP transform sets exactly `/rpc`, avoiding the default
@@ -103,12 +103,12 @@ alone does not prove runtime behaviour.
 
 The catalogue operation reads `MetadataQuery` and returns the canonical
 `CalculatorCatalogResponse` through the same calculator service. It carries no
-pay figures and runs no calculation. Both declared procedures use the existing
+pay figures and runs no calculation. All nine declared procedures use the existing
 version, body/batch limits, safe error/defect encoding, operation-scoped native
 client, complete response deadline and credential/redirect/tracing policy.
-No generic callback or new message protocol is introduced. A minor Changeset
-records this private package interface addition; it performs no versioning or
-publication. Complete package/transport/domain qualification remains T004 work.
+The major Changeset records the complete required method set and revision 3;
+it performs no versioning or publication. Complete package/transport/domain
+qualification remains T004 work.
 
 The streamed native POST reader and native RPC byte admission share the same
 64 KiB constant. The check counts encoded bytes, including multi-byte text,
@@ -124,11 +124,11 @@ messages and manual retry guidance. Other unsuccessful statuses remain
 unavailable. The request is scoped through headers and bounded body reading,
 then released before native RPC decoding. No automatic calculation retries.
 
-Both closed JSON operations count encoded response bytes before materialisation
+All nine closed JSON operations count encoded response bytes before materialisation
 and accept at most 2 MiB, including native envelopes and JSON whitespace. This
 shared channel limit also protects calculator replies; the accepted SPEC records
 why. A crossing chunk stops the source before its tail. Content-Length cannot
-bypass it. Exact-limit valid native calculator/catalogue replies must decode;
+bypass it. Exact-limit valid native replies to every named operation must decode;
 multi-byte and progressive oversized replies return the checked size error.
 The decoder and unrelated-defect identity rules remain unchanged. This does not
 qualify future framed/streaming MCP replies or public SDK transport policy.
@@ -136,7 +136,7 @@ qualify future framed/streaming MCP replies or public SDK transport policy.
 The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
 calculation budget. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC revision `2` errors. Website guidance requests
+503/504 envelopes or canonical RPC revision `3` errors. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
 seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
@@ -144,3 +144,30 @@ browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
 control returns. Rate identity, per-client rate limits, MCP and full T004
 qualification remain unfinished.
+
+
+## Complete named operation contract
+
+Revision `3` exposes the existing calculation, calculator detail/schema/graph,
+catalogue, facts, rules, jurisdictions and tax-year operations. Each handler
+calls its corresponding application operation once. Request/result Schemas
+come from the calculator owner; no alternate metadata or calculation model is
+created. Revisions `1` and `2` are rejected before reaching the service. The
+required methods added to the closed service contract have a major Changeset.
+
+The group itself supplies the allowed native procedure tags and owning exit
+Schemas. One private concrete Effect transformation owns each generated native
+client scope, the ten-second complete-response deadline, credential/redirect/
+tracing policy and safe transport failure projection. It accepts an already
+constructed native operation Effect and exposes no raw-client callback.
+Request-error projection is reused only by the four methods whose existing
+calculator contract can fail that way. Defects remain defects with fixed safe
+wire values. The 2 MiB reader applies to every reply; calculations do not retry.
+
+The saved RPC corpus checks every named call for bad JSON/result shapes, exact
+and exceeded response size, rejected status, deadline, interruption, caller
+scope cleanup, fetch policy and old revisions. Native built-Worker proof checks
+all seven new metadata calls as well as retained catalogue/calculation journeys.
+Full qualification is recorded in the [dated receipt](../../../docs/documentation-audit/clean-slate-foundation/2026-10-06-closed-rpc-operations.json).
+Remaining body/work/rate and whole T004 requirements are separate; this slice
+adds no rate identity, metadata operation budget, MCP or provider operation.

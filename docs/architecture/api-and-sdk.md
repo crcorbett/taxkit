@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-api-sdk-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: API or SDK contracts, exports, lifetime or caller composition change
 ---
 
@@ -398,10 +398,10 @@ do not establish the later calculator UI, transport limits or whole-task accepta
 
 ## Native website RPC (T003 locally accepted)
 
-`@taxkit/api-rpc` owns versioned `Calculate` and `ListCalculators` procedures over canonical
-calculator request/result/query/catalogue Schemas. Its native server mounts POST
+`@taxkit/api-rpc` owns all nine named calculator-service procedures over canonical
+calculator request/result/query/metadata Schemas. Its native server mounts POST
 `/rpc` with JSON; handlers delegate to the corresponding
-`PublicCalculatorService.calculate` or `listCalculators` operation.
+named `PublicCalculatorService` operation.
 The protocol lives in the caller's Layer scope; each named operation acquires and
 releases its native generated client's receive loop. Expected
 calculator failures project to fixed reasons, while version disagreement,
@@ -528,13 +528,12 @@ The docs app should document:
 The private catalogue procedure delegates to
 `PublicCalculatorService.listCalculators` with the canonical `MetadataQuery`
 and `CalculatorCatalogResponse`. It carries no calculation facts. Native
-envelope admission uses only the declared Calculate/ListCalculators tags;
+envelope admission derives its allowed tags from the owning nine-procedure group;
 each operation retains the same checked version, safe defect handling, body
 limits, whole-response deadline, native client scope and fetch policy. The
-private reply decoder marks only the two owning native exit Schemas; an
+private reply decoder marks only the group's owning native exit Schemas; an
 unrelated adapter Schema error remains a defect. Public HTTP/OpenAPI and SDK
-interfaces do not change. Reading this list in the homepage remains active
-T004 work until its actual route is implemented and qualified.
+interfaces do not change. The Website consumes this catalogue through its existing server application.
 
 The native body reader and RPC byte admission share
 `CalculatorRequestBodyLimit` from `@taxkit/api-rpc/request-boundary`: 64 KiB.
@@ -548,7 +547,7 @@ work/rate/concurrency policy remain active T004 work. Existing empty
 bounded size-policy slice; they do not complete the accepted failure contract.
 
 The private RPC client owns one ten-second complete-response deadline and a
-2 MiB byte cap for both closed JSON replies. Its concrete native HTTP adapter
+2 MiB byte cap for all nine closed JSON replies. Its concrete native HTTP adapter
 scopes each request through status validation and bounded stream reading before
 reusing native Response/Protocol/exit codecs. HTTP 408, 413 and 429 have distinct
 checked errors with fixed codes, literal safe messages and manual retry guidance;
@@ -562,8 +561,16 @@ The [calculator-owned policy](../../packages/calculators/README.md#shared-calcul
 supplies one eight-calculation pool and five-second budget to the native HTTP/RPC
 instance and one per standalone HTTP router. Calculation errors use separately
 declared HTTP 503/504 envelopes; existing request failures keep 400 and metadata
-errors stay unchanged. RPC revision 2 preserves the canonical fixed capacity and
+errors stay unchanged. RPC revision 3 preserves the canonical fixed capacity and
 timeout errors. Website forms request manual retry. SDK Schemas re-export these
 errors, while local SDK execution keeps its caller-owned lifetime and tax results.
 The owning package records cleanup and CPU proof limits. Rate identity, standalone
 HTTP body admission and future MCP operations remain T004/T006 work.
+
+
+The [complete RPC contract](../../packages/api/rpc/README.md#complete-named-operation-contract)
+keeps the nine application methods closed and named. The existing group is the
+single source for native tag admission and owned reply-decoder identities.
+Its private operation transformation owns native receive-loop cleanup and safe
+transport policy over an already constructed Effect. It is not a client callback
+escape. Public HTTP/OpenAPI and local SDK operations keep their existing owners.

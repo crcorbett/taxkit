@@ -284,16 +284,16 @@ ten-second complete-response client deadline. The calculator-owned bounded
 Layer supplies one pool to the native HTTP/RPC host and one per standalone HTTP
 router. Each batch calculation takes a place; excess work fails without waiting.
 Metadata does not take a calculation place. Checked capacity/timeout failures
-use HTTP 503/504 and RPC revision 2. The five-second calculation limit includes
+use HTTP 503/504 and RPC revision 3. The five-second calculation limit includes
 scoped cleanup and rejects late success using monotonic elapsed time; it cannot
 force synchronous CPU pre-emption or guarantee remote cancellation. Direct
 engine/local SDK execution retains its existing lifetime and results. Scope and approximation of the
 native rate limiter must be documented. Metadata/content responses are bounded
 to 2 MiB at the client. The same 2 MiB cap applies to the private closed JSON
-RPC channel, including calculator replies and native framing: both operations
+RPC channel, including calculator replies and native framing: all nine calculator operations
 share the installed whole-response reader, so leaving calculator replies
 unbounded would retain the same memory risk. Exact-limit valid native replies
-for both operations and actual built-host retained reports must pass; this
+for every named operation and actual built-host retained reports must pass; this
 policy does not apply to future framed MCP streams without separate proof.
 Return checked 413/429/timeout failures with safe codes
 and retry guidance; do not retry calculations automatically. Qualify valid

@@ -1,24 +1,53 @@
 import {
   CalculatorRunServiceRequest,
+  DescriptorFilterQuery,
+  GetCalculatorGraphRequest,
+  GetCalculatorRequest,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
 import { ByteSize, Duration, Schema, SchemaGetter } from "effect";
 
 export {
+  CalculatorCatalogItem,
   CalculatorCatalogResponse,
+  CalculatorGraphResponse,
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
+  CalculatorSchemaResponse,
+  DescriptorFilterQuery,
+  FactsResponse,
+  GetCalculatorGraphRequest,
+  GetCalculatorRequest,
+  JurisdictionsResponse,
   MetadataQuery,
+  RulesResponse,
+  TaxYearsResponse,
 } from "@taxkit/calculators/schemas";
 export { DocsNavigation, DocsPagePath } from "@taxkit/docs-content/schemas";
 
-export const CalculatorRpcVersion = "2";
+export const CalculatorRpcVersion = "3";
 export const CalculatorRpcPayload = Schema.Struct({
   request: CalculatorRunServiceRequest,
   version: Schema.String.check(Schema.isMaxLength(32)),
 });
 export const CalculatorCatalogRpcPayload = Schema.Struct({
   query: MetadataQuery,
+  version: CalculatorRpcPayload.fields.version,
+});
+
+export const CalculatorMetadataRpcPayload = Schema.Struct({
+  request: GetCalculatorRequest,
+  version: CalculatorRpcPayload.fields.version,
+});
+export const CalculatorGraphRpcPayload = Schema.Struct({
+  request: GetCalculatorGraphRequest,
+  version: CalculatorRpcPayload.fields.version,
+});
+export const CalculatorDescriptorRpcPayload = Schema.Struct({
+  query: DescriptorFilterQuery,
+  version: CalculatorRpcPayload.fields.version,
+});
+export const CalculatorDiscoveryRpcPayload = Schema.Struct({
   version: CalculatorRpcPayload.fields.version,
 });
 

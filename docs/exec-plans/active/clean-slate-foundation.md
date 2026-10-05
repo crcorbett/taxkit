@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-implementation-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: task progress, dependency qualification, acceptance evidence or authority change
 ---
 
@@ -32,8 +32,9 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: finish T004's three calculator pages, then its
-complete package, transport and domain qualification. T003's connection/containment
+Next continuation milestone: finish T004's complete named operations and
+remaining body/work/rate and domain/package qualification. All three calculator
+pages have local native/browser proof. T003's connection/containment
 qualification is locally accepted. T002's
 installed dependency graph, app/script/SDK/infrastructure
 migrations, six-extension strict scope, fixture containment and final source
@@ -76,7 +77,7 @@ records command outcomes and log digests.
 | T001 / DEV-72 | Implemented and locally tested | Retention, admission and diagnostic checks pass; draft PR review pending. |
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
-| T004 / DEV-75 | In progress after local T003 acceptance | Previous answer/stale-state candidate first; remaining calculator pages, breakdown/sources and transport/interface qualification follow. |
+| T004 / DEV-75 | In progress after local T003 acceptance | All three pages have local proof; complete named operations, remaining body/work/rate and domain/package qualification stay active. |
 | T005 / DEV-76 | Pending T003/T004 | Accepted content, route retention, search and discovery. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
@@ -2785,3 +2786,82 @@ admission, remaining named operations, MCP and the later tasks remain open.
 Parent #143's exact head has hosted Quality success; this candidate has no hosted
 result yet. Next continue the complete closed named RPC metadata operations.
 No merge, publication, deployment, provider apply or Medicare correction occurs.
+
+
+## T004 complete closed RPC operations candidate
+
+Parent draft #144 is pushed at `ded95d387f244f427c8349feba8fdd342274be42`;
+its exact hosted Quality run `37386080486` was running at initial readback.
+The new `codex/dev-75-closed-rpc-operations` branch adds the seven missing metadata
+calls to the existing RPC group/service/live/test handlers, reusing calculator
+Schemas and the existing application service. Revision `3` makes the complete
+operation set explicit; revisions `1`/`2` are rejected before service dispatch.
+No public HTTP/OpenAPI or local SDK interface changes.
+
+The group owns procedure admission and exit-decoder identities. A private
+concrete Effect transformation owns the native client scope, complete response
+deadline, fetch policy and safe error projection for all nine named calls; it
+receives an Effect, not an arbitrary raw-client callback. The request-error
+projection has four real consumers. This reduces repeated policy paths while
+keeping application operations explicit and closed. Existing browser test
+Layers implement every required method; unused metadata methods fail explicitly.
+
+Docs-maintainer impact: **Change required** for RPC/app/calculator READMEs,
+API/Effect/testing architecture, current SPEC/tasks/plan, stable journey, audit
+router and dated proof. **Preserve** tax algorithms/source/golden results,
+Medicare choice, HTTP/OpenAPI/SDK, body/work/rate owners, content lifecycle,
+provider/infrastructure identities, telemetry, skills, CI and lint permissions.
+Runbooks/commands/generated public references are **N/A**: no operational,
+public HTTP or publication change. A major private RPC Changeset records the
+required service methods and contract revision.
+
+Focused transport tests cover all nine operations. The first new metadata
+membership assertion incorrectly assumed list ordering; production is preserved
+and the oracle checks complete membership/length. Vitest's asymmetric matcher
+needs a mutable input array, so Effect Array copies the readonly expected list
+only at that framework boundary. Corrected compiler checks pass and 208 RPC
+cases pass in 616 ms before the final matcher adjustment; complete current
+qualification follows in the dated receipt. Actual native new metadata calls,
+negative controls and full repository checks are pending. T004 remains active
+for remaining body/work/rate policy and whole domain/package acceptance. No
+merge, deployment, publication, provider apply or Medicare correction occurs.
+
+
+Current corrected root lint/types/docs/runbooks and all 208 RPC cases pass
+(783 ms). Both unused-code checks pass. Four source removals fail their focused
+oracles: eleven-second client budget, removed schema-call revision check,
+missing schema-call ingress tag and missing schema-call reply marking. Every
+changed source is restored exactly. A fresh native build and all seven Worker
+cases pass in 80.37 seconds overall (74.63 seconds for tests), including every
+new metadata call and the browser's engine-import exclusion. Full closeout
+follows on the staged source; no source edits run during isolated verifier or
+fault builds. Parent #144's hosted check remains running at this readback.
+
+
+Full local qualification passes for the 27-file closed RPC candidate on
+6 October 2026: root tests (87.33 seconds; 16 fresh/11 cached workspace tasks,
+208 RPC cases), build (qualified seven fresh/nine cached tasks before the final
+16-task cache reuse), docs validation, fresh API smoke, genuine root and direct
+packed/downstream SDK consumers, Changeset status and verification (578.42
+seconds). Verification reaches 32 fresh workflow cases (470.85 seconds), both
+unused-code checks, compiler, 24 SDK browser cases, 19 Website browser cases and
+seven freshly built native Worker tests (75.19 seconds). All 27 staged files
+match their pre-check hashes after fault-source restoration. Four newly captured
+screenshots are byte-identical to the already inspected work-policy images.
+
+Parent #144 now has exact hosted Quality success: run `37386080486`, job
+`112019569943`, completion `2026-10-05T23:22:36Z`, head
+`ded95d387f244f427c8349feba8fdd342274be42`. This does not establish hosted proof
+for the new nine-operation candidate. The dated receipt binds 26 source files,
+nine compiled artifact roots and four screenshots; only this plan and receipt
+change after full qualification. Docs/runbooks/format/Changeset/whitespace checks
+are repeated before the tested commit, push and draft PR.
+
+Primary-owner review accepts this local closed-operation slice and its concrete
+Effect policy reuse. Required named service methods and revision 3 have a major
+private RPC Changeset. T004 remains in progress for trusted rate identity/
+limiting, shared standalone HTTP body admission, metadata operation budgets and
+whole domain/package review. Next share the HTTP body owner and complete the
+remaining request/operation protections. Tax behaviour, Medicare choice,
+provider identities and unrelated work are preserved; no merge, publication,
+deployment or provider apply occurs.

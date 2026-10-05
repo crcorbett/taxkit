@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-web-app-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: website rendering, settings, transport, form, generated types or build change
 ---
 
@@ -256,7 +256,7 @@ complete ten-second client deadline belong to the private RPC package.
 The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
 calculation budget. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC revision `2` errors. Website guidance requests
+503/504 envelopes or canonical RPC revision `3` errors. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
 seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
@@ -264,3 +264,10 @@ browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
 control returns. Rate identity, per-client rate limits, MCP and full T004
 qualification remain unfinished.
+
+
+The private checked RPC contract now contains all nine calculator-service calls,
+with operation-scoped client lifetime and shared reply protections. Website
+commands still request only the data needed by their pages; the added metadata
+calls do not load the calculation engine into the browser. See the
+[RPC owner](../../packages/api/rpc/README.md#complete-named-operation-contract).

@@ -1,20 +1,26 @@
 import type {
   CalculatorRunServiceRequest,
+  DescriptorFilterQuery,
+  GetCalculatorGraphRequest,
+  GetCalculatorRequest,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
-import { Effect, Layer, Schema } from "effect";
+import { Array, Effect, Layer, Schema } from "effect";
+import type { Scope } from "effect";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
+import type { RpcClientError } from "effect/rpc";
 import { Rpc, RpcClient, RpcSerialization } from "effect/rpc";
 
 import {
   boundedCalculatorRpcHttpClient,
   calculatorRpcTransportFailure,
 } from "./client-response.boundary.js";
+import type { CalculatorRpcExpectedError } from "./errors.js";
 import {
   CalculatorRpcDeadlineExceeded,
   CalculatorRpcInvalidResponse,
 } from "./errors.js";
-import { Calculate, ListCalculators, TaxKitRpcGroup } from "./group.js";
+import { TaxKitRpcGroup } from "./group.js";
 import { CalculatorRpcDeadline, CalculatorRpcVersion } from "./schemas.js";
 import type { CalculatorRpcOrigin } from "./schemas.js";
 import { TaxKitRpcClient } from "./service.js";
@@ -32,8 +38,10 @@ const replySerialization = Layer.succeed(
     ...RpcSerialization.json,
     codecFor: <S extends Schema.Top>(schema: S) => {
       const codec = RpcSerialization.json.codecFor(schema);
-      return schema.ast === Rpc.exitSchema(Calculate).ast ||
-        schema.ast === Rpc.exitSchema(ListCalculators).ast
+      return Array.some(
+        Array.fromIterable(TaxKitRpcGroup.requests.values()),
+        (procedure) => schema.ast === Rpc.exitSchema(procedure).ast
+      )
         ? codec.pipe(
             Schema.catchDecoding<typeof codec>(() =>
               Effect.die(new RpcReplyDecodeDefect())
@@ -43,6 +51,38 @@ const replySerialization = Layer.succeed(
     },
   })
 );
+
+// The concrete native operation owns its client scope, complete-response budget
+// and safe failure projection. This accepts an Effect, never a raw-client callback.
+const checkedRpcOperation = <A>(
+  operation: Effect.Effect<
+    A,
+    typeof CalculatorRpcExpectedError.Type | RpcClientError.RpcClientError,
+    Scope.Scope | RpcClient.Protocol
+  >,
+  protocol: RpcClient.Protocol["Service"]
+) =>
+  operation.pipe(
+    Effect.scoped,
+    Effect.provideService(RpcClient.Protocol, protocol),
+    Effect.provideService(HttpClient.TracerDisabledWhen, () => true),
+    Effect.provideService(FetchHttpClient.RequestInit, {
+      credentials: "omit",
+      redirect: "error",
+    }),
+    Effect.timeoutOrElse({
+      duration: CalculatorRpcDeadline,
+      orElse: () => Effect.fail(new CalculatorRpcDeadlineExceeded()),
+    }),
+    Effect.catchTag("RpcClientError", (error) =>
+      Effect.fail(calculatorRpcTransportFailure(error))
+    ),
+    Effect.catchDefect((defect) =>
+      Schema.is(RpcReplyDecodeDefect)(defect)
+        ? Effect.fail(new CalculatorRpcInvalidResponse())
+        : Effect.die(defect)
+    )
+  );
 
 // The app supplies its matching-stage HttpClient. The Layer retains transport
 // configuration, while each named operation owns its native client scope. A
@@ -57,62 +97,112 @@ export const TaxKitRpcClientLive = (origin: CalculatorRpcOrigin) =>
       return TaxKitRpcClient.of({
         calculate: Effect.fn("TaxKitRpcClient.calculate")(
           (request: CalculatorRunServiceRequest) =>
-            RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
-              Effect.flatMap((client) =>
-                client.Calculate({ request, version: CalculatorRpcVersion })
+            checkedRpcOperation(
+              RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
+                Effect.flatMap((client) =>
+                  client.Calculate({ request, version: CalculatorRpcVersion })
+                )
               ),
-              Effect.scoped,
-              Effect.provideService(RpcClient.Protocol, protocol),
-              // HTTP tracing is separate from RPC wire tracing. Keep both off
-              // for this private transport: native headers otherwise introduce
-              // an extra browser preflight policy and unqualified trace egress.
-              Effect.provideService(HttpClient.TracerDisabledWhen, () => true),
-              Effect.provideService(FetchHttpClient.RequestInit, {
-                credentials: "omit",
-                redirect: "error",
-              }),
-              Effect.timeoutOrElse({
-                duration: CalculatorRpcDeadline,
-                orElse: () => Effect.fail(new CalculatorRpcDeadlineExceeded()),
-              }),
-              Effect.catchTag("RpcClientError", (error) =>
-                Effect.fail(calculatorRpcTransportFailure(error))
+              protocol
+            )
+        ),
+        getCalculator: Effect.fn("TaxKitRpcClient.getCalculator")(
+          (request: GetCalculatorRequest) =>
+            checkedRpcOperation(
+              RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
+                Effect.flatMap((client) =>
+                  client.GetCalculator({
+                    request,
+                    version: CalculatorRpcVersion,
+                  })
+                )
               ),
-              Effect.catchDefect((defect) =>
-                Schema.is(RpcReplyDecodeDefect)(defect)
-                  ? Effect.fail(new CalculatorRpcInvalidResponse())
-                  : Effect.die(defect)
-              )
+              protocol
+            )
+        ),
+        getCalculatorGraph: Effect.fn("TaxKitRpcClient.getCalculatorGraph")(
+          (request: GetCalculatorGraphRequest) =>
+            checkedRpcOperation(
+              RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
+                Effect.flatMap((client) =>
+                  client.GetCalculatorGraph({
+                    request,
+                    version: CalculatorRpcVersion,
+                  })
+                )
+              ),
+              protocol
+            )
+        ),
+        getCalculatorSchema: Effect.fn("TaxKitRpcClient.getCalculatorSchema")(
+          (request: GetCalculatorRequest) =>
+            checkedRpcOperation(
+              RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
+                Effect.flatMap((client) =>
+                  client.GetCalculatorSchema({
+                    request,
+                    version: CalculatorRpcVersion,
+                  })
+                )
+              ),
+              protocol
             )
         ),
         listCalculators: Effect.fn("TaxKitRpcClient.listCalculators")(
           (query: MetadataQuery) =>
+            checkedRpcOperation(
+              RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
+                Effect.flatMap((client) =>
+                  client.ListCalculators({
+                    query,
+                    version: CalculatorRpcVersion,
+                  })
+                )
+              ),
+              protocol
+            )
+        ),
+        listFacts: Effect.fn("TaxKitRpcClient.listFacts")(
+          (query: DescriptorFilterQuery) =>
+            checkedRpcOperation(
+              RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
+                Effect.flatMap((client) =>
+                  client.ListFacts({ query, version: CalculatorRpcVersion })
+                )
+              ),
+              protocol
+            )
+        ),
+        listJurisdictions: Effect.fn("TaxKitRpcClient.listJurisdictions")(() =>
+          checkedRpcOperation(
             RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
               Effect.flatMap((client) =>
-                client.ListCalculators({ query, version: CalculatorRpcVersion })
-              ),
-              Effect.scoped,
-              Effect.provideService(RpcClient.Protocol, protocol),
-              // HTTP tracing is separate from RPC wire tracing. Keep both off
-              // for this private transport: native headers otherwise introduce
-              // an extra browser preflight policy and unqualified trace egress.
-              Effect.provideService(HttpClient.TracerDisabledWhen, () => true),
-              Effect.provideService(FetchHttpClient.RequestInit, {
-                credentials: "omit",
-                redirect: "error",
-              }),
-              Effect.timeoutOrElse({
-                duration: CalculatorRpcDeadline,
-                orElse: () => Effect.fail(new CalculatorRpcDeadlineExceeded()),
-              }),
-              Effect.catchTag("RpcClientError", (error) =>
-                Effect.fail(calculatorRpcTransportFailure(error))
-              ),
-              Effect.catchDefect((defect) =>
-                Schema.is(RpcReplyDecodeDefect)(defect)
-                  ? Effect.fail(new CalculatorRpcInvalidResponse())
-                  : Effect.die(defect)
+                client.ListJurisdictions({ version: CalculatorRpcVersion })
               )
+            ),
+            protocol
+          )
+        ),
+        listRules: Effect.fn("TaxKitRpcClient.listRules")(
+          (query: DescriptorFilterQuery) =>
+            checkedRpcOperation(
+              RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
+                Effect.flatMap((client) =>
+                  client.ListRules({ query, version: CalculatorRpcVersion })
+                )
+              ),
+              protocol
+            )
+        ),
+        listTaxYears: Effect.fn("TaxKitRpcClient.listTaxYears")(
+          (query: MetadataQuery) =>
+            checkedRpcOperation(
+              RpcClient.make(TaxKitRpcGroup, { disableTracing: true }).pipe(
+                Effect.flatMap((client) =>
+                  client.ListTaxYears({ query, version: CalculatorRpcVersion })
+                )
+              ),
+              protocol
             )
         ),
       });

@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-calculators-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
@@ -145,7 +145,7 @@ the response; this is not a claim of forced CPU or remote Worker cancellation.
 Both new errors contain only fixed code, message and manual-retry fields, with
 no request values. HTTP maps capacity to 503 and operation timeout to 504, using
 the existing `error` envelope. Existing calculator request errors keep 400.
-Native RPC revision `2` preserves the canonical errors; revision `1` clients get
+The current [native RPC contract](../api/rpc/README.md) preserves the canonical errors; older clients get
 an explicit mismatch. Website forms display the fixed guidance and never retry
 a calculation automatically. Per-client rate identity, rate limiting, standalone
 HTTP body admission and future MCP operations remain active work.

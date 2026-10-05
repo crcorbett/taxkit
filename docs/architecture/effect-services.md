@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-effect-services-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
@@ -444,3 +444,10 @@ transports and counts individual batch calculations. Scope and semaphore release
 own cleanup on every exit. Metadata remains outside calculation capacity. No
 runner or live Layer is built inside a calculation, and no transport gains a
 competing application contract. The owning package records timeout and CPU limits.
+
+
+The [RPC owner](../../packages/api/rpc/README.md#complete-named-operation-contract)
+exposes all nine existing calculator operations. Its private concrete native
+operation transformation shares scope/deadline/safe transport policy across
+those named methods; application work remains at the calculator service. No
+operation constructs a Layer or runner, and callers receive no raw client.

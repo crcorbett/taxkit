@@ -1,5 +1,8 @@
 import { describe, expect, it } from "@effect/vitest";
 import {
+  DescriptorFilterQuery,
+  GetCalculatorGraphRequest,
+  GetCalculatorRequest,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
 } from "@taxkit/calculators/schemas";
@@ -30,6 +33,7 @@ import { Rpc, RpcClient, RpcSerialization } from "effect/rpc";
 
 import {
   CalculationRequest,
+  CalculatorRpcOperationCases,
   CalculatorFixture,
   CalculatorLive,
   sensitiveSentinel,
@@ -43,6 +47,7 @@ import {
   CalculatorRpcResponseTooLarge,
   CalculatorRpcUnavailable,
   CalculatorRpcRejected,
+  CalculatorRpcVersionMismatch,
 } from "../src/errors.js";
 import { Calculate, ListCalculators, TaxKitRpcGroup } from "../src/group.js";
 import { TaxKitRpcClientLive } from "../src/live.layer.js";
@@ -129,6 +134,153 @@ describe("native calculator RPC", () => {
             Schema.fromJsonString(Schema.toCodecJson(CalculatorRpcClientError))
           )(wire)
         ).toEqual(error);
+      }).pipe(Effect.scoped)
+  );
+
+  it.effect(
+    "reads the complete metadata contract through native HTTP RPC",
+    () =>
+      Effect.gen(function* () {
+        const transport = yield* makeHttpTransport("success");
+        yield* Effect.gen(function* () {
+          const client = yield* TaxKitRpcClient;
+          const request = GetCalculatorRequest.make({
+            calculatorId: CalculationRequest.calculatorId,
+          });
+          const detail = yield* client.getCalculator(request);
+          expect(detail.title).toBe("AU take-home pay");
+          expect(detail.context).toEqual({
+            jurisdiction: "AU",
+            taxYear: "2025-26",
+          });
+          const schema = yield* client.getCalculatorSchema(request);
+          expect(schema.calculator).toEqual(detail);
+          expect(schema.inputFacts.length).toBeGreaterThan(0);
+          expect(schema.rules.length).toBeGreaterThan(0);
+          const graph = yield* client.getCalculatorGraph(
+            GetCalculatorGraphRequest.make({
+              calculatorId: request.calculatorId,
+            })
+          );
+          expect(graph.calculator).toEqual(detail);
+          expect(graph.edges.length).toBeGreaterThan(0);
+          expect(graph.validationIssues).toEqual([]);
+          const facts = yield* client.listFacts(
+            DescriptorFilterQuery.make({ calculator: request.calculatorId })
+          );
+          expect(facts.facts.length).toBeGreaterThan(0);
+          const rules = yield* client.listRules(
+            DescriptorFilterQuery.make({ calculator: request.calculatorId })
+          );
+          expect(rules.rules).toEqual(
+            expect.arrayContaining(Array.fromIterable(schema.rules))
+          );
+          expect(rules.rules).toHaveLength(schema.rules.length);
+          expect(yield* client.listJurisdictions()).toEqual({
+            jurisdictions: [{ code: "AU", title: "Australia" }],
+          });
+          expect(yield* client.listTaxYears(MetadataQuery.make({}))).toEqual({
+            taxYears: [{ jurisdiction: "AU", taxYear: "2025-26" }],
+          });
+        }).pipe(
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+      }).pipe(Effect.scoped)
+  );
+
+  it.effect.each(
+    Array.filter(
+      CalculatorRpcOperationCases,
+      ({ operation }) =>
+        operation === "getCalculator" ||
+        operation === "getCalculatorGraph" ||
+        operation === "getCalculatorSchema"
+    )
+  )(
+    "keeps the expected $operation failure safe through the native client",
+    ({ invoke }) =>
+      Effect.gen(function* () {
+        const transport = yield* makeHttpTransport("expected");
+        const failure = yield* TaxKitRpcClient.pipe(
+          Effect.flatMap((client) => invoke(client)),
+          Effect.flip,
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+        expect(failure).toEqual(new CalculatorRpcRejected({ reason: "input" }));
+        const encoded = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CalculatorRpcClientError)
+        )(failure);
+        expect(encoded).not.toContain(sensitiveSentinel);
+        expect(encoded).not.toContain("stack");
+      }).pipe(Effect.scoped)
+  );
+
+  it.effect.each(
+    Array.flatMap(CalculatorRpcOperationCases, (operation) => [
+      { ...operation, mode: "defect" as const },
+      { ...operation, mode: "mixed" as const },
+    ])
+  )("keeps remote $mode defects safe for $operation", ({ invoke, mode }) =>
+    Effect.gen(function* () {
+      const transport = yield* makeHttpTransport(mode);
+      const exit = yield* TaxKitRpcClient.pipe(
+        Effect.flatMap((client) => invoke(client)),
+        Effect.exit,
+        Effect.provide(
+          TaxKitRpcClientLive(origin).pipe(
+            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+          )
+        )
+      );
+      expect(Exit.isFailure(exit)).toBe(true);
+      if (Exit.isFailure(exit)) {
+        expect(Cause.hasFails(exit.cause)).toBe(false);
+        expect(
+          Result.match(Cause.findDie(exit.cause), {
+            onFailure: () => false,
+            onSuccess: (reason) =>
+              reason.defect === "Calculation service failed",
+          })
+        ).toBe(true);
+      }
+    }).pipe(Effect.scoped)
+  );
+
+  it.effect.each(
+    Array.flatMap(CalculatorRpcOperationCases, (operation) =>
+      Array.map(["1", "2"] as const, (version) => ({ ...operation, version }))
+    )
+  )(
+    "rejects old revision $version before $operation reaches the service",
+    ({ nativeInvoke, version }) =>
+      Effect.gen(function* () {
+        const transport = yield* makeHttpTransport("defect");
+        const client = yield* RpcClient.make(TaxKitRpcGroup, {
+          disableTracing: true,
+        }).pipe(
+          Effect.provide(
+            RpcClient.layerProtocolHttp({
+              transformClient: HttpClient.mapRequest(
+                HttpClientRequest.setUrl(`${origin.origin}/rpc`)
+              ),
+              url: `${origin.origin}/rpc`,
+            }).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
+              Layer.provide(RpcSerialization.layerJson)
+            )
+          )
+        );
+        expect(yield* nativeInvoke(client, version).pipe(Effect.flip)).toEqual(
+          new CalculatorRpcVersionMismatch()
+        );
       }).pipe(Effect.scoped)
   );
 
@@ -495,14 +647,14 @@ describe("native calculator RPC", () => {
     }).pipe(Effect.scoped)
   );
 
-  it.effect.each([
-    { mode: "json", operation: "calculate" },
-    { mode: "schema", operation: "calculate" },
-    { mode: "json", operation: "catalogue" },
-    { mode: "schema", operation: "catalogue" },
-  ] as const)(
+  it.effect.each(
+    Array.flatMap(CalculatorRpcOperationCases, (operation) => [
+      { ...operation, mode: "json" as const },
+      { ...operation, mode: "schema" as const },
+    ])
+  )(
     "classifies a broken $mode reply to $operation as a checked invalid response",
-    ({ mode, operation }) =>
+    ({ mode, invoke }) =>
       Effect.gen(function* () {
         const transport = HttpClient.make((request) =>
           Effect.gen(function* () {
@@ -540,13 +692,7 @@ describe("native calculator RPC", () => {
         );
         yield* Effect.gen(function* () {
           const client = yield* TaxKitRpcClient;
-          const error = yield* (
-            operation === "calculate"
-              ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
-              : client
-                  .listCalculators(MetadataQuery.make({}))
-                  .pipe(Effect.asVoid)
-          ).pipe(Effect.flip);
+          const error = yield* invoke(client).pipe(Effect.flip);
           expect(Schema.is(CalculatorRpcInvalidResponse)(error)).toBe(true);
         }).pipe(
           Effect.provide(
@@ -592,18 +738,16 @@ describe("native calculator RPC", () => {
   );
 });
 
-it.effect.each([
-  { operation: "calculate", status: 408 },
-  { operation: "calculate", status: 413 },
-  { operation: "calculate", status: 429 },
-  { operation: "calculate", status: 503 },
-  { operation: "catalogue", status: 408 },
-  { operation: "catalogue", status: 413 },
-  { operation: "catalogue", status: 429 },
-  { operation: "catalogue", status: 503 },
-] as const)(
+it.effect.each(
+  Array.flatMap(CalculatorRpcOperationCases, (operation) =>
+    Array.map([408, 413, 429, 503] as const, (status) => ({
+      ...operation,
+      status,
+    }))
+  )
+)(
   "classifies HTTP $status for $operation without reading its body or retrying",
-  ({ status, operation }) =>
+  ({ status, invoke }) =>
     Effect.gen(function* () {
       const calls = yield* Ref.make(0);
       const bodyRead = yield* Ref.make(false);
@@ -636,11 +780,7 @@ it.effect.each([
       );
       yield* Effect.gen(function* () {
         const client = yield* TaxKitRpcClient;
-        const error = yield* (
-          operation === "calculate"
-            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
-            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
-        ).pipe(Effect.flip);
+        const error = yield* invoke(client).pipe(Effect.flip);
         const expected = Match.value(status).pipe(
           Match.when(408, () => new CalculatorRpcRequestTimedOut()),
           Match.when(413, () => new CalculatorRpcRequestTooLarge()),
@@ -675,9 +815,9 @@ it.effect.each([
     })
 );
 
-it.effect.each(["calculate", "catalogue"] as const)(
-  "accepts a valid native %s reply at exactly two MiB",
-  (operation) =>
+it.effect.each(CalculatorRpcOperationCases)(
+  "accepts a valid native $operation reply at exactly two MiB",
+  ({ invoke }) =>
     Effect.gen(function* () {
       const native = yield* makeHttpTransport("success");
       const released = yield* Ref.make(false);
@@ -705,13 +845,7 @@ it.effect.each(["calculate", "catalogue"] as const)(
       );
       yield* Effect.gen(function* () {
         const client = yield* TaxKitRpcClient;
-        if (operation === "calculate") {
-          const reply = yield* client.calculate(CalculationRequest);
-          expect(reply.report._tag).toBe("TakeHomePayReport");
-        } else {
-          const reply = yield* client.listCalculators(MetadataQuery.make({}));
-          expect(reply.calculators).toHaveLength(3);
-        }
+        yield* invoke(client);
         expect(yield* Ref.get(released)).toBe(true);
       }).pipe(
         Effect.provide(
@@ -723,14 +857,14 @@ it.effect.each(["calculate", "catalogue"] as const)(
     }).pipe(Effect.scoped)
 );
 
-it.effect.each([
-  { operation: "calculate", representation: "chunks" },
-  { operation: "catalogue", representation: "chunks" },
-  { operation: "calculate", representation: "utf-8" },
-  { operation: "catalogue", representation: "utf-8" },
-] as const)(
+it.effect.each(
+  Array.flatMap(CalculatorRpcOperationCases, (operation) => [
+    { ...operation, representation: "chunks" as const },
+    { ...operation, representation: "utf-8" as const },
+  ])
+)(
   "stops oversized $representation replies to $operation before the tail and releases the source",
-  ({ operation, representation }) =>
+  ({ invoke, representation }) =>
     Effect.gen(function* () {
       const tailRead = yield* Ref.make(false);
       const released = yield* Ref.make(false);
@@ -767,11 +901,7 @@ it.effect.each([
       );
       yield* Effect.gen(function* () {
         const client = yield* TaxKitRpcClient;
-        const error = yield* (
-          operation === "calculate"
-            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
-            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
-        ).pipe(Effect.flip);
+        const error = yield* invoke(client).pipe(Effect.flip);
         expect(error).toEqual(new CalculatorRpcResponseTooLarge());
         expect(yield* Ref.get(tailRead)).toBe(false);
         expect(yield* Ref.get(released)).toBe(true);
@@ -786,14 +916,13 @@ it.effect.each([
     })
 );
 
-it.effect.each([
-  { operation: "calculate", status: 204 },
-  { operation: "catalogue", status: 204 },
-  { operation: "calculate", status: 205 },
-  { operation: "catalogue", status: 205 },
-] as const)(
+it.effect.each(
+  Array.flatMap(CalculatorRpcOperationCases, (operation) =>
+    Array.map([204, 205] as const, (status) => ({ ...operation, status }))
+  )
+)(
   "treats an empty HTTP $status reply for $operation as checked invalid data",
-  ({ operation, status }) =>
+  ({ invoke, status }) =>
     Effect.gen(function* () {
       const transport = HttpClient.make((request) =>
         Effect.succeed(
@@ -805,11 +934,7 @@ it.effect.each([
       );
       yield* Effect.gen(function* () {
         const client = yield* TaxKitRpcClient;
-        const error = yield* (
-          operation === "calculate"
-            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
-            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
-        ).pipe(Effect.flip);
+        const error = yield* invoke(client).pipe(Effect.flip);
         expect(error).toEqual(new CalculatorRpcInvalidResponse());
       }).pipe(
         Effect.provide(

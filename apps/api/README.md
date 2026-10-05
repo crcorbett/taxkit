@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-app-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: API app settings, startup, smoke command or shutdown change
 ---
 
@@ -24,7 +24,7 @@ schemas, generated OpenAPI and docs routes stay in `packages/api/http`.
 class and `.make` entry. `src/worker.application.ts` constructs one router and
 shared `PublicCalculatorService` in the native instance scope. HTTP and
 POST `/rpc` delegate to the same calculator service. Its named RPC operations
-calculate and read the supported catalogue using the canonical service contracts. Native requests keep their own
+match all nine existing calculator-service calls using the canonical request/result contracts. Native requests keep their own
 fibre and cleanup scope; the app constructs no backend ManagedRuntime.
 
 The Worker checks `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` with the
@@ -271,7 +271,7 @@ requirement. The fixed application reporter remains in use.
 The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
 calculation budget. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC revision `2` errors. Website guidance requests
+503/504 envelopes or canonical RPC revision `3` errors. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
 seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
