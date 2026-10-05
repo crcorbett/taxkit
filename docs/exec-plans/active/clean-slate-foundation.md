@@ -2535,3 +2535,77 @@ and trusted non-exported rate identity, ten-second complete-response client
 deadline, bounded metadata responses, complete named operations and retained
 domain/package qualification. Preserve the existing annual Medicare figures
 and visible limitation pending Cooper's scope decision.
+
+## T004 native request size-policy candidate
+
+Calculator pages are pushed as draft #141 at
+`5cfd306c7bcf7a109b47c379bf68ea80e0eea48d`; hosted Quality run
+`37271500109`, job `111639279386`, is in progress at first readback.
+Continue on `codex/dev-75-request-body-policy`. The streamed native POST
+reader and RPC byte admission now share the accepted 64 KiB limit, preserving
+the five-second body-read deadline, source cleanup and empty 413/408 replies.
+Strengthen the existing API oracle to accept valid HTTP/RPC JSON at exactly
+65536 bytes, reject progressive oversized chunks and multi-byte text, and keep
+its one supplied operation/request-scope proof. Actual built Workers must
+reject the oversized text at both API paths and all three Website form paths.
+
+Documentation impact: **Change required** for owning RPC reader/codec and
+focused API/RPC/native fixtures; RPC/API/Web READMEs; API/SDK/testing owners;
+active task/plan, stable journey and dated receipt. A major private RPC
+Changeset records the stricter package-facing size contract. **Preserve**
+retained tax rules/results, calculator/domain/SDK interfaces, public HTTP
+route/Schema/OpenAPI definitions, generated public MDX, infrastructure, skills,
+lint admissions, CI and runbooks. Public OpenAPI/MDX snapshot regeneration is
+**N/A** for this host-only admission change. No versioning or publication.
+
+First focused checks: 61 API tests and all 27 type tasks pass freshly. Running
+RPC tests alongside the type command's prerequisite dependency rebuild causes
+one suite to report a missing compiled calculator export; 11 deadline tests
+still pass. After dependency build finishes, all 36 RPC tests pass freshly in
+1.21 seconds. Do not overlap dependency rebuilds with focused consumers.
+Initial lint rejects two test labels spelled utf8; correct them to utf-8.
+Final lint, native proof and complete qualification are pending. T004 stays
+in progress: checked failure guidance, standalone HTTP admission, common
+work/concurrency/rate policy, ten-second clients, metadata response limits,
+complete named operations and retained domain/package review remain open.
+
+Restoring the old one-MiB constant makes the existing native oversized-body
+oracle fail as required; exact source bytes are restored. All 36 RPC tests
+then pass freshly in 1.11 seconds. Final lint has zero errors; docs/runbooks,
+root format and Changeset status pass. Fresh native builds and all six native
+tests pass in 50.93 seconds, including oversized multi-byte text at both API
+paths and all three calculator forms, unchanged CORS and existing retained
+calculator/error/restoration/cancellation/development journeys. Complete
+repository qualification follows with source edits frozen.
+
+The first sequential root test/build/API smoke/packed/downstream checks pass.
+Full verification then exits 101 during isolated Quality dependency installation
+with ENOSPC. Its scoped copies unwind; free disk later reads 12 GiB without
+manual removal of repository/user files. Retain this failed attempt and rerun.
+
+Parent #141's exact hosted Quality run fails, completed
+`2026-10-05T06:28:38Z`: the page test cannot open its macOS-only `/private/tmp`
+screenshot path on Linux; five other native tests pass. The current candidate
+corrects that fixture to Effect Path/FileSystem-created
+`.alchemy/native-pair/screenshots` under the existing ignored build root.
+Local macOS proof had not exercised a different temporary root. Durable testing
+ownership now records portable artifact placement and that false-green limit.
+The failed head stays in history; no rerun or hosted success is inferred.
+All complete checks must be repeated as required after the correction.
+
+Corrected complete local qualification passes. Root CLI executes 473 fresh
+cases (409 portable) in 73.61 seconds. Package/app tests have one fresh Web
+task and 26 cached tasks; build has one fresh task and 15 cached tasks. API
+smoke and packed/downstream consumer checks reuse unchanged-input cached
+evidence. Full verification executes 32 fresh Quality cases across 13 isolated
+copies in 602.97 seconds, all 27 type tasks (12 fresh, 15 cached), 24 fresh SDK
+browser tests, 12 fresh Website browser tests, and fresh native builds with all
+six native tests in 52.96 seconds. All four portable screenshot files are
+visually checked for controls, explanations, warning and distinct restored
+values. No hosted correction proof is claimed.
+
+Post-verification changes are limited to this plan and the
+[bounded receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-request-body-policy.json).
+Recheck docs/runbooks/format/Changeset status and whitespace before commit.
+T004 remains in progress; next qualify checked client failures and the accepted
+complete-response deadline, then the remaining shared request/work policy.

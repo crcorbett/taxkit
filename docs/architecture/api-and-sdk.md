@@ -314,7 +314,7 @@ array form emits a fixed allow-origin value even for unrelated origins.
 The predicate omits that header for an unrelated request. Only `content-type`
 is allowed for the current JSON client, with credentials disabled.
 
-POST bodies are read through the native Effect stream with a one-MiB limit
+POST bodies are read through the native Effect stream with a 64-KiB limit
 and a total five-second read deadline, before native JSON decoding. Oversized
 and stalled requests return empty 413/408 responses with the same CORS policy.
 The selected native web-request reader does not use `MaxBodySize`, so merely
@@ -409,7 +409,7 @@ unavailable transport, invalid replies and a complete-response deadline remain
 separate checked failures. Independent adapter defects remain defects.
 
 Native parser ingress checks procedure tags, bounded identities/batches/headers
-and a one-MiB UTF-8 input before dispatch. Native per-procedure and global defect
+and a 64-KiB UTF-8 input before dispatch. Native per-procedure and global defect
 encoding use a fixed value. The client marks only the native exit reply decoder;
 it does not classify every SchemaError as an invalid response. Installed Effect
 4.0.0 source and actual wire tests qualify these hooks. RPC APIs remain unstable.
@@ -535,3 +535,15 @@ private reply decoder marks only the two owning native exit Schemas; an
 unrelated adapter Schema error remains a defect. Public HTTP/OpenAPI and SDK
 interfaces do not change. Reading this list in the homepage remains active
 T004 work until its actual route is implemented and qualified.
+
+The native body reader and RPC byte admission share
+`CalculatorRequestBodyLimit` from `@taxkit/api-rpc/request-boundary`: 64 KiB.
+The API applies it to public HTTP and native RPC POST, and the Website applies
+it before decoding any supported standard HTML calculator form. At exactly
+the limit, valid JSON still reaches the same named calculation operation;
+exceeding it releases the source before its remaining tail is consumed.
+This limits the native hosts only. Checked caller guidance, standalone Bun
+HTTP admission, common work/rate/concurrency policy, the ten-second client
+deadline and metadata response limits remain active T004 work. Existing empty
+413/408 replies and five-second body-read deadlines are preserved in this
+bounded size-policy slice; they do not complete the accepted failure contract.

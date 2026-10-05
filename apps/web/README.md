@@ -233,3 +233,15 @@ or current-law correctness claim is made.
 The developer link opens the native API documentation. `/agents` links to the
 actual OpenAPI description and calculator list. Remote MCP, discovery content
 and accepted publication remain later tasks; this page does not claim they exist.
+
+All three standard HTML form POST paths share the native 64 KiB body limit and
+five-second total body-read deadline with the API host. Oversized bodies return
+empty 413 and stalled bodies return empty 408; unfinished readers close on
+rejection, timeout or interruption. This admission check runs before form data
+is materialised. It counts bytes, including multi-byte text, not characters.
+
+Native page proof screenshots are saved under ignored
+`.alchemy/native-pair/screenshots` at the checkout root. Effect Path/FileSystem
+creates that folder; tests must not assume a macOS-only temporary directory.
+These images contain controlled local examples and do not establish a deployed
+page or current-law correctness.

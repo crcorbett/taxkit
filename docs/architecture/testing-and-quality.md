@@ -1266,3 +1266,30 @@ would allow broken form restoration to pass; these distinct inputs prevent it.
 Both additional pages retain the old answer through a controlled 503 retry and
 invalid input, without automatic or invalid-input requests. Native disclosure
 and Calculate also work with the keyboard.
+
+### Native request size admission
+
+The native API boundary test sends valid HTTP and RPC calculation JSON padded
+to exactly 65536 encoded bytes. Both must return the retained report through
+one supplied application operation, with request scope and cleanup intact.
+The rejection tests cross the limit in separate chunks or use multi-byte text
+whose character count is below the byte limit; the unread tail must remain
+untouched and the source must close. Existing stalled-body and earlier caller
+interruption checks remain required.
+
+The saved native pair fixture checks actual built public HTTP/RPC and all
+three Website form paths with oversized multi-byte text. Each returns empty
+413; public API rejection retains the checked Website CORS policy. Normal
+catalogue and all retained calculator journeys must still pass. The
+[dated size-policy receipt](../documentation-audit/clean-slate-foundation/2026-10-05-request-body-policy.json)
+records exact qualification, damaged-limit detection and limits of this proof.
+It does not establish standalone Bun admission, later MCP envelopes or the
+complete rate/work/concurrency/client-failure policy.
+
+Native page screenshots use the existing ignored repository build root
+`.alchemy/native-pair/screenshots`, created through Effect Path/FileSystem.
+A hard-coded `/private/tmp` output passed locally on macOS but failed the exact
+Linux Quality run for page draft #141. Portable artifact placement belongs in
+the owning fixture; retain that failed hosted attempt alongside its corrected
+candidate. Complete local verification must also finish: an ENOSPC failure
+inside an isolated dependency installation is not a passing Quality check.

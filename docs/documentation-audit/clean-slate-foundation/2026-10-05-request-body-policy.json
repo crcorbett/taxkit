@@ -1,0 +1,316 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "native body reader, RPC byte admission, supported envelopes or cleanup changes",
+  "outcome": "Pass for native 64 KiB admission and portable screenshots; whole T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native API/Website and Chromium",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-request-body-policy",
+    "baseCommit": "5cfd306c7bcf7a109b47c379bf68ea80e0eea48d",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sources": [
+      {
+        "path": ".changeset/native-request-body-limit.md",
+        "sha256": "6ebdfede2d0fde8d4a658bbe0ec073e9196c3ae5cf1b0d72b19835d9adacfbff"
+      },
+      {
+        "path": "apps/api/README.md",
+        "sha256": "0d653075c46ab943b6445fbe4faebe9409ca846495ba819e25a778142e17166e"
+      },
+      {
+        "path": "apps/api/test/worker.boundary.test.ts",
+        "sha256": "1847f07bc4ccfacbc553b4fbf96da3e585ff8f34aa1ea510c91f8db1fe51dcb9"
+      },
+      {
+        "path": "apps/web/README.md",
+        "sha256": "34e540100e7b5b6eff42ba88c81c87cbaaea744796bd7e994017c8289be1ea02"
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "a684b6a788f932c5167374a42e3ea2257488c8464c9b52cc90489c083852133a"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "6def338aaab5f5969c927f3a5a9c60005fd2f7ab0f1420f835f1a18d130407dc"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "b00d3a1ddd4582e352f509cfcee56d551282caf4fe57e6566b5cd71571acb867"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "03d80b7db1cf17e302e1c04509e22c4178d2951b87034796d078f47bfe8eaf84"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "abb73f56ceff04c89185304a25a21f60a39911ce1aba6b8fc0bedb9403046b61"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "82d0db56f5f2866d09f4b25fa485220b3b3a3111a6be4b4aca035ca77d8272ae"
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "d0348660ab766ab06612d701f47a603f1d0fe180705a928422cc5716853b3260"
+      },
+      {
+        "path": "packages/api/rpc/README.md",
+        "sha256": "e0726f77c1d8575f23b42b102aad916c3473fb9e3adf04114653dfe3b7960573"
+      },
+      {
+        "path": "packages/api/rpc/src/request-boundary.ts",
+        "sha256": "6dbe55c8cb39b46b608acb04e019b59e07007e01c323774834edda54e7aa2fc3"
+      },
+      {
+        "path": "packages/api/rpc/src/server-serialization.boundary.ts",
+        "sha256": "b57fa5277c22db9e37e08235ee21f0f9278987fe0ca2bca3df300d6a29fdf15c"
+      },
+      {
+        "path": "packages/api/rpc/test/handlers.test.ts",
+        "sha256": "01e26bff07e34626fb273bbef377246c127389e47d40f1ceeac14e03df605d56"
+      }
+    ],
+    "sourceSha256": "3a1720152acd3342d135139b31d168de297968aab31cfee5d621d177c348bfdd"
+  },
+  "implementation": [
+    "Native streamed POST reader and native RPC byte admission share CalculatorRequestBodyLimit at 64 KiB.",
+    "Count encoded bytes before materialisation; preserve total five-second read deadline, interruption, cleanup and empty 413/408 responses.",
+    "Native API HTTP/RPC and all supported Website standard form paths use this shared reader.",
+    "No retained tax figure, domain service, public HTTP route/Schema, SDK or provider change.",
+    "Native page screenshots use the portable ignored .alchemy/native-pair/screenshots root built with Effect Path/FileSystem rather than a macOS-only /private/tmp path."
+  ],
+  "proof": [
+    {
+      "command": "bun run --filter=api test",
+      "outcome": "61 fresh tests pass in 2.77s, including valid HTTP/RPC requests at exactly 65536 bytes, oversized progressive chunks/multi-byte text and source release."
+    },
+    {
+      "command": "bun run check-types",
+      "outcome": "All 27 tasks fresh and pass in 12.525s, including prerequisite compiled dependency builds."
+    },
+    {
+      "command": "bun run --filter=@taxkit/api-rpc test after dependency rebuild",
+      "outcome": "All 36 fresh tests pass in 1.21s; private decoder guard rejects the now-oversized native input."
+    },
+    {
+      "command": "restore one-MiB constant and run existing native oversized-body oracle",
+      "outcome": "Required failure: one assertion fails because the oversized request now succeeds. Exact source bytes restored by finally; no concurrent dependency builder."
+    },
+    {
+      "command": "restored focused RPC, lint and documentation checks",
+      "outcome": "36 fresh RPC tests pass in 1.11s; lint zero errors in 8.414s; docs/runbooks/root format/Changeset status pass."
+    },
+    {
+      "command": "bun run web:test:native-pair",
+      "outcome": "Pass: fresh native builds and all six tests in 50.93s. Actual HTTP/RPC and all three form paths reject oversized multi-byte text; API keeps matching Website CORS. Existing catalogue/calculators/private form/hydration/error/cancellation/development checks preserved."
+    },
+    {
+      "command": "initial sequential complete qualification",
+      "outcome": "Root test/build/API smoke/packed/downstream commands pass; verification exits 101 during isolated Quality installation with ENOSPC in taxkit-hgi205-boundaries-VTLdqy. Not an accepted full verification. Space later reads 12 GiB; rerun pending."
+    },
+    {
+      "command": "corrected sequential bun run test/build/api:smoke and SDK packed/downstream checks",
+      "outcome": "Pass: 473 fresh CLI cases (409 portable) in 73.61s; 27 package/app tasks with one fresh Web task and 26 cached; build 16 tasks with one fresh and 15 cached. API smoke 12 cached tasks; packed/downstream seven cached tasks each. Cached results are unchanged-input evidence, not fresh executions."
+    },
+    {
+      "command": "bun run verification after portable screenshot correction",
+      "outcome": "Pass: 32 fresh Quality cases across 13 isolated copies in 602.97s; all 27 type tasks (12 fresh, 15 cached); 24 fresh SDK browser tests in 2.32s; 12 fresh Website browser tests in 2.96s; freshly built native Workers and all six native tests in 52.96s. All other required repository checks pass."
+    },
+    {
+      "command": "view all four corrected native screenshot files",
+      "outcome": "Pass: readable withholding/annual controls, report breakdowns, tax year, keyboard focus and Medicare warning; distinct restored 1654 weekly and 30000 annual inputs remain paired with their retained answers."
+    }
+  ],
+  "failedAttempts": [
+    {
+      "stage": "initial focused consumers during type prerequisites",
+      "observed": "RPC handler suite cannot find compiled calculator/live while the concurrent root type command rebuilds that dependency (rm dist then compile); 11 deadline tests pass.",
+      "recovery": "Finish the dependency build and rerun focused RPC tests separately; all 36 pass. Keep consumers sequential with dependency builders."
+    },
+    {
+      "stage": "initial lint",
+      "observed": "Two representation labels spelled utf8 are rejected by the canonical text-encoding rule.",
+      "recovery": "Use utf-8; final lint passes with zero errors."
+    },
+    {
+      "stage": "parent #141 hosted Quality",
+      "observed": "Linux cannot open the hard-coded macOS /private/tmp screenshot path. The native page test fails; five other native tests pass. Local macOS full qualification did not exercise a different temporary root.",
+      "recovery": "Use Effect Path/FileSystem under the ignored native artifact root; corrected full local verification and all six freshly built native tests pass. Hosted correction remains unqualified."
+    },
+    {
+      "stage": "initial complete local verification",
+      "observed": "Isolated Quality copy installation fails with ENOSPC; complete driver exits 101. The native focused suite and preceding root/consumer checks had passed.",
+      "recovery": "Scoped test copies unwind. Free disk later reads 12 GiB, without deleting repository/user files. Preserve failed log and rerun after portable screenshot correction."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "surface": "owning size contract, portable native artifact output and actual qualification",
+      "owners": [
+        "packages/api/rpc/src/request-boundary.ts",
+        "packages/api/rpc/src/server-serialization.boundary.ts",
+        "packages/api/rpc/test/handlers.test.ts",
+        "packages/api/rpc/README.md",
+        "apps/api/test/worker.boundary.test.ts",
+        "apps/web/test/native-pair.boundary.test.ts",
+        ".changeset/native-request-body-limit.md"
+      ],
+      "postcondition": "One 64 KiB byte constant; exact-limit success, stream-tail/multi-byte rejection and built-host proof; major private Changeset without version/publish. Native screenshots live under the portable ignored build root."
+    },
+    {
+      "decision": "Change required",
+      "surface": "durable ownership and proof routing",
+      "owners": [
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/verification/critical-journeys.json",
+        "docs/documentation-audit/README.md"
+      ],
+      "postcondition": "Native admission described without claiming complete T004 or standalone Bun policy."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "retained tax/package/operation contracts",
+      "owners": [
+        "packages/core",
+        "packages/rules",
+        "packages/calculators",
+        "packages/api/http",
+        "packages/sdk",
+        "packages/docs-content",
+        "packages/infrastructure",
+        ".agents/skills",
+        "oxlint.config.ts",
+        ".github/workflows",
+        "docs/runbooks",
+        "docs/operations"
+      ],
+      "reason": "No tax/domain/result, public HTTP route/Schema/OpenAPI, SDK/MDX, infrastructure, skill/lint/CI or consequential operation change."
+    },
+    {
+      "decision": "N/A",
+      "surface": "public generated OpenAPI/MDX snapshots",
+      "reason": "Host-only stricter admission; public route/Schema definitions remain unchanged. Complete checked failure contract is still pending."
+    }
+  ],
+  "limitations": [
+    "Native API/Website admission only; retained standalone Bun HTTP policy and later MCP envelopes not qualified.",
+    "Checked caller failure guidance, work/concurrency/rate policy, ten-second complete-response deadline, 2 MiB metadata responses and whole T004/later tasks remain open.",
+    "No Medicare correction/current-law proof, provider apply, deployment, publication or exported telemetry proof."
+  ],
+  "rollback": {
+    "identity": "5cfd306c7bcf7a109b47c379bf68ea80e0eea48d",
+    "action": "Revert this native size-policy slice; scoped tests release local resources. No provider action."
+  },
+  "parentHostedProof": {
+    "pullRequest": 141,
+    "headCommit": "5cfd306c7bcf7a109b47c379bf68ea80e0eea48d",
+    "runId": 37271500109,
+    "jobId": 111639279386,
+    "outcome": "failure",
+    "limitation": "Exact failed parent head retained; current candidate contains its portable output correction but has no hosted proof.",
+    "completedAt": "2026-10-05T06:28:38Z",
+    "failure": "Native page fixture ENOENT at /private/tmp/dev75-pages-au.pay.withholdings.png; five other native tests pass."
+  },
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for this local slice; whole T004 incomplete",
+    "remaining": "Exact hosted candidate checks, draft review, complete T004 and later tasks."
+  },
+  "environment": {
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "node": "v24.16.0",
+    "bun": "1.4.2",
+    "browser": "provisioned Chromium via PLAYWRIGHT_BROWSERS_PATH",
+    "initialFullAttemptFailure": "ENOSPC during isolated test installation; free disk later 12 GiB at readback."
+  },
+  "postCheckChanges": {
+    "scope": "Active plan and this receipt only after full verification; executable sources unchanged.",
+    "verification": "Pass: docs/runbooks/root format/Changeset status and whitespace after evidence update. Executable sources unchanged."
+  },
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 87,
+      "sha256": "ca867387c1faa280d38e4c74835ba59939ce7db09fdb2c61f8e2569b47ee36bb"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 19,
+      "sha256": "30ba18fa7caea09f41c852d76b4cc3fb81a5cd50caf9d3292b9c31a0bb841cdb"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 8,
+      "sha256": "8544fefa5407782f0066b40d9751f17d9619a61f98e81798e2eb5c6abd091aa0"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 19,
+      "sha256": "2ca79de29eacade71cbafd878d7650bf5c18535a0a13a5be84920de20fd8f8b5"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "9195e897ba05aa0a360d96c92cae4d127c43221e361756db415aa88dc3bc816f"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "3a24018bf465f4b36cd20071be261c456a7901d5bb4a0091fc8957107bcd650c"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "87ace94446591e9c90905b800d2e26374819db152bf333d4b9c92f143bb98670"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "2a02cf5e9fca12c2891f0d2f654cfbd7019494c72f6a1b6c77b4c11ed433394b"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular file under each named root.",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423"
+    }
+  ]
+}

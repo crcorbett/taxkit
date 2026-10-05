@@ -158,7 +158,7 @@ describe("native calculator RPC", () => {
               ...CalculationRequest,
               payload: {
                 ...CalculationRequest.payload,
-                padding: "x".repeat(1024 * 1024),
+                padding: "x".repeat(64 * 1024),
               },
             },
             version: CalculatorRpcVersion,

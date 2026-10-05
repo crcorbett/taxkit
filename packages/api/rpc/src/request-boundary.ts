@@ -14,7 +14,7 @@ import {
   HttpServerResponse,
 } from "effect/http";
 
-export const CalculatorRequestBodyLimit = ByteSize.mebibytes(1);
+export const CalculatorRequestBodyLimit = ByteSize.kibibytes(64);
 export const CalculatorRequestBodyDeadline = Duration.seconds(5);
 export class CalculatorRequestBodyRejected extends Schema.TaggedError<CalculatorRequestBodyRejected>()(
   "CalculatorRequestBodyRejected",

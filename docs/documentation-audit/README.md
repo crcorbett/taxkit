@@ -434,3 +434,8 @@ The [catalogue-backed calculator pages candidate](clean-slate-foundation/2026-10
 records separate withholding/annual page state, checked catalogue navigation,
 real native/browser/HTML-form results and the visible retained Medicare limit.
 Complete T004 package/transport/domain qualification remains open.
+
+The [native request size-policy candidate](clean-slate-foundation/2026-10-05-request-body-policy.json)
+records the common 64 KiB byte limit, exact-limit valid requests, multi-byte and
+stream-tail rejection, source release and actual built HTTP/RPC/form admission.
+Complete T004 transport/domain/package qualification remains open.

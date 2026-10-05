@@ -37,7 +37,7 @@ Planning leaves those resource addresses deferred. On first incoming use, the
 app decodes and caches the bound runtime values; missing or invalid values
 produce an empty 503 response, without a guessed address.
 
-Every POST body is limited to one MiB before JSON parsing, with a total
+Every native POST body is limited to 64 KiB before JSON parsing, with a total
 five-second read deadline. The native stream stops at the limit and its reader
 is closed on rejection, timeout or cancellation. Oversized requests return an
 empty 413; stalled bodies return an empty 408. CORS applies to those responses.

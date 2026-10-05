@@ -307,14 +307,32 @@ describe("native API application", () => {
     )
   );
 
-  it.effect(
-    "stops reading an oversized native body and releases its source",
-    () =>
+  it.effect.each([
+    { pathname: "/rpc", representation: "chunks" },
+    { pathname: "/rpc", representation: "utf-8" },
+    {
+      pathname: "/api/v1/calculators/au.pay.take-home/calculate",
+      representation: "chunks",
+    },
+    {
+      pathname: "/api/v1/calculators/au.pay.take-home/calculate",
+      representation: "utf-8",
+    },
+  ])(
+    "stops oversized $representation bytes and releases their source for $pathname",
+    ({ pathname, representation }) =>
       Effect.gen(function* () {
         const released = yield* Ref.make(false);
         const tailRead = yield* Ref.make(false);
         const app = yield* ApiWorkerInit;
-        const body = Stream.succeed(new Uint8Array(1024 * 1024 + 1)).pipe(
+        const chunks =
+          representation === "chunks"
+            ? Stream.make(
+                new Uint8Array(32 * 1024),
+                new Uint8Array(32 * 1024 + 1)
+              )
+            : Stream.succeed(new TextEncoder().encode("é".repeat(32_769)));
+        const body = chunks.pipe(
           Stream.concat(
             Stream.fromEffect(
               Ref.set(tailRead, true).pipe(Effect.as(new Uint8Array([1])))
@@ -326,7 +344,7 @@ describe("native API application", () => {
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromClientRequest(
-              HttpClientRequest.post("https://api.example.com/rpc").pipe(
+              HttpClientRequest.post(`https://api.example.com${pathname}`).pipe(
                 HttpClientRequest.bodyStream(body, {
                   contentType: "application/json",
                 })
@@ -344,101 +362,119 @@ describe("native API application", () => {
       )
   );
 
-  it.effect("shares one supplied operation across HTTP and native RPC", () =>
-    Effect.gen(function* () {
-      const calls = yield* Ref.make(0);
-      const constructions = yield* Ref.make(0);
-      const releases = yield* Ref.make(0);
-      const incomingPaths = yield* Ref.make<readonly string[]>([]);
-      const calculator = Layer.effect(
-        PublicCalculatorService,
-        Effect.gen(function* () {
-          yield* Ref.update(constructions, (count) => count + 1);
-          const live = yield* PublicCalculatorService;
-          return PublicCalculatorService.of({
-            ...live,
-            calculate: (request) =>
-              Effect.gen(function* () {
-                yield* Ref.update(calls, (count) => count + 1);
-                const incoming = yield* Effect.serviceOption(
-                  HttpServerRequest.HttpServerRequest
-                );
-                yield* incoming.pipe(
-                  Option.match({
-                    onNone: () => Effect.die("Incoming request is missing"),
-                    onSome: ({ url }) =>
-                      Ref.update(incomingPaths, Array.append(url)),
-                  })
-                );
-                const scope = yield* Effect.serviceOption(Scope.Scope);
-                yield* scope.pipe(
-                  Option.match({
-                    onNone: () =>
-                      Effect.die("Incoming request scope is missing"),
-                    onSome: (requestScope) =>
-                      Scope.addFinalizer(
-                        requestScope,
-                        Ref.update(releases, (count) => count + 1)
-                      ),
-                  })
-                );
-                return yield* live.calculate(request);
-              }),
-          });
-        })
-      ).pipe(Layer.provide(CalculatorLive));
-      const app = yield* ApiWorkerApplication.pipe(Effect.provide(calculator));
-      const transport = HttpClient.make((request) =>
-        app.fetch.pipe(
-          Effect.provideService(
-            HttpServerRequest.HttpServerRequest,
-            HttpServerRequest.fromClientRequest(request)
-          ),
-          Effect.map((response) =>
-            HttpServerResponse.toClientResponse(response, { request })
-          ),
-          Effect.scoped
-        )
-      );
-      const httpBody = yield* Schema.encodeEffect(Json)(
-        CalculationRequest.payload
-      );
-      const rpcBody = yield* Schema.encodeEffect(Json)(
-        NativeRequest.make({
-          headers: [],
-          id: "1",
-          payload: {
-            request: CalculationRequest,
-            version: CalculatorRpcVersion,
-          },
-          tag: "Calculate",
-        })
-      );
-      const http = yield* transport.execute(
-        HttpClientRequest.post(
-          "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate"
-        ).pipe(HttpClientRequest.bodyText(httpBody, "application/json"))
-      );
-      const rpc = yield* transport.execute(
-        HttpClientRequest.post("https://api.example.com/rpc").pipe(
-          HttpClientRequest.bodyText(rpcBody, "application/json")
-        )
-      );
-      expect(http.status).toBe(200);
-      expect(rpc.status).toBe(200);
-      expect(yield* http.text).toContain('"netPay"');
-      expect(yield* rpc.text).toContain('"netPay"');
-      expect(yield* Ref.get(calls)).toBe(2);
-      expect(yield* Ref.get(constructions)).toBe(1);
-      expect(yield* Ref.get(releases)).toBe(2);
-      expect(yield* Ref.get(incomingPaths)).toEqual([
-        "/api/v1/calculators/au.pay.take-home/calculate",
-        "/rpc",
-      ]);
-    }).pipe(
-      Effect.provideService(ConfigProvider.ConfigProvider, settings),
-      Effect.scoped
-    )
+  it.effect(
+    "accepts exactly 64 KiB across HTTP and native RPC with one shared operation",
+    () =>
+      Effect.gen(function* () {
+        const calls = yield* Ref.make(0);
+        const constructions = yield* Ref.make(0);
+        const releases = yield* Ref.make(0);
+        const incomingPaths = yield* Ref.make<readonly string[]>([]);
+        const calculator = Layer.effect(
+          PublicCalculatorService,
+          Effect.gen(function* () {
+            yield* Ref.update(constructions, (count) => count + 1);
+            const live = yield* PublicCalculatorService;
+            return PublicCalculatorService.of({
+              ...live,
+              calculate: (request) =>
+                Effect.gen(function* () {
+                  yield* Ref.update(calls, (count) => count + 1);
+                  const incoming = yield* Effect.serviceOption(
+                    HttpServerRequest.HttpServerRequest
+                  );
+                  yield* incoming.pipe(
+                    Option.match({
+                      onNone: () => Effect.die("Incoming request is missing"),
+                      onSome: ({ url }) =>
+                        Ref.update(incomingPaths, Array.append(url)),
+                    })
+                  );
+                  const scope = yield* Effect.serviceOption(Scope.Scope);
+                  yield* scope.pipe(
+                    Option.match({
+                      onNone: () =>
+                        Effect.die("Incoming request scope is missing"),
+                      onSome: (requestScope) =>
+                        Scope.addFinalizer(
+                          requestScope,
+                          Ref.update(releases, (count) => count + 1)
+                        ),
+                    })
+                  );
+                  return yield* live.calculate(request);
+                }),
+            });
+          })
+        ).pipe(Layer.provide(CalculatorLive));
+        const app = yield* ApiWorkerApplication.pipe(
+          Effect.provide(calculator)
+        );
+        const transport = HttpClient.make((request) =>
+          app.fetch.pipe(
+            Effect.provideService(
+              HttpServerRequest.HttpServerRequest,
+              HttpServerRequest.fromClientRequest(request)
+            ),
+            Effect.map((response) =>
+              HttpServerResponse.toClientResponse(response, { request })
+            ),
+            Effect.scoped
+          )
+        );
+        const httpBody = yield* Schema.encodeEffect(Json)(
+          CalculationRequest.payload
+        );
+        const rpcBody = yield* Schema.encodeEffect(Json)(
+          NativeRequest.make({
+            headers: [],
+            id: "1",
+            payload: {
+              request: CalculationRequest,
+              version: CalculatorRpcVersion,
+            },
+            tag: "Calculate",
+          })
+        );
+        const http = yield* transport.execute(
+          HttpClientRequest.post(
+            "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate"
+          ).pipe(
+            HttpClientRequest.bodyText(
+              httpBody +
+                " ".repeat(
+                  65_536 - new TextEncoder().encode(httpBody).byteLength
+                ),
+              "application/json"
+            )
+          )
+        );
+        const rpc = yield* transport.execute(
+          HttpClientRequest.post("https://api.example.com/rpc").pipe(
+            HttpClientRequest.bodyText(
+              rpcBody +
+                " ".repeat(
+                  65_536 - new TextEncoder().encode(rpcBody).byteLength
+                ),
+              "application/json"
+            )
+          )
+        );
+        expect(http.status).toBe(200);
+        expect(rpc.status).toBe(200);
+        expect(yield* http.text).toContain('"netPay"');
+        expect(yield* rpc.text).toContain('"netPay"');
+        expect(yield* Ref.get(calls)).toBe(2);
+        expect(yield* Ref.get(constructions)).toBe(1);
+        expect(yield* Ref.get(releases)).toBe(2);
+        expect(yield* Ref.get(incomingPaths)).toEqual([
+          "/api/v1/calculators/au.pay.take-home/calculate",
+          "/rpc",
+        ]);
+      }).pipe(
+        Effect.provideService(ConfigProvider.ConfigProvider, settings),
+        Effect.scoped
+      )
   );
 
   it.effect("serves after native instance initialisation returns", () =>

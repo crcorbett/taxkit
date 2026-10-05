@@ -32,6 +32,11 @@ describe("built native API and Website", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
         const root = path.resolve("../..");
+        const screenshotRoot = path.join(
+          root,
+          ".alchemy/native-pair/screenshots"
+        );
+        yield* fs.makeDirectory(screenshotRoot, { recursive: true });
         const apiRoot = path.join(
           root,
           ".alchemy/native-pair/bundles/TaxKitApi"
@@ -360,15 +365,48 @@ describe("built native API and Website", () => {
         expect(yield* Effect.promise(() => invalid.text())).toContain(
           "Check your pay details"
         );
-        const oversized = yield* Effect.promise(() =>
-          website.dispatchFetch(`${websiteOrigin}/`, {
-            body: "x".repeat(1_048_577),
-            headers: { "content-type": "application/x-www-form-urlencoded" },
-            method: "POST",
-          })
+        yield* Effect.forEach(
+          [
+            "/",
+            "/calculators/au.pay.withholdings",
+            "/calculators/au.income-tax.annual",
+          ],
+          (pathname) =>
+            Effect.gen(function* () {
+              const oversized = yield* Effect.promise(() =>
+                website.dispatchFetch(`${websiteOrigin}${pathname}`, {
+                  body: "é".repeat(32_769),
+                  headers: {
+                    "content-type": "application/x-www-form-urlencoded",
+                  },
+                  method: "POST",
+                })
+              );
+              expect(oversized.status).toBe(413);
+              expect(yield* Effect.promise(() => oversized.text())).toBe("");
+            })
         );
-        expect(oversized.status).toBe(413);
-        expect(yield* Effect.promise(() => oversized.text())).toBe("");
+        yield* Effect.forEach(
+          ["/rpc", "/api/v1/calculators/au.pay.take-home/calculate"],
+          (pathname) =>
+            Effect.gen(function* () {
+              const oversized = yield* Effect.promise(() =>
+                publicApi.dispatchFetch(`${apiOrigin}${pathname}`, {
+                  body: "é".repeat(32_769),
+                  headers: {
+                    "content-type": "application/json",
+                    origin: websiteOrigin,
+                  },
+                  method: "POST",
+                })
+              );
+              expect(oversized.status).toBe(413);
+              expect(oversized.headers.get("access-control-allow-origin")).toBe(
+                websiteOrigin
+              );
+              expect(yield* Effect.promise(() => oversized.text())).toBe("");
+            })
+        );
         const unavailableWorker = yield* Effect.promise(() =>
           website.getWorker("taxkit-website-unavailable")
         );
@@ -926,7 +964,7 @@ describe("built native API and Website", () => {
               yield* Effect.promise(() =>
                 page.screenshot({
                   fullPage: true,
-                  path: `/private/tmp/dev75-pages-${calculator.id}.png`,
+                  path: path.join(screenshotRoot, `${calculator.id}.png`),
                 })
               );
               yield* Effect.promise(() => calculatorInput.fill("30000"));
@@ -1053,7 +1091,10 @@ describe("built native API and Website", () => {
               yield* Effect.promise(() =>
                 savedPage.screenshot({
                   fullPage: true,
-                  path: `/private/tmp/dev75-pages-restored-${calculator.id}.png`,
+                  path: path.join(
+                    screenshotRoot,
+                    `restored-${calculator.id}.png`
+                  ),
                 })
               );
               expect(

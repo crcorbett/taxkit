@@ -28,7 +28,7 @@ connection acceptance is complete; T009 still owns safe exported tracing.
   the app supplies its HttpClient.
 - `./test`: explicit test-only in-process client over the same handler.
 - `./testing/fixtures`: deterministic real-calculator and failure fixtures only.
-- `./request-boundary`: shared native POST body limit, one MiB and five seconds.
+- `./request-boundary`: shared native POST body limit, 64 KiB and five seconds.
 - `./host-telemetry`: API/Website log and reporter containment with fixed fields.
 
 Workspace source conditions resolve `src`; ordinary imports and declarations
@@ -108,4 +108,14 @@ version, body/batch limits, safe error/defect encoding, operation-scoped native
 client, complete response deadline and credential/redirect/tracing policy.
 No generic callback or new message protocol is introduced. A minor Changeset
 records this private package interface addition; it performs no versioning or
-publication. Website catalogue consumption and other pages remain T004 work.
+publication. Complete package/transport/domain qualification remains T004 work.
+
+The streamed native POST reader and native RPC byte admission share the same
+64 KiB constant. The check counts encoded bytes, including multi-byte text,
+rather than characters or a claimed content length. Exactly 64 KiB is accepted;
+a stream crossing the limit stops before reading its remaining tail. The
+five-second body-read deadline and empty 413/408 replies are preserved. Checked
+caller guidance, common work/rate/concurrency limits, the ten-second client
+deadline and later MCP envelopes remain active T004/T006 work. This native
+boundary does not claim the retained standalone Bun HTTP server has the same
+admission policy.
