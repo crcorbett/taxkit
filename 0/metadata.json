@@ -1,0 +1,36 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M44PS3P93JVJ08ZZZH285DE2",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-05T00:17:59.921996Z",
+  "branch": "codex/dev-74-native-rpc-failures",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/web/test/native-rpc-failures.boundary.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "b7d70ba853ae",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 8018104,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 408818560,
+    "output_tokens": 1835295,
+    "api_call_count": 2725
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-05T00:17:58.481437Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 986,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 986,
+    "total_lines_changed": 1001,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}
