@@ -400,7 +400,7 @@ cancellation, the development pair and safe exported tracing remain unproved.
 
 The [native local development candidate](clean-slate-foundation/2026-10-05-native-local-development.json)
 records actual CLI startup, local matching bindings, source reload/restoration,
-browser/private calculations and shutdown. T003 remains active for safe exported
+browser/private calculations and shutdown. Later T003 acceptance below separates the unmet T009 safe exported
 telemetry; local development is not provider or deployment proof.
 
 The [native platform containment candidate](clean-slate-foundation/2026-10-05-native-trace-containment.json)
@@ -410,10 +410,15 @@ correction. T009 safe exported tracing remains unmet.
 
 The [native connection acceptance review](clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json)
 accepts T003 locally against its named criteria and bounded source/runtime
-proof. T009 safe exports, exact candidate hosted correction and DEV-75–81 remain
-separate unfinished work.
+proof. T009 safe exports and DEV-75–81 remain separate unfinished work.
 
 The [previous calculator answer candidate](clean-slate-foundation/2026-10-05-stale-calculator-answer.json)
 records T004's visible out-of-date answer, explicit recalculation, failed/invalid
 retry and server-submission hydration behaviour. Other calculator pages and
 T004's remaining interface/transport work remain unfinished.
+
+
+The [take-home explanation candidate](clean-slate-foundation/2026-10-05-take-home-explanation.json)
+records expandable report-owned breakdown, assumptions, supported year and
+source references, keyboard expansion and bounded link presentation. T004
+remains in progress for the other pages and complete package/transport work.

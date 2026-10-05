@@ -169,7 +169,8 @@
         "Unknown, extended or missing native settings function addresses return empty 404 before framework lookup/logging; native generated URL owns identity.",
         "Controlled slow headers and an unfinished actual reply reach the five-second deadline; browser requests abort after the deadline, editing and browser Back leaving the form.",
         "Real native CLI local development supplies both addresses/bindings, reloads API and Website source, restores exact sources and closes app ports on scoped shutdown.",
-        "Both actual saved local resources have explicitly disabled platform log/trace collection and zero sampling; source restoration uses the non-polling watcher and requires both visible page updates."
+        "Both actual saved local resources have explicitly disabled platform log/trace collection and zero sampling; source restoration uses the non-polling watcher and requires both visible page updates.",
+        "Take-home explanation opens with the keyboard without calculation; breakdown, recorded threshold and rule sources remain attached to the old report after form edits."
       ],
       "expectedSideEffects": [
         "Ignored native build files, scoped local Workers and Chromium only."
@@ -186,7 +187,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website-failures.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-local-development.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-trace-containment.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-05-stale-calculator-answer.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-stale-calculator-answer.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-take-home-explanation.json"
       ],
       "nonClaims": [
         "No cloud provider, deployed endpoint or trace-export proof; controlled native fatal/privacy paths are qualified only by the named local tests.",

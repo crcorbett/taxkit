@@ -30,11 +30,21 @@ transports settings only. No calculation runs when the page loads.
 Calculate sends the existing canonical request. Editing interrupts unfinished
 work and keeps the previous successful answer with an out-of-date message.
 A failed retry or invalid form keeps that answer visibly out of date; only a
-successful explicit calculation updates it. Leaving the form interrupts its operation;
+successful explicit calculation updates it. A previous request error is hidden
+while a new request is running. Leaving the form interrupts its operation;
 disposing the registry releases its resources. The standard HTML POST form also
 works without JavaScript, using the private binding and the same API operation.
 Server submissions use an encoded checked result when TanStack loads the page
 in the browser. Neither an Effect Context nor a service binding is serialised.
+
+The take-home result leaf shows the answer first and uses native `details` for
+its pay breakdown, assumptions, supported year and source references. Amounts,
+pay period, threshold choice and sources come from the checked report and its
+recorded withholding trace, not the currently edited form. This keeps an old
+answer's explanation consistent while it is out of date. Source references
+become links only when they are valid HTTPS addresses; other citations remain
+text. The container owns calculation commands; result rendering creates no
+browser client, cache or tax calculation.
 
 The shared RPC client owns its receive-loop scope per calculation. Retaining a
 client started by an earlier Worker request can stall a later request. Its

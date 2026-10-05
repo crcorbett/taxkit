@@ -2316,3 +2316,92 @@ the Website's eight browser checks are replayed from cache in that command;
 the Website checks were freshly run for this slice in 2.67 seconds. This is
 local proof for the stale-answer slice, with exact source/artifact identities
 in the dated receipt. Hosted candidate proof and draft review remain pending.
+
+
+## T004 take-home explanation candidate
+
+Continue the stale-answer draft #137 at
+`8e4236e1a9c596c3a5d3762d3ac1d4c150393edf` on
+`codex/dev-75-take-home-explanation`. At initial readback its exact hosted
+Quality run `37260854862`, job `111607580162`, is in progress. Local proof for
+that parent remains separate from this candidate.
+
+Implement the Q11 explanation for the existing take-home page using a focused
+readonly result leaf: main answer and stale warning first, native expandable
+pay breakdown, explicit Australian resident/2025–26/PAYG-only assumptions and
+limits, recorded threshold choice and report-owned source references. All
+amounts and changing assumptions remain attached to the report while the form
+changes. Missing trace scale cannot imply a choice. Valid HTTPS citations are
+links; other references are text. No new storage, calculation, public package
+contract, route or client.
+
+Documentation impact: **Change required** for the result/form leaves, styling,
+existing browser/native fixtures, pending-error container correction,
+app/frontend/testing owners and task/journey/
+evidence pointers. **Preserve** atoms/runtime/lifetimes, canonical
+facts/rules/results, SDK/RPC/HTTP/OpenAPI, public MDX, infrastructure/disabled
+platform policy, skills, lint permissions and runbooks. **N/A** Changeset for
+this private app rendering slice.
+
+The first actual six-test native suite passes in 41.98 seconds, including
+keyboard expansion and report identity after editing. Initial type/lint checks
+reject an unexported URL Schema and unchecked trace index. Use the owning
+record's Option lookup, with no policy exception. The malformed HTTPS browser
+case then rejects the attempted encoded-URL Schema check: that Schema is only
+annotated text, and validity belongs to its transformation. Correct link
+presentation with the platform validity check plus HTTPS condition; complete
+browser and repository qualification is pending. T004 remains in progress for
+other calculators and complete interface/transport/domain requirements.
+
+
+The explanation oracle also requires a distinct successful native browser
+request after restoring the server answer and retrying: 2000 dollars weekly,
+threshold not claimed, produces 1425 dollars take-home with 575 dollars PAYG
+withholding. Both gross/taxable fields become 2000 dollars, the recorded
+threshold changes to not claimed and the stale warning clears. This rejects
+an explanation hard-coded to the first 1654-dollar example.
+
+
+At later exact readback, parent #137 Quality succeeds at
+`8e4236e1a9c596c3a5d3762d3ac1d4c150393edf`, run `37260854862`,
+job `111607580162`, completed `2026-10-05T04:06:19Z`. This qualifies the
+parent only, not this explanation candidate.
+
+The distinct-result recovery case originally times out. Diagnostic browser
+headers contain no tracing/credential leak, and actual private/public Worker
+calls return the expected 1425-dollar result. Chrome's console identifies
+Local Network Access refusing the loopback request. The before/after evidence indicates that synthetic saved-document
+fulfillment changes the navigation's address-space classification; its mocked
+failure observation cannot qualify a later real request. Replace that saved
+navigation with one actual private POST using the existing form, then hydrate
+without replay. The controlled unavailable reply is limited to one request.
+The real subsequent RPC then updates the answer, both amounts and threshold
+assumption; the focused native fixture passes in 5.15 seconds. No browser
+permission/flag, provider, tracing or public transport change.
+
+The investigation also identifies a separate visible-state issue: AsyncResult
+retains the old failure/interruption while a new request waits. Add the policy
+container's waiting check so only a finished request failure becomes an alert;
+form validation still displays immediately. A focused browser case observes a
+completed failure and pending retry, busy state and absent old alert. Record
+its removal/restoration proof separately from the address-space fixture cause.
+Complete repository qualification remains pending.
+
+
+The pending-error removal fails the actual rendered alert assertion (one failed,
+11 skipped, 2.03 seconds). The driver restores the source bytes exactly, then
+all 12 Website browser checks freshly pass in 3.00 seconds. Final focused
+types/lint/docs/runbooks/format pass. The root test command freshly passes
+470 actual CLI lint cases, including 406 portable cases, in 59.97 seconds;
+27 app/package tasks pass with one fresh and 26 cached. The root build passes
+16 cached tasks. The first API smoke command is cached; a direct app smoke
+command then freshly passes real HTTP, external temporary consumer and cleanup.
+
+Complete verification passes with 32 fresh Quality cases, including 13 isolated
+copies in 520.83 seconds, both unused-code checks, one fresh type task with
+26 cached tasks, actual Worker declaration checks, fresh native builds and
+all six native tests in 47.46 seconds. SDK's 24 and Website's 12 browser checks
+are cache replays inside that command; the Website's fresh run is recorded
+above. Exact source and artifact identities belong to the dated receipt.
+This locally qualifies the bounded explanation/retry-display slice; hosted
+candidate checks, draft review and the remaining T004 work stay open.

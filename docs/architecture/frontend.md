@@ -320,3 +320,20 @@ success. The readonly leaf renders a named semantic `output` with an atomic
 polite announcement for both answer and out-of-date state. This state stays in
 the current React registry/checked submission; it is not browser storage or a
 URL. Expected errors still clear on editing and unfinished work still cancels.
+
+
+The focused `take-home-result.view.tsx` leaf receives only the checked report
+and stale flag. Native `details` supplies keyboard expansion. Money, period,
+withholding components and sources are report-owned; the trace's checked JSON
+record is read with `Record.get` and optional matching for the recorded scale.
+Missing/unrecognised scale values do not imply a threshold choice. Never use
+the currently edited form to explain an older answer. Link rendering uses the
+platform's URL validity check plus an HTTPS restriction, preserving non-link
+source references as text. It does not change the general SourceRef contract
+or calculate tax in the browser.
+
+
+A remembered failure or interruption in AsyncResult is not the outcome of a
+new request while `waiting` is true. The policy container therefore hides old
+request errors during waiting and displays the finished new failure only.
+Form validation errors still appear immediately without sending a request.

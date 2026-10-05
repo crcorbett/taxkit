@@ -62,6 +62,7 @@ export const TakeHomeCalculator = ({
     }
     if (
       showCalculation &&
+      !calculation.waiting &&
       (AsyncResult.isFailure(calculation) ||
         (AsyncResult.isSuccess(calculation) && Option.isNone(report)))
     ) {

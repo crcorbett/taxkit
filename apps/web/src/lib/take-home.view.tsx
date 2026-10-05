@@ -1,7 +1,8 @@
 import type { TakeHomePayReport } from "@taxkit/rules-au-pay/schemas";
-import { Option } from "effect";
+import type { Option } from "effect";
 
 import type { TakeHomeForm } from "./form.boundary";
+import { TakeHomeResultView } from "./take-home-result.view";
 
 export const TakeHomeFormView = ({
   form,
@@ -76,25 +77,6 @@ export const TakeHomeFormView = ({
       </button>
     </form>
     {message && <p role="alert">{message}</p>}
-    <output
-      aria-atomic="true"
-      aria-label="Calculation result"
-      aria-live="polite"
-    >
-      {Option.isSome(report) && stale && (
-        <span>This answer is out of date. Calculate again to update it.</span>
-      )}
-      {Option.isSome(report) && (
-        <span>
-          Take-home pay:{" "}
-          <strong>
-            {new Intl.NumberFormat("en-AU", {
-              currency: "AUD",
-              style: "currency",
-            }).format(report.value.netPay.cents / 100)}
-          </strong>
-        </span>
-      )}
-    </output>
+    <TakeHomeResultView report={report} stale={stale} />
   </section>
 );

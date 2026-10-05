@@ -396,6 +396,57 @@ describe("built native API and Website", () => {
             .getByText("$1,301.00", { exact: true })
             .waitFor({ timeout: 5000 })
         );
+        // Native details starts closed and opens with the keyboard, without work.
+        expect(
+          yield* Effect.promise(() =>
+            page.getByRole("heading", { name: "Pay breakdown" }).isVisible()
+          )
+        ).toBe(false);
+        yield* Effect.promise(() =>
+          page
+            .getByText("How this answer was worked out", { exact: true })
+            .focus()
+        );
+        yield* Effect.promise(() => page.keyboard.press("Enter"));
+        yield* Effect.promise(() =>
+          page
+            .getByRole("heading", { name: "Pay breakdown" })
+            .waitFor({ timeout: 5000 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .locator(".calculation-details")
+              .getByText("$1,654.00", { exact: true })
+              .count()
+          )
+        ).toBe(2);
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .locator(".calculation-details")
+              .getByText("$353.00", { exact: true })
+              .count()
+          )
+        ).toBe(2);
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .getByText("Tax-free threshold claimed.", { exact: true })
+              .count()
+          )
+        ).toBe(1);
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .getByRole("link", {
+                name: "ATO Schedule 1 - Statement of formulas for calculating amounts to be withheld",
+              })
+              .getAttribute("href")
+          )
+        ).toBe(
+          "https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld"
+        );
         const requests = yield* Queue.clear(calls);
         expect(requests).toHaveLength(1);
         expect(
@@ -430,6 +481,22 @@ describe("built native API and Website", () => {
             page.getByText("$1,301.00", { exact: true }).count()
           )
         ).toBe(1);
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .locator(".calculation-details")
+              .getByText("$1,654.00", { exact: true })
+              .count()
+          )
+        ).toBe(2);
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .locator(".calculation-details")
+              .getByText("$2,000.00", { exact: true })
+              .count()
+          )
+        ).toBe(0);
         expect(yield* Queue.clear(calls)).toEqual([]);
         expect(page.url()).toBe(`${websiteOrigin}/`);
         // Restoring the original figures still needs an explicit calculation.
@@ -572,13 +639,22 @@ describe("built native API and Website", () => {
             });
           }
         });
+        // Obtain actual private POST HTML over the document's real local connection.
+        // Synthetic navigation fulfillment misclassifies its address space in Chromium.
         yield* Effect.promise(() =>
-          savedPage.route(`${websiteOrigin}/`, (route) =>
-            route.fulfill({
-              body: serverHtml,
-              contentType: "text/html",
-              status: 200,
-            })
+          savedPage.route(
+            `${websiteOrigin}/`,
+            (route) =>
+              route.continue({
+                headers: {
+                  ...route.request().headers(),
+                  "content-type": "application/x-www-form-urlencoded",
+                  origin: websiteOrigin,
+                },
+                method: "POST",
+                postData: form,
+              }),
+            { times: 1 }
           )
         );
         yield* Effect.promise(() => savedPage.goto(websiteOrigin));
@@ -586,6 +662,29 @@ describe("built native API and Website", () => {
         expect(yield* Queue.clear(calls)).toEqual([]);
         const savedPayInput = savedPage.getByLabel("Pay before tax ($)");
         yield* Effect.promise(() => savedPayInput.fill("2000"));
+        yield* Effect.promise(() =>
+          savedPage.getByLabel("Claim the tax-free threshold").uncheck()
+        );
+        yield* Effect.promise(() =>
+          savedPage
+            .getByText("How this answer was worked out", { exact: true })
+            .click()
+        );
+        expect(
+          yield* Effect.promise(() =>
+            savedPage
+              .getByText("Tax-free threshold claimed.", { exact: true })
+              .count()
+          )
+        ).toBe(1);
+        expect(
+          yield* Effect.promise(() =>
+            savedPage
+              .locator(".calculation-details")
+              .getByText("$1,654.00", { exact: true })
+              .count()
+          )
+        ).toBe(2);
         yield* Effect.promise(() =>
           savedPage
             .getByText(
@@ -603,8 +702,10 @@ describe("built native API and Website", () => {
         ).toBe(1);
         expect(yield* Queue.clear(calls)).toEqual([]);
         yield* Effect.promise(() =>
-          savedPage.route(`${apiOrigin}/rpc`, (route) =>
-            route.fulfill({ body: "", status: 503 })
+          savedPage.route(
+            `${apiOrigin}/rpc`,
+            (route) => route.fulfill({ body: "", status: 503 }),
+            { times: 1 }
           )
         );
         yield* Effect.promise(() =>
@@ -624,6 +725,58 @@ describe("built native API and Website", () => {
         ).toContain("$1,301.00");
         expect(yield* Queue.clear(calls)).toHaveLength(1);
         expect(savedPage.url()).toBe(`${websiteOrigin}/`);
+        // A distinct real result must replace both the answer and its explanation.
+        yield* Effect.promise(() =>
+          savedPage
+            .getByRole("button", { exact: true, name: "Calculate" })
+            .click()
+        );
+        yield* Effect.promise(() =>
+          savedPage
+            .getByText("$1,425.00", { exact: true })
+            .waitFor({ timeout: 5000 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            savedPage
+              .locator(".calculation-details")
+              .getByText("$2,000.00", { exact: true })
+              .count()
+          )
+        ).toBe(2);
+        expect(
+          yield* Effect.promise(() =>
+            savedPage
+              .locator(".calculation-details")
+              .getByText("$575.00", { exact: true })
+              .count()
+          )
+        ).toBe(2);
+        expect(
+          yield* Effect.promise(() =>
+            savedPage
+              .getByText("Tax-free threshold not claimed.", { exact: true })
+              .count()
+          )
+        ).toBe(1);
+        expect(
+          yield* Effect.promise(() =>
+            savedPage
+              .getByText("Tax-free threshold claimed.", { exact: true })
+              .count()
+          )
+        ).toBe(0);
+        expect(
+          yield* Effect.promise(() =>
+            savedPage
+              .getByText(
+                "This answer is out of date. Calculate again to update it.",
+                { exact: true }
+              )
+              .count()
+          )
+        ).toBe(0);
+        expect(yield* Queue.clear(calls)).toHaveLength(1);
         yield* Effect.logInfo("native-pair: no JavaScript");
         const noJavaScript = yield* Effect.acquireRelease(
           Effect.promise(() =>

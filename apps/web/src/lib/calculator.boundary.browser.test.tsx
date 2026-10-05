@@ -2,7 +2,14 @@ import { RegistryContext } from "@effect/atom-react";
 import { describe, expect, it } from "@effect/vitest";
 import { CalculatorRpcUnavailable } from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
-import { Effect, Layer, Option, Result, Schema } from "effect";
+import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
+import { aud } from "@taxkit/core/primitives";
+import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
+import {
+  PayWithholdingsLedger,
+  TakeHomePayReport,
+} from "@taxkit/rules-au-pay/schemas";
+import { Effect, Layer, Option, Ref, Result, Schema } from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 import { createRoot, hydrateRoot } from "react-dom/client";
@@ -22,6 +29,7 @@ import {
   WebsiteSubmission,
   WebsiteSubmissionTransport,
 } from "./schemas";
+import { TakeHomeResultView } from "./take-home-result.view";
 import { TakeHomeCalculator } from "./take-home.container";
 
 describe("browser calculator lifetime", () => {
@@ -240,5 +248,123 @@ describe("browser calculator lifetime", () => {
         expect(errors).not.toHaveBeenCalled();
         expect(host.textContent).not.toContain("Take-home pay:");
       }).pipe(Effect.scoped)
+  );
+
+  it.effect("keeps old request errors hidden while a retry is running", () =>
+    Effect.gen(function* () {
+      const attempt = yield* Ref.make(0);
+      const client = Layer.succeed(
+        TaxKitRpcClient,
+        TaxKitRpcClient.of({
+          calculate: Effect.fn("TaxKitRpcClient.calculate")(() =>
+            Ref.getAndUpdate(attempt, (value) => value + 1).pipe(
+              Effect.flatMap((value) =>
+                value === 0
+                  ? Effect.fail(new CalculatorRpcUnavailable())
+                  : Effect.never
+              )
+            )
+          ),
+        })
+      );
+      const registry = yield* Effect.acquireRelease(
+        Effect.sync(() =>
+          AtomRegistry.make({
+            initialValues: [[calculatorRuntime.layer, client]],
+          })
+        ),
+        (value) => Effect.sync(() => value.dispose())
+      );
+      const host = yield* Effect.acquireRelease(
+        Effect.sync(() => {
+          const element = document.createElement("div");
+          document.body.appendChild(element);
+          return element;
+        }),
+        (element) => Effect.sync(() => element.remove())
+      );
+      const root = yield* Effect.acquireRelease(
+        Effect.sync(() => createRoot(host)),
+        (value) => Effect.sync(() => value.unmount())
+      );
+      root.render(
+        <RegistryContext.Provider value={registry}>
+          <TakeHomeCalculator submission={Option.none()} />
+        </RegistryContext.Provider>
+      );
+      yield* Effect.promise(() =>
+        expect.poll(() => host.querySelector("form")).not.toBeNull()
+      );
+      registry.set(submitTakeHomeAtom, "calculate");
+      yield* Effect.promise(() =>
+        expect
+          .poll(() => host.querySelector('[role="alert"]')?.textContent)
+          .toContain("Please try again.")
+      );
+      expect(registry.get(calculateAtom).waiting).toBe(false);
+      registry.set(submitTakeHomeAtom, "calculate");
+      yield* Effect.promise(() =>
+        expect.poll(() => host.textContent).toContain("Calculating…")
+      );
+      expect(registry.get(calculateAtom).waiting).toBe(true);
+      expect(host.querySelector('[role="alert"]')).toBeNull();
+    }).pipe(Effect.scoped)
+  );
+
+  it.effect.each([
+    { linked: true, reference: "https://www.ato.gov.au/example" },
+    { linked: false, reference: "data:text/html,example" },
+    { linked: false, reference: "https://" },
+  ])(
+    "renders only valid HTTPS rule-source links: $reference",
+    ({ reference, linked }) =>
+      Effect.sync(() => {
+        // Checked SourceRef allows general reference text; link presentation is narrower.
+        const trace = TraceNode.make({
+          children: [],
+          inputs: {},
+          result: 100,
+          ruleId: RuleId.make("test/source-link"),
+          sources: [
+            SourceRef.make({
+              kind: "ato-publication",
+              reference,
+              title: "Rule source",
+            }),
+          ],
+          title: "Source link fixture",
+        });
+        const component = LedgerComponent.make({
+          amount: aud(100),
+          effect: "additive",
+          id: ComponentId.make("test/payg"),
+          label: "PAYG withholding",
+          status: "active",
+          trace,
+        });
+        const report = new TakeHomePayReport({
+          grossPay: aud(200),
+          netPay: aud(100),
+          period: "weekly",
+          rulePackVersion: "rules-au-pay/1.0.0",
+          taxablePay: aud(200),
+          trace,
+          withholdings: new PayWithholdingsLedger({
+            components: [component],
+            period: "weekly",
+            total: aud(100),
+            trace,
+          }),
+          withholdingsTotal: aud(100),
+        });
+        const html = renderToString(
+          <TakeHomeResultView report={Option.some(report)} stale={false} />
+        );
+        expect(html.includes("href=")).toBe(linked);
+        expect(html).toContain("Rule source");
+        // No absent or unrecognised trace field can imply a threshold choice.
+        expect(html).not.toContain("Tax-free threshold claimed.");
+        expect(html).not.toContain("Tax-free threshold not claimed.");
+      })
   );
 });

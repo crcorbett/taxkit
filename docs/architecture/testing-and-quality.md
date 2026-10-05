@@ -1157,8 +1157,8 @@ out-of-date message and makes no request. Returning to the original figures
 still requires Calculate; one new real RPC clears the stale message and returns
 the retained answer. A controlled unavailable reply and an invalid form must
 keep the previous answer visible and out of date. A fresh Chromium context
-hydrates the actual Worker-generated successful submission HTML, makes no
-replayed calculation, and retains that answer after editing and a failed retry.
+loads actual successful private POST HTML over its real document connection,
+hydrates without replay, and retains that answer after editing and a failed retry.
 The semantic `output` has a name and atomic polite announcements.
 
 The server-restored browser input's named Playwright `fill` call is admitted
@@ -1168,4 +1168,50 @@ Runtime and other collection permissions remain unchanged. The existing
 interruption/route cleanup and private JavaScript-free paths must still pass.
 The [dated receipt](../documentation-audit/clean-slate-foundation/2026-10-05-stale-calculator-answer.json)
 owns candidate and removal/restoration observations. This does not complete
-T004's other calculators, breakdown/sources, package interface or transport limits.
+T004's other calculators, package interface or transport limits.
+
+
+### Take-home result explanation qualification
+
+The same native pair fixture now requires the result explanation to begin
+collapsed, receive keyboard focus and open with Enter without calculation.
+Its actual 1654-dollar weekly reply must show 1654 dollars gross/taxable pay,
+353 dollars PAYG/total withholding, the claimed threshold and the exact ATO
+reference. Editing to 2000 dollars retains those report amounts; editing the
+checkbox in restored successful Worker HTML keeps the old report's threshold
+choice. The main answer, stale warning, private no-JavaScript calculation,
+source reload, errors and cancellation still require their existing oracles.
+
+Three focused browser cases render owning Schema fixtures to admit a valid
+HTTPS source link and reject a non-HTTPS reference and malformed HTTPS address.
+Missing trace scale must not imply either threshold choice. These fixtures
+qualify link/absence presentation; they do not qualify tax rules or an ATO
+website. The [dated explanation receipt](../documentation-audit/clean-slate-foundation/2026-10-05-take-home-explanation.json)
+records this bounded slice. All calculator pages and complete T004 acceptance
+remain unfinished.
+
+
+The explanation oracle also requires a distinct successful native browser
+request after restoring the server answer and retrying: 2000 dollars weekly,
+threshold not claimed, produces 1425 dollars take-home with 575 dollars PAYG
+withholding. Both gross/taxable fields become 2000 dollars, the recorded
+threshold changes to not claimed and the stale warning clears. This rejects
+an explanation hard-coded to the first 1654-dollar example.
+
+
+The successful saved-answer navigation must continue to the real Website as a
+private POST, rather than fulfilling a document from captured HTML. The latter
+can classify the document outside the local address space in selected Chromium;
+mocked errors then work but a real API retry is refused by Local Network Access.
+The extended recovery oracle caught this gap. Actual private/public Worker
+calls still returned the expected 1425-dollar reply; Chrome's console named
+the loopback refusal. Changing only navigation to a real private POST qualified
+recovery without changing browser permissions, request tracing or transport
+policy. Captured error HTML remains a display-only hydration fixture and
+establishes no subsequent real-network retry.
+
+The browser lifetime fixture separately requires an actual completed mocked
+client failure followed by a pending retry: the busy label must show and the
+previous alert must disappear. Native AsyncResult preserves a previous failure
+during waiting; treating it as the current outcome gives a premature error.
+Removing the container's waiting check must fail that rendered-browser oracle.
