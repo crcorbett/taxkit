@@ -1,0 +1,36 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M44T4J95K631BH1TQPNC5JX6",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-05T01:16:38.596736Z",
+  "branch": "codex/dev-74-native-cancellation",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/web/test/native-cancellation.boundary.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "b7d70ba853ae",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 8428423,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 427372800,
+    "output_tokens": 1905694,
+    "api_call_count": 2849
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-05T01:16:37.310858Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 998,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 998,
+    "total_lines_changed": 1046,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}
