@@ -16,6 +16,7 @@ const taxkitReact = defineConfig({
 const decodingBoundaryFiles = [
   // Native app root stage ingress, checked before constructing secret Layers.
   "packages/infrastructure/src/apps-secrets.boundary.ts",
+  "apps/web/test/native-rpc-failures.boundary.test.ts",
   // Native RPC parser unknown envelopes and exact adversarial transport fixtures.
   "packages/api/rpc/src/server-serialization.boundary.ts",
   "packages/api/rpc/test/handlers.test.ts",
@@ -181,6 +182,7 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  "apps/web/test/native-rpc-failures.boundary.test.ts",
   "apps/web/test/native-settings-failure.boundary.test.ts",
   "apps/web/test/native-pair.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
@@ -608,6 +610,23 @@ export default defineConfig({
         "apps/web/src/lib/calculator.boundary.browser.test.tsx",
       ],
       rules: { "unicorn/prefer-dom-node-append": "off" },
+    },
+    {
+      files: ["apps/web/test/native-rpc-failures.boundary.test.ts"],
+      rules: {
+        "strict-effect/no-imperative-collections": [
+          "error",
+          {
+            allowedMethods: [
+              {
+                file: "apps/web/test/native-rpc-failures.boundary.test.ts",
+                method: "fill",
+                receiver: "invalidPayInput",
+              },
+            ],
+          },
+        ],
+      },
     },
     {
       files: ["apps/web/test/native-pair.boundary.test.ts"],

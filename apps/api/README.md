@@ -46,9 +46,10 @@ and severity. Arbitrary messages, Causes, annotations and span labels are
 discarded before console output. This is bounded containment; full safe native
 tracing and exporter qualification remains required by the active plan.
 
-The Worker is not yet wired into the infrastructure root. Local construction
-and transport tests do not prove a deployment or completion of DEV-74. The Bun
-commands and public contract stay available during this work.
+The apps infrastructure root now declares the native API and Website candidate
+and their matching resource bindings. Local plans and transport tests do not
+prove deployment or completion of DEV-74. The Bun commands and public contract
+stay available during this work.
 
 ## Runtime Shape
 
@@ -122,17 +123,17 @@ bun run --filter=api build
 bun run --filter=api clean
 ```
 
-For local UI development, run the API and web app in separate terminals:
+The retained standalone public API can be run separately:
 
 ```sh
 bun run --filter=api dev
-bun run --filter=web dev
 ```
 
-`bun run --filter=api dev` serves this app through portless at
-`https://api.taxkit.localhost`. `bun run --filter=web dev` injects that URL
-into `TAXKIT_API_BASE_URL` for SSR and `VITE_TAXKIT_API_BASE_URL` for browser
-navigation.
+This command serves the public API through portless at
+`https://api.taxkit.localhost`. The native Website needs a matching native API
+service for its private binding; this Bun process alone cannot provide it. The
+complete development pair remains active work. The Website README owns the
+local native build and test commands.
 
 ## Public-route smoke
 

@@ -1069,3 +1069,22 @@ parts and missing IDs against the function's generated URL. A short marker
 appeared in native framework logs before the exact-address check. Removal
 proof must inspect actual native logs as well as the saved 404 assertion, then
 restore exact source and rebuild both ordinary/fault artifacts.
+
+The native RPC failure fixture compiles the actual API entry separately for a
+post-calculation defect and a report field damaged after native encoding. The
+API compiler consumes compiled RPC dependencies; changing an unused source
+module is not proof. Each controlled build removes only its owned ignored
+output, restores exact entry bytes, and checks a marker in the actual entry
+plus the reached native response. Minified function names are not an oracle.
+
+The saved test requires a successful canonical calculation before malformed
+wire cases, safe global/procedure/fatal replies, version and expected service
+errors, and a valid-JSON damaged reply through the genuine Website binding.
+Chromium loads that actual Worker-produced error document and real assets;
+editing must clear the error without a calculation request. Positive fixed
+API/Website logs must omit private markers and pay values. Removal checks fail
+the saved test when global/procedure encoding or the owned reply decoder is
+disabled, then rebuild restored dependencies and artifacts. Procedure removal
+loses the fixed reply value; it does not establish marker reflection. Only
+exact fixture decoding, encoding and named Playwright input filling are admitted;
+actual CLI canaries still reject runtime execution at that fixture path.

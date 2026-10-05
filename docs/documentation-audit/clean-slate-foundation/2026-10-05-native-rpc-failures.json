@@ -1,0 +1,272 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "native RPC failure fixture, compiler inputs, encoding hooks, decoder or artifact changes",
+  "outcome": "qualified local native RPC global/procedure/fatal replies and damaged-reply Website/browser sub-slice; CSF-T003 remains in progress",
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-74-native-rpc-failures",
+    "baseCommit": "f4464a91385ec4044126c81b81b9453308cfee95",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "fileCount": 15,
+      "sortedEntriesSha256": "b137853fb0ad4752f967c9e9faef2c8490cf0259005ee9e51d6734b2867e08cf",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed repository-relative path and file sha256; excludes this post-check receipt to avoid self-hashing."
+    }
+  },
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation and controlled native test builds",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native Worker/browser",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "parentHostedProof": {
+    "pullRequest": 132,
+    "headCommit": "f4464a91385ec4044126c81b81b9453308cfee95",
+    "runId": 37233537827,
+    "jobId": 111528044011,
+    "outcome": "success",
+    "completedAt": "2026-10-04T21:05:50Z",
+    "limitation": "Parent revision only; no hosted result attributed to current candidate."
+  },
+  "nativeFixtures": {
+    "owner": "apps/web/scripts/native-pair-build.runtime.ts",
+    "source": "apps/api/src/worker.ts",
+    "defect": "Real PublicCalculatorService.calculate followed by Effect.die(PRIVATE9).",
+    "invalidReply": "One report field renamed after actual native encoding; framing and native server retained; JSON remains valid.",
+    "restoration": "Effect acquireRelease restores exact source before ordinary API build; only exact owned ignored output removed before each controlled compile.",
+    "oracle": "Marker in actual freshly built worker.js plus reached fatal or invalid reply and positive fixed safe reporting. Minified function names are not an oracle.",
+    "dependencyBoundary": "Native API compiler selects compiled RPC dependencies; build them before native compilation and after each hook-removal restoration.",
+    "ports": [
+      4199,
+      4200
+    ]
+  },
+  "proof": [
+    {
+      "command": "focused actual lint and Website types",
+      "outcome": "pass"
+    },
+    {
+      "command": "bun run --filter=web test:native-pair",
+      "outcome": "pass: all three genuine native Worker/browser tests, including real error HTML/assets and browser edit clearing without calculation replay"
+    },
+    {
+      "command": "remove native global defect encoding; rebuild dependencies/native artifacts; real wire probe and saved test",
+      "outcome": "pass: fatal response reflects PRIVATE9, saved test fails; exact restoration and all three native tests pass"
+    },
+    {
+      "command": "replace procedure defect Schema with native Schema.Unknown; rebuild and saved test",
+      "outcome": "pass: procedure decoder reply loses fixed safe value and saved test fails; no marker leak observed or claimed; exact restoration passes"
+    },
+    {
+      "command": "disable owned native exit reply decoder hook; rebuild and saved test",
+      "outcome": "pass: actual Website damaged-reply path returns 500 instead of checked 200 and saved test fails; exact restoration/rebuild makes all three pass"
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "pass: 780 installs/1007 packages checked; lock unchanged"
+    },
+    {
+      "command": "bun run test",
+      "outcome": "pass: 459 actual CLI lint cases and all 27 package/app tasks; changed API/RPC/Website/infrastructure tasks execute, unchanged tasks may use validated Turbo cache"
+    },
+    {
+      "command": "bun run build",
+      "outcome": "pass: all 16 tasks; 14 unchanged builds cached"
+    },
+    {
+      "command": "bun run api:smoke",
+      "outcome": "pass: fresh smoke process and separate temporary HTTP consumer; 11 prerequisite builds cached"
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass: docs/runbooks/path/governance, lint/format, both unused-code inventories, all compiler tasks, 32 Quality cases including 13 isolated cases (466.04 seconds), SDK/Website Chromium, actual Wrangler declarations, fresh native artifact build and all three Worker/browser journeys (6.69 seconds)"
+    }
+  ],
+  "failedAttempts": [
+    {
+      "finding": "Source-only handler injection did not reach native API artifact because dependencies use compiled exports.",
+      "recovery": "Target actual API entry, verify fresh worker.js marker and reached operation; rejected run is not proof."
+    },
+    {
+      "finding": "Initial hand-written ordinary payload omitted canonical tags and falsely failed the positive control.",
+      "recovery": "Encode owning CalculationRequest/CalculatorRpcPayload; actual ordinary native reply retains netPay 130100."
+    },
+    {
+      "finding": "Initial expected service error fixture failed earlier at procedure decoding.",
+      "recovery": "Use canonical annual calculator identity with shared-union pay facts; reaches selected calculator own input rejection."
+    },
+    {
+      "finding": "Initial Website fatal expectation demanded checked 200; unrelated native defects remain defects.",
+      "recovery": "Require empty 500 and fixed safe host report; malformed reply decoding alone uses checked invalid-response."
+    },
+    {
+      "finding": "Procedure removal initially demanded marker reflection; reply had no marker, but fixed safe value was lost.",
+      "recovery": "Exact source restoration/rebuild passed; revised removal oracle requires lost fixed value and saved-test failure. No leak claim."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "paths": [
+        "apps/web/scripts/native-pair-build.runtime.ts",
+        "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "apps/web/vitest.native.config.ts",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts"
+      ],
+      "reason": "Actual source-compiled native failure proof; exact decoder/encoder/named input-fill permissions, runtime rejection retained."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "packages/api/rpc/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/verification/critical-journeys.json",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/documentation-audit/README.md"
+      ],
+      "reason": "Bounded proof and compiler input ownership; correct stale API native graph/development claims; keep task unfinished."
+    },
+    {
+      "decision": "Preserve",
+      "paths": [
+        "production API/RPC source and wire",
+        "public HTTP/OpenAPI",
+        "retained tax rules and goldens",
+        ".agents/skills",
+        ".claude/skills",
+        "historical HGI/HFI/receipts",
+        "docs/runbooks"
+      ],
+      "reason": "Temporary source changes restored; no contract, rule, canonical policy or operational authority change."
+    },
+    {
+      "decision": "N/A",
+      "paths": [
+        "Changeset",
+        "public MDX/navigation",
+        "provider/deployment/publication records"
+      ],
+      "reason": "Private test/command/docs only; no versioned package behaviour or consequential operation."
+    }
+  ],
+  "parentAudit": {
+    "reviewer": "primary TaxKit implementation owner",
+    "outcome": "bounded native failure sub-slice reviewed and full local closeout passed; complete T003 acceptance remains pending",
+    "observations": [
+      "Canonical request/result Schemas and actual generated client remain the production owners. Fixture Unknown fields belong only to adversarial wire input.",
+      "Real calculator runs before injected fatal defect; native JSON framing is retained for invalid replies.",
+      "Fault artifacts require fresh owned output and actual entry marker plus positive reached response.",
+      "Client classifies only native reply decoding; unrelated fatal defects retain their identity.",
+      "Scoped Worker/browser resources dispose on failure and success. Browser editing proves hydration before the no-replay assertion.",
+      "No production runner or Layer construction added; canonical policies not weakened."
+    ]
+  },
+  "limitations": [
+    "Complete native cancellation and development pair remain unfinished.",
+    "RPC/HTTP tracing remains disabled as containment; safe exported tracing and provider telemetry are not qualified.",
+    "Structured local console observations are not provider ingestion privacy proof.",
+    "Saved malformed wire cases are bounded to the named native parser/procedure/fatal paths, not every possible framework or provider path."
+  ],
+  "rollback": "Revert this private test/command/docs slice to f4464a91385ec4044126c81b81b9453308cfee95; no external state changed.",
+  "nonClaims": [
+    "No complete DEV-74/CSF-T003 or overall goal completion.",
+    "No merge, deployment, publication, provider apply, Preview/Production or remote cancellation proof.",
+    "No confirmed Linear mutation; earlier automatic review restriction remains pending."
+  ],
+  "environment": {
+    "bun": "1.4.2",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "miniflare": "5.20261001.0-alpha",
+    "browser": "provisioned Chromium via PLAYWRIGHT_BROWSERS_PATH"
+  },
+  "restoredSources": [
+    {
+      "path": "apps/api/src/worker.ts",
+      "sha256": "5c1750b35b51f882614a876b3d82a9e66cf588316ce5612156a935b06553430e",
+      "matchesBaseBytes": true
+    },
+    {
+      "path": "packages/api/rpc/src/group.ts",
+      "sha256": "5b8a82f19382b07ecb70f22ffd5c56ee3ec23f08768f3f4b47c1b92878c52082",
+      "matchesBaseBytes": true
+    },
+    {
+      "path": "packages/api/rpc/src/live.layer.ts",
+      "sha256": "90abe8a1dc62511d2ead5c0ff179784421c04b8af23ee034a89e74bf94a5b282",
+      "matchesBaseBytes": true
+    },
+    {
+      "path": "packages/api/rpc/src/server-serialization.boundary.ts",
+      "sha256": "4a2c4017b52038f487c529603a928e387db6e1063df46022ebc6ab8e34e7b2d5",
+      "matchesBaseBytes": true
+    }
+  ],
+  "artifacts": {
+    "api": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "fileCount": 71,
+      "sortedEntriesSha256": "a575da3e39aa13c99a88a15ad5c302fbccf4eed6166a6c842a366588ad9051a6"
+    },
+    "apiDefect": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "fileCount": 39,
+      "sortedEntriesSha256": "a5ece8372f64c3fab2b2206f51fa0fb5254b36a1336e20250ad5693004e7355c"
+    },
+    "apiInvalidReply": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "fileCount": 39,
+      "sortedEntriesSha256": "11d0de8bf4fa6e006b47fab98f9b2c7f829693e1c7593d15cbc547b0c90250d8"
+    },
+    "websiteServer": {
+      "root": "apps/web/dist/server",
+      "fileCount": 28,
+      "sortedEntriesSha256": "6b8a3c8ccd59c7664137401e20c908a119eb10676fbdec4a4c35dac26a75eb78"
+    },
+    "browser": {
+      "root": "apps/web/dist/client",
+      "fileCount": 3,
+      "sortedEntriesSha256": "f7167d259efd52a7e26887dfc943797d56db5f37719051280a2475b6b63678dd"
+    },
+    "settingsDefect": {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "fileCount": 28,
+      "sortedEntriesSha256": "fb98077091875bf38cd52818d2f41d402cfbff78c66390e48246941ce85bfbab"
+    }
+  },
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted repository-relative file paths and file sha256; every regular file under each named artifact root.",
+  "postCheckChanges": {
+    "paths": [
+      "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-failures.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "scope": "Post-check receipt and active-plan closeout only; application/test/config and artifact bytes unchanged.",
+    "checks": [
+      "bun run check:docs",
+      "bun run check:runbooks",
+      "bun run changeset:status",
+      "git diff --cached --check"
+    ]
+  }
+}

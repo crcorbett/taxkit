@@ -2049,3 +2049,44 @@ to fail; the configured reruns pass. Only post-check receipt/plan text changes
 remain, checked through docs/runbooks and the staged whitespace check.
 T003 remains in progress; safe exported telemetry, further API native failure
 and complete cancellation/development pair proof remain unfinished.
+
+## T003 native RPC failure qualification
+
+Continue from draft #132 at `f4464a91385ec4044126c81b81b9453308cfee95` on
+`codex/dev-74-native-rpc-failures`. Its hosted Quality run 37233537827 passed
+at that exact revision; this is parent proof only. The current candidate adds
+actual native global/procedure/fatal reply checks and controlled API artifacts
+from the entry the native compiler consumes. A successful canonical request is
+the positive control. Malformed wire cases, checked service/version errors,
+safe fatal identity, private Website failure, and damaged valid-JSON reply
+classification now pass through real Workers. Chromium loads the actual error
+document and assets; editing clears its error without replay.
+
+Removing global encoding reflects the private marker. Removing procedure
+encoding loses its fixed safe value but does not reflect the marker. Removing
+the owned reply decoder changes the Website checked error to empty 500. Each
+saved test fails and exact source/dependency restoration passes. An earlier
+procedure oracle incorrectly demanded marker reflection; its restored check
+passed and the narrower oracle was then qualified. Source-only injection into
+a compiled dependency did not reach the native artifact and was rejected as
+proof. Neither failed attempt establishes privacy.
+
+Documentation impact: **Change required** for the source builder, saved native
+fixture/config, exact encoding/decoding/input-fill admissions and CLI canaries,
+API/Website/RPC READMEs, API/frontend/quality architecture, current journey and
+active evidence pointers. **Preserve** production RPC code/wire, public
+HTTP/OpenAPI, canonical skills, historical receipts, retained results and docs
+operations. **N/A** Changeset: only private test/command/docs behaviour changes;
+all temporary production source replacements are restored. Full local closeout
+is pending. T003 remains in progress for cancellation, the complete development
+pair and safe exported telemetry. No provider operation is authorised.
+
+Final local closeout passes frozen installation, 459 actual lint cases, all 27
+repository test tasks, all 16 builds, fresh public HTTP consumer smoke and full
+verification. Verification includes 32 Quality cases (13 isolated cases), both
+unused-code inventories, all compiler tasks, real Chromium, actual Wrangler
+declarations and all three freshly built native Worker/browser journeys.
+The dated RPC failure receipt binds exact changed source and all ordinary/fault
+artifacts. Only receipt and plan closeout text follow those checks; docs/runbooks,
+Changeset status and staged whitespace checks validate that final record.
+T003 remains in progress for cancellation, development and exported telemetry.

@@ -87,7 +87,12 @@ This package does not authorise a plan, deployment or secret access.
 Unit transport proof alone is not Worker, Website, binding or browser proof.
 The Website's local pair receipt separately records its native built artifacts
 and real Chromium journey. Neither proves a provider, telemetry backend or
-deployed calculation. Full native fatal/error/trace paths remain pending. Retained tax results remain unchanged; Medicare correction
+deployed calculation. The saved native RPC failure test now checks actual built global, procedure and
+fatal replies, checked service/version errors, and a damaged valid-JSON reply
+through the Website binding and Chromium form. Separate removal checks disable
+the native global/procedure encoder or reply decoder and require the saved test
+to fail, then restore source and compiled dependencies. This does not complete
+trace-export or cancellation proof. Retained tax results remain unchanged; Medicare correction
 is a separate unresolved decision. The canonical render receipt records its
 original scaffold and explicit stable-version adaptation; structural validation
 alone does not prove runtime behaviour.

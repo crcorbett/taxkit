@@ -125,3 +125,21 @@ the source byte-for-byte before rebuilding the ordinary pair. Do not run this
 builder concurrently with source scans or tests that replace source files.
 The fault test requires the injected operation in the actual artifact, empty
 500 response, positive fixed log event and no marker in logs or replies.
+
+The same builder also creates controlled API failure artifacts from the actual
+API entry: a real calculation followed by an unexpected defect, and one damaged
+report field after native reply encoding. Scoped finalisers restore the entry
+byte-for-byte before the ordinary build. Fresh owned output and reached-response
+checks prevent an old bundle from standing in for the injected operation.
+
+The native RPC failure test uses ports 4199 and 4200. Real Workers check malformed
+JSON, unknown procedures/envelopes, invalid identities, excess properties and
+bounded batches, plus procedure decoding, version disagreement and expected
+calculator rejection. The fatal reply retains its native defect identity and
+fixed safe message; the Website returns empty 500 through the private binding.
+A damaged valid-JSON reply becomes the checked invalid-response error. Its real
+Worker-produced HTML loads in Chromium; editing clears the restored error
+without replaying a calculation, proving the browser has taken over the form.
+Actual fixed API/Website log events must be present and omit the short marker
+and pay values. These are local observations; exported telemetry and complete
+cancellation remain unfinished.

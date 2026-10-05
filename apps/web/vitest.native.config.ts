@@ -5,6 +5,7 @@ export default defineConfig({
     fileParallelism: false,
     include: [
       "test/native-pair.boundary.test.ts",
+      "test/native-rpc-failures.boundary.test.ts",
       "test/native-settings-failure.boundary.test.ts",
     ],
     testTimeout: 30_000,

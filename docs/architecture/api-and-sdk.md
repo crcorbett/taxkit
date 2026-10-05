@@ -416,7 +416,12 @@ The [package README](../../packages/api/rpc/README.md) owns its explicit exports
 and current proof limits. The native API/Website candidates now consume it.
 The saved Website pair check exercises actual built artifacts, repeated private
 binding calls, an idle browser form, exact browser CORS and no-JavaScript POST.
-Full native fatal, framework logging and trace qualification remain in progress.
+The saved native RPC failure check also runs malformed envelopes, procedure
+decoding, expected/version errors and an injected fatal operation in actual
+Workers. A damaged valid-JSON reply crosses the real private binding and
+restores a checked error in Chromium without replay. Fixed host log events are
+required as positive controls. Safe exported tracing and complete native
+cancellation qualification remain in progress.
 Public HTTP/OpenAPI keeps its existing contract and shared application operation.
 
 Calculator Schemas use narrow core/rule Schema entrypoints. Diagnostics and

@@ -390,3 +390,5 @@ At audit time, check that:
   remain unfinished; local tests do not establish deployment.
 
 The [native Website settings-failure candidate](clean-slate-foundation/2026-10-05-native-website-failures.json) records short-marker ingress proof, controlled native internal failure, source restoration and remaining T003 limits.
+
+The [native RPC failure candidate](clean-slate-foundation/2026-10-05-native-rpc-failures.json) records actual built global/procedure/fatal replies, damaged-reply classification through the Website binding and Chromium, safeguard removal checks and remaining T003 limits.

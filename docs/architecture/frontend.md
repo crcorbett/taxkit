@@ -87,8 +87,11 @@ paths. The saved native pair test runs actual native artifacts, a private API
 binding and real Chromium. Focused browser tests qualify idle settings, editing,
 form unmount and expected-error hydration. The app README owns exact commands,
 generated Wrangler declarations and the distinction between standalone and
-Alchemy-native build output. Full T003 privacy/fatal proof and all calculator
-pages remain active work.
+Alchemy-native build output. The native RPC failure test also checks fixed global/procedure/fatal replies,
+a damaged valid-JSON result through the genuine private binding, and restored
+error editing in Chromium without replay. Positive fixed log events omit pay
+values and the short marker. Full exported telemetry, cancellation and all
+calculator pages remain active work.
 
 Docs SSR loaders retain their existing module-scoped runtime rule. `apps/docs` keeps one module-scoped
 server runtime for `DocsContentServiceLive`, composed over the TaxKit generated
