@@ -23,7 +23,8 @@ schemas, generated OpenAPI and docs routes stay in `packages/api/http`.
 `src/worker.ts` declares native `TaxKitApiWorker` with the standard Alchemy
 class and `.make` entry. `src/worker.application.ts` constructs one router and
 shared `PublicCalculatorService` in the native instance scope. HTTP and
-POST `/rpc` delegate to that same operation. Native requests keep their own
+POST `/rpc` delegate to the same calculator service. Its named RPC operations
+calculate and read the supported catalogue using the canonical service contracts. Native requests keep their own
 fibre and cleanup scope; the app constructs no backend ManagedRuntime.
 
 The Worker checks `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` with the

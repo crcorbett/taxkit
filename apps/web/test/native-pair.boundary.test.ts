@@ -1,15 +1,20 @@
 import { NodeServices } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
+import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
+import { CalculatorRpcOrigin, MetadataQuery } from "@taxkit/api-rpc/schemas";
+import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
 import {
   Array,
   Effect,
   FileSystem,
+  Layer,
   Option,
   Path,
   Queue,
   Record,
   Schema,
 } from "effect";
+import { FetchHttpClient } from "effect/http";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
@@ -198,6 +203,34 @@ describe("built native API and Website", () => {
         yield* Effect.logInfo("native-pair: waiting for website");
         yield* Effect.promise(() => website.ready).pipe(
           Effect.timeout("10 seconds")
+        );
+        const catalogueOrigin = CalculatorRpcOrigin.make(new URL(apiOrigin));
+        yield* Effect.forEach(["first", "after idle"] as const, (attempt) =>
+          Effect.gen(function* () {
+            if (attempt === "after idle") {
+              yield* Effect.sleep("750 millis");
+            }
+            const catalogue = yield* TaxKitRpcClient.pipe(
+              Effect.flatMap((client) =>
+                client.listCalculators(MetadataQuery.make({}))
+              ),
+              Effect.provide(
+                TaxKitRpcClientLive(catalogueOrigin).pipe(
+                  Layer.provide(FetchHttpClient.layer)
+                )
+              )
+            );
+            expect(catalogue.calculators).toHaveLength(3);
+            expect(
+              Array.map(catalogue.calculators, (value) => value.calculatorId)
+            ).toEqual(
+              expect.arrayContaining([
+                "au.pay.take-home",
+                "au.pay.withholdings",
+                "au.income-tax.annual",
+              ])
+            );
+          })
         );
         const settingsFunctionId = Array.findFirst(
           Record.values(websiteModules),

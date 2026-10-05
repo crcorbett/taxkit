@@ -1,7 +1,7 @@
 import { Effect, Layer, Match, Option, Result, Schema } from "effect";
 import { RpcSerialization } from "effect/rpc";
 
-import { Calculate } from "./group.js";
+import { Calculate, ListCalculators } from "./group.js";
 
 // Validate the native JSON parser's unknown envelopes before the native server
 // can reflect an unchecked procedure tag or request identity. This is ingress
@@ -21,7 +21,7 @@ const RequestEnvelope = Schema.TaggedStruct("Request", {
   ).check(Schema.isMaxLength(32)),
   id: RequestIdentity,
   payload: Schema.Unknown,
-  tag: Schema.Literal(Calculate._tag),
+  tag: Schema.Literals([Calculate._tag, ListCalculators._tag]),
 });
 const RequestBytes = Schema.Union([Schema.String, Schema.Uint8Array]).check(
   Schema.makeFilter(

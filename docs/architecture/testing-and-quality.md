@@ -1215,3 +1215,23 @@ client failure followed by a pending retry: the busy label must show and the
 previous alert must disappear. Native AsyncResult preserves a previous failure
 during waiting; treating it as the current outcome gives a premature error.
 Removing the container's waiting check must fail that rendered-browser oracle.
+
+
+### Calculator catalogue RPC qualification
+
+The existing RPC tests also require the named catalogue operation to return all
+three retained IDs and 2025–26 Australian contexts through the real service in
+the explicit test Layer, and canonical titles through native HTTP/JSON RPC.
+Version mismatch must stay a checked failure for either procedure. Damaged
+JSON and valid JSON with the wrong result shape must be checked invalid
+responses for both operation exits. Both operations use the existing stalled
+headers/body, earlier interruption, caller-scope cleanup and credential/redirect
+policy oracles. Unknown native procedure tags remain rejected.
+
+The existing saved native pair fixture additionally reads the built actual API
+catalogue with the checked native client, then repeats it after idle time. This
+qualifies the catalogue operation at a separate real local Worker connection;
+it does not claim homepage consumption, new calculator pages, rate/concurrency
+policy, provider state or deployment. The
+[dated catalogue receipt](../documentation-audit/clean-slate-foundation/2026-10-05-calculator-catalogue-rpc.json)
+owns exact candidate and qualification outcomes.

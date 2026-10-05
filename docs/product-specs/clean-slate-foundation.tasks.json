@@ -477,7 +477,8 @@
       "evidence": [
         "docs/documentation-audit/clean-slate-foundation/2026-10-04-sdk-client-lifetime.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-stale-calculator-answer.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-05-take-home-explanation.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-take-home-explanation.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculator-catalogue-rpc.json"
       ]
     },
     {

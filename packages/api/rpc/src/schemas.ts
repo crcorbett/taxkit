@@ -1,9 +1,14 @@
-import { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
+import {
+  CalculatorRunServiceRequest,
+  MetadataQuery,
+} from "@taxkit/calculators/schemas";
 import { Duration, Schema, SchemaGetter } from "effect";
 
 export {
+  CalculatorCatalogResponse,
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
+  MetadataQuery,
 } from "@taxkit/calculators/schemas";
 export { DocsNavigation, DocsPagePath } from "@taxkit/docs-content/schemas";
 
@@ -11,6 +16,10 @@ export const CalculatorRpcVersion = "1";
 export const CalculatorRpcPayload = Schema.Struct({
   request: CalculatorRunServiceRequest,
   version: Schema.String.check(Schema.isMaxLength(32)),
+});
+export const CalculatorCatalogRpcPayload = Schema.Struct({
+  query: MetadataQuery,
+  version: CalculatorRpcPayload.fields.version,
 });
 
 export const CalculatorRpcOrigin = Schema.URLFromString.check(

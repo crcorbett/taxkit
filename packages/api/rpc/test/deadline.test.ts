@@ -17,16 +17,21 @@ import { TestClock } from "effect/testing";
 import { CalculationRequest } from "../src/__testing__/fixtures.js";
 import { CalculatorRpcDeadlineExceeded } from "../src/errors.js";
 import { TaxKitRpcClientLive } from "../src/live.layer.js";
-import { CalculatorRpcOrigin } from "../src/schemas.js";
+import { CalculatorRpcOrigin, MetadataQuery } from "../src/schemas.js";
 import { TaxKitRpcClient } from "../src/service.js";
 
 const origin = Schema.decodeResult(CalculatorRpcOrigin)(
   "https://api.example.com"
 ).pipe(Result.getOrThrowWith(() => new Error("Invalid fixture origin")));
 
-it.effect.each(["headers", "body"] as const)(
-  "one deadline includes stalled %s and cleans up that work",
-  (phase) =>
+it.effect.each([
+  { operation: "calculate", phase: "headers" },
+  { operation: "calculate", phase: "body" },
+  { operation: "catalogue", phase: "headers" },
+  { operation: "catalogue", phase: "body" },
+] as const)(
+  "one deadline includes stalled $phase for $operation and cleans up that work",
+  ({ phase, operation }) =>
     Effect.gen(function* () {
       const started = yield* Deferred.make<boolean>();
       const released = yield* Deferred.make<boolean>();
@@ -48,9 +53,11 @@ it.effect.each(["headers", "body"] as const)(
       );
       yield* Effect.gen(function* () {
         const client = yield* TaxKitRpcClient;
-        const call = yield* client
-          .calculate(CalculationRequest)
-          .pipe(Effect.forkScoped);
+        const call = yield* (
+          operation === "calculate"
+            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
+            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
+        ).pipe(Effect.forkScoped);
         yield* Deferred.await(started);
         yield* TestClock.adjust("5 seconds");
         const error = yield* Fiber.join(call).pipe(Effect.flip);
@@ -66,9 +73,9 @@ it.effect.each(["headers", "body"] as const)(
     })
 );
 
-it.effect(
-  "an earlier caller interruption closes a stalled body and remains interruption",
-  () =>
+it.effect.each(["calculate", "catalogue"] as const)(
+  "an earlier caller interruption closes a stalled body and remains interruption for %s",
+  (operation) =>
     Effect.gen(function* () {
       const started = yield* Deferred.make<boolean>();
       const released = yield* Deferred.make<boolean>();
@@ -90,9 +97,11 @@ it.effect(
       );
       yield* Effect.gen(function* () {
         const client = yield* TaxKitRpcClient;
-        const call = yield* client
-          .calculate(CalculationRequest)
-          .pipe(Effect.forkScoped);
+        const call = yield* (
+          operation === "calculate"
+            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
+            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
+        ).pipe(Effect.forkScoped);
         yield* Deferred.await(started);
         yield* Fiber.interrupt(call);
         const exit = yield* Fiber.await(call);
@@ -112,9 +121,9 @@ it.effect(
     })
 );
 
-it.effect(
-  "closing the caller's scope interrupts pending native client work",
-  () =>
+it.effect.each(["calculate", "catalogue"] as const)(
+  "closing the caller's scope interrupts pending native client work for %s",
+  (operation) =>
     Effect.gen(function* () {
       const started = yield* Deferred.make<boolean>();
       const released = yield* Deferred.make<boolean>();
@@ -126,7 +135,11 @@ it.effect(
       );
       yield* Effect.gen(function* () {
         const client = yield* TaxKitRpcClient;
-        yield* client.calculate(CalculationRequest).pipe(Effect.forkScoped);
+        yield* (
+          operation === "calculate"
+            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
+            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
+        ).pipe(Effect.forkScoped);
         yield* Deferred.await(started);
       }).pipe(
         Effect.provide(
@@ -140,9 +153,9 @@ it.effect(
     })
 );
 
-it.effect(
-  "applies credential and redirect policy when the HTTP operation runs",
-  () =>
+it.effect.each(["calculate", "catalogue"] as const)(
+  "applies credential and redirect policy when the HTTP operation runs for %s",
+  (operation) =>
     Effect.gen(function* () {
       const reached = yield* Deferred.make<
         Readonly<{
@@ -170,9 +183,11 @@ it.effect(
       );
       yield* Effect.gen(function* () {
         const client = yield* TaxKitRpcClient;
-        const call = yield* client
-          .calculate(CalculationRequest)
-          .pipe(Effect.forkScoped);
+        const call = yield* (
+          operation === "calculate"
+            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
+            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
+        ).pipe(Effect.forkScoped);
         expect(yield* Deferred.await(reached)).toEqual({
           credentials: "omit",
           redirect: "error",

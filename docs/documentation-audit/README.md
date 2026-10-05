@@ -422,3 +422,9 @@ The [take-home explanation candidate](clean-slate-foundation/2026-10-05-take-hom
 records expandable report-owned breakdown, assumptions, supported year and
 source references, keyboard expansion and bounded link presentation. T004
 remains in progress for the other pages and complete package/transport work.
+
+
+The [calculator catalogue RPC candidate](clean-slate-foundation/2026-10-05-calculator-catalogue-rpc.json)
+records the named catalogue connection, canonical query/result ownership and
+operation-specific codec/lifetime checks. Homepage consumption, remaining
+calculator pages and complete T004 qualification remain open.

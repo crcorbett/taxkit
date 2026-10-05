@@ -93,6 +93,8 @@ describe("browser calculator lifetime", () => {
               Effect.onInterrupt(() => Effect.sync(cancelled))
             )
           ),
+          listCalculators: () =>
+            Effect.die("Catalogue not used by this fixture"),
         })
       );
       const registry = yield* Effect.acquireRelease(
@@ -135,6 +137,8 @@ describe("browser calculator lifetime", () => {
                 Effect.onInterrupt(() => Effect.sync(cancelled))
               )
             ),
+            listCalculators: () =>
+              Effect.die("Catalogue not used by this fixture"),
           })
         );
         const registry = yield* Effect.acquireRelease(
@@ -195,6 +199,8 @@ describe("browser calculator lifetime", () => {
                 Effect.andThen(Effect.fail(new CalculatorRpcUnavailable()))
               )
             ),
+            listCalculators: () =>
+              Effect.die("Catalogue not used by this fixture"),
           })
         );
         const submission = yield* Schema.encodeEffect(
@@ -265,6 +271,8 @@ describe("browser calculator lifetime", () => {
               )
             )
           ),
+          listCalculators: () =>
+            Effect.die("Catalogue not used by this fixture"),
         })
       );
       const registry = yield* Effect.acquireRelease(

@@ -15,6 +15,9 @@ export const TaxKitRpcClientTest = Layer.effect(
         calculate: Effect.fn("TaxKitRpcClient.calculate")((request) =>
           client.Calculate({ request, version: CalculatorRpcVersion })
         ),
+        listCalculators: Effect.fn("TaxKitRpcClient.listCalculators")((query) =>
+          client.ListCalculators({ query, version: CalculatorRpcVersion })
+        ),
       })
     )
   )

@@ -398,10 +398,11 @@ do not establish the later calculator UI, transport limits or whole-task accepta
 
 ## Native website RPC (T003 locally accepted)
 
-`@taxkit/api-rpc` now owns one versioned `Calculate` procedure over canonical
-calculator request/result Schemas. Its native server explicitly mounts POST
-`/rpc` with JSON; its handler delegates to `PublicCalculatorService.calculate`.
-The protocol lives in the caller's Layer scope; each calculation acquires and
+`@taxkit/api-rpc` owns versioned `Calculate` and `ListCalculators` procedures over canonical
+calculator request/result/query/catalogue Schemas. Its native server mounts POST
+`/rpc` with JSON; handlers delegate to the corresponding
+`PublicCalculatorService.calculate` or `listCalculators` operation.
+The protocol lives in the caller's Layer scope; each named operation acquires and
 releases its native generated client's receive loop. Expected
 calculator failures project to fixed reasons, while version disagreement,
 unavailable transport, invalid replies and a complete-response deadline remain
@@ -425,8 +426,8 @@ required as positive controls. The native cancellation test runs the real
 calculation/encoder before controlled eight-second header/body delays. The
 generated client must hit its five-second deadline; Chromium must abort on the
 deadline, editing and browser Back leaving the form. This establishes caller
-cancellation, with no upstream Worker cancellation claim. Safe exported tracing
-and the development pair remain in progress.
+cancellation, with no upstream Worker cancellation claim. Native local development
+is separately qualified; T009 safe exported tracing remains in progress.
 Public HTTP/OpenAPI keeps its existing contract and shared application operation.
 
 Calculator Schemas use narrow core/rule Schema entrypoints. Diagnostics and
@@ -522,3 +523,15 @@ The docs app should document:
 - API reference
 - SDK usage
 - contribution guide for official rule tables and golden tests
+
+
+The private catalogue procedure delegates to
+`PublicCalculatorService.listCalculators` with the canonical `MetadataQuery`
+and `CalculatorCatalogResponse`. It carries no calculation facts. Native
+envelope admission uses only the declared Calculate/ListCalculators tags;
+each operation retains the same checked version, safe defect handling, body
+limits, whole-response deadline, native client scope and fetch policy. The
+private reply decoder marks only the two owning native exit Schemas; an
+unrelated adapter Schema error remains a defect. Public HTTP/OpenAPI and SDK
+interfaces do not change. Reading this list in the homepage remains active
+T004 work until its actual route is implemented and qualified.

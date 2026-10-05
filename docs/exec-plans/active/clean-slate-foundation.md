@@ -2405,3 +2405,66 @@ are cache replays inside that command; the Website's fresh run is recorded
 above. Exact source and artifact identities belong to the dated receipt.
 This locally qualifies the bounded explanation/retry-display slice; hosted
 candidate checks, draft review and the remaining T004 work stay open.
+
+
+## T004 calculator catalogue connection candidate
+
+The take-home explanation is pushed as draft #138 at
+`48dcf8e657130da5a85a3a36db1c2dd974e62126`; exact hosted Quality run
+`37264804942`, job `111619227474`, is in progress at first readback. Continue
+on `codex/dev-75-calculator-catalogue` without treating its earlier local
+checks as hosted acceptance.
+
+The remaining pages must use the supported calculator catalogue rather than
+introducing a separate list. Add one closed named `ListCalculators` RPC over
+`PublicCalculatorService.listCalculators`, using its owning `MetadataQuery`
+and `CalculatorCatalogResponse` Schemas. Native request admission recognises
+only the existing Calculate and new declared procedure. Each client operation
+owns its receive-loop scope, complete five-second deadline, checked transport
+failures and disabled credential/redirect/tracing policy. Decode failures on
+the new native exit use the existing safe marker; unrelated defects remain
+defects. No generic operation callback or browser engine is added.
+
+Documentation impact: **Change required** for RPC source/tests/README, native
+API/Web fixture, API/SDK/package-ownership/effect-services/testing architecture,
+API README, task/plan/evidence and one minor private RPC Changeset. **Preserve**
+canonical tax rules/results, public HTTP/OpenAPI/SDK and MDX contracts, form
+behaviour, infrastructure, disabled platform policy, skills/lint/CI and
+runbooks. Public generated snapshots are **N/A** for an RPC-only addition.
+The Changeset records the private package interface; no version or publication
+operation is performed. T004 remains in progress; homepage consumption, the
+other two pages and complete transport/domain qualification remain open.
+
+The first 36 RPC checks pass. Initial type checking rejects a test-only union
+of calculation and catalogue Effects at `Effect.flip`. Discard each unused
+success value inside its selected branch; the error observation then has one
+checked type, with no cast or widened exception. Types and all 36 checks pass
+after that correction. Fresh saved native catalogue and complete repository
+qualification are pending.
+
+
+At later readback, parent #138 Quality succeeds at the exact head, run
+`37264804942`, job `111619227474`, completed `2026-10-05T04:58:45Z`.
+The catalogue candidate freshly builds and passes all six native tests in
+42.27 seconds, including two checked catalogue reads through the actual built
+API before/after idle. Full repository qualification remains pending.
+
+
+Catalogue closeout passes: 470 fresh actual CLI lint cases (406 portable) in
+56.56 seconds; 27 app/package tests (16 fresh, 11 cached); final root build
+with four fresh and 12 cached tasks; fresh API HTTP/external consumer smoke;
+fresh packed SDK (46 files) and downstream installation/types/runtime/exports/
+browser checks. The initial build omitted the provisioned browser path and
+failed docs MDX generation; adding that environment path passes, with no install
+or code change. The damaged catalogue-reply marker removal produces the
+required failure; exact restoration returns all 36 tests to passing.
+
+Full verification passes: 32 fresh Quality tests including 13 isolated copies
+in 474.10 seconds, both unused-code checks, 16 fresh and 11 cached type tasks,
+24 fresh SDK browser checks, actual Worker declarations, fresh native builds
+and all six native tests in 39.99 seconds. Website's 12 browser checks are
+replayed inside that command and were freshly run above in 2.97 seconds.
+Post-check changes are confined to this plan and the dated receipt. Exact
+source and built artifact identities are retained there; hosted candidate
+proof and draft review remain separate. T004 still requires actual catalogue
+consumption, other pages and complete package/transport/domain qualification.

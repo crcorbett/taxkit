@@ -29,11 +29,11 @@ Current implemented code lives in:
 - `packages/docs-fumadocs`
 - `packages/api/http`
 - `packages/api/rpc`
-: Private compiled native Effect RPC transport. It owns one versioned calculation
-  procedure, thin calculator-service handler, checked POST/JSON ingress and
+: Private compiled native Effect RPC transport. It owns versioned calculation/catalogue
+  procedures, thin named calculator-service handlers, checked POST/JSON ingress and
   caller-scoped private client Layers. Calculator/content Schemas remain with
   their existing owners. Explicit test-only composition is separate; no app
-  runtime or backend fallback belongs here. T003 app-host composition is pending.
+  runtime or backend fallback belongs here. T003 app-host composition is locally accepted; T009 exported tracing remains open.
 
 `packages/sdk/typescript`
 - `packages/rules/au/income-tax`
@@ -167,10 +167,11 @@ Root `alchemy.run.ts`
 : API application owner. It retains standalone Bun config/startup/shutdown
 and adds the native Alchemy Worker candidate for active DEV-74. The native
 instance owns one router and calculator service; incoming requests own body
-limits, dispatch and cleanup. HTTP and RPC share the named calculator operation.
+limits, dispatch and cleanup. HTTP and RPC share the named calculator service operations.
 The private `api/worker` export supplies native composition to the infrastructure
 graph. The Website uses its private binding for SSR and checked public origin
-for browser RPC; full T003 acceptance remains pending.
+for browser RPC; T003 is locally accepted by its dated connection acceptance review.
+T009 exported tracing and provider/deployment proof remain open.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs

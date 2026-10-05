@@ -184,8 +184,8 @@ checked submission state through ordinary React context. The container owns
 commands; focused leaves render readonly values. Editing and form unmount
 interrupt active work. Private binding transport belongs to the server Layer;
 public browser transport belongs to the registry. The RPC protocol Layer keeps
-configuration, while each native client receive loop has a calculation scope.
-No calculation builds a Layer or runner. See the [Website owner](../../apps/web/README.md).
+configuration, while each named native client receive loop has an operation scope.
+No calculation or catalogue read builds a Layer or runner. See the [Website owner](../../apps/web/README.md).
 The SDK owns one runtime per client, with caller disposal and bounded one-shot
 helpers; see the [SDK lifetime owner](api-and-sdk.md#typescript-sdk-facade).
 

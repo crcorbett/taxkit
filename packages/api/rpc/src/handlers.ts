@@ -38,6 +38,10 @@ export const TaxKitRpcHandlersLive = TaxKitRpcGroup.toLayer(
               )
             )
           : Effect.fail(new CalculatorRpcVersionMismatch()),
+      ListCalculators: ({ query, version }) =>
+        version === CalculatorRpcVersion
+          ? calculator.listCalculators(query)
+          : Effect.fail(new CalculatorRpcVersionMismatch()),
     });
   })
 );

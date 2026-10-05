@@ -31,9 +31,13 @@ import {
   CalculatorRpcInvalidResponse,
   CalculatorRpcRejected,
 } from "../src/errors.js";
-import { Calculate, TaxKitRpcGroup } from "../src/group.js";
+import { Calculate, ListCalculators, TaxKitRpcGroup } from "../src/group.js";
 import { TaxKitRpcClientLive } from "../src/live.layer.js";
-import { CalculatorRpcOrigin, CalculatorRpcVersion } from "../src/schemas.js";
+import {
+  CalculatorRpcOrigin,
+  CalculatorRpcVersion,
+  MetadataQuery,
+} from "../src/schemas.js";
 import { TaxKitRpcHttpLayer } from "../src/server.js";
 import { TaxKitRpcClient } from "../src/service.js";
 import { TaxKitRpcClientTest } from "../src/test.layer.js";
@@ -79,6 +83,69 @@ const makeHttpTransport = Effect.fnUntraced(function* (
 });
 
 describe("native calculator RPC", () => {
+  it.effect(
+    "reads all retained calculators through the explicit test layer",
+    () =>
+      Effect.gen(function* () {
+        const client = yield* TaxKitRpcClient;
+        const response = yield* client.listCalculators(MetadataQuery.make({}));
+        expect(response.calculators).toHaveLength(3);
+        expect(
+          Array.map(response.calculators, (value) => value.calculatorId)
+        ).toEqual(
+          expect.arrayContaining([
+            "au.pay.take-home",
+            "au.pay.withholdings",
+            "au.income-tax.annual",
+          ])
+        );
+        expect(
+          Array.every(
+            response.calculators,
+            (value) =>
+              value.context.jurisdiction === "AU" &&
+              value.context.taxYear === "2025-26"
+          )
+        ).toBe(true);
+      }).pipe(
+        Effect.provide(TaxKitRpcClientTest.pipe(Layer.provide(CalculatorLive)))
+      )
+  );
+
+  it.effect(
+    "reads the canonical catalogue through checked native HTTP RPC",
+    () =>
+      Effect.gen(function* () {
+        const nativeTransport = yield* makeHttpTransport("success");
+        const transport = HttpClient.make((request) => {
+          expect(request.headers).not.toHaveProperty("b3");
+          expect(request.headers).not.toHaveProperty("traceparent");
+          return nativeTransport.execute(request);
+        });
+        yield* Effect.gen(function* () {
+          const client = yield* TaxKitRpcClient;
+          const response = yield* client.listCalculators(
+            MetadataQuery.make({})
+          );
+          expect(response.calculators).toHaveLength(3);
+          expect(
+            Array.map(response.calculators, (value) => value.title)
+          ).toEqual(
+            expect.arrayContaining([
+              "AU take-home pay",
+              "AU pay withholdings",
+              "AU annual income tax",
+            ])
+          );
+        }).pipe(
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+      }).pipe(Effect.scoped)
+  );
   it.effect("rejects an oversized body before native JSON parsing", () =>
     Effect.gen(function* () {
       const transport = yield* makeHttpTransport("success");
@@ -367,14 +434,26 @@ describe("native calculator RPC", () => {
         .Calculate({ request: CalculationRequest, version: "2" })
         .pipe(Effect.flip);
       expect(skew._tag).toBe("CalculatorRpcVersionMismatch");
+      const catalogueSkew = yield* client
+        .ListCalculators({ query: MetadataQuery.make({}), version: "2" })
+        .pipe(Effect.flip);
+      expect(catalogueSkew._tag).toBe("CalculatorRpcVersionMismatch");
       expect(Rpc.exitSchema(Calculate).ast).toBe(Rpc.exitSchema(Calculate).ast);
+      expect(Rpc.exitSchema(ListCalculators).ast).toBe(
+        Rpc.exitSchema(ListCalculators).ast
+      );
       expect(Schema.Defect().ast).toBe(Schema.Defect().ast);
     }).pipe(Effect.scoped)
   );
 
-  it.effect.each(["json", "schema"] as const)(
-    "classifies a broken %s reply as a checked invalid response",
-    (mode) =>
+  it.effect.each([
+    { mode: "json", operation: "calculate" },
+    { mode: "schema", operation: "calculate" },
+    { mode: "json", operation: "catalogue" },
+    { mode: "schema", operation: "catalogue" },
+  ] as const)(
+    "classifies a broken $mode reply to $operation as a checked invalid response",
+    ({ mode, operation }) =>
       Effect.gen(function* () {
         const transport = HttpClient.make((request) =>
           Effect.gen(function* () {
@@ -412,9 +491,13 @@ describe("native calculator RPC", () => {
         );
         yield* Effect.gen(function* () {
           const client = yield* TaxKitRpcClient;
-          const error = yield* client
-            .calculate(CalculationRequest)
-            .pipe(Effect.flip);
+          const error = yield* (
+            operation === "calculate"
+              ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
+              : client
+                  .listCalculators(MetadataQuery.make({}))
+                  .pipe(Effect.asVoid)
+          ).pipe(Effect.flip);
           expect(Schema.is(CalculatorRpcInvalidResponse)(error)).toBe(true);
         }).pipe(
           Effect.provide(
