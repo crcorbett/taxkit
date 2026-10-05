@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M452QW7XE48V8XKT9C8S0GBG",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-75-stale-calculator-answer",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/web/src/lib/calculator.atoms.ts",
+    "apps/web/src/lib/take-home.container.tsx",
+    "apps/web/src/lib/take-home.view.tsx",
+    "apps/web/src/styles.css",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "oxlint.config.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 121424,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 9148928,
+    "output_tokens": 53969,
+    "api_call_count": 51
+  }
+}
