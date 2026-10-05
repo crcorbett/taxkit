@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M455Z63AENMKCZBYW22QHYRY",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-05T04:43:28.328159Z",
+  "branch": "codex/dev-75-take-home-explanation",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/web/README.md",
+    "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+    "apps/web/src/lib/take-home-result.view.tsx",
+    "apps/web/src/lib/take-home.container.tsx",
+    "apps/web/src/lib/take-home.view.tsx",
+    "apps/web/src/styles.css",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "docs/architecture/frontend.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/README.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-take-home-explanation.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/verification/critical-journeys.json"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "b7d70ba853ae",
+  "checkpoint_transcript_start": 25153,
+  "transcript_lines_at_start": 25153,
+  "compact_transcript_start": 3064,
+  "token_usage": {
+    "input_tokens": 283227,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 16559232,
+    "output_tokens": 72831,
+    "api_call_count": 120
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-05T04:43:26.138715Z",
+    "agent_lines": 941,
+    "agent_removed": 40,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 941,
+    "total_lines_changed": 981,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
