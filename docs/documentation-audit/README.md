@@ -444,3 +444,9 @@ The [private client response candidate](clean-slate-foundation/2026-10-05-client
 records checked status failures, byte admission, complete deadlines, request
 cleanup and manual retry guidance. Its local proof remains separate from the
 hosted parent correction and unfinished T004/MCP/provider work.
+
+
+The [shared calculation work candidate](clean-slate-foundation/2026-10-05-calculation-work-policy.json)
+records the eight-calculation pool and five-second operation policy, checked
+HTTP/RPC failures, native/browser/SDK proof and remaining T004 limits. It does
+not establish rate identity, MCP, deployment or publication.

@@ -44,6 +44,11 @@
       "source": "./src/schemas.ts",
       "types": "./dist/schemas.d.ts",
       "default": "./dist/schemas.js"
+    },
+    "./work": {
+      "source": "./src/work.layer.ts",
+      "types": "./dist/work.layer.d.ts",
+      "default": "./dist/work.layer.js"
     }
   },
   "publishConfig": {
@@ -75,6 +80,10 @@
       "./schemas": {
         "types": "./dist/schemas.d.ts",
         "default": "./dist/schemas.js"
+      },
+      "./work": {
+        "types": "./dist/work.layer.d.ts",
+        "default": "./dist/work.layer.js"
       }
     },
     "access": "public"

@@ -12,7 +12,7 @@ export {
 } from "@taxkit/calculators/schemas";
 export { DocsNavigation, DocsPagePath } from "@taxkit/docs-content/schemas";
 
-export const CalculatorRpcVersion = "1";
+export const CalculatorRpcVersion = "2";
 export const CalculatorRpcPayload = Schema.Struct({
   request: CalculatorRunServiceRequest,
   version: Schema.String.check(Schema.isMaxLength(32)),

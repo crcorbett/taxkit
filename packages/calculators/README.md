@@ -108,6 +108,7 @@ artifact, public entrypoints and concrete dependency ranges.
 - `@taxkit/calculators/metadata`
 - `@taxkit/calculators/service`
 - `@taxkit/calculators/schemas`
+- `@taxkit/calculators/work`
 
 ## Related Docs
 
@@ -121,3 +122,30 @@ artifact, public entrypoints and concrete dependency ranges.
 `@taxkit/calculators/schemas` consumes narrow core/rule Schema entrypoints and owns no live runtime or rule pack. The RPC contract reuses its existing request and report Schemas; calculation remains with `PublicCalculatorService.calculate`.
 
 The [transport architecture](../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.
+
+## Shared calculation work limits
+
+`@taxkit/calculators/work` exports `PublicCalculatorServiceBounded`. A host builds
+this Layer once over its calculator implementation. It owns one pool of eight
+active calculations; each calculation in an RPC batch takes a separate place.
+There is no waiting queue. A full pool returns `CalculatorCapacityExceeded`.
+The native API instance supplies the same service to HTTP and RPC. The retained
+standalone HTTP Layer builds its pool once when the router is constructed.
+Metadata does not take a calculation place. Direct engine and local SDK use
+remain outside this anonymous server policy; their retained results are unchanged.
+
+Each admitted calculation has a five-second budget, including its scoped
+cleanup. A timeout returns `CalculatorOperationTimedOut`; expected engine
+failures and unrelated defects retain their identity. Success, failure, timeout
+and caller interruption release the place after cleanup. A monotonic elapsed-time
+check also rejects a result returned after the budget. JavaScript timers cannot
+pre-empt synchronous CPU work, and uninterruptible work/finalisers can postpone
+the response; this is not a claim of forced CPU or remote Worker cancellation.
+
+Both new errors contain only fixed code, message and manual-retry fields, with
+no request values. HTTP maps capacity to 503 and operation timeout to 504, using
+the existing `error` envelope. Existing calculator request errors keep 400.
+Native RPC revision `2` preserves the canonical errors; revision `1` clients get
+an explicit mismatch. Website forms display the fixed guidance and never retry
+a calculation automatically. Per-client rate identity, rate limiting, standalone
+HTTP body admission and future MCP operations remain active work.

@@ -2688,3 +2688,100 @@ from synchronous CPU preemption. The private Alchemy binding bridge owns its
 own Effect abort signal; current caller/browser proof does not establish
 upstream Worker cancellation. Rate-key provenance, common work policy, standalone
 HTTP admission and remaining named metadata operations still require work.
+
+
+## T004 shared calculation work-policy candidate
+
+Base `9ca78ccb22b99fda32f55ca67329ad930b55685a` is pushed as draft #143. Its
+hosted Quality run `37301629784` passed that exact head, read back on 5 October
+2026 after completion at 11:35:09 UTC. Earlier failed parent checks retain their
+own history. The next branch is `codex/dev-75-calculation-work-policy`.
+
+The calculator package already owns application calculation orchestration. Its
+new `work` Layer applies the accepted eight-place pool/five-second budget over
+that same service contract, without adding a pass-through package or modifying
+tax algorithms. Native API initialisation and standalone HTTP router construction
+own one pool each. Installed `HttpRouter.provideRequest` builds its supplied
+Layer once while constructing middleware; it does not rebuild a pool for each
+request. Both transports and each RPC batch calculation use the shared service.
+
+`CalculatorCapacityExceeded` and `CalculatorOperationTimedOut` are canonical
+checked errors with fixed guidance. HTTP declares separate 503/504 response
+Schemas, native RPC revision 2 preserves their identities, and browser/SSR
+forms display manual-retry guidance. Existing request errors keep their four
+cases/HTTP 400 and metadata error contract. Metadata does not occupy a pool place.
+The direct SDK stays caller-owned with retained calculation behaviour; its
+Schema export adds the canonical errors for typed server consumers.
+
+Docs-maintainer impact: **Change required** for calculator ownership/exports,
+API/RPC/SDK/app READMEs, effect/API/testing architecture, draft API error copy,
+generated OpenAPI snapshot, journey, active SPEC/tasks/plan and dated evidence.
+**Preserve** tax rules/source/golden results, unresolved Medicare choice,
+infrastructure/provider identities, existing content lifecycle/navigation,
+telemetry containment, skills and CI/lint permissions. Runbooks and commands
+are **N/A**: no operational procedure or consequential authority changes. The
+OpenAPI snapshot is regenerated through its owner; authored MDX stays draft and
+no MDX generator or publisher gains authority.
+
+Focused service proof covers capacity, immediate rejection, cancelled-place
+reuse, timeout cleanup, late-result rejection, expected-failure/defect identity
+and independent host pools. Application proof holds seven RPC batch calculations
+plus one HTTP calculation and checks shared capacity/timeouts. Native qualification
+and full closeout are pending in the dated receipt. Timers cannot stop synchronous
+CPU work; uninterruptible work/cleanup can delay a reply. No forced remote
+cancellation, rate identity, rate limiter, standalone HTTP body admission, MCP,
+merge, deployment or publication is claimed. T004 remains in progress.
+
+
+The corrected built-work fixture passes both native failure tests in 12.88
+seconds. It reaches eight real operations, checks HTTP 503/504 CORS through the
+native bridge, private SSR and public browser guidance, exactly seven batch
+RPC timeouts plus one HTTP timeout, a later genuine client timeout and nine
+reached cleanup events. Earlier failures retain provenance: installed severity
+is `Warn`, and the real button name is `Calculate`. The source controls now
+fail explicit capacity/cleanup/late-result assertions rather than merely waiting
+for the test runner's timeout; exact source is restored. The generic upstream
+package validator cannot qualify the pre-existing calculator layout because it
+has no rendering receipt; no false scaffold receipt or ignored-log cleanup is
+introduced. Repository-owned contract, export/type and actual consumer checks
+remain the applicable qualification. Full repository closeout is pending.
+
+
+On 6 October the interrupted full-run handle and temporary logs were unavailable;
+no full pass is attributed to it. The pinned Bun 1.4.2 and Playwright Chromium
+1243 were restored; frozen installation checked 777 installs/1001 packages with
+no dependency changes. The first fresh root run passed 55 RPC cases but exposed
+an obsolete mismatch fixture sending newly accepted revision 2. Both procedures
+now explicitly send revision 1 and all 56 focused RPC cases pass. Turbo's
+interrupted sibling tasks are not reported as passes. The actual downstream
+fixture also imports/builds the new `@taxkit/calculators/work` declaration/default
+export and checks retained values through it. Full closeout is repeated below.
+
+
+Corrected full local qualification passed on 6 October 2026: root tests
+(87.55 seconds; all 27 workspace test tasks fresh), build (3.25 seconds;
+five fresh/eleven cached), docs validation, API smoke (one fresh/eleven cached),
+exact root and fresh direct SDK packed/downstream checks, Changeset status and
+full verification (555.87 seconds). Verification reached all 32 isolated Quality
+workflow cases, lint/format, both unused-code checks, compiler checks, 24 SDK
+browser cases, 19 Website browser cases and seven fresh native cases over five
+files (76.46 seconds). All 41 staged source files were restored byte-for-byte
+after the fault builds. Four fresh screenshots were inspected; retained answers,
+supported-year copy, breakdown controls and the Medicare caveat remain visible.
+
+The first full verification passed its 32 workflow cases but stopped at three
+unnecessary new HTTP-adapter re-exports. They were removed without widening any
+lint exception. Both unused-code checks and types then passed independently;
+complete closeout was repeated on the corrected source. The dated receipt binds
+40 source files, nine compiled artifact roots and four screenshots. Only this
+plan and its receipt are changed after full qualification, with documentation,
+runbook, format, Changeset and whitespace checks repeated before commit.
+
+Primary-owner review accepts the local shared calculation-limit slice. RPC
+revision 2 and its widened expected error contract deliberately require the
+major Changeset; tax behaviour and local SDK lifetime remain unchanged. This is
+not whole T004 acceptance. Trusted rate identity/limiting, standalone HTTP body
+admission, remaining named operations, MCP and the later tasks remain open.
+Parent #143's exact head has hosted Quality success; this candidate has no hosted
+result yet. Next continue the complete closed named RPC metadata operations.
+No merge, publication, deployment, provider apply or Medicare correction occurs.

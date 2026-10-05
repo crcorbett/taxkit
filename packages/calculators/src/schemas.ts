@@ -154,11 +154,41 @@ export class UnsupportedCalculatorContextError extends Schema.TaggedClass<Unsupp
   }
 ) {}
 
-export const CalculatorServiceError = Schema.Union([
+export class CalculatorCapacityExceeded extends Schema.TaggedError<CalculatorCapacityExceeded>()(
+  "CalculatorCapacityExceeded",
+  {
+    code: Schema.tag("calculation-capacity"),
+    message: Schema.tag(
+      "The calculators are busy. Try again when you are ready."
+    ),
+    retry: Schema.tag("try-again-manually"),
+  }
+) {}
+
+export class CalculatorOperationTimedOut extends Schema.TaggedError<CalculatorOperationTimedOut>()(
+  "CalculatorOperationTimedOut",
+  {
+    code: Schema.tag("calculation-timeout"),
+    message: Schema.tag(
+      "The calculation could not finish within five seconds. Try again when you are ready."
+    ),
+    retry: Schema.tag("try-again-manually"),
+  }
+) {}
+
+export const CalculatorRequestError = Schema.Union([
   CalculationError,
   CalculatorInputDecodeError,
   UnsupportedCalculatorError,
   UnsupportedCalculatorContextError,
+]);
+
+export type CalculatorRequestError = typeof CalculatorRequestError.Type;
+
+export const CalculatorServiceError = Schema.Union([
+  CalculatorRequestError,
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
 ]);
 
 export type CalculatorServiceError = typeof CalculatorServiceError.Type;

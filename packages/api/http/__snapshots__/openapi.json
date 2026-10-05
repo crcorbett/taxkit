@@ -137,6 +137,29 @@
         "required": ["_tag", "message"],
         "type": "object"
       },
+      "CalculatorCapacityExceededEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorCapacityExceeded"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["calculation-capacity"],
+            "type": "string"
+          },
+          "message": {
+            "enum": ["The calculators are busy. Try again when you are ready."],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["try-again-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
       "CalculatorInputDecodeErrorEncoded": {
         "additionalProperties": false,
         "properties": {
@@ -231,6 +254,31 @@
           }
         },
         "required": ["_tag", "message", "path"],
+        "type": "object"
+      },
+      "CalculatorOperationTimedOutEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorOperationTimedOut"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["calculation-timeout"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "The calculation could not finish within five seconds. Try again when you are ready."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["try-again-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
       "FactQuestionEncoded": {
@@ -1438,6 +1486,40 @@
                           "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorCapacityExceededEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
                   "required": ["error"],

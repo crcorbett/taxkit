@@ -11,6 +11,7 @@ import {
   sensitiveSentinel,
 } from "@taxkit/api-rpc/testing/fixtures";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
+import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import {
   Array,
   ConfigProvider,
@@ -52,6 +53,142 @@ const NativeRequest = Schema.TaggedStruct("Request", {
 });
 
 describe("native API application", () => {
+  it.effect("shares eight calculation places across HTTP and RPC batches", () =>
+    Effect.gen(function* () {
+      const live = yield* PublicCalculatorService;
+      const active = yield* Ref.make(0);
+      const started = yield* Deferred.make<boolean>();
+      const released = yield* Ref.make(0);
+      const app = yield* ApiWorkerApplication.pipe(
+        Effect.provide(
+          PublicCalculatorServiceBounded.pipe(
+            Layer.provide(
+              Layer.succeed(
+                PublicCalculatorService,
+                PublicCalculatorService.of({
+                  ...live,
+                  calculate: () =>
+                    Ref.updateAndGet(active, (count) => count + 1).pipe(
+                      Effect.flatMap((count) =>
+                        count === 8
+                          ? Deferred.succeed(started, true)
+                          : Effect.void
+                      ),
+                      Effect.andThen(Effect.never),
+                      Effect.ensuring(
+                        Ref.update(released, (count) => count + 1)
+                      )
+                    ),
+                })
+              )
+            )
+          )
+        )
+      );
+      const invoke = (
+        path: "/rpc" | "/api/v1/calculators/au.pay.take-home/calculate",
+        body: string
+      ) =>
+        app.fetch.pipe(
+          Effect.provideService(
+            HttpServerRequest.HttpServerRequest,
+            HttpServerRequest.fromWeb(
+              new Request(`https://api.example.com${path}`, {
+                body,
+                headers: {
+                  "content-type": "application/json",
+                  origin: "https://website.example.com",
+                },
+                method: "POST",
+              })
+            )
+          ),
+          Effect.scoped
+        );
+      const rpcBody = yield* Schema.encodeEffect(Json)(
+        Array.map(Array.range(1, 7), (id) =>
+          NativeRequest.make({
+            headers: [],
+            id: String(id),
+            payload: {
+              request: CalculationRequest,
+              version: CalculatorRpcVersion,
+            },
+            tag: "Calculate",
+          })
+        )
+      );
+      const httpBody = yield* Schema.encodeEffect(Json)(
+        CalculationRequest.payload
+      );
+      const http = yield* invoke(
+        "/api/v1/calculators/au.pay.take-home/calculate",
+        httpBody
+      ).pipe(Effect.forkScoped);
+      const rpc = yield* invoke("/rpc", rpcBody).pipe(Effect.forkScoped);
+      yield* Deferred.await(started).pipe(
+        Effect.raceFirst(
+          Fiber.join(http).pipe(
+            Effect.flatMap((response) =>
+              Effect.die(`HTTP fixture ended early: ${response.status}`)
+            )
+          )
+        ),
+        Effect.raceFirst(
+          Fiber.join(rpc).pipe(
+            Effect.flatMap((response) =>
+              Effect.die(`RPC fixture ended early: ${response.status}`)
+            )
+          )
+        )
+      );
+      const busyHttp = yield* invoke(
+        "/api/v1/calculators/au.pay.take-home/calculate",
+        httpBody
+      );
+      expect(busyHttp.status).toBe(503);
+      const busyHttpText = yield* Effect.promise(() =>
+        HttpServerResponse.toWeb(busyHttp).text()
+      );
+      expect(busyHttpText).toContain("CalculatorCapacityExceeded");
+      const busyRpc = yield* invoke("/rpc", rpcBody);
+      const busyRpcText = yield* Effect.promise(() =>
+        HttpServerResponse.toWeb(busyRpc).text()
+      );
+      expect(busyRpc.status).toBe(200);
+      expect(busyRpcText).toContain("CalculatorCapacityExceeded");
+      expect(yield* Ref.get(active)).toBe(8);
+      yield* TestClock.adjust("4 seconds");
+      expect(yield* Ref.get(released)).toBe(0);
+      yield* TestClock.adjust("1 second");
+      const timedHttp = yield* Fiber.join(http);
+      expect(timedHttp.status).toBe(504);
+      const timedHttpText = yield* Effect.promise(() =>
+        HttpServerResponse.toWeb(timedHttp).text()
+      );
+      const timedRpc = yield* Fiber.join(rpc);
+      const timedRpcText = yield* Effect.promise(() =>
+        HttpServerResponse.toWeb(timedRpc).text()
+      );
+      expect(timedHttpText).toContain("CalculatorOperationTimedOut");
+      expect(timedRpcText).toContain("CalculatorOperationTimedOut");
+      expect(yield* Ref.get(released)).toBe(8);
+      yield* Effect.forEach(
+        [busyHttpText, busyRpcText, timedHttpText, timedRpcText],
+        (text) =>
+          Effect.sync(() => {
+            expect(text).not.toContain(sensitiveSentinel);
+            expect(text).not.toContain("165400");
+            expect(text).not.toContain("stack");
+          })
+      );
+    }).pipe(
+      Effect.provide(CalculatorLive),
+      Effect.provideService(ConfigProvider.ConfigProvider, settings),
+      Effect.scoped
+    )
+  );
+
   it.effect("defers address reads during construction and decodes once", () =>
     Effect.gen(function* () {
       const reads = yield* Ref.make(0);

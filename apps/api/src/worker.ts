@@ -1,4 +1,5 @@
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Worker } from "alchemy/Cloudflare/Workers";
 import type { HttpEffect } from "alchemy/Http";
@@ -22,7 +23,10 @@ export const ApiWorkerObservability = {
 
 export const ApiWorkerInit = ApiWorkerApplication.pipe(
   Effect.provide(
-    PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
+    PublicCalculatorServiceBounded.pipe(
+      Layer.provide(PublicCalculatorServiceLive),
+      Layer.provide(CalculationEngineLive)
+    )
   )
 );
 

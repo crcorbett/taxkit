@@ -1,5 +1,6 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
+import { CalculatorOperationTimedOut } from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
 import {
   CalculatorRpcOrigin,
@@ -10,10 +11,15 @@ import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
 import {
   Array,
+  Cause,
+  Clock,
   Effect,
+  Exit,
+  Fiber,
   FileSystem,
   Layer,
   Match,
+  Option,
   Path,
   Queue,
   Record,
@@ -429,4 +435,307 @@ it.live(
       Effect.scoped,
       Effect.provide(NodeServices.layer)
     )
+);
+
+it.live("shares native HTTP, RPC batch and browser work limits", () =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const path = yield* Path.Path;
+    const root = path.resolve("../..");
+    const workApiOrigin = "http://127.0.0.1:4204";
+    const workWebsiteOrigin = "http://127.0.0.1:4205";
+    const logs = yield* Queue.make<WorkerdStructuredLog>();
+    const workers = yield* Effect.forEach(
+      [
+        {
+          entry: "worker.js",
+          name: "api-work",
+          output: ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+        },
+        {
+          entry: "server.js",
+          name: "website-work",
+          output: "apps/web/dist/server",
+        },
+      ] as const,
+      (artifact) =>
+        Effect.gen(function* () {
+          const modulesRoot = path.join(root, artifact.output);
+          const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+          expect(files).toContain(artifact.entry);
+          const modules = Record.fromEntries(
+            yield* Effect.forEach(files, (file) =>
+              fs
+                .readFileString(path.join(modulesRoot, file))
+                .pipe(
+                  Effect.map(
+                    (contents) =>
+                      [file, { contents, type: "esm" as const }] as const
+                  )
+                )
+            )
+          );
+          if (artifact.name === "api-work") {
+            expect(
+              Array.some(
+                Record.toEntries(modules),
+                ([file, module]) =>
+                  file === "worker.js" &&
+                  module.contents.includes("PRIVATE9 work started")
+              )
+            ).toBe(true);
+          }
+          const origins = {
+            API_PUBLIC_ORIGIN: { type: "json" as const, value: workApiOrigin },
+            WEBSITE_PUBLIC_ORIGIN: {
+              type: "json" as const,
+              value: workWebsiteOrigin,
+            },
+            WORKER_URL: { type: "json" as const, value: workApiOrigin },
+          };
+          return {
+            config: {
+              assets:
+                artifact.name === "website-work"
+                  ? {
+                      directory: path.join(root, "apps/web/dist/client"),
+                      hasUserWorker: true,
+                      runWorkerFirst: false,
+                    }
+                  : undefined,
+              compatibilityDate: "2026-10-04",
+              compatibilityFlags: ["nodejs_compat"],
+              env:
+                artifact.name === "website-work"
+                  ? {
+                      ...origins,
+                      TAXKIT_API: {
+                        type: "worker" as const,
+                        worker: "api-work",
+                      },
+                    }
+                  : origins,
+              manifest: { mainModule: artifact.entry, modules, modulesRoot },
+              name: artifact.name,
+            },
+          };
+        })
+    );
+    const host = yield* Effect.acquireRelease(
+      Effect.sync(
+        () =>
+          new Miniflare({
+            cf: false,
+            handleStructuredLogs: (log) => {
+              Queue.offerUnsafe(logs, log);
+            },
+            host: "127.0.0.1",
+            port: 4204,
+            workers,
+          })
+      ),
+      (value) => Effect.promise(() => value.dispose())
+    );
+    const websiteHost = yield* Effect.acquireRelease(
+      Effect.sync(
+        () =>
+          new Miniflare({
+            cf: false,
+            host: "127.0.0.1",
+            port: 4205,
+            workers: [
+              ...Array.filter(
+                workers,
+                (worker) => worker.config.name === "website-work"
+              ),
+              ...Array.filter(
+                workers,
+                (worker) => worker.config.name !== "website-work"
+              ),
+            ],
+          })
+      ),
+      (value) => Effect.promise(() => value.dispose())
+    );
+    yield* Effect.promise(() => host.ready);
+    yield* Effect.promise(() => websiteHost.ready);
+    const browser = yield* Effect.acquireRelease(
+      Effect.promise(() => chromium.launch({ headless: true })),
+      (value) => Effect.promise(() => value.close())
+    );
+    const context = yield* Effect.acquireRelease(
+      Effect.promise(() => browser.newContext()),
+      (value) => Effect.promise(() => value.close())
+    );
+    const page = yield* Effect.promise(() => context.newPage());
+    const invalidPayInput = page.getByLabel("Pay before tax ($)");
+    const requests = yield* Queue.make<string>();
+    page.on("request", (request) => {
+      if (new URL(request.url()).pathname === "/rpc") {
+        Queue.offerUnsafe(requests, request.url());
+      }
+    });
+    yield* Effect.promise(() => page.goto(workWebsiteOrigin));
+    yield* Effect.promise(() => invalidPayInput.fill("1654"));
+    const wire = yield* Schema.encodeEffect(Json)(
+      Array.map(Array.range(1, 7), (id) =>
+        NativeRequestFixture.make({
+          headers: [],
+          id: String(id),
+          payload: {
+            request: CalculationRequest,
+            version: CalculatorRpcVersion,
+          },
+          tag: "Calculate",
+        })
+      )
+    );
+    const api = yield* Effect.promise(() => host.getWorker("api-work"));
+    const httpBody = yield* Schema.encodeEffect(Json)(
+      CalculationRequest.payload
+    );
+    const started = yield* Clock.monotonicTimeNanos;
+    const batch = yield* Effect.promise(() =>
+      api.fetch(`${workApiOrigin}/rpc`, {
+        body: wire,
+        headers: { "content-type": "application/json" },
+        method: "POST",
+      })
+    ).pipe(Effect.forkScoped);
+    const http = yield* Effect.promise(() =>
+      api.fetch(
+        `${workApiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+        {
+          body: httpBody,
+          headers: {
+            "content-type": "application/json",
+            origin: workWebsiteOrigin,
+          },
+          method: "POST",
+        }
+      )
+    ).pipe(Effect.forkScoped);
+    // Each admitted operation emits one deliberately hostile warning, sanitised
+    // by the real host logger. Wait for eight reached operations, not a delay.
+    yield* Effect.forEach(Array.range(1, 8), () =>
+      Queue.take(logs).pipe(
+        Effect.flatMap((log) => Schema.encodeEffect(Json)(log.message)),
+        Effect.tap((text) =>
+          Effect.sync(() => {
+            expect(text).toContain("Warn");
+            expect(text).not.toContain("PRIVATE9");
+          })
+        )
+      )
+    ).pipe(
+      Effect.raceFirst(
+        Fiber.join(http).pipe(
+          Effect.flatMap((response) =>
+            Effect.die(`HTTP work ended early: ${response.status}`)
+          )
+        )
+      ),
+      Effect.raceFirst(
+        Fiber.join(batch).pipe(
+          Effect.flatMap((response) =>
+            Effect.die(`RPC work ended early: ${response.status}`)
+          )
+        )
+      )
+    );
+    const busy = yield* Effect.promise(() =>
+      api.fetch(
+        `${workApiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+        {
+          body: httpBody,
+          headers: {
+            "content-type": "application/json",
+            origin: workWebsiteOrigin,
+          },
+          method: "POST",
+        }
+      )
+    );
+    expect(busy.status).toBe(503);
+    expect(busy.headers.get("access-control-allow-origin")).toBe(
+      workWebsiteOrigin
+    );
+    expect(yield* Effect.promise(() => busy.text())).toContain(
+      "CalculatorCapacityExceeded"
+    );
+    const website = yield* Effect.promise(() => host.getWorker("website-work"));
+    const savedBusy = yield* Effect.promise(() =>
+      website.fetch(workWebsiteOrigin, {
+        body: "grossDollars=1654&period=weekly&taxFreeThresholdClaimed=on",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        method: "POST",
+      })
+    );
+    const savedBusyHtml = yield* Effect.promise(() => savedBusy.text());
+    expect(savedBusyHtml).toContain("CalculatorCapacityExceeded");
+    expect(savedBusyHtml).toContain("The calculators are busy.");
+    expect(savedBusyHtml).not.toContain("PRIVATE9");
+    yield* Effect.promise(() =>
+      page.getByRole("button", { exact: true, name: "Calculate" }).click()
+    );
+    yield* Effect.promise(() =>
+      page.getByRole("alert").waitFor({ timeout: 3000 })
+    );
+    expect(
+      yield* Effect.promise(() => page.getByRole("alert").textContent())
+    ).toContain("The calculators are busy.");
+    expect(yield* Queue.clear(requests)).toHaveLength(1);
+    yield* Effect.promise(() => invalidPayInput.fill("2000"));
+    yield* Effect.promise(() =>
+      page.getByRole("alert").waitFor({ state: "hidden", timeout: 3000 })
+    );
+    expect(yield* Queue.clear(requests)).toEqual([]);
+    const timed = yield* Fiber.join(batch);
+    expect(timed.status).toBe(200);
+    const timedText = yield* Effect.promise(() => timed.text());
+    const elapsed =
+      Number((yield* Clock.monotonicTimeNanos) - started) / 1_000_000;
+    expect(elapsed).toBeGreaterThanOrEqual(4500);
+    expect(elapsed).toBeLessThan(8000);
+    expect(timedText.match(/CalculatorOperationTimedOut/gu)).toHaveLength(7);
+    const timedHttp = yield* Fiber.join(http);
+    expect(timedHttp.status).toBe(504);
+    expect(timedHttp.headers.get("access-control-allow-origin")).toBe(
+      workWebsiteOrigin
+    );
+    expect(yield* Effect.promise(() => timedHttp.text())).toContain(
+      "CalculatorOperationTimedOut"
+    );
+    expect(timedText).not.toContain("PRIVATE9");
+    expect(timedText).not.toContain("165400");
+    const origin =
+      yield* Schema.decodeUnknownEffect(CalculatorRpcOrigin)(workApiOrigin);
+    const clientExit = yield* TaxKitRpcClient.pipe(
+      Effect.flatMap((client) => client.calculate(CalculationRequest)),
+      Effect.exit,
+      Effect.provide(
+        TaxKitRpcClientLive(origin).pipe(Layer.provide(FetchHttpClient.layer))
+      )
+    );
+    expect(Exit.isFailure(clientExit)).toBe(true);
+    if (Exit.isFailure(clientExit)) {
+      expect(Cause.findErrorOption(clientExit.cause)).toEqual(
+        Option.some(new CalculatorOperationTimedOut())
+      );
+    }
+    const capturedLogs = yield* Queue.clear(logs);
+    const messages = yield* Effect.forEach(capturedLogs, (log) =>
+      Schema.encodeEffect(Json)(log.message)
+    );
+    expect(
+      Array.filter(messages, (message) => message.includes("Info"))
+    ).toHaveLength(9);
+    const captured = yield* Schema.encodeEffect(Json)(capturedLogs);
+    expect(captured).not.toContain("PRIVATE9");
+    expect(captured).not.toContain("165400");
+  }).pipe(
+    Effect.timeout("25 seconds"),
+    Effect.scoped,
+    Effect.provide(NodeServices.layer)
+  )
 );

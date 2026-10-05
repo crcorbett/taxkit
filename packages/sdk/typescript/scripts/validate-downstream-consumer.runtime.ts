@@ -460,7 +460,8 @@ const writeConsumerFiles = (
         ),
         fs.writeFileString(
           path.join(workspacePath, "src/typecheck.ts"),
-          `import type { CalculationInput } from "@taxkit/sdk";
+          `import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
+import type { CalculationInput } from "@taxkit/sdk";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
@@ -468,6 +469,8 @@ import { auEffect } from "@taxkit/sdk/au/effect";
 import {
   CalculatorRunRequest,
   CalculatorServiceError,
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
   TaxKitFailure,
   TaxKitSuccess,
 } from "@taxkit/sdk/schemas";
@@ -499,8 +502,13 @@ auEffect
   .createClient()
   .calculations.calculateReport(au.calculations.takeHomePay, takeHomeFacts);
 
+void PublicCalculatorServiceBounded;
 void CalculatorRunRequest;
 void CalculatorServiceError;
+const workFailure: typeof CalculatorServiceError.Type = new CalculatorCapacityExceeded();
+const workTimeout: typeof CalculatorServiceError.Type = new CalculatorOperationTimedOut();
+void workFailure;
+void workTimeout;
 void TaxKitFailure;
 void TaxKitSuccess;
 void AuPayTakeHomeCalculation;
@@ -513,7 +521,8 @@ au.pay.takeHomePay({
         ),
         fs.writeFileString(
           path.join(workspacePath, "src/runtime.ts"),
-          `import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+          `import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "@taxkit/calculators/work";
+import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculationEngineLive } from "@taxkit/core";
 import { aud } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
@@ -522,9 +531,13 @@ import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
 
-const ServiceLive = PublicCalculatorServiceLive.pipe(
+const ServiceLive = PublicCalculatorServiceBounded.pipe(
+  Layer.provide(PublicCalculatorServiceLive),
   Layer.provide(CalculationEngineLive)
 );
+if (CalculatorConcurrencyLimit !== 8) {
+  throw new Error("Packed calculation policy has the wrong capacity.");
+}
 const takeHomeFacts = {
   grossPay: new GrossPay({
     amount: aud(165_400),

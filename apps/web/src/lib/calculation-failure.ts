@@ -11,6 +11,8 @@ export const calculationFailureMessage = (
 ) =>
   Match.value(error).pipe(
     Match.tag(
+      "CalculatorCapacityExceeded",
+      "CalculatorOperationTimedOut",
       "CalculatorRpcRequestTooLarge",
       "CalculatorRpcRequestTimedOut",
       "CalculatorRpcRateLimited",

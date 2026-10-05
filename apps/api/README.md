@@ -255,7 +255,7 @@ not qualify native trace export or every framework logging path.
 
 The Website's native cancellation fixture uses the real API calculation and
 reply encoder before delaying headers or the remainder of the encoded body.
-This qualifies the client's complete five-second wait and browser request abort,
+This qualifies the client's complete ten-second wait and browser request abort,
 not cancellation of upstream Worker work. The [Website README](../web/README.md)
 owns its local commands and [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json)
 records the bounded observations.
@@ -267,3 +267,15 @@ contain caller URLs even when the application reporter emits only fixed fields.
 Local graph/state checks establish the declared settings; they do not establish
 uploaded Cloudflare settings or safe exported rows. T009 owns that remaining
 requirement. The fixed application reporter remains in use.
+
+The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
+across HTTP and RPC, including individual batch messages, with a five-second
+calculation budget. Checked capacity and operation-timeout errors become HTTP
+503/504 envelopes or canonical RPC revision `2` errors. Website guidance requests
+manual retry only. This is separate from the body-read and ten-second client
+budgets. Metadata does not use a calculation place. Native built proof covers a
+seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
+browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
+cannot be stopped by a JavaScript timer; a late-result check rejects it after
+control returns. Rate identity, per-client rate limits, MCP and full T004
+qualification remain unfinished.

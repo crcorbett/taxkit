@@ -1,5 +1,7 @@
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import {
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
   CalculatorRunServiceRequest,
   CalculatorInputDecodeError,
   CalculatorInputIssue,
@@ -27,7 +29,7 @@ export const CalculatorLive = PublicCalculatorServiceLive.pipe(
 );
 
 export const CalculatorFixture = (
-  mode: "success" | "expected" | "defect" | "mixed"
+  mode: "success" | "expected" | "defect" | "mixed" | "capacity" | "timeout"
 ) =>
   Layer.effect(
     PublicCalculatorService,
@@ -37,6 +39,12 @@ export const CalculatorFixture = (
         ...calculator,
         calculate: (request) =>
           Match.value(mode).pipe(
+            Match.when("capacity", () =>
+              Effect.fail(new CalculatorCapacityExceeded())
+            ),
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
             Match.when("success", () => calculator.calculate(request)),
             Match.when("expected", () =>
               Effect.fail(

@@ -555,3 +555,15 @@ checked errors with fixed codes, literal safe messages and manual retry guidance
 no rejected body or raw HTTP cause reaches the page. Both calculator containers
 share safe guidance for current and restored checked failures without replay.
 The public SDK and standalone HTTP server retain their separate contracts.
+
+## Shared calculation work limits
+
+The [calculator-owned policy](../../packages/calculators/README.md#shared-calculation-work-limits)
+supplies one eight-calculation pool and five-second budget to the native HTTP/RPC
+instance and one per standalone HTTP router. Calculation errors use separately
+declared HTTP 503/504 envelopes; existing request failures keep 400 and metadata
+errors stay unchanged. RPC revision 2 preserves the canonical fixed capacity and
+timeout errors. Website forms request manual retry. SDK Schemas re-export these
+errors, while local SDK execution keeps its caller-owned lifetime and tax results.
+The owning package records cleanup and CPU proof limits. Rate identity, standalone
+HTTP body admission and future MCP operations remain T004/T006 work.

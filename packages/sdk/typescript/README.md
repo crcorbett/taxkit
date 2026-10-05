@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-sdk-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-05
 review_trigger: SDK contracts, lifetime, exports, examples or consumer validation change
 ---
 
@@ -269,3 +269,9 @@ bun run --filter=@taxkit/sdk validate:downstream
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/package-boundaries.md`
 - `docs/architecture/testing-and-quality.md`
+
+`@taxkit/sdk/schemas` also re-exports the canonical `CalculatorCapacityExceeded`
+and `CalculatorOperationTimedOut` errors. They belong to the widened checked
+service union and expose fixed manual-retry guidance for server consumers.
+Local SDK calculation does not acquire the API server's pool or time budget.
+The actual packed and downstream fixtures check these named exports and types.

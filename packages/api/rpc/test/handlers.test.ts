@@ -1,5 +1,9 @@
 import { describe, expect, it } from "@effect/vitest";
 import {
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
+} from "@taxkit/calculators/schemas";
+import {
   Array,
   Cause,
   Effect,
@@ -7,6 +11,7 @@ import {
   Layer,
   Logger,
   Match,
+  Option,
   Queue,
   References,
   Ref,
@@ -69,7 +74,7 @@ const NativeExitFixture = Schema.TaggedStruct("Exit", {
 });
 
 const makeHttpTransport = Effect.fnUntraced(function* (
-  mode: "success" | "expected" | "defect" | "mixed"
+  mode: "success" | "expected" | "defect" | "mixed" | "capacity" | "timeout"
 ) {
   const handler = yield* HttpRouter.toHttpEffect(
     TaxKitRpcHttpLayer.pipe(Layer.provide(CalculatorFixture(mode)))
@@ -91,6 +96,42 @@ const makeHttpTransport = Effect.fnUntraced(function* (
 });
 
 describe("native calculator RPC", () => {
+  it.effect.each([
+    { error: new CalculatorCapacityExceeded(), mode: "capacity" as const },
+    { error: new CalculatorOperationTimedOut(), mode: "timeout" as const },
+  ])(
+    "preserves checked $mode failure through the native HTTP client",
+    ({ mode, error }) =>
+      Effect.gen(function* () {
+        const transport = yield* makeHttpTransport(mode);
+        const clientExit = yield* TaxKitRpcClient.pipe(
+          Effect.flatMap((client) => client.calculate(CalculationRequest)),
+          Effect.exit,
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+        expect(Exit.isFailure(clientExit)).toBe(true);
+        if (Exit.isFailure(clientExit)) {
+          expect(Cause.findErrorOption(clientExit.cause)).toEqual(
+            Option.some(error)
+          );
+        }
+        const wire = yield* Schema.encodeEffect(
+          Schema.fromJsonString(Schema.toCodecJson(CalculatorRpcClientError))
+        )(error);
+        expect(wire).not.toContain(sensitiveSentinel);
+        expect(wire).not.toContain("stack");
+        expect(
+          yield* Schema.decodeUnknownEffect(
+            Schema.fromJsonString(Schema.toCodecJson(CalculatorRpcClientError))
+          )(wire)
+        ).toEqual(error);
+      }).pipe(Effect.scoped)
+  );
+
   it.effect(
     "reads all retained calculators through the explicit test layer",
     () =>
@@ -439,11 +480,11 @@ describe("native calculator RPC", () => {
         )
       );
       const skew = yield* client
-        .Calculate({ request: CalculationRequest, version: "2" })
+        .Calculate({ request: CalculationRequest, version: "1" })
         .pipe(Effect.flip);
       expect(skew._tag).toBe("CalculatorRpcVersionMismatch");
       const catalogueSkew = yield* client
-        .ListCalculators({ query: MetadataQuery.make({}), version: "2" })
+        .ListCalculators({ query: MetadataQuery.make({}), version: "1" })
         .pipe(Effect.flip);
       expect(catalogueSkew._tag).toBe("CalculatorRpcVersionMismatch");
       expect(Rpc.exitSchema(Calculate).ast).toBe(Rpc.exitSchema(Calculate).ast);

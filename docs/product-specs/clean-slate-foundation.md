@@ -280,7 +280,14 @@ or an experiment about worker performance.
 Initial anonymous calculation/MCP policy is 60 work requests per minute per
 trusted, non-logged client rate key; 64 KiB request bodies; at most eight active
 calculations per Worker isolate; a five-second operation budget; and a
-ten-second complete-response client deadline. Scope and approximation of the
+ten-second complete-response client deadline. The calculator-owned bounded
+Layer supplies one pool to the native HTTP/RPC host and one per standalone HTTP
+router. Each batch calculation takes a place; excess work fails without waiting.
+Metadata does not take a calculation place. Checked capacity/timeout failures
+use HTTP 503/504 and RPC revision 2. The five-second calculation limit includes
+scoped cleanup and rejects late success using monotonic elapsed time; it cannot
+force synchronous CPU pre-emption or guarantee remote cancellation. Direct
+engine/local SDK execution retains its existing lifetime and results. Scope and approximation of the
 native rate limiter must be documented. Metadata/content responses are bounded
 to 2 MiB at the client. The same 2 MiB cap applies to the private closed JSON
 RPC channel, including calculator replies and native framing: both operations

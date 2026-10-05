@@ -23,6 +23,9 @@ export {
 } from "./service.js";
 export { PublicCalculatorServiceLive } from "./live.layer.js";
 export {
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
+  CalculatorRequestError,
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
   CalculatorCatalogResponseData,

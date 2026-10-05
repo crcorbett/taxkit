@@ -340,3 +340,15 @@ one exact lint admission. It contains no async orchestration or Effect runner.
 Real CLI fixtures prove adjacent files reject the signature and the admitted
 file still rejects async/await. This preserves the current host bridge pending
 the separate native app composition task; it is not native Worker lifetime proof.
+
+The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
+across HTTP and RPC, including individual batch messages, with a five-second
+calculation budget. Checked capacity and operation-timeout errors become HTTP
+503/504 envelopes or canonical RPC revision `2` errors. Website guidance requests
+manual retry only. This is separate from the body-read and ten-second client
+budgets. Metadata does not use a calculation place. Native built proof covers a
+seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
+browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
+cannot be stopped by a JavaScript timer; a late-result check rejects it after
+control returns. Rate identity, per-client rate limits, MCP and full T004
+qualification remain unfinished.

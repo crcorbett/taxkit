@@ -1305,3 +1305,16 @@ observation allowance and 45-second total cancellation Effect budget (50-second 
 including cleanup) for three
 sequential ten-second deadlines plus setup/edit/departure work. Original
 15-second page observation guards remain unchanged.
+
+
+The calculation work-policy candidate adds focused calculator substitution tests
+and shared native application tests. The built Worker test fills one API pool
+using an RPC batch and HTTP, waits for eight reached operations through fixed
+safe host events, checks extra HTTP/private SSR/public browser failures, then
+checks five-second HTTP 504 and canonical RPC timeouts plus cleanup. The genuine
+native client preserves the timeout identity. Browser restoration covers both
+new errors with no replay. The dated [work-policy receipt](../documentation-audit/clean-slate-foundation/2026-10-05-calculation-work-policy.json)
+owns candidate outcomes, failures, exact source/artifact identity and limits.
+Timers cannot force CPU pre-emption, and local proof does not establish provider
+or deployed behaviour. No broader decoder/encoder/Playwright lint exception is
+introduced: tests use existing exact transport boundaries and qualified receivers.

@@ -1,4 +1,7 @@
 import {
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
+  CalculatorRequestError,
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
   CalculatorGraphResponse,
@@ -49,13 +52,29 @@ export {
   type CalculatorCatalogEntry,
 } from "@taxkit/calculators";
 
+const CalculatorApiRequestErrorEnvelope = Schema.Struct({
+  error: CalculatorRequestError,
+}).pipe(HttpApiSchema.status("BadRequest"));
+
+const CalculatorApiErrorEnvelopes = [
+  CalculatorApiRequestErrorEnvelope,
+  Schema.Struct({ error: CalculatorCapacityExceeded }).pipe(
+    HttpApiSchema.status("ServiceUnavailable")
+  ),
+  Schema.Struct({ error: CalculatorOperationTimedOut }).pipe(
+    HttpApiSchema.status("GatewayTimeout")
+  ),
+] as const;
+
 export const CalculatorApiErrorEnvelope = Schema.Struct({
   error: CalculatorServiceError,
-}).pipe(HttpApiSchema.status("BadRequest"));
+});
 
 export type CalculatorApiErrorEnvelope = typeof CalculatorApiErrorEnvelope.Type;
 
-export class CalculatorApiErrorEnvelopeData extends Data.Class<CalculatorApiErrorEnvelope> {}
+export class CalculatorApiErrorEnvelopeData<
+  E extends CalculatorServiceError = CalculatorServiceError,
+> extends Data.Class<CalculatorApiErrorEnvelope & { readonly error: E }> {}
 
 const CalculatorParams = Schema.Struct({
   calculatorId: CalculatorId,
@@ -90,7 +109,7 @@ const GetCalculatorEndpoint = HttpApiEndpoint.get(
   "getCalculator",
   "/calculators/:calculatorId",
   {
-    error: CalculatorApiErrorEnvelope,
+    error: CalculatorApiRequestErrorEnvelope,
     params: CalculatorParams,
     query: HelpQuery,
     success: CalculatorCatalogItem,
@@ -101,7 +120,7 @@ const GetCalculatorSchemaEndpoint = HttpApiEndpoint.get(
   "getCalculatorSchema",
   "/calculators/:calculatorId/schema",
   {
-    error: CalculatorApiErrorEnvelope,
+    error: CalculatorApiRequestErrorEnvelope,
     params: CalculatorParams,
     query: HelpQuery,
     success: CalculatorSchemaResponse,
@@ -115,7 +134,7 @@ const GetCalculatorGraphEndpoint = HttpApiEndpoint.get(
   "getCalculatorGraph",
   "/calculators/:calculatorId/graph",
   {
-    error: CalculatorApiErrorEnvelope,
+    error: CalculatorApiRequestErrorEnvelope,
     params: CalculatorParams,
     query: MetadataQuery,
     success: CalculatorGraphResponse,
@@ -129,7 +148,7 @@ const CalculateEndpoint = HttpApiEndpoint.post(
   "calculate",
   "/calculators/:calculatorId/calculate",
   {
-    error: CalculatorApiErrorEnvelope,
+    error: CalculatorApiErrorEnvelopes,
     params: CalculatorParams,
     payload: CalculatorRunRequest,
     query: CalculationQuery,

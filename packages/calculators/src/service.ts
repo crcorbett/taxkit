@@ -9,6 +9,7 @@ import type {
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
   CalculatorServiceError,
+  CalculatorRequestError,
   DescriptorFilterQuery,
   FactsResponse,
   GetCalculatorGraphRequest,
@@ -25,13 +26,13 @@ export interface PublicCalculatorServiceContract {
   ) => Effect.Effect<CalculatorRunResponse, CalculatorServiceError>;
   readonly getCalculator: (
     request: GetCalculatorRequest
-  ) => Effect.Effect<CalculatorCatalogItem, CalculatorServiceError>;
+  ) => Effect.Effect<CalculatorCatalogItem, CalculatorRequestError>;
   readonly getCalculatorGraph: (
     request: GetCalculatorGraphRequest
-  ) => Effect.Effect<CalculatorGraphResponse, CalculatorServiceError>;
+  ) => Effect.Effect<CalculatorGraphResponse, CalculatorRequestError>;
   readonly getCalculatorSchema: (
     request: GetCalculatorRequest
-  ) => Effect.Effect<CalculatorSchemaResponse, CalculatorServiceError>;
+  ) => Effect.Effect<CalculatorSchemaResponse, CalculatorRequestError>;
   readonly listCalculators: (
     query: MetadataQuery
   ) => Effect.Effect<CalculatorCatalogResponse>;

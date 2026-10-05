@@ -33,6 +33,11 @@ export const TaxKitRpcHandlersLive = TaxKitRpcGroup.toLayer(
                     "CalculationError",
                     () => new CalculatorRpcRejected({ reason: "calculation" })
                   ),
+                  Match.tag(
+                    "CalculatorCapacityExceeded",
+                    "CalculatorOperationTimedOut",
+                    (failure) => failure
+                  ),
                   Match.exhaustive
                 )
               )

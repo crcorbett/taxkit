@@ -305,6 +305,8 @@ assert.equal(typeof au.pay.takeHomePay, "function", "AU SDK import");
 assert.equal(typeof auEffect.createClient, "function", "AU Effect SDK import");
 assert.ok(schemas.CalculatorRunRequest, "schemas request import");
 assert.ok(schemas.CalculatorServiceError, "schemas service error import");
+assert.equal(new schemas.CalculatorCapacityExceeded().code, "calculation-capacity", "checked capacity error import");
+assert.equal(new schemas.CalculatorOperationTimedOut().code, "calculation-timeout", "checked work timeout import");
 assert.ok(schemas.TaxKitCalculationError, "schemas SDK error import");
 assert.ok(testing.AuPayTakeHomeCalculation, "testing import");
 assert.ok(schemas.TaxKitClientDisposedError, "closed-client error import");

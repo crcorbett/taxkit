@@ -1,4 +1,5 @@
 import { PublicCalculatorServiceLive } from "@taxkit/calculators";
+import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Effect, Layer } from "effect";
 import { HttpApiBuilder, HttpApiScalar } from "effect/http-api";
@@ -36,7 +37,10 @@ export const ApiRoutesLayer = Layer.mergeAll(
 
 export const ApiRoutesLive = ApiRoutesLayer.pipe(
   HttpRouter.provideRequest(
-    PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
+    PublicCalculatorServiceBounded.pipe(
+      Layer.provide(PublicCalculatorServiceLive),
+      Layer.provide(CalculationEngineLive)
+    )
   ),
   Layer.provide(HttpRouter.cors())
 );

@@ -1,5 +1,5 @@
 import { PublicCalculatorService } from "@taxkit/calculators";
-import { Effect } from "effect";
+import { Effect, Match } from "effect";
 import { HttpApiBuilder } from "effect/http-api";
 
 import { TaxKitApi } from "../api.js";
@@ -38,10 +38,7 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
             });
           }).pipe(
             Effect.mapError(
-              (error) =>
-                new CalculatorApiErrorEnvelopeData({
-                  error,
-                })
+              (error) => new CalculatorApiErrorEnvelopeData({ error })
             )
           )
         )
@@ -54,10 +51,7 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
             });
           }).pipe(
             Effect.mapError(
-              (error) =>
-                new CalculatorApiErrorEnvelopeData({
-                  error,
-                })
+              (error) => new CalculatorApiErrorEnvelopeData({ error })
             )
           )
         )
@@ -70,10 +64,7 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
             });
           }).pipe(
             Effect.mapError(
-              (error) =>
-                new CalculatorApiErrorEnvelopeData({
-                  error,
-                })
+              (error) => new CalculatorApiErrorEnvelopeData({ error })
             )
           )
         )
@@ -86,11 +77,23 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
               ...query,
             });
           }).pipe(
-            Effect.mapError(
-              (error) =>
-                new CalculatorApiErrorEnvelopeData({
-                  error,
-                })
+            Effect.mapError((error) =>
+              Match.value(error).pipe(
+                Match.tag(
+                  "CalculatorCapacityExceeded",
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                ),
+                Match.tag(
+                  "CalculatorOperationTimedOut",
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                ),
+                Match.orElse(
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                )
+              )
             )
           )
         )

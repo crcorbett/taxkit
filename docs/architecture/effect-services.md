@@ -433,3 +433,14 @@ encoded loader data, call the restore operation or run Effect runtimes.
 - [Rules and parameters](./rules-and-parameters.md)
 - [Calculators](./calculators.md)
 - [API and SDK](./api-and-sdk.md)
+
+## Shared calculation work limits
+
+The calculator-owned [bounded Layer](../../packages/calculators/README.md#shared-calculation-work-limits)
+is a real host substitution point over `PublicCalculatorService`: native API and
+standalone HTTP roots build it once over the live implementation, while focused
+tests supply controlled work at the same contract. One pool serves all native
+transports and counts individual batch calculations. Scope and semaphore release
+own cleanup on every exit. Metadata remains outside calculation capacity. No
+runner or live Layer is built inside a calculation, and no transport gains a
+competing application contract. The owning package records timeout and CPU limits.

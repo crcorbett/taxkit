@@ -16,71 +16,78 @@ const program = Effect.gen(function* () {
   yield* Effect.gen(function* () {
     // Qualify native fatal RPC replies using the real application entry and
     // operation. Restore the root before the ordinary API source build.
-    yield* Effect.gen(function* nativeRpcDefectBuild() {
-      const owner = path.join(root, "apps/api/src/worker.ts");
-      const original = yield* Effect.acquireRelease(
-        fs.readFileString(owner),
-        (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
-      );
-      if (
-        !original.includes(
-          'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";'
-        ) ||
-        !original.includes(
-          "PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))"
-        )
-      ) {
-        return yield* Effect.die(
-          "Native RPC defect fixture no longer matches its source owner"
+    yield* Effect.forEach(["defect", "stalled-work"] as const, (mode) =>
+      Effect.gen(function* nativeCalculationPolicyBuild() {
+        const owner = path.join(root, "apps/api/src/worker.ts");
+        const original = yield* Effect.acquireRelease(
+          fs.readFileString(owner),
+          (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
         );
-      }
-      const injected = original
-        .replace(
-          'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";',
-          'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";\nimport { PublicCalculatorService } from "@taxkit/calculators/service";'
-        )
-        .replace(
-          "PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))",
-          `Layer.effect(
+        if (
+          !original.includes(
+            'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";'
+          ) ||
+          !original.includes("Layer.provide(PublicCalculatorServiceLive)")
+        ) {
+          return yield* Effect.die(
+            "Native RPC defect fixture no longer matches its source owner"
+          );
+        }
+        const injected = original
+          .replace(
+            'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";',
+            'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";\nimport { PublicCalculatorService } from "@taxkit/calculators/service";'
+          )
+          .replace(
+            "Layer.provide(PublicCalculatorServiceLive)",
+            `Layer.provide(Layer.effect(
             PublicCalculatorService,
             Effect.gen(function* () {
               const calculator = yield* PublicCalculatorService;
               return PublicCalculatorService.of({
                 ...calculator,
-                calculate: (request) => calculator.calculate(request).pipe(
-                  Effect.andThen(Effect.die("PRIVATE9"))
-                ),
+                calculate: (request) => ${
+                  mode === "defect"
+                    ? 'calculator.calculate(request).pipe(Effect.andThen(Effect.die("PRIVATE9")))'
+                    : 'Effect.logWarning("PRIVATE9 work started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.calculate(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 work released")))'
+                },
               });
             })
-          ).pipe(Layer.provide(
-            PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
-          ))`
+          ).pipe(Layer.provide(PublicCalculatorServiceLive)))`
+          );
+        yield* fs.writeFileString(owner, injected);
+        const fixtureId =
+          mode === "defect" ? "TaxKitApiRpcDefect" : "TaxKitApiStalledWork";
+        yield* fs.remove(path.join(output, "bundles", fixtureId), {
+          force: true,
+          recursive: true,
+        });
+        const props = {
+          compatibility,
+          main: import.meta.resolve("api/worker"),
+        };
+        const artifacts = scopedArtifacts(fixtureId);
+        const source = yield* resolveSource(props).pipe(
+          Effect.provide(artifacts)
         );
-      yield* fs.writeFileString(owner, injected);
-      const fixtureId = "TaxKitApiRpcDefect";
-      yield* fs.remove(path.join(output, "bundles", fixtureId), {
-        force: true,
-        recursive: true,
-      });
-      const props = { compatibility, main: import.meta.resolve("api/worker") };
-      const artifacts = scopedArtifacts(fixtureId);
-      const source = yield* resolveSource(props).pipe(
-        Effect.provide(artifacts)
-      );
-      yield* source
-        .build(
-          makeSourceContext({
-            compatibility,
-            dotAlchemy: output,
-            fqn: fixtureId,
-            id: fixtureId,
-            props,
-            stack: { name: "TaxKitAppsLocalProof", stage: "dev_native_pair" },
-            workerName: "taxkit-api-local-rpc-defect",
-          })
-        )
-        .pipe(Effect.provide(artifacts));
-    }).pipe(Effect.scoped);
+        yield* source
+          .build(
+            makeSourceContext({
+              compatibility,
+              dotAlchemy: output,
+              fqn: fixtureId,
+              id: fixtureId,
+              props,
+              stack: { name: "TaxKitAppsLocalProof", stage: "dev_native_pair" },
+              workerName:
+                mode === "defect"
+                  ? "taxkit-api-local-rpc-defect"
+                  : "taxkit-api-local-stalled-work",
+            })
+          )
+          .pipe(Effect.provide(artifacts));
+      }).pipe(Effect.scoped)
+    );
     // Corrupt one field in the actual native encoded reply. The native message
     // framing and server remain intact; this qualifies the client's decoder.
     yield* Effect.gen(function* nativeInvalidReplyBuild() {

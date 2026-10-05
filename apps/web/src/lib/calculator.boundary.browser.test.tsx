@@ -5,6 +5,8 @@ import {
   CalculatorRpcDeadlineExceeded,
   CalculatorRpcRateLimited,
   CalculatorRpcRequestTimedOut,
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
   CalculatorRpcRequestTooLarge,
   CalculatorRpcResponseTooLarge,
 } from "@taxkit/api-rpc/errors";
@@ -204,6 +206,14 @@ describe("browser calculator lifetime", () => {
     },
     { error: new CalculatorRpcRateLimited(), message: "Wait a minute" },
     { error: new CalculatorRpcRequestTimedOut(), message: "request timed out" },
+    {
+      error: new CalculatorCapacityExceeded(),
+      message: "The calculators are busy",
+    },
+    {
+      error: new CalculatorOperationTimedOut(),
+      message: "within five seconds",
+    },
     { error: new CalculatorRpcRequestTooLarge(), message: "64 KiB or less" },
     { error: new CalculatorRpcResponseTooLarge(), message: "Reduce the query" },
   ])(

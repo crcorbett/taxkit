@@ -1,4 +1,6 @@
 export {
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
   CalculatorRunFacts,
   CalculatorRunReport,
   CalculatorRunRequest,

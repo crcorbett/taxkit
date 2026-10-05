@@ -1,4 +1,13 @@
+import {
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
+} from "@taxkit/calculators/schemas";
 import { Schema } from "effect";
+
+export {
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
+} from "@taxkit/calculators/schemas";
 
 export class CalculatorRpcRejected extends Schema.TaggedError<CalculatorRpcRejected>()(
   "CalculatorRpcRejected",
@@ -15,6 +24,8 @@ export class CalculatorRpcVersionMismatch extends Schema.TaggedError<CalculatorR
 export const CalculatorRpcExpectedError = Schema.Union([
   CalculatorRpcRejected,
   CalculatorRpcVersionMismatch,
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
 ]);
 
 export class CalculatorRpcUnavailable extends Schema.TaggedError<CalculatorRpcUnavailable>()(
