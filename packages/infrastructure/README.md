@@ -28,6 +28,9 @@ receipts live in `tools/docs-deployment`.
 
 Run `bun run --filter=@taxkit/infrastructure check-types` and
 `bun run --filter=@taxkit/infrastructure test` for local declaration proof.
+Build `api` first with `bun run --filter=api build` when its compiled app export
+has changed. The root `bun run test` already builds dependency exports; a direct
+package test does not. An older compiled API export cannot qualify a source edit.
 The test command uses Bun-hosted Vitest and the native Effect runner. It checks
 stage acceptance/rejection, bounded log settings and the actual app-owned asset
 header file through native file/path services. Compiler controls require both
@@ -53,7 +56,8 @@ not invented addresses; runtime application Config remains the checked ingress.
 The Website candidate now consumes the binding and checked public API origin.
 The graph supplies only three Website runtime values; it does not copy origins
 into Vite browser build constants. The Website's native pair test covers local
-runtime use; full T003 qualification remains in progress.
+runtime use. T003's local connection/containment review is complete; exact
+candidate hosted readback and safe exported tracing remain separate proof.
 
 Root native secret selection checks the existing `prod`, `pr-N` and
 `dev_identity` stage rules. It selects Doppler project `taxkit`, respectively
@@ -90,3 +94,18 @@ Native resources own the addresses, bindings and local Worker/Vite lifetimes.
 The [Website README](../../apps/web/README.md) owns contributor setup and the
 saved real-CLI development test. Local state is disposable development evidence,
 not cloud provider or deployment proof.
+
+## Calculator platform records
+
+The API app export owns `ApiWorkerObservability`. The native apps graph uses it
+for the API and declares the Website's separate disabled settings. Global
+collection, invocation logs, stored logs and traces are all explicitly disabled,
+with zero sampling. Omitting these properties would select Alchemy's default
+invocation logs, which can contain caller URLs outside the app's fixed reporter.
+
+Native mock plans and saved real local CLI state must both contain those settings.
+Removing the API graph settings fails the saved local-state check. This proves
+the declared local policy, not a Cloudflare upload or exported data. The
+standalone Website's `wrangler.jsonc` carries matching disabled settings. The
+existing docs app keeps its own policy. T009 still owes safe exported tracing;
+disabling collection does not complete that requirement.

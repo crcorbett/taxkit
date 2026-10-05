@@ -1,7 +1,11 @@
 import * as Website from "alchemy/Cloudflare/Website";
 import { Worker } from "alchemy/Cloudflare/Workers";
 import * as Output from "alchemy/Output";
-import { ApiWorkerInit, TaxKitApiWorker } from "api/worker";
+import {
+  ApiWorkerInit,
+  ApiWorkerObservability,
+  TaxKitApiWorker,
+} from "api/worker";
 import { Effect, Option } from "effect";
 
 // A forward API tag registers before its implementation Layer finishes. The
@@ -22,6 +26,19 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
         API_PUBLIC_ORIGIN: apiOrigin,
         TAXKIT_API: api,
         WEBSITE_PUBLIC_ORIGIN: Worker.URL,
+      },
+      // The Website's platform records can include caller URLs independently
+      // of its fixed application reporter. Qualified exporters remain pending.
+      observability: {
+        enabled: false,
+        headSamplingRate: 0,
+        logs: {
+          enabled: false,
+          headSamplingRate: 0,
+          invocationLogs: false,
+          persist: false,
+        },
+        traces: { enabled: false, headSamplingRate: 0, persist: false },
       },
       rootDir: "apps/web",
       workersDev: true,
@@ -46,6 +63,7 @@ const NativeApiHostLive = TaxKitApiWorker.make(
       // The app export owns its native entry; the graph crosses the workspace
       // through that export rather than a relative filesystem import.
       main: import.meta.resolve("api/worker"),
+      observability: ApiWorkerObservability,
       workersDev: true,
     };
   }),

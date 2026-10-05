@@ -43,12 +43,13 @@ empty 413; stalled bodies return an empty 408. CORS applies to those responses.
 
 The app's native logger and error reporter emit only a fixed event name, time
 and severity. Arbitrary messages, Causes, annotations and span labels are
-discarded before console output. This is bounded containment; full safe native
-tracing and exporter qualification remains required by the active plan.
+discarded before console output. This is bounded containment; T009 still owns
+safe native tracing and exporter qualification.
 
 The apps infrastructure root now declares the native API and Website candidate
 and their matching resource bindings. Local plans and transport tests do not
-prove deployment or completion of DEV-74. The Bun commands and public contract
+prove deployment. DEV-74's local acceptance review owns the complete connection
+qualification; T009 retains safe exported tracing. The Bun commands and public contract
 stay available during this work.
 
 ## Local native pair
@@ -257,3 +258,11 @@ This qualifies the client's complete five-second wait and browser request abort,
 not cancellation of upstream Worker work. The [Website README](../web/README.md)
 owns its local commands and [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json)
 records the bounded observations.
+
+The private `api/worker` export also owns `ApiWorkerObservability`. Both its
+default Worker and the native apps graph explicitly disable platform invocation
+logs, stored logs and traces, with zero sampling. Those automatic records can
+contain caller URLs even when the application reporter emits only fixed fields.
+Local graph/state checks establish the declared settings; they do not establish
+uploaded Cloudflare settings or safe exported rows. T009 owns that remaining
+requirement. The fixed application reporter remains in use.

@@ -338,7 +338,7 @@
     {
       "id": "CSF-T003",
       "title": "Prove one native API and Website path",
-      "status": "in_progress",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -355,7 +355,8 @@
         "Implement the Q9-agreed native Effect RPC in packages/api/rpc with shared calculator/content Schemas, thin handlers and private generated client Layers. Use native JSON serialisation and explicitly select HTTP POST rather than the native server WebSocket default. Keep the public HTTP adapter separate and call the same named application operation.",
         "Qualify checked semantic client errors, malformed-reply handling, safe RPC expected/defect/protocol replies, contract version agreement, credential/redirect/origin policy, one whole-response deadline and earlier caller interruption. Recheck every native fatal/global defect path and unknown-tag/invalid-envelope bypass as well as per-procedure encoding; an outer HTTP reporter, custom procedure defect Schema or codecFor hook alone is insufficient privacy proof. Qualify supported ingress treatment or an exact reviewed native correction where required.",
         "Use native instance/request lifetimes, matching-stage service binding/public address, one Website server runner and a React-owned browser Atom graph; no extra backend runner or Effect Context through TanStack. Bind each host's own origin from native Cloudflare.Worker.URL and cross-host addresses from native resource Outputs, decoded once at application ingress. Missing Outputs fail checked configuration without guessed or concatenated addresses.",
-        "Select native Stack.secrets/Doppler at the infrastructure root with explicit stage/precedence; qualify bindings without applying a cloud plan."
+        "Select native Stack.secrets/Doppler at the infrastructure root with explicit stage/precedence; qualify bindings without applying a cloud plan.",
+        "Explicitly disable unqualified platform log/trace collection on both calculator hosts; qualify the declared policy in native plans and actual local state. T009 separately owns safe exported native tracing and CSF-009 remains unmet until its export/privacy proof or a reviewed design change."
       ],
       "outputs": [
         "apps/api/src/**, apps/web/src/**, packages/api/rpc/**, packages/api/http/src/** and packages/infrastructure/src/** native composition",
@@ -394,7 +395,8 @@
         "A real calculator works through the separate apps; no frontend backend fallback exists.",
         "No package/app domain code constructs a runtime or builds a live Layer mid-operation.",
         "The same-stage origin/binding and deadline/cancellation claims have runtime evidence.",
-        "Website RPC, HTTP and later MCP reuse one checked application operation. Native RPC wire privacy and failure classification have source/version-matched proof, not assumed defaults or handwritten protocol framing."
+        "Website RPC, HTTP and later MCP reuse one checked application operation. Native RPC wire privacy and failure classification have source/version-matched proof, not assumed defaults or handwritten protocol framing.",
+        "Native plans and actual local resource state contain the explicitly disabled platform collection policy. This is bounded containment, not safe exported tracing; T009 retains that requirement."
       ],
       "commitAfterPassing": true,
       "evidence": [
@@ -405,7 +407,9 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website-failures.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-failures.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-local-development.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-local-development.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-trace-containment.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json"
       ]
     },
     {

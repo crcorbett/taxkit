@@ -479,3 +479,11 @@ work. The docs deployment runbook and workflows continue to select
 Native Stack secrets select the checked stage's Doppler configuration and reject
 `--env-file`; see [configuration](./configuration.md) and the
 [graph receipt](../documentation-audit/clean-slate-foundation/2026-10-05-native-app-graph.json).
+
+The calculator candidate explicitly disables platform invocation logs, stored
+logs and traces for both native resources. The standalone Website has matching
+Wrangler settings. Current native plan/local-state proof establishes desired
+settings only; it does not establish Cloudflare upload metadata or exported
+rows. Any later enabled tracing path must pass T009's closed-field privacy
+qualification before acceptance. This does not change the docs resource policy
+or authorise a provider operation.

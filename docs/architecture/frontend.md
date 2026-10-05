@@ -303,8 +303,9 @@ route base and Worker ingress share `WebsiteServerFunctionBase`; query payloads
 and non-GET methods are rejected before TanStack's parser. Expected settings
 errors remain encoded checked results. Unexpected settings failures use native
 HTTP matching/reporting and a native Response, bypassing error serialisation.
-This qualifies that named path only; other framework/fatal/trace paths remain
-with the active T003 work.
+The saved native suite also qualifies controlled fatal/RPC paths and caller
+cancellation. T003's bounded local connection acceptance is complete; T009
+retains the unqualified safe trace exports.
 
 Native settings ingress admits the function's own generated URL, without
 copying its build ID. Unknown IDs, extra path parts and missing IDs get empty

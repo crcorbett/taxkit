@@ -209,7 +209,8 @@ decodes bound addresses on first incoming runtime use. Request handling builds
 no live Layer. The native body stream has bounded accumulation, total read
 time and scoped cancellation. Safe logger/reporter context is built at instance
 initialisation and supplied to both native router construction and dispatch;
-complete native trace/export qualification remains with the active plan.
+T009 retains unqualified safe native trace exports. T003's local connection
+acceptance does not establish that later requirement.
 
 ## Promise boundaries
 

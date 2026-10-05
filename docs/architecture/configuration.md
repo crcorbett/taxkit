@@ -196,3 +196,20 @@ an empty profile directory. Alchemy creates an empty default profile directory
 but no credential JSON. These local bookkeeping files do not establish cloud
 credential custody. The [Website README](../../apps/web/README.md) owns setup;
 the current docs secret bridge remains separate.
+
+## Calculator platform logging and tracing
+
+`apps/api/src/worker.ts` owns the API's disabled platform collection policy;
+`packages/infrastructure/src/apps-stack.ts` supplies that policy to the native
+API and declares the Website's disabled policy. Both set global/log/trace
+collection and persistence to false, invocation logs to false and sampling to
+zero. The standalone Website config owns the matching Wrangler representation.
+This explicit state avoids Alchemy's default invocation logs. Automatic URL
+fields sit outside the fixed application logging policy, so that formatter
+alone cannot establish privacy for platform records.
+
+These settings are checked in native plans and saved local CLI resources.
+Cloudflare upload metadata, retained storage and safe exports require separate
+readback. T009 owns safe exported tracing and remains unmet; no competing trace
+exporter is admitted. The docs app's existing logging policy remains separately
+owned.

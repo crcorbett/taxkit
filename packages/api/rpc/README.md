@@ -12,7 +12,8 @@ review_trigger: RPC contracts, native codecs, clients, handlers, exports or tran
 Private compiled Effect 4 RPC transport over the existing calculator service.
 It owns the versioned calculation connection, thin handlers and checked clients.
 Tax definitions and calculation remain with `@taxkit/calculators` and rule
-packages. Both native app candidates now consume it; full T003 acceptance remains pending.
+packages. Both native app candidates now consume it. T003's bounded local
+connection acceptance is complete; T009 still owns safe exported tracing.
 
 ## Exports
 

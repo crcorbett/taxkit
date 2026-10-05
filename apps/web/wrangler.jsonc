@@ -4,6 +4,21 @@
   "main": "src/server.ts",
   "compatibility_date": "2026-10-04",
   "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 0,
+    "logs": {
+      "enabled": false,
+      "head_sampling_rate": 0,
+      "invocation_logs": false,
+      "persist": false,
+    },
+    "traces": {
+      "enabled": false,
+      "head_sampling_rate": 0,
+      "persist": false,
+    },
+  },
   "services": [
     { "binding": "TAXKIT_API", "service": "taxkit-api-local-candidate" },
   ],

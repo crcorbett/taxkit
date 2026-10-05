@@ -128,8 +128,9 @@ sources. Full exported telemetry and all calculator pages remain active work.
 - [Active execution plan](../../docs/exec-plans/active/clean-slate-foundation.md)
 
 Retained 2025–26 results are unchanged. The Medicare decision, remaining
-calculator pages, full native failure/privacy qualification and safe exported
-telemetry remain separate unfinished tasks.
+calculator pages and safe exported telemetry remain separate unfinished tasks.
+T003's local connection, failure/cancellation and disabled-platform acceptance
+is recorded in the [acceptance review](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json).
 
 The settings server function accepts GET without query data or client Context.
 The shared explicit route base is configured in Vite and checked at Worker
@@ -177,3 +178,15 @@ not an emitted pay message. Private text markers remain checked across the
 whole log record. The [dated cancellation receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json)
 records source-removal checks, restoration and the remaining
 exported-telemetry work.
+
+The native graph and standalone `wrangler.jsonc` explicitly disable platform
+invocation logs, stored logs and traces, with zero sampling. This protects the
+candidate while safe exports remain unqualified in T009. Saved real CLI state
+must contain the disabled policy for both apps; this is local desired-state
+proof, not a provider upload or exported-data observation.
+
+The saved development test uses the non-polling file watcher used by Linux CI.
+It separates the first visible page edit from exact source restoration by
+100 milliseconds because the pinned Vite watcher suppresses repeat file-change
+events within 50 milliseconds. It still requires both visible page updates;
+the original 15-second observation deadlines remain unchanged.

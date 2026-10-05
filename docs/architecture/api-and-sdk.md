@@ -325,8 +325,9 @@ The root installs a closed logger and error reporter before router construction
 and incoming dispatch. Console egress contains a fixed event, time and severity;
 raw native messages, Causes and arbitrary annotations do not escape this
 adapter. Full native trace/export proof remains pending. The native Worker
-candidate does not establish deployed availability or complete DEV-74; the
-retained Bun entry and public HTTP/OpenAPI contract remain available.
+candidate does not establish deployed availability. The T003 acceptance review
+qualifies the complete local connection; T009 retains safe native trace exports.
+The retained Bun entry and public HTTP/OpenAPI contract remain available.
 
 ## TypeScript SDK facade
 
@@ -395,7 +396,7 @@ owner. The Effect interface remains caller-composed and creates no runtime.
 These lifetime changes fulfil part of the accepted fresh interface work; they
 do not establish the later calculator UI, transport limits or whole-task acceptance.
 
-## Native website RPC (T003 in progress)
+## Native website RPC (T003 locally accepted)
 
 `@taxkit/api-rpc` now owns one versioned `Calculate` procedure over canonical
 calculator request/result Schemas. Its native server explicitly mounts POST

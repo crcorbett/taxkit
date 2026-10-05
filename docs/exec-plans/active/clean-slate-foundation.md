@@ -32,8 +32,9 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: implement T003's native website and backend
-calculation. T002's installed dependency graph, app/script/SDK/infrastructure
+Next continuation milestone: begin T004's calculator pages after T003's locally
+accepted connection/containment qualification. T002's
+installed dependency graph, app/script/SDK/infrastructure
 migrations, six-extension strict scope, fixture containment and final source
 review are complete locally. The [acceptance review](../../documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json)
 records the completed local checks and their limits. The companion adad
@@ -73,8 +74,8 @@ records command outcomes and log digests.
 | --- | --- | --- |
 | T001 / DEV-72 | Implemented and locally tested | Retention, admission and diagnostic checks pass; draft PR review pending. |
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
-| T003 / DEV-74 | In progress; T002 locally accepted | Native RPC contract first; same-stage website/backend calculation still pending. |
-| T004 / DEV-75 | Pending T003 | All three calculators and deliberate public interface changes. |
+| T003 / DEV-74 | Complete locally; review/hosted readback outstanding | Native RPC, matching API/Website, failure/cancellation, development and explicit platform containment pass. T009 exported tracing remains unmet. Linear state unchanged. |
+| T004 / DEV-75 | Ready after local T003 acceptance | All three calculators and deliberate public interface changes. |
 | T005 / DEV-76 | Pending T003/T004 | Accepted content, route retention, search and discovery. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
@@ -2172,3 +2173,86 @@ browser errors or initial replay, then stopped with both ports refused.
 Post-receipt docs checks remain required. This accepts the local development
 sub-slice only. T003 remains in progress for safe exported telemetry;
 DEV-75–81 remain later work.
+
+## T003 platform telemetry containment candidate
+
+Continue from local development draft #135 at
+`b3d759504f8dcdbb9dfea6d5521d98646dc0317b` on
+`codex/dev-74-native-trace-containment`. Parent local closeout passed. Hosted
+Quality run `37254770742`, job `111589383583`, failed at the exact parent head:
+the page did not show the restored heading within 15 seconds. Preserve this
+failed result; it is not hosted acceptance.
+
+Source review of pinned Alchemy beta.80 shows native Worker upload metadata
+supplies invocation logs by default when observability is omitted. Cloudflare's
+current [Workers Logs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/)
+documentation describes request URL records independently of application console
+formatters. Its [automatic span fields](https://developers.cloudflare.com/workers/observability/traces/spans-and-attributes/)
+also include full URL/query/header data. The native Telemetry binding exposes
+enablement, sampling and persistence; it does not expose a closed field filter.
+The [custom span API](https://developers.cloudflare.com/workers/observability/traces/custom-spans/)
+adds attributes and treats undefined as a no-op; that is not proved suppression
+of automatic platform fields.
+
+Implement explicit disabled platform logging/invocation/persistence/tracing in
+the API declaration and matching API/Website graph, retaining fixed local
+application reporting. Qualify the actual native planned resource properties
+and local pair after safeguard removal/restoration. This is desired-state local
+containment, not uploaded Cloudflare metadata or exported row proof. Preserve
+the current docs app policy and existing dataset ownership. No competing trace
+exporter is introduced. CSF-009 safe native exported tracing remains unmet
+until its version-matched platform/exported-row privacy checks succeed; do not
+claim safe native spans survive disabling the path. The SPEC/task owner now
+separates T003's local connection/containment acceptance from T009's later safe
+exported tracing requirement. T003 remains in progress pending this candidate's
+complete qualification and review; it does not wait on a circular T009 dependency.
+
+Documentation impact: **Change required** for API/infrastructure declarations,
+focused graph proof, local state readback, API/Website/infrastructure READMEs,
+configuration/testing/deployment owners, current task and dated evidence.
+**Preserve** HTTP/RPC/calculator contracts, docs policy, shared datasets,
+canonical skills, cloud command authority and provider state. **N/A** public
+Changeset: private resource-policy and local qualification only.
+
+Focused checks: the infrastructure typecheck passes. A first direct package
+test used the older compiled API export and failed the new API property checks;
+after the owning `api` build, all 32 infrastructure tests pass. The README now
+records that prerequisite; root test already builds dependency exports.
+The real CLI local journey passes. Removing only the API graph's explicit
+observability property makes the saved local-state Schema reject its missing
+policy after runtime checks. Exact source restoration makes both tests pass.
+
+The hosted heading-restoration timeout exposed a test timing weakness. The
+pinned Vite watcher drops repeat change events within 50 ms. A direct native
+non-polling watcher check sees only the first event for immediate change/restore,
+but both events for saves spaced 100 ms apart. The saved real CLI test now uses
+that non-polling watcher on macOS too and separates the first visible edit from
+restoration by 100 ms, retaining both visible assertions and original deadlines.
+Both real CLI tests pass in 16.52 seconds. A separate removal run happened to
+pass without the delay, so it is not a deterministic real-app removal failure;
+the direct watcher reproduction and original hosted failure remain distinct.
+Exact fixture restoration followed by both saved tests passes again.
+
+The first attempt to create the graph removal driver hit local ENOSPC before
+writing or executing it. A fresh disk check then showed sufficient space without
+any deletion by this task. The retry and exact restoration succeeded; do not
+infer a cleanup or provider event from that change in available space.
+
+The current candidate's full local closeout passes: all 467 lint cases, all
+27 fresh app/package test tasks, 16 builds (11 unchanged cached), standalone
+API/temporary consumer smoke, complete verification including 32 Quality cases
+and 13 isolated copies in 453.92 seconds, both unused-code graphs, all types,
+24 fresh SDK browser cases, eight fresh Website browser cases, actual Wrangler
+declarations and all six fresh native tests in 37.17 seconds. The
+[containment receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-native-trace-containment.json)
+records the exact candidate and artifacts. No application/config change follows
+these checks; final acceptance edits are documentation/evidence only.
+
+The [T003 acceptance review](../../documentation-audit/clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json)
+reconciles its four original outcomes and explicit containment criterion against
+source and actual tests. T003 is now **completed locally**. Exact candidate
+hosted correction, draft review and unchanged external Linear status remain
+separate. T009 still owns CSF-009 safe exported tracing and remains unmet;
+DEV-75–81, provider delivery and the Medicare choice remain unfinished. Begin
+T004 without treating a draft or this task milestone as the persistent goal's
+completion.

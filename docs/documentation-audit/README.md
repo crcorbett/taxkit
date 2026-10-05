@@ -402,3 +402,13 @@ The [native local development candidate](clean-slate-foundation/2026-10-05-nativ
 records actual CLI startup, local matching bindings, source reload/restoration,
 browser/private calculations and shutdown. T003 remains active for safe exported
 telemetry; local development is not provider or deployment proof.
+
+The [native platform containment candidate](clean-slate-foundation/2026-10-05-native-trace-containment.json)
+records disabled calculator platform logs/traces, real local-state and removal
+proof, the failed parent hosted source-restoration check and its bounded timing
+correction. T009 safe exported tracing remains unmet.
+
+The [native connection acceptance review](clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json)
+accepts T003 locally against its named criteria and bounded source/runtime
+proof. T009 safe exports, exact candidate hosted correction and DEV-75–81 remain
+separate unfinished work.

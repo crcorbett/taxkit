@@ -611,6 +611,15 @@ add minimal PostHog and safe shared Axiom telemetry, then qualify the complete
 replacement and its operational delivery. An active execution plan begins only
 after final shared understanding. A passing early slice is not final acceptance.
 
+T003 qualifies the first app connection, native failure/privacy boundaries,
+cancellation and local development. While exported telemetry remains
+unqualified, both calculator hosts explicitly disable platform logs and traces;
+T003 checks that declared containment in native plans and actual local state.
+T009 owns enabling and proving safe exported native tracing, including automatic
+fields and retained Cloudflare/Axiom rows. CSF-009 remains unmet until that proof
+or a reviewed design change exists. This separates the task owners without
+reducing the tracing or privacy requirements.
+
 | Impact surface and inspected owner | Decision | Required change, order and proof |
 | --- | --- | --- |
 | Tax rules/core/calculator owners and READMEs under `packages/core`, `packages/calculators`, `packages/rules/au/*` | Change required | Compatibility/type/input/interface corrections in T002/T004; preserve valid known results and rate tables. Owning package tests, whole test run, reviewed Changesets. |

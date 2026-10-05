@@ -958,11 +958,12 @@ and complete decoding, earlier interruption and scope cleanup. Operation-policy
 proof observes credential omission and redirect rejection at HttpClient ingress.
 
 This corpus does not prove browser CORS, service binding, Worker origin,
-production app startup or safe exported traces. Those are remaining T003 host
-checks. A browser build of the private client exposed live calculation modules
+production app startup or safe exported traces. The saved native app suite
+separately qualifies those local host paths; T009 retains safe trace exports.
+A browser build of the private client exposed live calculation modules
 through broad Schema imports; narrow canonical diagnostics/report/input exports
-remove those modules. Real Website bundle proof remains required after app
-composition. Existing golden calculator and packed SDK checks protect the old
+remove those modules. The native Website suite now checks the real browser
+bundle after app composition. Existing golden calculator and packed SDK checks protect the old
 exports and report values when these Schema owners move.
 
 The private native RPC package is accepted and rejected by the installed lint
@@ -1043,8 +1044,10 @@ Exact real-CLI canaries admit only the named Website hosts/encoders and reject
 execution/encoding/decoding in other owners. The generated Wrangler file stays
 outside formatter/lint edits; its real generator owns byte identity. Both Knip
 graphs now include the Website. These checks establish local candidate behaviour,
-not complete native failure/privacy paths, cloud deployment, exported telemetry
-or remote cancellation. T003 remains in progress until its other criteria pass.
+not cloud deployment, exported telemetry or upstream cancellation. The named
+failure/cancellation and local development tests below qualify T003's remaining
+local paths. Its [acceptance review](../documentation-audit/clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json)
+records the bounded complete local connection; T009 retains safe trace exports.
 
 
 The current inventory now has six named journeys, including the native Website.
@@ -1129,3 +1132,18 @@ releases descendants; both actual app ports must stop serving afterwards.
 Run this test alone with respect to source scans and other development watchers.
 It establishes local development only; cloud state, login, provider writes,
 deployment and exported tracing remain separate claims.
+
+Both saved local resource records must also contain explicitly disabled global,
+log/invocation/persistence and trace collection with zero sampling. Native mock
+Plan checks require the same fields on each actual planned resource. Removing
+the API graph policy must fail the real CLI local-state Schema check after its
+runtime journey, followed by exact restoration and passing saved checks.
+This oracle qualifies declared containment, not provider upload or exported rows.
+
+The development fixture uses the non-polling watcher used by Linux CI. It waits
+100 milliseconds after the first visible page edit before restoring the source,
+because the pinned Vite watcher suppresses repeat file-change events within
+50 milliseconds. Both visible updates remain required at the original deadlines.
+The dated receipt retains the original hosted restoration timeout and the
+direct watcher reproduction; a locally passing run does not turn that failed
+hosted attempt into a success.

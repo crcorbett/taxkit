@@ -21,7 +21,26 @@ const LocalOrigin = Schema.String.check(
   Schema.isPattern(/^http:\/\/localhost:[1-9][0-9]{3,4}$/u)
 );
 const LocalResource = Schema.fromJsonString(
-  Schema.Struct({ providerMode: Schema.Literal("local") })
+  Schema.Struct({
+    props: Schema.Struct({
+      observability: Schema.Struct({
+        enabled: Schema.Literal(false),
+        headSamplingRate: Schema.Literal(0),
+        logs: Schema.Struct({
+          enabled: Schema.Literal(false),
+          headSamplingRate: Schema.Literal(0),
+          invocationLogs: Schema.Literal(false),
+          persist: Schema.Literal(false),
+        }),
+        traces: Schema.Struct({
+          enabled: Schema.Literal(false),
+          headSamplingRate: Schema.Literal(0),
+          persist: Schema.Literal(false),
+        }),
+      }),
+    }),
+    providerMode: Schema.Literal("local"),
+  })
 );
 
 describe("native local development", () => {
@@ -40,6 +59,8 @@ describe("native local development", () => {
           ALCHEMY_HOME: auth,
           ALCHEMY_TELEMETRY_DISABLED: "1",
           BUN_OPTIONS: "--conditions=source --no-env-file",
+          // Exercise the non-polling watcher used on the Linux CI runner.
+          CHOKIDAR_USEPOLLING: "0",
           CI: "1",
           HOME: yield* Config.schema(Schema.String, "HOME"),
           NO_COLOR: "1",
@@ -179,6 +200,9 @@ describe("native local development", () => {
                 })
                 .waitFor({ timeout: 15_000 })
             );
+            // Vite's pinned watcher drops repeat change events within 50 ms.
+            // Keep the two observed saves separate before exact restoration.
+            yield* Effect.sleep("100 millis");
           }).pipe(Effect.scoped);
           expect(yield* fs.readFileString(viewPath)).toBe(originalView);
           yield* Effect.promise(() =>

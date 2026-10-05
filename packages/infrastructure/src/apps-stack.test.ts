@@ -221,6 +221,29 @@ describe("native paired app graph and planner", () => {
         const apiProps = "props" in apiNode ? apiNode.props : api.Props;
         const websiteProps =
           "props" in websiteNode ? websiteNode.props : website.Props;
+        // This is the actual native planned graph, not an assertion against
+        // an unused policy constant. Omitted metadata invokes SDK defaults.
+        const disabledPlatformTelemetry = Schema.Struct({
+          enabled: Schema.Literal(false),
+          headSamplingRate: Schema.Literal(0),
+          logs: Schema.Struct({
+            enabled: Schema.Literal(false),
+            headSamplingRate: Schema.Literal(0),
+            invocationLogs: Schema.Literal(false),
+            persist: Schema.Literal(false),
+          }),
+          traces: Schema.Struct({
+            enabled: Schema.Literal(false),
+            headSamplingRate: Schema.Literal(0),
+            persist: Schema.Literal(false),
+          }),
+        });
+        expect(
+          Schema.is(disabledPlatformTelemetry)(apiProps.observability)
+        ).toBe(true);
+        expect(
+          Schema.is(disabledPlatformTelemetry)(websiteProps.observability)
+        ).toBe(true);
         const privateBinding = Option.fromNullishOr(website.Props.env).pipe(
           Option.flatMap((env) => Record.get(env, "TAXKIT_API")),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
