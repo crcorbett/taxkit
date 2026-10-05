@@ -6,16 +6,29 @@
   "identitySource": "git rev-parse HEAD, git status --short --branch, and the content-addressed candidate manifest",
   "owners": {
     "docsRouter": "docs/README.md",
-    "architecture": ["docs/architecture/README.md", "docs/architecture/"],
-    "standards": ["docs/standards/README.md", "docs/standards/"],
-    "readmes": ["README.md", "apps/**/README.md", "packages/**/README.md"],
+    "architecture": [
+      "docs/architecture/README.md",
+      "docs/architecture/"
+    ],
+    "standards": [
+      "docs/standards/README.md",
+      "docs/standards/"
+    ],
+    "readmes": [
+      "README.md",
+      "apps/**/README.md",
+      "packages/**/README.md"
+    ],
     "generatedReference": [
       "packages/api/http/src/openapi.ts",
       "packages/api/http/__snapshots__/openapi.json",
       "packages/docs-content/source.config.ts",
       "packages/docs-content/.source/"
     ],
-    "runbooks": ["docs/runbooks/README.md", "docs/runbooks/"],
+    "runbooks": [
+      "docs/runbooks/README.md",
+      "docs/runbooks/"
+    ],
     "proof": [
       "docs/verification/critical-journeys.json",
       "docs/verification/docs-deployment-journeys.json",
@@ -27,15 +40,25 @@
       "docs/evidence/",
       "tools/evals/"
     ],
-    "activeSpecs": ["docs/product-specs/index.md"],
-    "activePlans": ["docs/exec-plans/active/README.md"],
+    "activeSpecs": [
+      "docs/product-specs/index.md"
+    ],
+    "activePlans": [
+      "docs/exec-plans/active/README.md"
+    ],
     "archives": [
       "docs/exec-plans/completed/",
       "docs/documentation-audit/",
       "docs/evidence/"
     ],
-    "skills": [".agents/skills/", ".claude/skills/"],
-    "agentGuidance": ["AGENTS.md", "CLAUDE.md"]
+    "skills": [
+      "docs/skills.md",
+      "docs/skill-profiles/"
+    ],
+    "agentGuidance": [
+      "AGENTS.md",
+      "CLAUDE.md"
+    ]
   },
   "commands": {
     "documentation": [
@@ -44,7 +67,7 @@
       "bun run check:docs-deployment",
       "bun run check:repository-paths"
     ],
-    "skills": ["bun run test:skills"],
+    "skills": [],
     "focused": [
       "bun run check:harness-governance:types",
       "bun run test:harness-governance",
@@ -52,7 +75,10 @@
       "bun run check:harness-foundation-epoch:types",
       "bun run check:harness-foundation-epoch"
     ],
-    "closeout": ["bun run verification", "git diff --check"]
+    "closeout": [
+      "bun run verification",
+      "git diff --check"
+    ]
   },
   "representativeJobs": [
     {
@@ -112,7 +138,7 @@
     "The existing Quality workflow invokes bun run release:check -- --ci for pull requests and main-branch pushes; that graph begins with root verification and remains the sole hosted CI route.",
     "Exactly five operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
     "The separate four-entry docs deployment journey owner and dated deployment receipts never alter the five local release journeys or historical HGI/HFI evidence.",
-    "Repository-local skills and validators must work from a clean clone without reading a user home or global skill installation."
+    "Repository validators work from a clean clone. Agents separately look up the latest plugin through docs/skills.md."
   ],
   "exclusions": [
     "Dependency, build, cache, generated route, temporary, binary, and vendored trees are excluded from readable corpus accounting.",
@@ -123,7 +149,8 @@
     "Repository-local validation does not establish hosted CI success.",
     "Local Git commits do not establish push, remote branch, tag, or release state.",
     "The DCD-002 requalification chain establishes one dated Preview deployment/hosted/teardown observation; it establishes no current Preview availability, Production, rollback, public-domain behavior, release or publication.",
-    "A target-specific harness epoch does not establish general causal effectiveness for other workers, repositories, or future skill states."
+    "A target-specific harness epoch does not establish general causal effectiveness for other workers, repositories, or future skill states.",
+    "Local checks do not establish remote Git, registry, release, deployment, provider, public-site or external-consumer state."
   ],
   "exceptions": []
 }

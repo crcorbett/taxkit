@@ -167,8 +167,8 @@ The canonical baseline is exactly:
 Each `.agents/skills/<name>/` folder must be a complete copy of one recorded
 canonical source tree. TaxKit may differ only at:
 
-- `.agents/skills/docs-maintainer/references/repository-profile.md`; and
-- `.agents/skills/package-structure/references/repository-profile.md`.
+- `docs/skill-profiles/docs-maintainer.md`; and
+- `docs/skill-profiles/package-structure.md`.
 
 Record a deterministic receipt at
 `tools/skills/canonical-skill-baseline.json`. It must contain the canonical
@@ -196,12 +196,12 @@ All standard Claude links must be relative symlinks to the local canonical
 folders:
 
 ```text
-.claude/skills/docs-maintainer
-.claude/skills/effect-client-wrapper
-.claude/skills/package-structure
-.claude/skills/prd-implementer
-.claude/skills/prd-review
-.claude/skills/prd-writer
+development-workflows:docs-maintainer
+development-workflows:effect-client-wrapper
+development-workflows:package-structure
+development-workflows:prd-implementer
+development-workflows:prd-review
+development-workflows:prd-writer
 ```
 
 Preserve the existing relative `docs-writer` and `portless` links. Do not
@@ -424,8 +424,7 @@ Every implementation task runs its focused checks before `bun run verification`.
 `check:harness-governance` script keys before later tasks invoke them. The
 currently executable repository closeout commands are:
 
-```bash
-bun run test:skills
+
 bun run check:docs
 bun run check:runbooks
 bun run check:repository-paths
@@ -510,5 +509,5 @@ epoch claim over changed skills.
 - [`effectiveness.md`](../verification/effectiveness.md)
 - [`critical-journeys.json`](../verification/critical-journeys.json)
 - [`HGI-206-validation.json`](../documentation-audit/HGI-206-validation.json)
-- [repository-local docs-maintainer](../../.agents/skills/docs-maintainer/SKILL.md)
-- [repository-local prd-writer](../../.agents/skills/prd-writer/SKILL.md)
+- [repository-local docs-maintainer](https://github.com/crcorbett/commonplace-plugins/blob/main/plugins/development-workflows/skills/docs-maintainer/SKILL.md)
+- [repository-local prd-writer](https://github.com/crcorbett/commonplace-plugins/blob/main/plugins/development-workflows/skills/prd-writer/SKILL.md)

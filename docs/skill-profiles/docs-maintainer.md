@@ -1,3 +1,12 @@
+---
+document_type: repository-profile
+lifecycle: current
+authority: canonical
+owner: repository-maintainers
+last_reviewed: 2026-10-05
+review_trigger: repository paths, commands, or plugin routing change
+---
+
 # TaxKit documentation profile
 
 Read this profile after `AGENTS.md` and `docs/README.md`. Paths and commands
@@ -27,7 +36,7 @@ not provider, registry, deployment, public-site or consumer proof.
 
 ## Commands and boundaries
 
-- Baseline documentation/path/skill checks: `bun run test:skills`, `bun run
+- Baseline documentation/path/skill checks: `bun run
 check:docs`, `bun run check:runbooks`, `bun run check:repository-paths`.
 - Harness foundation checks: `bun run check:harness-governance:types`, `bun run
   test:harness-governance`, and `bun run check:harness-governance`. The runtime

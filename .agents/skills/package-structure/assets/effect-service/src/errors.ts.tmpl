@@ -1,8 +1,0 @@
-import { Schema } from "effect";
-
-import { __SYMBOL__Id } from "./schemas";
-
-export class __SYMBOL__NotFoundError extends Schema.TaggedErrorClass<__SYMBOL__NotFoundError>()(
-  "__SYMBOL__NotFoundError",
-  { id: __SYMBOL__Id },
-) {}

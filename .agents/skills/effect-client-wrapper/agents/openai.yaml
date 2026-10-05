@@ -1,4 +1,0 @@
-interface:
-  display_name: "Effect Client Wrapper"
-  short_description: "Build typed Effect adapters for external SDKs"
-  default_prompt: "Use $effect-client-wrapper to design or implement a typed Effect service around this external SDK."

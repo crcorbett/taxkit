@@ -1,4 +1,0 @@
-interface:
-  display_name: "PRD Review"
-  short_description: "Edit specs and downstream implementation tasks"
-  default_prompt: "Use $prd-review to directly improve this SPEC and its tasks, including required docs, README, lint-rule, client-wrapper, skill, configuration, testing, and operational changes."
