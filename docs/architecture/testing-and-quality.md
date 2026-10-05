@@ -1096,7 +1096,7 @@ The cancellation fixture keeps the actual calculation, encoder and response
 bytes. Its controlled API roots delay headers or send a real first body byte
 before delaying the remainder. Identity content encoding prevents compression
 from buffering that first byte and masking the unfinished-body check. Both
-paths must hit the complete five-second client deadline. Browser checks require
+paths must hit the complete ten-second client deadline. Browser checks require
 actual `requestfailed` abort observations on deadline, editing and same-document
 browser Back leaving the form. A hard document replacement can lose the old
 page's observation and is not a substitute for the route-cleanup check.
@@ -1293,3 +1293,15 @@ Linux Quality run for page draft #141. Portable artifact placement belongs in
 the owning fixture; retain that failed hosted attempt alongside its corrected
 candidate. Complete local verification must also finish: an ENOSPC failure
 inside an isolated dependency installation is not a passing Quality check.
+
+Private RPC response policy has exact-limit calculator/catalogue oracles using
+valid native replies at 2 MiB, progressive/multi-byte oversized streams with
+unread tails and source release, and status rejection without body reading or
+automatic retry. Real native HTTP controllers must abort on checked status
+rejection. TestClock confirms the complete deadline has not fired at nine
+seconds and releases stalled headers/body at ten. The native delayed fixtures
+now wait twelve seconds: the contract change justifies a 12-second browser
+observation allowance and 45-second total cancellation Effect budget (50-second test-runner allowance
+including cleanup) for three
+sequential ten-second deadlines plus setup/edit/departure work. Original
+15-second page observation guards remain unchanged.

@@ -178,8 +178,8 @@ and pay values. These are local observations; exported telemetry remains unfinis
 
 The native cancellation test uses ports 4201–4203. Two controlled API artifacts
 first run the real calculation and native reply encoder, then delay headers or
-the rest of that same reply for eight seconds. The generated client must reach
-its five-second deadline in both cases. Chromium must abort its unfinished
+the rest of that same reply for twelve seconds. The generated client must reach
+its ten-second deadline in both cases. Chromium must abort its unfinished
 request after the deadline, on editing, and when browser Back leaves the form.
 These checks establish caller and browser cancellation. They do not establish
 that the upstream Worker stops its artificial delayed response.
@@ -245,3 +245,10 @@ Native page proof screenshots are saved under ignored
 creates that folder; tests must not assume a macOS-only temporary directory.
 These images contain controlled local examples and do not establish a deployed
 page or current-law correctness.
+
+The RPC client rejects oversized replies and distinguishes request timeout,
+request size and rate-limit errors before reading an error body. The calculator
+containers show fixed safe guidance for checked browser and restored form
+failures. A retry is always a visitor action; previous answers remain visibly
+out of date until an explicit successful calculation. The response limit and
+complete ten-second client deadline belong to the private RPC package.

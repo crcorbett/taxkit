@@ -2,7 +2,7 @@ import {
   CalculatorRunServiceRequest,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
-import { Duration, Schema, SchemaGetter } from "effect";
+import { ByteSize, Duration, Schema, SchemaGetter } from "effect";
 
 export {
   CalculatorCatalogResponse,
@@ -33,7 +33,8 @@ export const CalculatorRpcOrigin = Schema.URLFromString.check(
 ).pipe(Schema.brand("@taxkit/api-rpc/CalculatorRpcOrigin"));
 export type CalculatorRpcOrigin = typeof CalculatorRpcOrigin.Type;
 
-export const CalculatorRpcDeadline = Duration.seconds(5);
+export const CalculatorRpcDeadline = Duration.seconds(10);
+export const CalculatorRpcResponseLimit = ByteSize.mebibytes(2);
 export const CalculatorRpcSafeDefect = Schema.Unknown.pipe(
   Schema.encodeTo(Schema.Literal("Calculation service failed"), {
     decode: SchemaGetter.transform((value: string) => value),

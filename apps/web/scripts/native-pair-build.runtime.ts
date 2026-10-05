@@ -170,7 +170,7 @@ const program = Effect.gen(function* () {
                 Stream.make(response.body.body.subarray(0, 1)).pipe(
                   Stream.concat(Stream.fromEffect(
                     Effect.logWarning("PRIVATE9 started").pipe(
-                      Effect.andThen(Effect.sleep("8 seconds")),
+                      Effect.andThen(Effect.sleep("12 seconds")),
                       Effect.as(response.body.body.subarray(1))
                     )
                   )),
@@ -189,7 +189,7 @@ const program = Effect.gen(function* () {
           phase === "body"
             ? `Effect.map((response) => ${reply})`
             : `Effect.flatMap((response) => Effect.logWarning("PRIVATE9 headers").pipe(
-              Effect.andThen(Effect.sleep("8 seconds")),
+              Effect.andThen(Effect.sleep("12 seconds")),
               Effect.as(response),
               Effect.provideContext(telemetry)
             ))`;

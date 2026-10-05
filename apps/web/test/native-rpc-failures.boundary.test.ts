@@ -336,7 +336,7 @@ it.live(
       const invalidHtml = yield* Effect.promise(() => invalidPage.text());
       expect(invalidPage.status).toBe(200);
       expect(invalidHtml).toContain("CalculatorRpcInvalidResponse");
-      expect(invalidHtml).toContain("Check your pay details");
+      expect(invalidHtml).toContain("Check your details");
       expect(invalidHtml).not.toContain(sentinel);
       const websiteHost = yield* Effect.acquireRelease(
         Effect.sync(
@@ -401,7 +401,7 @@ it.live(
       );
       expect(
         yield* Effect.promise(() => page.getByRole("alert").textContent())
-      ).toContain("Check your pay details");
+      ).toContain("Check your details");
       expect(
         yield* Effect.promise(() =>
           page.getByText("$1,301.00", { exact: true }).count()

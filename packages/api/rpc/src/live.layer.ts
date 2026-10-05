@@ -2,14 +2,17 @@ import type {
   CalculatorRunServiceRequest,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
-import { Effect, Layer, Match, Schema } from "effect";
+import { Effect, Layer, Schema } from "effect";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import { Rpc, RpcClient, RpcSerialization } from "effect/rpc";
 
 import {
+  boundedCalculatorRpcHttpClient,
+  calculatorRpcTransportFailure,
+} from "./client-response.boundary.js";
+import {
   CalculatorRpcDeadlineExceeded,
   CalculatorRpcInvalidResponse,
-  CalculatorRpcUnavailable,
 } from "./errors.js";
 import { Calculate, ListCalculators, TaxKitRpcGroup } from "./group.js";
 import { CalculatorRpcDeadline, CalculatorRpcVersion } from "./schemas.js";
@@ -73,25 +76,7 @@ export const TaxKitRpcClientLive = (origin: CalculatorRpcOrigin) =>
                 orElse: () => Effect.fail(new CalculatorRpcDeadlineExceeded()),
               }),
               Effect.catchTag("RpcClientError", (error) =>
-                Effect.fail(
-                  Match.value(error.reason).pipe(
-                    Match.tag(
-                      "RpcClientDefect",
-                      () => new CalculatorRpcInvalidResponse()
-                    ),
-                    Match.tag("HttpError", (reason) =>
-                      Match.value(reason.kind).pipe(
-                        Match.whenOr(
-                          "DecodeError",
-                          "EmptyBodyError",
-                          () => new CalculatorRpcInvalidResponse()
-                        ),
-                        Match.orElse(() => new CalculatorRpcUnavailable())
-                      )
-                    ),
-                    Match.orElse(() => new CalculatorRpcUnavailable())
-                  )
-                )
+                Effect.fail(calculatorRpcTransportFailure(error))
               ),
               Effect.catchDefect((defect) =>
                 Schema.is(RpcReplyDecodeDefect)(defect)
@@ -121,25 +106,7 @@ export const TaxKitRpcClientLive = (origin: CalculatorRpcOrigin) =>
                 orElse: () => Effect.fail(new CalculatorRpcDeadlineExceeded()),
               }),
               Effect.catchTag("RpcClientError", (error) =>
-                Effect.fail(
-                  Match.value(error.reason).pipe(
-                    Match.tag(
-                      "RpcClientDefect",
-                      () => new CalculatorRpcInvalidResponse()
-                    ),
-                    Match.tag("HttpError", (reason) =>
-                      Match.value(reason.kind).pipe(
-                        Match.whenOr(
-                          "DecodeError",
-                          "EmptyBodyError",
-                          () => new CalculatorRpcInvalidResponse()
-                        ),
-                        Match.orElse(() => new CalculatorRpcUnavailable())
-                      )
-                    ),
-                    Match.orElse(() => new CalculatorRpcUnavailable())
-                  )
-                )
+                Effect.fail(calculatorRpcTransportFailure(error))
               ),
               Effect.catchDefect((defect) =>
                 Schema.is(RpcReplyDecodeDefect)(defect)
@@ -152,14 +119,20 @@ export const TaxKitRpcClientLive = (origin: CalculatorRpcOrigin) =>
     })
   ).pipe(
     Layer.provide(
-      RpcClient.layerProtocolHttp({
-        // Native HTTP RPC prepends a slash to its empty call path. Keep the
-        // canonical POST endpoint exact; browsers reject its redirect by policy.
-        transformClient: HttpClient.mapRequest(
-          HttpClientRequest.setUrl(new URL("/rpc", origin).href)
-        ),
-        url: new URL("/rpc", origin).href,
-      })
+      Layer.effect(
+        RpcClient.Protocol,
+        HttpClient.HttpClient.pipe(
+          Effect.map((client) =>
+            client.pipe(
+              HttpClient.mapRequest(
+                HttpClientRequest.setUrl(new URL("/rpc", origin).href)
+              ),
+              boundedCalculatorRpcHttpClient
+            )
+          ),
+          Effect.flatMap(RpcClient.makeProtocolHttp)
+        )
+      )
     ),
     Layer.provide(replySerialization)
   );

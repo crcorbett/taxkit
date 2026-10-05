@@ -59,7 +59,9 @@ it.effect.each([
             : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
         ).pipe(Effect.forkScoped);
         yield* Deferred.await(started);
-        yield* TestClock.adjust("5 seconds");
+        yield* TestClock.adjust("9 seconds");
+        expect(yield* Deferred.isDone(released)).toBe(false);
+        yield* TestClock.adjust("1 second");
         const error = yield* Fiber.join(call).pipe(Effect.flip);
         expect(Schema.is(CalculatorRpcDeadlineExceeded)(error)).toBe(true);
         yield* Deferred.await(released);

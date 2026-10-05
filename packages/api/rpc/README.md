@@ -19,7 +19,7 @@ connection acceptance is complete; T009 still owns safe exported tracing.
 
 - `./group`: native `Calculate` and `ListCalculators` procedures and `TaxKitRpcGroup`.
 - `./schemas`: calculator-owned request/result/catalogue/query and content-owned navigation/path
-  Schemas, checked API origin, contract version and five-second deadline.
+  Schemas, checked API origin, contract version and ten-second deadline.
 - `./errors`: bounded expected, unavailable, invalid-response and deadline errors.
 - `./handlers`: handler Layer calling the corresponding named calculator service operation once.
 - `./service`: closed `TaxKitRpcClient.calculate` and `listCalculators` client contract.
@@ -53,7 +53,7 @@ An unrelated adapter defect retains its identity; defects remain defects.
 The native exit/defect Schema identities and these paths are qualified on
 Effect 4.0.0, whose RPC APIs remain marked unstable. Requalify on upgrades.
 
-A single five-second budget includes headers and complete body decoding. Earlier
+A single ten-second budget includes headers and complete body decoding. Earlier
 caller interruption releases pending body work. Client resources belong to the
 operation scope; the protocol configuration belongs to the caller Layer.
 This package creates no runtime or Layer during either operation. A native Worker
@@ -94,7 +94,7 @@ through the Website binding and Chromium form. Separate removal checks disable
 the native global/procedure encoder or reply decoder and require the saved test
 to fail, then restore source and compiled dependencies. This does not complete
 trace-export proof. The native cancellation test separately qualifies the complete
-five-second headers/body budget and browser abort after a deadline, editing or
+ten-second headers/body budget and browser abort after a deadline, editing or
 browser Back leaving the form. Its upstream artificial stream can continue;
 remote-operation cancellation is not established. Retained tax results remain unchanged; Medicare correction
 is a separate unresolved decision. The canonical render receipt records its
@@ -114,8 +114,21 @@ The streamed native POST reader and native RPC byte admission share the same
 64 KiB constant. The check counts encoded bytes, including multi-byte text,
 rather than characters or a claimed content length. Exactly 64 KiB is accepted;
 a stream crossing the limit stops before reading its remaining tail. The
-five-second body-read deadline and empty 413/408 replies are preserved. Checked
-caller guidance, common work/rate/concurrency limits, the ten-second client
-deadline and later MCP envelopes remain active T004/T006 work. This native
+five-second body-read deadline and empty 413/408 replies are preserved. Common work/rate/concurrency limits and later MCP envelopes remain active T004/T006 work. This native
 boundary does not claim the retained standalone Bun HTTP server has the same
 admission policy.
+
+The private client checks HTTP status before reading a rejected body. Status
+408, 413 and 429 become distinct checked errors with fixed safe codes, literal
+messages and manual retry guidance. Other unsuccessful statuses remain
+unavailable. The request is scoped through headers and bounded body reading,
+then released before native RPC decoding. No automatic calculation retries.
+
+Both closed JSON operations count encoded response bytes before materialisation
+and accept at most 2 MiB, including native envelopes and JSON whitespace. This
+shared channel limit also protects calculator replies; the accepted SPEC records
+why. A crossing chunk stops the source before its tail. Content-Length cannot
+bypass it. Exact-limit valid native calculator/catalogue replies must decode;
+multi-byte and progressive oversized replies return the checked size error.
+The decoder and unrelated-defect identity rules remain unchanged. This does not
+qualify future framed/streaming MCP replies or public SDK transport policy.

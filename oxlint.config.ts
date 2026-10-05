@@ -21,6 +21,7 @@ const decodingBoundaryFiles = [
   "apps/web/test/native-local-development.boundary.test.ts",
   // Native RPC parser unknown envelopes and exact adversarial transport fixtures.
   "packages/api/rpc/src/server-serialization.boundary.ts",
+  "packages/api/rpc/src/client-response.boundary.ts",
   "packages/api/rpc/test/handlers.test.ts",
   "packages/api/rpc/test/deadline.test.ts",
   // Exact native website settings, form and hydration boundaries.

@@ -3,27 +3,32 @@ import {
   useAtomSet,
   useAtomValue,
 } from "@effect/atom-react";
+import type { CalculatorRpcClientError } from "@taxkit/api-rpc/errors";
 import type { CalculatorCatalogResponse } from "@taxkit/api-rpc/schemas";
 import type { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import type { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
-import { Option } from "effect";
+import { Cause, Option } from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as Atom from "effect/reactivity/Atom";
 import { useEffect, useMemo } from "react";
 
+import { calculationFailureMessage } from "./calculation-failure";
 import { CalculatorPageView } from "./calculator-page.view";
 import { calculatorPageAtoms } from "./calculator.atoms";
-import type { WebsiteCalculatorForm } from "./form.boundary";
+import type { TaxKitWebConfigError } from "./config";
+import type { WebsiteInputError, WebsiteCalculatorForm } from "./form.boundary";
 
 export const CalculatorPage = ({
   calculator,
   report,
-  savedFailed,
+  savedError,
   savedForm,
 }: {
   readonly calculator: CalculatorCatalogResponse["calculators"][number];
   readonly report: Option.Option<AnnualTaxReport | PayWithholdingsLedger>;
-  readonly savedFailed: boolean;
+  readonly savedError: Option.Option<
+    CalculatorRpcClientError | TaxKitWebConfigError | WebsiteInputError
+  >;
   readonly savedForm: Option.Option<WebsiteCalculatorForm>;
 }) => {
   const atoms = useMemo(
@@ -65,12 +70,21 @@ export const CalculatorPage = ({
       (AsyncResult.isFailure(calculation) ||
         (AsyncResult.isSuccess(calculation) && Option.isNone(report)))
     ) {
-      return "The calculation could not finish. Please try again.";
+      return AsyncResult.isFailure(calculation)
+        ? calculation.cause.pipe(
+            Cause.findErrorOption,
+            Option.map(calculationFailureMessage),
+            Option.getOrUndefined
+          )
+        : "The calculation could not finish. Please try again.";
     }
-    return showSaved && savedFailed
-      ? "The calculation could not finish. Check your details and try again."
+    return showSaved
+      ? savedError.pipe(
+          Option.map(calculationFailureMessage),
+          Option.getOrUndefined
+        )
       : undefined;
-  }, [formError, showCalculation, calculation, report, showSaved, savedFailed]);
+  }, [formError, showCalculation, calculation, report, showSaved, savedError]);
   return (
     <CalculatorPageView
       calculatorId={calculator.calculatorId}

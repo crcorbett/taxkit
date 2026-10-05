@@ -9,6 +9,8 @@ import {
   Match,
   Queue,
   References,
+  Ref,
+  Stream,
   Result,
   Schema,
 } from "effect";
@@ -29,6 +31,12 @@ import {
 } from "../src/__testing__/fixtures.js";
 import {
   CalculatorRpcInvalidResponse,
+  CalculatorRpcClientError,
+  CalculatorRpcRequestTooLarge,
+  CalculatorRpcRequestTimedOut,
+  CalculatorRpcRateLimited,
+  CalculatorRpcResponseTooLarge,
+  CalculatorRpcUnavailable,
   CalculatorRpcRejected,
 } from "../src/errors.js";
 import { Calculate, ListCalculators, TaxKitRpcGroup } from "../src/group.js";
@@ -542,3 +550,232 @@ describe("native calculator RPC", () => {
       })
   );
 });
+
+it.effect.each([
+  { operation: "calculate", status: 408 },
+  { operation: "calculate", status: 413 },
+  { operation: "calculate", status: 429 },
+  { operation: "calculate", status: 503 },
+  { operation: "catalogue", status: 408 },
+  { operation: "catalogue", status: 413 },
+  { operation: "catalogue", status: 429 },
+  { operation: "catalogue", status: 503 },
+] as const)(
+  "classifies HTTP $status for $operation without reading its body or retrying",
+  ({ status, operation }) =>
+    Effect.gen(function* () {
+      const calls = yield* Ref.make(0);
+      const bodyRead = yield* Ref.make(false);
+      const aborts = yield* Queue.make<boolean>();
+      const transport = HttpClient.make((request, _url, signal) =>
+        Effect.sync(() =>
+          signal.addEventListener(
+            "abort",
+            () => {
+              Queue.offerUnsafe(aborts, true);
+            },
+            { once: true }
+          )
+        ).pipe(
+          Effect.andThen(Ref.update(calls, (count) => count + 1)),
+          Effect.as(
+            HttpServerResponse.toClientResponse(
+              HttpServerResponse.stream(
+                Stream.fromEffect(
+                  Ref.set(bodyRead, true).pipe(
+                    Effect.as(new TextEncoder().encode(sensitiveSentinel))
+                  )
+                ),
+                { contentType: "application/json", status }
+              ),
+              { request }
+            )
+          )
+        )
+      );
+      yield* Effect.gen(function* () {
+        const client = yield* TaxKitRpcClient;
+        const error = yield* (
+          operation === "calculate"
+            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
+            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
+        ).pipe(Effect.flip);
+        const expected = Match.value(status).pipe(
+          Match.when(408, () => new CalculatorRpcRequestTimedOut()),
+          Match.when(413, () => new CalculatorRpcRequestTooLarge()),
+          Match.when(429, () => new CalculatorRpcRateLimited()),
+          Match.when(503, () => new CalculatorRpcUnavailable()),
+          Match.exhaustive
+        );
+        expect(error).toEqual(expected);
+        const encoded = yield* Schema.encodeEffect(
+          Schema.toCodecJson(CalculatorRpcClientError)
+        )(error);
+        expect(
+          yield* Schema.decodeEffect(
+            Schema.toCodecJson(CalculatorRpcClientError)
+          )(encoded)
+        ).toEqual(error);
+        expect(
+          yield* Schema.encodeEffect(
+            Schema.fromJsonString(CalculatorRpcClientError)
+          )(error)
+        ).not.toContain(sensitiveSentinel);
+        expect(yield* Ref.get(bodyRead)).toBe(false);
+        expect(yield* Queue.clear(aborts)).toEqual([true]);
+        expect(yield* Ref.get(calls)).toBe(1);
+      }).pipe(
+        Effect.provide(
+          TaxKitRpcClientLive(origin).pipe(
+            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+          )
+        )
+      );
+    })
+);
+
+it.effect.each(["calculate", "catalogue"] as const)(
+  "accepts a valid native %s reply at exactly two MiB",
+  (operation) =>
+    Effect.gen(function* () {
+      const native = yield* makeHttpTransport("success");
+      const released = yield* Ref.make(false);
+      const transport = HttpClient.make((request) =>
+        native.execute(request).pipe(
+          Effect.flatMap((response) => response.text),
+          Effect.map((text) =>
+            HttpServerResponse.toClientResponse(
+              HttpServerResponse.stream(
+                Stream.succeed(
+                  new TextEncoder().encode(
+                    text +
+                      " ".repeat(
+                        2 * 1024 * 1024 -
+                          new TextEncoder().encode(text).byteLength
+                      )
+                  )
+                ).pipe(Stream.ensuring(Ref.set(released, true))),
+                { contentType: "application/json" }
+              ),
+              { request }
+            )
+          )
+        )
+      );
+      yield* Effect.gen(function* () {
+        const client = yield* TaxKitRpcClient;
+        if (operation === "calculate") {
+          const reply = yield* client.calculate(CalculationRequest);
+          expect(reply.report._tag).toBe("TakeHomePayReport");
+        } else {
+          const reply = yield* client.listCalculators(MetadataQuery.make({}));
+          expect(reply.calculators).toHaveLength(3);
+        }
+        expect(yield* Ref.get(released)).toBe(true);
+      }).pipe(
+        Effect.provide(
+          TaxKitRpcClientLive(origin).pipe(
+            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+          )
+        )
+      );
+    }).pipe(Effect.scoped)
+);
+
+it.effect.each([
+  { operation: "calculate", representation: "chunks" },
+  { operation: "catalogue", representation: "chunks" },
+  { operation: "calculate", representation: "utf-8" },
+  { operation: "catalogue", representation: "utf-8" },
+] as const)(
+  "stops oversized $representation replies to $operation before the tail and releases the source",
+  ({ operation, representation }) =>
+    Effect.gen(function* () {
+      const tailRead = yield* Ref.make(false);
+      const released = yield* Ref.make(false);
+      const calls = yield* Ref.make(0);
+      const first =
+        representation === "chunks"
+          ? Stream.make(
+              new Uint8Array(1024 * 1024),
+              new Uint8Array(1024 * 1024 + 1)
+            )
+          : Stream.succeed(
+              new TextEncoder().encode("é".repeat(1024 * 1024 + 1))
+            );
+      const source = first.pipe(
+        Stream.concat(
+          Stream.fromEffect(
+            Ref.set(tailRead, true).pipe(Effect.as(new Uint8Array([1])))
+          )
+        ),
+        Stream.ensuring(Ref.set(released, true))
+      );
+      const transport = HttpClient.make((request) =>
+        Ref.update(calls, (count) => count + 1).pipe(
+          Effect.as(
+            HttpServerResponse.toClientResponse(
+              HttpServerResponse.stream(source, {
+                contentType: "application/json",
+                headers: { "content-length": "1" },
+              }),
+              { request }
+            )
+          )
+        )
+      );
+      yield* Effect.gen(function* () {
+        const client = yield* TaxKitRpcClient;
+        const error = yield* (
+          operation === "calculate"
+            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
+            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
+        ).pipe(Effect.flip);
+        expect(error).toEqual(new CalculatorRpcResponseTooLarge());
+        expect(yield* Ref.get(tailRead)).toBe(false);
+        expect(yield* Ref.get(released)).toBe(true);
+        expect(yield* Ref.get(calls)).toBe(1);
+      }).pipe(
+        Effect.provide(
+          TaxKitRpcClientLive(origin).pipe(
+            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+          )
+        )
+      );
+    })
+);
+
+it.effect.each([
+  { operation: "calculate", status: 204 },
+  { operation: "catalogue", status: 204 },
+  { operation: "calculate", status: 205 },
+  { operation: "catalogue", status: 205 },
+] as const)(
+  "treats an empty HTTP $status reply for $operation as checked invalid data",
+  ({ operation, status }) =>
+    Effect.gen(function* () {
+      const transport = HttpClient.make((request) =>
+        Effect.succeed(
+          HttpServerResponse.toClientResponse(
+            HttpServerResponse.empty({ status }),
+            { request }
+          )
+        )
+      );
+      yield* Effect.gen(function* () {
+        const client = yield* TaxKitRpcClient;
+        const error = yield* (
+          operation === "calculate"
+            ? client.calculate(CalculationRequest).pipe(Effect.asVoid)
+            : client.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid)
+        ).pipe(Effect.flip);
+        expect(error).toEqual(new CalculatorRpcInvalidResponse());
+      }).pipe(
+        Effect.provide(
+          TaxKitRpcClientLive(origin).pipe(
+            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+          )
+        )
+      );
+    })
+);

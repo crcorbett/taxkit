@@ -282,7 +282,13 @@ trusted, non-logged client rate key; 64 KiB request bodies; at most eight active
 calculations per Worker isolate; a five-second operation budget; and a
 ten-second complete-response client deadline. Scope and approximation of the
 native rate limiter must be documented. Metadata/content responses are bounded
-to 2 MiB at the client. Return checked 413/429/timeout failures with safe codes
+to 2 MiB at the client. The same 2 MiB cap applies to the private closed JSON
+RPC channel, including calculator replies and native framing: both operations
+share the installed whole-response reader, so leaving calculator replies
+unbounded would retain the same memory risk. Exact-limit valid native replies
+for both operations and actual built-host retained reports must pass; this
+policy does not apply to future framed MCP streams without separate proof.
+Return checked 413/429/timeout failures with safe codes
 and retry guidance; do not retry calculations automatically. Qualify valid
 catalogue responses and supported streaming/MCP envelopes before adopting these
 limits, and record a justified adjustment in the SPEC rather than adding an

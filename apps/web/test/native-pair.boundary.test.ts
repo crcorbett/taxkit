@@ -1,5 +1,6 @@
 import { NodeServices } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
+import { CalculatorRpcRequestTooLarge } from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
 import { CalculatorRpcOrigin, MetadataQuery } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
@@ -14,7 +15,7 @@ import {
   Record,
   Schema,
 } from "effect";
-import { FetchHttpClient } from "effect/http";
+import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
@@ -237,6 +238,33 @@ describe("built native API and Website", () => {
             );
           })
         );
+        // Deliberately oversize only this controlled transport's encoded body;
+        // preserve the actual native API and the checked catalogue operation.
+        const oversizedTransport = Layer.effect(
+          HttpClient.HttpClient,
+          HttpClient.HttpClient.pipe(
+            Effect.map(
+              HttpClient.mapRequest(
+                HttpClientRequest.bodyText(
+                  "é".repeat(32_769),
+                  "application/json"
+                )
+              )
+            )
+          )
+        ).pipe(Layer.provide(FetchHttpClient.layer));
+        const rejected = yield* TaxKitRpcClient.pipe(
+          Effect.flatMap((client) =>
+            client.listCalculators(MetadataQuery.make({}))
+          ),
+          Effect.flip,
+          Effect.provide(
+            TaxKitRpcClientLive(catalogueOrigin).pipe(
+              Layer.provide(oversizedTransport)
+            )
+          )
+        );
+        expect(rejected).toEqual(new CalculatorRpcRequestTooLarge());
         const settingsFunctionId = Array.findFirst(
           Record.values(websiteModules),
           (module) =>
@@ -363,7 +391,7 @@ describe("built native API and Website", () => {
         );
         expect(invalid.status).toBe(200);
         expect(yield* Effect.promise(() => invalid.text())).toContain(
-          "Check your pay details"
+          "Enter a valid pay amount and pay period."
         );
         yield* Effect.forEach(
           [
@@ -419,7 +447,7 @@ describe("built native API and Website", () => {
         );
         expect(unavailable.status).toBe(200);
         const unavailableHtml = yield* Effect.promise(() => unavailable.text());
-        expect(unavailableHtml).toContain("Check your pay details");
+        expect(unavailableHtml).toContain("Check your details");
         expect(unavailableHtml).not.toContain("invalid-local-fixture");
         // A second request after the isolate has been idle catches native receive
         // loops that were incorrectly retained from an earlier request.
@@ -691,7 +719,7 @@ describe("built native API and Website", () => {
           yield* Effect.promise(() =>
             errorPage.getByRole("alert").textContent()
           )
-        ).toContain("Check your pay details");
+        ).toContain("Check your details");
         const errorPayInput = errorPage.getByLabel("Pay before tax ($)");
         yield* Effect.promise(() => errorPayInput.fill("2000"));
         yield* Effect.promise(() =>

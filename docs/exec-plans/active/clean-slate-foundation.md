@@ -2609,3 +2609,82 @@ Post-verification changes are limited to this plan and the
 Recheck docs/runbooks/format/Changeset status and whitespace before commit.
 T004 remains in progress; next qualify checked client failures and the accepted
 complete-response deadline, then the remaining shared request/work policy.
+
+## T004 checked private client response candidate
+
+Draft #142 at `ee29ccf6fb15228770d8cea479d5f90c1c519425` passes hosted
+Quality run `37275408391`, job `111651213039`, completed
+`2026-10-05T07:22:11Z`. This qualifies the portable screenshot correction;
+failed #141 remains failed. Continue on `codex/dev-75-client-response-policy`.
+
+The actual private client previously classified empty 408/413/429 as invalid
+responses because native RPC tried to parse each body. Its concrete HTTP
+adapter now checks statuses first and owns request cleanup through bounded body
+reading. Two closed operations share a 2 MiB byte cap and one ten-second
+complete-response deadline. The SPEC records the channel-wide cap because the
+installed Web text/arrayBuffer reader ignores MaxBodySize. Keep native Protocol,
+parser, version and exit/defect codecs; no generic SDK callback or new protocol.
+Checked status/size/deadline errors carry fixed codes, literal messages and
+manual retry guidance, without raw causes. Both page containers preserve safe
+guidance on current/restored failures and never replay a calculation.
+
+Documentation impact: **Change required** for client Schemas/errors/private
+response boundary/live Layer, focused transport/deadline/browser/native tests,
+exact decoder admission and its positive/nearby negative lint oracle, RPC/Web
+READMEs, API/SDK/testing owners, SPEC/task/plan, stable journey and receipt.
+**Preserve** retained tax/rule/results, public HTTP/OpenAPI/SDK contracts,
+request body admission, infrastructure, telemetry, skills/CI/runbooks. Generated
+OpenAPI/public MDX regeneration is **N/A**. Private major Changeset records
+stricter reply/error representation; no versioning/publication.
+
+Focused 50 RPC tests and types pass; lint passes after ordinary key/import
+format fixes and moving native unknown-cause projection to its exact private
+response boundary. Initial use of generic native transformClient fails types
+because status/size handling adds HttpClientError; use the existing native
+makeProtocolHttp over the concrete injected HttpClient instead. Its actual
+Web Response needs an owned ArrayBuffer byte copy. The cancellation fixture
+now delays twelve seconds and checks ten-second deadlines, with explicitly
+justified 12-second browser and 45-second total observations. Complete built
+Worker/browser/repository qualification is pending. T004 remains in progress.
+
+Three canonical guard changes fail as required (deadline four assertions, cap
+four assertions, status filtering eight assertions), then exact source bytes
+are restored. All 54 fresh RPC tests pass, including empty successful status
+replies. Seventeen fresh browser tests pass; six checked error variants restore
+their safe guidance without another calculation. The first fresh native run
+finds a saved-input copy mismatch and the unchanged thirty-second test runner
+limit. Assert the canonical specific input message and allow fifty seconds for
+only the cancellation test, around its forty-five-second Effect budget including
+cleanup. All six fresh native tests then pass in 66.59 seconds. These fixture
+corrections preserve the original fifteen-second page guards. Final focused
+lint/docs/runbooks/root format/Changeset status pass. Stage all sources and
+freeze them for complete repository qualification.
+
+Complete local qualification passes: 475 fresh CLI cases (411 portable) in
+60.04 seconds; 27 app/package test tasks (17 fresh, 10 cached); build 16 tasks
+(five fresh, 11 cached); API smoke one fresh task and 11 cached. Direct packed
+SDK checking freshly packs 46 files. Fresh downstream install/typecheck/runtime,
+exports and browser bundle pass; scoped temporary folders are removed. Full
+verification passes 32 fresh Quality cases across 13 isolated copies in
+495.22 seconds, all 27 type tasks (16 fresh, 11 cached), 24 fresh SDK browser
+tests, 17 fresh Website browser tests, fresh native builds and all six native
+tests in 67.16 seconds. Four final native screenshots are visually checked.
+Post-verification changes affect only this plan and the
+[bounded receipt](../../documentation-audit/clean-slate-foundation/2026-10-05-client-response-policy.json);
+recheck documentation/format/Changeset status and whitespace before commit.
+No hosted current-candidate success is inferred. T004 remains in progress.
+
+Read-only preparation for the remaining shared work policy confirms the native
+RPC server merges each request's context into handler work, but current RPC
+handlers capture the calculator at Layer construction. HTTP handlers read it
+inside each named operation. Any request-owned access policy must preserve the
+shared instance and give both transports the correct request context; wire RPC
+headers cannot establish trusted rate identity. One request can carry several
+calculation messages, so request-count-only concurrency is insufficient. A local
+installed Semaphore probe holds eight calls, rejects the ninth immediately and
+reuses a cancelled place. This proves API behaviour only, not an implemented
+application policy. The five-second work budget must distinguish caller cleanup
+from synchronous CPU preemption. The private Alchemy binding bridge owns its
+own Effect abort signal; current caller/browser proof does not establish
+upstream Worker cancellation. Rate-key provenance, common work policy, standalone
+HTTP admission and remaining named metadata operations still require work.

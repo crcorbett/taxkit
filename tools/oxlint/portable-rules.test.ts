@@ -40,6 +40,7 @@ const fixtureCases = [
       "packages/api/rpc/src/errors.ts",
       "packages/api/rpc/src/server.ts",
       "packages/api/rpc/src/server-serialization.boundary.ts",
+      "packages/api/rpc/src/client-response.boundary.ts",
       "packages/api/rpc/src/service.ts",
       "packages/api/rpc/src/test.layer.ts",
       "packages/api/rpc/src/__testing__/fixtures.ts",
@@ -1622,6 +1623,13 @@ describe("exact native RPC lint boundaries", () => {
       rule: "strict-effect(no-imperative-collections)",
       source:
         "export const run = () => { const values = [1]; values.push(2); return values; };",
+    },
+    {
+      path: "packages/api/rpc/src/client-response.boundary.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
       path: "packages/api/rpc/src/server-serialization.boundary.ts",

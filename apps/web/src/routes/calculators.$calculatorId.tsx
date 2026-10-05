@@ -55,8 +55,8 @@ const CalculatorRoutePage = ({
       calculator={calculator}
       report={report}
       savedForm={saved.pipe(Option.map((value) => value.form))}
-      savedFailed={saved.pipe(
-        Option.exists((value) => Result.isFailure(value.result))
+      savedError={saved.pipe(
+        Option.flatMap((value) => Result.getFailure(value.result))
       )}
     />
   );

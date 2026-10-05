@@ -1,6 +1,13 @@
 import { RegistryContext } from "@effect/atom-react";
 import { describe, expect, it } from "@effect/vitest";
-import { CalculatorRpcUnavailable } from "@taxkit/api-rpc/errors";
+import {
+  CalculatorRpcUnavailable,
+  CalculatorRpcDeadlineExceeded,
+  CalculatorRpcRateLimited,
+  CalculatorRpcRequestTimedOut,
+  CalculatorRpcRequestTooLarge,
+  CalculatorRpcResponseTooLarge,
+} from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import { aud } from "@taxkit/core/primitives";
@@ -186,9 +193,22 @@ describe("browser calculator lifetime", () => {
       }).pipe(Effect.scoped)
   );
 
-  it.effect(
-    "restores an expected server error without starting another calculation",
-    () =>
+  it.effect.each([
+    {
+      error: new CalculatorRpcUnavailable(),
+      message: "Check your details",
+    },
+    {
+      error: new CalculatorRpcDeadlineExceeded(),
+      message: "within ten seconds",
+    },
+    { error: new CalculatorRpcRateLimited(), message: "Wait a minute" },
+    { error: new CalculatorRpcRequestTimedOut(), message: "request timed out" },
+    { error: new CalculatorRpcRequestTooLarge(), message: "64 KiB or less" },
+    { error: new CalculatorRpcResponseTooLarge(), message: "Reduce the query" },
+  ])(
+    "restores $error._tag and its guidance without starting another calculation",
+    ({ error, message }) =>
       Effect.gen(function* () {
         const called = vi.fn();
         const errors = vi.fn();
@@ -196,9 +216,7 @@ describe("browser calculator lifetime", () => {
           TaxKitRpcClient,
           TaxKitRpcClient.of({
             calculate: Effect.fn("TaxKitRpcClient.calculate")(() =>
-              Effect.sync(called).pipe(
-                Effect.andThen(Effect.fail(new CalculatorRpcUnavailable()))
-              )
+              Effect.sync(called).pipe(Effect.andThen(Effect.fail(error)))
             ),
             listCalculators: () =>
               Effect.die("Catalogue not used by this fixture"),
@@ -210,7 +228,7 @@ describe("browser calculator lifetime", () => {
           WebsiteSubmission.make({
             calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
             form: initialTakeHomeForm,
-            result: Result.fail(new CalculatorRpcUnavailable()),
+            result: Result.fail(error),
           })
         );
         const registry = yield* Effect.acquireRelease(
@@ -250,7 +268,7 @@ describe("browser calculator lifetime", () => {
         yield* Effect.promise(() =>
           expect
             .poll(() => host.querySelector('[role="alert"]')?.textContent)
-            .toContain("Check your pay details")
+            .toContain(message)
         );
         expect(called).not.toHaveBeenCalled();
         expect(errors).not.toHaveBeenCalled();

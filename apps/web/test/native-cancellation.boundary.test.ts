@@ -232,8 +232,8 @@ it.live(
           );
           const elapsed = (yield* Clock.currentTimeMillis) - started;
           expect(Schema.is(CalculatorRpcDeadlineExceeded)(error)).toBe(true);
-          expect(elapsed).toBeGreaterThanOrEqual(4500);
-          expect(elapsed).toBeLessThan(7000);
+          expect(elapsed).toBeGreaterThanOrEqual(9500);
+          expect(elapsed).toBeLessThan(12_000);
         })
       );
 
@@ -318,7 +318,7 @@ it.live(
           .waitFor({ timeout: 5000 })
       );
       yield* Effect.promise(() =>
-        page.getByRole("alert").waitFor({ timeout: 7000 })
+        page.getByRole("alert").waitFor({ timeout: 12_000 })
       );
       expect(
         yield* Effect.promise(() => page.getByRole("alert").textContent())
@@ -381,11 +381,12 @@ it.live(
       expect(messageText).not.toContain("1654");
       expect(messageText).not.toContain("130100");
       // Browser abort and caller cleanup are observed. The local Worker runtime
-      // does not establish upstream cancellation of its artificial eight-second
+      // does not establish upstream cancellation of its artificial twelve-second
       // stream; never report this as provider or remote-operation cancellation.
     }).pipe(
-      Effect.timeout("25 seconds"),
+      Effect.timeout("45 seconds"),
       Effect.scoped,
       Effect.provide(NodeServices.layer)
-    )
+    ),
+  50_000
 );

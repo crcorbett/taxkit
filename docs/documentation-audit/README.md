@@ -439,3 +439,8 @@ The [native request size-policy candidate](clean-slate-foundation/2026-10-05-req
 records the common 64 KiB byte limit, exact-limit valid requests, multi-byte and
 stream-tail rejection, source release and actual built HTTP/RPC/form admission.
 Complete T004 transport/domain/package qualification remains open.
+
+The [private client response candidate](clean-slate-foundation/2026-10-05-client-response-policy.json)
+records checked status failures, byte admission, complete deadlines, request
+cleanup and manual retry guidance. Its local proof remains separate from the
+hosted parent correction and unfinished T004/MCP/provider work.

@@ -423,8 +423,8 @@ decoding, expected/version errors and an injected fatal operation in actual
 Workers. A damaged valid-JSON reply crosses the real private binding and
 restores a checked error in Chromium without replay. Fixed host log events are
 required as positive controls. The native cancellation test runs the real
-calculation/encoder before controlled eight-second header/body delays. The
-generated client must hit its five-second deadline; Chromium must abort on the
+calculation/encoder before controlled twelve-second header/body delays. The
+generated client must hit its ten-second deadline; Chromium must abort on the
 deadline, editing and browser Back leaving the form. This establishes caller
 cancellation, with no upstream Worker cancellation claim. Native local development
 is separately qualified; T009 safe exported tracing remains in progress.
@@ -542,8 +542,16 @@ The API applies it to public HTTP and native RPC POST, and the Website applies
 it before decoding any supported standard HTML calculator form. At exactly
 the limit, valid JSON still reaches the same named calculation operation;
 exceeding it releases the source before its remaining tail is consumed.
-This limits the native hosts only. Checked caller guidance, standalone Bun
-HTTP admission, common work/rate/concurrency policy, the ten-second client
-deadline and metadata response limits remain active T004 work. Existing empty
+This limits the native hosts only. Standalone Bun HTTP admission and common
+work/rate/concurrency policy remain active T004 work. Existing empty
 413/408 replies and five-second body-read deadlines are preserved in this
 bounded size-policy slice; they do not complete the accepted failure contract.
+
+The private RPC client owns one ten-second complete-response deadline and a
+2 MiB byte cap for both closed JSON replies. Its concrete native HTTP adapter
+scopes each request through status validation and bounded stream reading before
+reusing native Response/Protocol/exit codecs. HTTP 408, 413 and 429 have distinct
+checked errors with fixed codes, literal safe messages and manual retry guidance;
+no rejected body or raw HTTP cause reaches the page. Both calculator containers
+share safe guidance for current and restored checked failures without replay.
+The public SDK and standalone HTTP server retain their separate contracts.

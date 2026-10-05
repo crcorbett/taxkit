@@ -4,11 +4,12 @@ import {
   useAtomValue,
 } from "@effect/atom-react";
 import { TakeHomePayReport } from "@taxkit/rules-au-pay/schemas";
-import { Option, Result, Schema } from "effect";
+import { Cause, Option, Result, Schema } from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as Atom from "effect/reactivity/Atom";
 import { useEffect, useMemo } from "react";
 
+import { calculationFailureMessage } from "./calculation-failure";
 import {
   calculateAtom,
   editTakeHomeAtom,
@@ -83,15 +84,17 @@ export const TakeHomeCalculator = ({
       (AsyncResult.isFailure(calculation) ||
         (AsyncResult.isSuccess(calculation) && Option.isNone(report)))
     ) {
-      return Option.some("The calculation could not finish. Please try again.");
+      return AsyncResult.isFailure(calculation)
+        ? calculation.cause.pipe(
+            Cause.findErrorOption,
+            Option.map(calculationFailureMessage)
+          )
+        : Option.some("The calculation could not finish. Please try again.");
     }
     if (showServerResult) {
       return saved.pipe(
         Option.flatMap((value) => Result.getFailure(value.result)),
-        Option.map(
-          () =>
-            "The calculation could not finish. Check your pay details and try again."
-        )
+        Option.map(calculationFailureMessage)
       );
     }
     return Option.none<string>();
