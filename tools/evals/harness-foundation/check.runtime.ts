@@ -347,14 +347,18 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
     const manifestArtifactHashes = yield* Effect.forEach(
       manifest.artifacts,
       (artifact) =>
-        (artifact.path === canonicalSkillReceiptPath
-          ? runGit(
+        Effect.gen(function* readManifestArtifactHash() {
+          if (artifact.path === canonicalSkillReceiptPath) {
+            const actual = yield* runGit(
               repositoryRoot,
               ["show", `${candidateCommit}:${artifact.path}`],
               artifact.path
-            ).pipe(Effect.flatMap(sha256))
-          : readHash(repositoryRoot, artifact.path)
-        ).pipe(Effect.map((actual) => ({ actual, artifact }))),
+            ).pipe(Effect.flatMap(sha256));
+            return { actual, artifact };
+          }
+          const actual = yield* readHash(repositoryRoot, artifact.path);
+          return { actual, artifact };
+        }),
       { concurrency: 4 }
     );
     yield* requireInvariant(
