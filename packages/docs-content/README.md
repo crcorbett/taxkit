@@ -106,6 +106,12 @@ period fields, invokes the native Effect SDK, and Schema-encodes its response.
 Both export programs for an application-owned host. Tests preserve the
 documented weekly pay result and reject invalid representations.
 
+The OpenAPI guide links to the checked API snapshot and its regeneration test.
+Content validation requires that source pointer and command beside the live
+document path, calculate path and request schema. The content build does not
+need a running API. Both the validation-error and type-safety guides copy the
+same complete external-input example; validation checks each copy.
+
 Literal money examples use `aud(Cents.make(...))`. Programs that construct
 unchecked amounts use `audFromCents` and handle its typed failure channel.
 The server example reuses request-decoded cents to assemble Money directly.

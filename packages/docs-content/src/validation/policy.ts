@@ -69,7 +69,9 @@ const openApiReferenceSource = DocsSourcePath.make(
 const openApiReferenceRequiredText = [
   "/api/docs/openapi.json",
   "/api/v1/calculators/{calculatorId}/calculate",
-  "Accepted exclusion",
+  "CalculatorRunRequest",
+  "__snapshots__/openapi.json",
+  "bun run --filter=@taxkit/api-http test:openapi",
 ] as const;
 
 const examplesReferenceRequiredText = [

@@ -116,8 +116,9 @@ const effect = client.calculations.calculateReport(
 
 ## Requirements
 
-Effect helpers require `PublicCalculatorService` in the environment. The plain
-SDK provides its own runtime. The Effect SDK leaves service provision to the
+Effect helpers require `PublicCalculatorService` in the environment. Each
+plain SDK client owns its runtime and must be disposed when finished; direct
+helpers clean up before returning. The Effect SDK leaves service provision to the
 consumer so application layers and tests can choose the calculator service
 implementation.
 

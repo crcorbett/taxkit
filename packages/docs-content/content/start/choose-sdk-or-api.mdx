@@ -29,7 +29,9 @@ flowchart TD
   Start["Where will the caller run?"]
   ServerTs["Server-side TypeScript"]
   EffectApp["Effect application"]
-  Browser["Browser or another language"]
+  Browser["Browser"]
+  AnotherLanguage["Another language"]
+  Location["Where should the browser calculation run?"]
   PlainSdk["Use the plain SDK"]
   EffectSdk["Use the Effect SDK"]
   HttpApi["Use the HTTP API"]
@@ -37,9 +39,13 @@ flowchart TD
   Start --> ServerTs
   Start --> EffectApp
   Start --> Browser
+  Start --> AnotherLanguage
   ServerTs --> PlainSdk
   EffectApp --> EffectSdk
-  Browser --> HttpApi
+  Browser --> Location
+  Location -->|"On the device"| PlainSdk
+  Location -->|"On a server"| HttpApi
+  AnotherLanguage --> HttpApi
 ```
 
 The HTTP API calls the calculator service directly. The SDK calls the same

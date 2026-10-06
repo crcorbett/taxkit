@@ -6,8 +6,8 @@ status: "draft"
 
 # Calculate annual income tax
 
-Use this guide when you need the current Australian annual income tax report
-from TypeScript.
+Use this guide to run the retained Australian 2025–26 annual income tax
+calculator from TypeScript.
 
 ## Before you start
 
@@ -51,7 +51,9 @@ Expected output:
 }
 ```
 
-The liability value is cents. `1958800` means $19,588.00.
+The liability value is cents. `1958800` means $19,588.00. This expected value
+checks the retained calculation fixture. A Medicare threshold update is still
+under review, so the fixture does not establish current-law accuracy.
 
 ## Handle errors
 

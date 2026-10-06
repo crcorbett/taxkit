@@ -29,6 +29,10 @@ export const checkedSnippetBindings = Schema.Array(CheckedSnippetBinding).make([
     page: DocsSourcePath.make("content/guides/handle-validation-errors.mdx"),
   },
   {
+    example: "validate-external-input.ts",
+    page: DocsSourcePath.make("content/sdk/type-safety.mdx"),
+  },
+  {
     example: "define-gross-pay-fact.ts",
     page: DocsSourcePath.make("content/contributing/add-a-fact.mdx"),
   },

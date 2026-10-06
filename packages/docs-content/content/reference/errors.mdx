@@ -20,7 +20,9 @@ responses.
 
 `TaxKitCalculationError.error` can contain a `CalculatorServiceError`, a
 schema decode error from descriptor output decoding or an unexpected defect
-wrapper.
+wrapper. It can also contain `TaxKitClientDisposedError` when the client has
+already closed. A safe disposal failure is `TaxKitClientDisposeError`; the
+[Plain SDK](../sdk/plain-sdk.mdx) explains the client lifetime.
 
 ## CalculatorServiceError
 
@@ -47,7 +49,14 @@ because it describes transport status encoding.
 {
   "error": {
     "_tag": "CalculatorInputDecodeError",
-    "issues": [{ "path": ["grossPay"], "message": "Expected GrossPay" }],
+    "calculatorId": "au.pay.take-home",
+    "issues": [
+      {
+        "_tag": "CalculatorInputIssue",
+        "path": ["grossPay"],
+        "message": "Expected GrossPay"
+      }
+    ],
     "message": "Invalid facts for au.pay.take-home"
   }
 }

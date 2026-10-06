@@ -18,9 +18,11 @@ untyped source.
 ## Steps
 
 1. Prefer typed SDK helpers for trusted TypeScript data.
-2. Use `TaxKit.safe.calculate` when expected failures should be values.
-3. Use `?help=errors` with HTTP calls when you want field guidance.
-4. Display issue paths from the calculator error rather than maintaining a
+2. Decode external input with the selected calculator's input schema.
+3. Use `TaxKit.safe.calculate` for checked input when calculation failures
+   should be values.
+4. Use `?help=errors` with HTTP calls when you want field guidance.
+5. Display issue paths from the calculator error rather than maintaining a
    separate list of fields.
 
 ## Example

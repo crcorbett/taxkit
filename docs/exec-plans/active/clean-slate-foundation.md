@@ -3880,3 +3880,40 @@ The remaining page review found browser/SDK wording, current-context wording,
 local command and illustrative-example details to resolve before acceptance.
 No acceptance is inferred from that review probe. T005 and the full goal remain
 in progress; no provider or publication authority is added.
+
+### Public source correction review
+
+The next pass corrects sixteen named pages: browser SDK choices, native versus
+standalone API development, caller-owned SDK cleanup, external-input decoding,
+the complete error-envelope JSON and the actual Schedule 1 Layer excerpt.
+Annual examples retain their existing values and explicitly link the unresolved
+Medicare threshold review. The OpenAPI guide now points to the existing checked
+snapshot and regeneration test; its validation policy requires those source
+pointers instead of an internal acceptance-policy heading. The type-safety
+guide uses the same checked complete external-input fence as the validation
+guide. No tax algorithm, fixture result or original integration template changes.
+
+Documentation impact: **Change required** for those public pages, docs-content
+validation/README, its patch Changeset, task evidence and this plan. **Preserve**
+all 61 draft statuses, empty acceptance bindings, current architecture and
+runtime ownership, retained historical evidence, selected dependencies and
+Cooper's metrics deferral. Runbook procedure changes and provider operations
+are evidenced **N/A**.
+
+The complete repository verification passes in 596.86 seconds; repository tests,
+build, focused content/example checks and all seven docs browser tests pass.
+The built retained docs app also passes local workerd/Chromium page-loading,
+navigation, back/forward, missing-page, accessibility and cleanup checks.
+Both actual HTTP error JSON examples pass the owning API Schema. The earlier
+native source commit `bd9df35a22e3395bba1cb4134cdbbae8c4f5d458` passed hosted
+Quality run `37450554220`; the next commit's hosted checks remain separate.
+
+The [page-correction receipt](../../documentation-audit/clean-slate-foundation/2026-10-06-public-page-copy-review.json)
+binds each changed page, command result and built-output identity. It retains
+the initial validation failure and the temporary probe's corrected Effect
+module selection. These are reviewed source corrections, not publication
+acceptance. Public link presentation, explicit acceptance, the replacement
+Website/API routes, discovery and images remain unfinished T005 work. The
+current HTML link adapter is not applied to processed Markdown, so the
+replacement must qualify both representations before retirement. No merge,
+deployment, publication or provider apply is claimed or authorised.

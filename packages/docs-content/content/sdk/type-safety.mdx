@@ -59,24 +59,33 @@ for checked arithmetic and error handling.
 Compile-time checks protect code you compile. Runtime schema decoding protects
 values that come from users, forms, JSON or other services.
 
-This illustrative block shows a value runtime decoding rejects. It is not
-intended to typecheck, because TypeScript also catches the wrong input shape.
+Decode external JSON with the selected calculator's input schema before
+calling the typed SDK. In this example, annual tax facts fail the pay
+calculator's schema check; the valid weekly pay input reaches calculation.
 
 ```ts
-import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
+import { Effect, Schema } from "effect";
 
-const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: "90000",
-});
+// Check an external JSON representation before calling a typed calculator.
+export const invalidInput = Schema.decodeEffect(
+  Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
+)('{"taxableIncome":{"_tag":"Money","cents":9000000,"currency":"AUD"}}');
 
-if (result._tag === "TaxKitFailure") {
-  console.error(result.error._tag);
-}
+export const validInput = Schema.decodeEffect(
+  Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
+)(
+  '{"grossPay":{"_tag":"GrossPay","amount":{"_tag":"Money","cents":165400,"currency":"AUD"},"period":"weekly"},"taxFreeThresholdClaimed":true}'
+).pipe(
+  Effect.flatMap((input) => Effect.promise(() => au.pay.takeHomePay(input)))
+);
 ```
 
-The safe facade returns a typed failure value for expected decode or calculation
-failures.
+These values are Effect programs for your application's runner.
+`invalidInput` fails with `SchemaError` before the SDK is called. The complete
+example is checked in [the example source](../../../docs-examples/src/validate-external-input.ts).
+See [Handle validation errors](../guides/handle-validation-errors.mdx) for
+handling this error separately from calculation failures.
 
 ## Full run typing
 
