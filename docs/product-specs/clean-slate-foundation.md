@@ -905,7 +905,7 @@ twenty-result limits. Accepted titles and descriptions link to existing pages;
 no-match, loading and unavailable states stay distinct. Search works without
 JavaScript, uses the existing heading-focus policy and carries `noindex,
 follow`. No personal calculation value, second index or collection event is
-introduced. Discovery, Markdown negotiation, share images and old-app retirement
+introduced. Discovery and Markdown are described below; share images and old-app retirement
 remain later T005 work. Metrics remain deferred under Cooper's latest direction.
 
 
@@ -931,5 +931,28 @@ calculation report, second content index or collection event is introduced.
 
 The existing native journey checks actual built API/Website files, XML parsing,
 all accepted content, correct media/cache headers and safe failure paths. T005
-remains in progress for same-page Markdown negotiation, share images and
-old-app retirement. Metrics remain deferred.
+remains in progress for share images and old-app retirement. Metrics remain deferred.
+
+
+## T005 Website Markdown contract
+
+Accepted public pages serve the existing processed body through both explicit
+Website `.md` links and same-page Accept negotiation. The visible article link
+and alternate head address identify the file. A bounded ingress-only Schema
+checks the whole preference field, quality and specificity; zero excludes a
+representation and HTML wins ties. Existing HTML Vary fields are preserved and
+Accept is added. No preference means ordinary HTML.
+
+One named native HTTP policy owns the checked original URL and representation
+headers inside the existing app runner and request scope. The captured
+`docsMarkdown` operation remains the body owner. GET/explicit empty 200 HEAD,
+UTF-8/cache/`nosniff`/Vary/canonical headers, safe method/query/missing/unavailable
+responses and browser link behaviour require actual built proof for every
+accepted page. Native functions and calculator forms retain their policy; search
+and agent landing pages do not gain report downloads. No source fallback,
+new catalogue, backend endpoint or package contract is added.
+
+The existing native journey and exact decoder CLI fixtures own qualification.
+[Markdown evidence](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
+keeps current proof separate from deployment. Whole T005 stays in progress for
+share images and old-app retirement; metrics remain deferred.

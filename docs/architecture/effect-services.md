@@ -509,3 +509,12 @@ document for a closed file identity. `ContentDiscovery` is contract-only;
 the live and observed test Layers remain separate. The Website reuses its
 existing runner/private client and projects the checked document to an HTTP
 body. No incoming request builds a Layer, compiler, content cache or runtime.
+
+
+Website Markdown composition uses a named HTTP policy over the existing native
+HTML Effect. Original URL and Accept ingress decode once at that exact boundary;
+checked body lookup uses the already captured app service. It owns the
+representation's response/error headers inside the host's existing runner and
+request scope. No request builds a Layer or executes another runtime. The
+policy preserves existing HTML Vary fields and expected/fatal error separation.
+Its exact decoder admission and adjacent rejected paths have actual CLI proof.

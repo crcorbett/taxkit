@@ -325,7 +325,8 @@ MDX compiler. Browser code imports only compiled presentation and checked
 contracts. Before display, compiled Markdown and frontmatter must match the
 API page exactly; a different body, metadata or missing module produces fixed
 safe guidance. Canonical URLs use the checked Website origin. The article's
-Markdown link opens the API's existing checked Markdown endpoint.
+Markdown link opens the same Website page's explicit `.md` address; its head
+links that address as an alternate Markdown representation.
 
 The native pair checks actual HTML for all 61 pages, native GET admission,
 three source-built content mismatches, malformed browser transport, real
@@ -403,5 +404,35 @@ contains no personal calculation reports. Native tests compare actual served
 documents with checked backend replies, parse sitemap XML in Chromium, check
 all page addresses/bodies, headers/HEAD, invalid requests and unavailable API.
 The [discovery receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json)
-keeps exact local proof and limitations. Same-page Markdown negotiation,
-share images and old-app retirement remain unfinished.
+keeps exact local proof and limitations. Share images and old-app retirement
+remain unfinished.
+
+
+## Documentation Markdown
+
+Accepted pages serve their checked processed body at both the ordinary page
+address with `Accept: text/markdown` and the explicit `.md` address. The latter
+works from the article link and alternate head link. The existing private
+`docsMarkdown` operation supplies the body; the Website reads no authored source.
+
+A bounded ingress-only Schema reads the complete Accept field, including
+weights, wildcards and quoted parameters. More specific preferences override
+wildcards; zero excludes a representation; HTML wins ties. Missing preference
+keeps HTML. Invalid fields return empty 400; excluding both representations
+returns empty 406. Same-address HTML keeps existing Vary fields and adds Accept.
+
+The named native HTTP policy composes the existing HTML Effect in the host's
+single request scope. The original URL supplies the checked public page identity.
+GET Markdown is UTF-8 with a five-minute public cache, `nosniff`, `Vary: Accept`
+and a checked Website canonical link. HEAD has those headers and explicit empty
+200. Explicit file methods other than GET/HEAD receive empty 405; Markdown query
+input receives empty 400; missing/unavailable content gives empty 404/503 with
+`no-store`. Calculator forms/functions and search/agent landing pages keep their
+existing behaviour. No personal report becomes a download.
+
+The existing native journey compares all 61 actual page/file GET bodies and
+HEAD headers with accepted content, tests real header choices and safe failures,
+and opens the real article link in Chromium. Exact decoding admissions have
+actual CLI positives and nearby negatives; encoder/runtime policy stays enforced.
+The [Markdown receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
+records qualification separately from hosted checks and public availability.

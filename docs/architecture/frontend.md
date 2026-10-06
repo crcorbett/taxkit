@@ -376,7 +376,7 @@ T005 now supplies five checked documentation calls at the API/RPC owner. The
 actual native pair test compares all accepted page values and exact Markdown
 through the documentation client, alongside the retained calculator journeys.
 The Website now connects these loaders and renders browser-safe compiled MDX
-presentation as described below. Markdown negotiation, share images and replacement qualification must
+presentation as described below. Share images and replacement qualification must
 finish before the retained docs app can retire.
 
 ## Replacement Website documentation composition
@@ -449,7 +449,7 @@ states have distinct fixed guidance; malformed loader data shares recoverable
 unavailable guidance. Results use the existing router-link and heading-focus
 policy. The form works without JavaScript. Search addresses are `noindex,
 follow`; words are not collected and no second index or calculation value is
-introduced. Share images and Markdown negotiation remain separate T005 work.
+introduced. Share images remain separate T005 work.
 
 
 ### Replacement Website discovery files
@@ -471,3 +471,27 @@ all accepted bodies, including fenced code examples. No personal reports enter
 these documents. The [discovery receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json)
 owns bounded local observations; availability and old-app retirement require
 separate proof.
+
+
+### Replacement Website Markdown
+
+A named native HTTP policy composes the HTML Effect inside the existing server
+runner and request scope. It checks the original pathname through the content
+owner's public page codec and delegates body lookup to the captured
+`docsMarkdown` operation. It builds no live Layer or source fallback. Explicit
+`.md` files and same-page Markdown negotiation use the same accepted body. The
+article and alternate head link point to the Website file; canonicals remain HTML.
+
+The ingress-only Accept Schema bounds characters, ranges and parameters, covers the
+whole token/quoted-string field and applies quality and specificity. Zero
+excludes a representation; HTML wins equal preferences and missing preference.
+HTML responses retain existing Vary fields and add Accept. Markdown GET and
+explicit empty 200 HEAD share UTF-8/cache/`nosniff`/Vary/canonical headers.
+Invalid/unacceptable fields, file methods, Markdown queries and missing or
+unavailable content have empty safe 400/406/405/400/404/503 responses.
+
+Exact HTTP/test decoding permissions admit no encoder, runner or nearby leaf.
+Native functions, calculator form paths, search and agent landing pages retain
+their existing policy; temporary calculation reports never enter Markdown. The
+[dated Markdown receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
+owns actual built content/header/browser observations and their limits.

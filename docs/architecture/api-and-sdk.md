@@ -662,3 +662,12 @@ checked, lazy cached stage settings; the client checks its returned file path
 against the requested one. Shared origin validation has separate API/Website
 identities. The Website serves the four conventional files without reading MDX
 source or constructing another runtime.
+
+
+The Website's same-page Markdown HTTP policy delegates to the existing named
+`getMarkdown` client operation. Explicit Website `.md` links and weighted
+Accept selection add no public API endpoint, private RPC operation or revision.
+The checked original page identity selects the accepted processed body. Native
+HTTP composition keeps the same caller scope, deadline and safe failures;
+[frontend architecture](frontend.md#replacement-website-markdown) owns the
+Website's representation and response-header policy.

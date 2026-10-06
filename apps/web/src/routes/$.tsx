@@ -27,14 +27,7 @@ export const Route = createFileRoute("/$")({
           <article className="docs-article">
             <MdxDocument page={page} />
             <p className="docs-markdown-link">
-              <a
-                href={
-                  new URL(
-                    `/api/v1/docs/markdown?path=${encodeURIComponent(page.path)}`,
-                    settings.apiOrigin
-                  ).href
-                }
-              >
+              <a href={new URL(`${page.path}.md`, settings.websiteOrigin).href}>
                 Read this page as Markdown
               </a>
             </p>
@@ -53,6 +46,11 @@ export const Route = createFileRoute("/$")({
           {
             href: new URL(page.path, settings.websiteOrigin).href,
             rel: "canonical",
+          },
+          {
+            href: new URL(`${page.path}.md`, settings.websiteOrigin).href,
+            rel: "alternate",
+            type: "text/markdown",
           },
         ],
         meta: [

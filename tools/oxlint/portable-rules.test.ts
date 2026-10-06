@@ -1466,6 +1466,8 @@ describe("exact native RPC lint boundaries", () => {
         "apps/web/src/lib/docs/mdx.boundary.tsx",
         "apps/web/src/lib/docs/route-boundary.ts",
         "apps/web/src/lib/docs/search-location.boundary.ts",
+        "apps/web/src/lib/docs/markdown.boundary.test.ts",
+        "apps/web/src/lib/docs/markdown.response.server.ts",
       ],
       (path) => [
         {

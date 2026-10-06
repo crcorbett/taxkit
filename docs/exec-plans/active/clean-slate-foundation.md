@@ -4290,3 +4290,87 @@ discovery assertions and retained calculators. Parent review found no new
 source/runtime/collection owner or policy exception. Full repository/package
 qualification now runs against frozen staged sources; its final receipt must
 retain failures and source identities before this slice is committed.
+
+### T005 same-page Markdown implementation intent — 7 October
+
+Discovery commit `501d419c` passed fresh types/lint, all eleven native tests,
+all nine ordered local CI-mode release checks and final staged receipt checks;
+it was pushed to draft #155. Its hosted Quality run `37515773213`, job
+`112448158688`, is pending. Search's separately observed hosted success remains
+its own proof. Metrics remain deferred.
+
+The next slice reuses the existing backend processed-Markdown operation and
+Website server runner. Accepted documentation has an explicit `.md` address and
+same-page GET/HEAD representation selection through a bounded `Accept` Schema.
+RFC 9110 section 12 was read on 7 October: quality values and specificity select
+the representation, HTML wins equal preferences, and same-address responses
+preserve existing Vary fields while adding Accept. Normal browser pages remain
+HTML. Personal calculator reports, calculator form/RPC/native function paths,
+search and agent landing pages do not gain report downloads.
+
+The original URL owns the checked public page identity; headers cannot override
+it. Only accepted processed bodies reach responses. Correct text media type,
+GET/explicit empty 200 HEAD headers, canonical links, method/query admission,
+missing-page and unavailable guidance need real built API/Website proof for
+all accepted pages. No source fallback, second catalogue, new runtime or
+backend public endpoint is intended. Owning Schema tests must exercise malformed
+quality, wildcards, quoted parameters, duplicate weights and false substring
+matches; narrow exact test decoding admissions need actual CLI positive and
+neighbouring negative proof.
+
+Documentation impact: Change required for Website Schema/host tests, exact
+lint/test ownership, Website/frontend/API/content/testing guides, SPEC/task/
+journey and dated local proof. Preserve accepted sources/reviews/navigation,
+five-operation documentation RPC revision 2, four public HTTP content routes,
+retained answers, historical receipts and collection deferral. N/A for a new
+package contract/Changeset, operational command/runbook or provider operation.
+
+
+Discovery head `501d419c` hosted Quality run `37515773213`, job `112448158688`,
+completed with failure on 6 October at 19:21:33 UTC. Full verification passed;
+the root test step failed the retained docs temporary-asset propagation case.
+It observed two asset requests but a fixed browser-proof failure rather than
+the expected recovery; raw underlying browser diagnostics are safely discarded.
+The precise browser cause is unknown. The fixture's 200-millisecond successful
+hydration budget did not match its functional recovery claim. Its successful
+case now allows five seconds while preserving exact request/retry counts and
+all positive/negative assertions. Production limits are unchanged. This owning
+fixture/testing-guide correction joins the Markdown slice and new proof receipt;
+the committed discovery receipt remains immutable.
+
+
+Fresh native proof caught the framework returning 406 for a valid weighted
+`text/*` preference after our Schema correctly selected HTML. The unit suite
+only observed the selection and could not prove the renderer's behaviour. The
+policy now supplies its checked concrete HTML choice through the native request
+Context; the existing host renders that native request. URL/signal/scope remain
+owned by the original request. The actual HTML wildcard assertion is retained;
+focused Vary tests also require original fields to survive and use a partial
+app mock that fails if an unused content operation is called.
+
+
+Corrected focused checks pass owning types, lint and all 51 Website unit cases,
+including four Vary-preservation checks. The freshly built Website main journey
+passes after the article-link selector was narrowed to its actual owner; a
+general `.md` selector had selected a valid GitHub README source link. Both
+Markdown addresses and every HEAD/body/header oracle pass for all 61 accepted
+pages, actual header failures and the real unavailable binding are observed,
+and Chromium opens the real link to exact processed text. The remaining ten
+native tests passed in the preceding full focused run; complete qualification
+now rebuilds and reruns all eleven together on frozen staged sources.
+
+Parent diff review retains one app runner/caller scope, the accepted catalogue
+and five native documentation operations. Only the HTTP boundary and its
+owned fixtures gain decoder permission; adjacent routes/leaves and encoder/
+runner policy stay checked. Package contracts, accepted sources/reviews and
+retained results are preserved, so this app/test-only slice needs no additional
+Changeset. Final proof must record current source identities and the hosted
+discovery failure separately before the tested commit/push.
+
+
+The first complete graph passed all 32 actual Quality-policy/release-boundary
+cases, then the unused-code check rejected an unnecessary exported
+`WebsiteDocsRepresentation`. The header codec alone owns this output Schema;
+keeping it module-private corrects the earliest owner and adds no ignored export
+or lint exception. The failed graph remains recorded. Sources are frozen again
+before corrected complete qualification.

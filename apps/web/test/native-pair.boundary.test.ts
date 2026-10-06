@@ -471,6 +471,187 @@ describe("built native API and Website", () => {
             );
           })
         );
+        // Both original page URLs and explicit files must read the owning
+        // processed body. A count, copied source or forged native header cannot
+        // satisfy these actual built-Worker responses.
+        yield* Effect.forEach(publicContent.pages, (page) =>
+          Effect.gen(function* () {
+            yield* Effect.forEach(["", ".md"] as const, (suffix) =>
+              Effect.gen(function* () {
+                const address = `${websiteOrigin}${page.path}${suffix}`;
+                const headers = {
+                  accept: "text/markdown",
+                  "x-taxkit-docs-page": "/private9",
+                };
+                const served = yield* Effect.promise(() =>
+                  website.dispatchFetch(address, { headers })
+                );
+                expect(served.status).toBe(200);
+                expect(served.headers.get("content-type")).toBe(
+                  "text/markdown; charset=utf-8"
+                );
+                expect(served.headers.get("cache-control")).toBe(
+                  "public, max-age=300"
+                );
+                expect(served.headers.get("vary")).toBe("Accept");
+                expect(served.headers.get("x-content-type-options")).toBe(
+                  "nosniff"
+                );
+                expect(served.headers.get("link")).toBe(
+                  `<${websiteOrigin}${page.path}>; rel="canonical"; type="text/html"`
+                );
+                expect(yield* Effect.promise(() => served.text())).toBe(
+                  page.markdown
+                );
+                const head = yield* Effect.promise(() =>
+                  website.dispatchFetch(address, { headers, method: "HEAD" })
+                );
+                expect(head.status).toBe(200);
+                yield* Effect.forEach(
+                  [
+                    "content-type",
+                    "cache-control",
+                    "vary",
+                    "x-content-type-options",
+                    "link",
+                  ],
+                  (header) =>
+                    Effect.sync(() => {
+                      expect(head.headers.get(header)).toBe(
+                        served.headers.get(header)
+                      );
+                    })
+                );
+                expect(yield* Effect.promise(() => head.text())).toBe("");
+              })
+            );
+          })
+        );
+        const quickstart = yield* Array.findFirst(
+          publicContent.pages,
+          (page) => page.path === "/start/quickstart"
+        ).pipe(Effect.fromOption);
+        yield* Effect.forEach(
+          [
+            {
+              accept: "text/markdown;q=0.9, text/html;q=0.7",
+              markdown: true,
+              status: 200,
+            },
+            {
+              accept: 'application/json;note="a,b;c", text/markdown',
+              markdown: true,
+              status: 200,
+            },
+            { accept: "text/markdown;q=0, */*", markdown: false, status: 200 },
+            {
+              accept: "text/markdown, text/html",
+              markdown: false,
+              status: 200,
+            },
+            {
+              accept: "text/markdown;q=0.6, text/*;q=0.8",
+              markdown: false,
+              status: 200,
+            },
+            {
+              accept: 'application/json;note="text/markdown"',
+              markdown: false,
+              status: 406,
+            },
+            {
+              accept: "text/markdown;q=0, text/html;q=0",
+              markdown: false,
+              status: 406,
+            },
+            { accept: "invalid text/markdown", markdown: false, status: 400 },
+            { accept: "text/markdown;q=1.001", markdown: false, status: 400 },
+            { accept: "x".repeat(4097), markdown: false, status: 400 },
+          ],
+          (choice) =>
+            Effect.gen(function* () {
+              const response = yield* Effect.promise(() =>
+                website.dispatchFetch(`${websiteOrigin}/start/quickstart`, {
+                  headers: { accept: choice.accept },
+                })
+              );
+              expect(response.status, choice.accept).toBe(choice.status);
+              expect(response.headers.get("vary")).toContain("Accept");
+              const body = yield* Effect.promise(() => response.text());
+              if (choice.status !== 200) {
+                expect(response.headers.get("cache-control")).toBe("no-store");
+                expect(body).toBe("");
+              } else if (choice.markdown) {
+                expect(body).toBe(quickstart.markdown);
+              } else {
+                expect(response.headers.get("content-type")).toContain(
+                  "text/html"
+                );
+                expect(body).toContain("docs-article");
+              }
+            })
+        );
+        // An explicit representation file does not depend on browser Accept.
+        const explicitMarkdown = yield* Effect.promise(() =>
+          website.dispatchFetch(`${websiteOrigin}/start/quickstart.md`, {
+            headers: { accept: "text/html" },
+          })
+        );
+        expect(explicitMarkdown.status).toBe(200);
+        expect(yield* Effect.promise(() => explicitMarkdown.text())).toBe(
+          quickstart.markdown
+        );
+        yield* Effect.forEach(
+          [
+            {
+              address: "/start/quickstart.md?PRIVATE9=1",
+              method: "GET",
+              status: 400,
+            },
+            {
+              address: "/start/quickstart?PRIVATE9=1",
+              method: "GET",
+              status: 400,
+            },
+            { address: "/invalid.path.md", method: "GET", status: 400 },
+            { address: "/private9.md", method: "GET", status: 404 },
+            { address: "/private9", method: "GET", status: 404 },
+            { address: "/search.md", method: "GET", status: 404 },
+            { address: "/agents.md", method: "GET", status: 404 },
+            { address: "/start/quickstart.md", method: "POST", status: 405 },
+            { address: "/start/quickstart.md", method: "PUT", status: 405 },
+            { address: "/start/quickstart", method: "POST", status: 404 },
+          ],
+          (invalid) =>
+            Effect.gen(function* () {
+              const response = yield* Effect.promise(() =>
+                website.dispatchFetch(`${websiteOrigin}${invalid.address}`, {
+                  headers: { accept: "text/markdown" },
+                  method: invalid.method,
+                })
+              );
+              expect(response.status).toBe(invalid.status);
+              if (invalid.status === 405) {
+                expect(response.headers.get("allow")).toBe("GET, HEAD");
+              }
+              expect(yield* Effect.promise(() => response.text())).toBe("");
+            })
+        );
+        yield* Effect.forEach(["", ".md"] as const, (suffix) =>
+          Effect.gen(function* () {
+            const unavailable = yield* Effect.promise(() =>
+              unavailableDiscoveryWorker.fetch(
+                `${websiteOrigin}/start/quickstart${suffix}`,
+                {
+                  headers: { accept: "text/markdown" },
+                }
+              )
+            );
+            expect(unavailable.status).toBe(503);
+            expect(unavailable.headers.get("cache-control")).toBe("no-store");
+            expect(yield* Effect.promise(() => unavailable.text())).toBe("");
+          })
+        );
         const docsSearch = yield* Effect.promise(() =>
           publicApi.dispatchFetch(
             `${apiOrigin}/api/v1/docs/search?term=Quickstart`
@@ -1689,6 +1870,11 @@ describe("built native API and Website", () => {
                 );
                 const article = document.querySelector(".docs-article");
                 return {
+                  alternate: document
+                    .querySelector(
+                      'link[rel="alternate"][type="text/markdown"]'
+                    )
+                    ?.getAttribute("href"),
                   canonical: document
                     .querySelector('link[rel="canonical"]')
                     ?.getAttribute("href"),
@@ -1697,7 +1883,7 @@ describe("built native API and Website", () => {
                     ?.getAttribute("content"),
                   heading: article?.querySelector("h1")?.textContent,
                   markdown: article
-                    ?.querySelector('a[href*="/api/v1/docs/markdown?"]')
+                    ?.querySelector(".docs-markdown-link a")
                     ?.getAttribute("href"),
                   navigation:
                     document.querySelectorAll(".docs-navigation a").length,
@@ -1712,14 +1898,31 @@ describe("built native API and Website", () => {
             );
             expect(rendered.description).toBe(expected.frontmatter.description);
             expect(rendered.canonical).toBe(`${websiteOrigin}${expected.path}`);
+            expect(rendered.alternate).toBe(
+              `${websiteOrigin}${expected.path}.md`
+            );
+            expect(response.headers.get("vary")).toContain("Accept");
             expect(rendered.navigation).toBe(61);
             expect(rendered.markdown).toBe(
-              `${apiOrigin}/api/v1/docs/markdown?path=${encodeURIComponent(expected.path)}`
+              `${websiteOrigin}${expected.path}.md`
             );
             expect(rendered.text?.length).toBeGreaterThan(100);
             expect(rendered.text).not.toContain("Documentation could not load");
           })
         );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("link", { name: "Read this page as Markdown" })
+            .click()
+        );
+        expect(docsPage.url()).toBe(`${websiteOrigin}/start/quickstart.md`);
+        expect(
+          yield* Effect.promise(() => docsPage.locator("pre").textContent())
+        ).toBe(quickstart.markdown);
+        yield* Effect.promise(() =>
+          docsPage.goto(`${websiteOrigin}/start/quickstart`)
+        );
+        yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
         const missing = yield* Effect.promise(() =>
           website.dispatchFetch(`${websiteOrigin}/private9`)
         );

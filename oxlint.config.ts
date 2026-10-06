@@ -65,6 +65,10 @@ const decodingBoundaryFiles = [
   "apps/web/src/lib/docs/mdx.boundary.tsx",
   "apps/web/src/lib/docs/route-boundary.ts",
   "apps/web/src/lib/docs/search-location.boundary.ts",
+  // Exact original-URL/representation-header HTTP ingress and bounded fixtures.
+  // No encoder, runner or neighbouring-module admission.
+  "apps/web/src/lib/docs/markdown.boundary.test.ts",
+  "apps/web/src/lib/docs/markdown.response.server.ts",
   "apps/web/src/lib/calculator.boundary.browser.test.tsx",
   "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/src/lib/form.boundary.ts",

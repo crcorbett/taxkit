@@ -1548,3 +1548,45 @@ that dependency causes general RPC unavailability before the intended mismatch
 can be observed; the existing exact presentation-error assertion catches this.
 The builder must retain the complete service graph rather than weakening that
 assertion to accept unrelated failure.
+
+
+### Native Website Markdown qualification
+
+The owning header suite tests bounded complete fields, empty list members,
+quoted separators/escapes, quality and specificity, zero exclusions, ties and
+false substring matches. Optional native RegExp capture values pass through
+nullish Options before use. Full-field coverage consumes each list separator;
+zero-width empty matches must not skip the next media range.
+
+The existing source-built native journey compares all 61 same-page and explicit
+`.md` GET bodies with the owning processed catalogue. It checks every HEAD's
+explicit 200, empty body and equal media/cache/`nosniff`/Vary/canonical headers.
+Real original addresses ignore forged native page headers. Actual weighted,
+quoted, invalid and excluded fields select HTML/Markdown or safe empty errors.
+File/query/missing inputs and a real unavailable API binding are exercised.
+Chromium parses every HTML article's alternate/visible Markdown link and opens
+that link to the exact processed text. Existing navigation/no-JavaScript and
+calculator/native failure/cancellation cases remain in the same journey.
+
+Actual lint commands admit only the exact new HTTP boundary and header fixture,
+reject encoding and runners there, and reject decoding in nearby leaves/routes.
+The [dated Markdown receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
+records candidate identities, actual checks, failures/corrections and remaining
+work. Local qualification does not establish hosted success or deployment.
+
+
+The retained docs asset-propagation fixture allows five seconds for successful
+Chromium hydration after the missing asset is served, while permanent missing
+assets keep the short wait. Its oracle still requires exactly two actual asset
+requests, one retry, a present router and no diagnostics. The fixture tests
+propagation recovery, not 200-millisecond browser performance. This changes no
+production deadline or retry policy; the new dated receipt retains the original
+hosted failure and the limit of its diagnostic evidence.
+
+
+The Website's checked HTML choice is supplied as concrete `text/html` to the
+framework through the native request Context. Otherwise the framework's own
+limited Accept check rejects a valid `text/*` preference even after the owning
+Schema chooses HTML. Original URL, caller signal and the host request scope
+remain intact. The actual wildcard journey must render an article, and focused
+HTTP policy tests preserve existing Vary fields without invoking content lookup.

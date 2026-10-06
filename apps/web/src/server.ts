@@ -22,6 +22,7 @@ import {
 } from "effect/http";
 
 import { WebsiteServerFunctionBase } from "./lib/config";
+import { withDocsRepresentation } from "./lib/docs/markdown.response.server";
 import {
   takeHomeRequestFromForm,
   annualTaxRequestFromForm,
@@ -134,13 +135,17 @@ export default {
             return HttpServerResponse.empty({ status: 400 });
           }
         }
-        if (request.method === "POST" && calculatorId === null) {
-          return HttpServerResponse.empty({ status: 404 });
-        }
+
         return yield* request.method !== "POST" || calculatorId === null
-          ? Effect.promise(() =>
-              Promise.resolve(render(request, { context: {} }))
-            ).pipe(Effect.map(HttpServerResponse.fromWeb))
+          ? Effect.gen(function* websiteHtml() {
+              const incoming = yield* HttpServerRequest.HttpServerRequest;
+              const htmlRequest = yield* HttpServerRequest.toWeb(incoming).pipe(
+                Effect.orDie
+              );
+              return yield* Effect.promise(() =>
+                Promise.resolve(render(htmlRequest, { context: {} }))
+              ).pipe(Effect.map(HttpServerResponse.fromWeb));
+            }).pipe(withDocsRepresentation)
           : withCalculatorRequestBodyLimit(
               Effect.gen(function* () {
                 const incoming = yield* HttpServerRequest.HttpServerRequest;

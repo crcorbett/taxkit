@@ -93,7 +93,10 @@ operation. The Website serves the checked XML/text body at its conventional
 address. The short agent index links to accepted processed Markdown; the full
 index retains those bodies, including fenced examples. No authored source,
 personal report, guessed origin or competing content catalogue is exposed.
-Same-page Markdown negotiation, share images and old-app retirement remain
+The Website serves the same checked processed body from accepted pages through
+same-address Accept negotiation and explicit `.md` links. It adds no backend
+route or compiler fallback; the [frontend owner](frontend.md#replacement-website-markdown)
+records representation policy. Share images and old-app retirement remain
 T005 work. This implementation does not establish public availability.
 
 `docs/architecture`

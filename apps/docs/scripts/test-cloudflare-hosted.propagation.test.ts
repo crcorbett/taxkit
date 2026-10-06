@@ -64,7 +64,9 @@ it.live.each(["temporary", "permanent"] as const)(
       const config = yield* Schema.decodeEffect(PropagationRequest)({
         attempts: mode === "temporary" ? 3 : 2,
         delayMs: 10,
-        hydrationTimeoutMs: 200,
+        // Successful browser hydration is not a 200 ms performance assertion.
+        // Keep missing-asset refusal fast; preserve exact retry and request counts.
+        hydrationTimeoutMs: mode === "temporary" ? 5000 : 200,
         origin: HttpServer.formatAddress(server.address),
       });
       const proof = yield* CloudflareHostedProof;
@@ -86,7 +88,7 @@ it.live.each(["temporary", "permanent"] as const)(
         );
       }
     }).pipe(Effect.provide(Layer.merge(proofLayer, serverLayer))),
-  10_000
+  20_000
 );
 
 // These cases exercise the installed browser adapter, not a fabricated service.
