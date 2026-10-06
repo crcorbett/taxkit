@@ -39,6 +39,12 @@ Those belong in the `apps/docs` runtime.
   explicit validation operation runs.
 - `src/test.layer.ts`: deterministic `DocsContentService` composition over the
   generic Fumadocs test Layer.
+- `src/catalogue-index.runtime.ts`: local command that asks the installed MDX
+  compiler to generate an independent native index in `.source/catalogue/`.
+- `src/catalogue-source.layer.ts`: local build-only compiler connection exposed
+  as `@taxkit/docs-content/catalogue-source`. It waits for Bun plugin setup,
+  loads that native index and uses the same generated collection adapter as
+  the retained Vite source. Browser and request handlers must not import it.
 - `.source/`: generated Fumadocs output. Regenerate it instead of editing it by
   hand.
 
@@ -106,6 +112,37 @@ The server example reuses request-decoded cents to assemble Money directly.
 The corresponding public browser/server snippets match these source examples;
 the money concept owns constructor and arithmetic guidance. MDX lifecycle and
 navigation remain draft until their separate acceptance.
+
+The five complete validation, raw-error, help, fact and test examples listed in
+`src/validation/checked-snippets.ts` must match their compiled source files
+exactly. This check applies to those named fences; it does not claim every
+fenced example in the documentation has been compiled.
+
+## Accepted catalogue build
+
+`bun run docs:catalogue` generates both compiler indexes, then runs the
+repository-owned builder in `tools/documentation/catalogue.runtime.ts`.
+The retained Mermaid compiler uses Chromium. Use the repository's configured
+`PLAYWRIGHT_BROWSERS_PATH`, as the Quality workflow does, when browsers are
+stored outside Playwright's default location.
+The MDX compiler owns frontmatter and processed Markdown. The builder reads
+the exact acceptance bindings in `tools/documentation/owner-policy.json` and
+requires version-two records with the reviewed source's SHA-256 hash. It
+checks the bytes before loading the compiler and again before writing output.
+Relative paths and their resolved files must stay inside the checkout.
+
+Published pages need matching accepted navigation. Drafts are omitted, and
+an accepted child cannot be hidden under a draft section page. The canonical
+`DocsPublicCatalogue` constructor checks page addresses, sources, titles and
+navigation coverage. No accepted pages is an error; it cannot silently create
+an empty public site. Successful builds encode the checked catalogue once to
+`.source/public-catalogue.json`. That generated file is local build output,
+not publication or deployment evidence.
+
+Version-one acceptance records remain readable by the regular docs checker
+for their retained lifecycle evidence. The new catalogue builder requires
+version two. Adding a record must follow page review; generating an index
+does not accept its authored pages. All current authored pages remain drafts.
 
 ## Frontmatter contract
 

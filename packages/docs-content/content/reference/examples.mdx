@@ -19,6 +19,16 @@ application runtime decides how to run them.
 | Effect request      | [`packages/docs-examples/src/effect.ts`](../../../docs-examples/src/effect.ts)                 | Constructing a `calculateRunRequest` program for an Effect application.                      |
 | Error handling      | [`packages/docs-examples/src/error-handling.ts`](../../../docs-examples/src/error-handling.ts) | Reading a `TaxKit.safe.calculate` failure value.                                             |
 
+The validation, calculator-help, fact-definition, integration-test and raw HTTP error guides also copy their
+complete TypeScript fences from checked example files. Authored-content
+validation rejects a fence that differs from its source.
+
+- [External input validation](../../../docs-examples/src/validate-external-input.ts)
+- [Typed calculator help](../../../docs-examples/src/calculator-help.ts)
+- [Raw HTTP error envelope](../../../docs-examples/src/api-error-envelope.ts)
+- [Fact definition](../../../docs-examples/src/define-gross-pay-fact.ts)
+- [Integration tests](../../../docs-examples/test/integration.example.test.ts)
+
 ## Typecheck examples
 
 Typecheck every checked example:

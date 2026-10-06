@@ -26,12 +26,16 @@ wrapper.
 
 The calculator service uses `CalculatorServiceError` for expected failures.
 
-| Error                               | Handling guidance                                               |
-| ----------------------------------- | --------------------------------------------------------------- |
-| `CalculatorInputDecodeError`        | Show issue paths and optional descriptor help.                  |
-| `UnsupportedCalculatorError`        | Treat the calculator id as an integration error.                |
-| `UnsupportedCalculatorContextError` | Ask the caller to choose a supported jurisdiction and tax year. |
-| `CalculationError`                  | The rule calculation could not produce a supported result.      |
+| Error                               | Handling guidance                                                                               |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `CalculatorInputDecodeError`        | Show issue paths and optional descriptor help.                                                  |
+| `UnsupportedCalculatorError`        | Treat the calculator id as an integration error.                                                |
+| `UnsupportedCalculatorContextError` | Ask the caller to choose a supported jurisdiction and tax year.                                 |
+| `CalculationError`                  | The rule calculation could not produce a supported result.                                      |
+| `CalculatorCapacityExceeded`        | The server has no free calculation place. Retry manually after the current work finishes.       |
+| `CalculatorOperationTimedOut`       | The operation reached its time limit. Retry manually.                                           |
+| `CalculatorRateLimited`             | The native per-client calculation limit was reached. Wait for `Retry-After` and retry manually. |
+| `CalculatorAdmissionUnavailable`    | The native request identity or rate limiter is unavailable. Retry manually.                     |
 
 ## HTTP errors
 

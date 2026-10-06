@@ -49,12 +49,17 @@
       "source": "./src/validate.runtime.ts",
       "default": "./src/validate.runtime.ts"
     },
-    "./source.config": "./source.config.ts"
+    "./source.config": "./source.config.ts",
+    "./catalogue-source": {
+      "types": "./src/catalogue-source.layer.ts",
+      "source": "./src/catalogue-source.layer.ts",
+      "default": "./src/catalogue-source.layer.ts"
+    }
   },
   "scripts": {
     "build": "bun run generate",
     "check-types": "bun run --filter=@taxkit/docs-fumadocs build && tsc --noEmit",
-    "generate": "bun run --filter=@taxkit/docs-fumadocs build && fumadocs-mdx",
+    "generate": "bun run --filter=@taxkit/docs-fumadocs build && fumadocs-mdx && bun --conditions=source run ./src/catalogue-index.runtime.ts",
     "test": "bun run --filter=@taxkit/docs-fumadocs build && vitest run --passWithNoTests",
     "validate": "bun run ./src/validate.runtime.ts",
     "clean": "rm -rf .source .turbo *.tsbuildinfo"

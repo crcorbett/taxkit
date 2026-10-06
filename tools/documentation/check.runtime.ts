@@ -17,10 +17,12 @@ import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
+import { verifyAcceptedSource } from "./catalogue.build.js";
 import { inspectDocumentation } from "./policy.js";
 import {
   DocumentationCheckError,
   DocumentationReceipt,
+  DocumentationRepositoryPath,
   OwnerPolicy,
   PublicPageAcceptanceRecord,
   WorkspacePackageManifest,
@@ -30,9 +32,6 @@ const repositoryRootUrl = new URL("../..", import.meta.url);
 const ownerPolicyUrl = new URL("owner-policy.json", import.meta.url);
 const reportPath = "tmp/docs-policy-report.json";
 const receiptLimit = 20;
-const RepositoryPath = Schema.NonEmptyString.pipe(
-  Schema.check(Schema.isPattern(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$)).+$/u))
-);
 export const decodePublicPageAcceptanceRecord = Schema.decodeEffect(
   Schema.fromJsonString(PublicPageAcceptanceRecord),
   { onExcessProperty: "error" }
@@ -121,9 +120,9 @@ export const checkDocumentation = (repositoryRoot: string) =>
           Uint8Array.from(Array.flatMap(stdout, Array.fromIterable))
         ),
     });
-    const inventory = yield* Schema.decodeEffect(Schema.Array(RepositoryPath))(
-      Array.filter(rawInventory.split("\0"), (entry) => entry.length > 0)
-    ).pipe(
+    const inventory = yield* Schema.decodeEffect(
+      Schema.Array(DocumentationRepositoryPath)
+    )(Array.filter(rawInventory.split("\0"), (entry) => entry.length > 0)).pipe(
       Effect.mapError(
         () =>
           new DocumentationCheckError({ operation: "decode-file-inventory" })
@@ -172,6 +171,11 @@ export const checkDocumentation = (repositoryRoot: string) =>
                 onNone: () => Effect.succeed([]),
                 onSome: (recordFile) =>
                   decodePublicPageAcceptanceRecord(recordFile.text).pipe(
+                    Effect.tap((record) =>
+                      record.schemaVersion === 2
+                        ? verifyAcceptedSource(repositoryRoot, record)
+                        : Effect.void
+                    ),
                     Effect.match({
                       onFailure: () => [],
                       onSuccess: (record) => [

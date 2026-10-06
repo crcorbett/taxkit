@@ -1,5 +1,9 @@
 import { Schema } from "effect";
 
+export const DocumentationRepositoryPath = Schema.NonEmptyString.check(
+  Schema.isPattern(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))(?!.*\\).+$/u)
+);
+
 export const DocumentationPathClass = Schema.Literals([
   "maintainer",
   "public",
@@ -73,16 +77,7 @@ const OwnerBinding = Schema.Struct({
   path: Schema.NonEmptyString,
 });
 
-export const PublicPageAcceptanceRecord = Schema.Struct({
-  observedAt: Schema.String.check(
-    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
-  ),
-  owner: Schema.NonEmptyString,
-  schemaVersion: Schema.Literal(1),
-  state: Schema.Literal("accepted"),
-  targetPath: Schema.NonEmptyString,
-});
-export type PublicPageAcceptanceRecord = typeof PublicPageAcceptanceRecord.Type;
+export { PublicPageAcceptanceRecord } from "@taxkit/content/schemas";
 
 export const OwnerPolicy = Schema.Struct({
   fumadocs: Schema.Struct({
@@ -284,4 +279,18 @@ export class RunbookValidationReceipt extends Schema.TaggedClass<RunbookValidati
 export class RunbookValidationError extends Schema.TaggedError<RunbookValidationError>()(
   "RunbookValidationError",
   { operation: Schema.NonEmptyString }
+) {}
+
+export class DocsCatalogueBuildError extends Schema.TaggedError<DocsCatalogueBuildError>()(
+  "DocsCatalogueBuildError",
+  {
+    operation: Schema.Literals([
+      "read-acceptance",
+      "verify-source",
+      "project",
+      "encode",
+      "write",
+      "no-accepted-pages",
+    ]),
+  }
 ) {}

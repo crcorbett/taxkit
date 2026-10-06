@@ -54,40 +54,25 @@ keeps its existing work policy.
 ## Handle an error response
 
 ```ts
-type ApiErrorEnvelope = {
-  error: {
-    _tag: string;
-    message: string;
-    issues?: ReadonlyArray<{ path: ReadonlyArray<string>; message: string }>;
-  };
-};
+import { CalculatorApiErrorEnvelope } from "@taxkit/api-http";
+import { Effect, Schema } from "effect";
+import type { HttpClientResponse } from "effect/http/HttpClientResponse";
 
-const response = await fetch(
-  "http://127.0.0.1:4000/api/v1/calculators/au.pay.take-home/calculate",
-  {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      facts: {
-        taxableIncome: { _tag: "Money", cents: 9000000, currency: "AUD" },
-      },
-      jurisdiction: "AU",
-      taxYear: "2025-26",
-    }),
-  }
-);
-
-if (!response.ok) {
-  const body = (await response.json()) as ApiErrorEnvelope;
-  console.error(body.error._tag, body.error.message);
-  for (const issue of body.error.issues ?? []) {
-    console.error(issue.path.join("."), issue.message);
-  }
-}
+// A response from an HTTP request is untrusted until its owning Schema checks it.
+export const readCalculatorError = (response: HttpClientResponse) =>
+  response.json.pipe(
+    Effect.flatMap(Schema.decodeUnknownEffect(CalculatorApiErrorEnvelope))
+  );
 ```
 
-Expected output for this shape is a `CalculatorInputDecodeError` because annual
-income facts are not valid facts for `au.pay.take-home`.
+Call `readCalculatorError` with the failed calculation response from an Effect
+HTTP client. The returned `body.error` has the owning calculator error type.
+If the response does not match that contract, decoding returns a Schema error.
+
+For typed HTTP-client calls, endpoint error bodies are already checked; use the
+error channel shown in [Build a browser app](../guides/build-a-browser-app-with-the-http-api.mdx).
+Do not maintain another error-envelope type or force an unchecked JSON value
+into one with a cast.
 
 ## Add help
 

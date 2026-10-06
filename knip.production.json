@@ -84,7 +84,9 @@
         "src/schemas.ts!",
         "src/server.ts!",
         "src/service.ts!",
-        "src/validate.runtime.ts!"
+        "src/validate.runtime.ts!",
+        "src/catalogue-index.runtime.ts!",
+        "src/catalogue-source.layer.ts!"
       ],
       "project": [
         ".source/browser.ts!",

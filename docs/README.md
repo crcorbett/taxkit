@@ -92,6 +92,16 @@ report is saved. Effect CLI owns option parsing.
 `published` means explicitly accepted current public documentation. Neither
 status proves runtime or external availability.
 
+Acceptance-record Schemas live in `@taxkit/content`. The docs tool explicitly
+selects source exports so it can run in a fresh checkout before package builds.
+Version-two records include the reviewed source hash, which this check verifies;
+version-one records retain their historical contract. The local accepted
+catalogue builder, `bun run docs:catalogue`, requires version two, checks source
+bytes before and after compilation, and writes generated output only when
+accepted pages and matching navigation exist. It does not accept pages or
+establish publication by running. See
+[`../packages/docs-content/README.md`](../packages/docs-content/README.md).
+
 `bun run check:runbooks` Schema-decodes the canonical runbook contract, the
 current journey inventory and the exact historical HGI-203 journey snapshot,
 then reconciles the immutable packet digest, four Markdown owners, commands,

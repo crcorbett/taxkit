@@ -171,7 +171,12 @@ describe("documentation command", () => {
       const child = yield* spawner.spawn(
         ChildProcess.make(
           "bun",
-          ["run", "tools/documentation/check.runtime.ts", ...args],
+          [
+            "--conditions=source",
+            "run",
+            "tools/documentation/check.runtime.ts",
+            ...args,
+          ],
           {
             cwd: root,
             extendEnv: true,

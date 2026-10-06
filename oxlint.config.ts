@@ -14,6 +14,12 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact acceptance JSON, external example JSON and raw HTTP error ingress.
+  "tools/documentation/catalogue.build.ts",
+  "tools/documentation/catalogue.build.test.ts",
+  "packages/docs-examples/src/validate-external-input.ts",
+  "packages/docs-examples/src/api-error-envelope.ts",
+  "packages/docs-examples/test/integration.example.test.ts",
   // Exact public catalogue wire and adversarial ingress fixtures only.
   "packages/content/src/__testing__/fixtures.ts",
   "packages/content/test/schemas.test.ts",
@@ -213,6 +219,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  "tools/documentation/catalogue.build.ts",
+  "tools/documentation/catalogue.build.test.ts",
   // Exact public catalogue representation round-trip proof, not a service encoder.
   "packages/content/test/schemas.test.ts",
   // Exact rate wire/secret-negative fixtures; no production encoding permission.
@@ -314,6 +322,8 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  "packages/docs-content/src/catalogue-index.runtime.ts",
+  "tools/documentation/catalogue.runtime.ts",
   "apps/web/scripts/native-pair-build.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
@@ -418,6 +428,8 @@ const bunAdapterFiles = [
 ];
 
 const bunRuntimeEntrypointFiles = [
+  "packages/docs-content/src/catalogue-index.runtime.ts",
+  "tools/documentation/catalogue.runtime.ts",
   "apps/web/scripts/native-pair-build.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
@@ -1228,6 +1240,23 @@ export default defineConfig({
           {
             allowedFiles: [
               "tools/docs-deployment/workflow-artifact.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: [
+        "tools/documentation/catalogue.runtime.ts",
+        "packages/docs-content/src/catalogue-index.runtime.ts",
+      ],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "tools/documentation/catalogue.runtime.ts",
+              "packages/docs-content/src/catalogue-index.runtime.ts",
             ],
           },
         ],

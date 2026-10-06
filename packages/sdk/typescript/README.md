@@ -23,8 +23,8 @@ facade, a plain Promise facade and Australian module helpers for the current
 public calculator catalog. The descriptor and facade generics consume
 calculator-owned `CalculatorRunFacts`, `CalculatorRunReport` and
 `CalculatorServiceError` contracts rather than HTTP transport aliases.
-The HTTP API consumes the SDK like an in-process downstream consumer, while the
-SDK remains independent from `@taxkit/api-http`.
+The HTTP API and SDK call the same owning calculator service independently.
+The SDK remains independent from `@taxkit/api-http`.
 
 Effect-native report helpers are named for the report-only boundary:
 `calculateReport` accepts descriptor-typed facts and `calculateReportRequest`

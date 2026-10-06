@@ -26,43 +26,39 @@ untyped source.
 ## Example
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
-import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
+import { Effect, Schema } from "effect";
 
-const result = await TaxKit.safe.calculate(
-  au.calculations.takeHomePay,
-  // External input can bypass compile-time checks before it reaches this call.
-  { taxableIncome: aud(Cents.make(9_000_000)) } as never
+// Check an external JSON representation before calling a typed calculator.
+export const invalidInput = Schema.decodeEffect(
+  Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
+)('{"taxableIncome":{"_tag":"Money","cents":9000000,"currency":"AUD"}}');
+
+export const validInput = Schema.decodeEffect(
+  Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
+)(
+  '{"grossPay":{"_tag":"GrossPay","amount":{"_tag":"Money","cents":165400,"currency":"AUD"},"period":"weekly"},"taxFreeThresholdClaimed":true}'
+).pipe(
+  Effect.flatMap((input) => Effect.promise(() => au.pay.takeHomePay(input)))
 );
-
-if (result._tag === "TaxKitFailure") {
-  const error = result.error.error;
-  console.log(error._tag);
-  console.log(result.error.message);
-}
 ```
 
 ## Verify the result
 
-Expected output includes:
+`invalidInput` fails with `SchemaError` before a calculation runs because annual
+income facts do not match the selected take-home calculator. `validInput`
+returns the retained weekly fixture result: net pay of `130_100` cents.
 
-```txt
-CalculatorInputDecodeError
-Invalid facts for au.pay.take-home
-```
+Run these Effects at your application boundary. For checked TypeScript input,
+use the [Safe SDK](../sdk/safe-sdk.mdx) and handle `TaxKitFailure` without an
+unsafe cast. Its calculator error channel is separate from the initial check
+of external input.
 
 ## HTTP error handling
 
-For HTTP callers, read `CalculatorApiErrorEnvelope.error`:
-
-```ts
-const body = await response.json();
-
-if (!response.ok) {
-  console.error(body.error._tag, body.error.message);
-}
-```
+The typed HTTP client checks endpoint replies. If you read a raw HTTP response,
+use the owning `CalculatorApiErrorEnvelope` decoder from [API errors](../api/errors.mdx).
+Do not access fields on unchecked `response.json()` data.
 
 ## Related pages
 

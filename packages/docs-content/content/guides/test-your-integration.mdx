@@ -19,39 +19,48 @@ TaxKit with the expected facts and handles expected failures.
 ## Steps
 
 1. Add a success test for the calculator you call.
-2. Add a validation failure test.
+2. Add a validation failure test that checks external input before calculation.
 3. Run your app tests and the relevant TaxKit package test when working in
    this repo.
 
 ## Example
 
 ```ts
+import { assert, it } from "@effect/vitest";
 import { Cents, aud } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
-import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
-import { expect, test } from "vitest";
+import { Effect, Schema } from "effect";
 
-test("calculates weekly take-home pay", async () => {
-  const report = await au.pay.takeHomePay({
-    grossPay: new GrossPay({
-      amount: aud(Cents.make(165_400)),
-      period: "weekly",
-    }),
-    taxFreeThresholdClaimed: true,
-  });
+it.effect("calculates weekly take-home pay", () =>
+  Effect.promise(() =>
+    au.pay.takeHomePay({
+      grossPay: new GrossPay({
+        amount: aud(Cents.make(165_400)),
+        period: "weekly",
+      }),
+      taxFreeThresholdClaimed: true,
+    })
+  ).pipe(
+    Effect.tap((report) =>
+      Effect.sync(() => {
+        assert.equal(report._tag, "TakeHomePayReport");
+        assert.equal(report.netPay.cents, 130_100);
+      })
+    )
+  )
+);
 
-  expect(report._tag).toBe("TakeHomePayReport");
-  expect(report.netPay.cents).toBe(130_100);
-});
-
-test("returns a typed validation failure", async () => {
-  const result = await TaxKit.safe.calculate(au.calculations.takeHomePay, {
-    taxableIncome: aud(Cents.make(9_000_000)),
-  } as never);
-
-  expect(result._tag).toBe("TaxKitFailure");
-});
+it.effect("rejects external input before calculation", () =>
+  Schema.decodeEffect(
+    Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
+  )('{"taxableIncome":{"_tag":"Money","cents":9000000,"currency":"AUD"}}').pipe(
+    Effect.flip,
+    Effect.tap((error) =>
+      Effect.sync(() => assert.equal(error._tag, "SchemaError"))
+    )
+  )
+);
 ```
 
 ## Verify the result

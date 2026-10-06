@@ -37,7 +37,7 @@
     "changeset": "changeset",
     "check": "ultracite check --type-aware",
     "check:docs": "turbo run //#check:docs:task",
-    "check:docs:task": "bun run tools/documentation/check.runtime.ts",
+    "check:docs:task": "bun --conditions=source run tools/documentation/check.runtime.ts",
     "check:docs-deployment": "turbo run //#check:docs-deployment:task",
     "check:docs-deployment:task": "bun --conditions=source run tools/docs-deployment/check.runtime.ts",
     "check:docs-deployment-automation": "turbo run //#check:docs-deployment-automation:task",
@@ -134,7 +134,8 @@
     "version-repo": "changeset version",
     "web:test:browser": "turbo run test:browser --filter=web",
     "sdk:test:browser": "turbo run test:browser --filter=@taxkit/sdk",
-    "web:test:native-pair": "bun run --filter=web build:native-pair && bun run --filter=web test:native-pair"
+    "web:test:native-pair": "bun run --filter=web build:native-pair && bun run --filter=web test:native-pair",
+    "docs:catalogue": "bun run --filter=@taxkit/docs-content generate && bun --conditions=source run tools/documentation/catalogue.runtime.ts"
   },
   "dependencies": {
     "@taxkit/infrastructure": "workspace:*",
@@ -147,6 +148,8 @@
     "@effect/tsgo": "0.48.0",
     "@effect/vitest": "catalog:",
     "@oxlint/plugins": "1.86.0",
+    "@taxkit/content": "workspace:*",
+    "@taxkit/docs-content": "workspace:*",
     "@taxkit/scripts": "workspace:*",
     "@types/bun": "catalog:",
     "@typescript/typescript6": "6.0.2",

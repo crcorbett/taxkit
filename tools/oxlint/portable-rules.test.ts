@@ -2128,6 +2128,69 @@ describe("exact native RPC lint boundaries", () => {
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
+    {
+      path: "tools/documentation/catalogue.build.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "tools/documentation/catalogue.build.ts",
+      rejected: false,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "tools/documentation/catalogue.build.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
+      path: "tools/documentation/catalogue.build.test.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "tools/documentation/catalogue.build.test.ts",
+      rejected: false,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "tools/documentation/catalogue.build.test.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
+      path: "tools/documentation/catalogue.runtime.ts",
+      rejected: false,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { BunRuntime } from "@effect/platform-bun";\nimport { Effect } from "effect";\n\nBunRuntime.runMain(Effect.void);',
+    },
+    {
+      path: "packages/docs-content/src/catalogue-index.runtime.ts",
+      rejected: false,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { BunRuntime } from "@effect/platform-bun";\nimport { Effect } from "effect";\n\nBunRuntime.runMain(Effect.void);',
+    },
+    {
+      path: "packages/docs-content/src/generated-collection.boundary.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { BunRuntime } from "@effect/platform-bun";\nimport { Effect } from "effect";\n\nBunRuntime.runMain(Effect.void);',
+    },
   ])("keeps $rule exact at $path", ({ path, source, rejected, rule }) =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;

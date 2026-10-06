@@ -29,7 +29,8 @@
         "tools/docs-deployment/workflow-artifact.runtime.ts",
         "tools/docs-deployment/*.test.ts",
         "alchemy.apps.run.ts",
-        "alchemy.apps.local.run.ts"
+        "alchemy.apps.local.run.ts",
+        "tools/documentation/catalogue.runtime.ts"
       ],
       "project": [
         "*.json",
@@ -37,7 +38,8 @@
         "tools/effect-language-service/**/*.ts",
         "tools/repository-paths/**/*.ts",
         "tools/quality-workflow/**/*.ts",
-        "tools/docs-deployment/**/*.ts"
+        "tools/docs-deployment/**/*.ts",
+        "tools/documentation/catalogue*.ts"
       ],
       "ignoreDependencies": ["typescript", "@effect/language-service"]
     },
@@ -144,7 +146,9 @@
         "src/test.layer.ts",
         "src/validate.runtime.ts",
         "src/**/*.test.ts",
-        "vitest.config.ts"
+        "vitest.config.ts",
+        "src/catalogue-index.runtime.ts",
+        "src/catalogue-source.layer.ts"
       ],
       "project": ["source.config.ts", "src/**/*.ts", "vitest.config.ts"],
       "ignoreDependencies": ["@shikijs/core", "@taxkit/tsconfig", "typescript"]

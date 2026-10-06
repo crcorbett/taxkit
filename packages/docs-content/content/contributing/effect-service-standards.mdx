@@ -13,7 +13,7 @@ providers, calculator execution or expected error handling.
 
 Use Effect services and layers for tax behaviour:
 
-- facts are provided through `Context.Tag`
+- facts are provided through `Context.Service`
 - parameter tables are services
 - rules are `Layer`s
 - calculators are Effect programs that require facts and return reports
@@ -28,11 +28,10 @@ shaping.
 
 Use Effect-native primitives when they fit:
 
-- `Data`, `Schema`, `Schema.TaggedClass` and `Data.TaggedError`
+- `Data`, `Schema`, `Schema.TaggedClass` and `Schema.TaggedError`
 - `Array`, `Chunk`, `HashSet`, `HashMap`, `Record`, `Option`, `Result`,
   `Exit` and `Match`
-- `Context`, `Layer`, `Config`, `Service`, `ManagedRuntime`, `Bun`,
-  `Platform` and `Command`
+- `Context`, `Layer`, `Config`, `ManagedRuntime` and `Command`
 
 Do not create ad hoc tagged objects, mutable `Map` or `Set` indexes, manual
 env parsing or per-request runtime wrappers when an Effect primitive owns the
@@ -40,8 +39,8 @@ pattern.
 
 ## Error handling
 
-Keep one-off `Effect.mapError`, `Effect.catchTag`, `Effect.catchAll` and
-`Effect.catchAllDefect` transformations inline at the callsite. Extract a
+Keep one-off `Effect.mapError`, `Effect.catchTag`, `Effect.catch` and
+`Effect.catchDefect` transformations inline at the callsite. Extract a
 helper only when it owns reusable policy or removes meaningful duplication.
 
 For the full rule set, read

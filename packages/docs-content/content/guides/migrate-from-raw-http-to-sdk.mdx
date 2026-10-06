@@ -13,7 +13,9 @@ but can import the SDK directly.
 
 - Confirm the caller runs in a TypeScript runtime that can import workspace or
   published packages.
-- Keep HTTP for browser and non-TypeScript callers.
+- Keep HTTP when calculation belongs on the server or the caller cannot import
+  TypeScript packages. Browser callers can use the SDK's browser-safe exports
+  when calculation should run on their device.
 - Read [Plain SDK](../sdk/plain-sdk.mdx).
 
 ## Steps

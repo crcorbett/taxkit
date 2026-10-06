@@ -196,9 +196,13 @@ T009 exported tracing and provider/deployment proof remain open.
   may read MDX files only through their explicit non-runtime operations; app
   routes use processed generated content through the service and client
   exports. Service interfaces use the precise `Contract` suffix.
+  The independent native MDX index and `./catalogue-source` Layer belong only
+  to the local accepted-catalogue builder. Request/browser code consumes its
+  checked generated representation; it must not initialise that compiler.
 
 `packages/docs-examples`
-: Private owner of the four public integration templates and their
+: Private owner of the four retained integration templates, additional checked
+  public snippet sources and their
   compiler/runtime checks. It depends on HTTP, SDK and calculator contracts.
   Those dependencies stay outside docs-content so HTTP can consume content
   contracts without a circular build graph. It has no exports, generated

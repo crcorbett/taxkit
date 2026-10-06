@@ -37,3 +37,17 @@ runbooks are N/A because this workspace performs no release or provider work.
 Content validation remains owned by
 [`docs-content`](../docs-content/README.md); package dependency direction is
 owned by [package boundaries](../../docs/architecture/package-boundaries.md).
+
+
+The validation, calculator-help and raw HTTP error examples are checked sources
+for their complete copied public MDX fences. Authored-content validation rejects
+copy drift. The checker uses the root's selected Node types for standard
+Node/browser request APIs; the templates do not use Bun-specific globals.
+Tests keep the original weekly-pay oracle and invalid-request cases and add
+external-input rejection, error-envelope decoding and actual HTTP metadata
+route checks. No example or test establishes statutory accuracy for retained
+calculation fixtures or public API availability.
+
+The fact definition and integration-test guides also use complete checked
+fences. The integration example executes as a real test suite; the fact
+example compiles against the owning Money and PayPeriod schemas.

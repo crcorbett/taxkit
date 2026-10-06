@@ -27,6 +27,10 @@ import type {
   DocsNavigationLeaf,
   DocsValidationResult,
 } from "../schemas.js";
+import {
+  checkedSnippetBindings,
+  validateCheckedSnippet,
+} from "./checked-snippets.js";
 import { validateMdxComponentPolicy } from "./mdx-component-policy.js";
 
 const { join, resolve } = nodePath;
@@ -490,12 +494,26 @@ const validateOpenApiReference = (
     )
   );
 
+const validateCheckedSnippets = Effect.forEach(
+  checkedSnippetBindings,
+  (binding) =>
+    Effect.all({
+      example: readText(join(absoluteExamplesRoot, binding.example)),
+      page: readText(join(absoluteDocsRoot, binding.page)),
+    }).pipe(
+      Effect.map(({ example, page }) =>
+        validateCheckedSnippet(binding.page, page, example)
+      )
+    )
+).pipe(Effect.map(EffectArray.flatten));
+
 const validateReferenceIntegration = Effect.all({
+  checkedSnippetIssues: validateCheckedSnippets,
   exampleIssues: validateExamplesReference(exampleReferenceSource),
   openApiIssues: validateOpenApiReference(openApiReferenceSource),
 }).pipe(
-  Effect.map(({ exampleIssues, openApiIssues }) =>
-    EffectArray.flatten([exampleIssues, openApiIssues])
+  Effect.map(({ checkedSnippetIssues, exampleIssues, openApiIssues }) =>
+    EffectArray.flatten([checkedSnippetIssues, exampleIssues, openApiIssues])
   ),
   Effect.mapError(() => sourceError())
 );

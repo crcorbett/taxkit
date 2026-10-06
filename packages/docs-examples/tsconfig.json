@@ -21,12 +21,17 @@
       "@taxkit/sdk/au/effect": ["../sdk/typescript/src/au-effect.ts"],
       "@taxkit/sdk/effect": ["../sdk/typescript/src/effect.ts"],
       "@taxkit/sdk/schemas": ["../sdk/typescript/src/schemas/index.ts"],
+      "@taxkit/api-http/client/live": ["../api/http/src/client/live.layer.ts"],
+      "@taxkit/api-http/client/server": [
+        "../api/http/src/client/server.layer.ts"
+      ],
+      "@taxkit/api-http": ["../api/http/src/index.ts"],
       "@taxkit/api-http/client": ["../api/http/src/client/index.ts"]
     },
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2024",
-    "types": ["bun"]
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

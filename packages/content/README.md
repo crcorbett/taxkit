@@ -17,9 +17,16 @@ composition supplies a checked catalogue through `ContentCatalogue`;
 
 The authored MDX, source review and Fumadocs compiler remain in
 [`docs-content`](../docs-content/README.md). This package cannot itself accept
-an authored page for publication. The generated catalogue and its acceptance
-records remain unfinished T005 work. Existing docs-content imports re-export
+an authored page for publication. The local catalogue builder requires reviewed
+source records; actual source acceptance and public routing remain T005 work.
+Existing docs-content imports re-export
 the canonical page, navigation and lookup error contracts for compatibility.
+
+Acceptance records have one canonical Schema here. Version one retains its
+existing fields for older lifecycle evidence. Version two adds the exact
+reviewed source SHA-256 hash. The repository catalogue builder requires the
+second version and checks file bytes; this package's Schema does not read files
+or accept authored pages by itself.
 
 Search matches page titles, descriptions and processed Markdown without case
 sensitivity. Results follow catalogue order, contain at most twenty pages, and

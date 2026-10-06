@@ -36,14 +36,17 @@ on the open-source tax engine and avoid downstream private-product specifics.
 : Private compiled owner of canonical docs page, frontmatter, navigation and
   source error contracts. Its public catalogue Schema admits published pages
   with matching navigation; its service reads that checked catalogue and limits
-  search to twenty short results. Source acceptance and catalogue generation
-  remain T005 work; no authored draft is accepted by adding this package.
+  search to twenty short results. It also owns both acceptance-record versions;
+  the second binds the reviewed source bytes. Adding this package does not
+  accept an authored draft.
 
 `packages/docs-content`
 : Private source-only package for authored navigation, meta, MDX, validation
   policy, validation errors and generated Fumadocs source access. Its existing
   page/navigation/source-error exports re-export `@taxkit/content` contracts;
   its source service still supports the existing docs app.
+  Its independent native MDX index and build-only source Layer use the installed
+  compiler and the same adapter as the retained Vite source.
 
 `packages/docs-examples`
 : Private checked integration templates and their compiler/runtime proof. It
@@ -61,6 +64,14 @@ on the open-source tax engine and avoid downstream private-product specifics.
 generated artifacts, and authored SDK documentation. It validates accepted
 public-status representation and navigation ownership without claiming runtime
 or external availability.
+
+`tools/documentation/catalogue.runtime.ts`
+: Local accepted-catalogue build command (`bun run docs:catalogue`). It checks
+version-two records and exact source hashes before and after MDX processing,
+omits drafts, checks navigation through the canonical catalogue constructor,
+and writes ignored `.source/public-catalogue.json` only on success. No accepted
+pages is a failure. Current authored pages remain drafts; the public HTTP and
+replacement Website routes are still T005 work.
 
 `docs/architecture`
 : Durable implementation architecture.

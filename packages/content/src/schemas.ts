@@ -178,3 +178,33 @@ export const DocsSearchResult = Schema.Struct({
   title: DocsNonEmptyText,
 });
 export type DocsSearchResult = typeof DocsSearchResult.Type;
+
+// Retained version-one records keep their exact existing representation.
+export const PublicPageAcceptanceRecordV1 = Schema.Struct({
+  observedAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  owner: Schema.NonEmptyString,
+  schemaVersion: Schema.Literal(1),
+  state: Schema.Literal("accepted"),
+  targetPath: Schema.NonEmptyString,
+});
+
+export const DocsAcceptedSourceDigest = Schema.String.check(
+  Schema.isPattern(/^[a-f0-9]{64}$/u)
+).pipe(Schema.brand("taxkit/DocsAcceptedSourceDigest"));
+export type DocsAcceptedSourceDigest = typeof DocsAcceptedSourceDigest.Type;
+
+export const PublicPageAcceptanceRecordV2 = Schema.Struct({
+  ...PublicPageAcceptanceRecordV1.fields,
+  schemaVersion: Schema.Literal(2),
+  sourceSha256: DocsAcceptedSourceDigest,
+});
+export type PublicPageAcceptanceRecordV2 =
+  typeof PublicPageAcceptanceRecordV2.Type;
+
+export const PublicPageAcceptanceRecord = Schema.Union([
+  PublicPageAcceptanceRecordV1,
+  PublicPageAcceptanceRecordV2,
+]);
+export type PublicPageAcceptanceRecord = typeof PublicPageAcceptanceRecord.Type;

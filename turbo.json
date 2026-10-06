@@ -30,7 +30,7 @@
         "content/**",
         "navigation.json",
         "source.config.ts",
-        "src/schemas.ts",
+        "src/**",
         "package.json"
       ],
       "outputs": [".source/**"]
@@ -113,7 +113,10 @@
     "//#check:docs-deployment:types:task": { "outputs": [] },
     "//#check:docs-deployment-tools:types:task": { "outputs": [] },
     "//#check:oxlint:types:task": { "outputs": [] },
-    "//#check:docs:types:task": { "outputs": [] },
+    "//#check:docs:types:task": {
+      "outputs": [],
+      "dependsOn": ["@taxkit/docs-content#build"]
+    },
     "//#check:effect-language-service:task": { "outputs": [] },
     "//#check:harness-governance:task": { "outputs": [] },
     "//#check:repository-paths:task": { "outputs": [] },
