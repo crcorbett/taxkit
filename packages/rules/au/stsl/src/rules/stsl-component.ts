@@ -83,7 +83,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     if (!stslDebt.enabled) {
       const trace = TraceNode.make({
         children: [taxable.trace],
-        formula: "stsl = 0 (opted out)",
+        formula: Option.some(Option.some("stsl = 0 (opted out)")),
         inputs: baseTraceInputs,
         result: 0,
         ruleId: StslComponentRuleId,
@@ -125,7 +125,9 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     if (weeklyWithholdingDollars === 0) {
       const trace = TraceNode.make({
         children: [taxable.trace],
-        formula: "stsl = 0 (Schedule 8 component rounds to zero)",
+        formula: Option.some(
+          Option.some("stsl = 0 (Schedule 8 component rounds to zero)")
+        ),
         inputs: {
           ...baseTraceInputs,
           a: BigDecimal.format(row.a),
@@ -134,7 +136,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
           weeklyFormulaCents,
         },
         result: 0,
-        rounding: "ato-withholding-rounding",
+        rounding: Option.some(Option.some("ato-withholding-rounding")),
         ruleId: StslComponentRuleId,
         sources: [table.source],
         title: "STSL withholding (zero component)",
@@ -159,8 +161,11 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
 
     const trace = TraceNode.make({
       children: [taxable.trace],
-      formula:
-        "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period",
+      formula: Option.some(
+        Option.some(
+          "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period"
+        )
+      ),
       inputs: {
         ...baseTraceInputs,
         a: BigDecimal.format(row.a),
@@ -170,7 +175,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         weeklyWithholdingCentsRaw,
       },
       result: periodWithholding.cents,
-      rounding: "ato-withholding-rounding",
+      rounding: Option.some(Option.some("ato-withholding-rounding")),
       ruleId: StslComponentRuleId,
       sources: [table.source],
       title: "STSL withholding (Schedule 8)",

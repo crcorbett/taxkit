@@ -53,3 +53,11 @@ tarball validated by the SDK-owned strict downstream gate.
 - `docs/architecture/rules-and-parameters.md`
 - `docs/architecture/calculators.md`
 - `docs/standards/code-patterns.md`
+
+
+Trace formula and rounding values now use Core's nested Option contract. Use
+the owning trace codec for transport or saved snapshots, and `Option.flatten`
+to read content when missing and undefined mean the same thing. Descriptor
+questions/source artifacts use Option and rule parameters are total arrays.
+See the [Core owner](../../../core/README.md). Existing formulas, tax amounts,
+source records and snapshot expectations are unchanged.

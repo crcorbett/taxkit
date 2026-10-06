@@ -152,3 +152,10 @@ a calculation automatically. Metadata lookup errors use the canonical
 operation timeout. Their lazy invocation counts eager metadata construction
 inside the operation budget. Per-client rate identity, rate limiting and future
 MCP operations remain active work.
+
+
+Core descriptor questions, source artifacts and duplicate-provider permissions
+are Options; rule parameter collections are total arrays. Metadata and error-help
+builders reuse those checked values directly. Public metadata codecs keep the
+same JSON fields, missing keys and values. Broader request absence changes
+remain separate work in the active clean-slate plan.

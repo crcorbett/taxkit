@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Money, Cents, moneyEquals } from "@taxkit/core/primitives";
+import { TraceNode } from "@taxkit/core/trace";
 import {
   CalculateTakeHomePay,
   GrossPay,
@@ -24,7 +25,7 @@ import {
   StslDebtFact,
 } from "@taxkit/rules-au-stsl";
 import { expectAt } from "@taxkit/testing";
-import { Array as EffectArray, Effect, Layer } from "effect";
+import { Array as EffectArray, Effect, Layer, Schema } from "effect";
 
 const weekly1500 = new GrossPay({
   amount: new Money({ cents: Cents.make(150_000), currency: "AUD" }),
@@ -211,6 +212,7 @@ describe("AU take-home pay with STSL", () => {
   it.effect("trace and ledger snapshot: PAYG plus STSL explanation order", () =>
     Effect.gen(function* () {
       const report = yield* stslScenario(weekly1500, stslEnabled);
+      const encodedTrace = yield* Schema.encodeEffect(TraceNode)(report.trace);
 
       expect({
         ledger: EffectArray.map(
@@ -222,7 +224,7 @@ describe("AU take-home pay with STSL", () => {
           })
         ),
         ledgerChildren: EffectArray.map(
-          expectAt(report.trace.children, 0).children,
+          expectAt(encodedTrace.children, 0).children,
           (child) => ({
             rounding: child.rounding,
             ruleId: child.ruleId,

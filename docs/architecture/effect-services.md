@@ -137,7 +137,7 @@ date Option contracts. A representation codec must retain its whole-record
 check on the encoded side when Type/Encoded transformations differ.
 
 Explicit recursive encoded contracts such as `TraceNodeEncoded`, and generic
-descriptor interfaces that preserve schema-to-continuation inference, are not
+descriptor relations that preserve schema-to-service inference, are not
 DTO mirrors. Keep them when TypeScript cannot otherwise express the recursive
 or generic relation. Do not use that exception for ordinary duplicated object
 shapes. The trace domain/encoded aliases infer their non-recursive fields
@@ -145,6 +145,14 @@ from one shared Schema and annotate only children. Ledger component aliases
 are inferred directly from their owning Schema. These exported aliases replace
 open interfaces, so declaration merging is no longer an extension point; their
 historical encoded values remain the same.
+
+The calculation engine separates its service contract from its live Layer.
+Its real Effect/Layer/result relation stays generic; optional validation input
+retains its empty-collection meaning. Fact/parameter/rule metadata derives from
+private owning Schemas, with Option for meaningful absence and a total rule
+parameter array. Tuple service types derive from the native key Identifier.
+The [Core owner](../../packages/core/README.md) explains missing versus explicit
+undefined trace/question representations.
 
 ## Provider and SDK adapters
 

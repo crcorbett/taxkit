@@ -3275,3 +3275,88 @@ commit and a separate tested compiler correction. Exact corrected-head hosted
 Linux proof remains separate; parent #148's failure stays recorded as history.
 T004 and the wider goal remain active for semantic absence/service ownership
 and trusted rate identity/limiting. No Medicare or provider change is made.
+
+
+## DEV-75 domain absence and descriptor owners — 6 October 2026
+
+Draft #149 is open at 5fd1ebbb13455bfef86fc27dab9c88e53fcf1385 with both
+local slices accepted; exact hosted Quality run 37404351740/job 112078530836
+is still in progress. Continue independently on
+codex/dev-75-domain-absence-owners without claiming hosted acceptance.
+
+The next local slice gives trace formula/rounding and question help text
+canonical Option codecs, preserving missing, present undefined and present
+value bytes and own keys. Ordinary descriptor metadata gets one Schema owner;
+generic service/schema/Layer relations stay typed. Fact-question and source-
+artifact absence becomes Option at the existing constructors. Their old
+constructors already omit explicit undefined. Rule parameters use a total
+empty collection when omitted, matching the current public metadata meaning;
+duplicate-provider permission preserves explicit false. Recursive trace
+constructor input is derived from the same fields, with only its child relation
+annotated; outside real compiler probes catch invalid fields and child records.
+
+Move the calculation engine's live Layer to its own file while retaining
+public exports and named run behaviour. Keep its genuine generic calculation/
+Layer/result relations; its optional validation input has an existing total
+empty-collection meaning and derives from the diagnostic Schema owner.
+The outside optional-codec prototype retains all six trace/question forms.
+Twenty-two pre-change actual metadata responses are saved before implementation
+for exact compatibility comparison, not regeneration after a change.
+
+Documentation impact: **Change required** for Core/rules/calculator/SDK owners,
+relevant Effect/rule/API/testing architecture, examples or generated references
+when their actual contracts change, active SPEC/tasks/plan/audit, a dated receipt
+and appropriate major Changesets. **Preserve** all authored tables/source data,
+tax results, historical codec/snapshot expectations, dependencies, runtime
+permissions, tooling, commands and Medicare decision. **N/A** for provider
+operations and new runbooks. Focused types/tests, genuine packed compile/runtime
+checks, deliberate removals, actual response comparisons and the full local
+graph are required before acceptance. Broader public request absence and
+trusted rate identity/limiting remain active work; T004 is not complete.
+
+
+Parent draft #149 at 5fd1ebbb13455bfef86fc27dab9c88e53fcf1385 now passes
+exact hosted Quality run 37404351740/job 112078530836. This establishes the
+previous table/clean-build slices on that head, not the current absence work.
+
+Current focused Core (65), SDK (57), genuine packed declarations/runtime,
+lint/types, docs/runbooks/format/Changeset checks pass. Packed assertions retain
+all 22 saved metadata hashes, three question forms and prior trace/ledger and
+table/source expectations. Six deliberate removals fail at the intended tests
+or actual packed declaration stage and restore exact source bytes. Twelve
+actual CLI admission cases retain test-only codecs and reject runtime execution.
+The SDK regression exposed repeat representation decoding of domain reports;
+selected Type narrowing fixes it. Native service Identifier lookup retains
+empty tuple meaning and actual input/parameter service types. Full current
+CI-mode qualification follows; no T004 or wider-goal acceptance is claimed.
+
+
+The first complete absence attempt fails at workspace tests after successful
+verification (32 workflow and seven native cases). Two HTTP fixtures decode
+the typed client result a second time, treating canonical trace/question
+Options as wire values. The fixtures now validate the owning Schema Type;
+raw HTTP JSON still uses its representation decoder. Expected tax amounts,
+input-error parity, secret/path checks and OpenAPI remain unchanged. Focused
+HTTP, RPC and calculator tests pass. The HTTP README records this boundary;
+the dated receipt retains the failed attempt. A fresh complete graph is
+required before acceptance.
+
+
+Local acceptance for the domain absence slice: all nine CI-mode stages pass
+in 650.81 seconds, including 32 workflow cases (455.52
+seconds), 512 actual lint cases, 65 Core, 52 rules and 57 SDK tests. Seven
+built native app cases pass in 77.86 seconds. Genuine packed compile/runtime
+checks retain the 22 historical metadata hashes, question/trace/ledger key and
+byte expectations, all 15 table/period/source fingerprints and tax results.
+Six deliberate removals fail at their owning tests or real packed declaration
+stage. Twelve actual CLI cases qualify exact test codecs and retain runtime
+rejection. All 53 staged files restore exact bytes; the API Worker source and
+lockfile remain unchanged. Nine native inventories are captured before later
+root builds; all four screenshots match the inspected parent bytes.
+
+Primary-owner review accepts this local slice and its eight major package
+Changesets. Only this plan and receipt change after qualification; final docs,
+runbooks, format, Changeset and whitespace checks follow before commit/push and
+a stacked draft. Hosted acceptance of the new immutable head remains separate.
+Broader public request absence/domain error review and trusted rate identity/
+limiting remain active; T004 and the wider goal are incomplete.

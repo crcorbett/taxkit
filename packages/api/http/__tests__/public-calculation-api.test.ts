@@ -146,7 +146,7 @@ describe("TaxKit public calculation HTTP API", () => {
         });
         const serviceResponse = yield* service.listCalculators(query);
         const decoded = yield* Schema.decodeUnknownEffect(
-          CalculatorCatalogResponse
+          Schema.toType(CalculatorCatalogResponse)
         )(response);
         const takeHomeCalculator = expectAt(
           Array.filter(
@@ -198,9 +198,9 @@ describe("TaxKit public calculation HTTP API", () => {
           },
         }
       );
-      const decoded = yield* Schema.decodeUnknownEffect(CalculatorRunResponse)(
-        response
-      );
+      const decoded = yield* Schema.decodeUnknownEffect(
+        Schema.toType(CalculatorRunResponse)
+      )(response);
 
       const takeHomeReport = Match.value(response.report).pipe(
         Match.tag("TakeHomePayReport", (report) => report),
@@ -325,10 +325,10 @@ describe("TaxKit public calculation HTTP API", () => {
           0
         );
         const envelope = yield* Schema.decodeUnknownEffect(
-          CalculatorApiErrorEnvelope
+          Schema.toType(CalculatorApiErrorEnvelope)
         )(failure.error);
         const decodedCalculatorError = yield* Schema.decodeUnknownEffect(
-          CalculatorServiceError
+          Schema.toType(CalculatorServiceError)
         )(envelope.error);
         const calculatorError = Match.value(decodedCalculatorError).pipe(
           Match.tag("CalculatorInputDecodeError", (error) => error),

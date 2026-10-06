@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
 import { audDollars, Money, Cents, moneyEquals } from "@taxkit/core/primitives";
+import { TraceNode } from "@taxkit/core/trace";
 import {
   AnnualTaxLedgerRuleId,
   AnnualTaxScenarioLive,
@@ -15,7 +16,7 @@ import {
   MedicareLevyRuleId,
 } from "@taxkit/rules-au-income-tax";
 import { expectAt } from "@taxkit/testing";
-import { Array as EffectArray, Effect, Exit, Layer } from "effect";
+import { Array as EffectArray, Effect, Exit, Layer, Schema } from "effect";
 
 const runScenario = (incomeDollars: number) =>
   Effect.gen(function* () {
@@ -293,6 +294,9 @@ describe("AU annual income tax calculator (2025-26)", () => {
     () =>
       Effect.gen(function* () {
         const report = yield* runScenario(80_000);
+        const encodedTrace = yield* Schema.encodeEffect(TraceNode)(
+          report.trace
+        );
 
         expect({
           ledger: EffectArray.map(report.ledger.components, (component) => ({
@@ -301,7 +305,7 @@ describe("AU annual income tax calculator (2025-26)", () => {
             id: component.id,
             status: component.status,
           })),
-          traceChildren: EffectArray.map(report.trace.children, (child) => ({
+          traceChildren: EffectArray.map(encodedTrace.children, (child) => ({
             rounding: child.rounding,
             ruleId: child.ruleId,
             sourceKinds: EffectArray.map(

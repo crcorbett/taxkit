@@ -6,7 +6,7 @@ import {
   multiplyCentsByDecimal,
 } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { BigDecimal, Effect, Layer, Match } from "effect";
+import { BigDecimal, Effect, Layer, Match, Option } from "effect";
 
 import { MedicareLevyComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
@@ -84,7 +84,7 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
 
     const trace = TraceNode.make({
       children: [],
-      formula,
+      formula: Option.some(Option.some(formula)),
       inputs: {
         incomeCents,
         levyRate: BigDecimal.format(table.levyRate),
@@ -94,7 +94,7 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
         thresholdCents: table.thresholdCents,
       },
       result: levyAmount.cents,
-      rounding: "round-to-nearest-cent",
+      rounding: Option.some(Option.some("round-to-nearest-cent")),
       ruleId: MedicareLevyRuleId,
       sources: [table.source],
       title: "Medicare Levy",

@@ -13,30 +13,29 @@ import {
 } from "@taxkit/rules-au-pay/rule-pack";
 import { StslDebtDescriptor } from "@taxkit/rules-au-stsl/facts";
 import { AuStslRuleDescriptors } from "@taxkit/rules-au-stsl/rule-pack";
-import { Array as EffectArray, Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema, Option } from "effect";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
   Effect.forEach(rules, (rule) =>
     Effect.gen(function* () {
-      const parameters = yield* Effect.forEach(
-        rule.parameters ?? [],
-        (parameter) =>
-          Schema.encodeEffect(ParameterEffectivePeriod)(
-            parameter.effectivePeriod
-          ).pipe(
-            Effect.map((effectivePeriod) => ({
-              effectivePeriod,
-              id: parameter.id,
-              source: parameter.source.kind,
-              sourceArtifact: parameter.sourceArtifact
-                ? {
-                    checksum: parameter.sourceArtifact.checksum,
-                    retrievedOn: parameter.sourceArtifact.retrievedOn,
-                    rowCount: parameter.sourceArtifact.extract.rowCount,
-                  }
-                : undefined,
-            }))
-          )
+      const parameters = yield* Effect.forEach(rule.parameters, (parameter) =>
+        Schema.encodeEffect(ParameterEffectivePeriod)(
+          parameter.effectivePeriod
+        ).pipe(
+          Effect.map((effectivePeriod) => ({
+            effectivePeriod,
+            id: parameter.id,
+            source: parameter.source.kind,
+            sourceArtifact: parameter.sourceArtifact.pipe(
+              Option.map((artifact) => ({
+                checksum: artifact.checksum,
+                retrievedOn: artifact.retrievedOn,
+                rowCount: artifact.extract.rowCount,
+              })),
+              Option.getOrUndefined
+            ),
+          }))
+        )
       );
       return {
         id: rule.id,
@@ -68,7 +67,12 @@ describe("AU STSL rule graph", () => {
   });
 
   it("surfaces caller question metadata on STSL input facts", () => {
-    expect(StslDebtDescriptor.question?.inputKind).toBe("boolean");
+    expect(
+      StslDebtDescriptor.question.pipe(
+        Option.map((question) => question.inputKind),
+        Option.getOrUndefined
+      )
+    ).toBe("boolean");
   });
 
   it.effect(

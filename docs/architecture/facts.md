@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-facts-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: fact Schema, identity, descriptor, authority or question metadata change
 ---
 
@@ -36,7 +36,8 @@ Import `FactDescriptor` and `makeFactDescriptor` from `@taxkit/core`; do not
 copy their fields into a second interface. The [descriptor owner](../../packages/core/src/facts/descriptor.ts)
 keeps the value Schema and `Context.Key<Self, Value>` tied to the same value
 type. Its readonly fields include a branded fact ID, title, authority and
-optional `FactQuestion`. This generic relation supports graph tools while
+`Option<FactQuestion>`. Ordinary fields derive from one private Schema; only
+the actual generic value Schema and service relation are annotated. This generic relation supports graph tools while
 Effect's dependency type still decides what execution needs.
 
 `FactAuthority` admits three values:
@@ -74,9 +75,12 @@ A supported default must belong to the input Schema or an explicit rule.
 ## Question metadata
 
 `FactQuestion` is the [core-owned Schema class](../../packages/core/src/facts/descriptor.ts).
-It carries a branded `FactQuestionId`, `prompt`, optional `helpText` and an
+It carries a branded `FactQuestionId`, `prompt`, nested Option `helpText` and an
 `inputKind` of `money`, `boolean` or `selection`. Reuse this class and the
 fact descriptor's question rather than introducing a competing question type.
+Help text keeps missing, present undefined and present string keys through its
+owning codec. The descriptor constructor's historically equivalent missing and
+undefined questions both become None; a checked question becomes Some.
 
 Question metadata describes supported input collection. It does not prove that
 a UI or CLI can automatically collect every missing fact; that behaviour needs

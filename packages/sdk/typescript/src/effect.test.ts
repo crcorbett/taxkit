@@ -145,6 +145,38 @@ describe("Effect SDK facade", () => {
   );
 
   it.effect(
+    "narrows canonical reports without decoding their wire form again",
+    () =>
+      Effect.gen(function* () {
+        const service = yield* PublicCalculatorService;
+        const response = yield* service.calculate({
+          calculatorId: AuPayTakeHomeCalculation.calculatorId,
+          payload: {
+            facts: takeHomeFacts,
+            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
+            taxYear: AuPayTakeHomeCalculation.taxYear,
+          },
+        });
+        const report = yield* AuPayTakeHomeCalculation.decodeOutput(
+          response.report
+        );
+        expect(report).toEqual(response.report);
+        const encoded = yield* Schema.encodeEffect(
+          AuPayTakeHomeCalculation.outputSchema
+        )(report);
+        const wireAsDomain = yield* AuPayTakeHomeCalculation.decodeOutput(
+          encoded
+        ).pipe(Effect.exit);
+        expect(Exit.isFailure(wireAsDomain)).toBe(true);
+        const malformed = yield* AuPayTakeHomeCalculation.decodeOutput({
+          ...report,
+          trace: { ...report.trace, formula: secretSentinel },
+        }).pipe(Effect.exit);
+        expect(Exit.isFailure(malformed)).toBe(true);
+      }).pipe(Effect.provide(ServiceLive))
+  );
+
+  it.effect(
     "keeps annual-tax descriptors executable through the same facade",
     () =>
       Effect.gen(function* () {

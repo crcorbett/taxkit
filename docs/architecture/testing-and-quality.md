@@ -1386,3 +1386,15 @@ fixed historical table/period/source SHA-256 hashes. Its explicit `bun` hash
 import belongs to the generated external test host; the consumer retains an
 empty ambient-types list. The active plan and dated receipt distinguish focused
 proof from the complete current-candidate graph.
+
+
+The domain absence slice adds Core representation round trips for all three
+trace and question forms, descriptor absence/value cases, total parameter
+collections and explicit false/true duplicate-provider behaviour. Twelve actual
+CLI cases prove exact new test codec admissions and retain runtime rejection.
+SDK tests distinguish checked report narrowing from transport decoding.
+Genuine packed fixtures reject wrong constructor/child/service types, assert
+22 pre-change metadata response hashes, and retain original trace/ledger and
+table/source fingerprints. The
+[dated candidate](../documentation-audit/clean-slate-foundation/2026-10-06-domain-absence-owners.json)
+owns qualification; public request absence and rate work remain unfinished.

@@ -822,3 +822,14 @@ The source-only build inherits that empty list, so clean installs do not rely
 on another workspace supplying unused Node types. The active plan and dated
 portability receipt own this corrective slice's checks; no runtime or tax
 behaviour changes, and T004 remains active.
+
+
+Core trace/question fields now have Option owners that retain missing, present
+undefined and present-value representations. Ordinary descriptor fields derive
+from Schemas; actual service/Layer relations remain typed and rule parameter
+collections are total. Tuple inference reads the native service Identifier.
+The engine implementation is separate from its contract with public exports
+preserved. SDK report narrowing validates the selected Type rather than decoding
+a domain report again. The active plan and dated absence-owner receipt qualify
+this slice; broader public request absence and trusted rate identity/limiting
+remain active, and T004 is incomplete.

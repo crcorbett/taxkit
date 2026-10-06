@@ -88,7 +88,7 @@ const collectParameters = (
     HashMap.empty<ParameterId, readonly AnyParameterDescriptor[]>(),
     (parameters, rule) =>
       Array.reduce(
-        rule.parameters ?? Array.empty<AnyParameterDescriptor>(),
+        rule.parameters,
         parameters,
         (updatedParameters, parameter) => {
           const existing = HashMap.get(updatedParameters, parameter.id);
@@ -176,7 +176,8 @@ export const validateRuleGraph = (args: {
     (issues, factProviders, factId) => {
       const duplicateProviders = Array.filter(
         factProviders,
-        (provider) => provider.allowDuplicateProvides !== true
+        (provider) =>
+          !Option.getOrElse(provider.allowDuplicateProvides, () => false)
       );
 
       return duplicateProviders.length > 1
@@ -201,7 +202,7 @@ export const validateRuleGraph = (args: {
       const sources = HashSet.fromIterable(Array.map(rule.sources, sourceKey));
 
       return Array.reduce(
-        rule.parameters ?? Array.empty(),
+        rule.parameters,
         issues,
         (updatedIssues, parameter) =>
           HashSet.has(sources, sourceKey(parameter.source))

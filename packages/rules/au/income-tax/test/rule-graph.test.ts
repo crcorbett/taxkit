@@ -4,30 +4,29 @@ import { ParameterEffectivePeriod } from "@taxkit/core/parameters";
 import type { AnyRuleDescriptor } from "@taxkit/core/rules";
 import { AnnualTaxableIncomeDescriptor } from "@taxkit/rules-au-income-tax/facts";
 import { AuAnnualTaxRuleDescriptors } from "@taxkit/rules-au-income-tax/rule-pack";
-import { Array as EffectArray, Effect, Schema } from "effect";
+import { Array as EffectArray, Effect, Schema, Option } from "effect";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
   Effect.forEach(rules, (rule) =>
     Effect.gen(function* () {
-      const parameters = yield* Effect.forEach(
-        rule.parameters ?? [],
-        (parameter) =>
-          Schema.encodeEffect(ParameterEffectivePeriod)(
-            parameter.effectivePeriod
-          ).pipe(
-            Effect.map((effectivePeriod) => ({
-              effectivePeriod,
-              id: parameter.id,
-              source: parameter.source.kind,
-              sourceArtifact: parameter.sourceArtifact
-                ? {
-                    checksum: parameter.sourceArtifact.checksum,
-                    retrievedOn: parameter.sourceArtifact.retrievedOn,
-                    rowCount: parameter.sourceArtifact.extract.rowCount,
-                  }
-                : undefined,
-            }))
-          )
+      const parameters = yield* Effect.forEach(rule.parameters, (parameter) =>
+        Schema.encodeEffect(ParameterEffectivePeriod)(
+          parameter.effectivePeriod
+        ).pipe(
+          Effect.map((effectivePeriod) => ({
+            effectivePeriod,
+            id: parameter.id,
+            source: parameter.source.kind,
+            sourceArtifact: parameter.sourceArtifact.pipe(
+              Option.map((artifact) => ({
+                checksum: artifact.checksum,
+                retrievedOn: artifact.retrievedOn,
+                rowCount: artifact.extract.rowCount,
+              })),
+              Option.getOrUndefined
+            ),
+          }))
+        )
       );
       return {
         id: rule.id,
@@ -50,7 +49,12 @@ describe("AU annual tax rule graph", () => {
   });
 
   it("surfaces caller question metadata on annual input facts", () => {
-    expect(AnnualTaxableIncomeDescriptor.question?.inputKind).toBe("money");
+    expect(
+      AnnualTaxableIncomeDescriptor.question.pipe(
+        Option.map((question) => question.inputKind),
+        Option.getOrUndefined
+      )
+    ).toBe("money");
   });
 
   it.effect(

@@ -5,7 +5,7 @@ import {
 } from "@taxkit/core/ledger";
 import type { LedgerComponent } from "@taxkit/core/ledger";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Array as EffectArray, Effect, Layer } from "effect";
+import { Array as EffectArray, Effect, Layer, Option } from "effect";
 
 import { GrossPayFact } from "../facts/pay.js";
 import type { PayPeriod } from "../facts/pay.js";
@@ -43,8 +43,11 @@ export const buildPayWithholdingsLedger = (
     const total = yield* sumLedgerComponents(components);
     const trace = TraceNode.make({
       children: EffectArray.map(components, (c) => c.trace),
-      formula:
-        "total = sum(active additive components) - sum(active subtractive components)",
+      formula: Option.some(
+        Option.some(
+          "total = sum(active additive components) - sum(active subtractive components)"
+        )
+      ),
       inputs: {
         activeComponentIds: EffectArray.map(
           EffectArray.filter(components, isComponentContributing),

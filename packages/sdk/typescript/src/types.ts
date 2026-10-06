@@ -99,7 +99,11 @@ export const defineSdkCalculation = <
   >
 ): SdkCalculation<Id, Jurisdiction, TaxYear, InputSchema, OutputSchema> => ({
   ...calculation,
-  decodeOutput: Schema.decodeUnknownEffect(calculation.outputSchema),
+  // The calculator service returns domain reports. Narrow that checked Type;
+  // decoding the transport representation again would corrupt Option fields.
+  decodeOutput: Schema.decodeUnknownEffect(
+    Schema.toType(calculation.outputSchema)
+  ),
 });
 
 export const defineTaxKitModule = <

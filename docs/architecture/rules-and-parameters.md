@@ -123,3 +123,12 @@ marginal rates, coefficient formulas, caps and ledger components. Add a shared
 rule builder only when it owns repeated policy and makes the call graph simpler;
 the [abstraction admission owner](../design-docs/abstraction-admission.md)
 defines that review.
+
+
+Rule descriptors always expose a parameter array. Their ordinary metadata fields
+derive from Core-owned Schemas, while their Layer and provided/required service
+tuples remain tied to each descriptor's native service identity. A missing
+duplicate-provider permission and explicit false both reject multiple unpermitted
+providers; explicit true retains the existing permission. Parameter source
+artifacts use Option. Checked effective-period values retain their date content.
+See the [Core owner](../../packages/core/README.md) for these constructor contracts.

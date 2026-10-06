@@ -71,3 +71,11 @@ The salary-sacrifice fact module imports canonical fact definitions through
 `@taxkit/core/facts`, keeping the full calculation engine out of browser fact
 consumers. The Website's native built-import test qualifies this distinction;
 retained rules, report values and public fact exports are unchanged.
+
+
+Trace formula and rounding values now use Core's nested Option contract. Use
+the owning trace codec for transport or saved snapshots, and `Option.flatten`
+to read content when missing and undefined mean the same thing. Descriptor
+questions/source artifacts use Option and rule parameters are total arrays.
+See the [Core owner](../../../core/README.md). Existing formulas, tax amounts,
+source records and snapshot expectations are unchanged.

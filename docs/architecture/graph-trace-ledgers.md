@@ -64,8 +64,11 @@ Inputs and results use checked `Schema.Json`, and source references reuse
 The codec retains its historical field order and the distinction between a
 missing optional key and a present undefined key. Schema encoding and decoding
 own representation changes. The packed consumer checks nested traces and exact
-legacy bytes; changing optional domain values later needs separate compatibility
-proof. This owner change does not convert semantic absence to Option yet.
+legacy bytes. Formula and rounding use `Option<Option<Value>>`: outer None
+means a missing key, Some(None) a present undefined key, and Some(Some(value))
+a value. Constructor and recursive child inputs derive from the same field
+owner. Their typed contract rejects incorrect ordinary fields and unbranded
+rule IDs while preserving the historical encoded forms.
 
 
 Trace output is part of the engine contract, not only debugging. It supports trust, auditability, contributor review and calculation explanation.

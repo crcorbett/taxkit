@@ -62,7 +62,7 @@ export const toCalculatorInputDecodeError = (args: {
         new CalculatorInputDecodeError({
           calculatorId: args.calculatorId,
           help: Array.map(args.entry.inputFacts, (fact) =>
-            Option.fromNullishOr(fact.question).pipe(
+            fact.question.pipe(
               Option.match({
                 onNone: () => ({
                   factId: fact.id,

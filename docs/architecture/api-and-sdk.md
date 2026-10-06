@@ -576,3 +576,11 @@ single source for native tag admission and owned reply-decoder identities.
 Its private operation transformation owns native receive-loop cleanup and safe
 transport policy over an already constructed Effect. It is not a client callback
 escape. Public HTTP/OpenAPI and local SDK operations keep their existing owners.
+
+
+SDK descriptor output narrowing checks `Schema.toType(outputSchema)` because
+the calculator service already returns a domain report. Applying the transport
+decoder again fails once trace fields are Options. HTTP/RPC representations
+still encode/decode through their owning codecs. The packed consumer compares
+22 saved metadata responses and the original trace/ledger bytes while its
+declarations expose the new Core Option types and checked constructor inputs.

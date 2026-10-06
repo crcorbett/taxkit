@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
 import { Money, Cents, moneyEquals } from "@taxkit/core/primitives";
+import { TraceNode } from "@taxkit/core/trace";
 import {
   AuTakeHomePay2024_25_Live,
   AuTakeHomePay2025_26_Live,
@@ -86,7 +87,8 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
 
         const paygTrace = expectAt(ledgerTrace.children, 0);
         expect(paygTrace.ruleId).toBe(PaygWithholdingRuleId);
-        expect(paygTrace.rounding).toBe("ato-withholding-rounding");
+        const encodedPayg = yield* Schema.encodeEffect(TraceNode)(paygTrace);
+        expect(encodedPayg.rounding).toBe("ato-withholding-rounding");
         expect(paygTrace.sources.length).toBe(1);
         expect(expectAt(paygTrace.sources, 0).kind).toBe("ato-publication");
 
@@ -115,9 +117,12 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
           grossPay: weekly1500,
           taxFreeThresholdClaimed: true,
         });
+        const encodedTrace = yield* Schema.encodeEffect(TraceNode)(
+          report.trace
+        );
 
         expect({
-          explanationOrder: EffectArray.map(report.trace.children, (child) => ({
+          explanationOrder: EffectArray.map(encodedTrace.children, (child) => ({
             children: EffectArray.map(child.children, (grandchild) => ({
               children: EffectArray.map(
                 grandchild.children,

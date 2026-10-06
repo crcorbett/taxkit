@@ -103,7 +103,7 @@ const schemaTag = (schema: Schema.Top): string => schema.ast._tag;
 const toFactDescriptorMetadata = (
   descriptor: AnyFactDescriptor
 ): FactDescriptorMetadata =>
-  Option.fromNullishOr(descriptor.question).pipe(
+  descriptor.question.pipe(
     Option.match({
       onNone: () =>
         new FactDescriptorMetadataData({
@@ -124,7 +124,7 @@ const toFactDescriptorMetadata = (
   );
 
 const toParameterDescriptorMetadata = (
-  descriptor: NonNullable<AnyRuleDescriptor["parameters"]>[number]
+  descriptor: AnyRuleDescriptor["parameters"][number]
 ): ParameterDescriptorMetadata =>
   new ParameterDescriptorMetadataData({
     effectivePeriod: descriptor.effectivePeriod,
@@ -136,15 +136,12 @@ const toParameterDescriptorMetadata = (
 const toRuleDescriptorMetadata = (
   descriptor: AnyRuleDescriptor
 ): RuleDescriptorMetadata => {
-  const parameters = Option.fromNullishOr(descriptor.parameters).pipe(
-    Option.match({
-      onNone: Array.empty,
-      onSome: (parameterDescriptors) =>
-        Array.map(parameterDescriptors, toParameterDescriptorMetadata),
-    })
+  const parameters = Array.map(
+    descriptor.parameters,
+    toParameterDescriptorMetadata
   );
 
-  return Option.fromNullishOr(descriptor.allowDuplicateProvides).pipe(
+  return descriptor.allowDuplicateProvides.pipe(
     Option.match({
       onNone: () =>
         new RuleDescriptorMetadataData({

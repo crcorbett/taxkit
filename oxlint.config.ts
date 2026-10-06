@@ -18,6 +18,8 @@ const decodingBoundaryFiles = [
   // No runtime, raw JSON or synchronous codec admission.
   "packages/core/src/primitives/date.ts",
   "packages/core/test/date.test.ts",
+  // Historical trace and question representation round trips only.
+  "packages/core/test/domain-absence.boundary.test.ts",
   // Native app root stage ingress, checked before constructing secret Layers.
   "packages/infrastructure/src/apps-secrets.boundary.ts",
   "apps/web/test/native-rpc-failures.boundary.test.ts",
@@ -150,6 +152,8 @@ const decodingBoundaryFiles = [
 
   // SDK rejected Promise ingress and descriptor/process boundaries.
   "packages/sdk/typescript/src/index.test.ts",
+  // Selected domain-report Type versus encoded representation regression test.
+  "packages/sdk/typescript/src/effect.test.ts",
   "packages/sdk/typescript/src/client-lifetime.test.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
@@ -195,6 +199,10 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Exact historical domain bytes and rule snapshots, using their owning codecs.
+  "packages/core/test/domain-absence.boundary.test.ts",
+  "packages/rules/au/income-tax/test/annual-tax.test.ts",
+  "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
   // Rule snapshot egress uses the canonical date codec and preserves saved snapshots.
   "packages/rules/au/income-tax/test/rule-graph.test.ts",
   "packages/rules/au/pay/test/rule-graph.test.ts",

@@ -463,9 +463,14 @@ const writeConsumerFiles = (
           `import { CalculatorRequestBodyPolicy, CalculatorRequestBodyTooLarge, CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/request-boundary";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import type { LedgerComponent, LedgerComponentEncoded } from "@taxkit/core/ledger";
-import type { RuleId, TraceNode, TraceNodeEncoded } from "@taxkit/core/trace";
+import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
+import type { TraceNodeEncoded } from "@taxkit/core/trace";
 import type { CalculationInput } from "@taxkit/sdk";
-import type { Effect, Option, Schema } from "effect";
+import { Context, Layer, Option, Schema } from "effect";
+import { Effect } from "effect";
+import { makeFactDescriptor } from "@taxkit/core/facts";
+import { makeRuleDescriptor } from "@taxkit/core/rules";
+import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
@@ -526,6 +531,41 @@ void encodedChildren;
 void componentTrace;
 void encodedComponentTrace;
 
+const traceMakeInput = {children: [], inputs: {}, result: 1, ruleId: RuleId.make("fixture/type"), sources: [], title: "Fixture"};
+const checkedTrace = TraceNode.make(traceMakeInput);
+const traceFormula: Option.Option<Option.Option<string>> = checkedTrace.formula;
+void traceFormula;
+// @ts-expect-error ordinary fields remain checked by the constructor.
+TraceNode.make({...traceMakeInput, title: 123});
+// @ts-expect-error rule identity must be branded.
+TraceNode.make({...traceMakeInput, ruleId: "fixture/type"});
+// @ts-expect-error a present formula needs its checked Option representation.
+TraceNode.make({...traceMakeInput, formula: "input + value"});
+// @ts-expect-error recursive children retain their constructor field requirements.
+TraceNode.make({...traceMakeInput, children: [{wrongField: true}]});
+class PackedFact extends Context.Service<PackedFact, number>()("fixture/PackedFact") {}
+class PackedInput extends Context.Service<PackedInput, string>()("fixture/PackedInput") {}
+const packedFact = makeFactDescriptor({authority: "derived", id: "fixture/number", schema: Schema.Number, tag: PackedFact, title: "Number"});
+const packedInput = makeFactDescriptor({authority: "input", id: "fixture/string", schema: Schema.String, tag: PackedInput, title: "String"});
+declare const packedLayer: Layer.Layer<PackedFact, never, PackedInput>;
+const packedRule = makeRuleDescriptor({id: RuleId.make("fixture/rule"), layer: packedLayer, provides: [packedFact], requires: [packedInput], sources: [], sourcePolicy: "not-required", title: "Fixture"});
+const preservedLayer: Layer.Layer<PackedFact, never, PackedInput> = packedRule.layer;
+void preservedLayer;
+// @ts-expect-error a Layer cannot substitute a different required service.
+const wrongLayer: Layer.Layer<PackedFact, never, PackedFact> = packedRule.layer;
+void wrongLayer;
+
+class PackedParameter extends Context.Service<PackedParameter, boolean>()("fixture/PackedParameter") {}
+declare const packedPeriod: DateInterval;
+const packedParameter = makeParameterDescriptor({effectivePeriod: packedPeriod, id: "fixture/parameter", schema: Schema.Boolean, source: SourceRef.make({kind: "internal-validation", reference: "fixture", title: "Fixture"}), tag: PackedParameter, title: "Flag"});
+declare const packedParameterizedLayer: Layer.Layer<PackedFact, never, PackedInput | PackedParameter>;
+const packedParameterizedRule = makeRuleDescriptor({id: RuleId.make("fixture/parameterized-rule"), layer: packedParameterizedLayer, parameters: [packedParameter], provides: [packedFact], requires: [packedInput], sources: [], sourcePolicy: "not-required", title: "Fixture"});
+const preservedParameterizedLayer: Layer.Layer<PackedFact, never, PackedInput | PackedParameter> = packedParameterizedRule.layer;
+void preservedParameterizedLayer;
+// @ts-expect-error the parameter service remains part of the required inputs.
+const omittedParameterLayer: Layer.Layer<PackedFact, never, PackedInput> = packedParameterizedRule.layer;
+void omittedParameterLayer;
+
 declare const checkedInterval: DateInterval;
 const intervalEnd: Option.Option<Option.Option<IsoDate>> = checkedInterval.toExclusive;
 const checkedAmount: Effect.Effect<Money, InvalidMoneyValue> = audFromCents(100);
@@ -569,9 +609,12 @@ au.pay.takeHomePay({
           `import { CalculatorRequestBodyErrorEnvelope, CalculatorRequestBodyTooLarge, CalculatorRequestBodyLimit } from "@taxkit/api-http/request-boundary";
 import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "@taxkit/calculators/work";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { PublicCalculatorService } from "@taxkit/calculators/service";
+import * as MetadataSchemas from "@taxkit/calculators/schemas";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "@taxkit/core/primitives";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
+import { FactQuestion, FactQuestionId } from "@taxkit/core/facts";
 import { RuleId, SourceArtifact, SourceRef, TraceNode } from "@taxkit/core/trace";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { CryptoHasher } from "bun";
@@ -723,9 +766,23 @@ await Effect.runPromise(Effect.gen(function* () {
 }));
 
 const fixtureSource = SourceRef.make({kind: "internal-validation", reference: "historical-codec-fixture", title: "Compatibility fixture"});
+const questionBase = {id: FactQuestionId.make("fixture/absence"), inputKind: "money", prompt: "Enter an amount"} as const;
+const questionSamples = [
+  {value: new FactQuestion(questionBase), own: false, bytes: '{"_tag":"FactQuestion","id":"fixture/absence","inputKind":"money","prompt":"Enter an amount"}'},
+  {value: new FactQuestion({...questionBase, helpText: Option.some(Option.none())}), own: true, bytes: '{"_tag":"FactQuestion","id":"fixture/absence","inputKind":"money","prompt":"Enter an amount"}'},
+  {value: new FactQuestion({...questionBase, helpText: Option.some(Option.some("Checked text"))}), own: true, bytes: '{"_tag":"FactQuestion","helpText":"Checked text","id":"fixture/absence","inputKind":"money","prompt":"Enter an amount"}'},
+];
+await Effect.runPromise(Effect.forEach(questionSamples, (sample) => Effect.gen(function* () {
+  const encoded = yield* Schema.encodeEffect(FactQuestion)(sample.value);
+  const restored = yield* Schema.decodeEffect(FactQuestion)(encoded);
+  const again = yield* Schema.encodeEffect(FactQuestion)(restored);
+  if (JSON.stringify(encoded) !== sample.bytes || JSON.stringify(again) !== sample.bytes || Object.hasOwn(encoded, "helpText") !== sample.own || Object.hasOwn(again, "helpText") !== sample.own) {
+    throw new Error("Packed question codec changed historical key identity or bytes.");
+  }
+})));
 const fixtureChild = TraceNode.make({children: [], inputs: {cents: 165_400}, result: 165_400, ruleId: RuleId.make("fixture/child"), sources: [fixtureSource], title: "Child"});
-const fixtureParent = TraceNode.make({children: [fixtureChild], formula: "result = input", inputs: {amount: 165_400}, result: 165_400, rounding: "round-to-nearest-cent", ruleId: RuleId.make("fixture/parent"), sources: [fixtureSource], title: "Parent"});
-const fixtureUndefined = TraceNode.make({...fixtureChild, formula: undefined, rounding: undefined});
+const fixtureParent = TraceNode.make({children: [fixtureChild], formula: Option.some(Option.some("result = input")), inputs: {amount: 165_400}, result: 165_400, rounding: Option.some(Option.some("round-to-nearest-cent")), ruleId: RuleId.make("fixture/parent"), sources: [fixtureSource], title: "Parent"});
+const fixtureUndefined = TraceNode.make({...fixtureChild, formula: Option.some(Option.none()), rounding: Option.some(Option.none())});
 const fixtureLedger = LedgerComponent.make({amount: aud(Cents.make(165_400)), effect: "additive", id: ComponentId.make("fixture/component"), label: "Fixture", status: "active", trace: fixtureParent});
 const encodedMissing = await Effect.runPromise(Schema.encodeEffect(TraceNode)(fixtureChild));
 if (JSON.stringify(encodedMissing) !== '{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}') {
@@ -788,6 +845,133 @@ const ServiceLive = PublicCalculatorServiceBounded.pipe(
 if (CalculatorConcurrencyLimit !== 8) {
   throw new Error("Packed calculation policy has the wrong capacity.");
 }
+
+// Saved before the domain absence migration. Never regenerate these expectations from the candidate.
+const historicalMetadataResponses = [
+  {
+    "name": "listCalculators/missing",
+    "sha256": "6e200f212e679b62fa58877df8bae5f537aa22b6fc7996547faae4e883f21edf"
+  },
+  {
+    "name": "listTaxYears/missing",
+    "sha256": "620a9e823c74ff266ce38ff560eb09a31048ff1382b1e744aada0b49e440ae81"
+  },
+  {
+    "name": "listFacts/missing",
+    "sha256": "305b21ede52932c1c0ea9387819711fa05a5efac1e089e9c98b1acdf974ea730"
+  },
+  {
+    "name": "listRules/missing",
+    "sha256": "77f7351f528043060b3996fa20c2cb0e6f189908818479e91c3c5597e79997a3"
+  },
+  {
+    "name": "listCalculators/undefined",
+    "sha256": "6e200f212e679b62fa58877df8bae5f537aa22b6fc7996547faae4e883f21edf"
+  },
+  {
+    "name": "listTaxYears/undefined",
+    "sha256": "620a9e823c74ff266ce38ff560eb09a31048ff1382b1e744aada0b49e440ae81"
+  },
+  {
+    "name": "listFacts/undefined",
+    "sha256": "305b21ede52932c1c0ea9387819711fa05a5efac1e089e9c98b1acdf974ea730"
+  },
+  {
+    "name": "listRules/undefined",
+    "sha256": "77f7351f528043060b3996fa20c2cb0e6f189908818479e91c3c5597e79997a3"
+  },
+  {
+    "name": "listCalculators/present",
+    "sha256": "6e200f212e679b62fa58877df8bae5f537aa22b6fc7996547faae4e883f21edf"
+  },
+  {
+    "name": "listTaxYears/present",
+    "sha256": "620a9e823c74ff266ce38ff560eb09a31048ff1382b1e744aada0b49e440ae81"
+  },
+  {
+    "name": "listFacts/present",
+    "sha256": "305b21ede52932c1c0ea9387819711fa05a5efac1e089e9c98b1acdf974ea730"
+  },
+  {
+    "name": "listRules/present",
+    "sha256": "77f7351f528043060b3996fa20c2cb0e6f189908818479e91c3c5597e79997a3"
+  },
+  {
+    "name": "listJurisdictions",
+    "sha256": "e9233758a746baf68f5838dcbfc1e6d789117dbbe5af2ebf7a0b7f4eb5d13d0b"
+  },
+  {
+    "name": "getCalculator/au.income-tax.annual",
+    "sha256": "61d982b8efe98aa551fdb83880b0d447460a70f10c066b2b57e2c12978864e6d"
+  },
+  {
+    "name": "getCalculatorSchema/au.income-tax.annual",
+    "sha256": "81da58b15dc6b354d5fb75371cb8164c6288dfc7843c07e8ef5c9a08b0b9f691"
+  },
+  {
+    "name": "getCalculatorGraph/au.income-tax.annual",
+    "sha256": "22ab7c276d183c4c8caa196a5a74df7f88f91f5887dbefb288955647d1121a1e"
+  },
+  {
+    "name": "getCalculator/au.pay.take-home",
+    "sha256": "cbc540e189918ca9a24e6b336d4a6fded7f6d8023014bb05ef158061ed621f5b"
+  },
+  {
+    "name": "getCalculatorSchema/au.pay.take-home",
+    "sha256": "c3eac30389f6336c1f29c91ef3fc88221f19970a228c2df61850b1f2b4fd4b75"
+  },
+  {
+    "name": "getCalculatorGraph/au.pay.take-home",
+    "sha256": "5d9362ac324909440e4f401a9d557a2a03b54e8e19f5555bf72cc59d193fe0e6"
+  },
+  {
+    "name": "getCalculator/au.pay.withholdings",
+    "sha256": "8ce477da37e564900c2e775f413c4ec17afefc6c86675d9511e90235e2d70c86"
+  },
+  {
+    "name": "getCalculatorSchema/au.pay.withholdings",
+    "sha256": "2f148ef2589d7dabd9e202d871080dc3e7d25c3955ebcb8d6989b1c4bea3d6f1"
+  },
+  {
+    "name": "getCalculatorGraph/au.pay.withholdings",
+    "sha256": "ed25422a9681dec33092ee1d18fb26a59c6a98a825570a24b1e2875f2b15dfdb"
+  }
+];
+const assertHistoricalMetadataResponse = (name: string, bytes: string) => {
+  const expected = historicalMetadataResponses.find((sample) => sample.name === name);
+  if (!expected || new CryptoHasher("sha256").update(bytes).digest("hex") !== expected.sha256) {
+    throw new Error("Packed metadata response changed saved bytes: " + name);
+  }
+};
+await Effect.runPromise(Effect.gen(function* () {
+  const service = yield* PublicCalculatorService;
+  for (const form of ["missing", "undefined", "present"] as const) {
+    const context = form === "missing" ? {} : form === "undefined" ? {jurisdiction: undefined, taxYear: undefined} : {jurisdiction: "AU", taxYear: "2025-26"} as const;
+    const query = yield* Schema.decodeEffect(MetadataSchemas.MetadataQuery)(context);
+    const filter = yield* Schema.decodeEffect(MetadataSchemas.DescriptorFilterQuery)(context);
+    const calculators = yield* service.listCalculators(query);
+    const years = yield* service.listTaxYears(query);
+    const facts = yield* service.listFacts(filter);
+    const rules = yield* service.listRules(filter);
+    assertHistoricalMetadataResponse("listCalculators/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorCatalogResponse)(calculators)));
+    assertHistoricalMetadataResponse("listTaxYears/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.TaxYearsResponse)(years)));
+    assertHistoricalMetadataResponse("listFacts/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.FactsResponse)(facts)));
+    assertHistoricalMetadataResponse("listRules/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.RulesResponse)(rules)));
+  }
+  assertHistoricalMetadataResponse("listJurisdictions", JSON.stringify(yield* service.listJurisdictions().pipe(Effect.flatMap((value) => Schema.encodeEffect(MetadataSchemas.JurisdictionsResponse)(value)))));
+  for (const calculatorId of ["au.income-tax.annual", "au.pay.take-home", "au.pay.withholdings"] as const) {
+    const input = {calculatorId, jurisdiction: "AU", taxYear: "2025-26"} as const;
+    const request = yield* Schema.decodeEffect(MetadataSchemas.GetCalculatorRequest)(input);
+    const graphRequest = yield* Schema.decodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(input);
+    const calculator = yield* service.getCalculator(request);
+    const schema = yield* service.getCalculatorSchema(request);
+    const graph = yield* service.getCalculatorGraph(graphRequest);
+    assertHistoricalMetadataResponse("getCalculator/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorCatalogItem)(calculator)));
+    assertHistoricalMetadataResponse("getCalculatorSchema/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorSchemaResponse)(schema)));
+    assertHistoricalMetadataResponse("getCalculatorGraph/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorGraphResponse)(graph)));
+  }
+}).pipe(Effect.provide(ServiceLive)));
+
 const takeHomeFacts = {
   grossPay: new GrossPay({
     amount: aud(Cents.make(165_400)),

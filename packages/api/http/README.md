@@ -245,9 +245,13 @@ surface. `__tests__/public-calculation-api.test.ts` covers:
 - schema-guided calculator input errors through `CalculatorApiErrorEnvelope`
 
 The calculate success fixture compares the HTTP response with
-`@taxkit/sdk/effect` `calculateRunRequest`. The expected input-error fixture
-decodes the transport envelope and checks that the underlying
-`CalculatorServiceError` matches the SDK and calculator service failures.
+`@taxkit/sdk/effect` `calculateRunRequest`. The typed client decodes the transport
+response once. These fixtures check the
+already decoded response and error against the owning Schema Type, including
+trace and question Options, rather than applying wire decoding a second time.
+The input-error fixture checks that the underlying `CalculatorServiceError`
+matches the SDK and calculator service failures, then encodes the canonical
+envelope to check that rejected input and private paths are absent.
 
 `apps/api` owns the live process smoke:
 

@@ -291,3 +291,14 @@ entrypoints. It rejects incomplete tables at construction and typed/saved
 representation decoding, and compares all five retained table, effective-period
 and source-artifact encodings against 15 historical SHA-256 values. These are
 local packed-package checks, not publication or provider proof.
+
+
+Core trace formula/rounding and question help fields now expose nested Options;
+descriptor question/artifact/permission fields expose Options and rule parameter
+collections are total arrays. Their encoded forms remain unchanged. SDK
+`decodeOutput` checks a report returned by the calculator service against the
+selected Schema's Type; it does not decode transport JSON again. Transport
+consumers use the owning report codec at their representation boundary.
+The genuine packed consumer rejects incorrect trace constructor fields and
+child records, preserves service tuple types, compares all 22 saved metadata
+response hashes and retains existing trace/ledger and table/source expectations.

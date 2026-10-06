@@ -1,7 +1,7 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { sumLedgerComponents } from "@taxkit/core/ledger";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Option } from "effect";
 
 import {
   IncomeTaxComponentFact,
@@ -39,7 +39,9 @@ export const AnnualTaxLedgerLive = Layer.effect(AnnualTaxLedgerFact)(
 
     const trace = TraceNode.make({
       children: [incomeTax.trace, lito.trace, medicareLevy.trace],
-      formula: "liability = incomeTax - lito + medicareLevy",
+      formula: Option.some(
+        Option.some("liability = incomeTax - lito + medicareLevy")
+      ),
       inputs: {
         incomeTaxCents: incomeTax.amount.cents,
         litoCents: lito.amount.cents,

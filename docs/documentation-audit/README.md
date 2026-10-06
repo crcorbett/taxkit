@@ -483,3 +483,10 @@ The [Core ambient-type portability correction](clean-slate-foundation/2026-10-06
 records the clean-install failure, isolated reproduction and empty compiler
 type-package setting. Local checks and exact hosted readback remain separate;
 this correction changes no runtime or tax behaviour.
+
+
+The [domain absence-owner candidate](clean-slate-foundation/2026-10-06-domain-absence-owners.json)
+records changed Core/descriptor domain types, retained trace/question and public
+metadata representations, service tuple inference, SDK Type narrowing and
+separate engine implementation. Its local qualification does not accept all
+public request absence, rate limiting, T004 or external operations.

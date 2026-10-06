@@ -42,6 +42,23 @@ HTTP handlers or filesystem adapters.
   The exported type aliases cannot be extended by interface declaration merging.
   Their existing encoded field order, omitted/undefined keys and nested values
   remain unchanged and are checked by the genuine packed consumer.
+- Trace formula/rounding and question help text use nested Options: None means
+  a missing encoded key, Some(None) means a present undefined key, and
+  Some(Some(value)) means a value. Use `Option.flatten` when both missing forms
+  mean no content. Their codecs preserve all original bytes and key presence.
+  The trace constructor retains inferred ordinary field requirements and derives
+  recursive child constructor input from those same fields; it does not widen
+  all constructor input to unknown.
+- Fact, parameter and rule descriptors derive ordinary fields from private
+  Schemas. Their generic value Schema, service key and Layer relations remain
+  explicit. Fact questions and source artifacts are Options; their constructor
+  inputs still accept checked values or an omitted question/artifact.
+  Rule parameters are always an array, defaulting to empty. Duplicate-provider
+  permission is an Option that preserves explicit false. Service tuple types
+  read each descriptor key's native `Identifier`, including empty tuples.
+- The calculation engine contract lives in `calculation-engine.ts`; its
+  implementation lives in `live.layer.ts`. Root and engine package entrypoints
+  retain `CalculationEngineLive`. Validation issues still default to empty.
 - Reuse canonical schemas, branded ids and constructors. Do not redeclare
   canonical fields such as `id: string` in consumers.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,

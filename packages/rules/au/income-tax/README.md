@@ -67,3 +67,11 @@ tarball validated by the SDK-owned strict downstream gate.
 Use `@taxkit/rules-au-income-tax/schemas` for canonical calculator metadata, `AnnualTaxReport` and `AnnualTaxScenarioInputSchema` without live calculator or rule-pack imports. Existing root/calculator exports retain the same definitions and calculation behaviour.
 
 The [transport architecture](../../../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.
+
+
+Trace formula and rounding values now use Core's nested Option contract. Use
+the owning trace codec for transport or saved snapshots, and `Option.flatten`
+to read content when missing and undefined mean the same thing. Descriptor
+questions/source artifacts use Option and rule parameters are total arrays.
+See the [Core owner](../../../core/README.md). Existing formulas, tax amounts,
+source records and snapshot expectations are unchanged.

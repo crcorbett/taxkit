@@ -112,8 +112,11 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
 
     const trace = TraceNode.make({
       children: [taxable.trace],
-      formula:
-        "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period",
+      formula: Option.some(
+        Option.some(
+          "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period"
+        )
+      ),
       inputs: {
         a: BigDecimal.format(row.a),
         bDollars: BigDecimal.format(row.bDollars),
@@ -126,7 +129,7 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
         weeklyWithholdingCentsRaw,
       },
       result: periodWithholding.cents,
-      rounding: "ato-withholding-rounding",
+      rounding: Option.some(Option.some("ato-withholding-rounding")),
       ruleId: PaygWithholdingRuleId,
       sources: [table.source],
       title: `PAYG withholding (Schedule 1, ${scale})`,

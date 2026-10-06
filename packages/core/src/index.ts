@@ -1,7 +1,7 @@
+export { CalculationEngineLive } from "./engine/live.layer.js";
 export {
   CalculationDiagnostics,
   CalculationEngine,
-  CalculationEngineLive,
   type CalculationEngineService,
   type CalculationRequest,
   type CalculationResult,

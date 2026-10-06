@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Effect, Option, Schema } from "effect";
 import type { Context } from "effect";
 
 /**
@@ -71,54 +71,51 @@ export type FactQuestionInputKind = typeof FactQuestionInputKind.Type;
 export class FactQuestion extends Schema.TaggedClass<FactQuestion>()(
   "FactQuestion",
   {
-    helpText: Schema.optional(Schema.String),
+    helpText: Schema.OptionFromOptionalKey(
+      Schema.OptionFromUndefinedOr(Schema.String)
+    ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
     id: FactQuestionId,
     inputKind: FactQuestionInputKind,
     prompt: Schema.String,
   }
 ) {}
 
-/**
- * Static metadata for a fact service in a rule graph.
- *
- * Descriptors are used by graph validation, docs generation, source review,
- * and caller question planning. The descriptor must match the actual
- * `Context.Service` tag supplied or derived by rule layers.
- *
- * @since 0.1.0
- */
-export interface FactDescriptor<Self, Value> {
-  readonly id: FactId;
-  readonly title: string;
-  readonly authority: FactAuthority;
-  readonly schema: Schema.Schema<Value>;
-  readonly tag: Context.Key<Self, Value>;
-  readonly question?: FactQuestion;
-}
+const FactDescriptorFields = Schema.Struct({
+  authority: FactAuthority,
+  id: FactId,
+  question: Schema.OptionFromOptional(Schema.toType(FactQuestion)).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
+  title: Schema.String,
+});
 
 /**
- * Builds a schema-backed fact descriptor with a branded stable ID.
+ * Checked fact metadata with its genuine schema-to-service relation.
  * @since 0.1.0
  */
-export const makeFactDescriptor = <Self, Value>(args: {
-  readonly id: string;
-  readonly title: string;
-  readonly authority: FactAuthority;
+export type FactDescriptor<Self, Value> = typeof FactDescriptorFields.Type & {
   readonly schema: Schema.Schema<Value>;
   readonly tag: Context.Key<Self, Value>;
-  readonly question?: FactQuestion;
-}): FactDescriptor<Self, Value> => {
-  const descriptor: FactDescriptor<Self, Value> = {
+};
+
+/**
+ * Builds a fact descriptor from its owning field representation.
+ * Missing and explicit undefined questions retain their old absent meaning.
+ * @since 0.1.0
+ */
+export const makeFactDescriptor = <Self, Value>(
+  args: Omit<typeof FactDescriptorFields.Encoded, "id"> & {
+    readonly id: string;
+    readonly schema: Schema.Schema<Value>;
+    readonly tag: Context.Key<Self, Value>;
+  }
+): FactDescriptor<Self, Value> => ({
+  ...FactDescriptorFields.make({
     authority: args.authority,
     id: FactId.make(args.id),
-    schema: args.schema,
-    tag: args.tag,
+    question: Option.fromUndefinedOr(args.question),
     title: args.title,
-  };
-
-  if (args.question !== undefined) {
-    return { ...descriptor, question: args.question };
-  }
-
-  return descriptor;
-};
+  }),
+  schema: args.schema,
+  tag: args.tag,
+});
