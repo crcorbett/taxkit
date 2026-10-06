@@ -65,7 +65,9 @@ TypeScript entrypoint. Root tools remain outside the production
 graph by ownership. Root verification also typechecks and executes
 the root repository-path gate, which scans
 Git-tracked readable text and safely reports only repository-relative file,
-positive line and closed finding category. Binary files are identified by a
+positive line and closed finding category. Stage new retained receipts before
+the final path check so their text is included in the tracked-file inventory;
+an earlier pass does not cover files added afterwards. Binary files are identified by a
 NUL byte or failed strict UTF-8 decode and skipped. For skill governance it
 also runs `test:skills`, which validates required policy language and rejects
 stale provider-wrapper examples. The root graph also runs

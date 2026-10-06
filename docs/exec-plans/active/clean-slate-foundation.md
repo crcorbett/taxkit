@@ -4158,3 +4158,23 @@ through the existing typed context pattern used by settings. The same route tree
 passes all twenty focused browser checks; no test-only module alias or production
 compiler substitution is introduced. Actual native page/transport proof remains
 separate. The page schema also stays private after the first Knip failure.
+
+### T005 hosted receipt portability correction — 7 October
+
+Hosted Quality for `7647642d` stopped at the repository path check: the embedded
+design documentation report still named two private machine roots. That new
+receipt was untracked during the earlier local path checks and staged later,
+so those checks did not cover it. The corrected portable report replaces only
+those roots with descriptive markers, retains the original isolated report
+hash and records the projected hash. Product source, catalogue, compiled
+artifacts, reading findings and capture bytes are unchanged. The earliest
+checking owner now states that new retained receipts must be staged before
+the final tracked-file check. The existing checker and its scope are preserved.
+
+Documentation impact: Change required for this receipt, the testing/quality
+owner and active plan; Preserve for product/runtime source and accepted
+content, review findings, tax results and prior immutable receipts; N/A for
+package contract, Changeset, operational procedure and provider state. Focused
+checks and corrected-commit hosted proof are recorded separately; earlier
+full local qualification does not establish hosted success. T005 remains in
+progress and metrics remain deferred.
