@@ -1,6 +1,6 @@
 {
   "$schema": "./navigation.schema.json",
-  "status": "draft",
+  "status": "published",
   "contentRoot": "packages/docs-content/content",
   "primaryNavigation": [
     {
@@ -106,7 +106,7 @@
       "primaryReader": "API consumer",
       "pages": [
         {
-          "title": "Overview",
+          "title": "API overview",
           "path": "/api/overview",
           "source": "content/api/overview.mdx",
           "pageType": "api reference overview",
@@ -120,7 +120,7 @@
           "primaryReader": "API consumer"
         },
         {
-          "title": "Errors",
+          "title": "API errors",
           "path": "/api/errors",
           "source": "content/api/errors.mdx",
           "pageType": "troubleshooting",

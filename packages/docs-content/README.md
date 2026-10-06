@@ -144,7 +144,7 @@ unchecked amounts use `audFromCents` and handle its typed failure channel.
 The server example reuses request-decoded cents to assemble Money directly.
 The corresponding public browser/server snippets match these source examples;
 the money concept owns constructor and arithmetic guidance. MDX lifecycle and
-navigation remain draft until their separate acceptance.
+navigation each require their own reviewed source acceptance.
 
 The five complete validation, raw-error, help, fact and test examples listed in
 `src/validation/checked-snippets.ts` must match their compiled source files
@@ -175,7 +175,12 @@ not publication or deployment evidence.
 Version-one acceptance records remain readable by the regular docs checker
 for their retained lifecycle evidence. The new catalogue builder requires
 version two. Adding a record must follow page review; generating an index
-does not accept its authored pages. All current authored pages remain drafts.
+does not accept its authored pages. The
+[dated page review](../../docs/documentation-audit/clean-slate-foundation/2026-10-06-public-content-acceptance.json)
+records the individual source and navigation decisions. Exact bindings in the
+owner policy determine which reviewed bytes may enter the generated catalogue;
+a later edit requires a fresh reviewed hash. Accepted source metadata establishes
+neither public routes nor external availability.
 
 ## Frontmatter contract
 

@@ -18,7 +18,9 @@ composition supplies a checked catalogue through `ContentCatalogue`;
 The authored MDX, source review and Fumadocs compiler remain in
 [`docs-content`](../docs-content/README.md). This package cannot itself accept
 an authored page for publication. The local catalogue builder requires reviewed
-source records; actual source acceptance and public routing remain T005 work.
+source records; the
+[dated source review](../../docs/documentation-audit/clean-slate-foundation/2026-10-06-public-content-acceptance.json)
+owns those individual decisions. Public routing remains T005 work.
 Existing docs-content imports re-export
 the canonical page, navigation and lookup error contracts for compatibility.
 
@@ -54,7 +56,7 @@ manifest does not establish a packed or published consumer.
 Change required for this README, docs-content compatibility routes,
 [repository package ownership](../../docs/architecture/package-ownership.md),
 [content architecture](../../docs/architecture/content-and-posts.md), the active
-T005 plan and focused proof. Preserve authored draft status, tax results,
+T005 plan and focused proof. Preserve exact reviewed lifecycle decisions, tax results,
 metrics deferral and historical receipts. Application routing, generated MDX
 presentation and external publication are separate owners.
 

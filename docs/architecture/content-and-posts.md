@@ -74,7 +74,9 @@ or external availability.
 version-two records and exact source hashes before and after MDX processing,
 omits drafts, checks navigation through the canonical catalogue constructor,
 and writes ignored `.source/public-catalogue.json` only on success. No accepted
-pages is a failure. Current authored pages remain drafts; the public HTTP and
+pages is a failure. Source acceptance is recorded independently for each page
+and navigation in the owner policy's exact bindings. Reviewed byte hashes
+prevent a later edit from silently inheriting acceptance. Public HTTP and
 replacement Website routes are still T005 work.
 
 `docs/architecture`

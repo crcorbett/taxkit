@@ -3977,3 +3977,48 @@ commit `a151e51e8a30247526fa93412df046955846eca4` passed hosted Quality run
 Explicit page/navigation acceptance, Website/API routes, discovery/images and
 old-app retirement remain T005 work. This slice establishes neither deployment
 nor public availability. Metrics remain deferred under Cooper's instruction.
+
+### Individual public-source acceptance
+
+The next T005 slice records a named review decision for each of the 61 authored
+pages and a separate navigation decision covering seven sections. Review checks
+current package/API/SDK names, commands, source links, complete checked examples,
+excerpt prerequisites, private release status and the retained annual fixture's
+Medicare limitation. Each decision has its own version-two record and exact
+owner-policy binding. Codex performs this source review under Cooper's approved
+T005 implementation authority; the receipt does not claim that Cooper personally
+reviewed every page.
+
+Only the reviewed lifecycle fields change from draft to published. This means
+accepted current repository documentation under HGI-207, with no deployment or
+external publication claim. All prose, examples, navigation addresses and reader
+order remain unchanged. The first real catalogue build correctly rejects two
+older short API navigation titles: `Overview` and `Errors` differ from their
+page titles. Use the owning `API overview` and `API errors` titles in navigation,
+review that correction and bind its new bytes; preserve the strict catalogue
+contract. Final formatted source bytes own each acceptance hash;
+future edits must receive a new review before the catalogue can include them.
+The real native builder produces 61 accepted pages in seven sections, and the
+checked content service reads every page, finds Quickstart with bounded search
+and returns the expected missing-page error. Repeated generation produces the
+same 233,447 bytes with SHA-256
+`05c2730c38c745e43e1eab3199bd9001529ad139d6d67ec6871af701d386a07f`.
+All processed page bodies match the preceding compiler-link receipt.
+
+Documentation impact is **Change required** for the 61 lifecycle fields,
+navigation status, 62 strict acceptance records and exact policy bindings,
+docs-content/content READMEs, content architecture, patch Changeset, dated review
+receipt and active task/plan pointers. **Preserve** authored prose and examples,
+tax algorithms and retained results, original integration-template bytes,
+selected dependencies, CI/cache contracts, historical receipts and deferred
+metrics. Runbook procedures and external operations are evidenced **N/A** for
+this local acceptance slice. The
+[individual review receipt](../../documentation-audit/clean-slate-foundation/2026-10-06-public-content-acceptance.json)
+retains each decision and source identity, the first rejected projection and
+its corrected navigation owner. Focused documentation/content tests, global
+types, the root build, all seven docs browser tests and built retained local
+workerd/Chromium checks pass. Fresh full repository verification passes in
+636.40 seconds; separate repository tests pass in 98.84 seconds. Final
+evidence-only changes receive fresh documentation, runbook, content, Changeset,
+format and whitespace checks. Replacement routes, discovery/images and old-app
+retirement remain unfinished; T005 stays in progress and metrics stay deferred.
