@@ -30,6 +30,10 @@ requirements live in [Testing and validation](./testing-and-validation.md).
 
 ## Current baseline
 
+Core checks its source and deterministic tests through explicit imports. Its
+empty compiler `types` list also applies to the separate source-only build;
+neither check relies on Node type packages supplied by another workspace.
+
 The current repository baseline is canonical root verification:
 
 ```bash

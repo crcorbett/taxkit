@@ -478,3 +478,8 @@ The [parameter-table relationship candidate](clean-slate-foundation/2026-10-06-p
 records row and whole-table checks, saved/decoded coverage, focused constructor
 and packed-consumer tests and unchanged historical table/source bytes. Full
 current-candidate qualification and wider T004 acceptance remain separate.
+
+The [Core ambient-type portability correction](clean-slate-foundation/2026-10-06-core-ambient-type-portability.json)
+records the clean-install failure, isolated reproduction and empty compiler
+type-package setting. Local checks and exact hosted readback remain separate;
+this correction changes no runtime or tax behaviour.

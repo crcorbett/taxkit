@@ -816,3 +816,9 @@ Generic decimals and signed Schedule 1 dollar coefficients retain their meaning.
 The active plan and dated receipt own current qualification; wider semantic
 absence/service ownership, trusted rate identity/limiting and whole T004
 acceptance remain open.
+
+Core's source/test compiler configuration requests no automatic type packages.
+The source-only build inherits that empty list, so clean installs do not rely
+on another workspace supplying unused Node types. The active plan and dated
+portability receipt own this corrective slice's checks; no runtime or tax
+behaviour changes, and T004 remains active.

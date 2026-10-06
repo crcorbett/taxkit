@@ -3225,3 +3225,53 @@ separate corrective slice will qualify that change. This local table pass does
 not establish hosted success. T004 remains active; semantic absence/service
 ownership and trusted rate identity/limiting still need work. The Medicare
 correction decision and retained zero-income behaviour remain unchanged.
+
+
+## DEV-75 Core clean-build correction — 6 October 2026
+
+Draft #149 retains the accepted table slice at
+`ab1293b053929707a73b4c5c345eb82b63629db7`. Parent #148's exact hosted
+Quality run 37401147145/job 112068388626 fails at Core build with TS2688:
+the newly added test configuration requests automatic Node type definitions,
+but Core declares no such dependency and uses no Node globals. The production
+build inherits that unnecessary requirement. A local full pass did not prove
+the same type resolution in GitHub's clean install.
+
+An isolated outside copy, with only Core's declared dependency links and no
+ancestor Node type package, reproduces both the original source-only build and
+source/test typecheck failure. Setting the owning compiler types list to empty
+passes both real compiler commands. This correction uses explicit imports and
+adds no dependency, platform types, runtime admission or emitted-output change.
+The same draft will receive a separate tested corrective commit.
+
+Documentation impact: **Change required** for the Core compiler/README,
+testing-quality owner, current SPEC/tasks/plan, audit pointer and dated receipt,
+plus a patch Core Changeset. **Preserve** all source operations, exports, emitted
+paths, dependencies/lockfile, tables/source records/goldens, HTTP/RPC/browser
+behaviour, request/rate policy, skills/commands/CI and unresolved Medicare values.
+**N/A** for new runbooks, commands, provider operations or public content changes.
+Focused owning compiler/tests, a fresh source-only frozen install, the complete
+CI-mode graph and exact current-head hosted readback follow. T004 stays active.
+
+
+Local acceptance for the Core compiler correction: a fresh copy of all 1,563
+tracked files installs 740 packages with the frozen lockfile unchanged. Core
+source/test checking, all 59 tests and source-only build pass there. Both original
+isolated compiler commands fail for the expected missing Node type package;
+both corrected commands pass. No dependency or emitted-path change is needed.
+
+The complete current CI-mode graph passes all nine stages in
+665.34 seconds, including 32 workflow tests (459.21
+seconds), all 500 real lint cases, 59 Core and 52 rule tests, packed/downstream
+consumers, API smoke, builds and docs/browser checks. Seven built Worker cases
+pass (79.04 seconds). All nine staged source files match their saved hashes;
+the API Worker is unchanged. Nine native inventories and four screenshots
+exactly match the accepted table parent, captured before later root builds.
+
+Primary-owner review accepts this local clean-build correction. Only this plan
+and receipt change after qualification; final docs/runbooks/format/Changeset
+and whitespace checks follow. Draft #149 will contain the accepted table
+commit and a separate tested compiler correction. Exact corrected-head hosted
+Linux proof remains separate; parent #148's failure stays recorded as history.
+T004 and the wider goal remain active for semantic absence/service ownership
+and trusted rate identity/limiting. No Medicare or provider change is made.

@@ -86,6 +86,9 @@ bun run --filter=@taxkit/core build
 
 `check-types` includes source and deterministic tests. The build uses its
 separate source-only configuration, preserving the existing `dist` paths.
+Core requests no automatically loaded type packages (`types: []`). Its source
+and tests use explicit imports, so a clean build does not depend on Node types
+being available through another workspace package.
 
 ## Packaging
 

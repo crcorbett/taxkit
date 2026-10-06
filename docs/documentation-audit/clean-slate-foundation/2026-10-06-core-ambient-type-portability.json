@@ -1,0 +1,560 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "Core compiler or clean dependency resolution changes",
+  "outcome": "Pass for local Core clean-build portability and fresh frozen-install qualification; T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR update"
+    ],
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-parameter-table-checks",
+    "baseCommit": "ab1293b053929707a73b4c5c345eb82b63629db7",
+    "pullRequest": "https://github.com/crcorbett/taxkit/pull/149",
+    "sources": [
+      {
+        "path": ".changeset/core-ambient-type-portability.md",
+        "sha256": "981166d68cfead7e4276de989e55989b413e1fa68bf6d879a74edf6a0722518d"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "0cd06d8215f8b94d14bc96d2b6143de60efe4e9d5a1f8e86971f71784ec59b43"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "b5f2240781c50b8f3cf2c54684b01fe6d98cde10f9ae68d07ddf5b813fd5cb2a"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "908b101baf762b813314fde729dabac21c295b0350d9a8bf2a864143fe6467d8"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "eaf1703104d0dd103eaee575cb59551dd6bffe74e4dbe16a369c60e34b693e00"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "52c821b41dca0249a3c399f7632330bbc2850637e93101d8c1b322cfcd632e26"
+      },
+      {
+        "path": "packages/core/README.md",
+        "sha256": "7eb002d5f4813e6fb2719e117e768585cd68e811af787e60c17c783dd1dfc0ee"
+      },
+      {
+        "path": "packages/core/tsconfig.json",
+        "sha256": "1ec3d30687d20da9a57dbcb9d5abeab7605e0b35fc0643b9d1f5f18854b1197e"
+      }
+    ],
+    "qualifiedSources": [
+      {
+        "path": ".changeset/core-ambient-type-portability.md",
+        "sha256": "981166d68cfead7e4276de989e55989b413e1fa68bf6d879a74edf6a0722518d"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "0cd06d8215f8b94d14bc96d2b6143de60efe4e9d5a1f8e86971f71784ec59b43"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "b5f2240781c50b8f3cf2c54684b01fe6d98cde10f9ae68d07ddf5b813fd5cb2a"
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/2026-10-06-core-ambient-type-portability.json",
+        "sha256": "a39e27b4982f6770a0ad5a27d6d6426ab6bdb0d30c25d92417ae6bbd9e4727cb"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "12a1c183f8419c0f730dc0b50525376ef92727354407af2630518a09283abb1c"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "eaf1703104d0dd103eaee575cb59551dd6bffe74e4dbe16a369c60e34b693e00"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "52c821b41dca0249a3c399f7632330bbc2850637e93101d8c1b322cfcd632e26"
+      },
+      {
+        "path": "packages/core/README.md",
+        "sha256": "7eb002d5f4813e6fb2719e117e768585cd68e811af787e60c17c783dd1dfc0ee"
+      },
+      {
+        "path": "packages/core/tsconfig.json",
+        "sha256": "1ec3d30687d20da9a57dbcb9d5abeab7605e0b35fc0643b9d1f5f18854b1197e"
+      }
+    ]
+  },
+  "finding": {
+    "parentPullRequest": "https://github.com/crcorbett/taxkit/pull/148",
+    "headCommit": "02c813f2d082a13ccbe38e52f350aa43bca8bb84",
+    "runId": 37401147145,
+    "jobId": 112068388626,
+    "conclusion": "FAILURE",
+    "completedAt": "2026-10-06T02:04:28Z",
+    "failure": "TS2688 Cannot find type definition file for node at Core production build",
+    "rootCause": "Core source/test config explicitly requests unused Node ambient type definitions; source-only build inherits it; Core has no direct Node types dependency",
+    "priorFalseGreen": "Mac workspace dependency resolution supplied types that the clean hosted install did not. The local graph was bounded local proof.",
+    "earliestCorrection": "Core owning compiler types: [] for both source/test and inherited source-only build; explicit imported test types stay checked."
+  },
+  "documentationImpact": {
+    "Change required": [
+      "Core compiler/README and testing-quality architecture",
+      "Current SPEC/tasks/plan/audit and dated receipt",
+      "Core patch Changeset for clean-build portability"
+    ],
+    "Preserve": [
+      "Runtime operations and type exports",
+      "Emitted paths and actual package contracts",
+      "Dependency graph/versions/lockfile and toolchain",
+      "Authored tables/source records/golden results and Medicare decision",
+      "HTTP/RPC/browser/body/work/rate behaviour",
+      "Skills, commands, lint admissions and CI"
+    ],
+    "N/A": [
+      "New runbook or command",
+      "Public editorial change",
+      "Provider, registry, publication or deployment"
+    ]
+  },
+  "isolatedDiagnostics": {
+    "scope": "Fresh outside Core src/test copy and canonical base config; explicit links to effect, vitest and @effect/vitest; no ambient @types directory in probe ancestors",
+    "results": [
+      {
+        "check": "original-build",
+        "exitCode": 1,
+        "nodeFailure": true
+      },
+      {
+        "check": "original-types",
+        "exitCode": 1,
+        "nodeFailure": true
+      },
+      {
+        "check": "candidate-build",
+        "exitCode": 0,
+        "tail": ""
+      },
+      {
+        "check": "candidate-types",
+        "exitCode": 0,
+        "tail": ""
+      }
+    ],
+    "logs": [
+      {
+        "path": "/private/tmp/dev75-core-ambient-diagnostic/candidate-build.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/dev75-core-ambient-diagnostic/candidate-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/dev75-core-ambient-diagnostic/original-build.log",
+        "sha256": "22d754e33e5e414d820e237c9e477c81ec8db495c45ab51f7665351a89a3c783"
+      },
+      {
+        "path": "/private/tmp/dev75-core-ambient-diagnostic/original-types.log",
+        "sha256": "22d754e33e5e414d820e237c9e477c81ec8db495c45ab51f7665351a89a3c783"
+      }
+    ],
+    "nonClaim": "Isolated compiler resolution proof; not a clean full install or hosted success"
+  },
+  "limitations": [
+    "This is local qualification plus a fresh Mac install; the corrected immutable head has not yet passed hosted Linux Quality.",
+    "Parent #148 hosted failure is retained history; table-only #149 head is superseded after corrective push.",
+    "Remaining semantic absence/service ownership and trusted rate identity/limiting are unfinished; T004 active.",
+    "Medicare decision unresolved; retained results unchanged.",
+    "No merge, deployment, publication, provider or registry proof."
+  ],
+  "rollback": "Revert this corrective commit; no provider/data migration.",
+  "nextOwner": "Primary implementation owner for qualification and wider T004; Cooper for the separate Medicare choice",
+  "focusedChecks": [
+    {
+      "stage": "core-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.22,
+      "log": "/private/tmp/dev75-core-portability-focused-v1-core-types.log"
+    },
+    {
+      "stage": "core-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.93,
+      "log": "/private/tmp/dev75-core-portability-focused-v1-core-tests.log"
+    },
+    {
+      "stage": "core-build",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.11,
+      "log": "/private/tmp/dev75-core-portability-focused-v1-core-build.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.44,
+      "log": "/private/tmp/dev75-core-portability-focused-v1-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.15,
+      "log": "/private/tmp/dev75-core-portability-focused-v1-runbooks.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.41,
+      "log": "/private/tmp/dev75-core-portability-focused-v1-format.log"
+    },
+    {
+      "stage": "changeset",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.24,
+      "log": "/private/tmp/dev75-core-portability-focused-v1-changeset.log"
+    }
+  ],
+  "freshInstallChecks": [
+    {
+      "stage": "frozen-install",
+      "command": [
+        "bun",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "cwd": "/private/tmp/dev75-core-portability-frozen-install-v1",
+      "exitCode": 0,
+      "durationSeconds": 3.19,
+      "log": "/private/tmp/dev75-core-portability-frozen-install.log"
+    },
+    {
+      "stage": "fresh-core-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "check-types"
+      ],
+      "cwd": "/private/tmp/dev75-core-portability-frozen-install-v1",
+      "exitCode": 0,
+      "durationSeconds": 0.59,
+      "log": "/private/tmp/dev75-core-portability-fresh-core-types.log"
+    },
+    {
+      "stage": "fresh-core-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "cwd": "/private/tmp/dev75-core-portability-frozen-install-v1",
+      "exitCode": 0,
+      "durationSeconds": 0.85,
+      "log": "/private/tmp/dev75-core-portability-fresh-core-tests.log"
+    },
+    {
+      "stage": "fresh-core-build",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "build"
+      ],
+      "cwd": "/private/tmp/dev75-core-portability-frozen-install-v1",
+      "exitCode": 0,
+      "durationSeconds": 0.11,
+      "log": "/private/tmp/dev75-core-portability-fresh-core-build.log"
+    }
+  ],
+  "freshInstallPostconditions": {
+    "sourceOnlyTrackedCopy": true,
+    "trackedFiles": 1563,
+    "packagesInstalled": 740,
+    "frozenLockUnchanged": true,
+    "coreTests": 59,
+    "noDependencyOrVersionChange": true,
+    "limitation": "Fresh Mac install; exact Linux hosted outcome remains separate"
+  },
+  "checks": [
+    {
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "mode": "local CI graph",
+      "exitCode": 0,
+      "durationSeconds": 665.34,
+      "orderedChecks": [
+        "verification",
+        "test",
+        "build",
+        "docs-validation",
+        "packed-artifact",
+        "downstream-consumer",
+        "api-smoke",
+        "docs-browser",
+        "changeset-status"
+      ],
+      "nonClaim": "No release attempt, publication or provider operation"
+    }
+  ],
+  "focusedEvidence": {
+    "workflowCases": 32,
+    "workflowSeconds": 459.21,
+    "nativeCases": 7,
+    "nativeSeconds": 79.04,
+    "lintCorpusCases": 500,
+    "coreCases": 59,
+    "ruleCases": 52,
+    "sourceRestoration": "All nine staged files match pre-check hashes; API worker source matches unchanged parent",
+    "qualifiedSources": {
+      ".changeset/core-ambient-type-portability.md": "981166d68cfead7e4276de989e55989b413e1fa68bf6d879a74edf6a0722518d",
+      "docs/architecture/testing-and-quality.md": "0cd06d8215f8b94d14bc96d2b6143de60efe4e9d5a1f8e86971f71784ec59b43",
+      "docs/documentation-audit/README.md": "b5f2240781c50b8f3cf2c54684b01fe6d98cde10f9ae68d07ddf5b813fd5cb2a",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-06-core-ambient-type-portability.json": "a39e27b4982f6770a0ad5a27d6d6426ab6bdb0d30c25d92417ae6bbd9e4727cb",
+      "docs/exec-plans/active/clean-slate-foundation.md": "12a1c183f8419c0f730dc0b50525376ef92727354407af2630518a09283abb1c",
+      "docs/product-specs/clean-slate-foundation.md": "eaf1703104d0dd103eaee575cb59551dd6bffe74e4dbe16a369c60e34b693e00",
+      "docs/product-specs/clean-slate-foundation.tasks.json": "52c821b41dca0249a3c399f7632330bbc2850637e93101d8c1b322cfcd632e26",
+      "packages/core/README.md": "7eb002d5f4813e6fb2719e117e768585cd68e811af787e60c17c783dd1dfc0ee",
+      "packages/core/tsconfig.json": "1ec3d30687d20da9a57dbcb9d5abeab7605e0b35fc0643b9d1f5f18854b1197e"
+    }
+  },
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "environmentBasis": "Pinned local tooling and unchanged lockfile/dependency versions; fresh tracked-source-only frozen install also qualified.",
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 151,
+      "sha256": "0a73bee65829e5ce6969c4a731677135460783a7c2b72ac634a32bafa374584e"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "cdd504adf1cb2c106af202e254845da2d9f6742c824d7a003239707450ae9fe9"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "37dfb635d9c3fd46d4906553293fc05f24a9ddf14f3a464341023f9b50b635b5"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "e5a63db7cd80aeb6aba4b7661ed86367ae95f7abf78d88486e728c67a638ffc2"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "784c95fd2c88ccb5d5e879a8be282e27bbcc41b2fcaecbd514c32d8faa672519"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "d83915902be2781a9c00f0742cf192dd916318ea5a01355b45a603b73642f178"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "1bec3fb332f87746cc46e012e11f0c7e3172296c338db7cb1f199667a401436a"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "b8fac71dbdcbee51037e91f8d36b17a033e5efae7fbfa39570732a27fd096fcb"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "15258326170da389ab3813577778b2d9956cc9d1f29e497631b9877fb3d84a4c"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "artifactCaptureBoundary": "Immediately after successful native verification, before later root build",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+      "inspection": "Exact bytes match previously inspected parent image"
+    }
+  ],
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for Core clean-build correction",
+    "basis": [
+      "Explicit empty ambient-type package list replaces unused implicit workspace Node dependency",
+      "Both original isolated compiler commands fail for TS2688; both corrected commands pass",
+      "Fresh source-only frozen install plus Core compiler, tests and build pass without lockfile changes",
+      "Complete current nine-stage local graph passes; all nine native inventories and four screenshots exactly match parent",
+      "Corrected compiler, durable owners, task pointers, receipt and patch Changeset align"
+    ],
+    "remaining": "Current-head hosted outcome and remaining semantic absence/service ownership, trusted rate identity/limiting and wider tasks"
+  },
+  "postconditions": {
+    "compiler": "Core source/test and inherited source-only build request no ambient type packages; explicit imported test types remain checked",
+    "freshInstall": "All four fresh Mac locked-install/Core checks pass; lockfile unchanged; 59 tests pass",
+    "fullGraph": "All nine local stages pass, including 32 workflow, 500 lint, 59 Core, 52 rule and seven native cases",
+    "artifacts": "Nine native inventories and four screenshots match parent bytes",
+    "restoration": "All nine staged files restored exactly; unchanged runtime source matches parent",
+    "preservation": "Runtime operations, exports, dependencies, emitted paths, tables/source records, goldens and Medicare values unchanged"
+  },
+  "qualifiedLogDigests": [
+    {
+      "check": "verification",
+      "path": "tmp/release-readiness/verification-stdout-YraJPB/b4074d374d44.log",
+      "sha256": "b086e3d8002b5202446cd49eca6e0571170d971eeb401fbb0a85d06d776b0e3a"
+    },
+    {
+      "check": "test",
+      "path": "tmp/release-readiness/test-stdout-xyGRoE/099b54794bef.log",
+      "sha256": "4b8d5d0cf0af7ca778967143a6741db3b3c393b14c2a1f514b353ed5c5857ea9"
+    },
+    {
+      "check": "full-wrapper",
+      "path": "/private/tmp/dev75-core-portability-full-release-ci-graph.log",
+      "sha256": "811bbc34050ba2431ad76cceb3b04fdbfd7d9c809ff39d3f02d626f02bc9d51d"
+    }
+  ],
+  "postCheckChanges": {
+    "scope": "Plan and receipt only",
+    "checks": "Docs/runbooks/format/Changeset/whitespace repeated before commit",
+    "outcome": "All five final checks pass; only plan and receipt changed"
+  },
+  "finalChecks": [
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.41,
+      "log": "/private/tmp/dev75-core-portability-final-v1-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.23,
+      "log": "/private/tmp/dev75-core-portability-final-v1-runbooks.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.59,
+      "log": "/private/tmp/dev75-core-portability-final-v1-format.log"
+    },
+    {
+      "stage": "changeset",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.32,
+      "log": "/private/tmp/dev75-core-portability-final-v1-changeset.log"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.01,
+      "log": "/private/tmp/dev75-core-portability-final-v1-diff.log"
+    }
+  ]
+}
