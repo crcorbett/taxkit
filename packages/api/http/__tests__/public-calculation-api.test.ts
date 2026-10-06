@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { CalculatorOperationTimedOut } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
 import { aud } from "@taxkit/core/primitives";
@@ -25,6 +26,12 @@ import {
   Option,
   Schema,
 } from "effect";
+import {
+  HttpClientRequest,
+  HttpRouter,
+  HttpServerRequest,
+  HttpServerResponse,
+} from "effect/http";
 
 import { TaxKitApiInProcessClientLive } from "../src/client/server.layer.js";
 import { TaxKitHttpApiService } from "../src/client/service.js";
@@ -34,6 +41,7 @@ import {
   CalculatorRunResponse,
   CalculatorServiceError,
 } from "../src/groups/calculators.js";
+import { TaxKitApiRoutesLayer } from "../src/server.js";
 
 const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
@@ -59,6 +67,58 @@ const grossPayFacts = (
 });
 
 describe("TaxKit public calculation HTTP API", () => {
+  it.effect.each([
+    "/api/v1/jurisdictions",
+    "/api/v1/tax-years",
+    "/api/v1/calculators",
+    "/api/v1/calculators/au.pay.take-home",
+    "/api/v1/calculators/au.pay.take-home/schema",
+    "/api/v1/calculators/au.pay.take-home/graph",
+    "/api/v1/facts",
+    "/api/v1/rules",
+  ])("declares and encodes a checked metadata timeout at %s", (pathname) =>
+    Effect.gen(function* () {
+      const live = yield* PublicCalculatorService;
+      const service = Layer.succeed(
+        PublicCalculatorService,
+        PublicCalculatorService.of({
+          ...live,
+          getCalculator: () => Effect.fail(new CalculatorOperationTimedOut()),
+          getCalculatorGraph: () =>
+            Effect.fail(new CalculatorOperationTimedOut()),
+          getCalculatorSchema: () =>
+            Effect.fail(new CalculatorOperationTimedOut()),
+          listCalculators: () => Effect.fail(new CalculatorOperationTimedOut()),
+          listFacts: () => Effect.fail(new CalculatorOperationTimedOut()),
+          listJurisdictions: () =>
+            Effect.fail(new CalculatorOperationTimedOut()),
+          listRules: () => Effect.fail(new CalculatorOperationTimedOut()),
+          listTaxYears: () => Effect.fail(new CalculatorOperationTimedOut()),
+        })
+      );
+      // HttpApiBuilder captures services while constructing handlers. Supply
+      // the controlled implementation there, rather than a later request override.
+      const handler = yield* HttpRouter.toHttpEffect(TaxKitApiRoutesLayer).pipe(
+        Effect.provide(service)
+      );
+      const request = HttpClientRequest.get(
+        `http://taxkit.internal${pathname}`
+      );
+      const response = yield* handler.pipe(
+        Effect.provideService(
+          HttpServerRequest.HttpServerRequest,
+          HttpServerRequest.fromClientRequest(request)
+        )
+      );
+      expect(response.status).toBe(504);
+      expect(
+        yield* Schema.decodeUnknownEffect(CalculatorApiErrorEnvelope)(
+          yield* HttpServerResponse.toClientResponse(response, { request }).json
+        )
+      ).toEqual({ error: new CalculatorOperationTimedOut() });
+    }).pipe(Effect.provide(PublicCalculatorServiceTestLive), Effect.scoped)
+  );
+
   it.effect("pins the health route fixture", () =>
     Effect.gen(function* () {
       const client = yield* TaxKitHttpApiService;

@@ -733,6 +733,68 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     const captured = yield* Schema.encodeEffect(Json)(capturedLogs);
     expect(captured).not.toContain("PRIVATE9");
     expect(captured).not.toContain("165400");
+    const metadataStarted = yield* Clock.monotonicTimeNanos;
+    const metadataHttp = yield* Effect.promise(() =>
+      api.fetch(`${workApiOrigin}/api/v1/calculators/au.pay.take-home/schema`, {
+        headers: { origin: workWebsiteOrigin },
+      })
+    ).pipe(Effect.forkScoped);
+    const metadataRpc = yield* TaxKitRpcClient.pipe(
+      Effect.flatMap((client) =>
+        client.getCalculatorSchema({
+          calculatorId: CalculationRequest.calculatorId,
+        })
+      ),
+      Effect.exit,
+      Effect.provide(
+        TaxKitRpcClientLive(origin).pipe(Layer.provide(FetchHttpClient.layer))
+      ),
+      Effect.forkScoped
+    );
+    yield* Effect.forEach(Array.range(1, 2), () =>
+      Queue.take(logs).pipe(
+        Effect.flatMap((log) => Schema.encodeEffect(Json)(log.message)),
+        Effect.tap((message) =>
+          Effect.sync(() => {
+            expect(message).toContain("Warn");
+            expect(message).not.toContain("PRIVATE9");
+          })
+        )
+      )
+    );
+    const metadataResponse = yield* Fiber.join(metadataHttp);
+    expect(metadataResponse.status).toBe(504);
+    expect(metadataResponse.headers.get("access-control-allow-origin")).toBe(
+      workWebsiteOrigin
+    );
+    const metadataText = yield* Effect.promise(() => metadataResponse.text());
+    expect(metadataText).toContain("CalculatorOperationTimedOut");
+    expect(metadataText).not.toContain("PRIVATE9");
+    const metadataExit = yield* Fiber.join(metadataRpc);
+    expect(Exit.isFailure(metadataExit)).toBe(true);
+    if (Exit.isFailure(metadataExit)) {
+      expect(Cause.findErrorOption(metadataExit.cause)).toEqual(
+        Option.some(new CalculatorOperationTimedOut())
+      );
+    }
+    const metadataElapsed =
+      Number((yield* Clock.monotonicTimeNanos) - metadataStarted) / 1_000_000;
+    expect(metadataElapsed).toBeGreaterThanOrEqual(4500);
+    expect(metadataElapsed).toBeLessThan(8000);
+    const metadataLogs = yield* Queue.clear(logs);
+    const metadataMessages = yield* Effect.forEach(metadataLogs, (log) =>
+      Schema.encodeEffect(Json)(log.message)
+    );
+    expect(
+      Array.filter(metadataMessages, (message) => message.includes("Info"))
+    ).toHaveLength(2);
+    expect(
+      Array.every(
+        metadataMessages,
+        (message) =>
+          !message.includes("PRIVATE9") && !message.includes("165400")
+      )
+    ).toBe(true);
   }).pipe(
     Effect.timeout("25 seconds"),
     Effect.scoped,

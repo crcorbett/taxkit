@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -92,7 +92,10 @@ for production-only runtime helpers.
 `packages/api/http`
 : Implemented HTTP API package. It owns Effect HTTP API definitions, boundary
 schemas, thin server handlers, OpenAPI, typed HTTP clients and HTTP
-status/transport annotations. Client and Layer constructors use `create*`;
+status/transport annotations. Its narrow `request-boundary` export also owns the
+shared streamed HTTP-body admission used by the RPC and native app hosts. The
+RPC package depends inward on that export and retains its compatibility alias;
+the HTTP package has no RPC runtime dependency. Client and Layer constructors use `create*`;
 deprecated `make*` aliases remain at the export owner for compatibility.
 
 `packages/calculators`

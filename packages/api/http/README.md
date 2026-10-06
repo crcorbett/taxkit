@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-http-api-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
@@ -46,7 +46,8 @@ fact and rule descriptors and graph diagnostics from `@taxkit/calculators`.
 Every handler, including Calculate, calls `PublicCalculatorService` directly.
 The HTTP Calculate route supplies its checked route ID, body and query to the
 same named `calculate` operation used by native RPC. Expected service failures
-keep the existing HTTP envelope; public JSON and OpenAPI remain unchanged.
+keep the existing HTTP envelope. The status declarations below describe the
+additional request and operation protections.
 The SDK is a test-only comparison dependency, rather than a server dependency.
 
 `@taxkit/api-http/server` exports `TaxKitApiRoutesLayer` for application-owned
@@ -116,6 +117,7 @@ Export paths:
 - `@taxkit/api-http/client/live`
 - `@taxkit/api-http/client/server`
 - `@taxkit/api-http/config`
+- `@taxkit/api-http/request-boundary`
 - `@taxkit/api-http/server`
 - `@taxkit/api-http/handlers`
 - `@taxkit/api-http/handlers/live`
@@ -343,8 +345,8 @@ the separate native app composition task; it is not native Worker lifetime proof
 
 The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
-calculation budget. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC revision `2` errors. Website guidance requests
+operation budget for all nine service methods. Checked capacity and operation-timeout errors become HTTP
+503/504 envelopes or canonical RPC errors. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
 seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
@@ -352,3 +354,23 @@ browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
 control returns. Rate identity, per-client rate limits, MCP and full T004
 qualification remain unfinished.
+
+
+## Shared request admission
+
+`@taxkit/api-http/request-boundary` owns the streamed 64 KiB POST body limit and
+five-second total read deadline. It counts encoded bytes before parsing, closes
+rejected/interrupted readers and rejects late synchronous reads after control
+returns. The retained standalone server applies it before calculator decoding;
+native API and Website hosts use the same owner. The RPC entrypoint re-exports
+its original four symbols for compatibility. Only the native API host's outer
+composition covers both HTTP and RPC; a custom route host must supply its own
+admission middleware.
+
+Fixed Schema-owned request errors use HTTP 413 (`request-too-large`, reduce the
+request) and 408 (`request-timeout`, retry manually). JSON responses use the
+`error` envelope. Website form hosts select the checked HTML policy, producing a
+fixed message and link back to the calculators without reflecting input or URLs.
+The calculation endpoint declares both statuses in OpenAPI. Every metadata
+endpoint declares 504 for the shared operation timeout; lookup failures retain
+400. Metadata never consumes a calculation place. No automatic retry is added.

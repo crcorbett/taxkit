@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -456,3 +456,9 @@ The [complete closed RPC candidate](clean-slate-foundation/2026-10-06-closed-rpc
 records the nine named canonical operations, shared reply/lifetime policy, old
 revision rejection and native metadata proof. Whole T004 and later tasks remain
 active; this record establishes no provider or public release state.
+
+
+The [shared request and operation protection candidate](clean-slate-foundation/2026-10-06-request-operation-protections.json)
+records standalone/native body admission, checked JSON/HTML request errors,
+metadata operation budgets, status contracts and bounded consumer/runtime proof.
+It does not complete per-client rate policy, T004 or the rebuild.

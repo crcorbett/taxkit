@@ -1333,3 +1333,23 @@ through the real built API Worker. Rule-list membership is compared without
 assuming the existing immutable collection's iteration order. The dated
 [receipt](../documentation-audit/clean-slate-foundation/2026-10-06-closed-rpc-operations.json)
 records qualification and remaining T004 limitations.
+
+
+## Shared request and metadata protections
+
+The HTTP package's actual standalone router rejects oversized encoded bodies
+before JSON decoding. Controlled streams prove five-second read closure in JSON
+and HTML policies, and controlled monotonic time rejects late synchronous reads.
+All eight metadata operations have controlled five-second timeout, cancellation,
+late-result and calculation-capacity tests. Actual HTTP handlers encode declared
+504 envelopes at all eight metadata endpoints; all nine RPC client methods
+preserve the checked operation timeout through native JSON transport.
+
+The built native pair additionally reaches stalled schema metadata through both
+HTTP and the generated RPC client, checks five-second 504/RPC failures, CORS and
+safe cleanup logs. Its form paths return safe 413 HTML and its API POST paths
+return checked 413 JSON. Genuine packed consumers import the HTTP admission
+export and the SDK's canonical metadata error declaration. The
+[request and operation protection candidate](../documentation-audit/clean-slate-foundation/2026-10-06-request-operation-protections.json) records qualification; rate identity/limits and whole T004 acceptance remain
+unfinished. Timers cannot force synchronous CPU pre-emption or remote Worker
+cancellation. Local evidence does not establish deployed behaviour.

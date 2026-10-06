@@ -441,7 +441,10 @@ is a real host substitution point over `PublicCalculatorService`: native API and
 standalone HTTP roots build it once over the live implementation, while focused
 tests supply controlled work at the same contract. One pool serves all native
 transports and counts individual batch calculations. Scope and semaphore release
-own cleanup on every exit. Metadata remains outside calculation capacity. No
+own cleanup on every exit. Metadata remains outside calculation capacity, while
+all nine calls share the five-second completion budget. Lazy invocation counts
+metadata construction within it. The HTTP-owned streamed body policy provides
+Schema-owned JSON errors or fixed HTML guidance at the host boundary. No
 runner or live Layer is built inside a calculation, and no transport gains a
 competing application contract. The owning package records timeout and CPU limits.
 

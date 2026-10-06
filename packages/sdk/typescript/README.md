@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-sdk-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: SDK contracts, lifetime, exports, examples or consumer validation change
 ---
 
@@ -275,3 +275,8 @@ and `CalculatorOperationTimedOut` errors. They belong to the widened checked
 service union and expose fixed manual-retry guidance for server consumers.
 Local SDK calculation does not acquire the API server's pool or time budget.
 The actual packed and downstream fixtures check these named exports and types.
+
+
+SDK Schemas also re-export the canonical `CalculatorMetadataError` union. Server
+hosts may apply the calculator-owned five-second policy to all nine methods;
+local SDK execution retains its caller-owned lifetime and calculation results.

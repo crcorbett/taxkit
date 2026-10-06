@@ -101,6 +101,29 @@ const makeHttpTransport = Effect.fnUntraced(function* (
 });
 
 describe("native calculator RPC", () => {
+  it.effect.each(CalculatorRpcOperationCases)(
+    "preserves a checked operation timeout through $operation",
+    ({ invoke }) =>
+      Effect.gen(function* () {
+        const transport = yield* makeHttpTransport("timeout");
+        const exit = yield* TaxKitRpcClient.pipe(
+          Effect.flatMap(invoke),
+          Effect.exit,
+          Effect.provide(
+            TaxKitRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+        expect(Exit.isFailure(exit)).toBe(true);
+        if (Exit.isFailure(exit)) {
+          expect(Cause.findErrorOption(exit.cause)).toEqual(
+            Option.some(new CalculatorOperationTimedOut())
+          );
+        }
+      }).pipe(Effect.scoped)
+  );
+
   it.effect.each([
     { error: new CalculatorCapacityExceeded(), mode: "capacity" as const },
     { error: new CalculatorOperationTimedOut(), mode: "timeout" as const },

@@ -2,7 +2,10 @@ import {
   createStartHandler,
   defaultStreamHandler,
 } from "@tanstack/react-start/server";
-import { withCalculatorRequestBodyLimit } from "@taxkit/api-rpc/request-boundary";
+import {
+  CalculatorRequestBodyPolicy,
+  withCalculatorRequestBodyLimit,
+} from "@taxkit/api-http/request-boundary";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax/schemas";
 import { AuPayCalculatorId } from "@taxkit/rules-au-pay/schemas";
 import { Effect, ErrorReporter, Match, Schema } from "effect";
@@ -151,7 +154,8 @@ export default {
                   )
                 );
                 return HttpServerResponse.fromWeb(response);
-              })
+              }),
+              CalculatorRequestBodyPolicy.make({ responseFormat: "html" })
             ).pipe(
               Effect.catchTag("WebsiteInputError", () =>
                 Effect.succeed(HttpServerResponse.empty({ status: 400 }))

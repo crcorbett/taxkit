@@ -54,6 +54,11 @@
       "source": "./src/handlers/live.ts",
       "types": "./dist/handlers/live.d.ts",
       "default": "./dist/handlers/live.js"
+    },
+    "./request-boundary": {
+      "source": "./src/request-boundary.ts",
+      "types": "./dist/request-boundary.d.ts",
+      "default": "./dist/request-boundary.js"
     }
   },
   "publishConfig": {
@@ -93,6 +98,10 @@
       "./handlers/live": {
         "types": "./dist/handlers/live.d.ts",
         "default": "./dist/handlers/live.js"
+      },
+      "./request-boundary": {
+        "types": "./dist/request-boundary.d.ts",
+        "default": "./dist/request-boundary.js"
       }
     },
     "access": "public"

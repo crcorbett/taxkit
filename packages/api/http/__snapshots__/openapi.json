@@ -281,6 +281,56 @@
         "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
+      "CalculatorRequestBodyTimedOutEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorRequestBodyTimedOut"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["request-timeout"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "This request could not be read within five seconds. Try again when you are ready."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["try-again-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
+      "CalculatorRequestBodyTooLargeEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorRequestBodyTooLarge"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["request-too-large"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "This request is too large. Reduce it to 64 KiB or less and try again."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["reduce-request"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
       "FactQuestionEncoded": {
         "additionalProperties": false,
         "properties": {
@@ -913,6 +963,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -1167,6 +1234,23 @@
                           "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
                   "required": ["error"],
@@ -1486,6 +1570,40 @@
                           "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "408": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorRequestBodyTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorRequestBodyTooLargeEncoded"
                     }
                   },
                   "required": ["error"],
@@ -1997,6 +2115,23 @@
               }
             },
             "description": "Error"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -2500,6 +2635,23 @@
               }
             },
             "description": "Error"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -2643,6 +2795,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -2701,6 +2870,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -2967,6 +3153,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -3091,6 +3294,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],

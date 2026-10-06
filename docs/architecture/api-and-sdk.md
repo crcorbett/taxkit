@@ -316,7 +316,7 @@ is allowed for the current JSON client, with credentials disabled.
 
 POST bodies are read through the native Effect stream with a 64-KiB limit
 and a total five-second read deadline, before native JSON decoding. Oversized
-and stalled requests return empty 413/408 responses with the same CORS policy.
+and stalled requests return checked JSON 413/408 guidance with the same CORS policy.
 The selected native web-request reader does not use `MaxBodySize`, so merely
 providing that reference would not enforce this limit. Native request
 conversion retains headers, method, path and remote address.
@@ -536,15 +536,18 @@ unrelated adapter Schema error remains a defect. Public HTTP/OpenAPI and SDK
 interfaces do not change. The Website consumes this catalogue through its existing server application.
 
 The native body reader and RPC byte admission share
-`CalculatorRequestBodyLimit` from `@taxkit/api-rpc/request-boundary`: 64 KiB.
+`CalculatorRequestBodyLimit` from `@taxkit/api-http/request-boundary`: 64 KiB.
+The RPC export preserves its original four-symbol compatibility alias.
 The API applies it to public HTTP and native RPC POST, and the Website applies
 it before decoding any supported standard HTML calculator form. At exactly
 the limit, valid JSON still reaches the same named calculation operation;
 exceeding it releases the source before its remaining tail is consumed.
-This limits the native hosts only. Standalone Bun HTTP admission and common
-work/rate/concurrency policy remain active T004 work. Existing empty
-413/408 replies and five-second body-read deadlines are preserved in this
-bounded size-policy slice; they do not complete the accepted failure contract.
+The retained standalone HTTP server mounts the same admission middleware.
+Oversized/stalled bodies return fixed Schema-owned 413/408 JSON guidance; native
+Website forms select fixed HTML guidance and a link back to the calculators.
+The five-second total reader budget also rejects late synchronous completion.
+Custom route/RPC-only hosts must supply request admission at their composition.
+Per-client rate identity and limiting remain active T004 work.
 
 The private RPC client owns one ten-second complete-response deadline and a
 2 MiB byte cap for all nine closed JSON replies. Its concrete native HTTP adapter
@@ -558,14 +561,13 @@ The public SDK and standalone HTTP server retain their separate contracts.
 ## Shared calculation work limits
 
 The [calculator-owned policy](../../packages/calculators/README.md#shared-calculation-work-limits)
-supplies one eight-calculation pool and five-second budget to the native HTTP/RPC
+supplies one eight-calculation pool and five-second operation budget to the native HTTP/RPC
 instance and one per standalone HTTP router. Calculation errors use separately
 declared HTTP 503/504 envelopes; existing request failures keep 400 and metadata
-errors stay unchanged. RPC revision 3 preserves the canonical fixed capacity and
+methods declare checked 504 timeouts without using calculation places. RPC revision 3 preserves the canonical fixed capacity and
 timeout errors. Website forms request manual retry. SDK Schemas re-export these
 errors, while local SDK execution keeps its caller-owned lifetime and tax results.
-The owning package records cleanup and CPU proof limits. Rate identity, standalone
-HTTP body admission and future MCP operations remain T004/T006 work.
+The owning package records cleanup and CPU proof limits. Rate identity, per-client rate limits and future MCP operations remain T004/T006 work.
 
 
 The [complete RPC contract](../../packages/api/rpc/README.md#complete-named-operation-contract)

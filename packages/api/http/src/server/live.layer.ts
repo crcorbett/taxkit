@@ -11,6 +11,7 @@ import { TaxKitApi } from "../api.js";
 import { CalculatorApiHandlerLive } from "../handlers/calculators.js";
 import { HealthHandlerLive } from "../handlers/health.js";
 import { taxKitOpenApiSpec } from "../openapi.js";
+import { withCalculatorRequestBodyLimit } from "../request-boundary.js";
 
 const ApiRoutes = HttpApiBuilder.layer(TaxKitApi).pipe(
   Layer.provide(CalculatorApiHandlerLive),
@@ -42,5 +43,6 @@ export const ApiRoutesLive = ApiRoutesLayer.pipe(
       Layer.provide(CalculationEngineLive)
     )
   ),
+  Layer.provide(HttpRouter.middleware(withCalculatorRequestBodyLimit).layer),
   Layer.provide(HttpRouter.cors())
 );

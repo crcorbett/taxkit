@@ -236,8 +236,9 @@ and accepted publication remain later tasks; this page does not claim they exist
 
 All three standard HTML form POST paths share the native 64 KiB body limit and
 five-second total body-read deadline with the API host. Oversized bodies return
-empty 413 and stalled bodies return empty 408; unfinished readers close on
-rejection, timeout or interruption. This admission check runs before form data
+HTML 413 guidance and stalled bodies return HTML 408 guidance, each with a fixed
+message and link back to the calculators. Neither reflects submitted figures or
+URLs. Unfinished readers close on rejection, timeout or interruption. This admission check runs before form data
 is materialised. It counts bytes, including multi-byte text, not characters.
 
 Native page proof screenshots are saved under ignored

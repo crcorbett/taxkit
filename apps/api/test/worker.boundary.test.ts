@@ -1,4 +1,9 @@
 import { describe, expect, it } from "@effect/vitest";
+import {
+  CalculatorRequestBodyErrorEnvelope,
+  CalculatorRequestBodyTimedOut,
+  CalculatorRequestBodyTooLarge,
+} from "@taxkit/api-http/request-boundary";
 import { CalculatorHostTelemetryLive } from "@taxkit/api-rpc/host-telemetry";
 import {
   CalculatorRpcPayload,
@@ -329,7 +334,16 @@ describe("native API application", () => {
       );
       yield* Deferred.await(started);
       yield* TestClock.adjust("5 seconds");
-      expect((yield* Fiber.join(fibre)).status).toBe(408);
+      const response = yield* Fiber.join(fibre);
+      expect(response.status).toBe(408);
+      const json = yield* HttpServerResponse.toClientResponse(response, {
+        request: HttpClientRequest.post("https://api.example.com/rpc"),
+      }).json;
+      expect(
+        yield* Schema.decodeUnknownEffect(CalculatorRequestBodyErrorEnvelope)(
+          json
+        )
+      ).toEqual({ error: new CalculatorRequestBodyTimedOut() });
       expect(yield* Ref.get(released)).toBe(true);
       const next = yield* app.fetch.pipe(
         Effect.provideService(
@@ -491,6 +505,14 @@ describe("native API application", () => {
           Effect.scoped
         );
         expect(response.status).toBe(413);
+        const json = yield* HttpServerResponse.toClientResponse(response, {
+          request: HttpClientRequest.post(`https://api.example.com${pathname}`),
+        }).json;
+        expect(
+          yield* Schema.decodeUnknownEffect(CalculatorRequestBodyErrorEnvelope)(
+            json
+          )
+        ).toEqual({ error: new CalculatorRequestBodyTooLarge() });
         expect(yield* Ref.get(tailRead)).toBe(false);
         expect(yield* Ref.get(released)).toBe(true);
       }).pipe(

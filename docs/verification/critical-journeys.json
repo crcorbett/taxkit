@@ -175,8 +175,9 @@
         "Take-home explanation opens with the keyboard without calculation; breakdown, recorded threshold and rule sources remain attached to the old report after form edits.",
         "Catalogue-backed navigation offers all three calculators; withholding and annual pages start with their own empty result and return the retained 2756 and 12228 dollar answers through real browser RPC and standard HTML POST without JavaScript.",
         "The new pages retain their own report and explanation after edits without another request; the annual Medicare limitation stays visible and the agent route links to actual API descriptions.",
-        "All supported native HTML form POST paths and public HTTP/RPC reject more than 64 KiB of encoded text with empty 413; public rejection preserves the Website CORS policy.",
-        "All nine closed named calculator RPC calls return checked canonical results; the seven additional metadata calls run through the real built API Worker."
+        "All supported native HTML form POST paths and public HTTP/RPC reject more than 64 KiB of encoded text with fixed safe HTML 413 form guidance or checked JSON 413 API guidance; public rejection preserves the Website CORS policy.",
+        "All nine closed named calculator RPC calls return checked canonical results; the seven additional metadata calls run through the real built API Worker.",
+        "Reached metadata work times out at five seconds through both actual HTTP and the generated RPC client; HTTP 504 keeps CORS and safe cleanup is observed. Metadata takes no calculation place."
       ],
       "expectedSideEffects": [
         "Ignored native build files, scoped local Workers and Chromium only."
@@ -200,7 +201,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-request-body-policy.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-client-response-policy.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculation-work-policy.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-06-closed-rpc-operations.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-closed-rpc-operations.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-request-operation-protections.json"
       ],
       "nonClaims": [
         "No cloud provider, deployed endpoint or trace-export proof; controlled native fatal/privacy paths are qualified only by the named local tests.",

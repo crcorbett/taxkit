@@ -26,6 +26,7 @@ export {
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
   CalculatorRequestError,
+  CalculatorMetadataError,
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
   CalculatorCatalogResponseData,

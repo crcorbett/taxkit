@@ -51,6 +51,7 @@ const program = Effect.gen(function* () {
                     ? 'calculator.calculate(request).pipe(Effect.andThen(Effect.die("PRIVATE9")))'
                     : 'Effect.logWarning("PRIVATE9 work started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.calculate(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 work released")))'
                 },
+                ${mode === "stalled-work" ? 'getCalculatorSchema: (request) => Effect.logWarning("PRIVATE9 metadata started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.getCalculatorSchema(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 metadata released"))),' : ""}
               });
             })
           ).pipe(Layer.provide(PublicCalculatorServiceLive)))`

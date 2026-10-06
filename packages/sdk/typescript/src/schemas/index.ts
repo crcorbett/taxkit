@@ -1,6 +1,7 @@
 export {
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
+  CalculatorMetadataError,
   CalculatorRunFacts,
   CalculatorRunReport,
   CalculatorRunRequest,

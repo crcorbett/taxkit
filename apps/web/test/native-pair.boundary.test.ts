@@ -1,5 +1,9 @@
 import { NodeServices } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
+import {
+  CalculatorRequestBodyErrorEnvelope,
+  CalculatorRequestBodyTooLarge,
+} from "@taxkit/api-http/request-boundary";
 import { CalculatorRpcRequestTooLarge } from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
 import {
@@ -466,7 +470,16 @@ describe("built native API and Website", () => {
                 })
               );
               expect(oversized.status).toBe(413);
-              expect(yield* Effect.promise(() => oversized.text())).toBe("");
+              expect(oversized.headers.get("content-type")).toContain(
+                "text/html"
+              );
+              const html = yield* Effect.promise(() => oversized.text());
+              expect(html).toContain(
+                new CalculatorRequestBodyTooLarge().message
+              );
+              expect(html).toContain('href="/"');
+              expect(html).not.toContain("é");
+              expect(html).not.toContain("PRIVATE9");
             })
         );
         yield* Effect.forEach(
@@ -487,7 +500,14 @@ describe("built native API and Website", () => {
               expect(oversized.headers.get("access-control-allow-origin")).toBe(
                 websiteOrigin
               );
-              expect(yield* Effect.promise(() => oversized.text())).toBe("");
+              const body = yield* Effect.promise(() => oversized.text());
+              expect(
+                yield* Schema.decodeEffect(
+                  Schema.fromJsonString(CalculatorRequestBodyErrorEnvelope)
+                )(body)
+              ).toEqual({ error: new CalculatorRequestBodyTooLarge() });
+              expect(body).not.toContain("PRIVATE9");
+              expect(body).not.toContain("stack");
             })
         );
         const unavailableWorker = yield* Effect.promise(() =>

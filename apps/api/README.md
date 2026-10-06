@@ -40,7 +40,7 @@ produce an empty 503 response, without a guessed address.
 Every native POST body is limited to 64 KiB before JSON parsing, with a total
 five-second read deadline. The native stream stops at the limit and its reader
 is closed on rejection, timeout or cancellation. Oversized requests return an
-empty 413; stalled bodies return an empty 408. CORS applies to those responses.
+checked JSON 413 guidance; stalled bodies return checked JSON 408 guidance. CORS applies to those responses.
 
 The app's native logger and error reporter emit only a fixed event name, time
 and severity. Arbitrary messages, Causes, annotations and span labels are
@@ -270,7 +270,7 @@ requirement. The fixed application reporter remains in use.
 
 The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
-calculation budget. Checked capacity and operation-timeout errors become HTTP
+operation budget for all nine methods. Checked capacity and operation-timeout errors become HTTP
 503/504 envelopes or canonical RPC revision `3` errors. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a

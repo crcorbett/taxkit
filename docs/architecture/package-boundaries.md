@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-package-boundaries-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: package responsibility, dependency direction or public export change
 ---
 
@@ -28,6 +28,7 @@ Implemented packages and apps:
 - `packages/docs-fumadocs`
 - `packages/core`
 - `packages/api/http`
+- `packages/api/rpc`
 - `packages/sdk/typescript`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
@@ -267,3 +268,10 @@ Server-only adapters and filesystem code must have explicit server-only export p
 ## Out Of Scope For Engine Packages
 
 Engine packages should contain tax-domain primitives, facts, rule packs, calculators, graph metadata, traces, validation fixtures and test helpers. Application-specific packages should stay outside the engine dependency graph.
+
+
+Shared streamed HTTP-body admission belongs to the existing HTTP transport
+package's narrow `request-boundary` export. The private RPC transport depends
+inward on that owner; no new package, reverse HTTP-to-RPC runtime dependency or
+SDK-to-HTTP runtime dependency is introduced. Native hosts compose admission
+outside their HTTP/RPC routes; the retained standalone HTTP server mounts it.

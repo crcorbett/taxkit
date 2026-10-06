@@ -21,6 +21,7 @@
     "@effect/atom-react": "4.0.0",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
+    "@taxkit/api-http": "workspace:*",
     "@taxkit/api-rpc": "workspace:*",
     "@taxkit/core": "workspace:*",
     "@taxkit/rules-au-income-tax": "workspace:*",

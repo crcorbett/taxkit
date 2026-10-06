@@ -114,9 +114,13 @@ The streamed native POST reader and native RPC byte admission share the same
 64 KiB constant. The check counts encoded bytes, including multi-byte text,
 rather than characters or a claimed content length. Exactly 64 KiB is accepted;
 a stream crossing the limit stops before reading its remaining tail. The
-five-second body-read deadline and empty 413/408 replies are preserved. Per-client rate limits and later MCP envelopes remain active T004/T006 work. This native
-boundary does not claim the retained standalone Bun HTTP server has the same
-admission policy.
+five-second body-read deadline now returns fixed checked JSON 413/408 guidance.
+The owning export is `@taxkit/api-http/request-boundary`; this package preserves
+its original compatibility re-export. The retained standalone HTTP server uses
+the same body owner. All nine service calls have the shared five-second operation
+budget; metadata uses no calculation place. Per-client rate limits and later MCP
+envelopes remain active T004/T006 work. A custom RPC-only host must supply its
+request-admission middleware; the native API host applies it outside both routes.
 
 The private client checks HTTP status before reading a rejected body. Status
 408, 413 and 429 become distinct checked errors with fixed safe codes, literal

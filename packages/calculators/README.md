@@ -134,7 +134,7 @@ standalone HTTP Layer builds its pool once when the router is constructed.
 Metadata does not take a calculation place. Direct engine and local SDK use
 remain outside this anonymous server policy; their retained results are unchanged.
 
-Each admitted calculation has a five-second budget, including its scoped
+All nine server service methods have a five-second budget, including scoped
 cleanup. A timeout returns `CalculatorOperationTimedOut`; expected engine
 failures and unrelated defects retain their identity. Success, failure, timeout
 and caller interruption release the place after cleanup. A monotonic elapsed-time
@@ -147,5 +147,8 @@ no request values. HTTP maps capacity to 503 and operation timeout to 504, using
 the existing `error` envelope. Existing calculator request errors keep 400.
 The current [native RPC contract](../api/rpc/README.md) preserves the canonical errors; older clients get
 an explicit mismatch. Website forms display the fixed guidance and never retry
-a calculation automatically. Per-client rate identity, rate limiting, standalone
-HTTP body admission and future MCP operations remain active work.
+a calculation automatically. Metadata lookup errors use the canonical
+`CalculatorMetadataError` union; all eight metadata methods admit the checked
+operation timeout. Their lazy invocation counts eager metadata construction
+inside the operation budget. Per-client rate identity, rate limiting and future
+MCP operations remain active work.

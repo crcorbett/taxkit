@@ -87,6 +87,7 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
+    "@taxkit/api-http": "workspace:*",
     "@taxkit/calculators": "workspace:*",
     "@taxkit/docs-content": "workspace:*",
     "effect": "catalog:"

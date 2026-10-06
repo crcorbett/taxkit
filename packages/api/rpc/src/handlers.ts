@@ -1,4 +1,7 @@
-import type { CalculatorRequestError } from "@taxkit/calculators/schemas";
+import type {
+  CalculatorRequestError,
+  CalculatorMetadataError,
+} from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { Effect, Match } from "effect";
 
@@ -32,6 +35,14 @@ const calculatorRpcRequestFailure = (error: CalculatorRequestError) =>
     Match.exhaustive
   );
 
+// Metadata preserves its checked timeout while retaining the same private-safe
+// projection for lookup failures at all three metadata request boundaries.
+const calculatorRpcMetadataFailure = (error: CalculatorMetadataError) =>
+  Match.value(error).pipe(
+    Match.tag("CalculatorOperationTimedOut", (failure) => failure),
+    Match.orElse(calculatorRpcRequestFailure)
+  );
+
 export const TaxKitRpcHandlersLive = TaxKitRpcGroup.toLayer(
   Effect.gen(function* () {
     const calculator = yield* PublicCalculatorService;
@@ -55,19 +66,19 @@ export const TaxKitRpcHandlersLive = TaxKitRpcGroup.toLayer(
         version === CalculatorRpcVersion
           ? calculator
               .getCalculator(request)
-              .pipe(Effect.mapError(calculatorRpcRequestFailure))
+              .pipe(Effect.mapError(calculatorRpcMetadataFailure))
           : Effect.fail(new CalculatorRpcVersionMismatch()),
       GetCalculatorGraph: ({ request, version }) =>
         version === CalculatorRpcVersion
           ? calculator
               .getCalculatorGraph(request)
-              .pipe(Effect.mapError(calculatorRpcRequestFailure))
+              .pipe(Effect.mapError(calculatorRpcMetadataFailure))
           : Effect.fail(new CalculatorRpcVersionMismatch()),
       GetCalculatorSchema: ({ request, version }) =>
         version === CalculatorRpcVersion
           ? calculator
               .getCalculatorSchema(request)
-              .pipe(Effect.mapError(calculatorRpcRequestFailure))
+              .pipe(Effect.mapError(calculatorRpcMetadataFailure))
           : Effect.fail(new CalculatorRpcVersionMismatch()),
       ListCalculators: ({ query, version }) =>
         version === CalculatorRpcVersion

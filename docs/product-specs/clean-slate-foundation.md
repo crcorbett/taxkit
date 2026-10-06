@@ -283,8 +283,8 @@ calculations per Worker isolate; a five-second operation budget; and a
 ten-second complete-response client deadline. The calculator-owned bounded
 Layer supplies one pool to the native HTTP/RPC host and one per standalone HTTP
 router. Each batch calculation takes a place; excess work fails without waiting.
-Metadata does not take a calculation place. Checked capacity/timeout failures
-use HTTP 503/504 and RPC revision 3. The five-second calculation limit includes
+Metadata does not take a calculation place; its HTTP endpoints declare 504. Checked capacity/timeout failures
+use HTTP 503/504 and RPC revision 3. The five-second limit on all nine service operations includes
 scoped cleanup and rejects late success using monotonic elapsed time; it cannot
 force synchronous CPU pre-emption or guarantee remote cancellation. Direct
 engine/local SDK execution retains its existing lifetime and results. Scope and approximation of the
@@ -786,3 +786,11 @@ This proposed SPEC/task set now carries the downstream-impact ledger. Complete
 its final review and shared-understanding confirmation before admitting
 implementation and starting an active plan. The grilling skill requires that
 confirmation before acting on the design.
+
+
+The current request/operation slice moves shared streamed body admission to the
+HTTP-owned export, retains the RPC compatibility alias and mounts it in the
+standalone HTTP server. Native API rejections have checked JSON 413/408 guidance;
+all native calculator form paths have fixed HTML guidance and a recovery link.
+The five-second operation policy includes lazy metadata invocation and cleanup
+at all nine methods; rate identity/limits and whole T004 acceptance remain open.

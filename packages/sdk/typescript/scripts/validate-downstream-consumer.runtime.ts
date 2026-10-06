@@ -460,7 +460,8 @@ const writeConsumerFiles = (
         ),
         fs.writeFileString(
           path.join(workspacePath, "src/typecheck.ts"),
-          `import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
+          `import { CalculatorRequestBodyPolicy, CalculatorRequestBodyTooLarge, CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/request-boundary";
+import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import type { CalculationInput } from "@taxkit/sdk";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
@@ -471,6 +472,7 @@ import {
   CalculatorServiceError,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
+  CalculatorMetadataError,
   TaxKitFailure,
   TaxKitSuccess,
 } from "@taxkit/sdk/schemas";
@@ -502,6 +504,12 @@ auEffect
   .createClient()
   .calculations.calculateReport(au.calculations.takeHomePay, takeHomeFacts);
 
+const bodyPolicy: typeof CalculatorRequestBodyPolicy.Type = CalculatorRequestBodyPolicy.make({ responseFormat: "html" });
+const bodyFailure: typeof CalculatorRequestBodyErrorEnvelope.Type = {error: new CalculatorRequestBodyTooLarge()};
+const metadataTimeout: typeof CalculatorMetadataError.Type = new CalculatorOperationTimedOut();
+void bodyPolicy;
+void bodyFailure;
+void metadataTimeout;
 void PublicCalculatorServiceBounded;
 void CalculatorRunRequest;
 void CalculatorServiceError;
@@ -521,7 +529,8 @@ au.pay.takeHomePay({
         ),
         fs.writeFileString(
           path.join(workspacePath, "src/runtime.ts"),
-          `import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "@taxkit/calculators/work";
+          `import { CalculatorRequestBodyErrorEnvelope, CalculatorRequestBodyTooLarge, CalculatorRequestBodyLimit } from "@taxkit/api-http/request-boundary";
+import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "@taxkit/calculators/work";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculationEngineLive } from "@taxkit/core";
 import { aud } from "@taxkit/core/primitives";
@@ -531,6 +540,10 @@ import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
 
+const requestFailure = new CalculatorRequestBodyTooLarge();
+if (!Schema.is(CalculatorRequestBodyErrorEnvelope)({error: requestFailure}) || requestFailure.code !== "request-too-large" || CalculatorRequestBodyLimit !== 65536n) {
+  throw new Error("Packed HTTP request-body contract is not available.");
+}
 const ServiceLive = PublicCalculatorServiceBounded.pipe(
   Layer.provide(PublicCalculatorServiceLive),
   Layer.provide(CalculationEngineLive)

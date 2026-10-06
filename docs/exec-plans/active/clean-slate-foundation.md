@@ -32,8 +32,8 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: finish T004's complete named operations and
-remaining body/work/rate and domain/package qualification. All three calculator
+Next continuation milestone: finish T004's per-client rate policy and
+whole domain/package qualification after the current request/operation checks. All three calculator
 pages have local native/browser proof. T003's connection/containment
 qualification is locally accepted. T002's
 installed dependency graph, app/script/SDK/infrastructure
@@ -2865,3 +2865,121 @@ whole domain/package review. Next share the HTTP body owner and complete the
 remaining request/operation protections. Tax behaviour, Medicare choice,
 provider identities and unrelated work are preserved; no merge, publication,
 deployment or provider apply occurs.
+
+
+## DEV-75 shared request and operation protections — 6 October 2026
+
+Parent draft #145 is pushed at `fc22e47a083ff967efa4763c310d8fbdd7e214fe`;
+its exact hosted Quality run `37388858997` remains running at this readback.
+The current branch `codex/dev-75-request-operation-protections` moves the shared
+native body guard into the HTTP transport owner, preserves the RPC compatibility
+alias and mounts the standalone HTTP guard. Fixed canonical body errors supply
+checked JSON 413/408 guidance or safe HTML form guidance with a recovery link.
+All nine calculator-service operations share the five-second completion budget;
+metadata does not consume a calculation place. Public HTTP metadata declares 504;
+the existing RPC revision already admits this checked timeout, so remains 3.
+
+Docs-maintainer impact: **Change required** for affected package/app READMEs,
+package/API/Effect/testing architecture, generated OpenAPI, source/declaration/
+packed consumers, exact decoder admissions, current SPEC/tasks/plan, stable
+native journey, audit router and dated receipt. **Preserve** retained rules,
+source/golden results, Medicare decision, browser calculation behaviour, closed
+RPC revision, SDK lifetime, infrastructure/provider identity, telemetry, skills,
+CI and operational procedures. **N/A** for runbook/command/public-content
+changes: no new procedure, publication or public editorial change. Major
+Changesets record service/error and HTTP/SDK/RPC consumer changes.
+
+Early checks found ordinary key-order/style issues, two fixture variable/type
+issues and missing exact egress decoder admissions. These are corrected at the
+owning files; no runtime or generic policy exception is broadened. The obsolete
+RPC body error factory admission is removed because that Schema now lives in the
+canonical HTTP Schemas module. Focused checks, source-removal controls, genuine
+packed consumers, native built tests, full repository checks and local CI-mode
+release graph qualification follow. T004 remains in progress; nothing is merged,
+deployed, published or applied to a provider.
+
+
+The first HTTP metadata fixture supplied its controlled service too late:
+`HttpApiBuilder` captures the construction context, so the original successful
+service was still used. The fixture now supplies the substitute while building
+handlers. Its eight real endpoint 504/error assertions remain unchanged. The
+owning OpenAPI generator's output also needed the repository formatter before
+root format qualification. Both failed checks remain in the dated receipt.
+
+
+Focused current checks pass: 35 calculator cases, 17 HTTP cases, 217 RPC cases
+and 62 native API cases, plus root lint/types, both unused-code checks and docs/
+runbooks. Six source-removal controls detect relaxed size/deadline/late-result
+checks, removed standalone admission and a wrong metadata status declaration.
+Each source is restored exactly. The size/admission controls reach the native
+payload parser's checked failure instead of the required early 413; the other
+four fail their unchanged assertions. The control harness initially required an
+assertion failure for the first parser control; its classification is corrected,
+with failed harness provenance retained. A wrong new relative documentation link
+is also repaired and rechecked. The generic package validator is inconclusive
+because it scans ignored `.turbo` logs and rejects their machine-specific paths;
+no logs or historical renderer receipts are deleted or invented to conceal that.
+
+The documented local CI-mode release graph will execute the full nine checks,
+including actual root verification/tests/build, docs/browser, API smoke and
+packed/downstream consumers, without creating a release candidate or touching
+external state. Native prequalification precedes that graph to check the new
+controlled built fixture before the long isolated verification tests.
+
+
+The first complete native run passed six of seven cases and reached all new
+metadata timeout/status assertions, then failed a new assumption that the final
+log queue contained only two entries. Four bounded host events were observed.
+The corrected oracle still requires exactly two Info cleanup events and checks
+all captured messages for private-fixture/figure leakage. Its focused actual
+Worker case passes in 19.23 seconds; the full graph will rerun all seven cases.
+The live Personal Linear workspace and exact Taxkit repository link now resolve;
+DEV-75 is still Backlog, has the draft PR attachments and no comments. Tracking
+writes remain unclaimed while the earlier automatic-approval rejection is pending.
+
+
+The first full CI-mode graph passed verification, including 32 workflow cases
+(508.54 seconds), 24 SDK browser cases, 19 Website browser cases and all seven
+native cases (81.54 seconds). Root tests then stopped on one of 475 lint cases:
+an older exact API test decoder oracle still expected rejection after that file's
+new explicit admission. The corrected oracle accepts that file, tests both other
+new decoder admissions and rejects three neighbouring files. Existing runtime
+and encoder restrictions stay checked. All 47 original staged files were
+restored exactly before this test-only correction; full checks follow again.
+
+
+The corrected CI-mode release graph passes all nine ordered checks on
+6 October 2026 in 758.84 seconds. It covers complete repository
+verification and tests, build, docs validation/browser, genuine packed and
+downstream consumers, API smoke and Changeset status. Verification reaches
+32 fresh workflow cases (532.07 seconds), both unused-code checks, compiler,
+24 SDK browser cases, 19 Website browser cases and all seven freshly built
+Worker cases (84.15 seconds). The corrected lint corpus contains 480 cases,
+including the three exact decoder admissions and three neighbouring refusals.
+All 48 staged source files match their pre-check bytes after the builders and
+negative CLI fixtures finish.
+
+The native artifact inventory is captured immediately after successful
+verification, before later root build work; four screenshots are byte-identical
+to the previously inspected parent images. Parent #145 has exact hosted Quality
+success for `fc22e47a083ff967efa4763c310d8fbdd7e214fe`, run `37388858997`,
+job `112028862698`, completed `2026-10-05T23:51:17Z`. This qualifies that parent
+only; hosted checks and review for this candidate remain pending. The dated
+receipt retains the failed graph and both corrected lint fixture attempts.
+
+Primary-owner review accepts the local request/metadata operation slice:
+canonical body errors, native checked JSON/HTML rendering, shared HTTP body
+owner, closed calculator metadata errors, one reused operation budget and thin
+transport mappings have concrete owners and focused failure controls. The
+major Changeset records public error/export changes. Only this active plan and
+receipt change after qualification; docs/runbooks/format/Changeset/whitespace
+checks follow before commit, push and draft PR.
+
+T004 remains in progress for the trusted non-logged rate key/limiter and full
+domain/package review. The recommended next rate design shares an allowance
+by connection; Cooper's optional browser preference is still unanswered and
+no limiter is implemented here. Read-only domain review found throwing
+constrained money/date helpers, semantic optional dates/metadata, mirrored
+non-recursive data fields and incomplete tax-table relationship checks. Those
+need separate corrections with unchanged source data, historical codecs and
+golden results. No Medicare correction or provider operation is included.

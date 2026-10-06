@@ -25,6 +25,8 @@ import {
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
   CalculatorRunServiceRequest,
+  GetCalculatorRequest,
+  GetCalculatorGraphRequest,
   UnsupportedCalculatorError,
 } from "../src/schemas.js";
 import { PublicCalculatorService } from "../src/service.js";
@@ -39,6 +41,103 @@ const Request = CalculatorRunServiceRequest.make({
     },
   },
 });
+const MetadataWorkCases = [
+  {
+    invoke: (service: PublicCalculatorService["Service"]) =>
+      service
+        .getCalculator(
+          GetCalculatorRequest.make({ calculatorId: Request.calculatorId })
+        )
+        .pipe(Effect.asVoid),
+    operation: "getCalculator",
+    substitute: (
+      service: PublicCalculatorService["Service"],
+      work: Effect.Effect<never>
+    ) => PublicCalculatorService.of({ ...service, getCalculator: () => work }),
+  },
+  {
+    invoke: (service: PublicCalculatorService["Service"]) =>
+      service
+        .getCalculatorGraph(
+          GetCalculatorGraphRequest.make({ calculatorId: Request.calculatorId })
+        )
+        .pipe(Effect.asVoid),
+    operation: "getCalculatorGraph",
+    substitute: (
+      service: PublicCalculatorService["Service"],
+      work: Effect.Effect<never>
+    ) =>
+      PublicCalculatorService.of({
+        ...service,
+        getCalculatorGraph: () => work,
+      }),
+  },
+  {
+    invoke: (service: PublicCalculatorService["Service"]) =>
+      service
+        .getCalculatorSchema(
+          GetCalculatorRequest.make({ calculatorId: Request.calculatorId })
+        )
+        .pipe(Effect.asVoid),
+    operation: "getCalculatorSchema",
+    substitute: (
+      service: PublicCalculatorService["Service"],
+      work: Effect.Effect<never>
+    ) =>
+      PublicCalculatorService.of({
+        ...service,
+        getCalculatorSchema: () => work,
+      }),
+  },
+  {
+    invoke: (service: PublicCalculatorService["Service"]) =>
+      service.listCalculators({}).pipe(Effect.asVoid),
+    operation: "listCalculators",
+    substitute: (
+      service: PublicCalculatorService["Service"],
+      work: Effect.Effect<never>
+    ) =>
+      PublicCalculatorService.of({ ...service, listCalculators: () => work }),
+  },
+  {
+    invoke: (service: PublicCalculatorService["Service"]) =>
+      service.listFacts({}).pipe(Effect.asVoid),
+    operation: "listFacts",
+    substitute: (
+      service: PublicCalculatorService["Service"],
+      work: Effect.Effect<never>
+    ) => PublicCalculatorService.of({ ...service, listFacts: () => work }),
+  },
+  {
+    invoke: (service: PublicCalculatorService["Service"]) =>
+      service.listJurisdictions().pipe(Effect.asVoid),
+    operation: "listJurisdictions",
+    substitute: (
+      service: PublicCalculatorService["Service"],
+      work: Effect.Effect<never>
+    ) =>
+      PublicCalculatorService.of({ ...service, listJurisdictions: () => work }),
+  },
+  {
+    invoke: (service: PublicCalculatorService["Service"]) =>
+      service.listRules({}).pipe(Effect.asVoid),
+    operation: "listRules",
+    substitute: (
+      service: PublicCalculatorService["Service"],
+      work: Effect.Effect<never>
+    ) => PublicCalculatorService.of({ ...service, listRules: () => work }),
+  },
+  {
+    invoke: (service: PublicCalculatorService["Service"]) =>
+      service.listTaxYears({}).pipe(Effect.asVoid),
+    operation: "listTaxYears",
+    substitute: (
+      service: PublicCalculatorService["Service"],
+      work: Effect.Effect<never>
+    ) => PublicCalculatorService.of({ ...service, listTaxYears: () => work }),
+  },
+] as const;
+
 const Live = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
@@ -63,6 +162,84 @@ const failure = <A, E>(exit: Exit.Exit<A, E>) => {
 };
 
 describe("shared calculation work policy", () => {
+  it.effect.each(MetadataWorkCases)(
+    "bounds $operation at five seconds and closes its resources",
+    ({ invoke, substitute }) =>
+      Effect.gen(function* () {
+        const live = yield* PublicCalculatorService;
+        const started = yield* Deferred.make<boolean>();
+        const released = yield* Ref.make(false);
+        const work = Deferred.succeed(started, true).pipe(
+          Effect.andThen(Effect.never),
+          Effect.ensuring(Ref.set(released, true))
+        );
+        const service = yield* bounded(substitute(live, work));
+        const call = yield* invoke(service).pipe(Effect.forkScoped);
+        yield* Deferred.await(started);
+        // Nine metadata calls can wait without using a calculation place.
+        const extra = yield* Effect.forEach(Array.range(1, 8), () =>
+          invoke(service).pipe(Effect.forkScoped)
+        );
+        expect((yield* service.calculate(Request)).report).toMatchObject({
+          netPay: { cents: 130_100 },
+        });
+        yield* TestClock.adjust("4 seconds");
+        expect(yield* Ref.get(released)).toBe(false);
+        yield* TestClock.adjust("1 second");
+        expect(yield* Ref.get(released)).toBe(true);
+        expect(failure(yield* Fiber.await(call))).toEqual(
+          Option.some(new CalculatorOperationTimedOut())
+        );
+        yield* Effect.forEach(extra, Fiber.await);
+      }).pipe(Effect.provide(Live), Effect.scoped)
+  );
+
+  it.effect.each(MetadataWorkCases)(
+    "closes $operation on earlier caller cancellation",
+    ({ invoke, substitute }) =>
+      Effect.gen(function* () {
+        const live = yield* PublicCalculatorService;
+        const started = yield* Deferred.make<boolean>();
+        const released = yield* Ref.make(false);
+        const service = yield* bounded(
+          substitute(
+            live,
+            Deferred.succeed(started, true).pipe(
+              Effect.andThen(Effect.never),
+              Effect.ensuring(Ref.set(released, true))
+            )
+          )
+        );
+        const call = yield* invoke(service).pipe(Effect.forkScoped);
+        yield* Deferred.await(started);
+        yield* TestClock.adjust("1 second");
+        yield* Fiber.interrupt(call);
+        expect(yield* Ref.get(released)).toBe(true);
+      }).pipe(Effect.provide(Live), Effect.scoped)
+  );
+
+  it.effect.each(MetadataWorkCases)(
+    "rejects late $operation results after control returns",
+    ({ invoke }) =>
+      Effect.gen(function* () {
+        const service = yield* bounded(yield* PublicCalculatorService);
+        const clock = yield* Clock.Clock;
+        const time = yield* Ref.make(0n);
+        const exit = yield* Effect.exit(invoke(service)).pipe(
+          Effect.provideService(Clock.Clock, {
+            ...clock,
+            monotonicTimeNanos: Ref.modify(time, (value) => [
+              value,
+              5_000_000_000n,
+            ]),
+          })
+        );
+        expect(failure(exit)).toEqual(
+          Option.some(new CalculatorOperationTimedOut())
+        );
+      }).pipe(Effect.provide(Live), Effect.scoped)
+  );
+
   it.effect(
     "admits eight calls, rejects the ninth immediately and reuses a cancelled place",
     () =>

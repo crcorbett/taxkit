@@ -185,6 +185,13 @@ export const CalculatorRequestError = Schema.Union([
 
 export type CalculatorRequestError = typeof CalculatorRequestError.Type;
 
+export const CalculatorMetadataError = Schema.Union([
+  CalculatorRequestError,
+  CalculatorOperationTimedOut,
+]);
+
+export type CalculatorMetadataError = typeof CalculatorMetadataError.Type;
+
 export const CalculatorServiceError = Schema.Union([
   CalculatorRequestError,
   CalculatorCapacityExceeded,

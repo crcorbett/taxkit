@@ -87,6 +87,9 @@ export const CalculatorFixture = (
         getCalculator: (request) =>
           Match.value(mode).pipe(
             Match.when("expected", () => Effect.fail(inputFailure)),
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
             Match.orElse(() => calculator.getCalculator(request))
@@ -94,6 +97,9 @@ export const CalculatorFixture = (
         getCalculatorGraph: (request) =>
           Match.value(mode).pipe(
             Match.when("expected", () => Effect.fail(inputFailure)),
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
             Match.orElse(() => calculator.getCalculatorGraph(request))
@@ -101,36 +107,54 @@ export const CalculatorFixture = (
         getCalculatorSchema: (request) =>
           Match.value(mode).pipe(
             Match.when("expected", () => Effect.fail(inputFailure)),
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
             Match.orElse(() => calculator.getCalculatorSchema(request))
           ),
         listCalculators: (query) =>
           Match.value(mode).pipe(
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
             Match.orElse(() => calculator.listCalculators(query))
           ),
         listFacts: (query) =>
           Match.value(mode).pipe(
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
             Match.orElse(() => calculator.listFacts(query))
           ),
         listJurisdictions: () =>
           Match.value(mode).pipe(
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
             Match.orElse(() => calculator.listJurisdictions())
           ),
         listRules: (query) =>
           Match.value(mode).pipe(
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
             Match.orElse(() => calculator.listRules(query))
           ),
         listTaxYears: (query) =>
           Match.value(mode).pipe(
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
             Match.orElse(() => calculator.listTaxYears(query))

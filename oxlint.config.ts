@@ -75,6 +75,12 @@ const decodingBoundaryFiles = [
   "packages/docs-fumadocs/src/test.layer.ts",
   "packages/docs-fumadocs/src/config.ts",
 
+  // Native built request egress and standalone HTTP body tests decode only
+  // actual representation responses; service internals remain excluded.
+  "apps/web/test/native-pair.boundary.test.ts",
+  "apps/api/test/worker.boundary.test.ts",
+  "packages/api/http/__tests__/request-body.boundary.test.ts",
+
   // Public API normalisation and focused API contract tests.
   "packages/api/http/src/openapi.ts",
   "packages/api/http/__tests__/openapi-snapshot.test.ts",
@@ -451,7 +457,6 @@ export default defineConfig({
         "packages/api/rpc/src/server-serialization.boundary.ts",
         "apps/web/src/lib/config.ts",
         "apps/web/src/lib/form.boundary.ts",
-        "packages/api/rpc/src/request-boundary.ts",
         "apps/api/scripts/routes.ts",
         "apps/api/scripts/smoke-public-routes.runtime.ts",
       ],

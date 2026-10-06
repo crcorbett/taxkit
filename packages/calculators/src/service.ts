@@ -9,7 +9,8 @@ import type {
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
   CalculatorServiceError,
-  CalculatorRequestError,
+  CalculatorMetadataError,
+  CalculatorOperationTimedOut,
   DescriptorFilterQuery,
   FactsResponse,
   GetCalculatorGraphRequest,
@@ -26,26 +27,29 @@ export interface PublicCalculatorServiceContract {
   ) => Effect.Effect<CalculatorRunResponse, CalculatorServiceError>;
   readonly getCalculator: (
     request: GetCalculatorRequest
-  ) => Effect.Effect<CalculatorCatalogItem, CalculatorRequestError>;
+  ) => Effect.Effect<CalculatorCatalogItem, CalculatorMetadataError>;
   readonly getCalculatorGraph: (
     request: GetCalculatorGraphRequest
-  ) => Effect.Effect<CalculatorGraphResponse, CalculatorRequestError>;
+  ) => Effect.Effect<CalculatorGraphResponse, CalculatorMetadataError>;
   readonly getCalculatorSchema: (
     request: GetCalculatorRequest
-  ) => Effect.Effect<CalculatorSchemaResponse, CalculatorRequestError>;
+  ) => Effect.Effect<CalculatorSchemaResponse, CalculatorMetadataError>;
   readonly listCalculators: (
     query: MetadataQuery
-  ) => Effect.Effect<CalculatorCatalogResponse>;
+  ) => Effect.Effect<CalculatorCatalogResponse, CalculatorOperationTimedOut>;
   readonly listFacts: (
     query: DescriptorFilterQuery
-  ) => Effect.Effect<FactsResponse>;
-  readonly listJurisdictions: () => Effect.Effect<JurisdictionsResponse>;
+  ) => Effect.Effect<FactsResponse, CalculatorOperationTimedOut>;
+  readonly listJurisdictions: () => Effect.Effect<
+    JurisdictionsResponse,
+    CalculatorOperationTimedOut
+  >;
   readonly listRules: (
     query: DescriptorFilterQuery
-  ) => Effect.Effect<RulesResponse>;
+  ) => Effect.Effect<RulesResponse, CalculatorOperationTimedOut>;
   readonly listTaxYears: (
     query: MetadataQuery
-  ) => Effect.Effect<TaxYearsResponse>;
+  ) => Effect.Effect<TaxYearsResponse, CalculatorOperationTimedOut>;
 }
 
 export class PublicCalculatorService extends Context.Service<
