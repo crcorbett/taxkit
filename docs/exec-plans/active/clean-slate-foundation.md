@@ -2983,3 +2983,68 @@ constrained money/date helpers, semantic optional dates/metadata, mirrored
 non-recursive data fields and incomplete tax-table relationship checks. Those
 need separate corrections with unchanged source data, historical codecs and
 golden results. No Medicare correction or provider operation is included.
+
+
+## DEV-75 canonical trace and ledger field owners — 6 October 2026
+
+Parent draft #146 is pushed at `72c8f42041ae942ef67a1327d6dc69ab1fb6d12c`;
+its exact hosted Quality run `37393720058` is still running. The next branch,
+`codex/dev-75-domain-schema-owners`, removes ordinary handwritten ledger Type/
+Encoded interfaces. Both aliases infer from the owning Schema. Recursive trace
+aliases share one non-recursive field Schema and annotate only children. This
+deliberately removes interface declaration merging; a major core Changeset
+records the public type-owner change. Values and encoded contracts stay the same.
+
+Four pre-change/current actual codec probes match encoded bytes, key order,
+omissions, explicit undefined keys and round trips, including nested traces and
+a ledger containing a Money value. The first probe incorrectly mixed direct
+Effect source imports with the installed distribution and failed on Money; the
+probe now uses the real package export and passes. This was a probe setup error,
+not a qualified core defect. The genuine packed/downstream consumer now checks
+the public aliases, recursive brands, exact historical bytes and round trips.
+
+Docs-maintainer impact: **Change required** for core README, the graph/trace/
+ledger owner (including legacy metadata and its outdated raw-Unknown example),
+Effect architecture, packed consumer fixture, current SPEC/tasks/plan, audit/
+testing pointers, dated receipt and major core Changeset. **Preserve** tax/source/
+golden values, current codecs and optional representations, HTTP/RPC/OpenAPI,
+calculator/browser behaviour, package paths, toolchain, skills, lint permissions,
+CI, infrastructure and telemetry. **N/A** for runbooks/new commands/public MDX:
+no operation, command or editorial publication changes. Focused and complete
+qualification follows before accepting the slice. T004 remains unfinished for
+rate identity/limits and the wider domain audit; no provider operation occurs.
+
+Both source-removal controls fail at their intended packed-consumer phases: a
+field-order change fails runtime, and replacing checked JSON inputs with unknown
+values fails type checking. Source is restored after each. The first outside
+harness expected a raw child error that the safe runner suppresses; its classifier
+now uses the named phase. No runner error output or production policy changed.
+
+
+Local acceptance for the trace/ledger field-owner slice: the complete nine-stage
+CI-mode graph passes in 745.19 seconds, including 32 fresh
+workflow cases (514.33 seconds), all 480 real lint cases, complete tests and
+builds, packed/downstream consumers, API smoke and docs/browser proof. Actual
+native verification passes seven built Worker cases (84.41 seconds). All
+13 staged candidate files match their pre-check hashes; the API fault-build
+source also matches its unchanged parent. Nine native output inventories were
+captured immediately after verification, before root build; four screenshots
+match the already inspected parent bytes. Only this plan and receipt change
+after the full graph; final docs/runbooks/format/Changeset/whitespace checks follow.
+
+Parent #146 now has exact hosted Quality success for
+`72c8f42041ae942ef67a1327d6dc69ab1fb6d12c`, run `37393720058`, job
+`112044577422`, completed `2026-10-06T00:40:15Z`. Current-candidate hosted proof
+and reviewer acceptance remain separate. Primary-owner review accepts the
+local inferred-alias change and its exact historical codec proof. A major core
+Changeset records the loss of open-interface declaration merging. This does
+not accept Option migration, constrained constructors, table relationships or
+rate limiting. T004 and the overall DEV-73 then DEV-74–81 goal remain active.
+
+Linear reads recovered. All 44 DEV-73 comments were enumerated; the original
+Medicare correction decision remains unresolved with no newer decision found.
+DEV-75 still reads Backlog and initially had zero comments. Cooper separately
+approved the prepared #146 progress comment after the connector paused it;
+comment `6a17034d-46f9-4450-821e-d5534c34df7c` is saved and independently read
+back as the sole comment. No status, description or native dependency change
+is claimed. Retained Medicare values and all tax outputs stay unchanged.

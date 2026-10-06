@@ -131,7 +131,11 @@ Explicit recursive encoded contracts such as `TraceNodeEncoded`, and generic
 descriptor interfaces that preserve schema-to-continuation inference, are not
 DTO mirrors. Keep them when TypeScript cannot otherwise express the recursive
 or generic relation. Do not use that exception for ordinary duplicated object
-shapes.
+shapes. The trace domain/encoded aliases infer their non-recursive fields
+from one shared Schema and annotate only children. Ledger component aliases
+are inferred directly from their owning Schema. These exported aliases replace
+open interfaces, so declaration merging is no longer an extension point; their
+historical encoded values remain the same.
 
 ## Provider and SDK adapters
 

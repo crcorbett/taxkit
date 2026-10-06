@@ -66,44 +66,11 @@ export const ComponentStatus = Schema.Literals([
 export type ComponentStatus = typeof ComponentStatus.Type;
 
 /**
- * A labelled calculation amount with trace evidence and total semantics.
+ * Canonical schema for a labelled amount, its trace and total semantics.
  *
  * @since 0.1.0
  */
-export interface LedgerComponent {
-  readonly _tag: "LedgerComponent";
-  readonly id: ComponentId;
-  readonly label: string;
-  readonly amount: Money;
-  readonly effect: ComponentEffect;
-  readonly status: ComponentStatus;
-  readonly trace: TraceNode;
-}
-
-/**
- * Encoded representation of a ledger component for persistence or transport.
- *
- * @since 0.1.0
- */
-export interface LedgerComponentEncoded {
-  readonly _tag: "LedgerComponent";
-  readonly id: string;
-  readonly label: string;
-  readonly amount: typeof Money.Encoded;
-  readonly effect: typeof ComponentEffect.Encoded;
-  readonly status: typeof ComponentStatus.Encoded;
-  readonly trace: typeof TraceNode.Encoded;
-}
-
-/**
- * Schema codec for ledger components.
- *
- * @since 0.1.0
- */
-export const LedgerComponent: Schema.Codec<
-  LedgerComponent,
-  LedgerComponentEncoded
-> = Schema.TaggedStruct("LedgerComponent", {
+export const LedgerComponent = Schema.TaggedStruct("LedgerComponent", {
   amount: Money,
   effect: ComponentEffect,
   id: ComponentId,
@@ -111,6 +78,20 @@ export const LedgerComponent: Schema.Codec<
   status: ComponentStatus,
   trace: TraceNode,
 });
+
+/**
+ * A labelled calculation amount with trace evidence and total semantics.
+ *
+ * @since 0.1.0
+ */
+export type LedgerComponent = typeof LedgerComponent.Type;
+
+/**
+ * Encoded representation of a ledger component for persistence or transport.
+ *
+ * @since 0.1.0
+ */
+export type LedgerComponentEncoded = typeof LedgerComponent.Encoded;
 
 /**
  * Returns whether a component should be applied to the ledger total.

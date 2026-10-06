@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-core-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
@@ -36,7 +36,12 @@ HTTP handlers or filesystem adapters.
 ## Guardrails
 
 - Use Effect Schema for boundary values and derive exported types from
-  canonical schemas.
+  canonical schemas. `LedgerComponent` and its encoded alias are inferred from
+  their owning Schema. `TraceNode` keeps a local recursive children relation;
+  its remaining type and encoded fields come from one shared field Schema.
+  The exported type aliases cannot be extended by interface declaration merging.
+  Their existing encoded field order, omitted/undefined keys and nested values
+  remain unchanged and are checked by the genuine packed consumer.
 - Reuse canonical schemas, branded ids and constructors. Do not redeclare
   canonical fields such as `id: string` in consumers.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,

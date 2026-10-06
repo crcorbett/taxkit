@@ -462,7 +462,10 @@ const writeConsumerFiles = (
           path.join(workspacePath, "src/typecheck.ts"),
           `import { CalculatorRequestBodyPolicy, CalculatorRequestBodyTooLarge, CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/request-boundary";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
+import type { LedgerComponent, LedgerComponentEncoded } from "@taxkit/core/ledger";
+import type { RuleId, TraceNode, TraceNodeEncoded } from "@taxkit/core/trace";
 import type { CalculationInput } from "@taxkit/sdk";
+import type { Schema } from "effect";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
@@ -504,6 +507,25 @@ auEffect
   .createClient()
   .calculations.calculateReport(au.calculations.takeHomePay, takeHomeFacts);
 
+declare const traceValue: TraceNode;
+declare const ledgerValue: LedgerComponent;
+declare const traceEncoded: TraceNodeEncoded;
+declare const ledgerEncoded: LedgerComponentEncoded;
+const traceRule: RuleId = traceValue.ruleId;
+const traceInputs: Readonly<Record<string, Schema.Json>> = traceValue.inputs;
+const traceResult: Schema.Json = traceValue.result;
+const traceChildren: readonly TraceNode[] = traceValue.children;
+const encodedChildren: readonly TraceNodeEncoded[] = traceEncoded.children;
+const componentTrace: TraceNode = ledgerValue.trace;
+const encodedComponentTrace: TraceNodeEncoded = ledgerEncoded.trace;
+void traceRule;
+void traceInputs;
+void traceResult;
+void traceChildren;
+void encodedChildren;
+void componentTrace;
+void encodedComponentTrace;
+
 const bodyPolicy: typeof CalculatorRequestBodyPolicy.Type = CalculatorRequestBodyPolicy.make({ responseFormat: "html" });
 const bodyFailure: typeof CalculatorRequestBodyErrorEnvelope.Type = {error: new CalculatorRequestBodyTooLarge()};
 const metadataTimeout: typeof CalculatorMetadataError.Type = new CalculatorOperationTimedOut();
@@ -534,11 +556,68 @@ import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "@tax
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculationEngineLive } from "@taxkit/core";
 import { aud } from "@taxkit/core/primitives";
+import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
+import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { Effect, Layer, Schema } from "effect";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
+
+const fixtureSource = SourceRef.make({kind: "internal-validation", reference: "historical-codec-fixture", title: "Compatibility fixture"});
+const fixtureChild = TraceNode.make({children: [], inputs: {cents: 165400}, result: 165400, ruleId: RuleId.make("fixture/child"), sources: [fixtureSource], title: "Child"});
+const fixtureParent = TraceNode.make({children: [fixtureChild], formula: "result = input", inputs: {amount: 165400}, result: 165400, rounding: "round-to-nearest-cent", ruleId: RuleId.make("fixture/parent"), sources: [fixtureSource], title: "Parent"});
+const fixtureUndefined = TraceNode.make({...fixtureChild, formula: undefined, rounding: undefined});
+const fixtureLedger = LedgerComponent.make({amount: aud(165400), effect: "additive", id: ComponentId.make("fixture/component"), label: "Fixture", status: "active", trace: fixtureParent});
+const encodedMissing = await Effect.runPromise(Schema.encodeEffect(TraceNode)(fixtureChild));
+if (JSON.stringify(encodedMissing) !== '{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}') {
+  throw new Error("Packed core missing encoding changed historical bytes.");
+}
+if (Object.hasOwn(encodedMissing, "formula") || Object.hasOwn(encodedMissing, "rounding")) {
+  throw new Error("Packed core trace introduced absent historical keys.");
+}
+const restoredMissing = await Effect.runPromise(Schema.decodeUnknownEffect(TraceNode)(encodedMissing));
+const reencodedMissing = await Effect.runPromise(Schema.encodeEffect(TraceNode)(restoredMissing));
+if (JSON.stringify(reencodedMissing) !== '{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}') {
+  throw new Error("Packed core missing codec round trip changed historical bytes.");
+}
+const encodedPresent = await Effect.runPromise(Schema.encodeEffect(TraceNode)(fixtureParent));
+if (JSON.stringify(encodedPresent) !== '{"_tag":"TraceNode","children":[{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}],"formula":"result = input","inputs":{"amount":165400},"result":165400,"rounding":"round-to-nearest-cent","ruleId":"fixture/parent","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Parent"}') {
+  throw new Error("Packed core present encoding changed historical bytes.");
+}
+const restoredPresent = await Effect.runPromise(Schema.decodeUnknownEffect(TraceNode)(encodedPresent));
+const reencodedPresent = await Effect.runPromise(Schema.encodeEffect(TraceNode)(restoredPresent));
+if (JSON.stringify(reencodedPresent) !== '{"_tag":"TraceNode","children":[{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}],"formula":"result = input","inputs":{"amount":165400},"result":165400,"rounding":"round-to-nearest-cent","ruleId":"fixture/parent","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Parent"}') {
+  throw new Error("Packed core present codec round trip changed historical bytes.");
+}
+const encodedUndefined = await Effect.runPromise(Schema.encodeEffect(TraceNode)(fixtureUndefined));
+if (JSON.stringify(encodedUndefined) !== '{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}') {
+  throw new Error("Packed core explicit-undefined encoding changed historical bytes.");
+}
+if (!Object.hasOwn(encodedUndefined, "formula") || !Object.hasOwn(encodedUndefined, "rounding")) {
+  throw new Error("Packed core trace lost explicitly undefined historical keys.");
+}
+const restoredUndefined = await Effect.runPromise(Schema.decodeUnknownEffect(TraceNode)(encodedUndefined));
+const reencodedUndefined = await Effect.runPromise(Schema.encodeEffect(TraceNode)(restoredUndefined));
+if (JSON.stringify(reencodedUndefined) !== '{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}') {
+  throw new Error("Packed core explicit-undefined codec round trip changed historical bytes.");
+}
+const encodedLedger = await Effect.runPromise(Schema.encodeEffect(LedgerComponent)(fixtureLedger));
+if (JSON.stringify(encodedLedger) !== '{"_tag":"LedgerComponent","amount":{"_tag":"Money","cents":165400,"currency":"AUD"},"effect":"additive","id":"fixture/component","label":"Fixture","status":"active","trace":{"_tag":"TraceNode","children":[{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}],"formula":"result = input","inputs":{"amount":165400},"result":165400,"rounding":"round-to-nearest-cent","ruleId":"fixture/parent","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Parent"}}') {
+  throw new Error("Packed core ledger encoding changed historical bytes.");
+}
+const restoredLedger = await Effect.runPromise(Schema.decodeUnknownEffect(LedgerComponent)(encodedLedger));
+const reencodedLedger = await Effect.runPromise(Schema.encodeEffect(LedgerComponent)(restoredLedger));
+if (JSON.stringify(reencodedLedger) !== '{"_tag":"LedgerComponent","amount":{"_tag":"Money","cents":165400,"currency":"AUD"},"effect":"additive","id":"fixture/component","label":"Fixture","status":"active","trace":{"_tag":"TraceNode","children":[{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}],"formula":"result = input","inputs":{"amount":165400},"result":165400,"rounding":"round-to-nearest-cent","ruleId":"fixture/parent","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Parent"}}') {
+  throw new Error("Packed core ledger codec round trip changed historical bytes.");
+}
+
+if (Schema.is(TraceNode)({...fixtureChild, inputs: {callback: () => "unsafe fixture"}}) || Schema.is(TraceNode)({...fixtureChild, result: () => "unsafe fixture"})) {
+  throw new Error("Packed core trace admitted a non-JSON value.");
+}
+if (Schema.is(Schema.toEncoded(LedgerComponent))({...encodedLedger, amount: {...encodedLedger.amount, currency: "USD"}})) {
+  throw new Error("Packed core ledger lost the canonical Money currency check.");
+}
 
 const requestFailure = new CalculatorRequestBodyTooLarge();
 if (!Schema.is(CalculatorRequestBodyErrorEnvelope)({error: requestFailure}) || requestFailure.code !== "request-too-large" || CalculatorRequestBodyLimit !== 65536n) {

@@ -462,3 +462,9 @@ The [shared request and operation protection candidate](clean-slate-foundation/2
 records standalone/native body admission, checked JSON/HTML request errors,
 metadata operation budgets, status contracts and bounded consumer/runtime proof.
 It does not complete per-client rate policy, T004 or the rebuild.
+
+
+The [canonical trace/ledger field-owner candidate](clean-slate-foundation/2026-10-06-domain-schema-owners.json)
+records schema-derived aliases, the bounded recursive annotation, historical
+codec compatibility and packed consumer proof. It does not complete the wider
+domain audit or request-rate policy.

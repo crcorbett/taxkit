@@ -303,7 +303,11 @@ unlimited fallback. Rate identity is not an analytics visitor ID and must not
 be exported in logs, spans or product events.
 
 Keep owning Schemas, schema-derived types, branded identities, checked semantic
-Config, services, Layers and tagged errors. Decode unknown representations once
+Config, services, Layers and tagged errors. Core ledger types now infer from their Schema;
+recursive trace types share one field owner and annotate only children. Existing
+encoded bytes, field order and omission/undefined behaviour stay unchanged.
+This type-owner slice does not complete the remaining fallible constructors,
+semantic Option migration or table relationship checks. Decode unknown representations once
 at their true boundary and encode outward values. Keep Effects lazy and flat;
 keep one-use mapping and error logic beside the operation. Separate contracts,
 live Layers, test Layers and application execution. Provider adapters expose

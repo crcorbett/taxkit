@@ -1353,3 +1353,8 @@ export and the SDK's canonical metadata error declaration. The
 [request and operation protection candidate](../documentation-audit/clean-slate-foundation/2026-10-06-request-operation-protections.json) records qualification; rate identity/limits and whole T004 acceptance remain
 unfinished. Timers cannot force synchronous CPU pre-emption or remote Worker
 cancellation. Local evidence does not establish deployed behaviour.
+
+
+The [core schema-owner candidate](../documentation-audit/clean-slate-foundation/2026-10-06-domain-schema-owners.json)
+binds historical trace/ledger codec compatibility to genuine packed declarations
+and runtime consumers. Whole T004 acceptance remains in the active plan.

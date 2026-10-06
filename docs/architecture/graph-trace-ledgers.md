@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-core-architecture-owner
+last_reviewed: 2026-10-06
+review_trigger: graph, trace, ledger or encoded contract change
 ---
 
 # Graph, Trace And Ledgers
@@ -35,7 +37,7 @@ Use graph metadata for:
 - impact analysis for package consumers
 - package documentation
 
-## Validation Gates
+## Validation checks
 
 Graph validation should run in CI for official rule packages.
 
@@ -53,18 +55,18 @@ No official rule with missing source references
 
 Every calculation should produce a trace tree. A trace records what rule ran, what it used, what it produced, how it rounded and which sources justify it.
 
-```ts
-export class TraceNode extends Schema.TaggedClass<TraceNode>()("TraceNode", {
-  ruleId: RuleId,
-  title: Schema.String,
-  inputs: Schema.Record({ key: Schema.String, value: Schema.Unknown }),
-  formula: Schema.optional(Schema.String),
-  result: Schema.Unknown,
-  rounding: Schema.optional(RoundingMode),
-  sources: Schema.Array(SourceRef),
-  children: Schema.Array(Schema.suspend(() => TraceNode)),
-}) {}
-```
+[`TraceNode`](../../packages/core/src/trace/node.ts) is a recursive tagged
+Struct codec. Its non-recursive fields have one private Schema owner; the
+exported domain and encoded aliases add only their recursive children relation.
+Inputs and results use checked `Schema.Json`, and source references reuse
+`SourceRef`. No second interface repeats their fields.
+
+The codec retains its historical field order and the distinction between a
+missing optional key and a present undefined key. Schema encoding and decoding
+own representation changes. The packed consumer checks nested traces and exact
+legacy bytes; changing optional domain values later needs separate compatibility
+proof. This owner change does not convert semantic absence to Option yet.
+
 
 Trace output is part of the engine contract, not only debugging. It supports trust, auditability, contributor review and calculation explanation.
 
@@ -74,13 +76,15 @@ For additive annual-tax and pay calculations, use ledger components instead of h
 
 ```ts
 export const LedgerComponent = Schema.TaggedStruct("LedgerComponent", {
+  amount: Money,
+  effect: ComponentEffect,
   id: ComponentId,
   label: Schema.String,
-  amount: Money,
-  effect: Schema.Literals(["additive", "subtractive", "informational"]),
-  status: Schema.Literals(["active", "disabled", "zeroed"]),
+  status: ComponentStatus,
   trace: TraceNode,
 });
+export type LedgerComponent = typeof LedgerComponent.Type;
+export type LedgerComponentEncoded = typeof LedgerComponent.Encoded;
 ```
 
 `effect` is intentionally domain-neutral. The aggregator that consumes the components decides what additive/subtractive _means_ in context: a pay-withholdings aggregator treats `additive` as "more withheld → less take-home"; an annual-tax aggregator treats `additive` as "more tax owed". Sharing the value type across domains lets `sumLedgerComponents` and other ledger utilities live in `@taxkit/core/ledger`.
