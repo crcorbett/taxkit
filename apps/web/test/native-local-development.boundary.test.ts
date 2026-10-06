@@ -146,6 +146,20 @@ describe("native local development", () => {
             page.request.get(`${apiOrigin}/api/health`)
           );
           expect(health.status()).toBe(200);
+          // A printed local address proves listening, not a served page. Give
+          // only gateway-unavailable startup responses a bounded readiness
+          // window; application errors and the real navigation still fail.
+          const websiteReady = yield* Effect.promise(() =>
+            page.request.get(websiteOrigin, { timeout: 5000 })
+          ).pipe(
+            Effect.map((response) => response.status()),
+            Effect.repeat({
+              schedule: Schedule.spaced("100 millis"),
+              while: (status) => status === 502 || status === 503,
+            }),
+            Effect.timeout("15 seconds")
+          );
+          expect(websiteReady).toBe(200);
           const initial = yield* Effect.promise(() => page.goto(websiteOrigin));
           expect(initial?.status()).toBe(200);
           yield* Effect.promise(() =>

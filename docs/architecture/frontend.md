@@ -375,9 +375,9 @@ The [Website owner](../../apps/web/README.md#native-calculation-rate-admission) 
 T005 now prepares four checked documentation calls at the API/RPC owner. The
 actual native pair test compares all accepted page values and exact Markdown
 through the documentation client, alongside the retained calculator journeys.
-This does not yet connect Website documentation loaders or replace its routes.
-Those routes must use the private named client and browser-safe compiled MDX
-presentation before the retained docs app can retire.
+The Website now connects these loaders and renders browser-safe compiled MDX
+presentation as described below. Discovery and replacement qualification must
+finish before the retained docs app can retire.
 
 ## Replacement Website documentation composition
 
@@ -397,7 +397,7 @@ add a dependency upgrade, custom RPC framing or another runtime.
 
 Native browser page navigation carries a bounded canonical public page address
 in `x-taxkit-docs-page`, through a data-free GET server function. Its generated
-identity and the settings identity are the only admitted function addresses.
+identity, the search identity and the settings identity are the only admitted function addresses.
 GET query or content-type input and invalid page headers reject before the
 framework parser. SSR derives the page from its original pathname. A private,
 per-request not-found identity preserves only the route's own native not-found
@@ -417,12 +417,36 @@ against the API page at preload and display. Body/metadata drift or a missing
 compiled module becomes fixed recoverable guidance. The native pair proves
 actual HTML for every accepted page, native 404, malformed loader restoration,
 internal navigation without document reload, phone/keyboard behaviour and
-reading without JavaScript. Search and discovery are later T005 work. The
+reading without JavaScript. Search is described below; discovery remains T005 work. The
 [dated receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json)
 records local proof; it establishes no deployment or public availability.
 
 The application router supplies the named documentation page loader through
-its typed router context, beside the settings loader. The page route consumes
+its typed router context, beside the settings and search loaders. The page route consumes
 that function without importing its server-only implementation. Standalone
 browser checks use the same route tree with supplied loaders; native built
 checks exercise the actual server function and private API connection.
+
+
+### Replacement Website search
+
+The `/search` route has a standard HTML GET form with one labelled `term`
+field. Its original URL owns SSR words; browser native GET carries only a
+bounded ASCII URI component header. The installed Schema URI codec preserves
+Unicode. A separate URL boundary admits one optional term, rejects duplicates
+and unexpected keys, trims words and reuses the content owner's bound. The
+router's parse/stringify callbacks preserve literal URL pairs, including
+scientific numbers, quoted words and duplicate keys, instead of JSON parsing.
+The host admits only the generated search function identity and checked wire
+header; the native producer decodes that input once. Empty words do not call
+search. Nonempty words call the existing named accepted-content operation.
+
+The route restores its encoded result once, matches it locally and passes only
+checked values to readonly form/results leaves. It keeps navigation and article
+composition visible. Accepted titles and descriptions remain readable without
+raw Markdown formatting. Empty, no-match, loading, invalid and unavailable
+states have distinct fixed guidance; malformed loader data shares recoverable
+unavailable guidance. Results use the existing router-link and heading-focus
+policy. The form works without JavaScript. Search addresses are `noindex,
+follow`; words are not collected and no second index or calculation value is
+introduced. Discovery files and share images remain separate T005 work.

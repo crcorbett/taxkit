@@ -1,0 +1,1414 @@
+{
+  "schemaVersion": 1,
+  "documentType": "bounded-proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-web-app-owner",
+  "observedAt": "2026-10-06T18:07:15.169711+00:00",
+  "status": "Local Website accepted-catalogue search qualified; whole T005 remains in progress",
+  "baseHead": "b7cbed17a0b52283b5f9f75abf68c448d73af390",
+  "actorAuthority": {
+    "principal": "Cooper",
+    "reviewer": "Codex",
+    "operation": "Approved CSF-T005 implementation, local checks, tested commit/push and continuation of draft PR155",
+    "environment": "Local native workerd/Chromium pair and repository checks",
+    "approvalBoundary": "No merge, deploy, publication, provider apply or metrics implementation"
+  },
+  "outcome": [
+    "A labelled /search GET form uses the existing accepted-catalogue searchDocs operation, works without JavaScript and links checked title/description results to documentation.",
+    "Literal URL pairs preserve scientific numbers, quoted words, duplicate keys and Unicode; checked ingress rejects unexpected/duplicate keys and overlong words.",
+    "Generated native search GET takes no data or client Context, carries only a bounded ASCII URI header and decodes Unicode through the installed Schema codec. Original SSR URLs resist forged headers.",
+    "Empty words skip search. Empty/no-match/loading/invalid/unavailable states remain separate; damaged genuine browser replies fail checked restoration safely.",
+    "The route restores and matches encoded results before readonly leaf composition. Typed route context avoids server imports in a browser route. Existing heading-focus and phone navigation remain owned.",
+    "Local startup observes served-page readiness after printed addresses, retrying only 502/503 for at most fifteen seconds before strict successful browser navigation. The earlier hosted 502 cause remains unknown."
+  ],
+  "impact": {
+    "changeRequired": [
+      "apps/web source/Schema/URL/restoration/native-loader/host ingress and existing native/browser tests",
+      "Exact oxlint selectors and actual CLI positive/negative cases",
+      "apps/web/README.md; frontend, content-and-posts, API-and-SDK, Effect-services and testing-quality architecture",
+      "Active SPEC/tasks/plan, existing taxkit-native-website journey and this receipt"
+    ],
+    "preserve": [
+      "127 hashed sources: 61 accepted pages, 64 review records, navigation and four integration templates; 62 exact bindings and owner policy",
+      "Content service and HTTP/RPC contracts; retained calculator answers and Medicare scope decision",
+      "Existing visual design and historical docs/runtime receipts",
+      "Disabled platform collection and explicit metrics deferral"
+    ],
+    "notApplicable": [
+      "No package export/wire change or new Changeset; existing documentation contract Changeset retained",
+      "No new runbook command, operational procedure, skill installation or provider/credential/release change"
+    ]
+  },
+  "environment": {
+    "bun": "1.4.2",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "reactRouter": "1.170.41",
+    "routerCore": "1.171.34",
+    "vite": "8.3.2",
+    "playwright": "1.63.0",
+    "host": "Local macOS arm64; selected Node/Bun and installed Chromium",
+    "referenceBoundary": "Earlier Effect and Alchemy upstream references retained; installed Effect URI codec, Alchemy Vite lifecycle and TanStack query/Transitioner source own compatibility. No dependency upgrade."
+  },
+  "sourceIdentities": [
+    {
+      "path": "apps/web/README.md",
+      "sha256": "5649d424841cfff2f4cea967b83c2b7cd3bc2ceadb94272ae2d524ba8ec22d95",
+      "bytes": 23774
+    },
+    {
+      "path": "apps/web/src/lib/docs/components.tsx",
+      "sha256": "85286f6e573ab5e85ab50e7a257445116e8609212f2bc5f0b43b34c1472297ac",
+      "bytes": 3292
+    },
+    {
+      "path": "apps/web/src/lib/docs/errors.ts",
+      "sha256": "b988591084342ae659c974856662d6bc852e5c247a4265d5f203eef5654fde10",
+      "bytes": 755
+    },
+    {
+      "path": "apps/web/src/lib/docs/page.view.tsx",
+      "sha256": "22178bf566c39bb3a5e022e2bf2bb57c5fee5c7ea51fa650c2a2f3d385d84efd",
+      "bytes": 2276
+    },
+    {
+      "path": "apps/web/src/lib/docs/route-boundary.ts",
+      "sha256": "211ff2bf309c6afb1df89003ea7e8a0b7b74c303ff7354009e285cf79ceb3331",
+      "bytes": 884
+    },
+    {
+      "path": "apps/web/src/lib/docs/search-location.boundary.ts",
+      "sha256": "f3ef7639c6e7cff836a062827d04bb32f7a12af9a596a56a2b1daf822db82875",
+      "bytes": 1599
+    },
+    {
+      "path": "apps/web/src/lib/docs/search.view.tsx",
+      "sha256": "a9f2cd37c205b2762aaab77c643bb86c52c477abab429e51acad9f238b83600d",
+      "bytes": 2020
+    },
+    {
+      "path": "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+      "sha256": "3abbfb9749a48b9f2b12d89d09a1a8a4de2e2c95da3fe77b05c930358b635ee9",
+      "bytes": 11316
+    },
+    {
+      "path": "apps/web/src/lib/loaders.server.ts",
+      "sha256": "46f108eb783513fde507632bd808b3943e5c8d5ff4ec24ac9bfc315b715170c0",
+      "bytes": 5823
+    },
+    {
+      "path": "apps/web/src/lib/loaders.ts",
+      "sha256": "4a8cfe62657a5060fbbaa1df215c55248dee0fb072c855452ed88d664a88bd1c",
+      "bytes": 2858
+    },
+    {
+      "path": "apps/web/src/lib/route-context.ts",
+      "sha256": "8f9083dcfd9d4b0371fed2553db295d49dbf63ca355b92e6495cd72fcaaf3c7d",
+      "bytes": 304
+    },
+    {
+      "path": "apps/web/src/lib/schemas.ts",
+      "sha256": "06a281165caddd2588123e3701383a6ed69e1e234beedc29051d5cf1ceed018c",
+      "bytes": 5336
+    },
+    {
+      "path": "apps/web/src/routeTree.gen.ts",
+      "sha256": "079ae66e33f22502bfa875f3fdb00b954666bd201049e8507405fd94a2f1c4c9",
+      "bytes": 4401
+    },
+    {
+      "path": "apps/web/src/router.tsx",
+      "sha256": "0bc8330cb536b58128d8e4b14cfff2e3aae1c3fa9a1818100b50ec68d53851e7",
+      "bytes": 937
+    },
+    {
+      "path": "apps/web/src/routes/$.tsx",
+      "sha256": "3c7357d3620407bc76413e64c58dac80ed2b3cf41ec916b101b5ea99b7868f4d",
+      "bytes": 2533
+    },
+    {
+      "path": "apps/web/src/routes/search.tsx",
+      "sha256": "08ba3c26e2cdc5392096a6804dd9da31756f367098da346cefdbcacedbde9bfd",
+      "bytes": 3113
+    },
+    {
+      "path": "apps/web/src/server.ts",
+      "sha256": "b22d28551cc1135fec8e66a83bf1417c4c305fdeecda89f57392ac27394ee957",
+      "bytes": 8533
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "sha256": "4945332ea4d0b44401ab0b854181fe5f3d74bd756527f80d52d43637fd052b3c",
+      "bytes": 6697
+    },
+    {
+      "path": "apps/web/test/native-local-development.boundary.test.ts",
+      "sha256": "bc24ffe94848c4148961ca0e769dcf6b935d8b5591e881d4c6ca23a69c64b407",
+      "bytes": 17672
+    },
+    {
+      "path": "apps/web/test/native-pair.boundary.test.ts",
+      "sha256": "f095e67b92b75579654110d3cd963695fcbc114330a397a2c280789036c69111",
+      "bytes": 83989
+    },
+    {
+      "path": "docs/architecture/api-and-sdk.md",
+      "sha256": "8abd84bf639be231fecb056c2bfaa04082b2d8e19422f0b679041c3a0daa4cf6",
+      "bytes": 31271
+    },
+    {
+      "path": "docs/architecture/content-and-posts.md",
+      "sha256": "d9b9a8576080ed3d7628d8f651e30f797ea7a7b7f41646cd0b970c5e2ec31481",
+      "bytes": 7743
+    },
+    {
+      "path": "docs/architecture/effect-services.md",
+      "sha256": "42ad5846a215f87a03a1c71640d8cb7b4f5e117b4eaaf4238dc2f5e3061033e8",
+      "bytes": 28448
+    },
+    {
+      "path": "docs/architecture/frontend.md",
+      "sha256": "c120a3cebd1a3be9c3489ec98e61be550e2b171c7cf0f3b14a635569568bc4c0",
+      "bytes": 26886
+    },
+    {
+      "path": "docs/architecture/testing-and-quality.md",
+      "sha256": "aa73e1f4dc0c75aa847ef36d0f02720660e02a3a7b63b6cad77cc1b912a8428b",
+      "bytes": 95453
+    },
+    {
+      "path": "docs/exec-plans/active/clean-slate-foundation.md",
+      "sha256": "f9e20dbafaab1ff524ce290ac4ca287e68f024c2f4f20ff02fa4bf015e6c3685",
+      "bytes": 274981
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.md",
+      "sha256": "723744bb3cab31f8a0e4e9adb08917aaccf8d00377cdbf7bd3b97f93ad7f0421",
+      "bytes": 68722
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "f6b4d63f5a9a15c8884a03f7a6388f08bf15edc7d3284be755b20fa416f4cc85",
+      "bytes": 73413
+    },
+    {
+      "path": "docs/verification/critical-journeys.json",
+      "sha256": "604e83a6a0992bcfd1a6d3aabcb282c1a38776340d838ec7a17ffbcf11231a4e",
+      "bytes": 20623
+    },
+    {
+      "path": "oxlint.config.ts",
+      "sha256": "7d930aae7140efc101474339e23bb1475655f92076ab56e1b6e9420ee85b6329",
+      "bytes": 57335
+    },
+    {
+      "path": "tools/oxlint/portable-rules.test.ts",
+      "sha256": "ef447ce4a84820a68e4310a734e5bfc2bbab076fc6b57bbe6fbe9dee6bda3c10",
+      "bytes": 87829
+    }
+  ],
+  "preservedSources": {
+    "authoredPages": 61,
+    "reviewRecords": 64,
+    "activeBindings": 62,
+    "unchangedNavigation": true,
+    "unchangedOwnerPolicy": true,
+    "identities": [
+      {
+        "path": "packages/docs-content/content/api/authentication-and-deployment-assumptions.mdx",
+        "sha256": "9db4a01ae8c5d2dcd611503263c83e5467b8ccd98352215dc5e0eba098e6dfef",
+        "bytes": 1864
+      },
+      {
+        "path": "packages/docs-content/content/api/endpoints.mdx",
+        "sha256": "320bd61fa331248549545a7d15f98c4c4b75a9e96207a3eef695b1c78e656d07",
+        "bytes": 4311
+      },
+      {
+        "path": "packages/docs-content/content/api/errors.mdx",
+        "sha256": "92f3e6d9ec1bd6a73192e22422c3fb31dbcd67013830f4b3ff0b59cb658f4fd4",
+        "bytes": 4560
+      },
+      {
+        "path": "packages/docs-content/content/api/index.mdx",
+        "sha256": "a3b1aa5756347db8dac15081575a21b91a546d3af9dc5c6abf407cd48a3f4855",
+        "bytes": 807
+      },
+      {
+        "path": "packages/docs-content/content/api/openapi-reference.mdx",
+        "sha256": "25f9f5564e3e14f9946f5e68760351a46aa7ca7fe4cef44021685e539b4b70fa",
+        "bytes": 1509
+      },
+      {
+        "path": "packages/docs-content/content/api/overview.mdx",
+        "sha256": "c11e2f06e3513a515dbb68fee8c0027ebe1ddd7e7680dbf5deb06a01fb3c857b",
+        "bytes": 2632
+      },
+      {
+        "path": "packages/docs-content/content/concepts/calculators.mdx",
+        "sha256": "c69961d6d10464ed3afba49251021eb39c8c4fe5c8ad1c1bc39255f17f7aabe9",
+        "bytes": 1026
+      },
+      {
+        "path": "packages/docs-content/content/concepts/diagnostics.mdx",
+        "sha256": "65f316c6357190e820f79d00e4daea2dcc02010252e724ab99c0d9f712a6b1b2",
+        "bytes": 1583
+      },
+      {
+        "path": "packages/docs-content/content/concepts/facts.mdx",
+        "sha256": "d14e50dc2408260cb7c1a2d1e28115f751fef7b40ec4d3842a7317e51c7735ee",
+        "bytes": 1169
+      },
+      {
+        "path": "packages/docs-content/content/concepts/index.mdx",
+        "sha256": "79d1c27541668881705f920fe16f3405d47d338e330fa092625929d0a5ef17b6",
+        "bytes": 768
+      },
+      {
+        "path": "packages/docs-content/content/concepts/jurisdictions-and-tax-years.mdx",
+        "sha256": "feaac55e94ef3c3a41bbde5c1b678bc44a56b76a2d2291794d70b4737705f6e9",
+        "bytes": 1022
+      },
+      {
+        "path": "packages/docs-content/content/concepts/money-and-branded-values.mdx",
+        "sha256": "2a5b9d282b3c295c7eb8bcc8c8c4fc83c4eeaf77dfe009e8af0b2ee771a6a26b",
+        "bytes": 2083
+      },
+      {
+        "path": "packages/docs-content/content/concepts/reports.mdx",
+        "sha256": "c3cf071c2e90e45259eea1dd16663269dfe609518c525dd95b103f9d74ba9643",
+        "bytes": 1485
+      },
+      {
+        "path": "packages/docs-content/content/concepts/rules.mdx",
+        "sha256": "4a549fd191715afd80e02631ee51f4fd02711993c791b25fd252edee3e60abd7",
+        "bytes": 1044
+      },
+      {
+        "path": "packages/docs-content/content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+        "sha256": "8a0cefafbd2583d881084852913f89bf2071acc4c78933ce0714a4dfb772db9a",
+        "bytes": 1682
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-calculator.mdx",
+        "sha256": "1c66cfbbca806d8d50a2e187f6531de3ecb94976b28caf0fab7797b44e469d53",
+        "bytes": 2297
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-fact.mdx",
+        "sha256": "cd3341b9b80f7bbb06a722c9731e9f6d22694f53c6581baaa9c1678f230cc229",
+        "bytes": 2955
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-rule.mdx",
+        "sha256": "77c91fa5911cd7c7c40a74e955de69afa4dfd8fef5d9e363fb585cfb1e05c61a",
+        "bytes": 2562
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-tax-year.mdx",
+        "sha256": "476302737871c9d91401f32daaed5251dd5bab2bc7a241a473a466b4a1306c71",
+        "bytes": 2224
+      },
+      {
+        "path": "packages/docs-content/content/contributing/backward-compatibility.mdx",
+        "sha256": "78cfacf9e0441d7e7667cf25c605be88bf813c7fa5c6fe14723003dbddc31249",
+        "bytes": 1972
+      },
+      {
+        "path": "packages/docs-content/content/contributing/changesets.mdx",
+        "sha256": "2b9fe8f2d0194c0df425ec513760e183fe2dbf923a7943060ec4565427824ff8",
+        "bytes": 1265
+      },
+      {
+        "path": "packages/docs-content/content/contributing/effect-service-standards.mdx",
+        "sha256": "f05022bb6f8b26b22b1db47c7c29dcb7a414307c9a327fe50c717db70ef504a2",
+        "bytes": 1651
+      },
+      {
+        "path": "packages/docs-content/content/contributing/fix-an-incorrect-result.mdx",
+        "sha256": "fc961d4a7e9b04576acb635c15937767248c93f7fe7a53c16ec7ea952fcdc598",
+        "bytes": 1714
+      },
+      {
+        "path": "packages/docs-content/content/contributing/index.mdx",
+        "sha256": "e9581f62b2fc53b28910f3b48c479d820d5126fad810cf8c75e9be691f1cd84d",
+        "bytes": 1932
+      },
+      {
+        "path": "packages/docs-content/content/contributing/naming-and-schema-standards.mdx",
+        "sha256": "99d659c2a5e27f128015f280e1a5636e2f0b05c2f2d4b9a5248a898ef99650ac",
+        "bytes": 2349
+      },
+      {
+        "path": "packages/docs-content/content/contributing/pr-evidence-checklist.mdx",
+        "sha256": "c5941244ef6faa658dac6035fe8848894874528af4a42802be2273c783f32710",
+        "bytes": 1731
+      },
+      {
+        "path": "packages/docs-content/content/contributing/review-expectations.mdx",
+        "sha256": "d671e77b1266717c63677aa945527acb8f2fc142dc4efb55e23071670d2e8cdc",
+        "bytes": 1491
+      },
+      {
+        "path": "packages/docs-content/content/contributing/source-citation-standards.mdx",
+        "sha256": "a2fd278a5eb1924f3b51a0fccb106f28c6250f4513d4d378bc09081ad3ae882d",
+        "bytes": 1439
+      },
+      {
+        "path": "packages/docs-content/content/contributing/testing-standards.mdx",
+        "sha256": "12cc13473961edcad4e9d6ea161349709c337f47baa148af55ef9b3a880a6c06",
+        "bytes": 2493
+      },
+      {
+        "path": "packages/docs-content/content/contributing/what-are-you-changing.mdx",
+        "sha256": "9f39955bb9c85dd724860cb73da15d07fe7af171ef2bf7efa43183027c785100",
+        "bytes": 3752
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+        "sha256": "3205ef76fc5d9fe332aa90e3d6aecaf41484a83a47f4b73814e9bff5aaaed215",
+        "bytes": 2748
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-server-route-with-the-sdk.mdx",
+        "sha256": "be7ac205e3642533c230b3b8aa7c0abbdd797a3afc119b37c17eb4e7de25dcc6",
+        "bytes": 3504
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+        "sha256": "a05d4a9135331e1c63b6ae15156988fee9877247d31fefc30c8501c5c93a27c0",
+        "bytes": 1969
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+        "sha256": "9703d92b814d88a249d18f33c2436883d18489f7ca442d71cf92755aa9c573bf",
+        "bytes": 1946
+      },
+      {
+        "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+        "sha256": "58ab2d9106459198fe43df2a89a23b82c0e4cae8d7481b3e37d94984ddc1b0ea",
+        "bytes": 2485
+      },
+      {
+        "path": "packages/docs-content/content/guides/index.mdx",
+        "sha256": "5d0d52d5cb051d2515a8840a2730695ee8491de59649d7a9ab920ea139cfbccd",
+        "bytes": 944
+      },
+      {
+        "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+        "sha256": "6e76472d153685544c14068f700575df466e1ecb6e199eade2ca0792c7dedead",
+        "bytes": 2374
+      },
+      {
+        "path": "packages/docs-content/content/guides/show-calculator-help-to-users.mdx",
+        "sha256": "8682d9a24885eb3ebb04604f412c53a6210bbeb41c5d6ba361c8256c72d5c4ed",
+        "bytes": 2482
+      },
+      {
+        "path": "packages/docs-content/content/guides/test-your-integration.mdx",
+        "sha256": "75570a690ddfdd9321189495a305a6ac548c4c54ca46259ce3d0f4575bcfd3d2",
+        "bytes": 2307
+      },
+      {
+        "path": "packages/docs-content/content/reference/api.mdx",
+        "sha256": "5cf3ab9773e5374c89557911a5dde97ecf49b96faf7c698627a3992f2607cd40",
+        "bytes": 2856
+      },
+      {
+        "path": "packages/docs-content/content/reference/changelog.mdx",
+        "sha256": "3b24fdcfc2810cf440c0ef2d5cbd9132c14f0b8942888e8f432c0bd529979606",
+        "bytes": 1853
+      },
+      {
+        "path": "packages/docs-content/content/reference/errors.mdx",
+        "sha256": "594dfc43871e441d229418e83f8cd042afda9141b1e73394cefac7d36d5f559d",
+        "bytes": 4160
+      },
+      {
+        "path": "packages/docs-content/content/reference/examples.mdx",
+        "sha256": "e56e7f44679062a0287c7719b171c547b099877d1410f4acf32bc177ee27c5b2",
+        "bytes": 2783
+      },
+      {
+        "path": "packages/docs-content/content/reference/index.mdx",
+        "sha256": "a8223193b6322f55137ae8d78523451ba653c05c0e163e1264809972f24c0052",
+        "bytes": 650
+      },
+      {
+        "path": "packages/docs-content/content/reference/release-notes.mdx",
+        "sha256": "585e4b90b5e0486ba4aaee9cb5e29c525c9135d6b99f04da6e03e3550c02efca",
+        "bytes": 1575
+      },
+      {
+        "path": "packages/docs-content/content/reference/schemas.mdx",
+        "sha256": "ca2d6b20117c34eb31156f50a3871f52193085fe7a8fbd2f3dfbed59a0574428",
+        "bytes": 4773
+      },
+      {
+        "path": "packages/docs-content/content/reference/sdk.mdx",
+        "sha256": "f16f0213929f1b449a55dedfd485784be8dbd229f7da290768ed27d2f5fff968",
+        "bytes": 3875
+      },
+      {
+        "path": "packages/docs-content/content/reference/versioning.mdx",
+        "sha256": "8456023ab3c159fe4665d1606b8be796de02f1cc2ddce11ca66c8318c494f0c6",
+        "bytes": 1410
+      },
+      {
+        "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+        "sha256": "4c01cae8723987e0feb4e506207c863759c479d6745eaafedd19681c8532df9d",
+        "bytes": 4041
+      },
+      {
+        "path": "packages/docs-content/content/sdk/index.mdx",
+        "sha256": "fd48d19bbcd8e7d73bb0018cf80dabccae2c924f669a54b107425d736f2bfccb",
+        "bytes": 581
+      },
+      {
+        "path": "packages/docs-content/content/sdk/plain-sdk.mdx",
+        "sha256": "df7aac2a617cef669fe35675c1f5e104fe93409221beb490d75ebcdce4db89de",
+        "bytes": 2238
+      },
+      {
+        "path": "packages/docs-content/content/sdk/safe-sdk.mdx",
+        "sha256": "9ffccb925464ef2822ebb2ec4fdc45c23bd41a7a3f72d125f381c17d3fad87ea",
+        "bytes": 1646
+      },
+      {
+        "path": "packages/docs-content/content/sdk/schemas.mdx",
+        "sha256": "71a258e4eb47d9e9dfbe43b54edf2e84e8b836768bf457177e6f54b731d0cd97",
+        "bytes": 1856
+      },
+      {
+        "path": "packages/docs-content/content/sdk/type-safety.mdx",
+        "sha256": "98a5accb952d7f12888981d499d6fe3832c8977e3fb44f23fb9d2918a452db3f",
+        "bytes": 3589
+      },
+      {
+        "path": "packages/docs-content/content/sdk/typescript-sdk.mdx",
+        "sha256": "7adb72811cddcbe649b68a3383588e91ec1d431c92867e40631c73a576edaa25",
+        "bytes": 2354
+      },
+      {
+        "path": "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+        "sha256": "d9e5437f4d3ebb655299da3356e852df5a3664ab100ffd9c0f3486e620fbabf8",
+        "bytes": 3008
+      },
+      {
+        "path": "packages/docs-content/content/start/index.mdx",
+        "sha256": "71cbdfd5f0c2b87428b5493a15f00dafefbb2d1628bd1babb0b76fc92f8e55ef",
+        "bytes": 616
+      },
+      {
+        "path": "packages/docs-content/content/start/install-the-sdk.mdx",
+        "sha256": "746b37c9ea5b063f3805f14e863042b8e6b2e5f6039b4fff23e144aeca04fcb4",
+        "bytes": 1901
+      },
+      {
+        "path": "packages/docs-content/content/start/overview.mdx",
+        "sha256": "a6f9a0793f8ecdf1e402753b5bd10dc3ccc19d93899ba273f3d5acde69081bb4",
+        "bytes": 2132
+      },
+      {
+        "path": "packages/docs-content/content/start/quickstart.mdx",
+        "sha256": "15608d28a074ade562346b5b6eea66d870ed66daee3ef47b6c61a226c10518d5",
+        "bytes": 1980
+      },
+      {
+        "path": "packages/docs-content/content/start/run-your-first-calculation.mdx",
+        "sha256": "94735e5de1330cf5b947e6fdefc671eaf3a71ca3378c58dc419a6ddb1268affb",
+        "bytes": 1837
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--authentication-and-deployment-assumptions.json",
+        "sha256": "2dd20a7bf566c0665ceedea4884a1dc24decf3ba29e7448114c9c099aa9037cd",
+        "bytes": 308
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--endpoints.json",
+        "sha256": "3a75bed7f14d39af0076f0b180bbdcbf8f9a3c8471f20765e2bbb1e7e1edb6ea",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--errors.json",
+        "sha256": "eb6fdace6c3b7a7fb0ef647c75159110e00de5ea1d5e990a6c7b1c38ba0ef80d",
+        "bytes": 273
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--index.json",
+        "sha256": "b3ad39cdb57517462951c60b4cd19f79ad5ec758f1f736a1738abae0729c9b2e",
+        "bytes": 272
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--openapi-reference.json",
+        "sha256": "77a8049bd277045642883c9b2101f867fdb762aa7d30a50ca614256bc6d9dafb",
+        "bytes": 284
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--overview.json",
+        "sha256": "ddcd6d99a15a42c74801cf4eaace83351456c47deb883c1570c8ea510a571ac7",
+        "bytes": 275
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--calculators.json",
+        "sha256": "ec18ee1e21358d3574654603f63199f7caf49664fd31b50ee2e0a4949b971870",
+        "bytes": 283
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--diagnostics.json",
+        "sha256": "29f10cba9f070b14ec6442828f5fcd04652b1903a5910d6c3ebc7ed505048425",
+        "bytes": 283
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--facts.json",
+        "sha256": "eb91aced242788d65e9a6ac8c2b45d02beb72c6042ecf697e2c5dbefa715f17a",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--index.json",
+        "sha256": "9dec252f5137d39938376d30a314837f7527ac65acd04abbad26bbc5f0ce6091",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--jurisdictions-and-tax-years.json",
+        "sha256": "eff47512d5113bdb1685ccf2af52e9696a876c0e58fa34c202473fa2a39780a5",
+        "bytes": 299
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--money-and-branded-values.json",
+        "sha256": "ae83889f9f43ad6adb2ccd572290ecb873b3dfa23fd71c3348e53b339f76745c",
+        "bytes": 296
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--reports.json",
+        "sha256": "24e0e0ecfa90393c24447d44d9d69e13105936b4bb6bf9f78853026f737b46a5",
+        "bytes": 279
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--rules.json",
+        "sha256": "bfffe4084ba3e373fcd4565e22309c62835b4efd3dae561454c7cc6b5c73c67e",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--sdk-http-api-and-calculators-service-boundary.json",
+        "sha256": "6fbcd5bdce1abd5c1dea48d7d4115b0f21dd9ebbd614ab3611aa5879352cda48",
+        "bytes": 317
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-calculator.json",
+        "sha256": "e78cc0f684e4cc407b1486c37c21582ef7bfcb8355c024d9710f8e04b2a50f10",
+        "bytes": 292
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-fact.json",
+        "sha256": "a89f3ac90b5daf918b77a2e062fbca3d3aaad77342a958326407b926ea6f933b",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-rule.json",
+        "sha256": "efd77a1ea5f6fcaad61bbbe0550432b6c511ea93fce091814d680e5d9fb3cd99",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-tax-year.json",
+        "sha256": "b72f27858e16cd9d11c230dd85401d13f73fcf7279435ec869596ac6f0412f47",
+        "bytes": 290
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--backward-compatibility.json",
+        "sha256": "551d71b346a546e518e245d99a93c2b6a1b1182c0645a05a01bfcd39cf69ccad",
+        "bytes": 298
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--changesets.json",
+        "sha256": "ddde01ccb784f0f4d0bffd512967af62478dddde478ad1a98632d53d9e5e647e",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--effect-service-standards.json",
+        "sha256": "5aff8d6bde5c63affe832b125ecc31c211a2d8d98828fcee95c3ad381556b813",
+        "bytes": 300
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--fix-an-incorrect-result.json",
+        "sha256": "08931b073acddf617917e0c761bb8d543b49c9b7d634096c32e0eb5fea970adb",
+        "bytes": 299
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--index.json",
+        "sha256": "68ce439f81d9f4edf05be56333e733ed0c07a61996044df9878e24bfc0309b1b",
+        "bytes": 281
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--naming-and-schema-standards.json",
+        "sha256": "907df619587ed8e16de7bb51bd8813ffe5b1c12d5b6657d71c4eba36bec73166",
+        "bytes": 303
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--pr-evidence-checklist.json",
+        "sha256": "a30c26264880dbc14b6e42f98cb5a4e8ec947129fc1f18352e5dcb61a95884f6",
+        "bytes": 297
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--review-expectations.json",
+        "sha256": "e277eae428651a97f4dee3ad5127c1076a2dde213b63619bb51a0850d7229bd2",
+        "bytes": 295
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--source-citation-standards.json",
+        "sha256": "f222f4bf21002847f8b0272f6b138c0325d8a848a9d6830c8b0327f7545070c8",
+        "bytes": 301
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--testing-standards.json",
+        "sha256": "a79ccea61db9ab81f6df6e3d095c36ee8b6eef209b7e86e2a7acf8b868470f44",
+        "bytes": 293
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--what-are-you-changing.json",
+        "sha256": "fe50bfeb6a67b444615ae1e373bd2a23baa196bde59e57ccddd91fe7995f8bec",
+        "bytes": 297
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--build-a-browser-app-with-the-http-api.json",
+        "sha256": "a77ca7af74ebbcb0aa3e5e9faa3b6b3cab39e21817e743ab622f32eb9a334fab",
+        "bytes": 307
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--build-a-server-route-with-the-sdk.json",
+        "sha256": "2597e8b0be7880da1ac4fb99652899c2e06f25f5db5d32e338397a66344fb622",
+        "bytes": 303
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--calculate-annual-income-tax.json",
+        "sha256": "6463dfa13a976569f8e657fd4f9a289f899781de66e8b125d5751dd51c7245b6",
+        "bytes": 297
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--calculate-australian-take-home-pay.json",
+        "sha256": "0e5c53640548677310a60638ae4b94788fe4ebce4d1b0895d3e673d5e70bd37b",
+        "bytes": 304
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--handle-validation-errors.json",
+        "sha256": "bcd5c6f6b92a8f56163d374b6f7d71b032bb6b08896f0dd9bca01f3192045bc6",
+        "bytes": 294
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--index.json",
+        "sha256": "4e9c363db90c08693768c3e30fb3bdbc9f5a7cc93c04172f240bcb7e1a23bedd",
+        "bytes": 275
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--migrate-from-raw-http-to-sdk.json",
+        "sha256": "2b4a9c2bc5bd53168cd5bb7b5d61cac83430cc99133f4f731a84e62daeda48b7",
+        "bytes": 298
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--show-calculator-help-to-users.json",
+        "sha256": "e73aaf8cd384b0d1082225166222b18aba90801c2e620ab2e2070151748a4ad0",
+        "bytes": 299
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--test-your-integration.json",
+        "sha256": "ae52c92b2abd53410e3159f81bfaa4aa3c9488e006de5a6afac5188c99936d86",
+        "bytes": 291
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/navigation.json",
+        "sha256": "f2a0812c8bdb06ec53854ed7a770b2a36dbe803d4177247a240625f6bd970690",
+        "bytes": 266
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--api.json",
+        "sha256": "fdbb72c149a9981bbd7f32b253c7d3fdbd3d746b1a26e71e77f3234db93eb4d2",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--changelog.json",
+        "sha256": "3cff11b6242f7541da82a7450517102bd3ba26089d8f740f61ebae5b99a92db6",
+        "bytes": 282
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--errors.json",
+        "sha256": "70ed821d566c17efbfcd9a26834a8eca33a74cecd0a449ba271e07842b987f38",
+        "bytes": 279
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--examples.json",
+        "sha256": "edc9b664109e236d1beef804e2d803c4e43514c7d134cd60a10c2ebc65f993a3",
+        "bytes": 281
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--index.json",
+        "sha256": "8434693444a32923fd79a834b6ed9ed3ddac69b8062c6838f7df5f896da43245",
+        "bytes": 278
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--release-notes.json",
+        "sha256": "1008047e7392a6f3433e411dbe04c06727eaef239e7ca89b85170876bf84441e",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--schemas.json",
+        "sha256": "53f3b5e393c667745cba206ec9a1beb5cd9c994998d266abec1443d28f2947b7",
+        "bytes": 280
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--sdk.json",
+        "sha256": "4969a08cd84c803757ab11b63866faf378e8171368b9a8d6e70bcbd0f7659eeb",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--versioning.json",
+        "sha256": "6192aa02d834ad5428ebc023e0cc5d1b7d6b7da99c1c6ab734af4b14038c8524",
+        "bytes": 283
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--effect-sdk.json",
+        "sha256": "569eff10002812c53e63776da2dad71ce5efde86012218e14987f45826e19f12",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--index.json",
+        "sha256": "6bb4d7cc3d7479b26dfb293e914adc30085d7675446f39a48375ae7817743d63",
+        "bytes": 272
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--plain-sdk.json",
+        "sha256": "94d047ee0cd9f14f04a1d030a0be791b60830ea5cbf67567a3e977c300e9bbee",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--safe-sdk.json",
+        "sha256": "41408858ecaedc82a575a823b29c87345aa7d6dd6bbea04b6fe7c206afec19aa",
+        "bytes": 275
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--schemas.json",
+        "sha256": "c73ceb7779b325c273ae0d2bd1fe1df495ef08a6a1549c12d94d75d988668075",
+        "bytes": 274
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--type-safety.json",
+        "sha256": "4e163ee06b4ed81432f00a44a5eea70abeac51c813f26b3695bd794d1b284914",
+        "bytes": 278
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--typescript-sdk.json",
+        "sha256": "3cb8f3d94e83d1d7b652cd57784e63a64466a82da1840d9ceadc896383712475",
+        "bytes": 281
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--choose-sdk-or-api.json",
+        "sha256": "95abd27bfe147bb1e0384001a7585957cb40046547db4c89af3170602fe84262",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--index.json",
+        "sha256": "fa5861cc08a19dcb65d46bac3f438e5bb783550a17021db4a2ef4c85cea0d1e5",
+        "bytes": 274
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--install-the-sdk.json",
+        "sha256": "d2794e9aedd35cd5201351262bfe076853991f3e2eda7bf0bd2e99e09f40e835",
+        "bytes": 284
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--overview.json",
+        "sha256": "a02066dc9e97f3dbda0e879e735856fa9d2239b1869d2836fbcb623e8e65efd3",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--quickstart.json",
+        "sha256": "9e0df988d887e48885a3f56a5bccaee93af2744f95faa82632518e4615e18094",
+        "bytes": 279
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--run-your-first-calculation.json",
+        "sha256": "b0ffc097048deea35f626d7476cdbbcd2625016b7a2ce4088ae8cf928085879b",
+        "bytes": 295
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--endpoints.json",
+        "sha256": "9059b5b57e1b17331dce81a456cd50166d3167c877713862e8935980baf1c0b5",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--errors.json",
+        "sha256": "54923b94566f0530217b2095b5cc557b36e9215c74833bcf5739df675ccb49a7",
+        "bytes": 273
+      },
+      {
+        "path": "packages/docs-content/navigation.json",
+        "sha256": "702af16f496d9dd5ad2b32caba525a7c1250d4166cb82ad201728a171d0a78c2",
+        "bytes": 15433
+      },
+      {
+        "path": "tools/documentation/owner-policy.json",
+        "sha256": "75c342c96118899eb11cd9c3bd2fa36ba98c8b6fd832e40d9190083e9b75bd54",
+        "bytes": 16702
+      }
+    ],
+    "retainedIntegrationTemplates": [
+      {
+        "path": "packages/docs-examples/src/node-server.ts",
+        "sha256": "615696a109f00a22c8b7adeeca0d23a0e3b0c3598cb03c8d374db5c60fedb908",
+        "bytes": 2000
+      },
+      {
+        "path": "packages/docs-examples/src/browser-http.ts",
+        "sha256": "bc7f0cb75b61ccd87e98a6f4e4c7c797e83bec1651c0fce1587a73deeb973862",
+        "bytes": 1157
+      },
+      {
+        "path": "packages/docs-examples/src/effect.ts",
+        "sha256": "a1bbc04ec1a8bbb31b52b8a9a22b591d5ffaf4e484da4f6e461eaadb3ec6619a",
+        "bytes": 1061
+      },
+      {
+        "path": "packages/docs-examples/src/error-handling.ts",
+        "sha256": "77616e6e6803778d226f1e7911cfbaf15300e611582a136dcfa1ba4f149aa570",
+        "bytes": 825
+      }
+    ]
+  },
+  "catalogueIdentity": {
+    "path": "packages/docs-content/.source/public-catalogue.json",
+    "sha256": "6f3d3beb055c2d5d83ba5abeb9feef3fb8da51188f077e9181685f8f708c26b6",
+    "bytes": 235703
+  },
+  "focusedQualification": {
+    "checks": [
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.67,
+        "log": "/private/tmp/dev76-search-final-native-d-format.log"
+      },
+      {
+        "stage": "lint",
+        "command": [
+          "bun",
+          "run",
+          "lint"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 6.01,
+        "log": "/private/tmp/dev76-search-final-native-d-lint.log"
+      },
+      {
+        "stage": "native",
+        "command": [
+          "bun",
+          "run",
+          "web:test:native-pair"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 106.99,
+        "log": "/private/tmp/dev76-search-final-native-d-native.log"
+      }
+    ],
+    "observation": "Fresh native build followed by all eleven tests across seven files; focus checks are distinct from the later full repository qualification."
+  },
+  "fullQualification": {
+    "status": "Passed",
+    "checks": [
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.61,
+        "log": "/private/tmp/dev76-search-full-c-format.log"
+      },
+      {
+        "stage": "all-tests",
+        "command": [
+          "bun",
+          "run",
+          "test"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 84.83,
+        "log": "/private/tmp/dev76-search-full-c-all-tests.log"
+      },
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 660.92,
+        "log": "/private/tmp/dev76-search-full-c-verification.log"
+      }
+    ],
+    "sourceIdentities": [
+      {
+        "path": "apps/web/README.md",
+        "sha256": "5649d424841cfff2f4cea967b83c2b7cd3bc2ceadb94272ae2d524ba8ec22d95",
+        "bytes": 23774
+      },
+      {
+        "path": "apps/web/src/lib/docs/components.tsx",
+        "sha256": "85286f6e573ab5e85ab50e7a257445116e8609212f2bc5f0b43b34c1472297ac",
+        "bytes": 3292
+      },
+      {
+        "path": "apps/web/src/lib/docs/errors.ts",
+        "sha256": "b988591084342ae659c974856662d6bc852e5c247a4265d5f203eef5654fde10",
+        "bytes": 755
+      },
+      {
+        "path": "apps/web/src/lib/docs/page.view.tsx",
+        "sha256": "22178bf566c39bb3a5e022e2bf2bb57c5fee5c7ea51fa650c2a2f3d385d84efd",
+        "bytes": 2276
+      },
+      {
+        "path": "apps/web/src/lib/docs/route-boundary.ts",
+        "sha256": "211ff2bf309c6afb1df89003ea7e8a0b7b74c303ff7354009e285cf79ceb3331",
+        "bytes": 884
+      },
+      {
+        "path": "apps/web/src/lib/docs/search-location.boundary.ts",
+        "sha256": "f3ef7639c6e7cff836a062827d04bb32f7a12af9a596a56a2b1daf822db82875",
+        "bytes": 1599
+      },
+      {
+        "path": "apps/web/src/lib/docs/search.view.tsx",
+        "sha256": "a9f2cd37c205b2762aaab77c643bb86c52c477abab429e51acad9f238b83600d",
+        "bytes": 2020
+      },
+      {
+        "path": "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+        "sha256": "3abbfb9749a48b9f2b12d89d09a1a8a4de2e2c95da3fe77b05c930358b635ee9",
+        "bytes": 11316
+      },
+      {
+        "path": "apps/web/src/lib/loaders.server.ts",
+        "sha256": "46f108eb783513fde507632bd808b3943e5c8d5ff4ec24ac9bfc315b715170c0",
+        "bytes": 5823
+      },
+      {
+        "path": "apps/web/src/lib/loaders.ts",
+        "sha256": "4a8cfe62657a5060fbbaa1df215c55248dee0fb072c855452ed88d664a88bd1c",
+        "bytes": 2858
+      },
+      {
+        "path": "apps/web/src/lib/route-context.ts",
+        "sha256": "8f9083dcfd9d4b0371fed2553db295d49dbf63ca355b92e6495cd72fcaaf3c7d",
+        "bytes": 304
+      },
+      {
+        "path": "apps/web/src/lib/schemas.ts",
+        "sha256": "06a281165caddd2588123e3701383a6ed69e1e234beedc29051d5cf1ceed018c",
+        "bytes": 5336
+      },
+      {
+        "path": "apps/web/src/routeTree.gen.ts",
+        "sha256": "079ae66e33f22502bfa875f3fdb00b954666bd201049e8507405fd94a2f1c4c9",
+        "bytes": 4401
+      },
+      {
+        "path": "apps/web/src/router.tsx",
+        "sha256": "0bc8330cb536b58128d8e4b14cfff2e3aae1c3fa9a1818100b50ec68d53851e7",
+        "bytes": 937
+      },
+      {
+        "path": "apps/web/src/routes/$.tsx",
+        "sha256": "3c7357d3620407bc76413e64c58dac80ed2b3cf41ec916b101b5ea99b7868f4d",
+        "bytes": 2533
+      },
+      {
+        "path": "apps/web/src/routes/search.tsx",
+        "sha256": "08ba3c26e2cdc5392096a6804dd9da31756f367098da346cefdbcacedbde9bfd",
+        "bytes": 3113
+      },
+      {
+        "path": "apps/web/src/server.ts",
+        "sha256": "b22d28551cc1135fec8e66a83bf1417c4c305fdeecda89f57392ac27394ee957",
+        "bytes": 8533
+      },
+      {
+        "path": "apps/web/src/styles.css",
+        "sha256": "4945332ea4d0b44401ab0b854181fe5f3d74bd756527f80d52d43637fd052b3c",
+        "bytes": 6697
+      },
+      {
+        "path": "apps/web/test/native-local-development.boundary.test.ts",
+        "sha256": "bc24ffe94848c4148961ca0e769dcf6b935d8b5591e881d4c6ca23a69c64b407",
+        "bytes": 17672
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "f095e67b92b75579654110d3cd963695fcbc114330a397a2c280789036c69111",
+        "bytes": 83989
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "8abd84bf639be231fecb056c2bfaa04082b2d8e19422f0b679041c3a0daa4cf6",
+        "bytes": 31271
+      },
+      {
+        "path": "docs/architecture/content-and-posts.md",
+        "sha256": "d9b9a8576080ed3d7628d8f651e30f797ea7a7b7f41646cd0b970c5e2ec31481",
+        "bytes": 7743
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "42ad5846a215f87a03a1c71640d8cb7b4f5e117b4eaaf4238dc2f5e3061033e8",
+        "bytes": 28448
+      },
+      {
+        "path": "docs/architecture/frontend.md",
+        "sha256": "c120a3cebd1a3be9c3489ec98e61be550e2b171c7cf0f3b14a635569568bc4c0",
+        "bytes": 26886
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "aa73e1f4dc0c75aa847ef36d0f02720660e02a3a7b63b6cad77cc1b912a8428b",
+        "bytes": 95453
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "f9e20dbafaab1ff524ce290ac4ca287e68f024c2f4f20ff02fa4bf015e6c3685",
+        "bytes": 274981
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "723744bb3cab31f8a0e4e9adb08917aaccf8d00377cdbf7bd3b97f93ad7f0421",
+        "bytes": 68722
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "f6b4d63f5a9a15c8884a03f7a6388f08bf15edc7d3284be755b20fa416f4cc85",
+        "bytes": 73413
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "604e83a6a0992bcfd1a6d3aabcb282c1a38776340d838ec7a17ffbcf11231a4e",
+        "bytes": 20623
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "7d930aae7140efc101474339e23bb1475655f92076ab56e1b6e9420ee85b6329",
+        "bytes": 57335
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "ef447ce4a84820a68e4310a734e5bfc2bbab076fc6b57bbe6fbe9dee6bda3c10",
+        "bytes": 87829
+      }
+    ],
+    "observations": [
+      "602 actual lint-rule tests passed inside bun run test",
+      "Full verification includes both Knip graphs, owning types/docs/runbooks/paths/workflow checks, SDK and Website browser checks, worker-type check, fresh native build and all native cases",
+      "Website browser suite contains 21 cases; the literal-word fixture waits for actual rendered destination words",
+      "No changed source bytes after frozen qualification; receipt metadata is excluded from self-referential source hashing and gets separate final tracked-file checks"
+    ]
+  },
+  "readingReview": {
+    "reviewer": "Fresh independent impeccable_search_reviewer",
+    "disposition": "ship",
+    "scope": "Both valid supplied desktop/phone captures and sampled search source; search design only",
+    "contract": "Fresh no-history agent used supplied Impeccable finish instructions because no preset loader was available",
+    "path": "/private/tmp/dev76-search-finish-review.md",
+    "originalSha256": "bd8e560cc5a51afa580309981678144b8469c6c0082588f504d6c8b5dc827dc2",
+    "projectedSha256": "bd8e560cc5a51afa580309981678144b8469c6c0082588f504d6c8b5dc827dc2",
+    "portableReport": "disposition: ship\n\nSupplied-contract review; no preset was loaded. PRODUCT.md, DESIGN.md, a quality card, concept roll, approved comp and measured reproduction files are N/A under the supplied brief for this bounded extension. Unread: remaining native test source and full test-run logs.\n\n## persistence\n\nPass for the stated scope. HEAD is b7cbed17a0b52283b5f9f75abf68c448d73af390, with the supplied search extension present as local changes. The frontend owner describes the standard search form, accepted result copy and inherited navigation. The absent whole-new-design files do not require invention for this extension.\n\nBoth required PNGs opened and passed file validation: desktop 1280 \u00d7 1114 and phone 390 \u00d7 1770. Each shows the document top, the Quickstart query and all five results, without blank or black regions. The capture source records 1280 \u00d7 900 and 390 \u00d7 844 viewports. Images establish appearance only; this review does not independently establish test success, deployment or public availability.\n\n## fidelity\n\n| Element or promise | Finding | Evidence |\n| --- | --- | --- |\n| TYPE / OWN-WORLD | match | The inherited Inter/system type, clear heading sizes and ordinary body text remain consistent with the supplied document design. No new display style appears. |\n| MATERIAL / OWN-WORLD | match | Plain text, native form controls and thin rules suit the existing document page. No imitation texture, decorative depth or invented picture is present. |\n| GROUND / OWN-WORLD | match | Both captures sample #f8fafc at the page field and top corner. The source uses the supplied dark text, quiet text, blue links and blue focus colours. Text contrast against the field is 15.55:1, 6.14:1 and 7.23:1 respectively. |\n| THESIS | match | The heading identifies documentation search; labelled controls and linked titles make the next step clear. |\n| STORY | match | Ordinary site links, the existing document navigation, search form, count and results follow the supplied reading order. |\n| FIRST VIEWPORT | match | Desktop shows the search heading, form and first results immediately. Within the phone's 844-pixel first screen, the heading, input and submit button are visible below the bounded navigation. |\n| FORM | match | Source retains a labelled GET form and a readonly list of accepted titles and descriptions. The visible copy contains no raw Markdown fragments or added claims. Concept seed requirements are N/A under the settled extension brief. |\n| Phone reflow | adaptation | The button moves below the input while the existing navigation keeps its bounded scroll region and native disclosure. This follows the supplied phone-navigation and standard-form requirements. No horizontal overflow is visible. |\n| Results and states | match | Five clearly separated title/description links match the visible count. Sampled source supplies empty, no-match, loading, invalid-input and unavailable guidance. Those additional states were not visually captured in this review. |\n| Focus and floor | match | The phone capture shows a clear blue input focus ring. Links keep underlines and the source retains heading-focus navigation. No kicker, gradient text, side stripe, repeated card scaffold or decorative shadow appears. The inherited type and browser controls are authorised by the supplied brief. |\n\n## ceiling\n\nReached for this ordinary document extension. The existing page calls for readable type, restrained rules, clear links and native controls; those are present. A quality card, decorative lettering, ornament, raster assets and authored motion have no authority in this scope. The review covers search design only, with metrics and the rest of T005 outside its decision.\n\n## material_fixes\n\nNone.\n\n## keep\n\nKeep the pale document field, clear title/description links, labelled native GET form, visible focus and bounded phone navigation.\n\n"
+  },
+  "designDocumentation": {
+    "reviewer": "Fresh independent impeccable_search_documenter",
+    "outcome": "Ordinary extension preserves existing system; no repository writes",
+    "contract": "Fresh no-history agent used supplied documenter instructions; frozen Git-index source checked during temporary CLI fixtures",
+    "path": "/private/tmp/dev76-search-design-documentation.md",
+    "originalSha256": "9c3362ed9cc7ef199303f99053573164fb5e978364e995cd08f4a61cbb15aea7",
+    "projectedSha256": "cd18e9790095c1af78eb3572bebd365e38e9a35e568b0ff687bae967851fb916",
+    "portableReport": "Supplied-contract role: independent Impeccable documenter using the supplied documenter contract; no preset agent was loaded.\n\nWritten: `/private/tmp/dev76-search-design-documentation.md` only. No changes to repository design documentation. This ordinary search extension preserves the existing design; it does not justify creating a design guide or sidecar.\n\nSource and system files checked:\n\n- Repository: `<repository-root>`; HEAD `b7cbed17a0b52283b5f9f75abf68c448d73af390` matches the supplied frozen-source record.\n- Product files were read from the Git index, not the temporarily overwritten working files. Every byte count and SHA-256 below matches `/private/tmp/dev76-search-frozen-sources.json`.\n\n| Frozen source | Bytes | SHA-256 |\n| --- | ---: | --- |\n| `apps/web/src/styles.css` | 6697 | `4945332ea4d0b44401ab0b854181fe5f3d74bd756527f80d52d43637fd052b3c` |\n| `apps/web/src/routes/search.tsx` | 3113 | `08ba3c26e2cdc5392096a6804dd9da31756f367098da346cefdbcacedbde9bfd` |\n| `apps/web/src/lib/docs/search.view.tsx` | 2020 | `a9f2cd37c205b2762aaab77c643bb86c52c477abab429e51acad9f238b83600d` |\n| `apps/web/src/lib/docs/page.view.tsx` | 2276 | `22178bf566c39bb3a5e022e2bf2bb57c5fee5c7ea51fa650c2a2f3d385d84efd` |\n| `apps/web/src/lib/docs/components.tsx` | 3292 | `85286f6e573ab5e85ab50e7a257445116e8609212f2bc5f0b43b34c1472297ac` |\n\n- `git diff --cached HEAD -- apps/web/src/styles.css` shows only the added search form, controls and result-list rules. Existing page colours, navigation, reading width, headings and phone layout are unchanged in the frozen source. The added white controls, thin borders, small corners and blue focus outline repeat the existing form treatment.\n- Confirmed absent at both repository and `apps/web` roots: `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json` and `.impeccable/config.json`. None was created.\n- Existing documentation checked: `docs/README.md`; `docs/architecture/frontend.md` lines 431\u2013452; `docs/architecture/content-and-posts.md` lines 78\u201390; `apps/web/README.md` lines 345\u2013363; `docs/product-specs/clean-slate-foundation.md` lines 894\u2013910. These already describe the plain GET form, accepted-content search, separate states, existing links and heading focus. Metrics remain deferred in the current SPEC.\n- Method files checked: `<installed-impeccable-skill>/reference/degraded/documenter.md`, `reference/document.md` and `reference/craft-floor.md`, each in full; repository-local `.agents/skills/docs-maintainer/SKILL.md` and its `repository-profile.md`, `document-classes.md`, `change-impact.md` and `proof-authority-and-lifecycle.md` references.\n- Appearance checked in `.alchemy/native-pair/screenshots/reviewed/search/docs-search-desktop.png` and `docs-search-mobile.png`. Both show the labelled form, five linked titles with plain descriptions and thin separators; the phone form is visible below the bounded navigation. `/private/tmp/dev76-search-finish-review.md` records `ship` and no material fixes.\n\nDocumentation impact: **Preserve** the current stylesheet, component patterns, app README, architecture and SPEC wording; the checked design claims agree. **N/A** for new design files, token sidecars, public-copy changes, generated references, runbooks, package/release notes, skills and CI changes: this pass changes no product or repository file. Existing proof and task status are preserved; the implementation owner retains responsibility for test and PR receipts. No lifecycle transition or regeneration is needed for this report.\n\nProof limit: source inspection confirms the ordinary GET form and distinct empty, no-match, loading, invalid and unavailable messages. The supplied images confirm appearance only. This pass did not run tests, use a browser, verify deployment or public availability, accept new content, or qualify the rest of T005. The supplied finish review is supporting evidence, not a substitute for independent source reading.\n\nPalette: pale field `#f8fafc`, dark text `#172033`, quiet text `#526071`, rules `#d6dde7`, links `#075985`, focus `#2563eb`; white form controls and `#94a3b8` control borders reuse the existing form colours.\nType: inherited Inter/system stack; article body `1.0625rem` with `1.75` line height, main heading `clamp(2rem, 4vw, 3rem)` with `1.15`, result titles `1.25rem` with `1.3`, help/navigation `0.9375rem`; labels use weight `600`.\nLayout: desktop `17rem` sidebar beside a reading column capped at `72ch`, inside an `86rem` page; at `52rem` and below the layout becomes one column and navigation stays capped at `16rem`; form controls wrap naturally on the phone.\nComponents: visible \u201cSearch words\u201d label, native search input capped at 100 characters, \u201cSearch documentation\u201d submit button, plain accepted titles linking to existing pages, descriptions and thin result separators; fixed guidance covers the five required states.\nNamed rules: preserve the existing heading-focus rule after ordinary document navigation and the bounded phone-navigation rule; the labelled GET form and readonly accepted result copy follow the settled brief. No new system-wide rule is invented.\n\nDefects/drift not canonised or repaired: no material search drift found in the frozen source and reviewed images; inherited Inter/system type and native browser controls are authorised by the fixed brief, and wider calculator styling is outside this pass.\n"
+  },
+  "reviewedCaptures": [
+    {
+      "path": ".alchemy/native-pair/screenshots/reviewed/search/docs-search-desktop.png",
+      "sha256": "15592e4434054cf39127affe096a30ba40eca5f433f8bedd56b21fd3df69c780",
+      "bytes": 127447,
+      "width": 1280,
+      "height": 1114
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/reviewed/search/docs-search-mobile.png",
+      "sha256": "66311086fd99140888c56489d857a0d9a861a731f756bc9adfd19602db4b7a7d",
+      "bytes": 110924,
+      "width": 390,
+      "height": 1770
+    }
+  ],
+  "compiledEntryIdentities": [
+    {
+      "path": ".alchemy/native-pair/bundles/TaxKitApi/worker.js",
+      "sha256": "f819fd9797f86293262e7e5040c8d50a72dccee2487d46b2710896dead278647",
+      "bytes": 3777431
+    },
+    {
+      "path": "apps/web/dist/server/server.js",
+      "sha256": "08aae6e179e5ab3610b3c9ff7f6f1c8fcc0b4ccb2934cd7c7acee608f923e318",
+      "bytes": 712970
+    }
+  ],
+  "failedLocalAttempts": [
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 2.99,
+      "log": "/private/tmp/dev76-search-browser-dom-a-lint.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.98,
+      "log": "/private/tmp/dev76-search-final-native-a-web-types.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.97,
+      "log": "/private/tmp/dev76-search-final-native-b-web-types.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 3.06,
+      "log": "/private/tmp/dev76-search-final-native-c-lint.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.96,
+      "log": "/private/tmp/dev76-search-focus-a-web-types.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.94,
+      "log": "/private/tmp/dev76-search-focus-b-web-types.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 2.98,
+      "log": "/private/tmp/dev76-search-focus-c-lint.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 2.93,
+      "log": "/private/tmp/dev76-search-focus-d-lint.log"
+    },
+    {
+      "stage": "all-tests",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 84.98,
+      "log": "/private/tmp/dev76-search-full-a-all-tests.log"
+    },
+    {
+      "stage": "verification",
+      "command": [
+        "bun",
+        "run",
+        "verification"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 548.67,
+      "log": "/private/tmp/dev76-search-full-b-verification.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 2.97,
+      "log": "/private/tmp/dev76-search-native-a-lint.log"
+    },
+    {
+      "stage": "native-build",
+      "command": [
+        "bun",
+        "run",
+        "web:build:native-pair"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.01,
+      "log": "/private/tmp/dev76-search-native-b-native-build.log"
+    },
+    {
+      "stage": "native",
+      "command": [
+        "bun",
+        "run",
+        "web:test:native-pair"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 105.08,
+      "log": "/private/tmp/dev76-search-native-c-native.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 3.14,
+      "log": "/private/tmp/dev76-search-query-a-lint.log"
+    },
+    {
+      "stage": "web-browser",
+      "command": [
+        "bun",
+        "run",
+        "web:test:browser"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 6.04,
+      "log": "/private/tmp/dev76-search-query-b-web-browser.log"
+    },
+    {
+      "stage": "web-browser",
+      "command": [
+        "bun",
+        "run",
+        "web:test:browser"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 2.95,
+      "log": "/private/tmp/dev76-search-query-c-web-browser.log"
+    },
+    {
+      "stage": "web-browser",
+      "command": [
+        "bun",
+        "run",
+        "web:test:browser"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 5.75,
+      "log": "/private/tmp/dev76-search-query-d-web-browser.log"
+    },
+    {
+      "stage": "web-browser",
+      "command": [
+        "bun",
+        "run",
+        "web:test:browser"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 5.87,
+      "log": "/private/tmp/dev76-search-query-f-web-browser.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 1.0,
+      "log": "/private/tmp/dev76-search-query-g-web-types.log"
+    }
+  ],
+  "failureCorrections": [
+    "The framework default query parser changed 1e3 into 1000; exact literal URL-pair callbacks correct this at the earliest URL owner.",
+    "Bare router and immediately resolved navigation did not observe completed React rendering; the fixture mounts actual loader/components in a plain shell and waits for rendered words. Nesting the actual HTML shell in the runner document was invalid and its stalled run was terminated.",
+    "Native framework reply uses Seroval representation; plain-JSON substring assertions were corrected, with actual decoded API/browser semantic observations retained.",
+    "Full verification found a Bun HTML-rewriter Element.append type clash in the browser fixture. Scoped detached rendering removes unnecessary DOM insertion; focused types, lint and all 21 browser checks pass without a cast, exception or global override.",
+    "The new neighbouring encoder canary initially named a nonexistent file although the fixture saves/restores an existing owner. It now exercises the actual router source, followed by all 602 checks passing."
+  ],
+  "hostedObservation": {
+    "candidate": "b7cbed17a0b52283b5f9f75abf68c448d73af390",
+    "runId": 37500299332,
+    "jobId": 112395262171,
+    "url": "https://github.com/crcorbett/taxkit/actions/runs/37500299332",
+    "outcome": "Failure: first real CLI Website navigation returned 502 after API health returned 200",
+    "underlyingCause": "Unknown; the available hosted excerpt supplies no child-process diagnosis",
+    "localResponse": "Bounded served-page readiness for 502/503 only, followed by strict browser navigation; exact final local native tests pass",
+    "newCommitHostedProof": "Pending after push; local proof does not reclassify earlier hosted failure"
+  },
+  "rollback": {
+    "local": "Restore this slice to baseHead b7cbed17 with source identities/retained content intact; use a reviewable revert if later changes depend on it",
+    "external": "No external runtime mutation to roll back; do not merge or deploy under this authority"
+  },
+  "nonClaims": [
+    "Whole DEV-76/T005 is unfinished: discovery, Markdown negotiation, share images and old-app retirement remain.",
+    "Metrics remain deferred; no safe exported telemetry, provider cancellation or collection proof.",
+    "No new candidate hosted success, deployment, public availability, publication or provider apply.",
+    "Images establish appearance only; independent reviewers did not repeat full runtime qualification.",
+    "Readiness does not establish the cause or reproduce the earlier hosted 502."
+  ],
+  "nextOwner": "Continue T005 discovery, Markdown negotiation, share images and retirement; keep DEV-76 In Progress and metrics deferred."
+}

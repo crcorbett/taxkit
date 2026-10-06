@@ -4178,3 +4178,48 @@ package contract, Changeset, operational procedure and provider state. Focused
 checks and corrected-commit hosted proof are recorded separately; earlier
 full local qualification does not establish hosted success. T005 remains in
 progress and metrics remain deferred.
+
+### T005 Website search implementation — 7 October
+
+The next bounded slice connects a human search page to the existing named
+`searchDocs` operation and accepted catalogue. A plain GET form keeps search
+usable without JavaScript; results use the existing document link behaviour.
+The original address owns SSR words, while the generated native browser GET
+carries only a bounded ASCII URI component header. The installed native URI
+codec carries Unicode, and the owning content Schema retains the 100-character
+term, 20-result and 240-character excerpt limits. Empty, missing, invalid,
+loading and unavailable states remain distinct. No separate search index,
+collection event or personalised content is introduced.
+
+Documentation impact before acceptance: Change required for Website source,
+Schema/route/host ingress, exact route-consumer lint proof, native reading/search
+journey, Website/frontend/content/API/testing owners, SPEC/task and this plan;
+Preserve for accepted source/review/navigation, content service/RPC contract,
+retained results and disabled collection; N/A for a new package export,
+Changeset, deployment procedure, provider or credential operation. Discovery,
+Markdown negotiation, images and old-app retirement remain later T005 work.
+
+
+The search router now preserves literal URL pairs: the framework's default
+JSON parser changed `1e3` into `1000`. The focused fixture uses the actual
+search loader/components with a plain shell because the browser runner already
+owns an HTML document; it waits for rendered words after navigation before
+asserting checked outcomes. Human results show accepted titles/descriptions;
+raw Markdown excerpts remain an API contract and are not displayed as prose.
+
+Hosted Quality run `37500299332` for `b7cbed17` failed on the real CLI
+fixture's initial Website navigation: 502 instead of 200 after API health
+succeeded. Its retained hosted excerpt identifies no underlying cause. The
+fixture now observes served-page readiness after printed addresses, retrying
+only 502/503 for fifteen seconds before a strict 200 browser navigation.
+Other errors remain failures. Qualification and later hosted status must be
+recorded separately; the earlier failed run is not reclassified as success.
+
+
+The first full search verification passed the complete tests and workflow
+failure-canaries, then caught a browser-fixture type clash: Bun's HTML-rewriter
+`Element.append` accepts text/streams rather than a DOM node. The fixture only
+needs its own rendered values, so its scoped React shell remains detached.
+No cast, lint exception or global type override is added. Real page, focus and
+form observations remain in the native journey. Fresh focused types, lint and
+browser checks precede complete qualification of the corrected sources.

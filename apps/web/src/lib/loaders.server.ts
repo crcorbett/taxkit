@@ -7,9 +7,13 @@ import { Array, Cause, Effect, ErrorReporter, Schema } from "effect";
 import { HttpServerError, HttpServerResponse } from "effect/http";
 
 import { WebsiteServerFunctionBase } from "./config";
+import { DocsSearchInputError } from "./docs/errors";
 import { preloadDocsPresentation } from "./docs/mdx.boundary";
 import { appRuntime } from "./runtime.server";
 import {
+  WebsiteDocsSearchHeader,
+  WebsiteDocsSearchLocation,
+  WebsiteDocsSearchTransport,
   WebsiteCatalogueTransport,
   WebsiteDocsPageTransport,
   WebsiteSettingsTransport,
@@ -100,6 +104,51 @@ export const loadWebsiteDocsPageServer = () => {
               )
             )
           )
+      )
+    ),
+    { signal: request.signal }
+  );
+};
+
+export const loadWebsiteDocsSearchServer = () => {
+  const request = getRequest();
+  const url = new URL(request.url);
+  // A document request owns its raw search words. Only the admitted native
+  // browser function reads the URI-encoded header; it cannot override SSR.
+  const term = url.pathname.startsWith(`${WebsiteServerFunctionBase}/`)
+    ? Schema.decodeUnknownEffect(WebsiteDocsSearchHeader)(
+        request.headers.get("x-taxkit-docs-search")
+      )
+    : Schema.decodeUnknownEffect(WebsiteDocsSearchLocation)(url.search).pipe(
+        Effect.map((query) => query.term ?? "")
+      );
+  return appRuntime.runPromise(
+    term.pipe(
+      Effect.mapError(() => new DocsSearchInputError()),
+      Effect.flatMap((value) =>
+        WebsiteServerApplication.pipe(
+          Effect.flatMap((application) =>
+            Effect.gen(function* () {
+              const settings = yield* application.settings;
+              const navigation = yield* application.docsNavigation;
+              const results =
+                value === "" ? [] : yield* application.searchDocs(value);
+              return { navigation, results, settings, term: value };
+            })
+          )
+        )
+      ),
+      Effect.result,
+      Effect.flatMap(Schema.encodeEffect(WebsiteDocsSearchTransport)),
+      Effect.orDie,
+      Effect.catchCause((cause) =>
+        HttpServerError.causeResponse(cause).pipe(
+          Effect.flatMap(([response, reportable]) =>
+            ErrorReporter.report(reportable).pipe(
+              Effect.as(HttpServerResponse.toWeb(response))
+            )
+          )
+        )
       )
     ),
     { signal: request.signal }

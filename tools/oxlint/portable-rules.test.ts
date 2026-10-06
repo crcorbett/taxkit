@@ -1465,6 +1465,7 @@ describe("exact native RPC lint boundaries", () => {
       [
         "apps/web/src/lib/docs/mdx.boundary.tsx",
         "apps/web/src/lib/docs/route-boundary.ts",
+        "apps/web/src/lib/docs/search-location.boundary.ts",
       ],
       (path) => [
         {
@@ -1494,6 +1495,8 @@ describe("exact native RPC lint boundaries", () => {
       [
         "apps/web/src/lib/docs/components.tsx",
         "apps/web/src/lib/docs/page.view.tsx",
+        "apps/web/src/lib/docs/search.view.tsx",
+        "apps/web/src/routes/search.tsx",
         "apps/web/src/routes/$.tsx",
       ],
       (path) => [
@@ -1744,6 +1747,20 @@ describe("exact native RPC lint boundaries", () => {
     },
     {
       path: "apps/web/src/lib/loaders.ts",
+      rejected: false,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/loaders.ts",
+      rejected: true,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/router.tsx",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:

@@ -31,11 +31,16 @@ import {
 } from "./lib/form.boundary";
 import type { WebsiteCalculatorForm } from "./lib/form.boundary";
 import {
+  WebsiteDocsSearchFunctionPath,
   WebsiteDocsPageFunctionPath,
   WebsiteSettingsFunctionPath,
 } from "./lib/loaders";
 import { appRuntime } from "./lib/runtime.server";
-import { WebsiteSubmission, WebsiteSubmissionTransport } from "./lib/schemas";
+import {
+  WebsiteDocsSearchHeader,
+  WebsiteSubmission,
+  WebsiteSubmissionTransport,
+} from "./lib/schemas";
 import type { WebsiteServerRenderContext } from "./lib/schemas";
 import { WebsiteServerApplication } from "./lib/service.server";
 
@@ -64,11 +69,12 @@ export default {
         if (url.pathname.startsWith(`${WebsiteServerFunctionBase}/`)) {
           if (
             url.pathname !== WebsiteSettingsFunctionPath &&
-            url.pathname !== WebsiteDocsPageFunctionPath
+            url.pathname !== WebsiteDocsPageFunctionPath &&
+            url.pathname !== WebsiteDocsSearchFunctionPath
           ) {
             return HttpServerResponse.empty({ status: 404 });
           }
-          // Both native GET functions take no data or client Context. Reject
+          // The native GET functions take no data or client Context. Reject
           // representation input before the framework's
           // JSON/FormData parser can reflect it in an unexpected error.
           if (request.method !== "GET") {
@@ -80,6 +86,10 @@ export default {
           if (
             url.search !== "" ||
             request.headers.has("content-type") ||
+            (url.pathname === WebsiteDocsSearchFunctionPath &&
+              !Schema.is(Schema.toEncoded(WebsiteDocsSearchHeader))(
+                request.headers.get("x-taxkit-docs-search")
+              )) ||
             (url.pathname === WebsiteDocsPageFunctionPath &&
               !Schema.is(DocsPublicPagePath)(
                 request.headers.get("x-taxkit-docs-page")

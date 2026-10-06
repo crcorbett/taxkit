@@ -889,3 +889,20 @@ metrics/exporter/dataset/dashboard choices must be revisited before that task
 starts. This continuation does not implement or accept that prior metrics
 approach. Existing disabled collection and fixed safe failure containment stay
 in place while calculator/API and other authorised work proceed.
+
+
+## T005 Website search contract
+
+The replacement Website has one `/search` page with a labelled standard GET
+form and optional `term` field. Original URL words determine SSR selection;
+router query callbacks preserve literal strings rather than JSON values.
+Duplicate/unexpected keys and overlong words produce fixed checked guidance.
+Browser native GET uses a bounded ASCII URI component header and the installed
+URI Schema codec for Unicode. Empty words do not search. Nonempty words use the
+same accepted-catalogue `searchDocs` operation and its 100-character,
+twenty-result limits. Accepted titles and descriptions link to existing pages;
+no-match, loading and unavailable states stay distinct. Search works without
+JavaScript, uses the existing heading-focus policy and carries `noindex,
+follow`. No personal calculation value, second index or collection event is
+introduced. Discovery, Markdown negotiation, share images and old-app retirement
+remain later T005 work. Metrics remain deferred under Cooper's latest direction.

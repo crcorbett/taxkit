@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Result } from "effect";
+import { Option, Result } from "effect";
 
 import { MdxDocument } from "#/lib/docs/mdx.boundary";
 import {
@@ -19,7 +19,10 @@ export const Route = createFileRoute("/$")({
       onSuccess: ({ navigation, page, settings }) => (
         <div className="docs-layout">
           <aside className="docs-sidebar">
-            <DocsNavigation currentPath={page.path} navigation={navigation} />
+            <DocsNavigation
+              currentPath={Option.some(page.path)}
+              navigation={navigation}
+            />
           </aside>
           <article className="docs-article">
             <MdxDocument page={page} />

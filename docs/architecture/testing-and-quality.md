@@ -1448,8 +1448,9 @@ The native workerd/Chromium pair separately compares all 61 accepted pages and
 exact Markdown through this client at the built API, retaining every existing
 calculator journey and public HTTP check. API/client tests do not establish
 Website rendering on their own. The extended native Website journey below
-qualifies local page rendering; search interaction, discovery assets, old-app
-retirement, deployment and public availability remain unproved by this slice.
+qualifies local page rendering. Search interaction has its own qualification
+below; discovery assets, old-app retirement, deployment and public availability
+remain unproved by these local slices.
 
 ### Native Website documentation qualification
 
@@ -1479,3 +1480,39 @@ functional checks. Browser bundle exclusion uses a positively observed API
 service identity; a calculator service name appearing in accepted documentation
 prose is not executable engine code. Exact decoder consumers and neighbouring
 renderer restrictions are exercised by the actual lint command.
+
+
+### Native Website search qualification
+
+The existing native pair reads the built search function identity, checks its
+exact ingress and compares real SSR result titles with the actual API search
+operation. Literal numbers, quoted text and Unicode stay unchanged. Original
+SSR words resist forged headers; duplicate/unexpected keys, overlong words,
+malformed URI components and invalid UTF-8 fail safely. Empty words, no matches
+and actual unavailable API settings have distinct rendered states. A genuine
+native reply is damaged in Chromium to prove restoration rejects it.
+
+Actual search navigation uses native GET without replacing the document;
+standard GET form submission and document links also work without JavaScript.
+Desktop/phone captures supplement keyboard focus, contained content and result
+navigation assertions. The focused browser fixture mounts the actual search
+loader/components in a scoped detached plain shell: rendered-value checks
+need no insertion into the runner document. Actual page/focus/form observations
+remain in the native journey. It waits for the rendered form after navigation,
+then checks restored words and duplicate-key rejection. A router promise alone
+is not an observation that React has finished showing its destination.
+
+Exact lint selectors admit URL ingress decoding only in the search-location
+boundary, output encoding in the existing native loader host, and one restore
+consumer in the search route. Actual CLI positive and neighbouring-renderer
+negative cases retain the runtime/decoder/composition restrictions. The native
+search operation and content contract remain unchanged; no separate index or
+analytics is qualified. The [dated search receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-search.json)
+keeps failures, fresh qualification and retained source identities separately.
+
+The real local-development fixture requires served-page readiness after printed
+addresses. It retries only 502/503 responses at 100-millisecond intervals for at
+most fifteen seconds, then requires 200 before strict browser navigation and
+heading observation. Application errors, socket errors and persistent gateway
+failures still fail. This strengthens the start condition without diagnosing
+an earlier hosted 502 or establishing that its cause has been reproduced.

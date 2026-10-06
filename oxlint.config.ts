@@ -64,6 +64,7 @@ const decodingBoundaryFiles = [
   "apps/web/src/lib/loaders.server.ts",
   "apps/web/src/lib/docs/mdx.boundary.tsx",
   "apps/web/src/lib/docs/route-boundary.ts",
+  "apps/web/src/lib/docs/search-location.boundary.ts",
   "apps/web/src/lib/calculator.boundary.browser.test.tsx",
   "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/src/lib/form.boundary.ts",
@@ -199,6 +200,7 @@ const routeTransportBoundaryModules = ["#/lib/docs/route-boundary"];
 
 const routeTransportConsumerFiles = [
   "apps/web/src/routes/$.tsx",
+  "apps/web/src/routes/search.tsx",
   "apps/docs/src/routes/$.tsx",
   "apps/docs/src/routes/index.tsx",
   "tools/oxlint/fixtures/route-transport-allowed.tsx",
@@ -270,6 +272,8 @@ const schemaEncoderEgressFiles = [
   "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
   "apps/web/src/lib/calculator.boundary.browser.test.tsx",
   "apps/web/src/lib/loaders.server.ts",
+  // Native public search header and checked local input-error transport egress.
+  "apps/web/src/lib/loaders.ts",
   "apps/web/src/server.ts",
   "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/src/lib/config.boundary.test.ts",

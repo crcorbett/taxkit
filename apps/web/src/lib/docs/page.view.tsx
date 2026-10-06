@@ -3,7 +3,7 @@ import type {
   DocsPublicNavigation,
   DocsPublicPage,
 } from "@taxkit/content/schemas";
-import { Array } from "effect";
+import { Array, Option } from "effect";
 
 import { requestDocsNavigationFocus } from "./components";
 
@@ -11,17 +11,22 @@ export const DocsNavigation = ({
   currentPath,
   navigation,
 }: {
-  readonly currentPath: DocsPublicPage["path"];
+  readonly currentPath: Option.Option<DocsPublicPage["path"]>;
   readonly navigation: DocsPublicNavigation;
 }) => (
   <details className="docs-navigation-panel" open>
     <summary>Documentation navigation</summary>
+    <Link onClick={requestDocsNavigationFocus} to="/search">
+      Search documentation
+    </Link>
     <nav aria-label="Documentation" className="docs-navigation">
       {Array.map(navigation.primaryNavigation, (section) => (
         <section key={section.path}>
           <Link
             activeOptions={{ exact: true }}
-            aria-current={section.path === currentPath ? "page" : undefined}
+            aria-current={
+              Option.contains(currentPath, section.path) ? "page" : undefined
+            }
             onClick={requestDocsNavigationFocus}
             params={{ _splat: section.path.slice(1) }}
             to="/$"
@@ -33,7 +38,9 @@ export const DocsNavigation = ({
               <li key={item.path}>
                 <Link
                   activeOptions={{ exact: true }}
-                  aria-current={item.path === currentPath ? "page" : undefined}
+                  aria-current={
+                    Option.contains(currentPath, item.path) ? "page" : undefined
+                  }
                   onClick={requestDocsNavigationFocus}
                   params={{ _splat: item.path.slice(1) }}
                   to="/$"

@@ -650,5 +650,8 @@ literal; procedure defects use the declared documentation literal. Defects stay
 defects. The Website now supplies that client over its private binding and
 uses browser-safe compiled MDX presentation. Its native GET loader transports
 only a bounded public page identity; original SSR pathnames own page selection.
-There is no authored-source fallback in the Website. Search interaction and
-discovery remain T005 work.
+There is no authored-source fallback in the Website. Its `/search` form uses
+the same named `searchDocs` operation, term and result limits. Browser native
+GET carries an ASCII URI component header; original SSR words cannot be
+overridden by that header. Empty words skip the operation. The private app
+connection changes no public HTTP/RPC contract. Discovery remains T005 work.

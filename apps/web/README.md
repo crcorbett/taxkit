@@ -300,7 +300,7 @@ The native pair test also uses the separate checked documentation RPC client
 against the actual built API. It compares navigation, every one of the 61
 accepted pages and exact Markdown, plus bounded search across separate Worker
 requests. The same saved journey now qualifies the Website page connection described below.
-Search interaction, discovery and retirement of the old app remain T005 work.
+Search interaction is described below. Discovery and retirement of the old app remain T005 work.
 
 ## Documentation pages
 
@@ -332,11 +332,49 @@ three source-built content mismatches, malformed browser transport, real
 sidebar/MDX navigation without document reload, heading focus, mobile
 navigation, table keyboard focus and reading without JavaScript. Saved local
 images supplement those checks. The [Website documentation receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json)
-records their scope. Search, discovery files, share images and old-app retirement
+records their scope. Discovery files, share images and old-app retirement
 are separate unfinished work. No local check establishes public availability.
 
 The application router supplies the named documentation page loader through
-its typed router context, beside the settings loader. The page route consumes
+its typed router context, beside the settings and search loaders. The page route consumes
 that function without importing its server-only implementation. Standalone
 browser checks use the same route tree with supplied loaders; native built
 checks exercise the actual server function and private API connection.
+
+
+## Documentation search
+
+`/search` has a labelled plain GET form with one `term` field. It works with
+and without JavaScript and calls the same accepted-catalogue `searchDocs`
+operation as the API. Empty words show an invitation to search; matching pages
+show their accepted titles and descriptions; no matches and unavailable search
+have separate guidance. Results link to the existing documentation routes.
+Search pages use `noindex, follow` and contain no calculation values.
+
+The content owner keeps the 100-character term and twenty-result limits. The
+Website checks its original URL once: duplicate or unexpected keys and excess
+length fail with fixed input guidance. Its router preserves literal URL pairs,
+so words such as `1e3`, quoted text and Unicode cannot turn into JSON values.
+The native browser GET carries a bounded ASCII URI component in
+`x-taxkit-docs-search`; the installed Schema codec encodes and decodes Unicode.
+SSR uses the original URL, so a forged header cannot change the search words.
+Only the generated settings, page and search function addresses are admitted.
+Native search query payloads, content types and malformed headers reject before
+framework parsing; checked input failures never expose decoding diagnostics.
+
+The search route restores its encoded outcome through its own checked boundary,
+then matches it before composing readonly form and result leaves. The typed
+route context supplies the named loader without importing server code into a
+browser route. Search links share the existing heading-focus policy; a normal
+HTML form submission remains an ordinary GET. No second index, personalised
+result store or collection event is added. The existing native journey checks
+real API results, literal words, hostile input, unavailable search, damaged
+transport, keyboard/phone behaviour and JavaScript-free form submission.
+The [search receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-search.json)
+records qualification separately from deployment and public availability.
+
+The saved local-development check waits up to fifteen seconds for the Website
+to serve a page after its address is printed. Only startup 502 or 503 responses
+are retried; other errors fail immediately. The following actual browser
+navigation must still return 200 and show the expected page. This is a bounded
+readiness condition, not evidence of the cause of an earlier hosted 502.

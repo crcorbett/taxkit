@@ -76,7 +76,7 @@ const DocsMdxLink = ({
   );
 };
 
-const DocsMdxHeading = ({
+export const DocsHeading = ({
   children,
   ...props
 }: Readonly<ComponentPropsWithoutRef<"h1">>) => (
@@ -114,7 +114,7 @@ const DocsMdxTable = ({
 
 export const docsMdxComponents = {
   a: DocsMdxLink,
-  h1: DocsMdxHeading,
+  h1: DocsHeading,
   img: Picture,
   pre: Pre,
   table: DocsMdxTable,

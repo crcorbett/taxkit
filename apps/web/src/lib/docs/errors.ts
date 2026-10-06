@@ -9,6 +9,15 @@ export class DocsPresentationUnavailable extends Schema.TaggedError<DocsPresenta
   }
 ) {}
 
+export class DocsSearchInputError extends Schema.TaggedError<DocsSearchInputError>()(
+  "DocsSearchInputError",
+  {
+    message: Schema.tag(
+      "Enter up to 100 characters to search the documentation."
+    ),
+  }
+) {}
+
 export class DocsRouteTransportError extends Schema.TaggedError<DocsRouteTransportError>()(
   "DocsRouteTransportError",
   {

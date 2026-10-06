@@ -1842,6 +1842,367 @@ describe("built native API and Website", () => {
             .getByRole("heading", { exact: true, name: "Quickstart" })
             .waitFor()
         );
+        const searchFunctionId = Array.findFirst(
+          Record.values(websiteModules),
+          (module) =>
+            module.contents.includes(
+              'functionName: "websiteDocsSearch_createServerFn_handler"'
+            )
+        ).pipe(
+          Option.flatMap((module) =>
+            Option.fromNullishOr(
+              module.contents.match(
+                /"(?<functionId>[a-f0-9]{64})":\s*\{\s*functionName:\s*"websiteDocsSearch_createServerFn_handler"/u
+              )?.groups
+            ).pipe(Option.flatMap(Record.get("functionId")))
+          ),
+          Option.getOrElse(() =>
+            expect.fail("Missing native generated search function identity")
+          )
+        );
+        const nativeSearchAddress = `${websiteOrigin}/_serverFn/${searchFunctionId}`;
+        const nativeSearchHeaders = {
+          origin: websiteOrigin,
+          "sec-fetch-site": "same-origin",
+          "x-taxkit-docs-search": "Quickstart",
+          "x-tsr-serverFn": "true",
+        };
+        const nativeSearch = yield* Effect.promise(() =>
+          website.dispatchFetch(nativeSearchAddress, {
+            headers: nativeSearchHeaders,
+          })
+        );
+        expect(nativeSearch.status).toBe(200);
+        const nativeSearchBody = yield* Effect.promise(() =>
+          nativeSearch.text()
+        );
+        expect(nativeSearchBody).toContain('"results"');
+        expect(nativeSearchBody).toContain('"term"');
+        yield* Effect.forEach(
+          [
+            { header: "%ZZ", suffix: "" },
+            { header: "a".repeat(1201), suffix: "" },
+            { header: "Quickstart", suffix: "?payload=PRIVATE9" },
+          ],
+          (invalidSearchInput) =>
+            Effect.gen(function* () {
+              const response = yield* Effect.promise(() =>
+                website.dispatchFetch(
+                  `${nativeSearchAddress}${invalidSearchInput.suffix}`,
+                  {
+                    headers: {
+                      ...nativeSearchHeaders,
+                      "x-taxkit-docs-search": invalidSearchInput.header,
+                    },
+                  }
+                )
+              );
+              expect(response.status).toBe(400);
+              expect(yield* Effect.promise(() => response.text())).toBe("");
+            })
+        );
+        yield* Effect.forEach(["税 😀", "a".repeat(101), "%ED%A0%80"], (term) =>
+          Effect.gen(function* () {
+            const response = yield* Effect.promise(() =>
+              website.dispatchFetch(nativeSearchAddress, {
+                headers: {
+                  ...nativeSearchHeaders,
+                  "x-taxkit-docs-search":
+                    term === "%ED%A0%80" ? term : encodeURIComponent(term),
+                },
+              })
+            );
+            expect(response.status).toBe(200);
+            const body = yield* Effect.promise(() => response.text());
+            expect(body).toContain(
+              term === "税 😀" ? '"s":"税 😀"' : "DocsSearchInputError"
+            );
+            expect(body).not.toContain("PRIVATE9");
+          })
+        );
+        yield* Queue.clear(docsCalls);
+        yield* Queue.clear(docsDocuments);
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("link", { exact: true, name: "Search documentation" })
+            .click()
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("heading", { exact: true, name: "Search documentation" })
+            .waitFor()
+        );
+        expect(yield* Queue.clear(docsCalls)).toContain(nativeSearchAddress);
+        expect(yield* Queue.clear(docsDocuments)).toEqual([]);
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .getByText("Enter a few words to find a documentation page.")
+              .count()
+          )
+        ).toBe(1);
+        yield* Effect.forEach(
+          ["Quickstart", "2025", "true", "null", "税 😀", "café"],
+          (term) =>
+            Effect.gen(function* () {
+              const response = yield* Effect.promise(() =>
+                publicApi.dispatchFetch(
+                  `${apiOrigin}/api/v1/docs/search?${new URLSearchParams({ term })}`
+                )
+              );
+              expect(response.status).toBe(200);
+              const expected = yield* Schema.decodeEffect(
+                Schema.fromJsonString(Schema.Array(DocsSearchResult))
+              )(yield* Effect.promise(() => response.text()));
+              // Use an actual original human address. A forged header cannot change
+              // the SSR words or substitute another result list.
+              const rendered = yield* Effect.promise(() =>
+                website.dispatchFetch(
+                  `${websiteOrigin}/search?${new URLSearchParams({ term })}`,
+                  {
+                    headers: { "x-taxkit-docs-search": "PRIVATE9" },
+                  }
+                )
+              );
+              expect(rendered.status).toBe(200);
+              const html = yield* Effect.promise(() => rendered.text());
+              expect(html).not.toContain("PRIVATE9");
+              yield* Effect.promise(() =>
+                docsPage.goto(
+                  `${websiteOrigin}/search?${new URLSearchParams({ term })}`
+                )
+              );
+              yield* Effect.promise(() =>
+                docsPage.waitForLoadState("networkidle")
+              );
+              expect(
+                yield* Effect.promise(() =>
+                  docsPage
+                    .getByRole("searchbox", { name: "Search words" })
+                    .inputValue()
+                )
+              ).toBe(term);
+              expect(
+                yield* Effect.promise(() =>
+                  docsPage
+                    .locator(".docs-search-results h3 a")
+                    .allTextContents()
+                )
+              ).toEqual(Array.map(expected, (item) => item.title));
+              expect(
+                yield* Effect.promise(() =>
+                  docsPage.locator(".docs-search-results li").count()
+                )
+              ).toBeLessThanOrEqual(20);
+              expect(
+                yield* Effect.promise(() =>
+                  docsPage
+                    .locator('meta[name="robots"]')
+                    .getAttribute("content")
+                )
+              ).toBe("noindex, follow");
+              if (expected.length === 0) {
+                expect(
+                  yield* Effect.promise(() =>
+                    docsPage
+                      .getByRole("heading", {
+                        exact: true,
+                        name: "No matching pages",
+                      })
+                      .count()
+                  )
+                ).toBe(1);
+              }
+            })
+        );
+        yield* Effect.forEach(
+          [
+            `?term=${"a".repeat(101)}`,
+            "?term=PRIVATE9&term=Quickstart",
+            "?unexpected=PRIVATE9",
+          ],
+          (query) =>
+            Effect.gen(function* () {
+              const response = yield* Effect.promise(() =>
+                website.dispatchFetch(`${websiteOrigin}/search${query}`)
+              );
+              expect(response.status).toBe(200);
+              const html = yield* Effect.promise(() => response.text());
+              expect(html).toContain(
+                "Enter up to 100 characters to search the documentation."
+              );
+              // The original URL may be retained by the native router for loading;
+              // neither a form value nor visible error copy reflects rejected data.
+              yield* Effect.promise(() =>
+                docsPage.goto(`${websiteOrigin}/search${query}`)
+              );
+              expect(
+                yield* Effect.promise(() =>
+                  docsPage.getByRole("alert").textContent()
+                )
+              ).not.toContain("PRIVATE9");
+              expect(
+                yield* Effect.promise(() =>
+                  docsPage
+                    .getByRole("searchbox", { name: "Search words" })
+                    .inputValue()
+                )
+              ).toBe("");
+            })
+        );
+        const unavailableSearchWorker = yield* Effect.promise(() =>
+          website.getWorker("taxkit-website-unavailable")
+        );
+        const unavailableSearch = yield* Effect.promise(() =>
+          unavailableSearchWorker.fetch(
+            `${websiteOrigin}/search?term=Quickstart`
+          )
+        );
+        expect(unavailableSearch.status).toBe(200);
+        expect(yield* Effect.promise(() => unavailableSearch.text())).toContain(
+          "Documentation search could not load. Please reload this page to try again."
+        );
+        yield* Effect.promise(() => docsPage.goto(`${websiteOrigin}/search`));
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("searchbox", { name: "Search words" })
+            .pressSequentially("Quickstart")
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("button", { exact: true, name: "Search documentation" })
+            .click()
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("link", { exact: true, name: "Quickstart" })
+            .last()
+            .waitFor()
+        );
+        yield* Effect.promise(() =>
+          docsPage.setViewportSize({ height: 900, width: 1280 })
+        );
+        yield* Effect.promise(() =>
+          docsPage.evaluate(() => window.scrollTo(0, 0))
+        );
+        yield* Effect.promise(() =>
+          docsPage.screenshot({
+            fullPage: true,
+            path: path.join(screenshotRoot, "docs-search-desktop.png"),
+          })
+        );
+        yield* Effect.promise(() =>
+          docsPage.setViewportSize({ height: 844, width: 390 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            docsPage.evaluate(
+              () => document.documentElement.scrollWidth <= window.innerWidth
+            )
+          )
+        ).toBe(true);
+        yield* Effect.promise(() =>
+          docsPage.getByRole("searchbox", { name: "Search words" }).focus()
+        );
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .getByRole("searchbox", { name: "Search words" })
+              .evaluate((element) => getComputedStyle(element).outlineStyle)
+          )
+        ).toBe("solid");
+        yield* Effect.promise(() =>
+          docsPage.evaluate(() => window.scrollTo(0, 0))
+        );
+        yield* Effect.promise(() =>
+          docsPage.screenshot({
+            fullPage: true,
+            path: path.join(screenshotRoot, "docs-search-mobile.png"),
+          })
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .locator('.docs-search-results a[href="/start/quickstart"]')
+            .click()
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("heading", { exact: true, name: "Quickstart" })
+            .waitFor()
+        );
+        yield* Effect.promise(() =>
+          expect
+            .poll(() =>
+              docsPage
+                .locator(".docs-article h1")
+                .evaluate((element) => document.activeElement === element)
+            )
+            .toBe(true)
+        );
+        yield* Effect.promise(() => plainPage.goto(`${websiteOrigin}/search`));
+        yield* Effect.promise(() =>
+          plainPage
+            .getByRole("searchbox", { name: "Search words" })
+            .pressSequentially("Quickstart")
+        );
+        yield* Effect.promise(() =>
+          plainPage
+            .getByRole("button", { exact: true, name: "Search documentation" })
+            .click()
+        );
+        yield* Effect.promise(() =>
+          plainPage
+            .locator('.docs-search-results a[href="/start/quickstart"]')
+            .waitFor()
+        );
+        yield* Effect.promise(() =>
+          plainPage
+            .locator('.docs-search-results a[href="/start/quickstart"]')
+            .click()
+        );
+        expect(
+          yield* Effect.promise(() =>
+            plainPage.locator(".docs-article h1").textContent()
+          )
+        ).toContain("Quickstart");
+        yield* Effect.promise(() =>
+          docsPage.goto(`${websiteOrigin}/start/quickstart`)
+        );
+        yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
+        yield* Effect.promise(() =>
+          docsPage.route(
+            nativeSearchAddress,
+            (route) =>
+              route.fulfill({
+                body: nativeSearchBody.replace('"results"', '"PRIVATE9"'),
+                headers: Record.fromEntries(nativeSearch.headers),
+                status: 200,
+              }),
+            { times: 1 }
+          )
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("link", { exact: true, name: "Search documentation" })
+            .click()
+        );
+        yield* Effect.promise(() => docsPage.getByRole("alert").waitFor());
+        expect(
+          yield* Effect.promise(() => docsPage.getByRole("alert").textContent())
+        ).toContain("Documentation search could not load.");
+        expect(
+          yield* Effect.promise(() => docsPage.getByRole("alert").textContent())
+        ).not.toContain("PRIVATE9");
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("link", { exact: true, name: "Open the Quickstart" })
+            .click()
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("heading", { exact: true, name: "Quickstart" })
+            .waitFor()
+        );
         expect(yield* Queue.clear(exceptions)).toEqual([]);
         const capturedLogs = yield* Queue.clear(logs);
         const logText = yield* Schema.encodeEffect(Json)(capturedLogs);
@@ -1852,10 +2213,10 @@ describe("built native API and Website", () => {
         expect(messageText).not.toContain("1654");
         expect(messageText).not.toContain("130100");
       }).pipe(
-        Effect.timeout("50 seconds"),
+        Effect.timeout("65 seconds"),
         Effect.scoped,
         Effect.provide(NodeServices.layer)
       ),
-    { timeout: 55_000 }
+    { timeout: 70_000 }
   );
 });

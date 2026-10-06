@@ -84,8 +84,10 @@ HTTP and native RPC documentation groups delegate page/navigation/search and
 processed Markdown to the same `ContentService`. Its compiled public-path
 refinement and fixed missing-page/search errors serve both transports. The
 replacement Website renders accepted pages using that private connection and
-browser-safe compiled presentation. Search interaction, discovery and old-app
-retirement remain T005 work.
+browser-safe compiled presentation. Its `/search` GET form uses the same named
+accepted-catalogue search operation, showing accepted titles and descriptions
+with the existing document links. No second index is added. Discovery and
+old-app retirement remain T005 work.
 
 `docs/architecture`
 : Durable implementation architecture.
