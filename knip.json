@@ -144,15 +144,9 @@
         "src/test.layer.ts",
         "src/validate.runtime.ts",
         "src/**/*.test.ts",
-        "vitest.config.ts",
-        "examples/**/*.ts"
+        "vitest.config.ts"
       ],
-      "project": [
-        "source.config.ts",
-        "src/**/*.ts",
-        "vitest.config.ts",
-        "examples/**/*.ts"
-      ],
+      "project": ["source.config.ts", "src/**/*.ts", "vitest.config.ts"],
       "ignoreDependencies": ["@shikijs/core", "@taxkit/tsconfig", "typescript"]
     },
     "packages/docs-fumadocs": {
@@ -226,6 +220,11 @@
         "vitest.config.ts"
       ],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/docs-examples": {
+      "entry": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+      "ignoreDependencies": ["typescript"]
     }
   }
 }

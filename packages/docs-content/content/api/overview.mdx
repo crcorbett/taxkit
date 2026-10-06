@@ -1,6 +1,6 @@
 ---
 title: "API overview"
-description: "Use HTTP as a thin transport over the SDK and calculator boundary."
+description: "Use HTTP to call the shared calculator service."
 status: "draft"
 ---
 
@@ -22,8 +22,8 @@ contract. If your caller can run TypeScript in-process, start with the
 
 ## Runtime model
 
-The API does not own tax logic. It decodes transport input, calls the same SDK
-and calculator service boundary as an in-process consumer, then returns the
+The API does not own tax logic. It decodes transport input, calls the same
+calculator service as an in-process SDK consumer, then returns the
 service result or an HTTP error envelope.
 
 ```ts
@@ -32,14 +32,13 @@ Production: HTTP calculate
 HTTP caller
   -> @taxkit/api-http route contract
     -> CalculatorApiHandlerLive
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorService.calculate
-          -> CalculationEngine
+      -> PublicCalculatorService.calculate
+        -> CalculationEngine
       -> CalculatorApiErrorEnvelope for expected service errors
 ```
 
-The calculate route proves the public call graph by using
-`calculateRunRequest`. It still validates facts against the selected
+The calculate route calls `PublicCalculatorService.calculate` directly.
+The service validates facts against the selected
 calculator, so a payload accepted by the generic HTTP schema can fail if it is
 for a different calculator.
 

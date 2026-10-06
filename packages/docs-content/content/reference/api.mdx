@@ -38,7 +38,7 @@ clients and endpoint reference pages.
 
 ## Calculate route
 
-The calculate route is a thin HTTP transport over the SDK Effect helper.
+The calculate route calls the calculator service directly.
 
 ```ts
 Production: HTTP calculate
@@ -46,9 +46,8 @@ Production: HTTP calculate
 HTTP caller
   -> @taxkit/api-http route contract
     -> CalculatorApiHandlerLive
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorService.calculate
-          -> CalculationEngine
+      -> PublicCalculatorService.calculate
+        -> CalculationEngine
       -> CalculatorApiErrorEnvelope for CalculatorServiceError
 ```
 

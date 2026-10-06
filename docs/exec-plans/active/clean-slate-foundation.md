@@ -3671,3 +3671,71 @@ global quota, real edge headers, account namespace uniqueness or remote
 cancellation. Hosted proof is still a separate immutable-head observation.
 Continue T005/DEV-76 next; T009/DEV-80 metrics approach stays deferred under
 Cooper's latest instruction. The wider goal remains active.
+
+## T005 content catalogue implementation
+
+The replacement docs slice starts from rate-admission head
+d39a16ec3f9e5f4ffac8068169f8b6931adbb5ed on
+codex/dev-76-public-content-catalogue. Draft #154's Quality check passes run
+37430978989/job 112161511716 at 07:58:40Z on 6 October. This is hosted check
+proof for that head, not deployment or publication. The proposed new Linear
+comment is still unposted pending the connector's fresh confirmation.
+
+Before implementation, documentation impact is Change required for the content
+package and its generated catalogue/acceptance contracts, checked example
+ownership, Website/API content routes and client contracts, public source
+fidelity corrections, package/content/frontend architecture, affected app and
+package READMEs, exact lint/Knip/compiler/build/cache owners, discovery assets,
+current runbook/command/profile pointers and active SPEC/tasks. Preserve tax
+rules and original calculation expectations, retained public MDX and historical
+proof, dependency versions, metrics deferral and provider state. New external
+publication, registry release and cloud operations are N/A to this local slice.
+Later retirement of apps/docs requires equivalent replacement journeys first.
+
+The four checked integration examples currently give docs-content development
+dependencies on the HTTP API and SDK. Move their ownership to the private
+docs-examples workspace before the HTTP API depends on content contracts; keep
+their bytes and result/error expectations. This removes the impending circular
+build graph without copying docs Schemas into the transport. The existing
+Fumadocs processed-text compiler remains the single Markdown producer. Its
+official installed Bun loader needs React resolution in the content package;
+declare the already selected catalog version instead of adding a compiler,
+dependency upgrade or resolution fallback. Public acceptance remains pending
+page-by-page review; all existing drafts are retained meanwhile.
+
+The checked examples follow the standard compiler build and emit application
+JavaScript/source maps without a library export or declaration contract. Their
+four source files remain exact parent bytes. Source and build compiler checks,
+the retained source tests and ordinary Node imports preserve the weekly result
+and all three invalid-request failures. An exploratory declaration build found
+TS2883 for inferred HTTP errors; no public declaration portability is claimed
+for these copied application templates. The canonical skill profile and receipt
+remain exact parent bytes.
+
+The installed Fumadocs Bun loader successfully reads processed text from all
+61 sources with the already selected React version. This qualifies the producer
+choice, not a new production catalogue generator. The source review identifies
+remaining draft corrections: old Effect service/catch names, unsafe validation
+examples, stale release/content paths and incomplete error reference tables.
+All pages and authored navigation remain draft; no acceptance record is added.
+Source links in machine Markdown also need canonical destination conversion.
+
+Before extending HTTP, qualify a compiled content service/contract owner that
+can survive ordinary installed-package resolution. The source-only Fumadocs
+collection cannot become an unqualified dependency of the packed HTTP package.
+Authored prose and the existing processed-text compiler stay package-owned;
+the accepted catalogue, transports, HTML and discovery remain T005 work.
+
+All nine local release checks pass in 894.46 seconds. Later focused checks
+qualify the final template build configuration and supporting documentation.
+The separate optional `check:harness-foundation-epoch` command fails at
+skill-receipt-projection with all its relevant inputs unchanged from the parent.
+Its July manifest contains six old skills while the current receipt contains
+the adopted collection. Preserve that dated proof; current graph qualification
+remains active-plan/T010 work. This is an inherited mismatch, not acceptance
+of the current checkout by the old epoch.
+
+The [checked-source receipt](../../documentation-audit/clean-slate-foundation/2026-10-06-checked-docs-source-owner.json)
+records exact example/source identities, the draft-review candidates, passed
+checks and retained failed experiments. This is a reviewable T005 preparation
+checkpoint, not completion of the public docs replacement.

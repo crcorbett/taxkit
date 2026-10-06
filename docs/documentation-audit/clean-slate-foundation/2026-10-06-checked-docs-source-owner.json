@@ -1,0 +1,1215 @@
+{
+  "schemaVersion": 1,
+  "documentType": "bounded-evidence",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-implementation-owner",
+  "observedAt": "2026-10-06T08:24:15Z",
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "parentCommit": "d39a16ec3f9e5f4ffac8068169f8b6931adbb5ed",
+    "branch": "codex/dev-76-public-content-catalogue",
+    "sourceIdentities": [
+      {
+        "path": ".changeset/checked-docs-example-owner.md",
+        "sha256": "8f8144792bbbee1f1491f3845f92fda875b4828e2ebbdc09261c218bb4e4abbc"
+      },
+      {
+        "path": "apps/docs/README.md",
+        "sha256": "e10a93a98c5fc0181e7f89c1f44b0107fa3a9ddb5540d1d3f2d371ed3699d3c0"
+      },
+      {
+        "path": "bun.lock",
+        "sha256": "51c860ee6a615ae977f69dcea602485e554d24c9487e0ebfe83e0e5c40a5b9be"
+      },
+      {
+        "path": "docs/architecture/content-and-posts.md",
+        "sha256": "7d00c44a7d51b57b6e9e219d77c04679cfe8a0ef707bec6e96774650e02c71b8"
+      },
+      {
+        "path": "docs/architecture/package-boundaries.md",
+        "sha256": "213c37a0630f72fb103108743a1dac36c3c142c4346cb8684fb1066071bfc8e1"
+      },
+      {
+        "path": "docs/architecture/package-ownership.md",
+        "sha256": "8d7f711c0d84253fcf5cd6b3c3b89b1f9ff68633cd348011415f29838eec5a2c"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "2b146436001a6e65af30c6d32eb195cec48e95a113cbbeed7021df7757a8b9a4"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "d8fa52333b517ac1d082efddfd7050cd31bf5f5324977beefc7bbd2fd8f69052"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "ca895d27bac79dff5d55a4396bbd2dd24bc97c2b7ac614baf94d5ae71e67c1a4"
+      },
+      {
+        "path": "knip.json",
+        "sha256": "5063c3b427386eed554f1be466c4467eb69361e073ab04a645e1e004afb34b61"
+      },
+      {
+        "path": "knip.production.json",
+        "sha256": "ec3be2533044fdc54d3312abf42a496b3c9733e5c52f59aff32c2a80a4626b62"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "f381ea3f42fec270301bc956fd11188f6af4726c13693a5024e2935b9ad5de6a"
+      },
+      {
+        "path": "packages/docs-content/README.md",
+        "sha256": "e5ca6d508dbeab8bb48026b4bcd0ad64de19a0df311eb2e003519764d845bf1e"
+      },
+      {
+        "path": "packages/docs-content/content/api/endpoints.mdx",
+        "sha256": "ddadd740ffdc37803f295d9afca2bdb41e843fbfbe222bef1dc9af719a84a888"
+      },
+      {
+        "path": "packages/docs-content/content/api/index.mdx",
+        "sha256": "b703ce3c5eb95bcc81fe4c696ef818f38c97ee365a452f01a0f7745c9c88300d"
+      },
+      {
+        "path": "packages/docs-content/content/api/overview.mdx",
+        "sha256": "bb5b43f82df9fecca45973aecdec7ca1ba224dae08156bf5889f8e71e4abc047"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+        "sha256": "04066ae0399308fba61e5366823f181f79e87113f450a4b382a39576b885a10a"
+      },
+      {
+        "path": "packages/docs-content/content/reference/api.mdx",
+        "sha256": "f0103858f4cd4d9dc718769ff6eb23b481f0e3afa009a9c65b7cfabf98f6bba5"
+      },
+      {
+        "path": "packages/docs-content/content/reference/examples.mdx",
+        "sha256": "ccbdca6a0b0518704417bf5d1b0d201a8b28d2f1cac26ad1e1a9228959870907"
+      },
+      {
+        "path": "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+        "sha256": "2ee911f1ea5bcf39e72a78b1e34d1f5d95838f82f4af0484e95a30be130b7c97"
+      },
+      {
+        "path": "packages/docs-content/content/start/overview.mdx",
+        "sha256": "7c3818ebc10e25715ea62123451ad839715d9f9148f100e69532da485f0845fa"
+      },
+      {
+        "path": "packages/docs-content/package.json",
+        "sha256": "9ab4a2e6c90c17727f41bbf1a45d05729f9baab20540151ec2b118782515f7e5"
+      },
+      {
+        "path": "packages/docs-content/src/validation/policy.ts",
+        "sha256": "e49fc433b8ed9e6c090ff6058a0628ffe4b3f5c52c1c3346bc4a5baf7d213d80"
+      },
+      {
+        "path": "packages/docs-examples/README.md",
+        "sha256": "267ee945f701c4178547f0183cc89c8f798361c052b0f8c78ab06723f856467a"
+      },
+      {
+        "path": "packages/docs-examples/package.json",
+        "sha256": "dccde037e2a6e0219109cedb43cabfe48391c1e0b83fdaa610495acfec345a96"
+      },
+      {
+        "path": "packages/docs-examples/src/browser-http.ts",
+        "sha256": "bc7f0cb75b61ccd87e98a6f4e4c7c797e83bec1651c0fce1587a73deeb973862"
+      },
+      {
+        "path": "packages/docs-examples/src/effect.ts",
+        "sha256": "a1bbc04ec1a8bbb31b52b8a9a22b591d5ffaf4e484da4f6e461eaadb3ec6619a"
+      },
+      {
+        "path": "packages/docs-examples/src/error-handling.ts",
+        "sha256": "77616e6e6803778d226f1e7911cfbaf15300e611582a136dcfa1ba4f149aa570"
+      },
+      {
+        "path": "packages/docs-examples/src/node-server.ts",
+        "sha256": "615696a109f00a22c8b7adeeca0d23a0e3b0c3598cb03c8d374db5c60fedb908"
+      },
+      {
+        "path": "packages/docs-examples/test/examples.boundary.test.ts",
+        "sha256": "b2db03367cf5480821758c69e0ed15f62eb3f9af33401cb81f67b9f758e5b39c"
+      },
+      {
+        "path": "packages/docs-examples/tsconfig.build.json",
+        "sha256": "27730fb7995fb5d527547fb49dfcfe1e3b43012509fb93e6a4eaa0ede8e3fc37"
+      },
+      {
+        "path": "packages/docs-examples/tsconfig.json",
+        "sha256": "42c0fef853e0e3df4c14b0711b6361b478cc44d7950426adbb4dddd7cc628375"
+      },
+      {
+        "path": "packages/docs-examples/vitest.config.ts",
+        "sha256": "b0a2aa6153e78aec5623fdf085578413d0026093c7f06e62d61f621fad97a877"
+      }
+    ],
+    "identityLimitation": "Receipt excludes its own recursive hash. Supporting source identities reflect the final checked closeout files; Git commit owns the complete slice."
+  },
+  "implementationAuthority": "Cooper authorised implementation, tested commits, pushes and draft PRs on 4 October; 6 October steering defers metrics and permits other work to continue.",
+  "outcome": "Passed docs-source preparation slice; CSF-T005/DEV-76 remains in_progress.",
+  "changes": [
+    "Move four byte-identical checked integration templates and their existing test/compiler owner to private docs-examples; the content package no longer depends on HTTP/SDK.",
+    "Declare the already selected React catalog version for the existing installed processed-Markdown producer.",
+    "Correct seven public pages describing the HTTP-to-calculator call graph, plus source-example links and current ownership/command pointers.",
+    "Move exact lint path admissions and Knip ownership without widening allowed constructs; retain canonical skill profile/baseline and historical evidence."
+  ],
+  "exampleMoves": [
+    {
+      "previousPath": "packages/docs-content/examples/browser-http.ts",
+      "path": "packages/docs-examples/src/browser-http.ts",
+      "sha256": "bc7f0cb75b61ccd87e98a6f4e4c7c797e83bec1651c0fce1587a73deeb973862",
+      "exactBytesPreserved": true
+    },
+    {
+      "previousPath": "packages/docs-content/examples/effect.ts",
+      "path": "packages/docs-examples/src/effect.ts",
+      "sha256": "a1bbc04ec1a8bbb31b52b8a9a22b591d5ffaf4e484da4f6e461eaadb3ec6619a",
+      "exactBytesPreserved": true
+    },
+    {
+      "previousPath": "packages/docs-content/examples/error-handling.ts",
+      "path": "packages/docs-examples/src/error-handling.ts",
+      "sha256": "77616e6e6803778d226f1e7911cfbaf15300e611582a136dcfa1ba4f149aa570",
+      "exactBytesPreserved": true
+    },
+    {
+      "previousPath": "packages/docs-content/examples/node-server.ts",
+      "path": "packages/docs-examples/src/node-server.ts",
+      "sha256": "615696a109f00a22c8b7adeeca0d23a0e3b0c3598cb03c8d374db5c60fedb908",
+      "exactBytesPreserved": true
+    }
+  ],
+  "publicSourceReview": {
+    "schemaVersion": 1,
+    "outcome": "candidate only",
+    "scope": "Read all 61 retained public MDX sources; this is not publication acceptance or complete snippet type proof.",
+    "pages": [
+      {
+        "path": "packages/docs-content/content/api/authentication-and-deployment-assumptions.mdx",
+        "sha256": "21d7ec0db402b4e4ee197d444cf876788a32145fd80b0ab4de54f794a200b283",
+        "status": "draft",
+        "processedBytes": 1553,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/api/endpoints.mdx",
+        "sha256": "ddadd740ffdc37803f295d9afca2bdb41e843fbfbe222bef1dc9af719a84a888",
+        "status": "draft",
+        "processedBytes": 3048,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/api/errors.mdx",
+        "sha256": "c4db74b445242466c9ca343221d1b2d95e7efd3a1f938a2229baeca7d5ac29fb",
+        "status": "draft",
+        "processedBytes": 3523,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/api/index.mdx",
+        "sha256": "b703ce3c5eb95bcc81fe4c696ef818f38c97ee365a452f01a0f7745c9c88300d",
+        "status": "draft",
+        "processedBytes": 744,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/api/openapi-reference.mdx",
+        "sha256": "273f9a4c40ac9d143cf3b46d6b79dd2674f41d3c122a1848e122434fe475653e",
+        "status": "draft",
+        "processedBytes": 1710,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/api/overview.mdx",
+        "sha256": "bb5b43f82df9fecca45973aecdec7ca1ba224dae08156bf5889f8e71e4abc047",
+        "status": "draft",
+        "processedBytes": 2392,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/calculators.mdx",
+        "sha256": "f9478d90019d8fa0038046529d58154146ed4c5ab701056cd167411f85261362",
+        "status": "draft",
+        "processedBytes": 967,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/diagnostics.mdx",
+        "sha256": "8a1579c60f9c47fd34cbcc893bda00c28ea1a416ef3b2e385aed956bdd47ff5b",
+        "status": "draft",
+        "processedBytes": 1532,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/facts.mdx",
+        "sha256": "1f04c34beb48d095a440378cf83580d496ce1bffeeea68a8f71e1e266b639943",
+        "status": "draft",
+        "processedBytes": 1125,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/index.mdx",
+        "sha256": "c1dac9071b265fca41dfe60ebc5dee92c9a0cba2f56c8c02b1c24fff95a0b911",
+        "status": "draft",
+        "processedBytes": 688,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/jurisdictions-and-tax-years.mdx",
+        "sha256": "5cb5e7ef153fa49b3dad26deb627629b1f7dda0a598cc57c58efa3a084f265d0",
+        "status": "draft",
+        "processedBytes": 964,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/money-and-branded-values.mdx",
+        "sha256": "7174765029fffee20ef5e3be83534f8c4b14afd8c7818eab6862bd13cc156917",
+        "status": "draft",
+        "processedBytes": 2061,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/reports.mdx",
+        "sha256": "ee01630caf2ca244e9220567b5036511d76b55a5e6a4b4cfbf4f6ef082fccaa8",
+        "status": "draft",
+        "processedBytes": 1223,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/rules.mdx",
+        "sha256": "bb315a4935e011e99ccda5ff39c3489e186925a57c679450a25a7673d92161b9",
+        "status": "draft",
+        "processedBytes": 1006,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+        "sha256": "04066ae0399308fba61e5366823f181f79e87113f450a4b382a39576b885a10a",
+        "status": "draft",
+        "processedBytes": 1636,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-calculator.mdx",
+        "sha256": "d860ac86bd84cbfe1b49adf556598a904032dccabd5f8b64f21f522a774539f7",
+        "status": "draft",
+        "processedBytes": 2240,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-fact.mdx",
+        "sha256": "eddfb980ec991e9ed4a6396c619d8f636ba95dc6d165cc022e612158811089ea",
+        "status": "draft",
+        "processedBytes": 2497,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-rule.mdx",
+        "sha256": "d7e16881d21e92d67f691f594f69efdc18013922cc97d37a406166de297b4609",
+        "status": "draft",
+        "processedBytes": 2175,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-tax-year.mdx",
+        "sha256": "2564c8f45afd4fd62308ca61540aaccd045c75086a95becebfd8eaf129c04067",
+        "status": "draft",
+        "processedBytes": 2169,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/backward-compatibility.mdx",
+        "sha256": "dcf18e62b4c5170ec2c2a0a8ae1b101c986a6d5994ba02559d065a3814d5f9ab",
+        "status": "draft",
+        "processedBytes": 1913,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/changesets.mdx",
+        "sha256": "b3cd99476cd656b29dae7e789f762d9b4b60271a08b29daf5752c217267310ab",
+        "status": "draft",
+        "processedBytes": 1206,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/effect-service-standards.mdx",
+        "sha256": "bedd28204955c9c35fbabd1b6b091fd36616817ac4fbf45f29c10d6565a096eb",
+        "status": "draft",
+        "processedBytes": 1628,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/fix-an-incorrect-result.mdx",
+        "sha256": "b1c2a801f3685ace5a4d6722a7c84e6bfc69be6a4d4c897ce7282c7a8f3bf112",
+        "status": "draft",
+        "processedBytes": 1637,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/index.mdx",
+        "sha256": "7d3c182e3c00c88631c5729d0546126cae3e4bb9c4016c43996551c2bc9beb07",
+        "status": "draft",
+        "processedBytes": 23693,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/naming-and-schema-standards.mdx",
+        "sha256": "446d1e8004a7b0249b8dcef814b121706756c5001f13a339bdcd40ad00eaf83f",
+        "status": "draft",
+        "processedBytes": 2299,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/pr-evidence-checklist.mdx",
+        "sha256": "ed44183576ed5a36e87c2ef526456d4c1e0f1810f079b6d3b0508675255ae45b",
+        "status": "draft",
+        "processedBytes": 1645,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/review-expectations.mdx",
+        "sha256": "d92a513593223dafb4df44970601218e5fd3b15f717511a056bbec6ff50a9541",
+        "status": "draft",
+        "processedBytes": 1428,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/source-citation-standards.mdx",
+        "sha256": "c94034c39333250f9ecadd81a5dd92eb3fd6534ce15073614d18bd19e2329ff7",
+        "status": "draft",
+        "processedBytes": 1371,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/testing-standards.mdx",
+        "sha256": "703b55f108f1eb6910c2969776f584306c0f3e9162a93cbc15146929089003a5",
+        "status": "draft",
+        "processedBytes": 2432,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/what-are-you-changing.mdx",
+        "sha256": "b1cfb0f241731c330e9d640b360d5db0b1e8e26a038ed9607aba28aecfbcfe73",
+        "status": "draft",
+        "processedBytes": 24871,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+        "sha256": "23c2de0a247b6355403a1cce09c15e679b460c1fc5d5d22c802ff9ff91c8777d",
+        "status": "draft",
+        "processedBytes": 2602,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-server-route-with-the-sdk.mdx",
+        "sha256": "0855263494fa492ffaf70b3f89d5236cffb6ed39ac755dbd64239777f772a0d5",
+        "status": "draft",
+        "processedBytes": 3477,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+        "sha256": "ed043b2bd3997face8730a85d77f33e1f9f2f8fe6c64a139ede2c8729644eee7",
+        "status": "draft",
+        "processedBytes": 1772,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+        "sha256": "e45eaa92b1c5684822f44a696d0bd8c31e56d69255455cc9e54b24b7adf496dd",
+        "status": "draft",
+        "processedBytes": 1801,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+        "sha256": "cb977a7b6b40905c3893c2a7657b15e310989260b5ca53794b326bd78bed54f3",
+        "status": "draft",
+        "processedBytes": 1751,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/guides/index.mdx",
+        "sha256": "0389f7012e6cf0777ba9610cd056fe6d8f048b2f06c2f67722de59ace0d68a1f",
+        "status": "draft",
+        "processedBytes": 862,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+        "sha256": "01163bf73271c5136fbc8260055fb66954404bb4c54b3801261542b6429d3de1",
+        "status": "draft",
+        "processedBytes": 2016,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/guides/show-calculator-help-to-users.mdx",
+        "sha256": "9abba726173e61112019d788d101ff82828e43b0f9f36cdc4e3feb9c1656215a",
+        "status": "draft",
+        "processedBytes": 1819,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/guides/test-your-integration.mdx",
+        "sha256": "0c44abafd2e51dd9eea702352dbf50e1d1181e1829c1dc63922f417e836e8c02",
+        "status": "draft",
+        "processedBytes": 2029,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/reference/api.mdx",
+        "sha256": "f0103858f4cd4d9dc718769ff6eb23b481f0e3afa009a9c65b7cfabf98f6bba5",
+        "status": "draft",
+        "processedBytes": 2832,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/reference/changelog.mdx",
+        "sha256": "4c4175f4f222bf56f4a851837ba1801ab06bbd722e625b29f9dc04ccbbde1b20",
+        "status": "draft",
+        "processedBytes": 1682,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/reference/errors.mdx",
+        "sha256": "bbdc139ef77d86152838b2b1e7d6fa18cc7804de5ccbfebd89d3e6e162e065e4",
+        "status": "draft",
+        "processedBytes": 3077,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/reference/examples.mdx",
+        "sha256": "ccbdca6a0b0518704417bf5d1b0d201a8b28d2f1cac26ad1e1a9228959870907",
+        "status": "draft",
+        "processedBytes": 2103,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/reference/index.mdx",
+        "sha256": "3841fe1970f2569003d5fc2c56c49f65cc3852344e8f940db26deb5e774f9a93",
+        "status": "draft",
+        "processedBytes": 570,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/reference/release-notes.mdx",
+        "sha256": "5b27b523f31cc41371c1900dd046300da1bd8ec7cd58adcd1b94b08ae56008a4",
+        "status": "draft",
+        "processedBytes": 1367,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/reference/schemas.mdx",
+        "sha256": "dcf33309cb623daaf45da24f3fc90f3009d42562461ee276c463ddf0ad3e482a",
+        "status": "draft",
+        "processedBytes": 4093,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/reference/sdk.mdx",
+        "sha256": "1f3b4440cb0ef70529ac4351e9373fd3fbfad8c23b2746a92eb4df131d5cc5ac",
+        "status": "draft",
+        "processedBytes": 3834,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/reference/versioning.mdx",
+        "sha256": "dd6c50c4397603b2b90c0150e5549fd5e8a1251b34ffb44d94f0b2e1f1933d3f",
+        "status": "draft",
+        "processedBytes": 1364,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+        "sha256": "8b2a64e448e7d412885d5fe17a5da2170abdcb44b2c8666fc72c99ed32997e8d",
+        "status": "draft",
+        "processedBytes": 3970,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/index.mdx",
+        "sha256": "5b26cc68ed100fc9a31da241681e3ee91c1adae68c912e8a4c32cfe24869ae7d",
+        "status": "draft",
+        "processedBytes": 493,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/plain-sdk.mdx",
+        "sha256": "d536fd323b56bbe30a2a07d9c10d91bef4c5ef23af87a9346a2c8c2728954b5a",
+        "status": "draft",
+        "processedBytes": 2191,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/safe-sdk.mdx",
+        "sha256": "352722a84d73233aa71811fedd01edb5854a95d2127c2aaacd495029a2ea6cd1",
+        "status": "draft",
+        "processedBytes": 1623,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/schemas.mdx",
+        "sha256": "b762afaf84c9a69564848d20c0ffc865a3e96df615fbcf6788b9365a3655518f",
+        "status": "draft",
+        "processedBytes": 1825,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/type-safety.mdx",
+        "sha256": "17fc46dc9c875af7d805488e019b1875b0c80d1fb72a9c83daf94054721e53aa",
+        "status": "draft",
+        "processedBytes": 2804,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/typescript-sdk.mdx",
+        "sha256": "7e44eb92a2244fb44157b9f69903478a70b39728e4d41717d10d31c792d30d8f",
+        "status": "draft",
+        "processedBytes": 2321,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+        "sha256": "2ee911f1ea5bcf39e72a78b1e34d1f5d95838f82f4af0484e95a30be130b7c97",
+        "status": "draft",
+        "processedBytes": 20758,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/start/index.mdx",
+        "sha256": "789164b5dfe43c3f26877e948fba8077788b1274f0317b5c8651ebedec84d36e",
+        "status": "draft",
+        "processedBytes": 528,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/start/install-the-sdk.mdx",
+        "sha256": "df1f4fe5ef62ad0eec275fb4471fa99ed75f850e15e4a4e4c82fba04654cfabd",
+        "status": "draft",
+        "processedBytes": 1871,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/start/overview.mdx",
+        "sha256": "7c3818ebc10e25715ea62123451ad839715d9f9148f100e69532da485f0845fa",
+        "status": "draft",
+        "processedBytes": 2138,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/start/quickstart.mdx",
+        "sha256": "85d4889b0a595e07c97a23458fc93c69c1e8729f5112e727e32fe37eca537a17",
+        "status": "draft",
+        "processedBytes": 1965,
+        "reviewState": "source read; public acceptance pending"
+      },
+      {
+        "path": "packages/docs-content/content/start/run-your-first-calculation.mdx",
+        "sha256": "b2bd83edba89c207a6b9193fe0ce9cb6254d93676b589beef3b4a3c278719c26",
+        "status": "draft",
+        "processedBytes": 1852,
+        "reviewState": "source read; public acceptance pending"
+      }
+    ]
+  },
+  "producerProbe": {
+    "fumadocsMdx": "15.4.6",
+    "fumadocsCore": "16.16.0",
+    "react": "19.3.0",
+    "processedPages": 61,
+    "method": "Installed default index plus official Bun runtime loader; page.data.getText(\"processed\") with the SDK receiver. Probe outputs were isolated and removed.",
+    "observedRawFrontmatter": 0,
+    "observedModuleImportsOutsideFences": 0,
+    "observedJsxOutsideFences": 0,
+    "limitation": "Current corpus observation and producer selection only; not a general malformed-MDX removal oracle or a production catalogue generator."
+  },
+  "compiledTemplateProof": {
+    "runtime": "Node 24.16.0",
+    "importedTemplates": 4,
+    "retainedSuccessBody": "{\"netPayCents\":130100,\"withholdingsCents\":35300}",
+    "invalidRequests": 3,
+    "errorTag": "PayPreviewRequestError",
+    "errorMessage": "Invalid pay preview request.",
+    "declarationContract": "None: application JavaScript/source maps are emitted, with no library exports.",
+    "artifacts": [
+      {
+        "path": "packages/docs-examples/dist/browser-http.js",
+        "sha256": "98fe815123401b25895669bccbdcec48b469ed2386af0863cbf4ba68111947d7"
+      },
+      {
+        "path": "packages/docs-examples/dist/browser-http.js.map",
+        "sha256": "bb67515b7d488ed3d838c733680dc31d40f425cb6e454aaa3760bb3af7a83ac5"
+      },
+      {
+        "path": "packages/docs-examples/dist/effect.js",
+        "sha256": "6443c2793e494ae3e2c1b2e6cf1ca48124c4060c4823cb5d326409fcf6c3f50d"
+      },
+      {
+        "path": "packages/docs-examples/dist/effect.js.map",
+        "sha256": "4326f0ff8e8420a444454bf52cbd7b79946afdf2e9317be47f07fdfc25a34bbb"
+      },
+      {
+        "path": "packages/docs-examples/dist/error-handling.js",
+        "sha256": "f5c79304617f99c3aab18025990b7c6c26b3145190426d15cb529854affe4caa"
+      },
+      {
+        "path": "packages/docs-examples/dist/error-handling.js.map",
+        "sha256": "8737540abdcefd8c37c63c6e7a06969d323efed2751d0b32c00ed6fef1c6ffb5"
+      },
+      {
+        "path": "packages/docs-examples/dist/node-server.js",
+        "sha256": "9a1ee0087c8ed582fa90e32709bba0640e1defd6bc6e3f046975c90100d4b09d"
+      },
+      {
+        "path": "packages/docs-examples/dist/node-server.js.map",
+        "sha256": "86a5a74e2721a709517014c3aef582c84459794eff2d3624c2555565a6c581b5"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "stage": "mdx-probe",
+      "command": [
+        "bun",
+        "--conditions=source",
+        "/private/tmp/dev76-mdx-default-probe.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.15,
+      "log": "/private/tmp/dev76-content-v1-mdx-probe.log"
+    },
+    {
+      "stage": "example-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-examples",
+        "check-examples"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.44,
+      "log": "/private/tmp/dev76-content-v1-example-types.log"
+    },
+    {
+      "stage": "example-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-examples",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.68,
+      "log": "/private/tmp/dev76-content-v1-example-tests.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.61,
+      "log": "/private/tmp/dev76-content-v2-format.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.45,
+      "log": "/private/tmp/dev76-content-v2-docs.log"
+    },
+    {
+      "stage": "validate",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.48,
+      "log": "/private/tmp/dev76-content-v2-validate.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.76,
+      "log": "/private/tmp/dev76-content-v2-lint.log"
+    },
+    {
+      "stage": "knip",
+      "command": [
+        "bun",
+        "run",
+        "knip"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.28,
+      "log": "/private/tmp/dev76-content-v2-knip.log"
+    },
+    {
+      "stage": "knip-production",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.17,
+      "log": "/private/tmp/dev76-content-v2-knip-production.log"
+    },
+    {
+      "stage": "release-graph",
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 894.46,
+      "log": "/private/tmp/dev76-content-v5-release-graph.log"
+    },
+    {
+      "stage": "mdx-all-pages",
+      "command": [
+        "bun",
+        "--no-env-file",
+        "--conditions=source",
+        "/private/tmp/dev76-mdx-all-pages-probe.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.29,
+      "log": "/private/tmp/dev76-content-v8-mdx-all-pages.log"
+    },
+    {
+      "stage": "changesets",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.42,
+      "log": "/private/tmp/dev76-content-v9-changesets.log"
+    },
+    {
+      "stage": "example-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-examples",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.69,
+      "log": "/private/tmp/dev76-content-v12-example-types.log"
+    },
+    {
+      "stage": "example-build",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-examples",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.22,
+      "log": "/private/tmp/dev76-content-v12-example-build.log"
+    },
+    {
+      "stage": "epoch",
+      "command": [
+        "bun",
+        "run",
+        "check:harness-foundation-epoch"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.19,
+      "log": "/private/tmp/dev76-content-v12-epoch.log"
+    },
+    {
+      "stage": "compiled-examples",
+      "command": [
+        "node",
+        "/private/tmp/dev76-compiled-examples-probe.mjs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.28,
+      "log": "/private/tmp/dev76-content-v14-compiled-examples.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.23,
+      "log": "/private/tmp/dev76-content-v14-format.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.55,
+      "log": "/private/tmp/dev76-content-v14-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "log": "/private/tmp/dev76-content-v14-runbooks.log"
+    },
+    {
+      "stage": "skills",
+      "command": [
+        "bun",
+        "run",
+        "test:skills"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.58,
+      "log": "/private/tmp/dev76-content-v14-skills.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.89,
+      "log": "/private/tmp/dev76-content-v15-format.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.52,
+      "log": "/private/tmp/dev76-content-v15-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.19,
+      "log": "/private/tmp/dev76-content-v15-runbooks.log"
+    },
+    {
+      "stage": "format-check",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.97,
+      "log": "/private/tmp/dev76-content-v15-format-check.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 8.5,
+      "log": "/private/tmp/dev76-content-v15-lint.log"
+    },
+    {
+      "stage": "knip",
+      "command": [
+        "bun",
+        "run",
+        "knip"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.64,
+      "log": "/private/tmp/dev76-content-v15-knip.log"
+    },
+    {
+      "stage": "knip-production",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.4,
+      "log": "/private/tmp/dev76-content-v15-knip-production.log"
+    },
+    {
+      "stage": "changesets",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.33,
+      "log": "/private/tmp/dev76-content-v15-changesets.log"
+    }
+  ],
+  "releaseGraph": {
+    "command": "bun run release:check -- --ci",
+    "exitCode": 0,
+    "durationSeconds": 894.46,
+    "orderedChecks": [
+      "verification",
+      "test",
+      "build",
+      "docs-validation",
+      "packed-artifact",
+      "downstream-consumer",
+      "api-smoke",
+      "docs-browser",
+      "changeset-status"
+    ],
+    "candidateLimitation": "Final template emit configuration was additionally qualified by focused source/build compiler and compiled Node checks after repository verification; final supporting docs/receipt receive separate closeout checks."
+  },
+  "retainedFailures": [
+    {
+      "attempt": "v3/v4",
+      "owner": "Repository path checker",
+      "observation": "Git still listed unstaged moved/deleted files; staged the exact owned renames and retried. Checker unchanged."
+    },
+    {
+      "attempt": "v6 inspection",
+      "owner": "Disposable Markdown probe predicate",
+      "observation": "Broad import-word detection matched English prose. Inspected exact output and narrowed detection to module import syntax; all 61 current pages pass. No production parser was changed."
+    },
+    {
+      "attempt": "v11",
+      "owner": "Disposable library declaration experiment",
+      "observation": "TS2883 for inferred HTTP request errors. Templates are application programs, with no library exports; final standard build emits JS/source maps and source/build type checks remain enabled."
+    },
+    {
+      "attempt": "v10/v12",
+      "owner": "Optional historical harness epoch checker",
+      "observation": "skill-receipt-projection fails with unchanged parent inputs. A proposed profile edit was discarded; no dated proof or canonical baseline was rewritten.",
+      "unchangedInputs": [
+        {
+          "path": "tools/evals/harness-foundation-source-manifest.json",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "tools/evals/harness-foundation/check.runtime.ts",
+          "unchangedFromParent": true
+        },
+        {
+          "path": ".agents/skills/package-structure/references/repository-profile.md",
+          "unchangedFromParent": true
+        },
+        {
+          "path": ".agents/skills/docs-maintainer/references/repository-profile.md",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "tools/skills/canonical-skill-baseline.json",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "docs/verification/repository-harness-profile.json",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "tools/governance/check.runtime.ts",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "tools/governance/input.boundary.ts",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "tools/governance/policy.ts",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "tools/governance/schemas.ts",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "docs/verification/critical-journeys.json",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "tools/evals/harness-foundation-scenarios.json",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "tools/evals/harness-foundation/input.boundary.ts",
+          "unchangedFromParent": true
+        },
+        {
+          "path": "tools/evals/harness-foundation/schemas.ts",
+          "unchangedFromParent": true
+        }
+      ],
+      "recovery": "Current graph qualification belongs to active-plan/T010 work; do not attribute the July epoch to this checkout."
+    },
+    {
+      "attempt": "v13",
+      "owner": "Disposable compiled Node probe",
+      "observation": "An overlapping placeholder produced an invalid probe import. Corrected the probe path; all four emitted modules and retained success/failure cases then pass."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "surface": "Content/examples ownership and commands",
+      "decision": "Change required",
+      "paths": [
+        "packages/docs-content/README.md",
+        "packages/docs-examples/README.md",
+        "apps/docs/README.md",
+        "docs/architecture/content-and-posts.md",
+        "docs/architecture/package-ownership.md",
+        "docs/architecture/package-boundaries.md"
+      ]
+    },
+    {
+      "surface": "Public source fidelity and validation",
+      "decision": "Change required",
+      "paths": [
+        "packages/docs-content/content/api/**",
+        "packages/docs-content/content/start/**",
+        "packages/docs-content/content/reference/api.mdx",
+        "packages/docs-content/content/reference/examples.mdx",
+        "packages/docs-content/content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+        "packages/docs-content/src/validation/policy.ts"
+      ]
+    },
+    {
+      "surface": "Package/build/consumer and exact enforcement owners",
+      "decision": "Change required",
+      "paths": [
+        "bun.lock",
+        "packages/docs-content/package.json",
+        "packages/docs-examples/package.json",
+        "packages/docs-examples/tsconfig*.json",
+        "packages/docs-examples/vitest.config.ts",
+        "knip.json",
+        "knip.production.json",
+        "oxlint.config.ts",
+        ".changeset/checked-docs-example-owner.md"
+      ]
+    },
+    {
+      "surface": "Active intent and bounded proof",
+      "decision": "Change required",
+      "paths": [
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/documentation-audit/README.md"
+      ]
+    },
+    {
+      "surface": "Tax, dependency versions, canonical skills, CI, public lifecycle and history",
+      "decision": "Preserve",
+      "basis": "No tax sources/expectations, version selections, canonical skill/profile bytes, CI commands, authored status/nav acceptance or historical records change."
+    },
+    {
+      "surface": "Application runtime/front-end route contracts, runbooks and provider operations",
+      "decision": "N/A",
+      "basis": "This preparatory slice changes no route, deployment, publication or provider operation. Existing app journeys remain; replacement journeys and command retirement are still T005 work."
+    }
+  ],
+  "changeset": {
+    "path": ".changeset/checked-docs-example-owner.md",
+    "package": "@taxkit/docs-content",
+    "releaseType": "patch",
+    "reason": "Checked example command and declared producer dependency ownership change; no versioning or publication performed."
+  },
+  "remainingDraftFindings": [
+    {
+      "id": "CSF-DOC-C001",
+      "paths": [
+        "packages/docs-content/content/contributing/add-a-fact.mdx",
+        "packages/docs-content/content/contributing/effect-service-standards.mdx"
+      ],
+      "finding": "Context.Tag and old catch names do not match installed Effect 4 and current fact services."
+    },
+    {
+      "id": "CSF-DOC-C002",
+      "paths": [
+        "packages/docs-content/content/api/errors.mdx",
+        "packages/docs-content/content/guides/handle-validation-errors.mdx",
+        "packages/docs-content/content/guides/test-your-integration.mdx",
+        "packages/docs-content/content/guides/show-calculator-help-to-users.mdx"
+      ],
+      "finding": "Replace cast/untyped/hand-mirrored examples with canonical checked ingress and client values before acceptance."
+    },
+    {
+      "id": "CSF-DOC-C003",
+      "paths": [
+        "packages/docs-content/content/reference/changelog.mdx",
+        "packages/docs-content/content/reference/release-notes.mdx"
+      ],
+      "finding": "Current repository changelog starts at 1.0.0; describe release availability using actual publication proof rather than source/manifest presence."
+    },
+    {
+      "id": "CSF-DOC-C004",
+      "paths": [
+        "packages/docs-content/content/contributing/changesets.mdx"
+      ],
+      "finding": "Old apps/docs/content path must name current package-owned source."
+    },
+    {
+      "id": "CSF-DOC-C005",
+      "paths": [
+        "packages/docs-content/content/reference/errors.mdx",
+        "packages/docs-content/content/reference/schemas.mdx"
+      ],
+      "finding": "Reconcile operational failure guidance with the current canonical calculator error union."
+    },
+    {
+      "id": "CSF-DOC-C006",
+      "finding": "Canonicalise processed Markdown source links against the accepted page/source catalogue, qualify compiled contract ownership and implement actual replacement routes/discovery/images before retirement."
+    }
+  ],
+  "limitations": [
+    "All 61 pages and authored navigation remain draft. No page-level acceptance record is added.",
+    "No accepted catalogue, new HTML/content/search/Markdown/image route, static discovery replacement or apps/docs retirement is claimed.",
+    "Tax output is retained pending Cooper Medicare scope decision; current fixture output is not fresh statutory correctness proof.",
+    "Metrics/telemetry approach work remains deferred.",
+    "The new DEV-75 connector comment is unposted pending fresh confirmation; the prior approved comment was already posted."
+  ],
+  "nonClaims": [
+    "No merge, deployment, publication, provider apply, registry change or credential operation.",
+    "No new historical harness acceptance or current-checkout claim from the July epoch."
+  ],
+  "rollback": "Restore this preparatory slice to parent d39a16ec3f9e5f4ffac8068169f8b6931adbb5ed; original source/example paths and expectations are retained in Git.",
+  "nextOwner": "Primary implementation owner continues CSF-T005 with compiled content contracts, source corrections and explicit acceptance, catalogue generation, backend/Website journeys and discovery proof."
+}

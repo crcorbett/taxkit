@@ -26,6 +26,7 @@ Current implemented code lives in:
 - `packages/core`
 - `packages/calculators`
 - `packages/docs-content`
+- `packages/docs-examples`
 - `packages/docs-fumadocs`
 - `packages/api/http`
 - `packages/api/rpc`
@@ -178,13 +179,21 @@ T009 exported tracing and provider/deployment proof remain open.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs
-  authored MDX, navigation, examples, frontmatter, meta, validation issues,
+  authored MDX, navigation, frontmatter, meta, validation issues,
   tagged docs errors, `DocsContentService`, the Fumadocs `source.config.ts`
   and the generated `.source/*` boundary. Navigation decoding is independent
   of the Node-only validation module. Validation and generated raw-text access
   may read MDX files only through their explicit non-runtime operations; app
   routes use processed generated content through the service and client
   exports. Service interfaces use the precise `Contract` suffix.
+
+`packages/docs-examples`
+: Private owner of the four public integration templates and their
+  compiler/runtime checks. It depends on HTTP, SDK and calculator contracts.
+  Those dependencies stay outside docs-content so HTTP can consume content
+  contracts without a circular build graph. It has no exports, generated
+  content, service runtime or publication entrypoint. Its standard compiler
+  build emits the templates without exporting a runtime package.
 
 `packages/docs-fumadocs`
 : Implemented private reusable package for generic Fumadocs integration. It

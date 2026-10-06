@@ -25,6 +25,7 @@ Implemented packages and apps:
 - `apps/web`
 - `packages/calculators`
 - `packages/docs-content`
+- `packages/docs-examples`
 - `packages/docs-fumadocs`
 - `packages/core`
 - `packages/api/http`
@@ -93,6 +94,7 @@ packages/
     typescript/
 
   docs-content/
+  docs-examples/
   docs-fumadocs/
   scripts/
 
@@ -205,7 +207,7 @@ Implemented private `@taxkit/sdk` owns:
 
 Implemented `@taxkit/docs-content` owns:
 
-- authored TaxKit MDX, navigation and checked examples
+- authored TaxKit MDX and navigation
 - TaxKit docs frontmatter, meta, navigation and validation schemas
 - navigation and source-text validation policy
 - docs content service tags and live layers

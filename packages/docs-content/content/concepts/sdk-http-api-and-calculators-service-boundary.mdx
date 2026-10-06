@@ -30,13 +30,12 @@ Plain TypeScript caller
 HTTP caller
   -> @taxkit/api-http route contract
     -> CalculatorApiHandlerLive
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorService.calculate
-          -> CalculationEngine
+      -> PublicCalculatorService.calculate
+        -> CalculationEngine
 ```
 
-The HTTP calculate route uses `calculateRunRequest` so the transport path and
-the SDK path share the calculator service contract.
+The HTTP calculate route calls `PublicCalculatorService.calculate` directly.
+The SDK helpers call the same service. HTTP does not depend on the SDK helpers.
 
 ## Boundary rules
 

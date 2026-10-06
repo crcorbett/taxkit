@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-21
-source_of_truth: docs
-confidence: medium
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-content-owner
+last_reviewed: 2026-10-06
+review_trigger: content ownership, acceptance or generated presentation changes
 ---
 
 # Content and posts
@@ -32,8 +34,14 @@ on the open-source tax engine and avoid downstream private-product specifics.
 
 `packages/docs-content`
 : Private source-only package for TaxKit docs frontmatter, meta, navigation,
-  authored MDX, examples, validation policy, tagged docs errors, generated
+  authored MDX, validation policy, tagged docs errors, generated
   Fumadocs source access and the content service.
+
+`packages/docs-examples`
+: Private checked integration templates and their compiler/runtime proof. It
+  depends on HTTP/SDK/calculator contracts independently of the content package,
+  preventing a cycle when the backend consumes content contracts. Public MDX
+  references these retained templates; content validation checks those links.
 
 `packages/docs-fumadocs`
 : Private reusable package for generic Fumadocs configuration, Effect Schema to

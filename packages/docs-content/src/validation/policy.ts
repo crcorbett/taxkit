@@ -32,7 +32,7 @@ import { validateMdxComponentPolicy } from "./mdx-component-policy.js";
 const { join, resolve } = nodePath;
 const docsRoot = "packages/docs-content";
 const contentRoot = "packages/docs-content/content";
-const examplesRoot = "packages/docs-content/examples";
+const examplesRoot = "packages/docs-examples/src";
 const navigationSource = "packages/docs-content/navigation.json";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
@@ -69,11 +69,11 @@ const openApiReferenceRequiredText = [
 ] as const;
 
 const examplesReferenceRequiredText = [
-  "../../examples/browser-http.ts",
-  "../../examples/effect.ts",
-  "../../examples/error-handling.ts",
-  "../../examples/node-server.ts",
-  "bun run --filter=docs check-examples",
+  "../../../docs-examples/src/browser-http.ts",
+  "../../../docs-examples/src/effect.ts",
+  "../../../docs-examples/src/error-handling.ts",
+  "../../../docs-examples/src/node-server.ts",
+  "bun run --filter=@taxkit/docs-examples check-examples",
 ] as const;
 
 const contentSourcePath = (path: string) =>

@@ -62,8 +62,8 @@ const decodingBoundaryFiles = [
   // Application configuration, executable smoke checks and checked examples.
   "apps/api/src/config.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
-  "packages/docs-content/examples/browser-http.ts",
-  "packages/docs-content/examples/node-server.ts",
+  "packages/docs-examples/src/browser-http.ts",
+  "packages/docs-examples/src/node-server.ts",
   "apps/docs/src/lib/docs/loaders.ts",
   "apps/docs/src/lib/docs/loaders.server.ts",
   "apps/docs/src/lib/docs/route-boundary.ts",
@@ -268,7 +268,7 @@ const schemaEncoderEgressFiles = [
   "packages/docs-content/src/service.test.ts",
   "packages/docs-content/src/generated-page.boundary.test.ts",
   "packages/docs-fumadocs/src/service.test.ts",
-  "packages/docs-content/examples/node-server.ts",
+  "packages/docs-examples/src/node-server.ts",
   "tools/governance/check.runtime.ts",
   // Exact historical skill representation test uses the Candidate-owned Schema.
   "tools/evals/hgi-206/service.test.ts",
@@ -1285,7 +1285,7 @@ export default defineConfig({
         "**/errors.ts",
         "packages/sdk/typescript/src/index.test.ts",
         "packages/sdk/typescript/src/client-lifetime.test.ts",
-        "packages/docs-content/examples/node-server.ts",
+        "packages/docs-examples/src/node-server.ts",
         "**/errors/*.ts",
         "**/schemas.ts",
         "**/*.schemas.ts",

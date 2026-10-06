@@ -41,8 +41,8 @@ flowchart TD
   Browser --> HttpApi
 ```
 
-The HTTP API is a thin transport over the SDK and calculator service. It should
-not contain calculator business logic that is missing from the SDK path.
+The HTTP API calls the calculator service directly. The SDK calls the same
+service in-process. Keep tax logic in the shared calculator and rule packages.
 
 ## Next steps
 

@@ -12,7 +12,7 @@ review_trigger: package contracts or generated-source boundaries change
 ## Scope
 
 Private source-only package for authored public TaxKit MDX, navigation,
-examples and content contracts. It owns Effect Schema frontmatter, meta and
+and content contracts. It owns Effect Schema frontmatter, meta and
 navigation schemas, tagged docs source errors, validation policy, generated
 source configuration and the content service. Reusable Fumadocs internals come
 from `@taxkit/docs-fumadocs`.
@@ -22,7 +22,7 @@ Those belong in the `apps/docs` runtime.
 
 ## Main areas
 
-- `content/`, `navigation.json` and `examples/`: the authored TaxKit public
+- `content/` and `navigation.json`: the authored TaxKit public
   documentation source.
 - `source.config.ts`: TaxKit collection declaration for `content/` using
   reusable `@taxkit/docs-fumadocs/config` helpers.
@@ -85,6 +85,12 @@ operation; `apps/docs` owns the isolated workerd failure oracle for that
 boundary.
 
 ## Checked examples
+
+[`@taxkit/docs-examples`](../docs-examples/README.md) owns the four source
+templates and their compiler/runtime checks. Content validation checks their
+existence and public references. Their HTTP/SDK dependencies do not belong in
+this content package; the HTTP API can therefore consume content contracts
+without a circular build graph.
 
 The browser HTTP example accepts an explicit `URL` and calls the typed API
 client through `FetchHttpClient.layer`; it has no implicit server or environment
@@ -154,8 +160,8 @@ implementation in `apps/docs` or reusable primitives in
   `bun run --filter=@taxkit/docs-content generate`; the package build executes
   it, and Turbo records its inputs, `.source/**` output and upstream
   docs-fumadocs build.
-- Run `bun run --filter=@taxkit/docs-content check-examples` after changing
-  package-owned examples.
+- Run `bun run --filter=@taxkit/docs-examples check-examples` after changing
+  the checked source templates.
 - Keep docs identifiers, frontmatter, meta, navigation and tagged source errors
   schema-owned in this package.
 - Keep service tests on the deterministic test Layer so accepted, missing and
@@ -173,8 +179,9 @@ implementation in `apps/docs` or reusable primitives in
 
 The Effect and browser HTTP templates construct the calculator-owned request
 Options. Their matching public guides explain the checked TypeScript values;
-raw HTTP JSON examples retain ordinary optional fields. The package checks both
-canonical templates as part of content qualification.
+raw HTTP JSON examples retain ordinary optional fields. The docs-examples
+compiler checks both canonical templates. Content validation checks their
+public references.
 
 
 The error reference distinguishes checked Core diagnostic absence from its

@@ -93,7 +93,7 @@ bun run --filter=docs build:cloudflare
 bun run --filter=docs check-types
 bun run --filter=docs build
 bun run --filter=docs preview
-bun run --filter=@taxkit/docs-content check-examples
+bun run --filter=@taxkit/docs-examples check-examples
 bun run docs:validate
 ```
 
@@ -113,9 +113,9 @@ Alchemy beta.80 injects its Cloudflare Vite plugin for the native resource;
 standalone Vite installs the same official plugin only when the documented
 `ALCHEMY_CLOUDFLARE_VITE_INJECTED` guard is absent.
 
-`@taxkit/docs-content` `check-types` includes `check-examples`, so the
-package-owned public examples stay connected to current SDK/API/calculator
-exports.
+`@taxkit/docs-examples` owns the four public integration templates. Its
+`check-types` and `check-examples` check their current SDK/API/calculator
+exports; content validation checks their source links.
 
 Run `build` before `preview`. Turbo orders the package-owned content build
 before the app, while a direct Vite app build regenerates the same package-owned
@@ -367,7 +367,7 @@ docs change
     -> frontmatter and navigation schemas
     -> local links and allowed MDX components
     -> example and OpenAPI reference checks
-  -> @taxkit/docs-content check-examples
+  -> @taxkit/docs-examples check-examples
     -> TypeScript example compilation
   -> docs build
     -> TanStack Start and Fumadocs rendering

@@ -192,6 +192,10 @@
       "vite": false,
       "ignoreDependencies": ["cloudflare"],
       "ignoreExportsUsedInFile": true
+    },
+    "packages/docs-examples": {
+      "entry": ["src/**/*.ts!"],
+      "project": ["src/**/*.ts!"]
     }
   }
 }

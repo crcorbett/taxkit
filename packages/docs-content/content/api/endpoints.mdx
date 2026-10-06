@@ -22,7 +22,7 @@ response detail.
 | `GET`  | `/api/v1/calculators`                         | List calculator catalog entries.                               |
 | `GET`  | `/api/v1/calculators/:calculatorId`           | Get one calculator catalog entry.                              |
 | `GET`  | `/api/v1/calculators/:calculatorId/schema`    | Get fact, rule and report schema metadata.                     |
-| `POST` | `/api/v1/calculators/:calculatorId/calculate` | Run one calculator through `calculateRunRequest`.              |
+| `POST` | `/api/v1/calculators/:calculatorId/calculate` | Run one calculator through the calculator service.             |
 | `GET`  | `/api/v1/calculators/:calculatorId/graph`     | Get graph edges and validation diagnostics.                    |
 | `GET`  | `/api/v1/facts`                               | List canonical fact descriptors.                               |
 | `GET`  | `/api/v1/rules`                               | List canonical rule descriptors.                               |

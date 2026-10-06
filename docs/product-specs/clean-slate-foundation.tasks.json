@@ -498,7 +498,7 @@
     {
       "id": "CSF-T005",
       "title": "Replace public docs and all discovery representations",
-      "status": "pending",
+      "status": "in_progress",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -520,6 +520,7 @@
       ],
       "outputs": [
         "packages/docs-content/** authored/status/navigation/generated owners and any justified retained docs-fumadocs bridge",
+        "packages/docs-examples/** checked source/compiler/runtime owner; preserve the four retained integration templates and their output/error expectations.",
         "apps/web HTML/docs presentation, generated static discovery/image assets and old-route redirect map",
         "apps/api dynamic page/navigation/search/processed-Markdown/image services and packages/api/http checked contracts/clients; owning content package preserves prose, links, tables and examples",
         "tools/documentation/owner-policy.json exact public acceptance records and generated edges",
@@ -558,7 +559,10 @@
         "Finished pages are explicitly accepted, unfinished pages do not enter public discovery, and valid public content retains source attribution.",
         "The replacement covers the retired app's useful journeys and historical evidence remains addressable."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-checked-docs-source-owner.json"
+      ]
     },
     {
       "id": "CSF-T006",

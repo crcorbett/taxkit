@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import * as HttpClientRequest from "effect/http/HttpClientRequest";
 import * as HttpClientResponse from "effect/http/HttpClientResponse";
 
-import { handlePayPreview } from "../examples/node-server.js";
+import { handlePayPreview } from "../src/node-server.js";
 
 it.effect("the server example preserves the documented weekly pay result", () =>
   Effect.gen(function* () {

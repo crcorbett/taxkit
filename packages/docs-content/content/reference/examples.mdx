@@ -12,19 +12,19 @@ application runtime decides how to run them.
 
 ## Example files
 
-| Example             | Path                                                                                   | Covers                                                                                       |
-| ------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Node server route   | [`packages/docs-content/examples/node-server.ts`](../../examples/node-server.ts)       | Returning an Effect that validates requests and calls `calculateReport` from a server route. |
-| Browser HTTP caller | [`packages/docs-content/examples/browser-http.ts`](../../examples/browser-http.ts)     | Returning an Effect that calls the typed HTTP client with canonical facts.                   |
-| Effect request      | [`packages/docs-content/examples/effect.ts`](../../examples/effect.ts)                 | Constructing a `calculateRunRequest` program for an Effect application.                      |
-| Error handling      | [`packages/docs-content/examples/error-handling.ts`](../../examples/error-handling.ts) | Reading a `TaxKit.safe.calculate` failure value.                                             |
+| Example             | Path                                                                                           | Covers                                                                                       |
+| ------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Node server route   | [`packages/docs-examples/src/node-server.ts`](../../../docs-examples/src/node-server.ts)       | Returning an Effect that validates requests and calls `calculateReport` from a server route. |
+| Browser HTTP caller | [`packages/docs-examples/src/browser-http.ts`](../../../docs-examples/src/browser-http.ts)     | Returning an Effect that calls the typed HTTP client with canonical facts.                   |
+| Effect request      | [`packages/docs-examples/src/effect.ts`](../../../docs-examples/src/effect.ts)                 | Constructing a `calculateRunRequest` program for an Effect application.                      |
+| Error handling      | [`packages/docs-examples/src/error-handling.ts`](../../../docs-examples/src/error-handling.ts) | Reading a `TaxKit.safe.calculate` failure value.                                             |
 
 ## Typecheck examples
 
 Typecheck every checked example:
 
 ```sh
-bun run --filter=docs check-examples
+bun run --filter=@taxkit/docs-examples check-examples
 ```
 
 The browser HTTP example takes an explicit `URL` and uses the typed API client
