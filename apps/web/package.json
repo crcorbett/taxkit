@@ -14,7 +14,7 @@
     "test": "bun --bun vitest run",
     "generate:worker-types": "wrangler types src/worker-runtime.generated.d.ts --include-env true --include-runtime true --strict-vars false --config wrangler.jsonc",
     "check:worker-types": "wrangler types src/worker-runtime.generated.d.ts --include-env true --include-runtime true --strict-vars false --config wrangler.jsonc --check",
-    "build:native-pair": "cd ../.. && turbo run build --filter=@taxkit/api-rpc && bun --conditions=source run apps/web/scripts/native-pair-build.runtime.ts",
+    "build:native-pair": "cd ../.. && turbo run build --filter=api && bun --conditions=source run apps/web/scripts/native-pair-build.runtime.ts",
     "test:native-pair": "node node_modules/vitest/vitest.mjs run --config vitest.native.config.ts"
   },
   "dependencies": {
@@ -36,6 +36,7 @@
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
+    "@taxkit/content": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

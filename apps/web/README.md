@@ -80,7 +80,8 @@ bun run --filter=web build:native-pair
 bun run --filter=web test:native-pair
 ```
 
-`build:native-pair` first builds compiled RPC dependencies, then uses Alchemy's
+`build:native-pair` first builds the API dependency graph, including the accepted
+docs catalogue and compiled RPC dependencies, then uses Alchemy's
 public native source builders for both apps. The Website declares `api` as a
 workspace development dependency because this local builder resolves
 `api/worker`; a stray root link cannot stand in for that declaration.

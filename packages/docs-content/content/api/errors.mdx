@@ -1,6 +1,6 @@
 ---
 title: "API errors"
-description: "Handle expected calculator service failures returned by the HTTP API."
+description: "Handle expected calculator and public documentation failures returned by the HTTP API."
 status: "published"
 ---
 
@@ -84,6 +84,21 @@ POST /api/v1/calculators/au.pay.take-home/calculate?help=errors
 
 The help data comes from canonical fact descriptors. Do not maintain a
 separate application copy of calculator fields.
+
+## Public documentation errors
+
+The documentation routes return their own error JSON. Read `_tag` and
+`message` directly; these replies do not use `CalculatorApiErrorEnvelope`.
+
+| Status | `_tag`                  | Message                                            | What to do                             |
+| ------ | ----------------------- | -------------------------------------------------- | -------------------------------------- |
+| `404`  | `DocsPageUnavailable`   | `The documentation page was not found.`            | Choose a page address from navigation. |
+| `503`  | `DocsSearchUnavailable` | `Documentation search is temporarily unavailable.` | Try your search again later.           |
+
+Both the page JSON and Markdown routes return the same missing-page error.
+A missing or invalid `path` or `term` returns an empty HTTP 400 reply. Check
+that you supplied the required query and used the limits in
+[Endpoints](./endpoints.mdx).
 
 ## Related pages
 

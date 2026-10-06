@@ -121,6 +121,7 @@ const prepareWorkspace = Effect.fnUntraced(function* (repositoryRoot: string) {
     `Offline frozen fixture install failed in ${workspace}:\n${install.stderr}\n${install.stdout}`
   ).toBe(0);
   const workspacePackages = [
+    ["content", "packages/content"],
     ["api-http", "packages/api/http"],
     ["calculators", "packages/calculators"],
     ["core", "packages/core"],

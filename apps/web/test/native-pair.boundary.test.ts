@@ -1,5 +1,6 @@
 import { NodeServices } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
+import { DocsPageUnavailable } from "@taxkit/api-http";
 import {
   CalculatorRequestBodyErrorEnvelope,
   CalculatorRequestBodyTooLarge,
@@ -14,6 +15,12 @@ import {
   MetadataQuery,
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
+import {
+  DocsPublicCatalogue,
+  DocsPublicPage,
+  DocsPublicNavigation,
+  DocsSearchResult,
+} from "@taxkit/content/schemas";
 import {
   Array,
   Effect,
@@ -230,6 +237,109 @@ describe("built native API and Website", () => {
           Effect.timeout("10 seconds")
         );
         const catalogueOrigin = CalculatorRpcOrigin.make(new URL(apiOrigin));
+        // Compare the actual built Worker with the owning checked catalogue,
+        // including every body rather than accepting a count or a placeholder.
+        const publicContent = yield* fs
+          .readFileString(
+            path.join(
+              root,
+              "packages/docs-content/.source/public-catalogue.json"
+            )
+          )
+          .pipe(
+            Effect.flatMap(
+              Schema.decodeEffect(Schema.fromJsonString(DocsPublicCatalogue))
+            )
+          );
+        expect(publicContent.pages).toHaveLength(61);
+        const docsNavigation = yield* Effect.promise(() =>
+          publicApi.dispatchFetch(`${apiOrigin}/api/v1/docs/navigation`)
+        );
+        expect(docsNavigation.status).toBe(200);
+        expect(
+          yield* Schema.decodeEffect(
+            Schema.fromJsonString(DocsPublicNavigation)
+          )(yield* Effect.promise(() => docsNavigation.text()))
+        ).toEqual(publicContent.navigation);
+        yield* Effect.forEach(publicContent.pages, (expectedPage) =>
+          Effect.gen(function* () {
+            const query = new URLSearchParams({ path: expectedPage.path });
+            const pageResponse = yield* Effect.promise(() =>
+              publicApi.dispatchFetch(
+                `${apiOrigin}/api/v1/docs/page?${query}`,
+                { headers: { origin: websiteOrigin } }
+              )
+            );
+            expect(pageResponse.status).toBe(200);
+            expect(
+              pageResponse.headers.get("access-control-allow-origin")
+            ).toBe(websiteOrigin);
+            const page = yield* Schema.decodeEffect(
+              Schema.fromJsonString(DocsPublicPage)
+            )(yield* Effect.promise(() => pageResponse.text()));
+            expect(page).toEqual(expectedPage);
+            const markdown = yield* Effect.promise(() =>
+              publicApi.dispatchFetch(
+                `${apiOrigin}/api/v1/docs/markdown?${query}`
+              )
+            );
+            expect(markdown.status).toBe(200);
+            expect(markdown.headers.get("content-type")).toContain(
+              "text/markdown"
+            );
+            expect(yield* Effect.promise(() => markdown.text())).toBe(
+              expectedPage.markdown
+            );
+          })
+        );
+        const docsSearch = yield* Effect.promise(() =>
+          publicApi.dispatchFetch(
+            `${apiOrigin}/api/v1/docs/search?term=Quickstart`
+          )
+        );
+        expect(docsSearch.status).toBe(200);
+        const docsResults = yield* Schema.decodeEffect(
+          Schema.fromJsonString(Schema.Array(DocsSearchResult))
+        )(yield* Effect.promise(() => docsSearch.text()));
+        expect(
+          Array.some(
+            docsResults,
+            (result) => result.path === "/start/quickstart"
+          )
+        ).toBe(true);
+        expect(docsResults.length).toBeLessThanOrEqual(20);
+        expect(
+          Array.every(docsResults, (result) => result.excerpt.length <= 240)
+        ).toBe(true);
+        yield* Effect.forEach(
+          [
+            "/api/v1/docs/page?path=..%2Ftaxkit-secret-sentinel",
+            "/api/v1/docs/search?term=%20%20",
+          ],
+          (address) =>
+            Effect.gen(function* () {
+              const invalid = yield* Effect.promise(() =>
+                publicApi.dispatchFetch(`${apiOrigin}${address}`)
+              );
+              expect(invalid.status).toBe(400);
+              expect(yield* Effect.promise(() => invalid.text())).toBe("");
+            })
+        );
+        const missingDocs = yield* Effect.promise(() =>
+          publicApi.dispatchFetch(
+            `${apiOrigin}/api/v1/docs/markdown?path=%2Fprivate-taxkit-sentinel`
+          )
+        );
+        expect(missingDocs.status).toBe(404);
+        expect(
+          yield* Schema.decodeEffect(
+            Schema.fromJsonString(DocsPageUnavailable)
+          )(yield* Effect.promise(() => missingDocs.text()))
+        ).toEqual(
+          new DocsPageUnavailable({
+            message: "The documentation page was not found.",
+          })
+        );
         yield* Effect.forEach(["first", "after idle"] as const, (attempt) =>
           Effect.gen(function* () {
             if (attempt === "after idle") {

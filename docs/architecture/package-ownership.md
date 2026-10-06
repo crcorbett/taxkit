@@ -183,8 +183,8 @@ T009 exported tracing and provider/deployment proof remain open.
   errors, the accepted public catalogue Schema and `ContentService`. Application
   composition injects one checked catalogue; the service reads accepted pages,
   navigation and bounded search without filesystem or runtime execution. This
-  owner does not perform source acceptance or compile MDX. Future HTTP consumers
-  must use this compiled contract instead of the source-only Fumadocs collection.
+  owner does not perform source acceptance or compile MDX. The HTTP content
+  group consumes this compiled contract instead of the source-only Fumadocs collection.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs
@@ -199,6 +199,8 @@ T009 exported tracing and provider/deployment proof remain open.
   The independent native MDX index and `./catalogue-source` Layer belong only
   to the local accepted-catalogue builder. Request/browser code consumes its
   checked generated representation; it must not initialise that compiler.
+  The package build emits the accepted JSON catalogue; `./public-catalogue`
+  exports that value without importing the source compiler or live Layers.
 
 `packages/docs-examples`
 : Private owner of the four retained integration templates, additional checked

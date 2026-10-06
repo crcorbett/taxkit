@@ -841,7 +841,7 @@ const fixtureCases = [
     ],
   },
   {
-    accepted: ["packages/api/http/src/client/in-process.layer.ts"],
+    accepted: ["packages/api/http/src/client/server.layer.ts"],
     generated: "packages/api/http/src/.generated-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",

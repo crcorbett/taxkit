@@ -155,6 +155,12 @@ fenced example in the documentation has been compiled.
 
 `bun run docs:catalogue` generates both compiler indexes, then runs the
 repository-owned builder in `tools/documentation/catalogue.runtime.ts`.
+The package `build` command now includes that same accepted catalogue step;
+`generate` remains the lower-level compiler-index command. The dedicated
+Turbo build inputs include the builder, policy Schemas, exact acceptance
+bindings and source-review records, alongside all package sources. Its checked
+browser path is an explicit build environment input because Mermaid rendering
+uses Chromium.
 The retained Mermaid compiler uses Chromium. Use the repository's configured
 `PLAYWRIGHT_BROWSERS_PATH`, as the Quality workflow does, when browsers are
 stored outside Playwright's default location.
@@ -171,6 +177,9 @@ navigation coverage. No accepted pages is an error; it cannot silently create
 an empty public site. Successful builds encode the checked catalogue once to
 `.source/public-catalogue.json`. That generated file is local build output,
 not publication or deployment evidence.
+`./public-catalogue` exports only that JSON value. The API host imports it at
+composition time and checks it with `@taxkit/content`; this export does not
+import compiler, filesystem, React or authored-source Layers.
 
 Version-one acceptance records remain readable by the regular docs checker
 for their retained lifecycle evidence. The new catalogue builder requires

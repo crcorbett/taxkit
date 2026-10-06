@@ -9,12 +9,14 @@ import * as HttpServerResponse from "effect/http/HttpServerResponse";
 
 import { TaxKitApi } from "../api.js";
 import { CalculatorApiHandlerLive } from "../handlers/calculators.js";
+import { ContentApiHandlerLive } from "../handlers/content.js";
 import { HealthHandlerLive } from "../handlers/health.js";
 import { taxKitOpenApiSpec } from "../openapi.js";
 import { withCalculatorRequestBodyLimit } from "../request-boundary.js";
 
 const ApiRoutes = HttpApiBuilder.layer(TaxKitApi).pipe(
   Layer.provide(CalculatorApiHandlerLive),
+  Layer.provide(ContentApiHandlerLive),
   Layer.provide(HealthHandlerLive)
 );
 

@@ -116,6 +116,7 @@
   },
   "dependencies": {
     "@taxkit/calculators": "workspace:*",
+    "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
     "effect": "catalog:"
   },

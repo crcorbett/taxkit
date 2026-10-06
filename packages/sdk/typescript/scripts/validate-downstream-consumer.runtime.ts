@@ -109,6 +109,11 @@ const packageClosure = [
   },
   {
     build: true,
+    packageName: "@taxkit/content",
+    relativeRoot: "packages/content",
+  },
+  {
+    build: true,
     packageName: "@taxkit/rules-au-income-tax",
     relativeRoot: "packages/rules/au/income-tax",
   },

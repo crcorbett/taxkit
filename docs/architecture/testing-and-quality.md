@@ -54,7 +54,7 @@ observed imports so first-run dependency discovery cannot reload the test
 iframe before assertions.
  The development-aware graph covers repository tooling, tests and
 current application scaffolds. The production graph separately proves the
-eight code-bearing packages in the nine-artifact release closure,
+nine code-bearing packages in the ten-artifact release closure,
 `@taxkit/scripts` exports and commands, and the standalone API runtime without
 test or development reachability. It also models the real `apps/docs`,
 `@taxkit/docs-content` and `@taxkit/docs-fumadocs` production entries,
@@ -146,7 +146,7 @@ bun run --filter=@taxkit/sdk validate:downstream
 ```
 
 The focused command uses an Effect-native, scope-managed Bun runtime to pack,
-inspect and import the SDK artifact. The strict command builds the nine-package
+inspect and import the SDK artifact. The strict command builds the ten-package
 release closure, materializes each declared dist-only
 `publishConfig.exports` view, Bun-packs it, rejects source/protocol leakage,
 installs all tarballs in a clean external workspace, typechecks and runs SDK

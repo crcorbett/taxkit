@@ -20,6 +20,7 @@ import {
   checkApiCalculation,
   checkApiCatalog,
   checkApiOpenApi,
+  checkApiPublicContent,
   waitForApiHealth,
 } from "./routes.js";
 import {
@@ -327,6 +328,10 @@ export const checkApiPublicRoutes = (settings: typeof ApiSmokeSettings.Type) =>
     );
     yield* checkApiOpenApi(origin);
     yield* Console.info("GET /api/docs/openapi.json passed");
+    yield* checkApiPublicContent(origin);
+    yield* Console.info(
+      "Public documentation page, navigation, search and Markdown passed"
+    );
 
     const workspacePath = yield* Effect.acquireRelease(
       fs.makeTempDirectory({ prefix: "taxkit-api-downstream-" }),

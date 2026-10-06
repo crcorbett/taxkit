@@ -25,7 +25,9 @@
     "@taxkit/api-http": "workspace:*",
     "@taxkit/api-rpc": "workspace:*",
     "@taxkit/calculators": "workspace:*",
+    "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
+    "@taxkit/docs-content": "workspace:*",
     "alchemy": "catalog:",
     "effect": "catalog:"
   },

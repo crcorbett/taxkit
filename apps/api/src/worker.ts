@@ -7,6 +7,7 @@ import type { InferEnv } from "alchemy/Cloudflare/Workers";
 import type { HttpEffect } from "alchemy/Http";
 import { Effect, Layer } from "effect";
 
+import { ApiContentLive } from "./content.boundary.js";
 import { ApiCalculatorAdmission } from "./worker-admission.layer.js";
 import { ApiWorkerApplication } from "./worker.application.js";
 
@@ -27,6 +28,7 @@ export const ApiWorkerObservability = {
 } as const;
 
 export const ApiWorkerInit = ApiWorkerApplication.pipe(
+  Effect.provide(ApiContentLive),
   Effect.provide(
     PublicCalculatorServiceBounded.pipe(
       Layer.provide(

@@ -20,7 +20,9 @@ The authored MDX, source review and Fumadocs compiler remain in
 an authored page for publication. The local catalogue builder requires reviewed
 source records; the
 [dated source review](../../docs/documentation-audit/clean-slate-foundation/2026-10-06-public-content-acceptance.json)
-owns those individual decisions. Public routing remains T005 work.
+owns those individual decisions. The checked
+[HTTP package](../api/http/README.md) now delegates public content routes to
+this service; replacement Website routing remains T005 work.
 Existing docs-content imports re-export
 the canonical page, navigation and lookup error contracts for compatibility.
 
@@ -49,7 +51,10 @@ projection failure stays in the safe `DocsSourceError` channel.
 All repository exports select source under the `source` condition and compiled
 JavaScript/declarations otherwise. The proposed publish exports omit test
 subpaths and source conditions. The package remains private; a proposed publish
-manifest does not establish a packed or published consumer.
+manifest does not establish a packed or published consumer. The HTTP package
+now depends on these compiled contracts, so the local downstream check includes
+this package in its ten-artifact closure and fixed version group. That check
+still does not authorise registry publication.
 
 ## Documentation impact
 

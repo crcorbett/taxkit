@@ -4,13 +4,18 @@ import {
   CalculatorRunResponse,
   HealthResponse,
 } from "@taxkit/api-http";
+import {
+  DocsPublicPage,
+  DocsPublicNavigation,
+  DocsSearchResult,
+} from "@taxkit/content/schemas";
 import { Money, Cents } from "@taxkit/core/primitives";
 import {
   AuPayJurisdiction,
   AuPayTaxYear,
   GrossPay,
 } from "@taxkit/rules-au-pay";
-import { Array, Effect, Option, Record, Schedule } from "effect";
+import { Array, Effect, Option, Record, Schedule, Schema } from "effect";
 import * as HttpBody from "effect/http/HttpBody";
 import * as HttpClient from "effect/http/HttpClient";
 import * as HttpClientResponse from "effect/http/HttpClientResponse";
@@ -21,6 +26,81 @@ import {
   ApiSmokeRouteError,
   ApiSmokeValidationError,
 } from "./schemas.js";
+
+export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
+  (origin: string) =>
+    Effect.gen(function* () {
+      const page = yield* HttpClient.get(
+        new URL("/api/v1/docs/page?path=%2Fstart%2Fquickstart", origin),
+        { acceptJson: true }
+      ).pipe(
+        Effect.flatMap(HttpClientResponse.filterStatusOk),
+        Effect.flatMap(HttpIncomingMessage.schemaBodyJson(DocsPublicPage))
+      );
+      const navigation = yield* HttpClient.get(
+        new URL("/api/v1/docs/navigation", origin),
+        { acceptJson: true }
+      ).pipe(
+        Effect.flatMap(HttpClientResponse.filterStatusOk),
+        Effect.flatMap(HttpIncomingMessage.schemaBodyJson(DocsPublicNavigation))
+      );
+      const search = yield* HttpClient.get(
+        new URL("/api/v1/docs/search?term=Quickstart", origin),
+        { acceptJson: true }
+      ).pipe(
+        Effect.flatMap(HttpClientResponse.filterStatusOk),
+        Effect.flatMap(
+          HttpIncomingMessage.schemaBodyJson(Schema.Array(DocsSearchResult))
+        )
+      );
+      const markdown = yield* HttpClient.get(
+        new URL("/api/v1/docs/markdown?path=%2Fstart%2Fquickstart", origin)
+      ).pipe(
+        Effect.flatMap(HttpClientResponse.filterStatusOk),
+        Effect.flatMap((response) => response.text)
+      );
+      if (
+        page.path !== "/start/quickstart" ||
+        markdown !== page.markdown ||
+        !Array.some(
+          search,
+          (result) =>
+            result.path === page.path && result.title === page.frontmatter.title
+        ) ||
+        !Array.some(
+          Array.flatMap(navigation.primaryNavigation, (item) => [
+            item,
+            ...item.pages,
+          ]),
+          (item) =>
+            item.path === page.path && item.title === page.frontmatter.title
+        )
+      ) {
+        return yield* new ApiSmokeValidationError({
+          message:
+            "Public documentation replies did not match their owning page.",
+        });
+      }
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new ApiSmokeRouteError({
+            reason: "request-or-response",
+            route: "public-content",
+          })
+      ),
+      Effect.timeoutOrElse({
+        duration: "5 seconds",
+        orElse: () =>
+          Effect.fail(
+            new ApiSmokeRouteError({
+              reason: "timeout",
+              route: "public-content",
+            })
+          ),
+      })
+    )
+);
 
 export const waitForApiHealth = (origin: string) =>
   HttpClient.get(new URL("/api/health", origin), { acceptJson: true }).pipe(

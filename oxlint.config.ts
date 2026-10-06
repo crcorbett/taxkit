@@ -109,6 +109,8 @@ const decodingBoundaryFiles = [
   "apps/web/test/native-pair.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
   "packages/api/http/__tests__/request-body.boundary.test.ts",
+  "packages/api/http/__tests__/public-content.boundary.test.ts",
+  "apps/api/src/content.boundary.ts",
 
   // Public API normalisation and focused API contract tests.
   "packages/api/http/src/openapi.ts",
@@ -990,20 +992,14 @@ export default defineConfig({
       },
     },
     {
-      // Fetch's Promise result is a host signature, not workflow orchestration.
-      // The second exact path is its scoped negative/positive CLI fixture.
-      files: [
-        "packages/api/http/src/client/in-process.layer.ts",
-        "tools/oxlint/.generated-fetch-host.ts",
-      ],
+      // The scoped CLI fixture checks Fetch's required Promise result signature.
+      // The native in-process client needs no production Promise exception.
+      files: ["tools/oxlint/.generated-fetch-host.ts"],
       rules: {
         "strict-effect/no-promise-workflow": [
           "error",
           {
-            allowedFiles: [
-              "packages/api/http/src/client/in-process.layer.ts",
-              "tools/oxlint/.generated-fetch-host.ts",
-            ],
+            allowedFiles: ["tools/oxlint/.generated-fetch-host.ts"],
           },
         ],
       },

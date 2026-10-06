@@ -40,7 +40,9 @@
         "@taxkit/api-http": "workspace:*",
         "@taxkit/api-rpc": "workspace:*",
         "@taxkit/calculators": "workspace:*",
+        "@taxkit/content": "workspace:*",
         "@taxkit/core": "workspace:*",
+        "@taxkit/docs-content": "workspace:*",
         "alchemy": "catalog:",
         "effect": "catalog:",
       },
@@ -106,6 +108,7 @@
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node": "catalog:",
         "@effect/vitest": "catalog:",
+        "@taxkit/content": "workspace:*",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
@@ -126,6 +129,7 @@
       "version": "1.0.0",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
+        "@taxkit/content": "workspace:*",
         "@taxkit/core": "workspace:*",
         "effect": "catalog:",
       },
@@ -237,6 +241,7 @@
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
+        "@taxkit/content": "workspace:*",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",

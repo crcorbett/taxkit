@@ -16,6 +16,7 @@ import {
   withCalculatorRequestBodyLimit,
 } from "../src/request-boundary.js";
 import { TaxKitServerLayer } from "../src/server.js";
+import { ContentTestLive } from "./content.fixture.js";
 
 const path =
   "http://taxkit.internal/api/v1/calculators/au.pay.take-home/calculate";
@@ -58,7 +59,9 @@ describe("shared HTTP request-body policy", () => {
     "guards the retained standalone HTTP routes before parsing oversized bytes",
     () =>
       Effect.gen(function* () {
-        const handler = yield* HttpRouter.toHttpEffect(TaxKitServerLayer);
+        const handler = yield* HttpRouter.toHttpEffect(TaxKitServerLayer).pipe(
+          Effect.provide(ContentTestLive)
+        );
         const request = HttpClientRequest.post(path).pipe(
           HttpClientRequest.bodyUint8Array(
             new TextEncoder().encode(`PRIVATE9${"é".repeat(32_769)}`),

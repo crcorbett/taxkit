@@ -381,6 +381,36 @@
         "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
+      "DocsPageUnavailableEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["DocsPageUnavailable"],
+            "type": "string"
+          },
+          "message": {
+            "enum": ["The documentation page was not found."],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "message"],
+        "type": "object"
+      },
+      "DocsSearchUnavailableEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["DocsSearchUnavailable"],
+            "type": "string"
+          },
+          "message": {
+            "enum": ["Documentation search is temporarily unavailable."],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "message"],
+        "type": "object"
+      },
       "FactQuestionEncoded": {
         "additionalProperties": false,
         "properties": {
@@ -779,7 +809,7 @@
     "securitySchemes": {}
   },
   "info": {
-    "description": "HTTP API for TaxKit health checks, public calculator metadata and public calculator execution.",
+    "description": "HTTP API for TaxKit health checks, public calculator metadata, calculator execution and accepted public documentation.",
     "title": "TaxKit API",
     "version": "0.0.1"
   },
@@ -2748,6 +2778,365 @@
         "tags": ["Calculator API"]
       }
     },
+    "/api/v1/docs/markdown": {
+      "get": {
+        "description": "Read processed public Markdown, with resolved links and without executable MDX. This route does not return personal calculation reports.",
+        "operationId": "content.getMarkdown",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "allOf": [
+                {
+                  "pattern": "^\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*$"
+                }
+              ],
+              "maxLength": 256,
+              "minLength": 1,
+              "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocsPageUnavailableEncoded"
+                }
+              }
+            },
+            "description": "DocsPageUnavailable"
+          }
+        },
+        "security": [],
+        "tags": ["Public documentation"]
+      }
+    },
+    "/api/v1/docs/navigation": {
+      "get": {
+        "description": "Read navigation for accepted public documentation.",
+        "operationId": "content.getNavigation",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "primaryNavigation": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "pageType": {
+                            "enum": [
+                              "api reference overview",
+                              "changelog or release note",
+                              "concept",
+                              "contribution guide",
+                              "decision page",
+                              "guide",
+                              "quickstart",
+                              "reference",
+                              "section index",
+                              "troubleshooting"
+                            ],
+                            "type": "string"
+                          },
+                          "pages": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "pageType": {
+                                  "enum": [
+                                    "api reference overview",
+                                    "changelog or release note",
+                                    "concept",
+                                    "contribution guide",
+                                    "decision page",
+                                    "guide",
+                                    "quickstart",
+                                    "reference",
+                                    "section index",
+                                    "troubleshooting"
+                                  ],
+                                  "type": "string"
+                                },
+                                "path": {
+                                  "minLength": 1,
+                                  "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                                  "type": "string"
+                                },
+                                "primaryReader": {
+                                  "enum": [
+                                    "API consumer",
+                                    "Application integrator",
+                                    "Correctness reviewer",
+                                    "Documentation contributor",
+                                    "New contributor",
+                                    "SDK evaluator",
+                                    "Type-safety focused developer"
+                                  ],
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "minLength": 1,
+                                  "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "minLength": 1,
+                                  "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "pageType",
+                                "path",
+                                "primaryReader",
+                                "source",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "path": {
+                            "minLength": 1,
+                            "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                            "type": "string"
+                          },
+                          "primaryReader": {
+                            "enum": [
+                              "API consumer",
+                              "Application integrator",
+                              "Correctness reviewer",
+                              "Documentation contributor",
+                              "New contributor",
+                              "SDK evaluator",
+                              "Type-safety focused developer"
+                            ],
+                            "type": "string"
+                          },
+                          "source": {
+                            "minLength": 1,
+                            "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                            "type": "string"
+                          },
+                          "title": {
+                            "minLength": 1,
+                            "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "pageType",
+                          "path",
+                          "primaryReader",
+                          "source",
+                          "title",
+                          "pages"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["primaryNavigation"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [],
+        "tags": ["Public documentation"]
+      }
+    },
+    "/api/v1/docs/page": {
+      "get": {
+        "description": "Read one accepted public documentation page.",
+        "operationId": "content.getPage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "allOf": [
+                {
+                  "pattern": "^\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*$"
+                }
+              ],
+              "maxLength": 256,
+              "minLength": 1,
+              "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "frontmatter": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "description": {
+                          "minLength": 1,
+                          "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": ["published"],
+                          "type": "string"
+                        },
+                        "title": {
+                          "minLength": 1,
+                          "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                          "type": "string"
+                        }
+                      },
+                      "required": ["description", "status", "title"],
+                      "type": "object"
+                    },
+                    "markdown": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "minLength": 1,
+                      "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                      "type": "string"
+                    },
+                    "slugs": {
+                      "items": {
+                        "minLength": 1,
+                        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "source": {
+                      "minLength": 1,
+                      "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "frontmatter",
+                    "markdown",
+                    "path",
+                    "slugs",
+                    "source"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocsPageUnavailableEncoded"
+                }
+              }
+            },
+            "description": "DocsPageUnavailable"
+          }
+        },
+        "security": [],
+        "tags": ["Public documentation"]
+      }
+    },
+    "/api/v1/docs/search": {
+      "get": {
+        "description": "Search accepted public documentation; at most 20 results with 240-character excerpts.",
+        "operationId": "content.searchPages",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "term",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "description": {
+                        "minLength": 1,
+                        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                        "type": "string"
+                      },
+                      "excerpt": {
+                        "maxLength": 240,
+                        "type": "string"
+                      },
+                      "path": {
+                        "minLength": 1,
+                        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                        "type": "string"
+                      },
+                      "title": {
+                        "minLength": 1,
+                        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                        "type": "string"
+                      }
+                    },
+                    "required": ["description", "excerpt", "path", "title"],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocsSearchUnavailableEncoded"
+                }
+              }
+            },
+            "description": "DocsSearchUnavailable"
+          }
+        },
+        "security": [],
+        "tags": ["Public documentation"]
+      }
+    },
     "/api/v1/facts": {
       "get": {
         "description": "List canonical fact descriptors, optionally filtered by calculator context.",
@@ -3415,6 +3804,9 @@
     },
     {
       "name": "Calculator API"
+    },
+    {
+      "name": "Public documentation"
     }
   ]
 }

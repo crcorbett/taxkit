@@ -1,6 +1,9 @@
 import { expect, it } from "@effect/vitest";
 import { TaxKitApiInProcessClientLive } from "@taxkit/api-http/client/server";
-import { Effect } from "effect";
+import { ContentServiceLive } from "@taxkit/content/live";
+import { ContentCatalogue } from "@taxkit/content/service";
+import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import { Effect, Layer } from "effect";
 import { HttpClientRequest, HttpClientResponse } from "effect/http";
 
 import { readCalculatorError } from "../src/api-error-envelope.js";
@@ -51,7 +54,17 @@ it.effect(
   () =>
     Effect.gen(function* () {
       const labels = yield* loadCalculatorHelp.pipe(
-        Effect.provide(TaxKitApiInProcessClientLive)
+        Effect.provide(
+          TaxKitApiInProcessClientLive.pipe(
+            Layer.provide(
+              ContentServiceLive.pipe(
+                Layer.provide(
+                  Layer.effect(ContentCatalogue, exampleContentCatalogue)
+                )
+              )
+            )
+          )
+        )
       );
       expect(labels).toContain(
         "taxkit/rules-au-pay/fact/GrossPay: Gross pay for a single pay period"

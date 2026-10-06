@@ -18,6 +18,26 @@ Worker candidate for the active DEV-74 work.
 `@taxkit/api-http/server` and graceful shutdown. API contracts, handlers,
 schemas, generated OpenAPI and docs routes stay in `packages/api/http`.
 
+Both API hosts provide `ContentService` from the accepted generated catalogue.
+`src/content.boundary.ts` imports only `@taxkit/docs-content/public-catalogue`
+JSON, checks it once when the host is built and reports a fixed configuration
+failure if it is invalid. Incoming requests do not load authored MDX or run
+the compiler. The public HTTP content group serves navigation, checked page
+JSON, bounded search and plain processed Markdown. See the
+[HTTP package](../../packages/api/http/README.md) for paths and response rules.
+
+The API dependency build generates the accepted catalogue before TypeScript
+or native bundling consumes it. Its ESNext module profile preserves the JSON
+import attribute for ordinary Node loading of emitted modules. The Website,
+infrastructure and Alchemy source-checking profiles also admit that attribute
+when they inspect the API Worker source. Compiled public packages retain their
+existing module profiles.
+
+The retained standalone smoke check reads page JSON, navigation, search and
+Markdown through the real HTTP process. It checks their common page address,
+title and processed body within one five-second operation deadline, in addition
+to the existing calculator and OpenAPI checks.
+
 ## Native Worker candidate
 
 `src/worker.ts` declares native `TaxKitApiWorker` with the standard Alchemy

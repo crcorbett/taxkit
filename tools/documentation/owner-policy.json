@@ -13,11 +13,11 @@
         },
         {
           "path": "packages/docs-content/content/api/endpoints.mdx",
-          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--endpoints.json"
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--endpoints.json"
         },
         {
           "path": "packages/docs-content/content/api/errors.mdx",
-          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--errors.json"
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--errors.json"
         },
         {
           "path": "packages/docs-content/content/api/index.mdx",

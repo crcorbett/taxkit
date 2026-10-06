@@ -193,8 +193,9 @@ The SDK owns the first downstream consumer validation gate:
 bun run --filter=@taxkit/sdk validate:downstream
 ```
 
-The command builds and Bun-packs the nine-package release closure, materializes
-each package's dist-only `publishConfig.exports` in a staged tarball, and
+The command builds and Bun-packs the ten-package release closure, including the
+compiled public-content contracts now required by the HTTP package. It materializes
+each package's dist-only `publishConfig.exports` in a staged tarball and
 rejects source files, missing export targets or unresolved `workspace:*` and
 `catalog:` ranges. It installs all unpublished tarballs into a temporary
 consumer outside the repo, typechecks and runs SDK examples, imports every

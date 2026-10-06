@@ -13,6 +13,18 @@
     "uploadTimeout": 20
   },
   "tasks": {
+    "@taxkit/docs-content#build": {
+      "dependsOn": ["^build"],
+      "env": ["NODE_ENV", "PLAYWRIGHT_BROWSERS_PATH"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/tools/documentation/catalogue.*",
+        "$TURBO_ROOT$/tools/documentation/schemas.ts",
+        "$TURBO_ROOT$/tools/documentation/owner-policy.json",
+        "$TURBO_ROOT$/docs/documentation-audit/clean-slate-foundation/public-content-acceptance/**/*.json"
+      ],
+      "outputs": [".source/**"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "env": [
@@ -145,7 +157,10 @@
       "outputs": []
     },
     "//#test:repository-paths:task": { "outputs": [] },
-    "//#test:quality-workflow:task": { "outputs": [] },
+    "//#test:quality-workflow:task": {
+      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
+      "outputs": []
+    },
     "//#test:skills:task": { "outputs": [] },
     "//#check:skills:types:task": { "outputs": [] },
     "//#changeset:status:task": { "outputs": [] },

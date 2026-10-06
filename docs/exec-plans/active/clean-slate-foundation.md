@@ -78,7 +78,7 @@ records command outcomes and log digests.
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
-| T005 / DEV-76 | In progress | Checked source/example preparation and the compiled catalogue service are reviewable candidates. Explicit acceptance, replacement routes and discovery remain unfinished. |
+| T005 / DEV-76 | In progress | All 61 pages and navigation have source-bound acceptance; draft #155 contains the tested catalogue and links. Four checked HTTP content routes pass focused, actual local host, complete repository and external package checks. Replacement Website routes and discovery remain unfinished. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
@@ -4022,3 +4022,40 @@ workerd/Chromium checks pass. Fresh full repository verification passes in
 evidence-only changes receive fresh documentation, runbook, content, Changeset,
 format and whitespace checks. Replacement routes, discovery/images and old-app
 retirement remain unfinished; T005 stays in progress and metrics stay deferred.
+
+### T005 checked public-content HTTP candidate — 6 October
+
+Continue the same draft #155 with four public documentation endpoints at
+`/api/v1/docs`: navigation, page JSON, bounded search and processed Markdown.
+The HTTP package owns status/query/text encoding and delegates to the compiled
+`ContentService`. Both API roots supply checked generated JSON. No incoming
+request runs the source compiler, no personal calculation report is exposed,
+and no shared content cache is introduced.
+
+The actual built native API compares all 61 page objects and Markdown bodies
+with their owning catalogue, plus navigation/search/CORS/invalid-query/missing
+page behaviour. The existing native pair passes all 11 tests in seven files.
+The retained standalone smoke now checks the four content replies through the
+real process with one five-second deadline; deterministic header/body deadline
+and cleanup cases accompany it. All 85 API tests and 29 HTTP tests pass. The
+actual external ten-artifact downstream consumer passes with `@taxkit/content`
+included in the private staged closure and fixed version group.
+
+Documentation impact is **Change required** for HTTP contracts/OpenAPI,
+application composition/smoke/native build, accepted JSON export and cache
+inputs, exact decoder/source-checking profiles, dependency closure/versioning,
+owning READMEs/architecture and active evidence. Semantic review also updates
+the public endpoint/error references, with two fresh exact source-review records
+and active bindings. The other 59 pages, navigation and all 62 prior records
+remain unchanged. The unused private Promise client adapter and its production
+permission/Knip allowance are retired; the actual lint fixture checks the native
+replacement. **Preserve** tax outputs/templates, native calculation policy,
+history, retained docs app and metrics deferral. **N/A** for provider,
+registry/deployment operations, new skills and operational runbook procedures.
+The [bounded HTTP receipt](../../documentation-audit/clean-slate-foundation/2026-10-06-public-content-http.json)
+retains the failures and narrow corrections. Complete repository verification
+passes in 607.31 seconds; all repository tests pass in
+98.16 seconds. The final compiled Node reader, repeated catalogue
+build and ten-artifact external package consumer pass. Replacement Website
+connection/routes, discovery/images and old-app retirement remain T005 work.
+No merge, publication, deployment or provider apply.

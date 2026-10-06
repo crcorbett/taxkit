@@ -17,10 +17,11 @@ changelog for humans reading the repository as one product.
 
 ## Release Train Policy
 
-The nine release-artifact packages share one fixed version group:
+The ten release-artifact packages share one fixed version group:
 
 - `@taxkit/core`
 - `@taxkit/api-http`
+- `@taxkit/content`
 - `@taxkit/calculators`
 - `@taxkit/rules-au-income-tax`
 - `@taxkit/rules-au-pay`
@@ -46,7 +47,7 @@ The repository config lives in `.changeset/config.json`.
 
 Important settings:
 
-- `fixed`: keeps the nine release-artifact `@taxkit/*` packages on the same
+- `fixed`: keeps the ten release-artifact `@taxkit/*` packages on the same
   version.
 - `privatePackages.version: true`: package versions are managed even while
   packages remain `private: true`.

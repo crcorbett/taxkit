@@ -8,6 +8,14 @@ import {
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { MetadataQuery } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
+import {
+  DocsPagePath,
+  DocsPublicPage,
+  DocsPublicNavigation,
+  DocsSearchTerm,
+  DocsSearchResult,
+} from "@taxkit/content/schemas";
+import { ContentService } from "@taxkit/content/service";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import {
@@ -41,10 +49,12 @@ import * as HttpClientResponse from "effect/http/HttpClientResponse";
 import { ChildProcessSpawner } from "effect/process";
 import { TestClock } from "effect/testing";
 
+import { ApiContentLive } from "../src/content.boundary.js";
 import {
   checkApiCalculation,
   checkApiCatalog,
   checkApiOpenApi,
+  checkApiPublicContent,
   waitForApiHealth,
 } from "./routes.js";
 import {
@@ -77,6 +87,19 @@ const settings = ApiSmokeSettings.make({
 });
 
 const successfulHttpClient = Effect.gen(function* () {
+  const content = yield* ContentService.pipe(Effect.provide(ApiContentLive));
+  const page = yield* content.getPage(
+    yield* DocsPagePath.makeEffect("/start/quickstart")
+  );
+  const pageJson = yield* Schema.encodeEffect(
+    Schema.fromJsonString(DocsPublicPage)
+  )(page);
+  const navigationJson = yield* Schema.encodeEffect(
+    Schema.fromJsonString(DocsPublicNavigation)
+  )(yield* content.getNavigation());
+  const searchJson = yield* Schema.encodeEffect(
+    Schema.fromJsonString(Schema.Array(DocsSearchResult))
+  )(yield* content.searchPages(yield* DocsSearchTerm.makeEffect("Quickstart")));
   const service = yield* PublicCalculatorService;
   const catalog = yield* service.listCalculators(MetadataQuery.make({}));
   const calculation = yield* service.calculate({
@@ -116,6 +139,10 @@ const successfulHttpClient = Effect.gen(function* () {
         new Response(
           Match.value(url.pathname).pipe(
             Match.when("/api/health", () => healthJson),
+            Match.when("/api/v1/docs/page", () => pageJson),
+            Match.when("/api/v1/docs/navigation", () => navigationJson),
+            Match.when("/api/v1/docs/search", () => searchJson),
+            Match.when("/api/v1/docs/markdown", () => page.markdown),
             Match.when("/api/v1/calculators", () => catalogJson),
             Match.when("/api/docs/openapi.json", () => openApiJson),
             Match.orElse(() => calculationJson)
@@ -203,6 +230,7 @@ it.effect.each([
   { duration: Duration.seconds(5), route: "catalog" },
   { duration: Duration.seconds(5), route: "calculate" },
   { duration: Duration.seconds(5), route: "openapi" },
+  { duration: Duration.seconds(5), route: "public-content" },
 ])(
   "bounds stalled headers and closes the request: $route",
   ({ route, duration }) =>
@@ -219,6 +247,7 @@ it.effect.each([
         Match.when("health", () => waitForApiHealth(origin)),
         Match.when("catalog", () => checkApiCatalog(origin)),
         Match.when("calculate", () => checkApiCalculation(origin)),
+        Match.when("public-content", () => checkApiPublicContent(origin)),
         Match.orElse(() => checkApiOpenApi(origin))
       );
       const fiber = yield* operation.pipe(
@@ -237,7 +266,7 @@ it.effect.each([
     })
 );
 
-it.effect.each(["health", "catalog", "calculate", "openapi"])(
+it.effect.each(["health", "catalog", "calculate", "openapi", "public-content"])(
   "bounds a stalled response body for %s",
   (route) =>
     Effect.gen(function* () {
@@ -261,6 +290,7 @@ it.effect.each(["health", "catalog", "calculate", "openapi"])(
         Match.when("health", () => waitForApiHealth(origin)),
         Match.when("catalog", () => checkApiCatalog(origin)),
         Match.when("calculate", () => checkApiCalculation(origin)),
+        Match.when("public-content", () => checkApiPublicContent(origin)),
         Match.orElse(() => checkApiOpenApi(origin))
       );
       const fiber = yield* operation.pipe(

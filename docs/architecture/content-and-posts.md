@@ -76,8 +76,12 @@ omits drafts, checks navigation through the canonical catalogue constructor,
 and writes ignored `.source/public-catalogue.json` only on success. No accepted
 pages is a failure. Source acceptance is recorded independently for each page
 and navigation in the owner policy's exact bindings. Reviewed byte hashes
-prevent a later edit from silently inheriting acceptance. Public HTTP and
-replacement Website routes are still T005 work.
+prevent a later edit from silently inheriting acceptance. The docs-content
+package build includes this step, with source-review records and the compiler's
+browser path in its cache inputs. Its JSON-only `./public-catalogue` export is
+checked once by each API host; it imports no compiler into request handling.
+The HTTP group delegates page/navigation/search and processed Markdown to
+`ContentService`. Replacement Website routes and discovery remain T005 work.
 
 `docs/architecture`
 : Durable implementation architecture.

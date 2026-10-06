@@ -55,6 +55,10 @@ POST /api/v1/calculators/:calculatorId/calculate
 GET /api/v1/calculators/:calculatorId/graph
 GET /api/v1/facts
 GET /api/v1/rules
+GET /api/v1/docs/navigation
+GET /api/v1/docs/page?path=/start/quickstart
+GET /api/v1/docs/search?term=Quickstart
+GET /api/v1/docs/markdown?path=/start/quickstart
 ```
 
 `apps/web` consumes the separate API through native RPC. It must not mount the canonical API or
@@ -109,6 +113,18 @@ Every public HTTP request and response schema should live in the owning API
 group or an owning package schema module. If downstream code needs the type,
 export it from the same module as a schema-derived type. Do not hand-write DTO
 interfaces or duplicate response shapes in handlers, clients or apps.
+
+The public documentation group uses canonical `@taxkit/content` page,
+navigation and search Schemas. Its thin handlers call `ContentService` and
+return the same processed page body for Markdown. Both API hosts inject a
+checked build-time JSON catalogue, without importing the MDX compiler into
+requests. Page queries are bounded public addresses; search terms and result
+sizes retain the content owner's limits. Missing-page and source-search
+failures have fixed typed 404/503 replies; native invalid queries return empty
+400 replies. These routes contain public documentation, never personal reports.
+The HTTP server Layers and native in-process client require supplied content.
+The latter runs native request Effects in caller-owned scopes and does not
+create an additional web-handler runner.
 
 Route-only HTTP envelopes, query schemas and status annotations stay in
 `@taxkit/api-http`. HTTP-facing names such as

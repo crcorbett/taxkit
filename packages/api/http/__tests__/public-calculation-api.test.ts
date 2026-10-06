@@ -46,13 +46,14 @@ import {
   CalculatorServiceError,
 } from "../src/groups/calculators.js";
 import { TaxKitApiRoutesLayer } from "../src/server.js";
+import { ContentTestLive } from "./content.fixture.js";
 
 const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
 
 const TestLive = Layer.mergeAll(
-  TaxKitApiInProcessClientLive,
+  TaxKitApiInProcessClientLive.pipe(Layer.provide(ContentTestLive)),
   PublicCalculatorServiceTestLive
 );
 
@@ -103,6 +104,7 @@ describe("TaxKit public calculation HTTP API", () => {
       // HttpApiBuilder captures services while constructing handlers. Supply
       // the controlled implementation there, rather than a later request override.
       const handler = yield* HttpRouter.toHttpEffect(TaxKitApiRoutesLayer).pipe(
+        Effect.provide(ContentTestLive),
         Effect.provide(service)
       );
       const request = HttpClientRequest.get(

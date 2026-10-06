@@ -34,7 +34,13 @@ export class ApiSmokeRouteError extends Schema.TaggedError<ApiSmokeRouteError>()
   "ApiSmokeRouteError",
   {
     reason: Schema.Literals(["request-or-response", "timeout"]),
-    route: Schema.Literals(["health", "catalog", "calculate", "openapi"]),
+    route: Schema.Literals([
+      "health",
+      "catalog",
+      "calculate",
+      "openapi",
+      "public-content",
+    ]),
   }
 ) {}
 export class ApiSmokeValidationError extends Schema.TaggedError<ApiSmokeValidationError>()(
@@ -45,6 +51,7 @@ export class ApiSmokeValidationError extends Schema.TaggedError<ApiSmokeValidati
       "Calculator catalog did not include au.pay.take-home.",
       "Calculate route returned the wrong calculator id.",
       "OpenAPI document did not include the calculate route.",
+      "Public documentation replies did not match their owning page.",
       "Temp workspace must be outside the repo.",
       "Failed to prepare the external HTTP consumer.",
       "Failed to remove the external HTTP consumer workspace.",

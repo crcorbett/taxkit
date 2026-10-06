@@ -43,6 +43,7 @@ import {
 } from "effect/http";
 import { TestClock, TestConsole } from "effect/testing";
 
+import { ApiContentLive } from "../src/content.boundary.js";
 import { ApiWorkerApplication } from "../src/worker.application.js";
 import { ApiWorkerSettingsConfig } from "../src/worker.config.js";
 import { ApiWorkerInit as ApiWorkerApplicationInit } from "../src/worker.js";
@@ -78,6 +79,7 @@ describe("native API application", () => {
       const started = yield* Deferred.make<boolean>();
       const released = yield* Ref.make(0);
       const app = yield* ApiWorkerApplication.pipe(
+        Effect.provide(ApiContentLive),
         Effect.provide(
           PublicCalculatorServiceBounded.pipe(
             Layer.provide(
@@ -587,6 +589,7 @@ describe("native API application", () => {
           })
         ).pipe(Layer.provide(CalculatorLive));
         const app = yield* ApiWorkerApplication.pipe(
+          Effect.provide(ApiContentLive),
           Effect.provide(calculator)
         );
         const transport = HttpClient.make((request) =>
@@ -724,6 +727,7 @@ describe("native API application", () => {
   it.effect("captures a native RPC defect in the installed safe reporter", () =>
     Effect.gen(function* () {
       const app = yield* ApiWorkerApplication.pipe(
+        Effect.provide(ApiContentLive),
         Effect.provide(CalculatorFixture("defect"))
       );
       const body = yield* Schema.encodeEffect(

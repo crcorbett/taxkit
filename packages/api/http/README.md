@@ -40,6 +40,10 @@ The implemented API surface is:
 - `GET /api/v1/calculators/:calculatorId/graph`
 - `GET /api/v1/facts`
 - `GET /api/v1/rules`
+- `GET /api/v1/docs/navigation`
+- `GET /api/v1/docs/page?path=/start/quickstart`
+- `GET /api/v1/docs/search?term=Quickstart`
+- `GET /api/v1/docs/markdown?path=/start/quickstart`
 
 The public calculation API routes use the reusable calculator catalogue,
 fact and rule descriptors and graph diagnostics from `@taxkit/calculators`.
@@ -53,7 +57,24 @@ The SDK is a test-only comparison dependency, rather than a server dependency.
 `@taxkit/api-http/server` exports `TaxKitApiRoutesLayer` for application-owned
 service and CORS composition. It also retains `TaxKitServerLayer` with the
 existing calculator engine and CORS defaults for Bun and in-process consumers.
-The native API host supplies its shared service instance to HTTP and RPC.
+Both server Layers require the caller's `ContentService`. API hosts supply the
+accepted build output; the HTTP package imports only the compiled content
+contracts. The native API host supplies its shared calculator service to HTTP
+and RPC.
+
+The `content` group delegates navigation, page lookup and search to that same
+content service. Markdown returns the owning processed page body as
+`text/markdown`. Page queries use checked, bounded public addresses; search
+terms have the owning 100-character limit. Missing pages return fixed typed
+JSON 404 guidance and a search-source failure returns fixed typed JSON 503
+guidance, without reflecting paths or source-error messages. Native invalid
+query responses are empty 400 replies. This surface returns accepted public
+documentation only, not personal calculation reports.
+
+`TaxKitApiInProcessClientLive` also requires supplied content. It now uses the
+native Effect HTTP client and router in the caller's Layer scope; each request
+closes its own scope. It creates no web-handler runner or Promise bridge.
+Its generated client checks the same response Schemas as remote consumers.
 
 ```ts
 HTTP calculate

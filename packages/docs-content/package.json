@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./public-catalogue": "./.source/public-catalogue.json",
     "./errors": {
       "types": "./src/errors.ts",
       "source": "./src/errors.ts",
@@ -57,7 +58,7 @@
     }
   },
   "scripts": {
-    "build": "bun run generate",
+    "build": "bun run generate && bun --conditions=source run ../../tools/documentation/catalogue.runtime.ts",
     "check-types": "bun run --filter=@taxkit/docs-fumadocs build && tsc --noEmit",
     "generate": "bun run --filter=@taxkit/docs-fumadocs build && fumadocs-mdx && bun --conditions=source run ./src/catalogue-index.runtime.ts",
     "test": "bun run --filter=@taxkit/docs-fumadocs build && vitest run --passWithNoTests",

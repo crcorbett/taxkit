@@ -1,6 +1,7 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it } from "@effect/vitest";
 import {
+  Array,
   Cause,
   Deferred,
   Effect,
@@ -367,17 +368,22 @@ it.effect.each([
 ] as const)("downstream checker stops safely: %s", (mode) =>
   Effect.gen(function* () {
     const removed = yield* Ref.make(0);
-    const calls = yield* Ref.make(0);
-    const spawner = ChildProcessSpawner.make(() =>
-      Effect.gen(function* () {
-        const call = yield* Ref.getAndUpdate(calls, (n) => n + 1);
+    const spawner = ChildProcessSpawner.make((command) =>
+      Effect.sync(() => {
+        const packing = Match.value(command).pipe(
+          Match.tag(
+            "StandardCommand",
+            (value) =>
+              value.command === "bun" && Array.contains(value.args, "pack")
+          ),
+          Match.tag("PipedCommand", () => expect.unreachable()),
+          Match.exhaustive
+        );
         const code =
-          mode === "build" || (mode === "packed-command" && call === 8)
-            ? 23
-            : 0;
+          mode === "build" || (mode === "packed-command" && packing) ? 23 : 0;
         return handleFixture(
           Stream.make(
-            new TextEncoder().encode(call >= 8 ? "/tmp/fixture.tgz" : "")
+            new TextEncoder().encode(packing ? "/tmp/fixture.tgz" : "")
           ),
           "success",
           code
@@ -412,6 +418,19 @@ it.effect.each([
           mode === "build" || mode === "packed-command"
             ? "DownstreamCommandError"
             : "DownstreamValidationError"
+        );
+        Match.value(error).pipe(
+          Match.tag("DownstreamCommandError", (failure) => {
+            expect(failure.stage).toBe(
+              mode === "build"
+                ? "build @taxkit/core"
+                : "pack workspace manifest for @taxkit/core"
+            );
+            expect(failure.exitCode).toEqual(Option.some(23));
+          }),
+          Match.orElse(() =>
+            expect(["root-manifest", "staged-manifest"]).toContain(mode)
+          )
         );
         expect(String(error)).not.toContain("TAXKIT_SECRET_SENTINEL");
       },

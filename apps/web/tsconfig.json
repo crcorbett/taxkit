@@ -12,6 +12,7 @@
     "vitest.native.config.ts"
   ],
   "compilerOptions": {
+    "module": "ESNext",
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "allowImportingTsExtensions": true,
     "noEmit": true,

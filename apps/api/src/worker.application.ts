@@ -12,6 +12,7 @@ import {
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcHttpLayer } from "@taxkit/api-rpc/server";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
+import { ContentService } from "@taxkit/content/service";
 import { safeHttpEffect } from "alchemy/Http";
 import {
   ByteSize,
@@ -73,7 +74,10 @@ export const ApiWorkerApplication = Effect.gen(function* () {
   const routes = Layer.mergeAll(
     TaxKitApiRoutesLayer,
     TaxKitRpcHttpLayer.pipe(Layer.provide(calculator))
-  ).pipe(HttpRouter.provideRequest(calculator));
+  ).pipe(
+    Layer.provide(Layer.succeed(ContentService, yield* ContentService)),
+    HttpRouter.provideRequest(calculator)
+  );
   const handler = yield* HttpRouter.toHttpEffect(routes).pipe(
     Effect.provideContext(telemetry)
   );
