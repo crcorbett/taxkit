@@ -1,0 +1,60 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M47EDQFK8VSMQW9BHP7TA7D2",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-75-fallible-domain-values",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".changeset/fallible-money-calendar.md",
+    "apps/api/scripts/smoke-boundaries.test.ts",
+    "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/graph-trace-ledgers.md",
+    "docs/architecture/rules-and-parameters.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/README.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/standards/documentation-writing.md",
+    "oxlint.config.ts",
+    "packages/api/rpc/src/__testing__/fixtures.ts",
+    "packages/calculators/__tests__/public-calculator-service.test.ts",
+    "packages/core/README.md",
+    "packages/core/src/ledger/component.ts",
+    "packages/core/src/primitives/date.ts",
+    "packages/core/src/primitives/money.ts",
+    "packages/core/src/primitives/rounding.ts",
+    "packages/core/src/primitives/tax.ts",
+    "packages/core/test/date.test.ts",
+    "packages/core/test/money.test.ts",
+    "packages/docs-content/README.md",
+    "packages/docs-content/content/concepts/money-and-branded-values.mdx",
+    "packages/docs-content/content/sdk/type-safety.mdx",
+    "packages/rules/au/income-tax/README.md",
+    "packages/rules/au/income-tax/src/rules/medicare-levy.ts",
+    "packages/rules/au/pay/README.md",
+    "packages/rules/au/pay/src/parameters/schedule1.ts",
+    "packages/rules/au/stsl/README.md",
+    "packages/rules/au/stsl/src/rules/stsl-component.ts",
+    "packages/sdk/typescript/README.md",
+    "packages/sdk/typescript/src/au.test.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 12704175,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 625662976,
+    "output_tokens": 2754364,
+    "api_call_count": 4172
+  }
+}
