@@ -36,13 +36,13 @@ Use `calculateRunRequest` when you need the canonical `CalculatorRunResponse`
 shape with a descriptor-decoded report type.
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { calculateRunRequest } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
 
 const effect = calculateRunRequest(AuAnnualIncomeTaxCalculation, {
   payload: {
-    facts: { taxableIncome: aud(9_000_000) },
+    facts: { taxableIncome: aud(Cents.make(9_000_000)) },
     jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
     taxYear: AuAnnualIncomeTaxCalculation.taxYear,
   },
@@ -55,13 +55,13 @@ Use `calculateReportRequest` when you have a full request payload but only need
 the report.
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { calculateReportRequest } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
 
 const effect = calculateReportRequest(AuAnnualIncomeTaxCalculation, {
   payload: {
-    facts: { taxableIncome: aud(9_000_000) },
+    facts: { taxableIncome: aud(Cents.make(9_000_000)) },
     jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
     taxYear: AuAnnualIncomeTaxCalculation.taxYear,
   },
@@ -71,19 +71,19 @@ const effect = calculateReportRequest(AuAnnualIncomeTaxCalculation, {
 Use `calculateReport` when you already have descriptor-typed facts:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
 
 const effect = calculateReport(AuAnnualIncomeTaxCalculation, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 
 ## Use an Effect client
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { createClient } from "@taxkit/sdk/effect";
 import {
   AuIncomeTax2025_26Module,
@@ -94,7 +94,7 @@ const client = createClient(AuIncomeTax2025_26Module);
 
 const effect = client.calculations.calculateReport(
   AuAnnualIncomeTaxCalculation,
-  { taxableIncome: aud(9_000_000) }
+  { taxableIncome: aud(Cents.make(9_000_000)) }
 );
 ```
 

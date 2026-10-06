@@ -77,7 +77,7 @@ export const makeParameterDescriptor = <Self, Value>(args: {
   readonly title: string;
 }): ParameterDescriptor<Self, Value> => {
   const descriptor: ParameterDescriptor<Self, Value> = {
-    effectivePeriod: ParameterEffectivePeriod.make(args.effectivePeriod),
+    effectivePeriod: args.effectivePeriod,
     id: ParameterId.make(args.id),
     schema: args.schema,
     source: args.source,

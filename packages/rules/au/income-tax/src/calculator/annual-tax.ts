@@ -1,4 +1,4 @@
-import { aud } from "@taxkit/core/primitives";
+import { Cents, Money } from "@taxkit/core/primitives";
 import { Effect, Layer } from "effect";
 
 import {
@@ -26,7 +26,10 @@ export const CalculateAnnualTax = Effect.gen(function* () {
   const ledger = yield* AnnualTaxLedgerFact;
 
   const { rawLiability } = ledger;
-  const liability = rawLiability.cents < 0 ? aud(0) : rawLiability;
+  const liability =
+    rawLiability.cents < 0
+      ? new Money({ cents: Cents.make(0), currency: "AUD" })
+      : rawLiability;
 
   return new AnnualTaxReport({
     ledger,

@@ -2,7 +2,7 @@ import { expect, it } from "@effect/vitest";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import {
   Deferred,
@@ -33,7 +33,10 @@ const ServiceLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
 const facts = {
-  grossPay: new GrossPay({ amount: aud(165_400), period: "weekly" }),
+  grossPay: new GrossPay({
+    amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
+    period: "weekly",
+  }),
   taxFreeThresholdClaimed: true,
 };
 const sentinel = "taxkit-private-secret:/private/sdk-lifetime/input.json";

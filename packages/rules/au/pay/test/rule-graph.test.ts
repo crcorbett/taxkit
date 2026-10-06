@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { validateRuleGraph } from "@taxkit/core/graph";
-import { isoDate } from "@taxkit/core/primitives";
+import { ParameterEffectivePeriod } from "@taxkit/core/parameters";
+import { DateInterval, IsoDate } from "@taxkit/core/primitives";
 import type { AnyRuleDescriptor } from "@taxkit/core/rules";
 import { SourceRef } from "@taxkit/core/trace";
 import {
@@ -14,27 +15,40 @@ import {
   AuTakeHomePayWithSacrificeRuleDescriptors,
   PaygWithholdingRuleDescriptor,
 } from "@taxkit/rules-au-pay/rule-pack";
-import { Array as EffectArray } from "effect";
+import { Option, Array as EffectArray, Effect, Schema } from "effect";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
-  EffectArray.map(rules, (rule) => ({
-    id: rule.id,
-    parameters: EffectArray.map(rule.parameters ?? [], (parameter) => ({
-      effectivePeriod: parameter.effectivePeriod,
-      id: parameter.id,
-      source: parameter.source.kind,
-      sourceArtifact: parameter.sourceArtifact
-        ? {
-            checksum: parameter.sourceArtifact.checksum,
-            retrievedOn: parameter.sourceArtifact.retrievedOn,
-            rowCount: parameter.sourceArtifact.extract.rowCount,
-          }
-        : undefined,
-    })),
-    provides: EffectArray.map(rule.provides, (fact) => fact.id),
-    requires: EffectArray.map(rule.requires, (fact) => fact.id),
-    sources: EffectArray.map(rule.sources, (source) => source.kind),
-  }));
+  Effect.forEach(rules, (rule) =>
+    Effect.gen(function* () {
+      const parameters = yield* Effect.forEach(
+        rule.parameters ?? [],
+        (parameter) =>
+          Schema.encodeEffect(ParameterEffectivePeriod)(
+            parameter.effectivePeriod
+          ).pipe(
+            Effect.map((effectivePeriod) => ({
+              effectivePeriod,
+              id: parameter.id,
+              source: parameter.source.kind,
+              sourceArtifact: parameter.sourceArtifact
+                ? {
+                    checksum: parameter.sourceArtifact.checksum,
+                    retrievedOn: parameter.sourceArtifact.retrievedOn,
+                    rowCount: parameter.sourceArtifact.extract.rowCount,
+                  }
+                : undefined,
+            }))
+          )
+      );
+      return {
+        id: rule.id,
+        parameters,
+        provides: EffectArray.map(rule.provides, (fact) => fact.id),
+        requires: EffectArray.map(rule.requires, (fact) => fact.id),
+        sources: EffectArray.map(rule.sources, (source) => source.kind),
+      };
+    })
+  );
 
 describe("AU take-home pay rule graph", () => {
   it("validates the base rule pack graph", () => {
@@ -59,13 +73,14 @@ describe("AU take-home pay rule graph", () => {
     expect(issues).toEqual([]);
   });
 
-  it("captures descriptor snapshots for published pay rule packs", () => {
-    expect({
-      base: rulePackSnapshot(AuTakeHomePayRuleDescriptors),
-      withSacrifice: rulePackSnapshot(
-        AuTakeHomePayWithSacrificeRuleDescriptors
-      ),
-    }).toMatchInlineSnapshot(`
+  it.effect("captures descriptor snapshots for published pay rule packs", () =>
+    Effect.gen(function* () {
+      expect({
+        base: yield* rulePackSnapshot(AuTakeHomePayRuleDescriptors),
+        withSacrifice: yield* rulePackSnapshot(
+          AuTakeHomePayWithSacrificeRuleDescriptors
+        ),
+      }).toMatchInlineSnapshot(`
       {
         "base": [
           {
@@ -200,7 +215,8 @@ describe("AU take-home pay rule graph", () => {
         ],
       }
     `);
-  });
+    })
+  );
 
   it("reports missing input facts", () => {
     const issues = validateRuleGraph({
@@ -262,10 +278,12 @@ describe("AU take-home pay rule graph", () => {
           parameters: [
             {
               ...AtoSchedule1TableDescriptor,
-              effectivePeriod: {
-                from: isoDate("2025-10-01"),
-                toExclusive: isoDate("2026-07-01"),
-              },
+              effectivePeriod: DateInterval.make({
+                from: IsoDate.make("2025-10-01"),
+                toExclusive: Option.some(
+                  Option.some(IsoDate.make("2026-07-01"))
+                ),
+              }),
               source: overlappingSource,
             },
           ],

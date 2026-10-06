@@ -1,6 +1,7 @@
-import { Array, Match, Schema } from "effect";
+import { Effect, Match, Schema } from "effect";
 
-import { aud, Money, moneyAdd, moneySub } from "../primitives/money.js";
+import type { InvalidMoneyValue } from "../primitives/errors.js";
+import { aud, Cents, Money, moneyAdd, moneySub } from "../primitives/money.js";
 import { TraceNode } from "../trace/node.js";
 
 /**
@@ -115,16 +116,20 @@ export const isComponentContributing = (c: LedgerComponent): boolean =>
  */
 export const sumLedgerComponents = (
   components: readonly LedgerComponent[]
-): Money =>
-  Array.reduce(components, aud(0), (acc, c) => {
-    if (!isComponentContributing(c)) {
-      return acc;
-    }
+): Effect.Effect<Money, InvalidMoneyValue> =>
+  Effect.reduce(
+    components,
+    () => aud(Cents.make(0)),
+    (acc, component) => {
+      if (!isComponentContributing(component)) {
+        return Effect.succeed(acc);
+      }
 
-    return Match.value(c.effect).pipe(
-      Match.when("additive", () => moneyAdd(acc, c.amount)),
-      Match.when("subtractive", () => moneySub(acc, c.amount)),
-      Match.when("informational", () => acc),
-      Match.exhaustive
-    );
-  });
+      return Match.value(component.effect).pipe(
+        Match.when("additive", () => moneyAdd(acc, component.amount)),
+        Match.when("subtractive", () => moneySub(acc, component.amount)),
+        Match.when("informational", () => Effect.succeed(acc)),
+        Match.exhaustive
+      );
+    }
+  );

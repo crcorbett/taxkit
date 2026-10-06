@@ -1,4 +1,6 @@
-import { Array, Option, Schema } from "effect";
+import { Array, Effect, Option, Schema } from "effect";
+
+import { InvalidCalendarValue } from "./errors.js";
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/u;
 const standardDaysInMonth = [
@@ -49,22 +51,44 @@ export const IsoDate = Schema.String.check(
  */
 export type IsoDate = typeof IsoDate.Type;
 
+const DateIntervalFields = Schema.Struct({
+  from: IsoDate,
+  toExclusive: Schema.OptionFromOptionalKey(
+    Schema.OptionFromUndefinedOr(IsoDate)
+  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+});
+
+const isIntervalOrdered = (from: string, end: Option.Option<string>): boolean =>
+  end.pipe(
+    Option.match({ onNone: () => true, onSome: (value) => from < value })
+  );
+
+// Check each representation at its owning boundary. A check on the decoded
+// Option fields alone is lost when Schema.toEncoded removes transformations.
 /**
  * Half-open date interval `[from, toExclusive)`.
  *
- * `toExclusive` may be absent only for an open-ended official source.
+ * The outer end Option preserves a missing key; its inner Option preserves a
+ * present undefined value. Flatten the end for overlap and ordering semantics.
  *
  * @since 0.1.0
  */
-export const DateInterval = Schema.Struct({
-  from: IsoDate,
-  toExclusive: Schema.optional(IsoDate),
-}).check(
-  Schema.makeFilter(
-    ({ from, toExclusive }) => toExclusive === undefined || from < toExclusive,
-    { expected: "interval start before end" }
+export const DateInterval = Schema.toEncoded(DateIntervalFields)
+  .check(
+    Schema.makeFilter(
+      ({ from, toExclusive }) =>
+        isIntervalOrdered(from, Option.fromUndefinedOr(toExclusive)),
+      { expected: "interval start before end" }
+    )
   )
-);
+  .pipe(Schema.decodeTo(DateIntervalFields))
+  .check(
+    Schema.makeFilter(
+      ({ from, toExclusive }) =>
+        isIntervalOrdered(from, Option.flatten(toExclusive)),
+      { expected: "interval start before end" }
+    )
+  );
 
 /**
  * Half-open date interval `[from, toExclusive)`.
@@ -78,29 +102,24 @@ export type DateInterval = typeof DateInterval.Type;
  *
  * @since 0.1.0
  */
-export const isoDate = (value: string): IsoDate => IsoDate.make(value);
-
-const optionalIsoDate = (
-  value: string | IsoDate | undefined
-): IsoDate | undefined =>
-  value === undefined ? undefined : isoDate(String(value));
+export const isoDate = (
+  value: string
+): Effect.Effect<IsoDate, InvalidCalendarValue> =>
+  IsoDate.makeEffect(value).pipe(
+    Effect.mapError(() => new InvalidCalendarValue())
+  );
 
 /**
  * Builds a validated half-open date interval.
  *
  * @since 0.1.0
  */
-export const dateInterval = (args: {
-  readonly from: string | IsoDate;
-  readonly toExclusive?: string | IsoDate;
-}): DateInterval => {
-  const from = isoDate(String(args.from));
-  const toExclusive = optionalIsoDate(args.toExclusive);
-
-  return DateInterval.make(
-    toExclusive === undefined ? { from } : { from, toExclusive }
+export const dateInterval = (
+  args: typeof DateInterval.Encoded
+): Effect.Effect<DateInterval, InvalidCalendarValue> =>
+  Schema.decodeEffect(DateInterval)(args).pipe(
+    Effect.mapError(() => new InvalidCalendarValue())
   );
-};
 
 /**
  * Returns whether two half-open date intervals overlap.
@@ -111,8 +130,44 @@ export const dateIntervalsOverlap = (
   left: DateInterval,
   right: DateInterval
 ): boolean =>
-  String(left.from) < String(right.toExclusive ?? "9999-12-31") &&
-  String(right.from) < String(left.toExclusive ?? "9999-12-31");
+  Option.flatten(right.toExclusive).pipe(
+    Option.match({ onNone: () => true, onSome: (end) => left.from < end })
+  ) &&
+  Option.flatten(left.toExclusive).pipe(
+    Option.match({ onNone: () => true, onSome: (end) => right.from < end })
+  );
+
+/**
+ * Complete Australian year label with a matching next-year suffix.
+ *
+ * Both July boundaries must fit the four-digit calendar-date representation.
+ * Generic TaxYear remains an open identifier owned separately.
+ *
+ * @since 0.1.0
+ */
+export const AustralianTaxYear = Schema.String.check(
+  Schema.makeFilter(
+    (value) => {
+      if (!/^\d{4}-\d{2}$/u.test(value)) {
+        return false;
+      }
+      const start = Number(value.slice(0, 4));
+      return (
+        start > 0 &&
+        start < 9999 &&
+        value.slice(5) === String((start + 1) % 100).padStart(2, "0")
+      );
+    },
+    { expected: "a complete Australian tax year with representable dates" }
+  )
+).pipe(Schema.brand("taxkit/AustralianTaxYear"));
+
+/**
+ * Complete Australian year label used by the calendar interval helper.
+ *
+ * @since 0.1.0
+ */
+export type AustralianTaxYear = typeof AustralianTaxYear.Type;
 
 /**
  * Converts an Australian tax year label such as `2025-26` to its date
@@ -120,11 +175,15 @@ export const dateIntervalsOverlap = (
  *
  * @since 0.1.0
  */
-export const australianTaxYearInterval = (year: string): DateInterval => {
-  const startYear = Schema.Int.make(Math.trunc(Number(year.slice(0, 4))));
-
-  return dateInterval({
-    from: `${startYear}-07-01`,
-    toExclusive: `${startYear + 1}-07-01`,
-  });
-};
+export const australianTaxYearInterval = (
+  year: string
+): Effect.Effect<DateInterval, InvalidCalendarValue> =>
+  AustralianTaxYear.makeEffect(year).pipe(
+    Effect.mapError(() => new InvalidCalendarValue()),
+    Effect.flatMap((value) =>
+      dateInterval({
+        from: `${value.slice(0, 4)}-07-01`,
+        toExclusive: `${String(Number(value.slice(0, 4)) + 1).padStart(4, "0")}-07-01`,
+      })
+    )
+  );

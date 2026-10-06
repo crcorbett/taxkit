@@ -18,10 +18,10 @@ import { PayPeriod } from "./pay.js";
  *
  * @example
  * ```ts
- * import { audDollars } from "@taxkit/core/primitives"
+ * import { Cents, aud } from "@taxkit/core/primitives"
  * import { SalarySacrifice } from "@taxkit/rules-au-pay/facts"
  *
- * const sacrifice = new SalarySacrifice({ amount: audDollars(250), period: "weekly" })
+ * const sacrifice = new SalarySacrifice({ amount: aud(Cents.make(25_000)), period: "weekly" })
  * ```
  */
 export class SalarySacrifice extends Schema.TaggedClass<SalarySacrifice>()(

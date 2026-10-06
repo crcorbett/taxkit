@@ -1358,3 +1358,14 @@ cancellation. Local evidence does not establish deployed behaviour.
 The [core schema-owner candidate](../documentation-audit/clean-slate-foundation/2026-10-06-domain-schema-owners.json)
 binds historical trace/ledger codec compatibility to genuine packed declarations
 and runtime consumers. Whole T004 acceptance remains in the active plan.
+
+The [fallible primitive candidate](../documentation-audit/clean-slate-foundation/2026-10-06-fallible-domain-values.json)
+tracks invalid amounts, arithmetic overflow, complete calendar checks and
+historical optional-end bytes. Core's existing type command now includes tests;
+its separate build configuration retains source-only output. Rule snapshots
+encode dates through the owning codec rather than snapshotting internal Option
+objects. Exact-path lint controls retain decoder/encoder separation and reject
+runtime execution in those admitted files. The packed consumer checks the
+changed constructor types and safe error representations. Qualification and
+limits belong to the dated record; this does not accept table relationships,
+rate limiting or all of T004.

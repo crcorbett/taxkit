@@ -1,5 +1,6 @@
-import { BigDecimal, Schema } from "effect";
+import { BigDecimal, Effect, Schema } from "effect";
 
+import { InvalidDecimalValue, InvalidMoneyValue } from "./errors.js";
 import { Cents } from "./money.js";
 
 /**
@@ -125,16 +126,26 @@ export const taxYear = (value: string): TaxYear => TaxYear.make(value);
  *
  * @since 0.1.0
  */
-export const taxRate = (value: string): TaxRate =>
-  TaxRate.make(BigDecimal.fromStringUnsafe(value));
+export const taxRate = (
+  value: string
+): Effect.Effect<TaxRate, InvalidDecimalValue> =>
+  BigDecimal.fromString(value).pipe(
+    Effect.fromOption(() => new InvalidDecimalValue()),
+    Effect.map((decimal) => TaxRate.make(decimal))
+  );
 
 /**
  * Parses and brands a string as a decimal coefficient.
  *
  * @since 0.1.0
  */
-export const decimalCoefficient = (value: string): DecimalCoefficient =>
-  DecimalCoefficient.make(BigDecimal.fromStringUnsafe(value));
+export const decimalCoefficient = (
+  value: string
+): Effect.Effect<DecimalCoefficient, InvalidDecimalValue> =>
+  BigDecimal.fromString(value).pipe(
+    Effect.fromOption(() => new InvalidDecimalValue()),
+    Effect.map((decimal) => DecimalCoefficient.make(decimal))
+  );
 
 const roundScaledInteger = (value: bigint, scale: number): bigint => {
   if (scale === 0) {
@@ -146,10 +157,27 @@ const roundScaledInteger = (value: bigint, scale: number): bigint => {
   return value >= 0n ? (value + half) / divisor : (value - half) / divisor;
 };
 
-const roundBigDecimalToInteger = (value: BigDecimal.BigDecimal): bigint =>
-  value.scale <= 0
-    ? value.value * 10n ** BigInt(Math.abs(value.scale))
-    : roundScaledInteger(value.value, value.scale);
+// Bound the power before constructing it. The decimal parser admits very large
+// exponents; they must produce a checked result rather than a BigInt defect.
+const roundDecimalToCents = (
+  value: BigDecimal.BigDecimal
+): Effect.Effect<Cents, InvalidMoneyValue> => {
+  const magnitude = value.value < 0n ? -value.value : value.value;
+  const digits = magnitude.toString().length;
+  if (magnitude === 0n || value.scale > digits) {
+    return Effect.succeed(Cents.make(0));
+  }
+  if (digits - value.scale > Number.MAX_SAFE_INTEGER.toString().length) {
+    return Effect.fail(new InvalidMoneyValue());
+  }
+  const rounded =
+    value.scale <= 0
+      ? value.value * 10n ** BigInt(Math.abs(value.scale))
+      : roundScaledInteger(value.value, value.scale);
+  return Cents.makeEffect(Number(rounded)).pipe(
+    Effect.mapError(() => new InvalidMoneyValue())
+  );
+};
 
 /**
  * Multiplies integer cents by a decimal coefficient and rounds once to cents.
@@ -161,14 +189,14 @@ const roundBigDecimalToInteger = (value: BigDecimal.BigDecimal): bigint =>
  * @since 0.1.0
  */
 export const multiplyCentsByDecimal = (
-  cents: number,
+  cents: Cents,
   coefficient: TaxRate | DecimalCoefficient
-): Cents => {
+): Effect.Effect<Cents, InvalidMoneyValue> => {
   const product = BigDecimal.multiply(
     BigDecimal.make(BigInt(cents), 0),
     coefficient
   );
-  return Cents.make(Number(roundBigDecimalToInteger(product)));
+  return roundDecimalToCents(product);
 };
 
 /**
@@ -176,7 +204,9 @@ export const multiplyCentsByDecimal = (
  *
  * @since 0.1.0
  */
-export const decimalDollarsToCents = (dollars: DecimalCoefficient): Cents => {
+export const decimalDollarsToCents = (
+  dollars: DecimalCoefficient
+): Effect.Effect<Cents, InvalidMoneyValue> => {
   const cents = BigDecimal.multiply(dollars, BigDecimal.make(100n, 0));
-  return Cents.make(Number(roundBigDecimalToInteger(cents)));
+  return roundDecimalToCents(cents);
 };

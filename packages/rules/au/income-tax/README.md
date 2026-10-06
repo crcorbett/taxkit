@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-au-income-tax-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
@@ -31,6 +31,11 @@ without runtime manifest reads.
   `Schema`, `Data`, `Record`, `Result` and `Exit` where they fit.
 - Do not mirror canonical IDs or fact shapes as local `string` or DTO fields.
 - Keep official parameter tables separate from algorithms.
+- Derived money and ledger totals use core fallible constructors and return
+  safe `CalculationError` failures for unsupported amounts. Exact decimal
+  arithmetic, retained source records and known tax results stay unchanged.
+  The active clean-slate plan owns the unresolved Medicare correction decision;
+  this constructor change does not correct those retained thresholds.
 
 ## Commands
 

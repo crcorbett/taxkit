@@ -1,6 +1,6 @@
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud, Cents } from "@taxkit/core/primitives";
+import { Cents, Money } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
 import { calculateReport } from "@taxkit/sdk/effect";
@@ -42,7 +42,7 @@ export const handlePayPreview = (request: Request) =>
     );
     const report = yield* calculateReport(AuPayTakeHomeCalculation, {
       grossPay: new GrossPay({
-        amount: aud(body.grossPayCents),
+        amount: new Money({ cents: body.grossPayCents, currency: "AUD" }),
         period: body.period,
       }),
       taxFreeThresholdClaimed: body.taxFreeThresholdClaimed,

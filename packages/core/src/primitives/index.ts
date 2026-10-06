@@ -1,4 +1,5 @@
 export {
+  AustralianTaxYear,
   DateInterval,
   IsoDate,
   australianTaxYearInterval,
@@ -11,6 +12,7 @@ export {
   Currency,
   Money,
   aud,
+  audFromCents,
   audDollars,
   moneyAdd,
   moneyEquals,
@@ -28,3 +30,9 @@ export {
   taxRate,
   taxYear,
 } from "./tax.js";
+
+export {
+  InvalidCalendarValue,
+  InvalidDecimalValue,
+  InvalidMoneyValue,
+} from "./errors.js";

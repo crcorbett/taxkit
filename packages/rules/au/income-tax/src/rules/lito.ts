@@ -1,6 +1,10 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { aud, multiplyCentsByDecimal } from "@taxkit/core/primitives";
+import {
+  Cents,
+  audFromCents,
+  multiplyCentsByDecimal,
+} from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
@@ -41,7 +45,7 @@ const findBracket = (
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `taxkit/rules-au-income-tax: no LITO bracket covers income=${incomeCents} cents`,
+          message: "No LITO bracket covers the amount.",
         })
       ),
     onSome: Effect.succeed,
@@ -69,14 +73,16 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
 
-    const rawOffsetCents =
-      bracket.fullOffsetCents -
-      multiplyCentsByDecimal(
-        incomeCents - bracket.thresholdCents,
-        bracket.phaseOutRate
-      );
+    const taxableExcess = yield* Cents.makeEffect(
+      incomeCents - bracket.thresholdCents
+    );
+    const phasedOut = yield* multiplyCentsByDecimal(
+      taxableExcess,
+      bracket.phaseOutRate
+    );
+    const rawOffsetCents = bracket.fullOffsetCents - phasedOut;
     const offsetCents = Math.max(0, rawOffsetCents);
-    const offsetAmount = aud(offsetCents);
+    const offsetAmount = yield* audFromCents(offsetCents);
     const status = offsetCents === 0 ? "zeroed" : "active";
 
     const trace = TraceNode.make({
@@ -106,5 +112,12 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
       trace,
     });
     return component;
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "LITO could not produce a supported amount.",
+        })
+    )
+  )
 );

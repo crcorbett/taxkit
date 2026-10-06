@@ -46,14 +46,30 @@ HTTP handlers or filesystem adapters.
   canonical fields such as `id: string` in consumers.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,
   `Context`, `Layer`, `Record`, `Result` and `Exit` where they fit.
-- Keep money and rounding explicit.
+- Keep money and rounding explicit. `aud` takes already checked `Cents` and
+  returns Money directly. Use `audFromCents` or `audDollars` when a number needs
+  checking; they return Effects with `InvalidMoneyValue`. Addition, subtraction,
+  money rounding, exact decimal conversion and ledger totals check each new
+  constrained amount and return that error when it cannot fit safe whole cents.
+  `taxRate` and `decimalCoefficient` return `InvalidDecimalValue` for strings
+  the installed decimal parser rejects. Their existing valid values and rounding
+  stay unchanged; the parser's existing empty-string-as-zero case is retained.
+  Decimal-to-cent rounding checks extreme exponents before constructing powers:
+  oversized non-zero results fail, and tiny amounts round to zero.
 - Use `IsoDate` and `isoDate` for effective-period and source-retrieval dates.
   Both paths enforce one real Gregorian-calendar `YYYY-MM-DD` invariant;
   malformed dates and impossible dates such as `2026-02-29` are rejected.
   `DateInterval` owns the whole-record start-before-end check, so direct Schema
   decoding and the convenience constructor both reject empty/reversed intervals.
-  Existing synchronous convenience constructors use owning Schema validation;
-  untrusted ingress should use the corresponding fallible Schema decoder.
+  `isoDate`, `dateInterval` and `australianTaxYearInterval` return Effects with
+  `InvalidCalendarValue`. The Australian helper checks the full year label,
+  including its matching next-year suffix and representable July boundaries.
+  Generic `TaxYear` remains an open identifier.
+  The interval's end is `Option<Option<IsoDate>>`: outer None keeps a missing
+  key, Some(None) keeps a present undefined key, and Some(Some(date)) keeps an
+  end date. Flatten it when both absence forms mean no end. The owning codec
+  preserves the original bytes and key presence; both its decoded and encoded
+  forms enforce start-before-end. An absent end is unbounded.
 - `Money` admits AUD only. Arithmetic consumes checked Money values; currency
   admission belongs to that Schema rather than a duplicate arithmetic guard.
 - Use package-owned descriptors and tagged errors.
@@ -67,6 +83,9 @@ bun run --filter=@taxkit/core check-types
 bun run --filter=@taxkit/core test
 bun run --filter=@taxkit/core build
 ```
+
+`check-types` includes source and deterministic tests. The build uses its
+separate source-only configuration, preserving the existing `dist` paths.
 
 ## Packaging
 

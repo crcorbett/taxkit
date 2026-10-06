@@ -3,7 +3,7 @@ import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculatorServiceError } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
 import {
@@ -28,7 +28,7 @@ const ServiceLive = PublicCalculatorServiceLive.pipe(
 
 const takeHomeFacts = {
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,
@@ -92,7 +92,10 @@ describe("Effect SDK facade", () => {
       const service = yield* PublicCalculatorService;
       const invalidFacts = {
         rejectedSource: `${secretSentinel}:${privatePathSentinel}`,
-        taxableIncome: aud(9_000_000),
+        taxableIncome: new Money({
+          cents: Cents.make(9_000_000),
+          currency: "AUD",
+        }),
       };
       const sdkExit = yield* calculateReport(
         AuPayTakeHomeCalculation,
@@ -146,7 +149,10 @@ describe("Effect SDK facade", () => {
     () =>
       Effect.gen(function* () {
         const report = yield* calculateReport(AuAnnualIncomeTaxCalculation, {
-          taxableIncome: aud(9_000_000),
+          taxableIncome: new Money({
+            cents: Cents.make(9_000_000),
+            currency: "AUD",
+          }),
         });
 
         expect(report._tag).toBe("AnnualTaxReport");

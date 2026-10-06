@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: package-readme
-confidence: medium
+document_type: package-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-au-stsl-owner
+last_reviewed: 2026-10-06
+review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
 # Australian STSL Rules
@@ -25,6 +27,9 @@ descriptors, rule packs and golden tests.
   `Schema`, `Data`, `Record`, `Result` and `Exit` where they fit.
 - Do not mirror canonical IDs or fact shapes as local `string` or DTO fields.
 - Keep official Schedule 8 parameters separate from algorithms.
+- Derived money and combined withholding totals use core fallible constructors
+  and return safe `CalculationError` failures for unsupported amounts. Retained
+  Schedule 8 coefficients, source records and known STSL results stay unchanged.
 
 ## Commands
 

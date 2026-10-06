@@ -11,23 +11,48 @@ uses integer cents and a currency, not floating-point dollars.
 
 ## When this matters
 
-Use branded constructors when building SDK input. Send tagged JSON values when
-calling HTTP. This keeps input aligned with canonical schemas and avoids
-application-specific DTOs.
+Use checked cents when building SDK input. Send tagged JSON values when
+calling HTTP. The same Money schema owns both forms.
 
 ## How it works
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 
-const taxableIncome = aud(9_000_000);
+const taxableIncome = aud(Cents.make(9_000_000));
 ```
+
+Use `Cents.make` for known constants. `aud` takes checked cents and returns a
+Money value directly. Fractional cents and numbers outside JavaScript's safe
+integer range are unsupported.
 
 The matching HTTP JSON is:
 
 ```json
 { "_tag": "Money", "cents": 9000000, "currency": "AUD" }
 ```
+
+## Check a number or a calculated amount
+
+Use `audFromCents` when a number needs checking. It returns an Effect that
+produces Money or `InvalidMoneyValue`. `audDollars` uses the same check after
+rounding dollars to cents. Your application host runs the Effect.
+
+```ts
+import { audFromCents, moneyAdd } from "@taxkit/core/primitives";
+import { Effect } from "effect";
+
+const amountProgram = Effect.gen(function* () {
+  const amount = yield* audFromCents(9_000_000);
+  const extra = yield* audFromCents(100);
+  return yield* moneyAdd(amount, extra);
+});
+```
+
+Addition, subtraction, money rounding and ledger totals return checked failures
+when a result is too large. You can handle `InvalidMoneyValue` through the
+Effect error channel. For JSON or other unknown input, decode the owning
+schema at your application boundary; do not cast the input to Money.
 
 `CalculatorId`, `Jurisdiction` and `TaxYear` are also branded or literal
 boundary values owned by packages. Use exported values and schemas instead of

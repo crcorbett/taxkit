@@ -35,6 +35,6 @@ export const PayWithholdingsLedgerWithStslLive = Layer.effect(
     const gross = yield* GrossPayFact;
     const payg = yield* PaygWithholdingComponentFact;
     const stsl = yield* StslComponentFact;
-    return buildPayWithholdingsLedger([payg, stsl], gross.period);
+    return yield* buildPayWithholdingsLedger([payg, stsl], gross.period);
   })
 );

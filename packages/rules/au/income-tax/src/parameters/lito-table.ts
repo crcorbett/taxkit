@@ -1,12 +1,11 @@
 import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
+  DateInterval,
+  IsoDate,
   Cents,
   CentsOrInfinity,
   TaxRate,
   TaxYear,
-  australianTaxYearInterval,
-  isoDate,
-  taxRate,
   taxYear,
 } from "@taxkit/core/primitives";
 import {
@@ -15,7 +14,7 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Context, Layer, Schema } from "effect";
+import { Option, BigDecimal, Context, Layer, Schema } from "effect";
 
 /**
  * Low Income Tax Offset phase-out bracket.
@@ -78,7 +77,7 @@ export const LitoArtifact2025_26 = new SourceArtifact({
     rowContract: "LitoBracket[]",
     rowCount: 4,
   }),
-  retrievedOn: isoDate("2026-05-12"),
+  retrievedOn: IsoDate.make("2026-05-12"),
   source: LitoSource2025_26,
 });
 
@@ -88,7 +87,10 @@ export const LitoArtifact2025_26 = new SourceArtifact({
  * @since 0.1.0
  */
 export const AtoLitoTableDescriptor = makeParameterDescriptor({
-  effectivePeriod: australianTaxYearInterval("2025-26"),
+  effectivePeriod: DateInterval.make({
+    from: IsoDate.make("2025-07-01"),
+    toExclusive: Option.some(Option.some(IsoDate.make("2026-07-01"))),
+  }),
   id: "taxkit/rules-au-income-tax/parameter/AtoLitoTable",
   schema: LitoTable,
   source: LitoSource2025_26,
@@ -107,25 +109,25 @@ const table2025_26 = new LitoTable({
     new LitoBracket({
       fullOffsetCents: Cents.make(70_000),
       maxCents: Cents.make(3_750_000),
-      phaseOutRate: taxRate("0"),
+      phaseOutRate: TaxRate.make(BigDecimal.make(0n, 0)),
       thresholdCents: Cents.make(0),
     }),
     new LitoBracket({
       fullOffsetCents: Cents.make(70_000),
       maxCents: Cents.make(4_500_000),
-      phaseOutRate: taxRate("0.05"),
+      phaseOutRate: TaxRate.make(BigDecimal.make(5n, 2)),
       thresholdCents: Cents.make(3_750_000),
     }),
     new LitoBracket({
       fullOffsetCents: Cents.make(32_500),
       maxCents: Cents.make(6_666_700),
-      phaseOutRate: taxRate("0.015"),
+      phaseOutRate: TaxRate.make(BigDecimal.make(15n, 3)),
       thresholdCents: Cents.make(4_500_000),
     }),
     new LitoBracket({
       fullOffsetCents: Cents.make(0),
       maxCents: "infinity",
-      phaseOutRate: taxRate("0"),
+      phaseOutRate: TaxRate.make(BigDecimal.make(0n, 0)),
       thresholdCents: Cents.make(6_666_700),
     }),
   ],

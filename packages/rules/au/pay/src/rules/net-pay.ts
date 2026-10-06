@@ -1,3 +1,4 @@
+import { CalculationError } from "@taxkit/core/errors";
 import { moneySub } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Effect, Layer } from "effect";
@@ -22,7 +23,7 @@ export const NetPayLive = Layer.effect(NetPayFact)(
     const gross = yield* GrossPayFact;
     const ledger = yield* PayWithholdingsLedgerFact;
 
-    const netAmount = moneySub(gross.amount, ledger.total);
+    const netAmount = yield* moneySub(gross.amount, ledger.total);
 
     const trace = TraceNode.make({
       children: [ledger.trace],
@@ -42,5 +43,12 @@ export const NetPayLive = Layer.effect(NetPayFact)(
       period: gross.period,
       trace,
     });
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Net pay could not produce a supported amount.",
+        })
+    )
+  )
 );

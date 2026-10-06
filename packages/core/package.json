@@ -125,6 +125,7 @@
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@effect/vitest": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

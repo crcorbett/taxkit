@@ -50,11 +50,11 @@ const body = await response.json();
 After:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 
@@ -70,7 +70,7 @@ Raw HTTP returns `CalculatorApiErrorEnvelope`. The SDK safe facade returns
 
 ```ts
 const result = await au.incomeTax.safe.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 if (result._tag === "TaxKitFailure") {

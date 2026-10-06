@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { audDollars, moneyEquals } from "@taxkit/core/primitives";
+import { Money, Cents, moneyEquals } from "@taxkit/core/primitives";
 import {
   CalculateTakeHomePay,
   GrossPay,
@@ -26,11 +26,20 @@ import {
 import { expectAt } from "@taxkit/testing";
 import { Array as EffectArray, Effect, Layer } from "effect";
 
-const weekly1500 = new GrossPay({ amount: audDollars(1500), period: "weekly" });
-const weekly1800 = new GrossPay({ amount: audDollars(1800), period: "weekly" });
-const weekly1000 = new GrossPay({ amount: audDollars(1000), period: "weekly" });
+const weekly1500 = new GrossPay({
+  amount: new Money({ cents: Cents.make(150_000), currency: "AUD" }),
+  period: "weekly",
+});
+const weekly1800 = new GrossPay({
+  amount: new Money({ cents: Cents.make(180_000), currency: "AUD" }),
+  period: "weekly",
+});
+const weekly1000 = new GrossPay({
+  amount: new Money({ cents: Cents.make(100_000), currency: "AUD" }),
+  period: "weekly",
+});
 const sacrifice300 = new SalarySacrifice({
-  amount: audDollars(300),
+  amount: new Money({ cents: Cents.make(30_000), currency: "AUD" }),
   period: "weekly",
 });
 const stslEnabled = new StslDebt({ enabled: true });
@@ -101,8 +110,18 @@ describe("AU take-home pay with STSL", () => {
       // $1500/week: PAYG = 304, STSL = round(0.15*1500.99 - 193.2692) = 32
       const report = yield* stslScenario(weekly1500, stslEnabled);
 
-      expect(moneyEquals(report.withholdingsTotal, audDollars(336))).toBe(true);
-      expect(moneyEquals(report.netPay, audDollars(1164))).toBe(true);
+      expect(
+        moneyEquals(
+          report.withholdingsTotal,
+          new Money({ cents: Cents.make(33_600), currency: "AUD" })
+        )
+      ).toBe(true);
+      expect(
+        moneyEquals(
+          report.netPay,
+          new Money({ cents: Cents.make(116_400), currency: "AUD" })
+        )
+      ).toBe(true);
       expect(report.withholdings.components.length).toBe(2);
       const payg = expectAt(report.withholdings.components, 0);
       const stsl = expectAt(report.withholdings.components, 1);
@@ -110,7 +129,12 @@ describe("AU take-home pay with STSL", () => {
       expect(payg.status).toBe("active");
       expect(stsl.id).toBe(StslComponentId);
       expect(stsl.status).toBe("active");
-      expect(moneyEquals(stsl.amount, audDollars(32))).toBe(true);
+      expect(
+        moneyEquals(
+          stsl.amount,
+          new Money({ cents: Cents.make(3200), currency: "AUD" })
+        )
+      ).toBe(true);
     })
   );
 
@@ -121,10 +145,18 @@ describe("AU take-home pay with STSL", () => {
         // $1000/week: PAYG = 143, STSL = 0 (zeroed)
         const report = yield* stslScenario(weekly1000, stslEnabled);
 
-        expect(moneyEquals(report.withholdingsTotal, audDollars(143))).toBe(
-          true
-        );
-        expect(moneyEquals(report.netPay, audDollars(857))).toBe(true);
+        expect(
+          moneyEquals(
+            report.withholdingsTotal,
+            new Money({ cents: Cents.make(14_300), currency: "AUD" })
+          )
+        ).toBe(true);
+        expect(
+          moneyEquals(
+            report.netPay,
+            new Money({ cents: Cents.make(85_700), currency: "AUD" })
+          )
+        ).toBe(true);
         expect(report.withholdings.components.length).toBe(2);
         const stsl = expectAt(report.withholdings.components, 1);
         expect(stsl.id).toBe(StslComponentId);
@@ -140,10 +172,18 @@ describe("AU take-home pay with STSL", () => {
         const report = yield* stslScenario(weekly1500, stslDisabled);
 
         // PAYG only: 304, STSL: 0 (disabled, not contributing)
-        expect(moneyEquals(report.withholdingsTotal, audDollars(304))).toBe(
-          true
-        );
-        expect(moneyEquals(report.netPay, audDollars(1196))).toBe(true);
+        expect(
+          moneyEquals(
+            report.withholdingsTotal,
+            new Money({ cents: Cents.make(30_400), currency: "AUD" })
+          )
+        ).toBe(true);
+        expect(
+          moneyEquals(
+            report.netPay,
+            new Money({ cents: Cents.make(119_600), currency: "AUD" })
+          )
+        ).toBe(true);
         expect(report.withholdings.components.length).toBe(2);
         const stsl = expectAt(report.withholdings.components, 1);
         expect(stsl.id).toBe(StslComponentId);
@@ -227,14 +267,27 @@ describe("AU take-home pay with STSL", () => {
     "+sacrifice only (no STSL): sacrifice reduces taxable pay and PAYG",
     () =>
       Effect.gen(function* () {
-        // taxable = 1500 - 300 = 1200; PAYG = round(0.3227*1200.99 - 180.0385) = 208
+        // taxable = 1_500 - 300 = 1_200; PAYG = round(0.3227*1200.99 - 180.0385) = 208
         const report = yield* sacrificeOnlyScenario(weekly1500, sacrifice300);
 
-        expect(moneyEquals(report.taxablePay, audDollars(1200))).toBe(true);
-        expect(moneyEquals(report.withholdingsTotal, audDollars(208))).toBe(
-          true
-        );
-        expect(moneyEquals(report.netPay, audDollars(1292))).toBe(true);
+        expect(
+          moneyEquals(
+            report.taxablePay,
+            new Money({ cents: Cents.make(120_000), currency: "AUD" })
+          )
+        ).toBe(true);
+        expect(
+          moneyEquals(
+            report.withholdingsTotal,
+            new Money({ cents: Cents.make(20_800), currency: "AUD" })
+          )
+        ).toBe(true);
+        expect(
+          moneyEquals(
+            report.netPay,
+            new Money({ cents: Cents.make(129_200), currency: "AUD" })
+          )
+        ).toBe(true);
         expect(report.withholdings.components.length).toBe(1);
 
         const ledgerTrace = expectAt(report.trace.children, 0);
@@ -248,23 +301,41 @@ describe("AU take-home pay with STSL", () => {
     "+both: STSL + sacrifice, STSL applies to post-sacrifice taxable",
     () =>
       Effect.gen(function* () {
-        // taxable = 1800 - 300 = 1500; PAYG = 304; STSL = 32; total = 336; net = 1464
+        // taxable = 1_800 - 300 = 1_500; PAYG = 304; STSL = 32; total = 336; net = 1_464
         const report = yield* stslWithSacrificeScenario(
           weekly1800,
           stslEnabled,
           sacrifice300
         );
 
-        expect(moneyEquals(report.taxablePay, audDollars(1500))).toBe(true);
-        expect(moneyEquals(report.withholdingsTotal, audDollars(336))).toBe(
-          true
-        );
-        expect(moneyEquals(report.netPay, audDollars(1464))).toBe(true);
+        expect(
+          moneyEquals(
+            report.taxablePay,
+            new Money({ cents: Cents.make(150_000), currency: "AUD" })
+          )
+        ).toBe(true);
+        expect(
+          moneyEquals(
+            report.withholdingsTotal,
+            new Money({ cents: Cents.make(33_600), currency: "AUD" })
+          )
+        ).toBe(true);
+        expect(
+          moneyEquals(
+            report.netPay,
+            new Money({ cents: Cents.make(146_400), currency: "AUD" })
+          )
+        ).toBe(true);
         const payg = expectAt(report.withholdings.components, 0);
         const stsl = expectAt(report.withholdings.components, 1);
         expect(payg.id).toBe(PaygWithholdingComponentId);
         expect(stsl.id).toBe(StslComponentId);
-        expect(moneyEquals(stsl.amount, audDollars(32))).toBe(true);
+        expect(
+          moneyEquals(
+            stsl.amount,
+            new Money({ cents: Cents.make(3200), currency: "AUD" })
+          )
+        ).toBe(true);
       })
   );
 
@@ -273,26 +344,37 @@ describe("AU take-home pay with STSL", () => {
     () =>
       Effect.gen(function* () {
         const report = yield* stslScenario(
-          new GrossPay({ amount: audDollars(6500), period: "monthly" }),
+          new GrossPay({
+            amount: new Money({ cents: Cents.make(650_000), currency: "AUD" }),
+            period: "monthly",
+          }),
           stslEnabled
         );
 
-        // 6500 monthly = 1500 weekly equivalent. PAYG: round(304*13/3)=1317.
+        // 6_500 monthly = 1_500 weekly equivalent. PAYG: round(304*13/3)=1317.
         // STSL: weekly component 32, monthly round(32*13/3)=139.
-        expect(moneyEquals(report.withholdingsTotal, audDollars(1456))).toBe(
-          true
-        );
-        expect(moneyEquals(report.netPay, audDollars(5044))).toBe(true);
+        expect(
+          moneyEquals(
+            report.withholdingsTotal,
+            new Money({ cents: Cents.make(145_600), currency: "AUD" })
+          )
+        ).toBe(true);
+        expect(
+          moneyEquals(
+            report.netPay,
+            new Money({ cents: Cents.make(504_400), currency: "AUD" })
+          )
+        ).toBe(true);
         expect(
           moneyEquals(
             expectAt(report.withholdings.components, 0).amount,
-            audDollars(1317)
+            new Money({ cents: Cents.make(131_700), currency: "AUD" })
           )
         ).toBe(true);
         expect(
           moneyEquals(
             expectAt(report.withholdings.components, 1).amount,
-            audDollars(139)
+            new Money({ cents: Cents.make(13_900), currency: "AUD" })
           )
         ).toBe(true);
       })
@@ -303,7 +385,10 @@ describe("AU take-home pay with STSL", () => {
     () =>
       Effect.gen(function* () {
         const report = yield* stslScenario(
-          new GrossPay({ amount: audDollars(3500), period: "weekly" }),
+          new GrossPay({
+            amount: new Money({ cents: Cents.make(350_000), currency: "AUD" }),
+            period: "weekly",
+          }),
           stslEnabled
         );
 
@@ -311,7 +396,7 @@ describe("AU take-home pay with STSL", () => {
         expect(
           moneyEquals(
             expectAt(report.withholdings.components, 1).amount,
-            audDollars(350)
+            new Money({ cents: Cents.make(35_000), currency: "AUD" })
           )
         ).toBe(true);
         expect(expectAt(report.withholdings.components, 1).status).toBe(

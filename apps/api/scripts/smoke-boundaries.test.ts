@@ -8,7 +8,7 @@ import {
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import {
   AuPayCalculatorId,
   AuPayJurisdiction,
@@ -81,7 +81,10 @@ const successfulHttpClient = Effect.gen(function* () {
     calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
     payload: {
       facts: {
-        grossPay: new GrossPay({ amount: aud(346_200), period: "fortnightly" }),
+        grossPay: new GrossPay({
+          amount: new Money({ cents: Cents.make(346_200), currency: "AUD" }),
+          period: "fortnightly",
+        }),
         taxFreeThresholdClaimed: true,
       },
       jurisdiction: AuPayJurisdiction.make("AU"),

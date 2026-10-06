@@ -465,7 +465,7 @@ import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import type { LedgerComponent, LedgerComponentEncoded } from "@taxkit/core/ledger";
 import type { RuleId, TraceNode, TraceNodeEncoded } from "@taxkit/core/trace";
 import type { CalculationInput } from "@taxkit/sdk";
-import type { Schema } from "effect";
+import type { Effect, Option, Schema } from "effect";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
@@ -480,12 +480,12 @@ import {
   TaxKitSuccess,
 } from "@taxkit/sdk/schemas";
 import { AuPayTakeHomeCalculation } from "@taxkit/sdk/testing";
-import { aud } from "@taxkit/core/primitives";
+import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 
 const takeHomeFacts: CalculationInput<typeof au.calculations.takeHomePay> = {
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: aud(Cents.make(165_400)),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,
@@ -499,7 +499,7 @@ const clientClosed: Promise<void> = plainClient.dispose();
 void clientReport;
 void clientClosed;
 // @ts-expect-error annual tax is outside this plain client's selected module.
-plainClient.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: aud(9_000_000) });
+plainClient.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: aud(Cents.make(9_000_000)) });
 au.pay.takeHomePay(takeHomeFacts);
 au.pay.safe.withholdings(takeHomeFacts);
 calculateReport(au.calculations.takeHomePay, takeHomeFacts);
@@ -526,6 +526,21 @@ void encodedChildren;
 void componentTrace;
 void encodedComponentTrace;
 
+declare const checkedInterval: DateInterval;
+const intervalEnd: Option.Option<Option.Option<IsoDate>> = checkedInterval.toExclusive;
+const checkedAmount: Effect.Effect<Money, InvalidMoneyValue> = audFromCents(100);
+const checkedSum: Effect.Effect<Money, InvalidMoneyValue> = moneyAdd(aud(Cents.make(100)), aud(Cents.make(1)));
+const checkedDates: Effect.Effect<DateInterval, InvalidCalendarValue> = dateInterval({ from: "2025-07-01" });
+void intervalEnd;
+void checkedAmount;
+void checkedSum;
+void checkedDates;
+// @ts-expect-error pure aud requires branded cents.
+aud(100);
+// @ts-expect-error a fallible constructor is a program, not Money.
+const uncheckedAmount: Money = audFromCents(100);
+void uncheckedAmount;
+
 const bodyPolicy: typeof CalculatorRequestBodyPolicy.Type = CalculatorRequestBodyPolicy.make({ responseFormat: "html" });
 const bodyFailure: typeof CalculatorRequestBodyErrorEnvelope.Type = {error: new CalculatorRequestBodyTooLarge()};
 const metadataTimeout: typeof CalculatorMetadataError.Type = new CalculatorOperationTimedOut();
@@ -545,7 +560,7 @@ void AuPayTakeHomeCalculation;
 
 au.pay.takeHomePay({
   // @ts-expect-error annual-tax facts cannot be submitted to take-home pay.
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 `
         ),
@@ -555,20 +570,61 @@ au.pay.takeHomePay({
 import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "@taxkit/calculators/work";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud } from "@taxkit/core/primitives";
+import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "@taxkit/core/primitives";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
 import { GrossPay } from "@taxkit/rules-au-pay";
-import { Effect, Layer, Schema } from "effect";
+import { Effect, Layer, Option, Record, Result, Schema } from "effect";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
 
+await Effect.runPromise(Effect.gen(function* () {
+  const maximum = yield* audFromCents(Number.MAX_SAFE_INTEGER);
+  const extra = yield* audFromCents(1);
+  const overflow = yield* moneyAdd(maximum, extra).pipe(Effect.result);
+  if (!Result.isFailure(overflow)) {
+    throw new Error("Packed money overflow did not return a checked failure.");
+  }
+  const error = yield* Schema.encodeEffect(InvalidMoneyValue)(overflow.failure);
+  if (JSON.stringify(error) !== '{"_tag":"InvalidMoneyValue","code":"invalid-money-value","message":"The amount must fit in safe whole AUD cents."}') {
+    throw new Error("Packed money failure changed its safe representation.");
+  }
+  const calendarFailure = yield* dateInterval({from: "private-calendar-sentinel"}).pipe(Effect.result);
+  if (!Result.isFailure(calendarFailure)) {
+    throw new Error("Packed calendar input did not return a checked failure.");
+  }
+  const calendarError = yield* Schema.encodeEffect(InvalidCalendarValue)(calendarFailure.failure);
+  if (JSON.stringify(calendarError) !== '{"_tag":"InvalidCalendarValue","code":"invalid-calendar-value","message":"The calendar date, interval or tax year is invalid."}') {
+    throw new Error("Packed calendar failure included unsupported details.");
+  }
+  const missing = yield* dateInterval({from: "2025-07-01"});
+  const explicitUndefined = yield* dateInterval({from: "2025-07-01", toExclusive: undefined});
+  const present = yield* dateInterval({from: "2025-07-01", toExclusive: "2026-07-01"});
+  const missingEncoded = yield* Schema.encodeEffect(DateInterval)(missing);
+  const undefinedEncoded = yield* Schema.encodeEffect(DateInterval)(explicitUndefined);
+  const presentEncoded = yield* Schema.encodeEffect(DateInterval)(present);
+  if (Record.has<string, string | undefined>(missingEncoded, "toExclusive") || !Record.has<string, string | undefined>(undefinedEncoded, "toExclusive") || !Option.isNone(missing.toExclusive) || !Option.isSome(explicitUndefined.toExclusive)) {
+    throw new Error("Packed date codec lost historical optional-key identity.");
+  }
+  if (JSON.stringify(missingEncoded) !== '{"from":"2025-07-01"}' || JSON.stringify(undefinedEncoded) !== '{"from":"2025-07-01"}' || JSON.stringify(presentEncoded) !== '{"from":"2025-07-01","toExclusive":"2026-07-01"}') {
+    throw new Error("Packed date codec changed historical bytes.");
+  }
+  const restored = yield* Schema.decodeEffect(DateInterval)(undefinedEncoded);
+  const restoredEncoded = yield* Schema.encodeEffect(DateInterval)(restored);
+  if (!Record.has<string, string | undefined>(restoredEncoded, "toExclusive")) {
+    throw new Error("Packed date codec lost an explicit key during round trip.");
+  }
+  if (Schema.is(Schema.toEncoded(DateInterval))({from: "2026-07-01", toExclusive: "2026-07-01"})) {
+    throw new Error("Packed encoded date codec lost the ordering check.");
+  }
+}));
+
 const fixtureSource = SourceRef.make({kind: "internal-validation", reference: "historical-codec-fixture", title: "Compatibility fixture"});
-const fixtureChild = TraceNode.make({children: [], inputs: {cents: 165400}, result: 165400, ruleId: RuleId.make("fixture/child"), sources: [fixtureSource], title: "Child"});
-const fixtureParent = TraceNode.make({children: [fixtureChild], formula: "result = input", inputs: {amount: 165400}, result: 165400, rounding: "round-to-nearest-cent", ruleId: RuleId.make("fixture/parent"), sources: [fixtureSource], title: "Parent"});
+const fixtureChild = TraceNode.make({children: [], inputs: {cents: 165_400}, result: 165_400, ruleId: RuleId.make("fixture/child"), sources: [fixtureSource], title: "Child"});
+const fixtureParent = TraceNode.make({children: [fixtureChild], formula: "result = input", inputs: {amount: 165_400}, result: 165_400, rounding: "round-to-nearest-cent", ruleId: RuleId.make("fixture/parent"), sources: [fixtureSource], title: "Parent"});
 const fixtureUndefined = TraceNode.make({...fixtureChild, formula: undefined, rounding: undefined});
-const fixtureLedger = LedgerComponent.make({amount: aud(165400), effect: "additive", id: ComponentId.make("fixture/component"), label: "Fixture", status: "active", trace: fixtureParent});
+const fixtureLedger = LedgerComponent.make({amount: aud(Cents.make(165_400)), effect: "additive", id: ComponentId.make("fixture/component"), label: "Fixture", status: "active", trace: fixtureParent});
 const encodedMissing = await Effect.runPromise(Schema.encodeEffect(TraceNode)(fixtureChild));
 if (JSON.stringify(encodedMissing) !== '{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}') {
   throw new Error("Packed core missing encoding changed historical bytes.");
@@ -620,7 +676,7 @@ if (Schema.is(Schema.toEncoded(LedgerComponent))({...encodedLedger, amount: {...
 }
 
 const requestFailure = new CalculatorRequestBodyTooLarge();
-if (!Schema.is(CalculatorRequestBodyErrorEnvelope)({error: requestFailure}) || requestFailure.code !== "request-too-large" || CalculatorRequestBodyLimit !== 65536n) {
+if (!Schema.is(CalculatorRequestBodyErrorEnvelope)({error: requestFailure}) || requestFailure.code !== "request-too-large" || CalculatorRequestBodyLimit !== 65_536n) {
   throw new Error("Packed HTTP request-body contract is not available.");
 }
 const ServiceLive = PublicCalculatorServiceBounded.pipe(
@@ -632,7 +688,7 @@ if (CalculatorConcurrencyLimit !== 8) {
 }
 const takeHomeFacts = {
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: aud(Cents.make(165_400)),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,
@@ -648,11 +704,11 @@ const effectReport = await Effect.runPromise(
   )
 );
 const plainAnnualReport = await au.incomeTax.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 const effectAnnualReport = await Effect.runPromise(
   calculateReport(au.calculations.annualIncomeTax, {
-    taxableIncome: aud(9_000_000),
+    taxableIncome: aud(Cents.make(9_000_000)),
   }).pipe(Effect.provide(ServiceLive))
 );
 
@@ -682,7 +738,7 @@ if (effectAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.0") {
 
 const client = au.createClient();
 const clientReport = await client.calculations.calculate(au.calculations.takeHomePay, takeHomeFacts);
-const clientAnnual = await client.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: aud(9_000_000) });
+const clientAnnual = await client.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: aud(Cents.make(9_000_000)) });
 const clientWithholdings = await client.calculations.calculate(au.calculations.payWithholdings, takeHomeFacts);
 if (clientReport.netPay.cents !== 130_100 || clientAnnual.liability.cents !== 1_958_800 || clientWithholdings.total.cents !== 35_300) {
   throw new Error("Caller-owned SDK client changed retained calculator results.");

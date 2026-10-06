@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-06
 review_trigger: package contracts or generated-source boundaries change
 ---
 
@@ -92,6 +92,13 @@ lookup. The server example Schema-decodes the request using canonical cents and
 period fields, invokes the native Effect SDK, and Schema-encodes its response.
 Both export programs for an application-owned host. Tests preserve the
 documented weekly pay result and reject invalid representations.
+
+Literal money examples use `aud(Cents.make(...))`. Programs that construct
+unchecked amounts use `audFromCents` and handle its typed failure channel.
+The server example reuses request-decoded cents to assemble Money directly.
+The corresponding public browser/server snippets match these source examples;
+the money concept owns constructor and arithmetic guidance. MDX lifecycle and
+navigation remain draft until their separate acceptance.
 
 ## Frontmatter contract
 

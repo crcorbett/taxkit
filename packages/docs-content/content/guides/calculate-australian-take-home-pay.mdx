@@ -25,13 +25,13 @@ The SDK path keeps the calculation in-process and avoids HTTP transport.
 ## Example
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.pay.takeHomePay({
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: aud(Cents.make(165_400)),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,
@@ -60,7 +60,7 @@ Use the safe helper when input crosses an untyped boundary:
 ```ts
 const result = await au.pay.safe.takeHomePay({
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: aud(Cents.make(165_400)),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,

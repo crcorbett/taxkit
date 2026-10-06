@@ -26,14 +26,14 @@ untyped source.
 ## Example
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const result = await TaxKit.safe.calculate(
   au.calculations.takeHomePay,
   // External input can bypass compile-time checks before it reaches this call.
-  { taxableIncome: aud(9_000_000) } as never
+  { taxableIncome: aud(Cents.make(9_000_000)) } as never
 );
 
 if (result._tag === "TaxKitFailure") {

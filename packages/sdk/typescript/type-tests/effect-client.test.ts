@@ -1,5 +1,5 @@
 import type { CalculatorServiceError } from "@taxkit/calculators/schemas";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import {
   AuPayJurisdiction,
   AuPayTaxYear,
@@ -32,7 +32,7 @@ const _payReport = payClient.calculations.calculateReport(
   AuPayTakeHomeCalculation,
   {
     grossPay: new GrossPay({
-      amount: aud(165_400),
+      amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
       period: "weekly",
     }),
     taxFreeThresholdClaimed: true,
@@ -42,7 +42,7 @@ const _payReport = payClient.calculations.calculateReport(
 const _annualReport = fullClient.calculations.calculateReport(
   AuAnnualIncomeTaxCalculation,
   {
-    taxableIncome: aud(9_000_000),
+    taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
   }
 );
 const _fullRun: Effect.Effect<
@@ -53,7 +53,7 @@ const _fullRun: Effect.Effect<
   payload: {
     facts: {
       grossPay: new GrossPay({
-        amount: aud(165_400),
+        amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
         period: "weekly",
       }),
       taxFreeThresholdClaimed: true,
@@ -67,7 +67,7 @@ const _reportRequest = calculateReportRequest(AuPayTakeHomeCalculation, {
   payload: {
     facts: {
       grossPay: new GrossPay({
-        amount: aud(165_400),
+        amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
         period: "weekly",
       }),
       taxFreeThresholdClaimed: true,
@@ -81,7 +81,7 @@ const _unsupportedModuleCalculation = payClient.calculations.calculateReport(
   // @ts-expect-error annual income tax is not provided by the pay-only module.
   AuAnnualIncomeTaxCalculation,
   {
-    taxableIncome: aud(9_000_000),
+    taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
   }
 );
 
@@ -90,7 +90,7 @@ const _wrongAnnualFacts = fullClient.calculations.calculateReport(
   {
     // @ts-expect-error take-home facts cannot be submitted to annual tax.
     grossPay: new GrossPay({
-      amount: aud(165_400),
+      amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
       period: "weekly",
     }),
     taxFreeThresholdClaimed: true,
@@ -101,14 +101,17 @@ const _wrongPayFacts = payClient.calculations.calculateReport(
   AuPayTakeHomeCalculation,
   {
     // @ts-expect-error annual-tax facts cannot be submitted to take-home pay.
-    taxableIncome: aud(9_000_000),
+    taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
   }
 );
 const _wrongReportRequest = calculateReportRequest(AuPayTakeHomeCalculation, {
   payload: {
     facts: {
       // @ts-expect-error request-preserving Effect facade still binds facts to the selected descriptor.
-      taxableIncome: aud(9_000_000),
+      taxableIncome: new Money({
+        cents: Cents.make(9_000_000),
+        currency: "AUD",
+      }),
     },
   },
 });
@@ -116,7 +119,10 @@ const _wrongRunRequest = calculateRunRequest(AuPayTakeHomeCalculation, {
   payload: {
     facts: {
       // @ts-expect-error full-run Effect facade still binds facts to the selected descriptor.
-      taxableIncome: aud(9_000_000),
+      taxableIncome: new Money({
+        cents: Cents.make(9_000_000),
+        currency: "AUD",
+      }),
     },
   },
 });

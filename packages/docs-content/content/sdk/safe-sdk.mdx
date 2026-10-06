@@ -12,12 +12,12 @@ rejected Promises.
 ## Call `TaxKit.safe.calculate`
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 if (result._tag === "TaxKitSuccess") {
@@ -35,11 +35,11 @@ The result is either `TaxKitSuccess` with the calculator report or
 ## Call AU safe helpers
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 
 const result = await au.incomeTax.safe.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 

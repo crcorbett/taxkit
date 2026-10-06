@@ -1,5 +1,10 @@
+import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { aud, multiplyCentsByDecimal } from "@taxkit/core/primitives";
+import {
+  Cents,
+  audFromCents,
+  multiplyCentsByDecimal,
+} from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { BigDecimal, Effect, Layer, Match } from "effect";
 
@@ -42,31 +47,39 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
 
     const incomeCents = income.income.cents;
 
-    const { levyCents, formula } = Match.value(incomeCents).pipe(
+    const { levyCents, formula } = yield* Match.value(incomeCents).pipe(
       Match.when(
         (cents) => cents <= table.thresholdCents,
-        () => ({
-          formula: "levy = 0 (below threshold)",
-          levyCents: 0,
-        })
+        () =>
+          Effect.succeed({
+            formula: "levy = 0 (below threshold)",
+            levyCents: Cents.make(0),
+          })
       ),
       Match.when(
         (cents) => cents <= table.shadeInMaxCents,
-        (cents) => ({
-          formula: "levy = round(shadeInRate * (income - threshold))",
-          levyCents: multiplyCentsByDecimal(
-            cents - table.thresholdCents,
-            table.shadeInRate
-          ),
-        })
+        (cents) =>
+          Cents.makeEffect(cents - table.thresholdCents).pipe(
+            Effect.flatMap((excess) =>
+              multiplyCentsByDecimal(excess, table.shadeInRate)
+            ),
+            Effect.map((checkedLevyCents) => ({
+              formula: "levy = round(shadeInRate * (income - threshold))",
+              levyCents: checkedLevyCents,
+            }))
+          )
       ),
-      Match.orElse((cents) => ({
-        formula: "levy = round(levyRate * income)",
-        levyCents: multiplyCentsByDecimal(cents, table.levyRate),
-      }))
+      Match.orElse((cents) =>
+        multiplyCentsByDecimal(cents, table.levyRate).pipe(
+          Effect.map((checkedLevyCents) => ({
+            formula: "levy = round(levyRate * income)",
+            levyCents: checkedLevyCents,
+          }))
+        )
+      )
     );
 
-    const levyAmount = aud(levyCents);
+    const levyAmount = yield* audFromCents(levyCents);
     const status = levyCents === 0 ? "zeroed" : "active";
 
     const trace = TraceNode.make({
@@ -96,5 +109,12 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
       trace,
     });
     return component;
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Medicare levy could not produce a supported amount.",
+        })
+    )
+  )
 );

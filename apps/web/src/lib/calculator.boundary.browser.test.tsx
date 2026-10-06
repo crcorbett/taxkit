@@ -12,7 +12,7 @@ import {
 } from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
 import {
   AuPayCalculatorId,
@@ -415,7 +415,7 @@ describe("browser calculator lifetime", () => {
           title: "Source link fixture",
         });
         const component = LedgerComponent.make({
-          amount: aud(100),
+          amount: aud(Cents.make(100)),
           effect: "additive",
           id: ComponentId.make("test/payg"),
           label: "PAYG withholding",
@@ -423,19 +423,19 @@ describe("browser calculator lifetime", () => {
           trace,
         });
         const report = new TakeHomePayReport({
-          grossPay: aud(200),
-          netPay: aud(100),
+          grossPay: aud(Cents.make(200)),
+          netPay: aud(Cents.make(100)),
           period: "weekly",
           rulePackVersion: "rules-au-pay/1.0.0",
-          taxablePay: aud(200),
+          taxablePay: aud(Cents.make(200)),
           trace,
           withholdings: new PayWithholdingsLedger({
             components: [component],
             period: "weekly",
-            total: aud(100),
+            total: aud(Cents.make(100)),
             trace,
           }),
-          withholdingsTotal: aud(100),
+          withholdingsTotal: aud(Cents.make(100)),
         });
         const html = renderToString(
           <TakeHomeResultView report={Option.some(report)} stale={false} />

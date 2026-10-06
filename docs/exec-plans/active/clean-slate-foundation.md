@@ -3048,3 +3048,104 @@ approved the prepared #146 progress comment after the connector paused it;
 comment `6a17034d-46f9-4450-821e-d5534c34df7c` is saved and independently read
 back as the sole comment. No status, description or native dependency change
 is claimed. Retained Medicare values and all tax outputs stay unchanged.
+
+
+## DEV-75 fallible money and calendar values — 6 October 2026
+
+Draft #147 is pushed at `390c3cd143ac31f787b646b8795b59bc66df2cbc`; hosted
+Quality run `37396296951` was in progress at slice start. The next branch is
+`codex/dev-75-fallible-domain-values`. Arbitrary money/date/decimal constructor
+inputs and derived constrained amounts return owned checked errors. Pure
+`aud(Cents)` assembles already checked cents; new `audFromCents(number)` checks
+a number that still needs validation. Dollar, arithmetic, rounding, decimal and
+calendar operations return Effects. Rule operations translate these failures to
+safe calculation errors. Trusted authored constants retain canonical Schema
+construction; no package or domain runtime is added. Public Type contracts and
+examples change together with deliberate major Changesets.
+
+Date overlap will treat an absent end as open-ended instead of using the finite
+9999-12-31 surrogate. The Australian interval helper will check the complete year
+label, including its suffix and representable end date; generic TaxYear stays
+an open branded identifier. Any optional-value migration in this slice must
+preserve the original codec bytes and admitted representations. The outside
+installed-Schema probe shows OptionFromOptionalKey(OptionFromUndefinedOr(...))
+can retain missing, explicitly undefined and present keys; a simpler nested
+optional-key composition failed that requirement and was not adopted. This
+prototype is not production or packed proof.
+
+Docs-maintainer impact: **Change required** for primitive/rule owners, affected
+public examples/export checks, package READMEs, relevant architecture, current
+SPEC/tasks/plan, dated evidence and major Changesets. **Preserve** tax/source
+values, known golden results, historical encoded data, supported years, UI
+behaviour, selected dependency versions/toolchain and canonical skills.
+**Change required** for Core's test typing/dependency declaration (the installed
+@effect/vitest version is unchanged), source-only build override, and exact
+primitive/date-snapshot decode/encode admissions with actual CLI controls.
+**N/A** for provider operations, new commands and operational runbooks unless
+the final change introduces one. Rate limiting, whole-table relationships and
+whole T004 acceptance remain separate unfinished work. No merge, deployment,
+publication, provider apply or credential change is included.
+
+Focused implementation findings: a domain-only Option ordering check vanished
+under Schema.toEncoded. The final codec composes its encoded representation and
+Option field owner, with one shared ordering predicate checked at both forms.
+The installed BigDecimal parser admits an empty string as zero; that existing
+case remains valid. Initial test assumptions about both behaviours were wrong
+and corrected from installed source and actual tests. Initial lint fixes also
+needed numeric grouping, safe imports and a relocated type-error directive.
+An outside formatting step altered source labels and literal JSON digits; those
+changes were restored. Fifteen actual pre-change/current table, period and
+source-artifact encodings match exactly after restoration. No source value or
+golden snapshot was updated to disguise a failure.
+
+Rule descriptor snapshots now use the owning date encoder and retain their
+existing expected snapshots. Core tests compile under the package's existing
+type command. Focused calculator tests require checked safe errors for oversized
+derived PAYG amounts in both public pay operations. Public browser/server code
+fences match their package-owned examples; the money concept explains the new
+constructors. Twenty new real-CLI cases allow only seven exact decode/encode
+operations and reject thirteen neighbour/runtime operations. Complete
+qualification and primary-owner acceptance follow before this slice is committed.
+
+Final arithmetic review found the installed decimal parser accepts safe but very
+large exponents. Cent conversion now bounds the power from the existing exact
+decimal magnitude before constructing it, returns checked failure for a result
+that cannot fit and rounds tiny values to zero. It retains zero multiplication,
+ordinary exact rates and half-away-from-zero cent rounding. A focused extreme-
+exponent test passes; removing the bound fails that assertion and source is
+restored. All 500 current real-CLI lint cases pass, including the twenty added
+cases; complete graph proof remains pending.
+
+The first complete qualification failed at the browser settings test after
+494.51 seconds. An outside numeric-formatting edit had also grouped the digits
+inside two local test URL ports; both original URL strings are restored and
+changed quoted strings checked for the same accidental edit. The 32 workflow
+tests passed in that attempt, but native verification was not reached. Its
+completion-triggered artifact inventory is retained as unqualified, not accepted
+native proof. Focused browser/API checks and a complete corrected attempt follow.
+
+
+Local acceptance for the fallible money/calendar slice: the corrected complete
+CI-mode graph passes all nine stages in 686.09 seconds. It
+includes 32 workflow tests (472.14 seconds), all 500 real lint cases, complete
+tests/builds, genuine packed/downstream consumers, API smoke and docs/browser
+checks. Native verification passes seven built Worker cases (80.38 seconds).
+All 97 staged files match their saved pre-check hashes and the API Worker matches
+its unchanged parent source. Nine native inventories were captured after
+successful verification, before the later root build; four screenshots match
+the already inspected parent images. The earlier failed attempt and unqualified
+inventory remain recorded.
+
+Primary-owner review accepts this local constructor/derived arithmetic/calendar
+change. Core's 59 tests cover safe fixed failures, overflow, decimal rounding
+and extreme exponents, real Gregorian dates, whole Australian labels and all
+three historical end-key representations. All 15 authored table, period and
+source-artifact encodings match saved pre-change bytes. Five deliberate removal
+controls fail for their named reason and restore sources. Public examples and
+major Changesets record the deliberate type/Effect changes; HTTP/RPC saved
+representations and retained tax results stay unchanged. Only this plan and
+receipt change after qualification; final docs/runbooks/format/Changeset and
+whitespace checks follow. Hosted checks and reviewer acceptance are separate.
+T004 and the wider DEV-73 then DEV-74–81 goal remain active; next are whole-table
+relationships, remaining semantic absence/service ownership and trusted rate
+identity/limiting. The Medicare correction decision remains unresolved.

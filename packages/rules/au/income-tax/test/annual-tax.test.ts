@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
-import { aud, audDollars, moneyEquals } from "@taxkit/core/primitives";
+import { audDollars, Money, Cents, moneyEquals } from "@taxkit/core/primitives";
 import {
   AnnualTaxLedgerRuleId,
   AnnualTaxScenarioLive,
@@ -20,12 +20,13 @@ import { Array as EffectArray, Effect, Exit, Layer } from "effect";
 const runScenario = (incomeDollars: number) =>
   Effect.gen(function* () {
     const engine = yield* CalculationEngine;
+    const taxableIncome = yield* audDollars(incomeDollars);
     const result = yield* engine.run({
       calculation: CalculateAnnualTax,
       layer: AuAnnualTax2025_26_Live.pipe(
         Layer.provideMerge(
           AnnualTaxScenarioLiveFromInput({
-            taxableIncome: audDollars(incomeDollars),
+            taxableIncome,
           })
         )
       ),
@@ -43,23 +44,48 @@ describe("AU annual income tax calculator (2025-26)", () => {
       // Liability:   $14,788 + $1,600 = $16,388
       const report = yield* runScenario(80_000);
 
-      expect(moneyEquals(report.liability, audDollars(16_388))).toBe(true);
-      expect(moneyEquals(report.rawLiability, audDollars(16_388))).toBe(true);
+      expect(
+        moneyEquals(
+          report.liability,
+          new Money({ cents: Cents.make(1_638_800), currency: "AUD" })
+        )
+      ).toBe(true);
+      expect(
+        moneyEquals(
+          report.rawLiability,
+          new Money({ cents: Cents.make(1_638_800), currency: "AUD" })
+        )
+      ).toBe(true);
       expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
 
       const incomeTax = expectAt(report.ledger.components, 0);
       const lito = expectAt(report.ledger.components, 1);
       const medicare = expectAt(report.ledger.components, 2);
-      expect(moneyEquals(incomeTax.amount, audDollars(14_788))).toBe(true);
+      expect(
+        moneyEquals(
+          incomeTax.amount,
+          new Money({ cents: Cents.make(1_478_800), currency: "AUD" })
+        )
+      ).toBe(true);
       expect(incomeTax.effect).toBe("additive");
       expect(incomeTax.status).toBe("active");
 
       // LITO is zeroed once the phase-out ceiling is reached.
-      expect(moneyEquals(lito.amount, aud(0))).toBe(true);
+      expect(
+        moneyEquals(
+          lito.amount,
+          new Money({ cents: Cents.make(0), currency: "AUD" })
+        )
+      ).toBe(true);
       expect(lito.effect).toBe("subtractive");
       expect(lito.status).toBe("zeroed");
 
-      expect(moneyEquals(medicare.amount, audDollars(1600))).toBe(true);
+      expect(
+        moneyEquals(
+          medicare.amount,
+          new Money({ cents: Cents.make(160_000), currency: "AUD" })
+        )
+      ).toBe(true);
       expect(medicare.effect).toBe("additive");
       expect(medicare.status).toBe("active");
     })
@@ -73,11 +99,26 @@ describe("AU annual income tax calculator (2025-26)", () => {
       // Liability:   $5,788 - $250 + $1,000 = $6,538
       const report = yield* runScenario(50_000);
 
-      expect(moneyEquals(report.liability, audDollars(6538))).toBe(true);
-      expect(moneyEquals(report.rawLiability, audDollars(6538))).toBe(true);
+      expect(
+        moneyEquals(
+          report.liability,
+          new Money({ cents: Cents.make(653_800), currency: "AUD" })
+        )
+      ).toBe(true);
+      expect(
+        moneyEquals(
+          report.rawLiability,
+          new Money({ cents: Cents.make(653_800), currency: "AUD" })
+        )
+      ).toBe(true);
 
       const lito = expectAt(report.ledger.components, 1);
-      expect(moneyEquals(lito.amount, audDollars(250))).toBe(true);
+      expect(
+        moneyEquals(
+          lito.amount,
+          new Money({ cents: Cents.make(25_000), currency: "AUD" })
+        )
+      ).toBe(true);
       expect(lito.effect).toBe("subtractive");
       expect(lito.status).toBe("active");
     })
@@ -91,15 +132,35 @@ describe("AU annual income tax calculator (2025-26)", () => {
       // Liability:   $1,888 - $700 + $277.80 = $1,465.80
       const report = yield* runScenario(30_000);
 
-      expect(moneyEquals(report.liability, aud(146_580))).toBe(true);
+      expect(
+        moneyEquals(
+          report.liability,
+          new Money({ cents: Cents.make(146_580), currency: "AUD" })
+        )
+      ).toBe(true);
 
       const incomeTax = expectAt(report.ledger.components, 0);
       const lito = expectAt(report.ledger.components, 1);
       const medicare = expectAt(report.ledger.components, 2);
-      expect(moneyEquals(incomeTax.amount, audDollars(1888))).toBe(true);
-      expect(moneyEquals(lito.amount, audDollars(700))).toBe(true);
+      expect(
+        moneyEquals(
+          incomeTax.amount,
+          new Money({ cents: Cents.make(188_800), currency: "AUD" })
+        )
+      ).toBe(true);
+      expect(
+        moneyEquals(
+          lito.amount,
+          new Money({ cents: Cents.make(70_000), currency: "AUD" })
+        )
+      ).toBe(true);
       expect(lito.status).toBe("active");
-      expect(moneyEquals(medicare.amount, aud(27_780))).toBe(true);
+      expect(
+        moneyEquals(
+          medicare.amount,
+          new Money({ cents: Cents.make(27_780), currency: "AUD" })
+        )
+      ).toBe(true);
       expect(medicare.status).toBe("active");
     })
   );
@@ -115,13 +176,28 @@ describe("AU annual income tax calculator (2025-26)", () => {
         // Floored:     $0
         const report = yield* runScenario(20_000);
 
-        expect(moneyEquals(report.rawLiability, aud(-41_200))).toBe(true);
-        expect(moneyEquals(report.liability, aud(0))).toBe(true);
+        expect(
+          moneyEquals(
+            report.rawLiability,
+            new Money({ cents: Cents.make(-41_200), currency: "AUD" })
+          )
+        ).toBe(true);
+        expect(
+          moneyEquals(
+            report.liability,
+            new Money({ cents: Cents.make(0), currency: "AUD" })
+          )
+        ).toBe(true);
 
         const incomeTax = expectAt(report.ledger.components, 0);
         const lito = expectAt(report.ledger.components, 1);
         const medicare = expectAt(report.ledger.components, 2);
-        expect(moneyEquals(incomeTax.amount, audDollars(288))).toBe(true);
+        expect(
+          moneyEquals(
+            incomeTax.amount,
+            new Money({ cents: Cents.make(28_800), currency: "AUD" })
+          )
+        ).toBe(true);
         // LITO is active; the report applies the liability floor.
         expect(lito.status).toBe("active");
         expect(medicare.status).toBe("zeroed");
@@ -139,15 +215,35 @@ describe("AU annual income tax calculator (2025-26)", () => {
         // Floored:     $0
         const report = yield* runScenario(15_000);
 
-        expect(moneyEquals(report.rawLiability, aud(-70_000))).toBe(true);
-        expect(moneyEquals(report.liability, aud(0))).toBe(true);
+        expect(
+          moneyEquals(
+            report.rawLiability,
+            new Money({ cents: Cents.make(-70_000), currency: "AUD" })
+          )
+        ).toBe(true);
+        expect(
+          moneyEquals(
+            report.liability,
+            new Money({ cents: Cents.make(0), currency: "AUD" })
+          )
+        ).toBe(true);
 
         const incomeTax = expectAt(report.ledger.components, 0);
         const lito = expectAt(report.ledger.components, 1);
-        expect(moneyEquals(incomeTax.amount, aud(0))).toBe(true);
+        expect(
+          moneyEquals(
+            incomeTax.amount,
+            new Money({ cents: Cents.make(0), currency: "AUD" })
+          )
+        ).toBe(true);
         // Nil bracket is active; the rate happens to be 0.
         expect(incomeTax.status).toBe("active");
-        expect(moneyEquals(lito.amount, audDollars(700))).toBe(true);
+        expect(
+          moneyEquals(
+            lito.amount,
+            new Money({ cents: Cents.make(70_000), currency: "AUD" })
+          )
+        ).toBe(true);
         expect(lito.status).toBe("active");
       })
   );
@@ -265,34 +361,42 @@ describe("AU annual income tax calculator (2025-26)", () => {
         expect(
           moneyEquals(
             expectAt(taxFreeThreshold.ledger.components, 0).amount,
-            aud(0)
+            new Money({ cents: Cents.make(0), currency: "AUD" })
           )
         ).toBe(true);
         expect(
           moneyEquals(
             expectAt(taxFreeThreshold.ledger.components, 1).amount,
-            audDollars(700)
+            new Money({ cents: Cents.make(70_000), currency: "AUD" })
           )
         ).toBe(true);
-        expect(moneyEquals(taxFreeThreshold.liability, aud(0))).toBe(true);
+        expect(
+          moneyEquals(
+            taxFreeThreshold.liability,
+            new Money({ cents: Cents.make(0), currency: "AUD" })
+          )
+        ).toBe(true);
 
         const litoFirstPhaseEnd = yield* runScenario(45_000);
         expect(
           moneyEquals(
             expectAt(litoFirstPhaseEnd.ledger.components, 0).amount,
-            audDollars(4288)
+            new Money({ cents: Cents.make(428_800), currency: "AUD" })
           )
         ).toBe(true);
         expect(
           moneyEquals(
             expectAt(litoFirstPhaseEnd.ledger.components, 1).amount,
-            audDollars(325)
+            new Money({ cents: Cents.make(32_500), currency: "AUD" })
           )
         ).toBe(true);
 
         const litoCeiling = yield* runScenario(66_667);
         expect(
-          moneyEquals(expectAt(litoCeiling.ledger.components, 1).amount, aud(0))
+          moneyEquals(
+            expectAt(litoCeiling.ledger.components, 1).amount,
+            new Money({ cents: Cents.make(0), currency: "AUD" })
+          )
         ).toBe(true);
         expect(expectAt(litoCeiling.ledger.components, 1).status).toBe(
           "zeroed"
@@ -308,7 +412,7 @@ describe("AU annual income tax calculator (2025-26)", () => {
         expect(
           moneyEquals(
             expectAt(belowThreshold.ledger.components, 2).amount,
-            aud(0)
+            new Money({ cents: Cents.make(0), currency: "AUD" })
           )
         ).toBe(true);
         expect(expectAt(belowThreshold.ledger.components, 2).status).toBe(
@@ -319,7 +423,7 @@ describe("AU annual income tax calculator (2025-26)", () => {
         expect(
           moneyEquals(
             expectAt(shadeInBoundary.ledger.components, 2).amount,
-            aud(68_050)
+            new Money({ cents: Cents.make(68_050), currency: "AUD" })
           )
         ).toBe(true);
         expect(expectAt(shadeInBoundary.ledger.components, 2).status).toBe(
@@ -330,7 +434,7 @@ describe("AU annual income tax calculator (2025-26)", () => {
         expect(
           moneyEquals(
             expectAt(fullRate.ledger.components, 2).amount,
-            aud(68_056)
+            new Money({ cents: Cents.make(68_056), currency: "AUD" })
           )
         ).toBe(true);
         expect(expectAt(fullRate.ledger.components, 2).status).toBe("active");

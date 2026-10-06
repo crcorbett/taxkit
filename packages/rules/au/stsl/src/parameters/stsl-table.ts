@@ -1,12 +1,11 @@
 import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
+  IsoDate,
   Cents,
   CentsOrInfinity,
   DecimalCoefficient,
   TaxYear,
-  dateInterval,
-  decimalCoefficient,
-  isoDate,
+  DateInterval,
   taxYear,
 } from "@taxkit/core/primitives";
 import {
@@ -15,7 +14,7 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Context, Layer, Schema } from "effect";
+import { Option, BigDecimal, Context, Layer, Schema } from "effect";
 
 /**
  * ATO Schedule 8 STSL coefficient row.
@@ -79,7 +78,7 @@ export const StslArtifact2025_26 = new SourceArtifact({
     rowContract: "StslRow[]",
     rowCount: 4,
   }),
-  retrievedOn: isoDate("2026-05-12"),
+  retrievedOn: IsoDate.make("2026-05-12"),
   source: StslSource2025_26,
 });
 
@@ -89,9 +88,9 @@ export const StslArtifact2025_26 = new SourceArtifact({
  * @since 0.1.0
  */
 export const AtoStslTableDescriptor = makeParameterDescriptor({
-  effectivePeriod: dateInterval({
-    from: "2025-09-24",
-    toExclusive: "2026-07-01",
+  effectivePeriod: DateInterval.make({
+    from: IsoDate.make("2025-09-24"),
+    toExclusive: Option.some(Option.some(IsoDate.make("2026-07-01"))),
   }),
   id: "taxkit/rules-au-stsl/parameter/AtoStslTable",
   schema: StslTable,
@@ -104,26 +103,26 @@ export const AtoStslTableDescriptor = makeParameterDescriptor({
 const table2025_26 = new StslTable({
   rows: [
     new StslRow({
-      a: decimalCoefficient("0"),
-      bDollars: decimalCoefficient("0"),
+      a: DecimalCoefficient.make(BigDecimal.make(0n, 0)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(0n, 0)),
       weeklyMaxCents: Cents.make(128_799),
       weeklyMinCents: Cents.make(0),
     }),
     new StslRow({
-      a: decimalCoefficient("0.15"),
-      bDollars: decimalCoefficient("193.2692"),
+      a: DecimalCoefficient.make(BigDecimal.make(15n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(1_932_692n, 4)),
       weeklyMaxCents: Cents.make(240_299),
       weeklyMinCents: Cents.make(128_800),
     }),
     new StslRow({
-      a: decimalCoefficient("0.17"),
-      bDollars: decimalCoefficient("241.3462"),
+      a: DecimalCoefficient.make(BigDecimal.make(17n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(2_413_462n, 4)),
       weeklyMaxCents: Cents.make(344_699),
       weeklyMinCents: Cents.make(240_300),
     }),
     new StslRow({
-      a: decimalCoefficient("0.1"),
-      bDollars: decimalCoefficient("0"),
+      a: DecimalCoefficient.make(BigDecimal.make(1n, 1)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(0n, 0)),
       weeklyMaxCents: "infinity",
       weeklyMinCents: Cents.make(344_700),
     }),

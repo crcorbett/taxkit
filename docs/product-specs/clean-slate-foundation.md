@@ -798,3 +798,12 @@ standalone HTTP server. Native API rejections have checked JSON 413/408 guidance
 all native calculator form paths have fixed HTML guidance and a recovery link.
 The five-second operation policy includes lazy metadata invocation and cleanup
 at all nine methods; rate identity/limits and whole T004 acceptance remain open.
+
+The current primitive slice keeps pure `aud(Cents)` for already checked cents
+and adds fallible `audFromCents(number)`. Dollar construction, arithmetic,
+rounding, decimal and calendar helpers return owned Effect failures. Date ends
+use Option while preserving the previous encoded values and key presence.
+This deliberately changes public Type contracts and examples with major
+Changesets. Retained tax tables, source records and golden results must stay
+unchanged. The active plan and dated receipt own qualification; full table
+relationships, wider semantic absence and rate limiting remain unfinished.

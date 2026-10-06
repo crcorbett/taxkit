@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { Effect } from "effect";
 
@@ -7,7 +7,7 @@ import { au } from "./au.js";
 
 const takeHomeFacts = {
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,
@@ -32,11 +32,19 @@ describe("AU SDK subpath", () => {
       const [helperReport, descriptorReport] = yield* Effect.all(
         [
           Effect.promise(() =>
-            au.incomeTax.annual({ taxableIncome: aud(9_000_000) })
+            au.incomeTax.annual({
+              taxableIncome: new Money({
+                cents: Cents.make(9_000_000),
+                currency: "AUD",
+              }),
+            })
           ),
           Effect.promise(() =>
             client.calculations.calculate(au.calculations.annualIncomeTax, {
-              taxableIncome: aud(9_000_000),
+              taxableIncome: new Money({
+                cents: Cents.make(9_000_000),
+                currency: "AUD",
+              }),
             })
           ),
         ],
@@ -52,10 +60,13 @@ describe("AU SDK subpath", () => {
   it.effect("returns safe AU failures through SDK-owned result values", () =>
     Effect.gen(function* () {
       const result = yield* Effect.promise(() =>
-        au.pay.safe.takeHomePay(
+        au.pay.safe.takeHomePay({
           // @ts-expect-error runtime coverage bypasses the typed SDK boundary.
-          { taxableIncome: aud(9_000_000) }
-        )
+          taxableIncome: new Money({
+            cents: Cents.make(9_000_000),
+            currency: "AUD",
+          }),
+        })
       );
 
       expect(result._tag).toBe("TaxKitFailure");

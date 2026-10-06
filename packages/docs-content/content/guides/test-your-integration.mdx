@@ -26,7 +26,7 @@ TaxKit with the expected facts and handles expected failures.
 ## Example
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
@@ -35,7 +35,7 @@ import { expect, test } from "vitest";
 test("calculates weekly take-home pay", async () => {
   const report = await au.pay.takeHomePay({
     grossPay: new GrossPay({
-      amount: aud(165_400),
+      amount: aud(Cents.make(165_400)),
       period: "weekly",
     }),
     taxFreeThresholdClaimed: true,
@@ -47,7 +47,7 @@ test("calculates weekly take-home pay", async () => {
 
 test("returns a typed validation failure", async () => {
   const result = await TaxKit.safe.calculate(au.calculations.takeHomePay, {
-    taxableIncome: aud(9_000_000),
+    taxableIncome: aud(Cents.make(9_000_000)),
   } as never);
 
   expect(result._tag).toBe("TaxKitFailure");

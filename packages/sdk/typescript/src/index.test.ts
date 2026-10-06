@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { Cause, Effect, Match, Schema } from "effect";
 
@@ -21,7 +21,7 @@ class SdkPromiseRejectionError extends Schema.TaggedError<SdkPromiseRejectionErr
 
 const takeHomeFacts = {
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,
@@ -193,7 +193,10 @@ describe("plain SDK facade", () => {
     Effect.gen(function* () {
       const report = yield* Effect.promise(() =>
         TaxKit.calculate(AuAnnualIncomeTaxCalculation, {
-          taxableIncome: aud(9_000_000),
+          taxableIncome: new Money({
+            cents: Cents.make(9_000_000),
+            currency: "AUD",
+          }),
         })
       );
 

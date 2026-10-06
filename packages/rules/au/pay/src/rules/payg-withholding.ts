@@ -1,7 +1,8 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
-  aud,
+  Cents,
+  audFromCents,
   decimalDollarsToCents,
   multiplyCentsByDecimal,
   roundCentsToDollar,
@@ -59,7 +60,7 @@ const findRow = (
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `taxkit/rules-au-pay: no Schedule1 ${scale} row covers weekly formula cents=${weeklyFormulaCents}`,
+          message: "No Schedule 1 row covers the amount.",
         })
       ),
     onSome: Effect.succeed,
@@ -86,16 +87,23 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
     const scale = tftClaimed.value ? "scale2" : "scale1";
     const row = yield* findRow(table, scale, weeklyFormulaCents);
 
-    const weeklyWithholdingCentsRaw =
-      multiplyCentsByDecimal(weeklyFormulaCents, row.a) -
-      decimalDollarsToCents(row.bDollars);
+    const checkedWeeklyFormulaCents =
+      yield* Cents.makeEffect(weeklyFormulaCents);
+    const multiplied = yield* multiplyCentsByDecimal(
+      checkedWeeklyFormulaCents,
+      row.a
+    );
+    const subtracted = yield* decimalDollarsToCents(row.bDollars);
+    const weeklyWithholdingCentsRaw = yield* Cents.makeEffect(
+      multiplied - subtracted
+    );
     const weeklyWithholdingCentsRounded = roundCentsToDollar(
       weeklyWithholdingCentsRaw,
       "ato-withholding-rounding"
     );
     const weeklyWithholdingDollars =
       Math.max(0, weeklyWithholdingCentsRounded) / 100;
-    const periodWithholding = aud(
+    const periodWithholding = yield* audFromCents(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
         taxable.period
@@ -134,5 +142,12 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
     });
 
     return component;
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "PAYG withholding could not produce a supported amount.",
+        })
+    )
+  )
 );

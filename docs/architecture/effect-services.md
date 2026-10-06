@@ -127,6 +127,15 @@ persistence, route or command egress. The owning Schema’s `make` is valid cons
 trusted literals; it is not evidence of runtime validation that the underlying
 Schema does not provide.
 
+Core's constrained money, date and decimal helpers return owned schema-tagged
+errors through Effects. `aud` remains pure for already checked cents; use
+`audFromCents` for a number that still needs checking. New arithmetic results
+must pass the owning fallible constructor. Rules translate those failures to
+safe calculation errors without copying the input amount or a raw Schema issue.
+The [core README](../../packages/core/README.md) owns the concrete helper and
+date Option contracts. A representation codec must retain its whole-record
+check on the encoded side when Type/Encoded transformations differ.
+
 Explicit recursive encoded contracts such as `TraceNodeEncoded`, and generic
 descriptor interfaces that preserve schema-to-continuation inference, are not
 DTO mirrors. Keep them when TypeScript cannot otherwise express the recursive

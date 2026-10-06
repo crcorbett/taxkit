@@ -36,7 +36,7 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
       });
     }
 
-    const taxableAmount = moneySub(gross.amount, sacrifice.amount);
+    const taxableAmount = yield* moneySub(gross.amount, sacrifice.amount);
 
     const trace = TraceNode.make({
       children: [],
@@ -57,5 +57,12 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
       period: gross.period,
       trace,
     });
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Taxable pay could not produce a supported amount.",
+        })
+    )
+  )
 );

@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-au-pay-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
@@ -31,6 +31,10 @@ runtime manifest reads.
   `Schema`, `Data`, `Record`, `Result` and `Exit` where they fit.
 - Do not mirror canonical IDs or fact shapes as local `string` or DTO fields.
 - Keep official Schedule 1 parameters separate from algorithms.
+- Derived money and ledger amounts use the core fallible constructors. An
+  unsupported amount returns a safe `CalculationError` through the Effect
+  error channel. `buildPayWithholdingsLedger` now returns an Effect; callers
+  yield its result. Retained Schedule 1 values and known pay results are unchanged.
 
 ## Commands
 

@@ -280,3 +280,8 @@ The actual packed and downstream fixtures check these named exports and types.
 SDK Schemas also re-export the canonical `CalculatorMetadataError` union. Server
 hosts may apply the calculator-owned five-second policy to all nine methods;
 local SDK execution retains its caller-owned lifetime and calculation results.
+
+The downstream consumer also checks core's fallible money/date constructors,
+their public error types, safe overflow failures and historical date bytes/key
+presence. `aud` requires already checked `Cents`; `audFromCents` returns an
+Effect. Public examples use the same owning primitive contracts.

@@ -1,12 +1,11 @@
 import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
+  DateInterval,
+  IsoDate,
   Cents,
   CentsOrInfinity,
   TaxRate,
   TaxYear,
-  australianTaxYearInterval,
-  isoDate,
-  taxRate,
   taxYear,
 } from "@taxkit/core/primitives";
 import {
@@ -15,7 +14,7 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Context, Layer, Schema } from "effect";
+import { Option, BigDecimal, Context, Layer, Schema } from "effect";
 
 /**
  * Marginal-rate bracket for resident individual income tax.
@@ -85,7 +84,7 @@ export const IncomeTaxArtifact2025_26 = new SourceArtifact({
     rowContract: "IncomeTaxBracket[]",
     rowCount: 5,
   }),
-  retrievedOn: isoDate("2026-05-12"),
+  retrievedOn: IsoDate.make("2026-05-12"),
   source: IncomeTaxSource2025_26,
 });
 
@@ -95,7 +94,10 @@ export const IncomeTaxArtifact2025_26 = new SourceArtifact({
  * @since 0.1.0
  */
 export const AtoIncomeTaxTableDescriptor = makeParameterDescriptor({
-  effectivePeriod: australianTaxYearInterval("2025-26"),
+  effectivePeriod: DateInterval.make({
+    from: IsoDate.make("2025-07-01"),
+    toExclusive: Option.some(Option.some(IsoDate.make("2026-07-01"))),
+  }),
   id: "taxkit/rules-au-income-tax/parameter/AtoIncomeTaxTable",
   schema: IncomeTaxTable,
   source: IncomeTaxSource2025_26,
@@ -112,31 +114,31 @@ const table2025_26 = new IncomeTaxTable({
     new IncomeTaxBracket({
       baseTaxCents: Cents.make(0),
       maxCents: Cents.make(1_820_000),
-      rate: taxRate("0"),
+      rate: TaxRate.make(BigDecimal.make(0n, 0)),
       thresholdCents: Cents.make(0),
     }),
     new IncomeTaxBracket({
       baseTaxCents: Cents.make(0),
       maxCents: Cents.make(4_500_000),
-      rate: taxRate("0.16"),
+      rate: TaxRate.make(BigDecimal.make(16n, 2)),
       thresholdCents: Cents.make(1_820_000),
     }),
     new IncomeTaxBracket({
       baseTaxCents: Cents.make(428_800),
       maxCents: Cents.make(13_500_000),
-      rate: taxRate("0.3"),
+      rate: TaxRate.make(BigDecimal.make(3n, 1)),
       thresholdCents: Cents.make(4_500_000),
     }),
     new IncomeTaxBracket({
       baseTaxCents: Cents.make(3_128_800),
       maxCents: Cents.make(19_000_000),
-      rate: taxRate("0.37"),
+      rate: TaxRate.make(BigDecimal.make(37n, 2)),
       thresholdCents: Cents.make(13_500_000),
     }),
     new IncomeTaxBracket({
       baseTaxCents: Cents.make(5_163_800),
       maxCents: "infinity",
-      rate: taxRate("0.45"),
+      rate: TaxRate.make(BigDecimal.make(45n, 2)),
       thresholdCents: Cents.make(19_000_000),
     }),
   ],

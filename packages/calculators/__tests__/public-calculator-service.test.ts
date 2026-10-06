@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents, audFromCents } from "@taxkit/core/primitives";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax";
 import {
   AuPayCalculatorId as PayCalculatorId,
@@ -13,11 +13,15 @@ import {
   Effect,
   Exit,
   Layer,
+  Result,
   Schema,
 } from "effect";
 
 import { PublicCalculatorServiceLive } from "../src/live.layer.js";
-import { CalculatorInputDecodeError } from "../src/schemas.js";
+import {
+  CalculatorInputDecodeError,
+  CalculatorServiceError,
+} from "../src/schemas.js";
 import { PublicCalculatorService } from "../src/service.js";
 
 const ServiceLive = PublicCalculatorServiceLive.pipe(
@@ -25,16 +29,12 @@ const ServiceLive = PublicCalculatorServiceLive.pipe(
 );
 
 const grossPayFacts = (
-  cents: number,
-  period: "fortnightly" | "monthly" | "weekly",
+  amount: Money,
+  period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
 ) => ({
-  grossPay: new GrossPay({ amount: aud(cents), period }),
+  grossPay: new GrossPay({ amount, period }),
   taxFreeThresholdClaimed,
-});
-
-const taxableIncomeFacts = (cents: number) => ({
-  taxableIncome: aud(cents),
 });
 
 const secretSentinel = "taxkit-secret-sentinel";
@@ -42,7 +42,7 @@ const privatePathSentinel = "/private/taxkit-sentinel/input.json";
 
 const calculateTakeHome = (
   cents: number,
-  period: "fortnightly" | "monthly" | "weekly",
+  period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
 ) =>
   Effect.gen(function* () {
@@ -50,7 +50,11 @@ const calculateTakeHome = (
     return yield* service.calculate({
       calculatorId: PayCalculatorId.make("au.pay.take-home"),
       payload: {
-        facts: grossPayFacts(cents, period, taxFreeThresholdClaimed),
+        facts: grossPayFacts(
+          yield* audFromCents(cents),
+          period,
+          taxFreeThresholdClaimed
+        ),
         jurisdiction: "AU",
         taxYear: "2025-26",
       },
@@ -59,7 +63,7 @@ const calculateTakeHome = (
 
 const calculateWithholdings = (
   cents: number,
-  period: "fortnightly" | "monthly" | "weekly",
+  period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
 ) =>
   Effect.gen(function* () {
@@ -67,7 +71,11 @@ const calculateWithholdings = (
     return yield* service.calculate({
       calculatorId: PayCalculatorId.make("au.pay.withholdings"),
       payload: {
-        facts: grossPayFacts(cents, period, taxFreeThresholdClaimed),
+        facts: grossPayFacts(
+          yield* audFromCents(cents),
+          period,
+          taxFreeThresholdClaimed
+        ),
         jurisdiction: "AU",
         taxYear: "2025-26",
       },
@@ -80,7 +88,7 @@ const calculateAnnualTax = (cents: number) =>
     return yield* service.calculate({
       calculatorId: AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
       payload: {
-        facts: taxableIncomeFacts(cents),
+        facts: { taxableIncome: yield* audFromCents(cents) },
         jurisdiction: "AU",
         taxYear: "2025-26",
       },
@@ -88,6 +96,40 @@ const calculateAnnualTax = (cents: number) =>
   }).pipe(Effect.provide(ServiceLive));
 
 describe("PublicCalculatorService", () => {
+  it.effect.each(["au.pay.take-home", "au.pay.withholdings"] as const)(
+    "returns a safe calculation failure for a derived amount too large in %s",
+    (calculatorId) =>
+      Effect.gen(function* () {
+        const service = yield* PublicCalculatorService;
+        const result = yield* service
+          .calculate({
+            calculatorId: PayCalculatorId.make(calculatorId),
+            payload: {
+              facts: grossPayFacts(
+                new Money({
+                  cents: Cents.make(Number.MAX_SAFE_INTEGER),
+                  currency: "AUD",
+                }),
+                "weekly",
+                true
+              ),
+              jurisdiction: "AU",
+              taxYear: "2025-26",
+            },
+          })
+          .pipe(Effect.result);
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.failure._tag).toBe("CalculationError");
+          const encoded = yield* Schema.encodeEffect(
+            Schema.fromJsonString(CalculatorServiceError)
+          )(result.failure);
+          expect(encoded).toBe(
+            '{"_tag":"CalculationError","message":"PAYG withholding could not produce a supported amount."}'
+          );
+        }
+      }).pipe(Effect.provide(ServiceLive))
+  );
   it.effect("runs varied take-home pay journeys", () =>
     Effect.gen(function* () {
       const nurse = yield* calculateTakeHome(165_400, "weekly", true);
@@ -191,7 +233,10 @@ describe("PublicCalculatorService", () => {
           help: "errors",
           payload: {
             facts: {
-              taxableIncome: aud(9_000_000),
+              taxableIncome: new Money({
+                cents: Cents.make(9_000_000),
+                currency: "AUD",
+              }),
             },
             jurisdiction: "AU",
             taxYear: "2025-26",

@@ -51,7 +51,7 @@ const sourceKey = (source: {
   readonly reference: string;
 }) => `${source.kind}:${source.reference}`;
 const parameterInstanceKey = (parameter: AnyParameterDescriptor): string =>
-  `${parameter.id}:${sourceKey(parameter.source)}:${parameter.effectivePeriod.from}:${parameter.effectivePeriod.toExclusive ?? "open"}`;
+  `${parameter.id}:${sourceKey(parameter.source)}:${parameter.effectivePeriod.from}:${Option.flatten(parameter.effectivePeriod.toExclusive).pipe(Option.getOrElse(() => "open"))}`;
 const parametersOverlap = (
   left: AnyParameterDescriptor,
   right: AnyParameterDescriptor

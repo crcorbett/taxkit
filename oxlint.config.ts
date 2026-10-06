@@ -14,6 +14,10 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact encoded date representation ingress and historical round-trip test.
+  // No runtime, raw JSON or synchronous codec admission.
+  "packages/core/src/primitives/date.ts",
+  "packages/core/test/date.test.ts",
   // Native app root stage ingress, checked before constructing secret Layers.
   "packages/infrastructure/src/apps-secrets.boundary.ts",
   "apps/web/test/native-rpc-failures.boundary.test.ts",
@@ -191,6 +195,13 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Rule snapshot egress uses the canonical date codec and preserves saved snapshots.
+  "packages/rules/au/income-tax/test/rule-graph.test.ts",
+  "packages/rules/au/pay/test/rule-graph.test.ts",
+  "packages/rules/au/stsl/test/rule-graph.test.ts",
+  // Exact historical primitive bytes and safe failure representation tests.
+  "packages/core/test/date.test.ts",
+  "packages/core/test/money.test.ts",
   "apps/web/test/native-rpc-failures.boundary.test.ts",
   "apps/web/test/native-cancellation.boundary.test.ts",
   "apps/web/test/native-settings-failure.boundary.test.ts",

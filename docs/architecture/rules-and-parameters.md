@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-rules-and-parameters-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: rule Layer, descriptor, parameter or rule-pack composition change
 ---
 
@@ -58,6 +58,15 @@ Parameter descriptors include source references and the table's effective
 tax-year period. Graph validation reports overlapping periods for different
 descriptors with the same parameter ID, preventing two competing tables from
 silently supplying the same service and year.
+
+The core date codec retains missing, explicitly undefined and present end keys
+while domain readers use Option. Both representations check start-before-end;
+an absent end remains unbounded. The [core owner](../../packages/core/README.md)
+explains the two Option levels and the fallible date helpers. Authored tables
+assemble trusted constants through their owning Schemas. Rule calculations
+check newly derived constrained amounts through fallible constructors and map
+expected failures to safe `CalculationError` values. This does not change the
+retained table values or expand supported tax years.
 
 ## Rule packs
 

@@ -3,7 +3,7 @@ import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculatorOperationTimedOut } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents, audFromCents } from "@taxkit/core/primitives";
 import {
   AuPayCalculatorId,
   GrossPay,
@@ -58,11 +58,11 @@ const secretSentinel = "taxkit-secret-sentinel";
 const privatePathSentinel = "/private/taxkit-sentinel/http-input.json";
 
 const grossPayFacts = (
-  cents: number,
-  period: "fortnightly" | "monthly" | "weekly",
+  amount: Money,
+  period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
 ) => ({
-  grossPay: new GrossPay({ amount: aud(cents), period }),
+  grossPay: new GrossPay({ amount, period }),
   taxFreeThresholdClaimed,
 });
 
@@ -170,7 +170,11 @@ describe("TaxKit public calculation HTTP API", () => {
   it.effect("pins calculate success through SDK full-run parity", () =>
     Effect.gen(function* () {
       const client = yield* TaxKitHttpApiService;
-      const facts = grossPayFacts(346_200, "fortnightly", true);
+      const facts = grossPayFacts(
+        yield* audFromCents(346_200),
+        "fortnightly",
+        true
+      );
       const response = yield* client.calculatorApi.calculate({
         params: {
           calculatorId: takeHomeCalculatorId,
@@ -216,7 +220,12 @@ describe("TaxKit public calculation HTTP API", () => {
           calculatorId: annualTaxCalculatorId,
         },
         payload: {
-          facts: { taxableIncome: aud(9_000_000) },
+          facts: {
+            taxableIncome: new Money({
+              cents: Cents.make(9_000_000),
+              currency: "AUD",
+            }),
+          },
           jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
           taxYear: AuPayTakeHomeCalculation.taxYear,
         },
@@ -240,7 +249,10 @@ describe("TaxKit public calculation HTTP API", () => {
         const service = yield* PublicCalculatorService;
         const invalidFacts = {
           rejectedSource: `${secretSentinel}:${privatePathSentinel}`,
-          taxableIncome: aud(9_000_000),
+          taxableIncome: new Money({
+            cents: Cents.make(9_000_000),
+            currency: "AUD",
+          }),
         };
         const exit = yield* client.calculatorApi
           .calculate({

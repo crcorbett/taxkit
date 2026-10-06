@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-31
-source_of_truth: docs
-confidence: medium
+document_type: documentation-standard
+lifecycle: current
+authority: canonical
+owner: taxkit-documentation-owner
+last_reviewed: 2026-10-06
+review_trigger: public copy rules or example contracts change
 ---
 
 # Documentation writing
@@ -111,7 +113,7 @@ Prefer:
 
 ```ts
 const report = await au.incomeTax.annual({
-  taxableIncome: aud(90_000_00),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 
@@ -138,7 +140,7 @@ Code snippets should be useful, short and current.
 Include imports when the snippet is meant to be copied:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 ```
 

@@ -1,12 +1,11 @@
 import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
+  DateInterval,
+  IsoDate,
   Cents,
   CentsOrInfinity,
   DecimalCoefficient,
   TaxYear,
-  australianTaxYearInterval,
-  decimalCoefficient,
-  isoDate,
   taxYear,
 } from "@taxkit/core/primitives";
 import {
@@ -15,7 +14,7 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Context, Layer, Schema } from "effect";
+import { Option, BigDecimal, Context, Layer, Schema } from "effect";
 
 /**
  * ATO Schedule 1 scale used for residents with or without the tax-free
@@ -105,7 +104,7 @@ export const Schedule1Artifact2025_26 = new SourceArtifact({
     rowContract: "Schedule1Row[]",
     rowCount: 15,
   }),
-  retrievedOn: isoDate("2026-05-12"),
+  retrievedOn: IsoDate.make("2026-05-12"),
   source: Schedule1Source2025_26,
 });
 
@@ -115,7 +114,10 @@ export const Schedule1Artifact2025_26 = new SourceArtifact({
  * @since 0.1.0
  */
 export const AtoSchedule1TableDescriptor = makeParameterDescriptor({
-  effectivePeriod: australianTaxYearInterval("2025-26"),
+  effectivePeriod: DateInterval.make({
+    from: IsoDate.make("2025-07-01"),
+    toExclusive: Option.some(Option.some(IsoDate.make("2026-07-01"))),
+  }),
   id: "taxkit/rules-au-pay/parameter/AtoSchedule1Table",
   schema: Schedule1Table,
   source: Schedule1Source2025_26,
@@ -127,113 +129,113 @@ export const AtoSchedule1TableDescriptor = makeParameterDescriptor({
 const table2025_26 = new Schedule1Table({
   rows: [
     new Schedule1Row({
-      a: decimalCoefficient("0.16"),
-      bDollars: decimalCoefficient("0.16"),
+      a: DecimalCoefficient.make(BigDecimal.make(16n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(16n, 2)),
       scale: "scale1",
       weeklyMaxCents: Cents.make(14_999),
       weeklyMinCents: Cents.make(0),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.2117"),
-      bDollars: decimalCoefficient("7.755"),
+      a: DecimalCoefficient.make(BigDecimal.make(2117n, 4)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(7755n, 3)),
       scale: "scale1",
       weeklyMaxCents: Cents.make(37_099),
       weeklyMinCents: Cents.make(15_000),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.189"),
-      bDollars: decimalCoefficient("-0.6702"),
+      a: DecimalCoefficient.make(BigDecimal.make(189n, 3)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(-6702n, 4)),
       scale: "scale1",
       weeklyMaxCents: Cents.make(51_499),
       weeklyMinCents: Cents.make(37_100),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.3227"),
-      bDollars: decimalCoefficient("68.2367"),
+      a: DecimalCoefficient.make(BigDecimal.make(3227n, 4)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(682_367n, 4)),
       scale: "scale1",
       weeklyMaxCents: Cents.make(93_199),
       weeklyMinCents: Cents.make(51_500),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.32"),
-      bDollars: decimalCoefficient("65.7202"),
+      a: DecimalCoefficient.make(BigDecimal.make(32n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(657_202n, 4)),
       scale: "scale1",
       weeklyMaxCents: Cents.make(224_599),
       weeklyMinCents: Cents.make(93_200),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.39"),
-      bDollars: decimalCoefficient("222.951"),
+      a: DecimalCoefficient.make(BigDecimal.make(39n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(222_951n, 3)),
       scale: "scale1",
       weeklyMaxCents: Cents.make(330_299),
       weeklyMinCents: Cents.make(224_600),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.47"),
-      bDollars: decimalCoefficient("487.2587"),
+      a: DecimalCoefficient.make(BigDecimal.make(47n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(4_872_587n, 4)),
       scale: "scale1",
       weeklyMaxCents: "infinity",
       weeklyMinCents: Cents.make(330_300),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0"),
-      bDollars: decimalCoefficient("0"),
+      a: DecimalCoefficient.make(BigDecimal.make(0n, 0)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(0n, 0)),
       scale: "scale2",
       weeklyMaxCents: Cents.make(36_099),
       weeklyMinCents: Cents.make(0),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.16"),
-      bDollars: decimalCoefficient("57.8462"),
+      a: DecimalCoefficient.make(BigDecimal.make(16n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(578_462n, 4)),
       scale: "scale2",
       weeklyMaxCents: Cents.make(49_999),
       weeklyMinCents: Cents.make(36_100),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.26"),
-      bDollars: decimalCoefficient("107.8462"),
+      a: DecimalCoefficient.make(BigDecimal.make(26n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(1_078_462n, 4)),
       scale: "scale2",
       weeklyMaxCents: Cents.make(62_499),
       weeklyMinCents: Cents.make(50_000),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.18"),
-      bDollars: decimalCoefficient("57.8462"),
+      a: DecimalCoefficient.make(BigDecimal.make(18n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(578_462n, 4)),
       scale: "scale2",
       weeklyMaxCents: Cents.make(72_099),
       weeklyMinCents: Cents.make(62_500),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.189"),
-      bDollars: decimalCoefficient("64.3365"),
+      a: DecimalCoefficient.make(BigDecimal.make(189n, 3)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(643_365n, 4)),
       scale: "scale2",
       weeklyMaxCents: Cents.make(86_499),
       weeklyMinCents: Cents.make(72_100),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.3227"),
-      bDollars: decimalCoefficient("180.0385"),
+      a: DecimalCoefficient.make(BigDecimal.make(3227n, 4)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(1_800_385n, 4)),
       scale: "scale2",
       weeklyMaxCents: Cents.make(128_199),
       weeklyMinCents: Cents.make(86_500),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.32"),
-      bDollars: decimalCoefficient("176.5769"),
+      a: DecimalCoefficient.make(BigDecimal.make(32n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(1_765_769n, 4)),
       scale: "scale2",
       weeklyMaxCents: Cents.make(259_599),
       weeklyMinCents: Cents.make(128_200),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.39"),
-      bDollars: decimalCoefficient("358.3077"),
+      a: DecimalCoefficient.make(BigDecimal.make(39n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(3_583_077n, 4)),
       scale: "scale2",
       weeklyMaxCents: Cents.make(365_299),
       weeklyMinCents: Cents.make(259_600),
     }),
     new Schedule1Row({
-      a: decimalCoefficient("0.47"),
-      bDollars: decimalCoefficient("650.6154"),
+      a: DecimalCoefficient.make(BigDecimal.make(47n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(6_506_154n, 4)),
       scale: "scale2",
       weeklyMaxCents: "infinity",
       weeklyMinCents: Cents.make(365_300),

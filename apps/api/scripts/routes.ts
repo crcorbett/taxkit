@@ -4,7 +4,7 @@ import {
   CalculatorRunResponse,
   HealthResponse,
 } from "@taxkit/api-http";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import {
   AuPayJurisdiction,
   AuPayTaxYear,
@@ -88,7 +88,10 @@ export const checkApiCatalog = (origin: string) =>
 export const checkApiCalculation = (origin: string) =>
   HttpBody.jsonSchema(CalculatorRunRequest)({
     facts: {
-      grossPay: new GrossPay({ amount: aud(346_200), period: "fortnightly" }),
+      grossPay: new GrossPay({
+        amount: new Money({ cents: Cents.make(346_200), currency: "AUD" }),
+        period: "fortnightly",
+      }),
       taxFreeThresholdClaimed: true,
     },
     jurisdiction: AuPayJurisdiction.make("AU"),

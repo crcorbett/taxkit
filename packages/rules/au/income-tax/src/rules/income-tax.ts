@@ -1,6 +1,10 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { aud, multiplyCentsByDecimal } from "@taxkit/core/primitives";
+import {
+  Cents,
+  audFromCents,
+  multiplyCentsByDecimal,
+} from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
@@ -40,7 +44,7 @@ const findBracket = (
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `taxkit/rules-au-income-tax: no income tax bracket covers income=${incomeCents} cents`,
+          message: "No income tax bracket covers the amount.",
         })
       ),
     onSome: Effect.succeed,
@@ -63,13 +67,14 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
 
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
-    const taxCents =
-      bracket.baseTaxCents +
-      multiplyCentsByDecimal(
-        incomeCents - bracket.thresholdCents,
-        bracket.rate
-      );
-    const taxAmount = aud(taxCents);
+    const taxableExcess = yield* Cents.makeEffect(
+      incomeCents - bracket.thresholdCents
+    );
+    const marginalTax = yield* multiplyCentsByDecimal(
+      taxableExcess,
+      bracket.rate
+    );
+    const taxAmount = yield* audFromCents(bracket.baseTaxCents + marginalTax);
 
     const trace = TraceNode.make({
       children: [],
@@ -97,5 +102,12 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
       trace,
     });
     return component;
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Income tax could not produce a supported amount.",
+        })
+    )
+  )
 );

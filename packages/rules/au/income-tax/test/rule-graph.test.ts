@@ -1,29 +1,43 @@
 import { describe, expect, it } from "@effect/vitest";
 import { validateRuleGraph } from "@taxkit/core/graph";
+import { ParameterEffectivePeriod } from "@taxkit/core/parameters";
 import type { AnyRuleDescriptor } from "@taxkit/core/rules";
 import { AnnualTaxableIncomeDescriptor } from "@taxkit/rules-au-income-tax/facts";
 import { AuAnnualTaxRuleDescriptors } from "@taxkit/rules-au-income-tax/rule-pack";
-import { Array as EffectArray } from "effect";
+import { Array as EffectArray, Effect, Schema } from "effect";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
-  EffectArray.map(rules, (rule) => ({
-    id: rule.id,
-    parameters: EffectArray.map(rule.parameters ?? [], (parameter) => ({
-      effectivePeriod: parameter.effectivePeriod,
-      id: parameter.id,
-      source: parameter.source.kind,
-      sourceArtifact: parameter.sourceArtifact
-        ? {
-            checksum: parameter.sourceArtifact.checksum,
-            retrievedOn: parameter.sourceArtifact.retrievedOn,
-            rowCount: parameter.sourceArtifact.extract.rowCount,
-          }
-        : undefined,
-    })),
-    provides: EffectArray.map(rule.provides, (fact) => fact.id),
-    requires: EffectArray.map(rule.requires, (fact) => fact.id),
-    sources: EffectArray.map(rule.sources, (source) => source.kind),
-  }));
+  Effect.forEach(rules, (rule) =>
+    Effect.gen(function* () {
+      const parameters = yield* Effect.forEach(
+        rule.parameters ?? [],
+        (parameter) =>
+          Schema.encodeEffect(ParameterEffectivePeriod)(
+            parameter.effectivePeriod
+          ).pipe(
+            Effect.map((effectivePeriod) => ({
+              effectivePeriod,
+              id: parameter.id,
+              source: parameter.source.kind,
+              sourceArtifact: parameter.sourceArtifact
+                ? {
+                    checksum: parameter.sourceArtifact.checksum,
+                    retrievedOn: parameter.sourceArtifact.retrievedOn,
+                    rowCount: parameter.sourceArtifact.extract.rowCount,
+                  }
+                : undefined,
+            }))
+          )
+      );
+      return {
+        id: rule.id,
+        parameters,
+        provides: EffectArray.map(rule.provides, (fact) => fact.id),
+        requires: EffectArray.map(rule.requires, (fact) => fact.id),
+        sources: EffectArray.map(rule.sources, (source) => source.kind),
+      };
+    })
+  );
 
 describe("AU annual tax rule graph", () => {
   it("validates the annual tax rule graph", () => {
@@ -39,8 +53,12 @@ describe("AU annual tax rule graph", () => {
     expect(AnnualTaxableIncomeDescriptor.question?.inputKind).toBe("money");
   });
 
-  it("captures descriptor snapshots for the published annual tax rule pack", () => {
-    expect(rulePackSnapshot(AuAnnualTaxRuleDescriptors)).toMatchInlineSnapshot(`
+  it.effect(
+    "captures descriptor snapshots for the published annual tax rule pack",
+    () =>
+      Effect.gen(function* () {
+        expect(yield* rulePackSnapshot(AuAnnualTaxRuleDescriptors))
+          .toMatchInlineSnapshot(`
       [
         {
           "id": "taxkit/rules-au-income-tax/rule/IncomeTax",
@@ -138,5 +156,6 @@ describe("AU annual tax rule graph", () => {
         },
       ]
     `);
-  });
+      })
+  );
 });

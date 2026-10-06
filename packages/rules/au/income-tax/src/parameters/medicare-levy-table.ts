@@ -1,11 +1,10 @@
 import { makeParameterDescriptor } from "@taxkit/core/parameters";
 import {
+  DateInterval,
+  IsoDate,
   Cents,
   TaxRate,
   TaxYear,
-  australianTaxYearInterval,
-  isoDate,
-  taxRate,
   taxYear,
 } from "@taxkit/core/primitives";
 import {
@@ -14,7 +13,7 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Context, Layer, Schema } from "effect";
+import { Option, BigDecimal, Context, Layer, Schema } from "effect";
 
 /**
  * Medicare Levy low-income threshold and rate table.
@@ -72,7 +71,7 @@ export const MedicareLevyArtifact2025_26 = new SourceArtifact({
     rowContract: "MedicareLevyTable",
     rowCount: 1,
   }),
-  retrievedOn: isoDate("2026-05-12"),
+  retrievedOn: IsoDate.make("2026-05-12"),
   source: MedicareLevySource2025_26,
 });
 
@@ -82,7 +81,10 @@ export const MedicareLevyArtifact2025_26 = new SourceArtifact({
  * @since 0.1.0
  */
 export const AtoMedicareLevyTableDescriptor = makeParameterDescriptor({
-  effectivePeriod: australianTaxYearInterval("2025-26"),
+  effectivePeriod: DateInterval.make({
+    from: IsoDate.make("2025-07-01"),
+    toExclusive: Option.some(Option.some(IsoDate.make("2026-07-01"))),
+  }),
   id: "taxkit/rules-au-income-tax/parameter/AtoMedicareLevyTable",
   schema: MedicareLevyTable,
   source: MedicareLevySource2025_26,
@@ -93,9 +95,9 @@ export const AtoMedicareLevyTableDescriptor = makeParameterDescriptor({
 
 // Single non-SAPTO 2025-26: nil at/below $27,222, shade-in to $34,027, then 2% flat.
 const table2025_26 = new MedicareLevyTable({
-  levyRate: taxRate("0.02"),
+  levyRate: TaxRate.make(BigDecimal.make(2n, 2)),
   shadeInMaxCents: Cents.make(3_402_700),
-  shadeInRate: taxRate("0.1"),
+  shadeInRate: TaxRate.make(BigDecimal.make(1n, 1)),
   source: MedicareLevySource2025_26,
   thresholdCents: Cents.make(2_722_200),
   year: taxYear("2025-26"),

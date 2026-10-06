@@ -468,3 +468,8 @@ The [canonical trace/ledger field-owner candidate](clean-slate-foundation/2026-1
 records schema-derived aliases, the bounded recursive annotation, historical
 codec compatibility and packed consumer proof. It does not complete the wider
 domain audit or request-rate policy.
+
+The [fallible money/calendar candidate](clean-slate-foundation/2026-10-06-fallible-domain-values.json)
+records checked constructors and derived amounts, date Option compatibility,
+unchanged authored tables and local consumer proof. Wider domain review and
+request-rate policy remain active work.

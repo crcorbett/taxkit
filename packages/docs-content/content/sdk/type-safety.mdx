@@ -15,12 +15,12 @@ decoding still validates untrusted values before calculation.
 The selected descriptor controls the accepted facts and the returned report:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 report.liability.cents;
@@ -29,12 +29,12 @@ report.liability.cents;
 If you pass facts for another calculator, the call should fail type checking:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  grossPay: aud(165_400),
+  grossPay: aud(Cents.make(165_400)),
   taxFreeThresholdClaimed: true,
 });
 ```
@@ -44,13 +44,15 @@ await TaxKit.calculate(au.calculations.annualIncomeTax, {
 Money values use canonical branded constructors from `@taxkit/core`:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 
-const taxableIncome = aud(9_000_000);
+const taxableIncome = aud(Cents.make(9_000_000));
 ```
 
-Use these constructors instead of raw numbers when a calculator fact expects a
-branded value.
+Use `Cents.make` for known constants and `aud` for cents you have already
+checked. Use the fallible `audFromCents` helper when a number still needs
+checking. See [Money and branded values](../concepts/money-and-branded-values.mdx)
+for checked arithmetic and error handling.
 
 ## Runtime schema decoding
 
