@@ -133,7 +133,10 @@ calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
   server runner and React Atom registry. The private server binding and checked
   public browser address reach the separate API through native RPC. The root
   restores encoded outcomes. Tax rules and calculations remain package/API-owned;
-  full T003 acceptance and the other calculator pages remain in progress.
+  the three calculator pages and bounded T003 connection are locally qualified.
+  The same app owns checked documentation page loaders, app-specific MDX
+  composition, navigation/focus and responsive reading. Search, discovery and
+  retirement of `apps/docs` remain T005 work.
 
 `apps/docs`
 : Implemented public documentation app. It owns TanStack Start routes, the

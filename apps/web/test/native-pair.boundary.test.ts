@@ -107,18 +107,25 @@ describe("built native API and Website", () => {
           (module) => module.contents
         ).join("\n");
         expect(apiCode).toContain("taxkit/core/CalculationEngine");
+        expect(apiCode).toContain(
+          "@taxkit/calculators/PublicCalculatorService"
+        );
         yield* Effect.forEach(
           [
             "node:fs",
             "cloudflare:workers",
             "taxkit/core/CalculationEngine",
-            "PublicCalculatorService.calculate",
+            // Public prose names this operation. Check the actual backend
+            // service identity, with a positive API oracle above, instead.
+            "@taxkit/calculators/PublicCalculatorService",
             "CLOUDFLARE_API_TOKEN",
             "DOPPLER_TOKEN",
             "AlchemyContext",
           ],
           (marker) =>
-            Effect.sync(() => expect(clientCode).not.toContain(marker))
+            Effect.sync(() =>
+              expect(clientCode.includes(marker), marker).toBe(false)
+            )
         );
         const logs = yield* Queue.make<WorkerdStructuredLog>();
         const exceptions = yield* Queue.make<string>();
@@ -205,6 +212,49 @@ describe("built native API and Website", () => {
             name,
           },
         });
+        const docsFixtureWorkers = yield* Effect.forEach(
+          ["Body", "Metadata", "MissingModule"] as const,
+          (mode) =>
+            Effect.gen(function* () {
+              const modulesRoot = path.join(
+                root,
+                `.alchemy/native-pair/bundles/TaxKitApiDocs${mode}`
+              );
+              const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+              expect(files).toContain("worker.js");
+              const modules = Record.fromEntries(
+                yield* Effect.forEach(files, (file) =>
+                  fs
+                    .readFileString(path.join(modulesRoot, file))
+                    .pipe(
+                      Effect.map(
+                        (contents) =>
+                          [file, { contents, type: "esm" as const }] as const
+                      )
+                    )
+                )
+              );
+              expect(
+                Array.some(
+                  Record.values(modules),
+                  (module) =>
+                    module.contents.includes("PRIVATE9") ||
+                    module.contents.includes("/private9")
+                )
+              ).toBe(true);
+              const name = `taxkit-api-docs-${mode}`;
+              const ordinary = apiWorker(name);
+              return [
+                {
+                  config: {
+                    ...ordinary.config,
+                    manifest: { mainModule: "worker.js", modules, modulesRoot },
+                  },
+                },
+                websiteWorker(`taxkit-website-docs-${mode}`, name),
+              ];
+            })
+        );
         const website = yield* Effect.acquireRelease(
           Effect.sync(
             () =>
@@ -226,6 +276,7 @@ describe("built native API and Website", () => {
                   ),
                   unavailableApiWorker,
                   apiWorker("taxkit-private-api"),
+                  ...Array.flatten(docsFixtureWorkers),
                 ],
               })
           ),
@@ -1387,6 +1438,410 @@ describe("built native API and Website", () => {
               .getAttribute("href")
           )
         ).toBe(`${apiOrigin}/api/docs/openapi.json`);
+        const docsFunctionId = Array.findFirst(
+          Record.values(websiteModules),
+          (module) =>
+            module.contents.includes(
+              'functionName: "websiteDocsPage_createServerFn_handler"'
+            )
+        ).pipe(
+          Option.flatMap((module) =>
+            Option.fromNullishOr(
+              module.contents.match(
+                /"(?<functionId>[a-f0-9]{64})":\s*\{\s*functionName:\s*"websiteDocsPage_createServerFn_handler"/u
+              )?.groups
+            ).pipe(Option.flatMap(Record.get("functionId")))
+          ),
+          Option.getOrElse(() =>
+            expect.fail("Missing native generated docs function identity")
+          )
+        );
+        const nativeDocsAddress = `${websiteOrigin}/_serverFn/${docsFunctionId}`;
+        const nativeDocsHeaders = {
+          origin: websiteOrigin,
+          "sec-fetch-site": "same-origin",
+          "x-taxkit-docs-page": "/start/quickstart",
+          "x-tsr-serverFn": "true",
+        };
+        const nativeDocs = yield* Effect.promise(() =>
+          website.dispatchFetch(nativeDocsAddress, {
+            headers: nativeDocsHeaders,
+          })
+        );
+        expect(nativeDocs.status).toBe(200);
+        const nativeDocsBody = yield* Effect.promise(() => nativeDocs.text());
+        expect(nativeDocsBody).toContain("Quickstart");
+        expect(nativeDocsBody).toContain('"navigation"');
+        yield* Effect.forEach(
+          [
+            { headers: nativeDocsHeaders, suffix: "?payload=PRIVATE9" },
+            {
+              headers: {
+                ...nativeDocsHeaders,
+                "content-type": "application/json",
+              },
+              suffix: "",
+            },
+            {
+              headers: {
+                ...nativeDocsHeaders,
+                "x-taxkit-docs-page": `/${"a".repeat(256)}`,
+              },
+              suffix: "",
+            },
+            {
+              headers: {
+                ...nativeDocsHeaders,
+                "x-taxkit-docs-page": "../PRIVATE9",
+              },
+              suffix: "",
+            },
+          ],
+          (invalidDocsRequest) =>
+            Effect.gen(function* () {
+              const response = yield* Effect.promise(() =>
+                website.dispatchFetch(
+                  `${nativeDocsAddress}${invalidDocsRequest.suffix}`,
+                  {
+                    headers: invalidDocsRequest.headers,
+                  }
+                )
+              );
+              expect(response.status).toBe(400);
+              expect(yield* Effect.promise(() => response.text())).toBe("");
+            })
+        );
+        const docsPage = yield* Effect.promise(() => context.newPage());
+        docsPage.on("pageerror", (error) =>
+          Queue.offerUnsafe(exceptions, error.message)
+        );
+        const docsCalls = yield* Queue.make<string>();
+        const docsDocuments = yield* Queue.make<string>();
+        docsPage.on("request", (request) => {
+          if (new URL(request.url()).pathname.startsWith("/_serverFn/")) {
+            Queue.offerUnsafe(docsCalls, request.url());
+          }
+          if (
+            request.isNavigationRequest() &&
+            request.frame() === docsPage.mainFrame()
+          ) {
+            Queue.offerUnsafe(docsDocuments, request.url());
+          }
+        });
+        yield* Effect.promise(() =>
+          docsPage.goto(`${websiteOrigin}/start/quickstart`)
+        );
+        yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
+        expect(
+          yield* Effect.promise(() => docsPage.locator("main").count())
+        ).toBe(1);
+        expect(
+          yield* Effect.promise(() =>
+            docsPage.locator(".docs-article h1").count()
+          )
+        ).toBe(1);
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .locator(".docs-article h1")
+              .evaluate((heading) => heading === document.activeElement)
+          )
+        ).toBe(false);
+        // Read every actual SSR article with the browser's HTML parser. The
+        // checked transport alone cannot satisfy these rendered-body oracles.
+        yield* Effect.forEach(publicContent.pages, (expected) =>
+          Effect.gen(function* () {
+            const response = yield* Effect.promise(() =>
+              website.dispatchFetch(`${websiteOrigin}${expected.path}`, {
+                headers: { "x-taxkit-docs-page": "/private9" },
+              })
+            );
+            expect(response.status).toBe(200);
+            const html = yield* Effect.promise(() => response.text());
+            const rendered = yield* Effect.promise(() =>
+              docsPage.evaluate((value) => {
+                const document = new DOMParser().parseFromString(
+                  value,
+                  "text/html"
+                );
+                const article = document.querySelector(".docs-article");
+                return {
+                  canonical: document
+                    .querySelector('link[rel="canonical"]')
+                    ?.getAttribute("href"),
+                  description: document
+                    .querySelector('meta[name="description"]')
+                    ?.getAttribute("content"),
+                  heading: article?.querySelector("h1")?.textContent,
+                  markdown: article
+                    ?.querySelector('a[href*="/api/v1/docs/markdown?"]')
+                    ?.getAttribute("href"),
+                  navigation:
+                    document.querySelectorAll(".docs-navigation a").length,
+                  text: article?.textContent,
+                  title: document.title,
+                };
+              }, html)
+            );
+            expect(rendered.heading).toBe(expected.frontmatter.title);
+            expect(rendered.title).toBe(
+              `${expected.frontmatter.title} | TaxKit`
+            );
+            expect(rendered.description).toBe(expected.frontmatter.description);
+            expect(rendered.canonical).toBe(`${websiteOrigin}${expected.path}`);
+            expect(rendered.navigation).toBe(61);
+            expect(rendered.markdown).toBe(
+              `${apiOrigin}/api/v1/docs/markdown?path=${encodeURIComponent(expected.path)}`
+            );
+            expect(rendered.text?.length).toBeGreaterThan(100);
+            expect(rendered.text).not.toContain("Documentation could not load");
+          })
+        );
+        const missing = yield* Effect.promise(() =>
+          website.dispatchFetch(`${websiteOrigin}/private9`)
+        );
+        expect(missing.status).toBe(404);
+        const missingHtml = yield* Effect.promise(() => missing.text());
+        expect(missingHtml).toContain("Documentation page not found");
+        expect(missingHtml).not.toContain(
+          "The documentation page was not found."
+        );
+        yield* Effect.forEach(
+          ["Body", "Metadata", "MissingModule"] as const,
+          (mode) =>
+            Effect.gen(function* () {
+              const worker = yield* Effect.promise(() =>
+                website.getWorker(`taxkit-website-docs-${mode}`)
+              );
+              const response = yield* Effect.promise(() =>
+                worker.fetch(`${websiteOrigin}/start/quickstart`)
+              );
+              const html = yield* Effect.promise(() => response.text());
+              expect(html).not.toContain("PRIVATE9");
+              expect(html).not.toContain("content/private9.mdx");
+              const native = yield* Effect.promise(() =>
+                worker.fetch(nativeDocsAddress, { headers: nativeDocsHeaders })
+              );
+              const body = yield* Effect.promise(() => native.text());
+              expect(body).toContain("DocsPresentationUnavailable");
+              expect(html).toContain("Documentation could not load");
+              expect(body).not.toContain("PRIVATE9");
+              expect(body).not.toContain("private9.mdx");
+            })
+        );
+        yield* Queue.clear(docsCalls);
+        yield* Queue.clear(docsDocuments);
+        yield* Effect.promise(() =>
+          docsPage
+            .locator('.docs-navigation a[href="/sdk/typescript-sdk"]')
+            .click()
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("heading", { exact: true, name: "TypeScript SDK" })
+            .waitFor()
+        );
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .locator(".docs-article h1")
+              .evaluate((heading) => heading === document.activeElement)
+          )
+        ).toBe(true);
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .locator('.docs-navigation [aria-current="page"]')
+              .getAttribute("href")
+          )
+        ).toBe("/sdk/typescript-sdk");
+        expect(yield* Queue.clear(docsCalls)).toContain(nativeDocsAddress);
+        expect(yield* Queue.clear(docsDocuments)).toEqual([]);
+        yield* Effect.promise(() =>
+          docsPage
+            .locator('.docs-article a[href="/sdk/plain-sdk"]')
+            .first()
+            .click()
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("heading", { exact: true, name: "Plain SDK" })
+            .waitFor({ timeout: 5000 })
+        );
+        expect(yield* Queue.clear(docsCalls)).toContain(nativeDocsAddress);
+        expect(yield* Queue.clear(docsDocuments)).toEqual([]);
+        yield* Effect.promise(() =>
+          docsPage
+            .locator('.docs-navigation a[href="/start/quickstart"]')
+            .click({ timeout: 5000 })
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("heading", { exact: true, name: "Quickstart" })
+            .waitFor({ timeout: 5000 })
+        );
+        yield* Effect.promise(() =>
+          docsPage.evaluate(() => window.scrollTo(0, 0))
+        );
+        yield* Effect.promise(() =>
+          docsPage.screenshot({
+            fullPage: true,
+            path: path.join(screenshotRoot, "docs-desktop.png"),
+          })
+        );
+        yield* Effect.promise(() =>
+          docsPage.setViewportSize({ height: 844, width: 390 })
+        );
+        expect(
+          yield* Effect.promise(() =>
+            docsPage.evaluate(
+              () => document.documentElement.scrollWidth <= window.innerWidth
+            )
+          )
+        ).toBe(true);
+        yield* Effect.promise(() =>
+          docsPage.locator(".docs-navigation-panel summary").focus()
+        );
+        yield* Effect.promise(() => docsPage.keyboard.press("Enter"));
+        expect(
+          yield* Effect.promise(() =>
+            docsPage.locator(".docs-navigation-panel").getAttribute("open")
+          )
+        ).toBe(null);
+        yield* Effect.promise(() =>
+          docsPage.evaluate(() => window.scrollTo(0, 0))
+        );
+        yield* Effect.promise(() =>
+          docsPage.screenshot({
+            fullPage: true,
+            path: path.join(screenshotRoot, "docs-mobile.png"),
+          })
+        );
+        yield* Effect.promise(() =>
+          plainPage.goto(`${websiteOrigin}/start/quickstart`)
+        );
+        expect(
+          yield* Effect.promise(() =>
+            plainPage.locator(".docs-article h1").textContent()
+          )
+        ).toBe("Quickstart");
+        yield* Effect.promise(() =>
+          plainPage
+            .locator('.docs-navigation a[href="/sdk/typescript-sdk"]')
+            .click()
+        );
+        expect(
+          yield* Effect.promise(() =>
+            plainPage.locator(".docs-article h1").textContent()
+          )
+        ).toBe("TypeScript SDK");
+        yield* Effect.promise(() =>
+          docsPage.goto(`${websiteOrigin}/contributing/what-are-you-changing`)
+        );
+        yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
+        yield* Effect.promise(() =>
+          docsPage.locator(".docs-navigation-panel summary").click()
+        );
+        expect(
+          yield* Effect.promise(() =>
+            docsPage.evaluate(
+              () => document.documentElement.scrollWidth <= window.innerWidth
+            )
+          )
+        ).toBe(true);
+        expect(
+          yield* Effect.promise(() =>
+            docsPage.locator(".docs-article svg").count()
+          )
+        ).toBeGreaterThan(0);
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .getByRole("region", { name: "Documentation table" })
+              .count()
+          )
+        ).toBeGreaterThan(0);
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("region", { name: "Documentation table" })
+            .first()
+            .focus()
+        );
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .getByRole("region", { name: "Documentation table" })
+              .first()
+              .evaluate((region) => region === document.activeElement)
+          )
+        ).toBe(true);
+        yield* Effect.promise(() => docsPage.keyboard.press("ArrowRight"));
+        yield* Effect.promise(() =>
+          docsPage.evaluate(() => window.scrollTo(0, 0))
+        );
+        yield* Effect.promise(() =>
+          docsPage.screenshot({
+            fullPage: true,
+            path: path.join(screenshotRoot, "docs-diagram-mobile.png"),
+          })
+        );
+        yield* Effect.promise(() =>
+          docsPage.setViewportSize({ height: 900, width: 1440 })
+        );
+        yield* Effect.promise(() =>
+          docsPage.locator(".docs-navigation-panel summary").click()
+        );
+        yield* Effect.promise(() =>
+          docsPage.evaluate(() => window.scrollTo(0, 0))
+        );
+        yield* Effect.promise(() =>
+          docsPage.screenshot({
+            fullPage: true,
+            path: path.join(screenshotRoot, "docs-diagram-desktop.png"),
+          })
+        );
+        yield* Effect.promise(() =>
+          docsPage.goto(`${websiteOrigin}/start/quickstart`)
+        );
+        yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
+        yield* Effect.promise(() =>
+          docsPage.route(
+            nativeDocsAddress,
+            (route) =>
+              route.fulfill({
+                body: nativeDocsBody.replace('"navigation"', '"PRIVATE9"'),
+                headers: Record.fromEntries(nativeDocs.headers),
+                status: 200,
+              }),
+            { times: 1 }
+          )
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .locator('.docs-navigation a[href="/sdk/typescript-sdk"]')
+            .click()
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("heading", {
+              exact: true,
+              name: "Documentation could not load",
+            })
+            .waitFor()
+        );
+        expect(
+          yield* Effect.promise(() => docsPage.locator("body").textContent())
+        ).not.toContain("PRIVATE9");
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("link", { exact: true, name: "Open the Quickstart" })
+            .click()
+        );
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("heading", { exact: true, name: "Quickstart" })
+            .waitFor()
+        );
         expect(yield* Queue.clear(exceptions)).toEqual([]);
         const capturedLogs = yield* Queue.clear(logs);
         const logText = yield* Schema.encodeEffect(Json)(capturedLogs);
@@ -1397,9 +1852,10 @@ describe("built native API and Website", () => {
         expect(messageText).not.toContain("1654");
         expect(messageText).not.toContain("130100");
       }).pipe(
-        Effect.timeout("25 seconds"),
+        Effect.timeout("50 seconds"),
         Effect.scoped,
         Effect.provide(NodeServices.layer)
-      )
+      ),
+    { timeout: 55_000 }
   );
 });

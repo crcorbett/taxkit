@@ -1445,5 +1445,35 @@ operation ingress observes credential/redirect policy.
 The native workerd/Chromium pair separately compares all 61 accepted pages and
 exact Markdown through this client at the built API, retaining every existing
 calculator journey and public HTTP check. API/client tests do not establish
-Website documentation routes, search interaction, discovery assets, old-app
-retirement, deployment or public availability. Those remain T005 work.
+Website rendering on their own. The extended native Website journey below
+qualifies local page rendering; search interaction, discovery assets, old-app
+retirement, deployment and public availability remain unproved by this slice.
+
+### Native Website documentation qualification
+
+The existing native Website journey now reads actual SSR HTML for every accepted
+page and independently checks headings, substantive article content, navigation,
+title, description, canonical and Markdown link. A checked loader value alone
+cannot satisfy that oracle. Requests carry a hostile page header to prove that
+SSR still uses the original address. Generated native page GET ingress accepts
+only a checked public page header; malformed paths, query and content-type
+input reject before framework parsing. Direct missing-page requests must return
+native HTML 404.
+
+Three source-built API artifacts change an otherwise valid page's Markdown,
+frontmatter or compiled-module identity. Each cold Website must return safe
+recoverable HTML and a checked native loader failure. This exposed a cross-request
+stream in the installed Fetcher adapter; preserving the native JSON byte body
+restored the intended failure path. A genuine valid server-function reply is
+also damaged in Chromium to prove the route restoration boundary rejects it.
+The native builder restores its actual source owners in a scope.
+
+Real sidebar and authored links must use native GET requests with zero document
+requests, one current-page marker and deliberate heading focus. Initial
+hydration must not steal focus. Mobile navigation, table keyboard focus,
+contained horizontal content and no-JavaScript reading are observed separately.
+Full-page desktop/mobile images start at the document top and supplement these
+functional checks. Browser bundle exclusion uses a positively observed API
+service identity; a calculator service name appearing in accepted documentation
+prose is not executable engine code. Exact decoder consumers and neighbouring
+renderer restrictions are exercised by the actual lint command.

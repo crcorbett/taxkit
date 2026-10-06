@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as CalculatorsCalculatorIdRouteImport } from './routes/calculators.$calculatorId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgentsRoute = AgentsRouteImport.update({
@@ -31,30 +37,34 @@ const CalculatorsCalculatorIdRoute = CalculatorsCalculatorIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/agents': typeof AgentsRoute
   '/calculators/$calculatorId': typeof CalculatorsCalculatorIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/agents': typeof AgentsRoute
   '/calculators/$calculatorId': typeof CalculatorsCalculatorIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/agents': typeof AgentsRoute
   '/calculators/$calculatorId': typeof CalculatorsCalculatorIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/agents' | '/calculators/$calculatorId'
+  fullPaths: '/' | '/$' | '/agents' | '/calculators/$calculatorId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/agents' | '/calculators/$calculatorId'
-  id: '__root__' | '/' | '/agents' | '/calculators/$calculatorId'
+  to: '/' | '/$' | '/agents' | '/calculators/$calculatorId'
+  id: '__root__' | '/' | '/$' | '/agents' | '/calculators/$calculatorId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
   AgentsRoute: typeof AgentsRoute
   CalculatorsCalculatorIdRoute: typeof CalculatorsCalculatorIdRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agents': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SplatRoute: SplatRoute,
   AgentsRoute: AgentsRoute,
   CalculatorsCalculatorIdRoute: CalculatorsCalculatorIdRoute,
 }

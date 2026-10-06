@@ -647,5 +647,8 @@ and tracing policy, checked version skew and decoder-only invalid-reply marker.
 Their fixed page/search errors and public-path bound belong to `@taxkit/content`
 and are shared with HTTP. Native fatal defects retain the existing safe global
 literal; procedure defects use the declared documentation literal. Defects stay
-defects. Website composition and browser-safe MDX presentation remain the next
-T005 work, with no authored-source fallback in the Website.
+defects. The Website now supplies that client over its private binding and
+uses browser-safe compiled MDX presentation. Its native GET loader transports
+only a bounded public page identity; original SSR pathnames own page selection.
+There is no authored-source fallback in the Website. Search interaction and
+discovery remain T005 work.

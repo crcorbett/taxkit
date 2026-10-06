@@ -4,7 +4,7 @@ import type { TaxKitApiBinding } from "api/worker";
 import { Config, Effect, Predicate, Schema } from "effect";
 
 import { TaxKitWebConfigError } from "./config";
-import { WebsiteHostOrigins } from "./schemas";
+import { WebsitePublicSettings } from "./schemas";
 
 // This is the native SDK capability boundary. Preserve the original Fetcher
 // object (and method receiver); a Struct would copy its methods off the binding.
@@ -22,7 +22,7 @@ const PrivateApiBinding: Schema.Codec<TaxKitApiBinding> =
 export const TaxKitWebServerConfig = (
   rawBinding: unknown
 ): Effect.Effect<
-  typeof WebsiteHostOrigins.Type & {
+  typeof WebsitePublicSettings.Type & {
     readonly binding: typeof PrivateApiBinding.Type;
     readonly hostMode: CalculatorHostMode;
   },
@@ -30,7 +30,7 @@ export const TaxKitWebServerConfig = (
 > =>
   Effect.all({
     apiOrigin: Config.schema(
-      WebsiteHostOrigins.fields.apiOrigin,
+      WebsitePublicSettings.fields.apiOrigin,
       "API_PUBLIC_ORIGIN"
     ),
     binding: Schema.decodeUnknownEffect(PrivateApiBinding)(rawBinding),
@@ -38,7 +38,7 @@ export const TaxKitWebServerConfig = (
       Config.withDefault("edge")
     ),
     websiteOrigin: Config.schema(
-      WebsiteHostOrigins.fields.websiteOrigin,
+      WebsitePublicSettings.fields.websiteOrigin,
       "WEBSITE_PUBLIC_ORIGIN"
     ),
   }).pipe(

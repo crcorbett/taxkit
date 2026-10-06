@@ -1,13 +1,16 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 
-import { loadWebsiteSettings } from "#/lib/loaders";
+import { loadWebsiteDocsPage, loadWebsiteSettings } from "#/lib/loaders";
 import type { WebsiteServerRenderContext } from "#/lib/schemas";
 
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () =>
   createTanStackRouter({
-    context: { loadSettings: loadWebsiteSettings },
+    context: {
+      loadDocsPage: loadWebsiteDocsPage,
+      loadSettings: loadWebsiteSettings,
+    },
     defaultPreload: "intent",
     routeTree,
     scrollRestoration: true,

@@ -1,7 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { Effect } from "effect";
 
-import { loadWebsiteSettingsServer } from "./loaders.server";
+import {
+  loadWebsiteDocsPageServer,
+  loadWebsiteSettingsServer,
+} from "./loaders.server";
 import type { WebsiteServerRenderContext } from "./schemas";
 
 const websiteSettings = createServerFn({ method: "GET" }).handler(() =>
@@ -9,6 +12,24 @@ const websiteSettings = createServerFn({ method: "GET" }).handler(() =>
 );
 // Use the native generated identity at ingress; never mirror a build-time ID.
 export const WebsiteSettingsFunctionPath = websiteSettings.url;
+const websiteDocsPage = createServerFn({ method: "GET" }).handler(() =>
+  loadWebsiteDocsPageServer()
+);
+export const WebsiteDocsPageFunctionPath = websiteDocsPage.url;
+
+export const loadWebsiteDocsPage = (options: {
+  readonly path: string;
+  readonly signal: AbortSignal;
+}) =>
+  Effect.runPromise(
+    Effect.promise(() =>
+      websiteDocsPage({
+        headers: { "x-taxkit-docs-page": options.path },
+        signal: options.signal,
+      })
+    ),
+    { signal: options.signal }
+  );
 
 // The framework owns this plain Promise transport. Its small Effect carries
 // the request signal and encoded SSR submission; it owns no client or Layer.

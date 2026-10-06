@@ -10,6 +10,7 @@ import {
   CalculatorRequestRateKey,
   calculatorEdgeRateKey,
 } from "@taxkit/api-rpc/rate-identity";
+import { DocsPublicPagePath } from "@taxkit/content/schemas";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax/schemas";
 import { AuPayCalculatorId } from "@taxkit/rules-au-pay/schemas";
 import { Effect, ErrorReporter, Match, Schema } from "effect";
@@ -29,7 +30,10 @@ import {
   WebsiteInputError,
 } from "./lib/form.boundary";
 import type { WebsiteCalculatorForm } from "./lib/form.boundary";
-import { WebsiteSettingsFunctionPath } from "./lib/loaders";
+import {
+  WebsiteDocsPageFunctionPath,
+  WebsiteSettingsFunctionPath,
+} from "./lib/loaders";
 import { appRuntime } from "./lib/runtime.server";
 import { WebsiteSubmission, WebsiteSubmissionTransport } from "./lib/schemas";
 import type { WebsiteServerRenderContext } from "./lib/schemas";
@@ -58,11 +62,14 @@ export default {
           Match.orElse(() => null)
         );
         if (url.pathname.startsWith(`${WebsiteServerFunctionBase}/`)) {
-          if (url.pathname !== WebsiteSettingsFunctionPath) {
+          if (
+            url.pathname !== WebsiteSettingsFunctionPath &&
+            url.pathname !== WebsiteDocsPageFunctionPath
+          ) {
             return HttpServerResponse.empty({ status: 404 });
           }
-          // The only native server function reads settings and takes no data or
-          // client Context. Reject representation input before the framework's
+          // Both native GET functions take no data or client Context. Reject
+          // representation input before the framework's
           // JSON/FormData parser can reflect it in an unexpected error.
           if (request.method !== "GET") {
             return HttpServerResponse.empty({
@@ -70,7 +77,14 @@ export default {
               status: 405,
             });
           }
-          if (url.search !== "") {
+          if (
+            url.search !== "" ||
+            request.headers.has("content-type") ||
+            (url.pathname === WebsiteDocsPageFunctionPath &&
+              !Schema.is(DocsPublicPagePath)(
+                request.headers.get("x-taxkit-docs-page")
+              ))
+          ) {
             return HttpServerResponse.empty({ status: 400 });
           }
         }

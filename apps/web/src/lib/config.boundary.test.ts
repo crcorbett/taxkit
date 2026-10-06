@@ -32,7 +32,10 @@ describe("native website settings boundary", () => {
           Schema.fromJsonString(WebsiteSettingsTransport)
         )(
           Result.succeed(
-            WebsitePublicSettings.make({ apiOrigin: checked.apiOrigin })
+            WebsitePublicSettings.make({
+              apiOrigin: checked.apiOrigin,
+              websiteOrigin: checked.websiteOrigin,
+            })
           )
         );
         const restored = yield* Schema.decodeUnknownEffect(
@@ -41,6 +44,10 @@ describe("native website settings boundary", () => {
         expect(Result.isSuccess(restored)).toBe(true);
         if (Result.isSuccess(restored)) {
           expect(restored.success.apiOrigin).toBeInstanceOf(URL);
+          expect(restored.success.websiteOrigin).toBeInstanceOf(URL);
+          expect(restored.success.websiteOrigin.href).toBe(
+            "https://taxkit.example/"
+          );
         }
       })
   );

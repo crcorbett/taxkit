@@ -10,7 +10,7 @@ review_trigger: frontend runtime, transport, rendering, build adapter, or compos
 # Frontend
 
 TaxKit has two browser-facing TanStack Start apps: `apps/web` is the native
-calculator Website candidate and `apps/docs` remains the public developer
+calculator/documentation Website candidate and `apps/docs` remains the public developer
 documentation app until its replacement is qualified.
 
 ## Scope
@@ -95,8 +95,8 @@ values in emitted messages and the short marker across complete records. The
 native cancellation test requires the five-second headers/body deadline and
 actual browser request abort after the deadline, editing and browser Back
 leaving the form. It observes caller cancellation; the upstream artificial
-stream can continue. Full exported telemetry and all calculator pages remain
-active work.
+stream can continue. The three calculator pages are locally qualified; full
+exported telemetry remains active work.
 
 The root local development command starts both native apps from the same graph.
 Native local resource outputs own the public origins and private binding. The
@@ -252,7 +252,7 @@ route loader/action or server function
 Do not add a hook, provider or wrapper component only to relocate a decoder or
 silence lint. Extract React composition when it owns reusable UI policy or
 removes meaningful repetition. App-specific composition remains app-owned;
-the docs accessibility and navigation UI stays in `apps/docs`, and this slice
+docs accessibility and navigation UI stays in each consuming app, and this slice
 does not create or depend on `packages/ui`.
 
 MDX component registries follow the same composition rule. The docs app owns
@@ -378,3 +378,51 @@ through the documentation client, alongside the retained calculator journeys.
 This does not yet connect Website documentation loaders or replace its routes.
 Those routes must use the private named client and browser-safe compiled MDX
 presentation before the retained docs app can retire.
+
+## Replacement Website documentation composition
+
+The Website's catch-all route gets canonical page/navigation values through
+four named `WebsiteServerApplication` documentation operations. One server
+runtime supplies the scoped native client. The app's documentation HttpClient
+materialises a native `Request` with `HttpClientRequest.toWeb`, preserving the
+immutable JSON byte body and request signal, then calls the attached binding
+receiver. Unknown native Responses are checked immediately. Safe transport
+errors discard provider diagnostics. Calculator binding composition stays separate.
+
+The installed generic Fetcher adapter turns that byte body into a stream. A
+fresh Worker request performing navigation then page lookup could receive a
+stream associated with an earlier request. The actual cold content-mismatch
+journey exposed this; preserving the native byte body fixes it. This does not
+add a dependency upgrade, custom RPC framing or another runtime.
+
+Native browser page navigation carries a bounded canonical public page address
+in `x-taxkit-docs-page`, through a data-free GET server function. Its generated
+identity and the settings identity are the only admitted function addresses.
+GET query or content-type input and invalid page headers reject before the
+framework parser. SSR derives the page from its original pathname. A private,
+per-request not-found identity preserves only the route's own native not-found
+signal; unexpected Causes still reach fixed native failure reporting.
+
+A dedicated route boundary restores encoded outcomes. Direct route and head
+consumers restore once and match the checked result. The route keeps the
+sidebar/article composition visible; focused readonly leaves receive only
+accepted navigation and page values. The app MDX map uses router links for
+internal addresses, records navigation focus intent and preserves initial
+hydration focus. Its labelled table scroll region has one narrowly scoped
+accessibility lint exception for explicit keyboard focus, qualified by real
+Chromium keyboard interaction. No broader decoder or runtime permission is added.
+
+The browser-safe MDX loader checks processed Markdown and all frontmatter
+against the API page at preload and display. Body/metadata drift or a missing
+compiled module becomes fixed recoverable guidance. The native pair proves
+actual HTML for every accepted page, native 404, malformed loader restoration,
+internal navigation without document reload, phone/keyboard behaviour and
+reading without JavaScript. Search and discovery are later T005 work. The
+[dated receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json)
+records local proof; it establishes no deployment or public availability.
+
+The application router supplies the named documentation page loader through
+its typed router context, beside the settings loader. The page route consumes
+that function without importing its server-only implementation. Standalone
+browser checks use the same route tree with supplied loaders; native built
+checks exercise the actual server function and private API connection.

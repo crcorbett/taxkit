@@ -1,3 +1,4 @@
+import { DocsRpcClientError } from "@taxkit/api-rpc/content/errors";
 import { CalculatorRpcClientError } from "@taxkit/api-rpc/errors";
 import {
   CalculatorRpcOrigin,
@@ -5,6 +6,7 @@ import {
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
 } from "@taxkit/api-rpc/schemas";
+import { DocsPublicNavigation, DocsPublicPage } from "@taxkit/content/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import {
   PayWithholdingsLedger,
@@ -13,6 +15,7 @@ import {
 import { Result, Schema } from "effect";
 
 import { TaxKitWebConfigError } from "./config";
+import { DocsPresentationUnavailable } from "./docs/errors";
 import {
   AnnualTaxForm,
   TakeHomeForm,
@@ -25,12 +28,9 @@ const WebsiteOrigin = CalculatorRpcOrigin.pipe(
 );
 export const WebsitePublicSettings = Schema.Struct({
   apiOrigin: CalculatorRpcOrigin,
-});
-export type WebsitePublicSettings = typeof WebsitePublicSettings.Type;
-export const WebsiteHostOrigins = Schema.Struct({
-  ...WebsitePublicSettings.fields,
   websiteOrigin: WebsiteOrigin,
 });
+export type WebsitePublicSettings = typeof WebsitePublicSettings.Type;
 export const WebsiteSettingsTransport = Schema.toCodecJson(
   Schema.Result(WebsitePublicSettings, TaxKitWebConfigError)
 );
@@ -38,6 +38,21 @@ export const WebsiteCatalogueTransport = Schema.toCodecJson(
   Schema.Result(
     CalculatorCatalogResponse,
     Schema.Union([CalculatorRpcClientError, TaxKitWebConfigError])
+  )
+);
+const WebsiteDocsPageView = Schema.Struct({
+  navigation: DocsPublicNavigation,
+  page: DocsPublicPage,
+  settings: WebsitePublicSettings,
+});
+export const WebsiteDocsPageTransport = Schema.toCodecJson(
+  Schema.Result(
+    WebsiteDocsPageView,
+    Schema.Union([
+      DocsRpcClientError,
+      TaxKitWebConfigError,
+      DocsPresentationUnavailable,
+    ])
   )
 );
 export const WebsiteSubmission = Schema.Struct({

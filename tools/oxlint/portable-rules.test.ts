@@ -1463,6 +1463,93 @@ describe("exact native RPC lint boundaries", () => {
   test.effect.each([
     ...Array.flatMap(
       [
+        "apps/web/src/lib/docs/mdx.boundary.tsx",
+        "apps/web/src/lib/docs/route-boundary.ts",
+      ],
+      (path) => [
+        {
+          path,
+          rejected: false,
+          rule: "taxkit(no-decoding-outside-boundaries)",
+          source:
+            'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+        },
+        {
+          path,
+          rejected: true,
+          rule: "effect(no-schema-encoder-outside-egress)",
+          source:
+            'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+        },
+        {
+          path,
+          rejected: true,
+          rule: "strict-effect(no-runtime-outside-boundary)",
+          source:
+            'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+        },
+      ]
+    ),
+    ...Array.flatMap(
+      [
+        "apps/web/src/lib/docs/components.tsx",
+        "apps/web/src/lib/docs/page.view.tsx",
+        "apps/web/src/routes/$.tsx",
+      ],
+      (path) => [
+        {
+          path,
+          rejected: true,
+          rule: "taxkit(no-decoding-outside-boundaries)",
+          source:
+            'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+        },
+        {
+          path,
+          rejected: true,
+          rule: "effect(no-schema-encoder-outside-egress)",
+          source:
+            'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+        },
+        {
+          path,
+          rejected: true,
+          rule: "strict-effect(no-runtime-outside-boundary)",
+          source:
+            'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+        },
+      ]
+    ),
+    {
+      path: "apps/web/src/lib/loaders.server.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/route-context.ts",
+      rejected: true,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/route-context.ts",
+      rejected: true,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/route-context.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    ...Array.flatMap(
+      [
         {
           encoder: false,
           path: "packages/api/rpc/src/content-client-response.boundary.ts",

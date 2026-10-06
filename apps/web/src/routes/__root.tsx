@@ -88,7 +88,7 @@ const RootComponent = () => {
         <WebsiteCatalogueContext.Provider value={catalogue}>
           <div className="app-shell">
             <a className="skip-link" href="#main-content">
-              Skip to calculator
+              Skip to content
             </a>
             <nav aria-label="Calculators">
               {Option.match(catalogue, {
@@ -124,6 +124,9 @@ const RootComponent = () => {
               </a>
               <Link activeProps={{ "aria-current": "page" }} to="/agents">
                 For agents: API access
+              </Link>
+              <Link params={{ _splat: "start/quickstart" }} to="/$">
+                Documentation
               </Link>
             </nav>
             <main id="main-content" tabIndex={-1}>

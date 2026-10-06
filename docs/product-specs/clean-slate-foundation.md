@@ -143,10 +143,14 @@ source loader, RPC server or backend fallback. Calculator facts go only in
 bounded bodies; reports live only in the current calculation/page state.
 Credentials are omitted and unexpected redirects rejected for public browser
 calls. Actual native request headers determine the tested CORS allowlist.
-The Website's native settings server function is a GET with no data or client
-Context. Its explicit build/ingress route uses the native generated function
-URL and rejects unknown or extended addresses with empty 404 before native
-lookup/logging. It rejects query payloads and unsupported methods before parsing; calculations remain body-only form/RPC requests.
+The Website's native settings and documentation page server functions are GET
+requests with no data or client Context. Their explicit build/ingress route
+uses the native generated function URLs and rejects unknown or extended
+addresses with empty 404 before native lookup/logging. It rejects query
+payloads, content-type input and unsupported methods before parsing. Page
+navigation carries only the canonical bounded public page identity in an
+explicit header; original SSR pathnames own page selection. Calculations remain
+body-only form/RPC requests.
 Expected settings errors keep their checked result. Unexpected settings failures
 use the native HTTP failure matcher and safe host reporter, then return the
 native empty response before TanStack can log or serialise an arbitrary error.

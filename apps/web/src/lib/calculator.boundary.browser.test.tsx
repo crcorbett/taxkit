@@ -51,6 +51,9 @@ describe("browser calculator lifetime", () => {
         const apiOrigin = yield* Schema.decodeUnknownEffect(
           WebsitePublicSettings.fields.apiOrigin
         )("http://127.0.0.1:49999");
+        const websiteOrigin = yield* Schema.decodeUnknownEffect(
+          WebsitePublicSettings.fields.websiteOrigin
+        )("http://127.0.0.1:49998");
         const request = yield* Effect.fromResult(
           takeHomeRequestFromForm(initialTakeHomeForm)
         );
@@ -60,7 +63,9 @@ describe("browser calculator lifetime", () => {
               initialValues: [
                 [
                   publicSettingsAtom,
-                  Option.some(WebsitePublicSettings.make({ apiOrigin })),
+                  Option.some(
+                    WebsitePublicSettings.make({ apiOrigin, websiteOrigin })
+                  ),
                 ],
               ],
             })

@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: package contracts or generated-source boundaries change
 ---
 
@@ -19,7 +19,8 @@ validation policy, generated source configuration and `DocsContentService`. Reus
 from `@taxkit/docs-fumadocs`.
 
 This package does not own routes, layout, MDX renderer components or search UI.
-Those belong in the `apps/docs` runtime.
+Those belong in the consuming app: the retained `apps/docs` runtime or the
+replacement `apps/web` candidate.
 
 ## Main areas
 
@@ -228,7 +229,7 @@ external availability, correctness, or user visibility from either value.
 
 Add new MDX component allowances in `src/validation/policy.ts` only when the
 component is intentionally supported by the docs app renderer. Keep renderer
-implementation in `apps/docs` or reusable primitives in
+implementation in the consuming app or reusable primitives in
 `@taxkit/docs-fumadocs/render`.
 
 ## Guardrails
@@ -272,3 +273,11 @@ public references.
 The error reference distinguishes checked Core diagnostic absence from its
 retained encoded forms and does not treat opaque diagnostics as safe telemetry.
 Content lifecycle and navigation acceptance remain unchanged.
+
+The replacement Website also consumes `./client` through the matching MDX Vite
+plugin and this package's collection configuration. Its server obtains checked
+page/navigation values from the separate API; the browser-safe compiled page
+must match that API value before display. The Website owns routes, rendering,
+focus, responsive navigation and recoverable errors. This adds no authored
+source, compiler or filesystem fallback to its request handlers. The retained
+docs app and its commands remain until replacement qualification is complete.

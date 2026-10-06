@@ -60,6 +60,10 @@ const decodingBoundaryFiles = [
   // Exact native website settings, form and hydration boundaries.
   "apps/web/src/lib/config.boundary.test.ts",
   "apps/web/src/lib/config.server.ts",
+  // Native documentation loader ingress: checked public header or SSR address.
+  "apps/web/src/lib/loaders.server.ts",
+  "apps/web/src/lib/docs/mdx.boundary.tsx",
+  "apps/web/src/lib/docs/route-boundary.ts",
   "apps/web/src/lib/calculator.boundary.browser.test.tsx",
   "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/src/lib/form.boundary.ts",
@@ -194,6 +198,7 @@ const decodingBoundaryFiles = [
 const routeTransportBoundaryModules = ["#/lib/docs/route-boundary"];
 
 const routeTransportConsumerFiles = [
+  "apps/web/src/routes/$.tsx",
   "apps/docs/src/routes/$.tsx",
   "apps/docs/src/routes/index.tsx",
   "tools/oxlint/fixtures/route-transport-allowed.tsx",
@@ -525,6 +530,7 @@ export default defineConfig({
         "packages/api/rpc/src/response-budget.boundary.ts",
         "packages/api/rpc/src/server-serialization.boundary.ts",
         "apps/web/src/lib/config.ts",
+        "apps/web/src/lib/docs/errors.ts",
         "apps/web/src/lib/form.boundary.ts",
         "apps/api/scripts/routes.ts",
         "apps/api/scripts/smoke-public-routes.runtime.ts",

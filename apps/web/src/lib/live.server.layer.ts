@@ -1,4 +1,7 @@
 import "@tanstack/react-start/server-only";
+import { DocsRpcUnavailable } from "@taxkit/api-rpc/content/errors";
+import { DocsRpcClientLive } from "@taxkit/api-rpc/content/live";
+import { DocsRpcClient } from "@taxkit/api-rpc/content/service";
 import { CalculatorAdmissionUnavailable } from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
 import {
@@ -92,8 +95,10 @@ export const WebsiteServerLive = (binding: Cloudflare.Env["TAXKIT_API"]) =>
           );
           return Layer.effect(
             WebsiteServerApplication,
-            Effect.map(TaxKitRpcClient, (client) =>
-              WebsiteServerApplication.of({
+            Effect.gen(function* () {
+              const client = yield* TaxKitRpcClient;
+              const docs = yield* DocsRpcClient;
+              return WebsiteServerApplication.of({
                 calculate: (request) =>
                   CalculatorRequestRateKey.pipe(
                     Effect.flatMap(
@@ -117,15 +122,65 @@ export const WebsiteServerLive = (binding: Cloudflare.Env["TAXKIT_API"]) =>
                     )
                   ),
                 catalogue: client.listCalculators(MetadataQuery.make({})),
+                docsMarkdown: docs.getMarkdown,
+                docsNavigation: docs.getNavigation(),
+                docsPage: docs.getPage,
+                searchDocs: docs.searchPages,
                 settings: Effect.succeed(
-                  WebsitePublicSettings.make({ apiOrigin: settings.apiOrigin })
+                  WebsitePublicSettings.make({
+                    apiOrigin: settings.apiOrigin,
+                    websiteOrigin: settings.websiteOrigin,
+                  })
                 ),
-              })
-            )
+              });
+            })
           ).pipe(
             Layer.provide(
-              TaxKitRpcClientLive(settings.apiOrigin).pipe(
-                Layer.provide(privateTransport)
+              Layer.mergeAll(
+                TaxKitRpcClientLive(settings.apiOrigin).pipe(
+                  Layer.provide(privateTransport)
+                ),
+                DocsRpcClientLive(settings.apiOrigin).pipe(
+                  // Documentation uses ordinary binding fetch. It never selects
+                  // the calculator's private admission operation or rate key.
+                  Layer.provide(
+                    HttpClient.layerMergedContext(
+                      Effect.succeed(
+                        // Native JSON RPC has a materialised byte body. Keep it
+                        // materialised through the binding: the generic Fetcher
+                        // bridge converts it into a request-owned stream.
+                        HttpClient.make((request, _url, signal) =>
+                          HttpClientRequest.toWeb(request, { signal }).pipe(
+                            Effect.flatMap((incoming) =>
+                              Effect.tryPromise({
+                                catch: () => new DocsRpcUnavailable(),
+                                try: () =>
+                                  settings.binding.fetch(incoming, { signal }),
+                              })
+                            ),
+                            Effect.flatMap(
+                              Schema.decodeUnknownEffect(
+                                Schema.instanceOf(Response)
+                              )
+                            ),
+                            Effect.map((response) =>
+                              HttpClientResponse.fromWeb(request, response)
+                            ),
+                            Effect.mapError(
+                              () =>
+                                new HttpClientError.HttpClientError({
+                                  reason: new HttpClientError.TransportError({
+                                    cause: new DocsRpcUnavailable(),
+                                    request,
+                                  }),
+                                })
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
               )
             )
           );
@@ -138,6 +193,10 @@ export const WebsiteServerLive = (binding: Cloudflare.Env["TAXKIT_API"]) =>
             WebsiteServerApplication.of({
               calculate: () => Effect.fail(error),
               catalogue: Effect.fail(error),
+              docsMarkdown: () => Effect.fail(error),
+              docsNavigation: Effect.fail(error),
+              docsPage: () => Effect.fail(error),
+              searchDocs: () => Effect.fail(error),
               settings: Effect.fail(error),
             })
           )

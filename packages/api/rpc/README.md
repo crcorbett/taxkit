@@ -74,7 +74,8 @@ The repository [transport architecture](../../../docs/architecture/api-and-sdk.m
 [quality guide](../../../docs/architecture/testing-and-quality.md) and active
 [execution plan](../../../docs/exec-plans/active/clean-slate-foundation.md) own the
 wider design and proof limits. The documentation client and native API operations are implemented in T005;
-replacement Website routes and discovery remain unfinished. Re-exported content
+replacement Website page routes now consume that client; search interaction
+and discovery remain unfinished. Re-exported content
 Schemas do not mount authored content in the browser.
 
 Run `bun run --filter=@taxkit/api-rpc test`, `check-types` and `build` for focused
@@ -230,4 +231,5 @@ adapter defects, exact/oversized encoded byte limits, headers/body deadlines,
 earlier cancellation, scope close and transport policy. The actual native pair
 check compares all 61 accepted page values and exact Markdown through these
 clients across separate Worker requests. Those checks qualify the API/client
-connection; replacement Website page/search composition remains T005 work.
+connection. The Website now composes page/navigation calls over its native
+binding and checks compiled presentation; search interaction remains T005 work.

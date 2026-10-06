@@ -10,15 +10,19 @@ review_trigger: website rendering, settings, transport, form, generated types or
 # Website app
 
 `apps/web` is the native TanStack Start Website candidate. Its calculator pages use
-native Effect RPC for the three supported Australian 2025–26 calculators. Tax calculation stays
+native Effect RPC for the three supported Australian 2025–26 calculators and
+the 61 accepted documentation pages. Tax calculation stays
 in the separate API app. The current public docs app remains `apps/docs`.
 
 ## What runs where
 
 The server has one `ManagedRuntime` in `src/lib/runtime.server.ts`. Its checked
-`WebsiteServerApplication` exposes settings, the supported catalogue and calculation. The private
-`TAXKIT_API` service binding supplies the server connection. The native Alchemy
-Fetcher adapter keeps the binding's receiver attached.
+`WebsiteServerApplication` exposes settings, the supported calculator catalogue,
+calculation and four named documentation operations. The private
+`TAXKIT_API` service binding supplies the server connection. Calculator calls use the native Alchemy Fetcher adapter. Documentation calls
+materialise their native HTTP request with `HttpClientRequest.toWeb`, preserving
+the JSON byte body and the binding's receiver. This avoids carrying a stream
+owned by an earlier Cloudflare request into a later call.
 
 The root route restores Schema-encoded settings and seeds a React-owned Atom
 registry. `calculator.atoms.ts` describes the browser connection and commands;
@@ -295,5 +299,44 @@ The private request omits an explicit AbortSignal because the pinned native RPC 
 The native pair test also uses the separate checked documentation RPC client
 against the actual built API. It compares navigation, every one of the 61
 accepted pages and exact Markdown, plus bounded search across separate Worker
-requests. This is API/client proof; the Website's production documentation
-page/search connection and routes remain unfinished T005 work.
+requests. The same saved journey now qualifies the Website page connection described below.
+Search interaction, discovery and retirement of the old app remain T005 work.
+
+## Documentation pages
+
+The catch-all route renders every accepted public page through the checked
+private documentation client. Server rendering reads the original pathname;
+request headers cannot select a different page. Browser navigation uses the
+native data-free GET function with one bounded `x-taxkit-docs-page` header.
+Its generated URL is admitted beside the settings function. Both reject query
+payloads, unsupported methods and content-type input before framework parsing;
+invalid public page addresses receive empty 400 responses.
+
+The route's dedicated browser-safe boundary restores checked loader outcomes.
+The route matches that result before composing its sidebar and article. One
+app-owned MDX map supplies internal router links, heading focus, code, images
+and keyboard-focusable table scrolling. Initial hydration keeps the reader's
+focus. Ordinary navigation moves focus to the new page heading. Missing pages
+use the native not-found state and HTTP 404. Expected failures offer a fixed
+message and an explicit recovery link.
+
+The Vite build uses the existing content collection configuration and matching
+MDX compiler. Browser code imports only compiled presentation and checked
+contracts. Before display, compiled Markdown and frontmatter must match the
+API page exactly; a different body, metadata or missing module produces fixed
+safe guidance. Canonical URLs use the checked Website origin. The article's
+Markdown link opens the API's existing checked Markdown endpoint.
+
+The native pair checks actual HTML for all 61 pages, native GET admission,
+three source-built content mismatches, malformed browser transport, real
+sidebar/MDX navigation without document reload, heading focus, mobile
+navigation, table keyboard focus and reading without JavaScript. Saved local
+images supplement those checks. The [Website documentation receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json)
+records their scope. Search, discovery files, share images and old-app retirement
+are separate unfinished work. No local check establishes public availability.
+
+The application router supplies the named documentation page loader through
+its typed router context, beside the settings loader. The page route consumes
+that function without importing its server-only implementation. Standalone
+browser checks use the same route tree with supplied loaders; native built
+checks exercise the actual server function and private API connection.

@@ -16,8 +16,11 @@ describe("actual website settings loader", () => {
       const apiOrigin = yield* Schema.decodeUnknownEffect(
         WebsitePublicSettings.fields.apiOrigin
       )("https://api.taxkit.example");
+      const websiteOrigin = yield* Schema.decodeUnknownEffect(
+        WebsitePublicSettings.fields.websiteOrigin
+      )("https://taxkit.example");
       const encoded = yield* Schema.encodeEffect(WebsiteSettingsTransport)(
-        Result.succeed(WebsitePublicSettings.make({ apiOrigin }))
+        Result.succeed(WebsitePublicSettings.make({ apiOrigin, websiteOrigin }))
       );
       const catalogue = yield* Schema.encodeEffect(WebsiteCatalogueTransport)(
         Result.succeed({ calculators: [] })
@@ -34,7 +37,13 @@ describe("actual website settings loader", () => {
       const router = yield* Effect.acquireRelease(
         Effect.sync(() =>
           createRouter({
-            context: { loadSettings },
+            context: {
+              loadDocsPage: () =>
+                Effect.runPromise(
+                  Effect.die("Unrequested documentation fixture")
+                ),
+              loadSettings,
+            },
             history: createMemoryHistory({ initialEntries: ["/"] }),
             routeTree,
           })
@@ -74,7 +83,13 @@ describe("actual website settings loader", () => {
         const router = yield* Effect.acquireRelease(
           Effect.sync(() =>
             createRouter({
-              context: { loadSettings },
+              context: {
+                loadDocsPage: () =>
+                  Effect.runPromise(
+                    Effect.die("Unrequested documentation fixture")
+                  ),
+                loadSettings,
+              },
               history: createMemoryHistory({ initialEntries: ["/"] }),
               routeTree,
             })

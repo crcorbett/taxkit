@@ -4095,3 +4095,66 @@ passes in 628.61 seconds, including the eleven built native
 cases. A final ordinary compiled Node comparison passes and all forty frozen
 source identities remain unchanged. The HTTP parent `103feda` has separately passed
 hosted Quality run `37474986158`; that result does not qualify this new candidate.
+
+### T005 Website documentation composition candidate — 7 October
+
+Continue from qualified connection commit
+`049b04ff9b71e8705507e819ba3ea31f8c9fa64e`. Its exact hosted Quality run
+`37481631010` completed successfully on 6 October at 15:10:07 UTC. That is parent
+commit proof, not qualification of this new slice.
+
+The Website now composes four named documentation operations over its native
+private connection. Its materialised native Request preserves the JSON byte
+body and binding receiver; calculator rate-key composition stays separate.
+The app has one server runtime and uses only browser-safe compiled presentation
+and checked contracts in browser modules. No authored-source fallback exists.
+
+The catch-all route renders all 61 accepted pages. A dedicated route boundary
+restores checked results before visible route-owned sidebar/article composition.
+Compiled Markdown and frontmatter must match the API page at preload and display.
+Missing pages keep native HTTP 404; expected failures provide fixed recovery UI.
+Canonical links use the checked Website origin; explicit Markdown links use the
+existing API endpoint. Native browser page GET takes no data or client Context,
+only a bounded public page header. SSR uses the original pathname. Exact
+generated function identities, query/content-type/method/path admission and
+safe not-found handling are owned at native ingress.
+
+The actual native pair passes eleven cases across seven files. It checks every
+page's real HTML, hostile SSR headers, native GET, three cold source-built
+content mismatches, damaged genuine browser transport, internal navigation
+without document reload, unique current-page semantics, heading focus without
+hydration stealing, phone navigation/table keyboard focus and reading without
+JavaScript. Images are supplemental reading-review evidence. Fresh independent
+reading review returns **ship** with no material fixes. The
+[Website documentation receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json)
+records complete repository qualification separately; whole T005 stays in progress.
+
+The mismatch test first exposed a stream tied to an earlier Cloudflare request
+in the generic Fetcher adapter. The native Request byte body fixes that actual
+cold-request failure. A browser bundle test also initially mistook a service
+name in accepted documentation prose for executable engine code; it now requires
+the positively observed API service identity and excludes that identity from
+browser output. The receipt retains failed attempts and the owning corrections.
+
+Documentation impact: **Change required** for Website/client composition,
+checked native loader admission, route/MDX/focus/table ownership, build inputs,
+exact lint profiles and actual fixtures, affected app/content/RPC READMEs,
+frontend/API/content/package/testing architecture, native journey, SPEC/tasks,
+this plan and bounded evidence. **Preserve** all accepted page/navigation/review
+and template bytes, calculator contracts and retained results, historical docs
+operations, disabled collection and metrics deferral. **N/A** for new runbook
+commands or provider/release/credential operations: existing native checks are
+extended; no deployment procedure changes. **N/A** for a new Changeset: only
+private app consumers and tests change, with no package export/wire change;
+the earlier native documentation contract Changeset is preserved.
+
+Search UI, crawler/discovery files, Markdown negotiation, share images and
+old-app retirement remain unfinished T005 work. No local check establishes
+public availability, publication, deployment or safe exported telemetry.
+
+The standalone browser suite later exposed a static server-only import through
+the new page route. The application router now supplies its named page loader
+through the existing typed context pattern used by settings. The same route tree
+passes all twenty focused browser checks; no test-only module alias or production
+compiler substitution is introduced. Actual native page/transport proof remains
+separate. The page schema also stays private after the first Knip failure.

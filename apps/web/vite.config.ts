@@ -1,7 +1,11 @@
+import { fileURLToPath } from "node:url";
+
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import * as docsConfig from "@taxkit/docs-content/source.config";
 import viteReact from "@vitejs/plugin-react";
 import { Config, ConfigProvider, Effect, Schema } from "effect";
+import mdx from "fumadocs-mdx/vite";
 import { defineConfig } from "vite";
 
 import { WebsiteServerFunctionBase } from "./src/lib/config.ts";
@@ -20,6 +24,18 @@ export default defineConfig(() => {
   return {
     envPrefix: [],
     plugins: [
+      // One shared generation phase keeps client and SSR presentation equal.
+      mdx(docsConfig, {
+        configPath: fileURLToPath(
+          new URL(
+            "../../packages/docs-content/source.config.ts",
+            import.meta.url
+          )
+        ),
+        outDir: fileURLToPath(
+          new URL("../../packages/docs-content/.source", import.meta.url)
+        ),
+      }),
       ...(alchemyOwnsCloudflareVite
         ? []
         : [cloudflare({ viteEnvironment: { name: "ssr" } })]),
