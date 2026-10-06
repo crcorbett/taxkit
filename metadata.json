@@ -1,0 +1,51 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M49267HGZVJYMXM8J88YR0MZ",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-76-public-content-catalogue",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "apps/web/package.json",
+    "apps/web/scripts/native-pair-build.runtime.ts",
+    "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+    "apps/web/src/lib/config.boundary.test.ts",
+    "apps/web/src/lib/config.server.ts",
+    "apps/web/src/lib/docs/components.tsx",
+    "apps/web/src/lib/docs/errors.ts",
+    "apps/web/src/lib/docs/mdx.boundary.tsx",
+    "apps/web/src/lib/docs/page.view.tsx",
+    "apps/web/src/lib/docs/route-boundary.ts",
+    "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+    "apps/web/src/lib/live.server.layer.ts",
+    "apps/web/src/lib/loaders.server.ts",
+    "apps/web/src/lib/loaders.ts",
+    "apps/web/src/lib/schemas.ts",
+    "apps/web/src/lib/service.server.ts",
+    "apps/web/src/routes/$.tsx",
+    "apps/web/src/routes/__root.tsx",
+    "apps/web/src/server.ts",
+    "apps/web/src/styles.css",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "apps/web/vite.config.ts",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "oxlint.config.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 18967343,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 892836096,
+    "output_tokens": 3967653,
+    "api_call_count": 5959,
+    "subagent_tokens_complete": false
+  }
+}
