@@ -1,0 +1,63 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M48TSG4Q7NM2X1SXC2DHGTQ0",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-06T14:45:08.559201Z",
+  "branch": "codex/dev-76-public-content-catalogue",
+  "checkpoints_count": 4,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/web/test/native-pair.boundary.test.ts",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "oxlint.config.ts",
+    "packages/api/http/src/groups/content.ts",
+    "packages/api/http/src/schemas.ts",
+    "packages/api/rpc/src/client-response.boundary.ts",
+    "packages/api/rpc/src/content-client-response.boundary.ts",
+    "packages/api/rpc/src/content.errors.ts",
+    "packages/api/rpc/src/content.group.ts",
+    "packages/api/rpc/src/content.handlers.ts",
+    "packages/api/rpc/src/content.live.layer.ts",
+    "packages/api/rpc/src/content.schemas.ts",
+    "packages/api/rpc/src/content.service.ts",
+    "packages/api/rpc/src/content.test.layer.ts",
+    "packages/api/rpc/src/group.ts",
+    "packages/api/rpc/src/response-budget.boundary.ts",
+    "packages/api/rpc/src/schemas.ts",
+    "packages/api/rpc/src/server-serialization.boundary.ts",
+    "packages/api/rpc/src/server.ts",
+    "packages/api/rpc/test/content.boundary.test.ts",
+    "packages/api/rpc/test/content.fixture.ts",
+    "packages/api/rpc/test/handlers.test.ts",
+    "packages/content/src/errors.ts",
+    "packages/content/src/schemas.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5bde412b8bc2",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 18463853,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 864356480,
+    "output_tokens": 3805837,
+    "api_call_count": 5779
+  },
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-06T14:45:05.820294Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 3510,
+    "human_modified": 78,
+    "human_removed": 0,
+    "total_committed": 3510,
+    "total_lines_changed": 3620,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}
