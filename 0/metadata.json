@@ -1,0 +1,40 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M49RY5QTA14E3B4X6MQ5249E",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-06T23:32:01.349555Z",
+  "branch": "codex/dev-76-public-content-catalogue",
+  "checkpoints_count": 4,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/docs/README.md",
+    "apps/docs/tsconfig.json",
+    "apps/docs/tsconfig.scripts.json",
+    "docs/architecture/package-boundaries.md",
+    "package.json",
+    "tools/docs-deployment/local-doppler.runtime.ts",
+    "tools/docs-deployment/retirement.refusal.boundary.test.ts",
+    "tools/docs-deployment/retirement.runtime.ts",
+    "tools/docs-deployment/retirement.schemas.ts",
+    "tools/docs-deployment/workflow-evidence.historical.ts",
+    "tools/docs-deployment/workflow-evidence.runtime.ts",
+    "tools/docs-deployment/workflow-evidence.test.ts",
+    "tools/docs-deployment/workflow-plan-projection.test.ts",
+    "tools/docs-deployment/workflow.contract.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5bde412b8bc2",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 21196632,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1009394432,
+    "output_tokens": 4569055,
+    "api_call_count": 6742
+  },
+  "session_metrics": {
+    "turn_count": 4
+  }
+}
