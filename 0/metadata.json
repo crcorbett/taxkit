@@ -1,0 +1,74 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M47B51XY0KWTCQ5MCJFGSB31",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-06T00:52:32.947678Z",
+  "branch": "codex/dev-75-domain-schema-owners",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/exec-plans/active/clean-slate-foundation.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5918999b0327",
+  "checkpoint_transcript_start": 26169,
+  "transcript_lines_at_start": 26169,
+  "compact_transcript_start": 3177,
+  "token_usage": {
+    "input_tokens": 2966847,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 118289664,
+    "output_tokens": 480770,
+    "api_call_count": 790
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-06T00:52:30.909998Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 99,
+    "human_removed": 2,
+    "total_committed": 27,
+    "total_lines_changed": 185,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1140,
+      "user_lines_removed": 101,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".changeset/schema-owned-trace-ledger.md": 8,
+        "docs/architecture/effect-services.md": 30,
+        "docs/architecture/graph-trace-ledgers.md": 24,
+        "docs/architecture/testing-and-quality.md": 145,
+        "docs/documentation-audit/README.md": 47,
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-schema-owners.json": 83,
+        "docs/exec-plans/active/clean-slate-foundation.md": 618,
+        "docs/product-specs/clean-slate-foundation.md": 28,
+        "docs/product-specs/clean-slate-foundation.tasks.json": 10,
+        "packages/core/README.md": 7,
+        "packages/core/src/ledger/component.ts": 13,
+        "packages/core/src/trace/node.ts": 19,
+        "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts": 108
+      },
+      "user_removed_per_file": {
+        "docs/architecture/effect-services.md": 5,
+        "docs/architecture/graph-trace-ledgers.md": 20,
+        "docs/architecture/testing-and-quality.md": 2,
+        "docs/documentation-audit/README.md": 1,
+        "docs/exec-plans/active/clean-slate-foundation.md": 4,
+        "docs/product-specs/clean-slate-foundation.md": 3,
+        "docs/product-specs/clean-slate-foundation.tasks.json": 2,
+        "packages/core/README.md": 2,
+        "packages/core/src/ledger/component.ts": 32,
+        "packages/core/src/trace/node.ts": 27,
+        "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts": 3
+      }
+    }
+  ]
+}
