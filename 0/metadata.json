@@ -1,0 +1,42 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M496D9QW00KAPC7CHK66678Y",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-06T18:08:11.821309Z",
+  "branch": "codex/dev-76-public-content-catalogue",
+  "checkpoints_count": 4,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+    "apps/web/test/native-local-development.boundary.test.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5bde412b8bc2",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 19454378,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 913286784,
+    "output_tokens": 4065346,
+    "api_call_count": 6105,
+    "subagent_tokens_complete": false
+  },
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-06T18:08:08.96175Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 2698,
+    "human_modified": 1,
+    "human_removed": 0,
+    "total_committed": 2698,
+    "total_lines_changed": 2744,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}

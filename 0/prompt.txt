@@ -1,0 +1,7 @@
+We are likely to change the metrics approach, so leave this for now and proceed
+
+---
+
+<send_user_message_question_reply>
+[{"answer":"Approve the DEV-76 update","questionItemId":"[\"request_user_input_async\",\"call_IfjoO3zN1anlISjAhlvKOxDG\",0]","question":"The Linear connector requires a fresh confirmation to mark DEV-76 In Progress and replace its old planning-only note with the tested PR #155 progress and metrics deferral. Approve this prepared issue update?"}]
+</send_user_message_question_reply>
