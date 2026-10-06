@@ -1,0 +1,29 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M47KSDA6R6EKXQ5GEKKPTAEZ",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-75-domain-absence-owners",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "oxlint.config.ts",
+    "packages/core/src/engine/calculation-engine.ts",
+    "packages/core/src/rules/descriptor.ts",
+    "packages/sdk/typescript/src/types.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 13746013,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 662427776,
+    "output_tokens": 2927768,
+    "api_call_count": 4423
+  }
+}
