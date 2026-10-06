@@ -1,0 +1,44 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M47SE8FJKDJ17JPA67DPB7H8",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-75-domain-contract-closeout",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".changeset/domain-contract-closeout.md",
+    "docs/architecture/api-and-sdk.md",
+    "docs/architecture/calculators.md",
+    "docs/documentation-audit/README.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-contract-closeout.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "packages/api/http/README.md",
+    "packages/calculators/README.md",
+    "packages/calculators/src/catalog.ts",
+    "packages/calculators/type-tests/catalog.ts",
+    "packages/core/README.md",
+    "packages/core/src/errors/calculation-error.ts",
+    "packages/core/test/domain-absence.boundary.test.ts",
+    "packages/docs-content/README.md",
+    "packages/docs-content/content/reference/errors.mdx",
+    "packages/sdk/typescript/README.md",
+    "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 197326,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 11264000,
+    "output_tokens": 42955,
+    "api_call_count": 78
+  }
+}
