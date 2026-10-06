@@ -1,0 +1,30 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M49N9DYVPNRKF4FSKDD95XBH",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-76-public-content-catalogue",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "packages/scripts/src/release-readiness/live.layer.test.ts",
+    "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
+    "packages/scripts/src/release-readiness/schemas.ts",
+    "tools/quality-workflow/policy.test.ts",
+    "tools/quality-workflow/policy.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 20744050,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 985186688,
+    "output_tokens": 4454076,
+    "api_call_count": 6588
+  }
+}
