@@ -7,7 +7,7 @@ import { Config, ConfigProvider, Effect, Layer, Schema } from "effect";
 // This application boundary receives a generated JSON value. Compiler and filesystem
 // Layers remain with the build command, outside incoming request handling.
 export const ApiContentLive = ContentServiceLive.pipe(
-  Layer.provide(
+  Layer.provideMerge(
     Layer.effect(
       ContentCatalogue,
       Schema.decodeUnknownEffect(DocsPublicCatalogue)(catalogue).pipe(

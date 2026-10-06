@@ -1434,7 +1434,7 @@ receipt retains that failed graph and the original assertions stay fixed.
 
 ### Native documentation connection qualification
 
-The documentation RPC corpus checks four named operations with a separate
+The documentation RPC corpus checks five named operations with a separate
 revision agreement through the real native HTTP server/client. It requires
 complete owning page/navigation/search values, byte-equal Markdown, fixed public
 failures, safe native fatal and procedure reply bytes, and damaged JSON/result
@@ -1449,8 +1449,8 @@ exact Markdown through this client at the built API, retaining every existing
 calculator journey and public HTTP check. API/client tests do not establish
 Website rendering on their own. The extended native Website journey below
 qualifies local page rendering. Search interaction has its own qualification
-below; discovery assets, old-app retirement, deployment and public availability
-remain unproved by these local slices.
+below. Discovery files have their own qualification below; old-app retirement,
+deployment and public availability remain unproved by these local slices.
 
 ### Native Website documentation qualification
 
@@ -1516,3 +1516,35 @@ most fifteen seconds, then requires 200 before strict browser navigation and
 heading observation. Application errors, socket errors and persistent gateway
 failures still fail. This strengthens the start condition without diagnosing
 an earlier hosted 502 or establishing that its cause has been reproduced.
+
+
+### Native Website discovery qualification
+
+Content tests derive all four closed documents from a checked synthetic
+catalogue and configuration, observe lazy cached settings, reject unsafe origins
+and relate each path to its media type and body bound. The existing private RPC
+corpus covers the fifth operation, including malformed/oversized/status/fatal
+replies, deadlines, interruption and revision skew. A valid checked reply for a
+different file must be rejected; fixed discovery guidance cannot contain the
+private source diagnostic.
+
+The source-built native pair compares each Website GET body against the real
+checked API client and accepted catalogue, checks all 61 canonical sitemap
+addresses and parses XML in Chromium. It checks actual GET/HEAD media/cache/
+`nosniff` headers, explicit empty 200 HEAD, method/query rejection and a real
+unavailable binding's empty uncached 503. Exact processed Markdown comparison
+preserves useful imports inside fenced code examples; an assertion rejecting
+all import lines would falsely reject accepted documentation. Existing source
+compilation owns removal of authored MDX syntax. Retained source hashes qualify
+source preservation separately. The [dated discovery receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json)
+records candidate identities, corrections and actual check results; it does not
+close T005, establish deployment or prove the later Markdown/image/retirement
+work.
+
+
+Controlled built page-mismatch fixtures retain ContentCatalogue with
+`Layer.provideMerge` while replacing only ContentService page replies. Dropping
+that dependency causes general RPC unavailability before the intended mismatch
+can be observed; the existing exact presentation-error assertion catches this.
+The builder must retain the complete service graph rather than weakening that
+assertion to accept unrelated failure.

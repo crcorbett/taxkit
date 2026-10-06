@@ -10,7 +10,7 @@ import {
   CalculatorRequestRateKey,
   calculatorEdgeRateKey,
 } from "@taxkit/api-rpc/rate-identity";
-import { DocsPublicPagePath } from "@taxkit/content/schemas";
+import { DocsDiscoveryPath, DocsPublicPagePath } from "@taxkit/content/schemas";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax/schemas";
 import { AuPayCalculatorId } from "@taxkit/rules-au-pay/schemas";
 import { Effect, ErrorReporter, Match, Schema } from "effect";
@@ -56,6 +56,42 @@ export default {
     appRuntime.runPromise(
       Effect.gen(function* websiteRequest() {
         const url = new URL(request.url);
+        const discoveryPath = url.pathname;
+        if (Schema.is(DocsDiscoveryPath)(discoveryPath)) {
+          if (request.method !== "GET" && request.method !== "HEAD") {
+            return HttpServerResponse.empty({
+              headers: { allow: "GET, HEAD" },
+              status: 405,
+            });
+          }
+          if (url.search !== "") {
+            return HttpServerResponse.empty({ status: 400 });
+          }
+          const application = yield* WebsiteServerApplication;
+          return yield* application.docsDiscovery(discoveryPath).pipe(
+            Effect.map((document) => {
+              const headers = {
+                "cache-control": "public, max-age=300",
+                "content-type": `${document.contentType}; charset=utf-8`,
+                "x-content-type-options": "nosniff",
+              };
+              return request.method === "HEAD"
+                ? HttpServerResponse.empty({ headers, status: 200 })
+                : HttpServerResponse.text(document.body, {
+                    contentType: `${document.contentType}; charset=utf-8`,
+                    headers,
+                  });
+            }),
+            Effect.catch(() =>
+              Effect.succeed(
+                HttpServerResponse.empty({
+                  headers: { "cache-control": "no-store" },
+                  status: 503,
+                })
+              )
+            )
+          );
+        }
         const calculatorId = Match.value(url.pathname).pipe(
           Match.when("/calculators/au.income-tax.annual", () =>
             AuAnnualTaxCalculatorId.make("au.income-tax.annual")

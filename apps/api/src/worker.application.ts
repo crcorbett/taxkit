@@ -12,7 +12,10 @@ import {
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcHttpLayer } from "@taxkit/api-rpc/server";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
-import { ContentService } from "@taxkit/content/service";
+import { DocsSourceError } from "@taxkit/content/errors";
+import { ContentDiscoveryLive } from "@taxkit/content/live";
+import { DocsDiscoverySettings } from "@taxkit/content/schemas";
+import { ContentCatalogue, ContentService } from "@taxkit/content/service";
 import { safeHttpEffect } from "alchemy/Http";
 import {
   ByteSize,
@@ -71,11 +74,35 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     PublicCalculatorService,
     yield* PublicCalculatorService
   );
+  const discovery = ContentDiscoveryLive(
+    settings.pipe(
+      Effect.map((config) =>
+        DocsDiscoverySettings.make({
+          apiOrigin: config.apiOrigin,
+          websiteOrigin: config.websiteOrigin,
+        })
+      ),
+      Effect.mapError(
+        () =>
+          new DocsSourceError({
+            message: "Documentation discovery settings are unavailable.",
+            operation: "getDiscoveryDocument",
+          })
+      )
+    )
+  ).pipe(
+    Layer.provide(Layer.succeed(ContentCatalogue, yield* ContentCatalogue))
+  );
   const routes = Layer.mergeAll(
     TaxKitApiRoutesLayer,
     TaxKitRpcHttpLayer.pipe(Layer.provide(calculator))
   ).pipe(
-    Layer.provide(Layer.succeed(ContentService, yield* ContentService)),
+    Layer.provide(
+      Layer.merge(
+        Layer.succeed(ContentService, yield* ContentService),
+        discovery
+      )
+    ),
     HttpRouter.provideRequest(calculator)
   );
   const handler = yield* HttpRouter.toHttpEffect(routes).pipe(

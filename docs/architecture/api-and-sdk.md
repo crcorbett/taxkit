@@ -632,11 +632,12 @@ The [calculator rate owner](../../packages/calculators/README.md#native-calculat
 
 ### Native documentation RPC
 
-The same API POST endpoint mounts four documentation procedures through
+The same API POST endpoint mounts five documentation procedures through
 `TaxKitPublicRpcGroup`, composed with the unchanged nine-procedure calculator
-group. Documentation has its own `DocsRpcClient` and revision 1; calculator
+group. Documentation has its own `DocsRpcClient` and revision 2; calculator
 revision 4 and its required client methods are preserved. The server requires
-both owning services, supplied once at API composition. The content handlers
+the calculator, content lookup and discovery services, supplied once at API
+composition. The content handlers
 reuse the generated accepted catalogue and canonical values; they run no
 calculation and take no calculator allowance.
 
@@ -644,8 +645,8 @@ Both private client groups share the native scoped 2 MiB response reader, then
 project its private marker into their own errors. Documentation calls have a
 ten-second complete-response deadline, caller cancellation, credential/redirect
 and tracing policy, checked version skew and decoder-only invalid-reply marker.
-Their fixed page/search errors and public-path bound belong to `@taxkit/content`
-and are shared with HTTP. Native fatal defects retain the existing safe global
+Their fixed page/search/discovery errors and path bounds belong to `@taxkit/content`.
+Page/search failures and public page paths are shared with HTTP. Native fatal defects retain the existing safe global
 literal; procedure defects use the declared documentation literal. Defects stay
 defects. The Website now supplies that client over its private binding and
 uses browser-safe compiled MDX presentation. Its native GET loader transports
@@ -654,4 +655,10 @@ There is no authored-source fallback in the Website. Its `/search` form uses
 the same named `searchDocs` operation, term and result limits. Browser native
 GET carries an ASCII URI component header; original SSR words cannot be
 overridden by that header. Empty words skip the operation. The private app
-connection changes no public HTTP/RPC contract. Discovery remains T005 work.
+connection preserves the four public HTTP content routes. The fifth named
+documentation call changes the private documentation revision. It returns a
+closed discovery document derived from accepted content and the API application's
+checked, lazy cached stage settings; the client checks its returned file path
+against the requested one. Shared origin validation has separate API/Website
+identities. The Website serves the four conventional files without reading MDX
+source or constructing another runtime.

@@ -1,4 +1,8 @@
-import type { DocsPagePath, DocsSearchTerm } from "@taxkit/content/schemas";
+import type {
+  DocsDiscoveryPath,
+  DocsPagePath,
+  DocsSearchTerm,
+} from "@taxkit/content/schemas";
 import { Array, Effect, Layer, Schema } from "effect";
 import type { Scope } from "effect";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
@@ -42,7 +46,7 @@ const replySerialization = Layer.succeed(
   })
 );
 
-// Four concrete documentation calls share lifetime and failure policy. This
+// Concrete documentation calls share lifetime and failure policy. This
 // accepts a native Effect, never an open-ended raw-client callback.
 const checkedDocsRpcOperation = <A>(
   operation: Effect.Effect<
@@ -80,6 +84,23 @@ export const DocsRpcClientLive = (origin: CalculatorRpcOrigin) =>
     Effect.gen(function* () {
       const protocol = yield* RpcClient.Protocol;
       return DocsRpcClient.of({
+        getDiscovery: Effect.fn("DocsRpcClient.getDiscovery")(
+          (path: DocsDiscoveryPath) =>
+            checkedDocsRpcOperation(
+              RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
+                Effect.flatMap((client) =>
+                  client.GetDocsDiscovery({ path, version: DocsRpcVersion })
+                )
+              ),
+              protocol
+            ).pipe(
+              Effect.flatMap((document) =>
+                document.path === path
+                  ? Effect.succeed(document)
+                  : Effect.fail(new DocsRpcInvalidResponse())
+              )
+            )
+        ),
         getMarkdown: Effect.fn("DocsRpcClient.getMarkdown")(
           (path: DocsPagePath) =>
             checkedDocsRpcOperation(

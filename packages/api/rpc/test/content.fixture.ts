@@ -14,6 +14,21 @@ export const docsTerm = Schema.decodeResult(DocsSearchTerm)("Start").pipe(
 export const DocsRpcOperationCases = [
   {
     invoke: (client: DocsRpcClient["Service"]) =>
+      client.getDiscovery("/sitemap.xml").pipe(Effect.asVoid),
+    nativeInvoke: (
+      client: RpcClient.FromGroup<
+        typeof DocsRpcGroup,
+        RpcClientError.RpcClientError
+      >,
+      version: string
+    ) =>
+      client
+        .GetDocsDiscovery({ path: "/sitemap.xml", version })
+        .pipe(Effect.asVoid),
+    operation: "getDiscovery",
+  },
+  {
+    invoke: (client: DocsRpcClient["Service"]) =>
       client.getNavigation().pipe(Effect.asVoid),
     nativeInvoke: (
       client: RpcClient.FromGroup<

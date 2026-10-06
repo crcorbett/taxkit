@@ -372,17 +372,17 @@ navigation, spaced controls and visible keyboard focus.
 
 The [Website owner](../../apps/web/README.md#native-calculation-rate-admission) captures checked original connection identity and uses the API's binding-only named operation for HTML forms. Browser calculations use public RPC. Both reach the same [calculator-owned allowance](../../packages/calculators/README.md#native-calculation-rate-admission), including separate batch members. Containers show fixed safe guidance with manual retry. This adds no calculation engine, stored figures, analytics identity or URL data to the Website. Private-call local cancellation and remote work limits remain distinct.
 
-T005 now prepares four checked documentation calls at the API/RPC owner. The
+T005 now supplies five checked documentation calls at the API/RPC owner. The
 actual native pair test compares all accepted page values and exact Markdown
 through the documentation client, alongside the retained calculator journeys.
 The Website now connects these loaders and renders browser-safe compiled MDX
-presentation as described below. Discovery and replacement qualification must
+presentation as described below. Markdown negotiation, share images and replacement qualification must
 finish before the retained docs app can retire.
 
 ## Replacement Website documentation composition
 
 The Website's catch-all route gets canonical page/navigation values through
-four named `WebsiteServerApplication` documentation operations. One server
+five named `WebsiteServerApplication` documentation operations. One server
 runtime supplies the scoped native client. The app's documentation HttpClient
 materialises a native `Request` with `HttpClientRequest.toWeb`, preserving the
 immutable JSON byte body and request signal, then calls the attached binding
@@ -417,7 +417,7 @@ against the API page at preload and display. Body/metadata drift or a missing
 compiled module becomes fixed recoverable guidance. The native pair proves
 actual HTML for every accepted page, native 404, malformed loader restoration,
 internal navigation without document reload, phone/keyboard behaviour and
-reading without JavaScript. Search is described below; discovery remains T005 work. The
+reading without JavaScript. Search and discovery are described below; later T005 work remains open. The
 [dated receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json)
 records local proof; it establishes no deployment or public availability.
 
@@ -449,4 +449,25 @@ states have distinct fixed guidance; malformed loader data shares recoverable
 unavailable guidance. Results use the existing router-link and heading-focus
 policy. The form works without JavaScript. Search addresses are `noindex,
 follow`; words are not collected and no second index or calculation value is
-introduced. Discovery files and share images remain separate T005 work.
+introduced. Share images and Markdown negotiation remain separate T005 work.
+
+
+### Replacement Website discovery files
+
+The Website host admits four closed paths before React routing: `/sitemap.xml`,
+`/robots.txt`, `/llms.txt` and `/llms-full.txt`. Its existing server runner calls
+`docsDiscovery`, backed by the native API client and `ContentDiscovery` owner.
+The backend derives the file from the same accepted catalogue and checks lazy
+application settings for actual stage addresses. The Website owns no second
+index, authored-source access or live Layer construction.
+
+GET returns checked XML or plain text, UTF-8, a five-minute public cache and
+`nosniff`. HEAD has the same headers, explicit 200 and no body. Other methods
+return empty 405 with `Allow: GET, HEAD`; query input returns empty 400.
+Expected transport/configuration failure gives empty 503 with `no-store`.
+Unexpected Causes keep the existing safe host failure policy. The short agent
+index links existing public API processed Markdown; the full file preserves
+all accepted bodies, including fenced code examples. No personal reports enter
+these documents. The [discovery receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json)
+owns bounded local observations; availability and old-app retirement require
+separate proof.

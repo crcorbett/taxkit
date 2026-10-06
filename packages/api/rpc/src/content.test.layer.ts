@@ -11,6 +11,9 @@ export const DocsRpcClientTest = Layer.effect(
   RpcTest.makeClient(DocsRpcGroup).pipe(
     Effect.map((client) =>
       DocsRpcClient.of({
+        getDiscovery: Effect.fn("DocsRpcClient.getDiscovery")((path) =>
+          client.GetDocsDiscovery({ path, version: DocsRpcVersion })
+        ),
         getMarkdown: Effect.fn("DocsRpcClient.getMarkdown")((path) =>
           client.GetDocsMarkdown({ path, version: DocsRpcVersion })
         ),

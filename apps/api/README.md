@@ -22,12 +22,21 @@ Both API hosts provide `ContentService` from the accepted generated catalogue.
 `src/content.boundary.ts` imports only `@taxkit/docs-content/public-catalogue`
 JSON, checks it once when the host is built and reports a fixed configuration
 failure if it is invalid. Incoming requests do not load authored MDX or run
-the compiler. Public HTTP and four native RPC documentation operations serve
+the compiler. Public HTTP and native RPC documentation operations serve
 navigation, checked page values, bounded search and exact processed Markdown
 from that same service. Documentation calls consume no calculator allowance.
 See the [HTTP package](../../packages/api/http/README.md) for paths/response rules
 and the [RPC owner](../../packages/api/rpc/README.md#documentation-connection)
 for the separate documentation revision and client.
+
+The native instance also builds `ContentDiscovery` from that same checked
+catalogue. It receives the already cached, checked API/Website settings as a
+lazy Effect, so deferred native addresses are resolved on incoming use. The
+revision-two native discovery call returns one of four bounded documents with
+its matching media type; internal projection/configuration failures become
+fixed unavailable guidance. The Website serves them at their ordinary file
+addresses. Existing public HTTP routes and the standalone Bun host retain
+their content contract. Discovery takes no calculator allowance.
 
 The API dependency build generates the accepted catalogue before TypeScript
 or native bundling consumes it. Its ESNext module profile preserves the JSON

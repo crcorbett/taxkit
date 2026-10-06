@@ -1,5 +1,50 @@
 import { Array, HashSet, Schema } from "effect";
 
+// Shared public address policy; API and Website retain distinct identities.
+export const PublicHttpOrigin = Schema.URLFromString.check(
+  Schema.makeFilter(
+    (url) =>
+      url.href === `${url.origin}/` &&
+      (url.protocol === "https:" ||
+        (url.protocol === "http:" &&
+          (url.hostname === "localhost" || url.hostname === "127.0.0.1")))
+  )
+);
+export const DocsWebsiteOrigin = PublicHttpOrigin.pipe(
+  Schema.brand("taxkit/DocsWebsiteOrigin")
+);
+export type DocsWebsiteOrigin = typeof DocsWebsiteOrigin.Type;
+export const DocsDiscoverySettings = Schema.Struct({
+  apiOrigin: PublicHttpOrigin,
+  websiteOrigin: DocsWebsiteOrigin,
+});
+export type DocsDiscoverySettings = typeof DocsDiscoverySettings.Type;
+export const DocsDiscoveryPath = Schema.Literals([
+  "/sitemap.xml",
+  "/robots.txt",
+  "/llms.txt",
+  "/llms-full.txt",
+]);
+export type DocsDiscoveryPath = typeof DocsDiscoveryPath.Type;
+// Even six-byte JSON escaping of every character fits the existing 2 MiB RPC
+// response budget, including its small fixed framing and metadata.
+export const DocsDiscoveryBody = Schema.String.check(
+  Schema.isMaxLength(300_000)
+).pipe(Schema.brand("taxkit/DocsDiscoveryBody"));
+export const DocsDiscoveryDocument = Schema.Struct({
+  body: DocsDiscoveryBody,
+  contentType: Schema.Literals(["application/xml", "text/plain"]),
+  path: DocsDiscoveryPath,
+}).check(
+  Schema.makeFilter(
+    (document) =>
+      document.contentType ===
+      (document.path === "/sitemap.xml" ? "application/xml" : "text/plain"),
+    { message: "The discovery address and media type must agree." }
+  )
+);
+export type DocsDiscoveryDocument = typeof DocsDiscoveryDocument.Type;
+
 export const DocsNonEmptyText = Schema.Trimmed.check(Schema.isMinLength(1));
 export type DocsNonEmptyText = typeof DocsNonEmptyText.Type;
 

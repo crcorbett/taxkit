@@ -122,6 +122,7 @@ export const WebsiteServerLive = (binding: Cloudflare.Env["TAXKIT_API"]) =>
                     )
                   ),
                 catalogue: client.listCalculators(MetadataQuery.make({})),
+                docsDiscovery: docs.getDiscovery,
                 docsMarkdown: docs.getMarkdown,
                 docsNavigation: docs.getNavigation(),
                 docsPage: docs.getPage,
@@ -193,6 +194,7 @@ export const WebsiteServerLive = (binding: Cloudflare.Env["TAXKIT_API"]) =>
             WebsiteServerApplication.of({
               calculate: () => Effect.fail(error),
               catalogue: Effect.fail(error),
+              docsDiscovery: () => Effect.fail(error),
               docsMarkdown: () => Effect.fail(error),
               docsNavigation: Effect.fail(error),
               docsPage: () => Effect.fail(error),

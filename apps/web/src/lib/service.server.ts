@@ -6,6 +6,8 @@ import type {
   CalculatorRunServiceRequest,
 } from "@taxkit/api-rpc/schemas";
 import type {
+  DocsDiscoveryDocument,
+  DocsDiscoveryPath,
   DocsPagePath,
   DocsPublicNavigation,
   DocsPublicPage,
@@ -19,6 +21,12 @@ import type { TaxKitWebConfigError } from "./config";
 import type { WebsitePublicSettings } from "./schemas";
 
 export interface WebsiteServerApplicationContract {
+  readonly docsDiscovery: (
+    path: DocsDiscoveryPath
+  ) => Effect.Effect<
+    DocsDiscoveryDocument,
+    DocsRpcClientError | TaxKitWebConfigError
+  >;
   readonly docsNavigation: Effect.Effect<
     DocsPublicNavigation,
     DocsRpcClientError | TaxKitWebConfigError

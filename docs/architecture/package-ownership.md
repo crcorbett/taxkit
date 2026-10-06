@@ -135,8 +135,10 @@ calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
   restores encoded outcomes. Tax rules and calculations remain package/API-owned;
   the three calculator pages and bounded T003 connection are locally qualified.
   The same app owns checked documentation page loaders, app-specific MDX
-  composition, navigation/focus and responsive reading. Search, discovery and
-  retirement of `apps/docs` remain T005 work.
+  composition, navigation/focus, search and responsive reading. Its server
+  returns checked backend discovery documents at their conventional addresses.
+  Markdown negotiation, share images and retirement of `apps/docs` remain
+  T005 work.
 
 `apps/docs`
 : Implemented public documentation app. It owns TanStack Start routes, the
@@ -189,7 +191,10 @@ T009 exported tracing and provider/deployment proof remain open.
   owner does not perform source acceptance or compile MDX. HTTP and native RPC
   content groups consume this compiled contract instead of the source-only
   Fumadocs collection. The public path refinement and fixed page/search errors
-  have one owner here.
+  have one owner here. `ContentDiscovery` and its separate live/test composition
+  derive the four discovery documents from the same catalogue and deferred
+  checked stage settings. Shared public-origin policy and distinct Website
+  identity live in its Schema owner; RPC retains a distinct API identity.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs

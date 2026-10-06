@@ -1,7 +1,11 @@
-import { DocsPublicPagePath, DocsSearchTerm } from "@taxkit/content/schemas";
+import {
+  DocsDiscoveryPath,
+  DocsPublicPagePath,
+  DocsSearchTerm,
+} from "@taxkit/content/schemas";
 import { Duration, Schema, SchemaGetter } from "effect";
 
-export const DocsRpcVersion = "1";
+export const DocsRpcVersion = "2";
 export const DocsRpcDeadline = Duration.seconds(10);
 export const DocsNavigationRpcPayload = Schema.Struct({
   version: Schema.String.check(Schema.isMaxLength(32)),
@@ -12,6 +16,10 @@ export const DocsPageRpcPayload = Schema.Struct({
 });
 export const DocsSearchRpcPayload = Schema.Struct({
   term: DocsSearchTerm,
+  ...DocsNavigationRpcPayload.fields,
+});
+export const DocsDiscoveryRpcPayload = Schema.Struct({
+  path: DocsDiscoveryPath,
   ...DocsNavigationRpcPayload.fields,
 });
 export const DocsRpcSafeDefect = Schema.Unknown.pipe(

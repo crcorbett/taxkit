@@ -7,9 +7,12 @@ import {
   CalculatorOperationTimedOut,
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
-import { ContentServiceLive } from "@taxkit/content/live";
+import { ContentDiscoveryLive, ContentServiceLive } from "@taxkit/content/live";
 import { ContentCatalogue } from "@taxkit/content/service";
-import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import {
+  exampleContentCatalogue,
+  exampleDiscoverySettings,
+} from "@taxkit/content/testing/fixtures";
 import {
   Array,
   Cause,
@@ -89,7 +92,10 @@ const makeHttpTransport = Effect.fnUntraced(function* (
     TaxKitRpcHttpLayer.pipe(
       Layer.provide(CalculatorFixture(mode)),
       Layer.provide(
-        ContentServiceLive.pipe(
+        Layer.merge(
+          ContentServiceLive,
+          ContentDiscoveryLive(exampleDiscoverySettings.pipe(Effect.orDie))
+        ).pipe(
           Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
         )
       )

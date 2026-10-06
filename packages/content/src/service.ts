@@ -3,6 +3,8 @@ import type { Effect } from "effect";
 
 import type { DocsPageNotFoundError, DocsSourceError } from "./errors.js";
 import type {
+  DocsDiscoveryDocument,
+  DocsDiscoveryPath,
   DocsPagePath,
   DocsPublicCatalogue,
   DocsPublicNavigation,
@@ -31,3 +33,12 @@ export class ContentService extends Context.Service<
   ContentService,
   ContentServiceContract
 >()("@taxkit/content/ContentService") {}
+
+export class ContentDiscovery extends Context.Service<
+  ContentDiscovery,
+  {
+    readonly getDocument: (
+      path: DocsDiscoveryPath
+    ) => Effect.Effect<DocsDiscoveryDocument, DocsSourceError>;
+  }
+>()("@taxkit/content/ContentDiscovery") {}

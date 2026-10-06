@@ -275,7 +275,7 @@ const program = Effect.gen(function* () {
           return ContentService.of({ ...content,
             getPage: (path) => content.getPage(path).pipe(Effect.map((page) => ${replacement})),
           });
-        })).pipe(Layer.provide(ApiContentLive))),`
+        })).pipe(Layer.provideMerge(ApiContentLive))),`
             );
           yield* fs.writeFileString(owner, injected);
           const fixtureId = `TaxKitApiDocs${mode}`;

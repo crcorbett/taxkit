@@ -7,6 +7,7 @@ import {
   CalculatorRunServiceRequest,
 } from "@taxkit/api-rpc/schemas";
 import {
+  DocsWebsiteOrigin,
   DocsPublicNavigation,
   DocsPublicPage,
   DocsSearchTerm,
@@ -31,12 +32,9 @@ import {
   WebsiteInputError,
 } from "./form.boundary";
 
-const WebsiteOrigin = CalculatorRpcOrigin.pipe(
-  Schema.brand("TaxKitWebsiteOrigin")
-);
 export const WebsitePublicSettings = Schema.Struct({
   apiOrigin: CalculatorRpcOrigin,
-  websiteOrigin: WebsiteOrigin,
+  websiteOrigin: DocsWebsiteOrigin,
 });
 export type WebsitePublicSettings = typeof WebsitePublicSettings.Type;
 export const WebsiteSettingsTransport = Schema.toCodecJson(

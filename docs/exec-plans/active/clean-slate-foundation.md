@@ -78,7 +78,7 @@ records command outcomes and log digests.
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
-| T005 / DEV-76 | In progress | All 61 pages and navigation have source-bound acceptance; draft #155 contains the tested catalogue and links. Four HTTP content routes pass full local and external package checks. Four separately versioned native documentation RPC operations are the current candidate. Replacement Website routes and discovery remain unfinished. |
+| T005 / DEV-76 | In progress | All 61 pages and navigation have source-bound acceptance; draft #155 contains the tested catalogue and links. Four HTTP content routes pass full local and external package checks. Pages and search passed local qualification. Five separately versioned native documentation RPC operations and four conventional discovery files are the current candidate. Markdown negotiation, share images and old-app retirement remain unfinished. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
@@ -4223,3 +4223,70 @@ needs its own rendered values, so its scoped React shell remains detached.
 No cast, lint exception or global type override is added. Real page, focus and
 form observations remain in the native journey. Fresh focused types, lint and
 browser checks precede complete qualification of the corrected sources.
+### T005 discovery implementation intent — 7 October
+
+Search commit `8b32afca` passed complete local tests and verification and was
+pushed to draft #155. Its own hosted Quality run `37509022712` remains pending
+at this observation. Metrics remain deferred.
+
+The next slice derives `/sitemap.xml`, `/robots.txt`, `/llms.txt` and
+`/llms-full.txt` from the accepted catalogue in the backend content owner.
+Native Website addresses are deferred `Worker.URL` values, so the ordinary
+source build cannot safely bake the actual stage origin into static files.
+One closed discovery operation will use the application's already checked,
+cached Website settings at request time; the Website will return its checked
+document without owning a second catalogue or reading authored MDX. Public
+origin validation will have one shared Schema with separate API and Website
+identities. No calculation values, invented modification dates, additional
+cache or collection event belong in these files.
+
+The current llms.txt proposal, sitemap protocol and Google's crawler guidance
+were read on 7 October. Agent links must lead to usable processed Markdown;
+the current explicit API Markdown links can do this while same-page Markdown
+negotiation remains a later slice. Robots controls crawling rather than access;
+search retains its noindex response/page policy. The actual configured origin,
+complete accepted-page coverage, text/media types, safe errors, request lifetime
+and old useful routes need local built-app proof before accepting this slice.
+
+Documentation impact: Change required for content/API/RPC/Website contracts,
+their package guides, owning architecture, exact checks and current task/journey
+pointers. Preserve source-bound acceptance, retained tax results, previous proof,
+disabled collection and the older app until retirement proof. No new operational
+command or provider action is intended, so runbook applicability is N/A.
+
+
+The final scope uses only the new private discovery call and conventional
+Website file URLs. An exploratory public HTTP JSON discovery route was removed:
+existing public Markdown links already serve the short index, so that extra
+route added no needed consumer. The four public HTTP content routes, accepted
+source/review records and generated OpenAPI owner stay unchanged. Content and
+private RPC have appropriate major Changesets for their new contracts.
+
+The first native attempt exposed HEAD's default empty 204 response; its host
+owner now explicitly returns 200 with GET-equivalent headers. The next attempt
+found an invalid full-index assertion that rejected imports inside useful fenced
+code examples. Exact accepted processed-body comparison replaces that assertion;
+source compilation retains responsibility for removing authored MDX syntax.
+No cast, policy exception or tax-data change is added. Current qualification is
+pending at the [discovery receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json).
+
+
+Fresh discovery qualification passed owning types, lint, content, RPC and API
+checks. Actual discovery GET/HEAD and XML/content assertions passed in the native
+journey, which later found a controlled mismatch fixture had dropped the new
+ContentCatalogue dependency. The fixture's Layer now retains that catalogue
+while substituting only the intended page reply; mismatch assertions stay
+unchanged. A fresh build and complete native run must qualify this correction.
+
+Search commit `8b32afca` separately passed hosted Quality run `37509022712`,
+job `112425009444`, completed 6 October at 18:26:09 UTC. The exact head was read
+back on 7 October. This proves that search commit's hosted checks only; current
+discovery files still need their own qualification and later hosted run.
+
+
+The corrected candidate passed fresh types and lint plus all eleven native tests
+across seven files, including the three intended presentation mismatches, all
+discovery assertions and retained calculators. Parent review found no new
+source/runtime/collection owner or policy exception. Full repository/package
+qualification now runs against frozen staged sources; its final receipt must
+retain failures and source identities before this slice is committed.

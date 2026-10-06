@@ -18,6 +18,7 @@ import {
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
 import {
+  DocsDiscoveryPath,
   DocsPublicCatalogue,
   DocsPublicPage,
   DocsPublicNavigation,
@@ -308,7 +309,7 @@ describe("built native API and Website", () => {
         expect(publicContent.pages).toHaveLength(61);
         // Native RPC restores the same catalogue values across separate
         // actual Worker requests. No authored source or compiler is consulted.
-        yield* Effect.gen(function* () {
+        const discoveryDocuments = yield* Effect.gen(function* () {
           const client = yield* DocsRpcClient;
           expect(yield* client.getNavigation()).toEqual(
             publicContent.navigation
@@ -326,12 +327,109 @@ describe("built native API and Website", () => {
           expect(
             Array.every(results, (result) => result.excerpt.length <= 240)
           ).toBe(true);
+          return yield* Effect.forEach(
+            DocsDiscoveryPath.literals,
+            client.getDiscovery
+          );
         }).pipe(
           Effect.provide(
             DocsRpcClientLive(catalogueOrigin).pipe(
               Layer.provide(FetchHttpClient.layer)
             )
           )
+        );
+        const unavailableDiscoveryWorker = yield* Effect.promise(() =>
+          website.getWorker("taxkit-website-unavailable")
+        );
+        yield* Effect.forEach(discoveryDocuments, (document) =>
+          Effect.gen(function* () {
+            const served = yield* Effect.promise(() =>
+              website.dispatchFetch(`${websiteOrigin}${document.path}`)
+            );
+            expect(served.status).toBe(200);
+            expect(served.headers.get("content-type")).toBe(
+              `${document.contentType}; charset=utf-8`
+            );
+            expect(served.headers.get("cache-control")).toBe(
+              "public, max-age=300"
+            );
+            expect(served.headers.get("x-content-type-options")).toBe(
+              "nosniff"
+            );
+            expect(yield* Effect.promise(() => served.text())).toBe(
+              document.body
+            );
+            const head = yield* Effect.promise(() =>
+              website.dispatchFetch(`${websiteOrigin}${document.path}`, {
+                method: "HEAD",
+              })
+            );
+            expect(head.status).toBe(200);
+            expect(head.headers.get("content-type")).toBe(
+              served.headers.get("content-type")
+            );
+            expect(head.headers.get("cache-control")).toBe(
+              served.headers.get("cache-control")
+            );
+            expect(head.headers.get("x-content-type-options")).toBe(
+              served.headers.get("x-content-type-options")
+            );
+            expect(yield* Effect.promise(() => head.text())).toBe("");
+            const wrongMethod = yield* Effect.promise(() =>
+              website.dispatchFetch(`${websiteOrigin}${document.path}`, {
+                body: "PRIVATE9",
+                method: "POST",
+              })
+            );
+            expect(wrongMethod.status).toBe(405);
+            expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD");
+            expect(yield* Effect.promise(() => wrongMethod.text())).toBe("");
+            const query = yield* Effect.promise(() =>
+              website.dispatchFetch(
+                `${websiteOrigin}${document.path}?PRIVATE9=1`
+              )
+            );
+            expect(query.status).toBe(400);
+            expect(yield* Effect.promise(() => query.text())).toBe("");
+            const unavailable = yield* Effect.promise(() =>
+              unavailableDiscoveryWorker.fetch(
+                `${websiteOrigin}${document.path}`
+              )
+            );
+            expect(unavailable.status).toBe(503);
+            expect(unavailable.headers.get("cache-control")).toBe("no-store");
+            expect(yield* Effect.promise(() => unavailable.text())).toBe("");
+          })
+        );
+        const discoverySitemap = yield* Array.findFirst(
+          discoveryDocuments,
+          (document) => document.path === "/sitemap.xml"
+        ).pipe(Effect.fromOption);
+        const discoveryIndex = yield* Array.findFirst(
+          discoveryDocuments,
+          (document) => document.path === "/llms.txt"
+        ).pipe(Effect.fromOption);
+        const discoveryFull = yield* Array.findFirst(
+          discoveryDocuments,
+          (document) => document.path === "/llms-full.txt"
+        ).pipe(Effect.fromOption);
+        expect(discoverySitemap.body).not.toContain("lastmod");
+        expect(discoverySitemap.body).not.toContain("/search");
+        expect(discoveryIndex.body).not.toContain(".mdx");
+        // Exact processed-body comparison preserves useful fenced import/code
+        // examples. It must not reject every line beginning with "import".
+        yield* Effect.forEach(publicContent.pages, (page) =>
+          Effect.sync(() => {
+            expect(discoverySitemap.body).toContain(
+              `<loc>${websiteOrigin}${page.path}</loc>`
+            );
+            expect(discoveryIndex.body).toContain(
+              `(${apiOrigin}/api/v1/docs/markdown?${new URLSearchParams({ path: page.path }).toString()})`
+            );
+            expect(discoveryFull.body).toContain(
+              `Canonical page: ${websiteOrigin}${page.path}\n\n${page.markdown}`
+            );
+          })
         );
         const docsNavigation = yield* Effect.promise(() =>
           publicApi.dispatchFetch(`${apiOrigin}/api/v1/docs/navigation`)
@@ -1512,6 +1610,31 @@ describe("built native API and Website", () => {
             })
         );
         const docsPage = yield* Effect.promise(() => context.newPage());
+        const parsedSitemap = yield* Effect.promise(() =>
+          docsPage.evaluate((xml) => {
+            const document = new DOMParser().parseFromString(
+              xml,
+              "application/xml"
+            );
+            return {
+              hasParserError: document.querySelector("parsererror") !== null,
+              locationCount: document.querySelectorAll("loc").length,
+              locationText: document.documentElement.textContent ?? "",
+              namespace: document.documentElement.namespaceURI,
+            };
+          }, discoverySitemap.body)
+        );
+        expect(parsedSitemap.hasParserError).toBe(false);
+        expect(parsedSitemap.namespace).toBe(
+          "http://www.sitemaps.org/schemas/sitemap/0.9"
+        );
+        expect(parsedSitemap.locationCount).toBe(61);
+        expect(parsedSitemap.locationText.trim().split(/\s+/u)).toEqual(
+          Array.map(
+            publicContent.pages,
+            (item) => `${websiteOrigin}${item.path}`
+          )
+        );
         docsPage.on("pageerror", (error) =>
           Queue.offerUnsafe(exceptions, error.message)
         );

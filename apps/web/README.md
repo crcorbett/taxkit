@@ -18,7 +18,7 @@ in the separate API app. The current public docs app remains `apps/docs`.
 
 The server has one `ManagedRuntime` in `src/lib/runtime.server.ts`. Its checked
 `WebsiteServerApplication` exposes settings, the supported calculator catalogue,
-calculation and four named documentation operations. The private
+calculation and five named documentation operations. The private
 `TAXKIT_API` service binding supplies the server connection. Calculator calls use the native Alchemy Fetcher adapter. Documentation calls
 materialise their native HTTP request with `HttpClientRequest.toWeb`, preserving
 the JSON byte body and the binding's receiver. This avoids carrying a stream
@@ -300,7 +300,7 @@ The native pair test also uses the separate checked documentation RPC client
 against the actual built API. It compares navigation, every one of the 61
 accepted pages and exact Markdown, plus bounded search across separate Worker
 requests. The same saved journey now qualifies the Website page connection described below.
-Search interaction is described below. Discovery and retirement of the old app remain T005 work.
+Search and discovery are described below. Retirement of the old app remains T005 work.
 
 ## Documentation pages
 
@@ -332,7 +332,7 @@ three source-built content mismatches, malformed browser transport, real
 sidebar/MDX navigation without document reload, heading focus, mobile
 navigation, table keyboard focus and reading without JavaScript. Saved local
 images supplement those checks. The [Website documentation receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json)
-records their scope. Discovery files, share images and old-app retirement
+records their scope. Share images and old-app retirement
 are separate unfinished work. No local check establishes public availability.
 
 The application router supplies the named documentation page loader through
@@ -378,3 +378,30 @@ to serve a page after its address is printed. Only startup 502 or 503 responses
 are retried; other errors fail immediately. The following actual browser
 navigation must still return 200 and show the expected page. This is a bounded
 readiness condition, not evidence of the cause of an earlier hosted 502.
+
+## Documentation discovery
+
+The Website serves `/sitemap.xml`, `/robots.txt`, `/llms.txt` and
+`/llms-full.txt` through the same app-owned server runner and the checked private
+`docsDiscovery` call. The backend content owner derives every document from
+the accepted catalogue and the configured stage addresses. No authored MDX,
+extra content index or guessed public origin enters Website request handling.
+
+GET returns the declared XML/plain-text UTF-8 body; HEAD returns the same
+successful headers with no body. Both use a five-minute public cache header
+and `nosniff`. Other methods receive empty 405 with `Allow: GET, HEAD`;
+query input receives empty 400. Expected backend/settings failure returns
+empty 503 with `no-store`. Each call retains the native documentation deadline,
+checked reply, address correlation and caller cancellation.
+
+The sitemap lists accepted documentation pages without inventing update dates.
+Robots links it and excludes private server functions; the search page's
+noindex policy remains visible to crawlers. Agent links use the existing
+processed-Markdown API; the full index preserves every accepted processed body
+and explains its Website link base. It includes useful code examples and
+contains no personal calculation reports. Native tests compare actual served
+documents with checked backend replies, parse sitemap XML in Chromium, check
+all page addresses/bodies, headers/HEAD, invalid requests and unavailable API.
+The [discovery receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json)
+keeps exact local proof and limitations. Same-page Markdown negotiation,
+share images and old-app retirement remain unfinished.

@@ -1,4 +1,5 @@
 import { CalculatorRpcOrigin } from "@taxkit/api-rpc/schemas";
+import { DocsWebsiteOrigin } from "@taxkit/content/schemas";
 import { Schema } from "effect";
 
 const ApiServerHostSchema = Schema.NonEmptyString;
@@ -33,14 +34,9 @@ export class ApiServerConfigError extends Schema.TaggedError<ApiServerConfigErro
   { operation: Schema.Literal("settings") }
 ) {}
 
-// Reuse the checked origin policy, with a distinct identity for the website.
-const ApiWebsiteOrigin = CalculatorRpcOrigin.pipe(
-  Schema.brand("ApiWebsiteOrigin")
-);
-
 export const ApiWorkerSettings = Schema.Struct({
   apiOrigin: CalculatorRpcOrigin,
-  websiteOrigin: ApiWebsiteOrigin,
+  websiteOrigin: DocsWebsiteOrigin,
 });
 
 export type ApiWorkerSettings = typeof ApiWorkerSettings.Type;

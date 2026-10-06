@@ -5,6 +5,7 @@ import {
   GetCalculatorRequest,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
+import { PublicHttpOrigin } from "@taxkit/content/schemas";
 import { ByteSize, Duration, Schema, SchemaGetter } from "effect";
 
 export {
@@ -51,15 +52,9 @@ export const CalculatorDiscoveryRpcPayload = Schema.Struct({
   version: CalculatorRpcPayload.fields.version,
 });
 
-export const CalculatorRpcOrigin = Schema.URLFromString.check(
-  Schema.makeFilter(
-    (url) =>
-      url.href === `${url.origin}/` &&
-      (url.protocol === "https:" ||
-        (url.protocol === "http:" &&
-          (url.hostname === "localhost" || url.hostname === "127.0.0.1")))
-  )
-).pipe(Schema.brand("@taxkit/api-rpc/CalculatorRpcOrigin"));
+export const CalculatorRpcOrigin = PublicHttpOrigin.pipe(
+  Schema.brand("@taxkit/api-rpc/CalculatorRpcOrigin")
+);
 export type CalculatorRpcOrigin = typeof CalculatorRpcOrigin.Type;
 
 export const CalculatorRpcDeadline = Duration.seconds(10);

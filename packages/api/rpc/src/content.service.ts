@@ -1,4 +1,6 @@
 import type {
+  DocsDiscoveryDocument,
+  DocsDiscoveryPath,
   DocsPagePath,
   DocsPublicNavigation,
   DocsPublicPage,
@@ -13,6 +15,9 @@ import type { DocsRpcClientError } from "./content.errors.js";
 export class DocsRpcClient extends Context.Service<
   DocsRpcClient,
   {
+    readonly getDiscovery: (
+      path: DocsDiscoveryPath
+    ) => Effect.Effect<DocsDiscoveryDocument, DocsRpcClientError>;
     readonly getNavigation: () => Effect.Effect<
       DocsPublicNavigation,
       DocsRpcClientError

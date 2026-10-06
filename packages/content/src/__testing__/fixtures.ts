@@ -1,6 +1,13 @@
 import { Schema } from "effect";
 
-import { DocsPublicCatalogue } from "../schemas.js";
+import { DocsDiscoverySettings, DocsPublicCatalogue } from "../schemas.js";
+
+export const exampleDiscoverySettings = Schema.decodeEffect(
+  DocsDiscoverySettings
+)({
+  apiOrigin: "https://api.example.com",
+  websiteOrigin: "https://website.example.com",
+});
 
 // Checked, controlled test data does not accept any authored MDX for publication.
 export const exampleContentCatalogue = Schema.decodeEffect(DocsPublicCatalogue)(

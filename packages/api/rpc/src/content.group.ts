@@ -1,4 +1,5 @@
 import {
+  DocsDiscoveryDocument,
   DocsPublicNavigation,
   DocsPublicPage,
   DocsSearchResult,
@@ -8,6 +9,7 @@ import { Rpc, RpcGroup } from "effect/rpc";
 
 import { DocsRpcExpectedError } from "./content.errors.js";
 import {
+  DocsDiscoveryRpcPayload,
   DocsNavigationRpcPayload,
   DocsPageRpcPayload,
   DocsSearchRpcPayload,
@@ -39,9 +41,17 @@ export class GetDocsMarkdown extends Rpc.make("GetDocsMarkdown", {
   success: Schema.String,
 }) {}
 
+export class GetDocsDiscovery extends Rpc.make("GetDocsDiscovery", {
+  defect: DocsRpcSafeDefect,
+  error: DocsRpcExpectedError,
+  payload: DocsDiscoveryRpcPayload,
+  success: DocsDiscoveryDocument,
+}) {}
+
 export const DocsRpcGroup = RpcGroup.make(
   GetDocsNavigation,
   GetDocsPage,
   SearchDocsPages,
-  GetDocsMarkdown
+  GetDocsMarkdown,
+  GetDocsDiscovery
 );

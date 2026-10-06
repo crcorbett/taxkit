@@ -1,10 +1,12 @@
 import {
+  DocsDiscoveryUnavailable,
   DocsPageUnavailable,
   DocsSearchUnavailable,
 } from "@taxkit/content/errors";
 import { Schema } from "effect";
 
 export {
+  DocsDiscoveryUnavailable,
   DocsPageUnavailable,
   DocsSearchUnavailable,
 } from "@taxkit/content/errors";
@@ -39,6 +41,7 @@ export class DocsRpcResponseTooLarge extends Schema.TaggedError<DocsRpcResponseT
 ) {}
 
 export const DocsRpcExpectedError = Schema.Union([
+  DocsDiscoveryUnavailable,
   DocsPageUnavailable,
   DocsSearchUnavailable,
   DocsRpcVersionMismatch,

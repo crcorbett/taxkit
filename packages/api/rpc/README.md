@@ -10,8 +10,8 @@ review_trigger: RPC contracts, native codecs, clients, handlers, exports or tran
 # `@taxkit/api-rpc`
 
 Private compiled Effect 4 RPC transport over the existing calculator and content services.
-It owns nine calculator operations at revision 4 and four documentation operations
-at revision 1, their thin handlers and separate checked clients.
+It owns nine calculator operations at revision 4 and five documentation operations
+at revision 2, their thin handlers and separate checked clients.
 Tax definitions and calculation remain with `@taxkit/calculators` and rule
 packages. Both native app candidates now consume it. T003's bounded local
 connection acceptance is complete; T009 still owns safe exported tracing.
@@ -74,8 +74,8 @@ The repository [transport architecture](../../../docs/architecture/api-and-sdk.m
 [quality guide](../../../docs/architecture/testing-and-quality.md) and active
 [execution plan](../../../docs/exec-plans/active/clean-slate-foundation.md) own the
 wider design and proof limits. The documentation client and native API operations are implemented in T005;
-replacement Website page routes now consume that client; search interaction
-and discovery remain unfinished. Re-exported content
+replacement Website pages, search and discovery files now consume that client.
+Markdown negotiation, share images and old-app retirement remain unfinished. Re-exported content
 Schemas do not mount authored content in the browser.
 
 Run `bun run --filter=@taxkit/api-rpc test`, `check-types` and `build` for focused
@@ -201,12 +201,13 @@ Revision `4` preserves canonical `CalculatorRateLimited` and `CalculatorAdmissio
 ## Documentation connection
 
 `./content/group`, `./content/schemas`, `./content/errors`, `./content/service`,
-`./content/handlers`, `./content/live` and `./content/test` own four named calls:
-`getNavigation`, `getPage`, `getMarkdown` and `searchPages`. Their native procedure
-tags are `GetDocsNavigation`, `GetDocsPage`, `GetDocsMarkdown` and `SearchDocsPages`.
+`./content/handlers`, `./content/live` and `./content/test` own five named calls:
+`getNavigation`, `getPage`, `getMarkdown`, `searchPages` and `getDiscovery`.
+Their native procedure tags are `GetDocsNavigation`, `GetDocsPage`,
+`GetDocsMarkdown`, `SearchDocsPages` and `GetDocsDiscovery`.
 The combined server group admits these alongside the existing nine calculator
 procedures. Calculator clients and revision 4 stay unchanged; documentation
-calls require their own revision 1 and fail with `DocsRpcVersionMismatch` during
+calls require their own revision 2 and fail with `DocsRpcVersionMismatch` during
 version skew. There is no automatic retry or backend fallback.
 
 `DocsRpcClientLive` takes the existing checked API origin and caller-supplied
@@ -217,15 +218,18 @@ keeps the native parser and response Schemas. Both clients map its private size
 marker to their own fixed error. Request credentials, redirects and tracing
 use the same qualified policy. Independent adapter defects remain defects.
 
-Handlers capture the supplied `ContentService` once and return its immutable
-values. Public missing-page and source-search errors use the content owner's
-fixed errors. The documentation procedure defect is a fixed literal; the native
+Handlers capture supplied `ContentService` and `ContentDiscovery` once and
+return their immutable values. Public missing-page, source-search and discovery
+errors use the content owner's fixed errors. Discovery accepts a closed file
+address rather than an arbitrary URL; settings and projection stay with the
+content/application owner. The client checks that the returned file address
+matches the requested one. The documentation procedure defect is a fixed literal; the native
 global fatal path retains its already qualified fixed literal. Internal source
 diagnostics and raw Causes are not response values. The native API supplies the
 same generated catalogue for HTTP and RPC. This package imports only compiled
 content contracts, with no MDX compiler or source collection dependency.
 
-Focused documentation tests cover all four calls, valid and incompatible
+Focused documentation tests cover all five calls, valid and incompatible
 versions, safe expected/global/procedure failures, damaged replies, unrelated
 adapter defects, exact/oversized encoded byte limits, headers/body deadlines,
 earlier cancellation, scope close and transport policy. The actual native pair

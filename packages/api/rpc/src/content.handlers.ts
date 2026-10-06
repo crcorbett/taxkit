@@ -1,7 +1,8 @@
-import { ContentService } from "@taxkit/content/service";
+import { ContentDiscovery, ContentService } from "@taxkit/content/service";
 import { Effect } from "effect";
 
 import {
+  DocsDiscoveryUnavailable,
   DocsPageUnavailable,
   DocsSearchUnavailable,
   DocsRpcVersionMismatch,
@@ -12,7 +13,20 @@ import { DocsRpcVersion } from "./content.schemas.js";
 export const DocsRpcHandlersLive = DocsRpcGroup.toLayer(
   Effect.gen(function* () {
     const content = yield* ContentService;
+    const discovery = yield* ContentDiscovery;
     return DocsRpcGroup.of({
+      GetDocsDiscovery: ({ path, version }) =>
+        version === DocsRpcVersion
+          ? discovery.getDocument(path).pipe(
+              Effect.mapError(
+                () =>
+                  new DocsDiscoveryUnavailable({
+                    message:
+                      "Documentation discovery is temporarily unavailable.",
+                  })
+              )
+            )
+          : Effect.fail(new DocsRpcVersionMismatch()),
       GetDocsMarkdown: ({ path, version }) =>
         version === DocsRpcVersion
           ? content.getPage(path).pipe(

@@ -1,9 +1,16 @@
 import { describe, expect, it } from "@effect/vitest";
 import { DocsSourceError } from "@taxkit/content/errors";
-import { ContentServiceLive } from "@taxkit/content/live";
+import { ContentDiscoveryLive, ContentServiceLive } from "@taxkit/content/live";
 import { DocsPublicPagePath } from "@taxkit/content/schemas";
-import { ContentCatalogue, ContentService } from "@taxkit/content/service";
-import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import {
+  ContentCatalogue,
+  ContentDiscovery,
+  ContentService,
+} from "@taxkit/content/service";
+import {
+  exampleContentCatalogue,
+  exampleDiscoverySettings,
+} from "@taxkit/content/testing/fixtures";
 import {
   Array,
   Cause,
@@ -28,6 +35,7 @@ import { RpcClient, RpcSerialization } from "effect/rpc";
 
 import { CalculatorFixture } from "../src/__testing__/fixtures.js";
 import {
+  DocsDiscoveryUnavailable,
   DocsPageUnavailable,
   DocsSearchUnavailable,
   DocsRpcClientError,
@@ -55,9 +63,10 @@ const origin = Schema.decodeResult(CalculatorRpcOrigin)(
 const missing = Schema.decodeResult(DocsPublicPagePath)("/start/missing").pipe(
   Result.getOrThrowWith(() => new Error("Invalid fixture missing address"))
 );
-const ContentLive = ContentServiceLive.pipe(
-  Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
-);
+const ContentLive = Layer.merge(
+  ContentServiceLive,
+  ContentDiscoveryLive(exampleDiscoverySettings.pipe(Effect.orDie))
+).pipe(Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue)));
 const NativeSuccess = Schema.TaggedStruct("Success", { value: Schema.Unknown });
 const NativeExit = Schema.TaggedStruct("Exit", {
   exit: NativeSuccess,
@@ -66,11 +75,13 @@ const NativeExit = Schema.TaggedStruct("Exit", {
 
 const makeTransport = Effect.gen(function* () {
   const content = yield* ContentService;
+  const discovery = yield* ContentDiscovery;
   const handler = yield* HttpRouter.toHttpEffect(
     TaxKitRpcHttpLayer.pipe(
       Layer.provide([
         CalculatorFixture("success"),
         Layer.succeed(ContentService, content),
+        Layer.succeed(ContentDiscovery, discovery),
       ])
     )
   );
@@ -94,6 +105,87 @@ const makeTransport = Effect.gen(function* () {
 });
 
 describe("checked documentation native RPC", () => {
+  it.effect(
+    "rejects a valid document for a different requested discovery address",
+    () =>
+      Effect.gen(function* () {
+        const native = yield* makeTransport.pipe(Effect.provide(ContentLive));
+        const transport = native.pipe(
+          HttpClient.transformResponse(
+            Effect.flatMap((response) =>
+              response.text.pipe(
+                Effect.map((text) => {
+                  expect(text).toContain('"path":"/sitemap.xml"');
+                  expect(text).toContain('"contentType":"application/xml"');
+                  return HttpClientResponse.fromWeb(
+                    response.request,
+                    new Response(
+                      text
+                        .replace(
+                          '"path":"/sitemap.xml"',
+                          '"path":"/robots.txt"'
+                        )
+                        .replace(
+                          '"contentType":"application/xml"',
+                          '"contentType":"text/plain"'
+                        ),
+                      { headers: response.headers, status: response.status }
+                    )
+                  );
+                })
+              )
+            )
+          )
+        );
+        const error = yield* DocsRpcClient.pipe(
+          Effect.flatMap((client) => client.getDiscovery("/sitemap.xml")),
+          Effect.flip,
+          Effect.provide(
+            DocsRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+        expect(error).toEqual(new DocsRpcInvalidResponse());
+      }).pipe(Effect.scoped)
+  );
+  it.effect(
+    "projects a private discovery failure to fixed public guidance",
+    () =>
+      Effect.gen(function* () {
+        const transport = yield* makeTransport.pipe(
+          Effect.provide(
+            Layer.succeed(
+              ContentDiscovery,
+              ContentDiscovery.of({
+                getDocument: () =>
+                  Effect.fail(
+                    new DocsSourceError({
+                      message: "PRIVATE9",
+                      operation: "getDiscoveryDocument",
+                    })
+                  ),
+              })
+            )
+          ),
+          Effect.provide(ContentLive)
+        );
+        const error = yield* DocsRpcClient.pipe(
+          Effect.flatMap((client) => client.getDiscovery("/sitemap.xml")),
+          Effect.flip,
+          Effect.provide(
+            DocsRpcClientLive(origin).pipe(
+              Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
+            )
+          )
+        );
+        expect(error).toEqual(
+          new DocsDiscoveryUnavailable({
+            message: "Documentation discovery is temporarily unavailable.",
+          })
+        );
+      }).pipe(Effect.scoped)
+  );
   it.effect.each(
     Array.flatMap(DocsRpcOperationCases, (operation) =>
       Array.map([400, 408, 413, 429, 500, 503] as const, (status) => ({
@@ -178,6 +270,11 @@ describe("checked documentation native RPC", () => {
           expect(yield* client.getNavigation()).toEqual(catalogue.navigation);
           expect(yield* client.getPage(docsPath)).toEqual(page);
           expect(yield* client.getMarkdown(docsPath)).toBe(page.markdown);
+          const discovery = yield* client.getDiscovery("/sitemap.xml");
+          expect(discovery.body).toContain(
+            "https://website.example.com/start/overview"
+          );
+          expect(discovery.path).toBe("/sitemap.xml");
           const results = yield* client.searchPages(docsTerm);
           expect(results).toHaveLength(1);
           expect(
@@ -269,7 +366,8 @@ describe("checked documentation native RPC", () => {
                     ),
                 })
               )
-            )
+            ),
+            Layer.provide(ContentLive)
           )
         );
         const transport = HttpClient.make((request) =>
@@ -412,14 +510,22 @@ describe("checked documentation native RPC", () => {
               );
         const native = yield* makeTransport.pipe(
           Effect.provide(
-            Layer.succeed(
-              ContentService,
-              ContentService.of({
-                getNavigation: () => remoteFailure,
-                getPage: () => remoteFailure,
-                listPages: () => remoteFailure,
-                searchPages: () => remoteFailure,
-              })
+            Layer.merge(
+              Layer.succeed(
+                ContentService,
+                ContentService.of({
+                  getNavigation: () => remoteFailure,
+                  getPage: () => remoteFailure,
+                  listPages: () => remoteFailure,
+                  searchPages: () => remoteFailure,
+                })
+              ),
+              Layer.succeed(
+                ContentDiscovery,
+                ContentDiscovery.of({
+                  getDocument: () => remoteFailure,
+                })
+              )
             )
           )
         );

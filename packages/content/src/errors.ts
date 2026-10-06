@@ -9,6 +9,7 @@ import {
 
 export const DocsSourceOperation = Schema.Literals([
   "decode",
+  "getDiscoveryDocument",
   "getNavigation",
   "getPage",
   "listPages",
@@ -29,6 +30,15 @@ export class DocsSearchUnavailable extends Schema.TaggedError<DocsSearchUnavaila
   "DocsSearchUnavailable",
   {
     message: Schema.Literal("Documentation search is temporarily unavailable."),
+  }
+) {}
+
+export class DocsDiscoveryUnavailable extends Schema.TaggedError<DocsDiscoveryUnavailable>()(
+  "DocsDiscoveryUnavailable",
+  {
+    message: Schema.Literal(
+      "Documentation discovery is temporarily unavailable."
+    ),
   }
 ) {}
 

@@ -86,8 +86,15 @@ refinement and fixed missing-page/search errors serve both transports. The
 replacement Website renders accepted pages using that private connection and
 browser-safe compiled presentation. Its `/search` GET form uses the same named
 accepted-catalogue search operation, showing accepted titles and descriptions
-with the existing document links. No second index is added. Discovery and
-old-app retirement remain T005 work.
+with the existing document links. No second index is added.
+`ContentDiscovery` derives four discovery files from the same accepted
+catalogue and the actual checked stage addresses, through one closed native
+operation. The Website serves the checked XML/text body at its conventional
+address. The short agent index links to accepted processed Markdown; the full
+index retains those bodies, including fenced examples. No authored source,
+personal report, guessed origin or competing content catalogue is exposed.
+Same-page Markdown negotiation, share images and old-app retirement remain
+T005 work. This implementation does not establish public availability.
 
 `docs/architecture`
 : Durable implementation architecture.

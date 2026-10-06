@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: current
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-07
 review_trigger: rebuild scope, interview answer, version selection, or implementation admission
 ---
 
@@ -84,7 +84,8 @@ backend API -> existing calculator contracts and rule packages
 human docs page -> checked API page/navigation -> accepted content contract
   -> Website HTML with browser-safe generated presentation components
 dynamic search, Markdown, content or images -> native API -> owning content/image service
-generated sitemap/robots/agent indexes/static Markdown/OG -> accepted catalogue assets
+sitemap/robots/agent indexes -> backend accepted catalogue + checked deferred stage origins
+generated static Markdown/OG -> accepted catalogue assets
 browser pageview -> private PostHog browser service -> bounded Website relay
 successful hosted calculation -> API application event owner -> PostHog capture
 request observations -> safe log/metric exporters and qualified native spans
@@ -906,3 +907,29 @@ JavaScript, uses the existing heading-focus policy and carries `noindex,
 follow`. No personal calculation value, second index or collection event is
 introduced. Discovery, Markdown negotiation, share images and old-app retirement
 remain later T005 work. Metrics remain deferred under Cooper's latest direction.
+
+
+## T005 discovery contract
+
+The backend content owner projects `/sitemap.xml`, `/robots.txt`, `/llms.txt`
+and `/llms-full.txt` from the same accepted catalogue. Application composition
+provides lazy cached, checked API and Website stage origins; native deferred
+addresses cannot be guessed during an ordinary source build. A shared secure
+root-origin Schema retains separate semantic identities. The closed discovery
+Schema owns the exact path/media relationship and a 300,000-character body
+bound within the existing two-MiB private reply budget.
+
+The fifth documentation RPC operation uses revision 2 and checks the reply path
+against the requested one. Calculator revision 4 and four public HTTP content
+routes stay unchanged. The Website's existing runner serves checked GET files
+and explicit empty 200 HEAD with the same headers. Unexpected methods/query and
+unavailable settings/binding have empty safe 405/400/503 responses. Sitemap XML
+contains all accepted canonical addresses with no guessed modification date.
+Short agent links use the existing processed-Markdown API endpoint; the full
+index preserves all processed bodies and useful fenced code examples. No
+calculation report, second content index or collection event is introduced.
+
+The existing native journey checks actual built API/Website files, XML parsing,
+all accepted content, correct media/cache headers and safe failure paths. T005
+remains in progress for same-page Markdown negotiation, share images and
+old-app retirement. Metrics remain deferred.

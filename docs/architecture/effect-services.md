@@ -497,7 +497,15 @@ capability; its settings boundary checks the richer API binding once.
 
 The native documentation RPC handler Layer captures the same supplied
 `ContentService` as public HTTP. It owns no runtime or catalogue fallback. A
-separate `DocsRpcClient` provides four closed named operations over native RPC,
+separate `DocsRpcClient` provides five closed named operations over native RPC,
 with its own revision/error vocabulary and per-call resource scope. Only the
 concrete closed JSON byte reader is shared with the calculator client; no raw
 client callback or provider object enters either service contract.
+
+The native API composes `ContentDiscoveryLive` once from the checked catalogue
+and its existing cached settings Effect. Configuration remains application-owned;
+the content capability lazily reads checked addresses and returns one bounded
+document for a closed file identity. `ContentDiscovery` is contract-only;
+the live and observed test Layers remain separate. The Website reuses its
+existing runner/private client and projects the checked document to an HTTP
+body. No incoming request builds a Layer, compiler, content cache or runtime.
