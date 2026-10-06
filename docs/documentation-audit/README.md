@@ -473,3 +473,8 @@ The [fallible money/calendar candidate](clean-slate-foundation/2026-10-06-fallib
 records checked constructors and derived amounts, date Option compatibility,
 unchanged authored tables and local consumer proof. Wider domain review and
 request-rate policy remain active work.
+
+The [parameter-table relationship candidate](clean-slate-foundation/2026-10-06-parameter-table-relationships.json)
+records row and whole-table checks, saved/decoded coverage, focused constructor
+and packed-consumer tests and unchanged historical table/source bytes. Full
+current-candidate qualification and wider T004 acceptance remain separate.

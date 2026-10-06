@@ -25,14 +25,27 @@ import { Option, BigDecimal, Context, Layer, Schema } from "effect";
  */
 export class MedicareLevyTable extends Schema.TaggedClass<MedicareLevyTable>()(
   "MedicareLevyTable",
-  {
+  Schema.Struct({
     levyRate: TaxRate,
     shadeInMaxCents: Cents,
     shadeInRate: TaxRate,
     source: SourceRef,
     thresholdCents: Cents,
     year: TaxYear,
-  }
+  }).check(
+    Schema.makeFilter(
+      ({ levyRate, shadeInMaxCents, shadeInRate, thresholdCents }) =>
+        thresholdCents >= 0 &&
+        shadeInMaxCents > thresholdCents &&
+        BigDecimal.Order(levyRate, BigDecimal.make(0n, 0)) > 0 &&
+        BigDecimal.Order(shadeInRate, levyRate) >= 0 &&
+        BigDecimal.Order(shadeInRate, BigDecimal.make(1n, 0)) <= 0,
+      {
+        expected:
+          "ordered non-negative Medicare thresholds with a positive levy rate no greater than the shade-in rate, both at most one",
+      }
+    )
+  )
 ) {}
 
 /**

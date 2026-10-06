@@ -31,6 +31,11 @@ runtime manifest reads.
   `Schema`, `Data`, `Record`, `Result` and `Exit` where they fit.
 - Do not mirror canonical IDs or fact shapes as local `string` or DTO fields.
 - Keep official Schedule 1 parameters separate from algorithms.
+- Schedule 1 checks inclusive weekly row bounds and multipliers from zero to
+  one. Each supported scale starts at zero, covers adjacent cents and has only
+  its final bound open. The saved and decoded table forms share the same
+  coverage check. Signed dollar coefficients remain valid, including the
+  retained negative coefficient; both authored years stay unchanged.
 - Derived money and ledger amounts use the core fallible constructors. An
   unsupported amount returns a safe `CalculationError` through the Effect
   error channel. `buildPayWithholdingsLedger` now returns an Effect; callers

@@ -14,7 +14,7 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Option, BigDecimal, Context, Layer, Schema } from "effect";
+import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
 
 /**
  * ATO Schedule 8 STSL coefficient row.
@@ -24,12 +24,62 @@ import { Option, BigDecimal, Context, Layer, Schema } from "effect";
  *
  * @since 0.1.0
  */
-export class StslRow extends Schema.TaggedClass<StslRow>()("StslRow", {
-  a: DecimalCoefficient,
-  bDollars: DecimalCoefficient,
-  weeklyMaxCents: CentsOrInfinity,
-  weeklyMinCents: Cents,
-}) {}
+export class StslRow extends Schema.TaggedClass<StslRow>()(
+  "StslRow",
+  Schema.Struct({
+    a: DecimalCoefficient,
+    bDollars: DecimalCoefficient,
+    weeklyMaxCents: CentsOrInfinity,
+    weeklyMinCents: Cents,
+  }).check(
+    Schema.makeFilter(
+      ({ a, weeklyMaxCents, weeklyMinCents }) =>
+        weeklyMinCents >= 0 &&
+        (weeklyMaxCents === "infinity" || weeklyMaxCents >= weeklyMinCents) &&
+        BigDecimal.between({
+          maximum: BigDecimal.make(1n, 0),
+          minimum: BigDecimal.make(0n, 0),
+        })(a),
+      {
+        expected:
+          "an ordered non-negative inclusive weekly range with a multiplier from zero to one",
+      }
+    )
+  )
+) {}
+
+// Keep the same relationship check on the saved representation and decoded rows.
+// Array class transformations otherwise remove this check under Schema.toEncoded.
+const StslTableCoverageCheck = Schema.makeFilter<
+  readonly (typeof StslRow.Encoded)[]
+>(
+  (rows) =>
+    Array.head(rows).pipe(Option.exists((row) => row.weeklyMinCents === 0)) &&
+    Array.last(rows).pipe(
+      Option.exists((row) => row.weeklyMaxCents === "infinity")
+    ) &&
+    Array.every(
+      rows,
+      (row, index) =>
+        index === 0 ||
+        Array.get(rows, index - 1).pipe(
+          Option.exists(
+            (previous) =>
+              previous.weeklyMaxCents !== "infinity" &&
+              previous.weeklyMaxCents === row.weeklyMinCents - 1
+          )
+        )
+    ),
+  {
+    expected:
+      "complete STSL weekly rows from zero without gaps or overlaps, with only the final bound open",
+  }
+);
+
+const StslTableRows = Schema.Array(Schema.toEncoded(StslRow))
+  .check(StslTableCoverageCheck)
+  .pipe(Schema.decodeTo(Schema.Array(StslRow)))
+  .check(StslTableCoverageCheck);
 
 /**
  * ATO Schedule 8 STSL withholding coefficient table for one tax year.
@@ -37,7 +87,7 @@ export class StslRow extends Schema.TaggedClass<StslRow>()("StslRow", {
  * @since 0.1.0
  */
 export class StslTable extends Schema.TaggedClass<StslTable>()("StslTable", {
-  rows: Schema.Array(StslRow),
+  rows: StslTableRows,
   source: SourceRef,
   year: TaxYear,
 }) {}

@@ -14,7 +14,7 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Option, BigDecimal, Context, Layer, Schema } from "effect";
+import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
 
 /**
  * ATO Schedule 1 scale used for residents with or without the tax-free
@@ -42,14 +42,68 @@ export type Schedule1Scale = typeof Schedule1Scale.Type;
  */
 export class Schedule1Row extends Schema.TaggedClass<Schedule1Row>()(
   "Schedule1Row",
-  {
+  Schema.Struct({
     a: DecimalCoefficient,
     bDollars: DecimalCoefficient,
     scale: Schedule1Scale,
     weeklyMaxCents: CentsOrInfinity,
     weeklyMinCents: Cents,
-  }
+  }).check(
+    Schema.makeFilter(
+      ({ a, weeklyMaxCents, weeklyMinCents }) =>
+        weeklyMinCents >= 0 &&
+        (weeklyMaxCents === "infinity" || weeklyMaxCents >= weeklyMinCents) &&
+        BigDecimal.between({
+          maximum: BigDecimal.make(1n, 0),
+          minimum: BigDecimal.make(0n, 0),
+        })(a),
+      {
+        expected:
+          "an ordered non-negative inclusive weekly range with a multiplier from zero to one",
+      }
+    )
+  )
 ) {}
+
+const hasCompleteWeeklyScale = (
+  rows: readonly (typeof Schedule1Row.Encoded)[]
+): boolean =>
+  Array.head(rows).pipe(Option.exists((row) => row.weeklyMinCents === 0)) &&
+  Array.last(rows).pipe(
+    Option.exists((row) => row.weeklyMaxCents === "infinity")
+  ) &&
+  Array.every(
+    rows,
+    (row, index) =>
+      index === 0 ||
+      Array.get(rows, index - 1).pipe(
+        Option.exists(
+          (previous) =>
+            previous.weeklyMaxCents !== "infinity" &&
+            previous.weeklyMaxCents === row.weeklyMinCents - 1
+        )
+      )
+  );
+
+// Keep the same relationship check on the saved representation and decoded rows.
+// Array class transformations otherwise remove this check under Schema.toEncoded.
+const Schedule1TableCoverageCheck = Schema.makeFilter<
+  readonly (typeof Schedule1Row.Encoded)[]
+>(
+  (rows) =>
+    Array.every(["scale1", "scale2"] as const, (scale) =>
+      hasCompleteWeeklyScale(Array.filter(rows, (row) => row.scale === scale))
+    ),
+  {
+    expected:
+      "complete Schedule 1 weekly scales from zero without gaps or overlaps, with only the final bound open",
+  }
+);
+
+const Schedule1TableRows = Schema.Array(Schema.toEncoded(Schedule1Row))
+  .check(Schedule1TableCoverageCheck)
+  .pipe(Schema.decodeTo(Schema.Array(Schedule1Row)))
+  .check(Schedule1TableCoverageCheck);
 
 /**
  * ATO Schedule 1 withholding coefficient table for one tax year.
@@ -59,7 +113,7 @@ export class Schedule1Row extends Schema.TaggedClass<Schedule1Row>()(
 export class Schedule1Table extends Schema.TaggedClass<Schedule1Table>()(
   "Schedule1Table",
   {
-    rows: Schema.Array(Schedule1Row),
+    rows: Schedule1TableRows,
     source: SourceRef,
     year: TaxYear,
   }

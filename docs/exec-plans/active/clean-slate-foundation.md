@@ -3149,3 +3149,79 @@ whitespace checks follow. Hosted checks and reviewer acceptance are separate.
 T004 and the wider DEV-73 then DEV-74–81 goal remain active; next are whole-table
 relationships, remaining semantic absence/service ownership and trusted rate
 identity/limiting. The Medicare correction decision remains unresolved.
+
+
+## DEV-75 whole parameter-table relationships — 6 October 2026
+
+Draft #148 is pushed at `02c813f2d082a13ccbe38e52f350aa43bca8bb84`;
+its hosted Quality run `37401147145` is in progress at slice start. The next
+branch is `codex/dev-75-parameter-table-checks`. Row and whole-table checks stay
+at the five existing parameter owners. Income tax and LITO begin at a zero
+threshold and have adjacent ordered brackets with only the final bound open.
+Schedule 1 checks each supported scale separately; STSL checks inclusive weekly
+rows. Both use adjacent cent ranges and a final open bound. Medicare checks
+threshold order and its positive levy/shade-in rate relationship. Local rates
+and multipliers lie between zero and one; the generic decimal brands remain
+open and Schedule 1's legitimate negative dollar coefficient remains valid.
+
+The outside prototype found that Array(class row) checks vanish under
+Schema.toEncoded. Each table derives the saved row array from its row owner and
+applies the same relationship check to saved and decoded arrays through the
+installed decodeTo composition. Thirty invalid table cases reject at three
+entry points, 24 invalid row cases reject at three entry points, and all 15
+saved table/period/source encodings still match the pre-change bytes. These
+are preparatory observations, not repository, packed or native qualification.
+Initial outside module resolution failed because root node_modules did not
+include the Core workspace link; only temporary prototype links were corrected.
+
+Docs-maintainer impact: **Change required** for the three rules package READMEs,
+rules/parameter and testing architecture, current SPEC/tasks/plan, audit pointer,
+qualified receipt, focused tests/consumer assertions and deliberate Changesets.
+**Preserve** all authored tables/source hashes, known tax goldens, historical
+encodings, supported years, HTTP/RPC/OpenAPI behaviour, rate/body/work policy,
+selected toolchain/dependencies, skills and commands. **N/A** for new operational
+runbooks, public editorial lifecycle and provider/publication operations.
+Repository lint/types/tests, boundary controls, packed/native/full qualification
+and primary-owner review follow. T004 remains in progress for the broader
+semantic absence/service ownership and trusted rate identity/limiting work.
+The unresolved Medicare correction is not included.
+
+Focused proof passes: ten new owning tests cover 60 invalid row/table cases at
+construction and saved representation checks, plus valid inclusive point rows,
+tiny decimal exponents, signed dollar coefficients, both Schedule 1 years and
+independently interleaved scales. Genuine packed consumers compare all 15
+historical table/period/source hashes and reject incomplete/invalid tables at
+construction, typed decoding and saved representation decoding. Five deliberate
+removals fail their intended owning assertion and restore exact source bytes.
+The first packed attempt failed because the generated consumer excludes ambient
+Bun types; explicit CryptoHasher import fixes that external test host without
+changing its configuration. Lint/types/restored rules/docs/runbooks/format and
+Changesets pass. Complete nine-stage qualification follows with sources frozen.
+
+
+Local acceptance for the parameter-table slice: all nine CI-mode stages pass
+in 663.63 seconds, including 32 workflow tests (461.42
+seconds), all 500 real lint cases, 59 Core tests and 52 rule tests, complete
+tests/builds, genuine packed/downstream consumers, API smoke and docs/browser
+checks. Seven built Worker cases pass (78.16 seconds). All 21 staged files
+match saved pre-check hashes; the API Worker is unchanged from its parent. Nine
+native inventories were captured after successful verification, before later
+root builds; four screenshots exactly match already inspected parent images.
+
+Primary-owner review accepts this local row/table relationship slice. Ten new
+owner tests reject 60 invalid inputs at constructor and saved-representation
+boundaries; the genuine packed consumer retains 15 original hashes and rejects
+15 invalid constructor/typed/saved decoding cases. Five deliberate removals fail
+their intended assertions and restore exact sources. No tax values, expected
+snapshots, supported years, runtime permissions or lint rules change. Only this
+plan and receipt change after qualification; final docs/runbooks/format/Changeset
+and whitespace checks follow.
+
+Parent #148's exact hosted head fails Quality run 37401147145/job 112068388626
+at Core build: an explicit Node ambient-type setting cannot resolve in the clean
+hosted install. An isolated outside copy reproduces both build and typecheck
+failures; removing that unnecessary ambient dependency passes both. The next
+separate corrective slice will qualify that change. This local table pass does
+not establish hosted success. T004 remains active; semantic absence/service
+ownership and trusted rate identity/limiting still need work. The Medicare
+correction decision and retained zero-income behaviour remain unchanged.

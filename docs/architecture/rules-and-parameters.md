@@ -68,6 +68,24 @@ check newly derived constrained amounts through fallible constructors and map
 expected failures to safe `CalculationError` values. This does not change the
 retained table values or expand supported tax years.
 
+## Whole parameter relationships
+
+The row and table Schemas own their relationships as well as individual fields.
+Income-tax and LITO brackets begin at a zero threshold, have ordered adjacent
+bounds and end with an open bound. Schedule 1 and STSL use inclusive weekly cent
+ranges; each Schedule 1 scale is checked separately. Their local rate/multiplier
+checks admit zero through one, while generic core decimal brands stay open.
+Schedule 1 dollar coefficients remain signed. Medicare checks threshold order
+and a positive full levy rate no greater than its shade-in rate, both at most
+one; it does not infer exact continuity from published rounded cutoffs.
+
+Each class-row array derives its saved form through the owning row Schema and
+checks coverage on saved and decoded arrays with one shared predicate. A check
+on an array of decoded class rows alone disappears under `Schema.toEncoded`.
+The shared check prevents a saved table with gaps, overlaps, missing scales or
+an open middle row from passing representation validation. Valid saved bytes,
+source artifacts, retained tax results and supported years are unchanged.
+
 ## Rule packs
 
 A rule pack composes existing Layers and keeps descriptors, sources and golden

@@ -14,7 +14,7 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Option, BigDecimal, Context, Layer, Schema } from "effect";
+import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
 
 /**
  * Low Income Tax Offset phase-out bracket.
@@ -23,13 +23,63 @@ import { Option, BigDecimal, Context, Layer, Schema } from "effect";
  */
 export class LitoBracket extends Schema.TaggedClass<LitoBracket>()(
   "LitoBracket",
-  {
+  Schema.Struct({
     fullOffsetCents: Cents,
     maxCents: CentsOrInfinity,
     phaseOutRate: TaxRate,
     thresholdCents: Cents,
-  }
+  }).check(
+    Schema.makeFilter(
+      ({ fullOffsetCents, maxCents, phaseOutRate, thresholdCents }) =>
+        fullOffsetCents >= 0 &&
+        thresholdCents >= 0 &&
+        (maxCents === "infinity" || maxCents > thresholdCents) &&
+        BigDecimal.between({
+          maximum: BigDecimal.make(1n, 0),
+          minimum: BigDecimal.make(0n, 0),
+        })(phaseOutRate),
+      {
+        expected:
+          "a non-negative LITO bracket with a phase-out rate from zero to one and an ordered upper bound",
+      }
+    )
+  )
 ) {}
+
+// Keep the same relationship check on the saved representation and decoded rows.
+// Array class transformations otherwise remove this check under Schema.toEncoded.
+const LitoTableCoverageCheck = Schema.makeFilter<
+  readonly (typeof LitoBracket.Encoded)[]
+>(
+  (brackets) =>
+    Array.head(brackets).pipe(
+      Option.exists((row) => row.thresholdCents === 0)
+    ) &&
+    Array.last(brackets).pipe(
+      Option.exists((row) => row.maxCents === "infinity")
+    ) &&
+    Array.every(
+      brackets,
+      (row, index) =>
+        index === 0 ||
+        Array.get(brackets, index - 1).pipe(
+          Option.exists(
+            (previous) =>
+              previous.maxCents !== "infinity" &&
+              previous.maxCents === row.thresholdCents
+          )
+        )
+    ),
+  {
+    expected:
+      "complete LITO brackets from zero without gaps or overlaps, with only the final bound open",
+  }
+);
+
+const LitoTableRows = Schema.Array(Schema.toEncoded(LitoBracket))
+  .check(LitoTableCoverageCheck)
+  .pipe(Schema.decodeTo(Schema.Array(LitoBracket)))
+  .check(LitoTableCoverageCheck);
 
 /**
  * ATO Low Income Tax Offset table for one tax year.
@@ -37,7 +87,7 @@ export class LitoBracket extends Schema.TaggedClass<LitoBracket>()(
  * @since 0.1.0
  */
 export class LitoTable extends Schema.TaggedClass<LitoTable>()("LitoTable", {
-  brackets: Schema.Array(LitoBracket),
+  brackets: LitoTableRows,
   source: SourceRef,
   year: TaxYear,
 }) {}

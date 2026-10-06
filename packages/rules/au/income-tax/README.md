@@ -31,6 +31,12 @@ without runtime manifest reads.
   `Schema`, `Data`, `Record`, `Result` and `Exit` where they fit.
 - Do not mirror canonical IDs or fact shapes as local `string` or DTO fields.
 - Keep official parameter tables separate from algorithms.
+- Income-tax and LITO rows check non-negative amounts, local rates from zero to
+  one and ordered bounds. Their tables begin at a zero threshold, retain
+  adjacent brackets and require a final open bound. Medicare checks threshold
+  order and positive levy/shade-in rates; it does not impose guessed exact
+  continuity or change the retained thresholds. Construction and saved-data
+  checks enforce the same relationships.
 - Derived money and ledger totals use core fallible constructors and return
   safe `CalculationError` failures for unsupported amounts. Exact decimal
   arithmetic, retained source records and known tax results stay unchanged.

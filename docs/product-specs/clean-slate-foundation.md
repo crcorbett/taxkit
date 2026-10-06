@@ -807,3 +807,12 @@ This deliberately changes public Type contracts and examples with major
 Changesets. Retained tax tables, source records and golden results must stay
 unchanged. The active plan and dated receipt own qualification; full table
 relationships, wider semantic absence and rate limiting remain unfinished.
+
+The parameter-table slice checks whole row/table relationships at the five
+existing owners. Saved and decoded class-row arrays share the same coverage
+check; row ranges, local rates, per-scale coverage and Medicare threshold/rate
+relationships are checked without guessed continuity or any tax-data change.
+Generic decimals and signed Schedule 1 dollar coefficients retain their meaning.
+The active plan and dated receipt own current qualification; wider semantic
+absence/service ownership, trusted rate identity/limiting and whole T004
+acceptance remain open.

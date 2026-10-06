@@ -285,3 +285,9 @@ The downstream consumer also checks core's fallible money/date constructors,
 their public error types, safe overflow failures and historical date bytes/key
 presence. `aud` requires already checked `Cents`; `audFromCents` returns an
 Effect. Public examples use the same owning primitive contracts.
+
+The genuine packed consumer also imports the three public rule-parameter
+entrypoints. It rejects incomplete tables at construction and typed/saved
+representation decoding, and compares all five retained table, effective-period
+and source-artifact encodings against 15 historical SHA-256 values. These are
+local packed-package checks, not publication or provider proof.

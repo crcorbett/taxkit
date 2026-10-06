@@ -1369,3 +1369,16 @@ runtime execution in those admitted files. The packed consumer checks the
 changed constructor types and safe error representations. Qualification and
 limits belong to the dated record; this does not accept table relationships,
 rate limiting or all of T004.
+
+
+The parameter-table slice adds focused tests at the three rules-package owners.
+They check malformed rows, whole-table gaps/overlaps/open-middle bounds and
+missing scale coverage through owning fallible constructors and the saved
+representation Schema. Valid single-cent inclusive rows, signed Schedule 1
+coefficients and both authored Schedule 1 years remain admitted. No new runtime,
+decoder or encoder file admission is added. The SDK's genuine packed consumer
+checks all five public table constructors and typed/saved decoding, plus 15
+fixed historical table/period/source SHA-256 hashes. Its explicit `bun` hash
+import belongs to the generated external test host; the consumer retains an
+empty ambient-types list. The active plan and dated receipt distinguish focused
+proof from the complete current-candidate graph.

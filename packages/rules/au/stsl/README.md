@@ -27,6 +27,10 @@ descriptors, rule packs and golden tests.
   `Schema`, `Data`, `Record`, `Result` and `Exit` where they fit.
 - Do not mirror canonical IDs or fact shapes as local `string` or DTO fields.
 - Keep official Schedule 8 parameters separate from algorithms.
+- STSL rows check ordered non-negative inclusive weekly bounds and multipliers
+  from zero to one. The table starts at zero, covers adjacent cents and has only
+  its final bound open. Saved and decoded table forms enforce the same coverage
+  check. Retained coefficients, effective dates and source bytes stay unchanged.
 - Derived money and combined withholding totals use core fallible constructors
   and return safe `CalculationError` failures for unsupported amounts. Retained
   Schedule 8 coefficients, source records and known STSL results stay unchanged.

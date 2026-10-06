@@ -572,8 +572,12 @@ import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "@taxkit/core/primitives";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
+import { RuleId, SourceArtifact, SourceRef, TraceNode } from "@taxkit/core/trace";
 import { GrossPay } from "@taxkit/rules-au-pay";
+import { CryptoHasher } from "bun";
+import { AtoIncomeTaxTable, AtoIncomeTax_2025_26_Live, AtoIncomeTaxTableDescriptor, IncomeTaxTable, IncomeTaxArtifact2025_26, AtoLitoTable, AtoLito_2025_26_Live, AtoLitoTableDescriptor, LitoTable, LitoArtifact2025_26, AtoMedicareLevyTable, AtoMedicareLevy_2025_26_Live, AtoMedicareLevyTableDescriptor, MedicareLevyTable, MedicareLevyArtifact2025_26 } from "@taxkit/rules-au-income-tax/parameters";
+import { AtoSchedule1Table, AtoSchedule1_2025_26_Live, AtoSchedule1TableDescriptor, Schedule1Table, Schedule1Artifact2025_26 } from "@taxkit/rules-au-pay/parameters";
+import { AtoStslTable, AtoStsl_2025_26_Live, AtoStslTableDescriptor, StslTable, StslArtifact2025_26 } from "@taxkit/rules-au-stsl/parameters";
 import { Effect, Layer, Option, Record, Result, Schema } from "effect";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
@@ -617,6 +621,104 @@ await Effect.runPromise(Effect.gen(function* () {
   }
   if (Schema.is(Schema.toEncoded(DateInterval))({from: "2026-07-01", toExclusive: "2026-07-01"})) {
     throw new Error("Packed encoded date codec lost the ordering check.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const income_tax = yield* AtoIncomeTaxTable.pipe(Effect.provide(AtoIncomeTax_2025_26_Live));
+  const income_taxEncoded = yield* Schema.encodeEffect(IncomeTaxTable)(income_tax);
+  const income_taxPeriod = yield* Schema.encodeEffect(DateInterval)(AtoIncomeTaxTableDescriptor.effectivePeriod);
+  const income_taxArtifact = yield* Schema.encodeEffect(SourceArtifact)(IncomeTaxArtifact2025_26);
+  if (new CryptoHasher("sha256").update(JSON.stringify(income_taxEncoded)).digest("hex") !== "9258a71a24c9a26dd43466a4940c7140a023ccff846969b1247a59ddd2e16aad") {
+    throw new Error("Packed income-tax table changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(income_taxPeriod)).digest("hex") !== "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25") {
+    throw new Error("Packed income-tax period changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(income_taxArtifact)).digest("hex") !== "39297168ce7bad1fed76c32eae48841eaeebb71f32a479c63c472e0d66204c90") {
+    throw new Error("Packed income-tax artifact changed historical bytes.");
+  }
+  const income_taxInvalid = yield* IncomeTaxTable.makeEffect({...income_tax, brackets: []}).pipe(Effect.result);
+  const income_taxDecoded = yield* Schema.decodeEffect(IncomeTaxTable)({...income_taxEncoded, brackets: []}).pipe(Effect.result);
+  const income_taxRepresentation = yield* Schema.decodeEffect(Schema.toEncoded(IncomeTaxTable))({...income_taxEncoded, brackets: []}).pipe(Effect.result);
+  if (!Result.isFailure(income_taxInvalid) || !Result.isFailure(income_taxDecoded) || !Result.isFailure(income_taxRepresentation)) {
+    throw new Error("Packed income-tax table admitted missing coverage.");
+  }
+  const lito = yield* AtoLitoTable.pipe(Effect.provide(AtoLito_2025_26_Live));
+  const litoEncoded = yield* Schema.encodeEffect(LitoTable)(lito);
+  const litoPeriod = yield* Schema.encodeEffect(DateInterval)(AtoLitoTableDescriptor.effectivePeriod);
+  const litoArtifact = yield* Schema.encodeEffect(SourceArtifact)(LitoArtifact2025_26);
+  if (new CryptoHasher("sha256").update(JSON.stringify(litoEncoded)).digest("hex") !== "5c6a5944cf83fea770c887e4fedc5da7d7c6bb1540c885232692a83e701eb872") {
+    throw new Error("Packed lito table changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(litoPeriod)).digest("hex") !== "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25") {
+    throw new Error("Packed lito period changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(litoArtifact)).digest("hex") !== "1c9681f9ac534e9a8fe638f01b7f09f18955b60a3a019858085aa373aefe6002") {
+    throw new Error("Packed lito artifact changed historical bytes.");
+  }
+  const litoInvalid = yield* LitoTable.makeEffect({...lito, brackets: []}).pipe(Effect.result);
+  const litoDecoded = yield* Schema.decodeEffect(LitoTable)({...litoEncoded, brackets: []}).pipe(Effect.result);
+  const litoRepresentation = yield* Schema.decodeEffect(Schema.toEncoded(LitoTable))({...litoEncoded, brackets: []}).pipe(Effect.result);
+  if (!Result.isFailure(litoInvalid) || !Result.isFailure(litoDecoded) || !Result.isFailure(litoRepresentation)) {
+    throw new Error("Packed lito table admitted missing coverage.");
+  }
+  const medicare_levy = yield* AtoMedicareLevyTable.pipe(Effect.provide(AtoMedicareLevy_2025_26_Live));
+  const medicare_levyEncoded = yield* Schema.encodeEffect(MedicareLevyTable)(medicare_levy);
+  const medicare_levyPeriod = yield* Schema.encodeEffect(DateInterval)(AtoMedicareLevyTableDescriptor.effectivePeriod);
+  const medicare_levyArtifact = yield* Schema.encodeEffect(SourceArtifact)(MedicareLevyArtifact2025_26);
+  if (new CryptoHasher("sha256").update(JSON.stringify(medicare_levyEncoded)).digest("hex") !== "a4c9271a2d82c7f403ca1819f59937c21e036bf0da978c45c250051b4a856cf8") {
+    throw new Error("Packed medicare-levy table changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(medicare_levyPeriod)).digest("hex") !== "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25") {
+    throw new Error("Packed medicare-levy period changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(medicare_levyArtifact)).digest("hex") !== "502caaaebe081be3b6abbc7dedf20daccf66acaa060089e017ff3dbf498d23e2") {
+    throw new Error("Packed medicare-levy artifact changed historical bytes.");
+  }
+  const medicare_levyInvalid = yield* MedicareLevyTable.makeEffect({...medicare_levy, shadeInMaxCents: medicare_levy.thresholdCents}).pipe(Effect.result);
+  const medicare_levyDecoded = yield* Schema.decodeEffect(MedicareLevyTable)({...medicare_levyEncoded, shadeInMaxCents: medicare_levyEncoded.thresholdCents}).pipe(Effect.result);
+  const medicare_levyRepresentation = yield* Schema.decodeEffect(Schema.toEncoded(MedicareLevyTable))({...medicare_levyEncoded, shadeInMaxCents: medicare_levyEncoded.thresholdCents}).pipe(Effect.result);
+  if (!Result.isFailure(medicare_levyInvalid) || !Result.isFailure(medicare_levyDecoded) || !Result.isFailure(medicare_levyRepresentation)) {
+    throw new Error("Packed Medicare table admitted invalid threshold order.");
+  }
+  const schedule1 = yield* AtoSchedule1Table.pipe(Effect.provide(AtoSchedule1_2025_26_Live));
+  const schedule1Encoded = yield* Schema.encodeEffect(Schedule1Table)(schedule1);
+  const schedule1Period = yield* Schema.encodeEffect(DateInterval)(AtoSchedule1TableDescriptor.effectivePeriod);
+  const schedule1Artifact = yield* Schema.encodeEffect(SourceArtifact)(Schedule1Artifact2025_26);
+  if (new CryptoHasher("sha256").update(JSON.stringify(schedule1Encoded)).digest("hex") !== "b0799054e0f0f792b3aad2ba0571f88f6aeee8f100eb02cdca96fc81c33ce645") {
+    throw new Error("Packed schedule1 table changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(schedule1Period)).digest("hex") !== "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25") {
+    throw new Error("Packed schedule1 period changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(schedule1Artifact)).digest("hex") !== "e6cc36f12b35c22c206f9f4e7b0aadee5cc5752f399c88569ac3590d871cbc34") {
+    throw new Error("Packed schedule1 artifact changed historical bytes.");
+  }
+  const schedule1Invalid = yield* Schedule1Table.makeEffect({...schedule1, rows: []}).pipe(Effect.result);
+  const schedule1Decoded = yield* Schema.decodeEffect(Schedule1Table)({...schedule1Encoded, rows: []}).pipe(Effect.result);
+  const schedule1Representation = yield* Schema.decodeEffect(Schema.toEncoded(Schedule1Table))({...schedule1Encoded, rows: []}).pipe(Effect.result);
+  if (!Result.isFailure(schedule1Invalid) || !Result.isFailure(schedule1Decoded) || !Result.isFailure(schedule1Representation)) {
+    throw new Error("Packed schedule1 table admitted missing coverage.");
+  }
+  const stsl = yield* AtoStslTable.pipe(Effect.provide(AtoStsl_2025_26_Live));
+  const stslEncoded = yield* Schema.encodeEffect(StslTable)(stsl);
+  const stslPeriod = yield* Schema.encodeEffect(DateInterval)(AtoStslTableDescriptor.effectivePeriod);
+  const stslArtifact = yield* Schema.encodeEffect(SourceArtifact)(StslArtifact2025_26);
+  if (new CryptoHasher("sha256").update(JSON.stringify(stslEncoded)).digest("hex") !== "ca94be8c2b5818381824d4a4f100789a35794312c5a00984ea1e83a8bfc366fe") {
+    throw new Error("Packed stsl table changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(stslPeriod)).digest("hex") !== "ce72cb303a5db02f62aefe810e606ce988084bb990b0153cbd3b1d89ae186e36") {
+    throw new Error("Packed stsl period changed historical bytes.");
+  }
+  if (new CryptoHasher("sha256").update(JSON.stringify(stslArtifact)).digest("hex") !== "4981834012bdbb02e22b0aab02e7fb2208cd80e81c400b1bf01147a2b8f6135b") {
+    throw new Error("Packed stsl artifact changed historical bytes.");
+  }
+  const stslInvalid = yield* StslTable.makeEffect({...stsl, rows: []}).pipe(Effect.result);
+  const stslDecoded = yield* Schema.decodeEffect(StslTable)({...stslEncoded, rows: []}).pipe(Effect.result);
+  const stslRepresentation = yield* Schema.decodeEffect(Schema.toEncoded(StslTable))({...stslEncoded, rows: []}).pipe(Effect.result);
+  if (!Result.isFailure(stslInvalid) || !Result.isFailure(stslDecoded) || !Result.isFailure(stslRepresentation)) {
+    throw new Error("Packed stsl table admitted missing coverage.");
   }
 }));
 

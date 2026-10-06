@@ -14,7 +14,7 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Option, BigDecimal, Context, Layer, Schema } from "effect";
+import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
 
 /**
  * Marginal-rate bracket for resident individual income tax.
@@ -26,13 +26,63 @@ import { Option, BigDecimal, Context, Layer, Schema } from "effect";
  */
 export class IncomeTaxBracket extends Schema.TaggedClass<IncomeTaxBracket>()(
   "IncomeTaxBracket",
-  {
+  Schema.Struct({
     baseTaxCents: Cents,
     maxCents: CentsOrInfinity,
     rate: TaxRate,
     thresholdCents: Cents,
-  }
+  }).check(
+    Schema.makeFilter(
+      ({ baseTaxCents, maxCents, rate, thresholdCents }) =>
+        baseTaxCents >= 0 &&
+        thresholdCents >= 0 &&
+        (maxCents === "infinity" || maxCents > thresholdCents) &&
+        BigDecimal.between({
+          maximum: BigDecimal.make(1n, 0),
+          minimum: BigDecimal.make(0n, 0),
+        })(rate),
+      {
+        expected:
+          "a non-negative income tax bracket with a rate from zero to one and an ordered upper bound",
+      }
+    )
+  )
 ) {}
+
+// Keep the same relationship check on the saved representation and decoded rows.
+// Array class transformations otherwise remove this check under Schema.toEncoded.
+const IncomeTaxTableCoverageCheck = Schema.makeFilter<
+  readonly (typeof IncomeTaxBracket.Encoded)[]
+>(
+  (brackets) =>
+    Array.head(brackets).pipe(
+      Option.exists((row) => row.thresholdCents === 0)
+    ) &&
+    Array.last(brackets).pipe(
+      Option.exists((row) => row.maxCents === "infinity")
+    ) &&
+    Array.every(
+      brackets,
+      (row, index) =>
+        index === 0 ||
+        Array.get(brackets, index - 1).pipe(
+          Option.exists(
+            (previous) =>
+              previous.maxCents !== "infinity" &&
+              previous.maxCents === row.thresholdCents
+          )
+        )
+    ),
+  {
+    expected:
+      "complete income tax brackets from zero without gaps or overlaps, with only the final bound open",
+  }
+);
+
+const IncomeTaxTableRows = Schema.Array(Schema.toEncoded(IncomeTaxBracket))
+  .check(IncomeTaxTableCoverageCheck)
+  .pipe(Schema.decodeTo(Schema.Array(IncomeTaxBracket)))
+  .check(IncomeTaxTableCoverageCheck);
 
 /**
  * ATO resident individual income tax table for one tax year.
@@ -42,7 +92,7 @@ export class IncomeTaxBracket extends Schema.TaggedClass<IncomeTaxBracket>()(
 export class IncomeTaxTable extends Schema.TaggedClass<IncomeTaxTable>()(
   "IncomeTaxTable",
   {
-    brackets: Schema.Array(IncomeTaxBracket),
+    brackets: IncomeTaxTableRows,
     source: SourceRef,
     year: TaxYear,
   }
