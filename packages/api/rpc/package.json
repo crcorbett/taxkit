@@ -63,6 +63,41 @@
       "source": "./src/rate-identity.boundary.ts",
       "types": "./dist/rate-identity.boundary.d.ts",
       "default": "./dist/rate-identity.boundary.js"
+    },
+    "./content/group": {
+      "source": "./src/content.group.ts",
+      "types": "./dist/content.group.d.ts",
+      "default": "./dist/content.group.js"
+    },
+    "./content/handlers": {
+      "source": "./src/content.handlers.ts",
+      "types": "./dist/content.handlers.d.ts",
+      "default": "./dist/content.handlers.js"
+    },
+    "./content/schemas": {
+      "source": "./src/content.schemas.ts",
+      "types": "./dist/content.schemas.d.ts",
+      "default": "./dist/content.schemas.js"
+    },
+    "./content/errors": {
+      "source": "./src/content.errors.ts",
+      "types": "./dist/content.errors.d.ts",
+      "default": "./dist/content.errors.js"
+    },
+    "./content/service": {
+      "source": "./src/content.service.ts",
+      "types": "./dist/content.service.d.ts",
+      "default": "./dist/content.service.js"
+    },
+    "./content/live": {
+      "source": "./src/content.live.layer.ts",
+      "types": "./dist/content.live.layer.d.ts",
+      "default": "./dist/content.live.layer.js"
+    },
+    "./content/test": {
+      "source": "./src/content.test.layer.ts",
+      "types": "./dist/content.test.layer.d.ts",
+      "default": "./dist/content.test.layer.js"
     }
   },
   "publishConfig": {
@@ -82,6 +117,18 @@
       "./live": {
         "types": "./dist/live.layer.d.ts",
         "default": "./dist/live.layer.js"
+      },
+      "./content/group": {
+        "types": "./dist/content.group.d.ts",
+        "default": "./dist/content.group.js"
+      },
+      "./content/service": {
+        "types": "./dist/content.service.d.ts",
+        "default": "./dist/content.service.js"
+      },
+      "./content/live": {
+        "types": "./dist/content.live.layer.d.ts",
+        "default": "./dist/content.live.layer.js"
       }
     }
   },
@@ -94,7 +141,7 @@
   "dependencies": {
     "@taxkit/api-http": "workspace:*",
     "@taxkit/calculators": "workspace:*",
-    "@taxkit/docs-content": "workspace:*",
+    "@taxkit/content": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

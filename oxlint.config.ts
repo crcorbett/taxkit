@@ -51,8 +51,12 @@ const decodingBoundaryFiles = [
   // Native RPC parser unknown envelopes and exact adversarial transport fixtures.
   "packages/api/rpc/src/server-serialization.boundary.ts",
   "packages/api/rpc/src/client-response.boundary.ts",
+  "packages/api/rpc/src/content-client-response.boundary.ts",
   "packages/api/rpc/test/handlers.test.ts",
   "packages/api/rpc/test/deadline.test.ts",
+  "packages/api/rpc/test/content.fixture.ts",
+  "packages/api/rpc/test/content.boundary.test.ts",
+  "packages/api/rpc/test/content-deadline.boundary.test.ts",
   // Exact native website settings, form and hydration boundaries.
   "apps/web/src/lib/config.boundary.test.ts",
   "apps/web/src/lib/config.server.ts",
@@ -199,6 +203,7 @@ const routeTransportConsumerFiles = [
 const effectContractFiles = [
   "apps/**/{config,errors,schema,schemas,service,services}.ts",
   "packages/**/{config,errors,schema,schemas,service,services}.ts",
+  "packages/api/rpc/src/content.{errors,schemas,service}.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
   "tools/oxlint/fixtures/.generated-effect-rejected.ts",
@@ -207,6 +212,7 @@ const effectContractFiles = [
 const effectServiceContractFiles = [
   "apps/**/{service,services}.ts",
   "packages/**/{service,services}.ts",
+  "packages/api/rpc/src/content.service.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
   "tools/oxlint/fixtures/.generated-effect-rejected.ts",
@@ -215,6 +221,7 @@ const effectServiceContractFiles = [
 const effectErrorContractFiles = [
   "apps/**/{errors,schema,schemas}.ts",
   "packages/**/{errors,schema,schemas}.ts",
+  "packages/api/rpc/src/content.errors.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
   "tools/oxlint/fixtures/.generated-effect-rejected.ts",
@@ -252,6 +259,7 @@ const schemaEncoderEgressFiles = [
   "apps/api/test/worker.boundary.test.ts",
   // Test-only native request/reply bytes; no production encoder admission.
   "packages/api/rpc/test/handlers.test.ts",
+  "packages/api/rpc/test/content.boundary.test.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
   "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
@@ -512,6 +520,9 @@ export default defineConfig({
         "apps/api/src/config.ts",
         // Schema.TaggedError is a class factory, not an Error constructor.
         "packages/api/rpc/src/live.layer.ts",
+        "packages/api/rpc/src/content.live.layer.ts",
+        "packages/api/rpc/src/content.errors.ts",
+        "packages/api/rpc/src/response-budget.boundary.ts",
         "packages/api/rpc/src/server-serialization.boundary.ts",
         "apps/web/src/lib/config.ts",
         "apps/web/src/lib/form.boundary.ts",

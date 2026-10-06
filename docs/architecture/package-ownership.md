@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -31,8 +31,8 @@ Current implemented code lives in:
 - `packages/docs-fumadocs`
 - `packages/api/http`
 - `packages/api/rpc`
-: Private compiled native Effect RPC transport. It owns versioned calculation/catalogue
-  procedures, thin named calculator-service handlers, checked POST/JSON ingress and
+: Private compiled native Effect RPC transport. It owns separately versioned
+  calculator and documentation procedures, thin named service handlers, checked POST/JSON ingress and
   caller-scoped private client Layers. Calculator/content Schemas remain with
   their existing owners. Explicit test-only composition is separate; no app
   runtime or backend fallback belongs here. T003 app-host composition is locally accepted; T009 exported tracing remains open.
@@ -183,8 +183,10 @@ T009 exported tracing and provider/deployment proof remain open.
   errors, the accepted public catalogue Schema and `ContentService`. Application
   composition injects one checked catalogue; the service reads accepted pages,
   navigation and bounded search without filesystem or runtime execution. This
-  owner does not perform source acceptance or compile MDX. The HTTP content
-  group consumes this compiled contract instead of the source-only Fumadocs collection.
+  owner does not perform source acceptance or compile MDX. HTTP and native RPC
+  content groups consume this compiled contract instead of the source-only
+  Fumadocs collection. The public path refinement and fixed page/search errors
+  have one owner here.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs

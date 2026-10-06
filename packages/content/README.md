@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-content-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: content contracts, search policy or package exports change
 ---
 
@@ -22,7 +22,9 @@ source records; the
 [dated source review](../../docs/documentation-audit/clean-slate-foundation/2026-10-06-public-content-acceptance.json)
 owns those individual decisions. The checked
 [HTTP package](../api/http/README.md) now delegates public content routes to
-this service; replacement Website routing remains T005 work.
+this service. The [native RPC package](../api/rpc/README.md#documentation-connection)
+delegates the same four documentation operations to it; replacement Website
+routing remains T005 work.
 Existing docs-content imports re-export
 the canonical page, navigation and lookup error contracts for compatibility.
 
@@ -41,7 +43,8 @@ projection failure stays in the safe `DocsSourceError` channel.
 ## Exports
 
 - `./schemas`: canonical page, navigation, accepted catalogue and search Schemas.
-- `./errors`: checked source and page lookup failures.
+- `./errors`: internal checked source/lookup failures and shared fixed public
+  page/search failures.
 - `./service`: `ContentServiceContract`, `ContentService` and `ContentCatalogue`.
 - `./live`: the implementation over a supplied checked catalogue.
 - `./test`: the same implementation with controlled request observations.
@@ -74,3 +77,10 @@ without external systems, runtime execution or consequential operations.
 
 Service tests and compiled output do not prove source acceptance, an installed
 HTTP consumer, app routes, deployment, public availability or publication.
+
+`DocsPublicPagePath` refines the existing page identity to a canonical lowercase
+public address of at most 256 characters. The public page Schema and HTTP/RPC
+request contracts reuse it. `DocsPageUnavailable` and `DocsSearchUnavailable`
+contain fixed messages with no request path or source diagnostic. Internal
+content lookup/source errors retain their existing checked fields; the two
+transport handlers project them at response egress.

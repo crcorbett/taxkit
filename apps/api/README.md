@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-app-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: API app settings, startup, smoke command or shutdown change
 ---
 
@@ -22,9 +22,12 @@ Both API hosts provide `ContentService` from the accepted generated catalogue.
 `src/content.boundary.ts` imports only `@taxkit/docs-content/public-catalogue`
 JSON, checks it once when the host is built and reports a fixed configuration
 failure if it is invalid. Incoming requests do not load authored MDX or run
-the compiler. The public HTTP content group serves navigation, checked page
-JSON, bounded search and plain processed Markdown. See the
-[HTTP package](../../packages/api/http/README.md) for paths and response rules.
+the compiler. Public HTTP and four native RPC documentation operations serve
+navigation, checked page values, bounded search and exact processed Markdown
+from that same service. Documentation calls consume no calculator allowance.
+See the [HTTP package](../../packages/api/http/README.md) for paths/response rules
+and the [RPC owner](../../packages/api/rpc/README.md#documentation-connection)
+for the separate documentation revision and client.
 
 The API dependency build generates the accepted catalogue before TypeScript
 or native bundling consumes it. Its ESNext module profile preserves the JSON

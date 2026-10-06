@@ -1,5 +1,5 @@
 import {
-  DocsPagePath,
+  DocsPublicPagePath,
   DocsPublicNavigation,
   DocsPublicPage,
   DocsSearchResult,
@@ -18,10 +18,7 @@ import { DocsPageUnavailable, DocsSearchUnavailable } from "../schemas.js";
 export { DocsPageUnavailable, DocsSearchUnavailable } from "../schemas.js";
 
 export const DocsPageQuery = Schema.Struct({
-  path: DocsPagePath.check(
-    Schema.isMaxLength(256),
-    Schema.isPattern(/^\/[a-z0-9-]+(?:\/[a-z0-9-]+)*$/u)
-  ),
+  path: DocsPublicPagePath,
 });
 
 export const DocsSearchQuery = Schema.Struct({ term: DocsSearchTerm });

@@ -3,27 +3,30 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-rpc-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: RPC contracts, native codecs, clients, handlers, exports or transport proof change
 ---
 
 # `@taxkit/api-rpc`
 
-Private compiled Effect 4 RPC transport over the existing calculator service.
-It owns the complete nine named calculator-service operations, their revision agreement, thin handlers and checked clients.
+Private compiled Effect 4 RPC transport over the existing calculator and content services.
+It owns nine calculator operations at revision 4 and four documentation operations
+at revision 1, their thin handlers and separate checked clients.
 Tax definitions and calculation remain with `@taxkit/calculators` and rule
 packages. Both native app candidates now consume it. T003's bounded local
 connection acceptance is complete; T009 still owns safe exported tracing.
 
 ## Exports
 
-- `./group`: all nine native procedures and `TaxKitRpcGroup`.
+- `./group`: the nine calculator procedures, `TaxKitRpcGroup` and the combined
+  `TaxKitPublicRpcGroup` used by the server.
 - `./schemas`: calculator-owned request/result/catalogue/query and content-owned navigation/path
   Schemas, checked API origin, contract version and ten-second deadline.
 - `./errors`: bounded expected, unavailable, invalid-response and deadline errors.
 - `./handlers`: handler Layer calling the corresponding named calculator service operation once.
 - `./service`: closed named client matching the existing calculator service.
-- `./server`: native POST `/rpc` Layer with JSON serialisation and checked ingress.
+- `./server`: native POST `/rpc` Layer with JSON serialisation and checked ingress;
+  requires supplied `PublicCalculatorService` and `ContentService`.
 - `./live`: configured protocol Layer with a native client scope per named operation;
   the app supplies its HttpClient.
 - `./test`: explicit test-only in-process client over the same handler.
@@ -70,8 +73,9 @@ The repository [transport architecture](../../../docs/architecture/api-and-sdk.m
 [package ownership](../../../docs/architecture/package-ownership.md),
 [quality guide](../../../docs/architecture/testing-and-quality.md) and active
 [execution plan](../../../docs/exec-plans/active/clean-slate-foundation.md) own the
-wider design and proof limits. Reusable content operations remain with T005;
-re-exported content Schemas do not mount authored content in the browser.
+wider design and proof limits. The documentation client and native API operations are implemented in T005;
+replacement Website routes and discovery remain unfinished. Re-exported content
+Schemas do not mount authored content in the browser.
 
 Run `bun run --filter=@taxkit/api-rpc test`, `check-types` and `build` for focused
 proof. Root verification also checks source/export direction, actual lint
@@ -192,3 +196,38 @@ wire contract and current revision retain their existing fields and values.
 ## Native calculation rate admission
 
 Revision `4` preserves canonical `CalculatorRateLimited` and `CalculatorAdmissionUnavailable` alongside existing expected errors. Older clients receive the checked revision mismatch. The native API and Website share the [calculator-owned rate contract](../../calculators/README.md#native-calculation-rate-admission); each batch calculation takes one unit and metadata takes none. `./rate-identity` is an explicit workspace-only host export; it is excluded from the published RPC capability surface. The rate identity is separate from RPC request JSON and is never an analytics identifier.
+
+## Documentation connection
+
+`./content/group`, `./content/schemas`, `./content/errors`, `./content/service`,
+`./content/handlers`, `./content/live` and `./content/test` own four named calls:
+`getNavigation`, `getPage`, `getMarkdown` and `searchPages`. Their native procedure
+tags are `GetDocsNavigation`, `GetDocsPage`, `GetDocsMarkdown` and `SearchDocsPages`.
+The combined server group admits these alongside the existing nine calculator
+procedures. Calculator clients and revision 4 stay unchanged; documentation
+calls require their own revision 1 and fail with `DocsRpcVersionMismatch` during
+version skew. There is no automatic retry or backend fallback.
+
+`DocsRpcClientLive` takes the existing checked API origin and caller-supplied
+HttpClient. Each call owns its native receive-loop scope, the ten-second whole
+reply deadline and the same private 2 MiB byte reader as calculator calls. That
+reader stops before an oversized tail, releases request/body resources and
+keeps the native parser and response Schemas. Both clients map its private size
+marker to their own fixed error. Request credentials, redirects and tracing
+use the same qualified policy. Independent adapter defects remain defects.
+
+Handlers capture the supplied `ContentService` once and return its immutable
+values. Public missing-page and source-search errors use the content owner's
+fixed errors. The documentation procedure defect is a fixed literal; the native
+global fatal path retains its already qualified fixed literal. Internal source
+diagnostics and raw Causes are not response values. The native API supplies the
+same generated catalogue for HTTP and RPC. This package imports only compiled
+content contracts, with no MDX compiler or source collection dependency.
+
+Focused documentation tests cover all four calls, valid and incompatible
+versions, safe expected/global/procedure failures, damaged replies, unrelated
+adapter defects, exact/oversized encoded byte limits, headers/body deadlines,
+earlier cancellation, scope close and transport policy. The actual native pair
+check compares all 61 accepted page values and exact Markdown through these
+clients across separate Worker requests. Those checks qualify the API/client
+connection; replacement Website page/search composition remains T005 work.

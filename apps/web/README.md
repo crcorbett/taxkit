@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-web-app-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: website rendering, settings, transport, form, generated types or build change
 ---
 
@@ -291,3 +291,9 @@ different request contract; production Vite configuration is unchanged.
 The API and Website use the [calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission). The Website checks its original Cloudflare connection address and supplies it separately from request JSON to the binding-only `calculatorRequest` operation. The installed Alchemy native RPC adapter owns private-call reply handling. Both browser and restored HTML forms display fixed rate/unavailable guidance and never retry automatically.
 
 The private request omits an explicit AbortSignal because the pinned native RPC cannot serialise it. Client cancellation stops local waiting; API work and reply budgets remain in force. This does not prove remote cancellation. The guarded disposable root selects `local-emulator` and one loopback allowance; hosted composition defaults to `edge`. [Infrastructure configuration](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns this distinction.
+
+The native pair test also uses the separate checked documentation RPC client
+against the actual built API. It compares navigation, every one of the 61
+accepted pages and exact Markdown, plus bounded search across separate Worker
+requests. This is API/client proof; the Website's production documentation
+page/search connection and routes remain unfinished T005 work.

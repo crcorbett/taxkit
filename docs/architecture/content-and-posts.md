@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-content-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: content ownership, acceptance or generated presentation changes
 ---
 
@@ -80,8 +80,9 @@ prevent a later edit from silently inheriting acceptance. The docs-content
 package build includes this step, with source-review records and the compiler's
 browser path in its cache inputs. Its JSON-only `./public-catalogue` export is
 checked once by each API host; it imports no compiler into request handling.
-The HTTP group delegates page/navigation/search and processed Markdown to
-`ContentService`. Replacement Website routes and discovery remain T005 work.
+HTTP and native RPC documentation groups delegate page/navigation/search and
+processed Markdown to the same `ContentService`. Its compiled public-path
+refinement and fixed missing-page/search errors serve both transports. Replacement Website routes and discovery remain T005 work.
 
 `docs/architecture`
 : Durable implementation architecture.

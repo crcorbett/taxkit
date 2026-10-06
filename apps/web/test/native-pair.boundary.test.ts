@@ -5,6 +5,8 @@ import {
   CalculatorRequestBodyErrorEnvelope,
   CalculatorRequestBodyTooLarge,
 } from "@taxkit/api-http/request-boundary";
+import { DocsRpcClientLive } from "@taxkit/api-rpc/content/live";
+import { DocsRpcClient } from "@taxkit/api-rpc/content/service";
 import { CalculatorRpcRequestTooLarge } from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
 import {
@@ -20,6 +22,7 @@ import {
   DocsPublicPage,
   DocsPublicNavigation,
   DocsSearchResult,
+  DocsSearchTerm,
 } from "@taxkit/content/schemas";
 import {
   Array,
@@ -252,6 +255,33 @@ describe("built native API and Website", () => {
             )
           );
         expect(publicContent.pages).toHaveLength(61);
+        // Native RPC restores the same catalogue values across separate
+        // actual Worker requests. No authored source or compiler is consulted.
+        yield* Effect.gen(function* () {
+          const client = yield* DocsRpcClient;
+          expect(yield* client.getNavigation()).toEqual(
+            publicContent.navigation
+          );
+          yield* Effect.forEach(publicContent.pages, (page) =>
+            Effect.gen(function* () {
+              expect(yield* client.getPage(page.path)).toEqual(page);
+              expect(yield* client.getMarkdown(page.path)).toBe(page.markdown);
+            })
+          );
+          const term = yield* Schema.decodeEffect(DocsSearchTerm)("Quickstart");
+          const results = yield* client.searchPages(term);
+          expect(results.length).toBeGreaterThan(0);
+          expect(results.length).toBeLessThanOrEqual(20);
+          expect(
+            Array.every(results, (result) => result.excerpt.length <= 240)
+          ).toBe(true);
+        }).pipe(
+          Effect.provide(
+            DocsRpcClientLive(catalogueOrigin).pipe(
+              Layer.provide(FetchHttpClient.layer)
+            )
+          )
+        );
         const docsNavigation = yield* Effect.promise(() =>
           publicApi.dispatchFetch(`${apiOrigin}/api/v1/docs/navigation`)
         );

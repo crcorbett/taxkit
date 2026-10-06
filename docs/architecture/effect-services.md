@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-effect-services-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
@@ -494,3 +494,10 @@ ingress, reject runners at every admitted file and reject decoding in the
 nearby calculator admission Layer. No wildcard or new unknown-parameter
 exception is added. The Website Layer accepts the generated native Fetcher
 capability; its settings boundary checks the richer API binding once.
+
+The native documentation RPC handler Layer captures the same supplied
+`ContentService` as public HTTP. It owns no runtime or catalogue fallback. A
+separate `DocsRpcClient` provides four closed named operations over native RPC,
+with its own revision/error vocabulary and per-call resource scope. Only the
+concrete closed JSON byte reader is shared with the calculator client; no raw
+client callback or provider object enters either service contract.

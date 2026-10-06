@@ -10,7 +10,7 @@ import {
 } from "effect";
 import { RpcSerialization } from "effect/rpc";
 
-import { TaxKitRpcGroup } from "./group.js";
+import { TaxKitPublicRpcGroup } from "./group.js";
 import { CalculatorRequestBodyLimit } from "./request-boundary.js";
 
 // Validate the native JSON parser's unknown envelopes before the native server
@@ -33,7 +33,7 @@ const RequestEnvelope = Schema.TaggedStruct("Request", {
   payload: Schema.Unknown,
   tag: Schema.Literals(
     Array.map(
-      Array.fromIterable(TaxKitRpcGroup.requests.values()),
+      Array.fromIterable(TaxKitPublicRpcGroup.requests.values()),
       (procedure) => procedure._tag
     )
   ),

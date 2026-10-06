@@ -23,7 +23,7 @@ export {
   RulesResponse,
   TaxYearsResponse,
 } from "@taxkit/calculators/schemas";
-export { DocsNavigation, DocsPagePath } from "@taxkit/docs-content/schemas";
+export { DocsNavigation, DocsPagePath } from "@taxkit/content/schemas";
 
 export const CalculatorRpcVersion = "4";
 export const CalculatorRpcPayload = Schema.Struct({

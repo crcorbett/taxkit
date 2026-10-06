@@ -3022,6 +3022,12 @@
                       "type": "string"
                     },
                     "path": {
+                      "allOf": [
+                        {
+                          "pattern": "^\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*$"
+                        }
+                      ],
+                      "maxLength": 256,
                       "minLength": 1,
                       "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
                       "type": "string"

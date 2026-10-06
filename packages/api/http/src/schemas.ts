@@ -1,16 +1,9 @@
 import { Schema } from "effect";
 
-export class DocsPageUnavailable extends Schema.TaggedError<DocsPageUnavailable>()(
-  "DocsPageUnavailable",
-  { message: Schema.Literal("The documentation page was not found.") }
-) {}
-
-export class DocsSearchUnavailable extends Schema.TaggedError<DocsSearchUnavailable>()(
-  "DocsSearchUnavailable",
-  {
-    message: Schema.Literal("Documentation search is temporarily unavailable."),
-  }
-) {}
+export {
+  DocsPageUnavailable,
+  DocsSearchUnavailable,
+} from "@taxkit/content/errors";
 
 export class CalculatorRequestBodyTooLarge extends Schema.TaggedError<CalculatorRequestBodyTooLarge>()(
   "CalculatorRequestBodyTooLarge",

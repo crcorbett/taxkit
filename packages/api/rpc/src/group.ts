@@ -11,6 +11,7 @@ import {
 } from "@taxkit/calculators/schemas";
 import { Rpc, RpcGroup } from "effect/rpc";
 
+import { DocsRpcGroup } from "./content.group.js";
 import { CalculatorRpcExpectedError } from "./errors.js";
 import {
   CalculatorCatalogRpcPayload,
@@ -96,3 +97,5 @@ export const TaxKitRpcGroup = RpcGroup.make(
   ListRules,
   ListTaxYears
 );
+
+export const TaxKitPublicRpcGroup = TaxKitRpcGroup.merge(DocsRpcGroup);

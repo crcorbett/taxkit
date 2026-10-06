@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-api-sdk-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: API or SDK contracts, exports, lifetime or caller composition change
 ---
 
@@ -629,3 +629,23 @@ qualification before T004 can close.
 ## Native calculation rate admission
 
 The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP/RPC/private Website calls share an allowance and each batch member takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance; RPC revision 4 preserves the same errors. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities to the published RPC exports.
+
+### Native documentation RPC
+
+The same API POST endpoint mounts four documentation procedures through
+`TaxKitPublicRpcGroup`, composed with the unchanged nine-procedure calculator
+group. Documentation has its own `DocsRpcClient` and revision 1; calculator
+revision 4 and its required client methods are preserved. The server requires
+both owning services, supplied once at API composition. The content handlers
+reuse the generated accepted catalogue and canonical values; they run no
+calculation and take no calculator allowance.
+
+Both private client groups share the native scoped 2 MiB response reader, then
+project its private marker into their own errors. Documentation calls have a
+ten-second complete-response deadline, caller cancellation, credential/redirect
+and tracing policy, checked version skew and decoder-only invalid-reply marker.
+Their fixed page/search errors and public-path bound belong to `@taxkit/content`
+and are shared with HTTP. Native fatal defects retain the existing safe global
+literal; procedure defects use the declared documentation literal. Defects stay
+defects. Website composition and browser-safe MDX presentation remain the next
+T005 work, with no authored-source fallback in the Website.

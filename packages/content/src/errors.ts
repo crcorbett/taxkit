@@ -18,6 +18,20 @@ export const DocsSourceOperation = Schema.Literals([
 ]);
 export type DocsSourceOperation = typeof DocsSourceOperation.Type;
 
+// Public transports share these fixed failures; internal source errors retain
+// their checked diagnostic fields only inside the content application.
+export class DocsPageUnavailable extends Schema.TaggedError<DocsPageUnavailable>()(
+  "DocsPageUnavailable",
+  { message: Schema.Literal("The documentation page was not found.") }
+) {}
+
+export class DocsSearchUnavailable extends Schema.TaggedError<DocsSearchUnavailable>()(
+  "DocsSearchUnavailable",
+  {
+    message: Schema.Literal("Documentation search is temporarily unavailable."),
+  }
+) {}
+
 export class DocsPageNotFoundError extends Schema.TaggedError<DocsPageNotFoundError>()(
   "DocsPageNotFoundError",
   {

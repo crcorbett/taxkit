@@ -7,6 +7,9 @@ import {
   CalculatorOperationTimedOut,
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
+import { ContentServiceLive } from "@taxkit/content/live";
+import { ContentCatalogue } from "@taxkit/content/service";
+import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
 import {
   Array,
   Cause,
@@ -83,7 +86,14 @@ const makeHttpTransport = Effect.fnUntraced(function* (
   mode: "success" | "expected" | "defect" | "mixed" | "capacity" | "timeout"
 ) {
   const handler = yield* HttpRouter.toHttpEffect(
-    TaxKitRpcHttpLayer.pipe(Layer.provide(CalculatorFixture(mode)))
+    TaxKitRpcHttpLayer.pipe(
+      Layer.provide(CalculatorFixture(mode)),
+      Layer.provide(
+        ContentServiceLive.pipe(
+          Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
+        )
+      )
+    )
   );
   return HttpClient.make((request, url) =>
     Effect.sync(() => expect(url.pathname).toBe("/rpc")).pipe(

@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-http-api-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
@@ -422,3 +422,8 @@ a diagnostic sanitiser; do not export legacy diagnostic values to telemetry.
 ## Native calculation rate admission
 
 The [calculator-owned rate contract](../../calculators/README.md#native-calculation-rate-admission) adds canonical rate/unavailable errors to calculation responses. The native API maps them to HTTP 429 with `Retry-After: 60` and fixed 503 guidance, using the existing error envelope. Metadata consumes no rate unit. Owning group Schemas drive generated clients and the OpenAPI snapshot; the standalone Bun host keeps its existing policy.
+
+The public page-address refinement and fixed documentation errors now belong
+to `@taxkit/content`, shared with native documentation RPC. This package retains
+its existing error exports and HTTP status/media rules. Generated OpenAPI names
+the same canonical address bound for both the request and returned page.

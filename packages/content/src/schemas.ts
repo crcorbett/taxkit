@@ -8,6 +8,12 @@ export const DocsPagePath = DocsNonEmptyText.pipe(
 );
 export type DocsPagePath = typeof DocsPagePath.Type;
 
+export const DocsPublicPagePath = DocsPagePath.check(
+  Schema.isMaxLength(256),
+  Schema.isPattern(/^\/[a-z0-9-]+(?:\/[a-z0-9-]+)*$/u)
+);
+export type DocsPublicPagePath = typeof DocsPublicPagePath.Type;
+
 export const DocsPageSlug = DocsNonEmptyText.pipe(
   Schema.brand("taxkit/DocsPageSlug")
 );
@@ -91,12 +97,12 @@ export const DocsPublicPage = Schema.Struct({
     ...DocsPageFrontmatter.fields,
     status: Schema.Literal("published"),
   }),
+  path: DocsPublicPagePath,
 }).check(
   Schema.makeFilter(
     (page) => {
       const path = page.slugs.join("/");
       return (
-        /^\/[a-z0-9-]+(?:\/[a-z0-9-]+)*$/u.test(page.path) &&
         page.path === `/${path}` &&
         (page.source === `content/${path}.mdx` ||
           page.source === `content/${path}/index.mdx`)

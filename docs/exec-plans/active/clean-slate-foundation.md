@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-implementation-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: task progress, dependency qualification, acceptance evidence or authority change
 ---
 
@@ -78,7 +78,7 @@ records command outcomes and log digests.
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
-| T005 / DEV-76 | In progress | All 61 pages and navigation have source-bound acceptance; draft #155 contains the tested catalogue and links. Four checked HTTP content routes pass focused, actual local host, complete repository and external package checks. Replacement Website routes and discovery remain unfinished. |
+| T005 / DEV-76 | In progress | All 61 pages and navigation have source-bound acceptance; draft #155 contains the tested catalogue and links. Four HTTP content routes pass full local and external package checks. Four separately versioned native documentation RPC operations are the current candidate. Replacement Website routes and discovery remain unfinished. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
@@ -4059,3 +4059,39 @@ passes in 607.31 seconds; all repository tests pass in
 build and ten-artifact external package consumer pass. Replacement Website
 connection/routes, discovery/images and old-app retirement remain T005 work.
 No merge, publication, deployment or provider apply.
+
+### T005 native documentation connection candidate — 7 October
+
+After the qualified HTTP commit `103feda047566d0941dc974784adf38eeaf9d68a`,
+continue the agreed Q9 Website connection with four named native documentation
+RPC calls over the same API POST endpoint. The content owner supplies the
+bounded public page address and fixed missing-page/search failures to both
+transports. A separate documentation client and revision agreement preserve
+the existing nine calculator methods and revision 4. Each documentation call
+owns its native client scope, a complete-response deadline and the accepted
+2 MiB closed JSON limit. No raw Cause, request or source diagnostic crosses
+that connection. The API supplies the same generated content service.
+
+Documentation impact: `Change required` for content/RPC/HTTP contracts and
+READMEs, API/Website composition, transport/frontend architecture, Changesets,
+focused tests, bounded proof and this plan. `Preserve` for calculator contracts,
+retained tax results, accepted authored pages, navigation and review records.
+Runbooks have evidenced `N/A` for this local connection candidate: no provider,
+credential, deployment or operational command changes. Website page/search
+composition and discovery remain unfinished; the retained docs app stays until
+equivalent actual journeys qualify its replacement. Metrics remain deferred.
+
+Focused qualification passes all 308 RPC tests, the 572 actual-command lint
+fixtures, types, lint, the root build and production dependency checks. The
+actual built native pair passes all 11 cases; ordinary compiled Node compares
+all 61 page values and Markdown bodies against the same owning catalogue.
+All authored pages, navigation, 64 historical source-review records, active
+bindings and four original integration templates remain byte-equal to the
+qualified HTTP parent. The
+[native connection receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-native-docs-connection.json)
+records the rejected experiments and narrow corrections. Complete repository
+tests pass in 95.83 seconds and fresh full verification
+passes in 628.61 seconds, including the eleven built native
+cases. A final ordinary compiled Node comparison passes and all forty frozen
+source identities remain unchanged. The HTTP parent `103feda` has separately passed
+hosted Quality run `37474986158`; that result does not qualify this new candidate.

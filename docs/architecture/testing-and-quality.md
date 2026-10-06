@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
@@ -1429,3 +1429,21 @@ and HTTP body codecs. Malformed tag/id cases mutate an encoded valid frame.
 The request-absence attempt exposed generic JSON encoding of domain Options
 that failed admission before the intended service/error path; the candidate
 receipt retains that failed graph and the original assertions stay fixed.
+
+### Native documentation connection qualification
+
+The documentation RPC corpus checks four named operations with a separate
+revision agreement through the real native HTTP server/client. It requires
+complete owning page/navigation/search values, byte-equal Markdown, fixed public
+failures, safe native fatal and procedure reply bytes, and damaged JSON/result
+classification. An unrelated adapter SchemaError retains its exact identity.
+Every call must accept a valid native reply padded to exactly 2 MiB and reject
+progressive/multi-byte oversized replies before their tail. Controlled clocks
+observe deadline through headers/body, earlier interruption and scope cleanup;
+operation ingress observes credential/redirect policy.
+
+The native workerd/Chromium pair separately compares all 61 accepted pages and
+exact Markdown through this client at the built API, retaining every existing
+calculator journey and public HTTP check. API/client tests do not establish
+Website documentation routes, search interaction, discovery assets, old-app
+retirement, deployment or public availability. Those remain T005 work.

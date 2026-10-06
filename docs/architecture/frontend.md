@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-07
 review_trigger: frontend runtime, transport, rendering, build adapter, or composition change
 ---
 
@@ -371,3 +371,10 @@ navigation, spaced controls and visible keyboard focus.
 ## Native calculation rate admission
 
 The [Website owner](../../apps/web/README.md#native-calculation-rate-admission) captures checked original connection identity and uses the API's binding-only named operation for HTML forms. Browser calculations use public RPC. Both reach the same [calculator-owned allowance](../../packages/calculators/README.md#native-calculation-rate-admission), including separate batch members. Containers show fixed safe guidance with manual retry. This adds no calculation engine, stored figures, analytics identity or URL data to the Website. Private-call local cancellation and remote work limits remain distinct.
+
+T005 now prepares four checked documentation calls at the API/RPC owner. The
+actual native pair test compares all accepted page values and exact Markdown
+through the documentation client, alongside the retained calculator journeys.
+This does not yet connect Website documentation loaders or replace its routes.
+Those routes must use the private named client and browser-safe compiled MDX
+presentation before the retained docs app can retire.

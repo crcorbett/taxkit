@@ -150,7 +150,7 @@
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/calculators": "workspace:*",
-        "@taxkit/docs-content": "workspace:*",
+        "@taxkit/content": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
