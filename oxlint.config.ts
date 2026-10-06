@@ -14,6 +14,9 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact build catalogue/renderer bytes and adversarial metadata fixture ingress.
+  "apps/web/scripts/docs-images.build.ts",
+  "apps/web/src/lib/docs/social.boundary.test.ts",
   // Exact imported navigation ingress at the synchronous Fumadocs config host.
   // No synchronous throwing codec, encoder or runtime execution admission.
   "packages/docs-content/source.config.ts",
@@ -230,6 +233,7 @@ const effectServiceContractFiles = [
 ];
 
 const effectErrorContractFiles = [
+  "apps/web/scripts/docs-images.build.ts",
   "apps/**/{errors,schema,schemas}.ts",
   "packages/**/{errors,schema,schemas}.ts",
   "packages/api/rpc/src/content.errors.ts",
@@ -242,6 +246,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Exact checked public structured-data script egress; no decoder/runtime permission.
+  "apps/web/src/lib/docs/metadata.egress.ts",
   "tools/documentation/catalogue.build.ts",
   "tools/documentation/catalogue.build.test.ts",
   // Exact public catalogue representation round-trip proof, not a service encoder.
@@ -532,6 +538,7 @@ export default defineConfig({
         "apps/docs/scripts/check-import-boundaries.runtime.ts",
         "apps/api/src/config.ts",
         // Schema.TaggedError is a class factory, not an Error constructor.
+        "apps/web/scripts/docs-images.build.ts",
         "packages/api/rpc/src/live.layer.ts",
         "packages/api/rpc/src/content.live.layer.ts",
         "packages/api/rpc/src/content.errors.ts",

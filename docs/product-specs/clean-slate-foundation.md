@@ -83,9 +83,9 @@ browser agent -> page-owned WebMCP tools -> the same website commands
 backend API -> existing calculator contracts and rule packages
 human docs page -> checked API page/navigation -> accepted content contract
   -> Website HTML with browser-safe generated presentation components
-dynamic search, Markdown, content or images -> native API -> owning content/image service
+dynamic search, Markdown or content -> native API -> owning content service
 sitemap/robots/agent indexes -> backend accepted catalogue + checked deferred stage origins
-generated static Markdown/OG -> accepted catalogue assets
+generated static OG -> Website build-only renderer -> accepted catalogue assets
 browser pageview -> private PostHog browser service -> bounded Website relay
 successful hosted calculation -> API application event owner -> PostHog capture
 request observations -> safe log/metric exporters and qualified native spans
@@ -956,3 +956,23 @@ The existing native journey and exact decoder CLI fixtures own qualification.
 [Markdown evidence](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
 keeps current proof separate from deployment. Whole T005 stays in progress for
 share images and old-app retirement; metrics remain deferred.
+
+## T005 Website share-image contract
+
+Share assets are generated statically from the accepted catalogue before the
+Website Vite build copies public assets. The exact selected Takumi 2.14.0
+WebAssembly graph includes its embedded font; no remote font, browser renderer
+or dynamic image service is needed. Each accepted page has a checked bounded
+1200 by 630 PNG at `/og` plus its public path and `.png`. One mapping supplies
+both generation and page metadata. The scoped build program releases its native
+renderer and exposes fixed safe failures. Previous owned generated files are
+removed so withdrawal cannot leave a copied stale public asset.
+
+The checked public page/origin supplies canonical, alternate Markdown, Open
+Graph/Twitter and encoded TechArticle output. Native Schema JSON encoding and
+script escaping retain unusual public text without inventing author/date fields.
+All accepted assets and heads, deterministic generation, actual static headers,
+Chromium decoding, build-only bundle exclusion and source preservation need
+boundary-matched proof in the [image receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json).
+T005 remains in progress for old-app retirement and harness replacement; metrics
+remain deferred and retained tax results are unchanged.

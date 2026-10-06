@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { NodeServices } from "@effect/platform-node";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import * as docsConfig from "@taxkit/docs-content/source.config";
 import viteReact from "@vitejs/plugin-react";
@@ -8,6 +9,7 @@ import { Config, ConfigProvider, Effect, Schema } from "effect";
 import mdx from "fumadocs-mdx/vite";
 import { defineConfig } from "vite";
 
+import { generateDocsImages } from "./scripts/docs-images.build.ts";
 import { WebsiteServerFunctionBase } from "./src/lib/config.ts";
 
 export default defineConfig(() => {
@@ -24,6 +26,16 @@ export default defineConfig(() => {
   return {
     envPrefix: [],
     plugins: [
+      {
+        configResolved: () =>
+          Effect.runPromise(
+            generateDocsImages.pipe(
+              Effect.asVoid,
+              Effect.provide(NodeServices.layer)
+            )
+          ),
+        name: "taxkit-accepted-doc-images",
+      },
       // One shared generation phase keeps client and SSR presentation equal.
       mdx(docsConfig, {
         configPath: fileURLToPath(

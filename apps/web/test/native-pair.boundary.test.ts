@@ -31,6 +31,7 @@ import {
   FileSystem,
   Layer,
   Option,
+  Order,
   Path,
   Queue,
   Record,
@@ -41,6 +42,13 @@ import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
+import { generateDocsImages } from "../scripts/docs-images.build";
+import { WebsiteDocsImageBytes } from "../scripts/docs-images.schemas";
+import {
+  docsImagePath,
+  WebsiteDocsArticleJson,
+  WebsiteDocsImageSize,
+} from "../src/lib/docs/social.schemas";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
@@ -128,6 +136,31 @@ describe("built native API and Website", () => {
               expect(clientCode.includes(marker), marker).toBe(false)
             )
         );
+        yield* Effect.forEach(
+          [
+            "taxkit/WebsiteDocsImageBytes",
+            "@takumi-rs",
+            "takumi_wasm",
+            "Public documentation images could not be built.",
+            "taxkit-accepted-doc-images",
+          ],
+          (marker) =>
+            Effect.sync(() => {
+              expect(clientCode.includes(marker), marker).toBe(false);
+              expect(
+                Array.some(Record.values(websiteModules), (module) =>
+                  module.contents.includes(marker)
+                ),
+                marker
+              ).toBe(false);
+              expect(apiCode.includes(marker), marker).toBe(false);
+            })
+        );
+        expect(
+          yield* fs.glob("**/*.wasm", {
+            root: path.join(root, "apps/web/dist"),
+          })
+        ).toEqual([]);
         const logs = yield* Queue.make<WorkerdStructuredLog>();
         const exceptions = yield* Queue.make<string>();
         const apiWorker = (name: string) => ({
@@ -307,6 +340,63 @@ describe("built native API and Website", () => {
             )
           );
         expect(publicContent.pages).toHaveLength(61);
+        // Repeat the actual build-only generator, then compare every fresh
+        // output with the already built asset. This checks determinism and
+        // Vite's public-copy ordering rather than a separate renderer probe.
+        const repeatedImages = yield* generateDocsImages;
+        expect(repeatedImages).toHaveLength(publicContent.pages.length);
+        const copiedImages = yield* fs.glob("og/**/*.png", {
+          root: path.join(root, "apps/web/dist/client"),
+        });
+        expect(Array.sort(copiedImages, Order.String)).toEqual(
+          Array.sort(
+            Array.map(publicContent.pages, (page) =>
+              docsImagePath(page).slice(1)
+            ),
+            Order.String
+          )
+        );
+        yield* Effect.forEach(repeatedImages, (image) =>
+          Effect.gen(function* () {
+            const built = yield* fs
+              .readFile(
+                path.join(root, "apps/web/dist/client", image.path.slice(1))
+              )
+              .pipe(Effect.flatMap(Schema.decodeEffect(WebsiteDocsImageBytes)));
+            expect(Array.fromIterable(built)).toEqual(
+              Array.fromIterable(image.bytes)
+            );
+            const served = yield* Effect.promise(() =>
+              website.dispatchFetch(`${websiteOrigin}${image.path}`)
+            );
+            expect(served.status).toBe(200);
+            expect(served.headers.get("content-type")).toContain("image/png");
+            expect(served.headers.get("cache-control")).toBe(
+              "public, max-age=0, must-revalidate"
+            );
+            expect(
+              Array.fromIterable(
+                new Uint8Array(
+                  yield* Effect.promise(() => served.arrayBuffer())
+                )
+              )
+            ).toEqual(Array.fromIterable(built));
+            const head = yield* Effect.promise(() =>
+              website.dispatchFetch(`${websiteOrigin}${image.path}`, {
+                method: "HEAD",
+              })
+            );
+            expect(head.status).toBe(200);
+            expect(head.headers.get("content-type")).toBe(
+              served.headers.get("content-type")
+            );
+            expect(head.headers.get("cache-control")).toBe(
+              served.headers.get("cache-control")
+            );
+            expect(yield* Effect.promise(() => head.text())).toBe("");
+          })
+        );
+
         // Native RPC restores the same catalogue values across separate
         // actual Worker requests. No authored source or compiler is consulted.
         const discoveryDocuments = yield* Effect.gen(function* () {
@@ -1851,6 +1941,10 @@ describe("built native API and Website", () => {
               .evaluate((heading) => heading === document.activeElement)
           )
         ).toBe(false);
+        const imagePage = yield* Effect.acquireRelease(
+          Effect.promise(() => browser.newPage()),
+          (resource) => Effect.promise(() => resource.close())
+        );
         // Read every actual SSR article with the browser's HTML parser. The
         // checked transport alone cannot satisfy these rendered-body oracles.
         yield* Effect.forEach(publicContent.pages, (expected) =>
@@ -1875,6 +1969,9 @@ describe("built native API and Website", () => {
                       'link[rel="alternate"][type="text/markdown"]'
                     )
                     ?.getAttribute("href"),
+                  articleJson:
+                    document.querySelector('script[type="application/ld+json"]')
+                      ?.textContent ?? "",
                   canonical: document
                     .querySelector('link[rel="canonical"]')
                     ?.getAttribute("href"),
@@ -1882,6 +1979,15 @@ describe("built native API and Website", () => {
                     .querySelector('meta[name="description"]')
                     ?.getAttribute("content"),
                   heading: article?.querySelector("h1")?.textContent,
+                  image: document
+                    .querySelector('meta[property="og:image"]')
+                    ?.getAttribute("content"),
+                  imageHeight: document
+                    .querySelector('meta[property="og:image:height"]')
+                    ?.getAttribute("content"),
+                  imageWidth: document
+                    .querySelector('meta[property="og:image:width"]')
+                    ?.getAttribute("content"),
                   markdown: article
                     ?.querySelector(".docs-markdown-link a")
                     ?.getAttribute("href"),
@@ -1889,9 +1995,52 @@ describe("built native API and Website", () => {
                     document.querySelectorAll(".docs-navigation a").length,
                   text: article?.textContent,
                   title: document.title,
+                  twitterCard: document
+                    .querySelector('meta[name="twitter:card"]')
+                    ?.getAttribute("content"),
                 };
               }, html)
             );
+
+            const article = yield* Schema.decodeEffect(WebsiteDocsArticleJson)(
+              rendered.articleJson
+            );
+            expect(article.headline).toBe(expected.frontmatter.title);
+            expect(article.description).toBe(expected.frontmatter.description);
+            expect(article.url.href).toBe(`${websiteOrigin}${expected.path}`);
+            expect(article.image.href).toBe(
+              `${websiteOrigin}${docsImagePath(expected)}`
+            );
+            expect(rendered.image).toBe(article.image.href);
+            expect(rendered.imageWidth).toBe(
+              String(WebsiteDocsImageSize.width)
+            );
+            expect(rendered.imageHeight).toBe(
+              String(WebsiteDocsImageSize.height)
+            );
+            expect(rendered.twitterCard).toBe("summary_large_image");
+            // Browser-native decode returns its own Promise at this required
+            // Playwright host callback. No renderer runs in the browser.
+            yield* Effect.promise(() =>
+              imagePage.setContent(
+                `<img id="docs-image-proof" src="${article.image.href}">`
+              )
+            );
+            yield* Effect.promise(() =>
+              imagePage
+                .locator("#docs-image-proof")
+                .evaluate((image: HTMLImageElement) => image.decode())
+            );
+            expect(
+              yield* Effect.promise(() =>
+                imagePage
+                  .locator("#docs-image-proof")
+                  .evaluate((image: HTMLImageElement) => ({
+                    height: image.naturalHeight,
+                    width: image.naturalWidth,
+                  }))
+              )
+            ).toEqual(WebsiteDocsImageSize);
             expect(rendered.heading).toBe(expected.frontmatter.title);
             expect(rendered.title).toBe(
               `${expected.frontmatter.title} | TaxKit`

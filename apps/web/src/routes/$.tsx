@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Option, Result } from "effect";
 
 import { MdxDocument } from "#/lib/docs/mdx.boundary";
+import { docsMetadata } from "#/lib/docs/metadata.egress";
 import {
   DocsPageNotFound,
   DocsPageUnavailable,
@@ -41,23 +42,12 @@ export const Route = createFileRoute("/$")({
     const restored = docsPageRouteBoundary.restore(loaderData);
     return Result.match(restored, {
       onFailure: () => ({ meta: [{ title: "Documentation | TaxKit" }] }),
-      onSuccess: ({ page, settings }) => ({
-        links: [
-          {
-            href: new URL(page.path, settings.websiteOrigin).href,
-            rel: "canonical",
-          },
-          {
-            href: new URL(`${page.path}.md`, settings.websiteOrigin).href,
-            rel: "alternate",
-            type: "text/markdown",
-          },
-        ],
-        meta: [
-          { title: `${page.frontmatter.title} | TaxKit` },
-          { content: page.frontmatter.description, name: "description" },
-        ],
-      }),
+      onSuccess: ({ page, settings }) =>
+        docsMetadata(page, settings).pipe(
+          Result.getOrElse(() => ({
+            meta: [{ title: "Documentation | TaxKit" }],
+          }))
+        ),
     });
   },
   loader: ({ params, context, abortController }) =>

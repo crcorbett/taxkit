@@ -449,7 +449,7 @@ states have distinct fixed guidance; malformed loader data shares recoverable
 unavailable guidance. Results use the existing router-link and heading-focus
 policy. The form works without JavaScript. Search addresses are `noindex,
 follow`; words are not collected and no second index or calculation value is
-introduced. Share images remain separate T005 work.
+introduced. Share images use the build-only owner described below.
 
 
 ### Replacement Website discovery files
@@ -495,3 +495,13 @@ Native functions, calculator form paths, search and agent landing pages retain
 their existing policy; temporary calculation reports never enter Markdown. The
 [dated Markdown receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
 owns actual built content/header/browser observations and their limits.
+
+### Replacement Website share metadata
+
+The checked page and Website settings supply canonical and explicit Markdown
+alternate links, Open Graph/Twitter cards and Schema-encoded TechArticle data.
+The named `apps/web/src/lib/docs/metadata.egress.ts` output boundary escapes
+script-breaking characters after native JSON encoding. It invents no authorship,
+publisher or dates. The shared `docsImagePath` maps that same public page to its
+static 1200 by 630 PNG. The route consumes this checked output; it adds no decoder,
+renderer or runner. The Website README owns generation and build prerequisites.

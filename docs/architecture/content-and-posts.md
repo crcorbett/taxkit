@@ -178,3 +178,15 @@ failures. The collection owner wraps synchronous loader calls and processed-text
 Promise reads, preserving the SDK receiver. The reusable Fumadocs live Layer
 decodes raw representations through its owning Schemas. Shiki metadata
 transformation returns replacement nodes instead of mutating SDK-owned input.
+
+### Accepted page share assets
+
+The Website Vite build derives PNG share assets from the existing accepted
+catalogue through `apps/web/scripts/docs-images.build.ts`. The same page address
+mapping supplies HTML metadata; there is no separate page list or dynamic image
+API. The exact current Takumi 2.14.0 WebAssembly renderer and embedded font are
+build-only dependencies. Generator, dimensions/byte Schema, metadata egress and
+Website config are tracked inputs; generated `apps/web/public/og/**` is ignored
+and declared as a Turbo build output. Upstream catalogue construction continues
+to bind reviewed source bytes and navigation. Static generation accepts no
+calculation values and creates no new content acceptance record.

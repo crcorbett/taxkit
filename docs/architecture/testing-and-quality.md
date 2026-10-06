@@ -1590,3 +1590,24 @@ limited Accept check rejects a valid `text/*` preference even after the owning
 Schema chooses HTML. Original URL, caller signal and the host request scope
 remain intact. The actual wildcard journey must render an article, and focused
 HTTP policy tests preserve existing Vary fields without invoking content lookup.
+
+### Native Website share-image qualification
+
+The focused boundary suite checks PNG signature/dimensions/truncation/byte limits
+and safely encoded unusual title/description characters using the owning public
+page contract. The existing source-built native pair reruns the actual generator
+and compares every output byte with the previously copied build asset. The asset
+set must exactly match accepted paths. Actual static GET/HEAD media, cache,
+empty body and bytes are checked separately from generation. All 61 actual HTML
+heads must contain matching canonical/image/card values and decoded TechArticle
+text/addresses. Chromium independently decodes each served image and observes
+its natural 1200 by 630 dimensions. A representative long-title image is viewed.
+Worker/browser artifacts must exclude the build renderer and its WebAssembly.
+Existing calculations, native development and content/failure journeys remain.
+Exact CLI fixtures qualify decoder/encoder permissions and adjacent refusals.
+The [dated image receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json)
+owns observations and limitations; it does not prove a hosted social preview.
+
+The full Knip graph includes the Website Vite host and its
+imported generation program. PNG byte validation belongs to build scripts, keeping
+build-only checks out of the public metadata module.

@@ -436,3 +436,36 @@ and opens the real article link in Chromium. Exact decoding admissions have
 actual CLI positives and nearby negatives; encoder/runtime policy stays enforced.
 The [Markdown receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
 records qualification separately from hosted checks and public availability.
+
+## Public documentation share images
+
+The Vite configuration runs `scripts/docs-images.build.ts` before copying public
+assets. That lazy, scoped Effect reads the checked accepted catalogue, uses the
+exact build-only `@takumi-rs/wasm` 2.14.0 renderer with its embedded Geist font,
+checks PNG dimensions and byte bounds through its build-only
+`docs-images.schemas.ts`, and writes the owned ignored `public/og`
+subtree. Each accepted page maps to `/og` plus its public path and `.png`.
+Images are 1200 by 630 pixels and include the public title, description and path.
+No calculation, source file, external font request or search word enters them.
+The full Knip graph includes this Vite host and its imported build program.
+The renderer is released when generation ends; a failed catalogue/render/image/
+write operation has fixed guidance. Former generated images are removed on each
+run so withdrawn pages cannot survive in this subtree.
+
+The existing Vite host supplies NodeServices and is the sole generation runner.
+Builds need the accepted catalogue first; the native pair and Turbo dependency
+graph already build that owner. Standalone development needs `bun run
+docs:catalogue` before `bun run --filter=web dev`. Development also generates the
+images when its Vite configuration starts. Turbo declares both `dist/**` and
+`public/og/**` outputs. Tracked template/config/Schema/manifest and lockfile inputs,
+plus the upstream catalogue's source/review inputs, determine the build cache.
+
+`metadata.egress.ts` derives canonical, Markdown alternate, Open Graph and
+Twitter addresses from the checked page and Website origin. Its owning
+TechArticle Schema encodes the structured-data script; `<` and Unicode line
+separators are escaped without changing the decoded text. Author, publisher and
+modification dates are absent because this catalogue does not own them.
+The image renderer and WebAssembly stay out of Worker and browser bundles.
+Qualification is recorded in the [share-image receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json).
+This private app/build change needs no additional Changeset; existing T005
+package Changesets remain. Old-app retirement and metrics work stay separate.

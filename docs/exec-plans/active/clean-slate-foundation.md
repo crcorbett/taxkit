@@ -4374,3 +4374,81 @@ cases, then the unused-code check rejected an unnecessary exported
 keeping it module-private corrects the earliest owner and adds no ignored export
 or lint exception. The failed graph remains recorded. Sources are frozen again
 before corrected complete qualification.
+
+
+### T005 public share images and metadata implementation intent — 7 October
+
+Markdown commit `5d5544d0` passed all nine ordered local CI-mode checks, all
+eleven source-built native cases, 51 Website cases, 608 actual lint-command
+cases and final staged owner checks. It is pushed to draft #155. Hosted Quality
+run `37523545054` is in progress for that exact head; no current hosted success
+is claimed. Earlier discovery hosted failure and source identities remain at
+their immutable dated receipts.
+
+The next slice generates deterministic 1200 by 630 PNGs from accepted public
+page titles, descriptions and paths. Official registry metadata on 7 October
+confirms selected Takumi core/wasm 2.14.0 remains current; the isolated Node/Bun
+probe qualifies all 61 pages, embedded Geist, matching native/wasm bytes and
+determinism. The preview's long title and full description were visually read.
+This is reference qualification, not a TaxKit build or served-image receipt.
+
+Prefer build-generated static assets, which T005 explicitly allows without an
+extra API. The checked catalogue remains the source. One scoped build renderer
+uses embedded fonts and no fetched assets; output dimensions/signature/size
+are checked before writing owned generated files. Installed Vite hook order
+must complete writes before public files are copied. Selected NodeServices can
+supply the native filesystem under the existing Vite host's one runner. No
+renderer, compiler or new runtime belongs in browser/Worker page handling.
+
+HTML share/canonical metadata uses the same checked page and Website settings.
+A shared owned image-address mapping avoids another manually maintained index.
+Any structured-data script has an owning Schema egress and safe script-text
+escaping; absent author/publisher/update dates are not invented. No calculation
+input, result, search word or query value is available to generated images.
+
+Acceptance needs every generated image's bounded valid PNG/dimensions and
+deterministic rerun, actual native static GET/HEAD/cache/media observations, all
+61 rendered metadata addresses, Chromium image decoding and a representative
+long-title view. Actual bundle checks exclude renderer/WASM/backend markers.
+Accepted source/review/navigation/template identities remain unchanged. Local
+development/build prerequisites and generated cache inputs need their own proof.
+
+Documentation impact: Change required for the build/template/PNG/metadata
+owners, Website dependency/lock/config/generated ignores, exact ingress/egress
+lint and actual-command fixtures, Website/frontend/content/testing/command/cache
+guides, SPEC/task/journey and dated receipt. Preserve current content acceptance,
+five-call private RPC revision 2/four HTTP routes, tax results/Medicare boundary,
+historical proof, collection deferral and rendered article design. N/A for a
+new dynamic backend operation, package wire contract, provider operation or
+operational runbook change unless actual implementation changes that assessment.
+Old-app retirement and replacement harness qualification remain the final T005
+work after images/metadata qualify; metrics stay deferred.
+
+
+The image candidate's focused checks now pass types, strict lint, 53 Website
+cases and the rebuilt native main journey. The first full native pass retained
+ten existing passing cases while detecting Buffer versus Uint8Array assertion
+containers, with identical file hashes. The corrected main journey compares
+native byte values, all 61 static GET/HEAD/cache/media responses and exact copied
+assets; all 61 Chromium image decodes and actual Schema-decoded metadata pass.
+The built longest-title asset was visually inspected and fits its full title,
+description and path. Full sequential repository/CI-mode qualification remains
+required before this slice is accepted or committed. The dated image receipt
+retains the attempts and final outcome. Whole T005 and deferred metrics remain
+separate; no hosted social-preview claim is made.
+
+The first full image qualification passed strict checks and the 32 Quality
+counterexamples, then production Knip found an unaccounted build-only image
+checker. The correction moves its Schema to the build scripts. The full Knip graph
+already checks that Vite host/imported generator; the production graph checks
+the shipped page modules. A proposed broader production-profile entry surfaced
+unrelated test-only calculator exports and virtual Worker imports, so that
+profile expansion is not part of this image slice. No unused-code suppression or artificial page
+consumer is added. Final qualification must use the corrected frozen graph.
+
+The corrected full-b run passed complete verification, including all eleven
+fresh native cases. Workspace tests then found an invalid negative lint fixture
+path: its existing-file replacement harness could not read the invented file.
+The actual neighbouring build Schema path already supplies all three refusal
+cases, so the nonexistent duplicate is removed. No production permission or
+fixture harness is weakened; actual-command qualification is refreshed.

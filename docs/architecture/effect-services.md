@@ -518,3 +518,15 @@ representation's response/error headers inside the host's existing runner and
 request scope. No request builds a Layer or executes another runtime. The
 policy preserves existing HTML Vary fields and expected/fatal error separation.
 Its exact decoder admission and adjacent rejected paths have actual CLI proof.
+
+### Website build-only share rendering
+
+`apps/web/scripts/docs-images.build.ts` is a lazy scoped build program, composed
+and executed by the existing Vite host with NodeServices. Filesystem catalogue
+input and private native renderer bytes are decoded at this exact ingress.
+`acquireRelease` owns the renderer's lifetime, sequential page Effects own fixed
+catalogue/render/image/write failures, and the scoped finaliser releases native
+memory. No client or runner escapes into content/page logic. The named metadata
+output module separately encodes the owning public TechArticle Schema. Exact
+lint selectors admit these crossings only; adjacent route/rendering modules
+retain their restrictions.

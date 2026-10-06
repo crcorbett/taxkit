@@ -1468,6 +1468,8 @@ describe("exact native RPC lint boundaries", () => {
         "apps/web/src/lib/docs/search-location.boundary.ts",
         "apps/web/src/lib/docs/markdown.boundary.test.ts",
         "apps/web/src/lib/docs/markdown.response.server.ts",
+        "apps/web/scripts/docs-images.build.ts",
+        "apps/web/src/lib/docs/social.boundary.test.ts",
       ],
       (path) => [
         {
@@ -1493,11 +1495,39 @@ describe("exact native RPC lint boundaries", () => {
         },
       ]
     ),
+    ...Array.map(
+      [
+        {
+          rejected: false,
+          rule: "effect(no-schema-encoder-outside-egress)",
+          source:
+            'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+        },
+        {
+          rejected: true,
+          rule: "taxkit(no-decoding-outside-boundaries)",
+          source:
+            'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+        },
+        {
+          rejected: true,
+          rule: "strict-effect(no-runtime-outside-boundary)",
+          source:
+            'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+        },
+      ],
+      (fixture) => ({
+        ...fixture,
+        path: "apps/web/src/lib/docs/metadata.egress.ts",
+      })
+    ),
     ...Array.flatMap(
       [
         "apps/web/src/lib/docs/components.tsx",
         "apps/web/src/lib/docs/page.view.tsx",
         "apps/web/src/lib/docs/search.view.tsx",
+        "apps/web/src/lib/docs/social.schemas.ts",
+        "apps/web/scripts/docs-images.schemas.ts",
         "apps/web/src/routes/search.tsx",
         "apps/web/src/routes/$.tsx",
       ],

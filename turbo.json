@@ -34,7 +34,13 @@
         "TAXKIT_API_BASE_URL",
         "VITE_*"
       ],
-      "outputs": ["dist/**", ".source/**", ".output/**", ".vercel/output/**"]
+      "outputs": [
+        "dist/**",
+        ".source/**",
+        ".output/**",
+        ".vercel/output/**",
+        "public/og/**"
+      ]
     },
     "generate": {
       "dependsOn": ["^build"],

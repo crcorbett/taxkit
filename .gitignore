@@ -17,3 +17,6 @@ tmp/
 
 # Vitest browser failure attachments
 .vitest/
+
+# Catalogue-derived static public documentation images
+/apps/web/public/og/

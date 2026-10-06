@@ -281,3 +281,10 @@ must match that API value before display. The Website owns routes, rendering,
 focus, responsive navigation and recoverable errors. This adds no authored
 source, compiler or filesystem fallback to its request handlers. The retained
 docs app and its commands remain until replacement qualification is complete.
+
+The Website also generates static PNG share assets from this checked catalogue
+at its Vite build boundary. Catalogue acceptance and authored bytes remain owned
+here; rendering, the image-address mapping, page metadata and build-only Takumi
+renderer belong to [the Website](../../apps/web/README.md). Its renderer consumes
+only checked public title, description and path. It does not add a source/export
+contract or a dynamic content operation.

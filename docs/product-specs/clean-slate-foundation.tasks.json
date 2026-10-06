@@ -513,7 +513,7 @@
       "scope": [
         "Review the retained authored pages and navigation for finished content and source fidelity, recording exact publication acceptance and excluding unfinished drafts from public search.",
         "Implement one accepted content/page catalogue. Website owns HTML and browser-safe generated presentation exports; dynamic page/navigation/source/search/Markdown/image services belong to the backend and checked client contract. Generated static sitemap/robots/agent indexes/Markdown/OG assets need no extra API.",
-        "Generate useful deterministic 1200x630 page OG images from checked public page metadata with the selected current Takumi/font graph; never incorporate calculation values.",
+        "Generate useful deterministic 1200x630 page OG images from checked public page metadata with the exact build-only Takumi 2.14.0 WebAssembly/embedded-font graph; never incorporate calculation values.",
         "Retire apps/docs and replaced rendering/build paths once equivalent local journeys and retained source/artifact identities are proved; update current owners and preserve addressability of history/old useful URLs.",
         "Replace hard-coded apps/docs browser/cache/quality paths in tools/quality-workflow/** and .github/workflows/quality.yml; update the docs browser command in packages/scripts/src/release-readiness/schemas.ts and current owners in docs/verification/repository-harness-profile.json.",
         "Apply Q13: processed Markdown exposes only accepted public pages/reference content. Personal report downloads are outside this release; calculation answers remain temporary and visible on screen or through the agreed agent tools. Any public-content cache uses an owned readonly structured key with installed Equal/Hash semantics, not JSON; prove equivalent reconstructed keys, distinct address fields and last-reader cancellation cleanup where a shared cache is needed."
@@ -523,7 +523,7 @@
         "packages/docs-content/** authored/status/navigation/generated owners and any justified retained docs-fumadocs bridge",
         "packages/docs-examples/** checked source/compiler/runtime owner; preserve the four retained integration templates and their output/error expectations.",
         "apps/web HTML/docs presentation, generated static discovery/image assets and old-route redirect map",
-        "apps/api dynamic page/navigation/search/processed-Markdown/image services and packages/api/http checked contracts/clients; owning content package preserves prose, links, tables and examples",
+        "apps/api dynamic page/navigation/search/processed-Markdown services and packages/api/http checked contracts/clients; owning content package preserves prose, links, tables and examples",
         "tools/documentation/owner-policy.json exact public acceptance records and generated edges",
         "Public/app/package READMEs, docs/architecture/frontend.md, content-and-posts.md, package-ownership.md and applicable runbook/command pointers",
         "tools/quality-workflow/**, .github/workflows/quality.yml, package.json/Turbo command wiring, packages/scripts/src/release-readiness/schemas.ts and docs/verification/repository-harness-profile.json"
@@ -573,7 +573,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-search.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json"
       ]
     },
     {
