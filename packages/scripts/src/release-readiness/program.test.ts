@@ -122,7 +122,12 @@ describe("release readiness", () => {
             workspaceRoot,
           ],
           ["api-smoke", "bun", ["run", "api:smoke"], workspaceRoot],
-          ["docs-browser", "bun", ["run", "docs:test:browser"], workspaceRoot],
+          [
+            "docs-browser",
+            "bun",
+            ["run", "web:test:native-pair"],
+            workspaceRoot,
+          ],
           [
             "changeset-status",
             "bun",

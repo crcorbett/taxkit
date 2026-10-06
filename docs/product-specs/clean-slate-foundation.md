@@ -905,8 +905,8 @@ twenty-result limits. Accepted titles and descriptions link to existing pages;
 no-match, loading and unavailable states stay distinct. Search works without
 JavaScript, uses the existing heading-focus policy and carries `noindex,
 follow`. No personal calculation value, second index or collection event is
-introduced. Discovery and Markdown are described below; share images and old-app retirement
-remain later T005 work. Metrics remain deferred under Cooper's latest direction.
+introduced. Discovery, Markdown and share images are described below; old-app retirement
+remains later T005 work. Metrics remain deferred under Cooper's latest direction.
 
 
 ## T005 discovery contract
@@ -931,7 +931,7 @@ calculation report, second content index or collection event is introduced.
 
 The existing native journey checks actual built API/Website files, XML parsing,
 all accepted content, correct media/cache headers and safe failure paths. T005
-remains in progress for share images and old-app retirement. Metrics remain deferred.
+remains in progress for old-app retirement and replacement checks. Metrics remain deferred.
 
 
 ## T005 Website Markdown contract
@@ -955,7 +955,7 @@ new catalogue, backend endpoint or package contract is added.
 The existing native journey and exact decoder CLI fixtures own qualification.
 [Markdown evidence](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
 keeps current proof separate from deployment. Whole T005 stays in progress for
-share images and old-app retirement; metrics remain deferred.
+old-app retirement and replacement checks; metrics remain deferred.
 
 ## T005 Website share-image contract
 
@@ -976,3 +976,22 @@ Chromium decoding, build-only bundle exclusion and source preservation need
 boundary-matched proof in the [image receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json).
 T005 remains in progress for old-app retirement and harness replacement; metrics
 remain deferred and retained tax results are unchanged.
+
+
+## T005 replacement-check contract
+
+Before removing the old app, current release and Quality checking select the
+replacement Website. The stable `docs-browser` check invokes the existing
+`web:test:native-pair` root owner, freshly builds both hosts and runs every
+native case. Its real reader journey adds missing skip-link, landmark,
+contrast and reduced-motion observations to accepted-page/navigation/error
+proof. No filtered subset may silently pass without a reader case.
+
+Quality's exact Playwright paths, policy and refusal corpus, current
+`taxkit-docs-runtime` journey/profile, command/package/Website guides,
+release runbook/contract and permitted local docs-maintainer profile overlay
+change together. Canonical skill assets and historical packet/attempt bytes
+remain unchanged. The old app/workspace and its operation route remain only
+until source/artifact retention and provider-procedure replacement are
+qualified; this check slice does not remove or deploy them. Evidence belongs
+to the [replacement-check receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json).

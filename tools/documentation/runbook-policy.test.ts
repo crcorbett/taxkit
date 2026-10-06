@@ -140,6 +140,7 @@ const validInspection = Effect.gen(function* () {
       "release:present",
       "test:release-readiness",
       "verification",
+      "web:test:native-pair",
       "version-repo",
       "check:docs-deployment",
     ]),

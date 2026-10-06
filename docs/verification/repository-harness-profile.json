@@ -115,9 +115,9 @@
     {
       "id": "TAXKIT-DOCS-RUNTIME",
       "consumer": "Local documentation-site reader",
-      "acceptedOutcome": "Validated content renders and the browser harness observes navigation, server functions, recoverable errors, and clean console behavior.",
+      "acceptedOutcome": "The freshly built native API/Website renders accepted pages and proves private calls, navigation, search, discovery, Markdown, images, keyboard/focus/landmarks/contrast/reduced motion and safe recovery.",
       "owningPaths": [
-        "apps/docs/",
+        "apps/web/",
         "packages/docs-content/",
         "packages/docs-fumadocs/",
         "docs/verification/critical-journeys.json#taxkit-docs-runtime"
@@ -150,7 +150,8 @@
     "The existing Quality workflow invokes bun run release:check -- --ci for pull requests and main-branch pushes; that graph begins with root verification and remains the sole hosted CI route.",
     "Exactly five operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
     "The current six local journeys include the native Website. The separate four-entry docs deployment journey owner and dated deployment receipts grant no additional authority; historical five-journey HGI/HFI evidence remains unchanged.",
-    "Repository-local skills and validators must work from a clean clone without reading a user home or global skill installation."
+    "Repository-local skills and validators must work from a clean clone without reading a user home or global skill installation.",
+    "Current docs-browser release checking and Quality Playwright bootstrap select apps/web. Retained apps/docs and its provider procedure remain separate pending T005 retirement/T010 operations; no historical packet or provider target is reinterpreted."
   ],
   "exclusions": [
     "Dependency, build, cache, generated route, temporary, binary, and vendored trees are excluded from readable corpus accounting.",

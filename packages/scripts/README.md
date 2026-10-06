@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-08-20
-source_of_truth: package-readme
-confidence: high
+document_type: package-guide
+lifecycle: current
+authority: supporting
+owner: taxkit-scripts-owner
+last_reviewed: 2026-10-07
+review_trigger: command, release graph, proof schema or orchestration change
 ---
 
 # Scripts
@@ -61,10 +63,19 @@ failure:
 5. `bun run sdk:check-packed-artifact`
 6. `bun run sdk:validate-downstream`
 7. `bun run api:smoke`
-8. `bun run docs:test:browser`
+8. `bun run web:test:native-pair`
 9. `bun run changeset:status`
 
-The nine checks and their order are unchanged. Their deterministic root,
+The nine check identities and their order are retained. The `docs-browser`
+check now freshly builds and runs all native API/Website tests, including the
+accepted documentation reader journey. It does not select the old docs app.
+Historical HGI-203 packets, command outcomes and five-journey Schemas retain
+their original bytes; presentation never substitutes this new command for an
+old attempt. `docs:test:browser` still names the retained legacy app while its
+deployment/recovery procedure is being replaced; it is outside the current
+release graph.
+
+Their deterministic root,
 workspace and app/package leaves now use Turbo tasks, while
 `@taxkit/scripts` remains the live sequential orchestrator and records each
 real exit code. Turbo may replay a correct local or remote result; it does not

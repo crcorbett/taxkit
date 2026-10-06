@@ -469,3 +469,15 @@ The image renderer and WebAssembly stay out of Worker and browser bundles.
 Qualification is recorded in the [share-image receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json).
 This private app/build change needs no additional Changeset; existing T005
 package Changesets remain. Old-app retirement and metrics work stay separate.
+
+
+## Release documentation check
+
+The root release graph's `docs-browser` check uses `bun run web:test:native-pair`.
+It rebuilds this Website and the native API and runs all native cases.
+The accepted-page reader observes actual HTML, private navigation, search,
+discovery, Markdown and all generated share images, plus keyboard/focus,
+landmarks, contrast and reduced motion. Quality installs Chromium from this
+app's pinned Playwright executable. The old docs app and provider procedure
+are still retained pending their separate retirement; they are not selected
+by this release check. This is local source/build/browser proof only.

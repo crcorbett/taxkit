@@ -78,7 +78,7 @@ records command outcomes and log digests.
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
-| T005 / DEV-76 | In progress | All 61 pages and navigation have source-bound acceptance; draft #155 contains the tested catalogue and links. Four HTTP content routes pass full local and external package checks. Pages and search passed local qualification. Five separately versioned native documentation RPC operations and four conventional discovery files are the current candidate. Markdown negotiation, share images and old-app retirement remain unfinished. |
+| T005 / DEV-76 | In progress | All 61 accepted pages, navigation, search, discovery, both Markdown representations and share images are locally qualified in draft #155. Current release/Quality replacement checks are the next candidate. Old app/build/operation retirement remains unfinished; metrics are deferred. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
@@ -4452,3 +4452,47 @@ path: its existing-file replacement harness could not read the invented file.
 The actual neighbouring build Schema path already supplies all three refusal
 cases, so the nonexistent duplicate is removed. No production permission or
 fixture harness is weakened; actual-command qualification is refreshed.
+
+
+## 2026-10-07 — T005 current Website replacement checks
+
+Share-image commit `0b406e7a` passed all nine local CI-mode checks and was
+pushed to draft #155. Exact-head hosted Quality run `37533331150` was in
+progress at readback. Prior Markdown head `5d5544d0` passed hosted run
+`37523545054`; neither observation is attributed to the next candidate.
+
+The current candidate replaces the release `docs-browser` command with the
+existing source-building native API/Website owner and changes Quality's exact
+Playwright bootstrap/cache identity path to apps/web. All native cases run;
+no name filter can make the selected reader silently empty. Comparing the old
+built proof with the replacement found missing skip-link, landmark, contrast
+and reduced-motion oracles. These are added to the actual reader, including
+mobile navigation and fixed error text, before switching the command.
+
+Documentation impact: Change required for release command/schema/contract and
+package/Website guides, Quality executable policy/refusal corpus and controls,
+current journey/profile, testing architecture, SPEC/task/plan and dated receipt.
+The permitted docs-maintainer local profile is updated and independently hashed;
+canonical skill files stay unchanged. Preserve the old app/workspace, all
+127 accepted source/review/navigation/template identities, historical
+HGI/DAR/HFI packets/attempts, existing provider graph/procedure, retained tax
+results and metrics deferral. N/A for a new package wire/export contract,
+Changeset (private scripts/app/check selection only), infrastructure apply,
+credentials or public content edits.
+
+The nine-step full CI-mode graph, focused real command/policy tests and final
+owners must pass on frozen source before acceptance. The [dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json)
+records all attempts, exact identities, limits and rollback. T005 stays in
+progress for old source/build/operation retirement. No deployment or provider
+cutover is inferred from changing this local release command.
+
+The first focused lint found unnamed RGB regex groups and unsorted host options;
+these were corrected without permissions. The full isolated Quality corpus then
+passed 31 cases and failed its source-only positive checkout: the strict runbook
+sample's named root-command set omitted the newly documented existing native
+command. Add that real command to the sample rather than weakening the validator.
+All 46 documentation cases, focused workflow policy, docs/runbook/governance/skill
+checks and all eleven freshly built native cases subsequently passed. The final
+source review removes an unnecessary Schema recheck of internally calculated
+luminance; only the real browser RGB strings are decoded. The final full graph
+must qualify that exact corrected source and both old-owner bootstrap refusals.

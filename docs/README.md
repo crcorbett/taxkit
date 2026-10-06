@@ -3,7 +3,7 @@ document_type: documentation-router
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-10-07
 review_trigger: any maintainer/public docs class, root route, SPEC, plan, runbook, proof, evidence, or lifecycle change
 ---
 
@@ -13,7 +13,9 @@ This is the sole router for maintainer-document type, lifecycle, truth layers,
 and semantic ownership. Root `README.md` is the public repository entry point;
 `AGENTS.md` is the short task map; `docs/architecture/README.md` is the current
 architecture route. Public documentation content is a separate product surface
-owned by `apps/docs` and the docs packages.
+owned by the replacement `apps/web`, backend content contracts and docs
+packages. The old `apps/docs` source remains only until its build/deployment
+and recovery dependencies are retired.
 
 ## Truth layers
 
@@ -51,7 +53,7 @@ lifecycle; migrate it only when its owner is materially revised.
 | Standards | [`standards/README.md`](standards/README.md) | Current durable engineering/documentation rules. |
 | Current intent | [`product-specs/index.md`](product-specs/index.md) and [`exec-plans/active/README.md`](exec-plans/active/README.md) | Only genuinely active work; implemented/history stays inventory. |
 | Completed history | [`exec-plans/completed/README.md`](exec-plans/completed/README.md) | Historical provenance, never default policy. |
-| Public docs product | [`../apps/docs/README.md`](../apps/docs/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md), and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) | Consumer-facing content/runtime, not maintainer lifecycle policy. |
+| Public docs product | [`../apps/web/README.md`](../apps/web/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md), and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) | Consumer-facing content/runtime, not maintainer lifecycle policy. |
 | Repeatable release/deployment/recovery operations | [`runbooks/README.md`](runbooks/README.md) and [`operations/authority-model.md`](operations/authority-model.md) | Exactly five target-owned procedures; stop consequential operations when principal, candidate, target or receipt is unknown. |
 | CI controls and recurring automation | [`standards/controls.md`](standards/controls.md) and [`operations/automation-register.md`](operations/automation-register.md) | Quality workflow admission, release-graph controls, and report-only candidate boundaries; neither route grants external authority. |
 | Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md), [`verification/critical-journeys.json`](verification/critical-journeys.json), [`evidence/releases/HGI-203-critical-journeys.json`](evidence/releases/HGI-203-critical-journeys.json), [`evidence/releases/HGI-203-local.json`](evidence/releases/HGI-203-local.json), and [`documentation-audit/HGI-203-validation.json`](documentation-audit/HGI-203-validation.json) | The current inventory owns evolving journeys. Accepted HGI-203 retains the exact historical five-journey snapshot and bounded local proof that its immutable packet observed; HGI-204 validates both epochs without attributing current changes to the old attempt. Raw logs and secrets are never durable proof. |

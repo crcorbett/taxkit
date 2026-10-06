@@ -57,14 +57,14 @@ jobs:
           key: ${"${{"} steps.bun-cache-restore.outputs.cache-primary-key }}
       - run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"
       - id: playwright-identity
-        run: echo "version=$(apps/docs/node_modules/.bin/playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(apps/web/node_modules/.bin/playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
       - id: playwright-cache-restore
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         continue-on-error: true
         with:
           path: ${"${{"} env.PLAYWRIGHT_BROWSERS_PATH }}
           key: playwright-chromium-${"${{"} runner.os }}-${"${{"} runner.arch }}-${"${{"} steps.playwright-identity.outputs.version }}-${"${{"} hashFiles('bun.lock') }}
-      - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium
+      - run: apps/web/node_modules/.bin/playwright install --with-deps chromium
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         if: steps.playwright-cache-restore.outputs.cache-hit != 'true'
         continue-on-error: true
@@ -155,11 +155,19 @@ describe("quality workflow policy", () => {
     Effect.forEach(
       [
         acceptedWorkflow.replace(
-          "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
+          "apps/web/node_modules/.bin/playwright install --with-deps chromium",
+          "apps/docs/node_modules/.bin/playwright install --with-deps chromium"
+        ),
+        acceptedWorkflow.replace(
+          "apps/web/node_modules/.bin/playwright --version",
+          "apps/docs/node_modules/.bin/playwright --version"
+        ),
+        acceptedWorkflow.replace(
+          "apps/web/node_modules/.bin/playwright install --with-deps chromium",
           "bunx playwright install --with-deps chromium"
         ),
         acceptedWorkflow.replace(
-          "      - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium\n",
+          "      - run: apps/web/node_modules/.bin/playwright install --with-deps chromium\n",
           ""
         ),
         acceptedWorkflow.replace(
@@ -251,7 +259,7 @@ describe("quality workflow policy", () => {
           "      - uses: actions/cache/save@"
         ),
         acceptedWorkflow.replace(
-          "      - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium\n      - uses: actions/cache/save@",
+          "      - run: apps/web/node_modules/.bin/playwright install --with-deps chromium\n      - uses: actions/cache/save@",
           "      - uses: actions/cache/save@"
         ),
       ],

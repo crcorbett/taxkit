@@ -12,7 +12,7 @@ below are repository-local; resolve the checkout with `git rev-parse --show-topl
 | SDK exports and examples                            | `packages/sdk/typescript` source/export map and README; packed-consumer/downstream proof; `docs/architecture/api-and-sdk.md`                                                                                                                                                                                                    |
 | HTTP/OpenAPI                                        | `packages/api/http/src/**` schemas and `src/openapi.ts`; generated snapshot `packages/api/http/__snapshots__/openapi.json` through `test:openapi`; `packages/api/http/README.md`, `apps/api/README.md`, and API/SDK architecture only when their contracts change                                                               |
 | Public MDX/navigation/lifecycle                     | `packages/docs-content/content/**`, `packages/docs-content/navigation.json`, and `tools/documentation/owner-policy.json`; `published` requires one exact `public.statusDecision.acceptanceRecords` binding to a strict addressable record, with the durable lifecycle decision routed from `docs/documentation-audit/hgi-207/public-mdx-lifecycle.json` |
-| Public docs runtime/generated Fumadocs              | `apps/docs/README.md`, `packages/docs-content/source.config.ts`, `packages/docs-content/.source`, and `packages/docs-fumadocs`; regenerate/check through the owning commands and never hand-edit generated output                                                                                                               |
+| Public docs runtime/generated Fumadocs              | `apps/web/README.md` and its accepted catalogue/private API presentation; retained legacy `apps/docs/README.md` stays with its unreplaced deployment/recovery procedure; `packages/docs-content/source.config.ts`, `packages/docs-content/.source`, and `packages/docs-fumadocs`; regenerate/check through the owning commands and never hand-edit generated output                                                                                                               |
 | Package/app roots                                   | owning package/app README, package ownership architecture, root routes only when discoverability changes                                                                                                                                                                                                                        |
 | Commands, CI, versioning and release readiness      | `package.json`, workflow/command owner, `docs/standards/versioning.md`, `docs/runbooks/README.md`, testing-quality architecture and proof owner                                                                                                                                                                                 |
 | Runbooks, authority, proof and history              | exactly five target-owned procedures routed by `docs/runbooks/README.md`; `docs/operations/authority-model.md`; `tools/documentation/runbook-contract.json`; sanitized `docs/evidence/releases/**`, `docs/evidence/deployments/**`, or dated `docs/documentation-audit/**`; preserve provenance and non-claims                             |
@@ -34,8 +34,11 @@ check:docs`, `bun run check:runbooks`, `bun run check:repository-paths`.
   gate reads only repository-local profile, audit, receipt, skill, link, and
   critical-journey owners.
 - Full local closeout: `bun run verification` and `git diff --check`.
-- Public content/runtime: `bun run docs:validate`, `bun run docs:build`,
-  `bun run --filter=docs test:browser` when applicable.
+- Current accepted content/runtime: `bun run docs:catalogue`, `bun run
+  docs:validate`, and `bun run web:test:native-pair`. The latter freshly builds
+  the native API/Website and owns the release `docs-browser` check. Legacy
+  `bun run docs:build` and `bun run --filter=docs test:browser` remain only for
+  the retained old app/deployment procedure until its retirement is qualified.
 - SDK package boundary: `bun run --filter=@taxkit/sdk check-packed-artifact`
   and `bun run --filter=@taxkit/sdk validate:downstream` when applicable.
 - Release evidence: `bun run release:check` is local proof only; versioning,

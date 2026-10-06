@@ -9,9 +9,10 @@ review_trigger: frontend runtime, transport, rendering, build adapter, or compos
 
 # Frontend
 
-TaxKit has two browser-facing TanStack Start apps: `apps/web` is the native
-calculator/documentation Website candidate and `apps/docs` remains the public developer
-documentation app until its replacement is qualified.
+`apps/web` is the native calculator/documentation Website candidate and the
+current local release reader. `apps/docs` remains a retained old app for its
+existing deployment/recovery procedure until qualified source/build retirement.
+Local replacement proof does not establish a deployed Website.
 
 ## Scope
 
@@ -29,7 +30,7 @@ define tax calculation rules.
   serves HTTP and RPC through the same checked calculator operation.
 
 `apps/docs`
-: Fumadocs-backed public documentation site for rule references, API docs, SDK
+: Retained old Fumadocs-backed documentation app for rule references, API docs, SDK
   guides and contributor docs. It owns the route runtime, app shell, app-local
   MDX component map and browser rendering. Route files import that shared map;
   they do not define local `mdxComponents` objects or inline MDX registries.

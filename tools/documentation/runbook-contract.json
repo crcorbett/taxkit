@@ -175,6 +175,15 @@
             "RELEASE_ATTEMPT_SHA256"
           ],
           "executeInDryRun": false
+        },
+        {
+          "scriptOwner": "root",
+          "script": "web:test:native-pair",
+          "argv": ["bun", "run", "web:test:native-pair"],
+          "invocation": "bun run web:test:native-pair",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
         }
       ],
       "evidencePaths": [

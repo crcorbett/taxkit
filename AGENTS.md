@@ -3,7 +3,7 @@ document_type: agent-router
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-07
 ---
 
 # TaxKit repository guide
@@ -51,7 +51,8 @@ attached implementation authority names the reviewer and publisher.
 - Frontend/public docs:
   [`docs/architecture/frontend.md`](docs/architecture/frontend.md),
   [`docs/architecture/content-and-posts.md`](docs/architecture/content-and-posts.md),
-  and [`apps/docs/README.md`](apps/docs/README.md).
+  and [`apps/web/README.md`](apps/web/README.md). The retained old app
+  belongs to the existing [docs deployment procedure](docs/runbooks/docs-deployment.md).
 - Current work: [`docs/product-specs/index.md`](docs/product-specs/index.md) and
   [`docs/exec-plans/active/README.md`](docs/exec-plans/active/README.md).
 - Standards, tests, and release checks:

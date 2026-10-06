@@ -69,7 +69,7 @@ const bunCachePathCommand = 'echo "path=$(bun pm cache)" >> "$GITHUB_OUTPUT"';
 const playwrightCachePathCommand =
   'echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"';
 const playwrightIdentityCommand =
-  'echo "version=$(apps/docs/node_modules/.bin/playwright --version | cut -d\' \' -f2)" >> "$GITHUB_OUTPUT"';
+  'echo "version=$(apps/web/node_modules/.bin/playwright --version | cut -d\' \' -f2)" >> "$GITHUB_OUTPUT"';
 const expectedBunCachePath = [
   workflowExpressionPrefix,
   "{{ steps.bun-cache-path.outputs.path }}",
@@ -114,7 +114,7 @@ const expectedRunSteps: readonly string[] = [
   "bun install --frozen-lockfile",
   playwrightCachePathCommand,
   playwrightIdentityCommand,
-  "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
+  "apps/web/node_modules/.bin/playwright install --with-deps chromium",
   "bun run check:quality-workflow",
   dopplerIdentityCommand,
   "bun run release:check -- --ci",
@@ -494,7 +494,7 @@ const inspectSteps = (
     browserStep !== null &&
     hasOnly(browserStep, ["run"]) &&
     Record.get(browserStep ?? {}, "run").pipe(Option.getOrUndefined) ===
-      "apps/docs/node_modules/.bin/playwright install --with-deps chromium" &&
+      "apps/web/node_modules/.bin/playwright install --with-deps chromium" &&
     playwrightCacheSaveStep !== null &&
     hasOnly(playwrightCacheSaveStep, [
       "uses",

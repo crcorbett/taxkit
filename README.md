@@ -28,11 +28,12 @@ validation, but it is not published yet.
 
 - [apps/api](./apps/api/README.md): standalone Bun process that owns API
   startup, listening config and Effect runtime teardown for `/api/*`.
-- [apps/docs](./apps/docs/README.md): TanStack Start public documentation app
-  that renders MDX through package-owned docs content and reusable Fumadocs
-  helpers.
+- [apps/docs](./apps/docs/README.md): retained old documentation app for its
+  existing deployment/recovery procedure, pending source/build retirement.
 - [apps/web](./apps/web/README.md): Native TanStack Website candidate with a take-home form,
-  private server binding and direct checked browser RPC to the API.
+  private server binding and direct checked browser RPC to the API. It also
+  renders accepted documentation, search, discovery, Markdown and share images
+  and owns the current release documentation journey.
 - [packages/api/http](./packages/api/http/README.md): Effect HTTP API contract,
   generated docs, public calculator routes, thin handler adapters, server
   handler exports and browser-safe client exports.
@@ -273,9 +274,10 @@ open docs/repo-status-outline.html
 - `apps/api` is the API runtime owner. It creates one process-lifetime
   `ManagedRuntime`, serves `packages/api/http` through Bun and disposes scoped
   resources on shutdown.
-- `apps/docs` is the docs runtime owner. It consumes `@taxkit/docs-content`
-  and `@taxkit/docs-fumadocs` rather than owning canonical frontmatter,
-  navigation or reusable Fumadocs internals.
+- `apps/web` owns the replacement documentation reader over the accepted
+  backend catalogue and compiled MDX. Canonical page fields and reusable
+  Fumadocs internals remain package-owned. `apps/docs` is retained for its
+  separately bounded legacy deployment/recovery route.
 - `apps/web/src/lib/runtime.server.ts` owns one server runner. React's Atom
   registry owns browser execution and cleanup. Both use native RPC to the
   separate API; the Website contains no calculation fallback.

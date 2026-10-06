@@ -92,32 +92,35 @@
     {
       "id": "taxkit-docs-runtime",
       "actorOrConsumer": "Documentation-site reader",
-      "boundary": "Local docs content, built SSR, hydration, HTTP status, navigation, server-function, recoverable-error, and console behavior",
-      "startingState": "Docs dependencies and the repository browser runtime are available locally.",
+      "boundary": "Accepted local documentation through the built native API/Website: HTML, navigation, search, discovery, Markdown, share images and recoverable failures",
+      "startingState": "Frozen accepted catalogue sources and local Node/Bun/Chromium are available; the owning command freshly builds the actual native API and Website.",
       "inputs": [
-        "Validated MDX/navigation sources",
-        "Local browser journey fixtures"
+        "Source-bound accepted MDX/navigation catalogue",
+        "Real native artifacts, private binding and Chromium reader"
       ],
-      "stepsOrProcedureOwner": "bun run docs:validate then bun run --filter=docs test:browser then bun run --filter=docs test:built",
+      "stepsOrProcedureOwner": "bun run docs:validate then bun run web:test:native-pair; the docs-browser release check invokes the latter and runs all eleven native cases",
       "expectedBehavior": [
-        "Validated content renders in the generated production app, the initial response contains the requested MDX, hydration is diagnostic-free, real sidebar and authored-MDX links cross the server-function transport without a document reload, client navigation restores heading focus without stealing initial hydration focus, keyboard/landmark/current-navigation/contrast/reduced-motion assertions pass, expected failures remain recoverable, and missing pages return HTTP 404 with framework-native not-found UI."
+        "All 61 accepted pages render matching SSR content and metadata; generated images decode at owned dimensions and GET/HEAD bytes/headers match. Search, discovery and both Markdown representations use the same checked catalogue.",
+        "Real sidebar and authored links use generated private server calls without document reload. Initial hydration leaves focus alone; navigation moves focus to the heading. Skip-link keyboard use, one main/article/Documentation navigation landmark, current links, mobile overflow, text contrast and reduced motion are observed in Chromium.",
+        "Missing pages return actual 404; malformed private transport shows safe fixed recovery and the reader returns to Quickstart. Browser/Worker builds exclude private renderer and authored-source owners; captured exceptions/logs reject private text."
       ],
       "expectedSideEffects": [
-        "Transient local build/browser output only, plus the bounded DAR-013 PNG/manifest set when the separately invoked candidate-bound screenshot mode is authorized."
+        "Transient command-owned build/browser/screenshots and generated public/og output only."
       ],
       "preservedInvariants": [
         "No network publication or deployed-site mutation."
       ],
-      "oracle": "Direct HTTP assertions establish SSR body and 404 status before Playwright independently observes hydration, server-function requests, zero document requests during real internal navigation, focus/keyboard/landmark/contrast/motion behavior, pending, not-found and error/console states; candidate-bound screenshots are supplemental only.",
+      "oracle": "The native command rebuilds from source; direct HTTP and the real private binding establish actual bodies/status/media/headers before Chromium independently observes hydration, generated server-call navigation without document reload, focus/keyboard/landmark/contrast/motion, error recovery and every image decode. The old app or fake loader cannot supply this proof.",
       "environment": "Local TaxKit checkout",
       "authority": "none",
       "evidence": [
-        "The docs-validation and docs-browser detail digests in the retained release attempt.",
-        "For DOCS-APP-006 only, the completed execution plan's candidate-bound DAR-013 PNG/manifest set after primary-owner visual review."
+        "Current docs-validation/docs-browser sanitised detail identities; dated 2026-10-07 Website replacement-check receipt.",
+        "Historical HGI-203/DAR records retain the exact old app and command epoch; they are not current Website proof."
       ],
       "nonClaims": [
-        "Local built/browser proof does not establish deployment, provider routing, a public URL, production behavior, or public availability.",
-        "A screenshot does not prove HTTP status, SSR response content, hydration diagnostics, request type, keyboard/focus behavior, contrast, motion suppression or console cleanliness."
+        "Local native/browser proof does not establish deployment, provider routing, public availability, exported telemetry or whole T005 retirement.",
+        "The old apps/docs source and deployment/recovery procedure remain retained pending their separately qualified replacement.",
+        "Screenshots supplement actual status, body, transport, keyboard/focus, contrast, motion and console oracles; they cannot replace them."
       ]
     },
     {

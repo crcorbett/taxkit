@@ -137,11 +137,14 @@ calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
   The same app owns checked documentation page loaders, app-specific MDX
   composition, navigation/focus, search and responsive reading. Its server
   returns checked backend discovery documents at their conventional addresses.
-  Markdown negotiation, share images and retirement of `apps/docs` remain
+  Both Markdown representations and generated share images are locally
+  qualified. Current release documentation checking selects this app.
+  Retirement of `apps/docs` and its build/operation dependencies remains
   T005 work.
 
 `apps/docs`
-: Implemented public documentation app. It owns TanStack Start routes, the
+: Retained old documentation app for the existing deployment/recovery route.
+  It owns TanStack Start routes, the
   docs app shell, route loaders, navigation presentation and app-local
   MDX component composition, Schema-decoded build target, Cloudflare Vite
   configuration, static-asset headers and local built-Worker proof. It
@@ -256,7 +259,8 @@ belongs in apps or explicitly server-only package exports.
 - Keep repository path classification and safe reporting in
   `tools/repository-paths`; do not move it into package orchestration or browser
   code.
-- Keep app-specific MDX components in `apps/docs`; promote only generic,
+- Keep replacement app-specific MDX components in `apps/web`; old components
+  remain with the retained legacy app until retirement. Promote only generic,
   repeated Fumadocs primitives to `packages/docs-fumadocs/render` or repeated
   TaxKit UI primitives to `packages/ui`.
 - Do not add flat engine packages once nested domain or rule ownership exists.

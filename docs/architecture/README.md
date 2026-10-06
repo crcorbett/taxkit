@@ -3,7 +3,7 @@ document_type: architecture-router
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-07
 review_trigger: package ownership, runtime boundary, public contract, or architecture-route change
 ---
 
@@ -33,11 +33,13 @@ Implemented surfaces:
 
 - `apps/api`: retained standalone Bun API and native Worker candidate sharing
   the public HTTP contract and calculator service.
-- `apps/docs`: TanStack Start public docs runtime over MDX content,
-  `@taxkit/docs-content` and `@taxkit/docs-fumadocs`.
+- `apps/docs`: retained old docs runtime for its existing deployment/recovery
+  procedure, pending qualified source/build retirement.
 - `apps/web`: native TanStack Website candidate; its take-home-pay form uses
   private API binding for server calculation and direct browser RPC. The
-  complete development pair and safe exported telemetry remain T003 work.
+  development pair and accepted documentation reader are locally qualified.
+  It owns current release documentation checking. Exported telemetry remains
+  deferred; old docs retirement and provider operations need separate proof.
 - `packages/api/rpc`: private native calculation transport over the same service.
 - `packages/api/http`: Effect HTTP API package for health, generated docs,
   OpenAPI JSON, public calculator metadata and public calculation routes.

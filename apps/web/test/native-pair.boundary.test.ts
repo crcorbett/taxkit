@@ -41,6 +41,7 @@ import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
+import type { Page } from "playwright";
 
 import { generateDocsImages } from "../scripts/docs-images.build";
 import { WebsiteDocsImageBytes } from "../scripts/docs-images.schemas";
@@ -58,6 +59,68 @@ const apiOrigin = "http://127.0.0.1:4197";
 const websiteOrigin = "http://127.0.0.1:4196";
 const form = "grossDollars=1654&period=weekly&taxFreeThresholdClaimed=on";
 const Json = Schema.fromJsonString(Schema.Unknown);
+const ColourChannel = Schema.NumberFromString.check(
+  Schema.isGreaterThanOrEqualTo(0),
+  Schema.isLessThanOrEqualTo(255)
+);
+const ColourChannels = Schema.Tuple([
+  ColourChannel,
+  ColourChannel,
+  ColourChannel,
+]);
+const expectReadableText = Effect.fnUntraced(function* (
+  page: Page,
+  selector: string
+) {
+  const foreground = yield* Effect.promise(() =>
+    page
+      .locator(selector)
+      .first()
+      .evaluate((element) => getComputedStyle(element).color)
+  );
+  const background = yield* Effect.promise(() =>
+    page
+      .locator(":root")
+      .evaluate((element) => getComputedStyle(element).backgroundColor)
+  );
+  const luminance = yield* Effect.forEach([foreground, background], (colour) =>
+    Option.fromNullishOr(
+      colour.match(/^rgb\((?<red>\d+), (?<green>\d+), (?<blue>\d+)\)$/u)
+    ).pipe(
+      Effect.fromOption,
+      Effect.map((matches) => Array.drop(matches, 1)),
+      Effect.flatMap(Schema.decodeUnknownEffect(ColourChannels)),
+      Effect.map((channels) =>
+        Array.reduce(
+          Array.zipWith(
+            channels,
+            [0.2126, 0.7152, 0.0722],
+            (channel, weight) => {
+              const normalised = channel / 255;
+              return (
+                (normalised <= 0.04045
+                  ? normalised / 12.92
+                  : ((normalised + 0.055) / 1.055) ** 2.4) * weight
+              );
+            }
+          ),
+          0,
+          (sum, value) => sum + value
+        )
+      ),
+      Effect.orDie
+    )
+  );
+  const text = Array.get(luminance, 0).pipe(
+    Option.getOrElse(() => expect.fail("Missing native text colour"))
+  );
+  const surface = Array.get(luminance, 1).pipe(
+    Option.getOrElse(() => expect.fail("Missing native surface colour"))
+  );
+  expect(
+    (Math.max(text, surface) + 0.05) / (Math.min(text, surface) + 0.05)
+  ).toBeGreaterThanOrEqual(4.5);
+});
 
 describe("built native API and Website", () => {
   it.live(
@@ -1941,6 +2004,67 @@ describe("built native API and Website", () => {
               .evaluate((heading) => heading === document.activeElement)
           )
         ).toBe(false);
+        expect(
+          yield* Effect.promise(() => docsPage.getByRole("article").count())
+        ).toBe(1);
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .getByRole("navigation", { exact: true, name: "Documentation" })
+              .count()
+          )
+        ).toBe(1);
+        expect(
+          yield* Effect.promise(() =>
+            docsPage.evaluate(() => document.activeElement === document.body)
+          )
+        ).toBe(true);
+        yield* expectReadableText(docsPage, ".docs-article p");
+        yield* expectReadableText(docsPage, ".docs-navigation-panel summary");
+        yield* Effect.promise(() => docsPage.keyboard.press("Tab"));
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .getByRole("link", { exact: true, name: "Skip to content" })
+              .evaluate((element) => element === document.activeElement)
+          )
+        ).toBe(true);
+        yield* Effect.promise(() => docsPage.keyboard.press("Enter"));
+        expect(
+          yield* Effect.promise(() =>
+            docsPage
+              .getByRole("main")
+              .evaluate((element) => element === document.activeElement)
+          )
+        ).toBe(true);
+        yield* Effect.promise(() =>
+          docsPage.emulateMedia({ reducedMotion: "reduce" })
+        );
+        const motionElements = docsPage.locator(
+          ".app-shell, .docs-layout, .docs-navigation-panel, .docs-navigation, .docs-article"
+        );
+        const motionCount = yield* Effect.promise(() => motionElements.count());
+        expect(motionCount).toBeGreaterThan(0);
+        yield* Effect.forEach(Array.range(0, motionCount - 1), (index) =>
+          Effect.gen(function* () {
+            const style = yield* Effect.promise(() =>
+              motionElements.nth(index).evaluate((element) => {
+                const computed = getComputedStyle(element);
+                return {
+                  animationName: computed.animationName,
+                  transitionDuration: computed.transitionDuration,
+                };
+              })
+            );
+            expect(style).toEqual({
+              animationName: "none",
+              transitionDuration: "0s",
+            });
+          })
+        );
+        yield* Effect.promise(() =>
+          docsPage.emulateMedia({ reducedMotion: "no-preference" })
+        );
         const imagePage = yield* Effect.acquireRelease(
           Effect.promise(() => browser.newPage()),
           (resource) => Effect.promise(() => resource.close())
@@ -2177,6 +2301,7 @@ describe("built native API and Website", () => {
         yield* Effect.promise(() =>
           docsPage.locator(".docs-navigation-panel summary").focus()
         );
+        yield* expectReadableText(docsPage, ".docs-navigation-panel summary");
         yield* Effect.promise(() => docsPage.keyboard.press("Enter"));
         expect(
           yield* Effect.promise(() =>
@@ -2307,6 +2432,7 @@ describe("built native API and Website", () => {
         expect(
           yield* Effect.promise(() => docsPage.locator("body").textContent())
         ).not.toContain("PRIVATE9");
+        yield* expectReadableText(docsPage, ".docs-state p");
         yield* Effect.promise(() =>
           docsPage
             .getByRole("link", { exact: true, name: "Open the Quickstart" })

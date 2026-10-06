@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-07
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -19,9 +19,12 @@ Quality graph a second time. There are deliberately no path filters, so a new
 or renamed release boundary cannot be skipped. The preceding bootstrap steps
 materialise complete `main` comparison history, resolve cache identities,
 perform a frozen Bun install and install Chromium plus its system packages
-through the app-local Playwright executable; a shallow checkout, cached
+through `apps/web/node_modules/.bin/playwright`; a shallow checkout, cached
 `node_modules`, skipped install or floating browser-tool resolution fails
-policy. The Schema-decoded workflow,
+policy. The `docs-browser` release check uses the freshly built native
+API/Website command `bun run web:test:native-pair`; the old docs browser
+command and Playwright path cannot supply current replacement proof. The
+Schema-decoded workflow,
 control register and negative corpus are owned by `tools/quality-workflow/` and
 run through `bun run check:quality-workflow`.
 

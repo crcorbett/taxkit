@@ -1611,3 +1611,29 @@ owns observations and limitations; it does not prove a hosted social preview.
 The full Knip graph includes the Website Vite host and its
 imported generation program. PNG byte validation belongs to build scripts, keeping
 build-only checks out of the public metadata module.
+
+
+## Current documentation replacement check
+
+The release graph retains nine check IDs and now binds `docs-browser` to
+`bun run web:test:native-pair`. The command freshly builds the native API and
+Website and runs all eleven native cases rather than selecting a name-filtered
+subset that could become empty. The reader journey independently proves all
+accepted pages and metadata, real private calls without document reload,
+search, discovery, Markdown, generated PNG delivery and browser decoding.
+It also observes skip-link keyboard use, initial/navigation focus, one main,
+article and Documentation navigation landmark, current links, mobile layout,
+text contrast of at least 4.5 and suppressed motion. Fixed error recovery and
+actual 404 responses remain separate from a successful transport decode.
+
+Quality resolves and installs Chromium through the Website's exact local
+Playwright executable. The existing path/version/key/order and cache/trust
+policy remains; its refusal cases also reject selection of the old docs owner.
+The current journey/profile and release runbook select this replacement.
+Historical HGI-203/DAR/HFI records and their Schemas keep their old identities.
+
+The old app's explicit local commands, workspace and deployment/recovery
+procedure remain until the next retirement slice replaces their dependencies
+with a retained-source and operation route. Passing this replacement command
+does not itself remove that app, qualify provider state or complete T005.
+See the [replacement-check receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json).

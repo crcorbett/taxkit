@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-release-readiness-operation-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-10-07
 review_trigger: release graph, current or historical journey inventory, proof schema, package graph, or accepted HGI-203 evidence change
 ---
 
@@ -13,8 +13,9 @@ Owner: `taxkit-release-readiness-operation-owner`
 
 ## Identity and resource scope
 
-This runbook evaluates one identified local TaxKit candidate and the five
-consumer-visible journeys. It may write ignored local proof and an explicitly
+This runbook evaluates one identified local TaxKit candidate and the six current
+consumer-visible journeys. The retained HGI-203 packet owns its separate exact
+five-journey historical contract. It may write ignored local proof and an explicitly
 scoped candidate packet. It does not include versioning or any external state.
 
 ## Preconditions
@@ -67,6 +68,11 @@ everything else. An accepted packet proves an observation, not authority.
    Local runs use local Turbo caching. Do not provide direct `TURBO_TEAM` or
    `TURBO_TOKEN` values. Trusted GitHub runs get those values only from the
    fixed `taxkit/ci` Doppler bridge.
+   The `docs-browser` check executes `bun run web:test:native-pair`: it freshly
+   builds the native API/Website and runs all eleven native cases, including
+   accepted pages, navigation, private server calls, search, Markdown, images,
+   keyboard/focus/landmarks/contrast/reduced-motion and safe recovery. It no
+   longer executes the old app browser command.
 6. Only for an explicitly prepared new candidate, run `bun run release:check`
    once. Do not rerun merely to improve presentation or conceal a failure.
 7. Preserve the immutable attempt, bounded summary, candidate identity,
@@ -88,6 +94,12 @@ for new local verification and future candidates.
 If candidate code is rejected, revert the identified semantic candidate while
 retaining accepted, failed, superseded and inconclusive evidence. Never delete
 or rewrite an immutable attempt to make a later run appear successful.
+To undo the current documentation check selection, restore the graph command,
+Quality Playwright owner/policy, current journey/profile and their guides
+together at the receipt's base revision. The old app and its deployment
+procedure remain retained pending their own replacement; this local check
+change does not redirect or roll back a provider.
+
 If the journey-epoch migration is reverted, revert its snapshot, contract,
 validator and documentation changes together; do not modify the original
 packet, summaries, manifests or validation receipt.

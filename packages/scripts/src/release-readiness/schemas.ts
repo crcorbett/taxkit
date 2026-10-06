@@ -429,11 +429,11 @@ export const createReleaseReadinessPlan = (
     label: "Public API smoke evidence",
   }),
   new ReleaseCheck({
-    args: ["run", "docs:test:browser"],
+    args: ["run", "web:test:native-pair"],
     command: "bun",
     cwd: workspaceRoot,
     id: "docs-browser",
-    label: "Documentation browser evidence",
+    label: "Built native Website and documentation evidence",
   }),
   new ReleaseCheck({
     args: ["run", "changeset:status"],
