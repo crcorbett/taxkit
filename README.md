@@ -110,8 +110,12 @@ entire enable --agent codex --telemetry=false --absolute-git-hook-path --checkpo
 
 Finish the normal workflow with `git commit` and `git push entire BRANCH`.
 Entire uploads chat checkpoints and forwards source changes to GitHub.
-The checkpoint destination is a local setting for this clone. A push through
-`origin` can also trigger a separate checkpoint upload to that destination.
+The shared `strategy_options.checkpoint_push_remote` selects `entire`, so new
+working copies inherit that upload destination. An ignored
+`.entire/settings.local.json` override takes priority; keep it set to `entire`
+too. Check that `entire status` names `entire`. A push directly to the GitHub
+`origin` skips chat uploads. New chat activity after a push waits for the next
+push through `entire`.
 Ending a chat alone does not prove that it was published. Check the hosted
 Sessions page for its conversation and linked commit.
 

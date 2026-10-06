@@ -2,6 +2,9 @@
   "enabled": true,
   "absolute_git_hook_path": true,
   "telemetry": false,
+  "strategy_options": {
+    "checkpoint_push_remote": "entire"
+  },
   "commit_linking": "always",
   "checkpoints": {
     "primary": {
