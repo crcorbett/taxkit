@@ -5,6 +5,7 @@ import {
   GetCalculatorRequest,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
+  CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
 import {
   Array,
@@ -189,11 +190,15 @@ describe("native calculator RPC", () => {
           expect(graph.edges.length).toBeGreaterThan(0);
           expect(graph.validationIssues).toEqual([]);
           const facts = yield* client.listFacts(
-            DescriptorFilterQuery.make({ calculator: request.calculatorId })
+            DescriptorFilterQuery.make({
+              calculator: Option.some(Option.some(request.calculatorId)),
+            })
           );
           expect(facts.facts.length).toBeGreaterThan(0);
           const rules = yield* client.listRules(
-            DescriptorFilterQuery.make({ calculator: request.calculatorId })
+            DescriptorFilterQuery.make({
+              calculator: Option.some(Option.some(request.calculatorId)),
+            })
           );
           expect(rules.rules).toEqual(
             expect.arrayContaining(Array.fromIterable(schema.rules))
@@ -492,12 +497,15 @@ describe("native calculator RPC", () => {
         );
         yield* Effect.gen(function* () {
           const transport = yield* makeHttpTransport(mode);
+          const encodedRequest = yield* Schema.encodeEffect(
+            CalculatorRunServiceRequest
+          )(CalculationRequest);
           const input = yield* Schema.encodeEffect(JsonFixture)(
             NativeRequestFixture.make({
               headers: [],
               id: "1",
               payload: {
-                request: CalculationRequest,
+                request: encodedRequest,
                 version: CalculatorRpcVersion,
               },
               tag: Calculate._tag,

@@ -1,7 +1,11 @@
 import { Array, Option, Schema, SchemaIssue } from "effect";
 
 import type { CalculatorCatalogEntry } from "./catalog.js";
-import { CalculatorInputDecodeError, CalculatorInputIssue } from "./schemas.js";
+import {
+  CalculatorInputDecodeError,
+  CalculatorInputIssue,
+  CalculatorInputHelp,
+} from "./schemas.js";
 import type { CalculatorId, HelpMode } from "./schemas.js";
 
 // Effect Schema's Standard Schema formatter can emit path segments as objects
@@ -60,20 +64,16 @@ export const toCalculatorInputDecodeError = (args: {
         }),
       onSome: () =>
         new CalculatorInputDecodeError({
-          calculatorId: args.calculatorId,
-          help: Array.map(args.entry.inputFacts, (fact) =>
-            fact.question.pipe(
-              Option.match({
-                onNone: () => ({
+          calculatorId: Option.some(Option.some(args.calculatorId)),
+          help: Option.some(
+            Option.some(
+              Array.map(args.entry.inputFacts, (fact) =>
+                CalculatorInputHelp.make({
                   factId: fact.id,
+                  question: Option.map(fact.question, Option.some),
                   title: fact.title,
-                }),
-                onSome: (question) => ({
-                  factId: fact.id,
-                  question,
-                  title: fact.title,
-                }),
-              })
+                })
+              )
             )
           ),
           issues,

@@ -6,9 +6,11 @@ import {
   CalculatorRpcOrigin,
   CalculatorRpcPayload,
   CalculatorRpcVersion,
+  GetCalculatorRequest,
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
+import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import {
   Array,
   Cause,
@@ -577,23 +579,24 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     });
     yield* Effect.promise(() => page.goto(workWebsiteOrigin));
     yield* Effect.promise(() => invalidPayInput.fill("1654"));
+    const payload = yield* Schema.encodeEffect(CalculatorRpcPayload)({
+      request: CalculationRequest,
+      version: CalculatorRpcVersion,
+    });
     const wire = yield* Schema.encodeEffect(Json)(
       Array.map(Array.range(1, 7), (id) =>
         NativeRequestFixture.make({
           headers: [],
           id: String(id),
-          payload: {
-            request: CalculationRequest,
-            version: CalculatorRpcVersion,
-          },
+          payload,
           tag: "Calculate",
         })
       )
     );
     const api = yield* Effect.promise(() => host.getWorker("api-work"));
-    const httpBody = yield* Schema.encodeEffect(Json)(
-      CalculationRequest.payload
-    );
+    const httpBody = yield* Schema.encodeEffect(
+      Schema.fromJsonString(CalculatorRunRequest)
+    )(CalculationRequest.payload);
     const started = yield* Clock.monotonicTimeNanos;
     const batch = yield* Effect.promise(() =>
       api.fetch(`${workApiOrigin}/rpc`, {
@@ -741,9 +744,11 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     ).pipe(Effect.forkScoped);
     const metadataRpc = yield* TaxKitRpcClient.pipe(
       Effect.flatMap((client) =>
-        client.getCalculatorSchema({
-          calculatorId: CalculationRequest.calculatorId,
-        })
+        client.getCalculatorSchema(
+          GetCalculatorRequest.make({
+            calculatorId: CalculationRequest.calculatorId,
+          })
+        )
       ),
       Effect.exit,
       Effect.provide(

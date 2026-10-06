@@ -157,5 +157,20 @@ MCP operations remain active work.
 Core descriptor questions, source artifacts and duplicate-provider permissions
 are Options; rule parameter collections are total arrays. Metadata and error-help
 builders reuse those checked values directly. Public metadata codecs keep the
-same JSON fields, missing keys and values. Broader request absence changes
-remain separate work in the active clean-slate plan.
+same JSON fields, missing keys and values.
+
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year.
+
+Optional error calculator identity/help, fact question and rule permission
+fields use the same representation-preserving owners. Explicit false permission
+remains a present value. Facts still decode once through the selected calculator
+so rejected input gets safe field guidance.
+
+`check-types` checks source and `tsconfig.test.json`; service/work test fixtures
+must use the canonical request Type, even when runtime tests could accept a raw
+object. The package test command retains the original tax and cleanup assertions.

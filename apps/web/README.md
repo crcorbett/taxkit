@@ -272,3 +272,14 @@ with operation-scoped client lifetime and shared reply protections. Website
 commands still request only the data needed by their pages; the added metadata
 calls do not load the calculation engine into the browser. See the
 [RPC owner](../../packages/api/rpc/README.md#complete-named-operation-contract).
+
+
+Website form restoration constructs known rule-owned context values through
+the canonical request Schema. It wraps them in the owning Options before RPC
+serialisation. Supported form fields, results and retry behaviour are unchanged.
+
+
+Chromium qualification forces a fresh dependency bundle for its explicitly
+included workspace RPC source. The lockfile alone cannot identify changes to
+those local Schemas. This prevents a stale compiled client from qualifying a
+different request contract; production Vite configuration is unchanged.

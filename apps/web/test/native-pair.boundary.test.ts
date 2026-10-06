@@ -274,11 +274,15 @@ describe("built native API and Website", () => {
           expect(graph.edges.length).toBeGreaterThan(0);
           expect(graph.validationIssues).toEqual([]);
           const facts = yield* client.listFacts(
-            DescriptorFilterQuery.make({ calculator: pay.calculatorId })
+            DescriptorFilterQuery.make({
+              calculator: Option.some(Option.some(pay.calculatorId)),
+            })
           );
           expect(facts.facts.length).toBeGreaterThan(0);
           const rules = yield* client.listRules(
-            DescriptorFilterQuery.make({ calculator: pay.calculatorId })
+            DescriptorFilterQuery.make({
+              calculator: Option.some(Option.some(pay.calculatorId)),
+            })
           );
           expect(rules.rules).toEqual(
             expect.arrayContaining(Array.fromIterable(schema.rules))

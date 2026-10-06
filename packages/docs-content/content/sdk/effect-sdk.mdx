@@ -33,19 +33,29 @@ Report-only helpers
 ## Return the full run response
 
 Use `calculateRunRequest` when you need the canonical `CalculatorRunResponse`
-shape with a descriptor-decoded report type.
+shape with a descriptor-decoded report type. Omitted request fields use their
+Schema defaults. Explicit context and help use nested Options: outer `None`
+means a missing key, `Some(None)` means a present undefined key and
+`Some(Some(value))` means a present value. JSON clients keep the usual optional
+fields; the codec handles this conversion.
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { audFromCents } from "@taxkit/core/primitives";
 import { calculateRunRequest } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
+import { Effect, Option } from "effect";
 
-const effect = calculateRunRequest(AuAnnualIncomeTaxCalculation, {
-  payload: {
-    facts: { taxableIncome: aud(Cents.make(9_000_000)) },
-    jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
-    taxYear: AuAnnualIncomeTaxCalculation.taxYear,
-  },
+const effect = Effect.gen(function* () {
+  const taxableIncome = yield* audFromCents(9_000_000);
+  return yield* calculateRunRequest(AuAnnualIncomeTaxCalculation, {
+    payload: {
+      facts: { taxableIncome },
+      jurisdiction: Option.some(
+        Option.some(AuAnnualIncomeTaxCalculation.jurisdiction)
+      ),
+      taxYear: Option.some(Option.some(AuAnnualIncomeTaxCalculation.taxYear)),
+    },
+  });
 });
 ```
 
@@ -55,16 +65,22 @@ Use `calculateReportRequest` when you have a full request payload but only need
 the report.
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { audFromCents } from "@taxkit/core/primitives";
 import { calculateReportRequest } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
+import { Effect, Option } from "effect";
 
-const effect = calculateReportRequest(AuAnnualIncomeTaxCalculation, {
-  payload: {
-    facts: { taxableIncome: aud(Cents.make(9_000_000)) },
-    jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
-    taxYear: AuAnnualIncomeTaxCalculation.taxYear,
-  },
+const effect = Effect.gen(function* () {
+  const taxableIncome = yield* audFromCents(9_000_000);
+  return yield* calculateReportRequest(AuAnnualIncomeTaxCalculation, {
+    payload: {
+      facts: { taxableIncome },
+      jurisdiction: Option.some(
+        Option.some(AuAnnualIncomeTaxCalculation.jurisdiction)
+      ),
+      taxYear: Option.some(Option.some(AuAnnualIncomeTaxCalculation.taxYear)),
+    },
+  });
 });
 ```
 

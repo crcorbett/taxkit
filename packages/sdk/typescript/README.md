@@ -39,7 +39,8 @@ Production: SDK Effect full run
 
 Effect consumer
   -> calculateRunRequest(descriptor, request)
-    -> PublicCalculatorService.calculate({ calculatorId, ...request })
+    -> construct context/help with their owning Schemas
+    -> PublicCalculatorService.calculate({ calculatorId, ...checkedOptions, payload })
       -> CalculatorRunResponse
     -> descriptor output decode for response.report
     -> typed CalculatorRunResponse with narrowed report
@@ -302,3 +303,16 @@ consumers use the owning report codec at their representation boundary.
 The genuine packed consumer rejects incorrect trace constructor fields and
 child records, preserves service tuple types, compares all 22 saved metadata
 response hashes and retains existing trace/ledger and table/source expectations.
+
+
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year.
+
+SDK request aliases derive constructor input from the calculator field owners
+and retain descriptor-specific facts. The SDK constructs context/help only; the
+selected calculator owns fact decoding and safe error help. Output narrowing
+checks the already decoded Schema Type.

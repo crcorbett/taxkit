@@ -14,7 +14,7 @@ import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
-import { Cause, Effect, Layer, Match } from "effect";
+import { Cause, Effect, Layer, Match, Option } from "effect";
 import type { RpcClient, RpcClientError } from "effect/rpc";
 
 import type { TaxKitRpcGroup } from "../group.js";
@@ -281,7 +281,9 @@ export const CalculatorRpcOperationCases = [
       client
         .listFacts(
           DescriptorFilterQuery.make({
-            calculator: CalculationRequest.calculatorId,
+            calculator: Option.some(
+              Option.some(CalculationRequest.calculatorId)
+            ),
           })
         )
         .pipe(Effect.asVoid),
@@ -295,7 +297,9 @@ export const CalculatorRpcOperationCases = [
       client
         .ListFacts({
           query: DescriptorFilterQuery.make({
-            calculator: CalculationRequest.calculatorId,
+            calculator: Option.some(
+              Option.some(CalculationRequest.calculatorId)
+            ),
           }),
           version,
         })
@@ -319,7 +323,9 @@ export const CalculatorRpcOperationCases = [
       client
         .listRules(
           DescriptorFilterQuery.make({
-            calculator: CalculationRequest.calculatorId,
+            calculator: Option.some(
+              Option.some(CalculationRequest.calculatorId)
+            ),
           })
         )
         .pipe(Effect.asVoid),
@@ -333,7 +339,9 @@ export const CalculatorRpcOperationCases = [
       client
         .ListRules({
           query: DescriptorFilterQuery.make({
-            calculator: CalculationRequest.calculatorId,
+            calculator: Option.some(
+              Option.some(CalculationRequest.calculatorId)
+            ),
           }),
           version,
         })

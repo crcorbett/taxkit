@@ -279,3 +279,14 @@ browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
 control returns. Rate identity, per-client rate limits, MCP and full T004
 qualification remain unfinished.
+
+
+Scripted typed HTTP requests construct the calculator-owned context/help
+Options. Raw public HTTP JSON still uses ordinary optional fields. The
+[calculator owner](../../packages/calculators/README.md) describes both forms.
+
+
+Known requests in work-pool, exact body-limit and defect fixtures encode through
+their owning HTTP/RPC Schemas before JSON framing. Bad tag/id tests mutate the
+encoded frame, so another request-shape error cannot mask the intended fault.
+The original capacity, body size, cleanup and safe-reporter assertions remain.

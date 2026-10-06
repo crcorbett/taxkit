@@ -63,8 +63,12 @@ JavaScript `Map`/`Set` indexes, nullable lookups, `switch`, `Object.values`,
 request-local runtime creation or hand-rolled runtime wrappers when Effect
 owns the pattern.
 
-For optional request values, use schema optionality plus `Option`/`Match` at
-the service boundary. Code MUST NOT use undefined checks and defaulting such
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year. Code MUST NOT use undefined checks and defaulting such
 as `payload.jurisdiction ?? "AU"` to invent missing calculator context.
 Missing context MUST either remain absent, be decoded by a schema that
 explicitly owns the default, or fail with a tagged expected error.

@@ -833,3 +833,13 @@ preserved. SDK report narrowing validates the selected Type rather than decoding
 a domain report again. The active plan and dated absence-owner receipt qualify
 this slice; broader public request absence and trusted rate identity/limiting
 remain active, and T004 is incomplete.
+
+
+Calculator-owned request context/help/filter and optional metadata/error fields
+now use representation-preserving nested Options. SDK aliases derive the
+constructor input while selected calculator facts keep their existing decoder.
+Calculator service/work fixtures join package type checking. Public templates
+and typed native/HTTP callers use the same owners. The active plan and dated
+[request absence receipt](../documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json)
+own qualification; remaining domain review and trusted rate identity/limits
+keep T004 active.

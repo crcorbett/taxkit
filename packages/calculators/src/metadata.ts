@@ -103,25 +103,13 @@ const schemaTag = (schema: Schema.Top): string => schema.ast._tag;
 const toFactDescriptorMetadata = (
   descriptor: AnyFactDescriptor
 ): FactDescriptorMetadata =>
-  descriptor.question.pipe(
-    Option.match({
-      onNone: () =>
-        new FactDescriptorMetadataData({
-          authority: descriptor.authority,
-          id: descriptor.id,
-          schemaTag: schemaTag(descriptor.schema),
-          title: descriptor.title,
-        }),
-      onSome: (question) =>
-        new FactDescriptorMetadataData({
-          authority: descriptor.authority,
-          id: descriptor.id,
-          question,
-          schemaTag: schemaTag(descriptor.schema),
-          title: descriptor.title,
-        }),
-    })
-  );
+  new FactDescriptorMetadataData({
+    authority: descriptor.authority,
+    id: descriptor.id,
+    question: Option.map(descriptor.question, Option.some),
+    schemaTag: schemaTag(descriptor.schema),
+    title: descriptor.title,
+  });
 
 const toParameterDescriptorMetadata = (
   descriptor: AnyRuleDescriptor["parameters"][number]
@@ -141,31 +129,19 @@ const toRuleDescriptorMetadata = (
     toParameterDescriptorMetadata
   );
 
-  return descriptor.allowDuplicateProvides.pipe(
-    Option.match({
-      onNone: () =>
-        new RuleDescriptorMetadataData({
-          id: descriptor.id,
-          parameters,
-          provides: Array.map(descriptor.provides, (fact) => fact.id),
-          requires: Array.map(descriptor.requires, (fact) => fact.id),
-          sourcePolicy: descriptor.sourcePolicy,
-          sources: descriptor.sources,
-          title: descriptor.title,
-        }),
-      onSome: (allowDuplicateProvides) =>
-        new RuleDescriptorMetadataData({
-          allowDuplicateProvides,
-          id: descriptor.id,
-          parameters,
-          provides: Array.map(descriptor.provides, (fact) => fact.id),
-          requires: Array.map(descriptor.requires, (fact) => fact.id),
-          sourcePolicy: descriptor.sourcePolicy,
-          sources: descriptor.sources,
-          title: descriptor.title,
-        }),
-    })
-  );
+  return new RuleDescriptorMetadataData({
+    allowDuplicateProvides: Option.map(
+      descriptor.allowDuplicateProvides,
+      Option.some
+    ),
+    id: descriptor.id,
+    parameters,
+    provides: Array.map(descriptor.provides, (fact) => fact.id),
+    requires: Array.map(descriptor.requires, (fact) => fact.id),
+    sourcePolicy: descriptor.sourcePolicy,
+    sources: descriptor.sources,
+    title: descriptor.title,
+  });
 };
 
 const collectFacts = (
@@ -269,19 +245,22 @@ export const filterCalculatorEntries = (
   query: DescriptorFilterQuery
 ): readonly CalculatorCatalogEntry[] =>
   Array.filter(listCalculatorCatalogEntries(), (entry) => {
-    const calculatorMatches = Option.fromNullishOr(query.calculator).pipe(
+    const calculatorMatches = query.calculator.pipe(
+      Option.flatten,
       Option.match({
         onNone: () => true,
         onSome: (calculator) => calculator === entry.calculatorId,
       })
     );
-    const jurisdictionMatches = Option.fromNullishOr(query.jurisdiction).pipe(
+    const jurisdictionMatches = query.jurisdiction.pipe(
+      Option.flatten,
       Option.match({
         onNone: () => true,
         onSome: (jurisdiction) => jurisdiction === entry.context.jurisdiction,
       })
     );
-    const taxYearMatches = Option.fromNullishOr(query.taxYear).pipe(
+    const taxYearMatches = query.taxYear.pipe(
+      Option.flatten,
       Option.match({
         onNone: () => true,
         onSome: (taxYear) => taxYear === entry.context.taxYear,

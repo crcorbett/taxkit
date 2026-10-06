@@ -490,3 +490,9 @@ records changed Core/descriptor domain types, retained trace/question and public
 metadata representations, service tuple inference, SDK Type narrowing and
 separate engine implementation. Its local qualification does not accept all
 public request absence, rate limiting, T004 or external operations.
+
+
+The [public request absence candidate](clean-slate-foundation/2026-10-06-public-request-absence.json)
+records canonical request/metadata/error Types, selected calculator guidance,
+checked service fixtures and original representation/report compatibility.
+Local and hosted qualification remain separate; rate work and T004 stay active.

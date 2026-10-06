@@ -19,14 +19,22 @@ or test that a calculator ran without metadata problems.
 `CalculatorRunResponse` includes a `diagnostics` field beside the calculator
 metadata and report:
 
-```ts
-const response = await client.calculatorApi.calculate({
-  params: { calculatorId },
-  payload,
-  query: { help: "errors" },
-});
+This excerpt assumes `client`, `calculatorId` and `payload` are already checked
+application values. It returns an Effect for your application host to run.
 
-console.log(response.diagnostics.graphIssues.length);
+```ts
+import { CalculationQuery } from "@taxkit/calculators/schemas";
+import { Effect, Option } from "effect";
+
+const issueCount = client.calculatorApi
+  .calculate({
+    params: { calculatorId },
+    payload,
+    query: CalculationQuery.make({
+      help: Option.some(Option.some("errors")),
+    }),
+  })
+  .pipe(Effect.map((response) => response.diagnostics.graphIssues.length));
 ```
 
 Expected output for the current take-home pay success fixture is:

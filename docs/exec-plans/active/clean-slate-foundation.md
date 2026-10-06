@@ -3360,3 +3360,119 @@ runbooks, format, Changeset and whitespace checks follow before commit/push and
 a stacked draft. Hosted acceptance of the new immutable head remains separate.
 Broader public request absence/domain error review and trusted rate identity/
 limiting remain active; T004 and the wider goal are incomplete.
+
+
+## DEV-75 public request absence — 6 October 2026
+
+Draft #150 is open at facca8306d3d37fce40f09d988ba080d596bb07b after the
+complete local domain-owner graph passed. Exact hosted Quality run
+37408781152/job 112092261901 succeeds at 03:46:36 UTC; that parent result
+remains separate from the current request candidate.
+Continue on codex/dev-75-request-absence-owners.
+
+Give the calculator-owned optional request context/help/filter fields and
+optional error/metadata fields canonical nested Options. Preserve missing,
+present undefined and present values at their existing codecs, including
+explicit false permission. Consumers receive canonical values and flatten
+only where both absent forms share a meaning. The SDK's genuine generic facts
+relation derives constructor input from the same request field owners; its
+service call constructs context/help once through the existing field owners.
+The selected calculator still decodes facts; constructing the whole union first
+would lose calculator-specific guidance. No mirrored wire DTO, repeated fact
+decode or generic transport callback is introduced.
+
+Outside prototypes retain 24 request forms, 22 error/metadata forms, all 22
+saved actual metadata replies, 36 actual reports, 36 actual input errors,
+36 HTTP replies, 34 RPC replies and the full generated OpenAPI. A fresh staged
+source copy installs the frozen lockfile unchanged; calculator/RPC types,
+RPC emitted build and SDK source build pass after fixture inputs are migrated.
+Three actual SDK runs preserve report bytes and nested constructor defaults.
+These are preparation only; the implemented candidate still needs owning
+workspace, packed and built-app qualification. Fresh-copy RPC test suites did
+not load because dependency packages had not been built; no test pass is claimed.
+
+Documentation impact: **Change required** for calculator/SDK/HTTP/RPC owners,
+matching public examples/templates, affected Effect/API/testing architecture
+and optional-field standards, current SPEC/tasks/plan/audit, a dated receipt
+and major Changesets for public Type changes. **Preserve** wire/OpenAPI
+representations, tables/source records, tax results and retained snapshots,
+public lifecycle/navigation status, commands/toolchain/dependencies/CI/skills,
+runtime permissions and Medicare values. **N/A** for new runbooks and provider
+operations. The public-copy route supplies clear reader wording after this
+owner decision. Genuine packed compile/runtime and unchanged original
+expectations, actual removal checks and the complete local graph are required.
+Catalogued execution metadata, domain errors and trusted rate identity/limits
+remain independent unfinished work; T004 and the wider goal stay active.
+
+
+The calculator type command now includes its service/work tests. Those fixtures
+previously escaped source type checking and admitted raw optional request values.
+The SDK Promise rejection check and RPC unknown-JSON fixture now respect their
+actual Type/representation boundary; original tax/privacy assertions stay fixed.
+Focused calculator, SDK, HTTP and RPC tests and workspace types pass. Packed and
+complete graph qualification remain pending. This command scope correction is
+Change required; command names, CI, dependency versions and permissions remain
+Preserve.
+
+
+Focused lint, docs/runbooks, types, SDK tests, content and Changeset checks pass.
+Four deliberate removals fail at the intended owner: guided-help test, calculator
+test compiler, SDK build after removing the help default, and real packed
+declarations admitting raw help. The help-default removal stops before packing;
+its receipt retains that actual boundary. All altered source bytes restore.
+Complete local CI-mode qualification follows on a frozen staged candidate.
+
+
+First full request candidate fails verification at the Website browser request
+after its source/packed checks pass. The explicitly optimised RPC dependency
+contains old Schema.optional fields: Vite retained it despite changed workspace
+source and an unchanged lockfile. Browser qualification now forces its dependency
+bundle to rebuild; all 19 Chromium tests pass and the compiled cache contains
+current Option owners. The receipt keeps the failed 490.46-second graph. This
+corrects the earliest test-config owner; no production Vite, runtime, permission
+or tax assertion changes. Fresh full qualification is required.
+
+
+The second complete request graph reaches built native tests: six pass, but the
+shared-work fixture fails because it sends domain Options through unknown JSON.
+RPC batch payloads and the public HTTP body now use their canonical encoders
+before framing. The existing eight reached-operation warnings, pool, timeout,
+cleanup and privacy assertions remain fixed. The 555.75-second failed graph and
+two failed preparation invocations are retained; fresh qualification follows.
+
+
+Both corrected built native failure/work tests pass in 20.26 seconds, retaining
+seven RPC plus one HTTP place, excess HTTP/form/browser rejection, metadata
+budgets, cleanup and safe warnings. Current types/docs checks also pass. Fresh
+complete graph follows; no whole T004 acceptance is claimed.
+
+
+Third full request graph passes verification, including all seven native cases,
+then fails three API app fixtures at workspace tests. Known native frames/arrays
+and HTTP bodies now encode through their owning Schemas; malformed tag/id cases
+mutate a valid encoded frame. All 62 focused API app tests pass. The failed
+616.45-second graph remains in the receipt; no complete acceptance is claimed.
+
+
+After correcting the API fixtures, all workspace tests, build, genuine packed
+SDK consumer checks and API smoke checks pass. The malformed tag/id checks now
+start from a valid encoded request too. Original expectations remain fixed;
+complete qualification follows on all 47 frozen candidate files.
+
+
+Local acceptance for public request absence: all nine CI-mode stages pass in
+660.13 seconds. This includes 32 workflow cases (469.15 seconds),
+512 lint cases, 65 Core, 52 rules, 37 calculator, 62 API app, 58 SDK, 17 HTTP and 217 RPC
+tests, plus seven native cases (77.67 seconds). Genuine packed declarations
+and runtime retain 24 request forms, 22 error/metadata forms, 36 reports and
+36 safe input errors, with the earlier metadata, trace/ledger, table/source and
+tax expectations fixed. Four deliberate removals fail at their actual owning
+test/compiler/build/packed stages. All 47 staged sources restore exact bytes;
+API Worker, lockfile and OpenAPI snapshot match parent. Nine native inventories
+are captured before later builds; four screenshots match inspected parent bytes.
+
+Primary-owner review accepts this local slice and its four major package
+Changesets plus the content patch. Only plan/receipt change after qualification;
+final docs/runbooks/format/Changeset/whitespace checks precede commit and stacked
+draft. Hosted proof remains separate. Trusted rate identity/limiting and remaining
+domain review keep T004 and the wider goal active.

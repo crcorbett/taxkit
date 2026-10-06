@@ -169,3 +169,9 @@ implementation in `apps/docs` or reusable primitives in
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/effect-services.md`
 - `docs/architecture/testing-and-quality.md`
+
+
+The Effect and browser HTTP templates construct the calculator-owned request
+Options. Their matching public guides explain the checked TypeScript values;
+raw HTTP JSON examples retain ordinary optional fields. The package checks both
+canonical templates as part of content qualification.

@@ -460,7 +460,8 @@ const writeConsumerFiles = (
         ),
         fs.writeFileString(
           path.join(workspacePath, "src/typecheck.ts"),
-          `import { CalculatorRequestBodyPolicy, CalculatorRequestBodyTooLarge, CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/request-boundary";
+          `import * as MetadataSchemas from "@taxkit/calculators/schemas";
+import { CalculatorRequestBodyPolicy, CalculatorRequestBodyTooLarge, CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/request-boundary";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import type { LedgerComponent, LedgerComponentEncoded } from "@taxkit/core/ledger";
 import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
@@ -532,6 +533,20 @@ void componentTrace;
 void encodedComponentTrace;
 
 const traceMakeInput = {children: [], inputs: {}, result: 1, ruleId: RuleId.make("fixture/type"), sources: [], title: "Fixture"};
+const requestDefaults = MetadataSchemas.CalculationQuery.make({});
+const checkedHelp: Option.Option<Option.Option<typeof MetadataSchemas.HelpMode.Type>> = requestDefaults.help;
+void checkedHelp;
+const checkedContext = MetadataSchemas.MetadataQuery.make({});
+const jurisdiction: Option.Option<Option.Option<typeof MetadataSchemas.CalculatorJurisdiction.Type>> = checkedContext.jurisdiction;
+void jurisdiction;
+// @ts-expect-error constructor inputs use canonical Options, not wire strings.
+MetadataSchemas.MetadataQuery.make({jurisdiction: "AU"});
+// @ts-expect-error constructor help uses canonical Options, not a wire string.
+MetadataSchemas.CalculationQuery.make({help: "full"});
+// @ts-expect-error nullable context is not an admitted request representation.
+MetadataSchemas.MetadataQuery.make({taxYear: null});
+// @ts-expect-error false permission must still be wrapped in its owning Option.
+MetadataSchemas.RuleDescriptorMetadata.make({id: RuleId.make("fixture/rule"), parameters: [], provides: [], requires: [], sourcePolicy: "not-required", sources: [], title: "Fixture", allowDuplicateProvides: false});
 const checkedTrace = TraceNode.make(traceMakeInput);
 const traceFormula: Option.Option<Option.Option<string>> = checkedTrace.formula;
 void traceFormula;
@@ -765,6 +780,468 @@ await Effect.runPromise(Effect.gen(function* () {
   }
 }));
 
+// Saved before the public request migration; expectations come from the original owners.
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)({});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
+    throw new Error("Packed MetadataQuery/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)({jurisdiction: undefined, taxYear: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
+    throw new Error("Packed MetadataQuery/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)({jurisdiction: "AU", taxYear: "2025-26"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "f45bea6dfdddf63af51736fca999756a1780f4b31d33495026c5c7fa88fbd5a0" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
+    throw new Error("Packed MetadataQuery/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)({});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false || Object.hasOwn(encoded, "help") !== false) {
+    throw new Error("Packed HelpQuery/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)({jurisdiction: undefined, taxYear: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
+    throw new Error("Packed HelpQuery/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)({jurisdiction: "AU", taxYear: "2025-26", help: "full"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "0be5bb97e742b21e1526e138ac2b85eb2cf971e1355aa0862e6941a8331adc67" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
+    throw new Error("Packed HelpQuery/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)({});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== false) {
+    throw new Error("Packed CalculationQuery/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)({help: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
+    throw new Error("Packed CalculationQuery/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)({help: "full"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "da39084a2e387010419681fabd9733b9183dc0130300ab37e2ea99b897dec05d" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
+    throw new Error("Packed CalculationQuery/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)({calculatorId: "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false || Object.hasOwn(encoded, "help") !== false) {
+    throw new Error("Packed GetCalculatorRequest/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
+    throw new Error("Packed GetCalculatorRequest/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "37671de06f163469dc22e3558fe7057a8e8f205ff728a287108fe999a7ebab9f" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
+    throw new Error("Packed GetCalculatorRequest/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
+    throw new Error("Packed GetCalculatorGraphRequest/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
+    throw new Error("Packed GetCalculatorGraphRequest/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "65fe06057e41885252e7a2b092290de8b7c5cec8b075f9e6247d528c4d7551d0" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
+    throw new Error("Packed GetCalculatorGraphRequest/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)({});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "calculator") !== false || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
+    throw new Error("Packed DescriptorFilterQuery/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)({calculator: undefined, jurisdiction: undefined, taxYear: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "calculator") !== true || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
+    throw new Error("Packed DescriptorFilterQuery/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)({calculator: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "adccd61014613c74da5bd5fa3b0dd8ac7452ae2cf0e1273cba6b34b6c364feda" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "calculator") !== true || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
+    throw new Error("Packed DescriptorFilterQuery/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "b0c6614005ab660bdb736bf10fefd1643b57bf5c784e2e3c4f0318ab2d579617" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
+    throw new Error("Packed CalculatorRunRequest/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: undefined, taxYear: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "b0c6614005ab660bdb736bf10fefd1643b57bf5c784e2e3c4f0318ab2d579617" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
+    throw new Error("Packed CalculatorRunRequest/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: "AU", taxYear: "2025-26"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "bec0ecf461d79d2524f0c4d3590c8f49095883d58fb64e6cba3bd18ac83df44f" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
+    throw new Error("Packed CalculatorRunRequest/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7d4cebb87770da5f461a30a47178e63eeb23b1e7bfece6c31631e412849114cb" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== false) {
+    throw new Error("Packed CalculatorRunServiceRequest/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7d4cebb87770da5f461a30a47178e63eeb23b1e7bfece6c31631e412849114cb" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
+    throw new Error("Packed CalculatorRunServiceRequest/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: "full"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "58c6a32c45ba03810fb7f864c7d0882d3072625130480b49d8021bcd038d71f1" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
+    throw new Error("Packed CalculatorRunServiceRequest/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "934afe89da88e80a9eabe058b7899d7698407a6c6842cf76ef010ec5393652bf" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["factId", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["factId", "title"])) {
+    throw new Error("Packed CalculatorInputHelp/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "91d29898239c61f2b3c9198263a2c39540d137430009da982b97e648d6b0824a" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["authority", "id", "schemaTag", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["authority", "id", "schemaTag", "title"])) {
+    throw new Error("Packed FactDescriptorMetadata/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "913960bc8e0e08c568c9150db526d4ef8c03bc10720a56fa9f82a5cdc7d417d0" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"])) {
+    throw new Error("Packed UnsupportedCalculatorContextError/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture", question: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "934afe89da88e80a9eabe058b7899d7698407a6c6842cf76ef010ec5393652bf" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["factId", "question", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["factId", "question", "title"])) {
+    throw new Error("Packed CalculatorInputHelp/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture", question: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "91d29898239c61f2b3c9198263a2c39540d137430009da982b97e648d6b0824a" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"])) {
+    throw new Error("Packed FactDescriptorMetadata/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": undefined, "taxYear": undefined}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "913960bc8e0e08c568c9150db526d4ef8c03bc10720a56fa9f82a5cdc7d417d0" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"])) {
+    throw new Error("Packed UnsupportedCalculatorContextError/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)({"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7efaeb721955f48f3c3986cfbc0243bc2919146997e172b0c4681bbf108432b7" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["factId", "question", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["factId", "question", "title"])) {
+    throw new Error("Packed CalculatorInputHelp/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "schemaTag": "Money", "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a4aea7f78123263173a29ba84f804b8b0b02f00192aee676e80627c18622bcb7" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"])) {
+    throw new Error("Packed FactDescriptorMetadata/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": "AU", "taxYear": "2025-26"}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "0363af54d90b1906faa9b64a27f256113bbf1fda2f067496eef8f16b4894f46b" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"])) {
+    throw new Error("Packed UnsupportedCalculatorContextError/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "1ec96367697bf2207c370ea47470dbb3db075dd7c3f82d771b5ecccfc1292705" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
+    throw new Error("Packed RuleDescriptorMetadata/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture", allowDuplicateProvides: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "1ec96367697bf2207c370ea47470dbb3db075dd7c3f82d771b5ecccfc1292705" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
+    throw new Error("Packed RuleDescriptorMetadata/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"allowDuplicateProvides": false, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "65a273a5cb1041e950715e738da2e774ee675e458b7ac558c3e62216a362d288" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
+    throw new Error("Packed RuleDescriptorMetadata/false changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"allowDuplicateProvides": true, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "3edbef562b82856cbf24da6e552d116e641143b1ee8f7d21f88749bcab4352e5" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
+    throw new Error("Packed RuleDescriptorMetadata/true changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "issues", "message"])) {
+    throw new Error("Packed CalculatorInputDecodeError/missing/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", help: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "help", "issues", "message"])) {
+    throw new Error("Packed CalculatorInputDecodeError/missing/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "3053782fc254bd270aa71aa13c2fda25f13570163998614a76e9f3e820d36281" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "help", "issues", "message"])) {
+    throw new Error("Packed CalculatorInputDecodeError/missing/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"])) {
+    throw new Error("Packed CalculatorInputDecodeError/undefined/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
+    throw new Error("Packed CalculatorInputDecodeError/undefined/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "3053782fc254bd270aa71aa13c2fda25f13570163998614a76e9f3e820d36281" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
+    throw new Error("Packed CalculatorInputDecodeError/undefined/present changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "c02eb42d05fe7e4c5fdb4821fa6079388c6a0ff890f40f9f038eb7350dafe587" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"])) {
+    throw new Error("Packed CalculatorInputDecodeError/present/missing changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input", help: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "c02eb42d05fe7e4c5fdb4821fa6079388c6a0ff890f40f9f038eb7350dafe587" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
+    throw new Error("Packed CalculatorInputDecodeError/present/undefined changed historical bytes or key identity.");
+  }
+}));
+
+await Effect.runPromise(Effect.gen(function* () {
+  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7426d620c184e3969b2becabc3d87b7157c61631988d8301d9a8e3725a4d64aa" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
+    throw new Error("Packed CalculatorInputDecodeError/present/present changed historical bytes or key identity.");
+  }
+}));
+
 const fixtureSource = SourceRef.make({kind: "internal-validation", reference: "historical-codec-fixture", title: "Compatibility fixture"});
 const questionBase = {id: FactQuestionId.make("fixture/absence"), inputKind: "money", prompt: "Enter an amount"} as const;
 const questionSamples = [
@@ -845,6 +1322,718 @@ const ServiceLive = PublicCalculatorServiceBounded.pipe(
 if (CalculatorConcurrencyLimit !== 8) {
   throw new Error("Packed calculation policy has the wrong capacity.");
 }
+
+// Original calculator report and error bytes, saved before public request changes.
+const historicalRuns = [
+  {
+    "name": "report/au.income-tax.annual/missing/missing",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/missing/missing",
+    "sha256": "e821140e6a43c53d73488b29b3a25a7435c50f74b0319bfe8655ce410bd4739c",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/missing/undefined",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/missing/undefined",
+    "sha256": "e821140e6a43c53d73488b29b3a25a7435c50f74b0319bfe8655ce410bd4739c",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/missing/errors",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/missing/errors",
+    "sha256": "3dbd6896001bec9bb9d6974a7ed86bf79a4a7becffc5f2bd370daf21875ad722",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/missing/full",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/missing/full",
+    "sha256": "3dbd6896001bec9bb9d6974a7ed86bf79a4a7becffc5f2bd370daf21875ad722",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/undefined/missing",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/undefined/missing",
+    "sha256": "e821140e6a43c53d73488b29b3a25a7435c50f74b0319bfe8655ce410bd4739c",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/undefined/undefined",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/undefined/undefined",
+    "sha256": "e821140e6a43c53d73488b29b3a25a7435c50f74b0319bfe8655ce410bd4739c",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/undefined/errors",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/undefined/errors",
+    "sha256": "3dbd6896001bec9bb9d6974a7ed86bf79a4a7becffc5f2bd370daf21875ad722",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/undefined/full",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/undefined/full",
+    "sha256": "3dbd6896001bec9bb9d6974a7ed86bf79a4a7becffc5f2bd370daf21875ad722",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/present/missing",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/present/missing",
+    "sha256": "e821140e6a43c53d73488b29b3a25a7435c50f74b0319bfe8655ce410bd4739c",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/present/undefined",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/present/undefined",
+    "sha256": "e821140e6a43c53d73488b29b3a25a7435c50f74b0319bfe8655ce410bd4739c",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/present/errors",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/present/errors",
+    "sha256": "3dbd6896001bec9bb9d6974a7ed86bf79a4a7becffc5f2bd370daf21875ad722",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.income-tax.annual/present/full",
+    "sha256": "d92a416c9b99f24a096a5500026e32d021bccf6a40048ab4a86b8b1a29b403c8",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.income-tax.annual/present/full",
+    "sha256": "3dbd6896001bec9bb9d6974a7ed86bf79a4a7becffc5f2bd370daf21875ad722",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/missing/missing",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/missing/missing",
+    "sha256": "0455d2e018ae5cd5c9b5eba756bfbce90629dfef9ce180641c9096b2a6702f39",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/missing/undefined",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/missing/undefined",
+    "sha256": "0455d2e018ae5cd5c9b5eba756bfbce90629dfef9ce180641c9096b2a6702f39",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/missing/errors",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/missing/errors",
+    "sha256": "2e5c6c606880e01d85549480cf84666dee71709c8a87c2e9a213df6cf2bd333b",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/missing/full",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/missing/full",
+    "sha256": "2e5c6c606880e01d85549480cf84666dee71709c8a87c2e9a213df6cf2bd333b",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/undefined/missing",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/undefined/missing",
+    "sha256": "0455d2e018ae5cd5c9b5eba756bfbce90629dfef9ce180641c9096b2a6702f39",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/undefined/undefined",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/undefined/undefined",
+    "sha256": "0455d2e018ae5cd5c9b5eba756bfbce90629dfef9ce180641c9096b2a6702f39",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/undefined/errors",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/undefined/errors",
+    "sha256": "2e5c6c606880e01d85549480cf84666dee71709c8a87c2e9a213df6cf2bd333b",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/undefined/full",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/undefined/full",
+    "sha256": "2e5c6c606880e01d85549480cf84666dee71709c8a87c2e9a213df6cf2bd333b",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/present/missing",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/present/missing",
+    "sha256": "0455d2e018ae5cd5c9b5eba756bfbce90629dfef9ce180641c9096b2a6702f39",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/present/undefined",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/present/undefined",
+    "sha256": "0455d2e018ae5cd5c9b5eba756bfbce90629dfef9ce180641c9096b2a6702f39",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/present/errors",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/present/errors",
+    "sha256": "2e5c6c606880e01d85549480cf84666dee71709c8a87c2e9a213df6cf2bd333b",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.take-home/present/full",
+    "sha256": "df45dbf1b7c6f5b71970a7ba6cf3e2a72000d317bd96734e59a3687f8f62850d",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.take-home/present/full",
+    "sha256": "2e5c6c606880e01d85549480cf84666dee71709c8a87c2e9a213df6cf2bd333b",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/missing/missing",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/missing/missing",
+    "sha256": "3bb456d60e5891df14d700a0cd6ef0c0d7cc4d3eb4439433fea29784f9e7d4e1",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/missing/undefined",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/missing/undefined",
+    "sha256": "3bb456d60e5891df14d700a0cd6ef0c0d7cc4d3eb4439433fea29784f9e7d4e1",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/missing/errors",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/missing/errors",
+    "sha256": "1aa2b4d425bcc917a32e837e0fa4358484ba984c174fc36550d310ccabaf7f32",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/missing/full",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/missing/full",
+    "sha256": "1aa2b4d425bcc917a32e837e0fa4358484ba984c174fc36550d310ccabaf7f32",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/undefined/missing",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/undefined/missing",
+    "sha256": "3bb456d60e5891df14d700a0cd6ef0c0d7cc4d3eb4439433fea29784f9e7d4e1",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/undefined/undefined",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/undefined/undefined",
+    "sha256": "3bb456d60e5891df14d700a0cd6ef0c0d7cc4d3eb4439433fea29784f9e7d4e1",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/undefined/errors",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/undefined/errors",
+    "sha256": "1aa2b4d425bcc917a32e837e0fa4358484ba984c174fc36550d310ccabaf7f32",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/undefined/full",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/undefined/full",
+    "sha256": "1aa2b4d425bcc917a32e837e0fa4358484ba984c174fc36550d310ccabaf7f32",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/present/missing",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/present/missing",
+    "sha256": "3bb456d60e5891df14d700a0cd6ef0c0d7cc4d3eb4439433fea29784f9e7d4e1",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/present/undefined",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/present/undefined",
+    "sha256": "3bb456d60e5891df14d700a0cd6ef0c0d7cc4d3eb4439433fea29784f9e7d4e1",
+    "keys": [
+      "_tag",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/present/errors",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/present/errors",
+    "sha256": "1aa2b4d425bcc917a32e837e0fa4358484ba984c174fc36550d310ccabaf7f32",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  },
+  {
+    "name": "report/au.pay.withholdings/present/full",
+    "sha256": "6e0a3ce751e28ac92543563e8cdf9de4082a853ee90ea1a5c8afd6577a6e30ad",
+    "keys": [
+      "calculator",
+      "diagnostics",
+      "report"
+    ]
+  },
+  {
+    "name": "error/au.pay.withholdings/present/full",
+    "sha256": "1aa2b4d425bcc917a32e837e0fa4358484ba984c174fc36550d310ccabaf7f32",
+    "keys": [
+      "_tag",
+      "calculatorId",
+      "help",
+      "issues",
+      "message"
+    ]
+  }
+];
+await Effect.runPromise(Effect.gen(function* () {
+  const service = yield* PublicCalculatorService;
+  for (const calculatorId of ["au.income-tax.annual", "au.pay.take-home", "au.pay.withholdings"] as const)
+  for (const contextForm of ["missing", "undefined", "present"] as const)
+  for (const helpForm of ["missing", "undefined", "errors", "full"] as const) {
+    const context = contextForm === "missing" ? {} : contextForm === "undefined" ? {jurisdiction: undefined, taxYear: undefined} : {jurisdiction: "AU", taxYear: "2025-26"};
+    const help = helpForm === "missing" ? {} : {help: helpForm === "undefined" ? undefined : helpForm};
+    const facts = calculatorId === "au.income-tax.annual" ? {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}} : {grossPay: {_tag: "GrossPay", amount: {_tag: "Money", cents: 346200, currency: "AUD"}, period: "fortnightly"}, taxFreeThresholdClaimed: true};
+    const request = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId, ...help, payload: {facts, ...context}});
+    const report = yield* service.calculate(request);
+    const encodedReport = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunResponse)(report);
+    // @ts-expect-error invalid external facts deliberately bypass the Type to qualify safe selected-calculator errors.
+    const error = yield* service.calculate({...request, payload: {...request.payload, facts: {privateSource: "private-fixed-sentinel"}}}).pipe(Effect.flip);
+    const encodedError = yield* Schema.encodeEffect(MetadataSchemas.CalculatorServiceError)(error);
+    const suffix = calculatorId + "/" + contextForm + "/" + helpForm;
+    for (const sample of [{name: "report/" + suffix, value: encodedReport}, {name: "error/" + suffix, value: encodedError}]) {
+      const prior = historicalRuns.find((row) => row.name === sample.name);
+      const bytes = JSON.stringify(sample.value);
+      if (!prior || new CryptoHasher("sha256").update(bytes).digest("hex") !== prior.sha256 || JSON.stringify(Object.keys(sample.value)) !== JSON.stringify(prior.keys) || bytes.includes("private-fixed-sentinel")) {
+        throw new Error("Packed calculator changed original result or safe error bytes: " + sample.name);
+      }
+    }
+  }
+}).pipe(Effect.provide(ServiceLive)));
 
 // Saved before the domain absence migration. Never regenerate these expectations from the candidate.
 const historicalMetadataResponses = [

@@ -378,3 +378,15 @@ fixed message and link back to the calculators without reflecting input or URLs.
 The calculation endpoint declares both statuses in OpenAPI. Every metadata
 endpoint declares 504 for the shared operation timeout; lookup failures retain
 400. Metadata never consumes a calculation place. No automatic retry is added.
+
+
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year.
+
+Typed client calls use canonical constructor values. Raw HTTP JSON and query
+strings still encode and decode through the owning request codecs; the OpenAPI
+snapshot remains the representation contract.

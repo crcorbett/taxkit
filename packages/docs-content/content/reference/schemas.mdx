@@ -20,6 +20,13 @@ It is owned by `@taxkit/calculators`.
 | `jurisdiction` | optional `CalculatorJurisdiction` | Omit only when the selected calculator has one supported context.  |
 | `taxYear`      | optional `CalculatorTaxYear`      | Omit only when the selected calculator has one supported tax year. |
 
+The table describes the JSON form. In decoded TypeScript requests, context
+fields are nested Options: `None` for a missing key, `Some(None)` for a present
+undefined key, and `Some(Some(value))` for a value. Use the owning request
+constructor to supply defaults; do not send Option objects as raw HTTP JSON.
+The same rule applies to optional help/filter fields and returned optional
+question, help and duplicate-provider permission fields.
+
 The `facts` union is intentionally composed from canonical rule package
 schemas. Do not mirror request DTOs in application code when the SDK or API
 schema already owns the shape.

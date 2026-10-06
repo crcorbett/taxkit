@@ -1398,3 +1398,34 @@ Genuine packed fixtures reject wrong constructor/child/service types, assert
 table/source fingerprints. The
 [dated candidate](../documentation-audit/clean-slate-foundation/2026-10-06-domain-absence-owners.json)
 owns qualification; public request absence and rate work remain unfinished.
+
+
+Calculator `check-types` includes `tsconfig.test.json`, covering the public
+service and shared-work fixtures. This prevents raw request fields bypassing the
+new canonical Option Types. The SDK regression retains guided errors when
+options are omitted, so a whole-union fact check cannot replace the selected
+calculator decoder. Genuine packed declarations reject raw option strings/null
+and unwrapped false permission. Its runtime retains 24 original request forms,
+22 error/metadata forms, 36 reports and 36 safe input errors by saved hashes and
+key identity, alongside the earlier metadata/table/trace expectations.
+
+
+Website Chromium qualification sets `optimizeDeps.force` because its explicit
+workspace RPC include can change without a lockfile change. Vite must rebuild
+that dependency bundle on each run. The failed request-absence attempt retained
+old request Schemas in that cache; the corrected run uses current Option owners.
+The candidate receipt keeps the failed graph and focused browser recovery.
+
+
+The built shared-work fixture encodes its known batch payload with the RPC
+payload Schema and its public HTTP body with CalculatorRunRequest before any
+unknown adversarial framing. Encoding domain Options as generic JSON otherwise
+fails admission before reaching work, hiding the intended pool/cleanup proof.
+Reached-operation warnings, capacity, deadline and privacy oracles remain fixed.
+
+
+The API app work-pool, 64 KiB and defect fixtures use their checked native frame
+and HTTP body codecs. Malformed tag/id cases mutate an encoded valid frame.
+The request-absence attempt exposed generic JSON encoding of domain Options
+that failed admission before the intended service/error path; the candidate
+receipt retains that failed graph and the original assertions stay fixed.

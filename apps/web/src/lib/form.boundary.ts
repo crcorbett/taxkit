@@ -3,19 +3,17 @@ import { Cents, Money } from "@taxkit/core/primitives";
 import {
   AnnualTaxScenarioInputSchema,
   AuAnnualTaxCalculatorId,
-  AuAnnualTaxContext,
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
 } from "@taxkit/rules-au-income-tax/schemas";
 import { GrossPay, PayPeriod } from "@taxkit/rules-au-pay/facts";
 import {
   AuPayCalculatorId,
-  AuPayContext,
   AuPayJurisdiction,
   AuPayTaxYear,
   TakeHomeScenarioInputSchema,
 } from "@taxkit/rules-au-pay/schemas";
-import { Result, Schema } from "effect";
+import { Option, Result, Schema } from "effect";
 
 export const TakeHomeForm = Schema.Struct({
   grossDollars: Schema.String,
@@ -74,10 +72,8 @@ export const takeHomeRequestFromForm = (
       calculatorId,
       payload: {
         facts,
-        ...AuPayContext.make({
-          jurisdiction: AuPayJurisdiction.make("AU"),
-          taxYear: AuPayTaxYear.make("2025-26"),
-        }),
+        jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
+        taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
       },
     });
   }).pipe(
@@ -106,10 +102,10 @@ export const annualTaxRequestFromForm = (
       calculatorId: AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
       payload: {
         facts,
-        ...AuAnnualTaxContext.make({
-          jurisdiction: AuAnnualTaxJurisdiction.make("AU"),
-          taxYear: AuAnnualTaxYear.make("2025-26"),
-        }),
+        jurisdiction: Option.some(
+          Option.some(AuAnnualTaxJurisdiction.make("AU"))
+        ),
+        taxYear: Option.some(Option.some(AuAnnualTaxYear.make("2025-26"))),
       },
     });
   }).pipe(

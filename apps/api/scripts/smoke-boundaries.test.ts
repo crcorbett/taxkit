@@ -6,6 +6,7 @@ import {
   HealthResponse,
 } from "@taxkit/api-http";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { MetadataQuery } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
@@ -26,6 +27,7 @@ import {
   FileSystem,
   Layer,
   Match,
+  Option,
   PlatformError,
   Ref,
   Result,
@@ -76,9 +78,10 @@ const settings = ApiSmokeSettings.make({
 
 const successfulHttpClient = Effect.gen(function* () {
   const service = yield* PublicCalculatorService;
-  const catalog = yield* service.listCalculators({});
+  const catalog = yield* service.listCalculators(MetadataQuery.make({}));
   const calculation = yield* service.calculate({
     calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
+    help: Option.none(),
     payload: {
       facts: {
         grossPay: new GrossPay({
@@ -87,8 +90,8 @@ const successfulHttpClient = Effect.gen(function* () {
         }),
         taxFreeThresholdClaimed: true,
       },
-      jurisdiction: AuPayJurisdiction.make("AU"),
-      taxYear: AuPayTaxYear.make("2025-26"),
+      jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
+      taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
     },
   });
   const healthJson = yield* Schema.encodeEffect(

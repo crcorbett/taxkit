@@ -6,6 +6,7 @@ import {
   GrossPay,
 } from "@taxkit/rules-au-pay";
 import type { TakeHomePayReport } from "@taxkit/rules-au-pay";
+import { Option } from "effect";
 import type { Effect, Schema } from "effect";
 
 import {
@@ -58,12 +59,12 @@ const _fullRun: Effect.Effect<
       }),
       taxFreeThresholdClaimed: true,
     },
-    jurisdiction: AuPayJurisdiction.make("AU"),
-    taxYear: AuPayTaxYear.make("2025-26"),
+    jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
+    taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
   },
 });
 const _reportRequest = calculateReportRequest(AuPayTakeHomeCalculation, {
-  help: "errors",
+  help: Option.some(Option.some("errors")),
   payload: {
     facts: {
       grossPay: new GrossPay({
@@ -72,8 +73,8 @@ const _reportRequest = calculateReportRequest(AuPayTakeHomeCalculation, {
       }),
       taxFreeThresholdClaimed: true,
     },
-    jurisdiction: AuPayJurisdiction.make("AU"),
-    taxYear: AuPayTaxYear.make("2025-26"),
+    jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
+    taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
   },
 });
 

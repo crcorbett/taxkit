@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-07-21
+last_reviewed: 2026-10-06
 review_trigger: Effect, schema boundary, service, Layer, collection, error, or abstraction rule change
 ---
 
@@ -164,20 +164,22 @@ return Option.match(row, {
 });
 ```
 
-For optional request fields, model optionality with `Schema.optional` and
-normalize at the boundary into `Option` when branching is needed. Code MUST NOT
-use `value ?? "AU"` or similar defaults to invent jurisdiction, tax year or
-calculator context. Missing context MUST remain missing unless an owning schema
-explicitly defines a default. Nullable inputs MUST be modeled with
-`Schema.NullOr` or a schema transform and normalized with
-`Option.fromNullable`; code MUST NOT compare directly against `null`.
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year.
+
+Nullable representations require an explicitly owning nullable Schema and a
+single ingress transform. Already checked Options must not be wrapped again
+through `Option.fromNullable` or decoded as their wire form.
 
 ```ts
-const requestedJurisdiction = Option.fromNullable(payload.jurisdiction);
-
-return requestedJurisdiction.pipe(
+return payload.jurisdiction.pipe(
+  Option.flatten,
   Option.match({
-    onNone: () => Effect.fail(new MissingCalculatorContextError(...)),
+    onNone: () => Effect.void,
     onSome: (jurisdiction) =>
       jurisdiction === entry.context.jurisdiction
         ? Effect.void
@@ -315,7 +317,8 @@ Use `HttpApi`, `HttpApiGroup`, `HttpApiEndpoint` and
 expose contract, handler and route layers; app packages provide platform
 runtimes and runtime config.
 
-Use `ManagedRuntime.make(...)` for module-scoped web/server-client runtimes and
-`BunRuntime.runMain(...)` for Bun process entrypoints. Do not create runtimes
-inside request handlers, route loaders, React components, package services or
-calculator orchestration code.
+Application composition owns platform execution and scoped client lifetimes.
+Use `BunRuntime.runMain(...)` for Bun process entrypoints. A plain SDK client
+owns its private Promise bridge and disposal; it must not use a package-global
+runtime. Do not create runtimes inside request handlers, route loaders, React
+components, package services or calculator orchestration code.

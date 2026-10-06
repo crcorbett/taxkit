@@ -2,17 +2,21 @@ import type {
   CalculatorId,
   CalculatorJurisdiction,
   CalculatorTaxYear,
-  CalculatorRunRequest,
   CalculatorRunFacts,
   CalculatorServiceError,
   CalculatorRunReport,
   CalculatorRunResponse,
+  CalculatorRunRequest,
   CalculatorRunServiceRequest,
+} from "@taxkit/calculators/schemas";
+import {
+  CalculatorContextQuery,
+  CalculationQuery,
 } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import type { PublicCalculatorServiceContract } from "@taxkit/calculators/service";
-import { Effect } from "effect";
-import type { Context, Schema } from "effect";
+import { Effect, Option, Schema } from "effect";
+import type { Context } from "effect";
 
 import type {
   AnyTaxKitModule,
@@ -44,14 +48,14 @@ const publicCalculatorService: Effect.Effect<
 > = Effect.service(PublicCalculatorService);
 
 export type SdkCalculatorRunPayload<Input> = Omit<
-  CalculatorRunRequest,
+  Schema.Struct.MakeIn<typeof CalculatorRunRequest.fields>,
   "facts"
 > & {
   readonly facts: Input;
 };
 
 export type SdkCalculatorRunServiceRequest<Input> = Omit<
-  CalculatorRunServiceRequest,
+  Schema.Struct.MakeIn<typeof CalculatorRunServiceRequest.fields>,
   "calculatorId" | "payload"
 > & {
   readonly payload: SdkCalculatorRunPayload<Input>;
@@ -85,27 +89,31 @@ export const calculateRunRequest = <
   TaxKitEffectRequirements
 > =>
   publicCalculatorService.pipe(
-    Effect.flatMap((service) => {
-      const { calculatorId, decodeOutput } = calculation;
-
-      return service
-        .calculate({
-          calculatorId,
-          ...request,
-        })
-        .pipe(
-          Effect.flatMap((response) =>
-            decodeOutput(response.report).pipe(
-              Effect.map(
-                (report): SdkCalculatorRunResponse<OutputSchema["Type"]> => ({
-                  ...response,
-                  report,
-                })
-              )
+    Effect.flatMap((service) =>
+      Effect.all({
+        context: CalculatorContextQuery.makeEffect(request.payload),
+        query: CalculationQuery.makeEffect(request),
+      }).pipe(
+        Effect.mapError((issue) => new Schema.SchemaError(issue)),
+        Effect.flatMap(({ context, query }) =>
+          service.calculate({
+            calculatorId: calculation.calculatorId,
+            ...query,
+            payload: { ...context, facts: request.payload.facts },
+          })
+        ),
+        Effect.flatMap((response) =>
+          calculation.decodeOutput(response.report).pipe(
+            Effect.map(
+              (report): SdkCalculatorRunResponse<OutputSchema["Type"]> => ({
+                ...response,
+                report,
+              })
             )
           )
-        );
-    })
+        )
+      )
+    )
   );
 
 export const calculateReportRequest = <
@@ -155,8 +163,8 @@ export const calculateReport = <
   calculateReportRequest(calculation, {
     payload: {
       facts: input,
-      jurisdiction: calculation.jurisdiction,
-      taxYear: calculation.taxYear,
+      jurisdiction: Option.some(Option.some(calculation.jurisdiction)),
+      taxYear: Option.some(Option.some(calculation.taxYear)),
     },
   });
 

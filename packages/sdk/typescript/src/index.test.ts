@@ -112,7 +112,9 @@ describe("plain SDK facade", () => {
       }).pipe(
         Effect.flip,
         Effect.flatMap((failure) =>
-          Schema.decodeUnknownEffect(TaxKitCalculationError)(failure.rejection)
+          Schema.decodeUnknownEffect(Schema.toType(TaxKitCalculationError))(
+            failure.rejection
+          )
         )
       );
 

@@ -15,6 +15,7 @@ import {
   CalculatorLive,
   sensitiveSentinel,
 } from "@taxkit/api-rpc/testing/fixtures";
+import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import {
@@ -110,7 +111,9 @@ describe("native API application", () => {
           ),
           Effect.scoped
         );
-      const rpcBody = yield* Schema.encodeEffect(Json)(
+      const rpcBody = yield* Schema.encodeEffect(
+        Schema.fromJsonString(Schema.Array(NativeRequest))
+      )(
         Array.map(Array.range(1, 7), (id) =>
           NativeRequest.make({
             headers: [],
@@ -123,9 +126,9 @@ describe("native API application", () => {
           })
         )
       );
-      const httpBody = yield* Schema.encodeEffect(Json)(
-        CalculationRequest.payload
-      );
+      const httpBody = yield* Schema.encodeEffect(
+        Schema.fromJsonString(CalculatorRunRequest)
+      )(CalculationRequest.payload);
       const http = yield* invoke(
         "/api/v1/calculators/au.pay.take-home/calculate",
         httpBody
@@ -259,15 +262,17 @@ describe("native API application", () => {
     () =>
       Effect.gen(function* () {
         const app = yield* ApiWorkerInit;
-        const request = NativeRequest.make({
-          headers: [],
-          id: "1",
-          payload: {
-            request: CalculationRequest,
-            version: CalculatorRpcVersion,
-          },
-          tag: "Calculate",
-        });
+        const request = yield* Schema.encodeEffect(NativeRequest)(
+          NativeRequest.make({
+            headers: [],
+            id: "1",
+            payload: {
+              request: CalculationRequest,
+              version: CalculatorRpcVersion,
+            },
+            tag: "Calculate",
+          })
+        );
         const wrongTag = yield* Schema.encodeEffect(Json)({
           ...request,
           tag: sensitiveSentinel,
@@ -581,10 +586,12 @@ describe("native API application", () => {
             Effect.scoped
           )
         );
-        const httpBody = yield* Schema.encodeEffect(Json)(
-          CalculationRequest.payload
-        );
-        const rpcBody = yield* Schema.encodeEffect(Json)(
+        const httpBody = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CalculatorRunRequest)
+        )(CalculationRequest.payload);
+        const rpcBody = yield* Schema.encodeEffect(
+          Schema.fromJsonString(NativeRequest)
+        )(
           NativeRequest.make({
             headers: [],
             id: "1",
@@ -704,7 +711,9 @@ describe("native API application", () => {
       const app = yield* ApiWorkerApplication.pipe(
         Effect.provide(CalculatorFixture("defect"))
       );
-      const body = yield* Schema.encodeEffect(Json)(
+      const body = yield* Schema.encodeEffect(
+        Schema.fromJsonString(NativeRequest)
+      )(
         NativeRequest.make({
           headers: [],
           id: "1",

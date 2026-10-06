@@ -72,16 +72,22 @@ Use `calculateRunRequest` when you need a full `CalculatorRunResponse` with the
 descriptor-decoded report:
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { audFromCents } from "@taxkit/core/primitives";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
 import { calculateRunRequest } from "@taxkit/sdk/effect";
+import { Effect, Option } from "effect";
 
-const effect = calculateRunRequest(AuAnnualIncomeTaxCalculation, {
-  payload: {
-    facts: { taxableIncome: aud(Cents.make(9_000_000)) },
-    jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
-    taxYear: AuAnnualIncomeTaxCalculation.taxYear,
-  },
+const effect = Effect.gen(function* () {
+  const taxableIncome = yield* audFromCents(9_000_000);
+  return yield* calculateRunRequest(AuAnnualIncomeTaxCalculation, {
+    payload: {
+      facts: { taxableIncome },
+      jurisdiction: Option.some(
+        Option.some(AuAnnualIncomeTaxCalculation.jurisdiction)
+      ),
+      taxYear: Option.some(Option.some(AuAnnualIncomeTaxCalculation.taxYear)),
+    },
+  });
 });
 ```
 

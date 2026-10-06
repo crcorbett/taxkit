@@ -175,3 +175,15 @@ all seven new metadata calls as well as retained catalogue/calculation journeys.
 Full qualification is recorded in the [dated receipt](../../../docs/documentation-audit/clean-slate-foundation/2026-10-06-closed-rpc-operations.json).
 Remaining body/work/rate and whole T004 requirements are separate; this slice
 adds no rate identity, metadata operation budget, MCP or provider operation.
+
+
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year.
+
+Native RPC serialisation applies the owning request codecs. Test messages built
+through an unknown JSON fixture must encode the canonical request first. The
+wire contract and current revision retain their existing fields and values.

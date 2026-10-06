@@ -584,3 +584,17 @@ decoder again fails once trace fields are Options. HTTP/RPC representations
 still encode/decode through their owning codecs. The packed consumer compares
 22 saved metadata responses and the original trace/ledger bytes while its
 declarations expose the new Core Option types and checked constructor inputs.
+
+
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year.
+
+SDK constructor-input aliases retain the selected descriptor facts relation.
+The SDK checks context/help through their owning Schemas and leaves facts to
+the selected calculator decoder. HTTP/RPC use canonical Types internally and
+representation codecs at serialisation. Their existing wire/OpenAPI fields and
+values remain the compatibility contract.

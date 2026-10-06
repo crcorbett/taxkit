@@ -13,6 +13,7 @@ import {
   Exit,
   Layer,
   Match,
+  Option,
   Schema,
 } from "effect";
 
@@ -39,6 +40,46 @@ const privatePathSentinel = "/private/taxkit-sentinel/effect-sdk-input.json";
 
 describe("Effect SDK facade", () => {
   it.effect(
+    "keeps selected-calculator help when omitted options use defaults",
+    () =>
+      Effect.gen(function* () {
+        const error = yield* calculateRunRequest(AuPayTakeHomeCalculation, {
+          help: Option.some(Option.some("errors")),
+          payload: {
+            facts: {
+              // @ts-expect-error rejected external input must still reach the selected calculator decoder.
+              grossPay: `${secretSentinel}:${privatePathSentinel}`,
+              taxFreeThresholdClaimed: true,
+            },
+          },
+        }).pipe(Effect.flip);
+        yield* Match.value(error).pipe(
+          Match.tag("CalculatorInputDecodeError", (failure) =>
+            Effect.gen(function* () {
+              expect(
+                EffectArray.map(failure.issues, (issue) => issue.path)
+              ).toContainEqual(["grossPay"]);
+              expect(
+                failure.help.pipe(
+                  Option.flatten,
+                  Option.map((help) => help.length)
+                )
+              ).toEqual(Option.some(2));
+              const wire = yield* Schema.encodeEffect(
+                Schema.toCodecJson(CalculatorServiceError)
+              )(failure);
+              expect(wire).not.toContain(secretSentinel);
+              expect(wire).not.toContain(privatePathSentinel);
+            })
+          ),
+          Match.orElse(() =>
+            Effect.sync(() => expect.fail("Expected selected calculator help"))
+          )
+        );
+      }).pipe(Effect.provide(ServiceLive))
+  );
+
+  it.effect(
     "returns the full canonical calculator run response with decoded report",
     () =>
       Effect.gen(function* () {
@@ -46,16 +87,21 @@ describe("Effect SDK facade", () => {
         const sdkResult = yield* calculateRunRequest(AuPayTakeHomeCalculation, {
           payload: {
             facts: takeHomeFacts,
-            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-            taxYear: AuPayTakeHomeCalculation.taxYear,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         });
         const serviceResult = yield* service.calculate({
           calculatorId: AuPayTakeHomeCalculation.calculatorId,
+          help: Option.none(),
           payload: {
             facts: takeHomeFacts,
-            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-            taxYear: AuPayTakeHomeCalculation.taxYear,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         });
 
@@ -76,10 +122,13 @@ describe("Effect SDK facade", () => {
         );
         const serviceResult = yield* service.calculate({
           calculatorId: AuPayTakeHomeCalculation.calculatorId,
+          help: Option.none(),
           payload: {
             facts: takeHomeFacts,
-            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-            taxYear: AuPayTakeHomeCalculation.taxYear,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         });
 
@@ -105,10 +154,13 @@ describe("Effect SDK facade", () => {
       const serviceExit = yield* service
         .calculate({
           calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
+          help: Option.none(),
           payload: {
             facts: invalidFacts,
-            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-            taxYear: AuPayTakeHomeCalculation.taxYear,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         })
         .pipe(Effect.exit);
@@ -151,10 +203,13 @@ describe("Effect SDK facade", () => {
         const service = yield* PublicCalculatorService;
         const response = yield* service.calculate({
           calculatorId: AuPayTakeHomeCalculation.calculatorId,
+          help: Option.none(),
           payload: {
             facts: takeHomeFacts,
-            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-            taxYear: AuPayTakeHomeCalculation.taxYear,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         });
         const report = yield* AuPayTakeHomeCalculation.decodeOutput(

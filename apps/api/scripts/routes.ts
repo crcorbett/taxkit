@@ -94,8 +94,8 @@ export const checkApiCalculation = (origin: string) =>
       }),
       taxFreeThresholdClaimed: true,
     },
-    jurisdiction: AuPayJurisdiction.make("AU"),
-    taxYear: AuPayTaxYear.make("2025-26"),
+    jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
+    taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
   }).pipe(
     Effect.flatMap((body) =>
       HttpClient.post(

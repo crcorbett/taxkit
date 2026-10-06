@@ -25,6 +25,8 @@ import {
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
   CalculatorRunServiceRequest,
+  MetadataQuery,
+  DescriptorFilterQuery,
   GetCalculatorRequest,
   GetCalculatorGraphRequest,
   UnsupportedCalculatorError,
@@ -94,7 +96,7 @@ const MetadataWorkCases = [
   },
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
-      service.listCalculators({}).pipe(Effect.asVoid),
+      service.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid),
     operation: "listCalculators",
     substitute: (
       service: PublicCalculatorService["Service"],
@@ -104,7 +106,7 @@ const MetadataWorkCases = [
   },
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
-      service.listFacts({}).pipe(Effect.asVoid),
+      service.listFacts(DescriptorFilterQuery.make({})).pipe(Effect.asVoid),
     operation: "listFacts",
     substitute: (
       service: PublicCalculatorService["Service"],
@@ -123,7 +125,7 @@ const MetadataWorkCases = [
   },
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
-      service.listRules({}).pipe(Effect.asVoid),
+      service.listRules(DescriptorFilterQuery.make({})).pipe(Effect.asVoid),
     operation: "listRules",
     substitute: (
       service: PublicCalculatorService["Service"],
@@ -132,7 +134,7 @@ const MetadataWorkCases = [
   },
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
-      service.listTaxYears({}).pipe(Effect.asVoid),
+      service.listTaxYears(MetadataQuery.make({})).pipe(Effect.asVoid),
     operation: "listTaxYears",
     substitute: (
       service: PublicCalculatorService["Service"],
@@ -287,9 +289,9 @@ describe("shared calculation work policy", () => {
         );
         expect(yield* Ref.get(active)).toBe(8);
         // Metadata does not occupy a calculation place.
-        expect((yield* service.listCalculators({})).calculators).toHaveLength(
-          3
-        );
+        expect(
+          (yield* service.listCalculators(MetadataQuery.make({}))).calculators
+        ).toHaveLength(3);
         yield* Fiber.interrupt(expectAt(calls, 0));
         expect(yield* Ref.get(active)).toBe(7);
         const replacement = yield* service
