@@ -10,7 +10,6 @@ import {
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
-import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import {
   Array,
   Cause,
@@ -595,7 +594,7 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     );
     const api = yield* Effect.promise(() => host.getWorker("api-work"));
     const httpBody = yield* Schema.encodeEffect(
-      Schema.fromJsonString(CalculatorRunRequest)
+      Schema.fromJsonString(CalculatorRpcPayload.fields.request.fields.payload)
     )(CalculationRequest.payload);
     const started = yield* Clock.monotonicTimeNanos;
     const batch = yield* Effect.promise(() =>

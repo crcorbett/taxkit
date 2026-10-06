@@ -866,5 +866,109 @@
   "postCheckChanges": {
     "scope": "Plan and receipt only",
     "checks": "Docs/runbooks/format/Changeset/whitespace repeated before commit"
+  },
+  "hostedCorrection": {
+    "originalHead": "1b85440f844858a96a91172014a10afb87aa452c",
+    "runId": 37414462610,
+    "jobId": 112109888774,
+    "conclusion": "FAILURE",
+    "completedAt": "2026-10-06T04:52:42Z",
+    "diagnosis": "Linux TS2307: Website native RPC fixture imported @taxkit/calculators/schemas without a declared Website dependency. Local checkout resolved it indirectly.",
+    "repair": "Reuse CalculatorRpcPayload.fields.request.fields.payload from the existing declared @taxkit/api-rpc owner. Its field is the identical canonical CalculatorRunRequest Schema.",
+    "documentationImpact": {
+      "decision": "Change required",
+      "surface": "Dated request proof records hosted failure/correction separately",
+      "preserve": "Package/app dependency graph, contract, existing tax/privacy/cleanup expected values, commands, lockfile, public docs and runtime behaviour unchanged."
+    },
+    "qualification": "Focused compiler/lint/docs/runbooks/format and exact schema/fixture-byte checks pass. Corrected immutable hosted Linux head and complete combined domain candidate remain pending.",
+    "focusedChecks": [
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "x",
+          "oxfmt",
+          "apps/web/test/native-rpc-failures.boundary.test.ts"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.29,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-format.log"
+      },
+      {
+        "stage": "web-types",
+        "command": [
+          "bun",
+          "run",
+          "--filter",
+          "web",
+          "check-types"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 2.19,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-web-types.log"
+      },
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.56,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-docs.log"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.22,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-runbooks.log"
+      },
+      {
+        "stage": "lint",
+        "command": [
+          "bun",
+          "run",
+          "lint"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 10.51,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-lint.log"
+      },
+      {
+        "stage": "format-check",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 2.84,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-format-check.log"
+      },
+      {
+        "stage": "schema-identity",
+        "command": [
+          "bun",
+          "--conditions=source",
+          "/private/tmp/dev75-alchemy-rate-probe/schema-owner-equivalence.ts"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.1,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v2-schema-identity.log"
+      }
+    ],
+    "schemaIdentityProof": {
+      "sameSchemaObject": true,
+      "identicalBytes": true,
+      "sha256": "2f0aa8abc456e98cde692a8b1059d61a4d54e232ab5e51d10c0072a023891954"
+    },
+    "correctedSourceSha256": "954326c7a6ee60d33a06272b30f0ca1936ab22c751048d49b17b5d6f3c7dc0a1",
+    "changeset": "N/A: fixture import/owning field correction only; no public export, runtime contract or package version consequence."
   }
 }
