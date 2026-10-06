@@ -3534,3 +3534,40 @@ Only plan/receipt change after qualification; final docs/runbooks/format/
 Changeset/whitespace checks precede delivery. Hosted proof remains separate.
 T004 stays active for native rate identity/limits; no provider operation,
 Medicare correction or wider rebuild completion is claimed.
+
+
+GitHub #151 original head 1b85440f fails Linux Quality run 37414462610/job
+112109888774 at 04:52:42Z: the Website native fixture imported calculator Schemas
+without a declared app dependency. Corrective head
+0d83692f5f3a81e3b4a776a4b82d990892685e9b uses the identical payload Schema from
+CalculatorRpcPayload.fields.request.fields.payload. Focused Website compiler,
+lint, docs, runbooks and formatting pass; direct owner/encoded-byte checks are
+identical. The pushed draft #151 is unchanged in scope and base; fresh hosted
+run 37416691591/job 112116757973 is running at 05:04:36Z.
+
+The original 19-source domain qualification passed all nine local stages in
+668.91 seconds (32 workflow cases in 458.61 seconds; seven native in 78.08).
+Its evidence is retained as prior local qualification, with the Linux parent
+failure recorded separately. Domain branch now follows corrected #151; complete
+combined qualification is repeated before delivery. This adds no dependency,
+permission, runtime behaviour, saved output or Medicare correction. T004 and
+native rate work remain active.
+
+
+Domain contract closeout local acceptance: all nine CI-mode stages pass in
+916.14 seconds, including 32 workflow cases (674.60 seconds),
+512 lint cases, 66 Core, 52 rule, 37 calculator, 62 API app, 58 SDK, 17 HTTP
+and 217 RPC tests, plus seven native cases (88.59 seconds). Genuine packed
+consumers retain four original diagnostic forms, reject raw cause/program
+Types, preserve catalogue runtime absence and all earlier request/report/tax
+oracles. Both deliberate removals fail; all 21 frozen sources restore exact
+bytes. Nine native inventories are captured before later builds, and four
+screenshots match inspected parent bytes. API Worker, lockfile and OpenAPI
+remain identical to parent.
+
+Primary-owner source/docs review accepts this local domain slice. Four package
+major Changesets and the content patch record the Type/capability consequences.
+Only plan/receipt change after qualification; final docs/runbooks/format/
+Changeset/whitespace checks precede delivery. Hosted proof remains separate.
+T004 stays active for native rate identity/limits; no provider operation,
+Medicare correction or wider rebuild completion is claimed.

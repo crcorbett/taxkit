@@ -13,12 +13,16 @@
   },
   "candidate": {
     "branch": "codex/dev-75-domain-contract-closeout",
-    "base": "1b85440f844858a96a91172014a10afb87aa452c",
-    "receiptRevision": "Qualified staged sources before plan/receipt closeout only",
+    "base": "0d83692f5f3a81e3b4a776a4b82d990892685e9b",
+    "receiptRevision": "Qualified frozen sources before plan/receipt closeout only",
     "qualifiedSources": [
       {
         "path": ".changeset/domain-contract-closeout.md",
         "sha256": "429f7d4b08953c36bd32d675ec4bceb39acd1f105b730306f19c72cff2f565bd"
+      },
+      {
+        "path": "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "sha256": "954326c7a6ee60d33a06272b30f0ca1936ab22c751048d49b17b5d6f3c7dc0a1"
       },
       {
         "path": "docs/architecture/api-and-sdk.md",
@@ -34,11 +38,15 @@
       },
       {
         "path": "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-contract-closeout.json",
-        "sha256": "2c10a83f0fb99418120dc31d1426a7db04d2bbc42ee9452394b86ba878d7c303"
+        "sha256": "7b39e974399219f9617106ed694befb461ad3178cfd653fe6fa37a881f34a1a7"
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json",
+        "sha256": "d54f5ac805c2244b8abcb510f4f3584af927ba6cc4a3510efcf40f3808aad0f6"
       },
       {
         "path": "docs/exec-plans/active/clean-slate-foundation.md",
-        "sha256": "68382068992c3d84cb766c9e8df77b5b34c8397774fdd3287c0385dac3c993f2"
+        "sha256": "23f90aacb748b582c074f3af68040d80ae692228bb7730e8ec10140d99bac49d"
       },
       {
         "path": "docs/product-specs/clean-slate-foundation.md",
@@ -172,6 +180,15 @@
       "decision": "N/A",
       "surface": "Runbooks/provider/registry/credentials/automation",
       "reason": "No new operational procedure or external mutation is introduced; existing runbook checks are still run."
+    },
+    {
+      "decision": "Change required",
+      "surface": "Parent corrective fixture/evidence reconciliation",
+      "paths": [
+        "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json"
+      ],
+      "reason": "GitHub found undeclared import. Separate pushed #151 corrective commit preserves identical Schema and fixture bytes. Combined checks observe that corrected base."
     }
   ],
   "compatibilityOracles": {
@@ -539,6 +556,165 @@
     "qualification": {
       "orderedStages": 9,
       "workflowCases": 32,
+      "workflowSeconds": 674.6,
+      "lintCases": 512,
+      "coreCases": 66,
+      "ruleCases": 52,
+      "calculatorCases": 37,
+      "apiAppCases": 62,
+      "sdkCases": 58,
+      "httpCases": 17,
+      "rpcCases": 217,
+      "nativeCases": 7,
+      "nativeSeconds": 88.59,
+      "packedDiagnosticForms": 4,
+      "packedCatalogueAbsence": true,
+      "retainedRequestForms": 24,
+      "retainedErrorMetadataForms": 22,
+      "retainedReports": 36,
+      "retainedInputErrors": 36,
+      "removalControls": 2,
+      "restoredSourceCount": 21
+    }
+  },
+  "limitations": [
+    "Local candidate qualified; hosted Linux checks remain a separate immutable-head observation.",
+    "Native trusted rate identity/limits and DEV-75 remain unfinished.",
+    "Medicare correction stays outside authorised bounded scope pending Cooper decision.",
+    "No merge/deployment/publication/provider/credential operation or current-law tax correctness claim."
+  ],
+  "rollback": "Restore this branch to its verified base before external delivery; after delivery use a reviewed revert. No provider state exists to reverse.",
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "environmentBasis": "Pinned local tooling and unchanged lockfile/dependency versions.",
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "artifactCaptureBoundary": "Immediately after successful native verification, before later root build",
+  "postCheckChanges": {
+    "scope": "Plan and receipt only",
+    "checks": "Docs/runbooks/format/Changeset/whitespace repeated before commit"
+  },
+  "priorLocalQualification": {
+    "base": "1b85440f844858a96a91172014a10afb87aa452c",
+    "outcome": "Pass for local domain contract closeout; T004 rate work incomplete",
+    "checks": [
+      {
+        "stage": "release-ci-graph",
+        "command": [
+          "bun",
+          "run",
+          "release:check",
+          "--",
+          "--ci"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 668.91,
+        "log": "/private/tmp/dev75-domain-closeout-v2-full-release-ci-graph.log",
+        "mode": "local CI graph",
+        "orderedChecks": [
+          "verification",
+          "test",
+          "build",
+          "docs-validation",
+          "packed-artifact",
+          "downstream-consumer",
+          "api-smoke",
+          "docs-browser",
+          "changeset-status"
+        ],
+        "nonClaim": "No release attempt, publication or provider operation"
+      }
+    ],
+    "qualifiedSources": [
+      {
+        "path": ".changeset/domain-contract-closeout.md",
+        "sha256": "429f7d4b08953c36bd32d675ec4bceb39acd1f105b730306f19c72cff2f565bd"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "c290b375b6f8d03c6e0cf5ad138647090ce16ed27e2f6378c46c9006cdc11085"
+      },
+      {
+        "path": "docs/architecture/calculators.md",
+        "sha256": "6557cb9a4a234b263429d71cba6c78e95d84146b58517b6450d57cb45db8cf64"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "8822ee9cbbe1e46418253daed7635b3e566035efd35355d4ed86c018dcd2a389"
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-contract-closeout.json",
+        "sha256": "2c10a83f0fb99418120dc31d1426a7db04d2bbc42ee9452394b86ba878d7c303"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "68382068992c3d84cb766c9e8df77b5b34c8397774fdd3287c0385dac3c993f2"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "cecb901119642802f8351f7f50574417b17897583b1c36b09d445ab7c885a71a"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "a39a1c3778eb9b8bada09a7bc090ef42b724a70f1dd5c748f4851dac813a08c1"
+      },
+      {
+        "path": "packages/api/http/README.md",
+        "sha256": "ebba95f69a680e03fb35cf1aeb2c86167b01b183fdd76bcb21801edf4cc2d886"
+      },
+      {
+        "path": "packages/calculators/README.md",
+        "sha256": "9f775857923f729491984b4a94d917ff970585df06d86a785cffbbc4e3775db5"
+      },
+      {
+        "path": "packages/calculators/src/catalog.ts",
+        "sha256": "8a348a0e4640579513708446612233f7bc1551a008c0f5b1f75b8d817230a74d"
+      },
+      {
+        "path": "packages/calculators/type-tests/catalog.ts",
+        "sha256": "7b467bec706086e375a315633541faa9794ffe10f55d3c251bdbd5af9618decd"
+      },
+      {
+        "path": "packages/core/README.md",
+        "sha256": "c2113791b94d0afd3aace1d86d1511d946ee232f6ca4ad1dd053a3b44c48f094"
+      },
+      {
+        "path": "packages/core/src/errors/calculation-error.ts",
+        "sha256": "f170a5b41afeea9111dbf2049612fd475c4975e87b2a9d363797e6d7f66f1e1b"
+      },
+      {
+        "path": "packages/core/test/domain-absence.boundary.test.ts",
+        "sha256": "d34446a009971c28212bd9048bad9c87e2ebafb396c2c138114b49034400db92"
+      },
+      {
+        "path": "packages/docs-content/README.md",
+        "sha256": "4a36c3e1b2bc95cc28aad326b9932e9b282fa30aa1c6b6ce070abfe5991fe1a9"
+      },
+      {
+        "path": "packages/docs-content/content/reference/errors.mdx",
+        "sha256": "bbdc139ef77d86152838b2b1e7d6fa18cc7804de5ccbfebd89d3e6e162e065e4"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "00a4cb5f1703feda286ddd3b7c267ca45dc4131c26d0a8a795d752ccff581496"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "8e9a839dd77eb9e477fd13c05b1b3d267f6b0e0ac0bb1b99d4f9f80d6a2182fd"
+      }
+    ],
+    "qualification": {
+      "orderedStages": 9,
+      "workflowCases": 32,
       "workflowSeconds": 458.61,
       "lintCases": 512,
       "coreCases": 66,
@@ -558,15 +734,108 @@
       "retainedInputErrors": 36,
       "removalControls": 2,
       "restoredSourceCount": 19
-    }
+    },
+    "qualifiedLogDigests": [
+      {
+        "check": "verification",
+        "path": "tmp/release-readiness/verification-stdout-kPT3Pm/26ad69dacb87.log",
+        "sha256": "ad20f16dd6e3f4682feb788cf4b180634100781c312f37d7e7aee64a41b411b5"
+      },
+      {
+        "check": "test",
+        "path": "tmp/release-readiness/test-stdout-N4VyKR/15ecaef8a39c.log",
+        "sha256": "6562849abe71dc66cc008199781f5807ca2817331389abe85b0285d73fcdd2ba"
+      },
+      {
+        "check": "full-wrapper",
+        "path": "/private/tmp/dev75-domain-closeout-v2-full-release-ci-graph.log",
+        "sha256": "811bbc34050ba2431ad76cceb3b04fdbfd7d9c809ff39d3f02d626f02bc9d51d"
+      }
+    ],
+    "artifacts": [
+      {
+        "root": ".alchemy/native-pair/bundles/TaxKitApi",
+        "files": 167,
+        "sha256": "9fd8da28008c8417c82cd8ad23cfbcbbd89b885cc2fa752c6365e0d307825100"
+      },
+      {
+        "root": "apps/web/dist/server",
+        "files": 20,
+        "sha256": "1c82ab07696849af31e7b99fed38a8deeb2b0b9805901b3d9d493126d69741d8"
+      },
+      {
+        "root": "apps/web/dist/client",
+        "files": 9,
+        "sha256": "6126822072769eec4ffee149c7affa90c696c1a1c7790b24d07b400876cfe39d"
+      },
+      {
+        "root": ".alchemy/native-pair/settings-defect/server",
+        "files": 20,
+        "sha256": "54cb5253de9d8af883e036ed16ea74b83a737b3f5954d14139a92c467c9372cf"
+      },
+      {
+        "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+        "files": 39,
+        "sha256": "1e839ee5c73a0e01faa93da9bc30c1945e8d62ab73d3a606aaf69b9fd855fcbf"
+      },
+      {
+        "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+        "files": 39,
+        "sha256": "6980dc0b6f819f1bd4746160203d8121981633a48a698199471d2214b99c9e3c"
+      },
+      {
+        "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+        "files": 39,
+        "sha256": "aba653c3ced7206be88b3c4e73d79e442c187c277463a642857c9724af3ae405"
+      },
+      {
+        "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+        "files": 39,
+        "sha256": "bd0e990a942b88ce81a64a7e5d12a4e317eb3aa8aff17072f1f5bf121ee3a7d3"
+      },
+      {
+        "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+        "files": 39,
+        "sha256": "c345f23b8ee0e6c51480ecc84cd2089b64f22da1c8bfab5288e9b76b87083b40"
+      }
+    ],
+    "screenshots": [
+      {
+        "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+        "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+        "inspection": "Exact bytes match previously inspected parent image"
+      },
+      {
+        "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+        "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+        "inspection": "Exact bytes match previously inspected parent image"
+      },
+      {
+        "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+        "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+        "inspection": "Exact bytes match previously inspected parent image"
+      },
+      {
+        "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+        "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+        "inspection": "Exact bytes match previously inspected parent image"
+      }
+    ],
+    "limitation": "Original parent later failed Linux declaration resolution in the Website fixture; this local qualification is preserved without attributing it to the corrected base."
   },
-  "limitations": [
-    "Local candidate qualified; hosted Linux checks remain a separate immutable-head observation.",
-    "Native trusted rate identity/limits and DEV-75 remain unfinished.",
-    "Medicare correction stays outside authorised bounded scope pending Cooper decision.",
-    "No merge/deployment/publication/provider/credential operation or current-law tax correctness claim."
-  ],
-  "rollback": "Restore this branch to its verified base before external delivery; after delivery use a reviewed revert. No provider state exists to reverse.",
+  "hostedParent": {
+    "pr": 151,
+    "originalHead": "1b85440f844858a96a91172014a10afb87aa452c",
+    "originalRunId": 37414462610,
+    "originalConclusion": "FAILURE",
+    "diagnosis": "TS2307: undeclared Website test import of calculators/schemas",
+    "correctedHead": "0d83692f5f3a81e3b4a776a4b82d990892685e9b",
+    "correctedRunId": 37416691591,
+    "correctedJobId": 112116757973,
+    "correctedStatus": "IN_PROGRESS",
+    "readbackAt": "2026-10-06T05:20:52Z",
+    "correction": "Fixture uses the identical canonical payload Schema through the declared RPC dependency. Focused compiler/identity/bytes checks pass."
+  },
   "checks": [
     {
       "stage": "release-ci-graph",
@@ -578,8 +847,8 @@
         "--ci"
       ],
       "exitCode": 0,
-      "durationSeconds": 668.91,
-      "log": "/private/tmp/dev75-domain-closeout-v2-full-release-ci-graph.log",
+      "durationSeconds": 916.14,
+      "log": "/private/tmp/dev75-domain-closeout-v3-full-release-ci-graph.log",
       "mode": "local CI graph",
       "orderedChecks": [
         "verification",
@@ -595,19 +864,6 @@
       "nonClaim": "No release attempt, publication or provider operation"
     }
   ],
-  "environment": {
-    "bun": "1.4.2 (744846f84)",
-    "node": "v24.16.0",
-    "effect": "4.0.0",
-    "alchemy": "2.0.0-beta.80",
-    "cloudflareVitePlugin": "1.62.5",
-    "wrangler": "4.147.0",
-    "workerd": "1.20261001.1",
-    "miniflare": "5.20261001.0-alpha",
-    "playwright": "1.63.0",
-    "chromium": "1243 / Chrome 153.0.8010.12"
-  },
-  "environmentBasis": "Pinned local tooling and unchanged lockfile/dependency versions.",
   "artifacts": [
     {
       "root": ".alchemy/native-pair/bundles/TaxKitApi",
@@ -655,8 +911,6 @@
       "sha256": "c345f23b8ee0e6c51480ecc84cd2089b64f22da1c8bfab5288e9b76b87083b40"
     }
   ],
-  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
-  "artifactCaptureBoundary": "Immediately after successful native verification, before later root build",
   "screenshots": [
     {
       "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
@@ -682,29 +936,25 @@
   "qualifiedLogDigests": [
     {
       "check": "verification",
-      "path": "tmp/release-readiness/verification-stdout-kPT3Pm/26ad69dacb87.log",
-      "sha256": "ad20f16dd6e3f4682feb788cf4b180634100781c312f37d7e7aee64a41b411b5"
+      "path": "tmp/release-readiness/verification-stdout-Zual9E/846e6834d428.log",
+      "sha256": "caf6352330364cdb770ef3011bf8d511d1ff37793ad3789b24629a5914e9910c"
     },
     {
       "check": "test",
-      "path": "tmp/release-readiness/test-stdout-N4VyKR/15ecaef8a39c.log",
-      "sha256": "6562849abe71dc66cc008199781f5807ca2817331389abe85b0285d73fcdd2ba"
+      "path": "tmp/release-readiness/test-stdout-jXO16c/484af5f12ad1.log",
+      "sha256": "ae55f01f9364870046aa0a23cd3439168f7086250040ffff95602ced5a9f98d8"
     },
     {
       "check": "full-wrapper",
-      "path": "/private/tmp/dev75-domain-closeout-v2-full-release-ci-graph.log",
+      "path": "/private/tmp/dev75-domain-closeout-v3-full-release-ci-graph.log",
       "sha256": "811bbc34050ba2431ad76cceb3b04fdbfd7d9c809ff39d3f02d626f02bc9d51d"
     }
   ],
   "postconditions": {
     "compatibility": "All four original diagnostic keys/order/bytes/hashes, reports and preceding tax/table/source/request oracles retained in genuine packed consumers. OpenAPI unchanged.",
     "types": "Nested diagnostic Options/default and absence of redundant catalogue program checked in source and packed declarations.",
-    "restoration": "All 19 staged sources match exact frozen bytes; Worker entry, lockfile and OpenAPI match parent.",
+    "restoration": "All 21 frozen sources match exact frozen bytes; Worker entry, lockfile and OpenAPI match parent.",
     "screenshots": "All four images match inspected parent bytes.",
     "scope": "T004 trusted native rate identity/limits and DEV-76 to DEV-81 remain unfinished."
-  },
-  "postCheckChanges": {
-    "scope": "Plan and receipt only",
-    "checks": "Docs/runbooks/format/Changeset/whitespace repeated before commit"
   }
 }
