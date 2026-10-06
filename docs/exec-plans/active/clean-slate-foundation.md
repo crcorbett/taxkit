@@ -4496,3 +4496,47 @@ checks and all eleven freshly built native cases subsequently passed. The final
 source review removes an unnecessary Schema recheck of internally calculated
 luminance; only the real browser RGB strings are decoded. The final full graph
 must qualify that exact corrected source and both old-owner bootstrap refusals.
+
+
+## 2026-10-07 — T005 exact CI detail output
+
+Replacement-check commit `ae961bc1` passed all nine local CI-mode checks in
+910.51 seconds and all seven final owner checks, then was pushed to draft #155.
+All 26 tested source identities, 127 accepted inputs, catalogue and 49 legacy
+source files matched before commit. Hosted run `37537984626` is pending at
+readback; image base `0b406e7a` passed hosted run `37533331150`.
+
+Before that commit, primary review caught the private receipt generator using
+a later small verification fixture as its newest-file selection. The actual
+observed full verification had 480022 stdout bytes, all 32 workflow cases and
+all eleven native cases. The receipt was corrected to that observed file and
+its adjacent 2118-byte stderr. It also records the older discovery receipt's
+fixture-detail limitation without rewriting that original evidence or claiming
+a retroactive exact-source run. T005 was already in progress.
+
+Promote prevention to the existing command/report owner: CI Console output now
+renders its own returned report's exact sanitised detail paths/digests. The
+existing candidate output stays byte-compatible. A native process test creates
+a later same-ID command and proves the earlier report names only its own
+returned pair, with no excerpts or sensitive paths. The exact Quality rule now
+admits one Schema-owner renderer over the canonical returned report and rejects
+plain text, another report, shadowing and candidate reads. The first focused
+check correctly refused the fourth call until this precise policy and its
+refusal corpus were updated; no broad permission was added. The next strict
+lint rejected unchecked argument lookups and excess complexity. A focused
+predicate now owns the returned-report output rule, and Effect Array heads
+select arguments without unchecked indexing. Its first edit exposed a newline
+return mistake in types; that was corrected. A second lint pass required the
+four expected calls to share one exact-count check. Final types, all nineteen
+workflow cases, exact policy and strict lint pass without relaxing a rule.
+
+Documentation impact: Change required for private report/runtime/test and
+Quality policy/corpus, scripts guide, release runbook, testing architecture,
+SPEC/task/plan and [dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-release-detail-output.json).
+Preserve the nine-command order, current reader oracles, canonical skill/profile
+identities, every accepted source/catalogue/legacy file and historical attempt
+bytes. N/A for a new command/option, runbook sidecar entry, package-facing wire
+contract or Changeset, app product/dependency change, provider action or metrics.
+Corrected focused checks pass; freeze the final sources and run the full ordered graph
+before acceptance. Consume its emitted returned paths/hashes directly for the
+new receipt, and verify each actual detail. Old-app retirement remains next.

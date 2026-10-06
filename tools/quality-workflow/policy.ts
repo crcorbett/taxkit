@@ -201,6 +201,7 @@ const hasShadowedReservedCallBinding = (file: ts.SourceFile) => {
   const reserved = HashSet.fromIterable([
     "Console",
     "createReleaseReadinessPlan",
+    "renderReleaseReadinessReport",
     "runCiReleaseReadiness",
   ]);
   return EffectArray.some(
@@ -770,6 +771,47 @@ export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
   );
 };
 
+const hasExactCiReportOutput = (
+  ciBranch: ts.IfStatement | undefined,
+  calls: readonly ts.CallExpression[],
+  releaseCall: ts.CallExpression | undefined
+) => {
+  const rendererCall = EffectArray.findFirst(
+    calls,
+    (call) => callIdentity(call.expression) === "renderReleaseReadinessReport"
+  ).pipe(Option.getOrUndefined);
+  const rendererArgument = EffectArray.head(rendererCall?.arguments ?? []).pipe(
+    Option.getOrUndefined
+  );
+  const consoleCall = EffectArray.findFirst(
+    calls,
+    (call) => callIdentity(call.expression) === "Console.info"
+  ).pipe(Option.getOrUndefined);
+  const returnedReport =
+    ciBranch !== undefined &&
+    EffectArray.some(
+      syntaxNodes(ciBranch.thenStatement),
+      (node) =>
+        ts.isVariableDeclaration(node) &&
+        ts.isIdentifier(node.name) &&
+        node.name.text === "report" &&
+        node.initializer !== undefined &&
+        ts.isYieldExpression(node.initializer) &&
+        node.initializer.expression === releaseCall
+    );
+  return (
+    returnedReport &&
+    rendererCall?.arguments.length === 1 &&
+    rendererArgument !== undefined &&
+    ts.isIdentifier(rendererArgument) &&
+    rendererArgument.text === "report" &&
+    consoleCall?.arguments.length === 1 &&
+    EffectArray.head(consoleCall?.arguments ?? []).pipe(
+      Option.getOrUndefined
+    ) === rendererCall
+  );
+};
+
 export const inspectReleaseRuntime = (source: string) => {
   const file = ts.createSourceFile(
     "release-readiness.runtime.ts",
@@ -818,20 +860,23 @@ export const inspectReleaseRuntime = (source: string) => {
     hasNamedImport(file, "effect", "Console") &&
     hasNamedImport(file, "./program.js", "runCiReleaseReadiness") &&
     hasNamedImport(file, "./schemas.js", "createReleaseReadinessPlan") &&
+    hasNamedImport(file, "./schemas.js", "renderReleaseReadinessReport") &&
     !hasShadowedReservedCallBinding(file);
   return ciBranch !== undefined &&
-    identities.length === 3 &&
-    EffectArray.filter(
-      identities,
-      (identity) => identity === "runCiReleaseReadiness"
-    ).length === 1 &&
-    EffectArray.filter(
-      identities,
-      (identity) => identity === "createReleaseReadinessPlan"
-    ).length === 1 &&
-    EffectArray.filter(identities, (identity) => identity === "Console.info")
-      .length === 1 &&
+    identities.length === 4 &&
+    EffectArray.every(
+      [
+        "runCiReleaseReadiness",
+        "createReleaseReadinessPlan",
+        "Console.info",
+        "renderReleaseReadinessReport",
+      ],
+      (expected) =>
+        EffectArray.filter(identities, (identity) => identity === expected)
+          .length === 1
+    ) &&
     exactReleasePlan &&
+    hasExactCiReportOutput(ciBranch, calls, releaseCall) &&
     exactBindings
     ? []
     : [

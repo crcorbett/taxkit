@@ -1637,3 +1637,20 @@ procedure remain until the next retirement slice replaces their dependencies
 with a retained-source and operation route. Passing this replacement command
 does not itself remove that app, qualify provider state or complete T005.
 See the [replacement-check receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json).
+
+
+## Exact local CI detail identity
+
+CI-mode release output now uses the existing report renderer over its checked
+returned result. Each successful check names its actual sanitised stdout/stderr
+path and SHA-256. The CI header retains its report-only limit; candidate output
+and retained attempt bytes stay unchanged. Evidence consumers verify these
+returned file identities rather than selecting the newest file in a directory.
+A later test can use the same check ID and produce another valid small log.
+
+The native process-boundary test runs two real commands with the same ID and
+proves the first report names only the first pair of returned artifacts, with
+no raw excerpts, secret sentinels or host paths. The Quality source policy
+requires the exact named renderer from the Schema/report owner and the result
+returned by the canonical CI call; plain success text, another result, shadowed
+renderers and candidate reads are rejected. See the [dated detail-output receipt](../documentation-audit/clean-slate-foundation/2026-10-07-release-detail-output.json).

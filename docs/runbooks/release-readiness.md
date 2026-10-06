@@ -73,6 +73,10 @@ everything else. An accepted packet proves an observation, not authority.
    accepted pages, navigation, private server calls, search, Markdown, images,
    keyboard/focus/landmarks/contrast/reduced-motion and safe recovery. It no
    longer executes the old app browser command.
+   Save the returned `PASS` lines and verify their exact stdout/stderr paths
+   and hashes before citing details. Do not infer a run from directory recency,
+   a shared check ID or nearby creation time: a test fixture may produce its
+   own later detail. CI output remains a bounded report, not an attempt receipt.
 6. Only for an explicitly prepared new candidate, run `bun run release:check`
    once. Do not rerun merely to improve presentation or conceal a failure.
 7. Preserve the immutable attempt, bounded summary, candidate identity,

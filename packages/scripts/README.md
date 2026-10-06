@@ -103,7 +103,13 @@ a temporary receipt file or provider observation to replay. The provider-free
 docs build uses the normal cacheable `docs#build` task.
 
 Each invocation records its exact executable, arguments and true exit code in a
-schema-backed outcome. Complete stdout and stderr are streamed through a
+schema-backed outcome.
+CI-mode output renders those returned outcomes directly: each `PASS` line
+names the exact sanitised stdout/stderr path and SHA-256. Collect evidence
+from these returned identities, then verify the files and hashes. Never select
+a latest file from the detail directory: tests can create newer files with
+the same check ID. This adds bounded output only; CI still creates no candidate
+or attempt receipt. Candidate-mode presentation keeps its existing text. Complete stdout and stderr are streamed through a
 cross-chunk redactor into unique ignored files under `tmp/release-readiness`;
 the default receipt includes only bounded excerpts, repository-relative paths
 and SHA-256 digests. Absolute macOS and Linux home-directory prefixes, Windows

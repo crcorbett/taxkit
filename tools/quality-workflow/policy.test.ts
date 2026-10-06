@@ -628,12 +628,12 @@ describe("quality workflow policy", () => {
       Effect.gen(function* () {
         const accepted = `import { Console } from "effect";
     import { runCiReleaseReadiness } from "./program.js";
-    import { createReleaseReadinessPlan } from "./schemas.js";
+    import { createReleaseReadinessPlan, renderReleaseReadinessReport } from "./schemas.js";
     const program = Effect.gen(function* main() {
       const cli = yield* decodeReleaseReadinessCli(args);
       if (cli.mode === "ci") {
         const report = yield* runCiReleaseReadiness(createReleaseReadinessPlan(root));
-        yield* Console.info("CI release graph passed");
+        yield* Console.info(renderReleaseReadinessReport(report));
         return report;
       }
       return yield* readReleaseEvidence(root);
@@ -641,6 +641,18 @@ describe("quality workflow policy", () => {
         expect(inspectReleaseRuntime(accepted)).toEqual([]);
         yield* Effect.forEach(
           [
+            accepted.replace(
+              "renderReleaseReadinessReport(report)",
+              "renderReleaseReadinessReport(otherReport)"
+            ),
+            accepted.replace(
+              "Console.info(renderReleaseReadinessReport(report))",
+              'Console.info("CI release graph passed")'
+            ),
+            accepted.replace(
+              "const cli =",
+              "const renderReleaseReadinessReport = fakeRenderer; const cli ="
+            ),
             accepted.replace(
               "const report =",
               "const read = readReleaseEvidence; yield* read(root); const report ="

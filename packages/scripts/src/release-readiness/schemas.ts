@@ -1,4 +1,4 @@
-import { Array, Schema } from "effect";
+import { Array, Match, Schema } from "effect";
 
 export const releaseExcerptLimit = 4096;
 
@@ -449,7 +449,7 @@ export const makeReleaseReadinessPlan = (workspaceRoot: string) =>
   createReleaseReadinessPlan(workspaceRoot);
 
 export const renderReleaseReadinessReport = (
-  report: ReleaseReadinessReport
+  report: ReleaseReadinessReport | CiReleaseReadinessReport
 ): string =>
   Array.prepend(
     Array.map(
@@ -457,5 +457,17 @@ export const renderReleaseReadinessReport = (
       (outcome) =>
         `PASS [${outcome.check.id}] target=${outcome.check.label}; stdout=${outcome.stdoutDetail?.path ?? "none"} (${outcome.stdoutDetail?.sha256 ?? "unavailable"}); stderr=${outcome.stderrDetail?.path ?? "none"} (${outcome.stderrDetail?.sha256 ?? "unavailable"})`
     ),
-    `Release readiness passed ${report.outcomes.length} ordered checks once; postcondition=local candidate checks passed; nonclaim=no publication, tag, release, deployment or provider mutation.`
+    Match.value(report).pipe(
+      Match.tag(
+        "ReleaseReadinessReport",
+        (value) =>
+          `Release readiness passed ${value.outcomes.length} ordered checks once; postcondition=local candidate checks passed; nonclaim=no publication, tag, release, deployment or provider mutation.`
+      ),
+      Match.tag(
+        "CiReleaseReadinessReport",
+        (value) =>
+          `CI release graph passed ${value.outcomes.length} ordered checks; postcondition=repository checks passed for this CI revision; nonclaim=no candidate, attempt receipt, publication, tag, release, deployment or provider mutation.`
+      ),
+      Match.exhaustive
+    )
   ).join("\n");

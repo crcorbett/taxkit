@@ -21,7 +21,11 @@ import * as Path from "effect/Path";
 import * as ChildProcessSpawner from "effect/process/ChildProcessSpawner";
 
 import { ReleaseCommandRunnerLive } from "./live.layer.js";
-import { ReleaseCheck } from "./schemas.js";
+import {
+  CiReleaseReadinessReport,
+  ReleaseCheck,
+  renderReleaseReadinessReport,
+} from "./schemas.js";
 import { ReleaseCommandRunner } from "./service.js";
 
 const workspaceRoot = new URL("../../../..", import.meta.url);
@@ -129,6 +133,38 @@ describe("release readiness live layer", () => {
           );
           expect(stderr).toContain("Authorization: <redacted>");
           expect(stderr).not.toContain("bearer-secret");
+
+          // A later command with the same check ID must not replace the
+          // returned run's artifact identities in a report.
+          const later = yield* runner.execute(
+            new ReleaseCheck({
+              args: ["-e", 'process.stdout.write("later fixture")'],
+              command: "bun",
+              cwd: repositoryRoot,
+              id: "verification",
+              label: "Later unrelated fixture",
+            })
+          );
+          expect(later.stdoutDetail).not.toBeNull();
+          expect(later.stderrDetail).not.toBeNull();
+          const rendered = renderReleaseReadinessReport(
+            new CiReleaseReadinessReport({ mode: "ci", outcomes: [outcome] })
+          );
+          expect(rendered).toContain(
+            "CI release graph passed 1 ordered checks"
+          );
+          expect(rendered).toContain(outcome.stdoutDetail.path);
+          expect(rendered).toContain(outcome.stdoutDetail.sha256);
+          expect(rendered).toContain(outcome.stderrDetail.path);
+          expect(rendered).toContain(outcome.stderrDetail.sha256);
+          expect(rendered).not.toContain("local candidate checks passed");
+          expect(rendered).not.toContain("visible-secret");
+          expect(rendered).not.toContain("bearer-secret");
+          expect(rendered).not.toContain(repositoryRoot);
+          if (later.stdoutDetail !== null && later.stderrDetail !== null) {
+            expect(rendered).not.toContain(later.stdoutDetail.path);
+            expect(rendered).not.toContain(later.stderrDetail.path);
+          }
         }
       }).pipe(
         Effect.provide(

@@ -47,9 +47,7 @@ const program = Effect.gen(function* releaseReadinessMain() {
     const report = yield* runCiReleaseReadiness(
       createReleaseReadinessPlan(workspaceRoot)
     );
-    yield* Console.info(
-      `CI release graph passed ${report.outcomes.length} ordered checks; postcondition=repository checks passed for this CI revision; nonclaim=no candidate, attempt receipt, publication, tag, release, deployment or provider mutation.`
-    );
+    yield* Console.info(renderReleaseReadinessReport(report));
     return report;
   }
   const evidence = yield* readReleaseEvidence(workspaceRoot);

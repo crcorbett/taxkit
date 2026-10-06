@@ -995,3 +995,16 @@ remain unchanged. The old app/workspace and its operation route remain only
 until source/artifact retention and provider-procedure replacement are
 qualified; this check slice does not remove or deploy them. Evidence belongs
 to the [replacement-check receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json).
+
+
+## T005 release evidence addressability
+
+The current CI-mode command must expose the exact bounded detail paths/hashes
+from its returned check outcomes. A successful wrapper does not identify a
+complete verification log when another test uses the same check ID. Preserve
+candidate-mode formatting and all immutable receipts; record any older
+detail-reference limitation separately. The existing native process fixture
+and Quality policy reject later unrelated artifacts, another result and plain
+success text. This repairs evidence selection, without a new candidate or
+attempt receipt. [Detail-output evidence](../documentation-audit/clean-slate-foundation/2026-10-07-release-detail-output.json)
+remains separate from old app retirement and metrics deferral.
