@@ -5,16 +5,53 @@
   "branch": "codex/dev-75-request-absence-owners",
   "checkpoints_count": 1,
   "files_touched": [
+    ".changeset/public-request-absence.md",
+    "apps/api/README.md",
+    "apps/api/scripts/routes.ts",
+    "apps/api/scripts/smoke-boundaries.test.ts",
     "apps/api/test/worker.boundary.test.ts",
+    "apps/web/README.md",
     "apps/web/src/lib/form.boundary.ts",
     "apps/web/test/native-pair.boundary.test.ts",
     "apps/web/test/native-rpc-failures.boundary.test.ts",
     "apps/web/vitest.browser.config.ts",
+    "docs/architecture/api-and-sdk.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/README.md",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "docs/standards/code-patterns.md",
+    "packages/api/http/README.md",
+    "packages/api/http/__tests__/public-calculation-api.test.ts",
     "packages/api/rpc/README.md",
+    "packages/api/rpc/src/__testing__/fixtures.ts",
     "packages/api/rpc/test/handlers.test.ts",
+    "packages/calculators/README.md",
+    "packages/calculators/__tests__/calculation-work.test.ts",
+    "packages/calculators/__tests__/public-calculator-service.test.ts",
+    "packages/calculators/package.json",
+    "packages/calculators/src/errors.ts",
     "packages/calculators/src/live.layer.ts",
+    "packages/calculators/src/metadata.ts",
+    "packages/calculators/src/schemas.ts",
+    "packages/calculators/tsconfig.test.json",
+    "packages/docs-content/README.md",
+    "packages/docs-content/content/concepts/diagnostics.mdx",
+    "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+    "packages/docs-content/content/reference/schemas.mdx",
+    "packages/docs-content/content/reference/sdk.mdx",
+    "packages/docs-content/content/sdk/effect-sdk.mdx",
+    "packages/docs-content/examples/browser-http.ts",
+    "packages/docs-content/examples/effect.ts",
+    "packages/sdk/typescript/README.md",
+    "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
     "packages/sdk/typescript/src/effect.test.ts",
-    "packages/sdk/typescript/src/index.test.ts"
+    "packages/sdk/typescript/src/effect.ts",
+    "packages/sdk/typescript/src/index.test.ts",
+    "packages/sdk/typescript/type-tests/effect-client.test.ts"
   ],
   "sessions": [
     {
@@ -22,14 +59,14 @@
       "transcript": "/0/full.jsonl",
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
-      "prompt": "/0/prompt.txt"
+      "prompt": ""
     }
   ],
   "token_usage": {
-    "input_tokens": 14399142,
+    "input_tokens": 2987,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 694532736,
-    "output_tokens": 3038150,
-    "api_call_count": 4624
+    "cache_read_tokens": 383104,
+    "output_tokens": 906,
+    "api_call_count": 2
   }
 }
