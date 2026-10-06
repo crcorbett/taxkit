@@ -1,0 +1,60 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M499DXA7D9D324QB55QS732K",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-76-public-content-catalogue",
+  "checkpoints_count": 4,
+  "files_touched": [
+    ".changeset/accepted-documentation-discovery.md",
+    "apps/api/README.md",
+    "apps/api/src/content.boundary.ts",
+    "apps/api/src/schemas.ts",
+    "apps/api/src/worker.application.ts",
+    "apps/web/README.md",
+    "apps/web/src/lib/live.server.layer.ts",
+    "apps/web/src/lib/schemas.ts",
+    "apps/web/src/lib/service.server.ts",
+    "apps/web/src/server.ts",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "docs/architecture/content-and-posts.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/package-ownership.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "packages/api/rpc/src/content.errors.ts",
+    "packages/api/rpc/src/content.group.ts",
+    "packages/api/rpc/src/content.handlers.ts",
+    "packages/api/rpc/src/content.live.layer.ts",
+    "packages/api/rpc/src/content.schemas.ts",
+    "packages/api/rpc/src/content.service.ts",
+    "packages/api/rpc/src/content.test.layer.ts",
+    "packages/api/rpc/src/schemas.ts",
+    "packages/api/rpc/test/content.boundary.test.ts",
+    "packages/api/rpc/test/content.fixture.ts",
+    "packages/api/rpc/test/handlers.test.ts",
+    "packages/content/README.md",
+    "packages/content/src/__testing__/fixtures.ts",
+    "packages/content/src/errors.ts",
+    "packages/content/src/live.layer.ts",
+    "packages/content/src/schemas.ts",
+    "packages/content/src/service.ts",
+    "packages/content/src/test.layer.ts",
+    "packages/content/test/schemas.test.ts",
+    "packages/content/test/service.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 19871943,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 932328704,
+    "output_tokens": 4141847,
+    "api_call_count": 6234
+  }
+}
