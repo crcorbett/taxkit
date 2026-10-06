@@ -1,10 +1,14 @@
 import {
+  CalculatorRateLimited,
+  CalculatorAdmissionUnavailable,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
 } from "@taxkit/calculators/schemas";
 import { Schema } from "effect";
 
 export {
+  CalculatorRateLimited,
+  CalculatorAdmissionUnavailable,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
 } from "@taxkit/calculators/schemas";
@@ -24,6 +28,8 @@ export class CalculatorRpcVersionMismatch extends Schema.TaggedError<CalculatorR
 export const CalculatorRpcExpectedError = Schema.Union([
   CalculatorRpcRejected,
   CalculatorRpcVersionMismatch,
+  CalculatorRateLimited,
+  CalculatorAdmissionUnavailable,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
 ]);
@@ -60,17 +66,6 @@ export class CalculatorRpcRequestTooLarge extends Schema.TaggedError<CalculatorR
   }
 ) {}
 
-export class CalculatorRpcRateLimited extends Schema.TaggedError<CalculatorRpcRateLimited>()(
-  "CalculatorRpcRateLimited",
-  {
-    code: Schema.tag("rate-limited"),
-    message: Schema.tag(
-      "Too many requests were sent. Wait a minute before trying again."
-    ),
-    retry: Schema.tag("wait-then-try-manually"),
-  }
-) {}
-
 export class CalculatorRpcRequestTimedOut extends Schema.TaggedError<CalculatorRpcRequestTimedOut>()(
   "CalculatorRpcRequestTimedOut",
   {
@@ -99,7 +94,7 @@ export const CalculatorRpcClientError = Schema.Union([
   CalculatorRpcInvalidResponse,
   CalculatorRpcDeadlineExceeded,
   CalculatorRpcRequestTooLarge,
-  CalculatorRpcRateLimited,
+
   CalculatorRpcRequestTimedOut,
   CalculatorRpcResponseTooLarge,
 ]);

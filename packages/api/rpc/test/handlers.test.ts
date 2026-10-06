@@ -44,7 +44,7 @@ import {
   CalculatorRpcClientError,
   CalculatorRpcRequestTooLarge,
   CalculatorRpcRequestTimedOut,
-  CalculatorRpcRateLimited,
+  CalculatorRateLimited,
   CalculatorRpcResponseTooLarge,
   CalculatorRpcUnavailable,
   CalculatorRpcRejected,
@@ -815,7 +815,7 @@ it.effect.each(
         const expected = Match.value(status).pipe(
           Match.when(408, () => new CalculatorRpcRequestTimedOut()),
           Match.when(413, () => new CalculatorRpcRequestTooLarge()),
-          Match.when(429, () => new CalculatorRpcRateLimited()),
+          Match.when(429, () => new CalculatorRateLimited()),
           Match.when(503, () => new CalculatorRpcUnavailable()),
           Match.exhaustive
         );

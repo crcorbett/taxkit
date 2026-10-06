@@ -137,6 +137,31 @@
         "required": ["_tag", "message"],
         "type": "object"
       },
+      "CalculatorAdmissionUnavailableEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorAdmissionUnavailable"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["calculation-admission-unavailable"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "The calculation could not be started. Try again when you are ready."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["try-again-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
       "CalculatorCapacityExceededEncoded": {
         "additionalProperties": false,
         "properties": {
@@ -275,6 +300,31 @@
           },
           "retry": {
             "enum": ["try-again-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
+      "CalculatorRateLimitedEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorRateLimited"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["rate-limited"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "Too many calculations were sent. Wait a minute before trying again."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["wait-then-try-manually"],
             "type": "string"
           }
         },
@@ -1613,18 +1663,58 @@
             },
             "description": "Error"
           },
-          "503": {
+          "429": {
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
                     "error": {
-                      "$ref": "#/components/schemas/CalculatorCapacityExceededEncoded"
+                      "$ref": "#/components/schemas/CalculatorRateLimitedEncoded"
                     }
                   },
                   "required": ["error"],
                   "type": "object"
+                }
+              }
+            },
+            "description": "Error",
+            "headers": {
+              "retry-after": {
+                "required": true,
+                "schema": {
+                  "enum": ["60"],
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "error": {
+                          "$ref": "#/components/schemas/CalculatorAdmissionUnavailableEncoded"
+                        }
+                      },
+                      "required": ["error"],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "error": {
+                          "$ref": "#/components/schemas/CalculatorCapacityExceededEncoded"
+                        }
+                      },
+                      "required": ["error"],
+                      "type": "object"
+                    }
+                  ]
                 }
               }
             },

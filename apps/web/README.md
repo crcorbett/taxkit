@@ -257,13 +257,13 @@ complete ten-second client deadline belong to the private RPC package.
 The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
 calculation budget. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC revision `3` errors. Website guidance requests
+503/504 envelopes or canonical RPC revision `4` errors. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
 seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
 browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
-control returns. Rate identity, per-client rate limits, MCP and full T004
+control returns. The native rate policy below is implemented separately; MCP and whole T004
 qualification remain unfinished.
 
 
@@ -283,3 +283,10 @@ Chromium qualification forces a fresh dependency bundle for its explicitly
 included workspace RPC source. The lockfile alone cannot identify changes to
 those local Schemas. This prevents a stale compiled client from qualifying a
 different request contract; production Vite configuration is unchanged.
+
+
+## Native calculation rate admission
+
+The API and Website use the [calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission). The Website checks its original Cloudflare connection address and supplies it separately from request JSON to the binding-only `calculatorRequest` operation. The installed Alchemy native RPC adapter owns private-call reply handling. Both browser and restored HTML forms display fixed rate/unavailable guidance and never retry automatically.
+
+The private request omits an explicit AbortSignal because the pinned native RPC cannot serialise it. Client cancellation stops local waiting; API work and reply budgets remain in force. This does not prove remote cancellation. The guarded disposable root selects `local-emulator` and one loopback allowance; hosted composition defaults to `edge`. [Infrastructure configuration](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns this distinction.

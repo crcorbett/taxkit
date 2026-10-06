@@ -118,8 +118,8 @@ five-second body-read deadline now returns fixed checked JSON 413/408 guidance.
 The owning export is `@taxkit/api-http/request-boundary`; this package preserves
 its original compatibility re-export. The retained standalone HTTP server uses
 the same body owner. All nine service calls have the shared five-second operation
-budget; metadata uses no calculation place. Per-client rate limits and later MCP
-envelopes remain active T004/T006 work. A custom RPC-only host must supply its
+budget; metadata uses no calculation place. Native rate admission is described below; later MCP
+envelopes remain T006 work. A custom RPC-only host must supply its
 request-admission middleware; the native API host applies it outside both routes.
 
 The private client checks HTTP status before reading a rejected body. Status
@@ -140,13 +140,13 @@ qualify future framed/streaming MCP replies or public SDK transport policy.
 The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
 calculation budget. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC revision `3` errors. Website guidance requests
+503/504 envelopes or canonical RPC revision `4` errors. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
 seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
 browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
-control returns. Rate identity, per-client rate limits, MCP and full T004
+control returns. The native rate policy below is implemented separately; MCP and whole T004
 qualification remain unfinished.
 
 
@@ -187,3 +187,8 @@ they mean the same thing; do not invent a jurisdiction or tax year.
 Native RPC serialisation applies the owning request codecs. Test messages built
 through an unknown JSON fixture must encode the canonical request first. The
 wire contract and current revision retain their existing fields and values.
+
+
+## Native calculation rate admission
+
+Revision `4` preserves canonical `CalculatorRateLimited` and `CalculatorAdmissionUnavailable` alongside existing expected errors. Older clients receive the checked revision mismatch. The native API and Website share the [calculator-owned rate contract](../../calculators/README.md#native-calculation-rate-admission); each batch calculation takes one unit and metadata takes none. `./rate-identity` is an explicit workspace-only host export; it is excluded from the published RPC capability surface. The rate identity is separate from RPC request JSON and is never an analytics identifier.

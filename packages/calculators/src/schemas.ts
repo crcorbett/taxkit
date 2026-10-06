@@ -188,6 +188,28 @@ export class CalculatorOperationTimedOut extends Schema.TaggedError<CalculatorOp
   }
 ) {}
 
+export class CalculatorRateLimited extends Schema.TaggedError<CalculatorRateLimited>()(
+  "CalculatorRateLimited",
+  {
+    code: Schema.tag("rate-limited"),
+    message: Schema.tag(
+      "Too many calculations were sent. Wait a minute before trying again."
+    ),
+    retry: Schema.tag("wait-then-try-manually"),
+  }
+) {}
+
+export class CalculatorAdmissionUnavailable extends Schema.TaggedError<CalculatorAdmissionUnavailable>()(
+  "CalculatorAdmissionUnavailable",
+  {
+    code: Schema.tag("calculation-admission-unavailable"),
+    message: Schema.tag(
+      "The calculation could not be started. Try again when you are ready."
+    ),
+    retry: Schema.tag("try-again-manually"),
+  }
+) {}
+
 export const CalculatorRequestError = Schema.Union([
   CalculationError,
   CalculatorInputDecodeError,
@@ -206,6 +228,8 @@ export type CalculatorMetadataError = typeof CalculatorMetadataError.Type;
 
 export const CalculatorServiceError = Schema.Union([
   CalculatorRequestError,
+  CalculatorRateLimited,
+  CalculatorAdmissionUnavailable,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
 ]);

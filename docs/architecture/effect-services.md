@@ -479,3 +479,18 @@ exposes all nine existing calculator operations. Its private concrete native
 operation transformation shares scope/deadline/safe transport policy across
 those named methods; application work remains at the calculator service. No
 operation constructs a Layer or runner, and callers receive no raw client.
+
+
+## Native calculation rate admission
+
+`CalculatorAdmission` is a closed named service; its [owning contract](../../packages/calculators/README.md#native-calculation-rate-admission) and redacted key Schema live with calculators. The request Context reference carries checked identity separately from facts. `PublicCalculatorServiceRateLimited` provides calculation-only admission; the native API composes it once below bounded work. Its provider Layer, installed live Layer and mock test Layer remain separate. Native provider replies are decoded immediately and failures become fixed errors without provider causes or addresses.
+
+
+Native rate decoding is admitted at the exact original-address, private-call,
+provider-reply and host-root owners in `oxlint.config.ts`. Its exact wire and
+redacted-key fixtures have separate decoder/encoder admissions. Actual CLI
+fixtures accept those owned crossings, reject encoder execution at production
+ingress, reject runners at every admitted file and reject decoding in the
+nearby calculator admission Layer. No wildcard or new unknown-parameter
+exception is added. The Website Layer accepts the generated native Fetcher
+capability; its settings boundary checks the richer API binding once.

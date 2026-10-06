@@ -14,6 +14,16 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact native connection, private-call and provider-reply trust boundaries.
+  // No encoder, runner, cast, mutation or neighbouring-path permission.
+  "packages/api/rpc/src/rate-identity.boundary.ts",
+  "apps/api/src/worker.application.ts",
+  "apps/api/src/worker-admission.layer.ts",
+  "apps/web/src/lib/live.server.layer.ts",
+  // Exact native rate wire/provider fixtures and redacted-key codec checks.
+  "apps/api/test/rate-admission.boundary.test.ts",
+  "apps/api/test/worker-admission.boundary.test.ts",
+  "packages/calculators/__tests__/calculation-admission.test.ts",
   // Exact encoded date representation ingress and historical round-trip test.
   // No runtime, raw JSON or synchronous codec admission.
   "packages/core/src/primitives/date.ts",
@@ -199,6 +209,12 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Exact rate wire/secret-negative fixtures; no production encoding permission.
+  "apps/api/test/rate-admission.boundary.test.ts",
+  "apps/api/test/worker-admission.boundary.test.ts",
+  "apps/web/test/native-rate.boundary.test.ts",
+  "apps/web/test/native-rate-provider.boundary.test.ts",
+  "packages/calculators/__tests__/calculation-admission.test.ts",
   // Exact historical domain bytes and rule snapshots, using their owning codecs.
   "packages/core/test/domain-absence.boundary.test.ts",
   "packages/rules/au/income-tax/test/annual-tax.test.ts",

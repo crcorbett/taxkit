@@ -547,7 +547,7 @@ Oversized/stalled bodies return fixed Schema-owned 413/408 JSON guidance; native
 Website forms select fixed HTML guidance and a link back to the calculators.
 The five-second total reader budget also rejects late synchronous completion.
 Custom route/RPC-only hosts must supply request admission at their composition.
-Per-client rate identity and limiting remain active T004 work.
+The native rate policy is described below; whole T004 qualification remains active.
 
 The private RPC client owns one ten-second complete-response deadline and a
 2 MiB byte cap for all nine closed JSON replies. Its concrete native HTTP adapter
@@ -567,7 +567,7 @@ declared HTTP 503/504 envelopes; existing request failures keep 400 and metadata
 methods declare checked 504 timeouts without using calculation places. RPC revision 3 preserves the canonical fixed capacity and
 timeout errors. Website forms request manual retry. SDK Schemas re-export these
 errors, while local SDK execution keeps its caller-owned lifetime and tax results.
-The owning package records cleanup and CPU proof limits. Rate identity, per-client rate limits and future MCP operations remain T004/T006 work.
+The owning package records cleanup and CPU proof limits. The native rate policy is described below; future MCP operations remain T006 work.
 
 
 The [complete RPC contract](../../packages/api/rpc/README.md#complete-named-operation-contract)
@@ -606,4 +606,10 @@ remain codec values and are not safe telemetry. Catalogue entries use their
 checked selected continuation without the unused generic `program` field.
 The fresh package declarations change deliberately; retained HTTP/RPC, report,
 metadata and table/source values stay fixed. The active plan and domain-contract
-receipt own qualification; trusted rate identity/limiting keeps T004 active.
+receipt own qualification; native rate admission below still needs whole-slice
+qualification before T004 can close.
+
+
+## Native calculation rate admission
+
+The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP/RPC/private Website calls share an allowance and each batch member takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance; RPC revision 4 preserves the same errors. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities to the published RPC exports.

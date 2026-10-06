@@ -92,13 +92,12 @@ const program = Effect.gen(function* () {
     // Corrupt one field in the actual native encoded reply. The native message
     // framing and server remain intact; this qualifies the client's decoder.
     yield* Effect.gen(function* nativeInvalidReplyBuild() {
-      const owner = path.join(root, "apps/api/src/worker.ts");
+      const owner = path.join(root, "apps/api/src/worker.application.ts");
       const original = yield* Effect.acquireRelease(
         fs.readFileString(owner),
         (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
       );
-      const declaration =
-        "export const ApiWorkerInit = ApiWorkerApplication.pipe(";
+      const declaration = ").pipe(Effect.provideContext(telemetry));";
       if (!original.includes(declaration)) {
         return yield* Effect.die(
           "Native invalid-reply fixture no longer matches its source owner"
@@ -106,29 +105,24 @@ const program = Effect.gen(function* () {
       }
       const injected = original
         .replace(
-          'import { Effect, Layer } from "effect";',
-          'import { Effect, Layer } from "effect";\nimport { Headers, HttpServerResponse } from "effect/http";'
-        )
-        .replace(
           declaration,
-          `${declaration}
-          Effect.map((application) => ({
-            fetch: application.fetch.pipe(
-              Effect.flatMap((response) =>
-                Effect.promise(() => HttpServerResponse.toWeb(response).text()).pipe(
-                  Effect.map((text) => HttpServerResponse.text(
-                    text.replace('"netPay":', '"PRIVATE9":'),
-                    {
-                      contentType: "application/json",
-                      headers: Headers.remove(response.headers, "content-length"),
-                      status: response.status,
-                    }
-                  ))
-                )
-              )
-            ),
-          })),`
-        );
+          `).pipe(
+          Effect.provideContext(telemetry),
+          Effect.flatMap((response) =>
+            Effect.promise(() => HttpServerResponse.toWeb(response).text()).pipe(
+              Effect.map((text) => HttpServerResponse.text(
+                text.replace('"netPay":', '"PRIVATE9":'),
+                {
+                  contentType: "application/json",
+                  headers: Headers.remove(response.headers, "content-length"),
+                  status: response.status,
+                }
+              ))
+            )
+          )
+        );`
+        )
+        .replace("HttpClientRequest,", "Headers, HttpClientRequest,");
       yield* fs.writeFileString(owner, injected);
       const fixtureId = "TaxKitApiInvalidReply";
       yield* fs.remove(path.join(output, "bundles", fixtureId), {
@@ -158,14 +152,13 @@ const program = Effect.gen(function* () {
     // headers or the remaining bytes after real encoding; keep its framing.
     yield* Effect.forEach(["body", "headers"] as const, (phase) =>
       Effect.gen(function* nativeStalledReplyBuild() {
-        const owner = path.join(root, "apps/api/src/worker.ts");
+        const owner = path.join(root, "apps/api/src/worker.application.ts");
         const original = yield* Effect.acquireRelease(
           fs.readFileString(owner),
           (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
         );
-        const declaration =
-          "export const ApiWorkerInit = ApiWorkerApplication.pipe(";
-        const imports = 'import { Effect, Layer } from "effect";';
+        const declaration = ").pipe(Effect.provideContext(telemetry));";
+        const imports = "HttpClientRequest,";
         if (!original.includes(declaration) || !original.includes(imports)) {
           return yield* Effect.die(
             "Native stalled-reply fixture no longer matches its source owner"
@@ -202,17 +195,10 @@ const program = Effect.gen(function* () {
               Effect.provideContext(telemetry)
             ))`;
         const injected = original
-          .replace(
-            imports,
-            'import { Effect, Layer, Stream } from "effect";\nimport { Headers, HttpServerResponse } from "effect/http";\nimport { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";'
-          )
+          .replace(imports, "Headers, HttpClientRequest,")
           .replace(
             declaration,
-            `${declaration}
-          Effect.flatMap((application) => Effect.gen(function* () {
-            const telemetry = yield* Layer.build(ApiSafeTelemetryLive);
-            return { fetch: application.fetch.pipe(${operation}) };
-          })),`
+            `).pipe(Effect.provideContext(telemetry), ${operation});`
           );
         yield* fs.writeFileString(owner, injected);
         const fixtureId =

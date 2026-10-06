@@ -6,10 +6,15 @@ import {
   CalculatorRequestBodyPolicy,
   withCalculatorRequestBodyLimit,
 } from "@taxkit/api-http/request-boundary";
+import {
+  CalculatorRequestRateKey,
+  calculatorEdgeRateKey,
+} from "@taxkit/api-rpc/rate-identity";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax/schemas";
 import { AuPayCalculatorId } from "@taxkit/rules-au-pay/schemas";
 import { Effect, ErrorReporter, Match, Schema } from "effect";
 import {
+  Headers as EffectHeaders,
   HttpServerError,
   HttpServerRequest,
   HttpServerResponse,
@@ -170,6 +175,10 @@ export default {
               ErrorReporter.report(reportable).pipe(Effect.as(response))
             )
           )
+        ),
+        Effect.provideService(
+          CalculatorRequestRateKey,
+          calculatorEdgeRateKey(EffectHeaders.fromInput(request.headers))
         ),
         Effect.provideService(
           HttpServerRequest.HttpServerRequest,

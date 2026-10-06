@@ -1,12 +1,18 @@
 import * as Website from "alchemy/Cloudflare/Website";
 import { Worker } from "alchemy/Cloudflare/Workers";
 import * as Output from "alchemy/Output";
+import type { CalculatorHostMode } from "api/worker";
 import {
-  ApiWorkerInit,
+  ApiWorkerNativeInit,
   ApiWorkerObservability,
   TaxKitApiWorker,
 } from "api/worker";
-import { Effect, Option } from "effect";
+import { Context, Effect, Option } from "effect";
+
+export const NativeAppsHostMode = Context.Reference<CalculatorHostMode>(
+  "@taxkit/infrastructure/NativeAppsHostMode",
+  { defaultValue: () => "edge" }
+);
 
 // A forward API tag registers before its implementation Layer finishes. The
 // native planner retains both address Outputs, including the binding cycle.
@@ -24,6 +30,7 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
       },
       env: {
         API_PUBLIC_ORIGIN: apiOrigin,
+        CALCULATOR_HOST_MODE: yield* NativeAppsHostMode,
         TAXKIT_API: api,
         WEBSITE_PUBLIC_ORIGIN: Worker.URL,
       },
@@ -56,6 +63,7 @@ const NativeApiHostLive = TaxKitApiWorker.make(
       },
       env: {
         API_PUBLIC_ORIGIN: Worker.URL,
+        CALCULATOR_HOST_MODE: yield* NativeAppsHostMode,
         WEBSITE_PUBLIC_ORIGIN: website.url.pipe(
           Output.map((url) => Option.getOrNull(Option.fromNullishOr(url)))
         ),
@@ -67,7 +75,7 @@ const NativeApiHostLive = TaxKitApiWorker.make(
       workersDev: true,
     };
   }),
-  ApiWorkerInit
+  ApiWorkerNativeInit
 );
 
 export const declareNativeAppsStack = Effect.gen(function* () {

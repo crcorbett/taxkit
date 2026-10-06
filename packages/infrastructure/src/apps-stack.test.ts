@@ -11,6 +11,7 @@ import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
 import * as Provider from "alchemy/Provider";
+import { packEnvValue } from "alchemy/RuntimeContext";
 import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import { inMemoryState, State } from "alchemy/State";
@@ -27,6 +28,7 @@ import {
   Order,
   Predicate,
   Record,
+  Redacted,
   Ref,
   Result,
   Schema,
@@ -105,13 +107,93 @@ const graphFixture = Effect.fnUntraced(function* (
             workerId: `proof-${resource.LogicalId}`,
             workerName: resource.LogicalId,
           },
-          bindings: [],
+          // These are the actual already-applied native bindings, including
+          // the circular address placeholders resolved later by the planner.
+          bindings:
+            resource.LogicalId === "TaxKitApi"
+              ? [
+                  {
+                    data: {
+                      bindings: [
+                        { name: "API_PUBLIC_ORIGIN", type: "self_url" },
+                      ],
+                    },
+                    sid: "API_PUBLIC_ORIGIN",
+                  },
+                  {
+                    data: {
+                      bindings: [
+                        {
+                          name: "CALCULATOR_HOST_MODE",
+                          text: "edge",
+                          type: "plain_text",
+                        },
+                      ],
+                    },
+                    sid: "CALCULATOR_HOST_MODE",
+                  },
+                  {
+                    data: {
+                      bindings: [
+                        {
+                          name: "CALCULATOR_RATE_LIMIT",
+                          namespaceId: "10076",
+                          simple: { limit: 60, period: 60 },
+                          type: "ratelimit",
+                        },
+                      ],
+                    },
+                    sid: "CALCULATOR_RATE_LIMIT",
+                  },
+                  {
+                    data: { bindings: [undefined] },
+                    sid: "WEBSITE_PUBLIC_ORIGIN",
+                  },
+                ]
+              : [
+                  { data: { bindings: [undefined] }, sid: "API_PUBLIC_ORIGIN" },
+                  {
+                    data: {
+                      bindings: [
+                        {
+                          name: "CALCULATOR_HOST_MODE",
+                          text: "edge",
+                          type: "plain_text",
+                        },
+                      ],
+                    },
+                    sid: "CALCULATOR_HOST_MODE",
+                  },
+                  {
+                    data: {
+                      bindings: [{ name: "TAXKIT_API", type: "service" }],
+                    },
+                    sid: "TAXKIT_API",
+                  },
+                  {
+                    data: {
+                      bindings: [
+                        { name: "WEBSITE_PUBLIC_ORIGIN", type: "self_url" },
+                      ],
+                    },
+                    sid: "WEBSITE_PUBLIC_ORIGIN",
+                  },
+                ],
           downstream: [],
           fqn: resource.FQN,
           instanceId: `proof-${resource.LogicalId}`,
           logicalId: resource.LogicalId,
           namespace: resource.Namespace,
-          props: {},
+          props:
+            resource.LogicalId === "TaxKitApi"
+              ? {
+                  env: {
+                    CALCULATOR_RATE_NAMESPACE: Redacted.make(
+                      packEnvValue(Redacted.make("10076"))
+                    ),
+                  },
+                }
+              : {},
           providerVersion: 0,
           resourceType: resource.Type,
           status: "created",
@@ -129,6 +211,9 @@ const graphFixture = Effect.fnUntraced(function* (
 
 const graphEnvironment = Effect.provide(
   Layer.mergeAll(
+    ConfigProvider.layerAdd(
+      ConfigProvider.fromUnknown({ CALCULATOR_RATE_NAMESPACE: "10076" })
+    ),
     BunServices.layer,
     Layer.succeed(ArtifactStore, createArtifactStore()),
     Layer.succeed(AuthProviders, {}),
@@ -207,8 +292,11 @@ describe("native paired app graph and planner", () => {
         expect(website.Props).toBeDefined();
         expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
         expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
-        expect(Record.keys(website.Props.env ?? {})).toEqual([
+        expect(
+          Array.sort(Record.keys(website.Props.env ?? {}), Order.String)
+        ).toEqual([
           "API_PUBLIC_ORIGIN",
+          "CALCULATOR_HOST_MODE",
           "TAXKIT_API",
           "WEBSITE_PUBLIC_ORIGIN",
         ]);

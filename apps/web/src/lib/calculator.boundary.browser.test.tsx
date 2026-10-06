@@ -3,7 +3,8 @@ import { describe, expect, it } from "@effect/vitest";
 import {
   CalculatorRpcUnavailable,
   CalculatorRpcDeadlineExceeded,
-  CalculatorRpcRateLimited,
+  CalculatorRateLimited,
+  CalculatorAdmissionUnavailable,
   CalculatorRpcRequestTimedOut,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
@@ -225,7 +226,11 @@ describe("browser calculator lifetime", () => {
       error: new CalculatorRpcDeadlineExceeded(),
       message: "within ten seconds",
     },
-    { error: new CalculatorRpcRateLimited(), message: "Wait a minute" },
+    { error: new CalculatorRateLimited(), message: "Wait a minute" },
+    {
+      error: new CalculatorAdmissionUnavailable(),
+      message: "Try again when you are ready",
+    },
     { error: new CalculatorRpcRequestTimedOut(), message: "request timed out" },
     {
       error: new CalculatorCapacityExceeded(),

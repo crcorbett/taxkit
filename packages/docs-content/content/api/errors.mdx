@@ -41,8 +41,15 @@ caller choose when to retry; do not automatically repeat calculations.
 The server shares eight active calculation places across HTTP and RPC. Each
 calculation in a batch takes a place. This budget does not claim that a
 JavaScript timer can forcibly stop synchronous CPU work. Current per-client
-rate limiting remains under implementation; these work limits do not establish
-that separate policy.
+rate admission in the native API adds 60 calculations per minute per checked
+connection address across HTTP, RPC and Website forms. Every batch calculation
+counts separately; metadata reads do not count. A rejected calculation returns
+HTTP 429 with `CalculatorRateLimited` and `Retry-After: 60`. Missing/invalid
+connection identity or a failed limiter returns HTTP 503 with
+`CalculatorAdmissionUnavailable`. Both contain fixed safe guidance and manual
+retry fields. These native limits are approximate and local to a Cloudflare
+location, rather than an exact worldwide quota. The standalone Bun server
+keeps its existing work policy.
 
 ## Handle an error response
 

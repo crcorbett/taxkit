@@ -6,7 +6,7 @@ import {
   CalculatorRpcInvalidResponse,
   CalculatorRpcUnavailable,
   CalculatorRpcRequestTooLarge,
-  CalculatorRpcRateLimited,
+  CalculatorRateLimited,
   CalculatorRpcRequestTimedOut,
   CalculatorRpcResponseTooLarge,
 } from "./errors.js";
@@ -50,7 +50,7 @@ export const calculatorRpcTransportFailure = (
                 Match.value(response.status).pipe(
                   Match.when(408, () => new CalculatorRpcRequestTimedOut()),
                   Match.when(413, () => new CalculatorRpcRequestTooLarge()),
-                  Match.when(429, () => new CalculatorRpcRateLimited()),
+                  Match.when(429, () => new CalculatorRateLimited()),
                   Match.exhaustive
                 )
               ),

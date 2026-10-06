@@ -26,6 +26,11 @@ import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
+import {
+  nativeLocalModeFixture,
+  nativeRateFixture,
+} from "./native-rate.fixture";
+
 const apiOrigin = "http://127.0.0.1:4201";
 const websiteOrigin = "http://127.0.0.1:4202";
 const headersOrigin = "http://127.0.0.1:4203";
@@ -99,6 +104,9 @@ it.live(
               ).toBe(true);
             }
             const origins = {
+              ...(artifact.entry === "worker.js"
+                ? nativeRateFixture("10078")
+                : nativeLocalModeFixture),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,
@@ -185,6 +193,7 @@ it.live(
           config: {
             ...worker.config,
             env: {
+              ...nativeLocalModeFixture,
               ...worker.config.env,
               API_PUBLIC_ORIGIN: {
                 type: "json" as const,

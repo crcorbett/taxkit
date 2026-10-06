@@ -1,11 +1,16 @@
+import { PublicCalculatorServiceRateLimited } from "@taxkit/calculators/admission.layer";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import { CalculationEngineLive } from "@taxkit/core";
-import { Worker } from "alchemy/Cloudflare/Workers";
+import { RateLimitBinding, Worker } from "alchemy/Cloudflare/Workers";
+import type { InferEnv } from "alchemy/Cloudflare/Workers";
 import type { HttpEffect } from "alchemy/Http";
 import { Effect, Layer } from "effect";
 
+import { ApiCalculatorAdmission } from "./worker-admission.layer.js";
 import { ApiWorkerApplication } from "./worker.application.js";
+
+export { CalculatorHostMode } from "@taxkit/api-rpc/rate-identity";
 
 // Platform invocation records include URLs outside the fixed app logger.
 // Keep the platform channels off until their exported fields are qualified.
@@ -24,16 +29,33 @@ export const ApiWorkerObservability = {
 export const ApiWorkerInit = ApiWorkerApplication.pipe(
   Effect.provide(
     PublicCalculatorServiceBounded.pipe(
-      Layer.provide(PublicCalculatorServiceLive),
+      Layer.provide(
+        PublicCalculatorServiceRateLimited.pipe(
+          Layer.provide(PublicCalculatorServiceLive)
+        )
+      ),
       Layer.provide(CalculationEngineLive)
     )
   )
 );
 
+export const ApiWorkerNativeInit = ApiWorkerInit.pipe(
+  Effect.provide(ApiCalculatorAdmission.pipe(Layer.provide(RateLimitBinding)))
+);
+
 export class TaxKitApiWorker extends Worker<
   TaxKitApiWorker,
-  { readonly fetch: HttpEffect }
+  {
+    readonly fetch: HttpEffect;
+    readonly calculatorRequest: Effect.Success<
+      typeof ApiWorkerApplication
+    >["calculatorRequest"];
+  }
 >()("TaxKitApi") {}
+
+export type TaxKitApiBinding = InferEnv<{
+  readonly TAXKIT_API: typeof TaxKitApiWorker;
+}>["TAXKIT_API"];
 
 export default TaxKitApiWorker.make(
   {
@@ -46,5 +68,5 @@ export default TaxKitApiWorker.make(
     observability: ApiWorkerObservability,
     workersDev: true,
   },
-  ApiWorkerInit
+  ApiWorkerNativeInit
 );

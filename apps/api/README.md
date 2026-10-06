@@ -271,13 +271,13 @@ requirement. The fixed application reporter remains in use.
 The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
 operation budget for all nine methods. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC revision `3` errors. Website guidance requests
+503/504 envelopes or canonical RPC revision `4` errors. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
 seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
 browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
-control returns. Rate identity, per-client rate limits, MCP and full T004
+control returns. The native rate policy below is implemented separately; MCP and whole T004
 qualification remain unfinished.
 
 
@@ -290,3 +290,12 @@ Known requests in work-pool, exact body-limit and defect fixtures encode through
 their owning HTTP/RPC Schemas before JSON framing. Bad tag/id tests mutate the
 encoded frame, so another request-shape error cannot mask the intended fault.
 The original capacity, body size, cleanup and safe-reporter assertions remain.
+
+
+## Native calculation rate admission
+
+The native API builds `PublicCalculatorServiceRateLimited` once underneath its bounded service. HTTP/RPC and the binding-only `calculatorRequest` operation share the [calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission). Public requests need a checked original Cloudflare connection address; forwarded Worker calls and arbitrary forwarded headers cannot select a key. The Website private call supplies its checked key separately from JSON; no HTTP route admits that argument. The closed reply is buffered inside the native event scope, bounded to 2 MiB and ten seconds.
+
+`ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. The operator must select an account-wide unique stage value before a cloud plan/apply; no provider value is invented. The [infrastructure owner](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns graph and local-root selection. Hosted mode defaults to `edge`. The guarded local root selects `local-emulator`; a shared local allowance additionally requires an HTTP loopback API origin.
+
+Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) is approximate and local to a location, not an exact global quota. Real edge identity, namespace uniqueness and uploaded provider settings need separate authorised readback. Direct engine/local SDK and standalone Bun execution keep their existing contracts.

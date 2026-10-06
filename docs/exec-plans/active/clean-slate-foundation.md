@@ -3571,3 +3571,103 @@ Only plan/receipt change after qualification; final docs/runbooks/format/
 Changeset/whitespace checks precede delivery. Hosted proof remains separate.
 T004 stays active for native rate identity/limits; no provider operation,
 Medicare correction or wider rebuild completion is claimed.
+
+
+Shared rate-limit implementation starts from clean draft #152 head
+0a8b823685a2a4aa453f8a4bccd624f4be976931 on
+codex/dev-75-shared-rate-limits. Draft #151 corrective head 0d83692f passes
+GitHub Quality run 37416691591/job 112116757973 at 05:26:07Z; #152 run
+37418263663 remains running at the 05:29Z readback. The approved #146 DEV-75
+comment is already saved as 6a17034d-46f9-4450-821e-d5534c34df7c; no duplicate
+comment is posted. T004 stays active.
+
+Documentation impact before implementation: Change required for calculator
+rate Schemas/service/export and README; HTTP errors/OpenAPI source and generated
+snapshot; RPC errors/revision/consumers and README; API/Website host/private
+binding config and READMEs; native infrastructure graph/namespace configuration
+and owning operational runbook; API/SDK, Effect and frontend architecture;
+public limits/error guidance; package Changesets; active SPEC/tasks and dated
+proof. Regenerate OpenAPI through its owning test command. Preserve tax
+algorithms, source/table/report oracles, lockfile, tool versions, standards,
+CI, skill assets, agent instructions and external authority. Root topology
+changes are N/A because existing packages continue to own the work. Native
+fixtures and packed/browser consumers must prove the whole shared allowance,
+metadata independence, checked failures and privacy before acceptance.
+
+The native host alone adds rate admission below its existing bounded service.
+Public HTTP/RPC and binding-only Website calls share 60 calculations per minute
+per checked redacted connection key; each batch member consumes one unit.
+Missing/invalid/forwarded identity fails safely; metadata consumes no unit.
+Required checked CALCULATOR_RATE_NAMESPACE has no fallback or chosen Production
+value. Local native fixtures use isolated explicit values with Alchemy's own
+packing. Provider namespace uniqueness and real edge identity remain separate
+pre-apply readback. No provider apply, publication or Medicare correction is
+authorised. This is implementation intent, not accepted runtime proof.
+
+
+Rate candidate progress at 06:12Z: draft #152 Quality passed
+37418263663/job 112121639658 at 05:45:25Z. The approved DEV-75 comment remains
+the sole saved comment. Infrastructure's 32 tests pass with the real captured
+Config representation in its persisted no-change fixture; no provider writes.
+API/Web/infrastructure compiler checks pass and API tests include native provider
+error/defect containment. The seven retained built-native tests pass. A new
+whole-host rate test passes separately, proving shared HTTP/Website/batch
+admission, IPv6 aliases, another client's allowance, metadata independence,
+fixed 429/503 guidance and no fixture addresses/figures in captured app logs.
+A repeated run crossed the fixed minute reset; the test now starts its short
+burst outside the last five seconds of a window. The rejection expectation
+remains unchanged. Whole-slice qualification is still pending.
+
+The website's first private call failed because an explicit AbortSignal cannot
+be serialised by the pinned native RPC. A disposable diagnostic retained this
+failed result and restored both source owners exactly. Use the installed native
+RPC adapter and omit the transferred signal, preserving local cancellation and
+the API work/reply budgets. Existing fatal, malformed/stalled reply, work-pool,
+CLI reload and no-JavaScript checks are retained; reply fixtures now change the
+shared private/public response owner rather than dropping the new native method.
+No experimental compatibility flag, dependency upgrade or remote-cancellation
+claim is introduced.
+
+Documentation impact refinement: the five canonical runbooks cover existing
+docs/release/consumer/recovery operations; the native app cloud delivery
+procedure remains T010/DEV-81. Runbook edit is evidenced N/A for this local rate
+slice; infrastructure README and the active SPEC own required native Config and
+pre-apply readback. This does not extend docs deployment authority to the apps.
+
+
+Cooper's 6 October steering defers metrics/telemetry approach work for now and
+authorises proceeding with the other tasks. Leave CSF-T009/DEV-80 pending and
+revisit its approach before implementation. Do not add exporters, datasets,
+dashboards or metric collection in this rate slice; preserve disabled platform
+collection and fixed safe error containment. This is a task-specific deferral,
+not a pause or completion of the overall clean-slate continuation.
+
+
+## T004 shared native calculation admission and local closeout
+
+The [shared-rate receipt](../../documentation-audit/clean-slate-foundation/2026-10-06-shared-rate-admission.json) qualifies the frozen 60-source candidate from draft #152 head
+0a8b823685a2a4aa453f8a4bccd624f4be976931. All nine ordered local release checks
+pass in 661.41 seconds. The actual built native pair passes all eleven cases,
+including the original seven; 534 actual lint cases, 32 workflow tests, 83 API
+tests and browser/packed consumers pass. Both deliberate admission removals fail
+at the intended native assertions and restore exact bytes. The native artifact
+inventory is captured after verification and before the later workspace build;
+all four screenshots match inspected parent bytes. Tax sources, original
+compatibility expectations and lockfile are unchanged.
+
+The provider factory stays separate from the native executable composition. Its
+private namespace Schema is checked by the real factory before native limiter
+use. HTTP, RPC and Website calls share canonical connection admission; metadata
+remains independent. SDK facade exports and checked public errors are included.
+Documentation impact is Change required at the recorded semantic owners;
+Preserve for tax/oracles/dependencies/skills/CI/provider state; operational
+runbooks are evidenced N/A for this local slice, with app cloud delivery still
+owned by T010. Final documentation, runbook, formatting, Changeset and whitespace
+checks qualify supporting closeout changes.
+
+Together with the preceding accepted calculator/SDK/domain/request slices,
+CSF-T004 is locally complete. This does not accept a cloud deployment, exact
+global quota, real edge headers, account namespace uniqueness or remote
+cancellation. Hosted proof is still a separate immutable-head observation.
+Continue T005/DEV-76 next; T009/DEV-80 metrics approach stays deferred under
+Cooper's latest instruction. The wider goal remains active.

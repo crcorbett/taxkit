@@ -54,7 +54,7 @@ entry once and binds the website privately to that same API resource as
 the other address from the peer's native Output. Absent peer URLs become null,
 not invented addresses; runtime application Config remains the checked ingress.
 The Website candidate now consumes the binding and checked public API origin.
-The graph supplies only three Website runtime values; it does not copy origins
+The graph supplies origins, the native binding and an explicit host mode; it does not copy origins
 into Vite browser build constants. The Website's native pair test covers local
 runtime use. T003's local connection/containment review is complete; exact
 candidate hosted readback and safe exported tracing remain separate proof.
@@ -109,3 +109,26 @@ the declared local policy, not a Cloudflare upload or exported data. The
 standalone Website's `wrangler.jsonc` carries matching disabled settings. The
 existing docs app keeps its own policy. T009 still owes safe exported tracing;
 disabling collection does not complete that requirement.
+
+
+## Native calculation limiter configuration
+
+`NativeAppsHostMode` defaults to `edge`. The graph binds that mode to both native
+apps as `CALCULATOR_HOST_MODE`. The API app's native admission Layer registers
+one 60/60 RateLimit binding and captures required checked
+`CALCULATOR_RATE_NAMESPACE` through Alchemy's own Config/runtime bridge. A stage
+operator must select an account-wide unique positive decimal value before any
+authorised cloud plan/apply. No provider value or credential is selected here.
+
+The guarded disposable root supplies `local-emulator` and isolated local
+namespace `10075`. It cannot select a cloud stage or provider mode. API and
+Website additionally require an HTTP loopback API origin before using their one
+shared local allowance. Native graph tests keep create/no-change/update checks
+and forbid provider writes. Their saved state uses Alchemy's own packed
+Config representation, including the captured namespace, rather than omitting
+new native settings from the no-change fixture.
+
+The existing docs deployment runbook owns `DocsWebsite` only. It does not
+authorise or supply an API/Website deployment procedure; T010/DEV-81 must settle
+that operation's candidate, namespace readback, receipt and rollback before
+provider approval. Local limiter tests cannot establish real edge or cloud state.

@@ -1,5 +1,7 @@
 import {
   CalculatorCapacityExceeded,
+  CalculatorRateLimited,
+  CalculatorAdmissionUnavailable,
   CalculatorOperationTimedOut,
   CalculatorRequestError,
   CalculatorCatalogItem,
@@ -71,6 +73,23 @@ const CalculatorApiMetadataErrorEnvelopes = [
 
 const CalculatorApiErrorEnvelopes = [
   CalculatorApiRequestErrorEnvelope,
+  Schema.Struct({ error: CalculatorRateLimited }).pipe(
+    HttpApiSchema.encodeToWithHeaders(
+      {
+        body: Schema.Struct({ error: CalculatorRateLimited }).pipe(
+          HttpApiSchema.status(429)
+        ),
+        headers: { "retry-after": Schema.Literal("60") },
+      },
+      {
+        decode: ({ body }) => body,
+        encode: (body) => ({ body, headers: { "retry-after": "60" as const } }),
+      }
+    )
+  ),
+  Schema.Struct({ error: CalculatorAdmissionUnavailable }).pipe(
+    HttpApiSchema.status("ServiceUnavailable")
+  ),
   Schema.Struct({ error: CalculatorCapacityExceeded }).pipe(
     HttpApiSchema.status("ServiceUnavailable")
   ),

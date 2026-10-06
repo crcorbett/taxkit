@@ -259,7 +259,7 @@ describe("native local development", () => {
                 )
                 .replace(
                   init,
-                  `${init}\n  Effect.map((application) => ({ fetch: application.fetch.pipe(Effect.map((response) => HttpServerResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })),`
+                  `${init}\n  Effect.map((application) => ({ ...application, fetch: application.fetch.pipe(Effect.map((response) => HttpServerResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })),`
                 )
             );
             yield* Effect.promise(() =>

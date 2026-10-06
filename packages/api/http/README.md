@@ -356,7 +356,7 @@ budgets. Metadata does not use a calculation place. Native built proof covers a
 seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
 browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
-control returns. Rate identity, per-client rate limits, MCP and full T004
+control returns. The native rate policy below is implemented separately; MCP and whole T004
 qualification remain unfinished.
 
 
@@ -396,3 +396,8 @@ The reusable Core calculation error now has a nested Option cause in checked
 TypeScript values. Its existing HTTP representation is retained, including
 missing/undefined/null diagnostic forms. This is an absence-owner change, not
 a diagnostic sanitiser; do not export legacy diagnostic values to telemetry.
+
+
+## Native calculation rate admission
+
+The [calculator-owned rate contract](../../calculators/README.md#native-calculation-rate-admission) adds canonical rate/unavailable errors to calculation responses. The native API maps them to HTTP 429 with `Retry-After: 60` and fixed 503 guidance, using the existing error envelope. Metadata consumes no rate unit. Owning group Schemas drive generated clients and the OpenAPI snapshot; the standalone Bun host keeps its existing policy.

@@ -1,7 +1,9 @@
 export {
+  CalculatorAdmissionUnavailable,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
   CalculatorMetadataError,
+  CalculatorRateLimited,
   CalculatorRunFacts,
   CalculatorRunReport,
   CalculatorRunRequest,

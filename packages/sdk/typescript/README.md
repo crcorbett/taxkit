@@ -322,3 +322,12 @@ The packed consumer also checks the Core diagnostic cause Option Type/default,
 its four original encoded forms and removal of the unused catalogue `program`
 field. Existing selected-report, input-help, trace/ledger, metadata and source
 expectations remain fixed. Legacy diagnostic values are not safe telemetry.
+
+
+The published schema facade also exposes canonical `CalculatorRateLimited` and
+`CalculatorAdmissionUnavailable`. They belong to the expanded checked service
+error union; rate guidance carries no connection key or provider cause.
+Packed runtime and TypeScript consumers check these identities and reject
+private cause/key properties. Direct local SDK calculations do not acquire the
+[native host rate policy](../../calculators/README.md#native-calculation-rate-admission),
+and their retained reports and caller-owned lifetime remain unchanged.

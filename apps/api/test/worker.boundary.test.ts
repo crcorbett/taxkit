@@ -15,6 +15,7 @@ import {
   CalculatorLive,
   sensitiveSentinel,
 } from "@taxkit/api-rpc/testing/fixtures";
+import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
 import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
@@ -44,7 +45,18 @@ import { TestClock, TestConsole } from "effect/testing";
 
 import { ApiWorkerApplication } from "../src/worker.application.js";
 import { ApiWorkerSettingsConfig } from "../src/worker.config.js";
-import { ApiWorkerInit } from "../src/worker.js";
+import { ApiWorkerInit as ApiWorkerApplicationInit } from "../src/worker.js";
+
+// These retained tests isolate body, protocol and lifetime behaviour. Actual
+// admission and native provider counters are qualified in their owning tests.
+const ApiWorkerInit = ApiWorkerApplicationInit.pipe(
+  Effect.provideService(
+    CalculatorAdmission,
+    CalculatorAdmission.of({
+      admitCalculation: () => Effect.void,
+    })
+  )
+);
 
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
@@ -288,7 +300,10 @@ describe("native API application", () => {
               HttpServerRequest.fromWeb(
                 new Request("https://api.example.com/rpc", {
                   body,
-                  headers: { "content-type": "application/json" },
+                  headers: {
+                    "cf-connecting-ip": "203.0.113.75",
+                    "content-type": "application/json",
+                  },
                   method: "POST",
                 })
               )
@@ -730,7 +745,10 @@ describe("native API application", () => {
           HttpServerRequest.fromWeb(
             new Request("https://api.example.com/rpc", {
               body,
-              headers: { "content-type": "application/json" },
+              headers: {
+                "cf-connecting-ip": "203.0.113.75",
+                "content-type": "application/json",
+              },
               method: "POST",
             })
           )

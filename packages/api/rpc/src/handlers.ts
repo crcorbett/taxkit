@@ -53,6 +53,8 @@ export const TaxKitRpcHandlersLive = TaxKitRpcGroup.toLayer(
               Effect.mapError((error) =>
                 Match.value(error).pipe(
                   Match.tag(
+                    "CalculatorRateLimited",
+                    "CalculatorAdmissionUnavailable",
                     "CalculatorCapacityExceeded",
                     "CalculatorOperationTimedOut",
                     (failure) => failure

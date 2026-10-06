@@ -1,4 +1,7 @@
-import { declareNativeAppsStack } from "@taxkit/infrastructure/apps-stack";
+import {
+  declareNativeAppsStack,
+  NativeAppsHostMode,
+} from "@taxkit/infrastructure/apps-stack";
 import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { Config, ConfigProvider, Effect } from "effect";
@@ -31,6 +34,18 @@ export default Alchemy.Stack(
         )
       );
     }
-    return yield* declareNativeAppsStack;
+    const config = yield* ConfigProvider.ConfigProvider;
+    return yield* declareNativeAppsStack.pipe(
+      Effect.provideService(NativeAppsHostMode, "local-emulator"),
+      Effect.provideService(
+        ConfigProvider.ConfigProvider,
+        ConfigProvider.orElse(
+          // This root can only run in local emulation. This isolated local
+          // namespace is neither a cloud reservation nor a Production value.
+          ConfigProvider.fromUnknown({ CALCULATOR_RATE_NAMESPACE: "10075" }),
+          config
+        )
+      )
+    );
   })
 );

@@ -49,6 +49,21 @@
       "source": "./src/work.layer.ts",
       "types": "./dist/work.layer.d.ts",
       "default": "./dist/work.layer.js"
+    },
+    "./admission.schemas": {
+      "source": "./src/admission.schemas.ts",
+      "types": "./dist/admission.schemas.d.ts",
+      "default": "./dist/admission.schemas.js"
+    },
+    "./admission.service": {
+      "source": "./src/admission.service.ts",
+      "types": "./dist/admission.service.d.ts",
+      "default": "./dist/admission.service.js"
+    },
+    "./admission.layer": {
+      "source": "./src/admission.layer.ts",
+      "types": "./dist/admission.layer.d.ts",
+      "default": "./dist/admission.layer.js"
     }
   },
   "publishConfig": {
@@ -84,6 +99,18 @@
       "./work": {
         "types": "./dist/work.layer.d.ts",
         "default": "./dist/work.layer.js"
+      },
+      "./admission.schemas": {
+        "types": "./dist/admission.schemas.d.ts",
+        "default": "./dist/admission.schemas.js"
+      },
+      "./admission.service": {
+        "types": "./dist/admission.service.d.ts",
+        "default": "./dist/admission.service.js"
+      },
+      "./admission.layer": {
+        "types": "./dist/admission.layer.d.ts",
+        "default": "./dist/admission.layer.js"
       }
     },
     "access": "public"

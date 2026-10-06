@@ -284,7 +284,8 @@ ten-second complete-response client deadline. The calculator-owned bounded
 Layer supplies one pool to the native HTTP/RPC host and one per standalone HTTP
 router. Each batch calculation takes a place; excess work fails without waiting.
 Metadata does not take a calculation place; its HTTP endpoints declare 504. Checked capacity/timeout failures
-use HTTP 503/504 and RPC revision 3. The five-second limit on all nine service operations includes
+use HTTP 503/504; shared native rate failures use HTTP 429 with Retry-After 60
+and RPC revision 4. The five-second limit on all nine service operations includes
 scoped cleanup and rejects late success using monotonic elapsed time; it cannot
 force synchronous CPU pre-emption or guarantee remote cancellation. Direct
 engine/local SDK execution retains its existing lifetime and results. Scope and approximation of the
@@ -301,6 +302,27 @@ catalogue responses and supported streaming/MCP envelopes before adopting these
 limits, and record a justified adjustment in the SPEC rather than adding an
 unlimited fallback. Rate identity is not an analytics visitor ID and must not
 be exported in logs, spans or product events.
+
+The native API alone owns the 60-calculation allowance. Public HTTP/RPC use a
+checked Cloudflare connection address; forwarded Worker calls, missing/invalid
+addresses and arbitrary forwarded headers cannot select a public key. Website
+HTML forms carry their original checked address through a binding-only named
+operation, separate from the request body. Each batch calculation consumes one
+unit; metadata consumes none. Address aliases are canonicalised and the key
+is redacted and cannot use the ordinary Schema encoder. No analytics identity
+or request-derived policy override is admitted. Cloudflare's limit is local
+to a location and approximate, not a global exact quota.
+
+`CALCULATOR_RATE_NAMESPACE` is a required positive decimal string selected by
+the operator for that account and stage. No cloud value is invented. The guarded
+disposable development root explicitly selects `local-emulator`, one shared
+loopback allowance and its isolated local namespace. Hosted composition defaults
+to `edge`; the local allowance additionally requires an HTTP loopback API origin.
+Missing hosted identity still fails safely. The native RPC does not transfer an
+explicit AbortSignal on the pinned runtime: client cancellation stops local
+waiting, while the existing API operation budget bounds remote work. No
+experimental platform flag or dependency upgrade is introduced.
+
 
 Keep owning Schemas, schema-derived types, branded identities, checked semantic
 Config, services, Layers and tagged errors. Core ledger types now infer from their Schema;
@@ -853,3 +875,13 @@ heterogeneous Schema/Layer relations retain their explicit owners. Historical
 opaque diagnostics are codec values, with no new safe-telemetry claim. The
 [domain contract receipt](../documentation-audit/clean-slate-foundation/2026-10-06-domain-contract-closeout.json)
 and active plan own qualification; rate identity/limiting keeps T004 active.
+
+
+## Metrics deferral — 6 October 2026
+
+Cooper asked to leave metrics work for now because the approach is likely to
+change, and to proceed with the other work. CSF-T009/DEV-80 remains pending; its
+metrics/exporter/dataset/dashboard choices must be revisited before that task
+starts. This continuation does not implement or accept that prior metrics
+approach. Existing disabled collection and fixed safe failure containment stay
+in place while calculator/API and other authorised work proceed.

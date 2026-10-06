@@ -366,3 +366,8 @@ The native fixture uses different saved figures from initial examples and
 checks server HTML, hydrated fields, retained reports and no replay.
 The Website also has a keyboard skip link, one main landmark, current-page
 navigation, spaced controls and visible keyboard focus.
+
+
+## Native calculation rate admission
+
+The [Website owner](../../apps/web/README.md#native-calculation-rate-admission) captures checked original connection identity and uses the API's binding-only named operation for HTML forms. Browser calculations use public RPC. Both reach the same [calculator-owned allowance](../../packages/calculators/README.md#native-calculation-rate-admission), including separate batch members. Containers show fixed safe guidance with manual retry. This adds no calculation engine, stored figures, analytics identity or URL data to the Website. Private-call local cancellation and remote work limits remain distinct.

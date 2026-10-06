@@ -92,6 +92,16 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
             Effect.mapError((error) =>
               Match.value(error).pipe(
                 Match.tag(
+                  "CalculatorRateLimited",
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                ),
+                Match.tag(
+                  "CalculatorAdmissionUnavailable",
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                ),
+                Match.tag(
                   "CalculatorCapacityExceeded",
                   (failure) =>
                     new CalculatorApiErrorEnvelopeData({ error: failure })

@@ -5,7 +5,11 @@ import { vi } from "vitest";
 import { TaxKitWebServerConfig } from "./config.server";
 import { WebsitePublicSettings, WebsiteSettingsTransport } from "./schemas";
 
-const binding = { connect: vi.fn(), fetch: vi.fn() };
+const binding = {
+  calculatorRequest: vi.fn(),
+  connect: vi.fn(),
+  fetch: vi.fn(),
+};
 const settings = {
   API_PUBLIC_ORIGIN: "https://api.taxkit.example",
   TAXKIT_API: binding,

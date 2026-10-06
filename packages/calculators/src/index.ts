@@ -24,6 +24,8 @@ export {
 export { PublicCalculatorServiceLive } from "./live.layer.js";
 export {
   CalculatorCapacityExceeded,
+  CalculatorRateLimited,
+  CalculatorAdmissionUnavailable,
   CalculatorOperationTimedOut,
   CalculatorRequestError,
   CalculatorMetadataError,

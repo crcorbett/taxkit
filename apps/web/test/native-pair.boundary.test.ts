@@ -30,6 +30,11 @@ import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
+import {
+  nativeLocalModeFixture,
+  nativeRateFixture,
+} from "./native-rate.fixture";
+
 const apiOrigin = "http://127.0.0.1:4197";
 const websiteOrigin = "http://127.0.0.1:4196";
 const form = "grossDollars=1654&period=weekly&taxFreeThresholdClaimed=on";
@@ -112,6 +117,8 @@ describe("built native API and Website", () => {
             compatibilityDate: "2026-10-04",
             compatibilityFlags: ["nodejs_compat"],
             env: {
+              ...nativeLocalModeFixture,
+              ...nativeRateFixture("10075"),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,
@@ -150,6 +157,7 @@ describe("built native API and Website", () => {
           config: {
             ...unavailableApi.config,
             env: {
+              ...nativeLocalModeFixture,
               ...unavailableApi.config.env,
               API_PUBLIC_ORIGIN: {
                 type: "json" as const,
@@ -168,6 +176,7 @@ describe("built native API and Website", () => {
             compatibilityDate: "2026-10-04",
             compatibilityFlags: ["nodejs_compat"],
             env: {
+              ...nativeLocalModeFixture,
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
               TAXKIT_API: {
                 type: "worker" as const,

@@ -483,6 +483,8 @@ import {
   CalculatorRunRequest,
   CalculatorServiceError,
   CalculatorCapacityExceeded,
+  CalculatorRateLimited,
+  CalculatorAdmissionUnavailable,
   CalculatorOperationTimedOut,
   CalculatorMetadataError,
   TaxKitFailure,
@@ -623,6 +625,14 @@ const workFailure: typeof CalculatorServiceError.Type = new CalculatorCapacityEx
 const workTimeout: typeof CalculatorServiceError.Type = new CalculatorOperationTimedOut();
 void workFailure;
 void workTimeout;
+const rateFailure: typeof CalculatorServiceError.Type = new CalculatorRateLimited();
+const admissionFailure: typeof CalculatorServiceError.Type = new CalculatorAdmissionUnavailable();
+// @ts-expect-error A native provider cause cannot be supplied as public rate guidance.
+new CalculatorRateLimited({ cause: "PRIVATE9" });
+// @ts-expect-error Connection identity is not part of checked unavailable guidance.
+admissionFailure.key;
+void rateFailure;
+void admissionFailure;
 void TaxKitFailure;
 void TaxKitSuccess;
 void AuPayTakeHomeCalculation;

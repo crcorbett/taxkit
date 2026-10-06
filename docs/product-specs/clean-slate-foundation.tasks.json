@@ -415,7 +415,7 @@
     {
       "id": "CSF-T004",
       "title": "Finish calculator pages and the fresh package interface",
-      "status": "in_progress",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -491,7 +491,8 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-06-core-ambient-type-portability.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-absence-owners.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-contract-closeout.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-contract-closeout.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-shared-rate-admission.json"
       ]
     },
     {

@@ -41,6 +41,7 @@ Clean slate implementation evidence:
 - [4 October canonical skill adoption and provisional strict-policy inventory](clean-slate-foundation/2026-10-04-canonical-skills.json)
 - [4 October Medicare scope conflict](clean-slate-foundation/2026-10-04-medicare-scope-conflict.json)
 - [5 October foundation acceptance review](clean-slate-foundation/2026-10-05-foundation-acceptance-review.json)
+- [6 October shared native calculation admission and local T004 closeout](clean-slate-foundation/2026-10-06-shared-rate-admission.json)
 
 The baseline preserves tax results and historical provider proof. The Medicare
 finding requires a scope decision before changing retained results; no correction
