@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M47SGV6BBXYAXSCHXNW4K4XP",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-06T05:03:55.339128Z",
+  "branch": "codex/dev-75-request-absence-owners",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/web/test/native-rpc-failures.boundary.test.ts",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5918999b0327",
+  "checkpoint_transcript_start": 38101,
+  "transcript_lines_at_start": 38101,
+  "compact_transcript_start": 4608,
+  "token_usage": {
+    "input_tokens": 5500,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 841472,
+    "output_tokens": 2498,
+    "api_call_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-06T05:03:51.909965Z",
+    "agent_lines": 105,
+    "agent_removed": 2,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 105,
+    "total_lines_changed": 107,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
