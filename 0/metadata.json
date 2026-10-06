@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M47QW5Q9R9HJC6HSX0MWHAAQ",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-06T04:34:52.831412Z",
+  "branch": "codex/dev-75-request-absence-owners",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/api/test/worker.boundary.test.ts",
+    "apps/web/src/lib/form.boundary.ts",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "apps/web/test/native-rpc-failures.boundary.test.ts",
+    "apps/web/vitest.browser.config.ts",
+    "packages/api/rpc/README.md",
+    "packages/api/rpc/test/handlers.test.ts",
+    "packages/calculators/src/live.layer.ts",
+    "packages/sdk/typescript/src/effect.test.ts",
+    "packages/sdk/typescript/src/index.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5918999b0327",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 14399142,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 694532736,
+    "output_tokens": 3038150,
+    "api_call_count": 4624
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-06T04:34:50.739742Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 2438,
+    "human_modified": 56,
+    "human_removed": 0,
+    "total_committed": 2438,
+    "total_lines_changed": 2726,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}

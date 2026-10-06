@@ -1,0 +1,35 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M47QW5Q9R9HJC6HSX0MWHAAQ",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-75-request-absence-owners",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/api/test/worker.boundary.test.ts",
+    "apps/web/src/lib/form.boundary.ts",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "apps/web/test/native-rpc-failures.boundary.test.ts",
+    "apps/web/vitest.browser.config.ts",
+    "packages/api/rpc/README.md",
+    "packages/api/rpc/test/handlers.test.ts",
+    "packages/calculators/src/live.layer.ts",
+    "packages/sdk/typescript/src/effect.test.ts",
+    "packages/sdk/typescript/src/index.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 14399142,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 694532736,
+    "output_tokens": 3038150,
+    "api_call_count": 4624
+  }
+}
