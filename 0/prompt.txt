@@ -1,0 +1,7 @@
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_1bVTWMcCf1Qh4ZCVQoDmUT9n\",0]","question":"The Linear connector requires a fresh confirmation to post the prepared progress comment to DEV-75. It links draft #146 and its passing checks, and says rate limiting and domain work remain unfinished. Approve this comment?","answer":"Approve the DEV-75 comment"}]
+</send_user_message_question_reply>
+
+---
+
+We are likely to change the metrics approach, so leave this for now and proceed
