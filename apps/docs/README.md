@@ -3,11 +3,15 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-app-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-06
 review_trigger: docs route, content boundary, build target, runtime, credential source, proof or deployment ownership change
 ---
 
 # Docs app
+
+The app and script typechecks select ESNext modules to support the compiler
+configuration's explicit JSON import declaration under Node's native loader.
+The docs-content README owns that shared configuration contract.
 
 This private TanStack Start app renders the public TaxKit developer
 documentation.

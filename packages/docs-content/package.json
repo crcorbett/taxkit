@@ -73,12 +73,16 @@
     "fumadocs-core": "16.16.0",
     "fumadocs-mdx": "15.4.6",
     "react": "catalog:",
+    "unist-util-map": "4.0.0",
     "yaml": "2.9.1"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
     "@types/bun": "catalog:",
+    "@types/mdast": "4.0.4",
     "typescript": "catalog:",
+    "unified": "11.0.5",
+    "vfile": "6.0.3",
     "vite": "catalog:",
     "vitest": "catalog:"
   }

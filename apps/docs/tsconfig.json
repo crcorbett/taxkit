@@ -4,6 +4,7 @@
   "compilerOptions": {
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "allowImportingTsExtensions": true,
+    "module": "ESNext",
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {

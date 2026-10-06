@@ -47,6 +47,10 @@ on the open-source tax engine and avoid downstream private-product specifics.
   its source service still supports the existing docs app.
   Its independent native MDX index and build-only source Layer use the installed
   compiler and the same adapter as the retained Vite source.
+  Its compiler-only link policy maps parsed page links through checked navigation
+  and repository references to a recorded immutable revision before both HTML
+  and processed Markdown are produced. It rejects unowned page destinations
+  and paths outside the checkout, preserving code examples and source bytes.
 
 `packages/docs-examples`
 : Private checked integration templates and their compiler/runtime proof. It

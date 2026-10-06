@@ -3917,3 +3917,63 @@ Website/API routes, discovery and images remain unfinished T005 work. The
 current HTML link adapter is not applied to processed Markdown, so the
 replacement must qualify both representations before retirement. No merge,
 deployment, publication or provider apply is claimed or authorised.
+
+### Shared compiler link presentation
+
+The next T005 slice moves page-link presentation into the existing MDX compiler.
+Fumadocs still owns parsing, highlighting, HTML and processed Markdown. A private
+docs-content plugin maps parsed links and reference definitions through checked
+navigation, including section indexes. Repository references point at immutable
+source revision `a151e51e8a30247526fa93412df046955846eca4`; all 34 distinct
+repository destinations exist in that revision. Anchors, queries, fragments and
+external links survive, while code examples and authored source bytes stay
+unchanged. Unknown page addresses and paths outside the checkout reject the
+compiler. The retained Vite and independent native indexes use this same policy.
+
+The synchronous Fumadocs configuration boundary checks imported navigation once
+using a non-throwing Schema result. It reports a fixed safe configuration error
+without running Effect. Its exact decoder admission does not admit throwing
+Schema codecs, encoders, runners or the neighbouring link module. Actual CLI
+fixtures retain those restrictions. The compiler callback restores VFile's
+unset path as an Option because its declared string getter can return undefined.
+The shared configuration helper exposes its known SDK callback directly; no
+runtime type inspection or compatibility cast is needed.
+
+Documentation impact is **Change required** for docs-content/compiler and
+docs-fumadocs configuration/READMEs, content architecture, exact lint admission
+and actual CLI fixtures, selected dependency declarations/lock, patch Changeset,
+task evidence and this plan. **Preserve** the 61 authored draft pages and draft
+navigation, empty acceptance bindings, tax results and original examples,
+deferred metrics, package ownership, CI/cache contracts and historical proof.
+Runbook procedure changes and external operations are evidenced **N/A** for this
+local compiler slice. Current cache inputs already include the configuration,
+navigation, source modules and dependency manifests.
+
+The first full verification and repository tests pass, but the final build
+catches Node's required JSON import attribute. The ES2022 typecheck had rejected
+that attribute during the initial experiment, leaving a bundled-config-only
+pass. Correct the real host contract by adding the attribute and selecting
+ESNext modules in docs-content, the retained docs app and script typechecks, and
+the documentation tool typecheck that imports generated Config types. Preserve
+root and compiled-public-package module settings. This changes the impact row
+to include those exact compiler profiles; requalify the actual native build and
+the complete checks after the correction. Retain the failed build as evidence.
+
+Focused checks pass, including fourteen parsed-tree cases. The real native
+service processes all 61 pages with 244 canonical page-link occurrences and 57
+repository-link occurrences, with no unresolved relative destination. A separate
+real compiler and Chromium check renders all 61 HTML bodies and confirms that
+their page/source destinations also appear in processed Markdown. The corrected
+configuration passes global types, the root build, all seven retained docs
+browser tests and the built local workerd/Chromium checks. Fresh full repository
+verification passes in 595.73 seconds; separate repository tests pass in 91.06
+seconds and the final 61-page HTML/Markdown comparison passes.
+
+The [compiler-link receipt](../../documentation-audit/clean-slate-foundation/2026-10-06-public-docs-links.json)
+binds the reviewed source bytes, native/HTML page identities, immutable source
+readback, final checks and the failed native-build experiment. Earlier copy
+commit `a151e51e8a30247526fa93412df046955846eca4` passed hosted Quality run
+`37453265100`; the new link commit has separate hosted checks after push.
+Explicit page/navigation acceptance, Website/API routes, discovery/images and
+old-app retirement remain T005 work. This slice establishes neither deployment
+nor public availability. Metrics remain deferred under Cooper's instruction.

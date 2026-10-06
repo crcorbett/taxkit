@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-06
 review_trigger: package contracts or generated-source boundaries change
 ---
 
@@ -42,6 +42,12 @@ callbacks or receive raw provider pages.
 The Shiki `pre` transformer returns a replacement HAST node with decoded
 metadata. It preserves the input node; the installed Shiki transformer contract
 consumes the returned node.
+
+`sharedMdxOptions` exposes its known remark-plugin callback through the
+installed SDK type. Collection owners can prepend their own compiler plugin and
+retain the existing plugins, Mermaid processing and highlighting options
+without inspecting a runtime union. TaxKit's page-link policy remains in
+docs-content; the reusable package does not acquire navigation or source roots.
 
 ## Build ordering
 

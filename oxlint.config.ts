@@ -14,6 +14,9 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact imported navigation ingress at the synchronous Fumadocs config host.
+  // No synchronous throwing codec, encoder or runtime execution admission.
+  "packages/docs-content/source.config.ts",
   // Exact acceptance JSON, external example JSON and raw HTTP error ingress.
   "tools/documentation/catalogue.build.ts",
   "tools/documentation/catalogue.build.test.ts",

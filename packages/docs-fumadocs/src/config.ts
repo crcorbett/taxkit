@@ -28,7 +28,12 @@ export const transformerCodeBlockMeta = (): ShikiTransformer => ({
   },
 });
 
-export const sharedMdxOptions = (): DefaultMDXOptions => ({
+export const sharedMdxOptions = (): DefaultMDXOptions & {
+  readonly remarkPlugins: Exclude<
+    DefaultMDXOptions["remarkPlugins"],
+    readonly unknown[] | undefined
+  >;
+} => ({
   rehypeCodeOptions: {
     defaultColor: false,
     themes: { dark: "github-dark", light: "github-light" },

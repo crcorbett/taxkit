@@ -26,7 +26,12 @@ Those belong in the `apps/docs` runtime.
 - `content/` and `navigation.json`: the authored TaxKit public
   documentation source.
 - `source.config.ts`: TaxKit collection declaration for `content/` using
-  reusable `@taxkit/docs-fumadocs/config` helpers.
+  reusable `@taxkit/docs-fumadocs/config` helpers. It checks imported navigation
+  once at the synchronous compiler configuration boundary.
+- `src/public-links.boundary.ts`: compiler-only mapping of parsed page and
+  repository links. It preserves the supplied tree and code examples.
+- `src/public-links.schema.ts`: checked repository URL and immutable Git revision
+  used by the compiler for source attribution.
 - `src/schemas.ts`: compatibility re-exports from `@taxkit/content` plus authored
   meta and validation issue schemas.
 - `src/errors.ts`: compatibility source/lookup error exports plus validation errors.
@@ -66,6 +71,28 @@ The authored `navigation.json` representation is decoded through
 `DocsNavigation` in `src/navigation.ts`. This keeps TaxKit navigation at its
 earliest semantic owner without initializing the Node-only validation module
 inside an app Worker.
+
+The compiler also checks imported navigation in `source.config.ts`. Its
+synchronous configuration host uses the non-throwing Schema result and turns an
+invalid result into a fixed safe configuration failure. It does not run an
+Effect runtime. Fumadocs owns parsing, highlighting and both HTML and processed
+Markdown. The private link plugin maps its parsed link and reference-definition
+nodes through checked navigation. Section indexes use their canonical section
+address. Repository references use the recorded immutable Git revision; queries
+and fragments survive. Anchors and external links are preserved, and code
+examples are not rewritten. Unknown page addresses and paths outside the
+checkout reject compilation. Refresh the source revision only at a recorded
+review phase after confirming its referenced files.
+
+The same plugin serves the retained Vite index and the independent native index.
+It belongs to the build process; browser modules and request handlers must not
+import its Node path operations or the compiler configuration.
+
+Node's native configuration loader requires `with { type: "json" }` on the
+navigation import. This source-only package, the retained docs app and its script
+typecheck, and the documentation tool typecheck select `ESNext` modules so the
+installed TypeScript compiler accepts that declaration. The root module setting
+and compiled public package settings retain their existing contract.
 
 This package is intentionally private and source-only. It is not a publishable
 runtime package because its server and client exports wrap generated

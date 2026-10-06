@@ -210,12 +210,16 @@
         "fumadocs-core": "16.16.0",
         "fumadocs-mdx": "15.4.6",
         "react": "catalog:",
+        "unist-util-map": "4.0.0",
         "yaml": "2.9.1",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "@types/bun": "catalog:",
+        "@types/mdast": "4.0.4",
         "typescript": "catalog:",
+        "unified": "11.0.5",
+        "vfile": "6.0.3",
         "vite": "catalog:",
         "vitest": "catalog:",
       },
@@ -2138,6 +2142,8 @@
     "unified": ["unified@11.0.5", "", { "dependencies": { "@types/unist": "^3.0.0", "bail": "^2.0.0", "devlop": "^1.0.0", "extend": "^3.0.0", "is-plain-obj": "^4.0.0", "trough": "^2.0.0", "vfile": "^6.0.0" } }, "sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA=="],
 
     "unist-util-is": ["unist-util-is@6.0.1", "", { "dependencies": { "@types/unist": "^3.0.0" } }, "sha512-LsiILbtBETkDz8I9p1dQ0uyRUWuaQzd/cuEeS1hoRSyW5E5XGmTzlwY1OrNzzakGowI9Dr/I8HVaw4hTtnxy8g=="],
+
+    "unist-util-map": ["unist-util-map@4.0.0", "", { "dependencies": { "@types/unist": "^3.0.0" } }, "sha512-HJs1tpkSmRJUzj6fskQrS5oYhBYlmtcvy4SepdDEEsL04FjBrgF0Mgggvxc1/qGBGgW7hRh9+UBK1aqTEnBpIA=="],
 
     "unist-util-position": ["unist-util-position@5.0.0", "", { "dependencies": { "@types/unist": "^3.0.0" } }, "sha512-fucsC7HjXvkB5R3kTCO7kUjRdrS0BJt3M/FPxmHMBOm8JQi2BsHAHFsy27E0EolP8rp0NzXsJ+jNPyDWvOJZPA=="],
 
