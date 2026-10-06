@@ -77,12 +77,12 @@ records command outcomes and log digests.
 | T001 / DEV-72 | Implemented and locally tested | Retention, admission and diagnostic checks pass; draft PR review pending. |
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
-| T004 / DEV-75 | In progress after local T003 acceptance | All three pages have local proof; complete named operations, remaining body/work/rate and domain/package qualification stay active. |
-| T005 / DEV-76 | Pending T003/T004 | Accepted content, route retention, search and discovery. |
+| T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
+| T005 / DEV-76 | In progress | Checked source/example preparation and the compiled catalogue service are reviewable candidates. Explicit acceptance, replacement routes and discovery remain unfinished. |
 | T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
-| T009 / DEV-80 | Pending T003/T004/T006 | Safe logs/traces/metrics in retained shared datasets. |
+| T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Pending T007/T008/T009 | Full review, release/consumer proof and separately authorised delivery. |
 
 Adad must not qualify an invented replacement revision. The existing source
@@ -3739,3 +3739,54 @@ The [checked-source receipt](../../documentation-audit/clean-slate-foundation/20
 records exact example/source identities, the draft-review candidates, passed
 checks and retained failed experiments. This is a reviewable T005 preparation
 checkpoint, not completion of the public docs replacement.
+
+
+### Compiled content contract candidate
+
+T005 now implements `@taxkit/content` as a private compiled owner before the
+HTTP package acquires a content dependency. Existing page/navigation brands and
+source error contracts move here with compatibility re-exports from
+docs-content. The accepted catalogue adds whole-record checks for published
+status, address/source agreement, uniqueness and matching navigation. A service
+requires the checked catalogue at composition and exposes page, navigation and
+bounded search operations; no empty production fallback is supplied.
+
+Documentation impact is **Change required** for content/docs-content READMEs,
+package/content architecture, exact fixture decode admissions, Knip workspace
+ownership, Changeset and this plan. **Preserve** authored drafts and acceptance
+records, tax results, installed dependency versions, metrics deferral and
+historical proof. **N/A** for provider operations and runbook procedure changes:
+this service reads checked local values. Application catalogue generation,
+source corrections/acceptance, HTTP composition, replacement docs journeys,
+discovery assets and any packed public release dependency remain unfinished.
+
+
+The initial draft #155 source-preparation head
+`d3fe4762be09803a2f7ad02073385de90295dbf3` passes hosted Quality run
+37436215902/job 112178548557 at 08:50:41Z on 6 October. This hosted result
+belongs to that earlier head. The compiled content candidate needs its own
+fresh local checks and later hosted result after push.
+
+An isolated actual Bun tarball installs with Effect 4.0.0 and passes ordinary
+Node execution plus NodeNext declaration checking with library checking enabled.
+The compiler probe uses ES2024, disposal and DOM libraries required by Effect's
+published declarations; its initial missing-library failures remain recorded.
+Bun pack retains repository source and test exports despite publishConfig, so
+this qualifies private ordinary compiled resolution only. Public release
+preparation and the HTTP dependency closure still need deliberate qualification.
+Search constructs its bounded excerpt through the owning checked type and maps
+projection failure to a fixed safe content error.
+
+
+The private compiled content checkpoint passes its seven focused tests, the
+existing nine docs-content tests, source/build types, strict lint, docs and
+runbook checks, authored-content validation, Knip and ordinary installed
+NodeNext/Node execution. The full repository verification passes in 676.65
+seconds; the wider test run passes in 87.83 seconds. Root build passes all
+18 tasks (13 unchanged cached results), and frozen install preserves the exact
+lockfile. Final owner/proof metadata receives fresh docs/runbook/format checks.
+This checkpoint leaves authored sources and navigation draft and adds no
+acceptance record, transport or replacement route. T005 stays in progress;
+T009 stays deferred. The [compiled-contract receipt](../../documentation-audit/clean-slate-foundation/2026-10-06-compiled-content-contract.json)
+records source identities, exact checks, retained failed attempts, ordinary
+private compiled resolution and the remaining public publication limitation.

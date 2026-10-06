@@ -25,6 +25,7 @@ Current implemented code lives in:
 - `apps/web`
 - `packages/core`
 - `packages/calculators`
+- `packages/content`
 - `packages/docs-content`
 - `packages/docs-examples`
 - `packages/docs-fumadocs`
@@ -177,11 +178,20 @@ graph. The Website uses its private binding for SSR and checked public origin
 for browser RPC; T003 is locally accepted by its dated connection acceptance review.
 T009 exported tracing and provider/deployment proof remain open.
 
+`packages/content`
+: Private compiled owner of canonical docs page/navigation contracts, source
+  errors, the accepted public catalogue Schema and `ContentService`. Application
+  composition injects one checked catalogue; the service reads accepted pages,
+  navigation and bounded search without filesystem or runtime execution. This
+  owner does not perform source acceptance or compile MDX. Future HTTP consumers
+  must use this compiled contract instead of the source-only Fumadocs collection.
+
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs
-  authored MDX, navigation, frontmatter, meta, validation issues,
-  tagged docs errors, `DocsContentService`, the Fumadocs `source.config.ts`
-  and the generated `.source/*` boundary. Navigation decoding is independent
+  authored MDX, authored navigation, meta, validation issues,
+  validation errors, `DocsContentService`, the Fumadocs `source.config.ts`
+  and the generated `.source/*` boundary. Its schema/error exports retain
+  compatibility re-exports from `@taxkit/content`. Navigation decoding is independent
   of the Node-only validation module. Validation and generated raw-text access
   may read MDX files only through their explicit non-runtime operations; app
   routes use processed generated content through the service and client

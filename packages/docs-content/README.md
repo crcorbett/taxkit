@@ -12,9 +12,10 @@ review_trigger: package contracts or generated-source boundaries change
 ## Scope
 
 Private source-only package for authored public TaxKit MDX, navigation,
-and content contracts. It owns Effect Schema frontmatter, meta and
-navigation schemas, tagged docs source errors, validation policy, generated
-source configuration and the content service. Reusable Fumadocs internals come
+and source composition. Canonical page, frontmatter, navigation and source error
+contracts come from `@taxkit/content`; existing imports here re-export those
+contracts for compatibility. This package owns meta and validation schemas,
+validation policy, generated source configuration and `DocsContentService`. Reusable Fumadocs internals come
 from `@taxkit/docs-fumadocs`.
 
 This package does not own routes, layout, MDX renderer components or search UI.
@@ -26,9 +27,9 @@ Those belong in the `apps/docs` runtime.
   documentation source.
 - `source.config.ts`: TaxKit collection declaration for `content/` using
   reusable `@taxkit/docs-fumadocs/config` helpers.
-- `src/schemas.ts`: canonical docs frontmatter, meta, navigation and
-  validation issue schemas.
-- `src/errors.ts`: tagged docs source and lookup errors.
+- `src/schemas.ts`: compatibility re-exports from `@taxkit/content` plus authored
+  meta and validation issue schemas.
+- `src/errors.ts`: compatibility source/lookup error exports plus validation errors.
 - `src/server.ts`: server-only generated Fumadocs source loader export for the
   content collection.
 - `src/navigation.ts`: deployment-neutral decoding of the bundled navigation

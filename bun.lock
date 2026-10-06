@@ -172,6 +172,18 @@
         "vitest": "catalog:",
       },
     },
+    "packages/content": {
+      "name": "@taxkit/content",
+      "version": "1.0.0",
+      "dependencies": {
+        "effect": "catalog:",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/core": {
       "name": "@taxkit/core",
       "version": "1.0.0",
@@ -190,6 +202,7 @@
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node": "catalog:",
+        "@taxkit/content": "workspace:*",
         "@taxkit/docs-fumadocs": "workspace:*",
         "effect": "catalog:",
         "fumadocs-core": "16.16.0",
@@ -1075,6 +1088,8 @@
     "@taxkit/api-rpc": ["@taxkit/api-rpc@workspace:packages/api/rpc"],
 
     "@taxkit/calculators": ["@taxkit/calculators@workspace:packages/calculators"],
+
+    "@taxkit/content": ["@taxkit/content@workspace:packages/content"],
 
     "@taxkit/core": ["@taxkit/core@workspace:packages/core"],
 

@@ -32,10 +32,18 @@ on the open-source tax engine and avoid downstream private-product specifics.
   source files, stable paths and primary reader metadata. It is authored,
   decoded and enforced beside the package-owned content and examples.
 
+`packages/content`
+: Private compiled owner of canonical docs page, frontmatter, navigation and
+  source error contracts. Its public catalogue Schema admits published pages
+  with matching navigation; its service reads that checked catalogue and limits
+  search to twenty short results. Source acceptance and catalogue generation
+  remain T005 work; no authored draft is accepted by adding this package.
+
 `packages/docs-content`
-: Private source-only package for TaxKit docs frontmatter, meta, navigation,
-  authored MDX, validation policy, tagged docs errors, generated
-  Fumadocs source access and the content service.
+: Private source-only package for authored navigation, meta, MDX, validation
+  policy, validation errors and generated Fumadocs source access. Its existing
+  page/navigation/source-error exports re-export `@taxkit/content` contracts;
+  its source service still supports the existing docs app.
 
 `packages/docs-examples`
 : Private checked integration templates and their compiler/runtime proof. It

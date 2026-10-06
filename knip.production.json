@@ -196,6 +196,15 @@
     "packages/docs-examples": {
       "entry": ["src/**/*.ts!"],
       "project": ["src/**/*.ts!"]
+    },
+    "packages/content": {
+      "entry": [
+        "src/schemas.ts!",
+        "src/errors.ts!",
+        "src/service.ts!",
+        "src/live.layer.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/test.layer.ts!", "!src/__testing__/**!"]
     }
   }
 }

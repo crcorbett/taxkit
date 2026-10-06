@@ -519,6 +519,7 @@
         "Apply Q13: processed Markdown exposes only accepted public pages/reference content. Personal report downloads are outside this release; calculation answers remain temporary and visible on screen or through the agreed agent tools. Any public-content cache uses an owned readonly structured key with installed Equal/Hash semantics, not JSON; prove equivalent reconstructed keys, distinct address fields and last-reader cancellation cleanup where a shared cache is needed."
       ],
       "outputs": [
+        "packages/content/** compiled canonical page/navigation/errors and accepted catalogue service; docs-content preserves compatibility re-exports.",
         "packages/docs-content/** authored/status/navigation/generated owners and any justified retained docs-fumadocs bridge",
         "packages/docs-examples/** checked source/compiler/runtime owner; preserve the four retained integration templates and their output/error expectations.",
         "apps/web HTML/docs presentation, generated static discovery/image assets and old-route redirect map",
@@ -561,7 +562,8 @@
       ],
       "commitAfterPassing": true,
       "evidence": [
-        "docs/documentation-audit/clean-slate-foundation/2026-10-06-checked-docs-source-owner.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-checked-docs-source-owner.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-compiled-content-contract.json"
       ]
     },
     {

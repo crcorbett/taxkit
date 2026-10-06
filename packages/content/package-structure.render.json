@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "kind": "effect-service",
+  "packageName": "@taxkit/content",
+  "domainPackage": null,
+  "sourceCondition": "source",
+  "versionSnapshot": {
+    "resolvedAt": "2026-10-06T08:32:01Z",
+    "sha256": "ceb50b484361dcd9be2cd765e4ba982d20a4d63e3398da588ea172512f02b966"
+  },
+  "officialSources": {
+    "repository": "https://github.com/crcorbett/taxkit/blob/d3fe4762be09803a2f7ad02073385de90295dbf3/package.json",
+    "effect": "https://registry.npmjs.org/effect/4.0.0"
+  },
+  "selectedVersions": {
+    "effect": "4.0.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  },
+  "compatibilityDecisions": [
+    {
+      "status": "qualified",
+      "decision": "Retain the receiving workspace exact Effect 4.0.0, TypeScript 7.0.2 and Vitest 5.0.3 selections; the current repository release graph passes.",
+      "evidence": "docs/documentation-audit/clean-slate-foundation/2026-10-06-checked-docs-source-owner.json",
+      "limitation": "Version identity and current receiving graph only. The generated scaffold still needs TaxKit adaptation and separate compiler/runtime/packed proof."
+    }
+  ],
+  "configDigests": {
+    "package.json": "b450aa0ed285907724e0e9c3e4fb574d5d750ea931eabc589d923ce5cb1c1a7d",
+    "tsconfig.json": "271254ffbd85688a122e7947e08af318169d7956e281a7714b547cb97d5969c0",
+    "tsconfig.build.json": "766d8f09971c4c7dd65bf59b604594d8b146ce076e1bf13293023ea14e50735b",
+    "vitest.config.ts": "0457254668f2fb23b5bdfa5d6fb283f0f6e96e354fc81fde87488ffaa5f6a124",
+    "tsconfig.test.json": "e04c26ce75f71c2458d5fdf83bc7b66e0e2a83c0285ff1686a6f99fb4845de18"
+  },
+  "limitations": [
+    "Structural rendering does not prove installed dependency, declaration, runtime, or packed-consumer behavior."
+  ],
+  "nonClaims": ["Selected versions are not claimed to remain latest."],
+  "renderedConfigDigests": {
+    "package.json": "5a6badd8211a1015fe7980456a191e88bff657b923fa07dfe5cf8bd76e623ec0",
+    "tsconfig.json": "71596163cd8ffea16eb4950049bc772ec8a8e2db408759c80bc8232aa40a6d99",
+    "tsconfig.build.json": "320b70b4115224df6a42038a8759a444d0feecabb0666c22a519904a1e9b9de9",
+    "vitest.config.ts": "8167d20931f3f88793a6253697dad0c2dc7a519ca7d4ec8aea6c2ffc9f1448b7"
+  },
+  "taxkitAdaptation": {
+    "owner": "Cooper authorised T005 implementation",
+    "decision": "Private compiled catalogue service with repository source conditions and ordinary compiled defaults; authored MDX stays private in docs-content.",
+    "changes": [
+      "Use the receiving catalogue dependencies and exact workspace compiler graph.",
+      "Retain existing canonical schema and error literals through compatibility re-exports.",
+      "Keep test exports out of proposed publishConfig; actual Bun pack retains repository exports, so publication remains unqualified."
+    ],
+    "proof": "docs/documentation-audit/clean-slate-foundation/2026-10-06-compiled-content-contract.json"
+  }
+}

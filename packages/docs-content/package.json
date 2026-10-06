@@ -62,6 +62,7 @@
   "dependencies": {
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
+    "@taxkit/content": "workspace:*",
     "@taxkit/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
     "fumadocs-core": "16.16.0",

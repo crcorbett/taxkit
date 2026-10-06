@@ -225,6 +225,19 @@
       "entry": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
       "ignoreDependencies": ["typescript"]
+    },
+    "packages/content": {
+      "entry": [
+        "src/schemas.ts",
+        "src/errors.ts",
+        "src/service.ts",
+        "src/live.layer.ts",
+        "src/test.layer.ts",
+        "src/__testing__/*.ts",
+        "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
     }
   }
 }

@@ -14,6 +14,10 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact public catalogue wire and adversarial ingress fixtures only.
+  "packages/content/src/__testing__/fixtures.ts",
+  "packages/content/test/schemas.test.ts",
+  "packages/content/test/service.test.ts",
   // Exact native connection, private-call and provider-reply trust boundaries.
   // No encoder, runner, cast, mutation or neighbouring-path permission.
   "packages/api/rpc/src/rate-identity.boundary.ts",
@@ -209,6 +213,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Exact public catalogue representation round-trip proof, not a service encoder.
+  "packages/content/test/schemas.test.ts",
   // Exact rate wire/secret-negative fixtures; no production encoding permission.
   "apps/api/test/rate-admission.boundary.test.ts",
   "apps/api/test/worker-admission.boundary.test.ts",
