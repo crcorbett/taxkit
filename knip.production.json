@@ -14,21 +14,6 @@
       ],
       "project": ["alchemy.run.ts!"]
     },
-    "apps/docs": {
-      "entry": [
-        "src/router.tsx!",
-        "src/server.ts!",
-        "src/routes/**/*.{ts,tsx}!",
-        "vite.config.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}!",
-        "!src/**/*.test.ts!",
-        "!src/**/*.type-test.ts!",
-        "vite.config.ts!"
-      ],
-      "vite": false
-    },
     "apps/api": {
       "entry": ["src/index.ts!", "src/worker.ts!"],
       "project": ["src/**/*.ts!"]

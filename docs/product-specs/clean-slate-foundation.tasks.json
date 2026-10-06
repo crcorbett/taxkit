@@ -1,7 +1,7 @@
 {
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/clean-slate-foundation.md",
-  "title": "Clean slate TaxKit foundation \u2014 implementation slices",
+  "title": "Clean slate TaxKit foundation — implementation slices",
   "status": "in_progress",
   "last_reviewed": "2026-10-07",
   "authority": "Cooper explicitly authorised implementation, reviewable commits and draft PRs on 2026-10-04. No merge, deploy or publication; provider-plan approval remains separate.",
@@ -498,7 +498,7 @@
     {
       "id": "CSF-T005",
       "title": "Replace public docs and all discovery representations",
-      "status": "in_progress",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -522,7 +522,7 @@
         "packages/content/** compiled canonical page/navigation/errors and accepted catalogue service; docs-content preserves compatibility re-exports.",
         "packages/docs-content/** authored/status/navigation/generated owners and any justified retained docs-fumadocs bridge",
         "packages/docs-examples/** checked source/compiler/runtime owner; preserve the four retained integration templates and their output/error expectations.",
-        "apps/web HTML/docs presentation, generated static discovery/image assets and old-route redirect map",
+        "apps/web HTML/docs presentation, generated static discovery/image assets and original-address disposition map and deliberate default-entry change",
         "apps/api dynamic page/navigation/search/processed-Markdown services and packages/api/http checked contracts/clients; owning content package preserves prose, links, tables and examples",
         "tools/documentation/owner-policy.json exact public acceptance records and generated edges",
         "Public/app/package READMEs, docs/architecture/frontend.md, content-and-posts.md, package-ownership.md and applicable runbook/command pointers",
@@ -576,7 +576,9 @@
         "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-07-release-detail-output.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-release-detail-output.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement.json"
       ]
     },
     {

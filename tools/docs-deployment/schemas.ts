@@ -40,13 +40,20 @@ const DeploymentJourney = Schema.Struct({
 });
 
 export const DeploymentJourneyInventory = Schema.Struct({
+  historicalInventory: Schema.Literal(
+    "docs/evidence/deployments/retired-docs-operations-2c5ffd40/docs-deployment-journeys.json"
+  ),
   journeys: Schema.Tuple([
     DeploymentJourney,
     DeploymentJourney,
     DeploymentJourney,
     DeploymentJourney,
   ]),
+  lifecycle: Schema.Literal("retired"),
   owner: Schema.Literal("taxkit-docs-deployment-proof-owner"),
+  retirementRecord: Schema.Literal(
+    "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
+  ),
   reviewTrigger: Schema.NonEmptyString,
   schemaVersion: Schema.Literal(1),
 });

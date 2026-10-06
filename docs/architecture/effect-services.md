@@ -186,7 +186,9 @@ narrow generated-collection adapter at construction, contains unknown provider
 output plus promise and throw handling, and emits safe tagged errors.
 `@taxkit/docs-content` supplies the TaxKit collection adapter and decodes the
 generic value into its canonical content Schemas. Neither package executes a
-runtime; `apps/docs` composes the Layers and runs the server Effect.
+runtime. The accepted catalogue is built through the generated adapter;
+`apps/api` owns its checked content service and `apps/web` owns the reader
+runner and private API connection. The old app runtime is retained history.
 
 Use [the repo-owned effect client wrapper skill](../../.agents/skills/effect-client-wrapper/SKILL.md)
 when introducing or reviewing a provider adapter. Its canonical example and

@@ -1,7 +1,9 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it as test } from "@effect/vitest";
-import { Array as EffectArray, Effect, FileSystem } from "effect";
+import { Array as EffectArray, Effect, FileSystem, Path } from "effect";
 
+import { readRetiredDocsSourceBundle } from "./retired-source.boundary.js";
+import type { RetiredDocsSourceBundle } from "./retired-source.schemas.js";
 import {
   inspectStrictAppBoundaries,
   readStrictAppBoundarySource,
@@ -11,45 +13,68 @@ import type {
   StrictAppBoundarySources,
 } from "./strict-boundaries.policy.js";
 
+const readHistoricalAppSource = Effect.fnUntraced(function* (
+  bundle: RetiredDocsSourceBundle,
+  path: StrictAppBoundaryPath
+) {
+  const source = yield* Effect.fromOption(
+    EffectArray.findFirst(bundle.sourceFiles, (entry) => entry.path === path)
+  );
+  return source.text;
+});
+
 const readGovernedSources = Effect.gen(function* () {
   const fileSystem = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const root = yield* path.fromFileUrl(new URL("../..", import.meta.url));
+  const historicalApp = yield* readRetiredDocsSourceBundle(root);
   return {
     "apps/docs/scripts/cloudflare-built-browser.live.ts":
-      yield* fileSystem.readFileString(
+      yield* readHistoricalAppSource(
+        historicalApp,
         "apps/docs/scripts/cloudflare-built-browser.live.ts"
       ),
     "apps/docs/scripts/cloudflare-built-proof.boundary.ts":
-      yield* fileSystem.readFileString(
+      yield* readHistoricalAppSource(
+        historicalApp,
         "apps/docs/scripts/cloudflare-built-proof.boundary.ts"
       ),
     "apps/docs/scripts/cloudflare-built-proof.live.layer.ts":
-      yield* fileSystem.readFileString(
+      yield* readHistoricalAppSource(
+        historicalApp,
         "apps/docs/scripts/cloudflare-built-proof.live.layer.ts"
       ),
     "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts":
-      yield* fileSystem.readFileString(
+      yield* readHistoricalAppSource(
+        historicalApp,
         "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts"
       ),
     "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts":
-      yield* fileSystem.readFileString(
+      yield* readHistoricalAppSource(
+        historicalApp,
         "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts"
       ),
     "apps/docs/scripts/test-cloudflare-built.tsx":
-      yield* fileSystem.readFileString(
+      yield* readHistoricalAppSource(
+        historicalApp,
         "apps/docs/scripts/test-cloudflare-built.tsx"
       ),
     "apps/docs/scripts/test-cloudflare-hosted.tsx":
-      yield* fileSystem.readFileString(
+      yield* readHistoricalAppSource(
+        historicalApp,
         "apps/docs/scripts/test-cloudflare-hosted.tsx"
       ),
     "apps/docs/src/lib/runtime-factory.server.ts":
-      yield* fileSystem.readFileString(
+      yield* readHistoricalAppSource(
+        historicalApp,
         "apps/docs/src/lib/runtime-factory.server.ts"
       ),
-    "apps/docs/src/lib/runtime.server.ts": yield* fileSystem.readFileString(
+    "apps/docs/src/lib/runtime.server.ts": yield* readHistoricalAppSource(
+      historicalApp,
       "apps/docs/src/lib/runtime.server.ts"
     ),
-    "apps/docs/src/server.ts": yield* fileSystem.readFileString(
+    "apps/docs/src/server.ts": yield* readHistoricalAppSource(
+      historicalApp,
       "apps/docs/src/server.ts"
     ),
     "tools/docs-deployment/doppler-custody.boundary.ts":
@@ -70,7 +95,7 @@ const readGovernedSources = Effect.gen(function* () {
       ),
     "tools/docs-deployment/local-doppler.runtime.ts":
       yield* fileSystem.readFileString(
-        "tools/docs-deployment/local-doppler.runtime.ts"
+        "docs/evidence/deployments/retired-docs-operations-2c5ffd40/local-doppler.runtime.ts.txt"
       ),
     "tools/docs-deployment/local-doppler.ts": yield* fileSystem.readFileString(
       "tools/docs-deployment/local-doppler.ts"
@@ -85,7 +110,7 @@ const readGovernedSources = Effect.gen(function* () {
       ),
     "tools/docs-deployment/workflow-evidence.runtime.ts":
       yield* fileSystem.readFileString(
-        "tools/docs-deployment/workflow-evidence.runtime.ts"
+        "docs/evidence/deployments/retired-docs-operations-2c5ffd40/workflow-evidence.runtime.ts.txt"
       ),
     "tools/docs-deployment/workflow-input-check.runtime.ts":
       yield* fileSystem.readFileString(
@@ -125,7 +150,7 @@ const findingInvariants = (sources: StrictAppBoundarySources) =>
     ({ invariant }) => invariant
   );
 
-describe("strict docs app and deployment architecture", () => {
+describe("retained docs app and current deployment-tool architecture", () => {
   test.effect("accepts the exact governed Effect and host boundaries", () =>
     Effect.gen(function* () {
       const sources = yield* readGovernedSources;

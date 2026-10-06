@@ -5,9 +5,9 @@
   "type": "module",
   "exports": {
     "./stack": {
-      "source": "./src/stack.ts",
-      "types": "./src/stack.ts",
-      "default": "./src/stack.ts"
+      "source": "./src/retired-stack.schemas.ts",
+      "types": "./src/retired-stack.schemas.ts",
+      "default": "./src/retired-stack.schemas.ts"
     },
     "./stage": {
       "source": "./src/stage.ts",

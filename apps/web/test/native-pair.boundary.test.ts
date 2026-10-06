@@ -624,6 +624,25 @@ describe("built native API and Website", () => {
             );
           })
         );
+        // Retirement must preserve every authored page address as real HTML,
+        // not only a successful Markdown or catalogue lookup.
+        yield* Effect.forEach(publicContent.pages, (page) =>
+          Effect.gen(function* () {
+            const response = yield* Effect.promise(() =>
+              website.dispatchFetch(`${websiteOrigin}${page.path}`, {
+                headers: { accept: "text/html" },
+              })
+            );
+            expect(response.status, page.path).toBe(200);
+            expect(response.headers.get("content-type")).toContain("text/html");
+            const html = yield* Effect.promise(() => response.text());
+            expect(html).toContain(`href="${websiteOrigin}${page.path}"`);
+            expect(html).toContain(
+              `content="${websiteOrigin}/og${page.path}.png"`
+            );
+            expect(html).toContain('class="docs-article"');
+          })
+        );
         // Both original page URLs and explicit files must read the owning
         // processed body. A count, copied source or forged native header cannot
         // satisfy these actual built-Worker responses.

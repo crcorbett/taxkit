@@ -29,7 +29,8 @@
         "tools/docs-deployment/*.test.ts",
         "alchemy.apps.run.ts",
         "alchemy.apps.local.run.ts",
-        "tools/documentation/catalogue.runtime.ts"
+        "tools/documentation/catalogue.runtime.ts",
+        "tools/docs-deployment/workflow-evidence.runtime.ts"
       ],
       "project": [
         "*.json",
@@ -83,32 +84,6 @@
         "vitest.native.config.ts"
       ],
       "ignoreDependencies": ["@taxkit/tsconfig", "cloudflare"]
-    },
-    "apps/docs": {
-      "entry": [
-        "scripts/**/*.{ts,tsx}",
-        "src/lib/docs/route-boundary.type-test.ts",
-        "src/**/*.test.ts",
-        "src/**/*.server.ts",
-        "src/router.tsx",
-        "src/server.ts",
-        "src/routes/**/*.{ts,tsx}",
-        "vitest.server.config.ts",
-        "vite.config.ts",
-        "vitest.scripts.config.ts",
-        "vitest.browser.config.ts"
-      ],
-      "project": [
-        "scripts/**/*.{ts,tsx}",
-        "test/**/*.ts",
-        "src/**/*.{ts,tsx}",
-        "vitest.server.config.ts",
-        "vite.config.ts",
-        "vitest.scripts.config.ts",
-        "vitest.browser.config.ts"
-      ],
-      "ignore": ["examples/**/*.ts", "src/routeTree.gen.ts"],
-      "ignoreDependencies": ["@taxkit/tsconfig"]
     },
     "packages/core": {
       "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],

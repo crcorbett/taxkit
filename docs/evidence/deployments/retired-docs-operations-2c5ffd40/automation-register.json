@@ -1,0 +1,260 @@
+[
+  {
+    "authority": {
+      "credentialIdentities": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"],
+      "denied": [
+        "automatic-orphan-deletion",
+        "credential-write",
+        "custom-domain-or-dns",
+        "release-or-publication",
+        "unrelated-provider-resource"
+      ],
+      "durationOrRevocation": "One protected Preview operation for the accepted exact candidate and pr-N stage through the taxkit/stg_preview bridge; revoke on completion, explicit revocation or identity/safety mismatch.",
+      "environment": "taxkit-docs-preview",
+      "operations": ["preview-deploy"],
+      "principal": "taxkit-docs-preview-workflow",
+      "resources": ["TaxKitDocsCloudflare/pr-N/DocsWebsite"]
+    },
+    "cancellation": "Planning and mutation queue behind the same exact Preview stage lock; no in-flight operation is cancelled.",
+    "convergence": "Reacquire the pr-N lock, recheck the trusted PR head and state/provider identity, then require an equal canonical replan before apply.",
+    "durableState": {
+      "identity": "exact candidate, pr-N, accepted plan digest, provider deployment/version and hosted proof",
+      "kind": "candidate-plan-provider-receipt",
+      "location": "allowlisted dated workflow artifact and docs/evidence/deployments receipt after acceptance"
+    },
+    "environment": {
+      "id": "taxkit-docs-preview",
+      "trigger": "separately dispatched trusted same-repository pull-request candidate"
+    },
+    "externalState": {
+      "receipt": "docs/evidence/deployments/2026-08-20-preview-pr-51/workflow-receipt-32301180775.json",
+      "status": "established"
+    },
+    "failure": {
+      "escalationOwner": "taxkit-docs-deployment-operation-owner",
+      "recovery": "Retain the failed receipt; disable the stg_preview bridge and revert to the last reviewed source under separate authority, or repair the named owner and retry only as a new exact authorized attempt.",
+      "rollback": "Use the accepted exact-stage teardown path; never broaden destroy scope.",
+      "stopConditions": [
+        "candidate is a fork or no longer the trusted PR head",
+        "quality result is absent or belongs to another commit",
+        "plan digest or provider/state identity differs",
+        "Doppler project/config, credential or environment identity differs"
+      ]
+    },
+    "id": "docs-preview-delivery",
+    "idempotence": "A matching deployed candidate may converge only after provider/state readback; no-op text is not sufficient.",
+    "lifecycle": {
+      "carryingCost": "Protected environment, workflow pins, remote-state drift review and retained hosted proof.",
+      "disconfirmingEvidence": [
+        "plan inequality",
+        "wrong Worker or stage",
+        "provider/state disagreement",
+        "hosted false green"
+      ],
+      "retirementCondition": "A stronger accepted Preview delivery owner replaces this exact contract and preserves receipt/readback coverage.",
+      "reviewTriggers": [
+        "workflow or action change",
+        "Alchemy or Cloudflare version change",
+        "state or credential change",
+        "failed apply or teardown"
+      ]
+    },
+    "lock": {
+      "cancelInProgress": false,
+      "group": "taxkit-docs-preview-${stage}",
+      "scope": "stage"
+    },
+    "owner": "taxkit-docs-deployment-automation-owner",
+    "plan": {
+      "acceptedDigestRequired": true,
+      "equalReplanRequired": true,
+      "providerReadbackRequired": true
+    },
+    "proof": {
+      "commandOwner": "tools/docs-deployment workflow operation owner, not workflow YAML",
+      "nonClaims": [
+        "Production",
+        "DNS or custom domain",
+        "release or publication"
+      ],
+      "receiptRoute": "docs/evidence/deployments/<dated-preview-workflow>/",
+      "successPostcondition": "Exact Preview candidate has provider/state, hosted, screenshot and teardown-ready readback."
+    },
+    "signal": {
+      "kind": "trusted-pull-request-dispatch",
+      "revisionSource": "exact same-repository pull-request head SHA"
+    }
+  },
+  {
+    "authority": {
+      "credentialIdentities": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"],
+      "denied": [
+        "automatic-orphan-deletion",
+        "credential-write",
+        "custom-domain-or-dns",
+        "release-or-publication",
+        "unrelated-provider-resource"
+      ],
+      "durationOrRevocation": "One protected fixed Production operation for the accepted exact candidate through the taxkit/prd bridge; revoke on completion, explicit revocation or identity/safety mismatch.",
+      "environment": "taxkit-docs-production",
+      "operations": ["production-deploy", "production-rollback"],
+      "principal": "taxkit-docs-production-workflow",
+      "resources": ["TaxKitDocsCloudflare/prod/DocsWebsite"]
+    },
+    "cancellation": "Planning, deploy and rollback queue behind the same fixed Production stage lock; no in-flight operation is cancelled.",
+    "convergence": "Reacquire the prod lock, recheck exact candidate and fixed Worker identity, then require an equal canonical replan before apply.",
+    "durableState": {
+      "identity": "accepted Preview source, exact Production candidate, plan digest, fixed Worker deployment/version and hosted proof",
+      "kind": "candidate-plan-provider-receipt",
+      "location": "allowlisted dated workflow artifact and docs/evidence/deployments receipt after acceptance"
+    },
+    "environment": {
+      "id": "taxkit-docs-production",
+      "trigger": "separately dispatched exact candidate after accepted Preview evidence"
+    },
+    "externalState": {
+      "receipt": "docs/evidence/deployments/2026-08-20-production-prod-7a23bf3/workflow-receipt-32301629287.json",
+      "status": "established"
+    },
+    "failure": {
+      "escalationOwner": "taxkit-docs-deployment-operation-owner",
+      "recovery": "Retain the failed receipt; disable the prd bridge and revert to the last reviewed source under separate authority, or use the normal accepted source-bound rollback path.",
+      "rollback": "Redeploy the last-known-good exact candidate through the same fixed Production graph.",
+      "stopConditions": [
+        "accepted Preview identity is absent or differs",
+        "quality result is absent or belongs to another commit",
+        "plan digest or fixed Worker identity differs",
+        "Doppler project/config, credential or environment identity differs"
+      ]
+    },
+    "id": "docs-production-delivery",
+    "idempotence": "A matching source may converge only after fixed Worker deployment/version and state readback.",
+    "lifecycle": {
+      "carryingCost": "Protected environment, workflow pins, fixed-stage lock, rollback owner and retained provider/hosted proof.",
+      "disconfirmingEvidence": [
+        "plan inequality",
+        "wrong fixed Worker",
+        "provider/state disagreement",
+        "rollback mismatch"
+      ],
+      "retirementCondition": "A stronger accepted Production owner replaces this contract without changing the underlying Worker identity.",
+      "reviewTriggers": [
+        "workflow or action change",
+        "Alchemy or Cloudflare version change",
+        "state or credential change",
+        "failed deploy or rollback"
+      ]
+    },
+    "lock": {
+      "cancelInProgress": false,
+      "group": "taxkit-docs-production-prod",
+      "scope": "stage"
+    },
+    "owner": "taxkit-docs-deployment-automation-owner",
+    "plan": {
+      "acceptedDigestRequired": true,
+      "equalReplanRequired": true,
+      "providerReadbackRequired": true
+    },
+    "proof": {
+      "commandOwner": "tools/docs-deployment workflow operation owner, not workflow YAML",
+      "nonClaims": [
+        "byte promotion",
+        "DNS or custom domain",
+        "release or publication"
+      ],
+      "receiptRoute": "docs/evidence/deployments/<dated-production-workflow>/",
+      "successPostcondition": "Fixed Production Worker has exact provider/state, hosted, screenshot and rollback identity."
+    },
+    "signal": {
+      "kind": "production-dispatch",
+      "revisionSource": "exact accepted candidate SHA"
+    }
+  },
+  {
+    "authority": {
+      "credentialIdentities": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"],
+      "denied": [
+        "automatic-orphan-deletion",
+        "credential-write",
+        "custom-domain-or-dns",
+        "release-or-publication",
+        "unrelated-provider-resource"
+      ],
+      "durationOrRevocation": "One exact PR-close teardown attempt for pr-N through the taxkit/stg_preview bridge; revoke on absence readback, explicit revocation or identity/safety mismatch.",
+      "environment": "taxkit-docs-preview",
+      "operations": ["preview-destroy"],
+      "principal": "taxkit-docs-preview-teardown-workflow",
+      "resources": ["TaxKitDocsCloudflare/pr-N/DocsWebsite"]
+    },
+    "cancellation": "The exact-stage destroy queues and cannot cancel an in-flight deploy or destroy.",
+    "convergence": "Reviewed default-branch code derives only pr-N, reads exact state/provider identity, requires an equal destroy plan and proves absence.",
+    "durableState": {
+      "identity": "closed PR number, reviewed workflow SHA, pr-N, destroy digest and provider/state absence",
+      "kind": "exact-stage-absence-receipt",
+      "location": "allowlisted dated workflow artifact and docs/evidence/deployments receipt after acceptance"
+    },
+    "environment": {
+      "id": "taxkit-docs-preview",
+      "trigger": "same-repository pull request closed"
+    },
+    "externalState": {
+      "receipt": "docs/evidence/deployments/2026-08-20-preview-teardown-pr-60/workflow-receipt-32367035323.json",
+      "status": "established"
+    },
+    "failure": {
+      "escalationOwner": "taxkit-docs-deployment-operation-owner",
+      "recovery": "Retain the stop receipt; disable the stg_preview bridge and revert to the last reviewed source under separate authority, or use the manual runbook under exact destroy authority.",
+      "rollback": "No destructive retry occurs until the exact retained Preview identity is re-read.",
+      "stopConditions": [
+        "workflow checks out or executes pull-request head code",
+        "default-branch workflow SHA is not reviewed",
+        "stage is not exactly derived as pr-N",
+        "destroy plan, Doppler project/config or provider/state identity differs"
+      ]
+    },
+    "id": "docs-preview-teardown",
+    "idempotence": "Already-absent exact stage is a proved no-op only after state and provider absence readback.",
+    "lifecycle": {
+      "carryingCost": "Shared Preview credential custody, retained absence evidence and stale-stage follow-up.",
+      "disconfirmingEvidence": [
+        "wrong PR or stage",
+        "unexpected resource",
+        "provider/state disagreement",
+        "former URL not absent"
+      ],
+      "retirementCondition": "A stronger accepted lifecycle owner replaces PR-close teardown and preserves exact-stage absence proof.",
+      "reviewTriggers": [
+        "close trigger or checkout change",
+        "stage naming change",
+        "state or credential change",
+        "failed destroy"
+      ]
+    },
+    "lock": {
+      "cancelInProgress": false,
+      "group": "taxkit-docs-preview-${stage}",
+      "scope": "stage"
+    },
+    "owner": "taxkit-docs-deployment-automation-owner",
+    "plan": {
+      "acceptedDigestRequired": true,
+      "equalReplanRequired": true,
+      "providerReadbackRequired": true
+    },
+    "proof": {
+      "commandOwner": "tools/docs-deployment workflow operation owner, not workflow YAML",
+      "nonClaims": [
+        "automatic orphan deletion",
+        "Production mutation",
+        "DNS or custom domain"
+      ],
+      "receiptRoute": "docs/evidence/deployments/<dated-preview-teardown-workflow>/",
+      "successPostcondition": "Exact pr-N state, Worker and former URL are absent."
+    },
+    "signal": {
+      "kind": "pull-request-closed",
+      "revisionSource": "reviewed-default-branch-workflow-commit-plus-closed-pr-number"
+    }
+  }
+]

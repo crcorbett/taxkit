@@ -10,8 +10,8 @@ review_trigger: frontend runtime, transport, rendering, build adapter, or compos
 # Frontend
 
 `apps/web` is the native calculator/documentation Website candidate and the
-current local release reader. `apps/docs` remains a retained old app for its
-existing deployment/recovery procedure until qualified source/build retirement.
+current local release reader. `apps/docs` is now a retirement tombstone
+for verified original-source data and dated provider recovery records.
 Local replacement proof does not establish a deployed Website.
 
 ## Scope
@@ -30,14 +30,8 @@ define tax calculation rules.
   serves HTTP and RPC through the same checked calculator operation.
 
 `apps/docs`
-: Retained old Fumadocs-backed documentation app for rule references, API docs, SDK
-  guides and contributor docs. It owns the route runtime, app shell, app-local
-  MDX component map and browser rendering. Route files import that shared map;
-  they do not define local `mdxComponents` objects or inline MDX registries.
-  Server loaders consume
-  `@taxkit/docs-content`; browser modules consume browser-safe
-  `@taxkit/docs-content/client`, `@taxkit/docs-content/schemas` and
-  `@taxkit/docs-fumadocs/render` exports.
+: Retirement tombstone, not an active workspace. Original source and provider
+  recovery identities remain preserved under the retention manifest.
 
 `packages/ui`
 : Planned shared UI primitives for TaxKit-owned apps, once repeated UI
@@ -105,88 +99,12 @@ Website imports its Fetcher adapter through `alchemy/Cloudflare/Bridge`, the
 SDK's supported runtime-only export, avoiding development-tool code in Worker
 SSR. Vite reads the injected plugin flag with a fresh ConfigProvider at its
 configuration boundary. The [Website README](../../apps/web/README.md) owns
-setup, source reload and the saved real-CLI check; docs development is separate.
+setup, source reload and the saved real-CLI check, including documentation.
 
-Docs SSR loaders retain their existing module-scoped runtime rule. `apps/docs` keeps one module-scoped
-server runtime for `DocsContentServiceLive`, composed over the TaxKit generated
-collection Layer, plus one app-private runtime-probe Layer, and exposes explicit
-disposal for tests and future host lifecycle integration. Native runtime tests
-acquire the actual factory, reuse its cached context and dispose it inside a
-scope; acquired content is released after success, failure and interruption.
-Only the private factory owns runtime creation permission; its tests own none.
-The probe Layer owns
-its construction state in an Effect `Ref`, creates its non-secret identifier
-through Effect `Random`, and admits a deterministic identity Effect in tests.
-The Worker callback executes its native request program at the exact host,
-normalises the framework's response or promise, and passes the request abort
-signal to that program. Framework promise cancellation is a separate concern.
-Only opt-in proof requests acquire the existing docs runtime's cached context
-for the typed probe read and Schema encoding at response-header egress;
-ordinary responses do not initialise docs services. Response body/status and
-unrelated headers are preserved. It owns no mutable counter or randomness.
-The browser owns no Effect runtime. A browser-reachable loader defines only
-the TanStack server-function transport stub. The installed Start compiler
-extracts its handler and removes unused static server imports from browser
-callers; the named `.server.ts` implementation acquires the service, decodes route input before
-lookup and preloads compiled MDX through the browser-safe client loader. App
-routes should not read `packages/docs-content/content` files,
-`navigation.json` or generated `.source/server` modules directly.
-`@taxkit/docs-content` bundles the authored navigation representation and
-decodes it with the canonical navigation schema, so built server functions do
-not depend on a source-relative filesystem path.
-
-The docs import checker uses native Effect file/path services and one exact
-Bun command entrypoint. The pinned TypeScript 6 compatibility parser owns
-its direct static source inspection; TypeScript 7 still owns compilation.
-It ignores server, test and generated owners and non-file directory entries,
-rejects browser runtime execution/file presence, and fails closed on file-service
-errors. Native fixtures and real CLI strict-rule canaries qualify this checker
-separately from transitive browser-bundle and local Worker behaviour.
-All docs app source and Vite/server-test/browser-test configurations receive
-the canonical strict rules. Exact hosts retain only the execution or promise
-result construct they require. The Vite host reads Alchemy's injection signal
-through an owning Config Schema, with absence preserving the original default.
-
-The opt-in proof response establishes one construction and stable identity only
-for the observed process/isolate. It does not establish a global singleton
-across Cloudflare isolates. Built proof may retain ignored, candidate-bound
-desktop/mobile screenshots and a digest manifest as visual review input; the
-behavioral HTTP/browser oracles remain the authority for SSR, hydration,
-navigation, status, focus, accessibility and console claims.
-
-Docs server functions encode route outcomes with a browser-safe Effect Schema
-boundary. Route loaders return that representation unchanged. On an initial
-request, TanStack Router dehydrates and hydrates the encoded loader state. On
-client navigation, the server-function RPC serialiser carries the encoded
-response before the route loader returns it. In both paths, the direct route
-root restores the value once and matches the typed `Result` before composing
-the page. Internal docs navigation uses TanStack `Link`; a browser click then
-runs the destination route loader and server-function RPC without a new
-document request. The app MDX adapter treats root-relative, query-only and
-authored relative `.mdx` destinations as router destinations, removes only the
-`.mdx` suffix before a query or fragment, and keeps external, mail,
-protocol-relative, download, repository-source and same-document destinations
-as anchors. Focus movement is app policy: sidebar, home and MDX route links
-record one navigation intent and the destination heading consumes it after
-client navigation. Initial hydration does not record that intent.
-
-The catch-all server-function implementation maps only
-`DocsPageNotFoundError` to TanStack `notFound()`. The route owns the nearest
-`notFoundComponent`, so direct missing-page requests return HTTP 404 and client
-navigation renders the same framework state. Expected source/preload failures
-remain schema-encoded recoverable outcomes; defects and interruptions remain
-in the framework error channel. `bun run --filter=docs test:built` proves this
-against the generated production server and browser output.
-
-```ts
-DocsContentService Effect
-  -> browser-safe Schema.Exit JSON encoding
-    -> createServerFn and route loader return encoded data unchanged
-      -> SSR hydration or client-navigation transport
-        -> direct route-root restore
-          -> Result match
-            -> canonical values reach composition and leaves
-```
+The current documentation composition is owned by the replacement Website
+section below. The retired runtime's original composition remains inspectable
+in the [retained source record](../documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json).
+Its old runtime proof is history, not current Website or provider qualification.
 
 ## Decoding and composition boundaries
 

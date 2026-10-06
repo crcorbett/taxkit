@@ -12,7 +12,8 @@ review_trigger: website rendering, settings, transport, form, generated types or
 `apps/web` is the native TanStack Start Website candidate. Its calculator pages use
 native Effect RPC for the three supported Australian 2025–26 calculators and
 the 61 accepted documentation pages. Tax calculation stays
-in the separate API app. The current public docs app remains `apps/docs`.
+in the separate API app. This Website also owns the accepted documentation reader. `apps/docs` is
+a retirement tombstone for the old source and dated recovery records.
 
 ## What runs where
 
@@ -478,6 +479,6 @@ It rebuilds this Website and the native API and runs all native cases.
 The accepted-page reader observes actual HTML, private navigation, search,
 discovery, Markdown and all generated share images, plus keyboard/focus,
 landmarks, contrast and reduced motion. Quality installs Chromium from this
-app's pinned Playwright executable. The old docs app and provider procedure
-are still retained pending their separate retirement; they are not selected
-by this release check. This is local source/build/browser proof only.
+app's pinned Playwright executable. The old docs workspace and writer workflows are
+retired. Their exact sources and dated recovery records remain addressable;
+new provider operations belong DEV-81. This is local source/build/browser proof only.

@@ -56,10 +56,10 @@ iframe before assertions.
 current application scaffolds. The production graph separately proves the
 nine code-bearing packages in the ten-artifact release closure,
 `@taxkit/scripts` exports and commands, and the standalone API runtime without
-test or development reachability. It also models the real `apps/docs`,
+test or development reachability. It models the current Website,
 `@taxkit/docs-content` and `@taxkit/docs-fumadocs` production entries,
-including the generated browser/server source consumed by the app and the
-build-time Vite/source config. `@taxkit/tsconfig` is JSON-only and remains
+including the generated source and build-time compiler/config they consume.
+The old docs workspace is absent from both unused-code inventories. `@taxkit/tsconfig` is JSON-only and remains
 covered by strict packed/downstream artifact proof rather than a fabricated
 TypeScript entrypoint. Root tools remain outside the production
 graph by ownership. Root verification also typechecks and executes
@@ -86,58 +86,32 @@ binds one immutable candidate to complete validator sources, the canonical
 skill and journey projections, retained failures, five receipts, fresh
 independent review, clocks, limitations and non-claims. It is a closeout check,
 not another root-verification or Quality-workflow edge.
-For docs, `apps/docs` type checking also
-typechecks checked examples,
-and dependent package builds run before type checks through Turbo.
-`@taxkit/docs-content#generate` names content, navigation, source config,
-canonical schema and package-manifest inputs, writes `.source/**`, and follows
-the compiled `@taxkit/docs-fumadocs` build. The content build executes that
-named generation command, and the docs app build follows both packages.
-Heavier
-docs runtime gates remain explicit package commands so normal local
-verification does not rebuild and validate the whole docs corpus on every
-change:
+Current documentation checking belongs to the Website and native API pair.
+`bun run docs:validate` checks authored content and examples; `bun run
+web:test:native-pair` freshly builds the pair and observes real page HTML,
+Markdown, private RPC, search, discovery, image delivery and browser behaviour.
+Every accepted authored page keeps its original address. Content generation and
+compiled package builds remain owned by Turbo and their package commands.
 
-```bash
-bun run docs:validate
-bun run docs:build
-bun run test:docs-boundaries
-bun run --filter=docs test
-bun run --filter=docs test:browser
-bun run --filter=docs test:built
-bun run --filter=docs test:cloudflare-built
-bun run --filter=@taxkit/docs-content test
-```
+The old app's 49 original sources are verified before historical boundary
+inspection. Its positive lint selectors retire with the source; all existing
+invalid-code canaries remain, alongside the current native hosts' positive and
+negative cases. No missing active source receives an archive exemption.
+Infrastructure stage/memo metadata stays for historical receipt decoding.
+The old asset-header bytes are inspected through the verified source bundle.
 
-Run those package-local docs gates whenever MDX content, Fumadocs source
-wiring, docs examples, validation policy or docs rendering changes.
-`test:docs-boundaries` checks browser imports, then invokes the default docs
-test owner once. That owner includes native import-checker fixtures, the typed
-native route-result corpus and tests that reuse one app-owned server runtime.
-The runtime tests use its native context/disposal Effects inside a scope and
-verify release after success, failure and interruption; they need no Promise
-execution permission. The exact private factory retains the runtime creation
-permission, with a neighbouring rejection fixture and an exact-selector test. The package content test composes
-the deterministic `DocsContentService` test Layer over the generic
-`FumadocsSource` test Layer and covers accepted, missing and malformed content.
+The current old writer CLI and workflow stops have real process proof. Workflow
+YAML must decode as one manual, permission-free Bash stop with no checkout or
+provider steps; its actual script exits unsuccessfully. Actual root aliases,
+local Doppler and receipt-writer CLIs stop before Config/custody/state writes.
+The actual Alchemy importer refuses its typed marker before session providers,
+remote state and planning. Its prior startup creates only logs and an empty
+profile, which the isolated test records rather than ignoring.
 
-The docs Chromium route harness uses native Effect tests and scoped DOM,
-React, router-history and console-spy resources. Its fake server-function
-loader is its only execution host. The actual compiler includes the Vite,
-server-test and browser-test configurations, and unused-code inventories own
-the browser configuration. Canonical strict rules cover all docs app source;
-real CLI canaries accept named hosts and reject a neighbouring source file.
-The built local Worker separately checks extracted server functions, hydration,
-navigation, immutable asset headers and one reused docs runtime context.
-
-The source-only infrastructure package uses Bun-hosted Vitest and native Effect
-tests. It checks stage policy and reads the real docs asset-header input through
-native file/path services, with no test execution exception. The compiler checks
-that shared memo arrays cannot be passed directly to Alchemy's writable include
-fields; top-level and nested arrays need fresh boundary copies. Removing their
-readonly definition makes both expected-error controls fail. The separate
-installed-Alchemy memo test still checks cache invalidation for both sibling
-docs workspaces. These checks make no provider-state or apply claim.
+Saved old workflow, command, journey, control, source and provider receipt
+identities remain in the retention manifest. The historical receipt algorithm
+runs against an owned temporary Git fixture, never missing or changing active
+files. It does not qualify a complete historical app rebuild or provider action.
 
 Release-facing package work must also prove actual tarballs rather than
 workspace imports or dry-run file lists:
@@ -176,23 +150,8 @@ route UI, framework error boundaries and console cleanliness, but it does not
 prove SSR or hydration. Prove initial SSR, hydration and client navigation
 separately against the built app on `https://docs.taxkit.localhost`, including
 a successful server-function response and no document request during the client
-transition. `bun run --filter=docs test:built` is that built-production HTTP,
-workerd and Playwright proof: it serves the generated Cloudflare no-bundle
-Worker and static assets on an ephemeral local port, asserts SSR response
-content and HTTP 404 before browser inspection, then proves clean hydration,
-server-function navigation through real sidebar and authored-MDX links, browser
-history, pending and client not-found behavior without another document
-request. It also asserts that initial hydration does not steal focus, client
-navigation focuses the destination heading, the skip link reaches the main
-landmark, navigation is labelled and current, the mobile disclosure is
-operable, representative interactive colours meet the owned contrast
-threshold, reduced motion removes no required information, immutable asset
-headers, runtime reuse and compressed upload limits, and the console is clean.
-The command owns workerd/browser cleanup. `test:cloudflare-built` is an
-explicit alias. Its screenshot mode is supplemental visual evidence only: a
-visually correct image does not prove SSR content, hydration, request resource
-type, HTTP status, keyboard or focus behavior, contrast, motion suppression or
-console cleanliness.
+transition. The retired built-app proof is retained history through the source manifest;
+it is no longer an executable current-workspace command.
 
 The built proof independently builds the official Cloudflare target, verifies
 Wrangler's no-bundle dry-run without credentials or bindings, and copies only
@@ -708,9 +667,9 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   trailing `!` marker, must map manifest exports to real source counterparts,
   and must not include tests, fixtures, examples or root tools. The native Website
   is included, with its scripts and fixtures excluded from production.
-  The docs production graph intentionally includes `apps/docs`, both docs
+  The production graph includes the current Website, both retained docs
   packages and the generated `.source/browser.ts` and `.source/server.ts`
-  modules they actually consume; `--no-gitignore` admits those two generated
+  modules their current consumers use; `--no-gitignore` admits those two generated
   production inputs without admitting the unused generated dynamic entry.
   Exact exceptions need a named owner and runtime reason.
   Knip does not replace SDK packed-artifact or downstream-consumer proof.
@@ -901,12 +860,9 @@ fixture at the expected 4xx assertion. The built proof uses the same correction.
 Actual strict CLI fixtures and source counterexamples guard the named service,
 codec, event Queue, browser scope and sole exact command runtime admission.
 
-The package `docs#test` and root `//#test:docs-boundaries:task` include the exact
-`PLAYWRIGHT_BROWSERS_PATH` input in Turbo's retained and hashed environment.
-Native tests read the actual task entries. The initial root test failed before
-browser work because those tasks dropped the installed browser location;
-correcting only those two entries preserves the existing browser cache and
-other test task environments.
+The old docs package/root test tasks and their environment selectors are
+retired with the workspace. Their original configuration remains in Git history;
+current Website/native test tasks retain their own browser environment inputs.
 
 
 The local built Worker proof has its own closed `LocalCloudflareBuiltProof`
@@ -1632,10 +1588,10 @@ policy remains; its refusal cases also reject selection of the old docs owner.
 The current journey/profile and release runbook select this replacement.
 Historical HGI-203/DAR/HFI records and their Schemas keep their old identities.
 
-The old app's explicit local commands, workspace and deployment/recovery
-procedure remain until the next retirement slice replaces their dependencies
-with a retained-source and operation route. Passing this replacement command
-does not itself remove that app, qualify provider state or complete T005.
+The old app workspace, build/test selection and writers are now retired.
+The verified retained-source and operation routes preserve history and refuse
+new old-resource operations. Final retirement qualification still needs its
+complete candidate checks; none of these local results proves provider state.
 See the [replacement-check receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json).
 
 

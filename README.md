@@ -3,7 +3,7 @@ document_type: repository-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-repository-maintainers
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-07
 review_trigger: contributor setup, repository entry points, or supported commands change
 ---
 
@@ -14,7 +14,7 @@ documentation site.
 
 The repo is early, but the main public integration surfaces now exist. The
 implemented surface includes the retained standalone Bun API and a native
-API/Website candidate with a take-home-pay form, a Fumadocs-backed docs app, an Effect HTTP API package
+API/Website candidate with a take-home-pay form, accepted documentation in the same Website, an Effect HTTP API package
 with health, generated docs, metadata and public calculation endpoints, a
 reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, a private
@@ -28,8 +28,8 @@ validation, but it is not published yet.
 
 - [apps/api](./apps/api/README.md): standalone Bun process that owns API
   startup, listening config and Effect runtime teardown for `/api/*`.
-- [apps/docs](./apps/docs/README.md): retained old documentation app for its
-  existing deployment/recovery procedure, pending source/build retirement.
+- [apps/docs](./apps/docs/README.md): retirement tombstone and retained-source
+  recovery route; no active documentation workspace.
 - [apps/web](./apps/web/README.md): Native TanStack Website candidate with a take-home form,
   private server binding and direct checked browser RPC to the API. It also
   renders accepted documentation, search, discovery, Markdown and share images
@@ -135,9 +135,7 @@ bun install
 bun run dev
 bun run --filter=api dev
 bun run --filter=web dev
-bun run --filter=docs dev
 bun run check:doppler-custody
-bun run --filter=docs test:cloudflare-built
 bun run check:repository-paths
 bun run check:harness-governance
 bun run check:docs
@@ -161,17 +159,10 @@ API exports to change. Stop the pair with Ctrl-C.
 portless at `https://api.taxkit.localhost`. The [Website README](./apps/web/README.md)
 owns its standalone fixture, generated types and native checks. Use `bun run
 web:test:native-pair` for the saved built and live development journeys.
-`bun run --filter=docs dev`
-is the credentialed, Alchemy-managed Cloudflare development path. It requires a
-repository-scoped Doppler login and an authorised `taxkit/dev` config, runs the
-pass/fail-only `bun run check:doppler-custody` check first during onboarding,
-and starts only a local `dev_<user>` Alchemy stage. It does not authorise or
-prove a provider change. Use `bun run --filter=docs dev:vite` for the fast,
-credential-free docs app at `https://docs.taxkit.localhost`. `bun run
---filter=docs test:cloudflare-built` builds the exact Cloudflare target and
-exercises an isolated copy of its Worker/assets under local workerd; it does
-not access provider credentials or prove a deployment. `bun run
-check:repository-paths` rejects machine-local checkout references in tracked
+Documentation development uses the native Website and API pair above. The
+old documentation workspace and writer workflows are retired; their exact
+source and recovery records are linked from the [retirement tombstone](./apps/docs/README.md).
+`bun run check:repository-paths` rejects machine-local checkout references in tracked
 readable text without printing the matched private value. `bun run check:docs`
 checks maintainer metadata, links, documented commands, workspace README
 coverage, public/maintainer path separation, and generated-source ownership.
@@ -276,8 +267,9 @@ open docs/repo-status-outline.html
   resources on shutdown.
 - `apps/web` owns the replacement documentation reader over the accepted
   backend catalogue and compiled MDX. Canonical page fields and reusable
-  Fumadocs internals remain package-owned. `apps/docs` is retained for its
-  separately bounded legacy deployment/recovery route.
+  Fumadocs internals remain package-owned. `apps/docs` is a
+  retirement tombstone; exact original source and deployed recovery identities
+  remain historical evidence.
 - `apps/web/src/lib/runtime.server.ts` owns one server runner. React's Atom
   registry owns browser execution and cleanup. Both use native RPC to the
   separate API; the Website contains no calculation fallback.

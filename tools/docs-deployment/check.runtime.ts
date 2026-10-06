@@ -27,6 +27,7 @@ import {
   inspectResumePreflightReceipt,
   inspectScreenshotImageDigest,
 } from "./policy.js";
+import { readRetiredDocsSourceBundle } from "./retired-source.boundary.js";
 import {
   DeploymentAuthorityPreflightReceipt,
   DeploymentAuthorityCapabilityReceipt,
@@ -56,6 +57,7 @@ const repositoryRootUrl = new URL("../..", import.meta.url);
 
 export const checkDocsDeployment = (repositoryRoot: string) =>
   Effect.gen(function* checkDocsDeploymentProgram() {
+    yield* readRetiredDocsSourceBundle(repositoryRoot);
     const [
       inventory,
       receipt,
@@ -1068,7 +1070,7 @@ const program = Effect.gen(function* docsDeploymentMain() {
   const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
   const findings = yield* checkDocsDeployment(repositoryRoot);
   yield* Console.info(
-    `Docs deployment validation: journeys=4; historicalPreflightReceipts=11; currentEpochPreflightReceipts=4; gitAuthorityReceipts=1; historicalGitReadbackReceipts=5; currentEpochGitReadbackReceipts=1; historicalPlanReceipts=11; currentEpochPlanReceipts=6; historicalProviderReadbackReceipts=6; currentEpochProviderReadbackReceipts=3; historicalHostedProofReceipts=6; currentEpochHostedProofReceipts=3; historicalScreenshotManifests=12; currentEpochScreenshotManifests=6; historicalTeardownReceipts=3; currentEpochTeardownReceipts=1; workflowTeardownReceipts=1; rollbackReceipts=1; failedApplyReceipts=1; violations=${findings.length}; providerReadOperations=45; providerMutations=14.`
+    `Retained docs deployment receipt validation: journeys=4; historicalPreflightReceipts=11; currentEpochPreflightReceipts=4; gitAuthorityReceipts=1; historicalGitReadbackReceipts=5; currentEpochGitReadbackReceipts=1; historicalPlanReceipts=11; currentEpochPlanReceipts=6; historicalProviderReadbackReceipts=6; currentEpochProviderReadbackReceipts=3; historicalHostedProofReceipts=6; currentEpochHostedProofReceipts=3; historicalScreenshotManifests=12; currentEpochScreenshotManifests=6; historicalTeardownReceipts=3; currentEpochTeardownReceipts=1; workflowTeardownReceipts=1; rollbackReceipts=1; failedApplyReceipts=1; violations=${findings.length}; providerReadOperations=45; providerMutations=14.`
   );
   return yield* Array.match(findings, {
     onEmpty: () => Effect.void,

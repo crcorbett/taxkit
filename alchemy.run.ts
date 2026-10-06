@@ -1,25 +1,7 @@
-import {
-  declareDocsStack,
-  docsCloudflareStackName,
-} from "@taxkit/infrastructure/stack";
-import { decodeDocsCloudflareStackStage } from "@taxkit/infrastructure/website";
-import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
-import { Stack } from "alchemy/Stack";
-import { Stage } from "alchemy/Stage";
-import * as Effect from "effect/Effect";
+import { RetiredDocsStack } from "@taxkit/infrastructure/stack";
 
-export default Alchemy.Stack(
-  docsCloudflareStackName,
-  {
-    providers: Cloudflare.providers(),
-    state: Cloudflare.state(),
-  },
-  Effect.gen(function* () {
-    const stack = yield* Stack;
-    const stage = yield* Stage.pipe(
-      Effect.flatMap(decodeDocsCloudflareStackStage)
-    );
-    return yield* declareDocsStack({ stackName: stack.name, stage });
-  })
-);
+export default new RetiredDocsStack({
+  reason: "The old docs app and its default Stack are retired.",
+  recoveryRecord:
+    "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json",
+});

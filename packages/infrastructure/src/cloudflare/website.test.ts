@@ -1,12 +1,10 @@
-import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it } from "@effect/vitest";
 import type { MemoOptions } from "alchemy/Command/Memo";
-import { Array, Effect, Exit, FileSystem, Path, Schema } from "effect";
+import { Array, Effect, Exit, Schema } from "effect";
 
 import { DocsDeploymentStage } from "../stage.js";
 import {
   decodeDocsCloudflareStackStage,
-  docsWorkerAssetHeaders,
   docsWorkerMemo,
   docsWorkerObservability,
 } from "./website.js";
@@ -86,17 +84,4 @@ describe("docs Cloudflare stack policy", () => {
       },
     });
   });
-
-  it.effect("keeps immutable asset headers in the Vite public input", () =>
-    Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
-      const headersPath = yield* path.fromFileUrl(
-        new URL("../../../../apps/docs/public/_headers", import.meta.url)
-      );
-      expect(yield* fs.readFileString(headersPath)).toBe(
-        docsWorkerAssetHeaders
-      );
-    }).pipe(Effect.provide(BunServices.layer))
-  );
 });

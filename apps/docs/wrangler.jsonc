@@ -1,7 +1,0 @@
-{
-  "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "taxkit-docs-local-candidate",
-  "compatibility_date": "2026-06-24",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "src/server.ts",
-}

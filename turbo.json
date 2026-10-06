@@ -57,11 +57,6 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
-    "docs#test": {
-      "dependsOn": ["^build"],
-      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
-      "outputs": []
-    },
     "test": {
       "dependsOn": ["^build"],
       "outputs": []
@@ -102,8 +97,12 @@
       "dependsOn": ["@taxkit/docs-content#build"],
       "outputs": []
     },
-    "//#check:docs-deployment:task": { "outputs": [] },
-    "//#check:docs-deployment-automation:task": { "outputs": [] },
+    "//#check:docs-deployment:task": {
+      "outputs": []
+    },
+    "//#check:docs-deployment-automation:task": {
+      "outputs": []
+    },
     "//#check:docs-deployment-inventory:task": {
       "cache": false,
       "passThroughEnv": ["ALCHEMY_PROFILE", "CLOUDFLARE_*", "TAXKIT_*"]
@@ -128,20 +127,40 @@
       "cache": false,
       "passThroughEnv": ["TAXKIT_*"]
     },
-    "//#check:docs-deployment:types:task": { "outputs": [] },
-    "//#check:docs-deployment-tools:types:task": { "outputs": [] },
-    "//#check:oxlint:types:task": { "outputs": [] },
+    "//#check:docs-deployment:types:task": {
+      "outputs": []
+    },
+    "//#check:docs-deployment-tools:types:task": {
+      "outputs": []
+    },
+    "//#check:oxlint:types:task": {
+      "outputs": []
+    },
     "//#check:docs:types:task": {
       "outputs": [],
       "dependsOn": ["@taxkit/docs-content#build"]
     },
-    "//#check:effect-language-service:task": { "outputs": [] },
-    "//#check:harness-governance:task": { "outputs": [] },
-    "//#check:repository-paths:task": { "outputs": [] },
-    "//#check:repository-paths:types:task": { "outputs": [] },
-    "//#check:quality-workflow:task": { "outputs": [] },
-    "//#check:quality-workflow:types:task": { "outputs": [] },
-    "//#format:check:task": { "outputs": [] },
+    "//#check:effect-language-service:task": {
+      "outputs": []
+    },
+    "//#check:harness-governance:task": {
+      "outputs": []
+    },
+    "//#check:repository-paths:task": {
+      "outputs": []
+    },
+    "//#check:repository-paths:types:task": {
+      "outputs": []
+    },
+    "//#check:quality-workflow:task": {
+      "outputs": []
+    },
+    "//#check:quality-workflow:types:task": {
+      "outputs": []
+    },
+    "//#format:check:task": {
+      "outputs": []
+    },
     "//#lint:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
@@ -149,10 +168,10 @@
       ],
       "outputs": []
     },
-    "//#test:documentation:task": { "outputs": [] },
-    "//#test:docs-deployment:task": { "outputs": [] },
-    "//#test:docs-boundaries:task": {
-      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
+    "//#test:documentation:task": {
+      "outputs": []
+    },
+    "//#test:docs-deployment:task": {
       "outputs": []
     },
     "//#test:oxlint:task": {
@@ -162,14 +181,22 @@
       ],
       "outputs": []
     },
-    "//#test:repository-paths:task": { "outputs": [] },
+    "//#test:repository-paths:task": {
+      "outputs": []
+    },
     "//#test:quality-workflow:task": {
       "env": ["PLAYWRIGHT_BROWSERS_PATH"],
       "outputs": []
     },
-    "//#test:skills:task": { "outputs": [] },
-    "//#check:skills:types:task": { "outputs": [] },
-    "//#changeset:status:task": { "outputs": [] },
+    "//#test:skills:task": {
+      "outputs": []
+    },
+    "//#check:skills:types:task": {
+      "outputs": []
+    },
+    "//#changeset:status:task": {
+      "outputs": []
+    },
     "dev": {
       "cache": false,
       "persistent": true

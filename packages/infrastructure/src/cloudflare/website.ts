@@ -15,8 +15,6 @@ export const docsCloudflareStackName = "TaxKitDocsCloudflare";
 export const docsWorkerResourceId = "DocsWebsite";
 export const docsWorkerCompatibilityDate = "2026-06-24";
 export const docsWorkerCompatibilityFlags = ["nodejs_compat"] as const;
-export const docsWorkerAssetHeaders =
-  "/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n";
 export const docsWorkerMemo = {
   include: ["**/*"],
   lockfile: true,

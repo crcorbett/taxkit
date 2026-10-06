@@ -14,6 +14,7 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  "tools/docs-deployment/retirement.refusal.boundary.test.ts",
   // Exact build catalogue/renderer bytes and adversarial metadata fixture ingress.
   "apps/web/scripts/docs-images.build.ts",
   "apps/web/src/lib/docs/social.boundary.test.ts",
@@ -93,21 +94,10 @@ const decodingBoundaryFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "packages/docs-examples/src/browser-http.ts",
   "packages/docs-examples/src/node-server.ts",
-  "apps/docs/src/lib/docs/loaders.ts",
-  "apps/docs/src/lib/docs/loaders.server.ts",
-  "apps/docs/src/lib/docs/route-boundary.ts",
-  "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
-  "apps/docs/scripts/cloudflare-built-browser.live.ts",
-  "apps/docs/scripts/cloudflare-built-browser.live.test.ts",
-  "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
-  "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
-  "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
-  "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
-  "apps/docs/scripts/cloudflare-hosted-proof.live.layer.test.ts",
-  "apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts",
+
   "packages/infrastructure/src/cloudflare/website.test.ts",
   "packages/infrastructure/src/cloudflare/website.ts",
-  "apps/docs/src/lib/build/docs-build-target.ts",
+
   "packages/docs-content/src/navigation.ts",
 
   // Docs content and rendering-library representation boundaries.
@@ -146,6 +136,7 @@ const decodingBoundaryFiles = [
   "tools/documentation/runbook-policy.test.ts",
   "tools/docs-deployment/doppler-custody.boundary.ts",
   "tools/docs-deployment/input.boundary.ts",
+  "tools/docs-deployment/retired-source.boundary.ts",
   "tools/docs-deployment/inventory-credentials.boundary.ts",
   "tools/docs-deployment/workflow-check.boundary.ts",
   "tools/docs-deployment/automation.policy.test.ts",
@@ -208,8 +199,7 @@ const routeTransportBoundaryModules = ["#/lib/docs/route-boundary"];
 const routeTransportConsumerFiles = [
   "apps/web/src/routes/$.tsx",
   "apps/web/src/routes/search.tsx",
-  "apps/docs/src/routes/$.tsx",
-  "apps/docs/src/routes/index.tsx",
+
   "tools/oxlint/fixtures/route-transport-allowed.tsx",
   "tools/oxlint/fixtures/.generated-route-transport-consumer.tsx",
 ];
@@ -277,9 +267,7 @@ const schemaEncoderEgressFiles = [
   // Test-only native request/reply bytes; no production encoder admission.
   "packages/api/rpc/test/handlers.test.ts",
   "packages/api/rpc/test/content.boundary.test.ts",
-  "apps/docs/scripts/test-cloudflare-built.tsx",
-  "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
-  "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
+
   "apps/web/src/lib/calculator.boundary.browser.test.tsx",
   "apps/web/src/lib/loaders.server.ts",
   // Native public search header and checked local input-error transport egress.
@@ -288,7 +276,7 @@ const schemaEncoderEgressFiles = [
   "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/src/lib/config.boundary.test.ts",
   // Exact negative wire fixtures; native encoding only, no decoder/runtime/throwing codec admission.
-  "apps/docs/src/lib/docs/route-boundary.test.ts",
+
   "apps/api/scripts/smoke-boundaries.test.ts",
   "apps/api/test/config.test.ts",
   "packages/sdk/typescript/scripts/script-boundaries.test.ts",
@@ -324,12 +312,7 @@ const schemaEncoderEgressFiles = [
   "packages/rules/au/pay/test/take-home-pay.test.ts",
   "packages/calculators/__tests__/public-calculator-service.test.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
-  "apps/docs/src/server.ts",
-  "apps/docs/src/lib/docs/route-boundary.ts",
-  "apps/docs/src/lib/docs/loaders.server.ts",
-  "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
-  "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
-  "apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts",
+
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   // Exact acceptance-record and command-fixture representation tests.
@@ -357,19 +340,13 @@ const runtimeBoundaryFiles = [
   "packages/docs-content/src/catalogue-index.runtime.ts",
   "tools/documentation/catalogue.runtime.ts",
   "apps/web/scripts/native-pair-build.runtime.ts",
-  "apps/docs/scripts/check-import-boundaries.runtime.ts",
+
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
-  "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
-  "apps/docs/src/lib/runtime-factory.server.ts",
-  "apps/docs/src/lib/runtime.server.ts",
-  "apps/docs/src/server.ts",
-  "apps/docs/scripts/test-cloudflare-built.tsx",
-  "apps/docs/scripts/test-cloudflare-hosted.tsx",
-  "apps/docs/vite.config.ts",
+
   "apps/web/vite.config.ts",
   "apps/web/src/lib/runtime.server.ts",
   "apps/web/src/lib/loaders.ts",
@@ -392,6 +369,7 @@ const runtimeBoundaryFiles = [
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/governance/policy.test.ts",
+  "tools/docs-deployment/retirement.runtime.ts",
   "tools/docs-deployment/check.runtime.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/doppler-custody.runtime.ts",
@@ -410,8 +388,7 @@ const runtimeBoundaryFiles = [
 const processBoundaryFiles = [
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
-  "apps/docs/scripts/test-cloudflare-hosted.tsx",
-  "apps/docs/vitest.browser.config.ts",
+
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
@@ -419,15 +396,14 @@ const processBoundaryFiles = [
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
-  "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/local-doppler.test.ts",
-  "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
 ];
 
 const consoleBoundaryFiles = [
-  "apps/docs/scripts/test-cloudflare-hosted.tsx",
+  "tools/docs-deployment/retirement.runtime.ts",
+
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
@@ -441,9 +417,7 @@ const consoleBoundaryFiles = [
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/doppler-custody.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/workflow-artifact.runtime.ts",
-  "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/workflow-run-check.runtime.ts",
@@ -453,23 +427,23 @@ const consoleBoundaryFiles = [
 
 const bunAdapterFiles = [
   "apps/api/src/server.ts",
-  "apps/docs/scripts/test-cloudflare-hosted.tsx",
+
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
+  "tools/docs-deployment/retirement.runtime.ts",
   "packages/docs-content/src/catalogue-index.runtime.ts",
   "tools/documentation/catalogue.runtime.ts",
   "apps/web/scripts/native-pair-build.runtime.ts",
-  "apps/docs/scripts/check-import-boundaries.runtime.ts",
+
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
-  "apps/docs/scripts/test-cloudflare-built.tsx",
-  "apps/docs/scripts/test-cloudflare-hosted.tsx",
+
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
@@ -535,7 +509,6 @@ export default defineConfig({
   overrides: [
     {
       files: [
-        "apps/docs/scripts/check-import-boundaries.runtime.ts",
         "apps/api/src/config.ts",
         // Schema.TaggedError is a class factory, not an Error constructor.
         "apps/web/scripts/docs-images.build.ts",
@@ -620,23 +593,7 @@ export default defineConfig({
         "packages/infrastructure/**",
         "apps/web/**",
         "packages/infrastructure/src/.generated-strict-rejected.ts",
-        "apps/docs/scripts/check-import-boundaries.runtime*.ts",
-        "apps/docs/scripts/cloudflare-built-*.ts",
-        "apps/docs/scripts/test-cloudflare-built*.{ts,tsx}",
-        "apps/docs/scripts/.generated-built-strict-rejected.ts",
-        "apps/docs/scripts/cloudflare-hosted-proof*.ts",
-        "apps/docs/scripts/test-cloudflare-hosted*.{ts,tsx}",
-        "apps/docs/scripts/.generated-imports-strict-rejected.ts",
-        "apps/docs/scripts/.generated-hosted-strict-rejected.ts",
-        "apps/docs/vitest.scripts.config.ts",
-        "apps/docs/vitest.server.config.ts",
-        "apps/docs/vitest.browser.config.ts",
-        "apps/docs/vite.config.ts",
-        "apps/docs/src/**",
-        "apps/docs/src/.generated-app-strict-rejected.ts",
-        "apps/docs/src/lib/runtime-factory.server*.ts",
-        "apps/docs/src/lib/docs/route-boundary.test.ts",
-        "apps/docs/src/lib/docs/.generated-native-tests-strict-rejected.ts",
+
         "packages/sdk/typescript/type-tests/**",
         "packages/sdk/typescript/vitest*.config.ts",
         "packages/testing/**",
@@ -661,44 +618,7 @@ export default defineConfig({
         "taxkit/no-object-writes": "error",
       },
     },
-    {
-      files: [
-        "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
-        "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
-      ],
-      rules: { "unicorn/throw-new-error": "off" },
-    },
-    {
-      files: ["apps/docs/scripts/test-cloudflare-built.tsx"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["apps/docs/scripts/test-cloudflare-built.tsx"] },
-        ],
-      },
-    },
-    {
-      files: ["apps/docs/scripts/test-cloudflare-hosted.tsx"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["apps/docs/scripts/test-cloudflare-hosted.tsx"] },
-        ],
-      },
-    },
-    {
-      files: ["apps/docs/scripts/check-import-boundaries.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "apps/docs/scripts/check-import-boundaries.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
+
     {
       files: ["apps/web/src/lib/config.server.ts"],
       rules: { "anti-slop/no-unknown-parameters": "off" },
@@ -874,64 +794,7 @@ export default defineConfig({
         ],
       },
     },
-    {
-      files: ["apps/docs/src/lib/runtime-factory.server.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["apps/docs/src/lib/runtime-factory.server.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["apps/docs/src/lib/docs/loaders.server.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["apps/docs/src/lib/docs/loaders.server.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["apps/docs/src/server.ts"],
-      rules: {
-        "strict-effect/no-promise-workflow": [
-          "error",
-          { allowedFiles: ["apps/docs/src/server.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["apps/docs/src/server.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["apps/docs/src/server.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["apps/docs/vite.config.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["apps/docs/vite.config.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["apps/docs/src/lib/docs/route-boundary.browser.test.tsx"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
-            ],
-          },
-        ],
-      },
-    },
+
     {
       files: ["apps/api/src/index.ts"],
       rules: {
@@ -1118,6 +981,15 @@ export default defineConfig({
           {
             allowedFiles: ["tools/docs-deployment/doppler-custody.runtime.ts"],
           },
+        ],
+      },
+    },
+    {
+      files: ["tools/docs-deployment/retirement.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/docs-deployment/retirement.runtime.ts"] },
         ],
       },
     },
@@ -1419,7 +1291,6 @@ export default defineConfig({
     },
     {
       files: [
-        "apps/docs/src/routes/**/*.tsx",
         "tools/oxlint/fixtures/mdx-accepted.tsx",
         "tools/oxlint/fixtures/.generated-mdx-rejected.tsx",
       ],
@@ -1474,14 +1345,6 @@ export default defineConfig({
       files: bunRuntimeEntrypointFiles,
       rules: {
         "bun/no-runtime-outside-entrypoints": "off",
-      },
-    },
-    {
-      // The browser harness uses programmatic routes to prove the production
-      // boundary without adding a production file route.
-      files: ["apps/docs/src/lib/docs/route-boundary.browser.test.tsx"],
-      rules: {
-        "taxkit/no-route-transport-restore-outside-consumers": "off",
       },
     },
   ],

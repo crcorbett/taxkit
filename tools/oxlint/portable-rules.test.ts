@@ -122,16 +122,8 @@ const fixtureCases = [
     ],
   })),
   {
-    accepted: [
-      "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
-      "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
-      "apps/docs/scripts/cloudflare-built-proof.live.layer.test.ts",
-      "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
-      "apps/docs/scripts/cloudflare-built-browser.live.ts",
-      "apps/docs/scripts/cloudflare-built-browser.live.test.ts",
-      "apps/docs/scripts/test-cloudflare-built.tsx",
-    ],
-    generated: "apps/docs/scripts/.generated-built-strict-rejected.ts",
+    accepted: [],
+    generated: "apps/web/scripts/.generated-retired-built-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -149,15 +141,8 @@ const fixtureCases = [
   },
 
   {
-    accepted: [
-      "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
-      "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
-      "apps/docs/scripts/cloudflare-hosted-proof.live.layer.test.ts",
-      "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
-      "apps/docs/scripts/test-cloudflare-hosted.tsx",
-      "apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts",
-    ],
-    generated: "apps/docs/scripts/.generated-hosted-strict-rejected.ts",
+    accepted: [],
+    generated: "apps/web/scripts/.generated-retired-hosted-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -219,7 +204,7 @@ const fixtureCases = [
   {
     accepted: [
       "packages/infrastructure/src/stage.ts",
-      "packages/infrastructure/src/stack.ts",
+      "packages/infrastructure/src/retired-stack.schemas.ts",
       "packages/infrastructure/src/cloudflare/website.ts",
       "packages/infrastructure/src/cloudflare/website.test.ts",
     ],
@@ -240,18 +225,8 @@ const fixtureCases = [
     ],
   },
   {
-    accepted: [
-      "apps/docs/src/server.ts",
-      "apps/docs/src/lib/runtime.server.ts",
-      "apps/docs/src/lib/docs/loaders.ts",
-      "apps/docs/src/lib/docs/loaders.server.ts",
-      "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
-      "apps/docs/src/lib/mdx/components.tsx",
-      "apps/docs/src/routes/$.tsx",
-      "apps/docs/vite.config.ts",
-      "apps/docs/vitest.browser.config.ts",
-    ],
-    generated: "apps/docs/src/.generated-app-strict-rejected.ts",
+    accepted: [],
+    generated: "apps/web/src/.generated-retired-app-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -268,14 +243,9 @@ const fixtureCases = [
     ],
   },
   {
-    accepted: [
-      "apps/docs/src/lib/runtime-factory.server.ts",
-      "apps/docs/src/lib/runtime-factory.server.test.ts",
-      "apps/docs/src/lib/docs/route-boundary.test.ts",
-      "apps/docs/vitest.server.config.ts",
-    ],
+    accepted: [],
     generated:
-      "apps/docs/src/lib/docs/.generated-native-tests-strict-rejected.ts",
+      "apps/web/src/lib/docs/.generated-retired-native-tests-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -292,12 +262,8 @@ const fixtureCases = [
     ],
   },
   {
-    accepted: [
-      "apps/docs/scripts/check-import-boundaries.runtime.ts",
-      "apps/docs/scripts/check-import-boundaries.runtime.test.ts",
-      "apps/docs/vitest.scripts.config.ts",
-    ],
-    generated: "apps/docs/scripts/.generated-imports-strict-rejected.ts",
+    accepted: [],
+    generated: "apps/web/scripts/.generated-retired-imports-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -678,6 +644,7 @@ const fixtureCases = [
       "tools/docs-deployment/inventory-credentials.boundary.test.ts",
       "tools/docs-deployment/inventory.schemas.ts",
       "tools/docs-deployment/local-doppler.ts",
+      "tools/docs-deployment/retirement.runtime.ts",
       "tools/docs-deployment/local-doppler.runtime.ts",
       "tools/docs-deployment/local-doppler.schemas.ts",
       "tools/docs-deployment/local-doppler.test.ts",
@@ -716,6 +683,7 @@ const fixtureCases = [
       "tools/docs-deployment/workflow-plan-check.runtime.ts",
       "tools/docs-deployment/workflow-evidence.ts",
       "tools/docs-deployment/workflow-evidence.runtime.ts",
+      "tools/docs-deployment/workflow-evidence.historical.ts",
       "tools/docs-deployment/workflow-evidence.schemas.ts",
       "tools/docs-deployment/workflow-evidence.test.ts",
     ],
@@ -1079,7 +1047,7 @@ test("keeps full source coverage and its five unexecuted fixture exclusions exac
 describe("portable Oxlint plugins", () => {
   test.effect.each([
     "apps/web/src/.generated-promise-mapping.ts",
-    "apps/docs/src/.generated-promise-mapping.tsx",
+    "apps/web/src/.generated-retired-promise-mapping.tsx",
     "packages/infrastructure/src/.generated-promise-mapping.ts",
     ".generated-promise-mapping.js",
     ".generated-promise-mapping.jsx",
@@ -1337,11 +1305,6 @@ test.effect.each([
 );
 
 test.each([
-  "apps/docs/scripts/test-cloudflare-built.tsx",
-  "apps/docs/scripts/test-cloudflare-hosted.tsx",
-  "apps/docs/src/lib/docs/loaders.server.ts",
-  "apps/docs/src/server.ts",
-  "apps/docs/vite.config.ts",
   "apps/web/vite.config.ts",
   "apps/web/src/lib/runtime.server.ts",
   "apps/web/src/lib/loaders.server.ts",
@@ -1349,9 +1312,6 @@ test.each([
   "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/scripts/native-pair-build.runtime.ts",
   "apps/web/src/server.ts",
-  "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
-  "apps/docs/src/lib/runtime-factory.server.ts",
-  "apps/docs/scripts/check-import-boundaries.runtime.ts",
   "apps/api/src/index.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
@@ -1370,6 +1330,7 @@ test.each([
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/docs-deployment/workflow-artifact.runtime.ts",
   "tools/docs-deployment/doppler-custody.runtime.ts",
+  "tools/docs-deployment/retirement.runtime.ts",
   "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
@@ -1407,7 +1368,6 @@ test.each([
 
 test.each([
   "packages/sdk/typescript/src/client.runtime.ts",
-  "apps/docs/src/server.ts",
   "apps/web/src/server.ts",
 ])("keeps the host Promise result admission exact: %s", (path) => {
   expect(

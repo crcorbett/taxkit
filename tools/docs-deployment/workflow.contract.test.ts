@@ -1,6 +1,12 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it as test } from "@effect/vitest";
-import { Array as EffectArray, Effect, FileSystem, Option } from "effect";
+import {
+  Array as EffectArray,
+  Effect,
+  FileSystem,
+  Option,
+  Record,
+} from "effect";
 
 const workflowPaths = {
   preview: ".github/workflows/docs-preview.yml",
@@ -13,7 +19,22 @@ const readFile = (path: string, _encoding: "utf-8") =>
   FileSystem.FileSystem.pipe(
     Effect.flatMap((fileSystem) => fileSystem.readFileString(path))
   );
-const readWorkflow = (path: string) => readFile(path, "utf-8");
+// These exact writer sources are history. Current stop workflows have their own proof.
+const historicalWorkflowPaths: Readonly<Record<string, string>> = {
+  ".github/workflows/docs-preview-teardown.yml":
+    "docs/evidence/deployments/retired-docs-workflows-2c5ffd40/docs-preview-teardown.yml.txt",
+  ".github/workflows/docs-preview.yml":
+    "docs/evidence/deployments/retired-docs-workflows-2c5ffd40/docs-preview.yml.txt",
+  ".github/workflows/docs-production.yml":
+    "docs/evidence/deployments/retired-docs-workflows-2c5ffd40/docs-production.yml.txt",
+};
+const readWorkflow = (path: string) =>
+  Record.get(historicalWorkflowPaths, path).pipe(
+    Option.match({
+      onNone: () => readFile(path, "utf-8"),
+      onSome: (retainedPath) => readFile(retainedPath, "utf-8"),
+    })
+  );
 const workflowRunApiReadback = [
   'run_json="$(gh api "repos/',
   "$",
@@ -49,7 +70,7 @@ const stepNamesWithBinding = (source: string, binding: string) =>
     }
   );
 
-describe("docs deployment workflow admission", () => {
+describe("retained docs workflow admission and current receipt verifiers", () => {
   test.effect("keeps every deployment workflow exact-SHA and pinned", () =>
     Effect.gen(function* () {
       const sources = yield* Effect.all(
@@ -261,7 +282,10 @@ describe("docs deployment workflow admission", () => {
     Effect.gen(function* () {
       const [packageSource, turboSource, inventoryRuntime, ...workflows] =
         yield* Effect.all([
-          readFile("package.json", "utf-8"),
+          readFile(
+            "docs/evidence/deployments/retired-docs-operations-2c5ffd40/package.json",
+            "utf-8"
+          ),
           readFile("turbo.json", "utf-8"),
           readFile("tools/docs-deployment/inventory.runtime.ts", "utf-8"),
           ...EffectArray.map(

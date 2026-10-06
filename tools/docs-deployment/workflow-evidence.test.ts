@@ -7,14 +7,16 @@ import {
   Match,
   Result,
   Schema,
+  Stream,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
+import { ChildProcess, ChildProcessSpawner } from "effect/process";
 import type * as Scope from "effect/Scope";
 
 import { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 import { DeploymentPlanReceipt } from "./schemas.js";
-import { runWorkflowEvidence } from "./workflow-evidence.runtime.js";
+import { runHistoricalWorkflowEvidence } from "./workflow-evidence.historical.js";
 import {
   WorkflowBootstrapReceipt,
   WorkflowEvidenceIdentity,
@@ -28,7 +30,7 @@ const digest = "c".repeat(64);
 type TestConfig = Readonly<Record<string, string | undefined>>;
 
 const runWithConfig = (config: TestConfig) =>
-  runWorkflowEvidence.pipe(
+  runHistoricalWorkflowEvidence.pipe(
     Effect.provideService(
       ConfigProvider.ConfigProvider,
       ConfigProvider.fromUnknown(config)
@@ -108,8 +110,60 @@ const withFixture = <A, E>(
     const directory = yield* fileSystem.makeTempDirectoryScoped({
       prefix: "taxkit-workflow-evidence-",
     });
-    const repositoryRoot = yield* path.fromFileUrl(
-      new URL("../..", import.meta.url)
+    // This tests the historical receipt algorithm, not today's retired graph.
+    const repositoryRoot = path.join(directory, "historical-input-fixture");
+    const fixtureFiles = [
+      "alchemy.run.ts",
+      "apps/docs/package.json",
+      "apps/docs/vite.config.ts",
+      "apps/docs/public/_headers",
+      "packages/infrastructure/src/cloudflare/website.ts",
+      "packages/infrastructure/src/stage.ts",
+      "packages/infrastructure/src/stack.ts",
+      "packages/docs-content/fixture.txt",
+      "packages/docs-fumadocs/fixture.txt",
+      "bun.lock",
+    ];
+    yield* Effect.forEach(fixtureFiles, (file) =>
+      fileSystem
+        .makeDirectory(path.dirname(path.join(repositoryRoot, file)), {
+          recursive: true,
+        })
+        .pipe(
+          Effect.andThen(
+            fileSystem.writeFileString(
+              path.join(repositoryRoot, file),
+              `Historical algorithm fixture: ${file}\n`
+            )
+          )
+        )
+    );
+    const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+    yield* Effect.forEach(
+      [
+        ["init", "--quiet"],
+        ["add", "--", ...fixtureFiles],
+      ],
+      (args) =>
+        Effect.gen(function* () {
+          const handle = yield* spawner.spawn(
+            ChildProcess.make("git", args, {
+              cwd: repositoryRoot,
+              stderr: "pipe",
+              stdin: "ignore",
+              stdout: "pipe",
+            })
+          );
+          const [exitCode] = yield* Effect.all(
+            [
+              handle.exitCode,
+              Stream.runDrain(handle.stdout),
+              Stream.runDrain(handle.stderr),
+            ],
+            { concurrency: 3 }
+          );
+          expect(Number(exitCode)).toBe(0);
+        })
     );
     yield* fileSystem.writeFileString(
       `${directory}/alchemy-plan.txt`,

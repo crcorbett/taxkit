@@ -233,3 +233,13 @@ workers.dev URL. The failed beta.64 runs remain historical non-claims. The
 deployment register therefore has four established entries; none establishes
 custom-domain, DNS, billing, release, publication, byte-promotion or current
 public-domain claims.
+
+## Current old-docs retirement controls
+
+The old docs workspace and writer workflows are retired. Their exact previous
+sources and controls remain under the retained-source manifest, and existing
+invalid-code checks remain active. Current writer-stop checks decode the real
+workflow shape and execute its permission-free stop script. Native process
+checks reject the old root, development and receipt-writer commands before
+provider planning. Historical receipt controls keep their original resource
+and workflow identities. New native provider operations belong DEV-81.

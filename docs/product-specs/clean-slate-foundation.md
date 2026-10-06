@@ -1008,3 +1008,39 @@ and Quality policy reject later unrelated artifacts, another result and plain
 success text. This repairs evidence selection, without a new candidate or
 attempt receipt. [Detail-output evidence](../documentation-audit/clean-slate-foundation/2026-10-07-release-detail-output.json)
 remains separate from old app retirement and metrics deferral.
+
+## T005 old-app retirement contract
+
+Retire only the old app workspace, obsolete build/test selectors, precise lint
+permissions and writer routes after replacement journeys and source identities
+are qualified. A README tombstone routes to the strict verified 49-file original
+source bundle and concrete retention manifest. Keep the initial T001 manifest,
+accepted authored inputs/catalogue and every old provider receipt unchanged.
+Keep all 61 authored page URLs; the approved default calculator replaces `/`
+and `/start` remains the docs entry. The native Worker proof must observe actual
+HTML and canonical/share metadata at each original page address.
+
+The replacement still consumes the shared Fumadocs render/config/source owners,
+so that package stays. Ignore neither missing active files nor source-policy
+failures. Historical inspections use explicit verified original sources; current
+native hosts retain actual positive/negative checks. All previous invalid-code
+canaries remain. Saved workflow, operation, journey, control and command bytes
+preserve the old contract outside default execution. The historical receipt
+algorithm qualifies its bytes in an owned temporary Git fixture, not current
+source files.
+
+The old Stack entry is a static typed marker that the actual Alchemy importer
+refuses before session providers, remote state or planning. Alchemy can create
+local logs and an empty profile earlier; proof records that limit. The four old
+writer/browser workflows admit only a manual permission-free stop, with no
+checkout, credential fetch or provider step. Actual old-development and
+receipt-writer commands stop before operation Config/custody/state work. The
+read-only historical receipt reconciler remains useful. No successful empty
+old-resource graph can invite a destroy apply.
+
+Original resource, stage, version, URL and recovery identities remain tied to
+their dated provider observations. The source bundle is not a complete rebuild
+checkout, deployed artifact, approval or exercised rollback. Ignored local
+build, dependency and state files stay physically untouched. Native provider
+operations and domains belong T010/DEV-81; metrics remain deferred. Full final
+qualification is required before whole T005 acceptance or delivery.

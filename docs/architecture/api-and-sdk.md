@@ -518,10 +518,10 @@ test-only descriptors and helpers for consumers validating type behaviour.
 
 ## Fumadocs site
 
-The public docs site lives under:
+The current local documentation reader lives under:
 
 ```txt
-apps/docs
+apps/web
 ```
 
 Reusable docs content and Fumadocs integration live under:

@@ -58,7 +58,11 @@ const AutomationLifecycle = Schema.Struct({
   carryingCost: Schema.NonEmptyString,
   disconfirmingEvidence: Schema.NonEmptyArray(Schema.NonEmptyString),
   retirementCondition: Schema.NonEmptyString,
+  retirementRecord: Schema.Literal(
+    "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
+  ),
   reviewTriggers: Schema.NonEmptyArray(Schema.NonEmptyString),
+  sourceStatus: Schema.Literal("retired"),
 });
 
 const AutomationFailure = Schema.Struct({
@@ -125,8 +129,12 @@ const DeploymentControl = Schema.Struct({
   preventedFailure: Schema.NonEmptyString,
   recovery: Schema.NonEmptyString,
   retirementCondition: Schema.NonEmptyString,
+  retirementRecord: Schema.Literal(
+    "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
+  ),
   reviewTrigger: Schema.NonEmptyString,
   signal: Schema.NonEmptyString,
+  sourceStatus: Schema.Literal("retained-historical-control"),
 });
 
 export type DeploymentControl = typeof DeploymentControl.Type;

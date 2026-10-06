@@ -21,7 +21,6 @@ contains the proposed package map and dependency direction.
 Current implemented code lives in:
 
 - `apps/api`
-- `apps/docs`
 - `apps/web`
 - `packages/core`
 - `packages/calculators`
@@ -139,42 +138,29 @@ calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
   returns checked backend discovery documents at their conventional addresses.
   Both Markdown representations and generated share images are locally
   qualified. Current release documentation checking selects this app.
-  Retirement of `apps/docs` and its build/operation dependencies remains
-  T005 work.
+  The old `apps/docs` workspace and writer workflows are retired; its
+  verified original source and dated recovery records remain addressable.
 
 `apps/docs`
-: Retained old documentation app for the existing deployment/recovery route.
-  It owns TanStack Start routes, the
-  docs app shell, route loaders, navigation presentation and app-local
-  MDX component composition, Schema-decoded build target, Cloudflare Vite
-  configuration, static-asset headers and local built-Worker proof. It
-  consumes package-owned content and Fumadocs helpers, but does not own
-  canonical frontmatter, navigation, generated source or reusable Fumadocs
-  integration contracts. It composes and executes one module-scoped
-  server-only managed runtime; browser code restores encoded route transport
-  and does not own an Effect runtime.
+: Retirement tombstone only. The strict historical source bundle retains all
+  49 original files. The deployment runbook owns inspection and separately
+  approved recovery, rather than an active old workspace.
 
 Root `alchemy.run.ts`
-: Repository deployment composition for the docs app. It owns Cloudflare
-  providers and remote state, decodes the stage, and calls the private
-  infrastructure package. It is not an application runtime owner.
+: Static retirement record which the actual Alchemy importer refuses before
+  session providers, remote state and planning. It declares no empty graph.
 
 `packages/infrastructure`
-: Private source-only owner of the `TaxKitDocsCloudflare` stack identity,
-  deployment stage Schema and one `Cloudflare.Website.Vite("DocsWebsite")`
-  resource policy. Its outputs remain Alchemy Outputs until the deployment
-  boundary resolves them. The docs app has no runtime dependency on it;
-  app-local proof scripts independently assert expected built settings.
-  Shared memo inputs are readonly; the stack makes fresh array copies at the
-  Alchemy input. Native provider-free tests and compiler controls qualify stage,
-  header, logging and readonly contracts separately from any provider graph or
-  deployment proof.
+: Private source-only owner of the native API/Website graph and stage/secret
+  selection. The old `./stack` export is now the typed retirement marker.
+  Pure retained old stage/resource metadata remains for historical receipt
+  decoding. New provider operations belong DEV-81 and cannot inherit old IDs
+  or approvals.
 
 `tools/docs-deployment`
-: Repository-local Schema, policy and command boundary for docs deployment
-  authority, stable journey inventory and sanitized dated receipts. It owns no
-  provider-generic framework, raw client, app runtime or reusable package. The
-  current validator performs no provider operation.
+: Read-only historical receipt, source and policy checks. Retired writer CLI
+  and workflow paths stop before configuration or credential fetch. Native
+  process tests qualify the stops separately from historical source inspection.
 
 `apps/api`
 : API application owner. It retains standalone Bun config/startup/shutdown

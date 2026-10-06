@@ -151,7 +151,7 @@
     "Exactly five operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
     "The current six local journeys include the native Website. The separate four-entry docs deployment journey owner and dated deployment receipts grant no additional authority; historical five-journey HGI/HFI evidence remains unchanged.",
     "Repository-local skills and validators must work from a clean clone without reading a user home or global skill installation.",
-    "Current docs-browser release checking and Quality Playwright bootstrap select apps/web. Retained apps/docs and its provider procedure remain separate pending T005 retirement/T010 operations; no historical packet or provider target is reinterpreted."
+    "Current docs-browser release checking and Quality Playwright bootstrap select apps/web. The old apps/docs workspace and writers are retired with verified retained sources; new provider operations remain T010 work; no historical packet or provider target is reinterpreted."
   ],
   "exclusions": [
     "Dependency, build, cache, generated route, temporary, binary, and vendored trees are excluded from readable corpus accounting.",

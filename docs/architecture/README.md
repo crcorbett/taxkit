@@ -33,8 +33,8 @@ Implemented surfaces:
 
 - `apps/api`: retained standalone Bun API and native Worker candidate sharing
   the public HTTP contract and calculator service.
-- `apps/docs`: retained old docs runtime for its existing deployment/recovery
-  procedure, pending qualified source/build retirement.
+- `apps/docs`: retirement tombstone with verified original-source and dated
+  provider recovery routes; no active app workspace.
 - `apps/web`: native TanStack Website candidate; its take-home-pay form uses
   private API binding for server calculation and direct browser RPC. The
   development pair and accepted documentation reader are locally qualified.

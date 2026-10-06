@@ -191,7 +191,7 @@ const program = Effect.gen(function* main() {
   const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
   const result = yield* checkDocsDeploymentAutomation(repositoryRoot);
   yield* Console.info(
-    `Docs deployment automation validation: automations=${result.automationCount}; controls=${result.controlCount}; externalStateEstablished=${result.externalStateEstablished}; violations=0.`
+    `Retired docs automation receipt validation: automations=${result.automationCount}; controls=${result.controlCount}; historicalEstablishedReceipts=${result.externalStateEstablished}; violations=0.`
   );
 }).pipe(
   Effect.tapErrorTag("DeploymentAutomationInputError", (error) =>

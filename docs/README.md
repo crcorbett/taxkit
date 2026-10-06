@@ -14,8 +14,9 @@ and semantic ownership. Root `README.md` is the public repository entry point;
 `AGENTS.md` is the short task map; `docs/architecture/README.md` is the current
 architecture route. Public documentation content is a separate product surface
 owned by the replacement `apps/web`, backend content contracts and docs
-packages. The old `apps/docs` source remains only until its build/deployment
-and recovery dependencies are retired.
+packages. The old `apps/docs` workspace is retired. Its tombstone routes to the verified
+source bundle and dated provider recovery records; no provider operation is
+authorised by that retained history.
 
 ## Truth layers
 

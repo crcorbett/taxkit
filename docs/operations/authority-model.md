@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-31
+last_reviewed: 2026-10-07
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -39,6 +39,17 @@ The exact machine-checked records live in
 `tools/documentation/runbook-contract.json`. That sidecar and this table must
 agree; neither grants authority. Provider/registry/deployment claims require
 current target-system readback by the authorized principal.
+
+## Current old-docs retirement boundary
+
+The current checkout retires the old docs workspace, writer workflows and
+Alchemy Stack entry. The [retention manifest](../documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json)
+preserves exact original sources and dated provider recovery identities.
+Historical deployment, credential and reconciliation approvals below remain
+attached to their original operations. They do not authorise resuming a retired
+writer, changing an old resource ID, deleting hosted resources or applying the
+native API/Website graph. DEV-81 must supply its own approved operation and
+readback. Repository retirement changes no provider or credential state.
 
 ## 2026-08-28 — Doppler repository authority and provider stop
 

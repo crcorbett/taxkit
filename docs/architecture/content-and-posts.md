@@ -19,7 +19,7 @@ on the open-source tax engine and avoid downstream private-product specifics.
 
 ## Main areas
 
-`apps/docs`
+`apps/web`
 : Public documentation site. It owns the TanStack Start route runtime, app
   shell, app-specific MDX component composition and browser rendering.
 
@@ -44,7 +44,7 @@ on the open-source tax engine and avoid downstream private-product specifics.
 : Private source-only package for authored navigation, meta, MDX, validation
   policy, validation errors and generated Fumadocs source access. Its existing
   page/navigation/source-error exports re-export `@taxkit/content` contracts;
-  its source service still supports the existing docs app.
+  its source service remains available to build-time content consumers.
   Its independent native MDX index and build-only source Layer use the installed
   compiler and the same adapter as the retained Vite source.
   Its compiler-only link policy maps parsed page links through checked navigation
@@ -96,8 +96,9 @@ personal report, guessed origin or competing content catalogue is exposed.
 The Website serves the same checked processed body from accepted pages through
 same-address Accept negotiation and explicit `.md` links. It adds no backend
 route or compiler fallback; the [frontend owner](frontend.md#replacement-website-markdown)
-records representation policy. Share images and old-app retirement remain
-T005 work. This implementation does not establish public availability.
+records representation policy. Share images are derived during the Website build. The old app workspace and
+writer workflows are retired; verified original-source data and dated provider
+recovery identities remain addressable. This implementation does not establish public availability.
 
 `docs/architecture`
 : Durable implementation architecture.
@@ -108,18 +109,13 @@ T005 work. This implementation does not establish public availability.
 ## Public docs graph
 
 ```ts
-Production: public docs request
+Current native public docs request
 
-browser
-  -> apps/docs route
-    -> apps/docs route boundary schema
-    -> DocsContentService
-      -> @taxkit/docs-fumadocs FumadocsSource
-        -> packages/docs-content/.source/server
-          -> packages/docs-content/content/**/*.mdx
-      -> packages/docs-content/navigation.json
-    -> @taxkit/docs-content/client
-      -> Fumadocs compiled MDX module
+browser or Website SSR
+  -> apps/web route and checked route boundary
+    -> private docs RPC / checked backend ContentService
+      -> accepted JSON catalogue
+    -> browser-safe compiled MDX presentation
     -> @taxkit/docs-fumadocs/render primitives
     -> app-local MDX component map
 ```
@@ -138,7 +134,7 @@ docs implementation
     -> generated Fumadocs and OpenAPI owner edges
     -> maintainer metadata, links, commands and package README coverage
   -> @taxkit/docs-fumadocs tests
-  -> apps/docs build and browser screenshots when rendering changes
+  -> apps/web native build and real browser/Worker checks when rendering changes
   -> bun run verification
 ```
 
@@ -163,7 +159,7 @@ docs implementation
   page-level acceptance records their transition.
 - Keep reusable Fumadocs code in `@taxkit/docs-fumadocs`; keep TaxKit
   content contracts in `@taxkit/docs-content`; keep route composition and
-  app-specific rendering in `apps/docs`.
+  app-specific rendering in `apps/web`.
 
 ## Related docs
 

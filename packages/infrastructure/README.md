@@ -3,50 +3,46 @@ document_type: package-guide
 lifecycle: current
 authority: supporting
 owner: taxkit-infrastructure-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-07
 review_trigger: Alchemy resource, stage, provider, state, or package-export change
 ---
 
 # TaxKit infrastructure
 
-This private source-only package owns the current docs graph and the separate
-API/Website candidate graph. Root `alchemy.run.ts` selects the Cloudflare provider
-and state store, decodes the stage, and calls `declareDocsStack`. The docs app
-owns Vite and the Worker code; it does not depend on this package.
+This private source-only package owns the native API/Website graph, stage
+rules and checked secret selection. Root `alchemy.apps.run.ts` selects the
+native cloud candidate; `alchemy.apps.local.run.ts` owns disposable local
+apps. The package has no application runtime.
 
-Its explicit `./stage`, `./website` and `./stack` exports remain source-only:
-callers need the repository's TypeScript-aware Alchemy/Bun toolchain. Shared
-memo settings are readonly, including nested workspace arrays. The stack gives
-Alchemy fresh arrays at the provider input because its current types require
-writable arrays; callers must also copy these arrays before using a writable
-provider input. Values, source selection and cache invalidation are preserved.
+The old `./stack` source-only export now supplies a typed static retirement
+marker. Root `alchemy.run.ts` exports that marker; the actual Alchemy importer
+refuses it before session providers, remote state and planning. Alchemy startup
+still creates local logs and an empty default profile. This is a deliberate
+refusal, not a successful empty resource plan.
 
-The stack keeps `TaxKitDocsCloudflare`, `DocsWebsite`, `dev_<user>`,
-`pr-N` and `prod` stable. It has no runtime binding, custom domain,
-database or Axiom resource. Deployment admission, state/provider readback and
-receipts live in `tools/docs-deployment`.
+The explicit `./stage` and `./website` exports retain pure old identity/stage
+metadata for historical receipt decoding and tests. They do not declare an old
+provider graph. Original `TaxKitDocsCloudflare/DocsWebsite` source and deployed
+recovery IDs remain addressable through the
+[retention manifest](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json).
+The old asset-header byte check now belongs to that verified historical-source
+proof. Current Website behaviour belongs to its freshly built native tests.
 
 Run `bun run --filter=@taxkit/infrastructure check-types` and
 `bun run --filter=@taxkit/infrastructure test` for local declaration proof.
-Build `api` first with `bun run --filter=api build` when its compiled app export
-has changed. The root `bun run test` already builds dependency exports; a direct
-package test does not. An older compiled API export cannot qualify a source edit.
-The test command uses Bun-hosted Vitest and the native Effect runner. It checks
-stage acceptance/rejection, bounded log settings and the actual app-owned asset
-header file through native file/path services. Compiler controls require both
-top-level and nested memo arrays to remain readonly. Canonical strict rules
-cover all package source/tests, with no test runtime execution permission.
-These commands do not plan, deploy or prove provider state. See
-[`docs/architecture/deployment.md`](../../docs/architecture/deployment.md)
-and [the deployment runbook](../../docs/runbooks/docs-deployment.md).
-
+Build `api` first with `bun run --filter=api build` when its compiled export has
+changed. Shared old memo values remain readonly, including nested arrays;
+compiler controls and the scoped native memo fixture preserve their contract.
+These checks do not plan a provider operation, deploy or prove external state.
+See [deployment architecture](../../docs/architecture/deployment.md) and
+[the deployment runbook](../../docs/runbooks/docs-deployment.md).
 
 ## Native API/Website candidate
 
 The explicit source-only `./apps-stack` and `./apps-secrets` exports are consumed
 by `alchemy.apps.run.ts`. This candidate declares `TaxKitAppsCloudflare` with
-`TaxKitApi` and `TaxKitWebsite`; current docs operations still select
-`alchemy.run.ts` and `TaxKitDocsCloudflare`.
+`TaxKitApi` and `TaxKitWebsite`; the old `alchemy.run.ts`
+operation refuses. The native provider procedure remains DEV-81 work.
 
 The graph consumes the API app's `api/worker` export, provides its live native
 entry once and binds the website privately to that same API resource as

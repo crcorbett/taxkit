@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "owner": "taxkit-docs-deployment-proof-owner",
+  "reviewTrigger": "docs Worker build, runtime, provider composition, stage, deployment, teardown, rollback, proof or receipt change",
+  "journeys": [
+    {
+      "id": "taxkit-docs-workerd",
+      "environment": "local-workerd",
+      "claim": "The exact deployable Worker/assets candidate runs under local workerd with the DCD-001 behavioral and lifecycle contract.",
+      "receiptRoute": "docs/evidence/deployments/README.md#local-workerd",
+      "oracleClasses": ["worker-bundle", "http-ssr-assets-404", "browser-hydration-navigation", "server-function", "runtime-lifetime"],
+      "falseGreenOracles": ["provider credentials are removed", "the exact deployment input digest is retained", "local readiness timing is not provider startup proof"]
+    },
+    {
+      "id": "taxkit-docs-preview",
+      "environment": "cloudflare-preview",
+      "claim": "One trusted exact PR head is deployed to its isolated read-back workers.dev Preview, behaviorally proved and safely torn down.",
+      "receiptRoute": "docs/evidence/deployments/README.md#preview",
+      "oracleClasses": ["candidate-plan-provider-binding", "hosted-http-browser-accessibility-console-cache", "desktop-mobile-screenshot", "teardown-absence"],
+      "falseGreenOracles": ["the candidate must be the provider-read-back trusted PR head", "screenshots do not replace behavioral or provider proof", "destroy must target only the exact stage"]
+    },
+    {
+      "id": "taxkit-docs-production",
+      "environment": "cloudflare-production",
+      "claim": "The Preview-accepted exact source is rebuilt through the fixed Production stage and proved at its stable read-back workers.dev URL.",
+      "receiptRoute": "docs/evidence/deployments/README.md#production",
+      "oracleClasses": ["preview-gate", "candidate-plan-provider-binding", "hosted-http-browser-accessibility-console-cache", "desktop-mobile-screenshot"],
+      "falseGreenOracles": ["same-source rebuild is not byte identity", "the URL comes from provider readback", "screenshots do not prove deployment or behavior"]
+    },
+    {
+      "id": "taxkit-docs-deployment-rollback",
+      "environment": "cloudflare-production-rollback",
+      "claim": "An operator can restore the last-known-good Production source through the admitted normal redeploy path and prove provider/runtime agreement.",
+      "receiptRoute": "docs/evidence/deployments/README.md#rollback",
+      "oracleClasses": ["rollback-authority", "last-known-good-identity", "provider-version-readback", "hosted-postcondition"],
+      "falseGreenOracles": ["a version change without hosted proof is insufficient", "rollback must not change stage or Worker identity", "break-glass reconciliation is not normal rollback"]
+    }
+  ]
+}

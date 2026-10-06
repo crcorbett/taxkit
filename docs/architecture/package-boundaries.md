@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-package-boundaries-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: package responsibility, dependency direction or public export change
 ---
 
@@ -21,7 +21,6 @@ This page is a target architecture, not a list of implemented packages.
 Implemented packages and apps:
 
 - `apps/api`
-- `apps/docs`
 - `apps/web`
 - `packages/calculators`
 - `packages/docs-content`

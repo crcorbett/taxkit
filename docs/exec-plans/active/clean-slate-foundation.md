@@ -4540,3 +4540,154 @@ contract or Changeset, app product/dependency change, provider action or metrics
 Corrected focused checks pass; freeze the final sources and run the full ordered graph
 before acceptance. Consume its emitted returned paths/hashes directly for the
 new receipt, and verify each actual detail. Old-app retirement remains next.
+
+## 2026-10-07 — T005 retained-source and old-app retirement
+
+Exact-output commit `2c5ffd40` passed the complete nine-check local CI-mode graph
+in 937.84 seconds, all seven final owner checks and final receipt-metadata
+checks, then was pushed to draft #155. Its receipt consumes every detail path
+and SHA256 from that returned command's actual output; all eighteen files were
+read back. Every frozen source/index identity, accepted input, catalogue byte
+and original app source identity matched. The new head has its own pending
+hosted check; neither that check nor the preceding head is assumed successful.
+
+The initial T001 retention manifest remains historical baseline evidence at
+`8ed03f0e`. Current T005 explicitly selects old-app retirement after equivalent
+local journeys, source/artifact identities and useful URL dispositions are
+proved. Add a concrete successor retention record without rewriting that
+baseline, accepted historical receipts or their resource identities.
+
+Retain all 49 original UTF-8 `apps/docs` sources from `5d5544d0` in a strict,
+bounded historical JSON bundle, with original paths, byte sizes and SHA256.
+The bundle is read-only data, never an active workspace, imported application,
+or implicit source restoration. Verify its own pinned bytes and each original
+source before historical inspections can use it. Exact original Git revision,
+lock/config/input identities and deployed recovery receipts retain the wider
+context. Source addressability does not prove a complete historical rebuild,
+current provider state, deployment permission or exercised rollback.
+
+The original and replacement catch-all routes use the same 61 authored page
+addresses. Keep each accepted page at its original URL and qualify those routes
+on the final candidate. The approved default calculator replaces the old `/`
+docs landing; `/start` remains the documentation entry. Generated old private
+server-function IDs and hashed build assets are not public page bookmarks;
+original artifacts remain tied to their retained provider recovery identities.
+The shared Fumadocs render/config/source package still has actual replacement
+consumers and stays; remove only app-owned obsolete composition/build paths.
+
+Retire old workspace/root build/test selection, exact lint/unused-code app
+entries and current guides together. Preserve the physically ignored old
+`dist`, `node_modules`, `.turbo`, `.vitest` and `.wrangler` entries; do not run a
+folder cleanup. Current native API/Website checks retain their existing owners.
+Historical old-app source inspection must be explicit and independently verified;
+missing active source must never pass via a generic archive exemption.
+
+Stop the old entry and writer routes before credential fetch, remote state,
+plan or mutation. Installed Alchemy beta.80 validates a default Stack before
+building session/provider/state services; a typed static retirement marker
+must refuse that real boundary instead of returning an empty graph. Keep the
+old `TaxKitDocsCloudflare/DocsWebsite` identity and approved historical recovery
+route distinct from `TaxKitAppsCloudflare/TaxKitApi/TaxKitWebsite`. The latter's
+provider operation still belongs T010. Preserve useful read-only historical
+receipt tooling and prevent old automated writers from treating the new graph
+as their resource. No provider operation is authorised or performed here.
+
+Documentation impact: Change required for the concrete retention record/bundle
+and native read/refusal proof; obsolete workspace/command/config selection;
+current app/package/architecture/root/skill routes; old operation/runbook/current
+journey/automation owners and real workflow refusal controls; SPEC/task/plan and
+dated qualification. Preserve original historical and binary evidence, accepted
+127 inputs/catalogue, shared rendering/source packages, deployed resource and
+recovery IDs, canonical skills, ignored files, retained tax results and metrics
+deferral. N/A for public tax/API wire changes, new provider authority, actual
+provider/credential/registry/merge operations or another package Changeset unless
+a package-facing change is actually required. This is implementation intent,
+not retirement acceptance; source removal and closeout require the actual
+replacement/history/refusal checks and full repository qualification.
+
+Retirement implementation now has a verified 49-file source bundle, reconstructed
+byte/hash proof and explicit historical source inspection. The actual Alchemy
+CLI refuses the static marker before session provider/state construction. Its
+initial startup made local `logs` and an empty `profiles/default`; the initial
+empty-home assertion failed correctly and now records that precise limit.
+Missing `Order` and an untyped test tuple were corrected by focused compiler
+checks. Two private runner invocations used non-existent script names; they
+made no acceptance claim and were replaced by actual manifest commands.
+
+Four current writer/browser workflows are manual permission-free stops. Their
+exact 2c5ffd40 bytes, the original automation/control/journey owners, root
+command manifest and runbook are retained separately. Ten native refusal cases
+run the actual workflow Bash, CLI entries and aliases with an empty environment.
+The first receipt tests exposed their dependence on deleted current input
+files; they now run the unchanged historical identity algorithm in an owned
+Git fixture. Subsequent old runbook assertions now inspect the saved history
+explicitly. Historical inspections never become a missing-source exemption.
+
+Removed exactly the 49 verified tracked app files, then added the README
+retirement tombstone. No recursive cleanup ran. Removed old workspace/build/test
+selection and exact unused-code scope. The lockfile loses only the docs workspace
+and its workspace alias, with no dependency version change. Removed eleven
+old-only lint permission objects and fifty-nine old path entries, plus thirty-eight
+old positive-file cases; every invalid-code canary remains. Current native
+positive cases and their exact permissions remain. The old header byte oracle
+moved into verified retained-source inspection. Focused lint required normal key
+ordering, corrected without suppressions. Canonical skill assets remain fixed;
+only the permitted docs-maintainer profile and its hash change with current facts.
+
+Current guides and operation owners now route to the replacement and truthful
+recovery stop. Documentation/runbook checks passed after old evidence-router
+command mentions were made explicitly historical. The original dated observations
+and binary receipts stay unchanged. Added actual HTML/canonical/share assertions
+for every accepted page address to the existing real native pair journey.
+Full source freeze and repository/release qualification remain next; these edits
+are not yet a completed T005, hosted replacement or provider operation.
+
+No new Changeset is required for this retirement slice: the removed app and
+infrastructure export are private, no public package wire/export or version is
+changed, and the existing T005 content/train Changeset remains intact.
+
+The first full lint-proof run found six deleted-directory fixture writes and one
+old Stack positive selector. Keep the rejected corpus bytes and all rule
+expectations, move those generated cases to real owned Website test paths,
+and select the real static retirement marker as the infrastructure positive
+case. This is an actual-command correction, not a missing-file success.
+The last pushed 2c5ffd40 hosted Quality run independently completed successfully
+at its own exact head; that result does not qualify these uncommitted edits.
+
+Review also removed unreachable legacy execution from the two retired CLI hosts.
+Both are now small direct stop entries with no provider/config imports. Their
+original 2c5ffd40 command bytes are retained and hashed for explicit historical
+inspection. The receipt algorithm moves to the named historical owner used only
+by owned fixtures; the actual CLI never selects it. Its first lint found one
+unused Schema import, which was removed. Current process/Console permissions
+were removed from the two stop entries. The historical source corpus retains
+its original forty refusal cases; ten actual process stops and seven pinned
+operation-owner digests cover current retirement separately.
+
+The next unused-code check required the actual retired receipt-writer CLI to be
+named as an entry after its fixture export moved out. Add only that real stop
+entry, not an unused-file exclusion. Public authored MDX contains no retired
+app path or removed docs command, so its accepted bytes need no revision here.
+
+
+## 2026-10-07 — T005 local retirement qualification
+
+The complete CI-mode release graph passed all nine ordered checks against the
+frozen staged retirement source. Its exact returned eighteen detail files were
+read and hashed; all frozen application/configuration sources, 127 accepted
+inputs, the catalogue and retained original bytes matched after the graph.
+The old app is now removed from current workspace/build/test selection, every
+accepted original page URL returns the actual built Website HTML and correct
+canonical/share address, and actual old commands/workflows refuse safely.
+All 258 ignored old-app file metadata identities remain unchanged.
+
+[Retirement proof](../../documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement.json)
+owns the exact checks, failed attempts, source identities, primary review,
+recovery and limitations. T005 is locally completed. The task status, manifest
+qualification wording and this proof note are post-qualification metadata;
+they are checked separately and are not claimed as the frozen application
+candidate bytes. Tested commit/push and exact draft PR155 readback remain the
+immediate delivery step. Existing staged PRs still need review; no merge,
+provider access/apply, deployment, hosted replacement or publication occurred.
+Metrics remain deferred, retained tax results remain unchanged, and T006 is
+next in the accepted order.

@@ -438,17 +438,20 @@ describe("Alchemy plan projection and historical capture custody", () => {
     "keeps the retired build name out of the current runbook procedure",
     () =>
       Effect.gen(function* () {
-        const source = yield* readFile(currentRunbookPath, "utf-8");
-        const sections = source.split("### Retired history");
-        const currentProcedure = yield* Effect.fromOption(
-          EffectArray.get(sections, 0)
+        const currentProcedure = yield* readFile(currentRunbookPath, "utf-8");
+        const source = yield* readFile(
+          "docs/evidence/deployments/retired-docs-operations-2c5ffd40/docs-deployment.md.txt",
+          "utf-8"
         );
+        const sections = source.split("### Retired history");
         const retiredHistory = yield* Effect.fromOption(
           EffectArray.get(sections, 1)
         );
 
         expect(source.match(/DocsBuild/gu)).toHaveLength(1);
         expect(currentProcedure).not.toContain("DocsBuild");
+        expect(currentProcedure).toContain("retired in this");
+        expect(currentProcedure).toContain("retired-docs-operations-2c5ffd40");
         expect(retiredHistory).toContain("history only");
         expect(retiredHistory).toContain("not a current resource");
       }).pipe(Effect.provide(BunServices.layer))

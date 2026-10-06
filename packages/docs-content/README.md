@@ -19,8 +19,8 @@ validation policy, generated source configuration and `DocsContentService`. Reus
 from `@taxkit/docs-fumadocs`.
 
 This package does not own routes, layout, MDX renderer components or search UI.
-Those belong in the consuming app: the retained `apps/docs` runtime or the
-replacement `apps/web` candidate.
+Those belong in the current consuming `apps/web` Website. The retired old
+app is no longer a workspace; its original source remains historical data.
 
 ## Main areas
 
@@ -116,8 +116,8 @@ decoded once by the Fumadocs live Layer. The SDK offers no abort signal for
 this read; interrupting its awaiting Effect does not prove provider cancellation. The validation
 policy remains Node-only and is dynamically imported only by
 `validateContent`. Normal docs requests must not initialize either filesystem
-operation; `apps/docs` owns the isolated workerd failure oracle for that
-boundary.
+operation. The original old-app failure oracle remains retained-source
+history. Current API/Website native tests own accepted-catalogue runtime proof.
 
 ## Checked examples
 
