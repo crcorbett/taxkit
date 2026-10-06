@@ -1,0 +1,44 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M49KR84P9BX83CW8EYFR6D8F",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-06T22:01:22.502652Z",
+  "branch": "codex/dev-76-public-content-catalogue",
+  "checkpoints_count": 4,
+  "save_step_count": 1,
+  "files_touched": [
+    "AGENTS.md",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "docs/README.md",
+    "packages/scripts/src/release-readiness/program.test.ts",
+    "packages/scripts/src/release-readiness/schemas.ts",
+    "tools/quality-workflow/policy.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5bde412b8bc2",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 20568671,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 975556480,
+    "output_tokens": 4411091,
+    "api_call_count": 6518
+  },
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-06T22:01:19.478842Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 2024,
+    "human_modified": 13,
+    "human_removed": 0,
+    "total_committed": 2024,
+    "total_lines_changed": 2097,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}
