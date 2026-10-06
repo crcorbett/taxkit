@@ -1,0 +1,52 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M48JEHAQPJZWJW63HE5GEMRC",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-76-public-content-catalogue",
+  "checkpoints_count": 4,
+  "files_touched": [
+    ".changeset/accepted-public-docs-catalogue.md",
+    "docs/architecture/content-and-posts.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "packages/content/README.md",
+    "packages/docs-content/README.md",
+    "packages/docs-content/content/api/authentication-and-deployment-assumptions.mdx",
+    "packages/docs-content/content/api/endpoints.mdx",
+    "packages/docs-content/content/api/index.mdx",
+    "packages/docs-content/content/api/openapi-reference.mdx",
+    "packages/docs-content/content/api/overview.mdx",
+    "packages/docs-content/content/concepts/reports.mdx",
+    "packages/docs-content/content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+    "packages/docs-content/content/contributing/add-a-rule.mdx",
+    "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+    "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+    "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+    "packages/docs-content/content/guides/handle-validation-errors.mdx",
+    "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+    "packages/docs-content/content/reference/api.mdx",
+    "packages/docs-content/content/reference/errors.mdx",
+    "packages/docs-content/content/sdk/effect-sdk.mdx",
+    "packages/docs-content/content/sdk/plain-sdk.mdx",
+    "packages/docs-content/content/sdk/type-safety.mdx",
+    "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+    "packages/docs-content/content/start/overview.mdx",
+    "packages/docs-content/navigation.json"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 1864302,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 71057280,
+    "output_tokens": 353097,
+    "api_call_count": 480
+  }
+}
