@@ -31,7 +31,7 @@ The calculator service uses `CalculatorServiceError` for expected failures.
 | `CalculatorInputDecodeError`        | Show issue paths and optional descriptor help.                  |
 | `UnsupportedCalculatorError`        | Treat the calculator id as an integration error.                |
 | `UnsupportedCalculatorContextError` | Ask the caller to choose a supported jurisdiction and tax year. |
-| `CalculationError`                  | Preserve the domain message and source context for review.      |
+| `CalculationError`                  | The rule calculation could not produce a supported result.      |
 
 ## HTTP errors
 
@@ -75,3 +75,8 @@ Caller
 - [Handle validation errors](../guides/handle-validation-errors.mdx)
 - [API errors](../api/errors.mdx)
 - [Schema reference](./schemas.mdx)
+
+In checked TypeScript, `CalculationError.cause` uses nested Options and defaults
+to a missing field. Its encoded error keeps the existing missing, undefined,
+null and diagnostic-value forms. The current rules omit this field. Existing
+diagnostic values are not safe to send to logs, traces or product events.

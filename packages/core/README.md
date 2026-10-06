@@ -49,6 +49,10 @@ HTTP handlers or filesystem adapters.
   The trace constructor retains inferred ordinary field requirements and derives
   recursive child constructor input from those same fields; it does not widen
   all constructor input to unknown.
+- `CalculationError.cause` uses the same nested Option owner and defaults to
+  missing when omitted from its constructor. Its codec retains the original
+  missing, undefined, null and opaque diagnostic values. Those legacy values
+  are not safe telemetry; the current rule errors omit them.
 - Fact, parameter and rule descriptors derive ordinary fields from private
   Schemas. Their generic value Schema, service key and Layer relations remain
   explicit. Fact questions and source artifacts are Options; their constructor

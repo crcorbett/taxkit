@@ -598,3 +598,12 @@ The SDK checks context/help through their owning Schemas and leaves facts to
 the selected calculator decoder. HTTP/RPC use canonical Types internally and
 representation codecs at serialisation. Their existing wire/OpenAPI fields and
 values remain the compatibility contract.
+
+
+Core calculation errors now retain diagnostic-key identity through nested
+Options. Current rule errors omit diagnostics; historical opaque/null values
+remain codec values and are not safe telemetry. Catalogue entries use their
+checked selected continuation without the unused generic `program` field.
+The fresh package declarations change deliberately; retained HTTP/RPC, report,
+metadata and table/source values stay fixed. The active plan and domain-contract
+receipt own qualification; trusted rate identity/limiting keeps T004 active.

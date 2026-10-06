@@ -390,3 +390,9 @@ they mean the same thing; do not invent a jurisdiction or tax year.
 Typed client calls use canonical constructor values. Raw HTTP JSON and query
 strings still encode and decode through the owning request codecs; the OpenAPI
 snapshot remains the representation contract.
+
+
+The reusable Core calculation error now has a nested Option cause in checked
+TypeScript values. Its existing HTTP representation is retained, including
+missing/undefined/null diagnostic forms. This is an absence-owner change, not
+a diagnostic sanitiser; do not export legacy diagnostic values to telemetry.

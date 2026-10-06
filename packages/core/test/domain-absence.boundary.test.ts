@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Array, Context, Effect, Layer, Option, Schema } from "effect";
+import { Array, Context, Effect, Layer, Option, Record, Schema } from "effect";
 
+import { CalculationError } from "../src/errors/calculation-error.js";
 import {
   FactQuestion,
   FactQuestionId,
@@ -283,4 +284,65 @@ describe("domain absence representations", () => {
       validateRuleGraph({ inputFacts: [], rules: [allowed, otherAllowed] })
     ).toEqual([]);
   });
+});
+
+describe("calculation error diagnostic absence", () => {
+  it.effect(
+    "preserves original missing, undefined, null and opaque-value forms",
+    () =>
+      Effect.gen(function* () {
+        const forms = [
+          {
+            bytes:
+              '{"_tag":"CalculationError","message":"Fixed fixture failure"}',
+            cause: Option.none(),
+            ownCause: false,
+          },
+          {
+            bytes:
+              '{"_tag":"CalculationError","message":"Fixed fixture failure"}',
+            cause: Option.some(Option.none()),
+            ownCause: true,
+          },
+          {
+            bytes:
+              '{"_tag":"CalculationError","cause":null,"message":"Fixed fixture failure"}',
+            cause: Option.some(Option.some(null)),
+            ownCause: true,
+          },
+          {
+            bytes:
+              '{"_tag":"CalculationError","cause":{"fixture":"safe-representative"},"message":"Fixed fixture failure"}',
+            cause: Option.some(Option.some({ fixture: "safe-representative" })),
+            ownCause: true,
+          },
+        ];
+        yield* Effect.forEach(forms, (form) =>
+          Effect.gen(function* () {
+            const error = new CalculationError({
+              cause: form.cause,
+              message: "Fixed fixture failure",
+            });
+            const encoded = yield* Schema.encodeEffect(CalculationError)(error);
+            const decoded =
+              yield* Schema.decodeEffect(CalculationError)(encoded);
+            expect(
+              yield* Schema.encodeEffect(
+                Schema.fromJsonString(CalculationError)
+              )(error)
+            ).toBe(form.bytes);
+            expect(Record.has<string, unknown>(encoded, "cause")).toBe(
+              form.ownCause
+            );
+            expect(decoded.cause).toEqual(form.cause);
+            expect(
+              yield* Schema.encodeEffect(CalculationError)(decoded)
+            ).toEqual(encoded);
+          })
+        );
+        expect(
+          new CalculationError({ message: "Fixed fixture failure" }).cause
+        ).toEqual(Option.none());
+      })
+  );
 });

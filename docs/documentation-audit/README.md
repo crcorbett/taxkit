@@ -496,3 +496,9 @@ The [public request absence candidate](clean-slate-foundation/2026-10-06-public-
 records canonical request/metadata/error Types, selected calculator guidance,
 checked service fixtures and original representation/report compatibility.
 Local and hosted qualification remain separate; rate work and T004 stay active.
+
+
+The [domain contract candidate](clean-slate-foundation/2026-10-06-domain-contract-closeout.json)
+records the remaining Core diagnostic Option owner and removal of the unused
+catalogue program field, original compatibility forms and owning/packed checks.
+Its qualification does not complete rate policy, T004 or external operations.

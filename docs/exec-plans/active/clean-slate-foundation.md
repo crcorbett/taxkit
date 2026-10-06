@@ -3476,3 +3476,61 @@ Changesets plus the content patch. Only plan/receipt change after qualification;
 final docs/runbooks/format/Changeset/whitespace checks precede commit and stacked
 draft. Hosted proof remains separate. Trusted rate identity/limiting and remaining
 domain review keep T004 and the wider goal active.
+
+
+Public-request slice is committed as 1b85440f844858a96a91172014a10afb87aa452c
+and pushed on codex/dev-75-request-absence-owners in attached draft #151.
+Its complete nine-stage local graph passes in 660.13 seconds; fresh workflow
+32 cases take 469.15 seconds and seven built native cases take 77.67 seconds.
+Hosted Quality run 37414462610 is running on that immutable head. The earlier
+approved DEV-75 comment is posted and read back. A new #151 update remains
+unsent after the connector's fresh-confirmation window ends; no approval is
+inferred and no tracking status/relations are changed.
+
+Next domain contract slice starts from clean #151 head on
+codex/dev-75-domain-contract-closeout. Core cause absence gets one canonical
+Option/default owner retaining four pre-change forms, while the redundant
+catalogue program field is removed in the fresh interface. Current 14 rule
+error producers omit causes; historical opaque diagnostics are not safe
+telemetry. Constructor/representation arguments whose meaning is an empty
+collection stay total, rather than creating artificial domain absence.
+Selected input/continuation typing, rule-program ownership and all retained
+tax/table/report metadata expectations remain fixed.
+
+Owning types, 66 Core tests, catalogue type tests and real packed declarations/
+runtime pass. One Core test initially inferred an optional record as a required
+record; explicit string-key generics correct that test observation. Two packed
+preparations stop at consumer type checking; the captured outside diagnostic
+shows the runtime check querying a removed key as keyof CalculatorCatalogEntry
+(TS2345). The membership check now admits the string key while retaining its
+actual absence assertion. Original expected data is not regenerated.
+Owning docs/READMEs, public error copy, SPEC/tasks and Changesets are reconciled
+in this slice; full qualification remains pending. T004 and the goal stay active.
+
+
+Domain closeout wider lint/docs/runbooks/content/Changeset checks pass after
+fixing test key order, replacing raw JSON serialisation with the owning Schema
+codec, and consuming the negative type expression. The failed lint attempt is
+retained. Removing the diagnostic codec fails the new Core compatibility test
+while all 65 original cases pass; restoring the unused catalogue program fails
+the genuine installed consumer compiler. Both source files restore exact bytes.
+Complete local qualification is next; this remains an active candidate.
+
+
+Domain contract closeout local acceptance: all nine CI-mode stages pass in
+668.91 seconds, including 32 workflow cases (458.61 seconds),
+512 lint cases, 66 Core, 52 rule, 37 calculator, 62 API app, 58 SDK, 17 HTTP
+and 217 RPC tests, plus seven native cases (78.08 seconds). Genuine packed
+consumers retain four original diagnostic forms, reject raw cause/program
+Types, preserve catalogue runtime absence and all earlier request/report/tax
+oracles. Both deliberate removals fail; all 19 staged sources restore exact
+bytes. Nine native inventories are captured before later builds, and four
+screenshots match inspected parent bytes. API Worker, lockfile and OpenAPI
+remain identical to parent.
+
+Primary-owner source/docs review accepts this local domain slice. Four package
+major Changesets and the content patch record the Type/capability consequences.
+Only plan/receipt change after qualification; final docs/runbooks/format/
+Changeset/whitespace checks precede delivery. Hosted proof remains separate.
+T004 stays active for native rate identity/limits; no provider operation,
+Medicare correction or wider rebuild completion is claimed.

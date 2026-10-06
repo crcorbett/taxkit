@@ -82,6 +82,9 @@ This package must not own:
 - Keep runtime execution outside this package. Calculator code returns Effect
   programs and layers; apps own `BunRuntime.runMain` and `ManagedRuntime`
   lifecycle.
+- Catalogue entries expose their selected, checked `calculate` continuation.
+  The unused generic `program` field is removed from the fresh interface;
+  rule-owned calculator programs remain available from their rule packages.
 - Keep service contracts separate from layer wiring. Do not export `Live`,
   `Mock` or `Test` layers from service contract files.
 

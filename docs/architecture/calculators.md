@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-calculator-architecture-owner
+last_reviewed: 2026-10-06
+review_trigger: calculator composition, catalogue execution or domain error contract change
 ---
 
 # Calculators
@@ -35,28 +37,32 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
 
 The calculator should be small and declarative. Rule layers derive the facts. Scenario layers provide the accepted inputs.
 
+Reusable catalogue entries couple one input Schema with its typed `calculate`
+continuation. They do not expose an additional erased `program` Effect. The
+rule package owns the actual typed calculator program and rule-pack Layer;
+metadata and retained output values are unchanged.
+
 ## Running A Calculator
 
 ```ts
-const result = await CalculateTakeHomePay.pipe(
-  Effect.provide(AuEmployeePay2025_26.Live),
-  Effect.provide(EmployeeScenario.fromUserInput(input))
+const calculation = CalculateTakeHomePay.pipe(
+  Effect.provide(AuTakeHomePay2025_26_Live),
+  Effect.provide(TakeHomeScenarioLiveFromInput(input))
 );
 ```
 
-The compiler should show unresolved requirements if a rule pack or scenario is missing.
+Here `input` is the checked rule-owned scenario Type. The application runner
+executes this lazy program; awaiting an Effect does not execute it. The compiler
+shows unresolved requirements if a rule pack or scenario is missing.
 
 ## Calculator Domains
 
-Initial calculator programs should be goal-specific:
+The retained calculator programs are goal-specific:
 
 ```txt
 CalculateTakeHomePay
-CalculatePaygWithholding
-CalculateSuperGuarantee
-CalculateAnnualTaxEstimate
-CalculateDeductionSummary
-CalculateMortgageRepayment
+CalculatePayWithholdings
+CalculateAnnualTax
 ```
 
 Avoid one large `calculate()` function with mode switches for PAYG, annual tax, FBT, super, mortgage and deductions.
@@ -79,6 +85,13 @@ Expected failures stay in the typed Effect error channel. Schema decode errors
 should be mapped to schema-backed public errors at the service boundary, and
 domain failures such as `CalculationError` should propagate as failures. Do not
 use `Effect.die` for recoverable calculator, schema or domain errors.
+
+Core `CalculationError.cause` represents missing, present undefined and present
+diagnostic values with nested Options and a missing-key constructor default.
+Its codec retains historical null/opaque diagnostics as values. The current
+rule producers omit diagnostics; this migration does not sanitise legacy
+diagnostic content or make it safe for telemetry. Public representations retain
+their existing codec.
 
 Public calculator orchestration must keep request facts tied to canonical
 scenario schemas. `@taxkit/calculators` composes the generic public calculate

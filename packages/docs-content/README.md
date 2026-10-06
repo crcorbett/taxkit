@@ -175,3 +175,8 @@ The Effect and browser HTTP templates construct the calculator-owned request
 Options. Their matching public guides explain the checked TypeScript values;
 raw HTTP JSON examples retain ordinary optional fields. The package checks both
 canonical templates as part of content qualification.
+
+
+The error reference distinguishes checked Core diagnostic absence from its
+retained encoded forms and does not treat opaque diagnostics as safe telemetry.
+Content lifecycle and navigation acceptance remain unchanged.

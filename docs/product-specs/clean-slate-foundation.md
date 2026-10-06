@@ -843,3 +843,13 @@ and typed native/HTTP callers use the same owners. The active plan and dated
 [request absence receipt](../documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json)
 own qualification; remaining domain review and trusted rate identity/limits
 keep T004 active.
+
+
+The remaining domain contract review moves Core diagnostic cause absence to
+its canonical nested Option/default owner and removes the unused erased
+calculator catalogue `program` capability. Ordinary optional constructor
+arguments retain their total empty-collection meaning; untrusted facts and
+heterogeneous Schema/Layer relations retain their explicit owners. Historical
+opaque diagnostics are codec values, with no new safe-telemetry claim. The
+[domain contract receipt](../documentation-audit/clean-slate-foundation/2026-10-06-domain-contract-closeout.json)
+and active plan own qualification; rate identity/limiting keeps T004 active.

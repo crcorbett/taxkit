@@ -461,6 +461,9 @@ const writeConsumerFiles = (
         fs.writeFileString(
           path.join(workspacePath, "src/typecheck.ts"),
           `import * as MetadataSchemas from "@taxkit/calculators/schemas";
+import { CalculationError } from "@taxkit/core/errors";
+import { listCalculatorCatalogEntries } from "@taxkit/calculators/catalog";
+import type { CalculatorCatalogEntry } from "@taxkit/calculators/catalog";
 import { CalculatorRequestBodyPolicy, CalculatorRequestBodyTooLarge, CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/request-boundary";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import type { LedgerComponent, LedgerComponentEncoded } from "@taxkit/core/ledger";
@@ -531,6 +534,17 @@ void traceChildren;
 void encodedChildren;
 void componentTrace;
 void encodedComponentTrace;
+
+
+const diagnostic = new CalculationError({message: "Fixed fixture failure"});
+const diagnosticCause: Option.Option<Option.Option<unknown>> = diagnostic.cause;
+void diagnosticCause;
+// @ts-expect-error diagnostic absence must use the canonical Option Type.
+new CalculationError({message: "Fixed fixture failure", cause: null});
+declare const catalogueEntry: CalculatorCatalogEntry;
+// @ts-expect-error the catalogue exposes a checked continuation, not an erased program.
+catalogueEntry.program;
+void listCalculatorCatalogEntries;
 
 const traceMakeInput = {children: [], inputs: {}, result: 1, ruleId: RuleId.make("fixture/type"), sources: [], title: "Fixture"};
 const requestDefaults = MetadataSchemas.CalculationQuery.make({});
@@ -626,6 +640,8 @@ import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "@tax
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import * as MetadataSchemas from "@taxkit/calculators/schemas";
+import { CalculationError } from "@taxkit/core/errors";
+import { listCalculatorCatalogEntries } from "@taxkit/calculators/catalog";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "@taxkit/core/primitives";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
@@ -636,12 +652,50 @@ import { CryptoHasher } from "bun";
 import { AtoIncomeTaxTable, AtoIncomeTax_2025_26_Live, AtoIncomeTaxTableDescriptor, IncomeTaxTable, IncomeTaxArtifact2025_26, AtoLitoTable, AtoLito_2025_26_Live, AtoLitoTableDescriptor, LitoTable, LitoArtifact2025_26, AtoMedicareLevyTable, AtoMedicareLevy_2025_26_Live, AtoMedicareLevyTableDescriptor, MedicareLevyTable, MedicareLevyArtifact2025_26 } from "@taxkit/rules-au-income-tax/parameters";
 import { AtoSchedule1Table, AtoSchedule1_2025_26_Live, AtoSchedule1TableDescriptor, Schedule1Table, Schedule1Artifact2025_26 } from "@taxkit/rules-au-pay/parameters";
 import { AtoStslTable, AtoStsl_2025_26_Live, AtoStslTableDescriptor, StslTable, StslArtifact2025_26 } from "@taxkit/rules-au-stsl/parameters";
-import { Effect, Layer, Option, Record, Result, Schema } from "effect";
+import { Array as EffectArray, Effect, Layer, Option, Record, Result, Schema } from "effect";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
 
 await Effect.runPromise(Effect.gen(function* () {
+// Original Core diagnostic forms saved before this owner migration.
+{
+  const value = yield* Schema.decodeEffect(CalculationError)({_tag:"CalculationError",message:"Fixed fixture failure"});
+  const encoded = yield* Schema.encodeEffect(CalculationError)(value);
+  const again = yield* Schema.decodeEffect(CalculationError)(encoded).pipe(Effect.flatMap(Schema.encodeEffect(CalculationError)));
+  if (!Option.isOption(value.cause) || new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "2e1c0c478792264b776ee67af4514dff1019029d35df4ac40654114c959a50ca" || JSON.stringify(Record.keys<string, unknown>(encoded)) !== JSON.stringify(["_tag", "message"]) || JSON.stringify(Record.keys<string, unknown>(again)) !== JSON.stringify(["_tag", "message"]) || JSON.stringify(encoded) !== JSON.stringify(again)) {
+    throw new Error("Packed Core diagnostic changed its original missing form.");
+  }
+}
+{
+  const value = yield* Schema.decodeEffect(CalculationError)({_tag:"CalculationError",message:"Fixed fixture failure",cause:undefined});
+  const encoded = yield* Schema.encodeEffect(CalculationError)(value);
+  const again = yield* Schema.decodeEffect(CalculationError)(encoded).pipe(Effect.flatMap(Schema.encodeEffect(CalculationError)));
+  if (!Option.isOption(value.cause) || new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "2e1c0c478792264b776ee67af4514dff1019029d35df4ac40654114c959a50ca" || JSON.stringify(Record.keys<string, unknown>(encoded)) !== JSON.stringify(["_tag", "cause", "message"]) || JSON.stringify(Record.keys<string, unknown>(again)) !== JSON.stringify(["_tag", "cause", "message"]) || JSON.stringify(encoded) !== JSON.stringify(again)) {
+    throw new Error("Packed Core diagnostic changed its original undefined form.");
+  }
+}
+{
+  const value = yield* Schema.decodeEffect(CalculationError)({_tag:"CalculationError",message:"Fixed fixture failure",cause:null});
+  const encoded = yield* Schema.encodeEffect(CalculationError)(value);
+  const again = yield* Schema.decodeEffect(CalculationError)(encoded).pipe(Effect.flatMap(Schema.encodeEffect(CalculationError)));
+  if (!Option.isOption(value.cause) || new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "14a23939f06cb0db51383619118d28a5b2184b4a1eca43fb896278f1080ffbf5" || JSON.stringify(Record.keys<string, unknown>(encoded)) !== JSON.stringify(["_tag", "cause", "message"]) || JSON.stringify(Record.keys<string, unknown>(again)) !== JSON.stringify(["_tag", "cause", "message"]) || JSON.stringify(encoded) !== JSON.stringify(again)) {
+    throw new Error("Packed Core diagnostic changed its original null form.");
+  }
+}
+{
+  const value = yield* Schema.decodeEffect(CalculationError)({_tag:"CalculationError",message:"Fixed fixture failure",cause:{fixture:"safe-representative"}});
+  const encoded = yield* Schema.encodeEffect(CalculationError)(value);
+  const again = yield* Schema.decodeEffect(CalculationError)(encoded).pipe(Effect.flatMap(Schema.encodeEffect(CalculationError)));
+  if (!Option.isOption(value.cause) || new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "1b27955d885f1b09d98591a96be676e13810572a1b639cdf91d4dd99ab7170f7" || JSON.stringify(Record.keys<string, unknown>(encoded)) !== JSON.stringify(["_tag", "cause", "message"]) || JSON.stringify(Record.keys<string, unknown>(again)) !== JSON.stringify(["_tag", "cause", "message"]) || JSON.stringify(encoded) !== JSON.stringify(again)) {
+    throw new Error("Packed Core diagnostic changed its original object form.");
+  }
+}
+const defaultError = new CalculationError({message:"Fixed fixture failure"});
+if (!Option.isNone(defaultError.cause) || listCalculatorCatalogEntries().some(entry => EffectArray.contains<string>(Record.keys(entry), "program"))) {
+  throw new Error("Packed domain contract lost defaults or retained its unused program escape.");
+}
+
   const maximum = yield* audFromCents(Number.MAX_SAFE_INTEGER);
   const extra = yield* audFromCents(1);
   const overflow = yield* moneyAdd(maximum, extra).pipe(Effect.result);

@@ -316,3 +316,9 @@ SDK request aliases derive constructor input from the calculator field owners
 and retain descriptor-specific facts. The SDK constructs context/help only; the
 selected calculator owns fact decoding and safe error help. Output narrowing
 checks the already decoded Schema Type.
+
+
+The packed consumer also checks the Core diagnostic cause Option Type/default,
+its four original encoded forms and removal of the unused catalogue `program`
+field. Existing selected-report, input-help, trace/ledger, metadata and source
+expectations remain fixed. Legacy diagnostic values are not safe telemetry.
