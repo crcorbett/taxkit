@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4AVY2Z35C3VDFT7WQY4TCF4",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-78-native-operation-handover",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/architecture/deployment.md",
+    "docs/operations/authority-model.md",
+    "docs/runbooks/docs-deployment.md",
+    "docs/runbooks/recovery.md",
+    "packages/infrastructure/README.md",
+    "tools/docs-deployment/README.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 25473663,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1214684672,
+    "output_tokens": 5570090,
+    "api_call_count": 8128
+  }
+}
