@@ -1,0 +1,41 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4BGPPPB1JYY5CS2BTG8923J",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T15:46:40.011464Z",
+  "branch": "codex/dev-79-bounded-event-relay",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/documentation-audit/clean-slate-foundation/2026-10-08-relay-collection-off-delivery.json",
+    "docs/exec-plans/active/clean-slate-foundation.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "ef48aa238168",
+  "checkpoint_transcript_start": 72818,
+  "transcript_lines_at_start": 72818,
+  "compact_transcript_start": 8600,
+  "token_usage": {
+    "input_tokens": 52621,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 6625024,
+    "output_tokens": 30467,
+    "api_call_count": 31
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T15:46:35.600011Z",
+    "agent_lines": 538,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 538,
+    "total_lines_changed": 538,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
