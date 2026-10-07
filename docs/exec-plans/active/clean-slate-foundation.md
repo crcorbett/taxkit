@@ -5698,3 +5698,14 @@ READMEs and testing architecture describe leaf versus dependency-graph use.
 This prerequisite correction changes no content, calculation or provider
 behaviour; the original failure remains evidence and requires fresh complete
 checks on the corrected source.
+
+
+Retained-project qualification: corrected source `4d5fe1124932549210b2de40ce6776722cc0c587`
+passes root tests in 74.68 seconds, builds in 4.90 seconds and complete
+`bun run verification` in 693.46 seconds. All 34 isolated workflow cases
+pass; the final native pair passes all 18 cases across 10 files in 118.97
+seconds. All 1,788 frozen file/link identities match after the checks. Only
+this plan and its receipt then receive qualification metadata, with focused
+closeout and unchanged remaining source. This accepts the local project
+management slice; no PostHog project, key, online plan or app activation has
+occurred. T008 and overall T010 remain in progress; metrics remain deferred.
