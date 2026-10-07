@@ -4,15 +4,15 @@
   "lifecycle": "evidence",
   "authority": "supporting",
   "owner": "taxkit-api-web-owner",
-  "observedAt": "2026-10-07T08:33:44Z",
-  "status": "Agent setup source and focused checks qualified; full clean-source local graph pending; T006 remains in progress",
+  "observedAt": "2026-10-07T09:28:33.953875+00:00",
+  "status": "T006 implementation locally accepted and ready for draft review; agent guide deployed and read back on Preview and Production; documented modern cancellation limit preserved",
   "baseHead": "580806576a74a57407ee266a731863d374a587d2",
   "actorAuthority": {
     "principal": "Cooper",
     "reviewer": "Codex primary owner",
-    "operation": "Approved T006 implementation, local checks, reviewable commits, pushes, draft PR and routine Linear tracking",
-    "environment": "Local repository and native workerd/Chromium",
-    "approvalBoundary": "This slice changes setup content only; no credential change, provider setting, new deployment, merge or package publication"
+    "operation": "Approved T006 implementation, full local checks, reviewable commits, pushes, draft PR, routine Linear tracking and native Preview/Production deployment from this Mac",
+    "environment": "Local repository/workerd/Chromium; TaxKitAppsCloudflare pr-162 and prod in account f9f94270a4a5af8af7010d891020922d",
+    "approvalBoundary": "Direct human Preview/Production authority; exact plans reviewed before answering only Apply this plan?; no shared-store upgrade, credential change, metrics change, merge or publication"
   },
   "outcome": [
     "The agent landing page derives the remote MCP endpoint from checked same-stage API settings.",
@@ -33,8 +33,8 @@
       "Earlier acceptance records and deployment receipts with their original identities"
     ],
     "notApplicable": [
-      "No Changeset: apps and documentation content are private; no published package export, contract or dependency changes",
-      "No runbook operation changes, credential changes or provider mutation in this slice"
+      "No Changeset: private apps/documentation; published package exports/contracts/dependencies unchanged",
+      "No credential, new provider policy or metrics change; native deployment uses the existing reviewed graph and runbook"
     ]
   },
   "cancellationInvestigation": {
@@ -63,7 +63,7 @@
     ],
     "rollback": "Restore the only experimental tracked test from base HEAD; confirmed exact original before the retained suite. Retain the private failed logs.",
     "resumeTrigger": "A supported native adapter or platform change can expose and qualify prompt pre-response cancellation without handwritten protocol or unapproved dependency changes.",
-    "nextOwner": "T006 implementation owner",
+    "nextOwner": "Future supported native adapter/platform qualification; the accepted five-second bound remains the current contract",
     "claimedFixed": false
   },
   "checks": [
@@ -332,12 +332,14 @@
     }
   ],
   "limitations": [
-    "Full clean-source local closeout is pending; focused results do not replace it.",
-    "Prompt modern pre-response server cleanup remains unfinished; older and in-process proof do not close it.",
-    "Native browser calls are test-controlled; no autonomous model session or universal browser support is claimed.",
-    "New setup content is not yet deployed. Earlier stage delivery proves only its exact deployed source.",
-    "No merge, package publication, provider setting change or credential operation occurred.",
-    "Metrics stay deferred. Earlier Production readback observes a Cloudflare RUM beacon separately from disabled Worker log/trace settings."
+    "Modern outgoing TCP abort stops its caller; server work may continue until the five-second budget. Older or in-process cancellation does not prove prompt modern cleanup.",
+    "Native browser calls are test-controlled actual developer-tools protocol calls in Chromium 153; no autonomous model session or universal browser availability.",
+    "Native alarm expiry/cancellation stress proof is local workerd, distinct from ordinary deployed older-client calls.",
+    "Local nine-check qualification and provider/public readback are separate from exact-head hosted Quality, which was still running at the last read.",
+    "No forced synchronous CPU pre-emption, global/exact edge quota or post-apply no-op convergence claim.",
+    "No merge, package publication, shared-store bootstrap/upgrade, credential change, unrelated provider policy or old-resource removal.",
+    "Metrics remain deferred; the separate Production Cloudflare RUM beacon is still observed and unqualified. Worker logs/traces remain disabled.",
+    "Draft review, T007 operational-owner alignment, T008, deferred T009 and overall T010 delivery remain outstanding."
   ],
   "failedAttempts": [
     {
@@ -403,5 +405,1549 @@
       "freezeSha256": "3d29a77b524eea2d6a8d27d11e83c186ebe492bb2651c06857f36081216bdc36",
       "trackedCount": 1749
     }
-  ]
+  ],
+  "candidateCommit": "72bfa16ac08dacc4c26f3de023a2880baefe1c55",
+  "candidateTree": "6d1468749f8963394bfcaa65b274e6517af53e93",
+  "pullRequest": "https://github.com/crcorbett/taxkit/pull/162",
+  "localQualification": {
+    "observedAt": "2026-10-07T09:24:41.229446+00:00",
+    "candidateCommit": "72bfa16ac08dacc4c26f3de023a2880baefe1c55",
+    "tree": "6d1468749f8963394bfcaa65b274e6517af53e93",
+    "trackedCount": 1749,
+    "trackedBytesUnchanged": true,
+    "freezePath": "dev77-agent-freeze-b.json",
+    "freezeSha256": "d36c07393c4434d468d17716b5c93b3a65543f00507e3b998a80032982509ee0",
+    "checks": [
+      {
+        "stage": "frozen-install",
+        "command": [
+          "bun",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.37,
+        "log": "dev77-agent-whole-b-frozen-install.log",
+        "logSha256": "6a51e08f2557fae69df7d5339362cd8d5562a090adaf66bfb8d25f4e5969441f"
+      },
+      {
+        "stage": "release-graph",
+        "command": [
+          "bun",
+          "run",
+          "release:check",
+          "--",
+          "--ci"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 997.08,
+        "log": "dev77-agent-whole-b-release-graph.log",
+        "logSha256": "57ed76cd5bcd5b5a8c4b14a314043be8cf1242194c04aec416f2c6fbded72867"
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.01,
+        "log": "dev77-agent-whole-b-diff.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "releaseGraph": [
+      {
+        "check": "verification",
+        "target": "Canonical repository verification",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/verification-stdout-NaboAW/adc037af09f3.log",
+            "sha256": "43ec7bd3696ff2efb741e098d4cfabe307b0c0cb4a6ed2d0be1d32804cfaca32",
+            "bytesRead": 547989,
+            "testSummaries": [
+              "//:test:docs-deployment:task:  Test Files  22 passed (22)",
+              "//:test:docs-deployment:task:       Tests  273 passed (273)",
+              "//:test:skills:task:  Test Files  1 passed (1)",
+              "//:test:skills:task:       Tests  21 passed (21)",
+              " Test Files  3 passed (3)",
+              "      Tests  16 passed (16)",
+              "//:test:quality-workflow:task:  Test Files  2 passed (2)",
+              "//:test:quality-workflow:task:       Tests  34 passed (34)",
+              "@taxkit/sdk:test:browser:  Test Files  4 passed (4)",
+              "@taxkit/sdk:test:browser:       Tests  26 passed (26)",
+              "web:test:browser:  Test Files  3 passed (3)",
+              "web:test:browser:       Tests  21 passed (21)",
+              "web test:native-pair:  Test Files  9 passed (9)",
+              "web test:native-pair:       Tests  14 passed (14)"
+            ]
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/verification-stderr-4dhOu0/3ecc7c63f535.log",
+            "sha256": "59504b0ca83995236774089abf8bb6719a8207c574d1bf0f530b68d2dd7badca",
+            "bytesRead": 2118,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "test",
+        "target": "Workspace tests including the direct calculator journey",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/test-stdout-UK7Pg9/d8d8d6169313.log",
+            "sha256": "48907ed0a39a2ca5d318687dac8a82638a8fc7ec42340807af664fc35f21dbbb",
+            "bytesRead": 85321,
+            "testSummaries": [
+              "//:test:documentation:task:  Test Files  6 passed (6)",
+              "//:test:documentation:task:       Tests  46 passed (46)",
+              "//:test:repository-paths:task:  Test Files  2 passed (2)",
+              "//:test:repository-paths:task:       Tests  11 passed (11)",
+              "//:test:oxlint:task:  Test Files  7 passed (7)",
+              "//:test:oxlint:task:       Tests  621 passed (621)",
+              "@taxkit/testing:test:  Test Files  1 passed (1)",
+              "@taxkit/testing:test:       Tests  5 passed (5)",
+              "@taxkit/content:test:  Test Files  2 passed (2)",
+              "@taxkit/content:test:       Tests  14 passed (14)",
+              "@taxkit/core:test:  Test Files  3 passed (3)",
+              "@taxkit/core:test:       Tests  66 passed (66)",
+              "@taxkit/rules-au-pay:test:  Test Files  3 passed (3)",
+              "@taxkit/rules-au-pay:test:       Tests  20 passed (20)",
+              "@taxkit/rules-au-income-tax:test:  Test Files  3 passed (3)",
+              "@taxkit/rules-au-income-tax:test:       Tests  18 passed (18)",
+              "@taxkit/scripts:test:  Test Files  4 passed (4)",
+              "@taxkit/scripts:test:       Tests  60 passed (60)",
+              "@taxkit/rules-au-stsl:test:  Test Files  3 passed (3)",
+              "@taxkit/rules-au-stsl:test:       Tests  14 passed (14)",
+              "@taxkit/calculators:test:  Test Files  3 passed (3)",
+              "@taxkit/calculators:test:       Tests  41 passed (41)",
+              "@taxkit/docs-fumadocs:test:  Test Files  2 passed (2)",
+              "@taxkit/docs-fumadocs:test:       Tests  6 passed (6)",
+              "web:test:  Test Files  5 passed (5)",
+              "web:test:       Tests  58 passed (58)",
+              "@taxkit/sdk:test:  Test Files  5 passed (5)",
+              "@taxkit/sdk:test:       Tests  58 passed (58)",
+              "@taxkit/docs-examples:test:  Test Files  3 passed (3)",
+              "@taxkit/docs-examples:test:       Tests  9 passed (9)",
+              "@taxkit/docs-content:test:  Test Files  5 passed (5)",
+              "@taxkit/docs-content:test:       Tests  24 passed (24)",
+              "@taxkit/api-http:test:  Test Files  4 passed (4)",
+              "@taxkit/api-http:test:       Tests  29 passed (29)",
+              "@taxkit/infrastructure:test:  Test Files  3 passed (3)",
+              "@taxkit/infrastructure:test:       Tests  41 passed (41)",
+              "api:test:  Test Files  7 passed (7)",
+              "api:test:       Tests  98 passed (98)",
+              "@taxkit/api-rpc:test:  Test Files  4 passed (4)",
+              "@taxkit/api-rpc:test:       Tests  332 passed (332)"
+            ]
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/test-stderr-M6emEx/5ef3ea1bbec5.log",
+            "sha256": "a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8",
+            "bytesRead": 216,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "build",
+        "target": "Workspace production builds",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/build-stdout-p3pRcW/ea95b8acb8ef.log",
+            "sha256": "7df92990eac44d54489ae198569c8d3f8acc2a2c4a0dcf6ced807fbb770814bb",
+            "bytesRead": 93077,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/build-stderr-hk4xdJ/01d8e7c8acdb.log",
+            "sha256": "844915855e64ad7359e63b5ba6df54e45ef4825107084cebde1492f28bf01a07",
+            "bytesRead": 137,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "docs-validation",
+        "target": "Documentation content validation",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/docs-validation-stdout-uW8s4R/0d9d07a3158a.log",
+            "sha256": "8b3693974d63e0ea353d08c8aeee4672701a93dc8d8da81260afb88510282cc2",
+            "bytesRead": 2295,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/docs-validation-stderr-7lTmEU/ce297c276354.log",
+            "sha256": "fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697",
+            "bytesRead": 51,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "packed-artifact",
+        "target": "Focused SDK packed artifact proof",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/packed-artifact-stdout-pmkC53/43486cb27421.log",
+            "sha256": "88c792a958e58ed8b31f86c8f40e86c72bcf671db74631b83e7f9c38f6fd5a7d",
+            "bytesRead": 3764,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/packed-artifact-stderr-TBMjji/9bc7ad8eaee5.log",
+            "sha256": "06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7",
+            "bytesRead": 55,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "downstream-consumer",
+        "target": "Strict downstream package proof",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/downstream-consumer-stdout-VMsLXw/1e52ba8bc546.log",
+            "sha256": "b372f2964b8a5165bde31dac2d5e912dff683fbdd9b5e121280663d129996701",
+            "bytesRead": 13352,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/downstream-consumer-stderr-WeKU5d/0e70eeb085ec.log",
+            "sha256": "d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9",
+            "bytesRead": 53,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "api-smoke",
+        "target": "Public API smoke evidence",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/api-smoke-stdout-HZMDDZ/354b813356ec.log",
+            "sha256": "ab947b45bc592a5da3940ca38427e8331ac077d5e4abf586e626ce5078a10c05",
+            "bytesRead": 64311,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/api-smoke-stderr-qrSFH9/7bfce5ce2ddc.log",
+            "sha256": "1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87",
+            "bytesRead": 31,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "docs-browser",
+        "target": "Built native Website and documentation evidence",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/docs-browser-stdout-54eTMG/2e033db5a7f1.log",
+            "sha256": "cf74c7c04f53b62ea12d855bef9ee48f1a7fe66e6de557606c521a8ec4a00188",
+            "bytesRead": 75956,
+            "testSummaries": [
+              "web test:native-pair:  Test Files  9 passed (9)",
+              "web test:native-pair:       Tests  14 passed (14)"
+            ]
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/docs-browser-stderr-oZN8Gf/7053c7f936ab.log",
+            "sha256": "781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4",
+            "bytesRead": 82,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "changeset-status",
+        "target": "Pending release train status",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/changeset-status-stdout-ciNj0G/27b88b3710e8.log",
+            "sha256": "b2712a6c013bc829324987d53bb6bc80190a68296763f900b6b4dd455ac45838",
+            "bytesRead": 10039,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/changeset-status-stderr-jLF9CI/77a0cb52dc17.log",
+            "sha256": "26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3",
+            "bytesRead": 37,
+            "testSummaries": []
+          }
+        ]
+      }
+    ],
+    "all18DetailBytesReadAndDigestsMatched": true,
+    "gitStatusClean": true,
+    "providerApplyClaim": false
+  },
+  "operationAuthority": {
+    "observedAt": "2026-10-07T09:18:12.197378+00:00",
+    "principal": "Cooper",
+    "reviewer": "Codex primary implementation owner",
+    "sourceAuthority": "Direct human instruction: run checks/deployments locally; Preview and Production from this Mac",
+    "candidateCommit": "72bfa16ac08dacc4c26f3de023a2880baefe1c55",
+    "previewStage": "pr-162",
+    "allowedStages": [
+      "pr-162",
+      "prod"
+    ],
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "zoneId": "15103853342ab9f18f7894b7fae39c39",
+    "operation": "Native Alchemy deploy after concrete source-bound plan review",
+    "resources": "Same TaxKit API/Website graph; Preview creates its own two Workers; Production updates existing two Workers and retains domain/zone ownership",
+    "approvalBoundary": "Answer only the concrete Apply this plan? prompt after checking resource classes; no shared-state upgrade, merge, publication, new credential, metrics setting or unrelated provider change",
+    "rollback": "Production redeploy previously qualified native source 787e6f72a4a2e06605290eaeb1990a360776a387 using existing token/state after source-bound plan review; do not destroy shared store or retained domains. New Preview retirement requires separately scoped teardown authority.",
+    "readback": "Native receipt plus independent provider bindings/domains/DNS and actual HTTPS API/MCP/browser guide journeys",
+    "qualificationPath": "dev77-agent-local-qualification.json",
+    "fullLocalCheckCount": 9,
+    "noHostedPassSubstitution": true,
+    "planReviewPending": false,
+    "planReview": {
+      "pr-162": {
+        "projectionPath": "tmp/native-apps-plans/pr-162/dev77-agent-plan.json",
+        "projectionSha256": "5dfadce85648bce75493265fc626267c8cf9a04e35514cadf1b160dd462ae48d",
+        "sourceIdentityPath": "tmp/native-apps-plans/pr-162/dev77-agent-source.json",
+        "sourceIdentitySha256": "dc3a22e7e85ea87155a5cdf5d913498a12f1c250a500a54c0ff2f6247ded5c95",
+        "sourceFileCount": 771,
+        "logicalResources": [
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi",
+            "resourceType": "Cloudflare.Worker"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite",
+            "resourceType": "Cloudflare.Worker"
+          }
+        ],
+        "bindingActions": [
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/API_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/CALCULATOR_HOST_MODE"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/CALCULATOR_RATE_LIMIT"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/TaxKitMcpSessions"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/WEBSITE_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite/API_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite/CALCULATOR_HOST_MODE"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite/TAXKIT_API"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN"
+          }
+        ],
+        "domains": [],
+        "noDeletesOrReplacements": true
+      },
+      "prod": {
+        "projectionPath": "tmp/native-apps-plans/prod/dev77-agent-plan.json",
+        "projectionSha256": "49579860e4839e26e410f1fee55b3fc2d00543759b8b4d2f3c55c68db3515b1e",
+        "sourceIdentityPath": "tmp/native-apps-plans/prod/dev77-agent-source.json",
+        "sourceIdentitySha256": "dc3a22e7e85ea87155a5cdf5d913498a12f1c250a500a54c0ff2f6247ded5c95",
+        "sourceFileCount": 771,
+        "logicalResources": [
+          {
+            "action": "update",
+            "logicalId": "TaxKitApi",
+            "resourceType": "Cloudflare.Worker"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitProductionDnsSettings",
+            "resourceType": "Cloudflare.DNS.ZoneSettings"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitProductionZone",
+            "resourceType": "Cloudflare.Zone.Zone"
+          },
+          {
+            "action": "update",
+            "logicalId": "TaxKitWebsite",
+            "resourceType": "Cloudflare.Worker"
+          }
+        ],
+        "bindingActions": [
+          {
+            "action": "noop",
+            "logicalId": "TaxKitApi/API_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitApi/CALCULATOR_HOST_MODE"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitApi/CALCULATOR_RATE_LIMIT"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitApi/TaxKitMcpSessions"
+          },
+          {
+            "action": "update",
+            "logicalId": "TaxKitApi/WEBSITE_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "update",
+            "logicalId": "TaxKitWebsite/API_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitWebsite/CALCULATOR_HOST_MODE"
+          },
+          {
+            "action": "update",
+            "logicalId": "TaxKitWebsite/TAXKIT_API"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN"
+          }
+        ],
+        "domains": [
+          "taxkit.dev",
+          "www.taxkit.dev",
+          "api.taxkit.dev"
+        ],
+        "noDeletesOrReplacements": true
+      }
+    },
+    "noCompetingLocalApplyAt": "2026-10-07T09:19:05.039777+00:00",
+    "hostedActiveOperations": "Only Quality run 37599590787 observed; no deployment workflow active",
+    "previewReadbackPassedAt": "2026-10-07T09:22:48.683960+00:00",
+    "previewPreconditionsPassed": [
+      "independent provider settings and exact same-stage origins",
+      "all live API/browser/guide/search/Markdown cases",
+      "both supported official client versions calculate and read new guide",
+      "Production DNS settings and www rule unchanged; three expected records and no second page"
+    ]
+  },
+  "cleanNativePlans": [
+    {
+      "stage": "pr-162",
+      "nativeStdoutSha256": "72621bf725ecda23a46fa3b206fd1f67f46660cb2b28722aac728e63b2849adf",
+      "projectionSha256": "5dfadce85648bce75493265fc626267c8cf9a04e35514cadf1b160dd462ae48d",
+      "sourceIdentitySha256": "dc3a22e7e85ea87155a5cdf5d913498a12f1c250a500a54c0ff2f6247ded5c95",
+      "sourceCount": 771,
+      "projection": {
+        "bindings": [
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/API_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/CALCULATOR_HOST_MODE"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/CALCULATOR_RATE_LIMIT"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/TaxKitMcpSessions"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi/WEBSITE_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite/API_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite/CALCULATOR_HOST_MODE"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite/TAXKIT_API"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN"
+          }
+        ],
+        "candidate": {
+          "deploymentInputSha256": "d1bc82040d7e06329f1c1cb88cf723f172140f8e2a2cc4e51b834fbccab9d962",
+          "exactCommit": "72bfa16ac08dacc4c26f3de023a2880baefe1c55",
+          "lockfileSha256": "b074ac52390345cccdc347bc8148256a4bb6d0baacd0ef37e6868544a5ff1f02"
+        },
+        "configSha256": "1910f9f31340a80e685360a14ad9357f8907f2fa5610cc9e7ea4ae559db4b92b",
+        "provider": {
+          "accountId": "f9f94270a4a5af8af7010d891020922d",
+          "alchemyPatchSha256": "08bf0e8e65631f2db175093cf2997c0a9a3d648d161b981a97538a5d6c277a93",
+          "alchemySourceCommit": "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
+          "alchemyVersion": "2.0.0-beta.80"
+        },
+        "redaction": {
+          "ansiRemoved": true,
+          "secretValuesIncluded": false,
+          "timestampsExcludedFromDigest": true
+        },
+        "schemaVersion": 3,
+        "stack": "TaxKitAppsCloudflare",
+        "domains": [],
+        "logicalResources": [
+          {
+            "action": "create",
+            "logicalId": "TaxKitApi",
+            "resourceType": "Cloudflare.Worker"
+          },
+          {
+            "action": "create",
+            "logicalId": "TaxKitWebsite",
+            "resourceType": "Cloudflare.Worker"
+          }
+        ],
+        "productionDns": "unmanaged",
+        "stage": "pr-162"
+      }
+    },
+    {
+      "stage": "prod",
+      "nativeStdoutSha256": "4dbdc2ea00bdb144ec8d31ed9ea216057c562674ca534ef1ebac25d542151530",
+      "projectionSha256": "49579860e4839e26e410f1fee55b3fc2d00543759b8b4d2f3c55c68db3515b1e",
+      "sourceIdentitySha256": "dc3a22e7e85ea87155a5cdf5d913498a12f1c250a500a54c0ff2f6247ded5c95",
+      "sourceCount": 771,
+      "projection": {
+        "bindings": [
+          {
+            "action": "noop",
+            "logicalId": "TaxKitApi/API_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitApi/CALCULATOR_HOST_MODE"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitApi/CALCULATOR_RATE_LIMIT"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitApi/TaxKitMcpSessions"
+          },
+          {
+            "action": "update",
+            "logicalId": "TaxKitApi/WEBSITE_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "update",
+            "logicalId": "TaxKitWebsite/API_PUBLIC_ORIGIN"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitWebsite/CALCULATOR_HOST_MODE"
+          },
+          {
+            "action": "update",
+            "logicalId": "TaxKitWebsite/TAXKIT_API"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN"
+          }
+        ],
+        "candidate": {
+          "deploymentInputSha256": "d1bc82040d7e06329f1c1cb88cf723f172140f8e2a2cc4e51b834fbccab9d962",
+          "exactCommit": "72bfa16ac08dacc4c26f3de023a2880baefe1c55",
+          "lockfileSha256": "b074ac52390345cccdc347bc8148256a4bb6d0baacd0ef37e6868544a5ff1f02"
+        },
+        "configSha256": "1910f9f31340a80e685360a14ad9357f8907f2fa5610cc9e7ea4ae559db4b92b",
+        "provider": {
+          "accountId": "f9f94270a4a5af8af7010d891020922d",
+          "alchemyPatchSha256": "08bf0e8e65631f2db175093cf2997c0a9a3d648d161b981a97538a5d6c277a93",
+          "alchemySourceCommit": "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
+          "alchemyVersion": "2.0.0-beta.80"
+        },
+        "redaction": {
+          "ansiRemoved": true,
+          "secretValuesIncluded": false,
+          "timestampsExcludedFromDigest": true
+        },
+        "schemaVersion": 3,
+        "stack": "TaxKitAppsCloudflare",
+        "domains": [
+          "taxkit.dev",
+          "www.taxkit.dev",
+          "api.taxkit.dev"
+        ],
+        "logicalResources": [
+          {
+            "action": "update",
+            "logicalId": "TaxKitApi",
+            "resourceType": "Cloudflare.Worker"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitProductionDnsSettings",
+            "resourceType": "Cloudflare.DNS.ZoneSettings"
+          },
+          {
+            "action": "noop",
+            "logicalId": "TaxKitProductionZone",
+            "resourceType": "Cloudflare.Zone.Zone"
+          },
+          {
+            "action": "update",
+            "logicalId": "TaxKitWebsite",
+            "resourceType": "Cloudflare.Worker"
+          }
+        ],
+        "productionDns": {
+          "removalPolicy": "retain",
+          "zoneId": "15103853342ab9f18f7894b7fae39c39",
+          "zoneName": "taxkit.dev"
+        },
+        "stage": "prod"
+      }
+    }
+  ],
+  "applies": [
+    {
+      "observedAt": "2026-10-07T09:19:52.472557+00:00",
+      "stage": "pr-162",
+      "candidateCommit": "72bfa16ac08dacc4c26f3de023a2880baefe1c55",
+      "exitCode": 0,
+      "durationSeconds": 46.71,
+      "command": [
+        "bun",
+        "--no-env-file",
+        "--conditions=source",
+        "run",
+        "node_modules/alchemy/bin/cli.js",
+        "deploy",
+        "--config",
+        "alchemy.apps.run.ts",
+        "--stage",
+        "pr-162",
+        "--profile",
+        "site-ci-env-v1"
+      ],
+      "log": "dev77-agent-native-pr-162-deploy-1791364745765089000.log",
+      "sha256": "11dc2578599cde59cdfe0a34a3c81bacdc694dc5e6f88cb13746af5b8c407faa",
+      "sharedStateAutoUpgradeFlag": false,
+      "exactPlanPromptAnsweredAfterReview": true
+    },
+    {
+      "observedAt": "2026-10-07T09:23:34.118935+00:00",
+      "stage": "prod",
+      "candidateCommit": "72bfa16ac08dacc4c26f3de023a2880baefe1c55",
+      "exitCode": 0,
+      "durationSeconds": 44.26,
+      "command": [
+        "bun",
+        "--no-env-file",
+        "--conditions=source",
+        "run",
+        "node_modules/alchemy/bin/cli.js",
+        "deploy",
+        "--config",
+        "alchemy.apps.run.ts",
+        "--stage",
+        "prod",
+        "--profile",
+        "site-ci-env-v1"
+      ],
+      "log": "dev77-agent-native-prod-deploy-1791364969855396000.log",
+      "sha256": "1f0ccfb52b8e8b3e1d67c845553bb15e48141347425a156b2a102528c0d2a43c",
+      "sharedStateAutoUpgradeFlag": false,
+      "exactPlanPromptAnsweredAfterReview": true
+    }
+  ],
+  "providerReadbacks": {
+    "preview": {
+      "observedAt": "2026-10-07T09:20:24.836959+00:00",
+      "accountId": "f9f94270a4a5af8af7010d891020922d",
+      "stage": "pr-162",
+      "workers": {
+        "api": {
+          "script": "taxkitappscloudflare-taxkitapi-pr-162-x6ws7iuayoheojsv",
+          "bindings": [
+            {
+              "name": "ALCHEMY_CLOUDFLARE_ACCOUNT_ID",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_PHASE",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_STACK_NAME",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_STAGE",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_WORKER_NAME",
+              "type": "plain_text"
+            },
+            {
+              "name": "API_PUBLIC_ORIGIN",
+              "type": "plain_text",
+              "text": "https://taxkitappscloudflare-taxkitapi-pr-162-x6ws7iuayoheojsv.coopercorbett.workers.dev"
+            },
+            {
+              "name": "CALCULATOR_HOST_MODE",
+              "type": "plain_text",
+              "text": "edge"
+            },
+            {
+              "name": "CALCULATOR_RATE_LIMIT",
+              "type": "ratelimit",
+              "namespace_id": "10078162",
+              "simple": {
+                "limit": 60,
+                "period": 60
+              }
+            },
+            {
+              "name": "CALCULATOR_RATE_NAMESPACE",
+              "type": "secret_text"
+            },
+            {
+              "name": "TaxKitMcpSessions",
+              "type": "durable_object_namespace",
+              "namespace_id": "a2e8381e7a8f4a5d9c8a133f4e1d20b4",
+              "class_name": "TaxKitMcpSessions"
+            },
+            {
+              "name": "WEBSITE_PUBLIC_ORIGIN",
+              "type": "plain_text",
+              "text": "https://taxkitappscloudflare-taxkitweb2uiirsygblyefwrzhql3g46z.coopercorbett.workers.dev"
+            }
+          ],
+          "compatibility_date": "2026-10-04",
+          "compatibility_flags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "observability": null,
+          "logpush": false,
+          "tailConsumers": null,
+          "latestDeployment": {
+            "id": "857a6f0f-2ce5-4b6b-9c6c-3e3a5336f84d",
+            "strategy": "percentage",
+            "created_on": "2026-10-07T09:19:33.236844Z",
+            "versions": [
+              {
+                "version_id": "90e5f60a-9d29-470d-97d5-06d0e41d52cd",
+                "percentage": 100
+              }
+            ]
+          }
+        },
+        "website": {
+          "script": "taxkitappscloudflare-taxkitweb2uiirsygblyefwrzhql3g46z",
+          "bindings": [
+            {
+              "name": "ALCHEMY_CLOUDFLARE_ACCOUNT_ID",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_PHASE",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_STACK_NAME",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_STAGE",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_WORKER_NAME",
+              "type": "plain_text"
+            },
+            {
+              "name": "API_PUBLIC_ORIGIN",
+              "type": "plain_text",
+              "text": "https://taxkitappscloudflare-taxkitapi-pr-162-x6ws7iuayoheojsv.coopercorbett.workers.dev"
+            },
+            {
+              "name": "ASSETS",
+              "type": "assets"
+            },
+            {
+              "name": "CALCULATOR_HOST_MODE",
+              "type": "plain_text",
+              "text": "edge"
+            },
+            {
+              "name": "TAXKIT_API",
+              "type": "service",
+              "service": "taxkitappscloudflare-taxkitapi-pr-162-x6ws7iuayoheojsv",
+              "environment": "production"
+            },
+            {
+              "name": "WEBSITE_PUBLIC_ORIGIN",
+              "type": "plain_text",
+              "text": "https://taxkitappscloudflare-taxkitweb2uiirsygblyefwrzhql3g46z.coopercorbett.workers.dev"
+            }
+          ],
+          "compatibility_date": "2026-10-04",
+          "compatibility_flags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "observability": null,
+          "logpush": false,
+          "tailConsumers": null,
+          "latestDeployment": {
+            "id": "b4a2dfd9-eb20-4951-9456-6d1744dfe31d",
+            "strategy": "percentage",
+            "created_on": "2026-10-07T09:19:50.243731Z",
+            "versions": [
+              {
+                "version_id": "1eaccafa-1004-4c0e-871b-3e480d9b0efc",
+                "percentage": 100
+              }
+            ]
+          }
+        }
+      },
+      "postconditionsPassed": [
+        "exact account and stage scripts",
+        "Stage-specific rate namespace and 60 per 60 seconds",
+        "MCP durable-object class",
+        "Website private API service target",
+        "pinned compatibility settings",
+        "provider script observability null, Logpush false and no tail consumers; source explicitly disables collection"
+      ],
+      "sameStageOriginsPassed": {
+        "api": "https://taxkitappscloudflare-taxkitapi-pr-162-x6ws7iuayoheojsv.coopercorbett.workers.dev",
+        "website": "https://taxkitappscloudflare-taxkitweb2uiirsygblyefwrzhql3g46z.coopercorbett.workers.dev"
+      },
+      "receiptSha256": "e099c8fbb09aa1dfe764ac41383dfe17c25cd2a80b5225183ea5f552f357e877"
+    },
+    "production": {
+      "observedAt": "2026-10-07T09:23:51.586580+00:00",
+      "accountId": "f9f94270a4a5af8af7010d891020922d",
+      "stage": "prod",
+      "workers": {
+        "api": {
+          "script": "taxkitappscloudflare-taxkitapi-prod-cbf6rcgntsf5y2vl",
+          "bindings": [
+            {
+              "name": "ALCHEMY_CLOUDFLARE_ACCOUNT_ID",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_PHASE",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_STACK_NAME",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_STAGE",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_WORKER_NAME",
+              "type": "plain_text"
+            },
+            {
+              "name": "API_PUBLIC_ORIGIN",
+              "type": "plain_text",
+              "text": "https://api.taxkit.dev"
+            },
+            {
+              "name": "CALCULATOR_HOST_MODE",
+              "type": "plain_text",
+              "text": "edge"
+            },
+            {
+              "name": "CALCULATOR_RATE_LIMIT",
+              "type": "ratelimit",
+              "namespace_id": "10078",
+              "simple": {
+                "limit": 60,
+                "period": 60
+              }
+            },
+            {
+              "name": "CALCULATOR_RATE_NAMESPACE",
+              "type": "secret_text"
+            },
+            {
+              "name": "TaxKitMcpSessions",
+              "type": "durable_object_namespace",
+              "namespace_id": "c5b3d3afb20b40e48a345c9aecb068c5",
+              "class_name": "TaxKitMcpSessions"
+            },
+            {
+              "name": "WEBSITE_PUBLIC_ORIGIN",
+              "type": "plain_text",
+              "text": "https://taxkit.dev"
+            }
+          ],
+          "compatibility_date": "2026-10-04",
+          "compatibility_flags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "observability": null,
+          "logpush": false,
+          "tailConsumers": null,
+          "latestDeployment": {
+            "id": "355f2c64-db38-44f9-bee3-080b89a1ed1e",
+            "strategy": "percentage",
+            "created_on": "2026-10-07T09:23:14.329905Z",
+            "versions": [
+              {
+                "version_id": "344a95cb-cb67-4bba-b742-f8a766a4ffc0",
+                "percentage": 100
+              }
+            ]
+          }
+        },
+        "website": {
+          "script": "taxkitappscloudflare-taxkitweb6exfjosfrbdjf3coo4ausvjj",
+          "bindings": [
+            {
+              "name": "ALCHEMY_CLOUDFLARE_ACCOUNT_ID",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_PHASE",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_STACK_NAME",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_STAGE",
+              "type": "plain_text"
+            },
+            {
+              "name": "ALCHEMY_WORKER_NAME",
+              "type": "plain_text"
+            },
+            {
+              "name": "API_PUBLIC_ORIGIN",
+              "type": "plain_text",
+              "text": "https://api.taxkit.dev"
+            },
+            {
+              "name": "ASSETS",
+              "type": "assets"
+            },
+            {
+              "name": "CALCULATOR_HOST_MODE",
+              "type": "plain_text",
+              "text": "edge"
+            },
+            {
+              "name": "TAXKIT_API",
+              "type": "service",
+              "service": "taxkitappscloudflare-taxkitapi-prod-cbf6rcgntsf5y2vl",
+              "environment": "production"
+            },
+            {
+              "name": "WEBSITE_PUBLIC_ORIGIN",
+              "type": "plain_text",
+              "text": "https://taxkit.dev"
+            }
+          ],
+          "compatibility_date": "2026-10-04",
+          "compatibility_flags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "observability": null,
+          "logpush": false,
+          "tailConsumers": null,
+          "latestDeployment": {
+            "id": "9e447967-9761-4726-bdfe-47ca4b4cfaf5",
+            "strategy": "percentage",
+            "created_on": "2026-10-07T09:23:30.929185Z",
+            "versions": [
+              {
+                "version_id": "fce294ac-0975-414a-93da-088f3c7f8abc",
+                "percentage": 100
+              }
+            ]
+          }
+        }
+      },
+      "postconditionsPassed": [
+        "exact account and stage scripts",
+        "Stage-specific rate namespace and 60 per 60 seconds",
+        "MCP durable-object class",
+        "Website private API service target",
+        "pinned compatibility settings",
+        "provider script observability null, Logpush false and no tail consumers; source explicitly disables collection"
+      ],
+      "sameStageOriginsPassed": {
+        "api": "https://api.taxkit.dev",
+        "website": "https://taxkit.dev"
+      },
+      "receiptSha256": "97575ea7ea60e9e4f59b8f16014ee737269947ad6ee2b46b60d449f32dcb529e"
+    }
+  },
+  "publicReadbacks": {
+    "preview": {
+      "api-routes": {
+        "observedAt": "2026-10-07T09:20:28.426Z",
+        "origin": "https://taxkitappscloudflare-taxkitapi-pr-162-x6ws7iuayoheojsv.coopercorbett.workers.dev",
+        "outcomes": [
+          {
+            "check": "health",
+            "passed": true
+          },
+          {
+            "check": "catalogue",
+            "passed": true
+          },
+          {
+            "check": "take-home-calculation",
+            "passed": true
+          },
+          {
+            "check": "openapi",
+            "passed": true
+          },
+          {
+            "check": "public-docs-page-navigation-search-markdown",
+            "passed": true
+          }
+        ],
+        "receiptSha256": "76fac5e7e94055d0f4eba4c784ba1946163b473ef5de6051bb7ff4254b8b8869"
+      },
+      "browser": {
+        "observedAt": "2026-10-07T09:21:39.299Z",
+        "origin": "https://taxkitappscloudflare-taxkitweb2uiirsygblyefwrzhql3g46z.coopercorbett.workers.dev",
+        "outcomes": [
+          {
+            "check": "take-home-browser-known-answer",
+            "passed": true,
+            "answer": "$1,301.00"
+          },
+          {
+            "check": "au.pay.withholdings-browser-known-answer",
+            "passed": true,
+            "answer": "$2,756.00"
+          },
+          {
+            "check": "au.income-tax.annual-browser-known-answer",
+            "passed": true,
+            "answer": "$12,228.00"
+          },
+          {
+            "check": "quickstart-rendered",
+            "passed": true
+          },
+          {
+            "check": "documentation-search",
+            "passed": true
+          },
+          {
+            "check": "mobile-search-layout",
+            "passed": true
+          },
+          {
+            "check": "calculator-without-javascript",
+            "passed": true
+          },
+          {
+            "check": "agent-page-same-stage-MCP-address",
+            "passed": true,
+            "endpoint": "https://taxkitappscloudflare-taxkitapi-pr-162-x6ws7iuayoheojsv.coopercorbett.workers.dev/mcp"
+          },
+          {
+            "check": "all-remote-and-visible-tool-names-rendered",
+            "passed": true
+          },
+          {
+            "check": "agent-guide-Markdown-and-cancellation-limit",
+            "passed": true
+          },
+          {
+            "check": "agent-guide-search-discovery",
+            "passed": true
+          }
+        ],
+        "browserErrors": [],
+        "receiptSha256": "b690d3f1a82a8545cc6ee2d59314d4cb1904fcaea32e0fc7f25aac2c8784c5f3"
+      },
+      "mcp-2026-07-28": {
+        "observedAt": "2026-10-07T09:21:39.740Z",
+        "origin": "https://taxkitappscloudflare-taxkitapi-pr-162-x6ws7iuayoheojsv.coopercorbett.workers.dev",
+        "clientProtocol": "2026-07-28",
+        "outcomes": [
+          {
+            "check": "official-modern-client-connect",
+            "passed": true
+          },
+          {
+            "check": "six-public-tools",
+            "passed": true
+          },
+          {
+            "check": "MCP-owned-calculation-schema",
+            "passed": true
+          },
+          {
+            "check": "MCP-agent-guide-through-canonical-page-schema",
+            "passed": true
+          }
+        ],
+        "receiptSha256": "fcc9cb9b05211ef66fa5e36c55fd4fa276994da1beb3c1918aad697565c6fd83"
+      },
+      "mcp-2025-11-25": {
+        "observedAt": "2026-10-07T09:22:19.691Z",
+        "origin": "https://taxkitappscloudflare-taxkitapi-pr-162-x6ws7iuayoheojsv.coopercorbett.workers.dev",
+        "clientProtocol": "2025-11-25",
+        "outcomes": [
+          {
+            "check": "official-modern-client-connect",
+            "passed": true
+          },
+          {
+            "check": "six-public-tools",
+            "passed": true
+          },
+          {
+            "check": "MCP-owned-calculation-schema",
+            "passed": true
+          },
+          {
+            "check": "MCP-agent-guide-through-canonical-page-schema",
+            "passed": true
+          }
+        ],
+        "receiptSha256": "6084d0227d488684a6656fe0f25282ea8c93c3680ef7df30a45c813c2a932574"
+      },
+      "screenshots": [
+        {
+          "path": "tmp/agent-guide-cloud-readback/preview-search-mobile.png",
+          "sha256": "6cc21aae752b81201855745d26b0d6d77e7b90ac15d508a93f6b155c2f69eef5"
+        },
+        {
+          "path": "tmp/agent-guide-cloud-readback/preview-agents-mobile.png",
+          "sha256": "ce0630bf4a6a2e5826815c8fc832de14ec0117e2bba6ceb0f05bdc32135b9a11"
+        }
+      ]
+    },
+    "production": {
+      "api-routes": {
+        "observedAt": "2026-10-07T09:23:55.010Z",
+        "origin": "https://api.taxkit.dev",
+        "outcomes": [
+          {
+            "check": "health",
+            "passed": true
+          },
+          {
+            "check": "catalogue",
+            "passed": true
+          },
+          {
+            "check": "take-home-calculation",
+            "passed": true
+          },
+          {
+            "check": "openapi",
+            "passed": true
+          },
+          {
+            "check": "public-docs-page-navigation-search-markdown",
+            "passed": true
+          }
+        ],
+        "receiptSha256": "923fdb07f8a4c597642131314319ffd657fe4963ed3a3525dbafa72cc956586a"
+      },
+      "browser": {
+        "observedAt": "2026-10-07T09:24:05.661Z",
+        "origin": "https://taxkit.dev",
+        "outcomes": [
+          {
+            "check": "take-home-browser-known-answer",
+            "passed": true,
+            "answer": "$1,301.00"
+          },
+          {
+            "check": "au.pay.withholdings-browser-known-answer",
+            "passed": true,
+            "answer": "$2,756.00"
+          },
+          {
+            "check": "au.income-tax.annual-browser-known-answer",
+            "passed": true,
+            "answer": "$12,228.00"
+          },
+          {
+            "check": "quickstart-rendered",
+            "passed": true
+          },
+          {
+            "check": "documentation-search",
+            "passed": true
+          },
+          {
+            "check": "mobile-search-layout",
+            "passed": true
+          },
+          {
+            "check": "calculator-without-javascript",
+            "passed": true
+          },
+          {
+            "check": "agent-page-same-stage-MCP-address",
+            "passed": true,
+            "endpoint": "https://api.taxkit.dev/mcp"
+          },
+          {
+            "check": "all-remote-and-visible-tool-names-rendered",
+            "passed": true
+          },
+          {
+            "check": "agent-guide-Markdown-and-cancellation-limit",
+            "passed": true
+          },
+          {
+            "check": "agent-guide-search-discovery",
+            "passed": true
+          }
+        ],
+        "browserErrors": [],
+        "receiptSha256": "de4776fec09fc6a0043cdd228bb9e67f5d0e6fa72a5e06c91e35f8a4ccce1db2"
+      },
+      "mcp-2026-07-28": {
+        "observedAt": "2026-10-07T09:24:06.092Z",
+        "origin": "https://api.taxkit.dev",
+        "clientProtocol": "2026-07-28",
+        "outcomes": [
+          {
+            "check": "official-client-connect",
+            "passed": true
+          },
+          {
+            "check": "six-public-tools",
+            "passed": true
+          },
+          {
+            "check": "MCP-owned-calculation-schema",
+            "passed": true
+          },
+          {
+            "check": "MCP-agent-guide-through-canonical-page-schema",
+            "passed": true
+          }
+        ],
+        "receiptSha256": "4a7c11df319bda344bdb55cb2b356f68b226bebbdc9e7e27a0fccc2d00996e74"
+      },
+      "mcp-2025-11-25": {
+        "observedAt": "2026-10-07T09:24:07.492Z",
+        "origin": "https://api.taxkit.dev",
+        "clientProtocol": "2025-11-25",
+        "outcomes": [
+          {
+            "check": "official-client-connect",
+            "passed": true
+          },
+          {
+            "check": "six-public-tools",
+            "passed": true
+          },
+          {
+            "check": "MCP-owned-calculation-schema",
+            "passed": true
+          },
+          {
+            "check": "MCP-agent-guide-through-canonical-page-schema",
+            "passed": true
+          }
+        ],
+        "receiptSha256": "54167683868667e9b903267a8a4a748293ded1d112417034ed66d3d32be7119a"
+      },
+      "screenshots": [
+        {
+          "path": "tmp/agent-guide-cloud-readback/production-search-mobile.png",
+          "sha256": "6cc21aae752b81201855745d26b0d6d77e7b90ac15d508a93f6b155c2f69eef5"
+        },
+        {
+          "path": "tmp/agent-guide-cloud-readback/production-agents-mobile.png",
+          "sha256": "8e404098a188218618782499cd8df5ce9184cee0833cf1714e0d854f4c2479bc"
+        }
+      ]
+    }
+  },
+  "protectedProductionReadback": {
+    "observedAt": "2026-10-07T09:24:10.809045+00:00",
+    "postconditionsPassed": [
+      "same existing Production token",
+      "all DNS settings equal previous deployed readback",
+      "same www redirect ruleset ID and exact rules",
+      "three unchanged expected Worker-managed records, no additional records"
+    ],
+    "dnsReceiptSha256": "6c01214c5ed12a4b5bc475d6044dd4a28c57283b824b35efe763e0849e9186a2",
+    "domainReceiptSha256": "04465e0609b53ef503365dfe23579fc71bc0c049940285a6e39ec175ce269d06",
+    "domains": [
+      {
+        "hostname": "taxkit.dev",
+        "http": 200,
+        "success": true,
+        "result_info": {
+          "page": 1,
+          "per_page": 1,
+          "count": 1,
+          "total_count": 1
+        },
+        "owners": [
+          {
+            "id": "e6d4940dcb7d247109a3c437fbcf49eaaf2a65bf",
+            "hostname": "taxkit.dev",
+            "service": "taxkitappscloudflare-taxkitweb6exfjosfrbdjf3coo4ausvjj",
+            "zoneId": "15103853342ab9f18f7894b7fae39c39",
+            "environment": "production"
+          }
+        ]
+      },
+      {
+        "hostname": "www.taxkit.dev",
+        "http": 200,
+        "success": true,
+        "result_info": {
+          "page": 1,
+          "per_page": 1,
+          "count": 1,
+          "total_count": 1
+        },
+        "owners": [
+          {
+            "id": "3263cc47f5ac4b005b85ec916e5ac0d011bca2c1",
+            "hostname": "www.taxkit.dev",
+            "service": "taxkitappscloudflare-taxkitweb6exfjosfrbdjf3coo4ausvjj",
+            "zoneId": "15103853342ab9f18f7894b7fae39c39",
+            "environment": "production"
+          }
+        ]
+      },
+      {
+        "hostname": "api.taxkit.dev",
+        "http": 200,
+        "success": true,
+        "result_info": {
+          "page": 1,
+          "per_page": 1,
+          "count": 1,
+          "total_count": 1
+        },
+        "owners": [
+          {
+            "id": "4d7dc52dee2413926d490e0cd9ac0a7ff0f696dd",
+            "hostname": "api.taxkit.dev",
+            "service": "taxkitappscloudflare-taxkitapi-prod-cbf6rcgntsf5y2vl",
+            "zoneId": "15103853342ab9f18f7894b7fae39c39",
+            "environment": "production"
+          }
+        ]
+      }
+    ],
+    "domainIdsAndOwnersEqualBefore": true,
+    "sameDnsSettingsAndRedirectRulesAsPriorDeployedReadback": true,
+    "recordNames": [
+      "api.taxkit.dev",
+      "taxkit.dev",
+      "www.taxkit.dev"
+    ],
+    "nextDnsPageEmpty": true,
+    "recordsReader": "Existing cf default profile; separate from the Production deploy token which lacks DNS-record read access"
+  },
+  "retainedReadbackAttempts": [
+    {
+      "scope": "Private cloud check selector",
+      "observed": "Read as Markdown link label timed out",
+      "correction": "Use actual owning link name Read this page as Markdown; corrected full live browser cases pass on both stages"
+    },
+    {
+      "scope": "Private official older client configuration",
+      "observed": "Modern-version pin refuses the 2025 protocol before a network call",
+      "correction": "Use the existing native test owner legacy mode with supportedProtocolVersions 2025-11-25; actual older live clients pass on both stages"
+    },
+    {
+      "scope": "Production DNS record read",
+      "observed": "Existing Production deploy credential cannot read DNS records; cf CLI returns a decoded record list, not the API envelope",
+      "correction": "Use existing explicitly authorised cf read profile, read both pages and check the actual list; no permission change"
+    }
+  ],
+  "primaryReview": {
+    "reviewer": "Codex primary TaxKit implementation owner",
+    "result": "Accept T006 local implementation against the current SPEC/task; draft review remains outstanding",
+    "criteria": [
+      {
+        "criterion": "Tool names, Schemas, descriptions and shared services match current accepted catalogue",
+        "evidence": [
+          "apps/api/src/mcp.tools.layer.ts",
+          "apps/web/src/lib/browser-tools.toolkit.ts",
+          "apps/web/src/lib/browser-tools.atoms.ts",
+          "packages/docs-content/content/api/agent-tools.mdx",
+          "Current full source-frozen checks and official deployed clients for both protocols"
+        ]
+      },
+      {
+        "criterion": "Remote/browser tools have actual caller evidence and browser limits are stated",
+        "evidence": [
+          "apps/web/test/native-mcp.boundary.test.ts",
+          "apps/web/test/native-browser-tools.boundary.test.ts",
+          "apps/web/test/native-pair.boundary.test.ts",
+          "Native Chromium 153 developer-tools caller with real form/result, interruption and route cleanup; no autonomous model-session claim"
+        ]
+      },
+      {
+        "criterion": "Anonymous bounded calls reuse existing calculation owner, with no account or stored figures",
+        "evidence": [
+          "apps/api/src/worker.application.ts",
+          "apps/api/src/mcp-session.layer.ts",
+          "Existing native pool/rate/body/response/lifetime/cancellation tests; automatic older alarm and actual modern negative oracle"
+        ]
+      }
+    ],
+    "contractDecision": "The accepted SPEC expressly does not guarantee remote cancellation and task browserVerification requires preserving the distinct modern TCP-abort pre-response cleanup limit. The tested five-second bound is accepted as written; no requirement was weakened and no prompt cancellation fix is claimed. Public setup is now qualified and deployed.",
+    "retainedEvidence": [
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json"
+    ],
+    "documentationImpact": "Change required for current SPEC/task/plan, API/Website READMEs and API architecture; preserve earlier dated receipts; private app/docs change needs no Changeset",
+    "sourceUnchangedThroughAllChecksAndBothApplies": true,
+    "trackedIdentityCount": 1749
+  },
+  "documentationOnlyCloseout": {
+    "paths": [
+      "apps/api/README.md",
+      "apps/web/README.md",
+      "docs/architecture/api-and-sdk.md",
+      "docs/product-specs/clean-slate-foundation.md",
+      "docs/product-specs/clean-slate-foundation.tasks.json",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json"
+    ],
+    "qualifiedApplicationAndConfigBytesUnchanged": true,
+    "focusedChecks": [
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.44,
+        "log": "dev77-agent-closeout-docs.log",
+        "logSha256": "248777b0bc56a8b3c0808139ba410e287a2583ec123fc60d099c4a096660ff57"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.14,
+        "log": "dev77-agent-closeout-runbooks.log",
+        "logSha256": "9ad2006546258d9a909b41907387910b9cfca9a24c29dbd5a0c7ebf95ad6d515"
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.26,
+        "log": "dev77-agent-closeout-paths.log",
+        "logSha256": "02f07f481a2646f572676cd7d1e412a72e32978cb4d46ddbf4fdb527de5b8ab2"
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.01,
+        "log": "dev77-agent-closeout-diff.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "qualifiedParentSourceCommit": "72bfa16ac08dacc4c26f3de023a2880baefe1c55",
+    "changedPaths": [
+      "apps/api/README.md",
+      "apps/web/README.md",
+      "docs/architecture/api-and-sdk.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/product-specs/clean-slate-foundation.md",
+      "docs/product-specs/clean-slate-foundation.tasks.json"
+    ],
+    "allOtherTrackedIdentitiesMatch": 1742,
+    "applicationContentConfigAndTestsUnchanged": true
+  }
 }

@@ -35,8 +35,9 @@ independent work. Cooper's 7 October direction adds native Preview and Productio
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: finish T006's prompt modern remote cleanup and
-public setup, and T007's native source-bound plan preparation. All three calculator
+Next continuation milestone: finish T007's current operational-owner alignment,
+then T008's accepted analytics work. T006 is locally accepted and ready for
+draft review with its documented five-second modern cancellation limit. All three calculator
 pages have local native/browser proof. T003's connection/containment
 qualification is locally accepted. T002's
 installed dependency graph, app/script/SDK/infrastructure
@@ -82,7 +83,7 @@ records command outcomes and log digests.
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
-| T006 / DEV-77 | In progress | Modern remote tools are locally tested in draft #156 with exact-head hosted Quality. Browser tools and both saved-page lifetimes are delivered in draft #157 after all nine local checks and exact-head hosted Quality. Older-session lifetime/cancellation passed the complete source-frozen nine-check graph on the current branch, including all fourteen native cases twice. Draft #158 is pushed at `013e02845e49d78af33aa9ea157075c24b8e0065`; exact-head hosted Quality `37574967845` passed at 05:29 UTC on 7 October. Prompt modern remote cleanup and public setup remain unfinished. |
+| T006 / DEV-77 | Complete locally; draft review outstanding | Six remote and five visible browser tools reuse the checked owners. All nine local checks pass at `72bfa16ac08dacc4c26f3de023a2880baefe1c55`, with both fourteen-case native runs. Draft #162 contains the stage-derived connection guide, deployed and read back on pr-162 and Production with both supported clients. The explicit modern five-second cleanup limit remains; no autonomous model session or prompt cleanup is claimed. |
 | T007 / DEV-78 | In progress; T003/T005 locally complete | Draft #159 contains the qualified Production graph, safe redirect read and native v3 projection. Follow-up source `195b20885c4b56e253456585864e80e5c72fd7b7` passed all nine local release checks and actual clean-checkout command probes. Native bootstrap/provider receipts, credentials and live plans remain unfinished. Cooper has authorised qualified Preview and Production deployment from this Mac. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
@@ -5434,7 +5435,7 @@ without observing an incoming signal during 1.5 seconds before its response.
 Restore the experimental test exactly and preserve the actual modern negative
 oracle. No flag, dependency or provider change is retained. This investigation
 supports the bounded limitation; it does not establish a production platform
-failure or fix. Prompt modern cancellation stays separate unfinished T006 work.
+failure or fix. The observed modern limit remains explicit in the accepted contract.
 
 Docs-maintainer: **Change required** for the route/journey, accepted guide and
 navigation bindings, API/Website READMEs, API architecture, active task/plan and
@@ -5447,7 +5448,29 @@ settings are unchanged. Documentation, runbooks, Web types, lint and the exact
 restored MCP cases passed. The new guide passed actual built browser/Markdown
 assertions. The first built suite had one local startup timeout; its unchanged
 two-case retry passed with original deadlines. Preserve that unresolved attempt.
-The full clean-source local graph is pending.
-New setup content requires a separate source-bound deployment before it is
-available. Keep T006 In Progress and do not claim an autonomous browser-agent
-session or prompt modern cleanup.
+The corrected source at `72bfa16ac08dacc4c26f3de023a2880baefe1c55` passed all
+nine ordered local checks in 997.08 seconds, including both fourteen-case native
+runs. All eighteen detail logs were read and hash-checked, and all 1,749 frozen
+tracked identities matched through both native applies. Draft #162 is pushed.
+
+Primary review accepts T006 against the current SPEC and task. The SPEC already
+says remote cancellation is not guaranteed; the task expressly requires the
+modern TCP-abort negative oracle to remain. Preserve that five-second bound,
+the older positive cancellation/automatic alarm proof and the native browser
+caller support ceiling. This is acceptance of the written contract, not a prompt
+cancellation fix or an autonomous model session. Draft review remains outstanding.
+
+Authorised native local deployment completed for pr-162 at 09:19:52 UTC and
+Production at 09:23:34 UTC on 7 October. Preview created only its two apps and
+nine bindings; Production updated the existing two apps and three bindings,
+with the retained zone/settings unchanged. Actual live API, all three calculator
+answers, guide, Markdown, search, mobile/no-JavaScript behaviour and both
+supported official clients pass. Independent provider reads confirm same-stage
+origins, the expected rate namespace, MCP class/service, unchanged domain IDs,
+DNS settings, www rule and three DNS records with the next page empty. The
+Production browser still observes the separate Cloudflare RUM beacon; metrics
+remain deferred. No credential, shared-store upgrade, merge or package publication
+occurred. Documentation-only closeout uses focused docs/runbook/path/diff checks;
+the qualified application, content and configuration bytes remain unchanged.
+Continue T007 operational-owner alignment and T008; deferred T009 and overall
+T010 acceptance remain outstanding.

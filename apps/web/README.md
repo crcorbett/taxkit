@@ -495,8 +495,9 @@ The same suite checks older native conversations, bounded allocation/request
 admission, conversation-scoped cancellation, automatic alarm expiry and fresh
 initialise after 404. It separately preserves the modern TCP-disconnect cleanup
 limit: remote pre-response work ends at its five-second budget. The real native
-browser caller check is described below. Prompt modern remote cleanup and public
-setup remain T006 work. The MCP client and calculator Schema imports are test-only dependencies;
+browser caller check is described below. T006 is locally accepted with this
+documented limit and ready for draft review. The MCP client and calculator
+Schema imports are test-only dependencies;
 no browser calculation implementation or production SDK client is added.
 
 ## Visible calculator browser tools
@@ -508,8 +509,10 @@ The guide also appears in documentation navigation, search, processed Markdown
 and both agent discovery files through the existing accepted catalogue. It
 distinguishes remote tools from visible browser commands and explains the
 modern five-second cleanup limit, older conversation expiry and experimental
-browser support. These setup checks do not establish an autonomous AI session
-or deployment of newly edited content.
+browser support. The
+[agent setup receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
+records the full local checks and separate Preview/Production guide deployment
+and live readback. No autonomous AI session is claimed.
 
 Supported experimental browsers can register five tools on a mounted calculator:
 `taxkit_find_calculators`, `taxkit_read_calculator`, `taxkit_fill_calculator`,

@@ -590,7 +590,7 @@
     {
       "id": "CSF-T006",
       "title": "Add remote MCP and visible browser agent tools",
-      "status": "in_progress",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [

@@ -318,8 +318,12 @@ automatic expiry without follow-up traffic and fresh initialise after 404. The
 calculation pool remains per application isolate, not global across Worker and
 object instances. Preserve the modern real-network negative oracle: a genuine
 outgoing TCP abort stops its caller while pre-response work remains until the
-five-second budget. This limit and public setup remain T006 work; older-session
-cancellation does not prove prompt modern remote cleanup.
+five-second budget. T006 is locally accepted with this documented bound; its
+setup guide and both ordinary remote protocols are deployed and read back on
+Preview and Production. Older-session cancellation does not prove prompt
+modern cleanup. The
+[agent setup receipt](../documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
+records the exact checks, primary review and browser/remote proof limits.
 Return checked 413/429/timeout failures with safe codes
 and retry guidance; do not retry calculations automatically. Qualify valid
 catalogue responses and supported streaming/MCP envelopes before adopting these

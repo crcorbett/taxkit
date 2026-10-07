@@ -386,8 +386,8 @@ notification cannot cancel it. Modern in-process AbortSignal cancellation also
 works. On the pinned real Worker, an outgoing modern TCP abort stops the caller
 but pre-response calculation work remains until its five-second budget. The
 native modern HTTP adapter has no conversation binding for that notification.
-No flag-only workaround is accepted, and prompt modern remote cleanup is still
-a T006 gap.
+No flag-only workaround is accepted. The current contract preserves this
+five-second bound and does not promise prompt modern remote cleanup.
 
 The [agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx)
 documents both versions, all six remote tools, anonymous limits, exact browser
@@ -396,8 +396,10 @@ The Website's `/agents` page derives its MCP address from the checked API
 settings, including in Preview. Ordinary official-client calls were read back
 on both deployed stages in the
 [local deployment receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json).
-That delivery does not prove prompt modern pre-response cleanup. The later
-setup-content slice needs its own deployment before its new guide is available.
+That delivery does not prove prompt modern pre-response cleanup. The
+[agent setup receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
+records the separately qualified guide deployment and both supported ordinary
+client calls on Preview and Production.
 
 `@modelcontextprotocol/client` 2.3.1 is test-only. The full native-pair command
 runs actual official clients over loopback TCP against the source-built API.
@@ -417,5 +419,6 @@ adding an emulator binding is insufficient and previously returned 503.
 See the [session candidate record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json),
 [earlier modern record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
 and [browser caller owner](../web/README.md#visible-calculator-browser-tools).
-Prompt modern remote cancellation remains T006 work. Source-built setup checks
-and ordinary deployed client calls are separate from that missing proof.
+T006 is locally accepted against its bounded contract and ready for draft
+review. Source-built setup, actual browser callers and deployed ordinary remote
+calls do not establish prompt modern cleanup or an autonomous model session.

@@ -583,7 +583,9 @@ declared HTTP 503/504 envelopes; existing request failures keep 400 and metadata
 methods declare checked 504 timeouts without using calculation places. RPC revision 3 preserves the canonical fixed capacity and
 timeout errors. Website forms request manual retry. SDK Schemas re-export these
 errors, while local SDK execution keeps its caller-owned lifetime and tax results.
-The owning package records cleanup and CPU proof limits. The native rate policy is described below; future MCP operations remain T006 work.
+The owning package records cleanup and CPU proof limits. The native rate policy
+and qualified MCP operations are described below; T006 retains the observed
+modern five-second remote cleanup limit.
 
 
 The [complete RPC contract](../../packages/api/rpc/README.md#complete-named-operation-contract)
