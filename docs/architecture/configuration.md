@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-configuration-owner
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-08
 review_trigger: config Schema, namespace, source selection or secret custody change
 ---
 
@@ -106,6 +106,14 @@ are deployment-only and never Worker bindings or browser settings. Current
 application analytics remain configured off; declaring project resources does
 not enable collection. The [infrastructure owner](../../packages/infrastructure/README.md#retained-posthog-project-candidate)
 describes deferred acquisition and native lifecycle bounds.
+
+The Website relay reuses the analytics package's checked runtime mode, numeric
+project ID, region, stage and redacted capture token plus `WEBSITE_PUBLIC_ORIGIN`.
+The existing server host supplies these through `ConfigProvider.fromUnknown(env)`.
+Off requires no analytics key; invalid enabled settings produce a named failure
+only on the relay route. Native output fixtures pack the numeric project ID as
+a number, preserving the actual Alchemy Output contract. Management/query keys
+are never Website settings or bindings. Current deployments remain off.
 
 ## Browser configuration boundary
 

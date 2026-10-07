@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-web-app-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: website rendering, settings, transport, form, generated types or build change
 ---
 
@@ -574,3 +574,33 @@ rate admission; it never forwards browser identity. A missing server request
 refuses collection. Settings/catalogue lookups emit no calculator-use event.
 The [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-calculator-collection-policy.json)
 separates controlled native/browser proof from provider ingestion or deployment.
+
+## Browser event relay
+
+The existing server runtime composes the private `WebsiteAnalyticsRelay` Layer.
+POST `/ingest/e/` fixes its upstream to `https://us.i.posthog.com/e/`. It admits
+the configured Website origin, checked `text/plain` gzip bytes or the selected
+SDK's JSON fallback, and one canonical `retry_count` from 0 to 10. Unknown or
+duplicate query fields, other media types and foreign/missing origins refuse.
+Each upstream attempt keeps complete bytes unchanged, strips caller cookies,
+authorisation, forwarded IP and trace headers, disables trace propagation, and
+refuses native redirects. It creates no retry queue or fallback destination.
+
+One five-second scope covers the incoming body, upstream headers and complete
+reply. Each body is limited to 65,536 bytes, including streams without a declared
+length; crossing the limit fails rather than forwarding a partial batch.
+Provider status and checked numeric retry advice survive. Replies are no-store
+and forward no cookies or Location. Denied collection or `DNT: 1` returns an
+empty 204 before body read or delivery. Configured-off returns 404 without a
+key; invalid enabled settings remain a distinct checked 503 failure on this
+route, keeping ordinary calculator/documentation service ownership separate.
+
+The relay does not decompress or rebuild events. Compressed byte bounds do not
+prove decompressed size; the future browser sender owns the field allowlist
+and withdrawal policy. Current app bindings keep collection off. This local
+candidate supplies no sender, project, credential, stored-event proof or
+activation. Only the minimal Fetch profile is supported: other SDK paths,
+form/beacon fallback, automatic features and unreviewed query formats refuse.
+The [relay receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-08-website-event-relay.json)
+separates controlled SDK transport, native app and complete local qualification
+from the still-pending browser queue-discard choice.

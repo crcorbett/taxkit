@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: frontend runtime, transport, rendering, build adapter, or composition change
 ---
 
@@ -487,3 +487,13 @@ not retain the first visitor’s choice when the server client is reused. No
 browser identity, storage or duplicate calculator event is added.
 The [Website owner](../../apps/web/README.md#calculator-collection-choice) routes
 the exact built-pair evidence and pending pageview sender work.
+
+## Browser event relay
+
+The existing Website runtime also composes the private POST `/ingest/e/` relay,
+the narrow provider-ingress exception agreed in the SPEC. It adds no domain
+operation or extra Worker. Off refuses without a key; invalid enabled settings
+fail only this route. The [Website owner](../../apps/web/README.md#browser-event-relay)
+owns its exact origin, query, media-type, complete-byte, deadline and reply policy.
+Browser delivery, the event allowlist, real projects and stored-event readback
+remain separate; composing this relay enables none of them.

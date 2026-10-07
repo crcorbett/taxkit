@@ -23,6 +23,13 @@ request and maps transport failures to safe errors. The exact encoder admission
 in `oxlint.config.ts` covers that provider egress and its safe error-byte test;
 it does not admit runtime execution, raw JSON or decoding in neighbouring code.
 The package’s collection-header boundary is reused by the API and Website.
+The private `WebsiteAnalyticsRelay` exposes one native request handler with
+checked failures and no service requirements escaping its caller. Its named
+adapter captures native HttpClient once, decodes metadata at that explicit
+boundary, forwards bounded complete bytes, and owns each request scope and
+whole-operation deadline. It uses the existing server runner. Exact decoder
+permissions admit neither neighbouring decoders, raw fetch nor another runner;
+actual lint fixtures enforce those limits.
 The browser calculator transport reads its native preference at dispatch, and
 the server transport reads the current original request; neither freezes policy
 when its Layer is built. Missing server/browser hosts refuse collection.

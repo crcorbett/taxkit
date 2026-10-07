@@ -1778,3 +1778,22 @@ prepares compiled dependency artifacts. This prevents the package test and
 build branches from concurrently removing the same compiled directory. The
 first retained-project full test run exposed that race; the failed log remains
 in the dated receipt, rather than being counted as a passing check.
+
+### Website event relay
+
+Focused Effect tests cover complete unchanged bytes, exact/crossing limits
+without Content-Length, refused origins/metadata, DNT, provider status/retry
+advice, stalled requests/headers/replies, late headers within one deadline,
+interruption and independent concurrent request scopes. A real native Fetch
+client against a local server proves redirect refusal before a second request.
+
+Four built-Website cases exercise off, malformed enabled config, forwarding and
+redirects through the actual runtime/route, including DNT and header stripping.
+A positive compiled-source oracle rejects old output. A checked synthetic
+fixture contains actual PostHog 1.438.2 gzip, JSON and retried request bytes from
+controlled Chromium. SDK integrity/browser observations are separate from
+deterministic replay. Only the minimal Fetch profile is qualified; no library
+lifetime or withdrawal claim follows. The
+[dated relay receipt](../documentation-audit/clean-slate-foundation/2026-10-08-website-event-relay.json)
+retains failed attempts, exact source and local checks. Real project/credential
+scope, activation and provider storage remain unqualified.

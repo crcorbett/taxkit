@@ -21,6 +21,7 @@ import {
   HttpServerResponse,
 } from "effect/http";
 
+import { WebsiteAnalyticsRelay } from "./lib/analytics/relay/service";
 import { WebsiteServerFunctionBase } from "./lib/config";
 import { withDocsRepresentation } from "./lib/docs/markdown.response.server";
 import {
@@ -57,6 +58,33 @@ export default {
     appRuntime.runPromise(
       Effect.gen(function* websiteRequest() {
         const url = new URL(request.url);
+        if (url.pathname.startsWith("/ingest/")) {
+          const relay = yield* WebsiteAnalyticsRelay;
+          const incoming = yield* HttpServerRequest.HttpServerRequest;
+          return yield* relay.handle(incoming).pipe(
+            Effect.catchTag("WebsiteRelayFailure", (error) =>
+              Effect.succeed(
+                HttpServerResponse.empty({
+                  headers: { "cache-control": "no-store" },
+                  status: Match.value(error.reason).pipe(
+                    Match.when("configuration", () => 503),
+                    Match.when("origin", () => 403),
+                    Match.whenOr("metadata", "request", () => 400),
+                    Match.when("request-size", () => 413),
+                    Match.whenOr(
+                      "transport",
+                      "redirect",
+                      "response-size",
+                      () => 502
+                    ),
+                    Match.when("deadline", () => 504),
+                    Match.exhaustive
+                  ),
+                })
+              )
+            )
+          );
+        }
         const discoveryPath = url.pathname;
         if (Schema.is(DocsDiscoveryPath)(discoveryPath)) {
           if (request.method !== "GET" && request.method !== "HEAD") {

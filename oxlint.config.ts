@@ -14,6 +14,9 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
+  "apps/web/src/lib/analytics/relay/relay.boundary.test.ts",
+  "apps/web/test/native-relay.boundary.test.ts",
   // Closed native PostHog SDK ingress; no runner or neighbouring-file permission.
   "packages/infrastructure/src/posthog/management.adapter.layer.ts",
   "packages/infrastructure/src/posthog/management.boundary.test.ts",
@@ -574,6 +577,7 @@ export default defineConfig({
       files: [
         "packages/analytics/src/**/*.ts",
         "packages/infrastructure/src/posthog/**/*.ts",
+        "apps/web/src/lib/analytics/relay/**/*.ts",
         "apps/api/src/analytics-request.boundary.ts",
         "apps/api/src/calculator-analytics.layer.ts",
         "apps/web/src/lib/calculator-policy.browser.layer.ts",

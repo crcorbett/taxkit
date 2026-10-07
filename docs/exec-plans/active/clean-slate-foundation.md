@@ -5754,3 +5754,43 @@ PostHog graph, current credentials and deferred metrics. **N/A** for a Changeset
 or new runbook: this closeout changes proof metadata only. T008 and overall
 T010 remain in progress for browser delivery, relay, real provider preparation
 and stored events. Production availability does not complete those outcomes.
+
+### T008 bounded Website relay candidate
+
+Continue from delivered draft [#166](https://github.com/crcorbett/taxkit/pull/166)
+at `51b02abc3d7f5053b25f8b51fc4a9f0363164feb` on
+`codex/dev-79-bounded-event-relay`. The existing Website runtime owns one
+private relay to the fixed US event endpoint. A five-second scope covers full
+request read, one attempt and full reply with 65,536-byte limits, checked
+origin/media/query metadata, no caller secret/IP/trace forwarding, native
+redirect refusal, unchanged opaque bytes and honest provider status. Off
+remains key-free; invalid enabled configuration fails only this route. Denial
+and DNT refuse before body read or upstream delivery.
+
+Registry integrity is revalidated for the exact official 1.438.2 archive.
+Controlled Chromium observes gzip `text/plain`, JSON and an SDK retry with
+stable event UUID/timestamp. The minimal Fetch profile uses no compression
+query; its canonical retry counter matches the installed ten-retry maximum.
+No provider call or SDK dependency installation occurs. A durable synthetic
+fixture and built app cases replay unchanged bytes. This transport evidence
+does not resolve the pending browser queue-discard choice.
+
+Focused tests and four native off/invalid/enabled/redirect cases pass. The first
+enabled native fixture packed a string project ID rather than the actual
+numeric Output and correctly produced a distinct configuration failure. Packing
+the numeric ID then passed without weakening runtime checks. Earlier type/lint
+corrections and the mistyped standalone lint-test config remain failed evidence.
+The new folder's explicit raw-fetch prohibition is proved alongside exact
+decoder and runner limits. The
+[dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-website-event-relay.json)
+owns final source and complete qualification.
+
+Documentation impact: **Change required** for the Website README, frontend,
+configuration, Effect and testing owners, exact lint admission, native test
+inventory, this plan and dated proof. **Preserve** browser design pending choice,
+published packages and retained tax outputs, providers/tokens/state, five
+runbooks and deferred metrics. **N/A** for a Changeset: private app transport
+adds no published package contract. This relay is a local candidate; deployed
+source stays `42610a5c25d4b03bb2d36ab75985a66b15ca17d3` until new qualified
+delivery. No browser sender, PostHog key/project, activation or stored events
+are claimed.
