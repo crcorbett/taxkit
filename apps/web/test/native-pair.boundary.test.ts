@@ -1442,12 +1442,13 @@ describe("built native API and Website", () => {
           )
         );
         yield* Effect.promise(() => errorPage.goto(websiteOrigin));
+        yield* Effect.promise(() => errorPage.waitForLoadState("networkidle"));
         yield* Effect.promise(() =>
           errorPage.getByRole("alert").waitFor({ timeout: 5000 })
         );
         expect(
           yield* Effect.promise(() =>
-            errorPage.getByRole("alert").textContent()
+            errorPage.getByRole("alert").textContent({ timeout: 5000 })
           )
         ).toContain("Check your details");
         const errorPayInput = errorPage.getByLabel("Pay before tax ($)");
@@ -1504,7 +1505,7 @@ describe("built native API and Website", () => {
         yield* Effect.promise(() =>
           savedPage
             .getByText("How this answer was worked out", { exact: true })
-            .click()
+            .click({ timeout: 5000 })
         );
         expect(
           yield* Effect.promise(() =>

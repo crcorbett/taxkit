@@ -3,19 +3,20 @@ import {
   useAtomSet,
   useAtomValue,
 } from "@effect/atom-react";
-import { TakeHomePayReport } from "@taxkit/rules-au-pay/schemas";
-import { Cause, Option, Result, Schema } from "effect";
-import * as AsyncResult from "effect/reactivity/AsyncResult";
+import {
+  AuPayCalculatorId,
+  TakeHomePayReport,
+} from "@taxkit/rules-au-pay/schemas";
+import { Option, Result, Schema } from "effect";
 import * as Atom from "effect/reactivity/Atom";
 import { useEffect, useMemo } from "react";
 
+import { browserCalculatorToolsAtom } from "./browser-tools.atoms";
 import { calculationFailureMessage } from "./calculation-failure";
 import {
   calculateAtom,
+  calculatorPageAtoms,
   editTakeHomeAtom,
-  formErrorAtom,
-  showCalculationAtom,
-  showServerResultAtom,
   submitTakeHomeAtom,
   takeHomeFormAtom,
 } from "./calculator.atoms";
@@ -28,6 +29,15 @@ export const TakeHomeCalculator = ({
 }: {
   readonly submission: Option.Option<typeof WebsiteSubmission.Type>;
 }) => {
+  const atoms = useMemo(
+    () => calculatorPageAtoms(AuPayCalculatorId.make("au.pay.take-home")),
+    []
+  );
+  const browserTools = useMemo(
+    () =>
+      browserCalculatorToolsAtom(AuPayCalculatorId.make("au.pay.take-home")),
+    []
+  );
   const saved = submission.pipe(
     Option.filter((value) => value.calculatorId === "au.pay.take-home")
   );
@@ -37,15 +47,33 @@ export const TakeHomeCalculator = ({
       Option.filter(Schema.is(TakeHomeForm)),
       Option.match({
         onNone: () => [],
-        onSome: (form) => [[takeHomeFormAtom, form]],
+        onSome: (form) => [[atoms.form, form]],
       })
     )
   );
+  useAtomInitialValues([
+    [
+      atoms.savedReport,
+      saved.pipe(
+        Option.flatMap((value) => Result.getSuccess(value.result)),
+        Option.map((value) => value.report)
+      ),
+    ],
+    [
+      atoms.savedMessage,
+      saved.pipe(
+        Option.flatMap((value) => Result.getFailure(value.result)),
+        Option.map(calculationFailureMessage)
+      ),
+    ],
+  ]);
+  const controlBrowserTools = useAtomSet(browserTools);
+  useEffect(() => {
+    controlBrowserTools("register");
+    return () => controlBrowserTools(Atom.Interrupt);
+  }, [controlBrowserTools]);
   const form = useAtomValue(takeHomeFormAtom);
-  const calculation = useAtomValue(calculateAtom);
-  const showServerResult = useAtomValue(showServerResultAtom);
-  const showCalculation = useAtomValue(showCalculationAtom);
-  const formError = useAtomValue(formErrorAtom);
+  const view = useAtomValue(atoms.view);
   const edit = useAtomSet(editTakeHomeAtom);
   const submit = useAtomSet(submitTakeHomeAtom);
   const controlCalculation = useAtomSet(calculateAtom);
@@ -53,66 +81,13 @@ export const TakeHomeCalculator = ({
     () => () => controlCalculation(Atom.Interrupt),
     [controlCalculation]
   );
-  const report = useMemo(
-    () =>
-      AsyncResult.value(calculation).pipe(
-        Option.map((value) => value.report),
-        Option.orElse(() =>
-          saved.pipe(
-            Option.flatMap((value) => Result.getSuccess(value.result)),
-            Option.map((value) => value.report)
-          )
-        ),
-        Option.filter(Schema.is(TakeHomePayReport))
-      ),
-    [calculation, saved]
-  );
-  const stale =
-    Option.isSome(report) &&
-    !showServerResult &&
-    (!showCalculation ||
-      calculation.waiting ||
-      !AsyncResult.isSuccess(calculation) ||
-      Option.isSome(formError));
-  const message = useMemo(() => {
-    if (Option.isSome(formError)) {
-      return formError;
-    }
-    if (
-      showCalculation &&
-      !calculation.waiting &&
-      (AsyncResult.isFailure(calculation) ||
-        (AsyncResult.isSuccess(calculation) && Option.isNone(report)))
-    ) {
-      return AsyncResult.isFailure(calculation)
-        ? calculation.cause.pipe(
-            Cause.findErrorOption,
-            Option.map(calculationFailureMessage)
-          )
-        : Option.some("The calculation could not finish. Please try again.");
-    }
-    if (showServerResult) {
-      return saved.pipe(
-        Option.flatMap((value) => Result.getFailure(value.result)),
-        Option.map(calculationFailureMessage)
-      );
-    }
-    return Option.none<string>();
-  }, [
-    formError,
-    showCalculation,
-    calculation,
-    showServerResult,
-    saved,
-    report,
-  ]);
   return (
     <TakeHomeFormView
       form={form}
-      busy={showCalculation && calculation.waiting}
-      message={Option.getOrUndefined(message)}
-      report={report}
-      stale={stale}
+      busy={view.busy}
+      message={Option.getOrUndefined(view.message)}
+      report={view.report.pipe(Option.filter(Schema.is(TakeHomePayReport)))}
+      stale={view.stale}
       onEdit={edit}
       onCalculate={() => submit("calculate")}
     />

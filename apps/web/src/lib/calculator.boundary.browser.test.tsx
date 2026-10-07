@@ -1,4 +1,4 @@
-import { RegistryContext } from "@effect/atom-react";
+import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import { describe, expect, it } from "@effect/vitest";
 import {
   CalculatorRpcUnavailable,
@@ -20,21 +20,28 @@ import {
   PayWithholdingsLedger,
   TakeHomePayReport,
 } from "@taxkit/rules-au-pay/schemas";
-import { Effect, Layer, Option, Ref, Result, Schema } from "effect";
+import { Array, Effect, Layer, Option, Ref, Result, Schema } from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
+import { useEffect } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { vi } from "vitest";
 
 import {
   calculateAtom,
+  calculatorPageAtoms,
   calculatorRuntime,
   editTakeHomeAtom,
   publicSettingsAtom,
   submitTakeHomeAtom,
+  takeHomeFormAtom,
 } from "./calculator.atoms";
-import { initialTakeHomeForm, takeHomeRequestFromForm } from "./form.boundary";
+import {
+  initialTakeHomeForm,
+  takeHomeRequestFromForm,
+  TakeHomeForm,
+} from "./form.boundary";
 import {
   WebsitePublicSettings,
   WebsiteSubmission,
@@ -222,7 +229,7 @@ describe("browser calculator lifetime", () => {
       }).pipe(Effect.scoped)
   );
 
-  it.effect.each([
+  it.live.each([
     {
       error: new CalculatorRpcUnavailable(),
       message: "Check your details",
@@ -253,33 +260,52 @@ describe("browser calculator lifetime", () => {
       Effect.gen(function* () {
         const called = vi.fn();
         const errors = vi.fn();
-        const client = Layer.succeed(
+        const hydrated = vi.fn();
+        const HydrationComplete = () => {
+          useEffect(hydrated, []);
+          return null;
+        };
+        const restoredForm = TakeHomeForm.make({
+          grossDollars: "2000",
+          period: "fortnightly",
+          taxFreeThresholdClaimed: false,
+        });
+        const client = Layer.effect(
           TaxKitRpcClient,
-          TaxKitRpcClient.of({
-            calculate: Effect.fn("TaxKitRpcClient.calculate")(() =>
-              Effect.sync(called).pipe(Effect.andThen(Effect.fail(error)))
-            ),
-            getCalculator: () =>
-              Effect.die("Metadata not used by this fixture"),
-            getCalculatorGraph: () =>
-              Effect.die("Metadata not used by this fixture"),
-            getCalculatorSchema: () =>
-              Effect.die("Metadata not used by this fixture"),
-            listCalculators: () =>
-              Effect.die("Catalogue not used by this fixture"),
-            listFacts: () => Effect.die("Metadata not used by this fixture"),
-            listJurisdictions: () =>
-              Effect.die("Metadata not used by this fixture"),
-            listRules: () => Effect.die("Metadata not used by this fixture"),
-            listTaxYears: () => Effect.die("Metadata not used by this fixture"),
-          })
+          Effect.yieldNow.pipe(
+            Effect.as(
+              TaxKitRpcClient.of({
+                calculate: Effect.fn("TaxKitRpcClient.calculate")((request) =>
+                  Effect.sync(() => called(request)).pipe(
+                    Effect.andThen(Effect.fail(error))
+                  )
+                ),
+                getCalculator: () =>
+                  Effect.die("Metadata not used by this fixture"),
+                getCalculatorGraph: () =>
+                  Effect.die("Metadata not used by this fixture"),
+                getCalculatorSchema: () =>
+                  Effect.die("Metadata not used by this fixture"),
+                listCalculators: () =>
+                  Effect.die("Catalogue not used by this fixture"),
+                listFacts: () =>
+                  Effect.die("Metadata not used by this fixture"),
+                listJurisdictions: () =>
+                  Effect.die("Metadata not used by this fixture"),
+                listRules: () =>
+                  Effect.die("Metadata not used by this fixture"),
+                listTaxYears: () =>
+                  Effect.die("Metadata not used by this fixture"),
+              })
+            )
+          )
         );
         const submission = yield* Schema.encodeEffect(
           WebsiteSubmissionTransport
         )(
           WebsiteSubmission.make({
             calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
-            form: initialTakeHomeForm,
+            form: restoredForm,
             result: Result.fail(error),
           })
         );
@@ -287,8 +313,13 @@ describe("browser calculator lifetime", () => {
           Effect.sync(() =>
             AtomRegistry.make({
               initialValues: [[calculatorRuntime.layer, client]],
+              scheduleTask,
             })
           ),
+          (value) => Effect.sync(() => value.dispose())
+        );
+        const serverRegistry = yield* Effect.acquireRelease(
+          Effect.sync(() => AtomRegistry.make()),
           (value) => Effect.sync(() => value.dispose())
         );
         const restored = yield* Schema.decodeEffect(WebsiteSubmissionTransport)(
@@ -297,17 +328,29 @@ describe("browser calculator lifetime", () => {
         const view = (
           <RegistryContext.Provider value={registry}>
             <TakeHomeCalculator submission={Option.some(restored)} />
+            <HydrationComplete />
           </RegistryContext.Provider>
         );
         const host = yield* Effect.acquireRelease(
           Effect.sync(() => {
             const element = document.createElement("div");
-            element.insertAdjacentHTML("afterbegin", renderToString(view));
+            element.insertAdjacentHTML(
+              "afterbegin",
+              renderToString(
+                <RegistryContext.Provider value={serverRegistry}>
+                  <TakeHomeCalculator submission={Option.some(restored)} />
+                </RegistryContext.Provider>
+              )
+            );
             document.body.appendChild(element);
             return element;
           }),
           (element) => Effect.sync(() => element.remove())
         );
+        // A first render may be abandoned before React subscribes. Exercise
+        // registry cleanup before the real client mount; the server is separate.
+        yield* Effect.sync(() => renderToString(view));
+        yield* Effect.sleep("100 millis");
         yield* Effect.acquireRelease(
           Effect.sync(() =>
             hydrateRoot(host, view, {
@@ -318,13 +361,32 @@ describe("browser calculator lifetime", () => {
           (value) => Effect.sync(() => value.unmount())
         );
         yield* Effect.promise(() =>
-          expect
-            .poll(() => host.querySelector('[role="alert"]')?.textContent)
-            .toContain(message)
+          expect.poll(() => hydrated.mock.calls.length).toBe(1)
+        );
+        // Check after client hydration and queued idle cleanup, not just SSR HTML.
+        yield* Effect.sleep("100 millis");
+        expect(host.querySelector('[role="alert"]')?.textContent).toContain(
+          message
         );
         expect(called).not.toHaveBeenCalled();
         expect(errors).not.toHaveBeenCalled();
         expect(host.textContent).not.toContain("Take-home pay:");
+        const page = calculatorPageAtoms(
+          AuPayCalculatorId.make("au.pay.take-home")
+        );
+        expect(registry.get(page.view).form).toEqual(restoredForm);
+        expect(registry.get(takeHomeFormAtom)).toEqual(restoredForm);
+        const amount = host.querySelector('input[name="grossDollars"]');
+        expect(amount?.getAttribute("value")).toBe("2000");
+        registry.set(submitTakeHomeAtom, "calculate");
+        yield* Effect.promise(() =>
+          expect.poll(() => called.mock.calls.length).toBe(1)
+        );
+        expect(
+          yield* Array.head(called.mock.calls).pipe(Effect.fromOption)
+        ).toEqual([
+          yield* Effect.fromResult(takeHomeRequestFromForm(restoredForm)),
+        ]);
       }).pipe(Effect.scoped)
   );
 

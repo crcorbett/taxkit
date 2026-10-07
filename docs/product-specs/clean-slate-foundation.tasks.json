@@ -210,7 +210,9 @@
         "bun run verification",
         "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
       ],
-      "browserVerification": [],
+      "browserVerification": [
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
+      ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
         "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
@@ -278,7 +280,8 @@
         "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
       ],
       "browserVerification": [
-        "Qualify Atom server rendering/hydration, scheduled/cancelled updates, rapid input changes, strict-mode remount and final disposal on the selected React/Scheduler graph."
+        "Qualify Atom server rendering/hydration, scheduled/cancelled updates, rapid input changes, strict-mode remount and final disposal on the selected React/Scheduler graph.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -378,7 +381,8 @@
         "Exercise initial render and client navigation against the matching local API.",
         "Check actual post-initialisation Worker startup, browser CORS, full response decoding, slow headers/stalled bodies, abort, route change and unmount.",
         "Inspect the production browser bundle for server/Alchemy/provider credentials or live domain implementations.",
-        "Use the actual generated RPC client and native POST/JSON server through browser URL and private server binding. Prove expected error/hydration round-trip, bad valid-JSON reply, unrelated adapter defect, version skew, malformed envelopes/unknown tags/invalid IDs, sensitive sentinels in all native reply/log/trace paths, and abort during complete body decoding."
+        "Use the actual generated RPC client and native POST/JSON server through browser URL and private server binding. Prove expected error/hydration round-trip, bad valid-JSON reply, unrelated adapter defect, version skew, malformed envelopes/unknown tags/invalid IDs, sensitive sentinels in all native reply/log/trace paths, and abort during complete body decoding.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -455,7 +459,8 @@
       "browserVerification": [
         "Exercise each supported calculator with representative valid and invalid values, all states, keyboard/focus and accessible result announcements.",
         "Check latest-input-wins, cancelled calculations, navigation/unmount cleanup, no saved figures and no figures in URL/history/share metadata.",
-        "Prove explicit Calculate, stale-answer indication and cancellation on edits, accessible expandable breakdown/assumptions/sources and supported-year visibility, without exporting input or trace values to telemetry."
+        "Prove explicit Calculate, stale-answer indication and cancellation on edits, accessible expandable breakdown/assumptions/sources and supported-year visibility, without exporting input or trace values to telemetry.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -540,7 +545,8 @@
       ],
       "browserVerification": [
         "Verify public docs/navigation, search, Markdown negotiation/explicit links, crawler-readable rendering, canonicals and share previews on actual local routes.",
-        "Check draft exclusion and removal of authored MDX syntax while preserving useful fenced code examples; valid image output/size/cache, mobile/keyboard behaviour and old useful URL redirects."
+        "Check draft exclusion and removal of authored MDX syntax while preserving useful fenced code examples; valid image output/size/cache, mobile/keyboard behaviour and old useful URL redirects.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -621,7 +627,9 @@
       "browserVerification": [
         "Exercise browser tools with the supported experimental browser/agent when available, including visible form changes and results.",
         "Verify fallback in an unsupported browser, cleanup after navigation, cancellation and equivalent results to manual UI/API.",
-        "Run a real MCP client for each advertised adapter: current-version per-request metadata/list/read/call; older-version initialise/session/list/read/call. Prove version/header agreement, unsupported versions, origins/rates, real Worker session routing/expiry, streaming cancellation and cleanup; persist no tax figures in session metadata."
+        "Run a real MCP client for each advertised adapter: current-version per-request metadata/list/read/call; older-version initialise/session/list/read/call. Prove version/header agreement, unsupported versions, origins/rates, real Worker session routing/expiry, streaming cancellation and cleanup; persist no tax figures in session metadata.",
+        "Restore checked server form/report/error through a paused first React render and completed hydration with a separate client registry; preserve retained answers and guidance without replay, then prove the next explicit request uses the restored form.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -679,7 +687,9 @@
         "bun run verification",
         "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
       ],
-      "browserVerification": [],
+      "browserVerification": [
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
+      ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
         "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
@@ -739,7 +749,8 @@
       "browserVerification": [
         "Inspect actual latest-SDK batches for only accepted page/calculator properties, no amounts/results/queries and no extra SDK endpoints.",
         "Prove initial/client navigation counts including A-to-B-to-A, one successful-use event per action across UI/WebMCP/API/MCP, no event on failure/cancellation, and backend browser opt-out.",
-        "Check denied storage, DNT before/after acquisition, ordinary Preview/development off, cleanup and relay size/deadline/status/redirect failures."
+        "Check denied storage, DNT before/after acquisition, ordinary Preview/development off, cleanup and relay size/deadline/status/redirect failures.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -800,7 +811,8 @@
       "browserVerification": [
         "Check actual request/render/response/cancellation lifetime and flush ownership without delaying or failing normal pages for telemetry.",
         "Send synthetic marker figures through valid POSTs, rejected URLs/queries and upstream failures; inspect all signal payloads for leaks.",
-        "Reconcile sequential and burst logs/metrics, parented safe spans and exact project/app/stage filters; record sampling/series/delivery limits."
+        "Reconcile sequential and burst logs/metrics, parented safe spans and exact project/app/stage filters; record sampling/series/delivery limits.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -880,7 +892,8 @@
       "browserVerification": [
         "Run all accepted local journeys on the final source/artifact, including crawler-visible docs, calculator forms, MCP/WebMCP and analytics privacy.",
         "After explicit provider authority, verify exact Preview artifact identity and independent PostHog/Axiom readback; verify DNS/TLS/canonical www/API behaviour after any approved domain apply.",
-        "Keep Production, package publication and future returning-visitor accuracy outside any local-only proof."
+        "Keep Production, package publication and future returning-visitor accuracy outside any local-only proof.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",

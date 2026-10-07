@@ -78,8 +78,8 @@ records command outcomes and log digests.
 | T002 / DEV-73 | Complete locally; review outstanding | Exact dependency graph, complete strict enforcement, native lifetimes/browser evidence and source review pass. New-commit hosted proof is separate; Linear status is unchanged. |
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
-| T005 / DEV-76 | In progress | All 61 accepted pages, navigation, search, discovery, both Markdown representations and share images are locally qualified in draft #155. Current release/Quality replacement checks are the next candidate. Old app/build/operation retirement remains unfinished; metrics are deferred. |
-| T006 / DEV-77 | Pending T004/T005 | Remote MCP and page-owned browser tools. |
+| T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
+| T006 / DEV-77 | In progress | Modern remote tools are locally tested in draft #156 with exact-head hosted Quality. Browser tools, saved-state and page-description lifetimes passed the complete local nine-check graph; tested draft delivery remains next. Older sessions, remote cancellation and public setup remain unfinished. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
@@ -4793,3 +4793,165 @@ the immediate delivery step. T006 stays in progress: older Worker session
 routing/expiry, real network cancellation, page-owned browser tools and public
 setup content are still unfinished. No provider apply, merge, deployment,
 publication or deferred metrics change occurred.
+
+
+## 2026-10-07 — T006 browser tool implementation begins
+
+Modern remote-tool commit `4b349e0d1605687d0c5670af3edcd4ffdb82481e` is pushed
+to draft #156, stacked on #155. Its exact remote head, draft title/body/base
+and clean checkout were read back; DEV-77 progress comment
+`53a730de-dcfc-4721-8032-e86546a4aa07` was posted and independently read back.
+Hosted Quality run `37554420197` is still running. Local nine-check success
+does not establish its result or a deployed endpoint.
+
+Continue on `codex/dev-77-browser-tools` from that exact commit. Browser tools
+will discover the visible calculator catalogue and read/fill/calculate/read
+results through the page's existing commands and React registry. They must not
+call a second backend client, calculate tax locally, calculate on registration
+or save figures. Current checked Website origin controls registration. Each
+page owns registration and unfinished tool calls; leaving it removes the tools
+and interrupts their work. Unsupported browsers remain ordinary absence.
+
+Private probes used real Chrome for Testing 153.0.8010.12 on localhost. Its
+experimental WebMCP feature is absent by default and available when enabled.
+A same-origin caller and the native developer-tools caller both discovered
+and ran actual registered tools, with a visible input change. That browser's
+document caller expects JSON text; the native developer-tools caller accepts
+structured input. Registration removal does not cancel unfinished execution;
+a separate invocation signal reaches cleanup. These fixtures establish host
+behaviour only, not a TaxKit browser-agent journey. Current Chrome guidance,
+version-specific Chromium source, the Effect and Alchemy reference repositories
+and installed receiving APIs were checked before choosing this method.
+
+Select exact type-only `webmcp-types` 0.1.10; its official archive hash was
+verified again before implementation. Its caller typing describes newer object
+input, so real Chrome153 qualification uses the installed Playwright developer-
+tools protocol types and actual native invocation, rather than casting browser
+input or inventing compatibility. No existing dependency upgrade is authorised.
+
+Documentation impact: **Change required** for page/command/lifetime owners,
+Website guide, frontend/test architecture, current browser journey, public agent
+setup after caller proof, exact decoder/encoder/host lint permissions and actual
+CLI fixtures, active intent and dated proof/index. **Preserve** retained tax
+reports/rules, ordinary HTML/manual commands, canonical accepted content beyond
+approved setup claims, shared RPC/calculation policy, native remote checkpoint,
+original recovery evidence and disabled collection. **N/A** for a Changeset
+while only private app code and a type-only test/build dependency change. No
+merge, deployment, publication, provider apply or metrics work is included.
+T006 remains in progress; older session routing/expiry and real network
+cancellation are separate required work.
+
+
+## 2026-10-07 — T006 visible browser caller qualification
+
+Hosted Quality run `37554420197` completed successfully for exact remote-tool
+commit `4b349e0d1605687d0c5670af3edcd4ffdb82481e` in draft #156. This readback
+qualifies that earlier head, not the current browser source or deployment.
+
+The browser candidate now uses one shared page form/report/error state and the
+existing visible edit/submit commands. Native Toolkit owns five commands and
+JSON output. One concrete host boundary preserves the original receiver,
+checks exact origin/capability and uses a registration-scoped FiberSet callback
+bridge. Native registration is explicitly started/interrupted by the container;
+deferred registry cleanup was too late when two pages used the same tool names.
+A retained checked request identity and per-invocation subscription prevent old
+calls returning a newer answer or cancelling newer unfinished work.
+
+Actual Chrome153 native developer-tools invocation passed catalogue/form reads,
+default take-home calculation, annual fill/calculate/read, equality after a real
+manual RPC response, excess-input rejection without another request, stale
+answer retention, busy rejection, caller abort, edit interruption, successful
+manual retry and route removal/cancellation. Controlled host checks separately
+cover absence, unsupported/wrong origin, receiver preservation, independent
+refusal, stalled registration and safe failures. This proves actual native
+protocol calls controlled by the test, not an autonomous model session.
+
+Receiving Effect 4.0.0 accepts excess keys for an empty Struct. Native
+`Tool.EmptyParams` now owns one unknown ingress decode and checked host metadata.
+The installed FnContext has no typed once/resultOnce operations; native registry
+operations own reads and fresh result waits. A writable form projection must
+not receive saved initial values directly: its underlying form can stay at the
+default. The home container seeds the owning page form. Hydration now proves a
+different amount, period and threshold agrees with visible fields/shared state
+and the next explicit request. These findings are promoted into current owner
+and direct tests rather than treated as passed protocol or UI proof.
+
+The dated browser receipt records sources, actual checks and proof limits.
+Documentation impact is **Change required** for Website/frontend/test/tooling
+owners, current journey, active intent and proof/index; **Preserve** for ordinary
+manual/HTML behaviour, retained tax rules/results, existing allowance/RPC,
+accepted public content, canonical skills, original recovery history and disabled
+collection. **N/A** for a Changeset: private app plus type-only dependency, no
+public package contract change. The existing native-pair and release operations
+remain the owners. Complete frozen qualification, primary review and tested
+commit/push/draft delivery remain next. Older remote sessions, actual remote
+cancellation and public setup still prevent whole T006 acceptance.
+
+
+## 2026-10-07 — Saved page state correction before browser delivery
+
+The first full browser candidate graph failed complete verification: saved
+reports/errors disappeared after built-page hydration. All twenty-five frozen
+sources still matched. Private fixed-flag diagnostics confirmed that checked
+submission data reached the browser, then the registry removed the unobserved
+page view and its seeded parents before React subscribed. The once-only hook
+then ignored re-seeding. Those temporary diagnostics are removed.
+
+The original focused test reused a server/client registry and could inspect SSR
+HTML too early. The stronger direct test uses a separate server, an unobserved
+first client render and cleanup, an actual hydration effect, and another idle
+interval. All nine saved errors failed before the correction. Keeping the shared
+page view alive for the root registry retains its checked form/outcome parents
+and fixes the loading race without another calculator or browser storage. Page
+cleanup still cancels work and removes tools; root disposal releases the values
+and client. This deliberate in-memory lifetime is recorded in the frontend owner.
+
+All twenty-one focused browser tests and thirteen actual built-app cases across
+nine files now pass, including distinct saved figures, retained reports, safe
+errors, manual/browser calls, cancellation and route changes. The first full
+graph and direct failures remain in the dated receipt. The corrected candidate
+still needs the complete frozen graph and tested commit/push/draft delivery.
+DEV-77 stays In Progress, metrics stay deferred and retained tax results remain
+unchanged. No external availability or production proof is claimed.
+
+
+## 2026-10-07 — Page description identity after browser memory cleanup
+
+Primary review found another lifetime defect before browser delivery. The root
+registry retained the view and its values, but the weak family could still lose
+the grouping object after leaving a page. Returning then created a new group
+with default fields while the old registry values remained. Earlier focused
+checks retained the description while mounted and did not force collection
+between visits. The second full graph was interrupted after seven successful
+ordered stages; all twenty-eight frozen sources matched. That partial result
+is not complete qualification.
+
+The actual native caller now leaves the annual calculator, forces Chrome garbage
+collection and returns. Before the correction the form reset from 77000 to
+67000. The same check passes after the retained view reads through its immutable
+description group. Fields, shared form and retained stale report survive without
+another RPC request. This uses the existing weak family and root registry;
+there is no custom cache, persistent store or extra runtime. Page cleanup still
+removes registrations and interrupts unfinished work, and root disposal releases
+the in-memory values and scoped client.
+
+Types, lint, all twenty-one focused browser checks, a fresh native build and the
+native return-after-collection caller passed. The current journey, task checks,
+frontend and Website owners record both value and description lifetimes.
+The corrected source c still needs the complete frozen nine-check graph and
+tested commit/push/draft delivery. T006 remains in progress.
+
+
+The frozen visible-browser source passed all nine ordered local CI-mode checks
+in 888.5 seconds. All eighteen exact returned stdout/stderr
+artifacts were read and hashed; all 28 frozen sources matched after the graph.
+Complete verification and the final fresh native app check both passed thirteen
+cases across nine files. The dated browser receipt owns the saved-state lifetime correction, sources, primary review,
+failed focused attempts, corrections and exact detail/check identities.
+
+This proof/plan closure is separately checked metadata. Tested commit/push and
+reviewable draft delivery stacked on #156 remain immediate work. The broader
+T006 task stays in progress for older remote sessions, actual remote cancellation
+and qualified public setup. Browser proof is native caller execution controlled
+by the test, not an autonomous model session, deployment or public availability.
+Metrics collection remains disabled and its approach deferred.

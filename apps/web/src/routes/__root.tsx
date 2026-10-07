@@ -11,7 +11,10 @@ import type { CalculatorCatalogResponse } from "@taxkit/api-rpc/schemas";
 import { Array, Option, Result, Schema } from "effect";
 import { createContext, useMemo } from "react";
 
-import { publicSettingsAtom } from "#/lib/calculator.atoms";
+import {
+  publicSettingsAtom,
+  websiteCatalogueAtom,
+} from "#/lib/calculator.atoms";
 import type { RouterContext } from "#/lib/route-context";
 import {
   WebsiteSettingsTransport,
@@ -82,7 +85,10 @@ const RootComponent = () => {
   return (
     <RegistryProvider
       key={checked.apiOrigin.href}
-      initialValues={[[publicSettingsAtom, Option.some(checked)]]}
+      initialValues={[
+        [publicSettingsAtom, Option.some(checked)],
+        [websiteCatalogueAtom, catalogue],
+      ]}
     >
       <WebsiteSubmissionContext.Provider value={submission}>
         <WebsiteCatalogueContext.Provider value={catalogue}>

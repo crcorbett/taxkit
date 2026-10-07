@@ -232,7 +232,7 @@ copying its build ID. Unknown IDs, extra path parts and missing IDs get empty
 404 responses before TanStack lookup; its native lookup otherwise logs unknown
 IDs even when the response body hides them.
 
-The answer container uses native `AsyncResult.value` to retain the last success
+The shared calculator page state uses native `AsyncResult.value` to retain the last success
 through refresh, failure and interruption. Submit does not reset that history.
 A checked server-submitted answer supplies the fallback before the first browser
 success. The readonly leaf renders a named semantic `output` with an atomic
@@ -260,11 +260,20 @@ Form validation errors still appear immediately without sending a request.
 
 The root Website bootstrap also restores the checked API catalogue. Navigation
 uses its titles, identities and context rather than a parallel local list.
-The additional calculator route selects only its own successful report; the
-container receives that checked report and owns form/work/error policy. Each
-calculator's description group is retained by React while mounted because
-`Atom.family` uses weak references. The registry owns the group's transient
-values and execution. Saved submission admission checks calculator identity,
+The additional calculator route restores only its own checked server report;
+the shared page state owns later browser reports and form/work/error policy. Each
+calculator's description group is weakly cached by `Atom.family`. The registry
+owns its transient values and execution. The shared page view uses
+`Atom.keepAlive` for the root registry's lifetime and its read callback holds
+the whole immutable description group. Holding only individual members would
+let browser memory cleanup remove the group and create a second description
+on a return visit, leaving the old values behind. This retains both page
+identity and checked form/outcome parents when a first
+React render pauses before subscriptions attach. Once-only initial-value hooks
+cannot restore values that registry cleanup has already removed. Page cleanup
+still interrupts calculations and browser callbacks; root disposal releases
+in-memory snapshots and the scoped client. No browser storage is added.
+Saved submission admission checks calculator identity,
 form shape and successful report shape together. No personal figure reaches
 navigation, page metadata, browser storage or a query string.
 
@@ -276,27 +285,67 @@ OpenAPI and calculator metadata; they do not imply finished remote MCP or
 content discovery.
 
 
-The registry provider seeds public settings only. Each feature container uses
-`useAtomInitialValues` for its checked saved form before reading form state.
+The registry provider seeds checked public settings and the catalogue. Each
+feature container uses `useAtomInitialValues` for its checked saved form on
+the owning page form atom before reading form state. Seeding a narrowed writable
+projection directly can leave its underlying form at the default amount.
 The route still owns transport restoration and result selection; this hook
 adds no decoder or transport. Provider options apply only on its first render,
 so saved form restoration must not depend on re-supplying those options.
 The native fixture uses different saved figures from initial examples and
-checks server HTML, hydrated fields, retained reports and no replay.
+checks server HTML, hydrated fields, retained reports and no replay. A focused
+browser fixture uses separate server/client registries, deliberately exercises
+an unobserved first render and cleanup, then waits for client mounting and idle
+cleanup before asserting the restored guidance and next explicit request.
+The native caller also leaves the annual page, forces actual browser garbage
+collection and returns. Visible fields, the shared result and the retained stale
+answer must still agree without another RPC request.
 The Website also has a keyboard skip link, one main landmark, current-page
 navigation, spaced controls and visible keyboard focus.
 
+
+## Page-owned browser tools
+
+`WebsiteBrowserToolkit` describes the five visible calculator commands separately
+from the remote tools. Its arguments reuse the owning form Schema, its catalogue
+uses the API contract, and its results reuse `WebsiteCalculatorViewState`.
+That state also supplies the containers' readonly form/report/error presentation.
+Routes restore server outcomes; no route selects an independent client answer.
+
+The browser family holds one checked calculator description and uses the existing
+`calculatorRuntime.fn` registration command. Containers explicitly start it and
+send `Atom.Interrupt` on cleanup. Relying on deferred registry garbage collection
+for registration cleanup allowed the next page to collide with old tool names.
+The registration scope's `FiberSet.makeRuntimePromise` is the single callback
+bridge; it creates no independent ManagedRuntime or backend client. Each native
+method retains its original receiver and its own abortable two-second limit.
+
+One checked request object identifies each visible attempt. The handler waits for
+its fresh native Atom result, with a subscription owned by that invocation's
+scope. Edit, caller abort or page exit interrupts it. Cleanup cancels unfinished
+work only while that exact request still owns the page; no old callback can return
+a newer answer or cancel a newer manual request. The registration holds the
+attempt atom while idle so garbage collection cannot erase this identity.
+
+Installed Effect 4.0.0's empty Struct accepts excess keys. No-argument tools
+therefore decode unknown input once through native `Tool.EmptyParams`; host
+metadata advertises that checked empty-record shape. Native Toolkit owns ordinary
+JSON result encoding. The host boundary encodes only fixed safe failures.
+Requalify these choices when the receiving Effect or native browser contract
+changes. The [Website guide](../../apps/web/README.md#visible-calculator-browser-tools)
+and [dated receipt](../documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
+separate actual caller evidence from autonomous-agent or deployment claims.
 
 ## Native calculation rate admission
 
 The [Website owner](../../apps/web/README.md#native-calculation-rate-admission) captures checked original connection identity and uses the API's binding-only named operation for HTML forms. Browser calculations use public RPC. Both reach the same [calculator-owned allowance](../../packages/calculators/README.md#native-calculation-rate-admission), including separate batch members. Containers show fixed safe guidance with manual retry. This adds no calculation engine, stored figures, analytics identity or URL data to the Website. Private-call local cancellation and remote work limits remain distinct.
 
-T005 now supplies five checked documentation calls at the API/RPC owner. The
+T005 supplies five checked documentation calls at the API/RPC owner. The
 actual native pair test compares all accepted page values and exact Markdown
 through the documentation client, alongside the retained calculator journeys.
 The Website now connects these loaders and renders browser-safe compiled MDX
-presentation as described below. Share images and replacement qualification must
-finish before the retained docs app can retire.
+presentation as described below. The old app's retirement and original-source
+recovery record are retained separately; this does not establish provider retirement.
 
 ## Replacement Website documentation composition
 

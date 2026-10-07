@@ -1,0 +1,1240 @@
+{
+  "document_type": "proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-implementation-owner",
+  "last_reviewed": "2026-10-07",
+  "review_trigger": "Browser tool contracts, page state, native host/caller, scope, receiving APIs or qualification change",
+  "outcome": "Visible browser tools checkpoint passed the complete local nine-check graph; T006 remains in progress",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "scope": "Approved DEV-77 local implementation/checks, tested commit/push/draft PR and routine Linear tracking",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes",
+      "memory changes"
+    ],
+    "metrics": "Deferred; collection remains disabled"
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-77-browser-tools",
+    "baseCommit": "4b349e0d1605687d0c5670af3edcd4ffdb82481e",
+    "phase": "Frozen corrected browser source c passed complete local CI-mode graph; final proof/plan closure is separately checked metadata",
+    "sources": [
+      {
+        "path": "apps/web/README.md",
+        "sha256": "942ce993c3887ff04fbbe17ca4a1e0d6a3d048bfa1ca1ebcc8839249e28cf5dc"
+      },
+      {
+        "path": "apps/web/package.json",
+        "sha256": "96245085fd4ccba4a0093688af0327aa9c50e15b0af360e40de527bb5989d942"
+      },
+      {
+        "path": "apps/web/src/lib/browser-tools.atoms.ts",
+        "sha256": "ea465ae32e5acecc0f991036518bbdda57ef4d387e67abc1bee68c6ccf1ea443"
+      },
+      {
+        "path": "apps/web/src/lib/browser-tools.boundary.test.ts",
+        "sha256": "754d0d6656e6dcea6ff339eb7e8e318507e71c6ec36ce866f5df4ed584178b0a"
+      },
+      {
+        "path": "apps/web/src/lib/browser-tools.boundary.ts",
+        "sha256": "34a2fd27db38894679284c4b2ec18c051b6e415a68c96da64a0fd07a854809ad"
+      },
+      {
+        "path": "apps/web/src/lib/browser-tools.schemas.ts",
+        "sha256": "db8d193930a6456d69dee2f4c1c0f3c5fe1078d6e85ded5a612faad1456ff873"
+      },
+      {
+        "path": "apps/web/src/lib/browser-tools.toolkit.ts",
+        "sha256": "889a4e5e92b6a2c055bc81707bfc9a801bbe6ae4c832dc957d03dec7818a5ede"
+      },
+      {
+        "path": "apps/web/src/lib/calculator-page.container.tsx",
+        "sha256": "4b4f9ef071ba269acb61221c2be701a53e6cf254a5aa1b89dac0f8f933acaf7b"
+      },
+      {
+        "path": "apps/web/src/lib/calculator.atoms.ts",
+        "sha256": "4cdf86c71466e31bb761f4a71b2c745f1cb30535483db6a564d8ae07a866990d"
+      },
+      {
+        "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "sha256": "2fdb91f63779421eb01c8367f49fe67d754cf67a4f3fdff4d06638b5fd1503c8"
+      },
+      {
+        "path": "apps/web/src/lib/schemas.ts",
+        "sha256": "f40a9e435c31bf62a58607ceb09674acbac948b1064911b6690ea647e6564d02"
+      },
+      {
+        "path": "apps/web/src/lib/take-home.container.tsx",
+        "sha256": "296e0540f3672cb6d41ab458475c0cedf38a8aaef5fc20e78b1e7966a125b97a"
+      },
+      {
+        "path": "apps/web/src/routes/__root.tsx",
+        "sha256": "c564732990e1352b43127c864b0d244d5bc7d493d1bb665ed9eee753d660715d"
+      },
+      {
+        "path": "apps/web/src/routes/calculators.$calculatorId.tsx",
+        "sha256": "148b52da3518eb94b215f22c605b93cfe97d8e1b19b705601e5421d8cbb63bda"
+      },
+      {
+        "path": "apps/web/test/native-browser-tools.boundary.test.ts",
+        "sha256": "a980b95a7e8a27a355e13ec05dbe2ff9bc7852ae7f0185cd364ac3f1b7a21d1f"
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "5f51cf5a12d4cc705a50bb6a0a6f894f40a72372b0e800bd70df092f52f26c0e"
+      },
+      {
+        "path": "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "sha256": "6ee8ac93eb98937d772fff536786c0a52c21dfb906c5dde67058e05d713afa73"
+      },
+      {
+        "path": "apps/web/vitest.native.config.ts",
+        "sha256": "61c734c3cbd3a4493f9125fdf8b3d54ae6dbbd43a54bc998c421a023428decdc"
+      },
+      {
+        "path": "bun.lock",
+        "sha256": "b074ac52390345cccdc347bc8148256a4bb6d0baacd0ef37e6868544a5ff1f02"
+      },
+      {
+        "path": "docs/architecture/frontend.md",
+        "sha256": "ddb1bef555ea4220a8e6a920b97101be9487c9689e9013f78e7d3fb0dbf96f69"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "ddb3916b7744787d52878c961498260467630c2a949d329e1ae4f9a6c00cd3e8"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "64b269166c697c338090464cc3f30f41c651a6b2869441d1326b92038aaf757a"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "97597b647cd1532ced979d798462a3d1563b705f4971e6e55016b0cf196c9440"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "6a61fc380d82db7a941385d70b739c8059ccfc46c9c0556653310e829ec0c10e"
+      },
+      {
+        "path": "docs/standards/tooling.md",
+        "sha256": "060d984a43236743a023674fe9ecda3a931c0a67b2bf903deb6355d3f3ff1242"
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "1c7176e1361adb37c5ea254dfc7c5b283793862e41d1a895367ca950884b20b8"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "1b46c2d39331602c88bd24860f11996c760d68cd3987899a147a11d674a036f6"
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "ba479c11d783ad484878f286141893367cfe91f0cb2e9321d16d2e7153c2945a"
+      }
+    ]
+  },
+  "versions": {
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "webmcpTypes": "0.1.10 type-only",
+    "webmcpTypesTarballSha256": "cf3352075f4ff3e407c26dc3e6317914ae1dac55bdafb5302ddf142650456be6",
+    "playwright": "1.63.0",
+    "chromium": "153.0.8010.12 with WebMCP enabled in a disposable browser",
+    "node": "24.16.0",
+    "bun": "1.4.2",
+    "referenceEffect": "rc.112 at 2600f62f4532026928454dcea8d1c48557b3f942; guidance only",
+    "referenceAlchemy": "beta.75 at 808ef694b2e742a2bb76cb301da371e71421fa57; guidance only",
+    "dependencyAccounting": "Lockfile diff adds only webmcp-types 0.1.10; no existing resolved package changes"
+  },
+  "ownership": {
+    "contracts": "Five private concrete native Toolkit tools; canonical catalogue/form/report contracts and one shared WebsiteCalculatorViewState",
+    "runtime": "Existing React calculatorRuntime.fn; explicit register/Atom.Interrupt page lifecycle; one registration-scoped FiberSet callback bridge; shared page view retained until root registry disposal, with explicit page interruption; the retained view callback also holds the entire immutable weak-family group to preserve description identity after native GC",
+    "commands": "Current form edit/submit commands and existing checked RPC calculation; no duplicate backend client or engine",
+    "attempt": "Checked request object identity survives idle registration, gates reply ownership and limits cleanup to its unfinished work",
+    "subscriptions": "AtomRegistry.getResult and invocation-scoped AtomRegistry.toStream; no per-call subscribers retained for whole registration",
+    "host": "Lazy capability and exact checked origin; original native receiver; independently abortable two-second registration; twelve-second outer execution limit",
+    "codec": "Unknown decoded once to native Tool.EmptyParams; checked Schema.toType advertises empty-record metadata; Toolkit owns JSON results, exact host owns fixed failure egress",
+    "privacy": "In-memory page state only; no browser storage, automatic retries, calculation on read/mount or raw host/cause/input diagnostics"
+  },
+  "focusedChecks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "apps/web/src/lib/take-home.container.tsx",
+        "apps/web/src/routes/calculators.$calculatorId.tsx",
+        "apps/web/test/native-browser-tools.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "logId": "dev77-browser-restore-a-format.log",
+      "logSha256": "173776d33f06c62fe25db3c3b68961c446b97818df2af8947c7b97abb9d862a5"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.42,
+      "logId": "dev77-browser-restore-a-types.log",
+      "logSha256": "70a1a3d9ae45394a03b968d137528b193b1144624187c84a755668a25a5d2ed1"
+    },
+    {
+      "stage": "browser",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "test:browser"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.24,
+      "logId": "dev77-browser-restore-a-browser.log",
+      "logSha256": "8b5f116fd6f6685016889ac7fce8fa495a9247e759f6c7b96527587961dd43b4"
+    },
+    {
+      "stage": "native-build",
+      "command": [
+        "bun",
+        "run",
+        "build:native-pair"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 17.11,
+      "logId": "dev77-browser-native-l-native-build.log",
+      "logSha256": "8a4b99a7e9ba6fa6c32937fe5cb85da086260b49a5bec876b482c7571f10926d"
+    },
+    {
+      "stage": "native-browser",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "vitest.native.config.ts",
+        "test/native-browser-tools.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.12,
+      "logId": "dev77-browser-native-l-native-browser.log",
+      "logSha256": "50c6c2c9bf0108b4806bd77eebfd421e4bc1bfccc81a2ef683a10edae4ae3f16"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "apps/web/src/lib/browser-tools.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.07,
+      "logId": "dev77-browser-final-focused-c-format.log",
+      "logSha256": "6d6326ebe438e0b1b227081208793181c6df9c0f33c3f41abfcc512d4c5b7aed"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.94,
+      "logId": "dev77-browser-final-focused-c-lint.log",
+      "logSha256": "bbf2e6365f18123e9b8517a99225991ae91fb9951828019445b67b81cc492ecb"
+    },
+    {
+      "stage": "unit",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "test",
+        "src/lib/browser-tools.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.48,
+      "logId": "dev77-browser-final-focused-c-unit.log",
+      "logSha256": "0d4a315bab34cc84c6201df96968f189988fd29041f67401b038c4a12d5cd901"
+    },
+    {
+      "stage": "oxlint",
+      "command": [
+        "bun",
+        "run",
+        "test:oxlint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 71.4,
+      "logId": "dev77-browser-final-focused-c-oxlint.log",
+      "logSha256": "9aa35319c9a1521d476334f4604d2807148fe6e45857e222ea5f76d6c61e0fac"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.37,
+      "logId": "dev77-browser-preflight-a-docs.log",
+      "logSha256": "3f9e5585cf5c27f9f1fc3414f944efff61529e90e0a0e46872fb4b9523e5b2f1"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.17,
+      "logId": "dev77-browser-preflight-a-runbooks.log",
+      "logSha256": "6dd8dddf580be17e6002fa0f886395f28e23b1ddf366d4dede7debdf1e9507ce"
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.28,
+      "logId": "dev77-browser-preflight-a-paths.log",
+      "logSha256": "398c9402ce85a8fd3a4c05b60bf8d2efbcbbb0abca16a523ab61b3b1e35f6c3b"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.16,
+      "logId": "dev77-browser-preflight-a-types.log",
+      "logSha256": "eb9bb813885717f8ececa2edf03dcec69d9bf22a021d23f4f3f277f9ab00bdfd"
+    },
+    {
+      "stage": "format-source",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "apps/web/src/lib/calculator.atoms.ts",
+        "docs/verification/critical-journeys.json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.07,
+      "logId": "dev77-browser-preflight-b-format-source.log",
+      "logSha256": "3a04fc50edf9798096f36481f0b2798cb62411aac1ba01362600825efd54a595"
+    },
+    {
+      "stage": "production-unused",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.16,
+      "logId": "dev77-browser-preflight-b-production-unused.log",
+      "logSha256": "519cd8e004a69e36e58b90ba7596db87c6711e8e46f7323a30dcfb9469afc427"
+    },
+    {
+      "stage": "unused",
+      "command": [
+        "bun",
+        "run",
+        "knip"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.79,
+      "logId": "dev77-browser-preflight-b-unused.log",
+      "logSha256": "aa4b5f0e0a15ce13fd85b7e4f18abad1ebb72adc45a7dc90bd9e3a6d8f596058"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.69,
+      "logId": "dev77-browser-preflight-b-format.log",
+      "logSha256": "00c96ab8fecf37cd39424e1002542ac898ff3fd27754af62d4041c1fed07cc96"
+    },
+    {
+      "stage": "oxlint-types",
+      "command": [
+        "bun",
+        "run",
+        "check:oxlint:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "logId": "dev77-browser-preflight-b-oxlint-types.log",
+      "logSha256": "3c100a9e2e6a744113446098167923409d64177c2ffba4e2d117679645b0f951"
+    },
+    {
+      "stage": "browser",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "test:browser"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.62,
+      "logId": "dev77-browser-fresh-registry-b-browser.log",
+      "logSha256": "7a56f4a4f5acebc910ff7b5206aae1a4e2e6d7c2613e5c7d898d43d3d0681beb"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "apps/web/src/lib/calculator.atoms.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.07,
+      "logId": "dev77-browser-saved-lifetime-green-a-format.log",
+      "logSha256": "3a04fc50edf9798096f36481f0b2798cb62411aac1ba01362600825efd54a595"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.35,
+      "logId": "dev77-browser-saved-lifetime-green-a-types.log",
+      "logSha256": "8449f0f7637c9e0e00c1c69708d1d68c2de623bfceac0bb79c9acaba586b925b"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.54,
+      "logId": "dev77-browser-saved-lifetime-green-b-lint.log",
+      "logSha256": "abc4bedde9ccf57e350be5ce2f1d22ccd7cf6b161c703194e4f8ac636e2f7865"
+    },
+    {
+      "stage": "browser",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "test:browser"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.47,
+      "logId": "dev77-browser-saved-lifetime-green-b-browser.log",
+      "logSha256": "e41b8349a5105d62b7efd3d6e26f87a0dc568a106c1855e19e2d51e6e6d99d28"
+    },
+    {
+      "stage": "native-build",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "build:native-pair"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 16.75,
+      "logId": "dev77-browser-saved-lifetime-green-b-native-build.log",
+      "logSha256": "cbc214dc34c7626d45f878e7ff78dff91e3e961e2cc70f8b1cc6afd020b72e37"
+    },
+    {
+      "stage": "native-all",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "vitest.native.config.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 103.5,
+      "logId": "dev77-browser-saved-lifetime-native-a-native-all.log",
+      "logSha256": "246bf9586e8f65dea26637fa5524b93f56ee4a79aebcc4b3dc85e3cf261dd7fd"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "logId": "dev77-browser-corrected-preflight-b-docs.log",
+      "logSha256": "433ab2defa72d2d57ac4dc1cd0b0b81bfeabf3ca138f3987da4a3ec72ce4de3c"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.15,
+      "logId": "dev77-browser-corrected-preflight-b-runbooks.log",
+      "logSha256": "255112509ddab3eb170fe42d88fa3b443be4de305a65b35c2c2cf02cfefafb95"
+    },
+    {
+      "stage": "format-check",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.67,
+      "logId": "dev77-browser-corrected-preflight-b-format-check.log",
+      "logSha256": "8cee38e335e05565586184ec50753008788870350d5a2b220e5237ee8a5d1c40"
+    },
+    {
+      "stage": "unused",
+      "command": [
+        "bun",
+        "run",
+        "knip"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.1,
+      "logId": "dev77-browser-corrected-preflight-b-unused.log",
+      "logSha256": "31cd0297f0786f66bf66275f856fef2e79d04414d7b2d7d27ac506696119be33"
+    },
+    {
+      "stage": "unused-production",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.97,
+      "logId": "dev77-browser-corrected-preflight-b-unused-production.log",
+      "logSha256": "d13638d8b62fe2119c5f0d27aadee9a7c6e079c5a6e095fa044a745803e365b9"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "apps/web/src/lib/calculator.atoms.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.08,
+      "logId": "dev77-browser-description-green-c-format.log",
+      "logSha256": "8355c7907de3100ef63f1e95fb73a4872b56d692484c9a941587561c4a453762"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.42,
+      "logId": "dev77-browser-description-green-c-types.log",
+      "logSha256": "2f182bbac50ec458aa042d61b04ad9b795c80186091f2333dd659b88bdc298cd"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.4,
+      "logId": "dev77-browser-description-green-c-lint.log",
+      "logSha256": "7dd2e9019b61ecbd56d947b86d4c9fe4640ca5e79bcbac7bdaf1001a8ccdd881"
+    },
+    {
+      "stage": "browser",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "test:browser"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.39,
+      "logId": "dev77-browser-description-green-c-browser.log",
+      "logSha256": "c7f6ffcb9862ef13a2e01a5b99a134db83c51c1ee9eafe363d65284b2a3f2f50"
+    },
+    {
+      "stage": "native-build",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "build:native-pair"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 15.42,
+      "logId": "dev77-browser-description-green-c-native-build.log",
+      "logSha256": "b16e1cff3b07d76e6972da324fce82ae2a5968ef96cef50437052e0a71da0926"
+    },
+    {
+      "stage": "native-browser",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "vitest.native.config.ts",
+        "test/native-browser-tools.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.6,
+      "logId": "dev77-browser-description-green-d-native-browser.log",
+      "logSha256": "f7aba15a955b31c277e43101deae6c434d445ef28eed88286847e8e08bac4ec3"
+    },
+    {
+      "stage": "native-browser",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "vitest.native.config.ts",
+        "test/native-browser-tools.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.29,
+      "logId": "dev77-browser-description-green-e-native-browser.log",
+      "logSha256": "403e9856340c19b759f63482ee475c2497afbf665920a4934c81dbd11a3b8507"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "apps/web/src/lib/calculator.atoms.ts",
+        "apps/web/test/native-browser-tools.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.09,
+      "logId": "dev77-browser-description-preflight-c-format.log",
+      "logSha256": "f18f6fa25f37edd18cde1dd82602cefa9c0ed57e3a22871ab693b0b1f43aabc6"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.42,
+      "logId": "dev77-browser-description-preflight-c-docs.log",
+      "logSha256": "3439472650d673053ae67b91d16bcfe25dbfb7bcffe696e0bf90dc7796344912"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "logId": "dev77-browser-description-preflight-c-runbooks.log",
+      "logSha256": "785cfe5f5b67ee203ff0b354b94107fafff01d5ceebeed45ff1f57fe59eecab0"
+    },
+    {
+      "stage": "format-check",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.6,
+      "logId": "dev77-browser-description-preflight-c-format-check.log",
+      "logSha256": "a4b73d70c8817cdae264bdc6e623513d6843d19cf27b5c0f6a7470c796dcb30f"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "logId": "dev77-browser-description-preflight-c-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "observedPostconditions": [
+    "Actual Chrome native developer-tools caller discovers five tools without calculation",
+    "Catalogue read, visible default take-home calculation/read and annual fill/calculation/read use existing RPC",
+    "Annual 75000-dollar form returns retained 14788-dollar answer, equal to completed manual calculation",
+    "Excess no-argument fields reject with fixed invalid-input and no extra request",
+    "Edit retains stale answer; overlapping call is busy",
+    "Native caller abort and form edit interrupt unfinished calls; subsequent manual retry succeeds",
+    "Navigating to another calculator removes old five and registers new five; leaving calculators removes all five and interrupts unfinished execution",
+    "Different restored pay form agrees with displayed fields, shared page view and next explicit checked request"
+  ],
+  "receivingQualifications": [
+    "Empty Struct silently accepted excess fields in Effect 4.0.0; native EmptyParams ingress is required",
+    "FnContext installed types have no once/resultOnce methods; use typed registry operations",
+    "Deferred registry garbage collection allowed cross-page tool name collisions; explicit named register/Interrupt removes old tools on page cleanup",
+    "Unretained attempt atom lost identity between callbacks; hold it for registration lifetime",
+    "Seeding the home writable projection displayed restored fields without updating owning form; seed owning atoms.form and prove distinct restored amount/period/threshold",
+    "Chrome153 document caller shape differs from newer type-only declarations; actual proof uses installed developer-tools native caller types",
+    "Chrome153 removal alone does not stop native execution; invocation/page scopes must interrupt the owned callback",
+    "Unobserved first React rendering can collect seeded state before hydration subscribes; once-only useAtomInitialValues cannot reseed removed nodes. Retain the shared view for its root registry lifetime; page cleanup still interrupts work.",
+    "Installed Atom.family weakly caches its returned grouping object, not individual members. The root-retained view callback reads group.form and thus retains that immutable group; actual native HeapProfiler collection between route departure and return failed before and passed after this correction."
+  ],
+  "documentationImpact": {
+    "changeRequired": [
+      "Website guide",
+      "frontend and testing architecture",
+      "exact tooling admissions and real CLI fixtures",
+      "current critical journey",
+      "active plan",
+      "dated proof/index",
+      "T006 direct saved-hydration verification and current delivery ledger"
+    ],
+    "preserve": [
+      "retained tax rules and results",
+      "existing anonymous allowance and RPC",
+      "ordinary browser and HTML forms",
+      "accepted public content and navigation",
+      "native remote checkpoint and original recovery records",
+      "disabled metrics"
+    ],
+    "notApplicable": [
+      "New Changeset: private app/type-only dependency only; no public package contract or export changes",
+      "New operational procedure: existing native-pair and release commands unchanged",
+      "Canonical skill assets and root instructions unchanged"
+    ]
+  },
+  "qualification": {
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 888.5,
+    "mode": "Report-only local CI graph; no release attempt or publication claim",
+    "wrapperLogIdentity": {
+      "logId": "dev77-browser-frozen-release-c-release-graph.log",
+      "sha256": "225d7023e1e304bfd29fc5d906021ff5d3bf46cbd94de8509b3ee4ef04357be0",
+      "bytes": 5366
+    },
+    "checks": [
+      {
+        "id": "verification",
+        "target": "Canonical repository verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/verification-stdout-4NbH9R/80ee6a69970c.log",
+            "sha256": "b4c6548a3dad7e1a7dec9e2d0ed463eaf1f75d9f6b7741a24069a77dd4740be0",
+            "bytes": 519357
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/verification-stderr-KrjuhO/cbcf0ac8c2c0.log",
+            "sha256": "59504b0ca83995236774089abf8bb6719a8207c574d1bf0f530b68d2dd7badca",
+            "bytes": 2118
+          }
+        }
+      },
+      {
+        "id": "test",
+        "target": "Workspace tests including the direct calculator journey",
+        "command": [
+          "bun",
+          "run",
+          "test"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/test-stdout-scstLE/f88fc525d995.log",
+            "sha256": "ccf739711185faf4bdaec82e139479438eb54fe53832af6a34add5b828107618",
+            "bytes": 76341
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/test-stderr-JGBjUx/a8cb7a150cff.log",
+            "sha256": "a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8",
+            "bytes": 216
+          }
+        }
+      },
+      {
+        "id": "build",
+        "target": "Workspace production builds",
+        "command": [
+          "bun",
+          "run",
+          "build"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/build-stdout-lcwQlm/adc23fb2ffcf.log",
+            "sha256": "ffc8a45d22c8883f5534e1279772332dc5fee24c8a307bec519d1b0845fc900c",
+            "bytes": 87830
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/build-stderr-Vo733v/10566a79929e.log",
+            "sha256": "c7ae53061ae01873a9768eadfdff2c192fb4acbd5744d4eb0741e66c8469a052",
+            "bytes": 18
+          }
+        }
+      },
+      {
+        "id": "docs-validation",
+        "target": "Documentation content validation",
+        "command": [
+          "bun",
+          "run",
+          "docs:validate"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/docs-validation-stdout-Ak2l4q/db348b467672.log",
+            "sha256": "ea25683150e0634815ea8a8bf02f2c089714e07faffeb7f232b820384e518a9d",
+            "bytes": 2312
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/docs-validation-stderr-AUb7AL/63f7e66de7d3.log",
+            "sha256": "fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697",
+            "bytes": 51
+          }
+        }
+      },
+      {
+        "id": "packed-artifact",
+        "target": "Focused SDK packed artifact proof",
+        "command": [
+          "bun",
+          "run",
+          "sdk:check-packed-artifact"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/packed-artifact-stdout-BALzfN/9fb3567c74e7.log",
+            "sha256": "8c13eba79e391f6b56d9555d8b766a279b8940c1e292c3365cca07f4021ef251",
+            "bytes": 3781
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/packed-artifact-stderr-3aEIcV/52969f3fc5f1.log",
+            "sha256": "06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7",
+            "bytes": 55
+          }
+        }
+      },
+      {
+        "id": "downstream-consumer",
+        "target": "Strict downstream package proof",
+        "command": [
+          "bun",
+          "run",
+          "sdk:validate-downstream"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/downstream-consumer-stdout-j3sfLI/9049de0ce8fb.log",
+            "sha256": "a418923e6f1005c81c2fab7658daa67b509e4196ec8a0fd23e7abb9f3e0f9778",
+            "bytes": 13368
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/downstream-consumer-stderr-vHwdN1/75a099bf7563.log",
+            "sha256": "d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9",
+            "bytes": 53
+          }
+        }
+      },
+      {
+        "id": "api-smoke",
+        "target": "Public API smoke evidence",
+        "command": [
+          "bun",
+          "run",
+          "api:smoke"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/api-smoke-stdout-ipg4kU/7a8cccbc9627.log",
+            "sha256": "bd6ba370510152c32f9c2000c2739d3d449d2ae52e0a8e6293708bf15bbce6d3",
+            "bytes": 59981
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/api-smoke-stderr-ZWIgjj/170f940210d8.log",
+            "sha256": "1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87",
+            "bytes": 31
+          }
+        }
+      },
+      {
+        "id": "docs-browser",
+        "target": "Built native Website and documentation evidence",
+        "command": [
+          "bun",
+          "run",
+          "web:test:native-pair"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/docs-browser-stdout-fFYDAy/bd7ba8f7b65c.log",
+            "sha256": "3a5e83e1c724dba69d5049d1262f6a478bbd39a6309a9ab9321d9a04bf9ace3a",
+            "bytes": 71082
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/docs-browser-stderr-EYb0V4/28146412542b.log",
+            "sha256": "781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4",
+            "bytes": 82
+          }
+        }
+      },
+      {
+        "id": "changeset-status",
+        "target": "Pending release train status",
+        "command": [
+          "bun",
+          "run",
+          "changeset:status"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/changeset-status-stdout-TyloSc/36319d33b639.log",
+            "sha256": "51cd29b3890ef6c1fcd4f523839cb2e30de20b0d70ae93bb063b24c4eb02582e",
+            "bytes": 10039
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/changeset-status-stderr-EU9geO/31ac1cbedd1c.log",
+            "sha256": "26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3",
+            "bytes": 37
+          }
+        }
+      }
+    ],
+    "sourceReadback": {
+      "matched": 28,
+      "mismatches": [],
+      "afterWholeGraphBeforeClosure": true,
+      "preGraphProofIdentity": {
+        "path": "docs/documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json",
+        "sha256": "46b9c62985574301a6cc6aa9efb0792557ce17c1245feccacf08e0b221b07dcc"
+      },
+      "proofMatched": true
+    },
+    "nativePair": {
+      "files": 9,
+      "tests": 13,
+      "result": "All passed in complete verification and separate final built-app graph check"
+    }
+  },
+  "limitations": [
+    "Native protocol caller is controlled by Playwright; no autonomous model agent session",
+    "Experimental feature enabled only in disposable test browser; no general browser support claim",
+    "Older remote adapter sessions, actual remote network cancellation and public setup remain unfinished",
+    "No deployment, public availability, provider state, merge or publication proof"
+  ],
+  "rollback": "Restore this slice to base commit 4b349e0d1605687d0c5670af3edcd4ffdb82481e; local only, no provider rollback needed",
+  "remaining": [
+    "Commit/push/read back reviewable draft stacked on #156",
+    "Finish older MCP sessions, real remote cancellation and qualified public setup before T006 acceptance"
+  ],
+  "failedAttempts": [
+    {
+      "logId": "dev77-browser-final-focused-a-oxlint.log",
+      "sha256": "6b926e4ad018b409aedfe5ffdb3a9fd64dc8fbc3545e9095a50909d8a248cd4e",
+      "correction": "New saved-form assertion used unchecked mock-call indexing; replaced with Effect Array.head and explicit Option handling. All 612 real CLI cases now pass."
+    },
+    {
+      "logId": "dev77-browser-final-focused-b-lint.log",
+      "sha256": "78995f8786f9b38c3e5251b11882e7c7072d27ec81e9197b75eff8a32a70ba57",
+      "correction": "Controlled deadline gate used void/undefined rejected by existing lint; use a checked true gate and native Effect.asVoid at the host return. Full lint passes."
+    },
+    {
+      "logId": "dev77-browser-frozen-release-a-release-graph.log",
+      "sha256": "481194fa990e28edb6d5517b336c6e33018a77ca4cc8d9878a2caf4a57dad9ff",
+      "correction": "Complete verification failed on disappearing native saved reports/errors; all 25 frozen sources matched. Corrected the shared page snapshot lifetime and direct oracle; no full success inferred."
+    },
+    {
+      "logId": "dev77-browser-saved-report-diagnostic-a-native-pair.log",
+      "sha256": "3a10eb24885053e3d7cdc1b1f513ef4f4b780dc7b6b43d560e16c074ca262442",
+      "correction": "Exact failed built artifacts reproduced a disappearing saved error; focused reproduction alone was not full acceptance."
+    },
+    {
+      "logId": "dev77-browser-saved-diagnostic-i-native-pair.log",
+      "sha256": "f59b681880ff4338103670b5ccce5f4d5de0b43273914f66edb073f13d7fc520",
+      "correction": "Temporary fixed presence flags observed removed view/report/message nodes after checked submission restoration. Removed diagnostics and applied the shared view lifetime correction."
+    },
+    {
+      "logId": "dev77-browser-saved-lifetime-red-a-browser.log",
+      "sha256": "bf472350daf25984d45942b59ed8dcb8f49e8250fec74e7a876e7fd0a9c05f29",
+      "correction": "Stronger direct paused-render fixture failed all nine saved errors before the correction; the same oracle then passed."
+    },
+    {
+      "logId": "dev77-browser-saved-lifetime-green-a-lint.log",
+      "sha256": "3aabeed33bcacdb11c0b07107d5886b1b68f43059100c71718b1153b5dbae439",
+      "correction": "Corrected new fixture key ordering; full lint then passed."
+    },
+    {
+      "logId": "dev77-browser-description-red-b-native-browser.log",
+      "sha256": "d866af1bd2f328be11ef10abcb30991a69fcb7a8aebbf30929fec5097658ff5e",
+      "bytes": 8826,
+      "correction": "Native GC after route departure caused returned fields to reset from 77000 to 67000; retain the whole immutable weak-family group through the retained view callback."
+    },
+    {
+      "logId": "dev77-browser-description-green-a-types.log",
+      "sha256": "a85a7c86192f57f6b85c374daa3d56841669c0831bdbbfb45a6e7e1eb2b414f1",
+      "bytes": 38,
+      "correction": "A mistyped private check command check:types did not run; corrected to the owning check-types command. This is not an application failure."
+    },
+    {
+      "logId": "dev77-browser-description-green-b-lint.log",
+      "sha256": "019e7cead1431b1f46edcf6897750ab122e9281af2fb1ce51dd57c9da9d87d24",
+      "bytes": 2426,
+      "correction": "A callback referencing a later separate constant failed no-use-before-define. Define the immutable group with its view callback in the same initialiser and an owning Schema-derived return type; no rule disabled."
+    }
+  ],
+  "primaryReview": {
+    "reviewer": "Primary implementation owner; not an independent external reviewer",
+    "result": "Static contracts, command/state parity, root-registry snapshot/weak-family description/page-execution lifetimes, privacy and exact-path controls reviewed; failed-graph root correction and strengthened direct oracle reviewed; complete corrected frozen local nine-check graph passed",
+    "checked": [
+      "Canonical form/catalogue/report Schemas, checked calculator identities and fixed error fields; no raw provider type mirrors or unchecked casts",
+      "One React page state and existing calculator runtime/RPC; no another backend client, engine, saved report store or generic SDK wrapper",
+      "Explicit register/Interrupt cleanup, scoped callback fibres/subscribers, current request identity and caller abort",
+      "Routes restore server outcomes; containers coordinate named commands; leaves render readonly values",
+      "Installed FnContext/AtomRegistry/Toolkit/EmptyParams/FiberSet contracts and exact upstream reference heads checked",
+      "Lockfile diff adds only one type-only dependency; existing versions and canonical skill assets unchanged",
+      "Native actual caller and completed manual response oracle, different saved form, exact CLI positive/negative fixtures and focused lint/types/unused/docs/runbook checks",
+      "Diagnosed unobserved-view cleanup; prior false-green oracle strengthened and failed before correction, then focused/browser-native passed; root-registry memory lifetime is explicit",
+      "Primary review rejected partial source b after finding a separate weak-family description defect; promoted actual native GC return oracle, observed red then green, retained immutable description identity and root-registry resource disposal"
+    ],
+    "limitations": [
+      "Review by the implementing owner does not establish independent acceptance",
+      "No autonomous model or public/deployed browser proof",
+      "T006 remaining remote session/cancellation/setup work is not accepted"
+    ]
+  },
+  "rootCorrection": {
+    "cause": "Registry cleanup removed the unobserved shared view and its seeded report/message parents during paused initial rendering; later once-only seeds were ignored",
+    "priorOracleGap": "Focused fixture reused server/client registry and could read SSR HTML before hydration completed",
+    "directOracle": "Separate server/client registries, unobserved first client rendering and idle cleanup, hydration effect and another idle interval; all nine errors failed before correction",
+    "correction": "Atom.keepAlive on the shared page view; registry disposal releases in-memory snapshot/client and page cleanup still interrupts calculations/tools",
+    "temporaryDiagnostics": "Fixed presence flags and native registry removal observation only; removed before corrected qualification",
+    "storedFigures": "No browser storage or new persistent store",
+    "descriptionCause": "The retained value node held member atoms but not the weak-family returned group; native browser collection allowed a new default group after route return while old registry values remained",
+    "descriptionPriorOracleGap": "Mounted focused fixtures retained the grouping object; no forced native garbage collection occurred between page visits",
+    "descriptionDirectOracle": "Actual Chrome HeapProfiler.collectGarbage after leaving the annual page, return through native navigation, visible input/shared form/previous stale report equality and no new RPC; failed before and passed after correction",
+    "descriptionCorrection": "View callback reads immutable group.form, retaining the same grouping identity for the root registry lifetime without a new cache or mutation"
+  },
+  "failedGraph": {
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 724.76,
+    "failedCheck": "verification",
+    "nativeResult": "9 files/13 tests: 2 failed, 11 passed",
+    "sourceReadback": {
+      "matched": 25,
+      "mismatches": []
+    },
+    "next": "Corrected candidate requires a fresh complete graph",
+    "sanitisedStdout": {
+      "path": "tmp/release-readiness/verification-stdout-NocBC0/cb47205717f5.log",
+      "sha256": "946b250e90948a6d75bb119f979a88db22f1bed4f0b647720f0852f7b09db978",
+      "bytes": 526981
+    }
+  },
+  "interruptedGraph": {
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "exitCode": 130,
+    "reason": "Primary review found the weak-family grouping identity defect; stopped before qualification and added the actual native GC oracle",
+    "completedStages": [
+      "verification",
+      "test",
+      "build",
+      "docs-validation",
+      "packed-artifact",
+      "downstream-consumer",
+      "api-smoke"
+    ],
+    "interruptedStage": "docs-browser",
+    "sourceReadback": {
+      "matched": 28,
+      "mismatches": []
+    },
+    "wrapperLogIdentity": {
+      "logId": "dev77-browser-frozen-release-b-release-graph.log",
+      "sha256": "22468059fe9c7606ffe7e9a8d3966e9491227e08dcdd3a130752959b41262a35",
+      "bytes": 1298
+    },
+    "nonClaim": "Seven stages passed, but the interrupted graph is not complete qualification; source c requires a fresh whole graph"
+  },
+  "parentHostedReadback": {
+    "pr": 156,
+    "headSha": "4b349e0d1605687d0c5670af3edcd4ffdb82481e",
+    "runId": "37554420197",
+    "conclusion": "success",
+    "url": "https://github.com/crcorbett/taxkit/actions/runs/37554420197",
+    "scope": "Earlier remote-tools commit only; not this browser checkpoint"
+  },
+  "postQualificationMetadata": {
+    "paths": [
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "scope": "Proof/plan closure only; tested application/configuration sources unchanged, closure checked separately before commit",
+    "checks": [
+      {
+        "stage": "install",
+        "command": [
+          "bun",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.36,
+        "logId": "dev77-browser-proof-close-c-install.log",
+        "logSha256": "b167133615dd64e922dcd353ad51534ac4ad343f2f2dca31241733c1bb415748"
+      },
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.32,
+        "logId": "dev77-browser-proof-close-c-docs.log",
+        "logSha256": "4f3be4f9f734a69488792a6fb4f4d2c4707395d54517c065b3361d737a0bd183"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.14,
+        "logId": "dev77-browser-proof-close-c-runbooks.log",
+        "logSha256": "905d57de3a7bf59d25c174e9e229300d096b098a32042380d18d27bdf613dc0c"
+      },
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.55,
+        "logId": "dev77-browser-proof-close-c-format.log",
+        "logSha256": "d41bb2d00a5ba9e0fe3173ab0b28c1c94c35d49729eb2d801ba99fe4b45e3963"
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.02,
+        "logId": "dev77-browser-proof-close-c-diff.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "sourceReadback": {
+      "applicationAndOtherFrozenSourcesMatched": 27,
+      "unexpectedChanges": [],
+      "permittedChange": "Plan/proof closure metadata only"
+    }
+  }
+}

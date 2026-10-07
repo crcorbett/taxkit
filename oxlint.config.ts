@@ -14,6 +14,10 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact native browser capability/refusal ingress; no runner permission.
+  "apps/web/src/lib/browser-tools.boundary.ts",
+  "apps/web/src/lib/browser-tools.boundary.test.ts",
+  "apps/web/test/native-browser-tools.boundary.test.ts",
   // Exact official MCP client wire ingress and adversarial host fixture.
   "apps/api/test/mcp-client.boundary.test.ts",
   "apps/web/test/native-mcp.boundary.test.ts",
@@ -239,6 +243,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Exact fixed browser-tool failure response at the native callback.
+  "apps/web/src/lib/browser-tools.boundary.ts",
   // Actual MCP client request bytes and secret-negative response assertions.
   "apps/api/test/mcp-client.boundary.test.ts",
   "apps/web/test/native-mcp.boundary.test.ts",
@@ -763,6 +769,17 @@ export default defineConfig({
         "strict-effect/no-promise-workflow": [
           "error",
           { allowedFiles: ["apps/web/src/server.ts"] },
+        ],
+      },
+    },
+    {
+      // Controlled native callback output must be checked as a Promise before
+      // awaiting it. This admits its host signature, not Promise workflows.
+      files: ["apps/web/src/lib/browser-tools.boundary.test.ts"],
+      rules: {
+        "strict-effect/no-promise-workflow": [
+          "error",
+          { allowedFiles: ["apps/web/src/lib/browser-tools.boundary.test.ts"] },
         ],
       },
     },

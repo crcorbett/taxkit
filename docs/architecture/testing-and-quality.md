@@ -1630,3 +1630,63 @@ No vendor/library-check suppression or dependency upgrade is introduced.
 The [dated MCP record](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
 retains source/log identities, failed attempts and the remaining session,
 network cancellation, browser-agent and setup work. T006 stays in progress.
+
+## Native visible browser caller qualification
+
+`native-browser-tools.boundary.test.ts` uses the built Website/API, disposable
+Chrome153 with WebMCP enabled and its actual developer-tools protocol caller.
+Installed Playwright types own command/event identities. Five tools must appear
+without a calculation request; read/fill/calculate/read-result must agree with
+visible fields and reports. A completed manual RPC must produce the same annual
+answer. Excess fields on a no-argument tool must fail without another request.
+An edit retains a stale answer, overlapping calculation is busy, caller abort
+and edit interrupt unfinished calls, manual retry succeeds, and route exit removes
+all five registrations and interrupts unfinished execution. Reply observations
+retain unmatched native events so one reply cannot hide another cancellation.
+After leaving, actual Chrome garbage collection runs before the caller returns
+to the annual page. Visible fields, the shared form and the previous stale
+report must survive without a new RPC request. This failed before the retained
+view's callback also held the whole weak-family description group.
+
+Controlled host tests separately prove absent/unsupported/wrong-origin fallback,
+receiver preservation, independent refusal, a two-second stalled registration,
+safe declared/defect failures and abortable scoped callbacks. They do not establish
+native browser acceptance. Existing hydration tests restore a different amount,
+period and threshold choice and require the displayed form, shared view and next
+explicit checked request to agree. Directly seeding a narrowed projection would
+otherwise show restored fields while submitting defaults.
+
+Actual CLI fixtures admit only exact host/test decoders, fixed host failure egress
+and the controlled test's Promise signature. They reject neighbouring codecs,
+general runtime execution, async/await, new Promises and Promise chains. The
+[dated browser receipt](../documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
+owns versions, source/check identities and failed attempts. This proves native
+protocol calls controlled by the test, not an autonomous model session. Older
+remote sessions, real remote cancellation and public setup remain T006 work.
+
+
+### Saved calculator state through a paused first render
+
+The page view stays alive in its root registry. The browser fixture restores a
+different amount, period and threshold through a separate server registry. It
+then renders once into the client registry without subscribing, lets its queued
+cleanup run, mounts hydration and waits for a React effect and another cleanup
+interval. Guidance, displayed form, shared state and the next explicit request
+must still agree; no calculation may occur on mount. This is a controlled live
+renderer lifetime check, not a network or autonomous agent proof.
+
+The original shared-registry fixture could observe server HTML before hydration
+completed. Complete built-app checks exposed disappearing saved reports/errors.
+The stronger fixture failed for all nine saved errors before `Atom.keepAlive`
+was applied to the shared view, then passed. The native saved-report/error checks
+also wait for document network idle and use bounded locator reads. Actual native
+HTML, browser fields, retained answers and no replay remain separate oracles.
+See the [dated browser receipt](../documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
+for the failed graph, direct reproduction, correction and subsequent evidence.
+
+Keeping a value node alone does not keep its weak-family grouping object. The
+native return-after-garbage-collection check catches that separate identity
+failure: the earlier focused checks left the description reachable while mounted
+and never forced browser collection between visits. The retained view now reads
+through its immutable group, so registry values and descriptions share a
+lifetime. Root disposal still releases the registry and scoped client.

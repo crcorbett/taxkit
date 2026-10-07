@@ -553,3 +553,14 @@ for `calculatorInput` and `plainCalculatorInput` in
 not array mutation. Actual CLI fixtures admit both names only at that test
 path, reject the same operation in the nearby application leaf, and retain the
 unrelated-receiver rejection. No portable strict rule is disabled.
+
+The browser tool host has exact decoding admission at
+`apps/web/src/lib/browser-tools.boundary.ts`, its controlled `.test.ts` and
+`apps/web/test/native-browser-tools.boundary.test.ts`. Only the production host
+has fixed-failure encoding admission. Native Toolkit owns normal JSON outputs.
+No general runtime runner is admitted at any of these paths or the browser atoms.
+The controlled host test alone may mention its native callback's Promise type;
+async/await, new Promises and Promise chains remain rejected. Actual CLI fixtures
+accept each necessary construct and reject those workflows and neighbouring
+codecs/runners. The existing page runtime and a registration-scoped FiberSet own
+the callback bridge; this does not authorise another browser ManagedRuntime.

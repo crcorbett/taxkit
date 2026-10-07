@@ -411,11 +411,14 @@ it.live(
         )
       );
       yield* Effect.promise(() => page.goto(websiteOrigin));
+      yield* Effect.promise(() => page.waitForLoadState("networkidle"));
       yield* Effect.promise(() =>
         page.getByRole("alert").waitFor({ timeout: 5000 })
       );
       expect(
-        yield* Effect.promise(() => page.getByRole("alert").textContent())
+        yield* Effect.promise(() =>
+          page.getByRole("alert").textContent({ timeout: 5000 })
+        )
       ).toContain("Check your details");
       expect(
         yield* Effect.promise(() =>

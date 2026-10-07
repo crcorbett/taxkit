@@ -168,6 +168,18 @@ export const WebsiteSubmission = Schema.Struct({
   })
 );
 export const WebsiteSubmissionTransport = Schema.toCodecJson(WebsiteSubmission);
+// One presentation value is shared by the visible form and its browser tools.
+// A retained answer stays visible, with an explicit stale flag after an edit,
+// failed refresh or cancelled attempt.
+export const WebsiteCalculatorViewState = Schema.Struct({
+  busy: Schema.Boolean,
+  calculatorId: CalculatorRunServiceRequest.fields.calculatorId,
+  form: WebsiteCalculatorForm,
+  message: Schema.Option(Schema.String),
+  report: Schema.Option(CalculatorRunResponse.fields.report),
+  stale: Schema.Boolean,
+});
+export type WebsiteCalculatorViewState = typeof WebsiteCalculatorViewState.Type;
 export const WebsiteServerRenderContext = Schema.Struct({
   submission: Schema.optional(Schema.toEncoded(WebsiteSubmissionTransport)),
 });

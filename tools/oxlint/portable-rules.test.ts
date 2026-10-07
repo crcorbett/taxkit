@@ -2256,6 +2256,108 @@ describe("exact native RPC lint boundaries", () => {
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
+      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      rejected: false,
+      rule: "strict-effect(no-promise-workflow)",
+      source:
+        'import { Predicate, Schema } from "effect";\n\nexport const Callback = Schema.declare<Promise<unknown>>(Predicate.isPromise);',
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      rejected: true,
+      rule: "strict-effect(no-promise-workflow)",
+      source: "export const run = async () => 1;",
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      rejected: true,
+      rule: "strict-effect(no-promise-workflow)",
+      source: "export const run = new Promise<void>((resolve) => resolve());",
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      rejected: true,
+      rule: "strict-effect(no-promise-workflow)",
+      source:
+        "export const run = (source: Promise<number>) => source.then((value) => value);",
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.atoms.ts",
+      rejected: true,
+      rule: "strict-effect(no-promise-workflow)",
+      source: "export const run = (source: Promise<number>) => source;",
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.boundary.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.boundary.ts",
+      rejected: false,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.boundary.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.atoms.ts",
+      rejected: true,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.atoms.ts",
+      rejected: true,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.atoms.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
+      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/test/native-browser-tools.boundary.test.ts",
+      rejected: false,
+      rule: "taxkit(no-decoding-outside-boundaries)",
+      source:
+        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/test/native-browser-tools.boundary.test.ts",
+      rejected: true,
+      rule: "effect(no-schema-encoder-outside-egress)",
+      source:
+        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+    },
+    {
+      path: "apps/web/test/native-browser-tools.boundary.test.ts",
+      rejected: true,
+      rule: "strict-effect(no-runtime-outside-boundary)",
+      source:
+        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+    },
+    {
       path: "apps/api/src/mcp.tools.layer.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",

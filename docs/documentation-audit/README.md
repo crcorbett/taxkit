@@ -512,3 +512,11 @@ shared work/admission ownership, safe failures and bounded response cleanup.
 Older session support, network cancellation, browser tools and setup content
 remain T006 work; metrics remain deferred. Local proof establishes no deployed
 endpoint, provider state, publication or complete task acceptance.
+
+The [visible browser tools candidate](clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
+records page-owned commands/state, native Chrome caller equality, cancellation
+and route cleanup, safe unsupported-host behaviour, corrected saved-form seeding
+and exact lint admissions. Its native protocol caller is controlled by the test;
+it establishes no autonomous model session, deployment or general browser support.
+T006 still includes older remote sessions, remote cancellation and public setup;
+metrics remain deferred.

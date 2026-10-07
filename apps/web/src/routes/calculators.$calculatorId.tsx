@@ -1,14 +1,11 @@
-import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import type { CalculatorCatalogResponse } from "@taxkit/api-rpc/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
 import { Array, Option, Result, Schema } from "effect";
-import * as AsyncResult from "effect/reactivity/AsyncResult";
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
 
 import { CalculatorPage } from "#/lib/calculator-page.container";
-import { calculatorPageAtoms } from "#/lib/calculator.atoms";
 import type { WebsiteSubmission } from "#/lib/schemas";
 
 import { WebsiteCatalogueContext, WebsiteSubmissionContext } from "./__root";
@@ -20,20 +17,13 @@ const CalculatorRoutePage = ({
   readonly calculator: CalculatorCatalogResponse["calculators"][number];
   readonly submission: Option.Option<typeof WebsiteSubmission.Type>;
 }) => {
-  const atoms = useMemo(
-    () => calculatorPageAtoms(calculator.calculatorId),
-    [calculator.calculatorId]
-  );
-  const calculation = useAtomValue(atoms.calculation);
   const saved = submission.pipe(
     Option.filter((value) => value.calculatorId === calculator.calculatorId)
   );
-  // The route selects a checked answer for this page. The policy container
-  // coordinates work; the result leaf only displays these readonly values.
-  const report = AsyncResult.value(calculation).pipe(
-    Option.orElse(() =>
-      saved.pipe(Option.flatMap((value) => Result.getSuccess(value.result)))
-    ),
+  // Restore only the checked server answer here. The shared page state owns
+  // later client answers for both the visible form and browser tools.
+  const report = saved.pipe(
+    Option.flatMap((value) => Result.getSuccess(value.result)),
     Option.filter(
       (value) => value.calculator.calculatorId === calculator.calculatorId
     ),

@@ -25,7 +25,7 @@ materialise their native HTTP request with `HttpClientRequest.toWeb`, preserving
 the JSON byte body and the binding's receiver. This avoids carrying a stream
 owned by an earlier Cloudflare request into a later call.
 
-The root route restores Schema-encoded settings and seeds a React-owned Atom
+The root route restores Schema-encoded settings/catalogue and seeds a React-owned Atom
 registry. `calculator.atoms.ts` describes the browser connection and commands;
 it creates no browser runner. Checked settings stay alive for that registry's
 lifetime, including time spent waiting before the first click. The browser calls
@@ -107,7 +107,9 @@ provider cancellation or every failure/trace-export path.
 
 The Atom/Scheduler browser checks cover scheduling, StrictMode remount,
 hydration, rapid updates, editing and form unmount cancellation, and expected
-server-error restoration without replaying a calculation. Effect scopes own
+server-error restoration without replaying a calculation. A different restored
+form must match both the displayed fields and shared state before its explicit
+retry sends that same checked request. Effect scopes own
 fixture cleanup. Exact lint admissions cover required execution, encoding,
 native binding input and Playwright's `fill` operation; nearby application
 files retain the restrictions. Both Knip graphs include the Website.
@@ -219,16 +221,17 @@ The root restores only encoded transport. The additional route selects the
 expected checked report and saved form for its calculator;
 the container seeds the checked saved form once with `useAtomInitialValues`
 and owns commands/cancellation. Focused readonly leaves show the form/report.
-The root registry seeds settings only; a later form restoration must not depend
+The root registry seeds settings and the catalogue; a later form restoration must not depend
 on its first-render-only initial values. A saved submission checks its identity, form and successful
 report together before restoration. Standard HTML POST uses the selected
 canonical calculator and same private connection at each page address.
 
-The React page retains its atom-family description while mounted.
-Controls have visible keyboard focus and a skip link to the single main landmark. That family
-uses weak references; holding only one member does not retain its grouping
-object. It describes state and work only, without a cached client or answer.
-The registry still owns values and execution.
+The root registry retains the shared view, whose read callback holds the whole
+atom-family description group. That family uses weak references; holding only
+individual members would allow a second group on a return visit after browser
+memory cleanup. The group describes state and work, while the registry owns
+values and execution. Controls have visible keyboard focus and a skip link to
+the single main landmark.
 
 The withholding and annual explanations use returned ledger components and
 sources. Annual subtractive offsets are labelled as reducing the total; the
@@ -488,6 +491,41 @@ The native-pair suite also runs the official MCP client over local TCP against
 its freshly built API. It compares returned calculation reports and accepted
 Markdown pages with HTTP and checks their common anonymous allowance. This
 belongs to the [API's agent-tools candidate](../api/README.md#native-remote-calculator-tools-candidate).
-Page-owned browser registration and a real browser-agent journey remain T006
-work. The MCP client and calculator Schema imports are test-only dependencies;
+The real native browser caller check is described below. Older remote sessions,
+network cancellation and public setup remain T006 work. The MCP client and calculator Schema imports are test-only dependencies;
 no browser calculation implementation or production SDK client is added.
+
+## Visible calculator browser tools
+
+Supported experimental browsers can register five tools on a mounted calculator:
+`taxkit_find_calculators`, `taxkit_read_calculator`, `taxkit_fill_calculator`,
+`taxkit_calculate_visible_form` and `taxkit_read_result`. The catalogue, visible
+form and answer come from the same React-owned state as the page. Fill uses the
+existing edit command; calculate uses its submit command and existing RPC client.
+Neither mounting nor reading starts a calculation. The previous answer remains
+marked out of date after editing or interruption. The shared page snapshot stays
+in memory until the root registry is disposed. This keeps once-restored server
+answers and errors through a paused first React render and later navigation,
+including browser memory cleanup between leaving and returning.
+No figures are written to browser storage.
+
+Registration requires native capability and the checked Website origin. Missing
+support leaves normal browser/HTML use working. Each tool has its own two-second
+registration limit; one refusal cannot prevent the others. Page cleanup removes
+tools and interrupts their unfinished callbacks. Caller cancellation or editing
+cancels only the request owned by that call; another unfinished calculation is
+rejected as busy. Execution has a twelve-second outer limit around the existing
+request limits. Fixed failures omit input values and raw host details.
+
+The native suite runs Chrome for Testing 153.0.8010.12 with experimental WebMCP
+enabled in a disposable browser. Its actual developer-tools caller discovers,
+reads, fills, calculates and reads results, compares an answer with a completed
+manual RPC, and checks excess arguments, stale answers, busy calls, cancellation,
+editing, manual retry, route cleanup and a return after forced browser garbage
+collection without losing fields/results or starting a request. It uses local
+ports 4230/4231. This is
+actual native protocol-caller proof, not an autonomous model session or general
+browser availability. `webmcp-types` 0.1.10 is type-only; the installed caller's
+own types qualify the tested browser contract. See the
+[dated browser receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
+and [frontend owner](../../docs/architecture/frontend.md#page-owned-browser-tools).
