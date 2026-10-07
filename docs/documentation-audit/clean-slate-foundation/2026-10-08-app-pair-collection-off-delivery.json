@@ -1,0 +1,524 @@
+{
+  "documentType": "delivery-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-infrastructure-owner",
+  "observedAt": "2026-10-07T14:01:35.624893+00:00",
+  "task": "CSF-T008",
+  "outcome": "qualified-app-pair-delivered-with-collection-off",
+  "repository": "crcorbett/taxkit",
+  "branch": "codex/dev-79-retained-posthog-projects",
+  "candidateCommit": "42610a5c25d4b03bb2d36ab75985a66b15ca17d3",
+  "sourceQualificationCommit": "4d5fe1124932549210b2de40ce6776722cc0c587",
+  "principal": "Cooper Corbett",
+  "authorityBasis": "7 October explicit local Preview and Production deployment grant, preserved in active SPEC/plan",
+  "operation": "Native Alchemy plan and deploy of the locally qualified API/Website with analytics off",
+  "resource": {
+    "stack": "TaxKitAppsCloudflare",
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "zoneId": "15103853342ab9f18f7894b7fae39c39",
+    "stateProfile": "site-ci-env-v1"
+  },
+  "approvalBoundary": "Only qualified API/Website and named peer bindings; existing Production domain/settings refreshed without replacement. No PostHog project/key, metrics, store bootstrap/upgrade, credentials, merge or publication. Answer only reviewed Apply this plan? prompt; do not use --yes.",
+  "sourceQualification": {
+    "receipt": "2026-10-08-retained-posthog-projects.json",
+    "frozenIdentitiesUnchangedAfterBothApplies": 1788,
+    "verificationSeconds": 693.46,
+    "nativeCases": 18,
+    "localOnly": true
+  },
+  "plans": {
+    "pr-166": {
+      "projectionSha256": "f039f0830dcc24aa9711752519223208c10b1f4442f6af4c3276a7ebad33501f",
+      "sourceIdentitySha256": "855850aa62651d1ec61adfc5da12c73d353e5aadb0483f1d8d3aa456e1319aa2",
+      "logicalResources": [
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi",
+          "resourceType": "Cloudflare.Worker"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite",
+          "resourceType": "Cloudflare.Worker"
+        }
+      ],
+      "bindings": [
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/API_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/CALCULATOR_HOST_MODE"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/CALCULATOR_RATE_LIMIT"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/TaxKitMcpSessions"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/WEBSITE_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite/API_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite/CALCULATOR_HOST_MODE"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite/TAXKIT_API"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN"
+        }
+      ],
+      "domains": [],
+      "noDeletesOrReplacements": true
+    },
+    "prod": {
+      "projectionSha256": "01e01d43c2bdcda6d218d4f6df47a65bceb3cdae26872296254a23c4eb59a7b6",
+      "sourceIdentitySha256": "855850aa62651d1ec61adfc5da12c73d353e5aadb0483f1d8d3aa456e1319aa2",
+      "logicalResources": [
+        {
+          "action": "update",
+          "logicalId": "TaxKitApi",
+          "resourceType": "Cloudflare.Worker"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitProductionDnsSettings",
+          "resourceType": "Cloudflare.DNS.ZoneSettings"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitProductionZone",
+          "resourceType": "Cloudflare.Zone.Zone"
+        },
+        {
+          "action": "update",
+          "logicalId": "TaxKitWebsite",
+          "resourceType": "Cloudflare.Worker"
+        }
+      ],
+      "bindings": [
+        {
+          "action": "noop",
+          "logicalId": "TaxKitApi/API_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitApi/CALCULATOR_HOST_MODE"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitApi/CALCULATOR_RATE_LIMIT"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitApi/TaxKitMcpSessions"
+        },
+        {
+          "action": "update",
+          "logicalId": "TaxKitApi/WEBSITE_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "update",
+          "logicalId": "TaxKitWebsite/API_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitWebsite/CALCULATOR_HOST_MODE"
+        },
+        {
+          "action": "update",
+          "logicalId": "TaxKitWebsite/TAXKIT_API"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN"
+        }
+      ],
+      "domains": [
+        "taxkit.dev",
+        "www.taxkit.dev",
+        "api.taxkit.dev"
+      ],
+      "noDeletesOrReplacements": true
+    }
+  },
+  "stages": {
+    "pr-166": {
+      "deployment": {
+        "observedAt": "2026-10-07T13:46:42.444788+00:00",
+        "candidateCommit": "42610a5c25d4b03bb2d36ab75985a66b15ca17d3",
+        "exitCode": 0,
+        "durationSeconds": 107.47,
+        "sharedStateAutoUpgradeFlag": false
+      },
+      "apply": {
+        "artifact": "dev79-apps-native-pr-166-deploy-1791380694976113000.log",
+        "sha256": "82dc7a58a487a03ec3ded0bc25e9249a681d176ddcd91b25d097421997743921"
+      },
+      "providerReadback": {
+        "artifact": "dev79-apps-pr-166-provider-after.json",
+        "sha256": "bc3df284d9e0629f6561034ef2b22a9714afe2a3093b12ed4db4624d606e34f0"
+      },
+      "liveReadback": {
+        "artifact": "dev79-apps-pr-166-live-journeys.json",
+        "sha256": "1d5e609a5f4745397d5cfaff55f11ca42873251d4868ef5bdd396130a9a6cc5b"
+      },
+      "origins": {
+        "api": "https://taxkitappscloudflare-taxkitapi-pr-166-nam7bgpzufwz3fmc.coopercorbett.workers.dev",
+        "website": "https://taxkitappscloudflare-taxkitweb235c76wzum24mk4b4nmo7jxk.coopercorbett.workers.dev"
+      },
+      "postconditions": [
+        "public HTTP calculation decoded with its owning Schema",
+        "plain HTML form produces retained $1,301.00 answer",
+        "public OpenAPI description is available",
+        "official MCP 2.3.1 client lists six tools, calculates the HTTP answer and reads documentation",
+        "Chromium calculator uses same-stage API and produces retained $1,301.00 answer",
+        "agent links point to same-stage API; guide and Markdown both load",
+        "Chromium documentation search opens Quickstart; no page errors or PostHog requests observed",
+        "independent Worker readback has no POSTHOG bindings; configured default stays off",
+        "Browser Do Not Track sends deny on calculation RPC",
+        "official MCP client legacy negotiation establishes a session, lists six tools, calculates the HTTP answer, reads docs and terminates its session"
+      ],
+      "workers": {
+        "api": {
+          "script": "taxkitappscloudflare-taxkitapi-pr-166-nam7bgpzufwz3fmc",
+          "compatibilityDate": "2026-10-04",
+          "compatibilityFlags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "rateLimitNamespace": "10078166",
+          "currentVersionIds": [
+            "22c2ad4c-c58a-4e5d-b019-61319d457e42"
+          ]
+        },
+        "website": {
+          "script": "taxkitappscloudflare-taxkitweb235c76wzum24mk4b4nmo7jxk",
+          "compatibilityDate": "2026-10-04",
+          "compatibilityFlags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "currentVersionIds": [
+            "d86e64d4-2e15-4cd1-b2bc-231c5d6b306a"
+          ]
+        }
+      },
+      "logs": [
+        {
+          "artifact": "dev79-apps-pr-166-live-journeys.log",
+          "sha256": "f7890050364d2a5a91fe73b8f83b6fbda962d4ac5fec3c5ef67c1f743213b701"
+        },
+        {
+          "artifact": "dev79-apps-pr-166-legacy-live.log",
+          "sha256": "e3976b5575865fbad19ff98e7b95858faa2527ebf6bbd2ce223efa33f8a6f174"
+        }
+      ]
+    },
+    "prod": {
+      "deployment": {
+        "observedAt": "2026-10-07T13:58:33.883448+00:00",
+        "candidateCommit": "42610a5c25d4b03bb2d36ab75985a66b15ca17d3",
+        "exitCode": 0,
+        "durationSeconds": 56.89,
+        "sharedStateAutoUpgradeFlag": false
+      },
+      "apply": {
+        "artifact": "dev79-apps-native-prod-deploy-1791381456988994000.log",
+        "sha256": "6e706833c6c8c2b7d62783820f1bd995f3f7d0293a5fdb979914c1b985a47168"
+      },
+      "providerReadback": {
+        "artifact": "dev79-apps-prod-provider-after.json",
+        "sha256": "a59fa29baf9b791c38637d74e936e46a755307462d61a20fbec181a7418d9aac"
+      },
+      "liveReadback": {
+        "artifact": "dev79-apps-prod-live-journeys.json",
+        "sha256": "850bb15d705f73bba3ed0d15d3fa6762a076bd7af89871734ad660772290efe9"
+      },
+      "origins": {
+        "api": "https://api.taxkit.dev",
+        "website": "https://taxkit.dev"
+      },
+      "postconditions": [
+        "public HTTP calculation decoded with its owning Schema",
+        "plain HTML form produces retained $1,301.00 answer",
+        "public OpenAPI description is available",
+        "official MCP 2.3.1 client lists six tools, calculates the HTTP answer and reads documentation",
+        "Chromium calculator uses same-stage API and produces retained $1,301.00 answer",
+        "agent links point to same-stage API; guide and Markdown both load",
+        "Chromium documentation search opens Quickstart; no page errors or PostHog requests observed",
+        "Browser Do Not Track sends deny on calculation RPC",
+        "independent Worker readback has no POSTHOG bindings; configured default stays off",
+        "official MCP client legacy negotiation establishes a session, lists six tools, calculates the HTTP answer, reads docs and terminates its session"
+      ],
+      "workers": {
+        "api": {
+          "script": "taxkitappscloudflare-taxkitapi-prod-cbf6rcgntsf5y2vl",
+          "compatibilityDate": "2026-10-04",
+          "compatibilityFlags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "rateLimitNamespace": "10078",
+          "currentVersionIds": [
+            "0dc96207-c276-473d-b429-9a10f2ad79d1"
+          ]
+        },
+        "website": {
+          "script": "taxkitappscloudflare-taxkitweb6exfjosfrbdjf3coo4ausvjj",
+          "compatibilityDate": "2026-10-04",
+          "compatibilityFlags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "currentVersionIds": [
+            "8c595609-32d9-47f2-b6cd-d00c74f677d9"
+          ]
+        }
+      },
+      "logs": [
+        {
+          "artifact": "dev79-apps-prod-live-journeys.log",
+          "sha256": "1c51c4bfc0a66cda5e8fae62c08e635ffe2f52b2cd16a2a20a556d587908f4d6"
+        },
+        {
+          "artifact": "dev79-apps-prod-legacy-live.log",
+          "sha256": "2321449e63d6b4cd2970a30d18ed4b06520b945e57c539da3e14997521eeb160"
+        }
+      ]
+    }
+  },
+  "protectedProduction": {
+    "before": {
+      "artifact": "dev79-apps-zone-before-production.json",
+      "sha256": "4b3f3190b5aa2e9945c34e49782fd6bdcf38f57b2cff781de910c83d5fb3e028"
+    },
+    "after": {
+      "artifact": "dev79-apps-zone-after-production.json",
+      "sha256": "dc886d2218e32786036ba665fd36b5cea3a40e366bab774c2c0a7065bc089da2"
+    },
+    "postconditions": [
+      "same existing Production token",
+      "all DNS settings equal previous deployed readback",
+      "same www redirect ruleset ID and exact rules",
+      "three unchanged expected Worker-managed records, no additional records",
+      "All three domain IDs and complete DNS records equal fresh pre-apply observation"
+    ],
+    "publicRedirect": {
+      "artifact": "dev79-apps-prod-public-redirect.json",
+      "sha256": "ae6a24b05f523567a373e7359e78cd496d8de497173095bafb0ab889b7110984"
+    },
+    "wwwRedirectStatus": 301,
+    "pathAndQueryPreserved": true
+  },
+  "sharedState": {
+    "before": {
+      "artifact": "dev79-apps-native-state-before.json",
+      "sha256": "37d4117849afbed7000304b147ab5ec315bc0c33fc4d6e8bb49f088afada052a"
+    },
+    "after": {
+      "artifact": "dev79-apps-native-state-after.json",
+      "sha256": "a88fccdee975882a81c5a809448472918a8662c0fd8de41427e75dfa70897c94"
+    },
+    "version": 7,
+    "stages": [
+      "pr-161",
+      "pr-162",
+      "pr-166",
+      "prod"
+    ],
+    "bootstrapOrUpgradePerformed": false,
+    "note": "An earlier Python transport probe returned 403. The actual Bun/native transport independently read version 7 and authenticated stages with HTTP 200 before and after delivery; no credential or store change followed that diagnostic."
+  },
+  "additionalLocalChecks": [
+    {
+      "stage": "docs-validation",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.2,
+      "logArtifact": "dev79-apps-consumer-closeout-docs-validation.log",
+      "logSha256": "446d6a26b887250298ae7b8f19546432b55a57ff899ccda57a28a127a1c83538"
+    },
+    {
+      "stage": "packed",
+      "command": [
+        "bun",
+        "run",
+        "sdk:check-packed-artifact"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.22,
+      "logArtifact": "dev79-apps-consumer-closeout-packed.log",
+      "logSha256": "4fa4fbab0b0ca9c6e8c9e72fbfaf2b3fb30f128967ca75851c17ab022d93a5b4"
+    },
+    {
+      "stage": "downstream",
+      "command": [
+        "bun",
+        "run",
+        "sdk:validate-downstream"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.91,
+      "logArtifact": "dev79-apps-consumer-closeout-downstream.log",
+      "logSha256": "58ba19eb137873e51e7671e8b5144c3722f63d3544e507f2939db24c0016c42f"
+    },
+    {
+      "stage": "smoke",
+      "command": [
+        "bun",
+        "run",
+        "api:smoke"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.58,
+      "logArtifact": "dev79-apps-consumer-closeout-smoke.log",
+      "logSha256": "69c74ac502c1362e6fbe58a6a3036ef05e75b0f7be95e3322153d118af5de1fc"
+    },
+    {
+      "stage": "changesets",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.25,
+      "logArtifact": "dev79-apps-consumer-closeout-changesets.log",
+      "logSha256": "022b430eabf233f324fb97fb3aac6d48c0c077d87e5c028daacec3a982afefba"
+    }
+  ],
+  "documentationImpact": {
+    "changeRequired": [
+      "active execution plan and dated delivery proof"
+    ],
+    "preserve": [
+      "runtime source and generated owners",
+      "accepted browser sender SPEC pending decision",
+      "pure tax and published SDK contracts",
+      "private PostHog graph remains unapplied",
+      "existing Production token policy and expiry",
+      "domain/DNS/redirect owners",
+      "five runbook procedures",
+      "deferred metrics"
+    ],
+    "notApplicable": {
+      "changeset": "Delivery proof metadata only; no package contract changes.",
+      "newRunbook": "Existing target-owned native deployment procedure was used unchanged."
+    }
+  },
+  "rollback": "Source-bound redeploy of previously qualified Production source 72bfa16ac08dacc4c26f3de023a2880baefe1c55 after fresh native plan review. Preserve retained domain/DNS settings and shared store; no Preview teardown authority.",
+  "limitations": [
+    "PostHog projects, management credentials, online project plan, collection activation and stored-event proof remain unqualified.",
+    "No hosted workflow pass or exact-head GitHub credit availability claim. Checks and deployments ran on this Mac.",
+    "No merge or package publication. Draft review remains outstanding.",
+    "The modern five-second caller cleanup limit remains as documented; this receipt does not prove cancellation of all server work.",
+    "The native plan conservatively refreshed peer outputs during apply; no no-op convergence or rollback execution claim.",
+    "Only the named retained example was checked live; no new Medicare result correctness claim."
+  ],
+  "custody": "Raw operational logs and readbacks remain private on this Mac. This receipt names content digests and artefact basenames without secret values.",
+  "proofCloseout": {
+    "checks": [
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "x",
+          "oxfmt",
+          "-c",
+          "oxfmt.config.ts",
+          "--write",
+          "docs/exec-plans/active/clean-slate-foundation.md",
+          "docs/documentation-audit/clean-slate-foundation/2026-10-08-app-pair-collection-off-delivery.json"
+        ],
+        "exitCode": 2,
+        "durationSeconds": 0.08,
+        "logArtifact": "dev79-apps-delivery-closeout-format.log",
+        "logSha256": "28b40859dad64c1d4ddb6d28cab92d3fd6cc3ec1daf5da0bb10f4e8ab9aa9f28"
+      },
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.38,
+        "logArtifact": "dev79-apps-delivery-closeout-docs.log",
+        "logSha256": "59af822980a0c0192a7537aeff570a1d1bfed6928a1f0ef3a2681825474e0a38"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.14,
+        "logArtifact": "dev79-apps-delivery-closeout-runbooks.log",
+        "logSha256": "440a8e918f26f3c6b0a44642d0fd17ee114784b44d11c2cf549393ba44a1bb32"
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.26,
+        "logArtifact": "dev79-apps-delivery-closeout-paths.log",
+        "logSha256": "6f14f05e26b537fde37cb0cdb1ce8ecc388706045e6ba11af8f67a92b0fbdd52"
+      },
+      {
+        "stage": "format-check",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.51,
+        "logArtifact": "dev79-apps-delivery-closeout-format-check.log",
+        "logSha256": "6688ddbc684172e6f11ed7f6e1ccc98c75ad4202cd505b5d6bc2df027b383047"
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.01,
+        "logArtifact": "dev79-apps-delivery-closeout-diff.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "failedFormatReason": "The targeted write-format command matched only documentation files explicitly excluded by oxfmt.config.ts. The existing repository format:check subsequently passes; authored documentation wrapping is preserved.",
+    "metadataOnlyPaths": [
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-08-app-pair-collection-off-delivery.json"
+    ],
+    "unchangedPreviousFrozenIdentities": 1787
+  }
+}

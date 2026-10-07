@@ -87,7 +87,7 @@ records command outcomes and log digests.
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | Complete locally; draft review outstanding | Six remote and five visible browser tools reuse the checked owners. All nine local checks pass at `72bfa16ac08dacc4c26f3de023a2880baefe1c55`, with both fourteen-case native runs. Draft #162 contains the stage-derived connection guide, deployed and read back on pr-162 and Production with both supported clients. The explicit modern five-second cleanup limit remains; no autonomous model session or prompt cleanup is claimed. |
 | T007 / DEV-78 | Complete locally; draft review outstanding | Exact native graph/source/secret/state/live plans are delivered in drafts #159–161, with #162 guide delivery. Draft #163 aligns the current native CLI/runbooks/recovery and paged provider reads. Full local verification passes `226c60bddb225467db64e772d48304af2368a216` in 684.12 seconds; all 1,750 frozen identities match, including the fourteen-case built app check. No new provider, state, credential or deployment mutation; rollback and no-op convergence remain unqualified. |
-| T008 / DEV-79 | In progress | Backend and Website calculator preference candidates are locally qualified. The retained-project candidate has focused local proof; browser sender choice, relay, real provider resources and stored-event proof remain. |
+| T008 / DEV-79 | In progress | Backend, Website calculator preferences and retained-project management pass full local qualification. The qualified app pair is delivered on pr-166 and Production with collection off; browser sender choice, relay, real PostHog resources and stored-event proof remain. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Pending T007/T008/T009 | Full review, release/consumer proof and separately authorised delivery. |
 
@@ -5709,3 +5709,48 @@ this plan and its receipt then receive qualification metadata, with focused
 closeout and unchanged remaining source. This accepts the local project
 management slice; no PostHog project, key, online plan or app activation has
 occurred. T008 and overall T010 remain in progress; metrics remain deferred.
+
+### T008 app delivery with collection off
+
+Cooper's explicit local Preview and Production deployment grant authorises the
+app pair at `42610a5c25d4b03bb2d36ab75985a66b15ca17d3`, stacked in draft
+[#166](https://github.com/crcorbett/taxkit/pull/166). The earlier project receipt
+records local preparation before deployment; the separate
+[delivery receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-app-pair-collection-off-delivery.json)
+records the later app operation and provider readback. The private PostHog
+project graph remains unapplied and collection stays off.
+
+Fresh native plans used the existing `site-ci-env-v1` profile and version-7
+state store. Preview creates its own two Workers in `pr-166`; Production updates
+the existing pair with three peer-binding changes. Neither plan deletes or
+replaces resources. Production zone and DNS-settings resources are no-ops.
+Both exact apply prompts were reviewed before confirmation, without a general
+auto-approval or state bootstrap/upgrade flag. Preview completed at 13:46:42 UTC
+and Production at 13:58:33 UTC on 7 October (8 October in Melbourne).
+
+Ten live postconditions pass per environment: checked HTTP calculation, plain
+HTML `$1,301.00` result, OpenAPI, official modern and older-session MCP calls,
+Chromium calculation, stage-correct agent links and guide Markdown,
+documentation search, browser Do Not Track propagation, and no PostHog bindings
+or observed browser PostHog requests. Both MCP modes list six tools and return
+the same checked report as HTTP; the older-session check explicitly terminates
+its session. The existing three domain owners and IDs, complete DNS records,
+DNS settings and redirect rules match fresh pre-apply reads. The live `www`
+redirect returns 301 and preserves path and query. All 1,788 frozen source
+identities still match after both deployments.
+
+Additional local docs validation, packed SDK, downstream, API smoke and
+Changeset checks pass. These are individual checks, not a new complete
+`release:check` invocation or hosted GitHub result. Recovery is a fresh reviewed
+plan to redeploy previously qualified Production source
+`72bfa16ac08dacc4c26f3de023a2880baefe1c55`, preserving domain/settings and shared
+state; no rollback execution or no-op convergence is claimed. Preview teardown
+is outside this delivery authority.
+
+Documentation impact: **Change required** for this execution plan and dated
+delivery evidence. **Preserve** qualified runtime bytes, existing operational
+owners and five runbooks, retained tax outputs, pending browser choice, private
+PostHog graph, current credentials and deferred metrics. **N/A** for a Changeset
+or new runbook: this closeout changes proof metadata only. T008 and overall
+T010 remain in progress for browser delivery, relay, real provider preparation
+and stored events. Production availability does not complete those outcomes.
