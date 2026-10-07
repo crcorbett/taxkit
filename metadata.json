@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4B19MP7CFZGKDAX15ARPYAC",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-79-analytics-policy-and-capture",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/api/README.md",
+    "apps/api/src/analytics-request.boundary.ts",
+    "apps/api/src/calculator-analytics.layer.ts",
+    "apps/api/src/mcp-session.layer.ts",
+    "apps/api/src/worker.application.ts",
+    "apps/api/src/worker.ts",
+    "apps/api/test/analytics-request.boundary.test.ts",
+    "apps/api/test/worker.boundary.test.ts",
+    "apps/web/README.md",
+    "apps/web/package.json",
+    "apps/web/test/native-analytics.boundary.test.ts",
+    "apps/web/vitest.native.config.ts",
+    "docs/architecture/api-and-sdk.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/package-ownership.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "oxlint.config.ts",
+    "packages/analytics/README.md",
+    "packages/analytics/src/__testing__/fixtures.ts",
+    "packages/analytics/src/config.ts",
+    "packages/analytics/src/live.layer.ts",
+    "tools/oxlint/analytics-boundaries.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 26118028,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1245537792,
+    "output_tokens": 5704051,
+    "api_call_count": 8322
+  }
+}

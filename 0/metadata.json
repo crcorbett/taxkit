@@ -1,0 +1,48 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4B19MP7CFZGKDAX15ARPYAC",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T11:17:23.027392Z",
+  "branch": "codex/dev-79-analytics-policy-and-capture",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/api/README.md",
+    "apps/api/src/analytics-request.boundary.ts",
+    "apps/api/src/calculator-analytics.layer.ts",
+    "apps/api/src/mcp-session.layer.ts",
+    "apps/api/src/worker.application.ts",
+    "apps/api/src/worker.ts",
+    "apps/api/test/analytics-request.boundary.test.ts",
+    "apps/api/test/worker.boundary.test.ts",
+    "apps/web/README.md",
+    "apps/web/package.json",
+    "apps/web/test/native-analytics.boundary.test.ts",
+    "apps/web/vitest.native.config.ts",
+    "docs/architecture/api-and-sdk.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/package-ownership.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "oxlint.config.ts",
+    "packages/analytics/README.md",
+    "packages/analytics/src/__testing__/fixtures.ts",
+    "packages/analytics/src/config.ts",
+    "packages/analytics/src/live.layer.ts",
+    "tools/oxlint/analytics-boundaries.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "ef48aa238168",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 26118028,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1245537792,
+    "output_tokens": 5704051,
+    "api_call_count": 8322
+  },
+  "session_metrics": {
+    "turn_count": 5
+  }
+}

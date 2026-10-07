@@ -1,0 +1,3 @@
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_16ba82e7edbf408bb9362439f8c07d76\",0]","question":"Approve adding three permissions to the existing Production token `taxkit-docs-production-20260831`, limited to taxkit.dev: read DNS settings, connect Worker addresses, and manage URL redirects? The token value, expiry, existing grants and Preview token stay unchanged. The prepared change is at /private/tmp/dev78-production-token-permission-proposal.json.","answer":"Approve the Production token permission change"}]
+</send_user_message_question_reply>
