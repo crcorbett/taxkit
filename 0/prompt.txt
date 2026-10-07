@@ -1,0 +1,11 @@
+<environment_context>
+  <current_date>2026-10-08</current_date>
+  <timezone>Australia/Melbourne</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/.codex/worktrees/aac7/taxkit</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+  <subagents>
+    <agent name="/root/impeccable_documenter" />
+    <agent name="/root/impeccable_search_documenter" />
+    <agent name="/root/impeccable_search_reviewer" />
+    <agent name="/root/impeccable_finish_reviewer" />
+  </subagents>
+</environment_context>

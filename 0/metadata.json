@@ -1,0 +1,60 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4B8T3AVGB7PCCDC3NX8BB1Z",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T13:28:42.297667Z",
+  "branch": "codex/dev-79-retained-posthog-projects",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "alchemy.posthog.run.ts",
+    "docs/architecture/configuration.md",
+    "docs/architecture/deployment.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/package-ownership.md",
+    "docs/architecture/testing-and-quality.md",
+    "knip.production.json",
+    "oxlint.config.ts",
+    "packages/infrastructure/README.md",
+    "packages/infrastructure/src/posthog/errors.ts",
+    "packages/infrastructure/src/posthog/index.ts",
+    "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    "packages/infrastructure/src/posthog/projects.live.layer.ts",
+    "packages/infrastructure/src/posthog/projects.provider.ts",
+    "packages/infrastructure/src/posthog/projects.test.ts",
+    "packages/infrastructure/src/posthog/schemas.ts",
+    "packages/infrastructure/src/posthog/service.ts",
+    "packages/infrastructure/src/posthog/stack.ts",
+    "packages/infrastructure/src/posthog/test.layer.ts",
+    "tools/oxlint/analytics-boundaries.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "ef48aa238168",
+  "checkpoint_transcript_start": 70249,
+  "transcript_lines_at_start": 70249,
+  "compact_transcript_start": 8310,
+  "token_usage": {
+    "input_tokens": 382176,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 16395776,
+    "output_tokens": 91891,
+    "api_call_count": 113
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T13:28:37.944634Z",
+    "agent_lines": 2791,
+    "agent_removed": 11,
+    "human_added": 484,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 3275,
+    "total_lines_changed": 3301,
+    "agent_percentage": 84.88336867615874,
+    "metric_version": 2
+  }
+}

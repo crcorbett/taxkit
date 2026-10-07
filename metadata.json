@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4B8T3AVGB7PCCDC3NX8BB1Z",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-79-retained-posthog-projects",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "alchemy.posthog.run.ts",
+    "docs/architecture/configuration.md",
+    "docs/architecture/deployment.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/package-ownership.md",
+    "docs/architecture/testing-and-quality.md",
+    "knip.production.json",
+    "oxlint.config.ts",
+    "packages/infrastructure/README.md",
+    "packages/infrastructure/src/posthog/errors.ts",
+    "packages/infrastructure/src/posthog/index.ts",
+    "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    "packages/infrastructure/src/posthog/projects.live.layer.ts",
+    "packages/infrastructure/src/posthog/projects.provider.ts",
+    "packages/infrastructure/src/posthog/projects.test.ts",
+    "packages/infrastructure/src/posthog/schemas.ts",
+    "packages/infrastructure/src/posthog/service.ts",
+    "packages/infrastructure/src/posthog/stack.ts",
+    "packages/infrastructure/src/posthog/test.layer.ts",
+    "tools/oxlint/analytics-boundaries.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 382176,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 16395776,
+    "output_tokens": 91891,
+    "api_call_count": 113
+  }
+}
