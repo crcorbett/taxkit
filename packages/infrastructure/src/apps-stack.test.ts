@@ -1,16 +1,20 @@
 import { BunServices } from "@effect/platform-bun";
 import { describe, expect, it } from "@effect/vitest";
+import { Unowned } from "alchemy/AdoptPolicy";
 import { AlchemyContext } from "alchemy/AlchemyContext";
 import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
 import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
+import { formatPlanLines } from "alchemy/Cli/LoggingCli";
 import { Providers } from "alchemy/Cloudflare";
+import { ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
 import {
   Worker,
   isDurableObjectExport,
   isSelfUrl,
 } from "alchemy/Cloudflare/Workers";
+import { Zone } from "alchemy/Cloudflare/Zone";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
@@ -27,6 +31,7 @@ import {
   ConfigProvider,
   Effect,
   Exit,
+  FileSystem,
   Layer,
   Option,
   Order,
@@ -46,7 +51,8 @@ import {
 import { declareNativeAppsStack } from "./apps-stack.js";
 
 const graphFixture = Effect.fnUntraced(function* (
-  mode: "create" | "noop" | "update" | "without-precreate"
+  mode: "create" | "noop" | "update" | "without-precreate" | "adopted",
+  stage = "dev_native_graph_proof"
 ) {
   const providerWrites = yield* Ref.make(0);
   const forbiddenWrite = Ref.update(providerWrites, (count) => count + 1).pipe(
@@ -74,21 +80,72 @@ const graphFixture = Effect.fnUntraced(function* (
     )
   );
   const stateLayer = inMemoryState();
+  const zoneProvider = Provider.succeed(Zone, {
+    delete: () => forbiddenWrite,
+    diff: () => Effect.void,
+    read: ({ output }) =>
+      Effect.succeed(
+        mode === "adopted"
+          ? Unowned({
+              accountId: "f9f94270a4a5af8af7010d891020922d",
+              accountName: undefined,
+              activatedOn: undefined,
+              cnameSuffix: undefined,
+              createdOn: "2026-10-03T05:08:24Z",
+              developmentMode: 0,
+              meta: {
+                cdnOnly: undefined,
+                customCertificateQuota: undefined,
+                dnsOnly: undefined,
+                foundationDns: false,
+                pageRuleQuota: undefined,
+                phishingDetected: undefined,
+                step: undefined,
+              },
+              modifiedOn: "2026-10-03T05:08:24Z",
+              name: "taxkit.dev",
+              nameServers: ["joan.ns.cloudflare.com", "kip.ns.cloudflare.com"],
+              originalDnshost: undefined,
+              originalNameServers: undefined,
+              originalRegistrar: undefined,
+              owner: { id: undefined, name: undefined, type: undefined },
+              paused: false,
+              status: "active",
+              tenant: undefined,
+              tenantUnit: undefined,
+              type: "full",
+              vanityNameServers: undefined,
+              verificationKey: undefined,
+              zoneId: "15103853342ab9f18f7894b7fae39c39",
+            } satisfies Zone["Attributes"])
+          : output
+      ),
+    reconcile: () => forbiddenWrite,
+  });
+  const settingsProvider = Provider.succeed(ZoneDnsSettings, {
+    delete: () => forbiddenWrite,
+    diff: () => Effect.void,
+    read: ({ output }) => Effect.succeed(output),
+    reconcile: () => forbiddenWrite,
+  });
   const providers = Layer.merge(
     Layer.effect(
       Providers,
-      Provider.collection([Worker]).pipe(Effect.provide(workerProvider))
+      Provider.collection([Worker, Zone, ZoneDnsSettings]).pipe(
+        Effect.provide(
+          Layer.mergeAll(workerProvider, zoneProvider, settingsProvider)
+        )
+      )
     ),
     stateLayer
   );
-  // The actual graph uses only Worker providers. Its public upstream type names
-  // the complete Cloudflare provider union; absent providers would still fail
-  // native planning rather than receive invented services.
+  // The actual stage selects its native resources. Unlisted providers still
+  // fail rather than receive invented services; all writes refuse.
   const compiled = yield* Stack.make<Providers | State>({
     name: "TaxKitAppsGraphProof",
     providers,
     state: stateLayer,
-  })(declareNativeAppsStack);
+  })(declareNativeAppsStack).pipe(Effect.provideService(Stage, stage));
   if (mode === "noop" || mode === "update") {
     const state = yield* State.pipe(Effect.provideContext(compiled.services));
     const store = yield* state;
@@ -260,6 +317,113 @@ const localContext = {
 };
 
 describe("native paired app graph and planner", () => {
+  it.live.each(["pr-214", "dev_ci_user"])(
+    "keeps Production DNS out of %s",
+    (stage) =>
+      Effect.gen(function* () {
+        const result = yield* graphFixture("create", stage);
+        const plan = yield* result.planned;
+        expect(Array.sort(Record.keys(plan.resources), Order.String)).toEqual([
+          "TaxKitApi",
+          "TaxKitWebsite",
+        ]);
+        expect(result.compiled.stage).toBe(stage);
+        expect(result.providerWrites).toBe(0);
+        if (stage === "pr-214") {
+          expect(formatPlanLines(plan).join("\n")).toBe(
+            (yield* (yield* FileSystem.FileSystem).readFileString(
+              "../../tools/docs-deployment/fixtures/alchemy-beta.80/native-apps-preview.txt"
+            )).trimEnd()
+          );
+        }
+        const members = Record.values(result.compiled.resources);
+        expect(
+          Array.every(
+            members,
+            (resource) => !Object.hasOwn(resource.Props, "domain")
+          )
+        ).toBe(true);
+      }).pipe(
+        Effect.provideService(AlchemyContext, localContext),
+        graphEnvironment,
+        Effect.scoped
+      )
+  );
+  it.live("pins Production domains to the adopted retained zone", () =>
+    Effect.gen(function* () {
+      const result = yield* graphFixture("adopted", "prod");
+      const plan = yield* result.planned;
+      expect(Array.sort(Record.keys(plan.resources), Order.String)).toEqual([
+        "TaxKitApi",
+        "TaxKitProductionDnsSettings",
+        "TaxKitProductionZone",
+        "TaxKitWebsite",
+      ]);
+      expect(result.providerWrites).toBe(0);
+      expect(formatPlanLines(plan).join("\n")).toBe(
+        (yield* (yield* FileSystem.FileSystem).readFileString(
+          "../../tools/docs-deployment/fixtures/alchemy-beta.80/native-apps-production.txt"
+        )).trimEnd()
+      );
+      const zone = Record.get(
+        result.compiled.resources,
+        "TaxKitProductionZone"
+      ).pipe(
+        Option.getOrElse(() => expect.fail("Expected native graph member"))
+      );
+      const settings = Record.get(
+        result.compiled.resources,
+        "TaxKitProductionDnsSettings"
+      ).pipe(
+        Option.getOrElse(() => expect.fail("Expected native graph member"))
+      );
+      const api = Record.get(result.compiled.resources, "TaxKitApi").pipe(
+        Option.getOrElse(() => expect.fail("Expected native graph member"))
+      );
+      const website = Record.get(
+        result.compiled.resources,
+        "TaxKitWebsite"
+      ).pipe(
+        Option.getOrElse(() => expect.fail("Expected native graph member"))
+      );
+      expect(zone.Adopt).toBe(true);
+      expect(zone.RemovalPolicy).toBe("retain");
+      expect(settings.RemovalPolicy).toBe("retain");
+      expect(zone.Props).toEqual({
+        name: "taxkit.dev",
+        paused: false,
+        type: "full",
+      });
+      const domains = yield* Output.evaluate(
+        {
+          api: api.Props.domain,
+          settingsZone: settings.Props.zoneId,
+          website: website.Props.domain,
+        },
+        { TaxKitProductionZone: { zoneId: "15103853342ab9f18f7894b7fae39c39" } }
+      ).pipe(Effect.provideContext(result.compiled.services));
+      expect(domains).toEqual({
+        api: {
+          name: "api.taxkit.dev",
+          zoneId: "15103853342ab9f18f7894b7fae39c39",
+        },
+        settingsZone: "15103853342ab9f18f7894b7fae39c39",
+        website: {
+          name: "taxkit.dev",
+          redirects: ["www.taxkit.dev"],
+          zoneId: "15103853342ab9f18f7894b7fae39c39",
+        },
+      });
+      expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
+      expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
+      expect(Object.hasOwn(settings.Props, "soa")).toBe(false);
+      expect(Object.hasOwn(settings.Props, "internalDns")).toBe(false);
+    }).pipe(
+      Effect.provideService(AlchemyContext, localContext),
+      graphEnvironment,
+      Effect.scoped
+    )
+  );
   it.live.each(["create", "noop", "update"] as const)(
     "keeps the actual circular address graph live for %s",
     (mode) =>

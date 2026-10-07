@@ -11,12 +11,17 @@ const AppsDopplerSelection = Schema.Struct({
   project: Schema.Literal("taxkit"),
 });
 
+// The native stage is external Alchemy input. Both secret and resource
+// selection restore it through the same existing stage Schema here.
+export const nativeAppsStage = (value: typeof Schema.Unknown.Type) =>
+  decodeDocsCloudflareStackStage(value);
+
 // Reuse the existing checked prod / pr-N / dev_identity stage owner. Invalid
 // stages fail before the native secret provider can request any credentials.
 export const nativeAppsDopplerSelection = Effect.fnUntraced(function* (
   stage: string
 ) {
-  const checked = yield* decodeDocsCloudflareStackStage(stage).pipe(
+  const checked = yield* nativeAppsStage(stage).pipe(
     Effect.mapError(
       () =>
         new Config.ConfigError(

@@ -1,6 +1,22 @@
-import { Array as EffectArray, Effect, Option, Record, Schema } from "effect";
+import {
+  Array as EffectArray,
+  Effect,
+  Equivalence,
+  HashSet,
+  Match,
+  Option,
+  Order,
+  Record,
+  Schema,
+} from "effect";
 
-import { DeploymentPlanProjection } from "./schemas.js";
+import {
+  DeploymentPlanProjection,
+  NativeAppsPlanAction,
+  NativeAppsPlanBinding,
+  NativeAppsPlanProjection,
+  NativeAppsPlanResource,
+} from "./schemas.js";
 
 export const alchemyPlanTextVersion = "2.0.0-beta.80" as const;
 export const alchemyPlanSourceCommit =
@@ -134,6 +150,11 @@ export const WorkflowPlanProjectionReason = Schema.Literals([
   "a native teardown plan must contain at most one DocsWebsite action",
   "a native teardown plan may only delete or noop the DocsWebsite resource",
   "beta.80 Alchemy plan summary does not match its native resource action",
+  "native app plan requires the exact account, stage, zone and patch identity",
+  "native app plan contains an unsupported or repeated resource or binding",
+  "native app plan resources do not match its stage",
+  "native app plan summary does not match its resources and bindings",
+  "native app plan cannot be used for teardown",
 ]);
 
 export class WorkflowPlanProjectionError extends Schema.TaggedError<WorkflowPlanProjectionError>()(
@@ -155,6 +176,20 @@ export const stringifyWorkflowPlanProjection = (
     )
   );
 
+export const stringifyNativeAppsPlanProjection = (
+  projection: NativeAppsPlanProjection
+) =>
+  Schema.encodeEffect(Schema.fromJsonString(NativeAppsPlanProjection))(
+    projection
+  ).pipe(
+    Effect.mapError(
+      () =>
+        new WorkflowPlanProjectionError({
+          reason: "could not encode the workflow plan projection",
+        })
+    )
+  );
+
 // oxlint-disable-next-line eslint/no-control-regex -- ANSI colour is an explicit Alchemy host-output boundary.
 const ansiEscape = /\u001B\[[0-?]*[ -/]*[@-~]/gu;
 const timestampLog = /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] [A-Z]+ /u;
@@ -166,6 +201,165 @@ const planSummaryLine = /^Plan: /u;
 
 const fail = (reason: typeof WorkflowPlanProjectionReason.Type) =>
   Effect.fail(new WorkflowPlanProjectionError({ reason }));
+
+const nativeAppLine = /^\[(?<logicalId>[^\]]+)\] (?<action>[a-z]+)$/u;
+
+// This is a text ingress adapter for the installed non-detailed formatter.
+// It validates resource and binding lines; it grants no provider authority.
+export const projectNativeAppsPlanText = (
+  source: string,
+  stage: NativeAppsPlanProjection["stage"]
+) =>
+  Effect.gen(function* () {
+    const lines = EffectArray.filter(
+      EffectArray.flatMap(
+        source.replace(ansiEscape, "").split(/\r?\n/u),
+        (line) =>
+          Option.fromNullishOr(timestampedPlanLine.exec(line)).pipe(
+            Option.flatMap((match) => Option.fromNullishOr(match.groups)),
+            Option.flatMap((groups) => Record.get(groups, "planLine")),
+            Option.flatMap(Option.fromNullishOr),
+            Option.match({
+              onNone: () => (timestampLog.test(line) ? [] : [line]),
+              onSome: (planLine) => [planLine],
+            })
+          )
+      ),
+      (line) => line.length > 0
+    );
+    const summaries = EffectArray.filter(lines, (line) =>
+      planSummaryLine.test(line)
+    );
+    if (summaries.length !== 1) {
+      return yield* fail(
+        "beta.80 Alchemy plan output must contain exactly one plan summary"
+      );
+    }
+    const entries = yield* Effect.forEach(
+      EffectArray.filter(lines, (line) => !planSummaryLine.test(line)),
+      (line) =>
+        Effect.gen(function* () {
+          const match = Option.fromNullishOr(nativeAppLine.exec(line)).pipe(
+            Option.flatMap((value) => Option.fromNullishOr(value.groups))
+          );
+          const groups = yield* Option.match(match, {
+            onNone: () =>
+              fail(
+                "native app plan contains an unsupported or repeated resource or binding"
+              ),
+            onSome: Effect.succeed,
+          });
+          const logicalId = Record.get(groups, "logicalId").pipe(
+            Option.getOrUndefined
+          );
+          const action = Record.get(groups, "action").pipe(
+            Option.getOrUndefined
+          );
+          const resourceType = Match.value(logicalId).pipe(
+            Match.when("TaxKitProductionZone", () => "Cloudflare.Zone.Zone"),
+            Match.when(
+              "TaxKitProductionDnsSettings",
+              () => "Cloudflare.DNS.ZoneSettings"
+            ),
+            Match.orElse(() => "Cloudflare.Worker")
+          );
+          return yield* Schema.decodeUnknownEffect(
+            Schema.Union([NativeAppsPlanResource, NativeAppsPlanBinding])
+          )(
+            logicalId?.includes("/")
+              ? { action, logicalId }
+              : { action, logicalId, resourceType },
+            { onExcessProperty: "error" }
+          ).pipe(
+            Effect.mapError(
+              () =>
+                new WorkflowPlanProjectionError({
+                  reason:
+                    "native app plan contains an unsupported or repeated resource or binding",
+                })
+            )
+          );
+        })
+    );
+    if (
+      HashSet.size(
+        HashSet.fromIterable(
+          EffectArray.map(entries, (entry) => entry.logicalId)
+        )
+      ) !== entries.length
+    ) {
+      return yield* fail(
+        "native app plan contains an unsupported or repeated resource or binding"
+      );
+    }
+    const logicalResources = EffectArray.sortWith(
+      EffectArray.filter(
+        entries,
+        (entry): entry is typeof NativeAppsPlanResource.Type =>
+          Schema.is(NativeAppsPlanResource)(entry)
+      ),
+      (entry: typeof NativeAppsPlanResource.Type) => entry.logicalId,
+      Order.String
+    );
+    const bindings = EffectArray.sortWith(
+      EffectArray.filter(
+        entries,
+        (entry): entry is typeof NativeAppsPlanBinding.Type =>
+          Schema.is(NativeAppsPlanBinding)(entry)
+      ),
+      (entry: typeof NativeAppsPlanBinding.Type) => entry.logicalId,
+      Order.String
+    );
+    const expectedIds =
+      stage === "prod"
+        ? [
+            "TaxKitApi",
+            "TaxKitProductionDnsSettings",
+            "TaxKitProductionZone",
+            "TaxKitWebsite",
+          ]
+        : ["TaxKitApi", "TaxKitWebsite"];
+    if (
+      !EffectArray.makeEquivalence(Equivalence.String)(
+        EffectArray.map(logicalResources, (entry) => entry.logicalId),
+        expectedIds
+      )
+    ) {
+      return yield* fail("native app plan resources do not match its stage");
+    }
+    const summaryParts = EffectArray.flatMap(
+      NativeAppsPlanAction.literals,
+      (action) => {
+        const count = EffectArray.filter(
+          logicalResources,
+          (entry) => entry.action === action
+        ).length;
+        return action === "noop" || count === 0
+          ? []
+          : [`${count} to ${action}`];
+      }
+    );
+    const bindingChanges = EffectArray.filter(
+      bindings,
+      (entry) => entry.action !== "noop"
+    ).length;
+    const allParts =
+      bindingChanges === 0
+        ? summaryParts
+        : [...summaryParts, `${bindingChanges} binding changes`];
+    const expectedSummary = `Plan: ${allParts.length === 0 ? "no changes" : allParts.join(", ")}`;
+    if (
+      !Option.exists(
+        EffectArray.head(summaries),
+        (summary) => summary === expectedSummary
+      )
+    ) {
+      return yield* fail(
+        "native app plan summary does not match its resources and bindings"
+      );
+    }
+    return { bindings, logicalResources };
+  });
 
 export const projectAlchemyPlanText = (
   source: string,

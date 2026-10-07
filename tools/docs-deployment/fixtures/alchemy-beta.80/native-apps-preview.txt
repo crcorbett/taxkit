@@ -1,0 +1,12 @@
+Plan: 2 to create, 9 binding changes
+[TaxKitApi] create
+[TaxKitApi/API_PUBLIC_ORIGIN] create
+[TaxKitApi/CALCULATOR_HOST_MODE] create
+[TaxKitApi/CALCULATOR_RATE_LIMIT] create
+[TaxKitApi/TaxKitMcpSessions] create
+[TaxKitApi/WEBSITE_PUBLIC_ORIGIN] create
+[TaxKitWebsite] create
+[TaxKitWebsite/API_PUBLIC_ORIGIN] create
+[TaxKitWebsite/CALCULATOR_HOST_MODE] create
+[TaxKitWebsite/TAXKIT_API] create
+[TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN] create

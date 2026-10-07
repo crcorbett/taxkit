@@ -520,3 +520,11 @@ and exact lint admissions. Its native protocol caller is controlled by the test;
 it establishes no autonomous model session, deployment or general browser support.
 T006 still includes older remote sessions, remote cancellation and public setup;
 metrics remain deferred.
+
+
+The [native domain/plan candidate](clean-slate-foundation/2026-10-07-native-domains.json)
+records Production-only zone/settings/domain declarations, the actual native
+formatter's checked two-app/Production projections and the corrected shared
+redirect read fallback. Its [provider readback](clean-slate-foundation/2026-10-07-domain-provider-readback.json)
+retains successful existing-profile GETs. Local mock/source/compiled proof is
+separate from live plans, real secret custody, apply and public availability.

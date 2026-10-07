@@ -149,3 +149,39 @@ saved-state operation. The local emulator binds this generated class to isolated
 fixture namespaces. The cloud API/Website operation remains DEV-81 work,
 including exact class migration/binding readback and rollback; current local
 proof does not approve or establish that operation.
+
+
+## Production-only domain candidate
+
+The native `prod` graph declares an adopted retained `taxkit.dev` zone and
+retained DNS settings matching the independent 7 October readback. It declares
+`taxkit.dev` for the Website, a native `www.taxkit.dev` redirect, and
+`api.taxkit.dev` for the API. Domain zone IDs come from the declared zone's
+Output. Self origins still use `Worker.URL`; peer origins still use resource
+Outputs and checked application Config. Local and `pr-N` graphs omit domain
+properties and both Production resources; they do not request domain removal.
+
+The [dated provider readback](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json)
+records existing state, not desired availability. DNSSEC, registrar lock,
+automatic renewal, TLS settings, SOA and unrelated records are not changed by
+this declaration. The focused native graph uses memory state, mocked reads and
+refused writes. The installed Alchemy beta.80 redirect provider originally treated every failed
+shared-rule read as an empty ruleset. Actual mocked-provider calls reproduced
+that behaviour. The receiving source and compiled provider are now patched to
+accept only native `RulesetNotFound` as absence: a 403 refuses rule replacement,
+a specific missing-rule reply permits creation, and existing unrelated rules
+survive. The three regular provider tests and six source/compiled probes pass.
+The provider uploads its Worker script before reading shared redirect rules;
+this correction does not roll that earlier upload back after a read failure.
+
+The version-three plan projection in `tools/docs-deployment` admits the native
+API/Website resources, checked bindings and summary. Its Production variant
+also admits the retained settings and adopted zone; zone creation, replacement,
+delete, unknown rows and Production resources in Preview refuse. It requires
+the exact configured account and Production zone plus a patch digest. Those
+checked input identities are not live credential/account readback or a fresh
+source-manifest calculation. Historical version-one/two receipts keep their
+original bytes and resource identities. Current writer workflows still refuse;
+live no-apply plans, the replacement workflow evidence writer and full secret
+custody/readback remain T007/DEV-81 work. No actual adoption, attachment,
+certificate, apply or public runtime is established here.

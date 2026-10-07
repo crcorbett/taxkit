@@ -1,5 +1,6 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it as test } from "@effect/vitest";
+import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import {
   Array as EffectArray,
   Effect,
@@ -14,7 +15,10 @@ import {
 } from "effect";
 import { sort as sortArray } from "effect/Array";
 
-import { DeploymentPlanProjection } from "./schemas.js";
+import {
+  DeploymentPlanProjection,
+  NativeAppsPlanProjection,
+} from "./schemas.js";
 import { workflowSha256 } from "./workflow-check.boundary.js";
 import {
   AlchemyPlanFixtureManifest,
@@ -23,6 +27,7 @@ import {
   historicalAlchemyPlanSourceCommit,
   historicalAlchemyPlanTextVersion,
   projectAlchemyPlanText,
+  projectNativeAppsPlanText,
   stringifyWorkflowPlanProjection,
 } from "./workflow-plan-projection.js";
 
@@ -685,5 +690,129 @@ describe("Alchemy plan projection and historical capture custody", () => {
         },
       ]);
     })
+  );
+});
+
+describe("replacement native app plan admission", () => {
+  test.effect.each(["preview", "production"] as const)(
+    "admits the actual formatter's %s graph",
+    (kind) =>
+      Effect.gen(function* () {
+        const stage = yield* Schema.decodeEffect(DocsDeploymentStage)(
+          kind === "preview" ? "pr-214" : "prod"
+        );
+        const source = yield* readFile(
+          `tools/docs-deployment/fixtures/alchemy-beta.80/native-apps-${kind}.txt`,
+          "utf-8"
+        );
+        const plan = yield* projectNativeAppsPlanText(source, stage);
+        expect(plan.logicalResources).toHaveLength(kind === "preview" ? 2 : 4);
+        expect(plan.bindings).toHaveLength(9);
+        expect(
+          EffectArray.map(
+            plan.logicalResources,
+            (resource) => resource.logicalId
+          )
+        ).toEqual(
+          kind === "preview"
+            ? ["TaxKitApi", "TaxKitWebsite"]
+            : [
+                "TaxKitApi",
+                "TaxKitProductionDnsSettings",
+                "TaxKitProductionZone",
+                "TaxKitWebsite",
+              ]
+        );
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect.each([
+    {
+      source: "Plan: no changes\n[TaxKitApi] noop\n[TaxKitWebsite] noop\n",
+      stage: "pr-214",
+    },
+    {
+      source:
+        "Plan: no changes\n[TaxKitApi] noop\n[TaxKitProductionDnsSettings] noop\n[TaxKitProductionZone] noop\n[TaxKitWebsite] noop\n",
+      stage: "prod",
+    },
+  ])("admits native no-change resource rows for $stage", ({ source, stage }) =>
+    Effect.gen(function* () {
+      const checked = yield* Schema.decodeEffect(DocsDeploymentStage)(stage);
+      const plan = yield* projectNativeAppsPlanText(source, checked);
+      expect(plan.bindings).toEqual([]);
+      expect(
+        EffectArray.every(
+          plan.logicalResources,
+          (entry) => entry.action === "noop"
+        )
+      ).toBe(true);
+    })
+  );
+  test.effect.each([
+    "wrong-summary",
+    "duplicate",
+    "unknown-resource",
+    "unknown-binding",
+    "replace",
+    "delete",
+    "binding-delete",
+    "zone-create",
+    "production-in-preview",
+    "empty",
+    "old-stack",
+    "local-mode",
+  ] as const)("refuses %s without exposing input", (problem) =>
+    Effect.gen(function* () {
+      const base = yield* readFile(
+        "tools/docs-deployment/fixtures/alchemy-beta.80/native-apps-production.txt",
+        "utf-8"
+      );
+      const sources = {
+        "binding-delete": base.replace(
+          "[TaxKitApi/API_PUBLIC_ORIGIN] create",
+          "[TaxKitApi/API_PUBLIC_ORIGIN] unbind"
+        ),
+        delete: base.replace(
+          "[TaxKitWebsite] create",
+          "[TaxKitWebsite] delete"
+        ),
+        duplicate: `${base}[TaxKitWebsite] create\n`,
+        empty: "Plan: no resources\n",
+        "local-mode": base.replace(
+          "[TaxKitApi] create",
+          "[TaxKitApi] create (local)"
+        ),
+        "old-stack": "Plan: 1 to create\n[DocsWebsite] create\n",
+        "production-in-preview": base,
+        replace: base.replace(
+          "[TaxKitWebsite] create",
+          "[TaxKitWebsite] replace"
+        ),
+        "unknown-binding": `${base}[TaxKitApi/private-input-sentinel] create\n`,
+        "unknown-resource": `${base}[private-input-sentinel] create\n`,
+        "wrong-summary": base.replace("3 to create", "2 to create"),
+        "zone-create": base.replace(
+          "[TaxKitProductionZone] adopted",
+          "[TaxKitProductionZone] create"
+        ),
+      } as const;
+      const stage = yield* Schema.decodeEffect(DocsDeploymentStage)(
+        problem === "production-in-preview" ? "pr-214" : "prod"
+      );
+      const result = yield* projectNativeAppsPlanText(
+        Record.get(sources, problem).pipe(
+          Option.getOrElse(() => expect.fail("Expected named refusal input"))
+        ),
+        stage
+      ).pipe(Effect.result);
+      expect(Result.isFailure(result)).toBe(true);
+      if (Result.isFailure(result)) {
+        expect(result.failure._tag).toBe("WorkflowPlanProjectionError");
+        expect(String(result.failure)).not.toContain("private-input-sentinel");
+      }
+      expect(Schema.is(NativeAppsPlanProjection)({ schemaVersion: 2 })).toBe(
+        false
+      );
+    }).pipe(Effect.provide(BunServices.layer))
   );
 });

@@ -1,7 +1,7 @@
 {
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/clean-slate-foundation.md",
-  "title": "Clean slate TaxKit foundation — implementation slices",
+  "title": "Clean slate TaxKit foundation \u2014 implementation slices",
   "status": "in_progress",
   "last_reviewed": "2026-10-07",
   "authority": "Cooper explicitly authorised implementation, reviewable commits and draft PRs on 2026-10-04. No merge, deploy or publication; provider-plan approval remains separate.",
@@ -652,7 +652,7 @@
     {
       "id": "CSF-T007",
       "title": "Prepare DNS, domain and secret provider plans",
-      "status": "pending",
+      "status": "in_progress",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -706,7 +706,11 @@
         "Doppler precedence, runtime binding and separate credential purposes have checked proof without secret values in output.",
         "All cloud mutations remain unexecuted until the concrete plan has the required named authority; DNS/TLS/registrar readback is separate from apply success."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-domains.json"
+      ]
     },
     {
       "id": "CSF-T008",

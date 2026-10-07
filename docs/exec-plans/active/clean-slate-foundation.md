@@ -79,8 +79,8 @@ records command outcomes and log digests.
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
-| T006 / DEV-77 | In progress | Modern remote tools are locally tested in draft #156 with exact-head hosted Quality. Browser tools and both saved-page lifetimes are delivered in draft #157 after all nine local checks and exact-head hosted Quality. Older-session lifetime/cancellation passed the complete source-frozen nine-check graph on the current branch, including all fourteen native cases twice. Its tested draft delivery is being prepared. Prompt modern remote cleanup and public setup remain unfinished. |
-| T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
+| T006 / DEV-77 | In progress | Modern remote tools are locally tested in draft #156 with exact-head hosted Quality. Browser tools and both saved-page lifetimes are delivered in draft #157 after all nine local checks and exact-head hosted Quality. Older-session lifetime/cancellation passed the complete source-frozen nine-check graph on the current branch, including all fourteen native cases twice. Draft #158 is pushed at `013e02845e49d78af33aa9ea157075c24b8e0065`; exact-head hosted Quality `37574967845` passed at 05:29 UTC on 7 October. Prompt modern remote cleanup and public setup remain unfinished. |
+| T007 / DEV-78 | In progress; T003/T005 locally complete | Existing cf CLI profile reads the exact zone and selected settings. Production-only retained graph, safe shared redirect read and native v3 projection passed 37 infrastructure and 42 plan/command cases, 621 policy cases and all nine local release checks. Real input calculation/writer, scoped Doppler custody and live no-apply plans remain unfinished; no apply. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Pending T007/T008/T009 | Full review, release/consumer proof and separately authorised delivery. |
@@ -5125,3 +5125,101 @@ runbook, format, frozen-install and source-identity checks all passed. DEV-77 re
 in progress: prompt modern network cleanup and public setup are unfinished.
 Metrics stay deferred, collection disabled and tax values retained. No cloud
 class/binding state, public availability or provider operation is established.
+
+
+## T007 domain preparation and existing connection
+
+Cooper asked to check existing `cf` CLI connections before creating one. The
+existing `default` OAuth profile is valid for the exact zone account and has
+the required read capabilities. No credential was created or changed. The
+[dated readback](../../documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json)
+records the independent successful GETs without token values or local paths:
+no DNS records were returned, DNSSEC is disabled, the registration is active
+with automatic renewal and transfer lock, and the shared dynamic redirect
+entrypoint returns the specific 404 absence code. Seven general zone settings
+were selected; that is not an exhaustive settings catalogue.
+
+The native graph checks the existing stage Schema before declaring resources.
+Only `prod` declares the adopted retained zone and retained DNS settings. Its
+Website declares `taxkit.dev` plus the native `www` redirect, and its API declares
+`api.taxkit.dev`; both use the zone's native Output. Local and `pr-N` stages
+omit domain properties and all Production zone/settings resources. Self and
+peer origins retain their native owners. The 34 focused infrastructure tests
+and type check pass; formatting passes. The first lint attempt used a missing
+script name and provides no lint proof; the corrected owned command passes after fixing the new fixture style.
+Documentation, runbook and diff checks also pass. Full repository checks have
+not qualified this slice yet.
+
+Actual receiving-provider calls reproduced the broad read-error fallback.
+The source and compiled provider now catch only native `RulesetNotFound`.
+Failed access produces no shared-rule PUT, confirmed absence permits creation,
+and existing foreign rules remain. All three regular provider tests and six
+source/compiled probes pass. The provider can upload its script before that
+read fails; this is not rollback of the complete Worker operation.
+
+The native v3 plan projection now admits exact app/resource/binding rows and
+summary counts, with Production-only adopted/retained zone/settings. Native
+formatter tests use the actual receiving plans, memory state and refused
+provider writes. 37 infrastructure cases, 42 plan/command cases, type checks,
+lint and the actual policy CLI fixtures pass. The old receipts and writer stops
+remain. Supplied source digests still need the native workflow evidence writer;
+real scoped Doppler custody and live no-apply planning remain unfinished.
+No live provider write, adoption, certificate, deployment or rollback is claimed.
+
+### T007 documentation impact
+
+| Surface | Decision | Owner and limits |
+| --- | --- | --- |
+| Native graph, infrastructure README and deployment architecture | Change required | Production-only retained zone/settings and native domains; focused stage and Output proof. |
+| SPEC/task and active execution plan | Change required | T007 is in progress; earlier T006 draft is pushed, with modern cleanup and setup still pending. |
+| Dated provider evidence | Change required | Independent exact-account cf GETs, bounded selected fields and explicit non-claims. |
+| Current plan admission, workflows and operator procedure | Change required | V3 projection admits the actual native pair and Production adoption/settings. Current writer/evidence replacement and live plan/custody remain pending; old operations still refuse. |
+| Public app origins, calculations, package contracts and metrics | Preserve | Native self/peer bindings and retained tax results remain; no public package change or Changeset. Metrics stay deferred. |
+| Historical receipts, old recovery identities and provider resources | Preserve | No rewriting of historical graphs and no provider operation. |
+
+
+### T007 local domain/redirect/plan candidate review
+
+The existing default `cf` profile answered the requested exact account/zone
+GETs without a new connection or credential. The receiving dependency patch
+adds only the native redirect absence catch, with matching compiled code and
+map; the existing Plan source/compiled/map patch is preserved. A frozen
+installation resolves the corrected dependency. Preparation failures (compiler
+API selection, interrupted installation dependency lookup, type inference and
+fixture style) remain identified; later passing checks do not rewrite them.
+The regular policy suite preserves exact codec permission and neighbouring
+runtime/codec refusals. No public package contract changes, so no new Changeset
+is required for these private app/deployment owners.
+
+Docs-maintainer review records Change required for the native graph/README,
+deployment/tool schemas and projection, architecture, current SPEC/tasks/plan,
+runbook recovery/authority/sidecar, exact lint admission tests and dated proof.
+Preserve applies to public calculations/results/content, app origins, metrics
+(deferral and disabled collection), old receipts/resource identities and stopped
+writer workflows. Live plan, real secret custody, workflow evidence writer and
+external postconditions remain pending; full local qualification is next.
+
+Draft #158 (`013e02845e49d78af33aa9ea157075c24b8e0065`) independently passed
+GitHub Quality `37574967845` at 05:29 UTC on 7 October. Linear DEV-77 and its
+existing session comment/project update now read back that exact hosted success.
+That qualifies the earlier session draft only, not this dirty T007 candidate.
+
+### T007 source-frozen local qualification
+
+The 57 recorded source identities matched before and after the complete local
+`bun run release:check -- --ci` execution. All nine ordered checks passed; all
+18 sanitised detail artifacts were read and their digests independently matched.
+Both native application runs passed all 14 cases. The release-boundary mutation
+suite passed all 32 cases; its 13 real-command cases took about 10 minutes.
+These results qualify the local snapshot only, not hosted CI, credentials, a
+cloud plan, provider adoption or public availability. Four actual local v3
+command probes also passed their expected success/refusal outcomes with
+synthetic source identities and the real receiving patch digest.
+
+After full qualification, documentation-only corrections distinguish retained
+v2 from native v3 and remove obsolete DEV-73 planning claims in the affected
+tool README. The dated receipt retains before/after hashes and separate focused
+checks. Executable source remains identical to the fully checked snapshot.
+No new check framework, Changeset, credential, provider apply or deployment was
+introduced. A draft checkpoint does not complete T007: current writer/input
+calculation, real scoped Doppler custody and live no-apply plan proof remain.

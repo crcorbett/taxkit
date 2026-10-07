@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "taskId": "HGI-204",
   "owner": "taxkit-runbook-contract-owner",
-  "reviewTrigger": "release command, Changesets, package graph, HGI-203 evidence, recovery, or authority-boundary change",
+  "reviewTrigger": "release command, Changesets, package graph, HGI-203 evidence, native app/domain plan, recovery, or authority-boundary change",
   "acceptedHandoff": {
     "packet": "docs/evidence/releases/HGI-203-local.json",
     "historicalJourneyInventory": "docs/evidence/releases/HGI-203-critical-journeys.json",
@@ -326,7 +326,8 @@
       "evidencePaths": [
         "docs/evidence/releases/HGI-203-accepted-attempt.json",
         "docs/evidence/releases/HGI-203-failed-attempts.json",
-        "docs/operations/authority-model.md"
+        "docs/operations/authority-model.md",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json"
       ],
       "stopOperations": [
         "versioning",
@@ -359,7 +360,8 @@
       "evidencePaths": [
         "docs/verification/docs-deployment-journeys.json",
         "docs/evidence/deployments/README.md",
-        "docs/operations/authority-model.md"
+        "docs/operations/authority-model.md",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json"
       ],
       "stopOperations": [
         "versioning",

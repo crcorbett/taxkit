@@ -42,6 +42,16 @@ current target-system readback by the authorized principal.
 
 ## Current old-docs retirement boundary
 
+Native version-three plan preparation names `TaxKitAppsCloudflare`, the exact
+account and Production zone, and the retained zone/settings plus app resources.
+Preview omits Production DNS. The existing `cf` default profile supplied the
+separately authorised 7 October GETs without credential creation. That read
+capability does not authorise a native cloud plan's bootstrap effects, state
+writes, domain attachment, apply, credential change or rollback. Checked
+projection input identities do not establish current provider/source identity.
+The [deployment runbook](../runbooks/docs-deployment.md) owns the pending native
+procedure; local proof and old receipts grant no new operation authority.
+
 The current checkout retires the old docs workspace, writer workflows and
 Alchemy Stack entry. The [retention manifest](../documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json)
 preserves exact original sources and dated provider recovery identities.

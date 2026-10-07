@@ -1,0 +1,713 @@
+{
+  "document_type": "verification-evidence",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-infrastructure-proof-owner",
+  "observedAt": "2026-10-07T06:10:08.064130+00:00",
+  "task": "CSF-T007",
+  "baseCommit": "013e02845e49d78af33aa9ea157075c24b8e0065",
+  "branch": "codex/dev-78-native-domains-and-secrets",
+  "scope": "Production-only native domains, exact local plan projection, safe shared redirect read fallback",
+  "providerPatch": {
+    "version": "2.0.0-beta.80",
+    "upstreamCommit": "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
+    "change": "catch only native RulesetNotFound instead of every shared-rule read error",
+    "existingPlanPatchPreserved": true,
+    "sourceAndCompiledWithMatchingMap": true
+  },
+  "mockProviderObservations": [
+    {
+      "case": "before-source-forbidden",
+      "logSha256": "fd77150c04dfa8390920792ed21a5bba1d4031abd7abc8586683fddc97db8212",
+      "scenario": "forbidden",
+      "exit": "success",
+      "sharedRulesPutCount": 1,
+      "workerScriptPutCount": 1,
+      "network": "mock provider.invalid only",
+      "foreignRulePreserved": false,
+      "rulesCount": 1
+    },
+    {
+      "case": "source-forbidden",
+      "logSha256": "f783c5c33516f1ef1a3ddfa81c15afbaaf94ed1269a9e2c66211e6d3039ddf82",
+      "scenario": "forbidden",
+      "exit": "failure",
+      "sharedRulesPutCount": 0,
+      "workerScriptPutCount": 1,
+      "network": "mock provider.invalid only"
+    },
+    {
+      "case": "source-absent",
+      "logSha256": "dab3e15fa9d33549c753c6d1f0e35426db9dd68731e60b31f48afa19547a7ff9",
+      "scenario": "absent",
+      "exit": "success",
+      "sharedRulesPutCount": 1,
+      "workerScriptPutCount": 1,
+      "network": "mock provider.invalid only",
+      "foreignRulePreserved": false,
+      "rulesCount": 1
+    },
+    {
+      "case": "source-existing",
+      "logSha256": "d4bb0eaf63b205fd7c8f19a0932218ddf2a0980c5a39f9f7723c04d711afe9b1",
+      "scenario": "existing",
+      "exit": "success",
+      "sharedRulesPutCount": 1,
+      "workerScriptPutCount": 1,
+      "network": "mock provider.invalid only",
+      "foreignRulePreserved": true,
+      "rulesCount": 2
+    },
+    {
+      "case": "compiled-forbidden",
+      "logSha256": "9ac62bda76a98b7ccc9d17b2a36198f23730605bf56da4714c2d96671f75f9c8",
+      "scenario": "forbidden",
+      "exit": "failure",
+      "sharedRulesPutCount": 0,
+      "workerScriptPutCount": 1,
+      "network": "mock provider.invalid only"
+    },
+    {
+      "case": "compiled-absent",
+      "logSha256": "ca8e1947bb9938149a1e186ad7c192c606f97638ed93b297e46e4697eef8d606",
+      "scenario": "absent",
+      "exit": "success",
+      "sharedRulesPutCount": 1,
+      "workerScriptPutCount": 1,
+      "network": "mock provider.invalid only",
+      "foreignRulePreserved": false,
+      "rulesCount": 1
+    },
+    {
+      "case": "compiled-existing",
+      "logSha256": "409fdd22e0d2341d605c7e4f88ef7151e6335b1f051be7e76c1808fa829c8a4d",
+      "scenario": "existing",
+      "exit": "success",
+      "sharedRulesPutCount": 1,
+      "workerScriptPutCount": 1,
+      "network": "mock provider.invalid only",
+      "foreignRulePreserved": true,
+      "rulesCount": 2
+    }
+  ],
+  "focusedChecks": {
+    "infrastructureCases": 37,
+    "planAndCommandCases": 42,
+    "actualPolicyCliSuitePassed": true,
+    "receivingTypesPassed": true,
+    "lintPassed": true,
+    "actualPolicyCliCases": 621
+  },
+  "fullLocalChecks": {
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "mode": "local execution of CI graph",
+    "exitCode": 0,
+    "durationSeconds": 1053.22,
+    "logSha256": "3e88eadcf00755d2756221cbe061e0a0075bd3847f17d797f33e86ef69073ca1",
+    "orderedChecks": [
+      {
+        "check": "verification",
+        "exitCode": 0,
+        "artifacts": [
+          {
+            "channel": "stdout",
+            "path": "tmp/release-readiness/verification-stdout-WlvDDb/015b3bc381d0.log",
+            "sha256": "18f12ce475c8ac88e59a6331daa567e4a98cca56ad3986aff892b72260af0870",
+            "bytes": 544936,
+            "detailRead": true
+          },
+          {
+            "channel": "stderr",
+            "path": "tmp/release-readiness/verification-stderr-YankBS/97e665b5b748.log",
+            "sha256": "59504b0ca83995236774089abf8bb6719a8207c574d1bf0f530b68d2dd7badca",
+            "bytes": 2118,
+            "detailRead": true
+          }
+        ]
+      },
+      {
+        "check": "test",
+        "exitCode": 0,
+        "artifacts": [
+          {
+            "channel": "stdout",
+            "path": "tmp/release-readiness/test-stdout-DYQa9U/a9d75a55f49b.log",
+            "sha256": "563e7dafd9b9fde22ce1c86407118a4cefb92d4941f6a285d0c526f21c75742f",
+            "bytes": 88856,
+            "detailRead": true
+          },
+          {
+            "channel": "stderr",
+            "path": "tmp/release-readiness/test-stderr-iZ96Tz/3c35d259aa46.log",
+            "sha256": "a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8",
+            "bytes": 216,
+            "detailRead": true
+          }
+        ]
+      },
+      {
+        "check": "build",
+        "exitCode": 0,
+        "artifacts": [
+          {
+            "channel": "stdout",
+            "path": "tmp/release-readiness/build-stdout-sacxwO/5e952b2f6092.log",
+            "sha256": "cd5d2a2fcf9069683bbd7b449585d25195c5f83cc294514b95f8a46f87b1a660",
+            "bytes": 92840,
+            "detailRead": true
+          },
+          {
+            "channel": "stderr",
+            "path": "tmp/release-readiness/build-stderr-nPWErx/58d9ac4d94be.log",
+            "sha256": "844915855e64ad7359e63b5ba6df54e45ef4825107084cebde1492f28bf01a07",
+            "bytes": 137,
+            "detailRead": true
+          }
+        ]
+      },
+      {
+        "check": "docs-validation",
+        "exitCode": 0,
+        "artifacts": [
+          {
+            "channel": "stdout",
+            "path": "tmp/release-readiness/docs-validation-stdout-qrZWAU/fc5dea055dde.log",
+            "sha256": "7e96c66c3f0a335cfa9fd8069917eef676e8932c254ea362d77252bb91695b0a",
+            "bytes": 2295,
+            "detailRead": true
+          },
+          {
+            "channel": "stderr",
+            "path": "tmp/release-readiness/docs-validation-stderr-7dG193/364459b20dcb.log",
+            "sha256": "fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697",
+            "bytes": 51,
+            "detailRead": true
+          }
+        ]
+      },
+      {
+        "check": "packed-artifact",
+        "exitCode": 0,
+        "artifacts": [
+          {
+            "channel": "stdout",
+            "path": "tmp/release-readiness/packed-artifact-stdout-ahOkjG/3527f2c5d6e7.log",
+            "sha256": "7a0c45a3ddd03217d575708dfbf2092b36cbe9b7e0d98c7432a8e909d53524f1",
+            "bytes": 3764,
+            "detailRead": true
+          },
+          {
+            "channel": "stderr",
+            "path": "tmp/release-readiness/packed-artifact-stderr-Jfofbr/be712256ca73.log",
+            "sha256": "06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7",
+            "bytes": 55,
+            "detailRead": true
+          }
+        ]
+      },
+      {
+        "check": "downstream-consumer",
+        "exitCode": 0,
+        "artifacts": [
+          {
+            "channel": "stdout",
+            "path": "tmp/release-readiness/downstream-consumer-stdout-RuCDqb/7ad0c8216369.log",
+            "sha256": "e1763596daed5b3ff65791ccca6fe2c06a5d1d21fd5bc9049893334389d87a64",
+            "bytes": 13351,
+            "detailRead": true
+          },
+          {
+            "channel": "stderr",
+            "path": "tmp/release-readiness/downstream-consumer-stderr-4SGKUr/8087ad5d1c4b.log",
+            "sha256": "d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9",
+            "bytes": 53,
+            "detailRead": true
+          }
+        ]
+      },
+      {
+        "check": "api-smoke",
+        "exitCode": 0,
+        "artifacts": [
+          {
+            "channel": "stdout",
+            "path": "tmp/release-readiness/api-smoke-stdout-JpHFsg/8e0696e6023f.log",
+            "sha256": "266501a21d54ad0db2ffe165ebc3df34bc628da7d90609110696696a06ab5ac9",
+            "bytes": 64312,
+            "detailRead": true
+          },
+          {
+            "channel": "stderr",
+            "path": "tmp/release-readiness/api-smoke-stderr-qOfRiv/aeb8acea289d.log",
+            "sha256": "1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87",
+            "bytes": 31,
+            "detailRead": true
+          }
+        ]
+      },
+      {
+        "check": "docs-browser",
+        "exitCode": 0,
+        "artifacts": [
+          {
+            "channel": "stdout",
+            "path": "tmp/release-readiness/docs-browser-stdout-Az36XW/dba9d8fe2666.log",
+            "sha256": "ddc8249070c631405d96aff8048e95d447b850bb0135e1eeabbf7b52623b0f3f",
+            "bytes": 77067,
+            "detailRead": true
+          },
+          {
+            "channel": "stderr",
+            "path": "tmp/release-readiness/docs-browser-stderr-7OOcXi/ed3f4bcb34ba.log",
+            "sha256": "781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4",
+            "bytes": 82,
+            "detailRead": true
+          }
+        ]
+      },
+      {
+        "check": "changeset-status",
+        "exitCode": 0,
+        "artifacts": [
+          {
+            "channel": "stdout",
+            "path": "tmp/release-readiness/changeset-status-stdout-zbcIAa/674ef4a7fb36.log",
+            "sha256": "9aef39438c18ee641a4e9451212dbf1250ee315e43fdb655e635d035dd5b3683",
+            "bytes": 10039,
+            "detailRead": true
+          },
+          {
+            "channel": "stderr",
+            "path": "tmp/release-readiness/changeset-status-stderr-QgIF5r/158efb5fa744.log",
+            "sha256": "26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3",
+            "bytes": 37,
+            "detailRead": true
+          }
+        ]
+      }
+    ],
+    "detailArtifactCount": 18,
+    "allDetailDigestsVerified": true,
+    "allDetailsRead": true,
+    "frozenSourceCount": 57,
+    "sourceIdentitiesMatchedAfterChecks": true,
+    "nonClaims": [
+      "hosted CI",
+      "provider plan",
+      "provider apply",
+      "deployment",
+      "publication",
+      "credential custody"
+    ]
+  },
+  "frozenSources": [
+    {
+      "path": "apps/api/README.md",
+      "sha256": "0de89660f152acfca68d29952621e97f523761ef2bf6008b07df6cef39895b62"
+    },
+    {
+      "path": "apps/api/package.json",
+      "sha256": "d33dad1fdf3f2e2ee9858eefcb7fefbe5913277b1f511697105d89f9768012ec"
+    },
+    {
+      "path": "apps/api/src/mcp-session.layer.ts",
+      "sha256": "53a697d2c2679d48ed8aeb688fd43064e2a2b83c20c3dc41863cb08a490892cd"
+    },
+    {
+      "path": "apps/api/src/mcp.schemas.ts",
+      "sha256": "f9aa41c1bac27397b0ff194abeea6b36f103265fa7469b7f8795f0a34cb177e9"
+    },
+    {
+      "path": "apps/api/src/mcp.tools.layer.ts",
+      "sha256": "8590bffc112bd0952b05bde04093439f48f6a3a2f695890eafe03a98aeee3913"
+    },
+    {
+      "path": "apps/api/src/worker.application.ts",
+      "sha256": "351b719eb7ef0804890015a95db2a5b74228d23640761fe32e72354d3fff1bfb"
+    },
+    {
+      "path": "apps/api/src/worker.ts",
+      "sha256": "0846f9c66164add10f734b167d41eecc6def8ce2827ad1e512d12cea4efdc2f1"
+    },
+    {
+      "path": "apps/web/README.md",
+      "sha256": "a8f5b8fe8530dc9fbd6d22b768453aed4655bfc25612eeb95bcd8ecd6b5c8465"
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "96245085fd4ccba4a0093688af0327aa9c50e15b0af360e40de527bb5989d942"
+    },
+    {
+      "path": "apps/web/scripts/native-api-source.boundary.ts",
+      "sha256": "404aa717a362ad778bf25d6aa51a501cb012a89db0baf8f0d95eeb04c0ec61d6"
+    },
+    {
+      "path": "apps/web/scripts/native-pair-build.runtime.ts",
+      "sha256": "f4b0b06955cba762eda2b29324b021a968035bc9fd67e1bd960d571a852ba673"
+    },
+    {
+      "path": "apps/web/test/native-browser-tools.boundary.test.ts",
+      "sha256": "7ca8df2eebe4daf193cc56e8624e04d1965b82ad8e641ac5b5550ad575f96454"
+    },
+    {
+      "path": "apps/web/test/native-cancellation.boundary.test.ts",
+      "sha256": "de4c123c87c68b19c0f9961dbcccb28194521ab027978b4c6b510b9ec3d03549"
+    },
+    {
+      "path": "apps/web/test/native-local-development.boundary.test.ts",
+      "sha256": "8a23c58fd9e64d233b71760415404e9429d820bc14dbd6ec09d9d49f960e4773"
+    },
+    {
+      "path": "apps/web/test/native-mcp.boundary.test.ts",
+      "sha256": "134a5060af8ba4dbf979756c8ccd73a7ff2ba649e81aae71b7e71e58a57cb7e0"
+    },
+    {
+      "path": "apps/web/test/native-mcp.fixture.ts",
+      "sha256": "af781c7523b03fb52e8ef2448f7ff3b922651744732a6245037682ac74407024"
+    },
+    {
+      "path": "apps/web/test/native-pair.boundary.test.ts",
+      "sha256": "321ee25fc5da92e107ee4aa02c05f4f98ade62432488cfd75b6d6b8302b34617"
+    },
+    {
+      "path": "apps/web/test/native-rate-provider.boundary.test.ts",
+      "sha256": "9caca8fedf6c37dacd7c64e91d1dd32870c2976c88b03cdfe8ee1431920bf557"
+    },
+    {
+      "path": "apps/web/test/native-rate.boundary.test.ts",
+      "sha256": "de38bd8d01cad54340b099ee63221680a068436b78285280a0425130ebbe72a1"
+    },
+    {
+      "path": "apps/web/test/native-rpc-failures.boundary.test.ts",
+      "sha256": "a03f0465f8b0f95eb44caee28241bd1b6156c1c098beb6a53b1bd2b03e4af9cb"
+    },
+    {
+      "path": "apps/web/vitest.native.config.ts",
+      "sha256": "61c734c3cbd3a4493f9125fdf8b3d54ae6dbbd43a54bc998c421a023428decdc"
+    },
+    {
+      "path": "bun.lock",
+      "sha256": "b074ac52390345cccdc347bc8148256a4bb6d0baacd0ef37e6868544a5ff1f02"
+    },
+    {
+      "path": "docs/architecture/api-and-sdk.md",
+      "sha256": "afe5f5328be468b42c27e103f2e600c03cae68411509607614d47db4990bf62b"
+    },
+    {
+      "path": "docs/architecture/deployment.md",
+      "sha256": "d94a821f07305688e2ce07811dcb976ceaeee831e7b20a0159d1b9f038ff33bd"
+    },
+    {
+      "path": "docs/architecture/testing-and-quality.md",
+      "sha256": "4f3bfd22c1c9e3875d3d0f173ccfab7aaa3def64f35ede9923888b1b0a853f20"
+    },
+    {
+      "path": "docs/documentation-audit/README.md",
+      "sha256": "60edbe291c61e3f2dafa948ac29ef877e37d6e2b6c7512763f96ab686b841dda"
+    },
+    {
+      "path": "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json",
+      "sha256": "4a341088c30b04e4049857bfd1c8e795bbe9be541f90af5cfe445812eebb0a9f"
+    },
+    {
+      "path": "docs/operations/authority-model.md",
+      "sha256": "f192fe753d0cba94287c9497df691bdfca7c4a3edce5c60cf7cfeb1d08d17611"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.md",
+      "sha256": "fa6fe6243eb61b770d0db072245fac2b6cc3e0bbc0add544715117185dc67347"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "320fae029c3fbc4b05843c3dda44622be480b941b2cc655fc92e9ba858bb8202"
+    },
+    {
+      "path": "docs/runbooks/docs-deployment.md",
+      "sha256": "ea20b159b9360cb3fc4c9513cb84299a373aa27cbe99b25ca2a4c15d1a567ffc"
+    },
+    {
+      "path": "docs/runbooks/recovery.md",
+      "sha256": "140c25d2dfd490ec11a529fcfe0c6fa7976cdec175197ff8a49184736f8ad413"
+    },
+    {
+      "path": "docs/verification/critical-journeys.json",
+      "sha256": "713be55642adc98afb3759a77d6f3ba8650e4f721a1617fbe9c433b0a0d9aa9d"
+    },
+    {
+      "path": "docs/verification/repository-harness-profile.json",
+      "sha256": "8422cee3057ae44a773142e5c68491af5dbad3a17f736f305769ef0a229273a2"
+    },
+    {
+      "path": "oxlint.config.ts",
+      "sha256": "c7042cbbd537547dafc5986832f2e87e327c055138823adf2bbe8b32ed971da7"
+    },
+    {
+      "path": "package.json",
+      "sha256": "1e912e128fe268c2b1ba68c1cab384fdf1d63349db353cd62b4ba24dde6bd222"
+    },
+    {
+      "path": "packages/infrastructure/README.md",
+      "sha256": "943b70fca7f1de5da5c4e7ca536da29daf192b8d549c01412c2b85f38034da00"
+    },
+    {
+      "path": "packages/infrastructure/package.json",
+      "sha256": "badb97f4ab5be372cfb4d8f08f295134e389b5d42e14a1dec5af193a040bafc1"
+    },
+    {
+      "path": "packages/infrastructure/src/apps-secrets.boundary.ts",
+      "sha256": "1cacfa33dabe84d1d8da929424048127dcf40f113440c6bed2d334b14e181a56"
+    },
+    {
+      "path": "packages/infrastructure/src/apps-stack.test.ts",
+      "sha256": "eadb9c9d294019b8bf2ce475508abedf6bb3ecba37a503375c2c11d0f496b2de"
+    },
+    {
+      "path": "packages/infrastructure/src/apps-stack.ts",
+      "sha256": "0e966edcb66c6c9183e0918c6829e992a914369f174b2f0fa567832d0f2c4595"
+    },
+    {
+      "path": "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
+      "sha256": "1b0e2f73f1e7184d51b8aeff39de95dc7398fbdacbd2c14fa8db54afb61021f8"
+    },
+    {
+      "path": "packages/scripts/src/release-readiness/cli.ts",
+      "sha256": "81733fe41dc3f39a4885a9db70a0bd7e773575d6bf5548069ced5a453ed87e6b"
+    },
+    {
+      "path": "packages/scripts/src/release-readiness/program.ts",
+      "sha256": "8fc48035f0091ff093b62c072bebb49efc8c4fd89fbadd0611392f8642c97c46"
+    },
+    {
+      "path": "packages/scripts/src/release-readiness/schemas.ts",
+      "sha256": "59ab849b8898f8e4b83e28d816eda80dc78a41999542c2bc5f2f1b1c91cf592b"
+    },
+    {
+      "path": "patches/alchemy@2.0.0-beta.80.patch",
+      "sha256": "08bf0e8e65631f2db175093cf2997c0a9a3d648d161b981a97538a5d6c277a93"
+    },
+    {
+      "path": "tools/docs-deployment/README.md",
+      "sha256": "d52ace06542710e0706003b857f124910482b62d883c594e405a756ae5facafb"
+    },
+    {
+      "path": "tools/docs-deployment/fixtures/alchemy-beta.80/native-apps-preview.txt",
+      "sha256": "4ef9c52f0dd555fe93ca6a52fc921ce5e5e92a6601644e852c111f17750c568f"
+    },
+    {
+      "path": "tools/docs-deployment/fixtures/alchemy-beta.80/native-apps-production.txt",
+      "sha256": "72381e6a79b1a4da3a0891fad8ce412906d059bb9d5172f626abac352db9be99"
+    },
+    {
+      "path": "tools/docs-deployment/schemas.ts",
+      "sha256": "877c84a7b315023988a77586be0a4ba530d7034cf6c1d63a9452d6b30b45b6f6"
+    },
+    {
+      "path": "tools/docs-deployment/workflow-plan-projection.runtime.test.ts",
+      "sha256": "ef34aedfe011baa2b7816c7839112f871d91e02b776736e9a68f72bd77921c60"
+    },
+    {
+      "path": "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+      "sha256": "953a51216e7587a1a4f10d01fb9dc3f41bea23b209cc71e37d249521e88ecb2a"
+    },
+    {
+      "path": "tools/docs-deployment/workflow-plan-projection.test.ts",
+      "sha256": "a64a028fd58b9f24a757b90a1771b47ecd4d91c104ce0e5f7b61136d6bc958f2"
+    },
+    {
+      "path": "tools/docs-deployment/workflow-plan-projection.ts",
+      "sha256": "cc9e4ff6d7ccda467715ede9cec5dbf2c3ad2dbad6fb3b77a237e0dd65c13759"
+    },
+    {
+      "path": "tools/documentation/runbook-contract.json",
+      "sha256": "ce8b9f8937754ad0a69900af5af25029d1626029a8cb0a10df4317652e90bc9c"
+    },
+    {
+      "path": "tools/oxlint/portable-rules.test.ts",
+      "sha256": "e871f84a43a1bfe826e48a9f24e8820995d4c56ae7f4bd1fafc19be22573e7e7"
+    },
+    {
+      "path": "turbo.json",
+      "sha256": "bca84d0e64ecf8457e54378c2c7d719e556e41577fe13a3eb8b1b8775ad2b93e"
+    }
+  ],
+  "primaryReview": "Reviewed actual graph/provider/parser/runtime diff, supplied-identity limits, focused and nine-check local evidence, source identities, affected documentation owners and preservation requirements. Full T007 acceptance remains unfinished.",
+  "external": {
+    "readback": "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json",
+    "cloudPlan": "not-executed",
+    "providerApply": "not-executed",
+    "deploy": "not-executed",
+    "credentialCreation": "not-executed"
+  },
+  "limitations": [
+    "Mock-provider observations establish no live attachment, certificate, public availability, adoption or rollback.",
+    "Worker script upload precedes shared-rule reads; the correction does not undo an earlier upload.",
+    "V3 projection validates supplied identities; current workflow identity calculation, real scoped Doppler custody and live no-apply plans remain unfinished.",
+    "Historical receipts and stopped writer workflows are preserved.",
+    "Metrics remain deferred and disabled; retained tax results are unchanged."
+  ],
+  "preparationFailures": [
+    "Wrong initial lint script; no lint proof from that command.",
+    "Compiler API selection failed before modification; matching installed TypeScript compiler used without dependency upgrade.",
+    "A focused test overlapped patch installation and could not resolve pathe; rerun after frozen installation passed.",
+    "Initial fixture type inference and lint findings corrected before source freeze."
+  ],
+  "freezeManifestSha256": "bfce70fc3d0b6a33b88a61888bbd1e7b024de3fb25a8bd8a2eae4e0da9d54b82",
+  "executionAuthority": {
+    "principal": "Cooper Corbett",
+    "scope": "Approved clean-slate repository implementation, checks, tested commit/push and draft PR",
+    "excluded": [
+      "merge",
+      "deployment",
+      "provider apply",
+      "publication",
+      "credential change"
+    ],
+    "metrics": "deferred; collection disabled"
+  },
+  "rollback": {
+    "local": "Reviewable source revert; preserve ignored build/state files and historical evidence.",
+    "external": "Not executed; exact separately approved source-bound partial-failure recovery remains required."
+  },
+  "localCommandProbes": [
+    {
+      "case": "preview",
+      "exitCode": 0,
+      "projectionWritten": true,
+      "durationSeconds": 0.08,
+      "logSha256": "010d54bdaa1ba332f83d769286dd88fc0f37cb79a4898e0ebc30543212174ab7",
+      "identityInputs": "synthetic candidate/input digests; real receiving patch digest; fixture plan text",
+      "projectionSha256": "1df12ea0c72fc568da9a09872848d2bc904d9458e7aa487543ce62893bb2d1ac",
+      "schemaVersion": 3,
+      "resources": [
+        "TaxKitApi",
+        "TaxKitWebsite"
+      ],
+      "domains": []
+    },
+    {
+      "case": "production",
+      "exitCode": 0,
+      "projectionWritten": true,
+      "durationSeconds": 0.08,
+      "logSha256": "6d387f5aac7dc75d7bb2676ad5b995e7232471562cd232ce9dc506aa253ee6da",
+      "identityInputs": "synthetic candidate/input digests; real receiving patch digest; fixture plan text",
+      "projectionSha256": "bf9a93c0938523a856d27f50f80d86965687024b7a031146d9552c5256c10614",
+      "schemaVersion": 3,
+      "resources": [
+        "TaxKitApi",
+        "TaxKitProductionDnsSettings",
+        "TaxKitProductionZone",
+        "TaxKitWebsite"
+      ],
+      "domains": [
+        "taxkit.dev",
+        "www.taxkit.dev",
+        "api.taxkit.dev"
+      ]
+    },
+    {
+      "case": "wrong-account",
+      "exitCode": 1,
+      "projectionWritten": false,
+      "durationSeconds": 0.08,
+      "logSha256": "6e7cd530c39319933a65922263e3f7c882fccd01e7a4f5e0a6c2c59dfcb5c2a6",
+      "identityInputs": "synthetic candidate/input digests; real receiving patch digest; fixture plan text"
+    },
+    {
+      "case": "missing-zone",
+      "exitCode": 1,
+      "projectionWritten": false,
+      "durationSeconds": 0.07,
+      "logSha256": "6e7cd530c39319933a65922263e3f7c882fccd01e7a4f5e0a6c2c59dfcb5c2a6",
+      "identityInputs": "synthetic candidate/input digests; real receiving patch digest; fixture plan text"
+    }
+  ],
+  "postQualificationDocumentation": [
+    {
+      "path": "tools/docs-deployment/README.md",
+      "beforeSha256": "d52ace06542710e0706003b857f124910482b62d883c594e405a756ae5facafb",
+      "afterSha256": "14e8aba1332e14f259c0f3d98298678e40288412e7122bf4fabedd4f1162015d",
+      "change": "Clarify retained v2 versus native v3 and replace stale DEV-73 planning claims with current bounded local qualification.",
+      "behaviourChanged": false,
+      "checks": [
+        {
+          "stage": "docs",
+          "command": [
+            "bun",
+            "run",
+            "check:docs"
+          ],
+          "exitCode": 0,
+          "durationSeconds": 0.5,
+          "logSha256": "edbc3216c46e08119d5177eb78c9e54608a8d75f5e037da00ddafdf7839d4d71"
+        },
+        {
+          "stage": "runbooks",
+          "command": [
+            "bun",
+            "run",
+            "check:runbooks"
+          ],
+          "exitCode": 0,
+          "durationSeconds": 0.16,
+          "logSha256": "b41c30438e13984267bd6828f1d128ae38955963dc7e6acffd9542490f296d83"
+        },
+        {
+          "stage": "paths",
+          "command": [
+            "bun",
+            "run",
+            "check:repository-paths"
+          ],
+          "exitCode": 0,
+          "durationSeconds": 0.29,
+          "logSha256": "c9c05c1dd976fd7f41c202a2dafcc7511664df1d7e6c47b0fe165bc71e08e8dc"
+        },
+        {
+          "stage": "deployment-admission",
+          "command": [
+            "bun",
+            "run",
+            "check:docs-deployment"
+          ],
+          "exitCode": 0,
+          "durationSeconds": 0.19,
+          "logSha256": "9c0f0aa962c53afbcfcbdfcf9435b15331ffcc0ecafc6be27effbdd71276541a"
+        },
+        {
+          "stage": "diff",
+          "command": [
+            "git",
+            "diff",
+            "--check"
+          ],
+          "exitCode": 0,
+          "durationSeconds": 0.02,
+          "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "priorCheckAttempts": [
+    {
+      "stage": "metadata-format",
+      "exitCode": 2,
+      "logSha256": "28b40859dad64c1d4ddb6d28cab92d3fd6cc3ec1daf5da0bb10f4e8ab9aa9f28"
+    },
+    {
+      "stage": "diff",
+      "exitCode": 2,
+      "logSha256": "b2a84fa880a694266ca41fe7017bd8f93e87957b96ed311d9925a04515b54b19"
+    }
+  ],
+  "warnings": [
+    "Workspace build succeeds with the existing private infrastructure no-output-files warning; no build-output policy is changed.",
+    "Matching current Vite emits configLoader native/import-extension warnings; current builds and native tests pass."
+  ]
+}

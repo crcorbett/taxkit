@@ -3,14 +3,14 @@ document_type: developer-guide
 lifecycle: current
 authority: supporting
 owner: taxkit-deployment-tool-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-07
 review_trigger: docs deployment command, receipt Schema, workflow adapter, provider inventory, authority, or proof change
 ---
 
 # Docs deployment tooling
 
 This directory owns repository-side validation, workflow receipt checks and
-provider/state inventory for the docs application. Durable resource policy
+provider/state inventory for retained docs operations and the replacement native app plan. Durable resource policy
 lives in [`../../docs/architecture/deployment.md`](../../docs/architecture/deployment.md);
 operator procedure and authority live in
 [`../../docs/runbooks/docs-deployment.md`](../../docs/runbooks/docs-deployment.md).
@@ -20,8 +20,10 @@ operator procedure and authority live in
 - `schemas.ts`, `workflow-receipts.schemas.ts`, `workflow-check.schemas.ts` and
   `inventory.schemas.ts` own current external representations and closed safe
   errors. `schemas.ts` also decodes immutable historical v1/v2 receipts, while
-  current v2 plans admit only the native one-resource graph. Historical
-  decoders are not current deployment admission.
+  version-three `NativeAppsPlanProjection` admits the replacement two-app graph
+  and its Production-only retained zone/settings. Old v2 projections remain
+  available for retained tooling; they cannot admit the replacement graph.
+  Historical decoders are not deployment authority.
 - `input.boundary.ts` owns repository-relative retained-evidence reads, typed
   JSON decoding and SHA-256 through Effect Crypto. Read/decode/hash failures
   expose only the safe target identity, preserving retained digest bytes.
@@ -88,13 +90,15 @@ operator procedure and authority live in
   fields/other headers and the request abort signal; deliberate bypass fixtures
   reject lost ownership. This source control is separate from actual Worker
   behaviour and framework promise cancellation.
-- Private `@taxkit/infrastructure` owns the native
-  `Cloudflare.Website.Vite("DocsWebsite")` declaration; root owns its provider
-  and state composition. This directory does not
-  build or spawn the docs app.
+- Private `@taxkit/infrastructure` owns the native `TaxKitApi` and
+  `TaxKitWebsite` declarations, plus Production-only zone/settings. Root
+  `alchemy.apps.run.ts` owns cloud providers/state and selected Doppler secrets.
+  This directory does not build or spawn either app. The old `DocsWebsite`
+  entry and writer workflows remain retired.
 - `workflow-plan-projection.ts` is the single beta.80-bound host adapter for
-  Alchemy's text plan output. It admits only the current native Website
-  resource and fails closed on any other resource line. Beta.80's upstream
+  Alchemy's text plan output. Its retained version-two path admits only the
+  retired `DocsWebsite` resource and rejects other resource lines. The
+  replacement version-three path is described below. Beta.80's upstream
   `formatPlanLines` emits `Plan: no resources` for an empty plan; the adapter
   admits that line only for an already-absent teardown. The
   `fixtures/alchemy-beta.64/` manifest binds five real sanitised GitHub
@@ -108,9 +112,37 @@ The retired orphan classifier has no current workflow, command, Schema,
 service, runtime or child-process boundary. Its immutable JSON receipts remain
 historical evidence; they are not a contributor-lifecycle system.
 
-The one remaining Promise host bridge is `apps/docs/src/server.ts`: TanStack's
-Cloudflare `fetch` callback crosses into the app-owned `ManagedRuntime` through
-`runPromise`. This is a framework adapter, not domain execution ownership.
+## Replacement native plan projection
+
+`workflow-plan-projection.runtime.ts` uses the existing command owner. Set
+`TAXKIT_WORKFLOW_PLAN_GRAPH=native-apps` to select version three; omitting it
+retains the historical v2 path. Native mode accepts only deploy-plan text and
+refuses teardown. It checks the exact account and requires the exact zone for
+`prod`. `pr-N` has two resources, no domains and unmanaged Production DNS.
+The parser recognises native adoption, binding rows and `Plan: no changes`.
+Repeated/unknown rows, deletes, replacement, zone creation, extra resources,
+local-mode output and wrong summary counts refuse with safe errors.
+
+The fixture text under `fixtures/alchemy-beta.80/` is checked against the
+installed formatter on actual receiving graph plans in the infrastructure
+suite, with memory state and provider writes forbidden. These are local
+mock-provider observations, not cloud plans. The v3 command tests cover both
+stages, target mismatch, missing zone, malformed patch identity, teardown and
+unknown mode. Its digest binds the encoded projection, including the supplied
+candidate/config/input/lockfile/patch digests. It does not calculate or verify
+those supplied source digests and does not contact a provider. The existing
+workflow-evidence writer still belongs to the retired graph; its replacement
+and live plan/custody qualification remain pending. No current writer is
+reactivated by adding this projection.
+
+The narrow Alchemy dependency patch now also changes the native shared redirect
+reader to catch only `RulesetNotFound`. The actual source and compiled provider
+were exercised with mock HTTP replies; failed access causes no shared-rule PUT,
+confirmed absence permits one PUT, and foreign rules are preserved. Worker
+upload precedes that read, so failure is not an atomic rollback of the whole
+Worker operation. The exact mock-wire fixture has decoding/encoding permission;
+actual-command lint fixtures keep runtime execution forbidden there and both
+codecs forbidden in its ordinary neighbouring test.
 
 ## Local verification
 
@@ -138,8 +170,9 @@ operational authority.
 The upload-file, retained-input, source-contract, credential, workflow-input,
 workflow-source, plan-projection, saved-evidence, automation receipt, retained-record policy and native memo tests use
 `@effect/vitest`, scoped FileSystem fixtures and ordered Effect work. The
-remaining suites preserve their existing assertions under Vitest; their full
-strict migration is pending in DEV-73. Local command checks read retained
+remaining suites preserve their existing assertions under Vitest. DEV-73
+strict enforcement is locally qualified; the active clean-slate plan owns its
+exact evidence and remaining review. Local command checks read retained
 records only. Static source checks, saved receipts and local passing tests do
 not establish current provider state or authorise a deployment.
 
@@ -157,7 +190,8 @@ admission is test-only; neighbouring files and production services gain none.
 The original negative child-exit assertion now checks the owning typed error.
 Credential tests preserve cached-file precedence, malformed fallback and
 unreadable-input refusal; scope tests preserve the most-specific selection
-regardless of ordering. Other policy/provider adapters remain pending strict work.
+regardless of ordering. Strict-policy qualification and provider/runtime
+behaviour are separate claims; current native plan work is recorded below.
 
 
 Workflow-source assertions retain ordered Effect traversal and checked step
@@ -183,7 +217,8 @@ no execution permission to tests or policy files; old raw Bun/decode/test
 permissions are removed. Scoped command fixtures cannot establish external
 state and reject malformed or incomplete registers. The original eight policy
 cases retain their assertions. Saved establishment counts do not prove current
-provider state. Provider inventory migration remains pending in DEV-73.
+provider state. The retained provider inventory is historical; these local
+checks do not qualify a live inventory of the replacement app graph.
 
 
 Retained-record policies use persistent collections, checked selections and
@@ -206,4 +241,5 @@ native service tests cover named reads, invalid version/stage/resource/attribute
 worker/tag replies, safe provider failures, other stacks, original first-tag
 selection and cancellation cleanup. Caller tests cover test-Layer substitution,
 exact saved JSON bytes, write refusal, Config defaults/empty values and CI refusal.
-These tests make no current provider request. Other DEV-73 owners remain pending.
+These tests make no current provider request. DEV-73 local qualification does
+not establish live provider state or complete the native T007 plan work.

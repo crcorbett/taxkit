@@ -1063,3 +1063,22 @@ checkout, deployed artifact, approval or exercised rollback. Ignored local
 build, dependency and state files stay physically untouched. Native provider
 operations and domains belong T010/DEV-81; metrics remain deferred. Full final
 qualification is required before whole T005 acceptance or delivery.
+
+
+### T007 native domain and plan progress — 7 October
+
+The receiving native graph now omits Production DNS/domain properties in local
+and Preview stages, and declares retained Production zone/settings plus the
+Website/API domains through native Outputs. Independent `cf` reads establish
+bounded existing zone state in the dated readback; the existing default profile
+works without creating a credential. The native shared redirect reader's broad
+fallback is reproduced and narrowed to its typed absence error, with actual
+source/compiled mock-provider proof.
+
+Version-three plan projection admits the native pair and Production-only
+adoption/settings, with exact configured account/zone and patch identity. It
+recognises native binding rows and refuses unknown, repeated, destructive or
+wrong-stage rows. Its supplied source identities still need a replacement
+workflow writer and independent live no-apply plan. Current retired writer
+workflows stay stopped; real scoped Doppler custody and cloud operation proof
+remain unfinished. This progress accepts no provider apply or public availability.

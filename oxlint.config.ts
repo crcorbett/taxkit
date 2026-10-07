@@ -14,6 +14,9 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Actual installed provider request bytes at the mocked network boundary.
+  // No provider, credential, profile or runtime-execution permission.
+  "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
   // Exact native session header/private binding capability ingress only.
   "apps/api/src/mcp-session.layer.ts",
   // Exact native browser capability/refusal ingress; no runner permission.
@@ -245,6 +248,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Mock Cloudflare HTTP reply egress for the actual installed provider tests.
+  "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
   // Exact fixed browser-tool failure response at the native callback.
   "apps/web/src/lib/browser-tools.boundary.ts",
   // Actual MCP client request bytes and secret-negative response assertions.

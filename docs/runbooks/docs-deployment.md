@@ -29,6 +29,11 @@ this repository retirement.
 candidate with `TaxKitApi` and `TaxKitWebsite`. Its provider operation belongs
 to DEV-81. Old plan, apply, teardown or rollback authority cannot transfer to it.
 
+Its `prod` candidate additionally declares the retained existing `taxkit.dev`
+zone and retained DNS settings, with `taxkit.dev`, `www.taxkit.dev` and
+`api.taxkit.dev` attachments. `pr-N` and local graphs omit all Production DNS
+and domain properties. This is declared intent, not an observed attachment.
+
 ## Preconditions
 
 Read `docs/operations/authority-model.md`,
@@ -68,6 +73,59 @@ those missing values.
    bundle into an active workspace or treat a successful empty plan as retirement.
 
 ## Evidence and postcondition
+
+### Native domain preparation
+
+The dated target read is retained at
+`docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json`.
+
+1. Preserve the exact candidate, native entry, lockfile, dependency patch and
+   source-input identities. The native plan projection is version three;
+   never change old receipt identities or pass a v2 `DocsWebsite` approval to it.
+2. For an authorised read, use the existing `cf` default profile and independently
+   check account `f9f94270a4a5af8af7010d891020922d` and zone
+   `15103853342ab9f18f7894b7fae39c39`. The 7 October
+   [readback](../documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json)
+   observes an empty first DNS page, disabled DNSSEC, active locked registration
+   with automatic renewal, preserved settings and a specific missing redirect
+   entrypoint reply. It is dated evidence, not a fresh pre-operation inventory.
+   Enumerate every DNS page exposed by the reader and preserve foreign records.
+3. Read shared redirect rules separately. Stop on access, malformed-reply or
+   network failure. Only the SDK's specific `RulesetNotFound` means absence.
+   The dependency patch preserves unrelated rules and uses the native 301
+   redirect with path and query retained. No registrar, DS, nameserver, TLS,
+   mail or verification change belongs to this candidate.
+4. Check native Alchemy credential/account selection and repository-scoped
+   Doppler custody separately. A working `cf` profile proves neither. The
+   root secret selection remains `taxkit/dev`, `taxkit/stg_preview` or
+   `taxkit/prd` by checked stage, with the implicit shell secret source disabled.
+   Stop credentialed planning if its credential purpose, account or custody is
+   unknown. Do not create or broaden credentials to complete a local check.
+5. Under a separately named planning operation, capture the exact native
+   beta.80 no-apply plan and its bootstrap/read effects. No live plan has been
+   qualified by this slice. Prepare the existing projection command's inputs:
+   `TAXKIT_WORKFLOW_PLAN_GRAPH=native-apps`, the candidate/config/input/lockfile
+   digests, plan/output paths, checked stage, exact account and actual patch
+   digest; `prod` also requires the exact zone. Run
+   `bun --no-env-file --conditions=source run tools/docs-deployment/workflow-plan-projection.runtime.ts`.
+   It reads local text and writes a sanitised projection/digest, with no provider
+   call. The supplied source digests require independent calculation and review;
+   the projection does not establish them by itself. Preview must contain only
+   the API/Website and their named bindings. Production must adopt/refresh the
+   retained zone, never create, replace or delete it.
+6. Prepare explicit approval, expiry, revocation, partial-failure and rollback
+   records before apply. The native redirect provider uploads its Worker script
+   before reading shared rules; a later read failure stops rule replacement but
+   does not undo that upload. Record the last successful step and compare the
+   actual script version, bindings, domains and rules before any recovery.
+7. After separately approved apply, independently read exact app/class/binding
+   and domain identities, DNS, certificates, TLS and actual Website/API behaviour.
+   Recheck registrar/DNSSEC without treating adoption or a green apply as their
+   proof. A fresh equal plan and source-bound rollback are separate checks.
+
+The existing workflow evidence writer and operation receipts still describe
+the retired graph. Their native replacement and real custody/live plan remain
+unfinished. The stopped writer workflows stay stopped.
 
 The local postcondition is verified source addressability, useful page routes
 and refusal of retired commands. The manifest retains source hashes and dated
