@@ -8,7 +8,7 @@ export const WebsiteRelayMediaType = Schema.String.check(
     /^(?:application\/json|text\/plain)(?:;[\t ]*charset=(?:UTF-8|utf-8))?$/u
   )
 );
-export const WebsiteRelayRetryCount = Schema.String.check(
+const WebsiteRelayRetryCount = Schema.String.check(
   Schema.isPattern(/^(?:[0-9]|10)$/u)
 ).pipe(Schema.brand("taxkit/WebsiteRelayRetryCount"));
 const WebsiteRelayQueryFields = Schema.Struct({
