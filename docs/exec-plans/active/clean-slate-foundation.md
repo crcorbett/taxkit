@@ -5559,7 +5559,10 @@ all preceding checks and 16 native cases, then exposed an outdated source-edit
 fixture: its old import replacement left the temporary reload app without an
 import. A named independent test import fixes that edit, and the isolated real
 reload test passes with the original deadlines. Fresh frozen-source verification
-remains pending at the [dated candidate receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json).
+then passed in 680.92 seconds at `311288c3b12c768af15e1efe4738286b56b5e506`,
+including all 17 native cases. All 1,772 tracked file/link identities matched
+after the run. Root tests and build passed at the preceding source; the only
+changes were this test fixture and two documentation owners. Evidence is at the [dated candidate receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json).
 
 Docs-maintainer: **Change required** for the new package and app READMEs,
 package/Effect/API architecture, exact lint admission and rejection fixtures (including the existing
@@ -5579,3 +5582,23 @@ installed by this checkpoint. Read-only preparation does not establish the
 Cooper organisation region or complete paged absence before a project create.
 No existing foreign project token is borrowed. Continue these independent
 local parts; metrics and the Medicare decision remain separate.
+
+### T008 browser library policy mismatch
+
+Private Chromium experiments with the official PostHog 1.438.2 archive sent
+a waiting pageview and a queued retry after Do Not Track changed to `1`.
+Final supported-options-only experiments kept cookie/local/session storage
+empty, but neither opt-out nor shutdown discards the waiting event. A runtime
+signal experiment blocked sends; current public types declare no signal in
+`fetch_options`, so that experiment is not a shipping contract. The latest
+SDK also wraps `api_key`, `batch` and `sent_at` at `/e/`; the checked event
+reconstruction preserves only agreed fields. No real provider request occurred.
+
+Cooper has been asked to choose between the proposed small TaxKit-owned browser
+sender and retaining the accepted SDK requirement while activation remains
+unqualified. The SPEC is preserved pending that choice. Continue independent
+provider and backend work; do not bypass private SDK queues or infer approval
+from elapsed time. The connector produces a US-host UI link, but authenticated
+management ownership, complete listing and capacity are still unverified. All
+four TaxKit Doppler configs (`ci`, `dev`, `prd`, `stg_preview`) have no PostHog
+variable names. No provider or credential has changed; metrics remain deferred.

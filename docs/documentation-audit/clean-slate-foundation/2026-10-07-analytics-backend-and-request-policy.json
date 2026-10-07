@@ -5,8 +5,8 @@
   "owner": "taxkit-analytics-owner",
   "last_reviewed": "2026-10-07",
   "review_trigger": "T008 source, native host, privacy, provider or qualification change",
-  "status": "T008 backend and request policy candidate; whole-source verification pending; T008 remains in progress",
-  "observedAt": "2026-10-07T11:34:50.490267+00:00",
+  "status": "T008 backend and request policy locally qualified; browser design decision and remaining T008 work pending",
+  "observedAt": "2026-10-07T11:48:27.886384+00:00",
   "baseHead": "d9cadb664291b327cf3e3cb624d40c511d78a384",
   "executionAuthority": {
     "principal": "Cooper",
@@ -30,7 +30,8 @@
     "focusedApiTests": 112,
     "actualPathLintCases": 16,
     "nativeAnalyticsCases": 3,
-    "wholeSource": "pending"
+    "wholeSource": "PASS at 311288c3b12c768af15e1efe4738286b56b5e506",
+    "nativeAllCases": 17
   },
   "referenceVersions": {
     "installedEffect": "4.0.0",
@@ -419,6 +420,71 @@
       "log": "/private/tmp/dev79-backend-startup-b-native-local.log",
       "logSha256": "da7c4e31f222ec1a02ee71b63c94505314eecffd17b2b674a8dc047702c8501b",
       "logBytesRead": 425
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.86,
+      "log": "/private/tmp/dev79-backend-repair-a-lint.log",
+      "logSha256": "f3d4f23d0eb93b06726478f661ae6c3d1e90092c8f733d09dbfbb88aaa681394",
+      "logBytesRead": 951
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.51,
+      "log": "/private/tmp/dev79-backend-repair-a-format.log",
+      "logSha256": "373581a18d1b406e6fb1c05672f38fe7974579a5d7a428c2e2b0a91b06af78e9",
+      "logBytesRead": 630
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.29,
+      "log": "/private/tmp/dev79-backend-repair-a-docs.log",
+      "logSha256": "5acf2df0bdfc41e5dc322f4233aea7d095c7104469831e160a46dccaca4b1e95",
+      "logBytesRead": 819
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev79-backend-repair-a-runbooks.log",
+      "logSha256": "e0a25bfa94a550f8864a9b2b47842f8294b50cfbcd8a4a46efba3c7c8ea28591",
+      "logBytesRead": 839
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.01,
+      "log": "/private/tmp/dev79-backend-repair-a-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logBytesRead": 0
     }
   ],
   "initialWholeSourceAttempt": {
@@ -475,5 +541,176 @@
       "failure": "Temporary reload fixture missing import; fixed without changing startup/reload deadline"
     },
     "verificationPassed": false
+  },
+  "wholeSourceQualification": {
+    "observedAt": "2026-10-07T11:48:27.854072+00:00",
+    "candidateCommit": "311288c3b12c768af15e1efe4738286b56b5e506",
+    "tree": "9f450f37aa0f25cdd9131d0a735cbd36b90f5e2f",
+    "trackedCount": 1772,
+    "trackedBytesUnchanged": true,
+    "gitStatusClean": true,
+    "freezeSha256": "30eb77b80d30a69c2fb56d0e06c8e1186bb61ddc13d7a65ce46b645f99efe785",
+    "checks": [
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 680.92,
+        "log": "/private/tmp/dev79-backend-whole-b-verification.log",
+        "logSha256": "e47218774ea3ea74291db087d22d8318f37b98434ddff49c626e25eee3e6d299",
+        "bytesRead": 567419,
+        "testSummaries": [
+          "//:test:docs-deployment:task:  Test Files  22 passed (22)",
+          "//:test:docs-deployment:task:       Tests  273 passed (273)",
+          "//:test:docs-deployment:task:    Duration  9.20s (tests 77%, import 21%, transform 2%)",
+          "//:test:skills:task:  Test Files  1 passed (1)",
+          "//:test:skills:task:       Tests  21 passed (21)",
+          "//:test:skills:task:    Duration  116ms (import 55%, tests 24%, transform 19%, worker 2%)",
+          " Test Files  3 passed (3)",
+          "      Tests  16 passed (16)",
+          "   Duration  599ms (tests 66%, import 26%, transform 6%, worker 1%)",
+          "//:test:quality-workflow:task:  Test Files  2 passed (2)",
+          "//:test:quality-workflow:task:       Tests  34 passed (34)",
+          "//:test:quality-workflow:task:    Duration  513.92s (tests 100%)",
+          "@taxkit/sdk:test:browser:  Test Files  4 passed (4)",
+          "@taxkit/sdk:test:browser:       Tests  26 passed (26)",
+          "@taxkit/sdk:test:browser:    Duration  1.34s (import 77%, worker 20%, tests 4%)",
+          "web:test:browser:  Test Files  3 passed (3)",
+          "web:test:browser:       Tests  21 passed (21)",
+          "web:test:browser:    Duration  4.89s (tests 72%, import 21%, worker 8%)",
+          "web test:native-pair:  Test Files  10 passed (10)",
+          "web test:native-pair:       Tests  17 passed (17)",
+          "web test:native-pair:    Duration  121.76s (tests 97%, import 3%)"
+        ]
+      }
+    ],
+    "allWholeLogBytesRead": true,
+    "newProviderApplyClaim": false
+  },
+  "checkLineage": {
+    "earlierRootTestAndBuildSource": "73f2bc7d8bcdb49446e02e878a3944e7e263e8c8",
+    "latestWholeVerificationSource": "311288c3b12c768af15e1efe4738286b56b5e506",
+    "pathsChangedBetweenSources": [
+      "apps/web/test/native-local-development.boundary.test.ts",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "applicationPackageAndBuildSourcesUnchanged": true,
+    "nativeReloadFixtureRepairCoveredByLatestVerification": true
+  },
+  "browserSdkPreparation": {
+    "scope": "Private controlled Chromium experiment only; no installed browser SDK, real provider request or runtime activation",
+    "version": "1.438.2",
+    "typesVersion": "1.415.1",
+    "batchAfterDoNotTrackChanged": {
+      "requests": 1,
+      "requestsWhileDntOne": 1
+    },
+    "retryAfterDoNotTrackChanged": {
+      "requests": 2,
+      "requestsWhileDntOne": 1,
+      "retryQuery": "retry_count=1"
+    },
+    "payload": "Current SDK wraps api_key, batch and sent_at at /e/ with text/plain; approved synchronous event reconstruction strips tax fields and URL context",
+    "storage": "No cookie or local/session storage in the final supported-options-only experiment; earlier use of the SDK opt-out API wrote a cookie and unsupported memory consent configuration was removed",
+    "experimentalSignal": "The runtime-only signal experiment prevented outbound requests, but the public fetch_options type declares cache and next_options only; no signal contract or shipping exception is claimed",
+    "decision": "Cooper asked to choose a small owned sender or retain the SDK requirement; accepted SPEC remains unchanged while waiting",
+    "proposal": "/private/tmp/dev79-browser-sender-proposal.md",
+    "evidence": "/private/tmp/dev79-sdk-policy-probe-e.json",
+    "evidenceSha256": "90ad14f945baaee30a77570dbdbffcd1a42373d792fded058288fd14f93dc81f"
+  },
+  "providerPreparation": {
+    "connectorUiHost": "https://us.posthog.com",
+    "activeProjectSelectionUnchanged": true,
+    "activeForeignProject": "645344",
+    "scope": "Generated existing connector UI link only; authenticated management region, complete listing and capacity still need qualification",
+    "taxkitDopplerConfigsWithoutPostHogVariableNames": [
+      "ci",
+      "dev",
+      "prd",
+      "stg_preview"
+    ],
+    "valuesPrinted": false,
+    "providerOrCredentialWrites": false
+  },
+  "postQualificationDocumentation": {
+    "paths": [
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "sourceBehaviourChanged": false,
+    "checkStatus": "PASS: docs, runbooks, repository paths, established format policy and diff",
+    "receiptBeforeSha256": "047831e554c2af1aba67529c9499b68159a124d296933a8682a60d711c4b056a",
+    "checks": [
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.34,
+        "log": "/private/tmp/dev79-backend-close-a-docs.log",
+        "logSha256": "4400c9e33d729097c2ecaa44560f2f97c8628f22b3551f0c41b6d3137d60912e",
+        "logBytesRead": 819
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.14,
+        "log": "/private/tmp/dev79-backend-close-a-runbooks.log",
+        "logSha256": "ab36d28f279736940f1873d1dc89ebbf36d776bf0600bd96745dbc863fdf98f7",
+        "logBytesRead": 839
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.24,
+        "log": "/private/tmp/dev79-backend-close-a-paths.log",
+        "logSha256": "ee44565a189eff8ffd0d0e236153869de41aed19dbaaa3187125985320378d69",
+        "logBytesRead": 565
+      },
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.52,
+        "log": "/private/tmp/dev79-backend-close-a-format.log",
+        "logSha256": "3dfb8c4c04d9297eb1cf39648e924336c53a9b5fb316f2f5c187fe1f92ef4871",
+        "logBytesRead": 630
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.01,
+        "log": "/private/tmp/dev79-backend-close-a-diff.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logBytesRead": 0
+      }
+    ]
   }
 }
