@@ -5,8 +5,8 @@
   "owner": "taxkit-infrastructure-owner",
   "last_reviewed": "2026-10-07",
   "review_trigger": "native command, authority, stage, source, provider readback or recovery change",
-  "status": "Eight focused handover checks pass; complete source-frozen verification pending",
-  "observedAt": "2026-10-07T09:41:29.331737+00:00",
+  "status": "Focused handover and format-correction checks pass; complete source-frozen verification pending",
+  "observedAt": "2026-10-07T09:50:05.164149+00:00",
   "baseHead": "778c6b2052c5bc065355146245e697cf52b14374",
   "executionAuthority": {
     "principal": "Cooper",
@@ -368,5 +368,106 @@
     "scope": "Runbook evidence pointers",
     "observed": "The runbook check requires exact repository-relative evidence paths, not only relative Markdown links",
     "correction": "Render both exact evidence paths in the existing evidence section; same check passes without changing its policy"
-  }
+  },
+  "failedWholeAttempt": {
+    "candidateCommit": "86dcf222c666c6f24fe509a070f88cd404cc1ff9",
+    "checks": [
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 1,
+        "durationSeconds": 20.51,
+        "log": "dev78-handover-whole-a-verification.log",
+        "sha256": "fe5e385ec015f83138a938c37303f9c05b635d5b19bcf1eb133fd129b1cc6aec",
+        "bytesRead": 56102,
+        "testSummaries": [
+          "//:test:docs-deployment:task:  Test Files  22 passed (22)",
+          "//:test:docs-deployment:task:       Tests  273 passed (273)"
+        ]
+      }
+    ],
+    "observed": "Full verification stops at the existing formatting check for tools/documentation/runbook-contract.json; earlier deployment checks pass",
+    "correction": "Format the one changed JSON sidecar with the existing formatter; retain the same check and policy"
+  },
+  "formatCorrectionChecks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "--no-install",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "tools/documentation/runbook-contract.json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.09,
+      "log": "dev78-handover-format-fix-format.log",
+      "sha256": "c183a6ed9ba90f3d232f234cee509118cea74d0306d7382168c634479c86268e",
+      "bytesRead": 46,
+      "testSummaries": []
+    },
+    {
+      "stage": "format-check",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.68,
+      "log": "dev78-handover-format-fix-format-check.log",
+      "sha256": "2b7698e51ccca354dc9c597668d1d80a1114b5d9dffa4616229325314b8fec7b",
+      "bytesRead": 630,
+      "testSummaries": []
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.37,
+      "log": "dev78-handover-format-fix-docs.log",
+      "sha256": "f71379400077c2037d60fbf0ba8c2b9af1c966182911516337bf39c1fdd190af",
+      "bytesRead": 819,
+      "testSummaries": []
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "dev78-handover-format-fix-runbooks.log",
+      "sha256": "e6920e0faedf102bdc1747ace90c604d0db1d05c9f89748bc3b9117edf175bca",
+      "bytesRead": 840,
+      "testSummaries": []
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.01,
+      "log": "dev78-handover-format-fix-diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytesRead": 0,
+      "testSummaries": []
+    }
+  ]
 }

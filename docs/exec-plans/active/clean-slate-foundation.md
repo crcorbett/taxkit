@@ -5508,7 +5508,10 @@ metrics. **N/A** for a Changeset, public acceptance/generated content or provide
 mutation: this is documentation-only. Focused and full local verification
 remain pending after eight focused checks pass, including all 273 deployment
 cases. The first runbook check required the exact evidence paths to be rendered;
-that owner correction passes without changing the check. T007 stays In Progress
+that owner correction passes without changing the check. Full verification at
+`86dcf222c666c6f24fe509a070f88cd404cc1ff9` stopped at the existing JSON
+format check; the same formatter corrects the sidecar and its focused checks
+pass. The complete run is being repeated on the corrected clean commit. T007 stays In Progress
 until primary review accepts its named preparation outcomes. Cloud rollback,
 teardown, no-op convergence and overall
 T010 delivery are not claimed.
