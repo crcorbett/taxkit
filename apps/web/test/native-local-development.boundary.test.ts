@@ -268,15 +268,10 @@ describe("native local development", () => {
             );
             yield* fs.writeFileString(
               workerPath,
-              originalWorker
-                .replace(
-                  'import { Effect, Layer } from "effect";',
-                  'import { Effect, Layer } from "effect";\nimport { HttpServerResponse } from "effect/http";'
-                )
-                .replace(
-                  init,
-                  `${init}\n  Effect.map((application) => ({ ...application, fetch: application.fetch.pipe(Effect.map((response) => HttpServerResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })),`
-                )
+              `import { HttpServerResponse as LocalReloadHttpResponse } from "effect/http";\n${originalWorker.replace(
+                init,
+                `${init}\n  Effect.map((application) => ({ ...application, fetch: application.fetch.pipe(Effect.map((response) => LocalReloadHttpResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })),`
+              )}`
             );
             yield* Effect.promise(() =>
               page.request.get(`${apiOrigin}/api/health`)

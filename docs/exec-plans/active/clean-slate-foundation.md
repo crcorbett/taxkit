@@ -5554,7 +5554,11 @@ deny → allow → deny in one conversation, one allowed event, no duplicate and
 unchanged tax replies. Controlled failures/redirects remain best-effort; stalled
 upstream data ends the app send at about five seconds while the tax reply returns
 within two seconds. The controlled Node response bridge does not expose body
-cancellation; that is a retained limitation. Full frozen-source verification
+cancellation; that is a retained limitation. The first full local run passed
+all preceding checks and 16 native cases, then exposed an outdated source-edit
+fixture: its old import replacement left the temporary reload app without an
+import. A named independent test import fixes that edit, and the isolated real
+reload test passes with the original deadlines. Fresh frozen-source verification
 remains pending at the [dated candidate receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json).
 
 Docs-maintainer: **Change required** for the new package and app READMEs,

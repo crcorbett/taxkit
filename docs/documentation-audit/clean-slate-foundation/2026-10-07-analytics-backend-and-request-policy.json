@@ -6,7 +6,7 @@
   "last_reviewed": "2026-10-07",
   "review_trigger": "T008 source, native host, privacy, provider or qualification change",
   "status": "T008 backend and request policy candidate; whole-source verification pending; T008 remains in progress",
-  "observedAt": "2026-10-07T11:14:45.383610+00:00",
+  "observedAt": "2026-10-07T11:34:50.490267+00:00",
   "baseHead": "d9cadb664291b327cf3e3cb624d40c511d78a384",
   "executionAuthority": {
     "principal": "Cooper",
@@ -65,7 +65,8 @@
         "docs/product-specs/clean-slate-foundation.tasks.json",
         "docs/exec-plans/active/clean-slate-foundation.md",
         "oxlint.config.ts",
-        "tools/oxlint/analytics-boundaries.test.ts"
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "apps/web/test/native-local-development.boundary.test.ts"
       ],
       "basis": "New private package, application boundary, exact decoder/encoder and native representation-test admission, candidate ownership and evidence pointers"
     },
@@ -97,7 +98,9 @@
     "The controlled Node response bridge did not expose body cancellation. Native bounded completion uses the existing safe logger plus measured timing; upstream cancellation is not claimed",
     "A lint auto-fix added new to the TaggedError factory and broke the test. The exact native test joins the existing TaggedError factory exception while the actual command proves ordinary Error calls still require new and runtime/adjacent decoding remain refused",
     "The official client requires legacy negotiation for 2025-11-25; its current supported protocol selection is explicit",
-    "The added factory-positive lint fixture initially failed the existing import-newline rule; its valid representation now passes without changing that rule."
+    "The added factory-positive lint fixture initially failed the existing import-newline rule; its valid representation now passes without changing that rule.",
+    "The full local run passed all preceding checks and 16 of 17 native cases, but the local reload fixture timed out: its exact old Effect import replacement no longer matched the new configuration imports, leaving its injected header operation without an import. A separate named test import fixes the real source mutation without extending any deadline. The isolated two-case native local-development test then passed.",
+    "An explicit receipt-only formatter call was refused because the established root formatter excludes docs; no formatter policy was changed and receipt formatting is not claimed."
   ],
   "limitations": [
     "T008 is not complete: browser SDK, React/Atom lifetime, final enrichment allowlist, denied-storage/DNT proof, same-origin relay, Website policy forwarding, retained projects and operational/public privacy owners remain",
@@ -371,6 +374,106 @@
       "log": "/private/tmp/dev79-backend-precommit-a-diff.log",
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logBytesRead": 0
+    },
+    {
+      "stage": "native-local",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "--",
+        "test/native-local-development.boundary.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 27.35,
+      "log": "/private/tmp/dev79-backend-startup-a-native-local.log",
+      "logSha256": "f3ec517d7639d342ab80d4d932a034214f179484a6bcbb0779d025b319ffa9d9",
+      "logBytesRead": 3594
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "--write",
+        "apps/web/test/native-local-development.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.08,
+      "log": "/private/tmp/dev79-backend-startup-b-format.log",
+      "logSha256": "dc58fb862cbb0f39a5acbed79ab194ec45c06573fbade4266c7d57a6ddb1397e",
+      "logBytesRead": 46
+    },
+    {
+      "stage": "native-local",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "--",
+        "test/native-local-development.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 13.72,
+      "log": "/private/tmp/dev79-backend-startup-b-native-local.log",
+      "logSha256": "da7c4e31f222ec1a02ee71b63c94505314eecffd17b2b674a8dc047702c8501b",
+      "logBytesRead": 425
     }
-  ]
+  ],
+  "initialWholeSourceAttempt": {
+    "candidateCommit": "73f2bc7d8bcdb49446e02e878a3944e7e263e8c8",
+    "tree": "b976995fe55f9716557eea1a0f840b7d290a0750",
+    "trackedCount": 1772,
+    "freezeSha256": "53c5a32cb17e7947870ae239e68e50a3030c6e0d94da9aa541b55113af52119f",
+    "unchangedAfterRunExceptDeliberateFixtureRepair": 1771,
+    "deliberateChangedPath": "apps/web/test/native-local-development.boundary.test.ts",
+    "checks": [
+      {
+        "stage": "tests",
+        "command": [
+          "bun",
+          "run",
+          "test"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 74.72,
+        "log": "/private/tmp/dev79-backend-whole-a-tests.log",
+        "logSha256": "a02983620a319741fecca4c7af5377c176af6bea4313d62e681b361380b4ed93",
+        "logBytesRead": 88131
+      },
+      {
+        "stage": "build",
+        "command": [
+          "bun",
+          "run",
+          "build"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 5.4,
+        "log": "/private/tmp/dev79-backend-whole-a-build.log",
+        "logSha256": "17d47d54f730bcbfeb1649800f3587415c4389ea823d9430575b423f48066d05",
+        "logBytesRead": 95313
+      },
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 1,
+        "durationSeconds": 697.54,
+        "log": "/private/tmp/dev79-backend-whole-a-verification.log",
+        "logSha256": "de115ad4966e1085068329261a91bac5a2d4b9d9b9ad067a0cbeddbd5724f8b7",
+        "logBytesRead": 570638
+      }
+    ],
+    "nativeCases": {
+      "passed": 16,
+      "failed": 1,
+      "failure": "Temporary reload fixture missing import; fixed without changing startup/reload deadline"
+    },
+    "verificationPassed": false
+  }
 }
