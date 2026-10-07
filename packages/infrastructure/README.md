@@ -178,10 +178,16 @@ The version-three plan projection in `tools/docs-deployment` admits the native
 API/Website resources, checked bindings and summary. Its Production variant
 also admits the retained settings and adopted zone; zone creation, replacement,
 delete, unknown rows and Production resources in Preview refuse. It requires
-the exact configured account and Production zone plus a patch digest. Those
-checked input identities are not live credential/account readback or a fresh
-source-manifest calculation. Historical version-one/two receipts keep their
-original bytes and resource identities. Current writer workflows still refuse;
-live no-apply plans, the replacement workflow evidence writer and full secret
-custody/readback remain T007/DEV-81 work. No actual adoption, attachment,
-certificate, apply or public runtime is established here.
+the exact configured account and Production zone. The existing projection
+command now checks a clean candidate and unchanged tracked source bytes,
+calculates configuration/input/lockfile/patch hashes, and writes a separate
+native source identity. Optional supplied hashes must agree. The manifest
+covers the named source paths; generated/dependency bytes, environment and
+provider state remain outside it. Installed beta.80 version and caller-supplied
+plan shape do not prove installed patch equality or the plan's origin.
+Historical version-one/two receipts keep their original bytes and resource
+identities, and historical writer commands/workflows still refuse. Native
+bootstrap/provider receipts, live no-apply plans and full secret custody/readback
+remain T007/DEV-81 work. No actual adoption, attachment, certificate, apply or
+public runtime is established here. The deployment tool README and runbook own
+source coverage, required command inputs and partial local-write recovery.

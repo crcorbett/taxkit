@@ -709,7 +709,8 @@
       "commitAfterPassing": true,
       "evidence": [
         "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-domains.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-domains.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json"
       ]
     },
     {

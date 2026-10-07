@@ -729,13 +729,13 @@ export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
     ...(Record.get(quality ?? {}, "runs-on").pipe(Option.getOrUndefined) ===
       "ubuntu-latest" &&
     Record.get(quality ?? {}, "timeout-minutes").pipe(Option.getOrUndefined) ===
-      30
+      60
       ? []
       : [
           finding(
             "workflow-timeout",
             ".github/workflows/quality.yml:jobs.quality.timeout-minutes",
-            "Use the bounded 30-minute timeout on the actual quality job."
+            "Use the bounded 60-minute timeout on the actual quality job."
           ),
         ]),
     ...(Record.get(workflow.env ?? {}, "TAXKIT_ACTION_PIN_UPDATE_OWNER").pipe(

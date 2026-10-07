@@ -269,6 +269,11 @@ records this local qualification separately from hosted checks.
 approval. Versioning, changelog application and publishing remain explicit
 operations after a human reviews pending Changesets and the release impact.
 
+The Quality job has a bounded sixty-minute timeout, enforced by its source
+policy. The previous thirty-minute limit could stop a successful cold run
+before the final native browser check. This budget preserves the complete
+check graph, read-only permissions and cancellation on a newer candidate.
+
 The Quality workflow invokes `bun run release:check -- --ci` for every
 configured pull request and for pushes to `main` rather than relying on path
 filters. Feature-branch pushes are covered by the pull-request event, so the

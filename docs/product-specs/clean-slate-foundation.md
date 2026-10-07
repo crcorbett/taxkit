@@ -1078,7 +1078,12 @@ source/compiled mock-provider proof.
 Version-three plan projection admits the native pair and Production-only
 adoption/settings, with exact configured account/zone and patch identity. It
 recognises native binding rows and refuses unknown, repeated, destructive or
-wrong-stage rows. Its supplied source identities still need a replacement
-workflow writer and independent live no-apply plan. Current retired writer
-workflows stay stopped; real scoped Doppler custody and cloud operation proof
-remain unfinished. This progress accepts no provider apply or public availability.
+wrong-stage rows. The existing native projection command now calculates and
+checks tracked source identities against an unchanged clean candidate, with a
+separate native identity record and protected stage-local output paths. Optional
+caller hashes must agree. That local record excludes generated/dependency bytes,
+environment/provider state and the origin of supplied plan text. Native
+bootstrap/provider receipts and independent live no-apply plan remain pending.
+Current retired commands/workflows stay stopped; real scoped Doppler custody
+and cloud operation proof remain unfinished. This progress accepts no provider
+apply or public availability.

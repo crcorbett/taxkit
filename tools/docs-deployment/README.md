@@ -39,13 +39,12 @@ operator procedure and authority live in
   shared boundary and one typed verification program, logs safe fields through
   Effect Console, provides Bun services and executes once through
   `BunRuntime.runMain`.
-- `workflow-evidence.schemas.ts`, `workflow-evidence.ts` and
-  `workflow-evidence.runtime.ts` form one closed command with `bootstrap`,
-  `plan`, `replan` and `provider` modes. It calculates shared tracked-file identities, reuses
-  the beta.80 plan projection and provider inventory Schemas, decodes bounded
-  Wrangler JSON, and encodes sanitised bootstrap, plan, provider and GitHub
-  output files. Its only child process is fixed `git ls-files`; it cannot choose
-  or run Alchemy, Wrangler, GitHub or another executable.
+- `workflow-evidence.schemas.ts` and `workflow-evidence.ts` retain the historical
+  `bootstrap`, `plan`, `replan` and `provider` algorithms and original receipt
+  bytes. Their runtime refuses every operation. The same source owner now
+  calculates native tracked-file identities for the existing plan-projection
+  command. It runs only fixed Git reads for the commit, clean status and file
+  list; it cannot choose or run Alchemy, Wrangler, GitHub or another executable.
 - `workflow-artifact.schemas.ts`, `workflow-artifact.ts` and its runtime own
   the final upload boundary. The runtime decodes one fixed mode and separate
   source/upload directories. The Effect program copies only the named safe
@@ -123,17 +122,36 @@ The parser recognises native adoption, binding rows and `Plan: no changes`.
 Repeated/unknown rows, deletes, replacement, zone creation, extra resources,
 local-mode output and wrong summary counts refuse with safe errors.
 
+The command checks a clean checkout at the named candidate before and after
+reading its tracked source files, and refuses changed bytes. It calculates the
+configuration, source-manifest, lockfile and receiving Alchemy patch hashes.
+Optional supplied hashes must match. It checks the installed Alchemy package
+version and writes a version-two native source identity beside the version-three
+projection. Both outputs must be distinct files inside the selected stage's
+ignored `tmp/native-apps-plans/<stage>/` directory; neither may overwrite the
+plan text or resolve through a symlink to source or another stage. The
+[runbook](../../docs/runbooks/docs-deployment.md) owns the exact inputs.
+
+The source manifest covers the named tracked app/package/tool/patch and root
+configuration paths in `workflow-evidence.ts`. It excludes ignored/generated
+files, installed dependency bytes, environment values and provider state. The
+installed version check does not prove installed patch bytes; the frozen
+installation and dependency checks remain separate. Caller-supplied plan text
+is checked for shape, but this command cannot prove which checkout or provider
+produced it. Source capture has a twenty-second deadline; it establishes a
+local snapshot, not a continuing lock on the checkout. Identity is written
+before projection, so a later write failure can leave the local identity file.
+Neither file supplies apply, bootstrap or provider approval.
+
 The fixture text under `fixtures/alchemy-beta.80/` is checked against the
 installed formatter on actual receiving graph plans in the infrastructure
 suite, with memory state and provider writes forbidden. These are local
-mock-provider observations, not cloud plans. The v3 command tests cover both
-stages, target mismatch, missing zone, malformed patch identity, teardown and
-unknown mode. Its digest binds the encoded projection, including the supplied
-candidate/config/input/lockfile/patch digests. It does not calculate or verify
-those supplied source digests and does not contact a provider. The existing
-workflow-evidence writer still belongs to the retired graph; its replacement
-and live plan/custody qualification remain pending. No current writer is
-reactivated by adding this projection.
+mock-provider observations, not cloud plans. The command tests cover both
+stages, wrong commits/hashes, changing source, unsafe output paths, target
+mismatch, missing zone, malformed patch identity, teardown and unknown mode.
+Actual CLI tests use isolated local homes and no credentials. Historical writer
+commands and workflows remain stopped. Native bootstrap/provider receipts,
+real custody and live plan qualification remain pending.
 
 The narrow Alchemy dependency patch now also changes the native shared redirect
 reader to catch only `RulesetNotFound`. The actual source and compiled provider

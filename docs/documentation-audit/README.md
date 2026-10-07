@@ -528,3 +528,10 @@ formatter's checked two-app/Production projections and the corrected shared
 redirect read fallback. Its [provider readback](clean-slate-foundation/2026-10-07-domain-provider-readback.json)
 retains successful existing-profile GETs. Local mock/source/compiled proof is
 separate from live plans, real secret custody, apply and public availability.
+
+The [native source-plan follow-up](clean-slate-foundation/2026-10-07-native-source-plan.json)
+records the existing command's calculated tracked-source identity, clean-candidate
+and changed-byte refusals, optional hash agreement and protected stage-local
+outputs. It preserves historical receipt bytes and writer stops. Qualification
+and metadata readback are bounded local observations; native bootstrap/provider
+receipts, worktree custody and live plans remain separate unfinished work.

@@ -48,7 +48,9 @@ Preview omits Production DNS. The existing `cf` default profile supplied the
 separately authorised 7 October GETs without credential creation. That read
 capability does not authorise a native cloud plan's bootstrap effects, state
 writes, domain attachment, apply, credential change or rollback. Checked
-projection input identities do not establish current provider/source identity.
+native source identities establish only the checked tracked-file snapshot.
+They exclude provider state, environment, generated/dependency bytes and the
+origin of supplied plan text. They do not grant bootstrap, plan or apply approval.
 The [deployment runbook](../runbooks/docs-deployment.md) owns the pending native
 procedure; local proof and old receipts grant no new operation authority.
 

@@ -56,6 +56,13 @@ duration, receipt, rollback and readback. Stop if any value is unknown.
 Neither this guide, a retained workflow nor a successful local check supplies
 those missing values.
 
+If GitHub cannot run because of account or runner limits, use the same pinned
+dependencies and complete local `bun run release:check -- --ci` graph. Record
+the unavailable run separately. Native plan/apply commands can run from the
+authorised local machine under the same exact resource, stage, credential,
+plan-review and readback requirements below. Confirm no other apply is active.
+The execution location grants no additional provider or Production authority.
+
 ## Procedure
 
 1. Run `bun run check:docs-deployment`. It verifies the retained source bundle
@@ -78,6 +85,8 @@ those missing values.
 
 The dated target read is retained at
 `docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json`.
+The local source identity follow-up is recorded at
+`docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json`.
 
 1. Preserve the exact candidate, native entry, lockfile, dependency patch and
    source-input identities. The native plan projection is version three;
@@ -104,13 +113,32 @@ The dated target read is retained at
 5. Under a separately named planning operation, capture the exact native
    beta.80 no-apply plan and its bootstrap/read effects. No live plan has been
    qualified by this slice. Prepare the existing projection command's inputs:
-   `TAXKIT_WORKFLOW_PLAN_GRAPH=native-apps`, the candidate/config/input/lockfile
-   digests, plan/output paths, checked stage, exact account and actual patch
-   digest; `prod` also requires the exact zone. Run
+   `TAXKIT_WORKFLOW_PLAN_GRAPH=native-apps`,
+   `TAXKIT_WORKFLOW_PLAN_KIND=deploy`,
+   `TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT` (the full clean checkout commit),
+   `TAXKIT_WORKFLOW_PLAN_REPOSITORY_ROOT`,
+   `TAXKIT_WORKFLOW_PLAN_TEXT_PATH`, `TAXKIT_WORKFLOW_PLAN_STAGE` and
+   `TAXKIT_WORKFLOW_PLAN_ACCOUNT_ID` (the exact account above). `prod` also
+   requires `TAXKIT_WORKFLOW_PLAN_ZONE_ID` (the exact zone above). Create the
+   ignored `tmp/native-apps-plans/<stage>/` directory in that checkout first.
+   Set `TAXKIT_WORKFLOW_PLAN_IDENTITY_PATH` and
+   `TAXKIT_WORKFLOW_PLAN_PROJECTION_PATH` to distinct files inside it; neither
+   may overwrite the plan text. Resolved symlinks must stay inside that stage.
+   Run
    `bun --no-env-file --conditions=source run tools/docs-deployment/workflow-plan-projection.runtime.ts`.
-   It reads local text and writes a sanitised projection/digest, with no provider
-   call. The supplied source digests require independent calculation and review;
-   the projection does not establish them by itself. Preview must contain only
+   It reads local text, checks the exact clean commit and source bytes before
+   and after capture, then writes a native source identity and sanitised
+   projection/digest with no provider call. The optional
+   `TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256`,
+   `TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256`,
+   `TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256` and
+   `TAXKIT_WORKFLOW_PLAN_ALCHEMY_PATCH_SHA256` must match calculated hashes when
+   supplied. Review the named tracked-file coverage in the
+   [tool owner](../../tools/docs-deployment/README.md); generated/dependency
+   bytes, environment and provider state remain outside that manifest. The
+   command checks the installed beta.80 version, not installed patch equality.
+   It does not establish the origin of supplied plan text. Preserve the plan
+   operation's own source/provider receipt separately. Preview must contain only
    the API/Website and their named bindings. Production must adopt/refresh the
    retained zone, never create, replace or delete it.
 6. Prepare explicit approval, expiry, revocation, partial-failure and rollback
@@ -123,9 +151,12 @@ The dated target read is retained at
    Recheck registrar/DNSSEC without treating adoption or a green apply as their
    proof. A fresh equal plan and source-bound rollback are separate checks.
 
-The existing workflow evidence writer and operation receipts still describe
-the retired graph. Their native replacement and real custody/live plan remain
-unfinished. The stopped writer workflows stay stopped.
+The historical workflow evidence command and operation receipts still describe
+the retired graph. The current native projection command writes only local
+source identity and projection; bootstrap/provider receipts, real custody and
+live plan proof remain unfinished. Historical commands and writer workflows
+stay stopped. If the second write fails, preserve the first local file and
+failed observation; a partial pair grants no operation approval.
 
 The local postcondition is verified source addressability, useful page routes
 and refusal of retired commands. The manifest retains source hashes and dated

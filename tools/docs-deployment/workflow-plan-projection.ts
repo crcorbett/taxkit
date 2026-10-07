@@ -155,6 +155,9 @@ export const WorkflowPlanProjectionReason = Schema.Literals([
   "native app plan resources do not match its stage",
   "native app plan summary does not match its resources and bindings",
   "native app plan cannot be used for teardown",
+  "native app plan requires an unchanged clean checkout at its candidate commit",
+  "native app plan supplied digests differ from its checked source identity",
+  "native app plan output paths must be distinct files inside its ignored plan directory",
 ]);
 
 export class WorkflowPlanProjectionError extends Schema.TaggedError<WorkflowPlanProjectionError>()(

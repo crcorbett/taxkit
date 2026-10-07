@@ -1,0 +1,357 @@
+{
+  "document_type": "verification-evidence",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-infrastructure-proof-owner",
+  "observedOn": "2026-10-07",
+  "task": "CSF-T007",
+  "baseCommit": "54dea58097ed9b409a1c202c6b416368273cb410",
+  "branch": "codex/dev-78-source-bound-plan-evidence",
+  "scope": "Local native plan source identity, matching optional digests and protected stage-local outputs",
+  "qualification": "focused passed; full local graph pending",
+  "nonClaims": [
+    "No live cloud plan or provider apply",
+    "No credential or scope change",
+    "No native bootstrap/provider receipt",
+    "No provider account or current worktree secret custody qualification",
+    "No hosted availability",
+    "No generated/dependency/environment/provider coverage in source manifest",
+    "No proof of caller-supplied plan origin"
+  ],
+  "checks": [
+    {
+      "stage": "lint-fix",
+      "command": [
+        "bun",
+        "x",
+        "oxlint",
+        "-c",
+        "oxlint.config.ts",
+        "--fix",
+        "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+        "tools/docs-deployment/workflow-plan-projection.runtime.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.56,
+      "log": "dev78-source-plan-focused-i-lint-fix.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+        "tools/docs-deployment/workflow-plan-projection.runtime.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.09,
+      "log": "dev78-source-plan-focused-i-format.log",
+      "logSha256": "431b75e195ef77ff4e71a0f6f0be5ef48a9d9177c6b1258c58291174c18fcc40"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check:docs-deployment-tools:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.89,
+      "log": "dev78-source-plan-focused-i-types.log",
+      "logSha256": "90060ea48abd6012bf2b0e362677b227a116fe9f52bc2d7bece379303e362d02"
+    },
+    {
+      "stage": "focused",
+      "command": [
+        "bun",
+        "--bun",
+        "vitest",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/docs-deployment/workflow-plan-projection.runtime.test.ts",
+        "tools/docs-deployment/workflow-plan-projection.test.ts",
+        "tools/docs-deployment/workflow-evidence.test.ts",
+        "tools/docs-deployment/retirement.refusal.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 9.28,
+      "log": "dev78-source-plan-focused-i-focused.log",
+      "logSha256": "6870f4bbaed5e9f5538342d53fd164b48bc63557ab609324f7efe3328be7dc1c"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.58,
+      "log": "dev78-source-plan-focused-i-lint.log",
+      "logSha256": "f0168306d571083df140bc2ee9d96282fd6c7cc41692180f84d71b50c1bf574a"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "tools/quality-workflow/policy.ts",
+        "tools/quality-workflow/policy.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.23,
+      "log": "dev78-source-plan-final-focused-a-format.log",
+      "logSha256": "81236c070e4176a27e31b3c15feb7dc06165244e83c4d774d35e9489c8477c1b"
+    },
+    {
+      "stage": "quality-types",
+      "command": [
+        "bun",
+        "run",
+        "check:quality-workflow:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.4,
+      "log": "dev78-source-plan-final-focused-a-quality-types.log",
+      "logSha256": "35f98d0b6a568dcbad0d173960831b362367478d42ddeb0ebe334025b562be4d"
+    },
+    {
+      "stage": "quality-policy",
+      "command": [
+        "bun",
+        "--bun",
+        "vitest",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/quality-workflow/policy.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.64,
+      "log": "dev78-source-plan-final-focused-a-quality-policy.log",
+      "logSha256": "4a1566dbf41e0c4c75f0f7504020650a90607cbfece659f8c032616ae7fa4cfe"
+    },
+    {
+      "stage": "quality",
+      "command": [
+        "bun",
+        "run",
+        "check:quality-workflow"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.26,
+      "log": "dev78-source-plan-final-focused-a-quality.log",
+      "logSha256": "b5a8778faadb79f1450bfc0a923bd0448cefd1ba30bc3492620d4d734c75ebd3"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "dev78-source-plan-final-focused-a-docs.log",
+      "logSha256": "a2fc69df71493a46d52d3216fc67bc103b83e6a145ef723c56a94be668da9745"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.16,
+      "log": "dev78-source-plan-final-focused-a-runbooks.log",
+      "logSha256": "f481c9a754916b99f31746c330ddcfee06007184d8e243a1a0de341a928901ed"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "dev78-source-plan-final-focused-a-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.23,
+      "log": "dev78-source-plan-owners-b-runbooks.log",
+      "logSha256": "04c2f1ac0a3eed6e4abd1060923cb9d7eed5f542dabd90a3ea6cecd2ebcde5bd"
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.37,
+      "log": "dev78-source-plan-owners-b-paths.log",
+      "logSha256": "40f6f7c7091d515fc175993611b6263315cb9f4bd50c80be330920771027f1a0"
+    },
+    {
+      "stage": "deployment",
+      "command": [
+        "bun",
+        "run",
+        "check:docs-deployment"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.19,
+      "log": "dev78-source-plan-owners-b-deployment.log",
+      "logSha256": "bf98e16f89625b7b67b226abbc504956bbbdff05a7f264cf8fc665e21bae8d11"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "dev78-source-plan-owners-b-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sourceIdentity": [],
+  "operationAuthority": {
+    "principal": "Cooper",
+    "operation": "local implementation, checked commits, push and draft PR",
+    "environment": "repository checkout",
+    "providerApply": false,
+    "mergeDeployPublish": false,
+    "rollback": "reviewed repository revert; preserve ignored local files"
+  },
+  "focusedCases": {
+    "nativePlanAndRetainedCompatibility": 92,
+    "qualityPolicy": 21
+  },
+  "retainedAttempts": [
+    {
+      "prefix": "dev78-source-plan-focused-a",
+      "failedStage": "lint",
+      "reason": "new fixture style and declaration order"
+    },
+    {
+      "prefix": "dev78-source-plan-focused-c",
+      "failedStage": "lint",
+      "reason": "ordinary test text decoding; corrected by reusing owning checked Git reader"
+    },
+    {
+      "prefix": "dev78-source-plan-focused-f",
+      "failedStage": "lint-fix",
+      "reason": "nested ternary"
+    },
+    {
+      "prefix": "dev78-source-plan-focused-g",
+      "failedStage": "types",
+      "reason": "automatic undefined-return style fix inferred void"
+    },
+    {
+      "prefix": "dev78-source-plan-owners-a",
+      "failedStage": "runbooks",
+      "reason": "new sidecar evidence path was absent from runbook text"
+    }
+  ],
+  "commonplaceGuidance": {
+    "version": "0.6.7",
+    "revision": "c1e08a8a8c257fd2ddb9fc913c75ce5f016f27fc",
+    "source": "plugins/development-workflows/skills/alchemy-iac/references/operations/authority-plan-apply.md",
+    "instruction": "Run the same full checks and authorised native deployments locally when CI is unavailable",
+    "receivingDependenciesAndVendoredSkillsUnchanged": true
+  },
+  "hostedRun": {
+    "url": "https://github.com/crcorbett/taxkit/actions/runs/37580219079",
+    "head": "54dea58097ed9b409a1c202c6b416368273cb410",
+    "conclusion": "cancelled",
+    "annotation": "The job has exceeded the maximum execution time of 30m0s",
+    "passedBeforeCancellation": [
+      "verification",
+      "test",
+      "build",
+      "docs-validation",
+      "packed-artifact",
+      "downstream-consumer",
+      "api-smoke"
+    ],
+    "activeAtCancellation": "docs-browser",
+    "fullHostedSuccess": false,
+    "logSha256": "37e879b0503bf2df9fb9bb0519f74a9db3f8adb7a76d5390cdb0aad0b9dea15e"
+  },
+  "localExecutionDirection": {
+    "principal": "Cooper",
+    "reportedGitHubAvailability": "out of credits",
+    "observedTimeoutKeptSeparate": true,
+    "githubRerun": false,
+    "billingChange": false,
+    "cloudApply": "exact target, credentials, plan and provider proof still required"
+  },
+  "sourceCoverage": {
+    "configurationFiles": 11,
+    "roots": [
+      ".gitignore",
+      "alchemy.apps.run.ts",
+      "apps/api",
+      "apps/web",
+      "packages",
+      "patches",
+      "tools",
+      "package.json",
+      "bun.lock",
+      "turbo.json",
+      "tsconfig*.json",
+      "oxlint.config.ts",
+      "oxfmt.config.ts",
+      "vitest*.ts"
+    ],
+    "sourceCaptureDeadlineSeconds": 20,
+    "optionalCallerHashesMustAgree": true,
+    "installedAlchemyVersion": "2.0.0-beta.80",
+    "installedDependencyBytesValidatedByManifest": false,
+    "planOriginEstablished": false,
+    "partialLocalWritePossible": true
+  },
+  "documentationImpact": {
+    "changeRequired": [
+      "deployment tools and native identity Schemas",
+      "deployment architecture and infrastructure README",
+      "Quality workflow/policy/tests and testing architecture",
+      "runbook/authority sidecar",
+      "SPEC/tasks/active plan",
+      "dated proof/audit pointer"
+    ],
+    "preserve": [
+      "historical receipt identities/bytes and writer stops",
+      "public app/package/API/SDK/content contracts",
+      "tax results and metrics deferral",
+      "provider resources and existing credentials"
+    ],
+    "changeset": "N/A: private local tools and CI budget; no public package contract change"
+  },
+  "preparedAt": "2026-10-07T06:48:31.822390+00:00"
+}

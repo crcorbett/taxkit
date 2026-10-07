@@ -1,8 +1,17 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
-import { Config, Console, Effect, Match, Schema } from "effect";
+import {
+  Array as EffectArray,
+  Config,
+  Console,
+  Effect,
+  HashSet,
+  Match,
+  Schema,
+} from "effect";
 import * as FileSystem from "effect/FileSystem";
+import * as Path from "effect/Path";
 
 import {
   DeploymentPlanProjection,
@@ -11,6 +20,10 @@ import {
   NativeAppsProductionDns,
 } from "./schemas.js";
 import { workflowSha256 } from "./workflow-check.boundary.js";
+import {
+  calculateNativeWorkflowEvidenceIdentity,
+  writeNativeWorkflowEvidenceIdentity,
+} from "./workflow-evidence.js";
 import {
   projectAlchemyPlanText,
   projectNativeAppsPlanText,
@@ -25,13 +38,13 @@ const Sha256 = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u));
 
 const WorkflowPlanProjectionConfig = Schema.Struct({
   TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT: CommitSha,
-  TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256: Sha256,
-  TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256: Sha256,
+  TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256: Schema.optional(Sha256),
+  TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256: Schema.optional(Sha256),
   TAXKIT_WORKFLOW_PLAN_GRAPH: Schema.optional(
     Schema.Literals(["retained-docs", "native-apps"])
   ),
   TAXKIT_WORKFLOW_PLAN_KIND: WorkflowPlanProjectionKind,
-  TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256: Sha256,
+  TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256: Schema.optional(Sha256),
   TAXKIT_WORKFLOW_PLAN_PROJECTION_PATH: Schema.NonEmptyString,
   TAXKIT_WORKFLOW_PLAN_STAGE: DocsDeploymentStage,
   TAXKIT_WORKFLOW_PLAN_TEXT_PATH: Schema.NonEmptyString,
@@ -40,8 +53,11 @@ const WorkflowPlanProjectionConfig = Schema.Struct({
 const NativeAppsIdentityConfig = Schema.Struct({
   TAXKIT_WORKFLOW_PLAN_ACCOUNT_ID:
     NativeAppsPlanProviderIdentity.fields.accountId,
-  TAXKIT_WORKFLOW_PLAN_ALCHEMY_PATCH_SHA256:
-    NativeAppsPlanProviderIdentity.fields.alchemyPatchSha256,
+  TAXKIT_WORKFLOW_PLAN_ALCHEMY_PATCH_SHA256: Schema.optional(
+    NativeAppsPlanProviderIdentity.fields.alchemyPatchSha256
+  ),
+  TAXKIT_WORKFLOW_PLAN_IDENTITY_PATH: Schema.NonEmptyString,
+  TAXKIT_WORKFLOW_PLAN_REPOSITORY_ROOT: Schema.NonEmptyString,
   TAXKIT_WORKFLOW_PLAN_ZONE_ID: Schema.optional(
     NativeAppsProductionDns.fields.zoneId
   ),
@@ -59,6 +75,17 @@ export const projectWorkflowPlan = Effect.gen(function* () {
         })
     )
   );
+  if (
+    config.TAXKIT_WORKFLOW_PLAN_GRAPH !== "native-apps" &&
+    (config.TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256 === undefined ||
+      config.TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256 === undefined ||
+      config.TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256 === undefined)
+  ) {
+    return yield* new WorkflowPlanProjectionError({
+      reason:
+        "workflow plan projection requires the candidate, digest, stage and plan paths",
+    });
+  }
   const fileSystem = yield* FileSystem.FileSystem;
   const source = yield* fileSystem
     .readFileString(config.TAXKIT_WORKFLOW_PLAN_TEXT_PATH)
@@ -86,6 +113,105 @@ export const projectWorkflowPlan = Effect.gen(function* () {
               })
           )
         );
+        const sourceIdentity = yield* calculateNativeWorkflowEvidenceIdentity(
+          identity.TAXKIT_WORKFLOW_PLAN_REPOSITORY_ROOT,
+          config.TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT
+        ).pipe(
+          Effect.mapError(
+            () =>
+              new WorkflowPlanProjectionError({
+                reason:
+                  "native app plan requires an unchanged clean checkout at its candidate commit",
+              })
+          )
+        );
+        if (
+          (config.TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256 !== undefined &&
+            sourceIdentity.configSha256 !==
+              config.TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256) ||
+          (config.TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256 !== undefined &&
+            sourceIdentity.deploymentInputSha256 !==
+              config.TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256) ||
+          (config.TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256 !== undefined &&
+            sourceIdentity.lockfileSha256 !==
+              config.TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256) ||
+          (identity.TAXKIT_WORKFLOW_PLAN_ALCHEMY_PATCH_SHA256 !== undefined &&
+            sourceIdentity.alchemyPatchSha256 !==
+              identity.TAXKIT_WORKFLOW_PLAN_ALCHEMY_PATCH_SHA256)
+        ) {
+          return yield* new WorkflowPlanProjectionError({
+            reason:
+              "native app plan supplied digests differ from its checked source identity",
+          });
+        }
+        const path = yield* Path.Path;
+        const root = yield* fileSystem
+          .realPath(identity.TAXKIT_WORKFLOW_PLAN_REPOSITORY_ROOT)
+          .pipe(
+            Effect.mapError(
+              () =>
+                new WorkflowPlanProjectionError({
+                  reason:
+                    "native app plan requires an unchanged clean checkout at its candidate commit",
+                })
+            )
+          );
+        const outputRoot = path.join(
+          root,
+          "tmp",
+          "native-apps-plans",
+          config.TAXKIT_WORKFLOW_PLAN_STAGE
+        );
+        const outputs = yield* Effect.forEach(
+          [
+            identity.TAXKIT_WORKFLOW_PLAN_IDENTITY_PATH,
+            config.TAXKIT_WORKFLOW_PLAN_PROJECTION_PATH,
+          ],
+          (output) =>
+            Effect.gen(function* () {
+              const resolved = path.resolve(output);
+              return yield* (yield* fileSystem.exists(resolved))
+                ? fileSystem.realPath(resolved)
+                : fileSystem
+                    .realPath(path.dirname(resolved))
+                    .pipe(
+                      Effect.map((parent) =>
+                        path.join(parent, path.basename(resolved))
+                      )
+                    );
+            })
+        ).pipe(
+          Effect.mapError(
+            () =>
+              new WorkflowPlanProjectionError({
+                reason:
+                  "native app plan output paths must be distinct files inside its ignored plan directory",
+              })
+          )
+        );
+        const planPath = yield* fileSystem
+          .realPath(config.TAXKIT_WORKFLOW_PLAN_TEXT_PATH)
+          .pipe(
+            Effect.mapError(
+              () =>
+                new WorkflowPlanProjectionError({
+                  reason:
+                    "native app plan output paths must be distinct files inside its ignored plan directory",
+                })
+            )
+          );
+        if (
+          !EffectArray.every(outputs, (output) =>
+            output.startsWith(`${outputRoot}${path.sep}`)
+          ) ||
+          outputs.length !== HashSet.size(HashSet.fromIterable(outputs)) ||
+          HashSet.has(HashSet.fromIterable(outputs), planPath)
+        ) {
+          return yield* new WorkflowPlanProjectionError({
+            reason:
+              "native app plan output paths must be distinct files inside its ignored plan directory",
+          });
+        }
         const resources = yield* projectNativeAppsPlanText(
           source,
           config.TAXKIT_WORKFLOW_PLAN_STAGE
@@ -96,12 +222,11 @@ export const projectWorkflowPlan = Effect.gen(function* () {
           {
             ...resources,
             candidate: {
-              deploymentInputSha256:
-                config.TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256,
+              deploymentInputSha256: sourceIdentity.deploymentInputSha256,
               exactCommit: config.TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT,
-              lockfileSha256: config.TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256,
+              lockfileSha256: sourceIdentity.lockfileSha256,
             },
-            configSha256: config.TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256,
+            configSha256: sourceIdentity.configSha256,
             domains:
               config.TAXKIT_WORKFLOW_PLAN_STAGE === "prod"
                 ? ["taxkit.dev", "www.taxkit.dev", "api.taxkit.dev"]
@@ -116,8 +241,7 @@ export const projectWorkflowPlan = Effect.gen(function* () {
                 : "unmanaged",
             provider: {
               accountId: identity.TAXKIT_WORKFLOW_PLAN_ACCOUNT_ID,
-              alchemyPatchSha256:
-                identity.TAXKIT_WORKFLOW_PLAN_ALCHEMY_PATCH_SHA256,
+              alchemyPatchSha256: sourceIdentity.alchemyPatchSha256,
               alchemySourceCommit: "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
               alchemyVersion: "2.0.0-beta.80",
             },
@@ -140,7 +264,20 @@ export const projectWorkflowPlan = Effect.gen(function* () {
               })
           )
         );
-        return yield* stringifyNativeAppsPlanProjection(projection);
+        const encodedProjection =
+          yield* stringifyNativeAppsPlanProjection(projection);
+        yield* writeNativeWorkflowEvidenceIdentity(
+          identity.TAXKIT_WORKFLOW_PLAN_IDENTITY_PATH,
+          sourceIdentity
+        ).pipe(
+          Effect.mapError(
+            () =>
+              new WorkflowPlanProjectionError({
+                reason: "could not write the workflow plan projection",
+              })
+          )
+        );
+        return encodedProjection;
       })
     : Effect.gen(function* () {
         const logicalResources = yield* projectAlchemyPlanText(

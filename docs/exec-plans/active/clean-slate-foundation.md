@@ -32,8 +32,8 @@ Medicare result changes remain gated on Cooper's concrete decision. Continue all
 independent work. No merge, deployment, publication or provider apply authority
 is added. Keep Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: finish T004's per-client rate policy and
-whole domain/package qualification after the current request/operation checks. All three calculator
+Next continuation milestone: finish T006's prompt modern remote cleanup and
+public setup, and T007's native source-bound plan preparation. All three calculator
 pages have local native/browser proof. T003's connection/containment
 qualification is locally accepted. T002's
 installed dependency graph, app/script/SDK/infrastructure
@@ -80,7 +80,7 @@ records command outcomes and log digests.
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | In progress | Modern remote tools are locally tested in draft #156 with exact-head hosted Quality. Browser tools and both saved-page lifetimes are delivered in draft #157 after all nine local checks and exact-head hosted Quality. Older-session lifetime/cancellation passed the complete source-frozen nine-check graph on the current branch, including all fourteen native cases twice. Draft #158 is pushed at `013e02845e49d78af33aa9ea157075c24b8e0065`; exact-head hosted Quality `37574967845` passed at 05:29 UTC on 7 October. Prompt modern remote cleanup and public setup remain unfinished. |
-| T007 / DEV-78 | In progress; T003/T005 locally complete | Existing cf CLI profile reads the exact zone and selected settings. Production-only retained graph, safe shared redirect read and native v3 projection passed 37 infrastructure and 42 plan/command cases, 621 policy cases and all nine local release checks. Real input calculation/writer, scoped Doppler custody and live no-apply plans remain unfinished; no apply. |
+| T007 / DEV-78 | In progress; T003/T005 locally complete | Draft #159 contains the qualified Production graph, safe redirect read and native v3 projection. The follow-up calculates source identities in that same command and checks clean/unchanged source and protected outputs. Full follow-up qualification is pending; native bootstrap/provider receipts, scoped custody and live no-apply plans remain unfinished. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Pending T007/T008/T009 | Full review, release/consumer proof and separately authorised delivery. |
@@ -5223,3 +5223,72 @@ checks. Executable source remains identical to the fully checked snapshot.
 No new check framework, Changeset, credential, provider apply or deployment was
 introduced. A draft checkpoint does not complete T007: current writer/input
 calculation, real scoped Doppler custody and live no-apply plan proof remain.
+
+## T007 native source-bound plan follow-up
+
+Draft #159 is pushed at `54dea58097ed9b409a1c202c6b416368273cb410`.
+This follow-up uses the existing native projection command and existing
+workflow-evidence source/codec owner. It adds no parallel deployment framework
+and does not reactivate historical commands or stopped workflows.
+
+The command checks the full clean candidate before and after hashing the named
+tracked source paths. It calculates configuration/source-manifest/lockfile/patch
+identities, checks installed beta.80 version and rejects optional caller hashes
+that disagree. A separate native identity version two retains source path/hash
+pairs; historical identities/receipts remain unchanged. Both local outputs must
+resolve inside the selected ignored stage directory and cannot overwrite source,
+one another, another stage or the supplied plan text. Capture has a twenty-second
+deadline with scoped Git children. A failed projection write can leave the first
+local identity file; that partial output supplies no approval.
+
+The record excludes generated/ignored/dependency bytes, environment and provider
+state. Installed version is not installed patch proof; supplied plan text is not
+proof of its source/provider origin. Native bootstrap/provider receipt, actual
+custody and live plan qualification remain pending. No credential, workflow,
+dependency version, tax result or deferred metrics change is included.
+
+Doppler read-only metadata checks found four existing TaxKit configurations and
+seven secret names in each selected app configuration through an existing primary
+checkout scope. No values were exported and no scope or credential was changed.
+That observation proves configuration/name access only; this worktree's custody,
+Alchemy profile and credential purposes are still unqualified. Mutable metadata
+belongs in the dated follow-up receipt, not durable configuration policy.
+
+Docs-maintainer impact: **Change required** for the deployment tool README,
+deployment architecture/infrastructure README, runbook/authority sidecar,
+SPEC/tasks/active plan and new dated proof. **Preserve** historical identities,
+receipts, writer stops, public app/package/content contracts, tax results and
+metrics deferral. **N/A** for generated references, public API/SDK and Changeset:
+this slice changes private local deployment preparation only. Focused checks
+and whole-checkout qualification are recorded in the linked follow-up receipt;
+unexecuted or failed attempts remain identified.
+
+### T007 hosted timeout correction
+
+GitHub run `37580219079` for draft #159's exact head finished cancelled at
+06:42 UTC on 7 October. The check annotation explicitly reports exceeding the
+thirty-minute job limit. Its log records successful verification, workspace
+tests, builds, docs validation, packed/downstream checks and API smoke before
+cancellation during the final native browser check. This is not hosted success
+or a proved browser failure. The hosted runner's cold verification took nearly
+twenty-four minutes; the local complete graph took about seventeen and a half.
+
+This follow-up raises the bounded Quality job limit to sixty minutes and updates
+its owning policy, accepted fixture and separate thirty/120-minute refusals.
+No check, permission or cancellation behaviour is removed. Docs-maintainer
+records **Change required** for Quality workflow/policy/tests, testing-and-quality
+architecture and this dated evidence; **Preserve** release operations and
+provider authority. A new exact-head hosted run remains necessary.
+
+### Local execution direction
+
+Cooper directed checks and deployments to run locally because GitHub credits
+are unavailable. Commonplace Development Workflows 0.6.7, current `main` and
+`stable` at `c1e08a8a8c257fd2ddb9fc913c75ce5f016f27fc`, was read directly.
+Its Alchemy operation guide says to use the same full checks and existing native
+commands locally, preserve provider/source authority and separate blocked CI
+from local/provider proof. This does not upgrade TaxKit's vendored skills or
+selected dependencies. No GitHub rerun or billing change is part of this work.
+The prior #159 cancellation remains the independently observed timeout, separate
+from Cooper's account-availability report. Local execution does not itself
+supply an unspecified deployment target or erase pending secret/state/plan proof.

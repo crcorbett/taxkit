@@ -4,8 +4,10 @@ import {
   Clock,
   Crypto,
   Effect,
+  HashSet,
   Option,
   Order,
+  Record,
   Schema,
   Stream,
 } from "effect";
@@ -24,6 +26,8 @@ import {
   WorkflowBootstrapReceipt,
   WorkflowEvidenceConfigError,
   WorkflowEvidenceIdentity,
+  NativeWorkflowEvidenceIdentity,
+  NativeWorkflowGitSnapshot,
   WorkflowEvidenceInputReadError,
   WorkflowEvidencePlanProjectionError,
   WorkflowEvidenceProviderIdentity,
@@ -61,6 +65,132 @@ const deploymentInputRoots = [
   "packages/docs-content",
   "packages/docs-fumadocs",
 ] as const;
+
+const nativeConfigurationFiles = [
+  "alchemy.apps.run.ts",
+  "apps/api/package.json",
+  "apps/web/package.json",
+  "apps/web/vite.config.ts",
+  "bun.lock",
+  "package.json",
+  "packages/infrastructure/package.json",
+  "packages/infrastructure/src/apps-secrets.boundary.ts",
+  "packages/infrastructure/src/apps-stack.ts",
+  "patches/alchemy@2.0.0-beta.80.patch",
+  "tsconfig.alchemy.json",
+] as const;
+
+const nativeDeploymentInputRoots = [
+  ".gitignore",
+  "alchemy.apps.run.ts",
+  "apps/api",
+  "apps/web",
+  "packages",
+  "patches",
+  "tools",
+  "package.json",
+  "bun.lock",
+  "turbo.json",
+  "tsconfig*.json",
+  "oxlint.config.ts",
+  "oxfmt.config.ts",
+  "vitest*.ts",
+] as const;
+
+export const readNativeGitSnapshot = (repositoryRoot: string) =>
+  Effect.gen(function* () {
+    const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+    const replies = yield* Effect.forEach(
+      [
+        { args: ["rev-parse", "HEAD"], role: "candidateCommit" },
+        {
+          args: ["status", "--porcelain=v1", "--untracked-files=normal"],
+          role: "status",
+        },
+        {
+          args: ["ls-files", "-z", "--", ...nativeDeploymentInputRoots],
+          role: "files",
+        },
+      ],
+      ({ role, args }) =>
+        Effect.gen(function* () {
+          const handle = yield* spawner.spawn(
+            ChildProcess.make("git", args, {
+              cwd: repositoryRoot,
+              extendEnv: true,
+              forceKillAfter: "2 seconds",
+              stderr: "pipe",
+              stdin: "ignore",
+              stdout: "pipe",
+            })
+          );
+          const [chunks, [exitCode]] = yield* Effect.all(
+            [
+              Stream.runCollect(handle.stdout),
+              Effect.zip(handle.exitCode, Stream.runDrain(handle.stderr), {
+                concurrent: true,
+              }),
+            ],
+            { concurrency: 2 }
+          );
+          if (Number(exitCode) !== 0) {
+            return yield* new WorkflowEvidenceInputReadError({
+              role: "native-git-snapshot",
+            });
+          }
+          const source = yield* Effect.try({
+            catch: () =>
+              new WorkflowEvidenceInputReadError({
+                role: "native-git-snapshot",
+              }),
+            try: () =>
+              new TextDecoder("utf-8", { fatal: true }).decode(
+                Uint8Array.from(Array.flatMap(chunks, Array.fromIterable))
+              ),
+          });
+          return [role, source] as const;
+        })
+    );
+    const values = Record.fromEntries(replies);
+    const commit = yield* Record.get(values, "candidateCommit").pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+      )
+    );
+    const status = yield* Record.get(values, "status").pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+      )
+    );
+    const files = yield* Record.get(values, "files").pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+      )
+    );
+    return yield* Schema.decodeUnknownEffect(NativeWorkflowGitSnapshot)({
+      candidateCommit: commit.trim(),
+      files: sortArray(Order.String)(
+        Array.filter(files.split("\0"), (file) => file.length > 0)
+      ),
+      status,
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+      )
+    );
+  }).pipe(
+    Effect.catchTag(
+      "PlatformError",
+      () => new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+    )
+  );
 
 const sha256Bytes = (bytes: Uint8Array, role: string) =>
   Crypto.Crypto.pipe(
@@ -191,6 +321,129 @@ const readText = (path: string, role: string) =>
     Effect.mapError(() => new WorkflowEvidenceInputReadError({ role }))
   );
 
+export const calculateNativeWorkflowEvidenceIdentity = (
+  repositoryRoot: string,
+  candidateCommit: WorkflowEvidenceIdentity["candidateCommit"]
+) =>
+  Effect.gen(function* () {
+    const path = yield* Path.Path;
+    const before = yield* readNativeGitSnapshot(repositoryRoot);
+    if (before.candidateCommit !== candidateCommit) {
+      return yield* new WorkflowEvidenceInputReadError({
+        role: "native-candidate-commit",
+      });
+    }
+    const required = HashSet.fromIterable<string>(nativeConfigurationFiles);
+    const included = HashSet.fromIterable(before.files);
+    if (
+      !Array.every(nativeConfigurationFiles, (file) =>
+        HashSet.has(included, file)
+      )
+    ) {
+      return yield* new WorkflowEvidenceInputReadError({
+        role: "native-configuration-inputs",
+      });
+    }
+    const installed = yield* readText(
+      path.join(repositoryRoot, "node_modules/alchemy/package.json"),
+      "native-alchemy-version"
+    ).pipe(
+      Effect.flatMap(
+        Schema.decodeEffect(
+          Schema.fromJsonString(
+            Schema.Struct({
+              name: Schema.Literal("alchemy"),
+              version: NativeWorkflowEvidenceIdentity.fields.alchemyVersion,
+            })
+          )
+        )
+      ),
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-alchemy-version" })
+      )
+    );
+    const sources = yield* Effect.forEach(
+      before.files,
+      (file) =>
+        digestFile(path.join(repositoryRoot, file), "native-source-file").pipe(
+          Effect.map((sha256) => ({ path: file, sha256 }))
+        ),
+      { concurrency: 8 }
+    );
+    const digests = Record.fromEntries(
+      Array.map(sources, (source) => [source.path, source.sha256] as const)
+    );
+    const lockfileSha256 = yield* Record.get(digests, "bun.lock").pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () => new WorkflowEvidenceInputReadError({ role: "native-lockfile" })
+      )
+    );
+    const alchemyPatchSha256 = yield* Record.get(
+      digests,
+      "patches/alchemy@2.0.0-beta.80.patch"
+    ).pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-alchemy-patch" })
+      )
+    );
+    const deploymentInputSha256 = yield* sha256Bytes(
+      new TextEncoder().encode(
+        Array.map(
+          sources,
+          (source) => `${source.sha256}  ${source.path}\n`
+        ).join("")
+      ),
+      "native-source-manifest"
+    );
+    const configSha256 = yield* sha256Bytes(
+      new TextEncoder().encode(
+        Array.map(
+          Array.filter(sources, (source) => HashSet.has(required, source.path)),
+          (source) => `${source.sha256}  ${source.path}\n`
+        ).join("")
+      ),
+      "native-configuration-manifest"
+    );
+    const after = yield* readNativeGitSnapshot(repositoryRoot);
+    if (
+      after.candidateCommit !== candidateCommit ||
+      (yield* digestManifest(repositoryRoot, after.files)) !==
+        deploymentInputSha256
+    ) {
+      return yield* new WorkflowEvidenceInputReadError({
+        role: "native-source-changed",
+      });
+    }
+    return yield* Schema.decodeUnknownEffect(NativeWorkflowEvidenceIdentity)({
+      alchemyPatchSha256,
+      alchemySourceCommit: "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
+      alchemyVersion: installed.version,
+      candidateCommit,
+      configSha256,
+      deploymentInputSha256,
+      lockfileSha256,
+      schemaVersion: 2,
+      sources,
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-source-identity" })
+      )
+    );
+  }).pipe(
+    Effect.timeout("20 seconds"),
+    Effect.catchTag(
+      "TimeoutError",
+      () =>
+        new WorkflowEvidenceInputReadError({ role: "native-source-timeout" })
+    ),
+    Effect.scoped
+  );
+
 const readOwnedJson = <A>(
   path: string,
   role: string,
@@ -236,6 +489,17 @@ const encodeAndWrite = <A>(
         Effect.mapError(() => new WorkflowEvidenceReceiptWriteError({ role }))
       );
   });
+
+export const writeNativeWorkflowEvidenceIdentity = (
+  path: string,
+  identity: NativeWorkflowEvidenceIdentity
+) =>
+  encodeAndWrite(
+    path,
+    "native-source-identity",
+    NativeWorkflowEvidenceIdentity,
+    identity
+  );
 
 const appendWorkflowFile = (path: string, role: string, output: string) =>
   FileSystem.FileSystem.pipe(

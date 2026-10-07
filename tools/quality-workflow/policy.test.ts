@@ -31,7 +31,7 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -315,7 +315,7 @@ describe("quality workflow policy", () => {
                 )
                 .replace(
                   "jobs:\n  quality:",
-                  "jobs:\n  spoof:\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - run: bun run release:check -- --ci\n  quality:"
+                  "jobs:\n  spoof:\n    runs-on: ubuntu-latest\n    timeout-minutes: 60\n    steps:\n      - run: bun run release:check -- --ci\n  quality:"
                 )
             ),
             (item) => item.invariant
@@ -399,7 +399,7 @@ describe("quality workflow policy", () => {
             yield* findingsFor(
               acceptedWorkflow
                 .replace("taxkit-ci-release-maintainer", "unowned")
-                .replace("timeout-minutes: 30", "timeout-minutes: 120")
+                .replace("timeout-minutes: 60", "timeout-minutes: 120")
                 .replace(
                   "cancel-in-progress: true",
                   "cancel-in-progress: false"
@@ -412,6 +412,24 @@ describe("quality workflow policy", () => {
           "workflow-pin-update-owner",
           "workflow-timeout",
         ]);
+      })
+  );
+
+  test.effect.each([30, 120])(
+    "rejects a quality timeout of %s minutes",
+    (minutes) =>
+      Effect.gen(function* () {
+        expect(
+          EffectArray.map(
+            yield* findingsFor(
+              acceptedWorkflow.replace(
+                "timeout-minutes: 60",
+                `timeout-minutes: ${minutes}`
+              )
+            ),
+            (item) => item.invariant
+          )
+        ).toEqual(["workflow-timeout"]);
       })
   );
 

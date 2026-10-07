@@ -361,7 +361,8 @@
         "docs/verification/docs-deployment-journeys.json",
         "docs/evidence/deployments/README.md",
         "docs/operations/authority-model.md",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json"
       ],
       "stopOperations": [
         "versioning",
