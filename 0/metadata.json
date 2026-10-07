@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M49XMF7F37DRX8Q2J892RGAZ",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T00:54:06.269438Z",
+  "branch": "codex/dev-77-native-agent-tools",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "apps/api/src/mcp-cancellation.boundary.ts",
+    "apps/api/src/mcp-request.service.ts",
+    "apps/api/src/mcp-response.boundary.ts",
+    "apps/api/src/mcp.schemas.ts",
+    "apps/api/src/mcp.tools.layer.ts",
+    "apps/api/src/worker.application.ts",
+    "apps/api/test/mcp-client.boundary.test.ts",
+    "apps/api/test/mcp-response.boundary.test.ts",
+    "apps/api/tsconfig.tests.json",
+    "apps/web/test/native-mcp.boundary.test.ts",
+    "oxlint.config.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5bde412b8bc2",
+  "checkpoint_transcript_start": 55555,
+  "transcript_lines_at_start": 55555,
+  "compact_transcript_start": 6619,
+  "token_usage": {
+    "input_tokens": 622127,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 32486912,
+    "output_tokens": 142166,
+    "api_call_count": 217
+  },
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T00:54:02.728666Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 0,
+    "total_lines_changed": 0,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}

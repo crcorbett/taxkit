@@ -1,0 +1,36 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M49XMF7F37DRX8Q2J892RGAZ",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-77-native-agent-tools",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "apps/api/src/mcp-cancellation.boundary.ts",
+    "apps/api/src/mcp-request.service.ts",
+    "apps/api/src/mcp-response.boundary.ts",
+    "apps/api/src/mcp.schemas.ts",
+    "apps/api/src/mcp.tools.layer.ts",
+    "apps/api/src/worker.application.ts",
+    "apps/api/test/mcp-client.boundary.test.ts",
+    "apps/api/test/mcp-response.boundary.test.ts",
+    "apps/api/tsconfig.tests.json",
+    "apps/web/test/native-mcp.boundary.test.ts",
+    "oxlint.config.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 622127,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 32486912,
+    "output_tokens": 142166,
+    "api_call_count": 217
+  }
+}
