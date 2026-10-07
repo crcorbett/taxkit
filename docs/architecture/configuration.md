@@ -96,6 +96,17 @@ private live Layer adapts it. The application service exposes named operations,
 never the native object. The adapter preserves its receiver and unrelated
 adapter defects. Settings errors contain only fixed safe fields.
 
+## Retained analytics project configuration
+
+The separate `TaxKitPostHog/prod` candidate reads only `taxkit/prd` through
+native Doppler secrets, with shell application settings disabled. Its checked
+`POSTHOG_ORGANISATION_ID` and redacted `POSTHOG_MANAGEMENT_KEY` have no defaults;
+the US management host is fixed in the private adapter. Management credentials
+are deployment-only and never Worker bindings or browser settings. Current
+application analytics remain configured off; declaring project resources does
+not enable collection. The [infrastructure owner](../../packages/infrastructure/README.md#retained-posthog-project-candidate)
+describes deferred acquisition and native lifecycle bounds.
+
 ## Browser configuration boundary
 
 The root TanStack server function returns Schema-encoded public settings only.

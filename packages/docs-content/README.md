@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: package contracts or generated-source boundaries change
 ---
 
@@ -240,12 +240,14 @@ implementation in the consuming app or reusable primitives in
 - Do not add app routes, layout, renderer components or search behavior here.
 - Keep generic MDX options, Standard Schema bridging, source loader adapters
   and reusable renderer primitives in `@taxkit/docs-fumadocs`.
-- Regenerate `.source/` with `bun run --filter=@taxkit/docs-content build`
+- Regenerate `.source/` with `bun x turbo run build --filter=@taxkit/docs-content`
   after changing content, `source.config.ts` or schema fields that affect
   generated source. The named lower-level command is
-  `bun run --filter=@taxkit/docs-content generate`; the package build executes
-  it, and Turbo records its inputs, `.source/**` output and upstream
-  docs-fumadocs build.
+  `bun x turbo run generate --filter=@taxkit/docs-content`; the package build
+  executes its generation leaf, and Turbo records its inputs, `.source/**`
+  output and upstream docs-fumadocs build. Tests and types also use the
+  filtered Turbo task when dependency artifacts have not been prepared.
+  Leaf commands never rebuild another package while it is in use.
 - Run `bun run --filter=@taxkit/docs-examples check-examples` after changing
   the checked source templates.
 - Keep docs identifiers, frontmatter, meta, navigation and tagged source errors

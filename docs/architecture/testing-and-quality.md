@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
@@ -1748,3 +1748,33 @@ failure: the earlier focused checks left the description reachable while mounted
 and never forced browser collection between visits. The retained view now reads
 through its immutable group, so registry values and descriptions share a
 lifetime. Root disposal still releases the registry and scoped client.
+
+
+### Retained PostHog projects
+
+The infrastructure tests use the installed Distilled operations with controlled
+HTTP replies, plus a real native Fetch request to a loopback redirect. They check
+complete paged ownership before create, safe permission failures, uncertain
+write recovery without a second POST, unchanged keys during update, supported
+privacy readback, one-attempt deadlines and streamed reply bounds. The native
+Stack/Plan tests use memory state and a deterministic management Layer; profile,
+credential and network services refuse access. Both projects retain, no-change
+and in-place rename preserve identity, missing retained resources refuse, and
+the native bulk-delete scan skips the project resource type.
+
+Actual lint fixtures admit the SDK only in its exact private adapter, including
+refusal of neighbouring static exports and literal dynamic imports. Decoder and
+synthetic encoder permissions remain exact paths; ordinary fetch and runtime
+execution still refuse. The
+[dated candidate receipt](../documentation-audit/clean-slate-foundation/2026-10-08-retained-posthog-projects.json)
+records local checks and failed attempts. These tests do not prove real project
+capacity, credential scope, provider changes or stored events.
+
+
+The docs-content generation, test and type leaves rely on Turbo's existing
+`^build` dependency. They do not launch another docs-fumadocs build. The root
+`docs:catalogue` route uses the filtered generation task, so its cold run still
+prepares compiled dependency artifacts. This prevents the package test and
+build branches from concurrently removing the same compiled directory. The
+first retained-project full test run exposed that race; the failed log remains
+in the dated receipt, rather than being counted as a passing check.

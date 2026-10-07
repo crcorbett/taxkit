@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -153,7 +153,10 @@ Root `alchemy.run.ts`
 
 `packages/infrastructure`
 : Private source-only owner of the native API/Website graph and stage/secret
-  selection. The old `./stack` export is now the typed retirement marker.
+  selection, plus the separate retained PostHog project candidate through the
+  explicit `./posthog` export and `alchemy.posthog.run.ts`. Its private management
+  adapter contains Distilled; application packages do not receive that client
+  or its management credentials. The old `./stack` export is now the typed retirement marker.
   Pure retained old stage/resource metadata remains for historical receipt
   decoding. New provider operations belong DEV-81 and cannot inherit old IDs
   or approvals.

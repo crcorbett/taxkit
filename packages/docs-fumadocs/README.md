@@ -52,10 +52,11 @@ docs-content; the reusable package does not acquire navigation or source roots.
 ## Build ordering
 
 `source`, `types` and `default` package conditions point to source and compiled
-artifacts explicitly. The named docs-content generation task depends on this
-package build. Direct docs-content generation/tests, docs app types/build and
-both Knip commands therefore compile this package before config loading and
-never depend on stale pre-existing `dist`.
+artifacts explicitly. Turbo owns this package build before docs-content generation, tests and type
+checks, app builds and both Knip commands. Docs-content leaf commands do not
+rebuild a dependency while another task is using its output. Use the root
+`docs:catalogue` command or a filtered Turbo task to prepare the dependency
+graph; direct leaf commands require that preparation.
 
 ```txt
 bun run --filter=@taxkit/docs-fumadocs test

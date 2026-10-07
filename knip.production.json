@@ -10,7 +10,8 @@
       "entry": [
         "alchemy.run.ts!",
         "alchemy.apps.run.ts!",
-        "alchemy.apps.local.run.ts!"
+        "alchemy.apps.local.run.ts!",
+        "alchemy.posthog.run.ts!"
       ],
       "project": ["alchemy.run.ts!"]
     },
@@ -193,5 +194,6 @@
       ],
       "project": ["src/**/*.ts!", "!src/test.layer.ts!", "!src/__testing__/**!"]
     }
-  }
+  },
+  "ignore": ["packages/infrastructure/src/posthog/test.layer.ts"]
 }

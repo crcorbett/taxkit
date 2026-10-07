@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: native app, retained recovery, provider resource, state, domain or rollback change
 ---
 
@@ -47,6 +47,32 @@ Root `bun run dev` supplies the empty owned env file and an isolated Alchemy
 home. Native resources own origins, bindings, Worker/Vite lifetimes and source
 reload. The [Website guide](../../apps/web/README.md) owns setup and actual local
 CLI/browser checks. Local state and local Worker proof are not cloud state.
+
+## Retained analytics project candidate
+
+`alchemy.posthog.run.ts` composes the private infrastructure `./posthog`
+export. `TaxKitPostHog/prod` owns two stable retained project identities for
+Production and one shared Preview. Local and PR stages refuse project
+declaration. Both projects use the fixed US service and checked organisation
+configuration; names never prove ownership. Every paged project identity is
+read before a creation decision because the current Distilled list omits the
+marker. Incomplete, forbidden or ambiguous inventory is an error, not absence.
+
+The native Provider owns lifecycle; the private Distilled Layer owns API calls
+and redacted management credentials. Expected configuration failures are
+deferred into native lifecycle error channels, with one cached management Layer
+under the stack's scope, because beta.80 requires error-free provider
+registration. No independent provider-write script exists. Failed create
+recovery performs checked reads, with no automatic second POST. Updates
+preserve provider IDs and capture keys. Missing retained state or changed
+account/region/environment/marker refuses replacement. Ordinary removal retains
+provider projects; the bulk-delete scan skips them.
+
+The [infrastructure guide](../../packages/infrastructure/README.md#retained-posthog-project-candidate)
+owns detailed bounds and local proof. This candidate establishes no management
+credential, project entitlement, cloud plan, apply or stored-event proof. The
+app graph has no analytics project reference and remains off by default.
+Browser design and provider activation remain T008 work; metrics remain deferred.
 
 ## Retired old documentation operation
 

@@ -14,6 +14,9 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Closed native PostHog SDK ingress; no runner or neighbouring-file permission.
+  "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+  "packages/infrastructure/src/posthog/management.boundary.test.ts",
   // Exact collection header and native browser preference ingress only.
   "packages/analytics/src/collection-policy.boundary.ts",
   "apps/web/src/lib/calculator-policy.browser.layer.ts",
@@ -254,6 +257,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Synthetic PostHog HTTP fixture representation only.
+  "packages/infrastructure/src/posthog/management.boundary.test.ts",
   // Exact native PostHog capture request and safe configuration error bytes.
   // No decoder, runtime runner, raw JSON or neighbouring-file permission.
   "packages/analytics/src/live.layer.ts",
@@ -538,10 +543,37 @@ export default defineConfig({
   ],
   overrides: [
     {
+      files: portableEffectSourceFiles,
+      rules: {
+        "no-restricted-imports": [
+          "error",
+          {
+            patterns: [
+              {
+                group: [
+                  "@distilled.cloud/posthog",
+                  "@distilled.cloud/posthog/*",
+                ],
+                message:
+                  "Use the closed PostHogManagement service; the SDK belongs only in its private management adapter.",
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: [
+        "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+      ],
+      rules: { "no-restricted-imports": "off" },
+    },
+    {
       // The analytics owners use native HttpClient. A decoder/encoder permission
       // does not admit bare browser or server fetch in these new files.
       files: [
         "packages/analytics/src/**/*.ts",
+        "packages/infrastructure/src/posthog/**/*.ts",
         "apps/api/src/analytics-request.boundary.ts",
         "apps/api/src/calculator-analytics.layer.ts",
         "apps/web/src/lib/calculator-policy.browser.layer.ts",

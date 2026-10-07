@@ -3,16 +3,17 @@ document_type: package-guide
 lifecycle: current
 authority: supporting
 owner: taxkit-infrastructure-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: Alchemy resource, stage, provider, state, or package-export change
 ---
 
 # TaxKit infrastructure
 
 This private source-only package owns the native API/Website graph, stage
-rules and checked secret selection. Root `alchemy.apps.run.ts` selects the
-native cloud candidate; `alchemy.apps.local.run.ts` owns disposable local
-apps. The package has no application runtime.
+rules, checked secret selection and the separate retained PostHog project
+candidate. Root `alchemy.apps.run.ts` selects the native cloud candidate;
+`alchemy.apps.local.run.ts` owns disposable local apps. The package has no
+application runtime.
 
 The old `./stack` source-only export now supplies a typed static retirement
 marker. Root `alchemy.run.ts` exports that marker; the actual Alchemy importer
@@ -79,6 +80,54 @@ private peer resource, self URLs, fresh Output evaluation, absent addresses and
 secret precedence with a fixture replacing Doppler. They do not establish real
 Cloudflare diff convergence, Doppler retrieval, cloud state or deployment.
 See the [dated graph receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-app-graph.json).
+
+## Retained PostHog project candidate
+
+The explicit source-only `./posthog` export composes `alchemy.posthog.run.ts`.
+The separate durable `TaxKitPostHog` stack accepts only `prod` and declares
+`TaxKitProductionProject` / `TaxKitPreviewProject`, with display names
+`TaxKit Production` / `TaxKit Preview`. Both use the fixed US management host
+and exact environment ownership markers. Neither PR nor local stages declare
+projects. Native secrets select only `taxkit/prd`, with ambient app settings
+disabled. Required `POSTHOG_ORGANISATION_ID` is a checked organisation identity;
+`POSTHOG_MANAGEMENT_KEY` is a checked redacted personal management key.
+Neither has a default. No credentials have been established by this candidate.
+
+The private Distilled adapter exposes four closed project operations. It checks
+every list page, count, identity and next destination, then reads every listed
+project because the current SDK's list omits the ownership marker. Unrelated
+nullable names and old token formats remain valid inventory. A matching name
+without the exact marker is foreign; multiple matches, a missing page, changed
+count, duplicate identity, forbidden read or vanished list item stop creation.
+Inventory is capped at 1,000 projects, 20 pages and 30 seconds. One native HTTP
+attempt reads at most 1 MiB; redirects refuse, credentials omit browser state,
+and tracing is disabled. A project read has a complete five-second deadline.
+
+Create runs under one Layer-owned write permit with a 75-second whole-operation
+bound. A failed or uncertain create reads ownership again before any later
+write; it never automatically repeats POST. Update checks ownership first,
+changes only the managed name and ten supported privacy controls, and reads
+back the same ID and capture key. Update is bounded to 15 seconds. Missing
+retained projects and changed ownership refuse rather than silently replacing
+history. Both native removal policies retain; provider delete additionally
+refuses even a forced call, and the bulk-delete scan skips this resource type.
+Removing tracking state is not deletion of the retained provider project.
+
+Alchemy beta.80 requires error-free provider registration. The private live
+provider Layer therefore defers fallible management acquisition to its first
+lifecycle call and caches one Layer within the native stack's scope. Missing
+or invalid keys remain named typed failures; no nested runtime or `orDie` is
+introduced. Starting another native CLI run reacquires configuration.
+
+The deterministic management Layer is test-only and is excluded only from the
+Production unused-code inventory. It remains typechecked and linted. Controlled
+SDK HTTP, a real loopback redirect, and native memory-state plans cover this
+candidate. These are neither project capacity, credential-scope nor provider
+change proof. Cross-process creation races remain a limitation of the provider
+API; duplicate ownership fails on a subsequent complete inventory. The app stack still collects off
+and has no PostHog project reference or management credentials in its bindings.
+Browser sender choice, capture wiring, stored-event readback and any real
+operation remain separately tracked T008 work. Metrics remain deferred.
 
 ## Disposable local apps
 

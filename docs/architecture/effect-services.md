@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-effect-services-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
@@ -204,6 +204,18 @@ generic value into its canonical content Schemas. Neither package executes a
 runtime. The accepted catalogue is built through the generated adapter;
 `apps/api` owns its checked content service and `apps/web` owns the reader
 runner and private API connection. The old app runtime is retained history.
+
+The infrastructure-owned `PostHogManagement` contract has only find, read,
+create and update operations over checked TaxKit identities. Its private
+Distilled adapter contains paging, credentials, supported privacy settings,
+bounded replies and safe failure mapping. The native resource provider and
+deterministic test Layer depend on that closed contract. Alchemy beta.80 requires
+provider registration without an error channel, so the composition Layer caches
+fallible live acquisition in the native stack scope and defers it to a lifecycle
+operation. Invalid settings remain typed failures before any request. The
+[infrastructure owner](../../packages/infrastructure/README.md) records the
+retention, limits and qualification boundaries; no app runtime receives this
+management service.
 
 Use [the repo-owned effect client wrapper skill](../../.agents/skills/effect-client-wrapper/SKILL.md)
 when introducing or reviewing a provider adapter. Its canonical example and

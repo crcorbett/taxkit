@@ -19,6 +19,84 @@ const decoder =
 it.effect.each([
   {
     allowed: true,
+    path: "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    rule: "",
+    source: decoder,
+  },
+  {
+    allowed: false,
+    path: "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    rule: "no-schema-encoder-outside-egress",
+    source: encoder,
+  },
+  {
+    allowed: false,
+    path: "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    rule: "no-runtime-execution-outside-boundaries",
+    source:
+      'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',
+  },
+  {
+    allowed: false,
+    path: "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    rule: "no-restricted-globals",
+    source: 'export const result = fetch("https://invalid.example");',
+  },
+  {
+    allowed: true,
+    path: "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    rule: "",
+    source:
+      'export { getOrganizationsProject as result } from "@distilled.cloud/posthog/organizations";',
+  },
+  {
+    allowed: false,
+    path: "packages/infrastructure/src/posthog/projects.provider.ts",
+    rule: "no-restricted-imports",
+    source:
+      'export { getOrganizationsProject as result } from "@distilled.cloud/posthog/organizations";',
+  },
+  {
+    allowed: false,
+    path: "apps/api/src/posthog-adjacent.ts",
+    rule: "no-restricted-imports",
+    source:
+      'export { getOrganizationsProject } from "@distilled.cloud/posthog/organizations";',
+  },
+  {
+    allowed: false,
+    path: "apps/api/src/posthog-adjacent.ts",
+    rule: "no-restricted-imports",
+    source:
+      'export const result = import("@distilled.cloud/posthog/organizations");',
+  },
+  {
+    allowed: false,
+    path: "packages/infrastructure/src/posthog/management.adjacent.ts",
+    rule: "no-decoding-outside-boundaries",
+    source: decoder,
+  },
+  {
+    allowed: true,
+    path: "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    rule: "",
+    source: decoder,
+  },
+  {
+    allowed: true,
+    path: "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    rule: "",
+    source: encoder,
+  },
+  {
+    allowed: false,
+    path: "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    rule: "no-restricted-imports",
+    source:
+      'export { getOrganizationsProject as result } from "@distilled.cloud/posthog/organizations";',
+  },
+  {
+    allowed: true,
     path: "packages/analytics/src/live.layer.ts",
     rule: "",
     source: encoder,

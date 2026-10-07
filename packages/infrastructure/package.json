@@ -28,6 +28,11 @@
       "source": "./src/apps-secrets.boundary.ts",
       "types": "./src/apps-secrets.boundary.ts",
       "default": "./src/apps-secrets.boundary.ts"
+    },
+    "./posthog": {
+      "source": "./src/posthog/index.ts",
+      "types": "./src/posthog/index.ts",
+      "default": "./src/posthog/index.ts"
     }
   },
   "scripts": {
@@ -36,6 +41,8 @@
     "test": "bun --bun vitest run"
   },
   "dependencies": {
+    "@distilled.cloud/posthog": "1.0.0-rc.13",
+    "@taxkit/analytics": "workspace:*",
     "alchemy": "catalog:",
     "api": "workspace:*",
     "effect": "catalog:"

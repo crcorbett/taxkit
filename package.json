@@ -130,7 +130,7 @@
     "web:test:browser": "turbo run test:browser --filter=web",
     "sdk:test:browser": "turbo run test:browser --filter=@taxkit/sdk",
     "web:test:native-pair": "bun run --filter=web build:native-pair && bun run --filter=web test:native-pair",
-    "docs:catalogue": "bun run --filter=@taxkit/docs-content generate && bun --conditions=source run tools/documentation/catalogue.runtime.ts"
+    "docs:catalogue": "turbo run generate --filter=@taxkit/docs-content && bun --conditions=source run tools/documentation/catalogue.runtime.ts"
   },
   "dependencies": {
     "@taxkit/infrastructure": "workspace:*",

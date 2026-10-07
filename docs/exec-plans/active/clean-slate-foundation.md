@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-implementation-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: task progress, dependency qualification, acceptance evidence or authority change
 ---
 
@@ -87,7 +87,7 @@ records command outcomes and log digests.
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | Complete locally; draft review outstanding | Six remote and five visible browser tools reuse the checked owners. All nine local checks pass at `72bfa16ac08dacc4c26f3de023a2880baefe1c55`, with both fourteen-case native runs. Draft #162 contains the stage-derived connection guide, deployed and read back on pr-162 and Production with both supported clients. The explicit modern five-second cleanup limit remains; no autonomous model session or prompt cleanup is claimed. |
 | T007 / DEV-78 | Complete locally; draft review outstanding | Exact native graph/source/secret/state/live plans are delivered in drafts #159–161, with #162 guide delivery. Draft #163 aligns the current native CLI/runbooks/recovery and paged provider reads. Full local verification passes `226c60bddb225467db64e772d48304af2368a216` in 684.12 seconds; all 1,750 frozen identities match, including the fourteen-case built app check. No new provider, state, credential or deployment mutation; rollback and no-op convergence remain unqualified. |
-| T008 / DEV-79 | In progress | Backend/request policy candidate; Website/browser, relay and provider proof remain. |
+| T008 / DEV-79 | In progress | Backend and Website calculator preference candidates are locally qualified. The retained-project candidate has focused local proof; browser sender choice, relay, real provider resources and stored-event proof remain. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Pending T007/T008/T009 | Full review, release/consumer proof and separately authorised delivery. |
 
@@ -5646,3 +5646,55 @@ metadata and focused closeout checks. This accepts the local Website forwarding
 slice only; browser pageviews, relay, retained provider resources, stored UUID
 proof and public privacy/operations updates remain T008 work in progress.
 No new provider, credential or deployment operation is claimed.
+
+
+### T008 retained PostHog project candidate
+
+Continue from draft [#165](https://github.com/crcorbett/taxkit/pull/165) at
+`c894892f443e1bee6cf90d85ecb14a1193f1046b` on
+`codex/dev-79-retained-posthog-projects`. The separate native
+`TaxKitPostHog` stack declares exactly two retained US projects in durable
+`prod`; local and PR stages refuse. Distilled PostHog 1.0.0-rc.13 is pinned
+without changing Effect or Alchemy. Checked organisation and management key
+settings have no defaults and select only the existing `taxkit/prd` config.
+No key or project has been created, and application collection remains off.
+
+The private closed management service contains complete bounded inventory,
+checked ownership markers, safe typed failures, one-attempt native transport,
+streamed byte limits and supported privacy controls. An uncertain create reads
+ownership again without automatically issuing another POST. Update preserves
+project and capture-key identities. Native retention plus explicit delete
+refusal protects history; bulk deletion skips the resource type. The native
+provider registration bridge caches fallible acquisition within the stack
+scope rather than creating another runtime or turning configuration errors
+into defects. Cross-process create races remain a provider API limitation.
+
+All 35 focused management/native lifecycle cases and 38 actual-command lint
+fixtures pass, including a real loopback redirect, refused writes, malformed
+inventory, stalled/oversized bodies and changed privacy/capture-key readback.
+The dynamic-import fixture confirms the same exact SDK admission as static
+imports. A mistyped test-config path stopped one command before tests started;
+the actual package command then passed. No check or deadline was weakened.
+The [dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-retained-posthog-projects.json)
+owns the full local qualification and its limits.
+
+Documentation impact: **Change required** for private infrastructure exports and
+README, configuration/deployment/Effect/package/testing architecture, exact
+lint permissions and fixtures, this plan and dated proof. **Preserve** the
+accepted browser sender SPEC pending Cooper's choice, pure tax and published
+SDK contracts, public content, provider credentials/state and the five
+inspect-only runbook procedures. **N/A** for a Changeset: this private
+infrastructure candidate leaves the published package closure unchanged.
+Provider capacity, full real inventory, fresh TaxKit credential scope, online
+plan/apply and stored events are still unqualified. Metrics remain deferred.
+
+
+The first complete test run passed all 659 lint cases, then stopped when the
+docs-content build and test leaves both rebuilt docs-fumadocs and concurrently
+removed its output. The earliest command owner now relies on Turbo's existing
+upstream build ordering. Root `docs:catalogue` routes through the same filtered
+generation task, preserving cold dependency preparation. The two package
+READMEs and testing architecture describe leaf versus dependency-graph use.
+This prerequisite correction changes no content, calculation or provider
+behaviour; the original failure remains evidence and requires fresh complete
+checks on the corrected source.

@@ -1,0 +1,401 @@
+{
+  "documentType": "qualification-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-infrastructure-owner",
+  "observedAt": "2026-10-08",
+  "task": "CSF-T008",
+  "outcome": "focused-local-retained-project-candidate",
+  "repository": "crcorbett/taxkit",
+  "branch": "codex/dev-79-retained-posthog-projects",
+  "baseCommit": "c894892f443e1bee6cf90d85ecb14a1193f1046b",
+  "authorisedPrincipal": "Cooper Corbett",
+  "authorityBasis": "Approved implementation continuation, local checks and reviewable draft PRs. No credential or provider operation in this slice.",
+  "changedOwners": [
+    "packages/infrastructure/src/posthog/",
+    "alchemy.posthog.run.ts",
+    "packages/infrastructure/package.json",
+    "oxlint.config.ts",
+    "tools/oxlint/analytics-boundaries.test.ts",
+    "packages/docs-content/package.json",
+    "package.json:docs:catalogue"
+  ],
+  "postconditions": [
+    "Separate durable prod stack declares exactly two retained US projects; local and PR stages refuse.",
+    "Management service exposes only checked find/read/create/update operations; Distilled and raw credentials remain in the private adapter.",
+    "Complete bounded paged inventory and exact markers precede a create; uncertain writes do not automatically repeat POST.",
+    "Updates verify supported privacy controls and unchanged project/capture-key identity.",
+    "Native removal retains both projects, forced provider deletion refuses, and bulk deletion skips this type.",
+    "Registration acquires no credential; fallible live acquisition is cached in the native stack scope and remains a typed lifecycle failure.",
+    "Application collection remains off and has no new project or management credential binding."
+  ],
+  "documentationImpact": {
+    "changeRequired": [
+      "infrastructure export map and README",
+      "configuration and deployment architecture",
+      "Effect, package ownership and testing architecture",
+      "exact lint admission and rejection fixtures",
+      "active plan and dated receipt",
+      "docs-content and docs-fumadocs READMEs for dependency build ownership"
+    ],
+    "preserve": [
+      "accepted browser sender SPEC pending decision",
+      "tax and published SDK contracts",
+      "public accepted content",
+      "all provider credentials and state",
+      "five runbook procedures",
+      "deferred metrics"
+    ],
+    "notApplicable": {
+      "changeset": "Only the private infrastructure package changes; published package closure is unchanged.",
+      "providerReadback": "No provider, credential, state or deployment operation has occurred in this slice.",
+      "publicContentAcceptance": "No public content or navigation changes."
+    }
+  },
+  "checks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "packages/infrastructure/src/posthog"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.06,
+      "log": "/private/tmp/dev79-retained-assembled-three-format.log",
+      "logSha256": "5a5d859e462b550ef7c354c7c854e63f2d01d4c9ffa1329dc09238b7a2388601",
+      "bytesRead": 47
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check:docs-deployment:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.54,
+      "log": "/private/tmp/dev79-retained-assembled-three-types.log",
+      "logSha256": "f54d192391448e670ef185ab719286b91a1757621165c9e9c422ae6721f53b89",
+      "bytesRead": 17144
+    },
+    {
+      "stage": "tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/infrastructure",
+        "test",
+        "src/posthog"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "/private/tmp/dev79-retained-assembled-three-tests.log",
+      "logSha256": "d5eab304b4588a19cb3cc71116a0810017a77f67345c57b7313975decafa556d",
+      "bytesRead": 538
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "x",
+        "oxlint",
+        "-c",
+        "oxlint.config.ts",
+        "packages/infrastructure/src/posthog",
+        "alchemy.posthog.run.ts",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "oxlint.config.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.43,
+      "log": "/private/tmp/dev79-retained-assembled-three-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytesRead": 0
+    },
+    {
+      "stage": "knip",
+      "command": [
+        "bun",
+        "run",
+        "knip"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.91,
+      "log": "/private/tmp/dev79-retained-assembled-three-knip.log",
+      "logSha256": "0f08d0cb0be64c7abef197fbc12407d57862f7ee80f4e52e31de17e12e254b03",
+      "bytesRead": 3481
+    },
+    {
+      "stage": "production",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.84,
+      "log": "/private/tmp/dev79-retained-assembled-three-production.log",
+      "logSha256": "c466931167364729f905483288c71bf2e719e74554ae3b2418ec10033428fed5",
+      "bytesRead": 4100
+    },
+    {
+      "stage": "knip-prod",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.97,
+      "log": "/private/tmp/dev79-retained-docs-knip-prod.log",
+      "logSha256": "5e7c6a05f12545cbcd4e1a0010f851092acea463e0951cd6eb0e6c11346d0524",
+      "bytesRead": 3594
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.32,
+      "log": "/private/tmp/dev79-retained-docs-docs.log",
+      "logSha256": "095348ed08de56cc869695beb19081a02270e0dab01fd55a7ff6f6e9464c3cdf",
+      "bytesRead": 819
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev79-retained-docs-runbooks.log",
+      "logSha256": "60741952dfff59f1d3b0a0f89ecc5a1527992bf47e8f1fbde64a368b13f72a1b",
+      "bytesRead": 839
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.27,
+      "log": "/private/tmp/dev79-retained-docs-paths.log",
+      "logSha256": "62018adadbabb110523cf9657c7ea5efe6e0b3d952b97795f40fe7c0814d2961",
+      "bytesRead": 565
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "packages/infrastructure/src/posthog",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "knip.production.json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.08,
+      "log": "/private/tmp/dev79-retained-last-admission-format.log",
+      "logSha256": "0f5960772c54d255a6aa45d2391e5f1f07b051420b09411f698ea49fa8c1149c",
+      "bytesRead": 47
+    },
+    {
+      "stage": "sdk",
+      "command": [
+        "bun",
+        "x",
+        "vitest",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 8.15,
+      "log": "/private/tmp/dev79-retained-last-admission-sdk.log",
+      "logSha256": "7f602f3640d535e4e208c7f94c6bebb344aa394f1da0c8492a7b4b65baa6ed89",
+      "bytesRead": 178
+    },
+    {
+      "stage": "management",
+      "command": [
+        "bun",
+        "x",
+        "vitest",
+        "run",
+        "--config",
+        "packages/infrastructure/vitest.config.ts",
+        "packages/infrastructure/src/posthog/management.boundary.test.ts",
+        "packages/infrastructure/src/posthog/projects.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.12,
+      "log": "/private/tmp/dev79-retained-last-admission-management.log",
+      "logSha256": "138f0e6d46667d1e6e5b4e395a32b2019cae2e7f19c21af5d6485281c166fe72",
+      "bytesRead": 2146
+    },
+    {
+      "stage": "management",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/infrastructure",
+        "test",
+        "src/posthog"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.51,
+      "log": "/private/tmp/dev79-retained-last-proof-management.log",
+      "logSha256": "f163b17720f7afc497f6060a98c8b902cf462c2ac2065839013261904667416a",
+      "bytesRead": 538
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check:docs-deployment:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.73,
+      "log": "/private/tmp/dev79-retained-last-proof-types.log",
+      "logSha256": "e2b4a2297b6d650a2865083f45c5127c283f8862e0ab41a45d58085a6986d9c5",
+      "bytesRead": 17144
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "x",
+        "oxlint",
+        "-c",
+        "oxlint.config.ts",
+        "packages/infrastructure/src/posthog",
+        "alchemy.posthog.run.ts",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "oxlint.config.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.48,
+      "log": "/private/tmp/dev79-retained-last-proof-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytesRead": 0
+    },
+    {
+      "stage": "test",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 69.96,
+      "log": "/private/tmp/dev79-retained-whole-test.log",
+      "logSha256": "a98a0002d22ba5aad392ddafc32a1b159e1cbfc89515e9cb2f6f673c5efc79df",
+      "bytesRead": 11742
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "package.json",
+        "packages/docs-content/package.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-08-retained-posthog-projects.json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.07,
+      "log": "/private/tmp/dev79-retained-build-order-format.log",
+      "logSha256": "1ff7af26d16d6b6f610048dcbdf59e743e5c7aecb524947a98044f1cb0d09298",
+      "bytesRead": 46
+    },
+    {
+      "stage": "cold-content",
+      "command": [
+        "bun",
+        "x",
+        "turbo",
+        "run",
+        "test",
+        "--filter=@taxkit/docs-content",
+        "--force"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.94,
+      "log": "/private/tmp/dev79-retained-build-order-cold-content.log",
+      "logSha256": "3b428695203a248f9b4dbe05a960f5bc0815bdb3770e2fe82621d3d49ef55ad1",
+      "bytesRead": 3164
+    },
+    {
+      "stage": "catalogue",
+      "command": [
+        "bun",
+        "run",
+        "docs:catalogue"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.65,
+      "log": "/private/tmp/dev79-retained-build-order-catalogue.log",
+      "logSha256": "0ee3fab820f0b315596a8ae940d23fc2bd6b0c1ce0c42374f6b1a8859d67ba38",
+      "bytesRead": 2640
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.32,
+      "log": "/private/tmp/dev79-retained-build-order-docs.log",
+      "logSha256": "cf1bcea2fac66156627587e136117c037e2e5209279129d6e2e4c51aa044fcf0",
+      "bytesRead": 819
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev79-retained-build-order-runbooks.log",
+      "logSha256": "fb9471300f63a1fd762d3e068510138924486da7d337813d20fcfc0c197bbb74",
+      "bytesRead": 840
+    }
+  ],
+  "focusedObservations": {
+    "managementAndNativeCases": 35,
+    "actualCommandLintCases": 38,
+    "sdk": "@distilled.cloud/posthog@1.0.0-rc.13",
+    "transport": "Installed SDK with controlled native HTTP replies; real native Fetch loopback redirect check.",
+    "planning": "Installed Alchemy Stack/Plan with memory state and deterministic service; credential/profile/network access refuses."
+  },
+  "retainedFailures": [
+    "Initial native API/type assumptions were corrected against installed source; early command logs are retained at /private/tmp/dev79-retained-*.log.",
+    "The controlled response fixture originally spread class getters; explicit request/status and a body-start handshake now ensure byte-bound and deadline assertions observe the body.",
+    "Production unused-code checking initially included the deterministic test-only Layer. Only its exact file is excluded; normal types and lint still cover it.",
+    "One focused test command named a nonexistent configuration file; the actual package test command passed. No suite or deadline was weakened.",
+    "First complete root test stopped after all 659 lint cases passed: docs-content build and test launched concurrent docs-fumadocs rebuilds. Existing Turbo ^build owns the dependency now; root docs:catalogue uses the filtered generation graph. Failed complete log: /private/tmp/dev79-retained-whole-test.log."
+  ],
+  "limitations": [
+    "No real provider organisation capacity or complete project inventory is established.",
+    "No new TaxKit management/query credential has been created or borrowed from another project.",
+    "Cross-process creates are not transactional; duplicate ownership refuses on a subsequent complete inventory.",
+    "No online plan/apply, deployment, capture wiring, browser pageview sender, relay or stored-event UUID proof is established.",
+    "The browser sender choice is pending and metrics remain deferred."
+  ],
+  "rollback": "Return to base commit c894892f443e1bee6cf90d85ecb14a1193f1046b. No external resource was changed.",
+  "nextOwner": "Cooper review; T008 implementation owner for complete local checks and separately approved provider work."
+}

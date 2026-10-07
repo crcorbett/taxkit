@@ -29,6 +29,7 @@
         "tools/docs-deployment/*.test.ts",
         "alchemy.apps.run.ts",
         "alchemy.apps.local.run.ts",
+        "alchemy.posthog.run.ts",
         "tools/documentation/catalogue.runtime.ts",
         "tools/docs-deployment/workflow-evidence.runtime.ts"
       ],

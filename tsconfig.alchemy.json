@@ -12,6 +12,7 @@
     "alchemy.run.ts",
     "alchemy.apps.run.ts",
     "alchemy.apps.local.run.ts",
+    "alchemy.posthog.run.ts",
     "packages/infrastructure/src/**/*.ts"
   ]
 }
