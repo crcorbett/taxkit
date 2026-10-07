@@ -1,0 +1,40 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4BASRW5PWAYJS6J15NKGRT3",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T14:03:28.664186Z",
+  "branch": "codex/dev-79-retained-posthog-projects",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/exec-plans/active/clean-slate-foundation.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "ef48aa238168",
+  "checkpoint_transcript_start": 71287,
+  "transcript_lines_at_start": 71287,
+  "compact_transcript_start": 8425,
+  "token_usage": {
+    "input_tokens": 158235,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 6972416,
+    "output_tokens": 38182,
+    "api_call_count": 52
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T14:03:24.392362Z",
+    "agent_lines": 46,
+    "agent_removed": 1,
+    "human_added": 524,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 570,
+    "total_lines_changed": 571,
+    "agent_percentage": 8.231173380035026,
+    "metric_version": 2
+  }
+}
