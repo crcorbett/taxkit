@@ -35,12 +35,13 @@ independent work. Cooper's 7 October direction adds native Preview and Productio
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: finish T008's browser sender and real PostHog
-preparation after Cooper's two concrete decisions. Backend capture rules,
+Next continuation milestone: finish T008's browser sender and settle the
+one-project scope proposed by Cooper. Temporary management-read preparation and
+cleanup are complete; the organisation has no free project slot. Backend capture rules,
 Website calculator preferences, retained-project management and the bounded
 relay have complete local qualification. Draft #167's app pair is delivered to
 Preview `pr-167` and Production with collection off; its dated delivery receipt
-owns the exact source and readback. Browser pageviews, real project preparation
+owns the exact source and readback. Browser pageviews, reviewed project ownership
 and stored-event proof remain unfinished. T007's operational handover is locally
 accepted and ready for draft review. T006 is locally accepted and ready for
 draft review with its documented five-second modern cancellation limit. All three calculator
@@ -91,7 +92,7 @@ records command outcomes and log digests.
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | Complete locally; draft review outstanding | Six remote and five visible browser tools reuse the checked owners. All nine local checks pass at `72bfa16ac08dacc4c26f3de023a2880baefe1c55`, with both fourteen-case native runs. Draft #162 contains the stage-derived connection guide, deployed and read back on pr-162 and Production with both supported clients. The explicit modern five-second cleanup limit remains; no autonomous model session or prompt cleanup is claimed. |
 | T007 / DEV-78 | Complete locally; draft review outstanding | Exact native graph/source/secret/state/live plans are delivered in drafts #159–161, with #162 guide delivery. Draft #163 aligns the current native CLI/runbooks/recovery and paged provider reads. Full local verification passes `226c60bddb225467db64e772d48304af2368a216` in 684.12 seconds; all 1,750 frozen identities match, including the fourteen-case built app check. No new provider, state, credential or deployment mutation; rollback and no-op convergence remain unqualified. |
-| T008 / DEV-79 | In progress | Backend, Website calculator preferences, retained-project management and the bounded relay pass full local qualification. Draft #167's qualified app pair is delivered on pr-167 and Production with collection off; all 11 live checks pass in each. Browser sender choice, temporary management-read preparation, real PostHog resources and final hosted/stored-event proof remain. |
+| T008 / DEV-79 | In progress | Backend, Website calculator preferences, retained-project management and the bounded relay pass full local qualification. Draft #167's qualified app pair is delivered on pr-167 and Production with collection off; all 11 live checks pass in each. Temporary management reads and the native no-apply plan passed, and the key/Doppler cleanup is independently confirmed. Browser sender choice, Cooper's proposed one-project scope, actual project resources and final hosted/stored-event proof remain. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Awaiting T008 and deferred T009 | T007 is locally complete. The #167 local release graph and collection-off app delivery are bounded progress; final independent review, completed analytics and the deferred telemetry requirement remain outstanding. No final rebuild acceptance, package version application or publication is claimed. |
 
@@ -5934,3 +5935,68 @@ The first proof-only closeout passed documentation (0.38 seconds), runbooks
 (0.14 seconds), repository paths (0.26 seconds), formatting (0.51 seconds) and
 whitespace (0.01 seconds). All 1,797 other checked identities and modes
 were independently matched before recording this final line.
+
+### T008 temporary PostHog read preparation and completed cleanup
+
+Cooper approved one temporary key limited to `organization:read` and
+`project:read` in the existing US organisation, plus temporary custody in
+`taxkit/prd`. The [dated read-preparation receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-posthog-read-preparation.json)
+records that exact authority and its completed revocation. The key value was
+transferred directly between the provider and Doppler interfaces without being
+printed or written to a local plaintext file. The organisation CLI read and
+actual bounded management reads pass against source
+`da94a2f736b07210bf27b8b467f5d74304d35456`.
+
+The native Alchemy `TaxKitPostHog` plan also exits successfully: two proposed
+retained projects, zero updates, replacements, deletions or adoptions. No apply
+was called. Both intended TaxKit ownership markers are absent. Selected shared
+state reads before and after confirm version 7, identical stack names and no
+`TaxKitPostHog` stages/resources. These observations prove the read preparation,
+not project capacity, creation, event storage or collection activation.
+
+The live account notice reports six projects and a six-project limit. Cooper
+then proposed one project with stage filters, as with the shared Axiom datasets.
+PostHog's current [dashboard documentation](https://posthog.com/docs/product-analytics/dashboards#dates-and-filters)
+supports event-property filtering. Existing backend events already carry
+`project=taxkit`, `application=api` and checked `stage` labels. Whether Cooper
+means one TaxKit project across stages or an existing project across apps remains
+the concrete scope question; one new project still needs a free slot. The
+un-applied two-project source and historical plan are preserved until that
+choice is settled. No foreign project is adopted, renamed, deleted or changed,
+and no paid upgrade or new organisation is approved.
+
+Both temporary Doppler names were removed and independently read back as absent
+at 22:44:05 UTC on 7 October. Every other configuration name was preserved;
+this does not claim an independent comparison of every other secret value.
+After Cooper's fresh exact confirmation, permanent key deletion succeeded at
+23:12:32 UTC. The fully loaded key list at 23:16:16 UTC independently confirms
+the temporary label is absent and both existing Site/Common Practice key labels
+remain present. Secret-bearing browser references were released and temporary
+research tabs closed. The provider offered no expiry setting; the actual
+revocation receipt replaces the earlier manual deadline.
+
+Documentation impact: **Change required** for this plan and the dated receipt.
+**Preserve** SPEC/tasks until the proposed ownership/sender choices are settled,
+runtime and package contracts, five runbooks, existing provider ownership,
+public/generated content, retained tax outputs, skills/lint/CI, previous proof
+and deferred metrics. **N/A** for a Changeset: only execution evidence changes.
+Local docs, runbook, path, formatting and complete verification checks qualify
+this closeout. Recovery is to revert these two documentation files; the
+temporary credential is already revoked and must not be recreated by a revert.
+T008/T010 remain incomplete and collection remains off.
+
+
+Local closeout qualification: `bun run verification` passes in 988.41 seconds,
+including all 34 isolated workflow cases and all 22 freshly built app cases
+across 11 files. The six focused docs/runbook/path/format/Changeset/whitespace
+checks also pass. All 1,799 frozen content/link identities and modes match
+after the full run; snapshot digest
+`2a9720e55bba4861e70e0236c30b1370625c1a9265281ff2321d27dc8d111f92`
+binds base source `da94a2f7` plus exactly this plan and the new receipt. Only
+those two evidence owners receive proof metadata after checking; all 1,797
+other identities must stay unchanged and focused closeout must pass again.
+This qualifies execution records locally; the deployed app source remains
+`12c72396`, collection stays off and no final analytics acceptance is claimed.
+
+Final six focused closeout checks pass for the saved proof metadata. All 1,797
+other content/link identities and modes match the frozen source.

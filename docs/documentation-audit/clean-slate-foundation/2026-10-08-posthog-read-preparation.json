@@ -1,0 +1,292 @@
+{
+  "documentType": "operation-preparation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-infrastructure-owner",
+  "observedAt": "2026-10-07T23:16:36.458799+00:00",
+  "principal": "Cooper Corbett",
+  "authorityBasis": "User approved the exact temporary read-only key and Doppler custody proposal on this turn; no project apply or account upgrade was approved. User then gave fresh exact confirmation for permanent key deletion; deletion succeeded and the loaded key list independently confirmed its absence and both existing named keys.",
+  "sourceCommit": "da94a2f736b07210bf27b8b467f5d74304d35456",
+  "branch": "codex/dev-79-bounded-event-relay",
+  "organisation": {
+    "id": "019bb70c-c87e-0000-47a6-c4fdc3043f42",
+    "name": "Cooper",
+    "region": "us"
+  },
+  "temporaryKey": {
+    "label": "taxkit-posthog-read-preparation-20261008",
+    "scopes": [
+      "organization:read",
+      "project:read"
+    ],
+    "organisationLimited": true,
+    "creationObservedAt": "2026-10-07T22:40:53.683Z",
+    "valuePrinted": false,
+    "localPlaintextSecretFileWritten": false,
+    "status": "revoked",
+    "revocationDeadlineUtc": "2026-10-08T22:40:53.683Z",
+    "providerEnforcedExpiry": false,
+    "otherNamedKeysPreserved": [
+      "site-alchemy-closeout-20261004",
+      "Common Practice Alchemy management"
+    ],
+    "revokedAt": "2026-10-07T23:12:32.522Z",
+    "deletionReadbackAt": "2026-10-07T23:16:16.186Z",
+    "temporaryKeyAbsentAfterReload": true,
+    "otherNamedKeysPresentAfterReload": true,
+    "secretReferencesReleased": true,
+    "otherNamedKeyValuesIndependentlyCompared": false
+  },
+  "doppler": {
+    "project": "taxkit",
+    "config": "prd",
+    "onlyAddedThenRemoved": [
+      "POSTHOG_MANAGEMENT_KEY",
+      "POSTHOG_ORGANISATION_ID"
+    ],
+    "bothNamesAbsentAfterCleanup": true,
+    "otherNamesPreserved": [
+      "CLOUDFLARE_ACCOUNT_ID",
+      "CLOUDFLARE_API_TOKEN",
+      "DOPPLER_CONFIG",
+      "DOPPLER_ENVIRONMENT",
+      "DOPPLER_PROJECT",
+      "TURBO_TEAM",
+      "TURBO_TOKEN"
+    ],
+    "cleanupObservedAt": "2026-10-07T22:44:05.487613+00:00"
+  },
+  "inventory": {
+    "nativeBoundedManagementReadsPassed": true,
+    "ownedProductionFound": false,
+    "ownedPreviewFound": false,
+    "connectorAndCliAccessibleProjectCount": 6,
+    "projectWritesCalled": false
+  },
+  "plan": {
+    "stack": "TaxKitPostHog",
+    "stage": "prod",
+    "profile": "site-ci-env-v1",
+    "createCount": 2,
+    "updateCount": 0,
+    "replaceCount": 0,
+    "deleteCount": 0,
+    "adoptionCount": 0,
+    "resources": [
+      {
+        "logicalId": "TaxKitPreviewProject",
+        "name": "TaxKit Preview",
+        "marker": "taxkit:posthog:preview:v1",
+        "retention": "retain"
+      },
+      {
+        "logicalId": "TaxKitProductionProject",
+        "name": "TaxKit Production",
+        "marker": "taxkit:posthog:production:v1",
+        "retention": "retain"
+      }
+    ],
+    "applyCalled": false
+  },
+  "state": {
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "version": 7,
+    "authenticatedReadBeforeAndAfter": true,
+    "stackNamesUnchanged": true,
+    "posthogStages": [],
+    "posthogResources": [],
+    "bootstrapOrUpgradeCalled": false
+  },
+  "capacity": {
+    "source": "https://us.posthog.com/organization/billing/overview",
+    "uiObservedLimit": 6,
+    "currentProjects": 6,
+    "remaining": 0,
+    "observation": "New project entry opens the explicit project usage-limit notice; more than 6 projects requires Boost, Scale or Enterprise.",
+    "upgradePerformed": false
+  },
+  "cli": {
+    "version": "0.18.9",
+    "temporaryInstallationOnly": true,
+    "organisationGetSucceeded": true,
+    "userReadScopeWarning": "CLI tried users/@me reads; user:read was not granted. Organisation read still succeeded.",
+    "permissionExpanded": false,
+    "credentialsStoredByCli": false
+  },
+  "checks": [
+    {
+      "step": "cli-organisation",
+      "exitCode": 0,
+      "artifact": "dev79-posthog-approved-cli-organisation.log",
+      "sha256": "b638bdbe59ea561391f5b4b6409ef1631307280e5e1b011ec9eb46fa41b96f50"
+    },
+    {
+      "step": "native-inventory",
+      "exitCode": 0,
+      "artifact": "dev79-posthog-approved-native-inventory.log",
+      "sha256": "ccdd93e3690144f1e3ec2901f3899103b87e4426375037a9dd4c24e08b975375"
+    },
+    {
+      "step": "native-plan",
+      "exitCode": 0,
+      "artifact": "dev79-posthog-approved-native-plan.log",
+      "sha256": "a0c234bde5aa6b7d56bf4342e7f72f84623ffa98d39b3903e8774798d0ad5653"
+    },
+    {
+      "step": "state-before",
+      "artifact": "dev79-posthog-approved-state-before.json",
+      "sha256": "f5f85a675b8a173bd8de424a236952edcb075cf628f93c68daabcb134a36b1e5",
+      "observationOnly": true
+    },
+    {
+      "step": "state-after",
+      "artifact": "dev79-posthog-approved-state-after.json",
+      "sha256": "f5ea474e5690b5084dc983c43c0eff42c8b435fa68fdec8e9fc9be7eb775dbf9",
+      "observationOnly": true
+    },
+    {
+      "step": "doppler-cleanup",
+      "artifact": "dev79-posthog-approved-doppler-cleanup.json",
+      "sha256": "2b48cb3c981c6600f9e8d5e43d85ee0d0f667e8b59d2be1be169771a3f76abe9",
+      "observationOnly": true
+    }
+  ],
+  "limitations": [
+    "Browser sender remains a pending design choice: current Common Practice source uses PostHog SDK with localStorage; TaxKit proposed sender would use page-only identity and drop waiting events when DNT turns on.",
+    "No project creation, collection activation, stored-event proof, or final hosted-header proof.",
+    "Native state GETs establish listed selected state unchanged; no new global drift, rollback or teardown proof."
+  ],
+  "continuation": {
+    "userProposal": "One PostHog project with stage filtering, like shared Axiom datasets.",
+    "supportedBy": "https://posthog.com/docs/product-analytics/dashboards#dates-and-filters",
+    "projectScopeQuestionPending": true,
+    "capacityStillZeroForNewProject": true,
+    "noProjectApplyOrCollectionActivation": true,
+    "sources": [
+      "https://posthog.com/docs/product-analytics/dashboards#dates-and-filters",
+      "https://posthog.com/docs/settings/projects"
+    ]
+  },
+  "task": "CSF-T008",
+  "outcome": "native-read-preparation-passed-and-temporary-key-revoked",
+  "repository": "crcorbett/taxkit",
+  "draftPullRequest": "https://github.com/crcorbett/taxkit/pull/167",
+  "operation": "Temporary read-only key custody, organisation/project inventory, native no-apply plan and complete temporary credential cleanup",
+  "approvalBoundary": "Only the named temporary key and absent-before-write Doppler values; no project apply, subscription upgrade, unrelated credential or project change",
+  "rollback": "Temporary key revoked and both introduced Doppler names removed; recreating it requires new authority. Local evidence can be reverted without a provider operation.",
+  "localDocumentationValidation": {
+    "status": "passed",
+    "sourceBaseCommit": "da94a2f736b07210bf27b8b467f5d74304d35456",
+    "reviewedChanges": [
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-08-posthog-read-preparation.json"
+    ],
+    "sourceFreeze": {
+      "identities": 1799,
+      "sha256": "2a9720e55bba4861e70e0236c30b1370625c1a9265281ff2321d27dc8d111f92",
+      "allIdentitiesUnchangedAfterFullCheck": true
+    },
+    "checks": [
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.54,
+        "logArtifact": "dev79-posthog-read-closeout-focused-docs.log",
+        "sha256": "64ae3ad58b76e70ba216498f0c7b2624ec6e8976aafee95c895d5b0dcf278436"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.21,
+        "logArtifact": "dev79-posthog-read-closeout-focused-runbooks.log",
+        "sha256": "42e0cc30dcf5c5b5d21057e8065557d511f0fac2140d314633dc85caf40f3a18"
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.37,
+        "logArtifact": "dev79-posthog-read-closeout-focused-paths.log",
+        "sha256": "2ec09796e8ad87bb4d66133b1de7677013d123290e362e251b808e71058e2439"
+      },
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.87,
+        "logArtifact": "dev79-posthog-read-closeout-focused-format.log",
+        "sha256": "ea0e65b5436d80538d435edd5c5d293bb2f68bb0dba1aba08e809f9223484236"
+      },
+      {
+        "stage": "changesets",
+        "command": [
+          "bun",
+          "run",
+          "changeset:status"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.4,
+        "logArtifact": "dev79-posthog-read-closeout-focused-changesets.log",
+        "sha256": "b82521594f58c77bae9b924b5932313bfee376717631762000324b268f84c7d9"
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.02,
+        "logArtifact": "dev79-posthog-read-closeout-focused-diff.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 988.41,
+        "logArtifact": "dev79-posthog-read-closeout-full-verification.log",
+        "sha256": "a9602d978c58fc712c59eda40e1cf6c3ea15e4c1a5a5f4642995b71aeb9705f0"
+      }
+    ],
+    "fullVerificationSeconds": 988.41,
+    "workflowCases": 34,
+    "builtAppCases": 22,
+    "builtAppFiles": 11,
+    "localOnly": true,
+    "postCheckMetadataOnlyFiles": [
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-08-posthog-read-preparation.json"
+    ],
+    "requiredUnchangedOtherIdentities": 1797
+  },
+  "nonClaims": [
+    "No new PostHog project or change to any existing project",
+    "No new deployment, merge, publication or collection activation",
+    "No stored-event, final hosted recipient header or whole rebuild acceptance",
+    "No shared Axiom metrics implementation; Cooper has deferred that work"
+  ]
+}
