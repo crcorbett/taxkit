@@ -1,0 +1,39 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4ASD23SE1N8HV986SAV9XSJ",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T08:59:25.581126Z",
+  "branch": "codex/dev-77-agent-setup-and-cancellation-bounds",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/web/test/native-pair.boundary.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "ef48aa238168",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 25238553,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1201079040,
+    "output_tokens": 5510337,
+    "api_call_count": 8037
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T08:59:21.114391Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 120,
+    "human_modified": 2,
+    "human_removed": 0,
+    "total_committed": 120,
+    "total_lines_changed": 124,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}
