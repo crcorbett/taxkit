@@ -3,8 +3,8 @@
   "spec": "docs/product-specs/clean-slate-foundation.md",
   "title": "Clean slate TaxKit foundation \u2014 implementation slices",
   "status": "in_progress",
-  "last_reviewed": "2026-10-07",
-  "authority": "Cooper explicitly authorised implementation, reviewable commits and draft PRs on 2026-10-04. No merge, deploy or publication; provider-plan approval remains separate.",
+  "last_reviewed": "2026-10-08",
+  "authority": "Cooper explicitly authorised implementation, reviewable commits, pushes, draft PRs and routine Linear tracking on 2026-10-04. On 2026-10-07 Cooper separately authorised native TaxKit Preview and Production deployments from this Mac after exact source, plans, credentials, recovery and readback are qualified, and approved the existing Production token permission change. Merge, package version application, publication, credential creation and unrelated provider changes remain outside this authority; new provider operations require their concrete approval boundary. The sibling SPEC and active plan retain the authority and dated delivery receipts.",
   "principles": [
     "Retain tax rules/results and their proof while replacing application foundations.",
     "Use immutable Schema-derived values and declarative, pipe-first Effect workflows across all owned apps/packages/tests/scripts/infrastructure; no local mutation, imperative loops or helper sprawl. Necessary state has a scoped React/Effect owner and pure updates.",
@@ -14,7 +14,7 @@
     "Each task is pending until its actual postconditions and applicable checks pass. Proposed tasks do not authorise cloud changes."
   ],
   "globalVerification": {
-    "commitPolicy": "Commit coherent passed slices and prepare draft PRs under the 2026-10-04 implementation request. Do not merge, version-release, publish or deploy.",
+    "commitPolicy": "Commit coherent passed slices and prepare draft PRs under the 2026-10-04 implementation request. Native TaxKit Preview and Production deployments from this Mac use Cooper's separate 2026-10-07 grant and require exact qualified source, reviewed plans, credentials, recovery and independent readback. Do not merge, apply package versions, publish, create credentials or make unrelated provider changes without separate concrete authority.",
     "requiredBeforeFinalPR": [
       "bun run verification",
       "bun run test",
@@ -868,7 +868,7 @@
       "goal": "Final accepted requirements, impacted owners, versioning and retained historical identities are reconciled without hidden failed checks.",
       "scope": [
         "Resolve remaining owner/pointer contradictions and remove only qualified obsolete app/wiring/tool paths listed in the retention manifest; preserve source history, binary evidence, deployed recovery identity and unrelated work.",
-        "Finish changed package Changesets and nine-package fixed-train implications; retain local packed/downstream/release evidence without publishing packages.",
+        "Finish changed package Changesets and the current ten-package fixed-train implications, including @taxkit/content, as owned by .changeset/config.json and docs/standards/versioning.md; retain local packed/downstream/release evidence without applying package versions or publishing packages.",
         "Update current journey inventory for each calculator path, docs/discovery, SDK consumer, remote/browser agents and analytics/telemetry privacy. Obtain one fresh independent review and reconcile material findings.",
         "Run complete local checks and deliver a concrete version-matched provider plan for final approval. Once separately authorised, apply controlled Preview, read back exact artifacts/events/signals/domains and teardown safely before a separately approved Production cutover.",
         "Retain safe bounded receipts for accepted/failed/no-op outcomes and a rollback to the recorded previous artifact. Close the active plan only when its accepted outcome is actually achieved."

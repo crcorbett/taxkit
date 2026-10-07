@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: current
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: rebuild scope, interview answer, version selection, or implementation admission
 ---
 
@@ -830,7 +830,10 @@ changed in this interview, and this observation does not qualify the planned
 replacement or establish the install failure's cause. The implementation plan
 must retain and resolve this failed proof step.
 
-## Documentation impact of this interview
+## Documentation impact of the original design interview
+
+These rows retain the original interview scope. They do not describe the later
+implementation state, which is owned by the sibling tasks and active plan.
 
 | Surface | Decision | Reason and owner |
 | --- | --- | --- |
@@ -842,10 +845,11 @@ must retain and resolve this failed proof step.
 | Changeset | N/A | These planning documents change no installed package, export or calculation behaviour. |
 | Provider changes, publication and deployment proof | N/A | The interview performs none of these operations. |
 
-This proposed SPEC/task set now carries the downstream-impact ledger. Complete
-its final review and shared-understanding confirmation before admitting
-implementation and starting an active plan. The grilling skill requires that
-confirmation before acting on the design.
+Cooper admitted implementation of this SPEC/task set on 4 October 2026, as
+recorded in the authority section above. That admission supersedes the original
+whole-design confirmation hold; Q1–Q13 remain settled. Only a material unresolved
+product choice or a consequential operation outside the recorded authority
+needs another concrete decision.
 
 
 The current request/operation slice moves shared streamed body admission to the
