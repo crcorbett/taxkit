@@ -1,0 +1,101 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4AJZHQC7DH4M11N5BQRGP7Y",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T07:07:15.989703Z",
+  "branch": "codex/dev-78-source-bound-plan-evidence",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".github/workflows/quality.yml",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/README.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/operations/authority-model.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/runbooks/docs-deployment.md",
+    "tools/docs-deployment/README.md",
+    "tools/docs-deployment/workflow-evidence.schemas.ts",
+    "tools/docs-deployment/workflow-evidence.ts",
+    "tools/docs-deployment/workflow-plan-projection.runtime.test.ts",
+    "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+    "tools/docs-deployment/workflow-plan-projection.ts",
+    "tools/quality-workflow/policy.test.ts",
+    "tools/quality-workflow/policy.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "e0edc23cfa4b",
+  "checkpoint_transcript_start": 64052,
+  "transcript_lines_at_start": 64052,
+  "compact_transcript_start": 7590,
+  "token_usage": {
+    "input_tokens": 388130,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 13141120,
+    "output_tokens": 85994,
+    "api_call_count": 89
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T07:07:11.764343Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 79,
+    "total_committed": 0,
+    "total_lines_changed": 79,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1240,
+      "user_lines_removed": 79,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".github/workflows/quality.yml": 1,
+        "docs/architecture/deployment.md": 13,
+        "docs/architecture/testing-and-quality.md": 5,
+        "docs/documentation-audit/README.md": 7,
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json": 31,
+        "docs/exec-plans/active/clean-slate-foundation.md": 59,
+        "docs/operations/authority-model.md": 3,
+        "docs/product-specs/clean-slate-foundation.md": 9,
+        "docs/product-specs/clean-slate-foundation.tasks.json": 2,
+        "docs/runbooks/docs-deployment.md": 33,
+        "packages/infrastructure/README.md": 13,
+        "tools/docs-deployment/README.md": 33,
+        "tools/docs-deployment/workflow-evidence.schemas.ts": 30,
+        "tools/docs-deployment/workflow-evidence.ts": 264,
+        "tools/docs-deployment/workflow-plan-projection.runtime.test.ts": 559,
+        "tools/docs-deployment/workflow-plan-projection.runtime.ts": 150,
+        "tools/docs-deployment/workflow-plan-projection.ts": 3,
+        "tools/documentation/runbook-contract.json": 2,
+        "tools/quality-workflow/policy.test.ts": 21,
+        "tools/quality-workflow/policy.ts": 2
+      },
+      "user_removed_per_file": {
+        ".github/workflows/quality.yml": 1,
+        "docs/architecture/deployment.md": 7,
+        "docs/exec-plans/active/clean-slate-foundation.md": 3,
+        "docs/operations/authority-model.md": 1,
+        "docs/product-specs/clean-slate-foundation.md": 4,
+        "docs/product-specs/clean-slate-foundation.tasks.json": 1,
+        "docs/runbooks/docs-deployment.md": 9,
+        "packages/infrastructure/README.md": 7,
+        "tools/docs-deployment/README.md": 15,
+        "tools/docs-deployment/workflow-plan-projection.runtime.test.ts": 12,
+        "tools/docs-deployment/workflow-plan-projection.runtime.ts": 13,
+        "tools/documentation/runbook-contract.json": 1,
+        "tools/quality-workflow/policy.test.ts": 3,
+        "tools/quality-workflow/policy.ts": 2
+      }
+    }
+  ]
+}
