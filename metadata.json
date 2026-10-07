@@ -1,0 +1,42 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4ARKB0GYFWZJ1PE2YAXSCVW",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-77-agent-setup-and-cancellation-bounds",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/api/README.md",
+    "apps/web/README.md",
+    "apps/web/src/routes/agents.tsx",
+    "apps/web/src/styles.css",
+    "apps/web/test/native-pair.boundary.test.ts",
+    "docs/architecture/api-and-sdk.md",
+    "packages/docs-content/content/api/agent-tools.mdx",
+    "packages/docs-content/content/api/index.mdx",
+    "packages/docs-content/navigation.json"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 25210999,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1196726528,
+    "output_tokens": 5495325,
+    "api_call_count": 8017,
+    "subagent_tokens": {
+      "input_tokens": 0,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 0,
+      "output_tokens": 0,
+      "api_call_count": 0
+    },
+    "subagent_tokens_complete": true
+  }
+}
