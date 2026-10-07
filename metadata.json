@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4AKKBFKSCTPF940HD2CJZSE",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-78-source-bound-plan-evidence",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/exec-plans/active/clean-slate-foundation.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 53064,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 2057728,
+    "output_tokens": 12867,
+    "api_call_count": 16
+  }
+}
