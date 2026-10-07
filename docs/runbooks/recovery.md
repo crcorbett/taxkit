@@ -82,6 +82,17 @@ separate approval, preserving foreign rules, DNS, registrar and DNSSEC state.
 The [deployment runbook](docs-deployment.md) owns the exact targets and readback.
 No cloud rollback is qualified by the local fixture checks.
 
+The dated native cloud and agent guide delivery receipts retain the previously
+qualified sources, exact app versions and protected domain identities. For a
+native rollback, prepare both apps from that exact accepted source, use the
+existing state/credential selection and qualify a fresh plan under the
+deployment runbook. Preserve the retained zone, DNS settings, domain ownership
+and foreign rules. Do not destroy the Production stack or shared state store.
+After a separately approved redeploy, independently check both app versions,
+their self/peer bindings, domain/DNS/redirect state and the actual public
+journeys. A proposed source-bound recovery is not an executed rollback or
+proof that provider planning will converge to no changes.
+
 Read-only diagnosis produces a bounded incident record with artifact identity,
 environment, authority, observed evidence, failed invariant, recovery proposal,
 limitations and non-claims. Mutation success additionally requires exact

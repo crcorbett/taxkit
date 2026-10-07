@@ -33,7 +33,10 @@ Old plan, apply, teardown or rollback authority cannot transfer to it.
 Its `prod` candidate additionally declares the retained existing `taxkit.dev`
 zone and retained DNS settings, with `taxkit.dev`, `www.taxkit.dev` and
 `api.taxkit.dev` attachments. `pr-N` and local graphs omit all Production DNS
-and domain properties. This is declared intent, not an observed attachment.
+and domain properties. Declaration alone proves no attachment. The
+[cloud delivery receipt](../documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json)
+and [agent guide delivery receipt](../documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
+record the separately authorised native operations and their actual readback.
 
 ## Preconditions
 
@@ -90,6 +93,10 @@ The local source identity follow-up is recorded at
 `docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json`.
 Native credential, state and namespace preparation is recorded at
 `docs/documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json`.
+Guide delivery is recorded at
+`docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json`.
+Current operational handover is recorded at
+`docs/documentation-audit/clean-slate-foundation/2026-10-07-native-operation-handover.json`.
 
 1. Preserve the exact candidate, native entry, lockfile, dependency patch and
    source-input identities. The native plan projection is version three;
@@ -102,6 +109,10 @@ Native credential, state and namespace preparation is recorded at
    with automatic renewal, preserved settings and a specific missing redirect
    entrypoint reply. It is dated evidence, not a fresh pre-operation inventory.
    Enumerate every DNS page exposed by the reader and preserve foreign records.
+   The existing `cf` reader returns a decoded list, without the API pagination
+   envelope. Use an explicit page size and continue to an empty page. The
+   Production deploy token does not include DNS-record read access; use the
+   separately verified existing read profile, without adding permissions.
 3. Read shared redirect rules separately. Stop on access, malformed-reply or
    network failure. Only the SDK's specific `RulesetNotFound` means absence.
    The dependency patch preserves unrelated rules and uses the native 301
@@ -124,13 +135,18 @@ Native credential, state and namespace preparation is recorded at
    Omit `--env-file` for the explicit native secret list. The owned namespace
    configuration supplies `10078` for Production and `10078<PR number>` for
    Preview. Read every available Worker binding before apply and refuse foreign
-   namespace collisions. Verify native state version and authenticated access
+   namespace collisions. Use the paged Worker script search to confirm the
+   complete name list, then read each script's settings; the older list reply
+   has no pagination metadata. A read after apply cannot establish this earlier
+   check. Verify native state version and authenticated access
    before planning; reuse a same-account native state profile only after this
    readback. Refuse automatic shared-store bootstrap, resume or upgrade outside
    the operation's named authority.
 5. Under a separately named planning operation, capture the exact native
-   beta.80 no-apply plan and its bootstrap/read effects. No live plan has been
-   qualified by this slice. Prepare the existing projection command's inputs:
+   beta.80 no-apply plan and its bootstrap/read effects. Reuse the already
+   authenticated store; do not bootstrap or upgrade it. The dated delivery
+   receipts retain live plans for their exact candidates. A new operation needs
+   a new source/provider observation. Prepare the existing projection inputs:
    `TAXKIT_WORKFLOW_PLAN_GRAPH=native-apps`,
    `TAXKIT_WORKFLOW_PLAN_KIND=deploy`,
    `TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT` (the full clean checkout commit),
@@ -169,11 +185,50 @@ Native credential, state and namespace preparation is recorded at
    Recheck registrar/DNSSEC without treating adoption or a green apply as their
    proof. A fresh equal plan and source-bound rollback are separate checks.
 
-The historical workflow evidence command and operation receipts still describe
-the retired graph. The current native projection command writes only local
-source identity and projection; bootstrap/provider receipts, real custody and
-live plan proof remain unfinished. Historical commands and writer workflows
-stay stopped. If the second write fails, preserve the first local file and
+### Native local commands
+
+After the existing repository-scoped Doppler login has been resolved in memory,
+select `taxkit/prd` for `prod` or `taxkit/stg_preview` for `pr-N`. Use that
+selection to supply only the existing native credential inputs; the native
+Stack owns application secret names and precedence. Select the independently
+verified native state profile. No token value belongs in command output,
+receipts or a copied environment file.
+
+From a clean checkout at the named candidate, use the installed native command:
+
+```sh
+bun --no-env-file --conditions=source run node_modules/alchemy/bin/cli.js plan --config alchemy.apps.run.ts --stage <stage> --profile <verified-state-profile>
+```
+
+Keep stdout and stderr separately, and qualify stdout with the existing
+source/projection command above. Complete the frozen installation and full
+local checks before apply; confirm no local or hosted apply is active against
+the same stack/stage. Retain account, stage, namespace, plan and source checks
+in the operation receipt. Under the named deployment authority, use:
+
+```sh
+bun --no-env-file --conditions=source run node_modules/alchemy/bin/cli.js deploy --config alchemy.apps.run.ts --stage <stage> --profile <verified-state-profile>
+```
+
+Review the plan shown by this command again before answering its exact
+`Apply this plan?` prompt. Refuse an unexpected resource, deletion, replacement,
+shared-store bootstrap or upgrade. Do not use `--yes`: it also accepts a
+shared-store upgrade. Do not use `--env-file` with this cloud Stack.
+The command may build and upload both apps more than once while native peer
+Outputs resolve; record the final saved versions and independently checked
+bindings. A later plan can conservatively propose two app and three binding
+updates for those Outputs. Do not repeatedly apply it merely to obtain an empty
+plan, or claim no-op convergence from correct provider/public behaviour.
+
+The historical workflow evidence command and receipts remain attached to the
+retired graph; historical writer workflows stay stopped. The native procedure
+uses the existing CLI, source/projection owner and bounded per-operation
+receipts, with no replacement command runner. The
+[handover receipt](../documentation-audit/clean-slate-foundation/2026-10-07-native-operation-handover.json)
+records current credential identities, authenticated state, paged names,
+separate rate counters and domain/certificate/registrar reads. It is dated
+evidence, not continuing authority or a guarantee of future provider state.
+If the projection's second write fails, preserve the first local file and
 failed observation; a partial pair grants no operation approval.
 
 The local postcondition is verified source addressability, useful page routes

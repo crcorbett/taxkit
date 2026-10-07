@@ -42,7 +42,9 @@ See [deployment architecture](../../docs/architecture/deployment.md) and
 The explicit source-only `./apps-stack` and `./apps-secrets` exports are consumed
 by `alchemy.apps.run.ts`. This candidate declares `TaxKitAppsCloudflare` with
 `TaxKitApi` and `TaxKitWebsite`; the old `alchemy.run.ts`
-operation refuses. The native provider procedure remains DEV-81 work.
+operation refuses. The deployment runbook owns the current native cloud
+procedure; DEV-81 retains overall delivery acceptance and separately scoped
+future operations.
 
 The graph consumes the API app's `api/worker` export, provides its live native
 entry once and binds the website privately to that same API resource as
@@ -147,7 +149,7 @@ The app owns one fixed-name host per stage, with bounded in-memory conversations
 and native alarm expiry. Only alarm bookkeeping uses storage. The
 [API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate)
 explains limits, private original-key forwarding, separate instance pools and
-the remaining modern cancellation gap.
+the documented modern five-second cancellation limit.
 
 The local native source builder compiles the actual API declaration using
 memory state to obtain the SDK-generated class export inventory. Every provider,

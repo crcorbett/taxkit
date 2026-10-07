@@ -150,8 +150,13 @@ mock-provider observations, not cloud plans. The command tests cover both
 stages, wrong commits/hashes, changing source, unsafe output paths, target
 mismatch, missing zone, malformed patch identity, teardown and unknown mode.
 Actual CLI tests use isolated local homes and no credentials. Historical writer
-commands and workflows remain stopped. Native bootstrap/provider receipts,
-real custody and live plan qualification remain pending.
+commands and workflows remain stopped. The current cloud procedure uses the
+installed native CLI and this projection owner. Dated
+[cloud delivery](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json),
+[agent guide delivery](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
+and [handover](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-operation-handover.json)
+receipts separately record real credentials/state, live plans and provider/public
+readback. No new runner, shared-store bootstrap or upgrade is introduced.
 
 The narrow Alchemy dependency patch now also changes the native shared redirect
 reader to catch only `RulesetNotFound`. The actual source and compiled provider

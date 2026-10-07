@@ -84,7 +84,7 @@ records command outcomes and log digests.
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | Complete locally; draft review outstanding | Six remote and five visible browser tools reuse the checked owners. All nine local checks pass at `72bfa16ac08dacc4c26f3de023a2880baefe1c55`, with both fourteen-case native runs. Draft #162 contains the stage-derived connection guide, deployed and read back on pr-162 and Production with both supported clients. The explicit modern five-second cleanup limit remains; no autonomous model session or prompt cleanup is claimed. |
-| T007 / DEV-78 | In progress; T003/T005 locally complete | Draft #159 contains the qualified Production graph, safe redirect read and native v3 projection. Follow-up source `195b20885c4b56e253456585864e80e5c72fd7b7` passed all nine local release checks and actual clean-checkout command probes. Native bootstrap/provider receipts, credentials and live plans remain unfinished. Cooper has authorised qualified Preview and Production deployment from this Mac. |
+| T007 / DEV-78 | In progress; final operational handover checks pending | Native graph/source/secret/state/live-plan preparation is delivered in drafts #159–161; #162 adds source-qualified guide delivery. The current runbook/tool/architecture owners now describe the actual native CLI and readback, with full paged name/settings, DNS/registrar/TLS/certificate reads. No new provider, state or credential mutation. Final handover qualification remains pending. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Pending T007/T008/T009 | Full review, release/consumer proof and separately authorised delivery. |
@@ -5474,3 +5474,41 @@ occurred. Documentation-only closeout uses focused docs/runbook/path/diff checks
 the qualified application, content and configuration bytes remain unchanged.
 Continue T007 operational-owner alignment and T008; deferred T009 and overall
 T010 acceptance remain outstanding.
+
+
+## T007 native operational handover
+
+Continue from draft #162 at `778c6b2052c5bc065355146245e697cf52b14374` on
+`codex/dev-78-native-operation-handover`. The current runbook, infrastructure
+and deployment/tool owners now route to the installed native CLI and existing
+source/projection command, exact source/stage/account/zone checks, separate
+read/deploy credentials and authenticated shared state. Historical writer
+workflows and receipts remain stopped and unchanged. No replacement runner is
+introduced. The sidecar adds the two current evidence pointers and preserves
+its five inspect-only procedures and unknown standing principals.
+
+Fresh read-only provider checks use both existing scoped credentials: all fifty
+Worker settings agree with the full paged search; the next page is empty, and
+the three native API rate namespaces have exactly their expected owner. The
+existing state store is version seven with pr-161, pr-162 and prod. Registration
+is active, locked and auto-renewing; DNSSEC stays disabled; selected TLS settings
+are preserved; four active certificate packs cover the three TaxKit hostnames
+and their next page is empty. Protected DNS/domain/redirect and actual public
+journeys retain the separate #162 receipt. These reads do not retrospectively
+establish a namespace pre-read for pr-162. The runbook requires that check
+before every future apply.
+
+Docs-maintainer: **Change required** for current native operational commands,
+recovery and authority pointers, deployment/infra/tool owners, sidecar evidence
+pointers, active task/plan and the
+[handover receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-native-operation-handover.json).
+**Preserve** native code, strict policy/fixtures, historical receipts, retained
+tax results, disabled Worker records, separate unqualified RUM and deferred
+metrics. **N/A** for a Changeset, public acceptance/generated content or provider
+mutation: this is documentation-only. Focused and full local verification
+remain pending after eight focused checks pass, including all 273 deployment
+cases. The first runbook check required the exact evidence paths to be rendered;
+that owner correction passes without changing the check. T007 stays In Progress
+until primary review accepts its named preparation outcomes. Cloud rollback,
+teardown, no-op convergence and overall
+T010 delivery are not claimed.

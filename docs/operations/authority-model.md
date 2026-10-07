@@ -51,7 +51,7 @@ writes, domain attachment, apply, credential change or rollback. Checked
 native source identities establish only the checked tracked-file snapshot.
 They exclude provider state, environment, generated/dependency bytes and the
 origin of supplied plan text. They do not grant bootstrap, plan or apply approval.
-The [deployment runbook](../runbooks/docs-deployment.md) owns the pending native
+The [deployment runbook](../runbooks/docs-deployment.md) owns the current native
 procedure; local proof and old receipts grant no new operation authority.
 
 Cooper's 7 October direction subsequently authorises native Preview and

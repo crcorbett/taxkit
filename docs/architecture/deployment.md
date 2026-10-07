@@ -81,8 +81,11 @@ with `/` deliberately becoming the calculator entry and `/start` the docs entry.
 Native declaration and runtime checks do not establish hosted replacement
 availability, domains or a provider rollback.
 
-DEV-81 owns the new exact-candidate provider procedure, preview/production
-operations, authority, accepted/equal plans, readback, hosted proof and recovery.
+T007 owns the native procedure in the deployment runbook and its exact-candidate
+plan/readback preparation. The dated cloud and agent guide receipts record
+authorised Preview/Production delivery. DEV-81 retains final overall delivery
+acceptance, future operations and separately qualified rollback; those dated
+operations grant no standing authority.
 Metrics remain deferred by Cooper. Both native resources explicitly disable
 platform invocation logs, stored logs and traces; later collection needs its
 own accepted approach and privacy proof.
@@ -131,7 +134,12 @@ provider state remain outside it. Installed beta.80 version and caller-supplied
 plan shape do not prove installed patch equality or the plan's origin.
 Historical version-one/two receipts keep their original bytes and resource
 identities, and historical writer commands/workflows still refuse. Native
-bootstrap/provider receipts, live no-apply plans and full secret custody/readback
-remain T007/DEV-81 work. No actual adoption, attachment, certificate, apply or
-public runtime is established here. The deployment tool README and runbook own
-source coverage, required command inputs and partial local-write recovery.
+source identities, existing authenticated state, credential selection, live
+plans and provider/public readback are recorded in the
+[cloud delivery receipt](../documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json),
+[agent guide delivery receipt](../documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
+and [operational handover receipt](../documentation-audit/clean-slate-foundation/2026-10-07-native-operation-handover.json).
+Declaration and fixture checks alone prove no cloud operation. The deployment
+tool README and runbook own source coverage, current native commands and partial
+local-write recovery. An empty post-apply plan and an executed cloud rollback
+remain separate, unqualified claims.

@@ -140,7 +140,11 @@
         {
           "scriptOwner": "root",
           "script": "test:release-readiness",
-          "argv": ["bun", "run", "test:release-readiness"],
+          "argv": [
+            "bun",
+            "run",
+            "test:release-readiness"
+          ],
           "invocation": "bun run test:release-readiness",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [],
@@ -149,7 +153,11 @@
         {
           "scriptOwner": "root",
           "script": "verification",
-          "argv": ["bun", "run", "verification"],
+          "argv": [
+            "bun",
+            "run",
+            "verification"
+          ],
           "invocation": "bun run verification",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [],
@@ -158,7 +166,11 @@
         {
           "scriptOwner": "root",
           "script": "release:check",
-          "argv": ["bun", "run", "release:check"],
+          "argv": [
+            "bun",
+            "run",
+            "release:check"
+          ],
           "invocation": "bun run release:check",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [],
@@ -167,7 +179,11 @@
         {
           "scriptOwner": "root",
           "script": "release:present",
-          "argv": ["bun", "run", "release:present"],
+          "argv": [
+            "bun",
+            "run",
+            "release:present"
+          ],
           "invocation": "RELEASE_ATTEMPT_PATH=<repository-relative-receipt.json> RELEASE_ATTEMPT_SHA256=sha256:<64-hex-digest> bun run release:present",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [
@@ -179,7 +195,11 @@
         {
           "scriptOwner": "root",
           "script": "web:test:native-pair",
-          "argv": ["bun", "run", "web:test:native-pair"],
+          "argv": [
+            "bun",
+            "run",
+            "web:test:native-pair"
+          ],
           "invocation": "bun run web:test:native-pair",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [],
@@ -215,7 +235,13 @@
         {
           "scriptOwner": "root",
           "script": "changeset",
-          "argv": ["bun", "run", "changeset", "status", "--verbose"],
+          "argv": [
+            "bun",
+            "run",
+            "changeset",
+            "status",
+            "--verbose"
+          ],
           "invocation": "bun run changeset status --verbose",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [],
@@ -224,7 +250,11 @@
         {
           "scriptOwner": "root",
           "script": "version-repo",
-          "argv": ["bun", "run", "version-repo"],
+          "argv": [
+            "bun",
+            "run",
+            "version-repo"
+          ],
           "invocation": "bun run version-repo",
           "requiredAuthority": "versioning",
           "requiredEnvironment": [],
@@ -271,7 +301,12 @@
         {
           "scriptOwner": "@taxkit/sdk",
           "script": "validate:downstream",
-          "argv": ["bun", "run", "--filter=@taxkit/sdk", "validate:downstream"],
+          "argv": [
+            "bun",
+            "run",
+            "--filter=@taxkit/sdk",
+            "validate:downstream"
+          ],
           "invocation": "bun run --filter=@taxkit/sdk validate:downstream",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [],
@@ -304,7 +339,11 @@
         {
           "scriptOwner": "root",
           "script": "release:present",
-          "argv": ["bun", "run", "release:present"],
+          "argv": [
+            "bun",
+            "run",
+            "release:present"
+          ],
           "invocation": "RELEASE_ATTEMPT_PATH=<repository-relative-receipt.json> RELEASE_ATTEMPT_SHA256=sha256:<64-hex-digest> bun run release:present",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [
@@ -316,7 +355,13 @@
         {
           "scriptOwner": "root",
           "script": "changeset",
-          "argv": ["bun", "run", "changeset", "status", "--verbose"],
+          "argv": [
+            "bun",
+            "run",
+            "changeset",
+            "status",
+            "--verbose"
+          ],
           "invocation": "bun run changeset status --verbose",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [],
@@ -350,7 +395,11 @@
         {
           "scriptOwner": "root",
           "script": "check:docs-deployment",
-          "argv": ["bun", "run", "check:docs-deployment"],
+          "argv": [
+            "bun",
+            "run",
+            "check:docs-deployment"
+          ],
           "invocation": "bun run check:docs-deployment",
           "requiredAuthority": "local-proof",
           "requiredEnvironment": [],
@@ -363,7 +412,9 @@
         "docs/operations/authority-model.md",
         "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json",
         "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json",
-        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json"
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-operation-handover.json"
       ],
       "stopOperations": [
         "versioning",
