@@ -22,6 +22,10 @@ two accepted event contracts. Its native backend Layer encodes a fixed provider
 request and maps transport failures to safe errors. The exact encoder admission
 in `oxlint.config.ts` covers that provider egress and its safe error-byte test;
 it does not admit runtime execution, raw JSON or decoding in neighbouring code.
+The package’s collection-header boundary is reused by the API and Website.
+The browser calculator transport reads its native preference at dispatch, and
+the server transport reads the current original request; neither freezes policy
+when its Layer is built. Missing server/browser hosts refuse collection.
 The application owns when to capture and which checked collection policy applies.
 The API application captures its delivery service during initialisation, then
 supplies it to each returned request operation. Worker and older MCP session

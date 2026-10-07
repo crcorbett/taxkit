@@ -56,7 +56,7 @@ it.effect.each([
   },
   {
     allowed: true,
-    path: "apps/api/src/analytics-request.boundary.ts",
+    path: "packages/analytics/src/collection-policy.boundary.ts",
     rule: "",
     source: decoder,
   },
@@ -77,6 +77,69 @@ it.effect.each([
     path: "apps/api/src/analytics-adjacent.ts",
     rule: "no-decoding-outside-boundaries",
     source: decoder,
+  },
+  {
+    allowed: true,
+    path: "apps/web/src/lib/calculator-policy.browser.layer.ts",
+    rule: "",
+    source: decoder,
+  },
+  {
+    allowed: false,
+    path: "apps/web/src/lib/calculator-policy.browser.layer.ts",
+    rule: "no-schema-encoder-outside-egress",
+    source: encoder,
+  },
+  {
+    allowed: false,
+    path: "apps/web/src/lib/calculator-policy.browser.layer.ts",
+    rule: "no-runtime-execution-outside-boundaries",
+    source:
+      'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',
+  },
+  {
+    allowed: false,
+    path: "apps/web/src/lib/calculator-policy.browser.layer.ts",
+    rule: "no-restricted-globals",
+    source: 'export const result = fetch("https://invalid.example");',
+  },
+  {
+    allowed: false,
+    path: "apps/web/src/lib/calculator-policy.browser.adjacent.ts",
+    rule: "no-decoding-outside-boundaries",
+    source: decoder,
+  },
+  {
+    allowed: false,
+    path: "packages/analytics/src/collection-policy.boundary.ts",
+    rule: "no-schema-encoder-outside-egress",
+    source: encoder,
+  },
+  {
+    allowed: false,
+    path: "apps/api/src/analytics-request.boundary.ts",
+    rule: "no-decoding-outside-boundaries",
+    source: decoder,
+  },
+  {
+    allowed: false,
+    path: "apps/web/test/native-analytics.boundary.test.ts",
+    rule: "no-object-writes",
+    source:
+      'export const result = Object.defineProperty({}, "ordinary", { value: true });',
+  },
+  {
+    allowed: false,
+    path: "apps/web/test/native-analytics.boundary.test.ts",
+    rule: "no-native-work",
+    source: 'export const result = () => { throw new Error("ordinary"); };',
+  },
+  {
+    allowed: false,
+    path: "apps/web/test/native-analytics.boundary.test.ts",
+    rule: "no-promise-workflow",
+    source:
+      'export const result = async () => await Promise.resolve("ordinary");',
   },
   {
     allowed: true,

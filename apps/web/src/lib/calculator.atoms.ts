@@ -18,6 +18,7 @@ import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as Atom from "effect/reactivity/Atom";
 
 import { calculationFailureMessage } from "./calculation-failure";
+import { BrowserCalculatorPolicyLive } from "./calculator-policy.browser.layer";
 import { TaxKitWebConfigError } from "./config";
 import {
   takeHomeRequestFromForm,
@@ -58,7 +59,9 @@ export const calculatorRuntime = Atom.runtime((get) =>
       ),
     onSome: (settings) =>
       TaxKitRpcClientLive(settings.apiOrigin).pipe(
-        Layer.provide(FetchHttpClient.layer)
+        Layer.provide(
+          BrowserCalculatorPolicyLive.pipe(Layer.provide(FetchHttpClient.layer))
+        )
       ),
   })
 );

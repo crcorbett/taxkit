@@ -12,10 +12,13 @@ import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
 import { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
 import { packEnvValue } from "alchemy/RuntimeContext";
 import {
+  Array,
   Clock,
   Effect,
   FileSystem,
+  Fiber,
   Layer,
+  Option,
   Path,
   Queue,
   Record,
@@ -27,6 +30,7 @@ import { McpSchema } from "effect/ai";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import { Miniflare, Response } from "miniflare";
 import type { Request, WorkerdStructuredLog } from "miniflare";
+import { chromium } from "playwright";
 
 import {
   nativeMcpSessionExports,
@@ -353,6 +357,371 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
       )(yield* Queue.clear(logs));
       expect(recorded).not.toContain("PRIVATE9");
       expect(recorded).not.toContain("165400");
+    }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
+  { timeout: 30_000 }
+);
+
+it.live(
+  "the built Website forwards fresh browser and HTML collection choices without sharing visitor state",
+  () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const root = path.resolve("../..");
+      const apiOrigin = "http://127.0.0.1:4319";
+      const websiteOrigin = "http://127.0.0.1:4320";
+      const apiRoot = path.join(root, ".alchemy/native-pair/bundles/TaxKitApi");
+      const websiteRoot = path.join(root, "apps/web/dist/server");
+      const apiFiles = yield* fs.glob("**/*.js", { root: apiRoot });
+      const websiteFiles = yield* fs.glob("**/*.js", { root: websiteRoot });
+      const apiModules = Record.fromEntries(
+        yield* Effect.forEach(apiFiles, (file) =>
+          fs
+            .readFileString(path.join(apiRoot, file))
+            .pipe(
+              Effect.map(
+                (contents) =>
+                  [file, { contents, type: "esm" as const }] as const
+              )
+            )
+        )
+      );
+      const websiteModules = Record.fromEntries(
+        yield* Effect.forEach(websiteFiles, (file) =>
+          fs
+            .readFileString(path.join(websiteRoot, file))
+            .pipe(
+              Effect.map(
+                (contents) =>
+                  [file, { contents, type: "esm" as const }] as const
+              )
+            )
+        )
+      );
+      expect(apiFiles).toContain("worker.js");
+      expect(websiteFiles).toContain("server.js");
+      const outgoing = yield* Queue.make<Request>();
+      const exceptions = yield* Queue.make<string>();
+      const apiWorker = (name: string) => ({
+        config: {
+          compatibilityDate: "2026-10-04",
+          compatibilityFlags: ["nodejs_compat"],
+          env: {
+            ...nativeMcpSessionFixture(name),
+            ...nativeRateFixture("10180"),
+            API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
+            POSTHOG_CAPTURE_TOKEN: {
+              type: "json" as const,
+              value: "phc_synthetic_taxkit_capture_fixture_only",
+            },
+            POSTHOG_COLLECTION_MODE: {
+              type: "json" as const,
+              value: "controlled-preview",
+            },
+            POSTHOG_PROJECT_ID: {
+              type: "json" as const,
+              value: packEnvValue("79"),
+            },
+            POSTHOG_REGION: { type: "json" as const, value: "us" },
+            POSTHOG_STAGE: { type: "json" as const, value: "pr-179" },
+            WEBSITE_PUBLIC_ORIGIN: {
+              type: "json" as const,
+              value: websiteOrigin,
+            },
+            WORKER_URL: { type: "json" as const, value: apiOrigin },
+          },
+          exports: nativeMcpSessionExports,
+          manifest: {
+            mainModule: "worker.js",
+            modules: apiModules,
+            modulesRoot: apiRoot,
+          },
+          name,
+        },
+        dev: {
+          outboundService: {
+            handler: (request: Request) => {
+              Queue.offerUnsafe(outgoing, request);
+              return new Response("", { status: 200 });
+            },
+            type: "fetcher" as const,
+          },
+        },
+      });
+      const publicApi = yield* Effect.acquireRelease(
+        Effect.sync(
+          () =>
+            new Miniflare({
+              cf: false,
+              handleUncaughtError: (error) => {
+                Queue.offerUnsafe(exceptions, error.message);
+              },
+              host: "127.0.0.1",
+              port: 4319,
+              workers: [apiWorker("collection-public-api")],
+            })
+        ),
+        (value) => Effect.promise(() => value.dispose())
+      );
+      const website = yield* Effect.acquireRelease(
+        Effect.sync(
+          () =>
+            new Miniflare({
+              cf: false,
+              handleUncaughtError: (error) => {
+                Queue.offerUnsafe(exceptions, error.message);
+              },
+              host: "127.0.0.1",
+              port: 4320,
+              workers: [
+                {
+                  config: {
+                    assets: {
+                      directory: path.join(root, "apps/web/dist/client"),
+                      hasUserWorker: true,
+                      runWorkerFirst: false,
+                    },
+                    compatibilityDate: "2026-10-04",
+                    compatibilityFlags: ["nodejs_compat"],
+                    env: {
+                      API_PUBLIC_ORIGIN: { type: "json", value: apiOrigin },
+                      CALCULATOR_HOST_MODE: {
+                        type: "json",
+                        value: "local-emulator",
+                      },
+                      TAXKIT_API: {
+                        type: "worker",
+                        worker: "collection-private-api",
+                      },
+                      WEBSITE_PUBLIC_ORIGIN: {
+                        type: "json",
+                        value: websiteOrigin,
+                      },
+                    },
+                    manifest: {
+                      mainModule: "server.js",
+                      modules: websiteModules,
+                      modulesRoot: websiteRoot,
+                    },
+                    name: "collection-website",
+                  },
+                },
+                apiWorker("collection-private-api"),
+              ],
+            })
+        ),
+        (value) => Effect.promise(() => value.dispose())
+      );
+      yield* Effect.promise(() => publicApi.ready);
+      yield* Effect.promise(() => website.ready);
+      const browser = yield* Effect.acquireRelease(
+        Effect.promise(() =>
+          chromium.launch({ args: ["--enable-features=WebMCP"] })
+        ),
+        (value) => Effect.promise(() => value.close())
+      );
+      const page = yield* Effect.promise(() => browser.newPage());
+      const caller = yield* Effect.acquireRelease(
+        Effect.promise(() => page.context().newCDPSession(page)),
+        (value) => Effect.promise(() => value.detach())
+      );
+      type Added = Parameters<
+        Parameters<typeof caller.on<"WebMCP.toolsAdded">>[1]
+      >[0];
+      type Responded = Parameters<
+        Parameters<typeof caller.on<"WebMCP.toolResponded">>[1]
+      >[0];
+      const added = yield* Queue.make<Added>();
+      const responded = yield* Queue.make<Responded>();
+      caller.on("WebMCP.toolsAdded", (event) => {
+        Queue.offerUnsafe(added, event);
+      });
+      caller.on("WebMCP.toolResponded", (event) => {
+        Queue.offerUnsafe(responded, event);
+      });
+      page.on("pageerror", (error) => {
+        Queue.offerUnsafe(exceptions, error.message);
+      });
+      yield* Effect.promise(() => caller.send("WebMCP.enable"));
+      yield* Effect.promise(() => page.goto(websiteOrigin));
+      yield* Effect.promise(() =>
+        expect
+          .poll(() =>
+            page
+              .getByRole("button", { exact: true, name: "Calculate" })
+              .isEnabled()
+          )
+          .toBe(true)
+      );
+      const tools = yield* Stream.fromQueue(added).pipe(
+        Stream.map((event) => event.tools),
+        Stream.scan(
+          () => Array.empty<Added["tools"][number]>(),
+          (current, next) => Array.appendAll(current, next)
+        ),
+        Stream.filter((value) => value.length === 5),
+        Stream.take(1),
+        Stream.runHead,
+        Effect.flatMap(Effect.fromOption),
+        Effect.timeout("5 seconds")
+      );
+      const calculateTool = yield* Array.findFirst(
+        tools,
+        (tool) => tool.name === "taxkit_calculate_visible_form"
+      ).pipe(Effect.fromOption);
+      expect(yield* Queue.clear(outgoing)).toEqual([]);
+      yield* Effect.forEach(
+        [
+          { callerKind: "manual", policy: "deny", preference: "1" },
+          { callerKind: "manual", policy: "allow", preference: "0" },
+          { callerKind: "manual", policy: "deny", preference: "1" },
+          { callerKind: "manual", policy: "deny", preference: "PRIVATE9" },
+          { callerKind: "manual", policy: "deny", preference: "refusing-host" },
+          { callerKind: "tool", policy: "deny", preference: "1" },
+          { callerKind: "tool", policy: "allow", preference: "0" },
+          { callerKind: "tool", policy: "deny", preference: "1" },
+        ] as const,
+        ({ callerKind, preference, policy }) =>
+          Effect.gen(function* () {
+            yield* Effect.promise(() =>
+              page.evaluate((value) => {
+                // oxlint-disable-next-line taxkit/no-object-writes -- Chromium-only fixture must change the native preference getter; application state remains Effect-owned.
+                Object.defineProperty(navigator, "doNotTrack", {
+                  configurable: true,
+                  get: () => {
+                    if (value === "refusing-host") {
+                      // oxlint-disable-next-line strict-effect/no-native-work -- Deliberately refusing native browser getter; the adapter must contain this host failure.
+                      throw new Error("PRIVATE9");
+                    }
+                    return value;
+                  },
+                });
+              }, preference)
+            );
+            const pending = yield* Effect.promise(() =>
+              page.waitForResponse(
+                (value) =>
+                  value.url() === `${apiOrigin}/rpc` &&
+                  value.request().method() === "POST"
+              )
+            ).pipe(Effect.forkChild);
+            if (callerKind === "manual") {
+              yield* Effect.promise(() =>
+                page
+                  .getByRole("button", { exact: true, name: "Calculate" })
+                  .click()
+              );
+            } else {
+              const started = yield* Effect.promise(() =>
+                caller.send("WebMCP.invokeTool", {
+                  frameId: calculateTool.frameId,
+                  input: {},
+                  toolName: calculateTool.name,
+                })
+              );
+              const replied = yield* Stream.fromQueue(responded).pipe(
+                Stream.filter(
+                  (event) => event.invocationId === started.invocationId
+                ),
+                Stream.take(1),
+                Stream.runHead,
+                Effect.flatMap(Effect.fromOption),
+                Effect.timeout("5 seconds")
+              );
+              expect(replied.status).toBe("Completed");
+            }
+
+            const response = yield* Fiber.join(pending);
+            expect(response.status()).toBe(200);
+            expect(
+              Record.get(
+                response.request().headers(),
+                "x-taxkit-collection-policy"
+              )
+            ).toEqual(Option.some(policy));
+            yield* Effect.promise(() =>
+              expect
+                .poll(() =>
+                  page
+                    .getByRole("button", { exact: true, name: "Calculate" })
+                    .isEnabled()
+                )
+                .toBe(true)
+            );
+            if (policy === "allow") {
+              const request = yield* Queue.take(outgoing).pipe(
+                Effect.timeout("2 seconds")
+              );
+              expect(request.url).toBe("https://us.i.posthog.com/batch/");
+              const text = yield* Effect.promise(() => request.text());
+              const batch = yield* Schema.decodeUnknownEffect(
+                Schema.fromJsonString(CalculatorCaptureBatch)
+              )(text, { onExcessProperty: "error" });
+              expect(
+                (yield* Array.get(batch.batch, 0).pipe(Effect.fromOption))
+                  .properties.calculator_id
+              ).toBe("au.pay.take-home");
+              expect(text).not.toContain("PRIVATE9");
+            }
+            expect(yield* Queue.clear(outgoing)).toEqual([]);
+          })
+      );
+      const worker = yield* Effect.promise(() =>
+        website.getWorker("collection-website")
+      );
+      yield* Effect.forEach(
+        [
+          {
+            allowed: false,
+            headers: { dnt: "1", "x-taxkit-collection-policy": "allow" },
+          },
+          { allowed: true, headers: { "x-taxkit-collection-policy": "allow" } },
+          { allowed: false, headers: { "x-taxkit-collection-policy": "deny" } },
+          {
+            allowed: false,
+            headers: { "x-taxkit-collection-policy": "PRIVATE9" },
+          },
+          { allowed: true, headers: {} },
+          { allowed: false, headers: { dnt: "1" } },
+        ],
+        ({ allowed, headers }) =>
+          Effect.gen(function* () {
+            const response = yield* Effect.promise(() =>
+              worker.fetch(websiteOrigin, {
+                body: "grossDollars=1654&period=weekly&taxFreeThresholdClaimed=on",
+                headers: {
+                  ...headers,
+                  "cf-connecting-ip": "127.0.0.1",
+                  "content-type": "application/x-www-form-urlencoded",
+                },
+                method: "POST",
+              })
+            );
+            expect(response.status).toBe(200);
+            const html = yield* Effect.promise(() => response.text());
+            expect(html).toContain('value="1654"');
+            expect(html).toContain("Take-home pay");
+            if (allowed) {
+              const request = yield* Queue.take(outgoing).pipe(
+                Effect.timeout("2 seconds")
+              );
+              const text = yield* Effect.promise(() => request.text());
+              const batch = yield* Schema.decodeUnknownEffect(
+                Schema.fromJsonString(CalculatorCaptureBatch)
+              )(text, { onExcessProperty: "error" });
+              expect(
+                (yield* Array.get(batch.batch, 0).pipe(Effect.fromOption))
+                  .properties.calculator_id
+              ).toBe("au.pay.take-home");
+              expect(text).not.toContain("PRIVATE9");
+              expect(text).not.toContain("165400");
+            }
+            expect(yield* Queue.clear(outgoing)).toEqual([]);
+          })
+      );
+      yield* Effect.sleep("200 millis");
+      expect(yield* Queue.clear(outgoing)).toEqual([]);
+      expect(yield* Queue.clear(exceptions)).toEqual([]);
     }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
   { timeout: 30_000 }
 );

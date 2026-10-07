@@ -473,3 +473,17 @@ script-breaking characters after native JSON encoding. It invents no authorship,
 publisher or dates. The shared `docsImagePath` maps that same public page to its
 static 1200 by 630 PNG. The route consumes this checked output; it adds no decoder,
 renderer or runner. The Website README owns generation and build prerequisites.
+
+
+## Calculator collection preference
+
+The existing calculator Atom runtime composes a native HttpClient policy Layer
+that reads Do Not Track at each outgoing request. It carries only allow/deny to
+the backend owner, and catches missing, refusing or malformed browser preferences
+as denial without blocking calculation. Visible browser tools share this same
+client. HTML calculation derives its policy from the original request in the
+server client, using the analytics package’s single header boundary. It does
+not retain the first visitor’s choice when the server client is reused. No
+browser identity, storage or duplicate calculator event is added.
+The [Website owner](../../apps/web/README.md#calculator-collection-choice) routes
+the exact built-pair evidence and pending pageview sender work.

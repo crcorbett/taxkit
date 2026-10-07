@@ -43,6 +43,11 @@
       "source": "./src/config.ts",
       "types": "./dist/config.d.ts",
       "default": "./dist/config.js"
+    },
+    "./collection-policy": {
+      "source": "./src/collection-policy.boundary.ts",
+      "types": "./dist/collection-policy.boundary.d.ts",
+      "default": "./dist/collection-policy.boundary.js"
     }
   },
   "publishConfig": {

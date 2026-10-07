@@ -30,7 +30,7 @@
     }
   ],
   "configDigests": {
-    "package.json": "59015f3c3f6e4c18c6cffce7b374b72eb0f201d685aa31ef07fc9940f3a64e2f",
+    "package.json": "c51493a39a23e4d8149ca4c6674811ba2134afa847334239284ea1473f4e4837",
     "tsconfig.json": "89330beddb9118c14591ce205a7be8d39d42264daa40a589966d92ffdb770938",
     "tsconfig.build.json": "044f58d619deef8e2416a1fce0a3418879aac27f2aa5d70b245a4c774acac230",
     "vitest.config.ts": "c81a2a24fc321eaa98816ca4b8e42bd601c6406b7bd48d3e8a5bd450dcc2faeb"

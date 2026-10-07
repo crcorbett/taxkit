@@ -1,4 +1,5 @@
 import { expect, it } from "@effect/vitest";
+import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import type { CalculatorUse } from "@taxkit/analytics/schemas";
 import {
   CalculationRequest,
@@ -10,10 +11,7 @@ import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { Array, Cause, Effect, Exit, Layer, Option, Ref } from "effect";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
-import {
-  CollectionPolicyHeader,
-  withCalculatorAnalytics,
-} from "../src/analytics-request.boundary.js";
+import { withCalculatorAnalytics } from "../src/analytics-request.boundary.js";
 import {
   ApiCalculatorAnalyticsLive,
   ApiCalculatorEvents,

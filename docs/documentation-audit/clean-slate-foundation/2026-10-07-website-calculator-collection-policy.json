@@ -1,0 +1,733 @@
+{
+  "documentType": "qualification-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-analytics-owner",
+  "observedAt": "2026-10-07",
+  "task": "CSF-T008",
+  "outcome": "locally-qualified-website-policy-slice",
+  "repository": "crcorbett/taxkit",
+  "branch": "codex/dev-79-website-collection-choice",
+  "baseCommit": "bea4539137e14844dff3732691c856a19353f626",
+  "authorisedPrincipal": "Cooper Corbett",
+  "authorityBasis": "Approved clean-slate implementation continuation; no provider operation in this slice.",
+  "changedOwners": [
+    "packages/analytics/src/collection-policy.boundary.ts",
+    "packages/analytics/src/schemas.ts",
+    "packages/analytics/package.json",
+    "apps/api/src/analytics-request.boundary.ts",
+    "apps/web/src/lib/calculator-policy.browser.layer.ts",
+    "apps/web/src/lib/live.server.layer.ts",
+    "apps/web/src/lib/calculator.atoms.ts"
+  ],
+  "postconditions": [
+    "The API and HTML Website use one checked header policy; DNT 1 overrides allow and malformed flags deny.",
+    "Browser calculations read current native Do Not Track at dispatch; refused, missing or unexpected host values deny without failing calculation.",
+    "Visible browser tools share the existing calculator Atom client; no identity or extra calculator-use event owner is added.",
+    "No persistent browser storage or PostHog browser sender is introduced."
+  ],
+  "documentationImpact": {
+    "changeRequired": [
+      "private analytics exports/README/render receipt",
+      "API and Website READMEs",
+      "frontend, API and Effect architecture",
+      "exact decoder/fetch permissions and actual-command rejection fixtures",
+      "active plan and dated evidence"
+    ],
+    "preserve": [
+      "accepted browser sender SPEC pending human decision",
+      "pure tax and published SDK contracts",
+      "public accepted content",
+      "provider credentials and retained resources",
+      "five runbook procedures",
+      "deferred metrics"
+    ],
+    "notApplicable": {
+      "changeset": "Private package/app changes leave the published package closure unchanged.",
+      "providerReadback": "No provider mutation or deployment in this slice."
+    }
+  },
+  "checks": [
+    {
+      "stage": "install",
+      "command": [
+        "bun",
+        "install",
+        "--ignore-scripts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "log": "/private/tmp/dev79-policy-first-install.log",
+      "logSha256": "e9f6df692e1fe09f6d2a1906aa33a1a73de25983f56f944619d0e33e52c61c20",
+      "bytesRead": 174
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/analytics",
+        "--filter=api",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.58,
+      "log": "/private/tmp/dev79-policy-first-types.log",
+      "logSha256": "4552d1d5655a2389e2b3bd7e20c413ac4d4570d21b926843fa10584f6da68c87",
+      "bytesRead": 137067
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "node_modules/.bin/oxlint",
+        "packages/analytics/src",
+        "apps/api/src/analytics-request.boundary.ts",
+        "apps/api/src/worker.application.ts",
+        "apps/api/test/analytics-request.boundary.test.ts",
+        "apps/web/src/lib/calculator-policy.browser.layer.ts",
+        "apps/web/src/lib/calculator.atoms.ts",
+        "apps/web/src/lib/live.server.layer.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.45,
+      "log": "/private/tmp/dev79-policy-first-lint.log",
+      "logSha256": "fe9395df111af84449047f3ad431e431bf2e734c3ed047b93d51cc7e91b4299c",
+      "bytesRead": 249
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "packages/analytics/src/collection-policy.boundary.ts",
+        "packages/analytics/src/schemas.ts",
+        "packages/analytics/package.json",
+        "packages/analytics/package-structure.render.json",
+        "apps/api/src/analytics-request.boundary.ts",
+        "apps/api/src/worker.application.ts",
+        "apps/api/test/analytics-request.boundary.test.ts",
+        "apps/web/src/lib/calculator-policy.browser.layer.ts",
+        "apps/web/src/lib/calculator.atoms.ts",
+        "apps/web/src/lib/live.server.layer.ts",
+        "apps/web/package.json",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "oxlint.config.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.08,
+      "log": "/private/tmp/dev79-policy-second-format.log",
+      "logSha256": "fa427533a540fb2b10c47091aac898a32411eeab7b5f94b44e13473365d7e759",
+      "bytesRead": 47
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/analytics",
+        "--filter=api",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 2.42,
+      "log": "/private/tmp/dev79-policy-second-types.log",
+      "logSha256": "3a5119964b0cef4029a63e33edec1cb4a9a0da7a37ac5eb6bc9c1905e659a4b8",
+      "bytesRead": 137997
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "apps/web/src/lib/calculator-policy.browser.layer.ts",
+        "apps/web/test/native-analytics.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.06,
+      "log": "/private/tmp/dev79-policy-third-format.log",
+      "logSha256": "040d8a1e9852ff20e1a35eb1883b4156fb49899e8485ca9bb66429986b1db044",
+      "bytesRead": 46
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/analytics",
+        "--filter=api",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.45,
+      "log": "/private/tmp/dev79-policy-third-types.log",
+      "logSha256": "b4c6a0e645cd2ea8a528358ce6e21f679f4071ccdbc438b92305da68b1480778",
+      "bytesRead": 137660
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "node_modules/.bin/oxlint",
+        "packages/analytics/src",
+        "apps/api/src/analytics-request.boundary.ts",
+        "apps/api/src/worker.application.ts",
+        "apps/api/test/analytics-request.boundary.test.ts",
+        "apps/web/src/lib/calculator-policy.browser.layer.ts",
+        "apps/web/src/lib/calculator.atoms.ts",
+        "apps/web/src/lib/live.server.layer.ts",
+        "apps/web/test/native-analytics.boundary.test.ts",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "oxlint.config.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.48,
+      "log": "/private/tmp/dev79-policy-third-lint.log",
+      "logSha256": "0effc274e489dca3422cc5175ad15036c0c557816ddee09725ef4fae8e3d99b3",
+      "bytesRead": 3568
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "apps/web/test/native-analytics.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.07,
+      "log": "/private/tmp/dev79-policy-fourth-format.log",
+      "logSha256": "d025e24f726bb7ede91c93e710f1fcc67272123366e190a0cfbbbec8fbfacbdc",
+      "bytesRead": 46
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "node_modules/.bin/oxlint",
+        "packages/analytics/src",
+        "apps/api/src/analytics-request.boundary.ts",
+        "apps/api/src/worker.application.ts",
+        "apps/api/test/analytics-request.boundary.test.ts",
+        "apps/web/src/lib/calculator-policy.browser.layer.ts",
+        "apps/web/src/lib/calculator.atoms.ts",
+        "apps/web/src/lib/live.server.layer.ts",
+        "apps/web/test/native-analytics.boundary.test.ts",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "oxlint.config.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.41,
+      "log": "/private/tmp/dev79-policy-fourth-lint.log",
+      "logSha256": "151413f8e955e31557be27036fe4f74152a06f750c265b4b446ca53ecaccef47",
+      "bytesRead": 680
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "apps/web/test/native-analytics.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.06,
+      "log": "/private/tmp/dev79-policy-fifth-format.log",
+      "logSha256": "0adbe932e9c4db846a9da1fb80dfee23d14810ff477017fd009b25b36bddb72c",
+      "bytesRead": 46
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "node_modules/.bin/oxlint",
+        "packages/analytics/src",
+        "apps/api/src/analytics-request.boundary.ts",
+        "apps/api/src/worker.application.ts",
+        "apps/api/test/analytics-request.boundary.test.ts",
+        "apps/web/src/lib/calculator-policy.browser.layer.ts",
+        "apps/web/src/lib/calculator.atoms.ts",
+        "apps/web/src/lib/live.server.layer.ts",
+        "apps/web/test/native-analytics.boundary.test.ts",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "oxlint.config.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.41,
+      "log": "/private/tmp/dev79-policy-fifth-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytesRead": 0
+    },
+    {
+      "stage": "native-build",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "build:native-pair"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 20.13,
+      "log": "/private/tmp/dev79-policy-fifth-native-build.log",
+      "logSha256": "4ac429f9d4e00b82f6a524a0853e15bcfeeb007fff2bcf515e3a193847ac6d59",
+      "bytesRead": 78082
+    },
+    {
+      "stage": "native",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "--",
+        "test/native-analytics.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 8.46,
+      "log": "/private/tmp/dev79-policy-fifth-native.log",
+      "logSha256": "33a68446a8b1e6b553af636fb98f913be72dd8438ff6111df6f52617f68c0c8c",
+      "bytesRead": 438
+    },
+    {
+      "stage": "focus-lint",
+      "command": [
+        "bun",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.86,
+      "log": "/private/tmp/dev79-policy-focused-focus-lint.log",
+      "logSha256": "f4a48bbd2e12ea2da2941b980f892b77e7fd9ae79306f768aaed2f25cfedea37",
+      "bytesRead": 178
+    },
+    {
+      "stage": "api",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.97,
+      "log": "/private/tmp/dev79-policy-focused-api.log",
+      "logSha256": "511de2c62bce145043ab2eb5dd80ae4f553568d3945bff5d24f294e05c01f758",
+      "bytesRead": 324
+    },
+    {
+      "stage": "analytics",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/analytics",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "log": "/private/tmp/dev79-policy-focused-analytics.log",
+      "logSha256": "a3cbee964cdaef8f5b7e0aaaa03b765174ace7ed9e86898b6d75d2e50fc4d6ee",
+      "bytesRead": 483
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "/private/tmp/dev79-policy-focused-docs.log",
+      "logSha256": "00a488d7acb147ad3c58715248630adc4677b1e7200a77a8210eeab44abe9202",
+      "bytesRead": 819
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.13,
+      "log": "/private/tmp/dev79-policy-focused-runbooks.log",
+      "logSha256": "ada0d15f8a044f4715eaffa10b834eaf26e24b7b3cc2695ec2e5fc3760c6ad9e",
+      "bytesRead": 839
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.24,
+      "log": "/private/tmp/dev79-policy-focused-paths.log",
+      "logSha256": "7ecd06b7bb87dd94d08086276f2b9620208c220d629152b0bba2e7587ca962f8",
+      "bytesRead": 565
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "apps/web/test/native-analytics.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.08,
+      "log": "/private/tmp/dev79-policy-tools-format.log",
+      "logSha256": "dc58fb862cbb0f39a5acbed79ab194ec45c06573fbade4266c7d57a6ddb1397e",
+      "bytesRead": 46
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "node_modules/.bin/oxlint",
+        "apps/web/test/native-analytics.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.27,
+      "log": "/private/tmp/dev79-policy-tools-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytesRead": 0
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.12,
+      "log": "/private/tmp/dev79-policy-tools-types.log",
+      "logSha256": "392adf9ebcc41cf7789057882d94cb7cba922ceaa4c8e5112ecec122cc435bfd",
+      "bytesRead": 48260
+    },
+    {
+      "stage": "native",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "--",
+        "test/native-analytics.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 8.21,
+      "log": "/private/tmp/dev79-policy-tools-native.log",
+      "logSha256": "a06f38d8824754db736e45f16d5959ab15b499a267d117eac88e4bb158ce85a9",
+      "bytesRead": 438
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "packages/analytics/package-structure.render.json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.06,
+      "log": "/private/tmp/dev79-policy-admission-format.log",
+      "logSha256": "1d5ad52fd2fdfb6fbcb884854a9e554c3adafb6286043b270db4f3cc5cedfcf1",
+      "bytesRead": 46
+    },
+    {
+      "stage": "focus-lint",
+      "command": [
+        "bun",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.49,
+      "log": "/private/tmp/dev79-policy-admission-focus-lint.log",
+      "logSha256": "cb854f9aa3105fd7a1899cd9cf8fcc3f058e8bac7f40bfc5ee57e6264afd92d7",
+      "bytesRead": 178
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "log": "/private/tmp/dev79-policy-admission-docs.log",
+      "logSha256": "f1a1ee41c801e4c19f290bccd67483aaa22a5e0142ac3560d8c6d0c95b852794",
+      "bytesRead": 819
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev79-policy-admission-runbooks.log",
+      "logSha256": "159475f65f00ec14b1673d565833b28df4224609b10f5175ef570a07ab10385e",
+      "bytesRead": 839
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "/private/tmp/dev79-policy-admission-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytesRead": 0
+    }
+  ],
+  "limitations": [
+    "Local controlled upstream observes transport only; no stored-event UUID or PostHog project ownership claim.",
+    "Browser pageview sender decision is pending; no accepted design change inferred.",
+    "Local and ordinary Preview analytics remain off.",
+    "The complete checks ran on the frozen worktree. Only this receipt and the active plan receive qualification metadata afterwards, with focused checks; all other identities must match."
+  ],
+  "rollback": "Return to base commit bea4539137e14844dff3732691c856a19353f626; no external resource to revoke.",
+  "nativeObservations": {
+    "manualBrowserChoices": [
+      "deny",
+      "allow",
+      "deny",
+      "malformed deny",
+      "refusing host deny"
+    ],
+    "actualChromeWebMCPChoices": [
+      "deny",
+      "allow",
+      "deny"
+    ],
+    "htmlChoices": [
+      "DNT overriding allow",
+      "allow",
+      "deny",
+      "malformed deny",
+      "missing allow",
+      "DNT deny"
+    ],
+    "allowedEventOwner": "One catalogue-only event for each allowed successful action; no second Website event.",
+    "transport": "Real built API and Website modules, native private binding and public RPC, Chromium/CDP caller, controlled local US capture upstream and synthetic token."
+  },
+  "retainedFailures": [
+    "Initial focused lint/style and Effect catchTag typing errors were corrected before focused acceptance; complete logs retain their exit codes. No runtime deadline was extended."
+  ],
+  "completeQualification": {
+    "observedAt": "2026-10-07T12:22:20.197198+00:00",
+    "baseCommit": "bea4539137e14844dff3732691c856a19353f626",
+    "branch": "codex/dev-79-website-collection-choice",
+    "frozenFileCount": 1775,
+    "allFrozenFileBytesUnchangedAtReadback": true,
+    "freezeSha256": "966fed63e79ec1a157612731dea77e06d7d7aa9b248e9e99cbfef27e29ed9c65",
+    "checks": [
+      {
+        "stage": "test",
+        "command": [
+          "bun",
+          "run",
+          "test"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 70.35,
+        "log": "/private/tmp/dev79-policy-whole-test.log",
+        "logSha256": "1664b4622d743880fab5d828d36e0bbba48aa0fdc1ecfb74081532312d8c7602",
+        "bytesRead": 88252,
+        "testSummaries": [
+          "//:test:documentation:task:  Test Files  6 passed (6)",
+          "//:test:documentation:task:       Tests  46 passed (46)",
+          "//:test:documentation:task:    Duration  1.61s (tests 75%, import 20%, transform 4%, worker 1%)",
+          "//:test:repository-paths:task:  Test Files  2 passed (2)",
+          "//:test:repository-paths:task:       Tests  11 passed (11)",
+          "//:test:repository-paths:task:    Duration  227ms (import 51%, tests 34%, transform 13%, worker 2%)",
+          "//:test:oxlint:task:  Test Files  8 passed (8)",
+          "//:test:oxlint:task:       Tests  647 passed (647)",
+          "//:test:oxlint:task:    Duration  64.39s (tests 99%, import 1%)",
+          "@taxkit/content:test:  Test Files  2 passed (2)",
+          "@taxkit/content:test:       Tests  14 passed (14)",
+          "@taxkit/content:test:    Duration  538ms (import 75%, transform 22%, tests 3%, worker 1%)",
+          "@taxkit/testing:test:  Test Files  1 passed (1)",
+          "@taxkit/testing:test:       Tests  5 passed (5)",
+          "@taxkit/testing:test:    Duration  599ms (import 81%, transform 18%, tests 1%)",
+          "@taxkit/core:test:  Test Files  3 passed (3)",
+          "@taxkit/core:test:       Tests  66 passed (66)",
+          "@taxkit/core:test:    Duration  628ms (import 72%, transform 19%, tests 7%, worker 1%)",
+          "@taxkit/rules-au-pay:test:  Test Files  3 passed (3)",
+          "@taxkit/rules-au-pay:test:       Tests  20 passed (20)",
+          "@taxkit/rules-au-pay:test:    Duration  783ms (import 48%, transform 47%, tests 3%, worker 1%)",
+          "@taxkit/rules-au-income-tax:test:  Test Files  3 passed (3)",
+          "@taxkit/rules-au-income-tax:test:       Tests  18 passed (18)",
+          "@taxkit/rules-au-income-tax:test:    Duration  790ms (import 52%, transform 45%, tests 2%, worker 1%)",
+          "@taxkit/analytics:test:  Test Files  2 passed (2)",
+          "@taxkit/analytics:test:       Tests  31 passed (31)",
+          "@taxkit/analytics:test:    Duration  842ms (transform 55%, import 38%, tests 6%, worker 1%)",
+          "@taxkit/scripts:test:  Test Files  4 passed (4)",
+          "@taxkit/scripts:test:       Tests  60 passed (60)",
+          "@taxkit/scripts:test:    Duration  963ms (tests 44%, import 39%, transform 17%)",
+          "@taxkit/rules-au-stsl:test:  Test Files  3 passed (3)",
+          "@taxkit/rules-au-stsl:test:       Tests  14 passed (14)",
+          "@taxkit/rules-au-stsl:test:    Duration  1.09s (transform 55%, import 43%, tests 1%)",
+          "@taxkit/docs-fumadocs:test:  Test Files  2 passed (2)",
+          "@taxkit/docs-fumadocs:test:       Tests  6 passed (6)",
+          "@taxkit/docs-fumadocs:test:    Duration  1.23s (import 90%, transform 8%, tests 1%)",
+          "@taxkit/calculators:test:  Test Files  3 passed (3)",
+          "@taxkit/calculators:test:       Tests  41 passed (41)",
+          "@taxkit/calculators:test:    Duration  1.31s (transform 56%, import 34%, tests 9%, worker 1%)",
+          "@taxkit/sdk:test:  Test Files  5 passed (5)",
+          "@taxkit/sdk:test:       Tests  58 passed (58)",
+          "@taxkit/sdk:test:    Duration  1000ms (transform 59%, import 37%, tests 3%)",
+          "@taxkit/docs-examples:test:  Test Files  3 passed (3)",
+          "@taxkit/docs-examples:test:       Tests  9 passed (9)",
+          "@taxkit/docs-examples:test:    Duration  1.05s (transform 56%, import 41%, tests 2%)",
+          "@taxkit/api-http:test:  Test Files  4 passed (4)",
+          "@taxkit/api-http:test:       Tests  29 passed (29)",
+          "@taxkit/api-http:test:    Duration  1.29s (transform 58%, import 38%, tests 4%)",
+          "@taxkit/docs-content:test:  Test Files  5 passed (5)",
+          "@taxkit/docs-content:test:       Tests  24 passed (24)",
+          "@taxkit/docs-content:test:    Duration  598ms (import 61%, transform 29%, tests 8%, worker 1%)",
+          "web:test:  Test Files  5 passed (5)",
+          "web:test:       Tests  58 passed (58)",
+          "web:test:    Duration  605ms (transform 58%, import 34%, tests 7%, worker 1%)",
+          "api:test:  Test Files  8 passed (8)",
+          "api:test:       Tests  112 passed (112)",
+          "api:test:    Duration  1.62s (import 48%, transform 44%, tests 7%)",
+          "@taxkit/api-rpc:test:  Test Files  4 passed (4)",
+          "@taxkit/api-rpc:test:       Tests  332 passed (332)",
+          "@taxkit/api-rpc:test:    Duration  2.07s (transform 41%, tests 33%, import 25%, worker 1%)",
+          "@taxkit/infrastructure:test:  Test Files  3 passed (3)",
+          "@taxkit/infrastructure:test:       Tests  41 passed (41)",
+          "@taxkit/infrastructure:test:    Duration  1.08s (import 70%, transform 23%, tests 7%)"
+        ]
+      },
+      {
+        "stage": "build",
+        "command": [
+          "bun",
+          "run",
+          "build"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 4.89,
+        "log": "/private/tmp/dev79-policy-whole-build.log",
+        "logSha256": "a2632678a93f1abd004d9160c943e605dcf6a7c5556d8a205137b2e622dcd36e",
+        "bytesRead": 95542,
+        "testSummaries": []
+      },
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 689.81,
+        "log": "/private/tmp/dev79-policy-whole-verification.log",
+        "logSha256": "717eb94f65dd636b411942c04646feb7872b57e7a382627698a572a5a8c98d8c",
+        "bytesRead": 570093,
+        "testSummaries": [
+          "//:test:docs-deployment:task:  Test Files  22 passed (22)",
+          "//:test:docs-deployment:task:       Tests  273 passed (273)",
+          "//:test:docs-deployment:task:    Duration  8.98s (tests 76%, import 21%, transform 2%)",
+          "//:test:skills:task:  Test Files  1 passed (1)",
+          "//:test:skills:task:       Tests  21 passed (21)",
+          "//:test:skills:task:    Duration  116ms (import 56%, tests 25%, transform 18%, worker 2%)",
+          " Test Files  3 passed (3)",
+          "      Tests  16 passed (16)",
+          "   Duration  588ms (tests 66%, import 26%, transform 6%, worker 1%)",
+          "//:test:quality-workflow:task:  Test Files  2 passed (2)",
+          "//:test:quality-workflow:task:       Tests  34 passed (34)",
+          "//:test:quality-workflow:task:    Duration  517.50s (tests 100%)",
+          "@taxkit/sdk:test:browser:  Test Files  4 passed (4)",
+          "@taxkit/sdk:test:browser:       Tests  26 passed (26)",
+          "@taxkit/sdk:test:browser:    Duration  1.33s (import 79%, worker 18%, tests 4%)",
+          "web:test:browser:  Test Files  3 passed (3)",
+          "web:test:browser:       Tests  21 passed (21)",
+          "web:test:browser:    Duration  4.94s (tests 71%, import 21%, worker 8%)",
+          "web test:native-pair:  Test Files  10 passed (10)",
+          "web test:native-pair:       Tests  18 passed (18)",
+          "web test:native-pair:    Duration  122.67s (tests 97%, import 3%)"
+        ]
+      }
+    ],
+    "allWholeLogBytesRead": true
+  },
+  "sourceReview": "One shared header decoder, browser preference reads at dispatch, original-request server policy, same existing manual/tool Atom client, unchanged admission/calculator/SDK contracts. Exact negative CLI fixtures still reject nearby or wrong-purpose decoding, encoding, execution, bare fetch, ordinary Object writes, native throws and Promise workflows.",
+  "metadataCloseout": [
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.33,
+      "log": "/private/tmp/dev79-policy-close-docs.log",
+      "logSha256": "cae56586fc20784c3a4b5a0251d87e9a5cccec59ee93ac65dce91c473e2c83db",
+      "bytesRead": 819
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.13,
+      "log": "/private/tmp/dev79-policy-close-runbooks.log",
+      "logSha256": "5845c8d48699d809aadfe933014c6fe39af0bbfc1353dd27a96a1632c82a02ed",
+      "bytesRead": 839
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.25,
+      "log": "/private/tmp/dev79-policy-close-paths.log",
+      "logSha256": "28f46c929d29fc17bd6ec2a3fe501ff048379ba82b3d59fb3ead9f716e01d4a0",
+      "bytesRead": 565
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "--check",
+        "."
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.55,
+      "log": "/private/tmp/dev79-policy-close-format.log",
+      "logSha256": "4b6ec71382a70af96fa9834d7f7cc5bba390b0045972f5545fb4810226cbd7ee",
+      "bytesRead": 115
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "/private/tmp/dev79-policy-close-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytesRead": 0
+    }
+  ]
+}

@@ -1,4 +1,6 @@
 import "@tanstack/react-start/server-only";
+import { collectionPolicyFromHeaders } from "@taxkit/analytics/collection-policy";
+import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import { DocsRpcUnavailable } from "@taxkit/api-rpc/content/errors";
 import { DocsRpcClientLive } from "@taxkit/api-rpc/content/live";
 import { DocsRpcClient } from "@taxkit/api-rpc/content/service";
@@ -18,6 +20,7 @@ import {
   HttpClientError,
   HttpClientRequest,
   HttpClientResponse,
+  HttpServerRequest,
 } from "effect/http";
 import { NetAddress } from "effect/net";
 
@@ -88,6 +91,24 @@ export const WebsiteServerLive = (binding: Cloudflare.Env["TAXKIT_API"]) =>
                           )
                         ),
                     })
+                  )
+                )
+              ).pipe(
+                HttpClient.mapRequestEffect((outgoing) =>
+                  Effect.serviceOption(
+                    HttpServerRequest.HttpServerRequest
+                  ).pipe(
+                    Effect.map((incoming) =>
+                      HttpClientRequest.setHeader(
+                        outgoing,
+                        CollectionPolicyHeader,
+                        Option.match(incoming, {
+                          onNone: () => "deny",
+                          onSome: (request) =>
+                            collectionPolicyFromHeaders(request.headers),
+                        })
+                      )
+                    )
                   )
                 )
               )

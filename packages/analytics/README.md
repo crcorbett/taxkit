@@ -21,6 +21,7 @@ Tax rule packages and local SDK calculations do not depend on this package.
 - `./errors`: public typed failures.
 - `./config`: checked collection mode and capture settings. Off needs no token;
   invalid enabled settings fail with `AnalyticsConfigurationError`.
+- `./collection-policy`: one checked incoming-header policy used by the API and Website. Missing allows direct clients; malformed or denied flags and `DNT: 1` refuse collection.
 - `./service`: public Effect service contract.
 - `./live`: production Layer; compose only at an application/runtime boundary.
 - `./test`: deterministic contract-level test Layer.

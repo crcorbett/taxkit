@@ -5602,3 +5602,47 @@ from elapsed time. The connector produces a US-host UI link, but authenticated
 management ownership, complete listing and capacity are still unverified. All
 four TaxKit Doppler configs (`ci`, `dev`, `prd`, `stg_preview`) have no PostHog
 variable names. No provider or credential has changed; metrics remain deferred.
+
+
+### T008 Website calculator preference candidate
+
+Draft [#164](https://github.com/crcorbett/taxkit/pull/164) contains the locally
+qualified backend source. The next attached slice closes Website preference
+forwarding independently of the pending browser pageview sender decision. One
+private header boundary is shared with the API; browser requests read native
+Do Not Track at each dispatch, and HTML requests read their original headers.
+The same existing Atom client serves manual and visible-tool calculation.
+Refusing/missing browser hosts, unexpected preference values and missing server
+request contexts refuse collection without changing the calculation request.
+
+The expanded native analytics fixture uses real built API and Website modules,
+Chromium and synthetic capture settings. Exact two-line lint exemptions admit
+only changing the native browser preference getter and throwing its controlled
+refusal; ordinary object mutation and native throws remain forbidden elsewhere.
+All orchestration stays in Effect scopes. Focused native tests now pass, including
+actual Chrome WebMCP deny → allow → deny calls with one allowed event, five
+manual browser preferences and six repeated HTML policies. The
+[dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-website-calculator-collection-policy.json)
+owns candidate identities, actual checks and remaining proof.
+
+Documentation impact: **Change required** for the shared export/README, API and
+Website owners, frontend/API/Effect architecture, exact lint configuration and
+fixtures, this plan and its proof. **Preserve** the accepted sender SPEC pending
+Cooper’s choice, pure tax/SDK contracts, public documentation content, private
+provider credentials and all five runbook procedures. **N/A** for a Changeset:
+only a private package and private apps change; published package closure is
+unchanged. No provider, credential, deployment, merge or publication occurs.
+Metrics remain deferred; T008 remains in progress.
+
+
+Website preference qualification: root tests passed in 70.35 seconds, builds in
+4.89 seconds and full `bun run verification` in 689.81 seconds. All 18 built
+native cases passed across 10 files in 122.67 seconds; the new policy case uses
+real manual and Chrome WebMCP requests plus repeated private HTML calculations.
+The actual-command policy fixture has 26 passing cases, with full root lint
+regression checks also passed. All 1,775 frozen input identities matched after
+the complete checks. Only this plan and the dated receipt then receive proof
+metadata and focused closeout checks. This accepts the local Website forwarding
+slice only; browser pageviews, relay, retained provider resources, stored UUID
+proof and public privacy/operations updates remain T008 work in progress.
+No new provider, credential or deployment operation is claimed.

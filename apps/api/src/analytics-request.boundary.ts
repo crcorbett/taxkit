@@ -1,4 +1,4 @@
-import { CollectionPolicy } from "@taxkit/analytics/schemas";
+import { collectionPolicyFromHeaders } from "@taxkit/analytics/collection-policy";
 import type { CalculatorUse } from "@taxkit/analytics/schemas";
 import { BackendAnalytics } from "@taxkit/analytics/service";
 import {
@@ -7,12 +7,10 @@ import {
 } from "alchemy/Cloudflare/Workers";
 import type { HttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
-import { Context, Effect, Layer, Option, Ref, Schema } from "effect";
-import { Headers, HttpServerRequest } from "effect/http";
+import { Context, Effect, Layer, Option, Ref } from "effect";
+import { HttpServerRequest } from "effect/http";
 
 import { ApiCalculatorEvents } from "./calculator-analytics.layer.js";
-
-export const CollectionPolicyHeader = "x-taxkit-collection-policy";
 
 // Native host composition supplies capture. An in-process or local host
 // deliberately has no background delivery; it must not borrow another runtime.
@@ -74,17 +72,7 @@ export const withCalculatorAnalytics = Effect.fnUntraced(function* <R>(
   operation: HttpEffect<R>
 ) {
   const request = yield* HttpServerRequest.HttpServerRequest;
-  const dnt = Headers.get(request.headers, "dnt");
-  const policy = Headers.get(request.headers, CollectionPolicyHeader).pipe(
-    Option.match({
-      onNone: () => "allow" as const,
-      onSome: (value) =>
-        Schema.decodeUnknownOption(CollectionPolicy)(value).pipe(
-          Option.getOrElse(() => "deny" as const)
-        ),
-    })
-  );
-  const collectionPolicy = Option.contains(dnt, "1") ? "deny" : policy;
+  const collectionPolicy = collectionPolicyFromHeaders(request.headers);
   const events = yield* Ref.make<readonly CalculatorUse[]>([]);
   const response = yield* operation.pipe(
     Effect.provideService(

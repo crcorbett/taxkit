@@ -14,8 +14,9 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
-  // Exact optional analytics collection header; no identity or admission change.
-  "apps/api/src/analytics-request.boundary.ts",
+  // Exact collection header and native browser preference ingress only.
+  "packages/analytics/src/collection-policy.boundary.ts",
+  "apps/web/src/lib/calculator-policy.browser.layer.ts",
   // Exact synthetic analytics representation fixture; no runtime or encoder.
   "packages/analytics/src/__testing__/fixtures.ts",
   // Actual installed provider request bytes at the mocked network boundary.
@@ -543,6 +544,7 @@ export default defineConfig({
         "packages/analytics/src/**/*.ts",
         "apps/api/src/analytics-request.boundary.ts",
         "apps/api/src/calculator-analytics.layer.ts",
+        "apps/web/src/lib/calculator-policy.browser.layer.ts",
       ],
       rules: {
         "no-restricted-globals": [

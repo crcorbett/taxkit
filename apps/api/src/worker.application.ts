@@ -1,3 +1,4 @@
+import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { CalculatorRpcResponseTooLarge } from "@taxkit/api-rpc/errors";
 import {
@@ -40,7 +41,6 @@ import {
 
 import {
   ApiCalculatorDelivery,
-  CollectionPolicyHeader,
   withCalculatorAnalytics,
 } from "./analytics-request.boundary.js";
 import { ApiCalculatorEvents } from "./calculator-analytics.layer.js";

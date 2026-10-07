@@ -109,9 +109,9 @@ The native analytics test uses the freshly built API and a controlled local
 upstream with a synthetic capture token. It covers HTTP, RPC and both official
 MCP client versions, changing collection choice within each conversation,
 refused/redirected capture and a stalled reply. It uses no PostHog provider
-credentials or service. The Website's browser adapter, relay and opt-out
-forwarding remain T008 work in progress; ordinary local/Preview collection
-stays off. See the [API candidate owner](../api/README.md#analytics-candidate)
+credentials or service. The built pair additionally checks fresh browser and
+HTML collection choices, including actual Chrome WebMCP caller changes. Ordinary local/Preview collection stays off. The
+pageview sender and relay remain T008 work in progress. See the [API candidate owner](../api/README.md#analytics-candidate)
 and [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json).
 
 The Atom/Scheduler browser checks cover scheduling, StrictMode remount,
@@ -555,3 +555,22 @@ browser availability. `webmcp-types` 0.1.10 is type-only; the installed caller's
 own types qualify the tested browser contract. See the
 [dated browser receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
 and [frontend owner](../../docs/architecture/frontend.md#page-owned-browser-tools).
+
+
+## Calculator collection choice
+
+The browser calculator HttpClient reads `navigator.doNotTrack` at each actual
+request. `1` refuses collection; recognised unset/allow values permit it. A
+missing or refusing browser host or an unexpected value refuses collection
+without changing the tax request. Manual calculation and visible browser tools
+use the same existing Atom client, so neither path sends a second usage event.
+This adds no identity or storage and does not implement the pending pageview sender.
+
+HTML form calculation reads the original request through the shared private
+analytics header boundary. `DNT: 1` overrides allow, malformed and denied flags
+refuse collection, and a missing flag keeps ordinary HTML use compatible. Each
+private request carries only the checked allow/deny flag, alongside its existing
+rate admission; it never forwards browser identity. A missing server request
+refuses collection. Settings/catalogue lookups emit no calculator-use event.
+The [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-calculator-collection-policy.json)
+separates controlled native/browser proof from provider ingestion or deployment.

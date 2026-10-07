@@ -96,7 +96,8 @@ failed or interrupted calculations add no successful-use event. A request can
 collect at most 64 successes; excess analytics are dropped without changing
 the calculation. This bounded loss does not promise an exact count under loss.
 
-`src/analytics-request.boundary.ts` reads the optional collection header once.
+`src/analytics-request.boundary.ts` uses the private analytics package’s shared
+header boundary to read the optional collection choice once.
 Missing means allow; deny, malformed values or `DNT: 1` mean no collection.
 The policy carries no browser identity and changes neither admission nor the
 existing rate key. The native MCP registration omits the request collector;
@@ -120,9 +121,11 @@ successful; a stalled capture reply reaches the native five-second drop while
 the tax reply returns within two seconds. The controlled Node response bridge
 does not expose upstream body cancellation; that is not claimed.
 
-Website opt-out forwarding, browser SDK privacy, retained provider projects and
-stored UUID readback still require their remaining tests and separately
-qualified provider journey. The
+The Website forwards a fresh browser preference or original HTML request choice
+to this same boundary. Its built-pair proof is recorded in the
+[Website policy receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-calculator-collection-policy.json).
+Browser sender privacy, retained provider projects and stored UUID readback
+still require their remaining tests and separately qualified provider journey. The
 [candidate receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json)
 keeps focused and full-source qualification separate. No analytics provider or
 deployment change is claimed by these source edits.

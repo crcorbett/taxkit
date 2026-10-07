@@ -42,6 +42,7 @@ export const AnalyticsSettings = Schema.Union([
 export type AnalyticsSettings = typeof AnalyticsSettings.Type;
 export const CollectionPolicy = Schema.Literals(["allow", "deny"]);
 export type CollectionPolicy = typeof CollectionPolicy.Type;
+export const CollectionPolicyHeader = "x-taxkit-collection-policy";
 export const CaptureDisposition = Schema.Literals([
   "accepted",
   "disabled",
