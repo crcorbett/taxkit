@@ -5794,3 +5794,29 @@ adds no published package contract. This relay is a local candidate; deployed
 source stays `42610a5c25d4b03bb2d36ab75985a66b15ca17d3` until new qualified
 delivery. No browser sender, PostHog key/project, activation or stored events
 are claimed.
+
+
+Relay local qualification: the first complete graph stopped after 34 isolated
+workflow cases when Knip found an unnecessary exported retry Schema. The Schema
+now stays private at its codec owner. Corrected source
+`40849c822ae5c49bf5c7be858374c30aa5f1abdc` passes all nine ordered local
+CI-mode release commands in 904.38 seconds, including full verification, root
+tests/builds, docs validation, packed/downstream SDK, API smoke, all 22 freshly
+built native cases across 11 files and Changeset status. The frozen dependency
+install passes. All 18 returned detail digests are independently checked; all
+1,797 frozen file/link identities and modes match after checks and installation.
+Only this plan and its receipt then receive proof metadata, with focused
+closeout and all 1,795 other identities required unchanged. No hosted GitHub
+pass, candidate release attempt, publication or provider apply is claimed.
+
+The final source review accepts the private relay's checked ingress, complete
+byte bounds, one whole-operation deadline, fixed single attempt, honest reply,
+scoped interruption and existing runner ownership. Header stripping is proved
+at application/native test boundaries. [Cloudflare's current header contract](https://developers.cloudflare.com/fundamentals/reference/http-headers/)
+documents provider-added subrequest headers, so final hosted recipient headers
+and stored fields remain a controlled Preview proof before broader privacy or
+collection activation. This records a proof limit, not an observed disclosure.
+The pending browser sender and read-key decisions remain unchanged; collection
+is off and metrics stay deferred. A new source-bound native app delivery can
+proceed under Cooper's existing local Preview/Production grant without enabling
+capture or changing PostHog resources, credentials or shared state ownership.
