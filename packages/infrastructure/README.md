@@ -112,9 +112,15 @@ disabling collection does not complete that requirement.
 `NativeAppsHostMode` defaults to `edge`. The graph binds that mode to both native
 apps as `CALCULATOR_HOST_MODE`. The API app's native admission Layer registers
 one 60/60 RateLimit binding and captures required checked
-`CALCULATOR_RATE_NAMESPACE` through Alchemy's own Config/runtime bridge. A stage
-operator must select an account-wide unique positive decimal value before any
-authorised cloud plan/apply. No provider value or credential is selected here.
+`CALCULATOR_RATE_NAMESPACE` through Alchemy's own Config/runtime bridge.
+The native cloud secret composition supplies non-secret namespace `10078` for
+Production and `10078` followed by the checked PR number for each Preview.
+These values take precedence over the selected Doppler config; shell app values
+remain disabled. Different Preview stages and Production have separate counters.
+Development retains its selected configuration. Before cloud apply,
+independently read every available Worker binding and refuse a foreign namespace
+collision. The dated deployment receipt owns that account observation; the
+declaration alone cannot reserve a provider namespace.
 
 The guarded disposable root supplies `local-emulator` and isolated local
 namespace `10075`. It cannot select a cloud stage or provider mode. API and
@@ -124,10 +130,11 @@ and forbid provider writes. Their saved state uses Alchemy's own packed
 Config representation, including the captured namespace, rather than omitting
 new native settings from the no-change fixture.
 
-The existing docs deployment runbook owns `DocsWebsite` only. It does not
-authorise or supply an API/Website deployment procedure; T010/DEV-81 must settle
-that operation's candidate, namespace readback, receipt and rollback before
-provider approval. Local limiter tests cannot establish real edge or cloud state.
+The deployment runbook preserves old `DocsWebsite` operations as stopped
+history and separately owns native preparation. Cooper's current active plan
+authorises qualified Preview and Production deployment from this Mac. Each
+operation still needs its exact candidate, namespace readback, receipt and
+recovery. Local limiter tests cannot establish real edge or cloud state.
 
 
 ## Native older-client conversation host

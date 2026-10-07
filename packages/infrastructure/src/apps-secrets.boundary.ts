@@ -46,6 +46,27 @@ export const nativeAppsSecrets = (({ stage }: SecretsContext) => [
       Effect.map((selection) => Doppler.Secrets(selection).layer)
     )
   ),
+  ConfigProvider.layerAdd(
+    nativeAppsStage(stage).pipe(
+      Effect.map((checked) => {
+        // This account's 7 October Worker inventory has no rate-limit
+        // namespaces. Reserve 10078 for Production and append each checked
+        // PR number for Preview; two stages must never share its counters.
+        if (checked === "prod") {
+          return ConfigProvider.fromUnknown({
+            CALCULATOR_RATE_NAMESPACE: "10078",
+          });
+        }
+        if (checked.startsWith("pr-")) {
+          return ConfigProvider.fromUnknown({
+            CALCULATOR_RATE_NAMESPACE: `10078${checked.slice(3)}`,
+          });
+        }
+        return ConfigProvider.fromUnknown({});
+      })
+    ),
+    { asPrimary: true }
+  ),
   // Native Stack.secrets otherwise appends the shell as its highest priority.
   // Credentials still come through the native provider's credential source;
   // ambient application values cannot override the selected Doppler config.

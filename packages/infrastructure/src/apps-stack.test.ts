@@ -568,6 +568,35 @@ describe("native paired app graph and planner", () => {
 });
 
 describe("native app root secret selection", () => {
+  it.live.each([
+    { namespace: "10078", stage: "prod" },
+    { namespace: "10078160", stage: "pr-160" },
+    { namespace: "10078161", stage: "pr-161" },
+    { namespace: "selected-doppler-fixture", stage: "dev_ci_user" },
+  ])("isolates the rate namespace for $stage", ({ namespace, stage }) =>
+    Effect.gen(function* () {
+      const compiled = yield* Stack.make({
+        name: "TaxKitAppsNamespaceProof",
+        providers: Layer.empty,
+        secrets: (context) => [
+          ConfigProvider.layerAdd(
+            ConfigProvider.fromUnknown({
+              CALCULATOR_RATE_NAMESPACE: "selected-doppler-fixture",
+            }),
+            { asPrimary: true }
+          ),
+          ...Array.drop(nativeAppsSecrets(context), 1),
+        ],
+        state: inMemoryState(),
+      })(Config.schema(Schema.String, "CALCULATOR_RATE_NAMESPACE"));
+      expect(compiled.output).toBe(namespace);
+    }).pipe(
+      Effect.provideService(AlchemyContext, localContext),
+      Effect.provideService(Stage, stage),
+      graphEnvironment,
+      Effect.scoped
+    )
+  );
   it.effect.each([
     { config: "prd", stage: "prod" },
     { config: "stg_preview", stage: "pr-214" },

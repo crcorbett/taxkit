@@ -1,0 +1,258 @@
+{
+  "document_type": "implementation-evidence",
+  "lifecycle": "current",
+  "authority": "supporting",
+  "owner": "taxkit-implementation-owner",
+  "observedOn": "2026-10-07",
+  "task": "CSF-T007 / DEV-78",
+  "baseCommit": "c2b8f23ef3fb754f5ce1e79121f6c52044c2b830",
+  "branch": "codex/dev-78-local-native-deployments",
+  "qualification": "focused infrastructure tests/types and lint pass; whole qualification and deployment pending",
+  "operationAuthority": {
+    "principal": "Cooper",
+    "direction": "Run checks/deployments locally; Preview and Production can run from this Mac",
+    "stack": "TaxKitAppsCloudflare",
+    "stages": [
+      "pr-N from exact reviewed draft head",
+      "prod"
+    ],
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "productionZoneId": "15103853342ab9f18f7894b7fae39c39",
+    "resources": [
+      "TaxKitApi",
+      "TaxKitWebsite",
+      "Production-only retained TaxKitProductionZone and TaxKitProductionDnsSettings"
+    ],
+    "approvalBoundary": "Exact checked candidate, native plan and existing credentials before apply; Preview proof before Production",
+    "duration": "this authorised clean-slate delivery",
+    "credentialMutation": false,
+    "sharedStoreUpgrade": false,
+    "mergeOrPublication": false,
+    "recoveryOwner": "Cooper",
+    "recovery": "Preserve all old Workers/state and foreign records; restore exact prior native candidate via reviewed native plan; first-time Preview can be removed only through its exact native stage with independent absence readback. No unreviewed deletion of old Production resources."
+  },
+  "namespaceConfiguration": {
+    "production": "10078",
+    "preview": "10078 followed by the checked PR number",
+    "development": "selected configuration unchanged",
+    "source": "native Stack secret composition ConfigProvider; checked by owning API Config Schema",
+    "foreignCollisionReadRequired": true,
+    "providerReservationClaim": false
+  },
+  "credentials": {
+    "dopplerSource": "existing primary TaxKit checkout-scoped personal CLI login with system-keyring custody; same verified repository; native DOPPLER_TOKEN exists only in child environment",
+    "cloudflareSource": "same selected taxkit/stg_preview or taxkit/prd config via Doppler run",
+    "scopeMutation": false,
+    "credentialCopyToDisk": false,
+    "secretValuesIncluded": false,
+    "stateProfile": "existing site-ci-env-v1 state bearer only; provider credentials independently selected from TaxKit Doppler",
+    "alchemyProfiles": "existing Cloudflare profile documents contain only oauth method and cannot supply installed native login credentials"
+  },
+  "providerReads": [
+    {
+      "config": "stg_preview",
+      "accountId": "f9f94270a4a5af8af7010d891020922d",
+      "observedAt": "2026-10-07T07:20:20.451859+00:00",
+      "tokenVerification": {
+        "id": "fac0407eb8783c8a01dea57141b3d395",
+        "status": "active",
+        "not_before": null,
+        "expires_on": "2026-11-18T23:59:59Z"
+      },
+      "workerScriptPages": [
+        {
+          "page": 1,
+          "http": 200,
+          "result_info": null,
+          "rowCount": 46
+        }
+      ],
+      "workerSettingsCount": 46,
+      "allWorkerSettingsRead200": true,
+      "activeRateLimitBindings": 0,
+      "resultPaginationMetadataExposed": false,
+      "providerReadReceiptSha256": "c453cb610ac4ec2a14a6f65731911a0ec32ea396e41a41424853ad4f6446a665",
+      "tokenMetadataReadback": {
+        "id": "fac0407eb8783c8a01dea57141b3d395",
+        "name": "taxkit-docs-preview-20260831",
+        "status": "active",
+        "issued_on": "2026-08-31T02:59:35Z",
+        "modified_on": "2026-08-31T02:59:35Z",
+        "expires_on": "2026-11-18T23:59:59Z",
+        "permissionGroups": [
+          "Workers Observability Write",
+          "Secrets Store Write",
+          "Workers Scripts Write"
+        ],
+        "allowedResourceScopes": [
+          "com.cloudflare.api.account.f9f94270a4a5af8af7010d891020922d"
+        ],
+        "zonePermissionsAbsent": true
+      }
+    },
+    {
+      "config": "prd",
+      "accountId": "f9f94270a4a5af8af7010d891020922d",
+      "observedAt": "2026-10-07T07:21:24.200748+00:00",
+      "tokenVerification": {
+        "id": "35bf3c96b36551ea663e62e5739b68e9",
+        "status": "active",
+        "not_before": null,
+        "expires_on": "2026-11-18T23:59:59Z"
+      },
+      "workerScriptPages": [
+        {
+          "page": 1,
+          "http": 200,
+          "result_info": null,
+          "rowCount": 46
+        }
+      ],
+      "workerSettingsCount": 46,
+      "allWorkerSettingsRead200": true,
+      "activeRateLimitBindings": 0,
+      "resultPaginationMetadataExposed": false,
+      "providerReadReceiptSha256": "493adf3427d43aa0042ef009a6671103888bf0b2b5794306292c61ff1bc76475",
+      "tokenMetadataReadback": {
+        "id": "35bf3c96b36551ea663e62e5739b68e9",
+        "name": "taxkit-docs-production-20260831",
+        "status": "active",
+        "issued_on": "2026-08-31T02:59:52Z",
+        "modified_on": "2026-08-31T02:59:53Z",
+        "expires_on": "2026-11-18T23:59:59Z",
+        "permissionGroups": [
+          "Workers Observability Write",
+          "Secrets Store Write",
+          "Workers Scripts Write"
+        ],
+        "allowedResourceScopes": [
+          "com.cloudflare.api.account.f9f94270a4a5af8af7010d891020922d"
+        ],
+        "zonePermissionsAbsent": true
+      }
+    }
+  ],
+  "stateReadback": {
+    "url": "https://alchemy-state-store.coopercorbett.workers.dev",
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "client": "Bun 1.4.2 fetch",
+    "version": 7,
+    "authenticatedStacksReadHttp": 200,
+    "nativeAppsStagesReadHttp": 200,
+    "nativeAppsStages": [],
+    "localBootstrapStageAbsent": true,
+    "upgradeOrRefreshExecuted": false
+  },
+  "checks": [
+    {
+      "stage": "infrastructure-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/infrastructure",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.63,
+      "logSha256": "5124e2be6c6c7602cea97f173546422237f0141e130297ad6822305e7386c269"
+    },
+    {
+      "stage": "infrastructure-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/infrastructure",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.15,
+      "logSha256": "84a5afb0755557aeea957170cd2d4efde8fd4a769741a724672b4b701fbf1d8e"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.93,
+      "logSha256": "a9ac55902610d4d2ed7bb6bbb7312ef8550bf45f016b986b6649b931c24bdc70"
+    }
+  ],
+  "retainedAttempts": [
+    {
+      "command": "native Preview plan with explicit env-file",
+      "exitCode": 1,
+      "reason": "Explicit native secrets rejects --env-file; retry omits it",
+      "logSha256": "06522ecb833271166e609654bbde63c8158a687ca9bdc1cfd935be8f66252b1e"
+    },
+    {
+      "command": "native Preview plan before namespace input",
+      "exitCode": 1,
+      "reason": "SchemaError at CALCULATOR_RATE_NAMESPACE",
+      "logSha256": "007859ea0599067f83248b25813899d023a2439968efd6a00b3bca57fb3a4c72",
+      "rawLogRetained": false,
+      "limitation": "Temporary log path was reused by the following diagnostic run; this retained summary/digest is not a retained full log"
+    },
+    {
+      "command": "infrastructure check:types",
+      "exitCode": 1,
+      "reason": "Actual package script is check-types; corrected retry passed"
+    },
+    {
+      "command": "Python state-store GETs",
+      "http": 403,
+      "reason": "Cloudflare error 1010 for client signature; actual Bun client independently passed version/authenticated state reads; no provider security setting changed"
+    },
+    {
+      "command": "state GET /stacks",
+      "http": 500,
+      "reason": "Wrong diagnostic route; correct installed /state/stacks returned 200"
+    },
+    {
+      "command": "check:runbooks first preparation pass",
+      "exitCode": 1,
+      "reason": "New sidecar evidence path needed its exact canonical runbook pointer; added pointer without policy broadening"
+    }
+  ],
+  "diagnosticNativePlan": {
+    "stage": "pr-160",
+    "sourceState": "dirty namespace candidate; not apply-qualified",
+    "exitCode": 0,
+    "summary": "Plan: 2 to create, 9 binding changes",
+    "productionResourcesAbsent": true,
+    "detailedPropertiesRead": true,
+    "logSha256": "56d304a94827839a40e579b72b6122f0005e3519e46c2fb77b938f1ecc6ee37a"
+  },
+  "documentationImpact": {
+    "Change required": [
+      "native secret config and its actual composition tests",
+      "infrastructure README",
+      "deployment architecture",
+      "native runbook and authority",
+      "active plan and dated receipt routing"
+    ],
+    "Preserve": [
+      "tax results",
+      "metrics deferral and disabled collection",
+      "old credential scopes and values",
+      "historical deployment identities and stopped writers",
+      "dependency versions and patch"
+    ],
+    "N/A": [
+      "public package contract and Changeset; private infrastructure input only",
+      "generated references"
+    ]
+  },
+  "nonClaims": [
+    "No apply or deployment yet",
+    "No public availability",
+    "No new or broadened credentials",
+    "No shared-store mutation or upgrade",
+    "No exact clean-source live plan yet",
+    "No whole qualification for this changed source yet"
+  ]
+}

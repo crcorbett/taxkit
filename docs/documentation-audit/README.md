@@ -535,3 +535,8 @@ and changed-byte refusals, optional hash agreement and protected stage-local
 outputs. It preserves historical receipt bytes and writer stops. Qualification
 and metadata readback are bounded local observations; native bootstrap/provider
 receipts, worktree custody and live plans remain separate unfinished work.
+
+The [native cloud preparation](clean-slate-foundation/2026-10-07-native-cloud-preparation.json)
+records existing TaxKit credential reuse, independent state version/access,
+namespace isolation and real diagnostic native planning. Full qualification and
+Preview/Production apply/readback remain separate results.

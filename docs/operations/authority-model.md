@@ -54,6 +54,15 @@ origin of supplied plan text. They do not grant bootstrap, plan or apply approva
 The [deployment runbook](../runbooks/docs-deployment.md) owns the pending native
 procedure; local proof and old receipts grant no new operation authority.
 
+Cooper's 7 October direction subsequently authorises native Preview and
+Production deployments from this Mac. The active clean-slate plan records that
+new authority; it does not broaden credentials, authorise unrelated resources or
+permit a shared-store upgrade. Bind each exact candidate, stage, account,
+resource graph, existing credential, plan, recovery and readback before apply.
+The native bridge may resolve the existing TaxKit repository-scoped CLI login in
+memory; it does not change the retired writer's custody contract or store a new
+credential. Historical approvals below remain attached to their original work.
+
 The current checkout retires the old docs workspace, writer workflows and
 Alchemy Stack entry. The [retention manifest](../documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json)
 preserves exact original sources and dated provider recovery identities.

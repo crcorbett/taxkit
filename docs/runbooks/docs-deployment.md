@@ -26,8 +26,9 @@ GitHub environment settings and deployed websites have not been changed by
 this repository retirement.
 
 `alchemy.apps.run.ts` declares the separate native `TaxKitAppsCloudflare`
-candidate with `TaxKitApi` and `TaxKitWebsite`. Its provider operation belongs
-to DEV-81. Old plan, apply, teardown or rollback authority cannot transfer to it.
+candidate with `TaxKitApi` and `TaxKitWebsite`. Cooper's 7 October active plan
+authorises qualified native Preview and Production deployment from this Mac.
+Old plan, apply, teardown or rollback authority cannot transfer to it.
 
 Its `prod` candidate additionally declares the retained existing `taxkit.dev`
 zone and retained DNS settings, with `taxkit.dev`, `www.taxkit.dev` and
@@ -87,6 +88,8 @@ The dated target read is retained at
 `docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json`.
 The local source identity follow-up is recorded at
 `docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json`.
+Native credential, state and namespace preparation is recorded at
+`docs/documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json`.
 
 1. Preserve the exact candidate, native entry, lockfile, dependency patch and
    source-input identities. The native plan projection is version three;
@@ -105,11 +108,26 @@ The local source identity follow-up is recorded at
    redirect with path and query retained. No registrar, DS, nameserver, TLS,
    mail or verification change belongs to this candidate.
 4. Check native Alchemy credential/account selection and repository-scoped
-   Doppler custody separately. A working `cf` profile proves neither. The
+   Doppler custody separately. A working `cf` profile proves neither. An existing
+   TaxKit CLI login may supply native provider credentials only through an
+   explicitly selected scope belonging to the same verified TaxKit repository.
+   Resolve its system-keyring token in memory for native `DOPPLER_TOKEN`, and
+   use `doppler run` with the exact project/config for the Cloudflare pair.
+   Never print, persist, copy to another environment or broaden credentials.
+   This native bridge is distinct from the retired writer's checkout-scope
+   guard. Record its identity, purpose, expiry and readback in the operation
+   receipt. The
    root secret selection remains `taxkit/dev`, `taxkit/stg_preview` or
    `taxkit/prd` by checked stage, with the implicit shell secret source disabled.
    Stop credentialed planning if its credential purpose, account or custody is
    unknown. Do not create or broaden credentials to complete a local check.
+   Omit `--env-file` for the explicit native secret list. The owned namespace
+   configuration supplies `10078` for Production and `10078<PR number>` for
+   Preview. Read every available Worker binding before apply and refuse foreign
+   namespace collisions. Verify native state version and authenticated access
+   before planning; reuse a same-account native state profile only after this
+   readback. Refuse automatic shared-store bootstrap, resume or upgrade outside
+   the operation's named authority.
 5. Under a separately named planning operation, capture the exact native
    beta.80 no-apply plan and its bootstrap/read effects. No live plan has been
    qualified by this slice. Prepare the existing projection command's inputs:

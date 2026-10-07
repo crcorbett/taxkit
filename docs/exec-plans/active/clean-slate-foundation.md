@@ -5323,3 +5323,33 @@ attempts and limitations. This final receipt/plan update changes documentation
 only. Exact native credentials, rate-limit namespace, state, cloud plans,
 deployment receipts, recovery and public readback remain to be qualified for
 Cooper's newly authorised local Preview and Production deployments.
+
+## T007 local native cloud preparation
+
+The existing TaxKit primary-checkout Doppler login supplies the native provider
+bridge in memory, with each environment's own Cloudflare token selected from
+its existing config. No scope, token or secret is changed. Current account-token
+verification and independent cf metadata reads identify the retained Preview
+and Production tokens, both active until 18 November. Both have Worker script,
+observability and Secrets Store write permissions; Production domain/DNS
+permissions remain unqualified. All 46 returned Worker settings were read with
+no active rate-limit binding. The native secret composition therefore selects
+namespace `10078` for Production and `10078<PR number>` for Preview. Actual
+composition tests prove separate Preview values and unchanged development
+selection. Four new cases, infrastructure types/tests and lint pass.
+
+The native Bun client independently reads shared-store version seven and
+authenticated state. Its existing same-account state bearer can be selected
+without bootstrap, upgrade, refresh or credential copying. The native app stack
+has no existing stages. A real diagnostic Preview plan against the changed
+source reports two creates and nine binding changes, with no Production
+resources. It is not an apply-qualified clean-source plan. Corrected attempts
+and limitations are retained in the [dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json).
+
+Docs-maintainer: **Change required** for native config/composition tests,
+infrastructure README, deployment architecture, runbook/authority, plan and
+receipt routing. **Preserve** tax results, deferred metrics, disabled collection,
+old credentials, historical identities and stopped writers. **N/A** for a
+Changeset and generated references: private infrastructure configuration only.
+Whole-checkout qualification and exact clean native plans are next; Preview is
+proved before Production under Cooper's existing deployment approval.

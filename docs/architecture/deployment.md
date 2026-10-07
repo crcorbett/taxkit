@@ -29,7 +29,11 @@ owns that resource declaration. Each host gets its own address from native
 `Worker.URL` and its peer address from the peer's Output. Missing addresses
 remain null during declaration and become checked runtime configuration errors,
 not guessed URLs. Native Stack secrets select the checked stage's Doppler
-configuration and reject `--env-file`.
+configuration and reject `--env-file`. The same composition adds non-secret
+rate namespaces: `10078` for Production and `10078` followed by the checked PR
+number for Preview. Those values override Doppler namespace values while shell
+app values remain disabled. Before apply, read available Worker bindings and
+refuse collisions with foreign namespaces; declaration is not reservation.
 
 The installed beta.80 planner patch fixes circular property resolution before
 walking fresh API/Website Outputs. It preserves cycle rejection when an early
