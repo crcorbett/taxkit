@@ -35,8 +35,8 @@ independent work. Cooper's 7 October direction adds native Preview and Productio
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: finish T007's current operational-owner alignment,
-then T008's accepted analytics work. T006 is locally accepted and ready for
+Next continuation milestone: implement T008's accepted analytics work. T007's
+operational handover is locally accepted and ready for draft review. T006 is locally accepted and ready for
 draft review with its documented five-second modern cancellation limit. All three calculator
 pages have local native/browser proof. T003's connection/containment
 qualification is locally accepted. T002's
@@ -84,7 +84,7 @@ records command outcomes and log digests.
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | Complete locally; draft review outstanding | Six remote and five visible browser tools reuse the checked owners. All nine local checks pass at `72bfa16ac08dacc4c26f3de023a2880baefe1c55`, with both fourteen-case native runs. Draft #162 contains the stage-derived connection guide, deployed and read back on pr-162 and Production with both supported clients. The explicit modern five-second cleanup limit remains; no autonomous model session or prompt cleanup is claimed. |
-| T007 / DEV-78 | In progress; final operational handover checks pending | Native graph/source/secret/state/live-plan preparation is delivered in drafts #159–161; #162 adds source-qualified guide delivery. The current runbook/tool/architecture owners now describe the actual native CLI and readback, with full paged name/settings, DNS/registrar/TLS/certificate reads. No new provider, state or credential mutation. Final handover qualification remains pending. |
+| T007 / DEV-78 | Complete locally; draft review outstanding | Exact native graph/source/secret/state/live plans are delivered in drafts #159–161, with #162 guide delivery. Draft #163 aligns the current native CLI/runbooks/recovery and paged provider reads. Full local verification passes `226c60bddb225467db64e772d48304af2368a216` in 684.12 seconds; all 1,750 frozen identities match, including the fourteen-case built app check. No new provider, state, credential or deployment mutation; rollback and no-op convergence remain unqualified. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Pending T007/T008/T009 | Full review, release/consumer proof and separately authorised delivery. |
@@ -5505,13 +5505,21 @@ pointers, active task/plan and the
 **Preserve** native code, strict policy/fixtures, historical receipts, retained
 tax results, disabled Worker records, separate unqualified RUM and deferred
 metrics. **N/A** for a Changeset, public acceptance/generated content or provider
-mutation: this is documentation-only. Focused and full local verification
-remain pending after eight focused checks pass, including all 273 deployment
-cases. The first runbook check required the exact evidence paths to be rendered;
-that owner correction passes without changing the check. Full verification at
-`86dcf222c666c6f24fe509a070f88cd404cc1ff9` stopped at the existing JSON
-format check; the same formatter corrects the sidecar and its focused checks
-pass. The complete run is being repeated on the corrected clean commit. T007 stays In Progress
-until primary review accepts its named preparation outcomes. Cloud rollback,
-teardown, no-op convergence and overall
-T010 delivery are not claimed.
+mutation: this is documentation-only. Eight focused checks pass, including all
+273 deployment cases. The first runbook check required exact evidence paths to
+be rendered; that correction passes without changing the check. Full verification
+at `86dcf222c666c6f24fe509a070f88cd404cc1ff9` stopped at the existing JSON
+format check; the same formatter corrects the sidecar and its focused checks pass.
+
+Corrected clean source `226c60bddb225467db64e772d48304af2368a216` passes full
+verification in 684.12 seconds. All 1,750 frozen file/link identities match. The
+run includes 34 workflow cases, 26 SDK browser cases, 21 Website browser cases
+and all 14 freshly built native Website/API cases. Primary review accepts T007
+against its named preparation outcomes and affected owners; draft
+[#163](https://github.com/crcorbett/taxkit/pull/163) awaits Cooper review. The
+SPEC now points to the later dated deployment authority, rather than implying
+the original implementation-only boundary remains the latest instruction.
+Four documentation/task/evidence closeout files use focused docs, runbook, path,
+format and diff checks; application and configuration source stay unchanged.
+Cloud rollback, teardown, no-op convergence and overall T010 delivery are not
+claimed. Continue T008; metrics and the Medicare decision remain separate.

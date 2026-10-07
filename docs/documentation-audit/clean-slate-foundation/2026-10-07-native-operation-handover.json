@@ -5,8 +5,8 @@
   "owner": "taxkit-infrastructure-owner",
   "last_reviewed": "2026-10-07",
   "review_trigger": "native command, authority, stage, source, provider readback or recovery change",
-  "status": "Focused handover and format-correction checks pass; complete source-frozen verification pending",
-  "observedAt": "2026-10-07T09:50:05.164149+00:00",
+  "status": "T007 preparation locally accepted; tested native operational handover in draft #163 for Cooper review",
+  "observedAt": "2026-10-07T10:04:32.915901+00:00",
   "baseHead": "778c6b2052c5bc065355146245e697cf52b14374",
   "executionAuthority": {
     "principal": "Cooper",
@@ -196,7 +196,8 @@
       "tools/documentation/runbook-contract.json evidence pointers",
       "docs/product-specs/clean-slate-foundation.tasks.json",
       "docs/exec-plans/active/clean-slate-foundation.md",
-      "this dated receipt"
+      "this dated receipt",
+      "docs/product-specs/clean-slate-foundation.md later authority pointer"
     ],
     "preserve": [
       "All native graph, source/projection runtime, strict policy and fixture logic",
@@ -363,7 +364,52 @@
       "testSummaries": []
     }
   ],
-  "primaryReview": "pending focused and complete verification",
+  "primaryReview": {
+    "reviewer": "Codex primary TaxKit implementation owner",
+    "result": "Accept T007 named preparation outcomes locally; Cooper draft review outstanding",
+    "criteria": [
+      {
+        "criterion": "Exact source/account/stage/resource plans omit Production DNS for Preview",
+        "evidence": [
+          "2026-10-07-native-domains.json",
+          "2026-10-07-native-source-plan.json",
+          "2026-10-07-native-cloud-preparation.json",
+          "2026-10-07-agent-setup-and-cancellation-bounds.json",
+          "Current native graph and source/projection fixture checks; 273 cases pass"
+        ]
+      },
+      {
+        "criterion": "Doppler precedence, separate credential purposes and checked runtime bindings",
+        "evidence": [
+          "Existing secret boundary/code and checked admission fixtures are unchanged",
+          "Prior exact-source local nine-check and actual cloud binding reads",
+          "Existing Production/Preview credentials remain independently readable with matching identity/expiry; existing state stays version seven"
+        ]
+      },
+      {
+        "criterion": "Concrete authority precedes apply; domain/DNS/TLS/registrar readback stays separate",
+        "evidence": [
+          "Cooper local Preview/Production authority and exact Production token grant approval retained in the cloud receipt",
+          "Current handover includes paged names and settings, DNS and certificate next-page checks, DNSSEC/TLS/registrar observations",
+          "Future namespace pre-read required; no retroactive pr-162 pre-read claim"
+        ]
+      },
+      {
+        "criterion": "Required focused and full checks and affected owners are complete",
+        "evidence": [
+          "Eight focused handover checks pass, including 273 deployment cases",
+          "Full verification passes source 226c60bddb225467db64e772d48304af2368a216 in 684.12 seconds: 34 workflow, 26 SDK browser, 21 Website browser and 14 native pair cases",
+          "All 1750 frozen file/link identities match; earlier failed runbook/format attempts retained",
+          "Current runbooks, recovery, authority, infra/tool/architecture pointers, exact sidecar paths and task/plan are aligned"
+        ]
+      }
+    ],
+    "contractLimits": [
+      "Named preparation task is accepted; no executed rollback, destroy or no-op convergence requirement was silently claimed",
+      "No new provider, credential or app deployment in this handover",
+      "Metrics remain deferred; unrelated RUM and Medicare choices stay explicit"
+    ]
+  },
   "failedAttempt": {
     "scope": "Runbook evidence pointers",
     "observed": "The runbook check requires exact repository-relative evidence paths, not only relative Markdown links",
@@ -469,5 +515,133 @@
       "bytesRead": 0,
       "testSummaries": []
     }
-  ]
+  ],
+  "candidateCommit": "226c60bddb225467db64e772d48304af2368a216",
+  "candidateTree": "6cbc7a2ec1e4036e6ca1eff94c13a22d6979720b",
+  "pullRequest": "https://github.com/crcorbett/taxkit/pull/163",
+  "localQualification": {
+    "observedAt": "2026-10-07T10:02:48.916218+00:00",
+    "candidateCommit": "226c60bddb225467db64e772d48304af2368a216",
+    "tree": "6cbc7a2ec1e4036e6ca1eff94c13a22d6979720b",
+    "trackedCount": 1750,
+    "trackedBytesUnchanged": true,
+    "gitStatusClean": true,
+    "freezeSha256": "13f04cba2c9cb1aebea7ade182387ba5350697d878ea712bea48670a35ad15e8",
+    "checks": [
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 684.12,
+        "log": "dev78-handover-whole-b-verification.log",
+        "logSha256": "d47fb738e77cc7ffb0194d40ea10cbaf0670d7db64d9444a77a2a2acd3f62954",
+        "bytesRead": 550210,
+        "testSummaries": [
+          "//:test:docs-deployment:task:  Test Files  22 passed (22)",
+          "//:test:docs-deployment:task:       Tests  273 passed (273)",
+          "//:test:docs-deployment:task:    Duration  9.42s (tests 77%, import 20%, transform 2%)",
+          "//:test:skills:task:  Test Files  1 passed (1)",
+          "//:test:skills:task:       Tests  21 passed (21)",
+          "//:test:skills:task:    Duration  118ms (import 56%, tests 24%, transform 18%, worker 2%)",
+          " Test Files  3 passed (3)",
+          "      Tests  16 passed (16)",
+          "   Duration  640ms (tests 68%, import 25%, transform 6%, worker 1%)",
+          "//:test:quality-workflow:task:  Test Files  2 passed (2)",
+          "//:test:quality-workflow:task:       Tests  34 passed (34)",
+          "//:test:quality-workflow:task:    Duration  515.03s (tests 100%)",
+          "@taxkit/sdk:test:browser:  Test Files  4 passed (4)",
+          "@taxkit/sdk:test:browser:       Tests  26 passed (26)",
+          "@taxkit/sdk:test:browser:    Duration  1.65s (import 76%, worker 20%, tests 3%)",
+          "web:test:browser:  Test Files  3 passed (3)",
+          "web:test:browser:       Tests  21 passed (21)",
+          "web:test:browser:    Duration  4.90s (tests 73%, import 21%, worker 6%)",
+          "web test:native-pair:  Test Files  9 passed (9)",
+          "web test:native-pair:       Tests  14 passed (14)",
+          "web test:native-pair:    Duration  116.14s (tests 97%, import 3%)"
+        ]
+      }
+    ],
+    "allWholeLogBytesRead": true,
+    "newProviderApplyClaim": false
+  },
+  "documentationOnlyCloseout": {
+    "paths": [
+      "docs/product-specs/clean-slate-foundation.md",
+      "docs/product-specs/clean-slate-foundation.tasks.json",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-operation-handover.json"
+    ],
+    "allOther1746FrozenIdentitiesUnchanged": true,
+    "focusedChecks": [
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.43,
+        "log": "dev78-handover-closeout-a-docs.log",
+        "sha256": "6bd36ef9c1be42823e3f4f26d54c816fb3bb4b59319f282f2c9dbf70030c1bdc",
+        "bytesRead": 819
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.14,
+        "log": "dev78-handover-closeout-a-runbooks.log",
+        "sha256": "00b226ac9b77f634d15698f302c07f16edc769fb7669f812356967cff1c144ad",
+        "bytesRead": 839
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.25,
+        "log": "dev78-handover-closeout-a-paths.log",
+        "sha256": "420d56c2e3f988bd2f2c333b8754d373b164e24f6ef5a11652c1a2980be1da01",
+        "bytesRead": 565
+      },
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.61,
+        "log": "dev78-handover-closeout-a-format.log",
+        "sha256": "d0bc0be11a87da977e8b40514aac6c0ffd59490db8a20b078e06f4ecd2d94f3f",
+        "bytesRead": 630
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.02,
+        "log": "dev78-handover-closeout-a-diff.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytesRead": 0
+      }
+    ]
+  }
 }

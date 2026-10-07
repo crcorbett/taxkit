@@ -655,7 +655,7 @@
     {
       "id": "CSF-T007",
       "title": "Prepare DNS, domain and secret provider plans",
-      "status": "in_progress",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [

@@ -14,8 +14,14 @@ Cooper explicitly requested implementation on 4 October 2026, superseding the
 prior whole-design Q14 admission hold. Q1–Q13 remain settled. The
 [sibling tasks](./clean-slate-foundation.tasks.json) and
 [active plan](../exec-plans/active/clean-slate-foundation.md) track actual progress.
-This authority includes reviewable commits and draft PRs, but no merge, deploy,
-publication or provider apply. Final provider-plan approval remains separate.
+The original implementation authority includes reviewable commits and draft
+PRs. Cooper subsequently authorised native TaxKit Preview and Production
+deployments from this Mac on 7 October after exact source, plans, credentials,
+recovery and readback are qualified, and separately approved the existing
+Production token permission change. The active plan and dated delivery receipts
+record those operations. Merge, publication, credential creation and unrelated
+provider changes remain outside that authority; new provider operations need
+their concrete approval boundary.
 
 ## Agreed direction
 
