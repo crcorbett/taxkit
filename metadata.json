@@ -1,0 +1,27 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4B8Y00R5QE9K8A36BMJSBAJ",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-79-retained-posthog-projects",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/documentation-audit/clean-slate-foundation/2026-10-08-retained-posthog-projects.json",
+    "docs/exec-plans/active/clean-slate-foundation.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 9278,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 706816,
+    "output_tokens": 3241,
+    "api_call_count": 4
+  }
+}
