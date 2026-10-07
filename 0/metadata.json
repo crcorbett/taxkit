@@ -1,0 +1,60 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4A58440QXGSD838ZN6JHMTW",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T03:07:09.484176Z",
+  "branch": "codex/dev-77-browser-tools",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "apps/web/README.md",
+    "apps/web/src/lib/browser-tools.atoms.ts",
+    "apps/web/src/lib/browser-tools.boundary.test.ts",
+    "apps/web/src/lib/browser-tools.boundary.ts",
+    "apps/web/src/lib/browser-tools.schemas.ts",
+    "apps/web/src/lib/browser-tools.toolkit.ts",
+    "apps/web/src/lib/calculator-page.container.tsx",
+    "apps/web/src/lib/calculator.atoms.ts",
+    "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+    "apps/web/src/lib/schemas.ts",
+    "apps/web/src/lib/take-home.container.tsx",
+    "apps/web/src/routes/__root.tsx",
+    "apps/web/src/routes/calculators.$calculatorId.tsx",
+    "apps/web/test/native-browser-tools.boundary.test.ts",
+    "apps/web/vitest.native.config.ts",
+    "docs/architecture/frontend.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/documentation-audit/README.md",
+    "docs/standards/tooling.md",
+    "oxlint.config.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "5bde412b8bc2",
+  "checkpoint_transcript_start": 57360,
+  "transcript_lines_at_start": 57360,
+  "compact_transcript_start": 6833,
+  "token_usage": {
+    "input_tokens": 889782,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 49861248,
+    "output_tokens": 229900,
+    "api_call_count": 341
+  },
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T03:07:05.915343Z",
+    "agent_lines": 1887,
+    "agent_removed": 218,
+    "human_added": 1447,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 3334,
+    "total_lines_changed": 3572,
+    "agent_percentage": 58.93057110862262,
+    "metric_version": 2
+  }
+}
