@@ -9,6 +9,13 @@ review_trigger: API or SDK contracts, exports, lifetime or caller composition ch
 
 # API and SDK
 
+The active T008 candidate adds minimal analytics only in the native API app.
+Its checked collection header carries allow/deny without browser identity and
+cannot bypass normal calculator admission. One app decorator collects catalogue
+ID/name after success. Pure calculators and SDK package calls remain free of
+analytics. The [API README](../../apps/api/README.md#analytics-candidate) owns
+the current bounded collector, background delivery design and remaining proof.
+
 TaxKit should publish a reusable API app server and TypeScript SDK around the
 open-source calculation engine.
 

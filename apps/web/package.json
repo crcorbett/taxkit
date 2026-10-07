@@ -41,6 +41,7 @@
     "@effect/vitest": "catalog:",
     "@modelcontextprotocol/client": "2.3.1",
     "@takumi-rs/wasm": "2.14.0",
+    "@taxkit/analytics": "workspace:*",
     "@taxkit/calculators": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

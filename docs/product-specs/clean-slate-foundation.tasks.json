@@ -720,7 +720,7 @@
     {
       "id": "CSF-T008",
       "title": "Implement minimal PostHog traffic and calculator analytics",
-      "status": "pending",
+      "status": "in_progress",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [

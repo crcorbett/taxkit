@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",
+    "@effect/platform-node": "catalog:",
+    "@taxkit/analytics": "workspace:*",
     "@taxkit/api-http": "workspace:*",
     "@taxkit/api-rpc": "workspace:*",
     "@taxkit/calculators": "workspace:*",

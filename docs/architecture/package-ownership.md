@@ -25,6 +25,7 @@ Current implemented code lives in:
 - `packages/core`
 - `packages/calculators`
 - `packages/content`
+- `packages/analytics`
 - `packages/docs-content`
 - `packages/docs-examples`
 - `packages/docs-fumadocs`
@@ -184,6 +185,16 @@ T009 exported tracing and provider/deployment proof remain open.
   derive the four discovery documents from the same catalogue and deferred
   checked stage settings. Shared public-origin policy and distinct Website
   identity live in its Schema owner; RPC retains a distinct API identity.
+
+`packages/analytics`
+: Private compiled owner of checked page/calculator events, collection policy,
+  settings, safe errors and named browser/backend service contracts. Its native
+  backend capture Layer has one bounded HTTP attempt. The application owns
+  execution, best-effort delivery and successful-use placement; the Website
+  owns its private browser SDK and relay; infrastructure owns retained provider
+  projects. Calculators, rules and the local SDK have no analytics dependency.
+  T008 application and provider qualification remain in progress; package tests
+  alone do not prove browser privacy or ingestion.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs

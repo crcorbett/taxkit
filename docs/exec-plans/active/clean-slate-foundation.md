@@ -35,7 +35,9 @@ independent work. Cooper's 7 October direction adds native Preview and Productio
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: implement T008's accepted analytics work. T007's
+Next continuation milestone: continue T008's accepted analytics work. The private
+backend and API collection owner have focused local proof; Website/browser,
+relay and retained provider resources remain. T007's
 operational handover is locally accepted and ready for draft review. T006 is locally accepted and ready for
 draft review with its documented five-second modern cancellation limit. All three calculator
 pages have local native/browser proof. T003's connection/containment
@@ -85,7 +87,7 @@ records command outcomes and log digests.
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | Complete locally; draft review outstanding | Six remote and five visible browser tools reuse the checked owners. All nine local checks pass at `72bfa16ac08dacc4c26f3de023a2880baefe1c55`, with both fourteen-case native runs. Draft #162 contains the stage-derived connection guide, deployed and read back on pr-162 and Production with both supported clients. The explicit modern five-second cleanup limit remains; no autonomous model session or prompt cleanup is claimed. |
 | T007 / DEV-78 | Complete locally; draft review outstanding | Exact native graph/source/secret/state/live plans are delivered in drafts #159–161, with #162 guide delivery. Draft #163 aligns the current native CLI/runbooks/recovery and paged provider reads. Full local verification passes `226c60bddb225467db64e772d48304af2368a216` in 684.12 seconds; all 1,750 frozen identities match, including the fourteen-case built app check. No new provider, state, credential or deployment mutation; rollback and no-op convergence remain unqualified. |
-| T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
+| T008 / DEV-79 | In progress | Backend/request policy candidate; Website/browser, relay and provider proof remain. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Pending T007/T008/T009 | Full review, release/consumer proof and separately authorised delivery. |
 
@@ -5523,3 +5525,53 @@ Four documentation/task/evidence closeout files use focused docs, runbook, path,
 format and diff checks; application and configuration source stay unchanged.
 Cloud rollback, teardown, no-op convergence and overall T010 delivery are not
 claimed. Continue T008; metrics and the Medicare decision remain separate.
+
+
+## T008 backend and request collection candidate
+
+Continue from draft #163 at `d9cadb664291b327cf3e3cb624d40c511d78a384` on
+`codex/dev-79-analytics-policy-and-capture`. The new private compiled
+`packages/analytics` uses the canonical renderer with an explicit TaxKit stable
+configuration adaptation. Catalogue-owned identities, checked settings and safe
+errors separate deliberate off from invalid enabled configuration. Backend
+capture has one scoped HTTP attempt and one complete five-second deadline,
+64 KiB reply bound, omitted credentials, disabled tracing and manual redirect
+policy. It sends only the agreed catalogue ID/name and required event/operational
+identity; transport success is not stored-event proof.
+
+The API adds one successful-use decorator and one fresh collector per request,
+capped at 64 successes. Denied/malformed collection policy or DNT does not
+change calculation admission. The application captures its delivery service
+during initialisation and supplies it to returned request operations; Worker
+and older session `waitUntil` own best-effort sends. Registration omits the
+collector so an agent conversation cannot retain its first collection choice.
+Pure tax packages, local SDK calculations and the standalone local Bun host
+have no analytics send.
+
+Focused package/API tests and actual-path lint fixtures pass. The actual native
+Fetch proof covers HTTP and RPC plus both official MCP client protocols with
+deny → allow → deny in one conversation, one allowed event, no duplicate and
+unchanged tax replies. Controlled failures/redirects remain best-effort; stalled
+upstream data ends the app send at about five seconds while the tax reply returns
+within two seconds. The controlled Node response bridge does not expose body
+cancellation; that is a retained limitation. Full frozen-source verification
+remains pending at the [dated candidate receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json).
+
+Docs-maintainer: **Change required** for the new package and app READMEs,
+package/Effect/API architecture, exact lint admission and rejection fixtures (including the existing
+TaggedError class-factory exception with the replacement constructor check),
+active task/plan and receipt. **Preserve** retained tax results, published
+interfaces, accepted public content, canonical skills, existing provider state,
+five inspect-only runbook procedures and deferred metrics. **N/A** for a
+Changeset: this private package/app candidate does not alter the published
+tax/SDK closure. No provider, credential, deployment, merge or publication
+operation occurs.
+
+T008 remains in progress for the private browser SDK/lifetime/allowlist, relay,
+Website opt-out forwarding, actual browser privacy journeys, retained provider
+projects and corresponding public/operational owners. Registry archive research
+uses PostHog browser 1.438.2 and Distilled PostHog 1.0.0-rc.13; neither SDK is
+installed by this checkpoint. Read-only preparation does not establish the
+Cooper organisation region or complete paged absence before a project create.
+No existing foreign project token is borrowed. Continue these independent
+local parts; metrics and the Medicare decision remain separate.

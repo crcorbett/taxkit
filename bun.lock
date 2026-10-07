@@ -37,6 +37,8 @@
       "name": "api",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
+        "@effect/platform-node": "catalog:",
+        "@taxkit/analytics": "workspace:*",
         "@taxkit/api-http": "workspace:*",
         "@taxkit/api-rpc": "workspace:*",
         "@taxkit/calculators": "workspace:*",
@@ -84,6 +86,7 @@
         "@effect/vitest": "catalog:",
         "@modelcontextprotocol/client": "2.3.1",
         "@takumi-rs/wasm": "2.14.0",
+        "@taxkit/analytics": "workspace:*",
         "@taxkit/calculators": "workspace:*",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
@@ -100,6 +103,21 @@
         "vitest": "catalog:",
         "webmcp-types": "0.1.10",
         "wrangler": "catalog:",
+      },
+    },
+    "packages/analytics": {
+      "name": "@taxkit/analytics",
+      "version": "0.1.0",
+      "dependencies": {
+        "@taxkit/calculators": "workspace:*",
+        "@taxkit/content": "workspace:*",
+        "effect": "catalog:",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
       },
     },
     "packages/api/http": {
@@ -1079,6 +1097,8 @@
     "@tanstack/store": ["@tanstack/store@0.11.2", "", {}, "sha512-sJ4mjol8uQsHV0gOJzzjwXfh2Fwm+Sz0+8deqiTm4jGbMdjzNSW+xZCFm0kUa870uhd8yi+DpKnZb5Kc4apa0Q=="],
 
     "@tanstack/virtual-file-routes": ["@tanstack/virtual-file-routes@1.162.0", "", {}, "sha512-uhOeFyxLcU41HzvrxsGpiWdcMbScY1EDgbZ5K7DVRMYInbLYWAC0EA/kx9wXAoSM8q82bUG2hRl8+EAjE6XAbA=="],
+
+    "@taxkit/analytics": ["@taxkit/analytics@workspace:packages/analytics"],
 
     "@taxkit/api-http": ["@taxkit/api-http@workspace:packages/api/http"],
 

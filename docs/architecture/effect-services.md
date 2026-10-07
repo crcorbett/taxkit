@@ -17,6 +17,17 @@ shape for deterministic tax calculation boundaries.
 This doc owns cross-package Effect service conventions. Rule-specific service
 contracts live with their owning rule packages and should link back here.
 
+The private [analytics package](../../packages/analytics/README.md) owns the
+two accepted event contracts. Its native backend Layer encodes a fixed provider
+request and maps transport failures to safe errors. The exact encoder admission
+in `oxlint.config.ts` covers that provider egress and its safe error-byte test;
+it does not admit runtime execution, raw JSON or decoding in neighbouring code.
+The application owns when to capture and which checked collection policy applies.
+The API application captures its delivery service during initialisation, then
+supplies it to each returned request operation. Worker and older MCP session
+delivery use their own native `waitUntil`; request collection remains fresh.
+T008 Website/browser composition and provider readback remain pending.
+
 ## Service shape
 
 Prefer package-owned `Context.Service` services with explicit dependencies through

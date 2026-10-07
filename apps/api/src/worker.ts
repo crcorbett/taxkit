@@ -1,3 +1,6 @@
+import { NodeCrypto } from "@effect/platform-node";
+import { AnalyticsSettingsConfig } from "@taxkit/analytics/config";
+import { BackendAnalyticsLive } from "@taxkit/analytics/live";
 import { PublicCalculatorServiceRateLimited } from "@taxkit/calculators/admission.layer";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
@@ -5,8 +8,11 @@ import { CalculationEngineLive } from "@taxkit/core";
 import { RateLimitBinding, Worker } from "alchemy/Cloudflare/Workers";
 import type { InferEnv } from "alchemy/Cloudflare/Workers";
 import type { HttpEffect } from "alchemy/Http";
-import { Effect, Layer } from "effect";
+import { Config, ConfigProvider, Effect, Layer } from "effect";
+import { FetchHttpClient } from "effect/http";
 
+import { ApiCalculatorDeliveryLive } from "./analytics-request.boundary.js";
+import { ApiCalculatorAnalyticsLive } from "./calculator-analytics.layer.js";
 import { ApiContentLive } from "./content.boundary.js";
 import { McpSessionHostLive } from "./mcp-session.layer.js";
 import { ApiCalculatorAdmission } from "./worker-admission.layer.js";
@@ -30,13 +36,39 @@ export const ApiWorkerObservability = {
 
 const ApiWorkerServicesLive = Layer.merge(
   ApiContentLive,
-  PublicCalculatorServiceBounded.pipe(
+  ApiCalculatorAnalyticsLive.pipe(
     Layer.provide(
-      PublicCalculatorServiceRateLimited.pipe(
-        Layer.provide(PublicCalculatorServiceLive)
+      PublicCalculatorServiceBounded.pipe(
+        Layer.provide(
+          PublicCalculatorServiceRateLimited.pipe(
+            Layer.provide(PublicCalculatorServiceLive)
+          )
+        ),
+        Layer.provide(CalculationEngineLive)
       )
-    ),
-    Layer.provide(CalculationEngineLive)
+    )
+  )
+);
+
+const ApiAnalyticsLive = ApiCalculatorDeliveryLive.pipe(
+  Layer.provide(
+    Layer.unwrap(
+      AnalyticsSettingsConfig.pipe(
+        Effect.mapError(
+          () =>
+            new Config.ConfigError(
+              new ConfigProvider.SourceError({
+                message:
+                  "PostHog analytics configuration is missing or invalid.",
+              })
+            )
+        ),
+        Effect.map(BackendAnalyticsLive)
+      )
+    ).pipe(
+      Layer.provide(FetchHttpClient.layer),
+      Layer.provide(NodeCrypto.layer)
+    )
   )
 );
 
@@ -48,6 +80,7 @@ export const ApiWorkerNativeInit = ApiWorkerApplication.pipe(
   Effect.provide(
     McpSessionHostLive.pipe(Layer.provideMerge(ApiWorkerServicesLive))
   ),
+  Effect.provide(ApiAnalyticsLive),
   Effect.provide(ApiCalculatorAdmission.pipe(Layer.provide(RateLimitBinding)))
 );
 

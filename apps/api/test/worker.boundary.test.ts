@@ -462,7 +462,7 @@ describe("native API application", () => {
         Headers.get(matching.headers, "access-control-allow-headers").pipe(
           Option.getOrUndefined
         )
-      ).toBe("content-type");
+      ).toBe("content-type,x-taxkit-collection-policy");
       expect(
         Headers.get(matching.headers, "access-control-allow-credentials").pipe(
           Option.getOrUndefined

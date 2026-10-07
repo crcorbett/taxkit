@@ -31,6 +31,11 @@ import {
 } from "effect/http";
 import { NetAddress } from "effect/net";
 
+import {
+  ApiCalculatorDelivery,
+  withCalculatorAnalytics,
+} from "./analytics-request.boundary.js";
+import { ApiCalculatorEvents } from "./calculator-analytics.layer.js";
 import { McpRequestAbortSignal } from "./mcp-request.service.js";
 import { withBoundedMcpReply } from "./mcp-response.boundary.js";
 import {
@@ -62,6 +67,7 @@ const SessionRateHeader = "x-taxkit-mcp-calculator-key";
 export const McpSessionHostLive = Layer.effect(
   McpSessionHost,
   Effect.gen(function* () {
+    const analytics = yield* ApiCalculatorDelivery;
     const settings = yield* Effect.cached(ApiWorkerSettingsConfig);
     const telemetry = yield* Layer.build(ApiSafeTelemetryLive);
     const calculator = Layer.succeed(
@@ -112,6 +118,7 @@ export const McpSessionHostLive = Layer.effect(
                 Effect.updateContext(
                   (context: Context.Context<RuntimeContext>) =>
                     Context.omit(
+                      ApiCalculatorEvents,
                       CalculatorRequestRateKey,
                       McpRequestAbortSignal,
                       HttpServerRequest.HttpServerRequest
@@ -236,7 +243,10 @@ export const McpSessionHostLive = Layer.effect(
                     Schema.decodeUnknownOption(CalculatorClientRateKey)
                   )
                 );
-                return yield* withBoundedMcpReply(active.handler).pipe(
+                return yield* withCalculatorAnalytics(
+                  withBoundedMcpReply(active.handler)
+                ).pipe(
+                  Effect.provideService(ApiCalculatorDelivery, analytics),
                   Effect.provideService(CalculatorRequestRateKey, key),
                   Effect.provideService(
                     McpRequestAbortSignal,

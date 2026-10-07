@@ -14,6 +14,10 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact optional analytics collection header; no identity or admission change.
+  "apps/api/src/analytics-request.boundary.ts",
+  // Exact synthetic analytics representation fixture; no runtime or encoder.
+  "packages/analytics/src/__testing__/fixtures.ts",
   // Actual installed provider request bytes at the mocked network boundary.
   // No provider, credential, profile or runtime-execution permission.
   "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
@@ -125,6 +129,7 @@ const decodingBoundaryFiles = [
   // Native built request egress and standalone HTTP body tests decode only
   // actual representation responses; service internals remain excluded.
   "apps/web/test/native-pair.boundary.test.ts",
+  "apps/web/test/native-analytics.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
   "packages/api/http/__tests__/request-body.boundary.test.ts",
   "packages/api/http/__tests__/public-content.boundary.test.ts",
@@ -248,6 +253,10 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Exact native PostHog capture request and safe configuration error bytes.
+  // No decoder, runtime runner, raw JSON or neighbouring-file permission.
+  "packages/analytics/src/live.layer.ts",
+  "packages/analytics/test/schemas.test.ts",
   // Mock Cloudflare HTTP reply egress for the actual installed provider tests.
   "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
   // Exact fixed browser-tool failure response at the native callback.
@@ -281,6 +290,7 @@ const schemaEncoderEgressFiles = [
   "apps/web/test/native-rpc-failures.boundary.test.ts",
   "apps/web/test/native-cancellation.boundary.test.ts",
   "apps/web/test/native-settings-failure.boundary.test.ts",
+  "apps/web/test/native-analytics.boundary.test.ts",
   "apps/web/test/native-pair.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
   // Test-only native request/reply bytes; no production encoder admission.
@@ -527,11 +537,30 @@ export default defineConfig({
   ],
   overrides: [
     {
+      // The analytics owners use native HttpClient. A decoder/encoder permission
+      // does not admit bare browser or server fetch in these new files.
+      files: [
+        "packages/analytics/src/**/*.ts",
+        "apps/api/src/analytics-request.boundary.ts",
+        "apps/api/src/calculator-analytics.layer.ts",
+      ],
+      rules: {
+        "no-restricted-globals": [
+          "error",
+          {
+            message: "Use the application-owned native Effect HttpClient.",
+            name: "fetch",
+          },
+        ],
+      },
+    },
+    {
       files: [
         "apps/api/src/config.ts",
         // Schema.TaggedError is a class factory, not an Error constructor.
         "apps/api/test/mcp-client.boundary.test.ts",
         "apps/web/test/native-mcp.boundary.test.ts",
+        "apps/web/test/native-analytics.boundary.test.ts",
         "apps/web/scripts/docs-images.build.ts",
         "packages/api/rpc/src/live.layer.ts",
         "packages/api/rpc/src/content.live.layer.ts",

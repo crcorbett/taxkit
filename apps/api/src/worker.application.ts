@@ -38,6 +38,12 @@ import {
   HttpServerResponse,
 } from "effect/http";
 
+import {
+  ApiCalculatorDelivery,
+  CollectionPolicyHeader,
+  withCalculatorAnalytics,
+} from "./analytics-request.boundary.js";
+import { ApiCalculatorEvents } from "./calculator-analytics.layer.js";
 import { McpRequestAbortSignal } from "./mcp-request.service.js";
 import { withBoundedMcpReply } from "./mcp-response.boundary.js";
 import { McpSessionHost } from "./mcp-session.layer.js";
@@ -49,6 +55,7 @@ import { ApiWorkerSettingsConfig } from "./worker.config.js";
 // Construct once in the native instance scope. Both transports receive this
 // same application service; native requests keep their own scope and fibre.
 export const ApiWorkerApplication = Effect.gen(function* () {
+  const analytics = yield* ApiCalculatorDelivery;
   // Native planning binds deferred resource addresses. Read their runtime
   // values once on first incoming use, without inventing planning URLs.
   const settings = yield* Effect.cached(ApiWorkerSettingsConfig);
@@ -129,6 +136,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       Scope.provide(instanceScope),
       Effect.updateContext((context: Context.Context<never>) =>
         Context.omit(
+          ApiCalculatorEvents,
           CalculatorRequestRateKey,
           McpRequestAbortSignal,
           HttpServerRequest.HttpServerRequest
@@ -174,17 +182,21 @@ export const ApiWorkerApplication = Effect.gen(function* () {
             )
           )
         : handler;
-      return yield* withApiRequestBodyLimit(selected).pipe(
+      return yield* withCalculatorAnalytics(
+        withApiRequestBodyLimit(selected)
+      ).pipe(
+        Effect.provideService(ApiCalculatorDelivery, analytics),
         HttpMiddleware.cors({
           allowedHeaders: isMcp
             ? [
+                CollectionPolicyHeader,
                 "content-type",
                 "mcp-method",
                 "mcp-name",
                 "mcp-protocol-version",
                 "mcp-session-id",
               ]
-            : ["content-type"],
+            : ["content-type", CollectionPolicyHeader],
           allowedMethods: ["GET", "POST", "OPTIONS"],
           // The native predicate checks the actual request origin.
           allowedOrigins: (origin) => origin === config.websiteOrigin.origin,

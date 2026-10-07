@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "kind": "effect-service",
+  "packageName": "@taxkit/analytics",
+  "domainPackage": null,
+  "sourceCondition": "source",
+  "versionSnapshot": {
+    "resolvedAt": "2026-10-07",
+    "sha256": "263bd13f098099137c1ea2cd204e2920a41c5a8ddc22dba49724d9285aa80a12"
+  },
+  "officialSources": {
+    "effect": "https://registry.npmjs.org/effect/4.0.0",
+    "vitest": "https://registry.npmjs.org/vitest/5.0.3",
+    "typescript": "https://registry.npmjs.org/typescript/7.0.2"
+  },
+  "selectedVersions": {
+    "effect": "4.0.0",
+    "@effect/vitest": "4.0.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  },
+  "compatibilityDecisions": [
+    {
+      "status": "qualified",
+      "decision": "Reuse TaxKit T002 stable Effect 4.0.0 dependency qualification and installed types; rendered source is a scaffold and needs real TaxKit type/lint/tests before acceptance"
+    },
+    {
+      "status": "qualified",
+      "decision": "Adapt the renderer to the existing TaxKit root tsconfig, source export condition and catalogue dependencies. The exact adapted package passes its installed Effect 4.0.0 type check, build and 31 contract tests; this is focused package compatibility, not complete T008 app, browser or provider acceptance."
+    }
+  ],
+  "configDigests": {
+    "package.json": "59015f3c3f6e4c18c6cffce7b374b72eb0f201d685aa31ef07fc9940f3a64e2f",
+    "tsconfig.json": "89330beddb9118c14591ce205a7be8d39d42264daa40a589966d92ffdb770938",
+    "tsconfig.build.json": "044f58d619deef8e2416a1fce0a3418879aac27f2aa5d70b245a4c774acac230",
+    "vitest.config.ts": "c81a2a24fc321eaa98816ca4b8e42bd601c6406b7bd48d3e8a5bd450dcc2faeb"
+  },
+  "limitations": [
+    "Structural rendering does not prove installed dependency, declaration, runtime, or packed-consumer behavior.",
+    "Scaffold config digests retain renderer provenance; configDigests identify the adapted TaxKit configuration. Native app, browser SDK, relay and provider qualification remain separate."
+  ],
+  "nonClaims": ["Selected versions are not claimed to remain latest."],
+  "scaffoldConfigDigests": {
+    "package.json": "1ee730f376aa3675eee314d99c24564d3dfaec5215387106cb46981dbafbf4ca",
+    "tsconfig.json": "71596163cd8ffea16eb4950049bc772ec8a8e2db408759c80bc8232aa40a6d99",
+    "tsconfig.build.json": "320b70b4115224df6a42038a8759a444d0feecabb0666c22a519904a1e9b9de9",
+    "vitest.config.ts": "8167d20931f3f88793a6253697dad0c2dc7a519ca7d4ec8aea6c2ffc9f1448b7"
+  }
+}

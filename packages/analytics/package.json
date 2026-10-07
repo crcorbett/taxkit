@@ -1,0 +1,85 @@
+{
+  "name": "@taxkit/analytics",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./schemas": {
+      "source": "./src/schemas.ts",
+      "types": "./dist/schemas.d.ts",
+      "default": "./dist/schemas.js"
+    },
+    "./errors": {
+      "source": "./src/errors.ts",
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
+    },
+    "./service": {
+      "source": "./src/service.ts",
+      "types": "./dist/service.d.ts",
+      "default": "./dist/service.js"
+    },
+    "./live": {
+      "source": "./src/live.layer.ts",
+      "types": "./dist/live.layer.d.ts",
+      "default": "./dist/live.layer.js"
+    },
+    "./test": {
+      "source": "./src/test.layer.ts",
+      "types": "./dist/test.layer.d.ts",
+      "default": "./dist/test.layer.js"
+    },
+    "./testing/fixtures": {
+      "source": "./src/__testing__/fixtures.ts",
+      "types": "./dist/__testing__/fixtures.d.ts",
+      "default": "./dist/__testing__/fixtures.js"
+    },
+    "./testing/observations": {
+      "source": "./src/__testing__/observations.ts",
+      "types": "./dist/__testing__/observations.d.ts",
+      "default": "./dist/__testing__/observations.js"
+    },
+    "./config": {
+      "source": "./src/config.ts",
+      "types": "./dist/config.d.ts",
+      "default": "./dist/config.js"
+    }
+  },
+  "publishConfig": {
+    "exports": {
+      "./schemas": {
+        "types": "./dist/schemas.d.ts",
+        "default": "./dist/schemas.js"
+      },
+      "./errors": {
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.js"
+      },
+      "./service": {
+        "types": "./dist/service.d.ts",
+        "default": "./dist/service.js"
+      },
+      "./live": {
+        "types": "./dist/live.layer.d.ts",
+        "default": "./dist/live.layer.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "check-types": "tsc --noEmit",
+    "test": "bun --bun vitest run",
+    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@taxkit/calculators": "workspace:*",
+    "@taxkit/content": "workspace:*",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

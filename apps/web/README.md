@@ -105,6 +105,15 @@ across idle time, one exact browser POST, omitted cookies/tracing headers,
 editing, and a calculation without JavaScript. It does not prove deployment,
 provider cancellation or every failure/trace-export path.
 
+The native analytics test uses the freshly built API and a controlled local
+upstream with a synthetic capture token. It covers HTTP, RPC and both official
+MCP client versions, changing collection choice within each conversation,
+refused/redirected capture and a stalled reply. It uses no PostHog provider
+credentials or service. The Website's browser adapter, relay and opt-out
+forwarding remain T008 work in progress; ordinary local/Preview collection
+stays off. See the [API candidate owner](../api/README.md#analytics-candidate)
+and [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json).
+
 The Atom/Scheduler browser checks cover scheduling, StrictMode remount,
 hydration, rapid updates, editing and form unmount cancellation, and expected
 server-error restoration without replaying a calculation. A different restored

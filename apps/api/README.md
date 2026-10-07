@@ -63,7 +63,8 @@ The Worker checks `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` with the
 canonical RPC origin policy. Its own origin comes from native `Worker.URL`;
 the apps stack supplies the matching website resource Output.
 Absent or invalid settings return a fixed native Config error without the
-rejected value. CORS allows the checked website origin and `content-type`,
+rejected value. CORS allows the checked website origin, `content-type` and the
+optional `x-taxkit-collection-policy` header,
 with credentials disabled. Other origins receive no allow-origin header.
 Planning leaves those resource addresses deferred. On first incoming use, the
 app decodes and caches the bound runtime values; missing or invalid values
@@ -84,6 +85,47 @@ and their matching resource bindings. Local plans and transport tests do not
 prove deployment. DEV-74's local acceptance review owns the complete connection
 qualification; T009 retains safe exported tracing. The Bun commands and public contract
 stay available during this work.
+
+## Analytics candidate
+
+`src/calculator-analytics.layer.ts` adds one application owner after a native
+hosted calculation succeeds. It collects only the catalogue calculator ID and
+name. HTTP, native RPC and the two MCP protocols use this same decorator;
+pure tax packages and local SDK calls have no analytics dependency. Metadata,
+failed or interrupted calculations add no successful-use event. A request can
+collect at most 64 successes; excess analytics are dropped without changing
+the calculation. This bounded loss does not promise an exact count under loss.
+
+`src/analytics-request.boundary.ts` reads the optional collection header once.
+Missing means allow; deny, malformed values or `DNT: 1` mean no collection.
+The policy carries no browser identity and changes neither admission nor the
+existing rate key. The native MCP registration omits the request collector;
+the older session host makes a fresh collector for each incoming request.
+
+The native application composes the private
+[analytics backend](../../packages/analytics/README.md). After a completed
+bounded response, native Worker or session `waitUntil` schedules the one-attempt
+send. The send owns its HTTP scope and deadline. Expected capture errors have
+fixed safe diagnostics and do not change the response. Off is the default;
+invalid enabled settings become a fixed native Config error. An in-process
+host has no background delivery. The retained standalone Bun host remains
+local and does not acquire analytics.
+
+T008 is still in progress. Focused tests cover the event owner, request
+isolation, policies and controlled transport. The built native API additionally
+checks real Fetch sends after HTTP and RPC calculations and both official MCP
+client protocols. Each MCP conversation changes deny → allow → deny without
+retaining its first choice. Rejected or redirected capture keeps the tax reply
+successful; a stalled capture reply reaches the native five-second drop while
+the tax reply returns within two seconds. The controlled Node response bridge
+does not expose upstream body cancellation; that is not claimed.
+
+Website opt-out forwarding, browser SDK privacy, retained provider projects and
+stored UUID readback still require their remaining tests and separately
+qualified provider journey. The
+[candidate receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json)
+keeps focused and full-source qualification separate. No analytics provider or
+deployment change is claimed by these source edits.
 
 ## Local native pair
 
