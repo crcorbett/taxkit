@@ -11,8 +11,10 @@ review_trigger: task progress, dependency qualification, acceptance evidence or 
 
 Cooper's 4 October request authorises implementation, reviewable commits and
 draft PRs. It supersedes the old Q14 whole-design admission hold; Q1–Q13 remain
-settled. No merge, deploy, publication or provider mutation is authorised.
-Final provider-plan approval is a separate boundary. The
+settled. Cooper's 7 October direction now authorises native Preview and
+Production deployments from this Mac after exact source, target, credentials,
+plans, recovery and readback are qualified. Merge, publication, unrelated
+provider changes and credential creation remain outside this authority. The
 [SPEC](../../product-specs/clean-slate-foundation.md) and
 [task ledger](../../product-specs/clean-slate-foundation.tasks.json) own scope,
 dependencies and acceptance; this plan owns execution evidence.
@@ -29,8 +31,9 @@ The local continuation also records this objective in the runtime's native goal
 manager. This active plan and the task ledger remain the durable repository
 continuation record.
 Medicare result changes remain gated on Cooper's concrete decision. Continue all
-independent work. No merge, deployment, publication or provider apply authority
-is added. Keep Linear activity, status and evidence aligned with actual results.
+independent work. Cooper's 7 October direction adds native Preview and Production
+deployment authority from this Mac, subject to the qualification above. Keep
+Linear activity, status and evidence aligned with actual results.
 
 Next continuation milestone: finish T006's prompt modern remote cleanup and
 public setup, and T007's native source-bound plan preparation. All three calculator
@@ -80,7 +83,7 @@ records command outcomes and log digests.
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | In progress | Modern remote tools are locally tested in draft #156 with exact-head hosted Quality. Browser tools and both saved-page lifetimes are delivered in draft #157 after all nine local checks and exact-head hosted Quality. Older-session lifetime/cancellation passed the complete source-frozen nine-check graph on the current branch, including all fourteen native cases twice. Draft #158 is pushed at `013e02845e49d78af33aa9ea157075c24b8e0065`; exact-head hosted Quality `37574967845` passed at 05:29 UTC on 7 October. Prompt modern remote cleanup and public setup remain unfinished. |
-| T007 / DEV-78 | In progress; T003/T005 locally complete | Draft #159 contains the qualified Production graph, safe redirect read and native v3 projection. The follow-up calculates source identities in that same command and checks clean/unchanged source and protected outputs. Full follow-up qualification is pending; native bootstrap/provider receipts, scoped custody and live no-apply plans remain unfinished. |
+| T007 / DEV-78 | In progress; T003/T005 locally complete | Draft #159 contains the qualified Production graph, safe redirect read and native v3 projection. Follow-up source `195b20885c4b56e253456585864e80e5c72fd7b7` passed all nine local release checks and actual clean-checkout command probes. Native bootstrap/provider receipts, credentials and live plans remain unfinished. Cooper has authorised qualified Preview and Production deployment from this Mac. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Pending T007/T008/T009 | Full review, release/consumer proof and separately authorised delivery. |
@@ -5278,7 +5281,8 @@ its owning policy, accepted fixture and separate thirty/120-minute refusals.
 No check, permission or cancellation behaviour is removed. Docs-maintainer
 records **Change required** for Quality workflow/policy/tests, testing-and-quality
 architecture and this dated evidence; **Preserve** release operations and
-provider authority. A new exact-head hosted run remains necessary.
+provider authority. Hosted proof remains separate; local qualification follows
+Cooper's direction below while GitHub credits are unavailable.
 
 ### Local execution direction
 
@@ -5291,4 +5295,31 @@ from local/provider proof. This does not upgrade TaxKit's vendored skills or
 selected dependencies. No GitHub rerun or billing change is part of this work.
 The prior #159 cancellation remains the independently observed timeout, separate
 from Cooper's account-availability report. Local execution does not itself
-supply an unspecified deployment target or erase pending secret/state/plan proof.
+supply secret/state/plan proof. Cooper subsequently named both Preview and
+Production as authorised deployment targets from this Mac.
+
+### T007 follow-up local qualification
+
+Committed source `195b20885c4b56e253456585864e80e5c72fd7b7`, tree
+`0af2d5e537747ca3a8f599325272d7af6ff739a6`, passed all nine ordered local release
+checks in 951.84 seconds. All 1,742 recorded tracked file/link identities matched
+before and after; the new receipt is excluded from this comparison. All eighteen
+detail files were read and their digests independently matched. The complete
+deployment suite passed 273 cases, Quality passed 34 cases (including thirteen
+real-checkout cases in 580.10 seconds), and both native application runs passed
+fourteen cases. Focused native/retained checks passed 92 cases; focused Quality
+policy checks passed 21.
+
+The actual clean receiving checkout also passed Preview and Production source
+identity/projection commands using mock plan text. Each captured 770 tracked
+source entries without supplied source hashes, calculated the receiving patch
+digest, and refused a deliberately incorrect configuration digest. These are
+real command checks with mock provider plans; they do not prove a cloud plan.
+Isolated homes stayed empty and no credentials were used.
+
+The [dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json)
+retains complete check outcomes, log/detail digests, source identities, corrected
+attempts and limitations. This final receipt/plan update changes documentation
+only. Exact native credentials, rate-limit namespace, state, cloud plans,
+deployment receipts, recovery and public readback remain to be qualified for
+Cooper's newly authorised local Preview and Production deployments.
