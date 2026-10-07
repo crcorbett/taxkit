@@ -1,0 +1,56 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4BDCZAEXWSKD6VX6Q66X5S1",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T14:48:54.779831Z",
+  "branch": "codex/dev-79-bounded-event-relay",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/web/README.md",
+    "apps/web/src/lib/analytics/relay/errors.ts",
+    "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
+    "apps/web/src/lib/analytics/relay/relay.boundary.test.ts",
+    "apps/web/src/lib/analytics/relay/schemas.ts",
+    "apps/web/src/lib/analytics/relay/service.ts",
+    "apps/web/src/lib/runtime.server.ts",
+    "apps/web/src/server.ts",
+    "apps/web/test/native-relay.boundary.test.ts",
+    "apps/web/vitest.native.config.ts",
+    "docs/architecture/configuration.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/frontend.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "oxlint.config.ts",
+    "tools/oxlint/analytics-boundaries.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "ef48aa238168",
+  "checkpoint_transcript_start": 71755,
+  "transcript_lines_at_start": 71755,
+  "compact_transcript_start": 8474,
+  "token_usage": {
+    "input_tokens": 159263,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 10340864,
+    "output_tokens": 57811,
+    "api_call_count": 64
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T14:48:50.616091Z",
+    "agent_lines": 1415,
+    "agent_removed": 4,
+    "human_added": 400,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1815,
+    "total_lines_changed": 1819,
+    "agent_percentage": 78.00989554700385,
+    "metric_version": 2
+  }
+}

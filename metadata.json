@@ -1,0 +1,42 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4BDCZAEXWSKD6VX6Q66X5S1",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-79-bounded-event-relay",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/web/README.md",
+    "apps/web/src/lib/analytics/relay/errors.ts",
+    "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
+    "apps/web/src/lib/analytics/relay/relay.boundary.test.ts",
+    "apps/web/src/lib/analytics/relay/schemas.ts",
+    "apps/web/src/lib/analytics/relay/service.ts",
+    "apps/web/src/lib/runtime.server.ts",
+    "apps/web/src/server.ts",
+    "apps/web/test/native-relay.boundary.test.ts",
+    "apps/web/vitest.native.config.ts",
+    "docs/architecture/configuration.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/frontend.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "oxlint.config.ts",
+    "tools/oxlint/analytics-boundaries.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 159263,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 10340864,
+    "output_tokens": 57811,
+    "api_call_count": 64
+  }
+}
