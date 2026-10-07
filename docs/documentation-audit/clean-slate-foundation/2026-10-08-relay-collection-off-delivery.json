@@ -1,0 +1,494 @@
+{
+  "documentType": "delivery-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-infrastructure-owner",
+  "observedAt": "2026-10-07T15:44:33.042709+00:00",
+  "task": "CSF-T008",
+  "outcome": "qualified-relay-app-pair-delivered-with-collection-off",
+  "repository": "crcorbett/taxkit",
+  "branch": "codex/dev-79-bounded-event-relay",
+  "draftPullRequest": "https://github.com/crcorbett/taxkit/pull/167",
+  "candidateCommit": "12c723962761de4c2f73d4c84952b7fe54d785b0",
+  "sourceQualificationCommit": "40849c822ae5c49bf5c7be858374c30aa5f1abdc",
+  "principal": "Cooper Corbett",
+  "authorityBasis": "Explicit local Preview and Production deployment grant, preserved in active SPEC/plan",
+  "operation": "Native Alchemy plan and deploy of the locally qualified API/Website with relay and PostHog collection off",
+  "resource": {
+    "stack": "TaxKitAppsCloudflare",
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "zoneId": "15103853342ab9f18f7894b7fae39c39",
+    "stateProfile": "site-ci-env-v1"
+  },
+  "approvalBoundary": "Only qualified API/Website and named peer bindings; existing Production domains/settings refreshed without replacement. No PostHog project/key, metrics, store bootstrap/upgrade, credentials, merge or publication. Review and answer only the exact Apply this plan? prompt; do not use --yes.",
+  "sourceQualification": {
+    "receipt": "2026-10-08-website-event-relay.json",
+    "nineLocalReleaseCommandsPassed": true,
+    "localGraphSeconds": 904.38,
+    "detailDigestsVerified": 18,
+    "nativeCases": 22,
+    "frozenIdentitiesUnchangedAfterBothApplies": 1797,
+    "metadataOnlyQualificationChanges": [
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-08-website-event-relay.json"
+    ],
+    "localOnly": true
+  },
+  "plans": {
+    "pr-167": {
+      "projectionSha256": "1409d4f9c220657019fce94f54adb80603b7546c2573d1e1c8e210e5f17942cb",
+      "sourceIdentitySha256": "afb8e0ed7efa1b368e359b2e6f9452beb3b01da01d3c40f54848847c6cf2ab2b",
+      "logicalResources": [
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi",
+          "resourceType": "Cloudflare.Worker"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite",
+          "resourceType": "Cloudflare.Worker"
+        }
+      ],
+      "bindings": [
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/API_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/CALCULATOR_HOST_MODE"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/CALCULATOR_RATE_LIMIT"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/TaxKitMcpSessions"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitApi/WEBSITE_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite/API_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite/CALCULATOR_HOST_MODE"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite/TAXKIT_API"
+        },
+        {
+          "action": "create",
+          "logicalId": "TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN"
+        }
+      ],
+      "domains": [],
+      "noDeletesOrReplacements": true
+    },
+    "prod": {
+      "projectionSha256": "1b668d23741558f73cadaab6594ddb0e439fc490ac5ac26f549539fcd44dfa2a",
+      "sourceIdentitySha256": "afb8e0ed7efa1b368e359b2e6f9452beb3b01da01d3c40f54848847c6cf2ab2b",
+      "logicalResources": [
+        {
+          "action": "update",
+          "logicalId": "TaxKitApi",
+          "resourceType": "Cloudflare.Worker"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitProductionDnsSettings",
+          "resourceType": "Cloudflare.DNS.ZoneSettings"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitProductionZone",
+          "resourceType": "Cloudflare.Zone.Zone"
+        },
+        {
+          "action": "update",
+          "logicalId": "TaxKitWebsite",
+          "resourceType": "Cloudflare.Worker"
+        }
+      ],
+      "bindings": [
+        {
+          "action": "noop",
+          "logicalId": "TaxKitApi/API_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitApi/CALCULATOR_HOST_MODE"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitApi/CALCULATOR_RATE_LIMIT"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitApi/TaxKitMcpSessions"
+        },
+        {
+          "action": "update",
+          "logicalId": "TaxKitApi/WEBSITE_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "update",
+          "logicalId": "TaxKitWebsite/API_PUBLIC_ORIGIN"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitWebsite/CALCULATOR_HOST_MODE"
+        },
+        {
+          "action": "update",
+          "logicalId": "TaxKitWebsite/TAXKIT_API"
+        },
+        {
+          "action": "noop",
+          "logicalId": "TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN"
+        }
+      ],
+      "domains": [
+        "taxkit.dev",
+        "www.taxkit.dev",
+        "api.taxkit.dev"
+      ],
+      "noDeletesOrReplacements": true
+    }
+  },
+  "stages": {
+    "pr-167": {
+      "deployment": {
+        "observedAt": "2026-10-07T15:30:18.090778+00:00",
+        "candidateCommit": "12c723962761de4c2f73d4c84952b7fe54d785b0",
+        "exitCode": 0,
+        "durationSeconds": 52.8,
+        "sharedStateAutoUpgradeFlag": false
+      },
+      "nativeApplySeconds": 33.5,
+      "apply": {
+        "artifact": "dev79-relay-native-pr-167-deploy-1791386965292857000.log",
+        "sha256": "e4e2fda2a4871b4c18f4ee5c3e729c3728be16311a724e3fc1bf22ff401c7618"
+      },
+      "providerReadback": {
+        "artifact": "dev79-relay-pr-167-provider-after.json",
+        "sha256": "e3859ddb40f71108090d93ece66efb8bd331896bd41f3f607876ab83677f509d"
+      },
+      "liveReadback": {
+        "artifact": "dev79-relay-pr-167-live-journeys.json",
+        "sha256": "5f23793c4a30a54f64e7784381171b343c19f17bc1feeb362e2b930f4277294d"
+      },
+      "origins": {
+        "api": "https://taxkitappscloudflare-taxkitapi-pr-167-oiwupxuquswfzam3.coopercorbett.workers.dev",
+        "website": "https://taxkitappscloudflare-taxkitwebfhmwzc7r26wmheug3tlompbj.coopercorbett.workers.dev"
+      },
+      "postconditions": [
+        "public HTTP calculation decoded with its owning Schema",
+        "plain HTML form produces retained $1,301.00 answer",
+        "public OpenAPI description is available",
+        "official MCP 2.3.1 client lists six tools, calculates the HTTP answer and reads documentation",
+        "Chromium calculator uses same-stage API and produces retained $1,301.00 answer",
+        "agent links point to same-stage API; guide and Markdown both load",
+        "Chromium documentation search opens Quickstart; no page errors or PostHog requests observed",
+        "Browser Do Not Track sends deny on calculation RPC",
+        "built relay refuses the captured synthetic SDK body with empty 404, no-store and nosniff while collection is off",
+        "independent Worker readback has no POSTHOG bindings; configured default stays off",
+        "official MCP client legacy negotiation establishes a session, lists six tools, calculates the HTTP answer, reads docs and terminates its session"
+      ],
+      "workers": {
+        "api": {
+          "script": "taxkitappscloudflare-taxkitapi-pr-167-oiwupxuquswfzam3",
+          "compatibilityDate": "2026-10-04",
+          "compatibilityFlags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "currentDeploymentId": "a2cfb949-39f7-4193-a17a-f0d40aedfe2a",
+          "currentVersionIds": [
+            "adb44e32-e5f0-496e-8313-1c31e2b03e5f"
+          ],
+          "observability": null,
+          "logpush": false,
+          "tailConsumers": null,
+          "rateLimitNamespace": "10078167"
+        },
+        "website": {
+          "script": "taxkitappscloudflare-taxkitwebfhmwzc7r26wmheug3tlompbj",
+          "compatibilityDate": "2026-10-04",
+          "compatibilityFlags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "currentDeploymentId": "2b5b8e38-7df0-46fb-bc6f-c7644b10147b",
+          "currentVersionIds": [
+            "35c1686e-feda-46ed-96f0-a740818e1f50"
+          ],
+          "observability": null,
+          "logpush": false,
+          "tailConsumers": null
+        }
+      },
+      "logs": [
+        {
+          "artifact": "dev79-relay-pr-167-live-journeys.log",
+          "sha256": "f9635a9ab71297c0f6f2abe8f0448f47cbd5e837f8c330a453332c122b2e489c"
+        },
+        {
+          "artifact": "dev79-relay-pr-167-live-legacy.log",
+          "sha256": "28f61b66a9ee35a673273695616c51ba6c0e3e93314641676f2323830c4d2340"
+        }
+      ]
+    },
+    "prod": {
+      "deployment": {
+        "observedAt": "2026-10-07T15:35:50.785571+00:00",
+        "candidateCommit": "12c723962761de4c2f73d4c84952b7fe54d785b0",
+        "exitCode": 0,
+        "durationSeconds": 69.63,
+        "sharedStateAutoUpgradeFlag": false
+      },
+      "nativeApplySeconds": 15.3,
+      "apply": {
+        "artifact": "dev79-relay-native-prod-deploy-1791387281154838000.log",
+        "sha256": "b1a929313f6798c15ceefbeb94c24807a862c9b7518652d5dc9acb27fa59f359"
+      },
+      "providerReadback": {
+        "artifact": "dev79-relay-prod-provider-after.json",
+        "sha256": "b591ce8a606555ccd077dfb66f217b94e36fa84c459e644c26486d3e53a0a0c5"
+      },
+      "liveReadback": {
+        "artifact": "dev79-relay-prod-live-journeys.json",
+        "sha256": "e7586fa0852ddd102582c2075b17ce7515485d73061934c7883039fcbf00151e"
+      },
+      "origins": {
+        "api": "https://api.taxkit.dev",
+        "website": "https://taxkit.dev"
+      },
+      "postconditions": [
+        "public HTTP calculation decoded with its owning Schema",
+        "plain HTML form produces retained $1,301.00 answer",
+        "public OpenAPI description is available",
+        "official MCP 2.3.1 client lists six tools, calculates the HTTP answer and reads documentation",
+        "Chromium calculator uses same-stage API and produces retained $1,301.00 answer",
+        "agent links point to same-stage API; guide and Markdown both load",
+        "Chromium documentation search opens Quickstart; no page errors or PostHog requests observed",
+        "Browser Do Not Track sends deny on calculation RPC",
+        "built relay refuses the captured synthetic SDK body with empty 404, no-store and nosniff while collection is off",
+        "independent Worker readback has no POSTHOG bindings; configured default stays off",
+        "official MCP client legacy negotiation establishes a session, lists six tools, calculates the HTTP answer, reads docs and terminates its session"
+      ],
+      "workers": {
+        "api": {
+          "script": "taxkitappscloudflare-taxkitapi-prod-cbf6rcgntsf5y2vl",
+          "compatibilityDate": "2026-10-04",
+          "compatibilityFlags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "currentDeploymentId": "d80ef727-e6ba-4149-ac07-e299aebccc81",
+          "currentVersionIds": [
+            "e411eb5e-c4e8-45b0-aff8-8ff27d27cbe7"
+          ],
+          "observability": null,
+          "logpush": false,
+          "tailConsumers": null,
+          "rateLimitNamespace": "10078"
+        },
+        "website": {
+          "script": "taxkitappscloudflare-taxkitweb6exfjosfrbdjf3coo4ausvjj",
+          "compatibilityDate": "2026-10-04",
+          "compatibilityFlags": [
+            "nodejs_compat",
+            "new_module_registry"
+          ],
+          "currentDeploymentId": "c1b8de38-d5c7-40ce-9ec1-7319e09a2107",
+          "currentVersionIds": [
+            "b30ba47d-2edf-4b0c-9cd6-88abf1a01d8a"
+          ],
+          "observability": null,
+          "logpush": false,
+          "tailConsumers": null
+        }
+      },
+      "logs": [
+        {
+          "artifact": "dev79-relay-prod-live-journeys.log",
+          "sha256": "ba31db60c4e0569311a4c6299b206b51e7d37cc677e5fbb52e57b8b704de2548"
+        },
+        {
+          "artifact": "dev79-relay-prod-live-legacy.log",
+          "sha256": "2321449e63d6b4cd2970a30d18ed4b06520b945e57c539da3e14997521eeb160"
+        }
+      ]
+    }
+  },
+  "protectedProduction": {
+    "before": {
+      "artifact": "dev79-relay-zone-before-production.json",
+      "sha256": "d4e56961c765969b54757cdfb584490904b85d550137439827eab54ebcb48d21"
+    },
+    "after": {
+      "artifact": "dev79-relay-zone-after-production.json",
+      "sha256": "8c40cb4039166dc965ebbf58f2830274ab681ab8e73dc17198ae6b240cbc323e"
+    },
+    "postconditions": [
+      "same existing Production token",
+      "all DNS settings equal previous deployed readback",
+      "same www redirect ruleset ID and exact rules",
+      "three unchanged expected Worker-managed records, no additional records",
+      "All three domain IDs and complete DNS records equal fresh pre-apply observation"
+    ],
+    "publicRedirect": {
+      "artifact": "dev79-relay-prod-public-redirect.json",
+      "sha256": "90840581fb910edec8593c1f23511d8c70a8e8dbce868d4d7a646f4860c0898d"
+    },
+    "wwwRedirectStatus": 301,
+    "pathAndQueryPreserved": true,
+    "dnsSettingsAndThreeDomainOwnersUnchanged": true
+  },
+  "sharedState": {
+    "before": {
+      "artifact": "dev79-relay-native-state-before.json",
+      "sha256": "6dd76a31a92c400f933e2880b6a3753ae9983c99556b09029e007625049cbdf9"
+    },
+    "after": {
+      "artifact": "dev79-relay-native-state-after.json",
+      "sha256": "e570c1bca77c975d5eb463fbf259d6c817f888f65838c651da5bf6c1e0d70ba2"
+    },
+    "version": 7,
+    "stages": [
+      "pr-161",
+      "pr-162",
+      "pr-166",
+      "pr-167",
+      "prod"
+    ],
+    "bootstrapOrUpgradePerformed": false
+  },
+  "preflight": {
+    "completeWorkerCount": 50,
+    "search": {
+      "artifact": "dev79-relay-worker-search-before.json",
+      "sha256": "bf6ccf3edbe0f7459cafa85d0c1fecbb12eb78208208f778cc09ba53d566b8b5"
+    },
+    "namespaces": {
+      "artifact": "dev79-relay-rate-namespaces-before.json",
+      "sha256": "875d985a078ebb83354548d2f8fb5cce5a16966154d9d89b69cc5a67ccd83f02"
+    },
+    "postconditions": [
+      "Actual script_name values, complete two-page inventory, all 50 settings read before apply",
+      "Production 10078 belongs only to its expected API; new Preview 10078167 unused before apply",
+      "No active local or hosted apply observed"
+    ],
+    "failedReadRecovery": {
+      "artifact": "dev79-relay-preflight-failed-read.json",
+      "sha256": "4f6fd2e805ed3c49caab7d917d3493ce771cf3d8327a0c43c8b9cc6f94d951df"
+    },
+    "failureReason": "Initial read helper projected the search id tag as a script name and then tried a nonexistent name field. Actual script_name ingress was independently inspected; complete inventory/settings then passed. Both failed reads changed no provider resource."
+  },
+  "documentationImpact": {
+    "changeRequired": [
+      "active execution plan and this dated delivery proof"
+    ],
+    "preserve": [
+      "qualified runtime bytes and compiled owners",
+      "relay qualification and earlier deployment receipts",
+      "pending browser sender and credential choices",
+      "published packages and retained tax outputs",
+      "existing token policies and expiry",
+      "domain/DNS/redirect/state ownership",
+      "five runbook procedures",
+      "deferred metrics"
+    ],
+    "notApplicable": {
+      "changeset": "Delivery proof metadata only; no package contract changes.",
+      "newRunbook": "Existing native deployment/readback procedure used; no new shipped command runner or provider operation."
+    }
+  },
+  "rollback": "Fresh reviewed native plan to redeploy qualified preceding Production source 42610a5c25d4b03bb2d36ab75985a66b15ca17d3. Preserve domain/DNS/settings and shared state. Preview teardown is outside this delivery attempt.",
+  "limitations": [
+    "PostHog collection remains off; browser sender choice, temporary management-read key, real project inventory/capacity, reviewed project apply and stored-event proof remain unfinished.",
+    "Header stripping is qualified at application/native test boundaries. Final hosted recipient headers and stored fields still need controlled Preview proof before collection activation.",
+    "No hosted GitHub pass, candidate release attempt, merge or package publication. Draft review remains outstanding.",
+    "No no-op convergence, Preview teardown or rollback execution. Native peer outputs conservatively refresh bindings.",
+    "Modern MCP caller cleanup limits and deferred metrics remain as documented.",
+    "Only the named retained example was checked live; this is no new Medicare correctness claim."
+  ],
+  "custody": "Operational logs and readbacks remain private on this Mac; this receipt retains artefact basenames and hashes without secret values.",
+  "proofCloseout": {
+    "checksPending": false,
+    "checks": [
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.4,
+        "logArtifact": "dev79-relay-delivery-closeout-docs.log",
+        "logSha256": "f3982d495181f3f7f9ec69170f05101c312912ea19a69414b3b2c84f740c2e65"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.14,
+        "logArtifact": "dev79-relay-delivery-closeout-runbooks.log",
+        "logSha256": "03e02c35cf821cadf89434c52181260f48db049debc84404d8c073590b4935e0"
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.26,
+        "logArtifact": "dev79-relay-delivery-closeout-paths.log",
+        "logSha256": "25e0c287206128a8f2833905633345db3b19f56d5729dd2934aa1f16be99bad3"
+      },
+      {
+        "stage": "format-check",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.51,
+        "logArtifact": "dev79-relay-delivery-closeout-format-check.log",
+        "logSha256": "3608f26919f80f2b14260102db7173ac21b387bad46fe46bdcaa8af021eec2e5"
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.01,
+        "logArtifact": "dev79-relay-delivery-closeout-diff.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "metadataOnlyPaths": [
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-08-relay-collection-off-delivery.json"
+    ],
+    "unchangedPreviousFrozenIdentities": 1796
+  }
+}

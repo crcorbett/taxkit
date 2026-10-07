@@ -5820,3 +5820,47 @@ The pending browser sender and read-key decisions remain unchanged; collection
 is off and metrics stay deferred. A new source-bound native app delivery can
 proceed under Cooper's existing local Preview/Production grant without enabling
 capture or changing PostHog resources, credentials or shared state ownership.
+
+
+### T008 relay app delivery with collection off
+
+Draft [#167](https://github.com/crcorbett/taxkit/pull/167) at
+`12c723962761de4c2f73d4c84952b7fe54d785b0` is now delivered from this Mac to
+Preview `pr-167` and Production under Cooper's existing local grant. The
+[relay delivery receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-relay-collection-off-delivery.json)
+records the operation after its separate local qualification. Preview completed
+at 15:30:18 UTC and Production at 15:35:50 UTC on 7 October (8 October in
+Melbourne). Exact apply prompts matched the reviewed two-create/nine-binding
+Preview and two-update/three-peer-binding Production plans. Zone and DNS
+settings stayed no-ops; no deletion, replacement, shared-store bootstrap or
+upgrade was approved or performed.
+
+Fresh preflight reads use actual `script_name` values, complete pages and all 50
+Worker settings. An initial tag/name projection failed read-only and is retained
+with its correction. Production's counter belongs only to its API, and the new
+Preview counter was unused. Independent saved reads confirm those namespaces,
+60/60 limits, the session class, correct peers/origins, compatibility settings
+and disabled native collection. Both stages pass eleven live postconditions,
+including the new relay's empty 404/no-store/nosniff refusal, retained `$1,301.00`
+HTTP/plain-form/Chromium result, docs/search/agent links, browser DNT, and modern
+and older-session official MCP calls with explicit older-session termination.
+No PostHog bindings or browser PostHog requests are observed.
+
+Fresh complete DNS/settings, all three domain owners and redirect rules remain
+identical before/after Production. `www` returns 301 with the same path/query.
+The authenticated state remains version 7 with the additional `pr-167` stage.
+All 1,797 frozen file/link identities and modes match after both deliveries.
+Only this plan and the new receipt receive delivery metadata afterwards, with
+focused closeout and all 1,796 existing other identities required unchanged.
+Qualified preceding Production source `42610a5c25d4b03bb2d36ab75985a66b15ca17d3`
+is the source-bound recovery target after a fresh reviewed native plan;
+no recovery or Preview teardown was executed.
+
+Documentation impact: **Change required** for this plan and dated receipt.
+**Preserve** runtime, previous proof, token/domain/DNS/state owners, five runbooks,
+retained tax outputs, pending browser/credential decisions and deferred metrics.
+**N/A** for a Changeset or new procedure: this closeout changes proof metadata
+only. T008 and overall T010 remain in progress for sender choice, real PostHog
+preparation and reviewed resources, final hosted-header/stored-event proof,
+activation and public privacy/operations completion. This collection-off app
+delivery does not accept those outcomes.
