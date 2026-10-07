@@ -63,6 +63,18 @@ The native bridge may resolve the existing TaxKit repository-scoped CLI login in
 memory; it does not change the retired writer's custody contract or store a new
 credential. Historical approvals below remain attached to their original work.
 
+Cooper then separately approved adding `Zone DNS Settings Read`,
+`Workers Routes Write` and `Dynamic URL Redirects Write` to the existing
+Production token `taxkit-docs-production-20260831`, identity
+`35bf3c96b36551ea663e62e5739b68e9`, only for zone
+`15103853342ab9f18f7894b7fae39c39`. Independent readback preserved its full
+earlier account policy, name, active status, issue date and 18 November expiry.
+The token value, Preview token and Doppler configuration were not changed.
+The [dated cloud receipt](../documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json)
+records that exact change, its policy restoration procedure, both authorised
+native applies and provider/public readback. It creates no standing authority
+for further credential changes, shared-store upgrades or unrelated writes.
+
 The current checkout retires the old docs workspace, writer workflows and
 Alchemy Stack entry. The [retention manifest](../documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json)
 preserves exact original sources and dated provider recovery identities.

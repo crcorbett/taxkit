@@ -5353,3 +5353,65 @@ old credentials, historical identities and stopped writers. **N/A** for a
 Changeset and generated references: private infrastructure configuration only.
 Whole-checkout qualification and exact clean native plans are next; Preview is
 proved before Production under Cooper's existing deployment approval.
+
+## T007 authorised local Preview and Production delivery
+
+Draft [#161](https://github.com/crcorbett/taxkit/pull/161) at
+`787e6f72a4a2e06605290eaeb1990a360776a387` passed the frozen install and all
+nine ordered local release checks in 1,038.5 seconds. Every one of the 1,744
+tracked files and links matched before and after those checks and both native
+deployments. All eighteen check-output digests were independently read and
+verified. Both browser runs passed fourteen cases. This is local proof; it
+does not claim hosted Quality success or restore GitHub credits.
+
+The real native Preview and Production plans were bound to that exact clean
+source, account, stage, zone and installed Alchemy beta.80 patch. Cooper's
+direct local deployment approval covered both operations. Cooper separately
+approved three additions to the existing Production token: DNS settings read,
+Worker routes write and dynamic URL redirects write, limited to taxkit.dev.
+Independent metadata and reads through the unchanged stored credential proved
+the same token identity, expiry and full earlier account policy. No Preview
+token, Doppler config or secret value changed.
+
+Native `deploy` ran without `--yes`; each specific plan prompt was answered
+after comparing its resources with the qualified plan. Preview `pr-161`
+completed at 07:54 UTC and Production at 08:03 UTC on 7 October. The existing
+shared state store stayed at version seven without bootstrap or upgrade;
+ordinary native state now contains only these two new app stages. Old Workers
+and unrelated stacks were preserved. The live Website is
+[taxkit.dev](https://taxkit.dev), the API is
+[api.taxkit.dev](https://api.taxkit.dev), and the
+[Preview Website](https://taxkitappscloudflare-taxkitweb7xvou7miucr7nekqlt7s3lct.coopercorbett.workers.dev)
+uses its own API and rate namespace `10078161`; Production uses `10078`.
+
+Independent provider reads prove the private Website-to-API connection, MCP
+session class, exact origin bindings, current version/deployment IDs and
+three Production hostname owners. The full DNS settings reply is identical
+before and after apply. The only DNS records are the three Worker-managed
+AAAA records; the single native www rule redirects with status 301 while
+preserving path and query. HTTPS health, catalogue, known calculation, OpenAPI,
+documentation page/navigation/search/Markdown, all three visible calculator
+answers, mobile search and a calculation without JavaScript pass in both
+environments. The official modern MCP client connects, lists six tools and
+calculates through both deployed APIs. Modern prompt cancellation and public
+agent setup remain unfinished, so T006 is not accepted.
+
+Two limits remain explicit. A follow-up Preview plan proposes two Worker and
+three binding updates because resolved peer Outputs become unknown during
+planning; the actual saved bindings and public behaviour agree. No replay was
+performed and no no-op convergence is claimed. The Production browser also
+observes Cloudflare's injected `/cdn-cgi/rum` beacon. Worker script settings
+report observability null and Logpush false, consistent with the explicitly
+disabled app collection policy, but that does not disable this separate
+browser beacon. Read-only site inventory did not identify its configuration
+owner. The metrics approach remains deferred; no beacon configuration or
+metrics implementation was changed and no privacy qualification is claimed.
+
+The [dated cloud receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json)
+retains authority, token permissions before/after, source/check/plan digests,
+native applies, provider/public reads, corrected check attempts and recovery.
+This three-document closeout changes no qualified code or configuration and
+uses bounded documentation, runbook, portability and diff checks. T007 stays
+in progress for the remaining current workflow/evidence alignment; T008,
+deferred T009 and final T010 acceptance remain unfinished. No merge or package
+publication occurred.
