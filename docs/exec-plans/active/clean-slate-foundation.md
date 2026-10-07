@@ -5415,3 +5415,39 @@ uses bounded documentation, runbook, portability and diff checks. T007 stays
 in progress for the remaining current workflow/evidence alignment; T008,
 deferred T009 and final T010 acceptance remain unfinished. No merge or package
 publication occurred.
+
+## T006 agent setup and cancellation bounds
+
+Continue from deployment draft #161 at
+`580806576a74a57407ee266a731863d374a587d2` on
+`codex/dev-77-agent-setup-and-cancellation-bounds`. The `/agents` page now
+projects the actual checked same-stage MCP address. Its accepted public guide
+explains connection steps, all six remote tools, input-first use, the five
+visible browser tools, experimental browser support, anonymous limits, older
+conversation expiry and the modern five-second cancellation limit. The existing
+catalogue supplies navigation, search, processed Markdown and agent discovery;
+there is no second index or tool implementation.
+
+Two local `enable_request_signal` experiments did not qualify prompt
+pre-response cleanup. A minimal direct-socket Worker also stopped its client
+without observing an incoming signal during 1.5 seconds before its response.
+Restore the experimental test exactly and preserve the actual modern negative
+oracle. No flag, dependency or provider change is retained. This investigation
+supports the bounded limitation; it does not establish a production platform
+failure or fix. Prompt modern cancellation stays separate unfinished T006 work.
+
+Docs-maintainer: **Change required** for the route/journey, accepted guide and
+navigation bindings, API/Website READMEs, API architecture, active task/plan and
+[dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json).
+**Preserve** the native protocol, response limits, older alarm/cancellation
+proof, retained tax results, earlier receipts and deferred metrics. **N/A** for
+Changesets because apps and this documentation content are private and published
+package interfaces are unchanged; runbook operations, credentials and provider
+settings are unchanged. Documentation, runbooks, Web types, lint and the exact
+restored MCP cases passed. The new guide passed actual built browser/Markdown
+assertions. The first built suite had one local startup timeout; its unchanged
+two-case retry passed with original deadlines. Preserve that unresolved attempt.
+The full clean-source local graph is pending.
+New setup content requires a separate source-bound deployment before it is
+available. Keep T006 In Progress and do not claim an autonomous browser-agent
+session or prompt modern cleanup.

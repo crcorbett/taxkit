@@ -501,6 +501,16 @@ no browser calculation implementation or production SDK client is added.
 
 ## Visible calculator browser tools
 
+The `/agents` route offers a remote MCP address derived from the checked
+same-stage API settings, plus the accepted
+[agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx).
+The guide also appears in documentation navigation, search, processed Markdown
+and both agent discovery files through the existing accepted catalogue. It
+distinguishes remote tools from visible browser commands and explains the
+modern five-second cleanup limit, older conversation expiry and experimental
+browser support. These setup checks do not establish an autonomous AI session
+or deployment of newly edited content.
+
 Supported experimental browsers can register five tools on a mounted calculator:
 `taxkit_find_calculators`, `taxkit_read_calculator`, `taxkit_fill_calculator`,
 `taxkit_calculate_visible_form` and `taxkit_read_result`. The catalogue, visible

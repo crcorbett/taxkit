@@ -389,6 +389,16 @@ native modern HTTP adapter has no conversation binding for that notification.
 No flag-only workaround is accepted, and prompt modern remote cleanup is still
 a T006 gap.
 
+The [agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx)
+documents both versions, all six remote tools, anonymous limits, exact browser
+Origin admission, older expiry and the modern five-second cancellation limit.
+The Website's `/agents` page derives its MCP address from the checked API
+settings, including in Preview. Ordinary official-client calls were read back
+on both deployed stages in the
+[local deployment receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json).
+That delivery does not prove prompt modern pre-response cleanup. The later
+setup-content slice needs its own deployment before its new guide is available.
+
 `@modelcontextprotocol/client` 2.3.1 is test-only. The full native-pair command
 runs actual official clients over loopback TCP against the source-built API.
 Reports and accepted processed Markdown equal HTTP, two conversations remain
@@ -407,5 +417,5 @@ adding an emulator binding is insufficient and previously returned 503.
 See the [session candidate record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json),
 [earlier modern record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
 and [browser caller owner](../web/README.md#visible-calculator-browser-tools).
-Public setup and prompt modern remote cancellation remain T006 work. This
-candidate establishes no deployment, hosted support or public availability.
+Prompt modern remote cancellation remains T006 work. Source-built setup checks
+and ordinary deployed client calls are separate from that missing proof.

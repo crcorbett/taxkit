@@ -139,6 +139,13 @@
           "source": "content/api/endpoints.mdx",
           "pageType": "reference",
           "primaryReader": "API consumer"
+        },
+        {
+          "title": "Agent connection guide",
+          "path": "/api/agent-tools",
+          "source": "content/api/agent-tools.mdx",
+          "pageType": "guide",
+          "primaryReader": "API consumer"
         }
       ]
     },

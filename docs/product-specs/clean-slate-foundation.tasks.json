@@ -647,7 +647,10 @@
         "Remote and browser tools have actual caller evidence; lack of a supported browser is recorded as a proof gap, never a passed agent journey.",
         "Anonymous access has bounded work and no required account or stored calculation."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json"
+      ]
     },
     {
       "id": "CSF-T007",

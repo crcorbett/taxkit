@@ -408,7 +408,7 @@ describe("built native API and Website", () => {
               Schema.decodeEffect(Schema.fromJsonString(DocsPublicCatalogue))
             )
           );
-        expect(publicContent.pages).toHaveLength(61);
+        expect(publicContent.pages).toHaveLength(62);
         // Repeat the actual build-only generator, then compare every fresh
         // output with the already built asset. This checks determinism and
         // Vite's public-copy ordering rather than a separate renderer probe.
@@ -1896,6 +1896,60 @@ describe("built native API and Website", () => {
               .getAttribute("href")
           )
         ).toBe(`${apiOrigin}/api/docs/openapi.json`);
+        expect(
+          yield* Effect.promise(() =>
+            page
+              .getByRole("link", { exact: true, name: `${apiOrigin}/mcp` })
+              .getAttribute("href")
+          )
+        ).toBe(`${apiOrigin}/mcp`);
+        yield* Effect.promise(() =>
+          page
+            .getByRole("link", {
+              exact: true,
+              name: "Agent connection guide and tool list",
+            })
+            .click()
+        );
+        yield* Effect.promise(() =>
+          page
+            .getByRole("heading", {
+              exact: true,
+              name: "Agent connection guide",
+            })
+            .waitFor({ timeout: 5000 })
+        );
+        const guideText = yield* Effect.promise(() =>
+          page.locator("main").textContent()
+        );
+        expect(guideText).toContain("https://api.taxkit.dev/mcp");
+        expect(guideText).toContain("taxkit_get_calculator_schema");
+        expect(guideText).toContain("five-second limit");
+        expect(guideText).toContain("taxkit_calculate_visible_form");
+        const guideMarkdown = yield* Effect.promise(() =>
+          page
+            .getByRole("link", {
+              exact: true,
+              name: "Read this page as Markdown",
+            })
+            .getAttribute("href")
+        );
+        expect(guideMarkdown).toBe(`${websiteOrigin}/api/agent-tools.md`);
+        const guideBody = yield* Effect.gen(function* () {
+          const reply = yield* HttpClient.get(
+            `${websiteOrigin}/api/agent-tools.md`
+          );
+          expect(reply.status).toBe(200);
+          expect(
+            Record.get(reply.headers, "content-type").pipe(
+              Option.map((value) => value.includes("text/markdown"))
+            )
+          ).toEqual(Option.some(true));
+          return yield* reply.text;
+        }).pipe(Effect.provide(FetchHttpClient.layer));
+        expect(guideBody).toContain("# Agent connection guide");
+        expect(guideBody).toContain("taxkit_get_calculator_schema");
+        expect(guideBody).toContain("five-second limit");
         const docsFunctionId = Array.findFirst(
           Record.values(websiteModules),
           (module) =>
@@ -1988,7 +2042,7 @@ describe("built native API and Website", () => {
         expect(parsedSitemap.namespace).toBe(
           "http://www.sitemaps.org/schemas/sitemap/0.9"
         );
-        expect(parsedSitemap.locationCount).toBe(61);
+        expect(parsedSitemap.locationCount).toBe(62);
         expect(parsedSitemap.locationText.trim().split(/\s+/u)).toEqual(
           Array.map(
             publicContent.pages,
@@ -2201,7 +2255,7 @@ describe("built native API and Website", () => {
               `${websiteOrigin}${expected.path}.md`
             );
             expect(response.headers.get("vary")).toContain("Accept");
-            expect(rendered.navigation).toBe(61);
+            expect(rendered.navigation).toBe(62);
             expect(rendered.markdown).toBe(
               `${websiteOrigin}${expected.path}.md`
             );

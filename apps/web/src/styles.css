@@ -142,6 +142,10 @@ a:focus-visible,
   padding: 0.15rem 0.35rem;
 }
 
+.home .agent-endpoint {
+  overflow-wrap: anywhere;
+}
+
 .home output {
   display: grid;
   gap: 0.5rem;

@@ -712,7 +712,12 @@ subscription, GET stream, termination or resumption contract is added. Older
 network cancellation is conversation-scoped and immediately releases actual
 work. The modern real-network pre-response abort still relies on the existing
 five-second work budget; earlier in-process cancellation does not prove prompt
-remote cleanup. Public setup remains pending that qualification.
+remote cleanup. Public setup explains this limit rather than promising prompt
+modern cancellation. The accepted [agent guide](../../packages/docs-content/content/api/agent-tools.mdx)
+owns connection steps, the discovered tool names, input-first use, older expiry
+and experimental browser support. The Website's `/agents` route derives its
+remote MCP address from checked same-stage API settings and links that guide;
+processed Markdown and documentation discovery reuse the accepted catalogue.
 
 The memory-only native source builder consumes computed SDK exports from the
 actual app declaration, refusing provider/credential/network access. Tests must

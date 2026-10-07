@@ -21,7 +21,7 @@
         },
         {
           "path": "packages/docs-content/content/api/index.mdx",
-          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--index.json"
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--index.json"
         },
         {
           "path": "packages/docs-content/content/api/openapi-reference.mdx",
@@ -253,7 +253,11 @@
         },
         {
           "path": "packages/docs-content/navigation.json",
-          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/navigation.json"
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/navigation.json"
+        },
+        {
+          "path": "packages/docs-content/content/api/agent-tools.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--agent-tools.json"
         }
       ],
       "path": "docs/documentation-audit/hgi-207/public-mdx-lifecycle.json",

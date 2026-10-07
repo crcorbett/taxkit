@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 1,
+  "documentType": "bounded-proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-api-web-owner",
+  "observedAt": "2026-10-07T08:33:44Z",
+  "status": "Agent setup source and focused checks qualified; full clean-source local graph pending; T006 remains in progress",
+  "baseHead": "580806576a74a57407ee266a731863d374a587d2",
+  "actorAuthority": {
+    "principal": "Cooper",
+    "reviewer": "Codex primary owner",
+    "operation": "Approved T006 implementation, local checks, reviewable commits, pushes, draft PR and routine Linear tracking",
+    "environment": "Local repository and native workerd/Chromium",
+    "approvalBoundary": "This slice changes setup content only; no credential change, provider setting, new deployment, merge or package publication"
+  },
+  "outcome": [
+    "The agent landing page derives the remote MCP endpoint from checked same-stage API settings.",
+    "Accepted content adds a connection guide with both tested protocol versions, the six remote tools, the five visible browser tools, input-first use and real cancellation/expiry/browser support limits.",
+    "The existing catalogue owns navigation, search, Markdown and documentation discovery; no additional registry or backend operation was added.",
+    "Experimental enable_request_signal did not qualify prompt native pre-response cancellation. The experiment was restored exactly; no application, test or provider flag change is retained."
+  ],
+  "impact": {
+    "changeRequired": [
+      "apps/web agent route, endpoint wrapping and existing native pair journey",
+      "Accepted agent guide, API index, navigation, exact content acceptance records and owner-policy bindings",
+      "API and Website READMEs, API architecture, active T006 task/plan and this dated receipt"
+    ],
+    "preserve": [
+      "Existing native MCP parsing and response budgets, older conversation cancellation and alarm proof",
+      "Modern TCP-abort negative oracle and the five-second calculation limit",
+      "Retained tax values, calculator/SDK/RPC/HTTP contracts, dependency versions and deferred metrics",
+      "Earlier acceptance records and deployment receipts with their original identities"
+    ],
+    "notApplicable": [
+      "No Changeset: apps and documentation content are private; no published package export, contract or dependency changes",
+      "No runbook operation changes, credential changes or provider mutation in this slice"
+    ]
+  },
+  "cancellationInvestigation": {
+    "primarySources": [
+      "https://developers.cloudflare.com/workers/configuration/compatibility-flags/#enable-requestsignal-for-incoming-requests",
+      "https://developers.cloudflare.com/changelog/post/2025-05-22-handle-request-cancellation/"
+    ],
+    "effectUpstreamRead": "e72b12fc305710550bc6dcb978e92de8abff88cd",
+    "alchemyMatchingSourceRead": "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
+    "installedEffect": "4.0.0",
+    "installedAlchemy": "2.0.0-beta.80",
+    "finding": "Native RPC HTTP waits for the first encoded response chunk. Two enable_request_signal fixture experiments failed with one-second timeouts and are retained as inconclusive full-case attempts. A separate direct-socket native Worker probe observed client abort without an incoming signal event during 1500 ms of pre-response work. Neither experiment qualifies a correction or establishes general production signal behaviour.",
+    "attempts": [
+      {
+        "log": "dev77-signal-experiment-native-modern-experiment.log",
+        "sha256": "059b5b56b9ba7fb24482bedf4606038aee3df483c74356e6c0aafa72c2f17e06"
+      },
+      {
+        "log": "dev77-signal-isolated-native-modern-experiment.log",
+        "sha256": "6b83b2db84dbae69ee00abca0dcffaf4a8a9f3e34cc02ab51781f6ed41a842c4"
+      },
+      {
+        "log": "dev77-native-signal-probe.log",
+        "sha256": "3ea6afca44f6c4f290767cebea2685a6e1a03b2d2b331686e9875200a5993a52"
+      }
+    ],
+    "rollback": "Restore the only experimental tracked test from base HEAD; confirmed exact original before the retained suite. Retain the private failed logs.",
+    "resumeTrigger": "A supported native adapter or platform change can expose and qualify prompt pre-response cancellation without handwritten protocol or unapproved dependency changes.",
+    "nextOwner": "T006 implementation owner",
+    "claimedFixed": false
+  },
+  "checks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "--no-install",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "apps/web/src/routes/agents.tsx",
+        "apps/web/src/styles.css",
+        "apps/web/test/native-pair.boundary.test.ts",
+        "tools/documentation/owner-policy.json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "log": "dev77-agent-focus-a-format.log",
+      "sha256": "173776d33f06c62fe25db3c3b68961c446b97818df2af8947c7b97abb9d862a5"
+    },
+    {
+      "stage": "catalogue",
+      "command": [
+        "bun",
+        "run",
+        "docs:catalogue"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.55,
+      "log": "dev77-agent-focus-a-catalogue.log",
+      "sha256": "b8d14bb893b8eed7216f348906b4f3fe852b2deb61b1feb3afb694c1e06fa700"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.4,
+      "log": "dev77-agent-focus-a-docs.log",
+      "sha256": "f81b2b70d50cba7d533282020f56e9e262fe94772d1af5481c2789857ffac0ad"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "dev77-agent-focus-a-runbooks.log",
+      "sha256": "766b690ad2fa4e98f3bcd93aec9af13bdc49ec6eea087b64bfdd6ea9534242b8"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 1.13,
+      "log": "dev77-agent-focus-a-web-types.log",
+      "sha256": "7c10a872a42ded01c7e2007daccfbd237e13cb218ce0a635cbc3130d947bb7d3"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "--no-install",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "apps/web/test/native-pair.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "log": "dev77-agent-focus-b-format.log",
+      "sha256": "5120738094fabd46aa515a02f6be2c9589179f4eb23bf02454a01504cf3456bd"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.27,
+      "log": "dev77-agent-focus-b-web-types.log",
+      "sha256": "b334a489290dc3a21390571a8ad0dd093c4bdbef0db9f31afa121e1d9a16aa0b"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 3.27,
+      "log": "dev77-agent-focus-b-lint.log",
+      "sha256": "7000e97ef0799774aa41a2101f871a03925f9d409f7da9e0d8dbb31b25738130"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "--no-install",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "apps/web/test/native-pair.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "log": "dev77-agent-focus-c-format.log",
+      "sha256": "ecea900ac7e21e5cb32d5b40e625a3c0fcf5561ed30a58dec7359056f0199d64"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.98,
+      "log": "dev77-agent-focus-c-lint.log",
+      "sha256": "dbacbf77f835c1cfd577e417a0e3da8fb3fbf7a8f56c00fca7340a4734739f0b"
+    },
+    {
+      "stage": "original-mcp",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "test/native-mcp.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 9.9,
+      "log": "dev77-agent-focus-c-original-mcp.log",
+      "sha256": "1926fbbede04821cf82b2a58fea84da92955abbc5f6c275f38d333cc5773624f"
+    },
+    {
+      "stage": "native-pair",
+      "command": [
+        "bun",
+        "run",
+        "web:test:native-pair"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 156.26,
+      "log": "dev77-agent-focus-c-native-pair.log",
+      "sha256": "bb4def622d8224f3e2a59102611fae43a7ed4ffb281e043e8093c44f9c1e2b18"
+    },
+    {
+      "stage": "local-development",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "test/native-local-development.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 19.02,
+      "log": "dev77-agent-local-recheck-a-local-development.log",
+      "sha256": "a47d4b849ba81a6d0d60183c15a1e123fe7d5c315c6ff3e8d8c5ee00adbbf745"
+    }
+  ],
+  "limitations": [
+    "Full clean-source local closeout is pending; focused results do not replace it.",
+    "Prompt modern pre-response server cleanup remains unfinished; older and in-process proof do not close it.",
+    "Native browser calls are test-controlled; no autonomous model session or universal browser support is claimed.",
+    "New setup content is not yet deployed. Earlier stage delivery proves only its exact deployed source.",
+    "No merge, package publication, provider setting change or credential operation occurred.",
+    "Metrics stay deferred. Earlier Production readback observes a Cloudflare RUM beacon separately from disabled Worker log/trace settings."
+  ],
+  "failedAttempts": [
+    {
+      "owner": "New guide HTTP assertion",
+      "finding": "First type check identified a missing HttpClient service; provide FetchHttpClient for only that request. Next type check passed."
+    },
+    {
+      "owner": "New native-pair assertions",
+      "finding": "Lint identified four unordered argument keys, innerText and one unchecked header read. Use ordered keys, textContent and an Option header lookup; lint passed."
+    },
+    {
+      "owner": "Existing native local development journey",
+      "finding": "First complete built suite passed 13 of 14 cases, including the guide; local startup timed out waiting for its calculator heading. Exact unchanged two-case local-development retry passed in 19.02 seconds with the original deadlines. Cause is unqualified; do not claim it fixed or attribute it to the guide."
+    }
+  ],
+  "focusedPostconditions": {
+    "acceptedPages": 62,
+    "contentAcceptanceHashesMatch": true,
+    "originalNativeMcpTestRestoredExactly": true,
+    "originalNativeMcpTestsPass": 2,
+    "webTypesPass": true,
+    "lintPass": true,
+    "newGuideBuiltBrowserAndMarkdownPass": true,
+    "unchangedLocalDevelopmentRetryPass": 2,
+    "nativeSuiteFirstAttemptPassed": 13,
+    "nativeSuiteFirstAttemptFailed": 1,
+    "wholeGraphClaim": false
+  },
+  "localCiGuidance": {
+    "release": "@commonplace/development-workflows@0.6.9",
+    "publishedAt": "2026-10-07T07:50:08Z",
+    "source": "https://github.com/crcorbett/commonplace-plugins",
+    "reference": "alchemy-iac/references/operations/authority-plan-apply.md#local-execution-when-ci-cannot-start",
+    "rule": "Pin source and frozen dependencies, run the full existing local graph, use native owners and separately read provider/public behaviour. Do not disable checks or change billing.",
+    "repositoryCanonicalSkillsUnchanged": true
+  }
+}
