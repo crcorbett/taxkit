@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@modelcontextprotocol/client": "2.3.1",
     "@taxkit/rules-au-pay": "workspace:*",
     "@taxkit/tsconfig": "workspace:*",
     "@types/bun": "catalog:",

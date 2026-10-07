@@ -301,6 +301,12 @@ share the installed whole-response reader, so leaving calculator replies
 unbounded would retain the same memory risk. Exact-limit valid native replies
 for every named operation and actual built-host retained reports must pass; this
 policy does not apply to future framed MCP streams without separate proof.
+The current modern MCP candidate separately bounds complete native JSON/SSE
+replies to 2 MiB and ten seconds. Actual official-client calls cover all six
+canonical tools, built local Worker report/page equality and shared allowance;
+exact framed-byte/deadline tests cover source-stream cleanup. This adds no
+subscription or resumption contract. Older session and real network-cancellation
+proof remain T006 work.
 Return checked 413/429/timeout failures with safe codes
 and retry guidance; do not retry calculations automatically. Qualify valid
 catalogue responses and supported streaming/MCP envelopes before adopting these

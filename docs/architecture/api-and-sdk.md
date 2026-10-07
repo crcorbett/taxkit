@@ -671,3 +671,27 @@ The checked original page identity selects the accepted processed body. Native
 HTTP composition keeps the same caller scope, deadline and safe failures;
 [frontend architecture](frontend.md#replacement-website-markdown) owns the
 Website's representation and response-header policy.
+
+
+## Native remote MCP candidate
+
+The native API adds the app-owned `/mcp` adapter using installed Effect
+`McpServer`, `Tool` and `Toolkit`. Its six named tools use canonical calculator
+and accepted-content Schemas, delegating to the same captured services as
+HTTP/RPC. Successful reports and processed Markdown are existing domain values;
+fixed transport failures contain no submitted facts or underlying causes.
+The safe reporter remains the single application error owner.
+
+Only protocol `2026-07-28` is currently composed. Its per-request metadata and
+origin checks belong to the native adapter. The API owns original connection
+identity, streamed POST admission, total reply bounds and the original HTTP
+stop signal. The same calculator service owns rate admission, capacity and work
+time. The protocol host is built once in the instance scope on first runtime
+use; first-caller identity, request and stop signal cannot enter registration.
+Replies are complete, with native JSON/SSE framing bounded to 2 MiB and ten
+seconds. No subscription/resumption contract or saved tax figures is added.
+See the [API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate)
+and [dated proof](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json).
+Older session routing/expiry, network cancellation and browser commands remain
+separately unqualified. Current app-owned transport changes do not change a
+published package export or the SDK lifetime contract.

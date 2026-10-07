@@ -5,6 +5,7 @@ export default defineConfig({
     fileParallelism: false,
     include: [
       "test/native-pair.boundary.test.ts",
+      "test/native-mcp.boundary.test.ts",
       "test/native-rate.boundary.test.ts",
       "test/native-rate-provider.boundary.test.ts",
       "test/native-rpc-failures.boundary.test.ts",

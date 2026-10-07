@@ -331,3 +331,42 @@ The native API builds `PublicCalculatorServiceRateLimited` once underneath its b
 `ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. The operator must select an account-wide unique stage value before a cloud plan/apply; no provider value is invented. The [infrastructure owner](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns graph and local-root selection. Hosted mode defaults to `edge`. The guarded local root selects `local-emulator`; a shared local allowance additionally requires an HTTP loopback API origin.
 
 Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) is approximate and local to a location, not an exact global quota. Real edge identity, namespace uniqueness and uploaded provider settings need separate authorised readback. Direct engine/local SDK and standalone Bun execution keep their existing contracts.
+
+
+## Native remote calculator tools candidate
+
+The native Worker candidate serves `/mcp` through installed Effect's
+`McpServer` and `Toolkit`, using protocol `2026-07-28`. The six tools list
+calculators, read an input Schema, calculate, read docs navigation, search docs
+and read a processed Markdown page. Inputs and successful replies use the
+existing calculator/content Schemas and the same captured services as HTTP/RPC.
+There is no separate tax engine or saved personal report.
+
+The protocol host is built once in the instance scope on first use, when native
+addresses can be read. Registration excludes that first caller's request, rate
+identity and stop signal. Each call receives its current checked identity and
+shares the eight-place calculation pool, five-second operation budget and
+anonymous allowance with HTTP/RPC. The existing 64 KiB streamed POST limit
+applies. Complete native JSON/SSE replies are read within ten seconds and 2 MiB;
+subscriptions and stream resumption are not advertised. The exact website
+Origin is accepted; other supplied Origins fail. Origin-less clients remain
+usable. Only `/mcp` permits modern protocol headers in CORS; other routes keep
+the existing header policy.
+
+The original HTTP AbortSignal also stops toolkit work. Its Effect callback
+registers the native listener before checking for an already-arrived abort,
+and removes it during cleanup. Actual official-client tests fill eight places,
+cancel one, finish a replacement and close the remaining calls. Expected
+failures have fixed codes and manual-retry guidance. Internal errors use the
+native safe reply and existing fixed reporter; submitted figures and underlying
+causes must not appear in either output.
+
+`@modelcontextprotocol/client` 2.3.1 is test-only. In-process tests check actual
+client frames, routing-header/version/origin refusal, safe errors, separate
+caller allowances and cancellation. The full native-pair command also uses this
+client over real local TCP against the built Worker, comparing its report/page
+with HTTP and proving their shared allowance. The
+[dated qualification record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
+distinguishes these boundaries. The older session adapter, real network
+cancellation, page-owned browser tools and public setup content remain T006
+work. This candidate establishes no deployed endpoint or hosted support.

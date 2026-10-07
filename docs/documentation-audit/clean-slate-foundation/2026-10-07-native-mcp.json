@@ -1,0 +1,870 @@
+{
+  "document_type": "proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-implementation-owner",
+  "last_reviewed": "2026-10-07",
+  "review_trigger": "MCP tools, native host composition, bounds, client, cancellation or qualification changes",
+  "outcome": "Modern MCP checkpoint passed the complete local nine-check graph; T006 remains in progress",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "scope": "Approved DEV-77 implementation, local checks, tested commits/pushes/draft PRs and routine Linear tracking",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes",
+      "memory changes"
+    ],
+    "metrics": "Deferred by Cooper; collection remains disabled"
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-77-native-agent-tools",
+    "baseCommit": "366b3e1464a356ef12d08fef34ee3c1525566910",
+    "phase": "Frozen source c passed complete local CI-mode checks; final proof/plan closure is separately checked metadata",
+    "sources": [
+      {
+        "path": "apps/api/README.md",
+        "sha256": "9ecc3b9dcaedb17793d49d3348f87719334f5333b3b7bdd8fdaaef0a04935e89"
+      },
+      {
+        "path": "apps/api/package.json",
+        "sha256": "d33dad1fdf3f2e2ee9858eefcb7fefbe5913277b1f511697105d89f9768012ec"
+      },
+      {
+        "path": "apps/api/src/mcp-cancellation.boundary.ts",
+        "sha256": "a9b95b6682eb2e40508c8b44857accb61f2bb8ed9ae43498cd40accf6cf4bedb"
+      },
+      {
+        "path": "apps/api/src/mcp-request.service.ts",
+        "sha256": "cf91e59fffaefe5754474e656c6d810cdbe223a171133a2c91fea3d333fa1ba0"
+      },
+      {
+        "path": "apps/api/src/mcp-response.boundary.ts",
+        "sha256": "70083c2b56462c1e7522754b051c93fcda321c83d68dfa4f6deea4de3211c03a"
+      },
+      {
+        "path": "apps/api/src/mcp.schemas.ts",
+        "sha256": "7e79da01e541eb3f94f28f82668d52c2469c88c8b06f0f524f3d3af265182cbe"
+      },
+      {
+        "path": "apps/api/src/mcp.tools.layer.ts",
+        "sha256": "238a856c660673c9e87fdaed3f0f198e01b1b00a1cb242b3c0c358e5ee119967"
+      },
+      {
+        "path": "apps/api/src/worker.application.ts",
+        "sha256": "6fcec73c061dec28a9458ff4ea42bcd21ef2314ff3ab59b47647baa3ec82f743"
+      },
+      {
+        "path": "apps/api/test/mcp-client.boundary.test.ts",
+        "sha256": "d4ec7b20a434c9d79c1048b53511a58452c82b4c20fe55646226066652c5fc70"
+      },
+      {
+        "path": "apps/api/test/mcp-response.boundary.test.ts",
+        "sha256": "0a5a3d69a12e1a239d78105bb2baa513c81206960407848db232ed241877f278"
+      },
+      {
+        "path": "apps/api/tsconfig.tests.json",
+        "sha256": "eafe43d813d7382bc3c792c1d03f0b6b2538b4a9d58ec9d325ea574ecbfcf29b"
+      },
+      {
+        "path": "apps/web/README.md",
+        "sha256": "ec2ecfb5632b2c0a157d4261f7ac9f8fbc7fee064f27aed301c3281c6b9dacc8"
+      },
+      {
+        "path": "apps/web/package.json",
+        "sha256": "34da6703cebb9fec34af08cf161daffd3e33e54a869a6e04805f64dfce511ae2"
+      },
+      {
+        "path": "apps/web/test/native-mcp.boundary.test.ts",
+        "sha256": "6bef391d3a2ada8ae89601c033080b08fba2f378cc9f48fe8f9800d5c782a06a"
+      },
+      {
+        "path": "apps/web/tsconfig.json",
+        "sha256": "50306580ff34de4b0030f94a32d4187413bca3c57e37e9f19714c3024f6f897f"
+      },
+      {
+        "path": "apps/web/vitest.native.config.ts",
+        "sha256": "8002069540194bbf8af2b85de13391306b7945e09119b5adabfaec814ec772a5"
+      },
+      {
+        "path": "bun.lock",
+        "sha256": "925676a4c7af0149b0a0e4f14cc0a2ce4b881fda76c537de5d24823fd9331c70"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "11c07dfc1fd5dc45c0758c60a35a74b9ff0acc5096ba5b49fb2837dc4899ee2e"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "3b1ccf69c4d773b85a12dd4c4b2f29d79c91e2d5e444b9112051e42376c9cd7f"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "92e411ae724adf3f1933033ab947e8a00facfa7427a382c2a7bdf28c95981f41"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "d79b2f5b01ef9dc59c120d5bd26181470add21f5bd91553714f3befa7d8bb2a9"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "891ab39f0383aa3231077691a5cdead8178fe681d76b7cfa1a1c92458884e86e"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "dfefc48aaa9a914ae40a0bf4aa521defba9c3b52393741aee8cc9f6231597db6"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "b1e7a18fba7511474a9c43ba3a02352a24866a3a2e9508e2f0cfa8bd0124bf79"
+      },
+      {
+        "path": "docs/runbooks/release-readiness.md",
+        "sha256": "98bd801006cf4ed7e9dc3fca9e34b7d6586949169c641d56cf30617e9ce8b09e"
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "37cc3bda6ebabde02c07b535374da70a1ada89f784da1ef05f0b100f63a05738"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "4f3bf7e07a6c71c8a907cd406c2725a39fa26fed966ed410e8f25afd4268c3f5"
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "b3646df1d5143e9ae3901fdfc9627429dfa79384901f4e29a1fe0795e5794f81"
+      }
+    ]
+  },
+  "ownership": {
+    "runtime": "Native Alchemy API instance/request owner; lazy protocol host is built once in its instance scope after native origins resolve",
+    "protocol": "Installed Effect McpServer/Toolkit, only v2026_07_28 composed at /mcp; native JSON/SSE frames and per-request metadata",
+    "contracts": "Canonical calculator/content Schemas and captured named services; MCP owns only the search-result envelope around the canonical content result Schema. Toolkit stays private. No independent engine, saved personal report or public package export.",
+    "allowance": "One checked calculator request identity, calculation pool, work budget and rate service shared with HTTP/RPC; first caller capabilities excluded from toolkit construction",
+    "cancellation": "Original native Request.signal supplied as private Context.Reference<Option<AbortSignal>>; synchronous native Effect callback registers then checks again and owns cleanup",
+    "response": "Complete reply bytes bounded to 2 MiB and total handler/body read to ten seconds; no subscriptions or resumption advertised",
+    "privacy": "Fixed declared failure vocabulary and existing safe error reporter; no raw causes, figures or rate identities in replies/logs"
+  },
+  "versions": {
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "officialClient": "2.3.1 test-only in API/Web",
+    "clientTarballSha256": "0febe399e355b703d4e9fa6eb1453c5fa06b06c78e2421d797dcb145fb9bb68f",
+    "effectTarballSha256": "eff6ca16140c491380cfdb4bcbc51be6a51f1ac2d402ebc8420e76ccf3e0e19a",
+    "referenceEffect": "rc.112 at 2600f62f4532026928454dcea8d1c48557b3f942, guidance only",
+    "referenceAlchemy": "beta.75 at 808ef694b2e742a2bb76cb301da371e71421fa57, guidance only",
+    "compatibility": "Installed APIs own compatibility; no existing dependency upgrade. Test type conditions choose compiled EventSource export identical to standard import, avoiding its unrelated raw source under workspace source conditions.",
+    "existingPackageVersionAccounting": "HEAD-to-candidate resolved package/version multiset loses no existing entry; six new test-client packages only. path-key 3.1.1 and 4.0.0 are relocated without a consumer version change."
+  },
+  "focusedChecks": [
+    {
+      "stage": "install",
+      "command": [
+        "bun",
+        "install"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.54,
+      "logId": "dev77-mcp-canonical-tools-a-install.log",
+      "logSha256": "0161d289571441136f541753ca1de0d9de7eac92e0569a8ad81c6513a1f8a532"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "apps/api/test/mcp-client.boundary.test.ts",
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/effect-services.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/runbooks/release-readiness.md",
+        "docs/documentation-audit/README.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/verification/critical-journeys.json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "logId": "dev77-mcp-canonical-tools-a-format.log",
+      "logSha256": "076a6f686d4d15af97187428a2ec80ee9ccaa4039eb4cfef79c2109c5b4a46af"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "x",
+        "oxlint",
+        "-c",
+        "oxlint.config.ts",
+        "apps/api/test/mcp-client.boundary.test.ts",
+        "apps/web/test/native-mcp.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.46,
+      "logId": "dev77-mcp-canonical-tools-a-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "api-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.2,
+      "logId": "dev77-mcp-canonical-tools-a-api-tests.log",
+      "logSha256": "593af06bf3e3d75ec2eb57073728fd2651c9b3b6deea5e5d3effddb93a6b2c4a"
+    },
+    {
+      "stage": "api-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.55,
+      "logId": "dev77-mcp-canonical-tools-a-api-types.log",
+      "logSha256": "dcd870dd85a5f8922970ce39ef47ca712e3b74f6b9043a48e82d4d78bf7efc10"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.17,
+      "logId": "dev77-mcp-canonical-tools-a-web-types.log",
+      "logSha256": "dd89d8ab921ae4e0bceb2a3df186d02bc2800efd2f24b05ca27b02da58118cc6"
+    },
+    {
+      "stage": "native-mcp",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "vitest.native.config.ts",
+        "test/native-mcp.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.05,
+      "logId": "dev77-mcp-native-worker-b-native-mcp.log",
+      "logSha256": "3ca2ab321c5c05fff0e39e59ed544040098036784e77f34f46506f1275c346e0"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "apps/api/test/mcp-client.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.23,
+      "logId": "dev77-mcp-header-admission-c-format.log",
+      "logSha256": "1c1afceb9316a9b7d3961da08db06d18550b66f8ab8d195d0ea1f6000d0b4dc8"
+    },
+    {
+      "stage": "api-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.72,
+      "logId": "dev77-mcp-header-admission-c-api-types.log",
+      "logSha256": "55aa9e0bee45b7fe345ef51d7a88f386f38f5e5ce0d8bd1b0ca96bc75835ae8f"
+    },
+    {
+      "stage": "api-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.27,
+      "logId": "dev77-mcp-header-admission-c-api-tests.log",
+      "logSha256": "d9a669392b8d04b85e8e9dd7c3538546520812eb1b82e0a99b5425c2b94c4767"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.43,
+      "logId": "dev77-mcp-repository-preflight-b-docs.log",
+      "logSha256": "56707ca49d0285e0c9a21b81adf5f49ac9df44defa421c3b1fe028fc9d652417"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.17,
+      "logId": "dev77-mcp-repository-preflight-b-runbooks.log",
+      "logSha256": "e08b34bf3de670d3b88a06a732ef5035a330c0ddc3a2575a31c705abc0e99098"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.22,
+      "logId": "dev77-mcp-repository-preflight-b-lint.log",
+      "logSha256": "199b82b7e78c7be071a74d066f0e8fa6fec4f561788cfbe4f95fbbb6f720db5e"
+    },
+    {
+      "stage": "knip",
+      "command": [
+        "bun",
+        "run",
+        "knip"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.64,
+      "logId": "dev77-mcp-repository-preflight-b-knip.log",
+      "logSha256": "74961ff0318ef39178a731c6cc11141963b148f30900467a9e67cfa677cdc6c9"
+    },
+    {
+      "stage": "frozen-install",
+      "command": [
+        "bun",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.48,
+      "logId": "dev77-mcp-freeze-preflight-b-frozen-install.log",
+      "logSha256": "7bf997165dc6ce107e31135cb655b212cb59fa1cd2ab14feb772f9ad9d0ac2dc"
+    },
+    {
+      "stage": "format-check",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.22,
+      "logId": "dev77-mcp-freeze-preflight-b-format-check.log",
+      "logSha256": "0c05fe97a099758cc5299cf6ec7554028dcbc7c8f1e3ee78cd5a4956d1c5f6be"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "apps/api/src/mcp.schemas.ts",
+        "apps/api/src/mcp.tools.layer.ts",
+        "apps/api/test/mcp-client.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.08,
+      "logId": "dev77-mcp-schema-owner-a-format.log",
+      "logSha256": "613859af73e7ce01ede19c30bbcc485bd0512880ba71a634b9c3bd15e983a406"
+    },
+    {
+      "stage": "api-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.54,
+      "logId": "dev77-mcp-schema-owner-a-api-types.log",
+      "logSha256": "e8d779cecd4d8b9d694cdb8098b938f8749ac31290c3e8107c0e63237ab8f22a"
+    },
+    {
+      "stage": "api-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.98,
+      "logId": "dev77-mcp-schema-owner-a-api-tests.log",
+      "logSha256": "395277c106f7fe7e3ef0c56d3313e6943280cd19bac75a319bd8c61d58657e5d"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.63,
+      "logId": "dev77-mcp-schema-owner-a-lint.log",
+      "logSha256": "40d20b8ac66ae673653e500b21995b7759b92110faf5a20c0c8e7d80f828b33b"
+    },
+    {
+      "stage": "knip-production",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.77,
+      "logId": "dev77-mcp-schema-owner-a-knip-production.log",
+      "logSha256": "6a1846601d4bb49d754a8b33525fb6c9b57afe02c531b2643a4416618a447e6d"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.31,
+      "logId": "dev77-mcp-schema-owner-preflight-a-docs.log",
+      "logSha256": "165a25349ee218e70d7f12aee8e22c84398bfeb580b4c2a4be2196f6497edb95"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "logId": "dev77-mcp-schema-owner-preflight-a-runbooks.log",
+      "logSha256": "dc92ee3fa811cca195a02ecb3a8454739a7a7c9fb7766b2fe8cd6b760b5db9e7"
+    },
+    {
+      "stage": "format-check",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.64,
+      "logId": "dev77-mcp-schema-owner-preflight-a-format-check.log",
+      "logSha256": "162d508d2caf6aee5af5ac9ebd997854df55b85020ae4fdabff1cc6be73e37fc"
+    }
+  ],
+  "observations": [
+    "Official client lists and successfully calls all six tools; report/page/navigation/search/schema replies decode through canonical Schemas and match captured service results.",
+    "Two exact host address fixtures retain independent allowances; invalid calculation payload fails without consuming admission or reflecting its sentinel.",
+    "Actual client origin, unsupported revision and conflicting method/name headers are rejected with observed native HTTP 403/400, without console output. Positive exact website Origin succeeds.",
+    "Eight actual client calculations fill the real bounded service pool; aborting one reaches its original signal/cleanup, a replacement returns the retained report, then all remaining calls close.",
+    "Expected input/capacity/timeout failures retain fixed safe tool codes; an internal defect returns the native fixed tool failure with positive fixed API reporting and no sentinel/pay figure.",
+    "Exact 2 MiB framed response succeeds; one byte more fails, stalled body reaches the ten-second limit, and source streams close.",
+    "Real official-client TCP calls against the built native Worker match actual HTTP calculation/page responses and exhaust one common three-call disposable local fixture allowance; no native exception or pay-value log appears."
+  ],
+  "failedAttempts": [
+    {
+      "issue": "Early native abort occurred before Stream listener acquisition; original tool signal was aborted but calculation cleanup stalled",
+      "correction": "Use Effect callback to register listener synchronously then check aborted state again; actual-client filled-pool test passes"
+    },
+    {
+      "issue": "Removing Scope from two captured native Toolkit contexts did not fix the stall",
+      "correction": "Removed the unsuccessful experiment; standard native Toolkit.toLayer/McpServer.toolkit retained"
+    },
+    {
+      "issue": "Built network journey waited on Queue.takeAll for a message in an empty exception queue",
+      "correction": "Installed Queue.clear performs non-waiting silence inspection; bounded full network journey passes"
+    },
+    {
+      "issue": "Initial routing test assumed connect made no request and assumed an irrelevant name header would fail tools/list",
+      "correction": "Observe actual connect/call failures, test name agreement on a named tool call; native HTTP statuses now pass"
+    },
+    {
+      "issue": "Test types selected vendor raw EventSource source under source condition",
+      "correction": "Use compiled vendor export through test type conditions; no cast or new library-check suppression"
+    },
+    {
+      "issue": "Focused compilation/style failures during initial construction",
+      "correction": "Corrected exact installed APIs, failure typing, request test context, canonical page Markdown field and exact wire fixture permissions; fresh API/Web types/lint/tests passed"
+    },
+    {
+      "issue": "First complete CI-mode graph stopped in production unused-export checking after 567.01 seconds because a toolkit export was used only by a test",
+      "correction": "Toolkit now stays private; the MCP search response Schema reuses the canonical content result Schema and is consumed by the live tool and actual-client test. Fresh API tests/types, lint and production unused-export check pass. Full graph must rerun.",
+      "logId": "dev77-mcp-frozen-release-a-release-graph.log",
+      "logSha256": "24e6c5d6d71ac6252d88a3743a2282c94df56ff70fff29ae111c038519430562"
+    }
+  ],
+  "documentationImpact": {
+    "changeRequired": [
+      "API/Web app guides",
+      "API/service/test architecture",
+      "existing full native-pair selection and release runbook wording",
+      "existing current native journey",
+      "exact actual CLI wire fixtures",
+      "active plan/tasks and dated proof/index"
+    ],
+    "preserve": [
+      "accepted MDX/navigation/catalogue bytes",
+      "tax rules/tables/reports",
+      "SDK/package public exports",
+      "canonical skill assets",
+      "provider recovery history",
+      "disabled collection"
+    ],
+    "changeset": "N/A: private app composition and test-only dependencies; no versioned package contract/export change"
+  },
+  "remaining": [
+    "Commit, push and verify reviewable draft delivery for this tested modern checkpoint",
+    "Older v2025_11_25 native Worker session routing, capacity and expiry",
+    "Real network tool cancellation and complete native lifetime refusal proof",
+    "Page-owned browser tools, real browser caller and unsupported-browser fallback",
+    "Public agent setup/discovery content and complete T006 acceptance"
+  ],
+  "nonClaims": [
+    "No whole T006 completion",
+    "No older session support advertised",
+    "No network cancellation proved by in-process abort test",
+    "No browser-agent execution",
+    "No forced synchronous CPU pre-emption",
+    "No edge rate exactness/global quota",
+    "No deployed endpoint, provider readback/apply, merge or publication",
+    "No Medicare tax correction or deferred metrics work"
+  ],
+  "rollback": "Do not merge this reviewable candidate if its tools or lifetime proof is inadequate; prior accepted source is 366b3e1464a356ef12d08fef34ee3c1525566910. No provider changes need reversing.",
+  "qualification": {
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 896.89,
+    "mode": "Report-only CI graph; no candidate or attempt receipt or release claim",
+    "wrapperLogIdentity": {
+      "logId": "dev77-mcp-frozen-release-b-release-graph.log",
+      "sha256": "416bb1d0853924f7fcdd8160434b552133f45dd0c05c86cab059253ddb00a440",
+      "bytes": 5366
+    },
+    "checks": [
+      {
+        "id": "verification",
+        "target": "Canonical repository verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/verification-stdout-d2BFua/1cc0f4eb8638.log",
+            "sha256": "6a3f8e62fbb0fc87b4a3e0bb6835eb13c8e27301785feeda99aaace78a0b5124",
+            "bytes": 511661
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/verification-stderr-7ZhWGm/e506b3a687f7.log",
+            "sha256": "59504b0ca83995236774089abf8bb6719a8207c574d1bf0f530b68d2dd7badca",
+            "bytes": 2118
+          }
+        }
+      },
+      {
+        "id": "test",
+        "target": "Workspace tests including the direct calculator journey",
+        "command": [
+          "bun",
+          "run",
+          "test"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/test-stdout-dT6abH/707ce853dc9f.log",
+            "sha256": "76bddbec5eba53842285483e4c0be9b83c65323a3f9ce2f44a9a18e95fe87370",
+            "bytes": 76210
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/test-stderr-EhOGLx/2cd3e7216a3e.log",
+            "sha256": "a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8",
+            "bytes": 216
+          }
+        }
+      },
+      {
+        "id": "build",
+        "target": "Workspace production builds",
+        "command": [
+          "bun",
+          "run",
+          "build"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/build-stdout-LO2sGj/5a4b49bd178a.log",
+            "sha256": "aa4c91781b3da227bad538bb50e5e8fd96907c18113abf969e6c38db00ca36f0",
+            "bytes": 87800
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/build-stderr-mnTmGG/13afbf766ba4.log",
+            "sha256": "844915855e64ad7359e63b5ba6df54e45ef4825107084cebde1492f28bf01a07",
+            "bytes": 137
+          }
+        }
+      },
+      {
+        "id": "docs-validation",
+        "target": "Documentation content validation",
+        "command": [
+          "bun",
+          "run",
+          "docs:validate"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/docs-validation-stdout-EMIhtP/7d8de8a3767c.log",
+            "sha256": "a4f841e8891d41673f03ae61a7e135ed168436dda0ec6dd54685b339c007725f",
+            "bytes": 2295
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/docs-validation-stderr-76ceU3/084d287c026c.log",
+            "sha256": "fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697",
+            "bytes": 51
+          }
+        }
+      },
+      {
+        "id": "packed-artifact",
+        "target": "Focused SDK packed artifact proof",
+        "command": [
+          "bun",
+          "run",
+          "sdk:check-packed-artifact"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/packed-artifact-stdout-EwIw8J/ecb04e9a58a5.log",
+            "sha256": "02623d5a0c248dee27c3f88e9c60b714b4e9e2600014a0ea6c364c68f0735a77",
+            "bytes": 3764
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/packed-artifact-stderr-2rTGKI/beb9746c1d65.log",
+            "sha256": "06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7",
+            "bytes": 55
+          }
+        }
+      },
+      {
+        "id": "downstream-consumer",
+        "target": "Strict downstream package proof",
+        "command": [
+          "bun",
+          "run",
+          "sdk:validate-downstream"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/downstream-consumer-stdout-zKPqeT/3c12a753acb4.log",
+            "sha256": "0f5a12897ab59052731450871d5fc7e7f516501390161fd38d32efa9d0c2a0da",
+            "bytes": 13352
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/downstream-consumer-stderr-Li4VC6/696b49b2304a.log",
+            "sha256": "d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9",
+            "bytes": 53
+          }
+        }
+      },
+      {
+        "id": "api-smoke",
+        "target": "Public API smoke evidence",
+        "command": [
+          "bun",
+          "run",
+          "api:smoke"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/api-smoke-stdout-jjm4Ss/5b2e892f1a89.log",
+            "sha256": "5b19893e6b310ccebd54aa7b614999d3060ebd4dc6414eb80a924b9fc5e49648",
+            "bytes": 59964
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/api-smoke-stderr-IQ9Wpa/050457779945.log",
+            "sha256": "1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87",
+            "bytes": 31
+          }
+        }
+      },
+      {
+        "id": "docs-browser",
+        "target": "Built native Website and documentation evidence",
+        "command": [
+          "bun",
+          "run",
+          "web:test:native-pair"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/docs-browser-stdout-t9ler7/4cd2ea2c7790.log",
+            "sha256": "5bcf076e6e2987e4a037545e77e958f60e346ce9a0f23c993a748f7ae2e0b180",
+            "bytes": 71084
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/docs-browser-stderr-r3bAYc/b858a88ff3c6.log",
+            "sha256": "781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4",
+            "bytes": 82
+          }
+        }
+      },
+      {
+        "id": "changeset-status",
+        "target": "Pending release train status",
+        "command": [
+          "bun",
+          "run",
+          "changeset:status"
+        ],
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/changeset-status-stdout-VRzriu/31200ddbe84e.log",
+            "sha256": "842dbb9bc52ea4dcaed92576ccc343f99960b6fd9fc4a6e119c010ae5de13a52",
+            "bytes": 10039
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/changeset-status-stderr-ExkejJ/2f07ab10aa76.log",
+            "sha256": "26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3",
+            "bytes": 37
+          }
+        }
+      }
+    ],
+    "sourceReadback": {
+      "matched": 28,
+      "mismatches": [],
+      "afterWholeGraphBeforeClosure": true
+    },
+    "nativePair": {
+      "files": 8,
+      "tests": 12,
+      "result": "All passed in both complete verification and the separate final native graph step"
+    }
+  },
+  "primaryReview": {
+    "reviewer": "Primary TaxKit implementation owner",
+    "scope": "Frozen staged modern MCP source c; independent acceptance is still outstanding",
+    "artifacts": [
+      "apps/api/src/mcp.schemas.ts",
+      "apps/api/src/mcp.tools.layer.ts",
+      "apps/api/src/mcp-cancellation.boundary.ts",
+      "apps/api/src/mcp-request.service.ts",
+      "apps/api/src/mcp-response.boundary.ts",
+      "apps/api/src/worker.application.ts",
+      "apps/api/test/mcp-client.boundary.test.ts",
+      "apps/web/test/native-mcp.boundary.test.ts",
+      "docs/product-specs/clean-slate-foundation.tasks.json"
+    ],
+    "findings": [
+      "Six named native tools reuse canonical calculator/content contracts and captured existing services; only a private app search envelope is added.",
+      "Checked rate identity and original request signal are private request capabilities; lazy host creation omits first-caller capabilities and retains the native instance scope.",
+      "The response reader owns complete JSON/SSE byte and time bounds. Cancellation registers synchronously, rechecks the native signal, removes its listener and awaits interrupted work cleanup.",
+      "Actual-client equality/refusal/safe-error/full-pool tests and the built TCP fixture test distinguish in-process cancellation from network cancellation.",
+      "Exact test-only client/decoder permissions have real accepted/rejected CLI fixtures; runtime permission is not broadened.",
+      "No public MDX/catalogue, tax rule/report, package export, canonical skill or provider operation changes. No Changeset required for private app/test-only changes.",
+      "Modern-only composition and incomplete older session/browser/public setup work are stated in current intent, guides and proof. T006 remains in progress."
+    ],
+    "limitations": [
+      "No independent review or whole T006 acceptance",
+      "Complete nine-check graph passed; all eighteen exact returned detail files were read and hashed. This is local CI-mode proof only.",
+      "No real network cancellation, older Worker session routing/expiry or TaxKit browser-tool journey"
+    ]
+  },
+  "postQualificationMetadata": {
+    "paths": [
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "scope": "Proof and active-plan closure only. Frozen application/configuration/test sources remain unchanged; closure is checked separately before commit.",
+    "checks": [
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.44,
+        "logId": "dev77-mcp-closure-a-docs.log",
+        "logSha256": "1949a9d18f7661988b6c8e40419ee18e9ef650ecd3703f07527741371ca5bab0"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.15,
+        "logId": "dev77-mcp-closure-a-runbooks.log",
+        "logSha256": "4d70ad45c31086ed8bd190d1f08f4265ba8b7a188c87035bb136efe8fe782a06"
+      },
+      {
+        "stage": "format-check",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.64,
+        "logId": "dev77-mcp-closure-a-format-check.log",
+        "logSha256": "87d88775dceec6b74708c66587c31640039224f03a5aa0e6e6fa1f45ccbb2075"
+      }
+    ]
+  }
+}

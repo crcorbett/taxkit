@@ -232,8 +232,9 @@ workerd instance scope has no teardown hook, so no isolate-finaliser claim is
 made; request-coupled I/O belongs inside incoming dispatch.
 
 Origins stay deferred during native planning. A cached native Config effect
-decodes bound addresses on first incoming runtime use. Request handling builds
-no live Layer. The native body stream has bounded accumulation, total read
+decodes bound addresses on first incoming runtime use. HTTP/RPC handling builds no live Layer. The native MCP protocol host is
+built once on first runtime use in the existing instance scope, after addresses
+resolve; its registrations omit first-caller request capabilities. The native body stream has bounded accumulation, total read
 time and scoped cancellation. Safe logger/reporter context is built at instance
 initialisation and supplied to both native router construction and dispatch;
 T009 retains unqualified safe native trace exports. T003's local connection
@@ -532,3 +533,14 @@ memory. No client or runner escapes into content/page logic. The named metadata
 output module separately encodes the owning public TechArticle Schema. Exact
 lint selectors admit these crossings only; adjacent route/rendering modules
 retain their restrictions.
+
+
+Native MCP tools use `Toolkit.toLayer` and `McpServer.toolkit`; no replacement
+registry or package runner is introduced. Current HTTP cancellation enters via
+an app-private `Context.Reference<Option<AbortSignal>>`. The named lifetime
+operation races tool work against an Effect callback for the native stop event.
+Listener registration and a second aborted-state check close the early-abort
+race; losing work and its finalisers are awaited. This capability carries no
+figures or identity and never changes a calculator/content service contract.
+The [API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate)
+records the actual-client and built-Worker proof limits.

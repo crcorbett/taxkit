@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "include": ["test/**/*.ts", "scripts/**/*.ts", "vitest.config.ts"],
   "compilerOptions": {
+    "customConditions": ["bun", "source"],
     "rootDir": ".",
     "noEmit": true,
     "tsBuildInfoFile": "tests.tsbuildinfo"

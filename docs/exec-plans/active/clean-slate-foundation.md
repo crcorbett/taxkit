@@ -4691,3 +4691,105 @@ immediate delivery step. Existing staged PRs still need review; no merge,
 provider access/apply, deployment, hosted replacement or publication occurred.
 Metrics remain deferred, retained tax results remain unchanged, and T006 is
 next in the accepted order.
+
+
+## 2026-10-07 — T006 protocol qualification begins
+
+T005 retirement commit `366b3e1464a356ef12d08fef34ee3c1525566910` was pushed
+to draft #155. Its remote head, exact draft title/body/base and source tree were
+read back. DEV-76 is In Review with the tested source and current limitations;
+its new hosted Quality run `37547139175` is independently still running.
+The complete local nine-check graph passed in 899.20 seconds. No provider,
+merge, publication or deferred metrics operation occurred.
+
+T006 is active on `codex/dev-77-native-agent-tools`, stacked on that exact head.
+First qualify the selected native Effect adapters with the actual official MCP
+client before mounting or advertising them. Installed stable Effect 4.0.0's
+McpServer, McpProtocol and native lifecycle source bytes match the official npm
+tarball. The prior Effect rc.112 and Alchemy beta.75 source repositories were
+checked for guidance; receiving Alchemy beta.80 and installed stable types own
+compatibility. No dependency upgrade follows from that research.
+
+The selected stateless `v2026_07_28` and older stateful `v2025_11_25` adapters
+exist. The latter's default state is instance-local and has no public expiry
+control. Its native Worker routing, hard lifetime and cleanup must be proved
+before support is advertised; a scoped native session owner is an investigation
+candidate only. Reuse the captured calculation/content operations, checked edge
+identity, shared work/rate policy and safe reporter. No second engine, saved tax
+figures or transport-owned calculation policy is admitted.
+
+Current official Chrome guidance uses `document.modelContext` and cancellation
+signals for registration and execution. Installed browsers are Chrome154 and
+controlled Chromium153; actual version-specific input behaviour and a real
+browser caller need separate proof. Fake registration cannot establish an agent
+journey. Ordinary browser use and route cleanup remain required.
+
+Documentation impact: Change required for exact active intent, native agent
+transport/browser command owners, app guides, accepted setup/discovery content,
+architecture, critical journeys and any necessary exact lint/type/export wiring.
+Preserve retained tax outputs, accepted content outside changed setup claims,
+original evidence, current native owners, private runtime lifetimes and disabled
+collection. N/A for merge, hosted availability, provider apply, account/storage
+features or metrics implementation. Package Changeset impact is decided against
+actual public contract changes; no new package is inferred from this app-owned
+transport. T006 remains unaccepted until its complete caller and lifetime proof.
+
+
+## 2026-10-07 — T006 modern native MCP candidate
+
+Hosted Quality run `37547139175` completed successfully for the exact T005
+head `366b3e1464a356ef12d08fef34ee3c1525566910`. That observation belongs draft
+#155; it does not qualify the current dirty T006 source or a deployment.
+
+The native application now composes six canonical tools through installed
+Effect's modern stateless adapter. First-use protocol construction retains the
+instance scope and excludes first-caller request capabilities. Real official
+client tests compare retained reports and accepted pages, separate two callers,
+check safe expected/defect replies and fill eight places before cancelling one
+and finishing a replacement. A real TCP client against the built Worker also
+matches HTTP report/page values and proves one common HTTP/MCP allowance.
+
+The early-abort test exposed a listener-registration race. Checking before a
+stream listener starts misses an abort arriving between those steps. The native
+Effect callback registers first and checks again, with owned listener removal
+and awaited work cleanup. Removing captured Scope from native Toolkit services
+was an unsuccessful investigation and is absent from the candidate. The built
+journey's first timeout came from `Queue.takeAll` on an empty captured-log queue;
+installed `Queue.clear` supplies the non-waiting silence check. Both failed
+attempts and successful reruns remain in the dated proof.
+
+Documentation impact: **Change required** for API/Web app guides, API/service/
+test architecture, native-pair selection, current journey, exact wire fixture
+permissions, active intent and dated proof/index. The release runbook still runs
+its existing full native command, now also including this caller; check its
+contract. **Preserve** accepted MDX/navigation/catalogue bytes, tax tables and
+reports, SDK/package exports, canonical skill assets, native rate namespaces,
+provider recovery history and disabled collection. **N/A** for a Changeset:
+only private app composition and test dependencies change; no versioned package
+contract/export changes. **N/A** for merge, deployment, publication, provider
+apply, credential changes or deferred metrics work. Full current-source checks
+and reviewable commit/push remain next. Older session routing/expiry, real
+network cancellation, browser tools and public setup content remain unfinished;
+T006 stays in progress.
+
+The first complete CI-mode graph stopped after 567.01 seconds at production
+unused-export checking. A toolkit export existed only for an actual-client test.
+The toolkit is now private; the transport owns its search-response envelope and
+reuses the canonical content result Schema in both production and the test.
+Focused API tests/types, lint and production unused-export checking pass after
+this correction. The frozen sources were unchanged after the failed graph.
+Complete qualification must rerun; the failed attempt remains in the receipt.
+
+The corrected frozen modern MCP source passed all nine ordered local CI-mode
+checks in 896.89 seconds. All eighteen exact returned stdout/stderr files were
+read and hashed; all 28 frozen sources matched after the graph. Both complete
+verification and the separate final built-app step passed all twelve native
+cases across eight files. The dated MCP receipt retains the failed first graph,
+correction, exact source/check identities, primary review and proof limits.
+
+This proof/plan closure is post-qualification metadata and is checked separately
+before commit. Tested commit/push and a reviewable draft stacked on #155 remain
+the immediate delivery step. T006 stays in progress: older Worker session
+routing/expiry, real network cancellation, page-owned browser tools and public
+setup content are still unfinished. No provider apply, merge, deployment,
+publication or deferred metrics change occurred.

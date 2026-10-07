@@ -1573,7 +1573,7 @@ build-only checks out of the public metadata module.
 
 The release graph retains nine check IDs and now binds `docs-browser` to
 `bun run web:test:native-pair`. The command freshly builds the native API and
-Website and runs all eleven native cases rather than selecting a name-filtered
+Website and runs all native cases without selecting a name-filtered
 subset that could become empty. The reader journey independently proves all
 accepted pages and metadata, real private calls without document reload,
 search, discovery, Markdown, generated PNG delivery and browser decoding.
@@ -1610,3 +1610,23 @@ no raw excerpts, secret sentinels or host paths. The Quality source policy
 requires the exact named renderer from the Schema/report owner and the result
 returned by the canonical CI call; plain success text, another result, shadowed
 renderers and candidate reads are rejected. See the [dated detail-output receipt](../documentation-audit/clean-slate-foundation/2026-10-07-release-detail-output.json).
+
+
+## Native MCP caller qualification
+
+API tests use the exact official MCP client 2.3.1 against the native application,
+including real frame/header parsing, expected/defect privacy, different caller
+allowances and filled-pool cancellation/reuse. The complete native-pair suite
+also uses it over real local TCP against the source-built API. Its report and
+accepted Markdown page must equal HTTP results, and alternating HTTP/MCP work
+must exhaust one local allowance. Empty log queues use the installed `Queue.clear`
+operation; `takeAll` waits for a first message and cannot prove silence.
+
+Exact API/native client fixtures admit wire decoding and checked egress only;
+actual CLI fixtures reject runtime execution and neighbouring production-file
+codecs. The test type conditions select compiled vendor exports while retaining
+workspace source exports, matching the official client's runtime dependencies.
+No vendor/library-check suppression or dependency upgrade is introduced.
+The [dated MCP record](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
+retains source/log identities, failed attempts and the remaining session,
+network cancellation, browser-agent and setup work. T006 stays in progress.

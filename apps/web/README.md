@@ -482,3 +482,12 @@ landmarks, contrast and reduced motion. Quality installs Chromium from this
 app's pinned Playwright executable. The old docs workspace and writer workflows are
 retired. Their exact sources and dated recovery records remain addressable;
 new provider operations belong DEV-81. This is local source/build/browser proof only.
+
+
+The native-pair suite also runs the official MCP client over local TCP against
+its freshly built API. It compares returned calculation reports and accepted
+Markdown pages with HTTP and checks their common anonymous allowance. This
+belongs to the [API's agent-tools candidate](../api/README.md#native-remote-calculator-tools-candidate).
+Page-owned browser registration and a real browser-agent journey remain T006
+work. The MCP client and calculator Schema imports are test-only dependencies;
+no browser calculation implementation or production SDK client is added.

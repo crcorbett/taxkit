@@ -14,6 +14,9 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact official MCP client wire ingress and adversarial host fixture.
+  "apps/api/test/mcp-client.boundary.test.ts",
+  "apps/web/test/native-mcp.boundary.test.ts",
   "tools/docs-deployment/retirement.refusal.boundary.test.ts",
   // Exact build catalogue/renderer bytes and adversarial metadata fixture ingress.
   "apps/web/scripts/docs-images.build.ts",
@@ -236,6 +239,9 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Actual MCP client request bytes and secret-negative response assertions.
+  "apps/api/test/mcp-client.boundary.test.ts",
+  "apps/web/test/native-mcp.boundary.test.ts",
   // Exact checked public structured-data script egress; no decoder/runtime permission.
   "apps/web/src/lib/docs/metadata.egress.ts",
   "tools/documentation/catalogue.build.ts",
@@ -511,6 +517,8 @@ export default defineConfig({
       files: [
         "apps/api/src/config.ts",
         // Schema.TaggedError is a class factory, not an Error constructor.
+        "apps/api/test/mcp-client.boundary.test.ts",
+        "apps/web/test/native-mcp.boundary.test.ts",
         "apps/web/scripts/docs-images.build.ts",
         "packages/api/rpc/src/live.layer.ts",
         "packages/api/rpc/src/content.live.layer.ts",

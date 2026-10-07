@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -504,3 +504,11 @@ The [domain contract candidate](clean-slate-foundation/2026-10-06-domain-contrac
 records the remaining Core diagnostic Option owner and removal of the unused
 catalogue program field, original compatibility forms and owning/packed checks.
 Its qualification does not complete rate policy, T004 or external operations.
+
+
+The [native MCP candidate](clean-slate-foundation/2026-10-07-native-mcp.json)
+records actual official-client application and built local Worker proof,
+shared work/admission ownership, safe failures and bounded response cleanup.
+Older session support, network cancellation, browser tools and setup content
+remain T006 work; metrics remain deferred. Local proof establishes no deployed
+endpoint, provider state, publication or complete task acceptance.

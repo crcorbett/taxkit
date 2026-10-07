@@ -69,7 +69,7 @@ everything else. An accepted packet proves an observation, not authority.
    `TURBO_TOKEN` values. Trusted GitHub runs get those values only from the
    fixed `taxkit/ci` Doppler bridge.
    The `docs-browser` check executes `bun run web:test:native-pair`: it freshly
-   builds the native API/Website and runs all eleven native cases, including
+   builds the native API/Website and runs all native cases, including
    accepted pages, navigation, private server calls, search, Markdown, images,
    keyboard/focus/landmarks/contrast/reduced-motion and safe recovery. It no
    longer executes the old app browser command.

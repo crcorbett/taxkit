@@ -20,10 +20,12 @@ import { safeHttpEffect } from "alchemy/Http";
 import {
   ByteSize,
   Config,
+  Context,
   Effect,
   Layer,
   Option,
   Schema,
+  Scope,
   Stream,
 } from "effect";
 import {
@@ -35,6 +37,9 @@ import {
   HttpServerResponse,
 } from "effect/http";
 
+import { McpRequestAbortSignal } from "./mcp-request.service.js";
+import { withBoundedMcpReply } from "./mcp-response.boundary.js";
+import { TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
 import { withApiRequestBodyLimit } from "./worker-request.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
@@ -74,6 +79,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     PublicCalculatorService,
     yield* PublicCalculatorService
   );
+  const content = Layer.succeed(ContentService, yield* ContentService);
   const discovery = ContentDiscoveryLive(
     settings.pipe(
       Effect.map((config) =>
@@ -97,24 +103,69 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     TaxKitApiRoutesLayer,
     TaxKitRpcHttpLayer.pipe(Layer.provide(calculator))
   ).pipe(
-    Layer.provide(
-      Layer.merge(
-        Layer.succeed(ContentService, yield* ContentService),
-        discovery
-      )
-    ),
+    Layer.provide(Layer.merge(content, discovery)),
     HttpRouter.provideRequest(calculator)
   );
   const handler = yield* HttpRouter.toHttpEffect(routes).pipe(
     Effect.provideContext(telemetry)
   );
+  const instanceScope = yield* Scope.Scope;
+  // Build the protocol host once on first use, after native addresses resolve.
+  // Retain its fibres in the instance Scope, and keep the first caller's
+  // request/key out of registration. Each call receives its own native Context.
+  const mcp = yield* Effect.cached(
+    settings.pipe(
+      Effect.flatMap((config) =>
+        HttpRouter.toHttpEffect(
+          TaxKitMcpHttpLayer(config.websiteOrigin).pipe(
+            Layer.provide(calculator),
+            Layer.provide(content)
+          )
+        )
+      ),
+      Scope.provide(instanceScope),
+      Effect.updateContext((context: Context.Context<never>) =>
+        Context.omit(
+          CalculatorRequestRateKey,
+          McpRequestAbortSignal,
+          HttpServerRequest.HttpServerRequest
+        )(context)
+      ),
+      Effect.provideContext(telemetry),
+      Effect.catchTags({
+        ConfigError: () =>
+          Effect.succeed(
+            Effect.succeed(HttpServerResponse.empty({ status: 503 }))
+          ),
+        IllegalArgumentError: () =>
+          Effect.succeed(
+            Effect.succeed(HttpServerResponse.empty({ status: 503 }))
+          ),
+      })
+    )
+  );
 
   const fetch = safeHttpEffect(
     Effect.gen(function* () {
       const config = yield* settings;
-      return yield* withApiRequestBodyLimit(handler).pipe(
+      const request = yield* HttpServerRequest.HttpServerRequest;
+      const isMcp = new URL(request.url, config.apiOrigin).pathname === "/mcp";
+      const selected = isMcp
+        ? mcp.pipe(
+            Effect.flatMap(withBoundedMcpReply),
+            Effect.provideService(
+              McpRequestAbortSignal,
+              Schema.decodeUnknownOption(Schema.instanceOf(Request))(
+                request.source
+              ).pipe(Option.map((original) => original.signal))
+            )
+          )
+        : handler;
+      return yield* withApiRequestBodyLimit(selected).pipe(
         HttpMiddleware.cors({
-          allowedHeaders: ["content-type"],
+          allowedHeaders: isMcp
+            ? ["content-type", "mcp-method", "mcp-name", "mcp-protocol-version"]
+            : ["content-type"],
           allowedMethods: ["GET", "POST", "OPTIONS"],
           // The native predicate checks the actual request origin.
           allowedOrigins: (origin) => origin === config.websiteOrigin.origin,
