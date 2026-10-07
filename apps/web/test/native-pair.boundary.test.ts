@@ -37,7 +37,12 @@ import {
   Record,
   Schema,
 } from "effect";
-import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
+import {
+  FetchHttpClient,
+  Headers,
+  HttpClient,
+  HttpClientRequest,
+} from "effect/http";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
@@ -1941,7 +1946,7 @@ describe("built native API and Website", () => {
           );
           expect(reply.status).toBe(200);
           expect(
-            Record.get(reply.headers, "content-type").pipe(
+            Headers.get(reply.headers, "content-type").pipe(
               Option.map((value) => value.includes("text/markdown"))
             )
           ).toEqual(Option.some(true));

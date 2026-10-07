@@ -246,6 +246,89 @@
       "durationSeconds": 19.02,
       "log": "dev77-agent-local-recheck-a-local-development.log",
       "sha256": "a47d4b849ba81a6d0d60183c15a1e123fe7d5c315c6ff3e8d8c5ee00adbbf745"
+    },
+    {
+      "stage": "frozen-install",
+      "command": [
+        "bun",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.64,
+      "log": "dev77-agent-whole-a-frozen-install.log",
+      "sha256": "b7b234ffea7fbe5e0d77884a0eae1f2a75ab9157a73d205e8aacae6e7e92b855",
+      "sourceCommit": "d96de5b8a94231c46ba5041d9ad1541e996160e7"
+    },
+    {
+      "stage": "release-graph",
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 599.46,
+      "log": "dev77-agent-whole-a-release-graph.log",
+      "sha256": "7a54b7d48d69de30c4f79736e2d3bfac3d93129acea972de052eb381c16e3e6a",
+      "sourceCommit": "d96de5b8a94231c46ba5041d9ad1541e996160e7"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "--no-install",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "apps/web/test/native-pair.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.12,
+      "log": "dev77-agent-header-fix-a-format.log",
+      "sha256": "9889e37acd9af55b74d3909ee742873053f31768febdaddedeb91195bb13c2c3"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.23,
+      "log": "dev77-agent-header-fix-a-web-types.log",
+      "sha256": "122f1148999860cf3152c715cf71a19294a219f9a2452cc68f127a8514ae0a50"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.97,
+      "log": "dev77-agent-header-fix-a-lint.log",
+      "sha256": "09a80eeb6e173cde02ad5e37aed564299f938dea97d697bec9e374bc9a8b435d"
+    },
+    {
+      "stage": "built-pair",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 116.09,
+      "log": "dev77-agent-header-fix-a-built-pair.log",
+      "sha256": "7788fa3e17b6d1700445b6ea2cf8392d7ed0481a0cf801e23a059eb7d0207134"
     }
   ],
   "limitations": [
@@ -268,6 +351,24 @@
     {
       "owner": "Existing native local development journey",
       "finding": "First complete built suite passed 13 of 14 cases, including the guide; local startup timed out waiting for its calculator heading. Exact unchanged two-case local-development retry passed in 19.02 seconds with the original deadlines. Cause is unqualified; do not claim it fixed or attribute it to the guide."
+    },
+    {
+      "owner": "New native-pair header assertion",
+      "finding": "First clean-source whole graph stopped in verification after its successful quality-policy tests. The later test edit used Record.get on native Headers; strict types rejected its Symbol members. Correct it to owning Headers.get. No failed candidate is qualified or deployed.",
+      "verificationDetails": [
+        {
+          "role": "verification-stdout",
+          "path": "tmp/release-readiness/verification-stdout-qCUX5J/2bbdb1e7f5e4.log",
+          "sha256": "8532ca990de236e58b1698c7d0f97645b83a322abb45acc535d159bb75e2b50f",
+          "bytesRead": 384582
+        },
+        {
+          "role": "verification-stderr",
+          "path": "tmp/release-readiness/verification-stderr-JHk0te/d5c03144ba16.log",
+          "sha256": "7e1cb333d2acfdae7f10edb54a41ee3b8e9dbdb93e3d24eb3be2291d9f0c4aeb",
+          "bytesRead": 2253
+        }
+      ]
     }
   ],
   "focusedPostconditions": {
@@ -281,7 +382,10 @@
     "unchangedLocalDevelopmentRetryPass": 2,
     "nativeSuiteFirstAttemptPassed": 13,
     "nativeSuiteFirstAttemptFailed": 1,
-    "wholeGraphClaim": false
+    "wholeGraphClaim": false,
+    "correctedNativeSuitePassed": 14,
+    "correctedNativeSuiteFilesPassed": 9,
+    "nativeHeadersReaderTypeAndLintPassed": true
   },
   "localCiGuidance": {
     "release": "@commonplace/development-workflows@0.6.9",
@@ -290,5 +394,14 @@
     "reference": "alchemy-iac/references/operations/authority-plan-apply.md#local-execution-when-ci-cannot-start",
     "rule": "Pin source and frozen dependencies, run the full existing local graph, use native owners and separately read provider/public behaviour. Do not disable checks or change billing.",
     "repositoryCanonicalSkillsUnchanged": true
-  }
+  },
+  "sourceHistory": [
+    {
+      "commit": "d96de5b8a94231c46ba5041d9ad1541e996160e7",
+      "qualification": "Failed verification header assertion; superseded by native header-reader correction",
+      "freeze": "dev77-agent-freeze-a.json",
+      "freezeSha256": "3d29a77b524eea2d6a8d27d11e83c186ebe492bb2651c06857f36081216bdc36",
+      "trackedCount": 1749
+    }
+  ]
 }
