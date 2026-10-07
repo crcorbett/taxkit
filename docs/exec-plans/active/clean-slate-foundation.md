@@ -79,7 +79,7 @@ records command outcomes and log digests.
 | T003 / DEV-74 | Complete locally; draft review outstanding | Native connection/containment and exact #136 hosted Quality pass. T009 exported tracing remains unmet. Linear state unchanged. |
 | T004 / DEV-75 | Complete locally; draft review outstanding | Named operations, body/work/rate policy and domain/package checks pass. Draft #154 has exact-head hosted Quality proof; Linear state is unchanged. |
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
-| T006 / DEV-77 | In progress | Modern remote tools are locally tested in draft #156 with exact-head hosted Quality. Browser tools, saved-state and page-description lifetimes passed the complete local nine-check graph; tested draft delivery remains next. Older sessions, remote cancellation and public setup remain unfinished. |
+| T006 / DEV-77 | In progress | Modern remote tools are locally tested in draft #156 with exact-head hosted Quality. Browser tools and both saved-page lifetimes are delivered in draft #157 after all nine local checks and exact-head hosted Quality. Older-session lifetime/cancellation passed the complete source-frozen nine-check graph on the current branch, including all fourteen native cases twice. Its tested draft delivery is being prepared. Prompt modern remote cleanup and public setup remain unfinished. |
 | T007 / DEV-78 | Pending T003/T005 | Reviewable Alchemy domain/Doppler plan; no apply. |
 | T008 / DEV-79 | Pending T004/T005/T006 | Minimal private PostHog events. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
@@ -4955,3 +4955,173 @@ T006 task stays in progress for older remote sessions, actual remote cancellatio
 and qualified public setup. Browser proof is native caller execution controlled
 by the test, not an autonomous model session, deployment or public availability.
 Metrics collection remains disabled and its approach deferred.
+
+
+## 2026-10-07 — Native session lifetime slice begins
+
+Browser draft [#157](https://github.com/crcorbett/taxkit/pull/157) is open on
+`codex/dev-77-browser-tools` at `964b7e9b839545e135476a516541e8f4750268e7`,
+stacked on #156. Push, exact draft/base/head and attachment were read back.
+Hosted Quality run 37565321855 is still in progress at this observation.
+DEV-77 comment `d8aa3a49-624c-4375-920d-181070f3d812` and native project
+update `560420b2-94e8-4784-854b-7b744b456e73` were independently read back.
+
+Continue from that clean source on `codex/dev-77-native-session-lifecycle`.
+Actual official-client preparation against the built TaxKit stalled-work API
+filled all eight places and aborted one real outgoing HTTP request. The API
+kept the place until its five-second work budget; a replacement could not
+enter within the earlier observation. Default settings, the incoming-signal
+flag, and incoming plus forwarding flags all behaved alike. This negative
+network observation does not invalidate the earlier positive in-process test,
+and that earlier test does not prove real network cancellation. No flag-only
+correction is accepted. The next native oracle must retain this distinction.
+
+Qualify the older native adapter separately. The installed adapter owns its
+session identifiers, message parsing and cancellation matching, but exposes no
+per-session expiry operation. The proposed local candidate uses one fixed-name
+native Durable Object per stage with a scoped in-memory protocol host. Reuse
+the same captured calculator/content service implementations and native rate
+binding; do not copy an engine, parser, private protocol Map or provider client.
+The calculation pool remains local to its application instance, as already
+owned by the calculator work policy; a new native host is not a global pool.
+Actual interleaved rate proof must establish the common allowance.
+
+The candidate admits at most 32 initialisation attempts per ten-minute host
+lifetime and at most 32 simultaneous native requests without queuing. The
+short host lifetime bounds retained native client metadata. Native alarms and
+an incoming time check close the whole host scope at expiry; only the alarm
+timestamp may enter platform storage, never client metadata or tax figures.
+The installed parser still owns all messages. Its actual HTTP admission rejects
+initialise carrying an existing session ID before registration. Preserve that
+native refusal and the existing conversations; it cannot bypass the exhausted
+bootstrap allowance. No application parser or extra reinitialisation workaround
+is needed.
+Sessions are anonymous protocol conversation identities, not login identities.
+The current original checked request key crosses only the private native
+binding separately from JSON; caller-supplied copies must be replaced.
+
+Before any acceptance, prove actual SDK composition and official-client
+initialise/list/read/calculate, version/origin refusal, distinct sessions,
+wrong-session cancellation isolation, real cancellation cleanup and immediate
+place reuse, capacity, automatic expiry and fresh reconnect. Public setup is
+still withheld until its supported connection contracts are tested. Modern
+pre-response network cancellation remains a separately unresolved limitation;
+do not claim that older session cancellation fixes it.
+
+Documentation impact under attached `$docs-maintainer`: **Change required**
+for the SPEC/task and this active intent, API/SDK architecture, API README,
+native composition/graph proof where the object is declared, testing-quality
+and the current MCP journey, and a dated source-matched qualification record.
+**Preserve** canonical tax values, public HTTP/RPC/SDK contracts, browser tools,
+accepted public content, skills, recovery history, disabled collection and
+existing release-operation ownership. **N/A** for publication, provider apply
+and a Changeset unless this slice changes a public package contract. Local
+source builds and workerd experiments authorise no deployment or cloud state.
+
+
+### Session preparation correction and parent hosted readback
+
+Hosted Quality [37565321855](https://github.com/crcorbett/taxkit/actions/runs/37565321855)
+passed at 03:36 UTC for exact browser head
+`964b7e9b839545e135476a516541e8f4750268e7`. The existing DEV-77 comment and
+project update were edited and independently read back; neither this parent
+result nor its local receipt qualifies the dirty session slice.
+
+The first actual older-client connection returned 503 because the local source
+builder omitted the SDK-generated Durable Object export inventory. Memory-only
+compilation of the actual application declaration now supplies its computed
+properties to the native source builder. Provider, credential and network
+operations refuse; no plan/apply or saved provider state is acquired. A real
+built class export and actual older-client connection are both required.
+The corrected private preparation reached eight real calculations, cancelled
+one by the native conversation's notification and observed immediate cleanup
+and entry of a ninth calculation, with no uncaught native exception.
+
+The first permanent lifecycle check incorrectly expected reinitialisation to
+close the host. Reading the receiving `McpRuntime` HTTP admission confirmed
+its explicit existing-ID initialise refusal before registration. The extra
+application workaround was removed. The check must instead preserve the
+existing IDs and exhausted admission allowance, then independently prove
+native alarm expiry and actual fresh reconnect. The earlier inference about
+client reconnection at reinitialisation was not an observed result.
+
+
+### Focused actual session observations
+
+The corrected actual native cases passed as `dev77-session-candidate-ac`:
+modern/older/HTTP report equality and common allowance, routing/version/origin
+refusal, 32 distinct official-client conversations and bounded refusal,
+unchanged IDs after native refused reinitialise, native bookkeeping-only SQL
+tables, actual instance eviction and fresh handshake, wrong-conversation
+cancellation isolation, immediate older cancellation/place reuse, all-request
+capacity, unattended native alarm cleanup and fresh handshake after expiry.
+The official client does not transparently reconnect its expired call; that
+call fails and a new client must perform initialise. This corrects the earlier
+untested inference about automatic reconnect.
+
+The same actual case explicitly aborts a modern outgoing TCP request. The
+caller stops, but a replacement remains busy and all work releases at the
+five-second budget. This is a retained negative oracle, not a solved prompt
+modern cancellation claim. The full native case takes roughly nine seconds;
+its native alarm fixture shortens only the actual host lifetime to 1.5 seconds.
+The alarm-removal challenge and source restoration run before frozen complete
+qualification. No application edit is accepted from temporary challenge sources.
+
+Native graph and actual lint checks passed. The first extended lint suite
+failed because its neighbouring-path fixture named a nonexistent file;
+replacing that target with the real `mcp-request.service.ts` makes all 616
+actual CLI cases pass. The new host has decoder permission only; no encoder,
+runner, neighbouring-service or vendor/library suppression was admitted.
+
+
+### Actual alarm removal challenge
+
+Replacing only the native alarm callback with an empty Effect makes the real
+older-client lifecycle case time out at its three-second unattended cleanup
+wait. The modern case still passes. The driver restores the original source
+bytes exactly, then freshly builds the normal source; both actual cases pass.
+The dated native-session receipt records the four build/test identities and
+restored source hash. This rejects a host that cleans up only on another request.
+Frozen full qualification is still required; no cloud timing is claimed.
+
+
+### First frozen session graph failure
+
+The first complete local graph stopped at repository verification after 521.22
+seconds. All 39 frozen source identities matched; the 32 workflow cases passed,
+but the unused-code check rejected the exported TypeScript class
+`TaxKitMcpSessions`. That declaration is used only inside its own module. Keep
+it private: the SDK separately owns the native generated class export from
+registration. This is a source correction, not a new unused-code exception.
+Fresh native class/client checks and a new full frozen graph are required. The
+dated receipt retains both failure details and their hashes.
+
+
+### Native reload fixture correction
+
+The second frozen graph stopped during native verification after 681.43
+seconds: thirteen native cases passed, but local reload never observed its
+positive marker. All 39 frozen source identities matched before correction.
+The fixture still altered `ApiWorkerInit`; the actual local Worker now uses
+`ApiWorkerNativeInit` directly. Point the existing fixture at that served
+composition, preserving its fifteen-second bound and exact restoration check.
+This corrects the test target; it does not relax readiness or accept a failed
+run. Focused reload checks and a new complete frozen graph are required.
+
+
+### Complete older-session local qualification
+
+The corrected source-frozen graph C passed all nine ordered checks in 877.26 seconds. Both full built-app runs passed all fourteen cases across
+nine files, including actual session capacity, private rate forwarding,
+conversation cancellation, unattended native alarm cleanup, eviction/fresh
+handshake, the distinct modern five-second cleanup limit and native local
+reload. All eighteen returned detail artifacts were read and hash-checked; all
+forty frozen source identities matched before metadata closure. The dated
+receipt retains both earlier failed graphs, corrections and the alarm-removal
+challenge. Primary review accepts this local older-session sub-slice only.
+
+Only this plan and its proof record changed during closeout. Documentation,
+runbook, format, frozen-install and source-identity checks all passed. DEV-77 remains
+in progress: prompt modern network cleanup and public setup are unfinished.
+Metrics stay deferred, collection disabled and tax values retained. No cloud
+class/binding state, public availability or provider operation is established.

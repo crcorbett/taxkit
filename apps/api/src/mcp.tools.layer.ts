@@ -204,10 +204,11 @@ const TaxKitMcpHandlersLive = TaxKitMcpToolkit.toLayer(
   })
 );
 
-// Only the stateless adapter is composed here. The older adapter remains
-// unexposed until its native Worker session routing and expiry are qualified.
+// The composition root selects the native adapter. Each host keeps its own
+// native protocol scope while using the captured calculator/content owners.
 export const TaxKitMcpHttpLayer = (
-  websiteOrigin: ApiWorkerSettings["websiteOrigin"]
+  websiteOrigin: ApiWorkerSettings["websiteOrigin"],
+  protocol: McpProtocol.ProtocolAdapter = McpProtocol.v2026_07_28
 ) =>
   McpServer.toolkit(TaxKitMcpToolkit).pipe(
     Layer.provide(TaxKitMcpHandlersLive),
@@ -216,7 +217,7 @@ export const TaxKitMcpHttpLayer = (
         allowedOrigins: [websiteOrigin.origin],
         name: "TaxKit",
         path: "/mcp",
-        protocols: [McpProtocol.v2026_07_28],
+        protocols: [protocol],
         version: "1",
       })
     )

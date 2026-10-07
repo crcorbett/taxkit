@@ -14,6 +14,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Exact native session header/private binding capability ingress only.
+  "apps/api/src/mcp-session.layer.ts",
   // Exact native browser capability/refusal ingress; no runner permission.
   "apps/web/src/lib/browser-tools.boundary.ts",
   "apps/web/src/lib/browser-tools.boundary.test.ts",

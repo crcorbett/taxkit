@@ -7,6 +7,11 @@ import { Array, Effect, FileSystem, Path, Queue, Record, Schema } from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
+import {
+  nativeMcpSessionExports,
+  nativeMcpSessionFixture,
+} from "./native-mcp.fixture";
+
 it.live.each(["missing", "invalid", "throwing"] as const)(
   "contains a %s native limiter binding without exposing provider data",
   (mode) =>
@@ -76,7 +81,11 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
                   config: {
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
-                    env,
+                    env: {
+                      ...env,
+                      ...nativeMcpSessionFixture("api-provider-proof"),
+                    },
+                    exports: nativeMcpSessionExports,
                     manifest: { mainModule: "worker.js", modules, modulesRoot },
                     name: "api-provider-proof",
                   },

@@ -32,6 +32,10 @@ import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
 import {
+  nativeMcpSessionExports,
+  nativeMcpSessionFixture,
+} from "./native-mcp.fixture";
+import {
   nativeLocalModeFixture,
   nativeRateFixture,
 } from "./native-rate.fixture";
@@ -120,7 +124,10 @@ it.live(
             }
             const origins = {
               ...(artifact.entry === "worker.js"
-                ? nativeRateFixture("10076")
+                ? {
+                    ...nativeRateFixture("10076"),
+                    ...nativeMcpSessionFixture(artifact.name),
+                  }
                 : nativeLocalModeFixture),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
               WEBSITE_PUBLIC_ORIGIN: {
@@ -151,6 +158,10 @@ it.live(
                         },
                       }
                     : origins,
+                exports:
+                  artifact.entry === "worker.js"
+                    ? nativeMcpSessionExports
+                    : undefined,
                 manifest: { mainModule: artifact.entry, modules, modulesRoot },
                 name: artifact.name,
               },
@@ -500,7 +511,10 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
           const origins = {
             ...(artifact.name === "website-work"
               ? nativeLocalModeFixture
-              : nativeRateFixture("10077")),
+              : {
+                  ...nativeRateFixture("10077"),
+                  ...nativeMcpSessionFixture(artifact.name),
+                }),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: workApiOrigin },
             WEBSITE_PUBLIC_ORIGIN: {
               type: "json" as const,
@@ -530,6 +544,10 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
                       },
                     }
                   : origins,
+              exports:
+                artifact.entry === "worker.js"
+                  ? nativeMcpSessionExports
+                  : undefined,
               manifest: { mainModule: artifact.entry, modules, modulesRoot },
               name: artifact.name,
             },

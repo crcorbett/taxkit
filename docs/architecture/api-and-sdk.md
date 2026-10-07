@@ -682,16 +682,44 @@ HTTP/RPC. Successful reports and processed Markdown are existing domain values;
 fixed transport failures contain no submitted facts or underlying causes.
 The safe reporter remains the single application error owner.
 
-Only protocol `2026-07-28` is currently composed. Its per-request metadata and
-origin checks belong to the native adapter. The API owns original connection
-identity, streamed POST admission, total reply bounds and the original HTTP
-stop signal. The same calculator service owns rate admission, capacity and work
-time. The protocol host is built once in the instance scope on first runtime
-use; first-caller identity, request and stop signal cannot enter registration.
-Replies are complete, with native JSON/SSE framing bounded to 2 MiB and ten
-seconds. No subscription/resumption contract or saved tax figures is added.
-See the [API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate)
-and [dated proof](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json).
-Older session routing/expiry, network cancellation and browser commands remain
-separately unqualified. Current app-owned transport changes do not change a
-published package export or the SDK lifetime contract.
+Modern `2026-07-28` is composed in the native Worker; older `2025-11-25`
+is composed in one app-owned, fixed-name Durable Object per stage. The SDK owns
+its generated class, binding and runtime composition. Native Effect owns message
+parsing, session IDs, version/header agreement and notification matching. The
+plain/in-process composition remains modern-only.
+
+The API owns original connection identity, streamed POST admission and total
+reply bounds. Its private object forwarding replaces a caller-supplied key
+header with the checked original capability, separately from JSON. Native rate
+admission is common to both adapters and HTTP/RPC, subject to the provider's
+location and approximation contract. Each application isolate has its own
+captured eight-place calculation pool and five-second work budget; no global
+pool is claimed.
+
+Older host lifetime is ten minutes from first admission, with 32 initialisation
+attempts and 32 concurrent requests without a queue. Expiry closes the entire
+native protocol scope, releasing its in-memory sessions and work. The native
+alarm owns unattended expiry; an incoming time check also refuses old IDs.
+Clients need a fresh handshake after 404, including after a runtime eviction;
+no conversation resumption is promised. The native adapter itself rejects
+initialise carrying an existing ID before registration, preserving existing
+conversations and their exhausted allocation allowance. Native alarm bookkeeping
+is the only storage operation; neither client metadata nor figures are persisted.
+
+Host registration excludes the first caller's request, rate key and stop signal.
+Replies retain native JSON/SSE framing, bounded to 2 MiB and ten seconds. No
+subscription, GET stream, termination or resumption contract is added. Older
+network cancellation is conversation-scoped and immediately releases actual
+work. The modern real-network pre-response abort still relies on the existing
+five-second work budget; earlier in-process cancellation does not prove prompt
+remote cleanup. Public setup remains pending that qualification.
+
+The memory-only native source builder consumes computed SDK exports from the
+actual app declaration, refusing provider/credential/network access. Tests must
+load the generated native class and use actual clients and platform alarms,
+rather than substitute bindings or handwritten frames. See the
+[API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate),
+[session candidate record](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json)
+and [browser owner](frontend.md#page-owned-browser-tools).
+Current app-owned transport changes do not change a published package export or
+the SDK lifetime contract.

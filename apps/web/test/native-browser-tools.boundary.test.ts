@@ -22,6 +22,10 @@ import type { Route } from "playwright";
 import { WebsiteBrowserToolFailure } from "../src/lib/browser-tools.schemas";
 import { WebsiteBrowserToolkit } from "../src/lib/browser-tools.toolkit";
 import { WebsiteCalculatorViewState } from "../src/lib/schemas";
+import {
+  nativeMcpSessionExports,
+  nativeMcpSessionFixture,
+} from "./native-mcp.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const apiOrigin = "http://127.0.0.1:4231";
@@ -77,6 +81,7 @@ it.live(
           compatibilityDate: "2026-10-04",
           compatibilityFlags: ["nodejs_compat"],
           env: {
+            ...nativeMcpSessionFixture(name),
             ...nativeRateFixture("10090"),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
             WEBSITE_PUBLIC_ORIGIN: {
@@ -85,6 +90,7 @@ it.live(
             },
             WORKER_URL: { type: "json" as const, value: apiOrigin },
           },
+          exports: nativeMcpSessionExports,
           manifest: {
             mainModule: "worker.js",
             modules: apiModules,

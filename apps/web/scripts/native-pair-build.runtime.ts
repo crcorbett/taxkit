@@ -4,8 +4,10 @@ import { provideFreshArtifactStore, scopedArtifacts } from "alchemy/Artifacts";
 import { makeSourceContext, resolveSource } from "alchemy/Cloudflare/Workers";
 import { Effect, FileSystem, Match, Path } from "effect";
 
-// Only the native source builders run here. No provider, state, credentials,
-// plan or apply is acquired. Build sequentially because Vite owns dist/server.
+import { nativeApiSourceProps } from "./native-api-source.boundary";
+
+// SDK declaration discovery is memory-only with all external operations
+// refused. Build sequentially because Vite owns dist/server and source fixtures.
 const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
@@ -14,33 +16,52 @@ const program = Effect.gen(function* () {
   const compatibility = { date: "2026-10-04", flags: ["nodejs_compat"] };
   yield* fs.makeDirectory(output, { recursive: true });
   yield* Effect.gen(function* () {
+    const apiDeclaration = yield* nativeApiSourceProps;
     // Qualify native fatal RPC replies using the real application entry and
     // operation. Restore the root before the ordinary API source build.
-    yield* Effect.forEach(["defect", "stalled-work"] as const, (mode) =>
-      Effect.gen(function* nativeCalculationPolicyBuild() {
-        const owner = path.join(root, "apps/api/src/worker.ts");
-        const original = yield* Effect.acquireRelease(
-          fs.readFileString(owner),
-          (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
-        );
-        if (
-          !original.includes(
-            'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";'
-          ) ||
-          !original.includes("Layer.provide(PublicCalculatorServiceLive)")
-        ) {
-          return yield* Effect.die(
-            "Native RPC defect fixture no longer matches its source owner"
+    yield* Effect.forEach(
+      [
+        {
+          fixtureId: "TaxKitApiRpcDefect",
+          mode: "defect",
+          workerName: "taxkit-api-local-rpc-defect",
+        },
+        {
+          fixtureId: "TaxKitApiStalledWork",
+          mode: "stalled-work",
+          workerName: "taxkit-api-local-stalled-work",
+        },
+        {
+          fixtureId: "TaxKitApiSessionExpiry",
+          mode: "session-expiry",
+          workerName: "taxkit-api-local-session-expiry",
+        },
+      ] as const,
+      ({ fixtureId, mode, workerName }) =>
+        Effect.gen(function* nativeCalculationPolicyBuild() {
+          const owner = path.join(root, "apps/api/src/worker.ts");
+          const original = yield* Effect.acquireRelease(
+            fs.readFileString(owner),
+            (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
           );
-        }
-        const injected = original
-          .replace(
-            'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";',
-            'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";\nimport { PublicCalculatorService } from "@taxkit/calculators/service";'
-          )
-          .replace(
-            "Layer.provide(PublicCalculatorServiceLive)",
-            `Layer.provide(Layer.effect(
+          if (
+            !original.includes(
+              'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";'
+            ) ||
+            !original.includes("Layer.provide(PublicCalculatorServiceLive)")
+          ) {
+            return yield* Effect.die(
+              "Native RPC defect fixture no longer matches its source owner"
+            );
+          }
+          const injected = original
+            .replace(
+              'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";',
+              'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";\nimport { PublicCalculatorService } from "@taxkit/calculators/service";'
+            )
+            .replace(
+              "Layer.provide(PublicCalculatorServiceLive)",
+              `Layer.provide(Layer.effect(
             PublicCalculatorService,
             Effect.gen(function* () {
               const calculator = yield* PublicCalculatorService;
@@ -51,43 +72,68 @@ const program = Effect.gen(function* () {
                     ? 'calculator.calculate(request).pipe(Effect.andThen(Effect.die("PRIVATE9")))'
                     : 'Effect.logWarning("PRIVATE9 work started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.calculate(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 work released")))'
                 },
-                ${mode === "stalled-work" ? 'getCalculatorSchema: (request) => Effect.logWarning("PRIVATE9 metadata started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.getCalculatorSchema(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 metadata released"))),' : ""}
+                ${mode === "defect" ? "" : 'getCalculatorSchema: (request) => Effect.logWarning("PRIVATE9 metadata started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.getCalculatorSchema(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 metadata released"))),'}
               });
             })
           ).pipe(Layer.provide(PublicCalculatorServiceLive)))`
+            );
+          yield* fs.writeFileString(owner, injected);
+          if (mode === "session-expiry") {
+            const lifetimeOwner = path.join(
+              root,
+              "apps/api/src/mcp.schemas.ts"
+            );
+            const lifetime = yield* Effect.acquireRelease(
+              fs.readFileString(lifetimeOwner),
+              (saved) =>
+                fs.writeFileString(lifetimeOwner, saved).pipe(Effect.orDie)
+            );
+            const declaration = "McpSessionLifetime = Duration.minutes(10)";
+            if (!lifetime.includes(declaration)) {
+              return yield* Effect.die(
+                "Native session expiry fixture no longer matches its source owner"
+              );
+            }
+            // Accelerate only the actual native alarm lifetime. The handler,
+            // alarm callback, session adapter and held work stay unchanged.
+            yield* fs.writeFileString(
+              lifetimeOwner,
+              lifetime.replace(
+                declaration,
+                "McpSessionLifetime = Duration.millis(1500)"
+              )
+            );
+          }
+          yield* fs.remove(path.join(output, "bundles", fixtureId), {
+            force: true,
+            recursive: true,
+          });
+          const props = {
+            ...apiDeclaration,
+            compatibility,
+            main: import.meta.resolve("api/worker"),
+          };
+          const artifacts = scopedArtifacts(fixtureId);
+          const source = yield* resolveSource(props).pipe(
+            Effect.provide(artifacts)
           );
-        yield* fs.writeFileString(owner, injected);
-        const fixtureId =
-          mode === "defect" ? "TaxKitApiRpcDefect" : "TaxKitApiStalledWork";
-        yield* fs.remove(path.join(output, "bundles", fixtureId), {
-          force: true,
-          recursive: true,
-        });
-        const props = {
-          compatibility,
-          main: import.meta.resolve("api/worker"),
-        };
-        const artifacts = scopedArtifacts(fixtureId);
-        const source = yield* resolveSource(props).pipe(
-          Effect.provide(artifacts)
-        );
-        yield* source
-          .build(
-            makeSourceContext({
-              compatibility,
-              dotAlchemy: output,
-              fqn: fixtureId,
-              id: fixtureId,
-              props,
-              stack: { name: "TaxKitAppsLocalProof", stage: "dev_native_pair" },
-              workerName:
-                mode === "defect"
-                  ? "taxkit-api-local-rpc-defect"
-                  : "taxkit-api-local-stalled-work",
-            })
-          )
-          .pipe(Effect.provide(artifacts));
-      }).pipe(Effect.scoped)
+          yield* source
+            .build(
+              makeSourceContext({
+                compatibility,
+                dotAlchemy: output,
+                fqn: fixtureId,
+                id: fixtureId,
+                props,
+                stack: {
+                  name: "TaxKitAppsLocalProof",
+                  stage: "dev_native_pair",
+                },
+                workerName,
+              })
+            )
+            .pipe(Effect.provide(artifacts));
+        }).pipe(Effect.scoped)
     );
     // Corrupt one field in the actual native encoded reply. The native message
     // framing and server remain intact; this qualifies the client's decoder.
@@ -103,10 +149,9 @@ const program = Effect.gen(function* () {
           "Native invalid-reply fixture no longer matches its source owner"
         );
       }
-      const injected = original
-        .replace(
-          declaration,
-          `).pipe(
+      const injected = original.replace(
+        declaration,
+        `).pipe(
           Effect.provideContext(telemetry),
           Effect.flatMap((response) =>
             Effect.promise(() => HttpServerResponse.toWeb(response).text()).pipe(
@@ -121,15 +166,18 @@ const program = Effect.gen(function* () {
             )
           )
         );`
-        )
-        .replace("HttpClientRequest,", "Headers, HttpClientRequest,");
+      );
       yield* fs.writeFileString(owner, injected);
       const fixtureId = "TaxKitApiInvalidReply";
       yield* fs.remove(path.join(output, "bundles", fixtureId), {
         force: true,
         recursive: true,
       });
-      const props = { compatibility, main: import.meta.resolve("api/worker") };
+      const props = {
+        ...apiDeclaration,
+        compatibility,
+        main: import.meta.resolve("api/worker"),
+      };
       const artifacts = scopedArtifacts(fixtureId);
       const source = yield* resolveSource(props).pipe(
         Effect.provide(artifacts)
@@ -158,7 +206,7 @@ const program = Effect.gen(function* () {
           (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
         );
         const declaration = ").pipe(Effect.provideContext(telemetry));";
-        const imports = "HttpClientRequest,";
+        const imports = "Headers,";
         if (!original.includes(declaration) || !original.includes(imports)) {
           return yield* Effect.die(
             "Native stalled-reply fixture no longer matches its source owner"
@@ -194,12 +242,10 @@ const program = Effect.gen(function* () {
               Effect.as(response),
               Effect.provideContext(telemetry)
             ))`;
-        const injected = original
-          .replace(imports, "Headers, HttpClientRequest,")
-          .replace(
-            declaration,
-            `).pipe(Effect.provideContext(telemetry), ${operation});`
-          );
+        const injected = original.replace(
+          declaration,
+          `).pipe(Effect.provideContext(telemetry), ${operation});`
+        );
         yield* fs.writeFileString(owner, injected);
         const fixtureId =
           phase === "body" ? "TaxKitApiStalledBody" : "TaxKitApiStalledHeaders";
@@ -208,6 +254,7 @@ const program = Effect.gen(function* () {
           recursive: true,
         });
         const props = {
+          ...apiDeclaration,
           compatibility,
           main: import.meta.resolve("api/worker"),
         };
@@ -242,7 +289,7 @@ const program = Effect.gen(function* () {
             fs.readFileString(owner),
             (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
           );
-          const declaration = "Effect.provide(ApiContentLive),";
+          const declaration = "  ApiContentLive,";
           if (!original.includes(declaration)) {
             return yield* Effect.die(
               "Native docs presentation fixture no longer matches its source owner"
@@ -270,12 +317,12 @@ const program = Effect.gen(function* () {
             )
             .replace(
               declaration,
-              `Effect.provide(Layer.effect(ContentService, Effect.gen(function* () {
+              `Layer.effect(ContentService, Effect.gen(function* () {
           const content = yield* ContentService;
           return ContentService.of({ ...content,
             getPage: (path) => content.getPage(path).pipe(Effect.map((page) => ${replacement})),
           });
-        })).pipe(Layer.provideMerge(ApiContentLive))),`
+        })).pipe(Layer.provideMerge(ApiContentLive)),`
             );
           yield* fs.writeFileString(owner, injected);
           const fixtureId = `TaxKitApiDocs${mode}`;
@@ -284,6 +331,7 @@ const program = Effect.gen(function* () {
             recursive: true,
           });
           const props = {
+            ...apiDeclaration,
             compatibility,
             main: import.meta.resolve("api/worker"),
           };
@@ -309,7 +357,11 @@ const program = Effect.gen(function* () {
             .pipe(Effect.provide(artifacts));
         }).pipe(Effect.scoped)
     );
-    const apiProps = { compatibility, main: import.meta.resolve("api/worker") };
+    const apiProps = {
+      ...apiDeclaration,
+      compatibility,
+      main: import.meta.resolve("api/worker"),
+    };
     const apiArtifacts = scopedArtifacts("TaxKitApi");
     const apiSource = yield* resolveSource(apiProps).pipe(
       Effect.provide(apiArtifacts)

@@ -21,6 +21,10 @@ import {
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
+import {
+  nativeMcpSessionExports,
+  nativeMcpSessionFixture,
+} from "./native-mcp.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const apiOrigin = "http://127.0.0.1:4214";
@@ -79,7 +83,10 @@ it.live(
                 compatibilityFlags: ["nodejs_compat"],
                 env: {
                   ...(artifact.entry === "worker.js"
-                    ? nativeRateFixture("10079")
+                    ? {
+                        ...nativeRateFixture("10079"),
+                        ...nativeMcpSessionFixture(artifact.name),
+                      }
                     : {
                         TAXKIT_API: {
                           type: "worker" as const,
@@ -106,6 +113,10 @@ it.live(
                         : websiteOrigin,
                   },
                 },
+                exports:
+                  artifact.entry === "worker.js"
+                    ? nativeMcpSessionExports
+                    : undefined,
                 manifest: { mainModule: artifact.entry, modules, modulesRoot },
                 name: artifact.name,
               },

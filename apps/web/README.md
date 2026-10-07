@@ -491,8 +491,12 @@ The native-pair suite also runs the official MCP client over local TCP against
 its freshly built API. It compares returned calculation reports and accepted
 Markdown pages with HTTP and checks their common anonymous allowance. This
 belongs to the [API's agent-tools candidate](../api/README.md#native-remote-calculator-tools-candidate).
-The real native browser caller check is described below. Older remote sessions,
-network cancellation and public setup remain T006 work. The MCP client and calculator Schema imports are test-only dependencies;
+The same suite checks older native conversations, bounded allocation/request
+admission, conversation-scoped cancellation, automatic alarm expiry and fresh
+initialise after 404. It separately preserves the modern TCP-disconnect cleanup
+limit: remote pre-response work ends at its five-second budget. The real native
+browser caller check is described below. Prompt modern remote cleanup and public
+setup remain T006 work. The MCP client and calculator Schema imports are test-only dependencies;
 no browser calculation implementation or production SDK client is added.
 
 ## Visible calculator browser tools

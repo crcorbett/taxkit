@@ -257,8 +257,10 @@ describe("native local development", () => {
           );
           const workerPath = path.join(root, "apps/api/src/worker.ts");
           const originalWorker = yield* fs.readFileString(workerPath);
+          // Local development runs the native entry point. Alter that actual
+          // composition so a passing reload proves the served Worker changed.
           const init =
-            "export const ApiWorkerInit = ApiWorkerApplication.pipe(";
+            "export const ApiWorkerNativeInit = ApiWorkerApplication.pipe(";
           expect(originalWorker).toContain(init);
           yield* Effect.gen(function* () {
             yield* Effect.addFinalizer(() =>

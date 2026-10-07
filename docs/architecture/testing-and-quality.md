@@ -1628,8 +1628,61 @@ codecs. The test type conditions select compiled vendor exports while retaining
 workspace source exports, matching the official client's runtime dependencies.
 No vendor/library-check suppression or dependency upgrade is introduced.
 The [dated MCP record](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
-retains source/log identities, failed attempts and the remaining session,
-network cancellation, browser-agent and setup work. T006 stays in progress.
+retains source/log identities, failed attempts and remaining work at that
+checkpoint. The newer session candidate below separately qualifies actual older
+calls. T006 stays in progress.
+
+## Native older-client lifetime candidate
+
+The existing `native-mcp.boundary.test.ts` now starts the real built API,
+stalled-work API and accelerated-expiry API with SDK-generated Durable Object
+exports. Official client 2.3.1 supplies all handshakes and tool frames over actual
+TCP sockets. Two `2025-11-25` conversations list tools and read/calculate through
+canonical Schemas; reports and processed Markdown equal HTTP. Interleaved
+HTTP/modern/older calculations exhaust one native allowance despite a forged
+private rate header. Real modern frames with mismatched routing/version headers
+receive 400. Origins and malformed IDs fail, and GET/DELETE remain 405.
+
+Thirty further official-client handshakes fill the older host's 32-attempt
+allowance. A further request receives 429 with Retry-After; existing clients
+still work. Native initialise with an existing ID receives 400, preserves those
+conversations and does not reopen allocation. SQL inspection after calculations,
+docs reads and all 32 conversations sees only native metadata bookkeeping and
+the emulator's name table. Platform-private metadata values are not exposed by
+that inspection; no claim of their contents comes from this query. Actual native
+instance eviction loses the old IDs, and a fresh official-client handshake works.
+
+A separate stalled-work object reaches eight actual calculations. Another
+conversation's cancellation notification must leave them running; the owning
+client's cancellation must release exactly one place within one second, and a
+replacement must enter before the original five-second budget. Cleanup releases
+the rest. A modern real outgoing TCP request is then explicitly aborted through
+its native signal. Its client stops, but no place is released immediately and a
+replacement receives safe capacity refusal. All eight actual operations release
+at their five-second budget. This negative observation cannot be replaced by an
+in-process cancellation pass or the older conversation's positive test.
+
+The expiry fixture changes only `McpSessionLifetime` from ten minutes to 1.5
+seconds while retaining the real app, handlers, native class and alarm callback.
+Thirty-two actual metadata operations occupy all request places; another is
+refused immediately with 503. No new HTTP request or manually invoked callback
+runs while the check waits for all 32 cleanup observations. The native platform
+alarm must release them within three seconds. Old IDs then receive 404 and a
+new official client must initialise and list six tools with a different ID.
+The [session candidate record](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json)
+records the source-built alarm-removal challenge, restoration, complete-check
+status and limits. Ten-minute cloud timing and prompt modern remote cancellation
+are not established by this accelerated local proof.
+
+The source builder gets native class exports from memory-only compilation of
+the actual API declaration; all provider, credential and network operations
+refuse. It runs no provider plan/apply. Actual source-built class exports and
+successful clients prevent an emulator-only binding from qualifying an absent
+handler. Native graph tests require this class on the API and its absence on
+the Website in create/no-change/update cases. Exact session ingress permits only
+its decoder; actual CLI fixtures reject its encoder/runtime and a neighbouring
+service decoder. No public package export, SDK contract, dependency version or
+collection policy changes.
 
 ## Native visible browser caller qualification
 
@@ -1661,8 +1714,8 @@ and the controlled test's Promise signature. They reject neighbouring codecs,
 general runtime execution, async/await, new Promises and Promise chains. The
 [dated browser receipt](../documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
 owns versions, source/check identities and failed attempts. This proves native
-protocol calls controlled by the test, not an autonomous model session. Older
-remote sessions, real remote cancellation and public setup remain T006 work.
+protocol calls controlled by the test, not an autonomous model session. Prompt
+modern remote cleanup and public setup remain T006 work.
 
 
 ### Saved calculator state through a paused first render

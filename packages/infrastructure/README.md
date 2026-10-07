@@ -128,3 +128,24 @@ The existing docs deployment runbook owns `DocsWebsite` only. It does not
 authorise or supply an API/Website deployment procedure; T010/DEV-81 must settle
 that operation's candidate, namespace readback, receipt and rollback before
 provider approval. Local limiter tests cannot establish real edge or cloud state.
+
+
+## Native older-client conversation host
+
+The API app's native composition registers `TaxKitMcpSessions`. The SDK adds its
+Durable Object export and binding to the actual API resource. The Website does
+not export this class. Graph tests check this distinction in their memory-only
+create/no-change/update cases; no namespace ID or provider setting is invented.
+The app owns one fixed-name host per stage, with bounded in-memory conversations
+and native alarm expiry. Only alarm bookkeeping uses storage. The
+[API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate)
+explains limits, private original-key forwarding, separate instance pools and
+the remaining modern cancellation gap.
+
+The local native source builder compiles the actual API declaration using
+memory state to obtain the SDK-generated class export inventory. Every provider,
+credential and network operation refuses. It runs no provider plan/apply or
+saved-state operation. The local emulator binds this generated class to isolated
+fixture namespaces. The cloud API/Website operation remains DEV-81 work,
+including exact class migration/binding readback and rollback; current local
+proof does not approve or establish that operation.

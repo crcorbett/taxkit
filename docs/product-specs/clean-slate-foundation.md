@@ -305,8 +305,21 @@ The current modern MCP candidate separately bounds complete native JSON/SSE
 replies to 2 MiB and ten seconds. Actual official-client calls cover all six
 canonical tools, built local Worker report/page equality and shared allowance;
 exact framed-byte/deadline tests cover source-stream cleanup. This adds no
-subscription or resumption contract. Older session and real network-cancellation
-proof remain T006 work.
+subscription or resumption contract. The native older-client candidate adds a
+fixed-name Durable Object per stage, with 32 initialisation attempts per
+ten-minute host generation and 32 concurrent requests without queuing. Its native
+alarm closes the entire protocol scope; an incoming time check also refuses
+expired IDs. No client metadata or tax figure is persisted. The existing native
+HTTP adapter refuses initialise with an existing ID before registration, so a
+reinitialisation workaround is unnecessary. Actual older clients must prove
+independent conversation IDs, cancellation isolation, immediate work-place reuse,
+common HTTP/modern/older rate admission, untouched IDs after refused reinitialise,
+automatic expiry without follow-up traffic and fresh initialise after 404. The
+calculation pool remains per application isolate, not global across Worker and
+object instances. Preserve the modern real-network negative oracle: a genuine
+outgoing TCP abort stops its caller while pre-response work remains until the
+five-second budget. This limit and public setup remain T006 work; older-session
+cancellation does not prove prompt modern remote cleanup.
 Return checked 413/429/timeout failures with safe codes
 and retry guidance; do not retry calculations automatically. Qualify valid
 catalogue responses and supported streaming/MCP envelopes before adopting these

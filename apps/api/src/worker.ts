@@ -8,6 +8,7 @@ import type { HttpEffect } from "alchemy/Http";
 import { Effect, Layer } from "effect";
 
 import { ApiContentLive } from "./content.boundary.js";
+import { McpSessionHostLive } from "./mcp-session.layer.js";
 import { ApiCalculatorAdmission } from "./worker-admission.layer.js";
 import { ApiWorkerApplication } from "./worker.application.js";
 
@@ -27,21 +28,26 @@ export const ApiWorkerObservability = {
   traces: { enabled: false, headSamplingRate: 0, persist: false },
 } as const;
 
-export const ApiWorkerInit = ApiWorkerApplication.pipe(
-  Effect.provide(ApiContentLive),
-  Effect.provide(
-    PublicCalculatorServiceBounded.pipe(
-      Layer.provide(
-        PublicCalculatorServiceRateLimited.pipe(
-          Layer.provide(PublicCalculatorServiceLive)
-        )
-      ),
-      Layer.provide(CalculationEngineLive)
-    )
+const ApiWorkerServicesLive = Layer.merge(
+  ApiContentLive,
+  PublicCalculatorServiceBounded.pipe(
+    Layer.provide(
+      PublicCalculatorServiceRateLimited.pipe(
+        Layer.provide(PublicCalculatorServiceLive)
+      )
+    ),
+    Layer.provide(CalculationEngineLive)
   )
 );
 
-export const ApiWorkerNativeInit = ApiWorkerInit.pipe(
+export const ApiWorkerInit = ApiWorkerApplication.pipe(
+  Effect.provide(ApiWorkerServicesLive)
+);
+
+export const ApiWorkerNativeInit = ApiWorkerApplication.pipe(
+  Effect.provide(
+    McpSessionHostLive.pipe(Layer.provideMerge(ApiWorkerServicesLive))
+  ),
   Effect.provide(ApiCalculatorAdmission.pipe(Layer.provide(RateLimitBinding)))
 );
 

@@ -31,6 +31,7 @@ import {
 import {
   HttpClientRequest,
   HttpClientResponse,
+  Headers,
   HttpMiddleware,
   HttpRouter,
   HttpServerRequest,
@@ -39,6 +40,7 @@ import {
 
 import { McpRequestAbortSignal } from "./mcp-request.service.js";
 import { withBoundedMcpReply } from "./mcp-response.boundary.js";
+import { McpSessionHost } from "./mcp-session.layer.js";
 import { TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
 import { withApiRequestBodyLimit } from "./worker-request.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
@@ -110,6 +112,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     Effect.provideContext(telemetry)
   );
   const instanceScope = yield* Scope.Scope;
+  const sessions = yield* McpSessionHost;
   // Build the protocol host once on first use, after native addresses resolve.
   // Retain its fibres in the instance Scope, and keep the first caller's
   // request/key out of registration. Each call receives its own native Context.
@@ -150,8 +153,18 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       const config = yield* settings;
       const request = yield* HttpServerRequest.HttpServerRequest;
       const isMcp = new URL(request.url, config.apiOrigin).pathname === "/mcp";
+      const protocol = Headers.get(request.headers, "mcp-protocol-version");
+      const legacy =
+        Option.isSome(sessions) &&
+        Option.match(protocol, {
+          onNone: () => true,
+          onSome: (value) => value === "2025-11-25",
+        });
       const selected = isMcp
-        ? mcp.pipe(
+        ? (legacy && Option.isSome(sessions)
+            ? Effect.succeed(sessions.value.fetch)
+            : mcp
+          ).pipe(
             Effect.flatMap(withBoundedMcpReply),
             Effect.provideService(
               McpRequestAbortSignal,
@@ -164,7 +177,13 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       return yield* withApiRequestBodyLimit(selected).pipe(
         HttpMiddleware.cors({
           allowedHeaders: isMcp
-            ? ["content-type", "mcp-method", "mcp-name", "mcp-protocol-version"]
+            ? [
+                "content-type",
+                "mcp-method",
+                "mcp-name",
+                "mcp-protocol-version",
+                "mcp-session-id",
+              ]
             : ["content-type"],
           allowedMethods: ["GET", "POST", "OPTIONS"],
           // The native predicate checks the actual request origin.

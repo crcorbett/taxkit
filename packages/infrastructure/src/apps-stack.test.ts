@@ -6,7 +6,11 @@ import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
 import { Providers } from "alchemy/Cloudflare";
-import { Worker, isSelfUrl } from "alchemy/Cloudflare/Workers";
+import {
+  Worker,
+  isDurableObjectExport,
+  isSelfUrl,
+} from "alchemy/Cloudflare/Workers";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
@@ -290,6 +294,16 @@ describe("native paired app graph and planner", () => {
         );
         expect(api.Props).toBeDefined();
         expect(website.Props).toBeDefined();
+        expect(
+          Record.get(api.Props.exports ?? {}, "TaxKitMcpSessions").pipe(
+            Option.exists(isDurableObjectExport)
+          )
+        ).toBe(true);
+        expect(
+          Record.get(website.Props.exports ?? {}, "TaxKitMcpSessions").pipe(
+            Option.isNone
+          )
+        ).toBe(true);
         expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
         expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
         expect(

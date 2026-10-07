@@ -336,37 +336,76 @@ Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-ap
 ## Native remote calculator tools candidate
 
 The native Worker candidate serves `/mcp` through installed Effect's
-`McpServer` and `Toolkit`, using protocol `2026-07-28`. The six tools list
-calculators, read an input Schema, calculate, read docs navigation, search docs
-and read a processed Markdown page. Inputs and successful replies use the
-existing calculator/content Schemas and the same captured services as HTTP/RPC.
-There is no separate tax engine or saved personal report.
+`McpServer` and `Toolkit`. It composes modern protocol `2026-07-28` in the
+Worker and older protocol `2025-11-25` in an app-owned native Durable Object.
+The six tools list calculators, read an input Schema, calculate, read docs
+navigation, search docs and read a processed Markdown page. Both adapters use
+canonical calculator/content Schemas and the same service implementations as
+HTTP/RPC. There is no separate tax engine or saved personal report.
 
-The protocol host is built once in the instance scope on first use, when native
-addresses can be read. Registration excludes that first caller's request, rate
-identity and stop signal. Each call receives its current checked identity and
-shares the eight-place calculation pool, five-second operation budget and
-anonymous allowance with HTTP/RPC. The existing 64 KiB streamed POST limit
-applies. Complete native JSON/SSE replies are read within ten seconds and 2 MiB;
-subscriptions and stream resumption are not advertised. The exact website
-Origin is accepted; other supplied Origins fail. Origin-less clients remain
-usable. Only `/mcp` permits modern protocol headers in CORS; other routes keep
-the existing header policy.
+Modern calls carry their protocol/routing headers and per-request metadata.
+An older client's first initialise has no version header; subsequent requests
+carry its native session ID and `2025-11-25` header. The installed adapter owns
+parsing, IDs, version agreement and cancellation matching. The native API selects
+the app-owned host; no copied parser or private session Map is added. The plain
+in-process composition remains modern-only.
 
-The original HTTP AbortSignal also stops toolkit work. Its Effect callback
-registers the native listener before checking for an already-arrived abort,
-and removes it during cleanup. Actual official-client tests fill eight places,
-cancel one, finish a replacement and close the remaining calls. Expected
-failures have fixed codes and manual-retry guidance. Internal errors use the
-native safe reply and existing fixed reporter; submitted figures and underlying
-causes must not appear in either output.
+The older host uses one fixed-name object per stage and keeps at most 32
+initialisation attempts within a ten-minute host lifetime, plus 32 simultaneous
+requests without waiting for a place. These are shared host limits, not limits
+per client. The lifetime begins when that host starts; a later conversation has
+only its remaining time. Runtime eviction may end it earlier; conversations do
+not resume across eviction. The native alarm and an incoming time check close the
+whole protocol scope at expiry. All affected clients receive 404 and need a
+fresh initialise. Reinitialising an existing conversation is already refused
+by the installed HTTP adapter and cannot bypass the allocation limit. Client
+metadata stays in memory; only native alarm bookkeeping uses storage. GET/DELETE
+streams, subscriptions, termination and resumption are not advertised.
 
-`@modelcontextprotocol/client` 2.3.1 is test-only. In-process tests check actual
-client frames, routing-header/version/origin refusal, safe errors, separate
-caller allowances and cancellation. The full native-pair command also uses this
-client over real local TCP against the built Worker, comparing its report/page
-with HTTP and proving their shared allowance. The
-[dated qualification record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
-distinguishes these boundaries. The older session adapter, real network
-cancellation, page-owned browser tools and public setup content remain T006
-work. This candidate establishes no deployed endpoint or hosted support.
+The host captures the existing calculator/content services without its first
+caller's request, rate identity or stop signal. Its calculation pool belongs to
+that native application instance. It is not a global pool shared with the outer
+Worker's separate isolate. Both use the same native anonymous rate binding and
+five-second operation budget. The API replaces any caller-supplied private key
+header with its current checked original key before the private object call;
+that capability stays outside request JSON and is never logged. Actual local
+HTTP/modern/older calls exhaust one allowance even with a forged private header.
+Cloud location/approximation limits still apply.
+
+The existing 64 KiB streamed POST limit applies before delegation. Complete
+native JSON/SSE replies are read within ten seconds and 2 MiB. The exact Website
+Origin is accepted; other supplied Origins fail, while origin-less clients work.
+Only `/mcp` permits protocol/routing/session headers in CORS. Expected failures
+have fixed codes and manual-retry guidance; native internal failures use the
+existing safe reply and fixed reporter.
+
+Cancellation has two separately tested boundaries. An older conversation's
+native cancellation notification immediately stops its actual network call,
+releases a calculation place and admits a replacement. Another conversation's
+notification cannot cancel it. Modern in-process AbortSignal cancellation also
+works. On the pinned real Worker, an outgoing modern TCP abort stops the caller
+but pre-response calculation work remains until its five-second budget. The
+native modern HTTP adapter has no conversation binding for that notification.
+No flag-only workaround is accepted, and prompt modern remote cleanup is still
+a T006 gap.
+
+`@modelcontextprotocol/client` 2.3.1 is test-only. The full native-pair command
+runs actual official clients over loopback TCP against the source-built API.
+Reports and accepted processed Markdown equal HTTP, two conversations remain
+distinct, admission is bounded and stale IDs fail. A scoped source fixture
+shortens only the actual host lifetime to 1.5 seconds: its real platform alarm
+must release 32 held metadata calls without another HTTP request, then a fresh
+client must initialise and list tools. After real calculations, docs reads and
+32 conversations, local SQL inspection observes only native bookkeeping and the
+emulator's name table, with no application or key-value table.
+
+The native source builder discovers the SDK-generated class export inventory
+by memory-only compilation of the actual API declaration. All provider,
+credential and network methods refuse; it runs no provider plan/apply. Local
+fixtures bind the genuine generated class in disposable namespaces. Merely
+adding an emulator binding is insufficient and previously returned 503.
+See the [session candidate record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json),
+[earlier modern record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
+and [browser caller owner](../web/README.md#visible-calculator-browser-tools).
+Public setup and prompt modern remote cancellation remain T006 work. This
+candidate establishes no deployment, hosted support or public availability.

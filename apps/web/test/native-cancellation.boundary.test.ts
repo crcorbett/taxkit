@@ -27,6 +27,10 @@ import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
 import {
+  nativeMcpSessionExports,
+  nativeMcpSessionFixture,
+} from "./native-mcp.fixture";
+import {
   nativeLocalModeFixture,
   nativeRateFixture,
 } from "./native-rate.fixture";
@@ -105,7 +109,10 @@ it.live(
             }
             const origins = {
               ...(artifact.entry === "worker.js"
-                ? nativeRateFixture("10078")
+                ? {
+                    ...nativeRateFixture("10078"),
+                    ...nativeMcpSessionFixture(artifact.name),
+                  }
                 : nativeLocalModeFixture),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
               WEBSITE_PUBLIC_ORIGIN: {
@@ -136,6 +143,10 @@ it.live(
                         },
                       }
                     : origins,
+                exports:
+                  artifact.entry === "worker.js"
+                    ? nativeMcpSessionExports
+                    : undefined,
                 manifest: { mainModule: artifact.entry, modules, modulesRoot },
                 name: artifact.name,
               },
