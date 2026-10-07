@@ -1,0 +1,39 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4AC28PC09Z9KY8KCM1RYZ57",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-77-native-session-lifecycle",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "apps/api/src/mcp-session.layer.ts",
+    "apps/api/src/mcp.schemas.ts",
+    "apps/api/src/mcp.tools.layer.ts",
+    "apps/api/src/worker.application.ts",
+    "apps/api/src/worker.ts",
+    "apps/web/scripts/native-api-source.boundary.ts",
+    "apps/web/scripts/native-pair-build.runtime.ts",
+    "apps/web/test/native-mcp.boundary.test.ts",
+    "apps/web/test/native-mcp.fixture.ts",
+    "apps/web/test/native-rpc-failures.boundary.test.ts",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "oxlint.config.ts",
+    "packages/infrastructure/src/apps-stack.test.ts",
+    "tools/oxlint/portable-rules.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 23621529,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1133503616,
+    "output_tokens": 5150662,
+    "api_call_count": 7571
+  }
+}

@@ -1,0 +1,3 @@
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_FBDOIw0AHeLOJHlfzOkDfdK2\",0]","question":"Which existing Cloudflare read connection or profile should I use for taxkit.dev DNS records and settings? The current connector returns 403, and this checkout’s Doppler check reports no scoped token. Please give the connection or profile name only, not a secret value.","answer":"Can you create one with the cf cli? Or check what exists?"}]
+</send_user_message_question_reply>
