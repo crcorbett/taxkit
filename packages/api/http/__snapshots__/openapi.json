@@ -77,7 +77,7 @@
             "$ref": "#/components/schemas/MoneyEncoded"
           },
           "rulePackVersion": {
-            "enum": ["rules-au-income-tax/1.0.0"],
+            "enum": ["rules-au-income-tax/1.0.1"],
             "type": "string"
           },
           "taxableIncome": {

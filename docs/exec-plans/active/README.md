@@ -14,6 +14,8 @@ tombstone: false
 The [Clean slate foundation](./clean-slate-foundation.md) implements the accepted
 website/API rebuild in dependency order; provider apply remains separately gated.
 
+The approved [2025–26 annual Medicare correction](../../product-specs/medicare-2025-26-correction.md) is active under the same implementation plan; its source/result proof is separate from adad consumer enablement.
+
 The completed [Entire session history setup](../completed/entire-session-history.md)
 retains recording, import and hosted publication proof.
 

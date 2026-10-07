@@ -57,7 +57,7 @@
         },
         {
           "path": "packages/docs-content/content/concepts/reports.mdx",
-          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--reports.json"
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-08/concepts--reports.json"
         },
         {
           "path": "packages/docs-content/content/concepts/rules.mdx",
@@ -137,7 +137,7 @@
         },
         {
           "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
-          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--calculate-annual-income-tax.json"
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-08/guides--calculate-annual-income-tax.json"
         },
         {
           "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
@@ -153,7 +153,7 @@
         },
         {
           "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
-          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--migrate-from-raw-http-to-sdk.json"
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-08/guides--migrate-from-raw-http-to-sdk.json"
         },
         {
           "path": "packages/docs-content/content/guides/show-calculator-help-to-users.mdx",
@@ -257,7 +257,7 @@
         },
         {
           "path": "packages/docs-content/content/api/agent-tools.mdx",
-          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--agent-tools.json"
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-08/api--agent-tools.json"
         }
       ],
       "path": "docs/documentation-audit/hgi-207/public-mdx-lifecycle.json",

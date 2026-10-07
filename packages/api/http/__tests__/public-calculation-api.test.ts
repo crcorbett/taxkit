@@ -253,7 +253,7 @@ describe("TaxKit public calculation HTTP API", () => {
         Match.orElse(() => expect.fail("Expected annual tax report"))
       );
       expect(annualTaxResponse.report._tag).toBe("AnnualTaxReport");
-      expect(annualReport.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
+      expect(annualReport.rulePackVersion).toBe("rules-au-income-tax/1.0.1");
     }).pipe(Effect.provide(TestLive))
   );
 

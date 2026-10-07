@@ -30,8 +30,7 @@ safe action. A draft PR, checkpoint or completed slice is not the terminal goal.
 The local continuation also records this objective in the runtime's native goal
 manager. This active plan and the task ledger remain the durable repository
 continuation record.
-Medicare result changes remain gated on Cooper's concrete decision. Continue all
-independent work. Cooper's 7 October direction adds native Preview and Production
+Cooper approved the separate [2025–26 annual Medicare correction](../../product-specs/medicare-2025-26-correction.md) on 8 October. Its owning task MCR-001 permits affected result changes; independent rebuild work continues. Cooper's 7 October direction adds native Preview and Production
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 

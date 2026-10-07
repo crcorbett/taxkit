@@ -37,7 +37,9 @@ const findBracket = (
 ): Effect.Effect<IncomeTaxBracket, CalculationError> => {
   const bracket = Array.findFirst(
     Array.reverse(brackets),
-    (b) => incomeCents > b.thresholdCents
+    (b) =>
+      incomeCents > b.thresholdCents ||
+      (incomeCents === 0 && b.thresholdCents === 0)
   );
 
   return Option.match(bracket, {

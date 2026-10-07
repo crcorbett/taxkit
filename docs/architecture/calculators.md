@@ -132,7 +132,7 @@ Each report owner defines its ruleset-version Schema as an exact literal and
 emits that value directly. Ruleset versions describe the independent tax-rule
 edition used for a calculation; they are not read from package manifests at
 runtime. Current report values are `rules-au-pay/1.0.0` and
-`rules-au-income-tax/1.0.0`.
+`rules-au-income-tax/1.0.1`.
 
 ## Question Planning
 

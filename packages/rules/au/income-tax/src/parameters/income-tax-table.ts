@@ -157,7 +157,7 @@ export const AtoIncomeTaxTableDescriptor = makeParameterDescriptor({
 });
 
 // Resident individual tax rates 2025-26.
-// Each bracket covers: thresholdCents < income ≤ maxCents.
+// Each bracket covers thresholdCents < income ≤ maxCents; the nil-rate band also includes exact zero.
 // The nil-rate band (0 – $18,200) has threshold=0 and rate=0.
 const table2025_26 = new IncomeTaxTable({
   brackets: [

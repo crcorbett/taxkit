@@ -35,7 +35,7 @@ export const CalculateAnnualTax = Effect.gen(function* () {
     ledger,
     liability,
     rawLiability,
-    rulePackVersion: AnnualTaxRulePackVersion.make("rules-au-income-tax/1.0.0"),
+    rulePackVersion: AnnualTaxRulePackVersion.make("rules-au-income-tax/1.0.1"),
     taxableIncome: income.income,
     trace: ledger.trace,
   });

@@ -204,7 +204,7 @@ describe("plain SDK facade", () => {
 
       expect(report._tag).toBe("AnnualTaxReport");
       expect(report.liability.cents).toBe(1_958_800);
-      expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
+      expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.1");
     })
   );
 });

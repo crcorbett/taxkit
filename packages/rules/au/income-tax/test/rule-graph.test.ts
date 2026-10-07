@@ -127,10 +127,10 @@ describe("AU annual tax rule graph", () => {
                 "toExclusive": "2026-07-01",
               },
               "id": "taxkit/rules-au-income-tax/parameter/AtoMedicareLevyTable",
-              "source": "ato-publication",
+              "source": "legislation",
               "sourceArtifact": {
-                "checksum": "sha256:d3b8ab27d44a3b0dc9d84b81c09a5f1af0cfa197f9f96deab47d19362195c987",
-                "retrievedOn": "2026-05-12",
+                "checksum": "sha256:8298b458c6a579ffad9305acf5b4604255c928313654eea58e495164e4478b67",
+                "retrievedOn": "2026-10-08",
                 "rowCount": 1,
               },
             },
@@ -142,7 +142,7 @@ describe("AU annual tax rule graph", () => {
             "taxkit/rules-au-income-tax/fact/AnnualTaxableIncome",
           ],
           "sources": [
-            "ato-publication",
+            "legislation",
           ],
         },
         {

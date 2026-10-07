@@ -18,7 +18,7 @@ export {
  * @since 1.0.0
  */
 export const AnnualTaxRulePackVersion = Schema.Literal(
-  "rules-au-income-tax/1.0.0"
+  "rules-au-income-tax/1.0.1"
 );
 
 /**

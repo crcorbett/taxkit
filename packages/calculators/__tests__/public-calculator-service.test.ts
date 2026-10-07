@@ -228,7 +228,7 @@ describe("PublicCalculatorService", () => {
         const student = yield* calculateAnnualTax(1_500_000);
         expect(student.report._tag).toBe("AnnualTaxReport");
         expect(student.report.rulePackVersion).toBe(
-          "rules-au-income-tax/1.0.0"
+          "rules-au-income-tax/1.0.1"
         );
         expect(student.report.rawLiability.cents).toBe(-70_000);
         expect(student.report.liability.cents).toBe(0);
