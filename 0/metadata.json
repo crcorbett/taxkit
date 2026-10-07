@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4B34XF96GERRYJ4JQXBJKFX",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T11:49:44.864083Z",
+  "branch": "codex/dev-79-analytics-policy-and-capture",
+  "checkpoints_count": 1,
+  "files_touched": [],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "ef48aa238168",
+  "checkpoint_transcript_start": 69507,
+  "transcript_lines_at_start": 69507,
+  "compact_transcript_start": 8220,
+  "token_usage": {
+    "input_tokens": 79283,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 4711680,
+    "output_tokens": 20289,
+    "api_call_count": 23
+  },
+  "session_metrics": {
+    "turn_count": 5
+  }
+}
