@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4B52MWHVQ57T6B3YFVQMGT3",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T12:23:27.632119Z",
+  "branch": "codex/dev-79-website-collection-choice",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/api/src/analytics-request.boundary.ts",
+    "apps/api/src/worker.application.ts",
+    "apps/web/src/lib/calculator-policy.browser.layer.ts",
+    "apps/web/src/lib/calculator.atoms.ts",
+    "apps/web/src/lib/live.server.layer.ts",
+    "apps/web/test/native-analytics.boundary.test.ts",
+    "oxlint.config.ts",
+    "packages/analytics/src/collection-policy.boundary.ts",
+    "packages/analytics/src/schemas.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "ef48aa238168",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 26726221,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1266109696,
+    "output_tokens": 5790348,
+    "api_call_count": 8456
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T12:23:23.472481Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 1342,
+    "human_modified": 20,
+    "human_removed": 0,
+    "total_committed": 1342,
+    "total_lines_changed": 1378,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}
