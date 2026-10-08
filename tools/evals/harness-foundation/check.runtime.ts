@@ -8,16 +8,14 @@ import {
   Option,
   Record as EffectRecord,
   Stream,
+  Schema,
 } from "effect";
 import { Command } from "effect/cli";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
-import {
-  CanonicalSkillBaseline,
-  CriticalJourneyInventory,
-} from "../../governance/schemas.js";
+import { CriticalJourneyInventory } from "../../governance/schemas.js";
 import {
   hashEpochBytes,
   decodeGitText,
@@ -45,6 +43,7 @@ import {
   validationCheckNames,
 } from "./schemas.js";
 import type { JourneyId } from "./schemas.js";
+import { CanonicalSkillBaseline } from "./skill-receipt.schema.js";
 
 const repositoryRootUrl = new URL("../../..", import.meta.url);
 const requiredJourneyIds = [
@@ -252,10 +251,19 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       epochPaths.scenarios,
       Scenarios
     );
-    const canonicalSkillReceipt = yield* readEpochJson(
+    const canonicalSkillReceipt = yield* runGit(
       repositoryRoot,
-      canonicalSkillReceiptPath,
-      CanonicalSkillBaseline
+      ["show", `${candidateCommit}:${canonicalSkillReceiptPath}`],
+      canonicalSkillReceiptPath
+    ).pipe(
+      Effect.flatMap((bytes) =>
+        decodeGitText(canonicalSkillReceiptPath, bytes)
+      ),
+      Effect.flatMap(
+        Schema.decodeUnknownEffect(
+          Schema.fromJsonString(CanonicalSkillBaseline)
+        )
+      )
     );
     const criticalJourneys = yield* readEpochJson(
       repositoryRoot,
@@ -346,9 +354,18 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
     const manifestArtifactHashes = yield* Effect.forEach(
       manifest.artifacts,
       (artifact) =>
-        readHash(repositoryRoot, artifact.path).pipe(
-          Effect.map((actual) => ({ actual, artifact }))
-        ),
+        Effect.gen(function* readManifestArtifactHash() {
+          if (artifact.path === canonicalSkillReceiptPath) {
+            const actual = yield* runGit(
+              repositoryRoot,
+              ["show", `${candidateCommit}:${artifact.path}`],
+              artifact.path
+            ).pipe(Effect.flatMap(sha256));
+            return { actual, artifact };
+          }
+          const actual = yield* readHash(repositoryRoot, artifact.path);
+          return { actual, artifact };
+        }),
       { concurrency: 4 }
     );
     yield* requireInvariant(

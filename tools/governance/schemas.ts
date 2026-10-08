@@ -164,7 +164,7 @@ export const RepositoryHarnessProfile = Schema.Struct({
     closeout: PathArray,
     documentation: PathArray,
     focused: PathArray,
-    skills: PathArray,
+    skills: Schema.Array(NonEmpty),
   }),
   criticalJourneyOwner: NonEmpty,
   exceptions: Schema.Array(Schema.Unknown),
@@ -204,11 +204,6 @@ export type RepositoryHarnessProfile = typeof RepositoryHarnessProfile.Type;
 export const GovernanceInvariant = Schema.Literals([
   "audit-crosswalk",
   "repository-profile",
-  "canonical-skill-tree",
-  "skill-overlay",
-  "claude-link",
-  "skill-reference",
-  "portable-runtime",
   "external-claim",
   "critical-journey",
 ]);
@@ -236,50 +231,6 @@ export class GovernancePolicyError extends Schema.TaggedError<GovernancePolicyEr
     findings: Schema.NonEmptyArray(GovernanceFinding),
   }
 ) {}
-
-const TreeReceipt = Schema.Struct({
-  entryCount: Schema.Number,
-  treeDigest: NonEmpty,
-});
-
-export const CanonicalSkillBaseline = Schema.Struct({
-  allowedOverlays: Schema.NonEmptyArray(
-    Schema.Struct({
-      owner: NonEmpty,
-      path: NonEmpty,
-      sha256: NonEmpty,
-    })
-  ),
-  claudeLinks: Schema.Record(NonEmpty, NonEmpty),
-  cleanCloneRule: NonEmpty,
-  extras: Schema.Record(
-    NonEmpty,
-    Schema.Struct({
-      classification: NonEmpty,
-      entryCount: Schema.Number,
-      owner: NonEmpty,
-      scope: NonEmpty,
-      treeDigest: NonEmpty,
-    })
-  ),
-  limitations: Schema.NonEmptyArray(NonEmpty),
-  nonClaims: Schema.NonEmptyArray(NonEmpty),
-  observedAt: NonEmpty,
-  retirementCondition: NonEmpty,
-  reviewTrigger: NonEmpty,
-  schemaVersion: Schema.Literal("1"),
-  skills: Schema.Record(NonEmpty, TreeReceipt),
-  source: Schema.Struct({
-    aggregateDigest: NonEmpty,
-    identityLimitation: NonEmpty,
-    kind: NonEmpty,
-    originalObservedAggregateDigest: NonEmpty,
-    owner: NonEmpty,
-    repositoryRevision: Schema.NullOr(NonEmpty),
-  }),
-  treeDigestAlgorithm: NonEmpty,
-});
-export type CanonicalSkillBaseline = typeof CanonicalSkillBaseline.Type;
 
 export const ProductSpecTaskPlan = Schema.StructWithRest(
   Schema.Struct({

@@ -227,7 +227,7 @@ the operation's scope, including refusal before reading a redirect body. The
 SDK receives only a bounded, collected in-memory response; that response can
 outlive the completed native request without retaining its connection.
 
-Use [the repo-owned effect client wrapper skill](../../.agents/skills/effect-client-wrapper/SKILL.md)
+Use [the repo-owned effect client wrapper skill](https://github.com/crcorbett/commonplace-plugins/blob/main/plugins/development-workflows/skills/effect-client-wrapper/SKILL.md)
 when introducing or reviewing a provider adapter. Its canonical example and
 stale-pattern audit are acceptance requirements, not an optional template.
 

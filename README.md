@@ -111,8 +111,12 @@ entire enable --agent codex --telemetry=false --absolute-git-hook-path --checkpo
 
 Finish the normal workflow with `git commit` and `git push entire BRANCH`.
 Entire uploads chat checkpoints and forwards source changes to GitHub.
-The checkpoint destination is a local setting for this clone. A push through
-`origin` can also trigger a separate checkpoint upload to that destination.
+The shared `strategy_options.checkpoint_push_remote` selects `entire`, so new
+working copies inherit that upload destination. An ignored
+`.entire/settings.local.json` override takes priority; keep it set to `entire`
+too. Check that `entire status` names `entire`. A push directly to the GitHub
+`origin` skips chat uploads. New chat activity after a push waits for the next
+push through `entire`.
 Ending a chat alone does not prove that it was published. Check the hosted
 Sessions page for its conversation and linked commit.
 
@@ -140,8 +144,7 @@ bun run check:repository-paths
 bun run check:harness-governance
 bun run check:docs
 bun run knip:production
-bun run verification
-bun run test:skills
+
 bun run release:check
 bun run changeset
 bun run version-repo
@@ -169,16 +172,15 @@ coverage, public/maintainer path separation, and generated-source ownership.
 It treats public content status as opaque and does not establish publication,
 availability, accuracy, or accepted-current truth. `bun run
 check:harness-governance` validates the repository-local harness profile,
-accepted HE crosswalk, skill-tree receipt, allowed overlays, relative Claude
-links, local skill references, critical journeys, and external non-claims. It
+accepted HE crosswalk, critical journeys, and external non-claims. It
 does not read a global skill installation or establish remote Git, hosted CI,
 registry, release, deployment, provider, public-site, or external-consumer
 state. `bun run knip:production`
 checks the release-artifact package, repository command and
 API runtime graph without test or development reachability. `bun run
 verification` is the baseline verification command for documentation, package
-wiring and scaffold changes and includes repo-owned skill policy checks. `bun
-run test:skills` runs that focused stale-pattern suite directly. `bun run
+wiring and scaffold changes. Shared skills use the latest plugin; see
+[development skills](docs/skills.md). Checks for saved skill copies have been removed. `bun run
 release:check` runs the complete ordered
 release evidence, including tests, builds, package artifacts, API smoke, docs
 browser proof and Changeset status.

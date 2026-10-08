@@ -6,7 +6,9 @@
     "tsconfig.base.json",
     "tsconfig.alchemy.json"
   ],
-  "globalEnv": ["CI"],
+  "globalEnv": [
+    "CI"
+  ],
   "remoteCache": {
     "enabled": true,
     "timeout": 10,
@@ -14,8 +16,13 @@
   },
   "tasks": {
     "@taxkit/docs-content#build": {
-      "dependsOn": ["^build"],
-      "env": ["NODE_ENV", "PLAYWRIGHT_BROWSERS_PATH"],
+      "dependsOn": [
+        "^build"
+      ],
+      "env": [
+        "NODE_ENV",
+        "PLAYWRIGHT_BROWSERS_PATH"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/tools/documentation/catalogue.*",
@@ -23,10 +30,14 @@
         "$TURBO_ROOT$/tools/documentation/owner-policy.json",
         "$TURBO_ROOT$/docs/documentation-audit/clean-slate-foundation/public-content-acceptance/**/*.json"
       ],
-      "outputs": [".source/**"]
+      "outputs": [
+        ".source/**"
+      ]
     },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "ALCHEMY_CLOUDFLARE_VITE_INJECTED",
         "NODE_ENV",
@@ -43,7 +54,9 @@
       ]
     },
     "generate": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "content/**",
         "navigation.json",
@@ -51,50 +64,78 @@
         "src/**",
         "package.json"
       ],
-      "outputs": [".source/**"]
+      "outputs": [
+        ".source/**"
+      ]
     },
     "check-types": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "validate": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "check-packed-artifact": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "outputs": []
     },
     "validate:downstream": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "outputs": []
     },
     "smoke": {
-      "dependsOn": ["build"],
-      "env": ["TAXKIT_API_SMOKE_PORT"],
+      "dependsOn": [
+        "build"
+      ],
+      "env": [
+        "TAXKIT_API_SMOKE_PORT"
+      ],
       "outputs": []
     },
     "test:browser": {
-      "dependsOn": ["build"],
-      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
+      "dependsOn": [
+        "build"
+      ],
+      "env": [
+        "PLAYWRIGHT_BROWSERS_PATH"
+      ],
       "outputs": []
     },
     "//#check:docs:task": {
-      "outputs": ["tmp/docs-policy-report.json"]
+      "outputs": [
+        "tmp/docs-policy-report.json"
+      ]
     },
     "//#check:runbooks:task": {
-      "outputs": ["tmp/runbook-validation-report.json"]
+      "outputs": [
+        "tmp/runbook-validation-report.json"
+      ]
     },
     "//#knip:task": {
-      "dependsOn": ["@taxkit/docs-content#build"],
+      "dependsOn": [
+        "@taxkit/docs-content#build"
+      ],
       "outputs": []
     },
     "//#knip:production:task": {
-      "dependsOn": ["@taxkit/docs-content#build"],
+      "dependsOn": [
+        "@taxkit/docs-content#build"
+      ],
       "outputs": []
     },
     "//#check:docs-deployment:task": {
@@ -105,27 +146,41 @@
     },
     "//#check:docs-deployment-inventory:task": {
       "cache": false,
-      "passThroughEnv": ["ALCHEMY_PROFILE", "CLOUDFLARE_*", "TAXKIT_*"]
+      "passThroughEnv": [
+        "ALCHEMY_PROFILE",
+        "CLOUDFLARE_*",
+        "TAXKIT_*"
+      ]
     },
     "//#check:docs-deployment-workflow-proof:task": {
       "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
+      "passThroughEnv": [
+        "TAXKIT_*"
+      ]
     },
     "//#check:docs-deployment-workflow-input:task": {
       "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
+      "passThroughEnv": [
+        "TAXKIT_*"
+      ]
     },
     "//#check:docs-deployment-workflow-run:task": {
       "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
+      "passThroughEnv": [
+        "TAXKIT_*"
+      ]
     },
     "//#check:docs-deployment-workflow-plan:task": {
       "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
+      "passThroughEnv": [
+        "TAXKIT_*"
+      ]
     },
     "//#check:docs-deployment-workflow-teardown-proof:task": {
       "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
+      "passThroughEnv": [
+        "TAXKIT_*"
+      ]
     },
     "//#check:docs-deployment:types:task": {
       "outputs": []
@@ -138,7 +193,9 @@
     },
     "//#check:docs:types:task": {
       "outputs": [],
-      "dependsOn": ["@taxkit/docs-content#build"]
+      "dependsOn": [
+        "@taxkit/docs-content#build"
+      ]
     },
     "//#check:effect-language-service:task": {
       "outputs": []
@@ -185,13 +242,9 @@
       "outputs": []
     },
     "//#test:quality-workflow:task": {
-      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
-      "outputs": []
-    },
-    "//#test:skills:task": {
-      "outputs": []
-    },
-    "//#check:skills:types:task": {
+      "env": [
+        "PLAYWRIGHT_BROWSERS_PATH"
+      ],
       "outputs": []
     },
     "//#changeset:status:task": {

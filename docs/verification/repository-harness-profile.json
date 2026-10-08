@@ -52,8 +52,8 @@
       "docs/evidence/"
     ],
     "skills": [
-      ".agents/skills/",
-      ".claude/skills/"
+      "docs/skills.md",
+      "docs/skill-profiles/"
     ],
     "agentGuidance": [
       "AGENTS.md",
@@ -67,9 +67,7 @@
       "bun run check:docs-deployment",
       "bun run check:repository-paths"
     ],
-    "skills": [
-      "bun run test:skills"
-    ],
+    "skills": [],
     "focused": [
       "bun run check:harness-governance:types",
       "bun run test:harness-governance",
@@ -150,7 +148,7 @@
     "The existing Quality workflow invokes bun run release:check -- --ci for pull requests and main-branch pushes; that graph begins with root verification and remains the sole hosted CI route.",
     "Exactly five operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
     "The current six local journeys include the native Website. The separate four-entry docs deployment journey owner and dated deployment receipts grant no additional authority; historical five-journey HGI/HFI evidence remains unchanged.",
-    "Repository-local skills and validators must work from a clean clone without reading a user home or global skill installation.",
+    "Repository validators work from a clean clone. Agents separately look up the latest plugin through docs/skills.md.",
     "Current docs-browser release checking and Quality Playwright bootstrap select apps/web. The old apps/docs workspace and writers are retired with verified retained sources; new provider operations remain T010 work; no historical packet or provider target is reinterpreted."
   ],
   "exclusions": [
@@ -162,7 +160,8 @@
     "Repository-local validation does not establish hosted CI success.",
     "Local Git commits do not establish push, remote branch, tag, or release state.",
     "The DCD-002 requalification chain establishes one dated Preview deployment/hosted/teardown observation; it establishes no current Preview availability, Production, rollback, public-domain behavior, release or publication.",
-    "A target-specific harness epoch does not establish general causal effectiveness for other workers, repositories, or future skill states."
+    "A target-specific harness epoch does not establish general causal effectiveness for other workers, repositories, or future skill states.",
+    "Local checks do not establish remote Git, registry, release, deployment, provider, public-site or external-consumer state."
   ],
   "exceptions": []
 }

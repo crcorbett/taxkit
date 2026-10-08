@@ -29,8 +29,8 @@ file; edit `AGENTS.md` only.
 
 For any material calculator/rule/schema, SDK/export/example, HTTP/OpenAPI,
 public MDX/navigation/runtime, package/app, command/CI/versioning/release-proof,
-lifecycle, SPEC, plan, runbook, or skill change, invoke the repository-local
-`$docs-maintainer` route before accepting the slice. Record `Change required`,
+lifecycle, SPEC, plan, runbook, or skill change, invoke the plugin
+`development-workflows:docs-maintainer` route before accepting the slice. Record `Change required`,
 `Preserve`, or evidenced `N/A` for its documentation impact. Scheduled or
 background freshness work is report-only candidate output unless a separately
 attached implementation authority names the reviewer and publisher.
@@ -104,3 +104,10 @@ Use `bun run check:repository-paths` for checkout portability and
 `bun run verification` for repository closeout. Use `bun run release:check`
 only for its documented local release-evidence graph; it does not authorize or
 prove publication.
+
+## Shared development skills
+
+Before starting work, follow [the plugin lookup](docs/skills.md) and load the
+latest published Commonplace `development-workflows` plugin. Do not use saved
+repository copies or assume a cached plugin version is current. Read the local
+profiles in `docs/skill-profiles/` alongside the plugin.

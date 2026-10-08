@@ -76,7 +76,7 @@ earliest durable owner and necessary pointers in the same slice. Counts prove
 accounting only; semantic and consumer claims need owner review and
 boundary-matched proof.
 
-Use the repository-local `$docs-maintainer` skill for this impact decision on
+Use the plugin `development-workflows:docs-maintainer` skill for this impact decision on
 both PRD and ordinary changes. `$docs-writer` is limited to public-copy wording
 after the maintenance route has selected the owner; it cannot close lifecycle,
 generated-content, package, proof, or validation work. Background freshness
@@ -111,3 +111,5 @@ then reconciles the immutable packet digest, four Markdown owners, commands,
 evidence paths, stop operations, index rows and authority rows. It writes only
 the ignored bounded receipt `tmp/runbook-validation-report.json`, executes none
 of the documented procedures and establishes no consequential state.
+
+Shared development workflows: [latest plugin and repository profiles](skills.md).

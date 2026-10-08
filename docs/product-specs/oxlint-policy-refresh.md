@@ -90,8 +90,7 @@ plugins and root configuration.
 ## Verification and limits
 
 Focused proof was `bun run test:oxlint`, `bun run lint`, `bun run check-types`,
-`bun run check:docs`, `bun run check:runbooks`, `bun run test:skills`,
-`bun run check:repository-paths`, `git diff --check` and
+`bun run check:docs`, `bun run check:runbooks`, `bun run check:repository-paths`, `git diff --check` and
 `bun run verification`. Candidate `48384d5da44c25894612c7253003adc677f601dd`
 passed hosted Quality run `33375644482`; [pull request
 #76](https://github.com/crcorbett/taxkit/pull/76) merged it as

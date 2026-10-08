@@ -68,24 +68,14 @@ Git-tracked readable text and safely reports only repository-relative file,
 positive line and closed finding category. Stage new retained receipts before
 the final path check so their text is included in the tracked-file inventory;
 an earlier pass does not cover files added afterwards. Binary files are identified by a
-NUL byte or failed strict UTF-8 decode and skipped. For skill governance it
-also runs `test:skills`, which validates required policy language and rejects
-stale provider-wrapper examples. The root graph also runs
-`check:harness-governance` exactly once. That Effect-native gate decodes the
-TaxKit profile, structured HE findings/crosswalk, canonical skill receipt, and
-critical-journey inventory at filesystem ingress, then checks local skill-tree
-digests, the two permitted profile overlays, the two declared extras, eight
-relative Claude links, the maintained lifecycle with stable spec/plan index
-owners, self-contained references, portable runtime paths, and external
-non-claims. Its positive and adversarial corpus is owned by
-`tools/governance/`; focused type and test commands are
-`check:harness-governance:types` and `test:harness-governance`.
-Target-specific requalification is separately owned by
-`check:harness-foundation-epoch` and its focused TypeScript check. That command
-binds one immutable candidate to complete validator sources, the canonical
-skill and journey projections, retained failures, five receipts, fresh
-independent review, clocks, limitations and non-claims. It is a closeout check,
-not another root-verification or Quality-workflow edge.
+NUL byte or failed strict UTF-8 decode and skipped. Shared skills come from the latest plugin through `docs/skills.md`; copied
+skill text, tree-digest, overlay and alias checks are removed as approved in
+#140. The root graph runs `check:harness-governance` exactly once. It checks
+the TaxKit profile, accepted findings and task mappings, six current critical
+journeys and external non-claims. Its focused type and test commands remain
+`check:harness-governance:types` and `test:harness-governance`. Retained HFI/HGI
+evaluation records describe their original candidates; they do not select or
+validate the current plugin version.
 Current documentation checking belongs to the Website and native API pair.
 `bun run docs:validate` checks authored content and examples; `bun run
 web:test:native-pair` freshly builds the pair and observes real page HTML,
