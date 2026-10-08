@@ -1,0 +1,819 @@
+{
+  "schemaVersion": 1,
+  "documentType": "bounded-proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-implementation-owner",
+  "observedAt": "2026-10-08T01:57:34.372747+00:00",
+  "status": "Bounded review/handover locally qualified; draft delivery pending; full rebuild not accepted",
+  "baseHead": "94e0362037df3590c193fc522387fe256f40d826",
+  "branch": "codex/dev-81-review-handover",
+  "actorAuthority": {
+    "principal": "Cooper",
+    "operation": "Bounded draft review, corrections to current documentation, local checks, commits, pushes, draft PR and routine Linear tracking",
+    "approval": "Direct request on 8 October to continue the stated review/handover work as the goal",
+    "environment": "Local TaxKit repository; GitHub draft delivery and Personal/Taxkit Linear tracking",
+    "duration": "This bounded handover only",
+    "excluded": [
+      "merge",
+      "package version application",
+      "publication",
+      "deployment",
+      "billing upgrade",
+      "credential creation",
+      "provider changes"
+    ],
+    "rollback": "Revert only this handover commit to the recorded parent; preserve all dated proof and the separate Medicare draft."
+  },
+  "scope": {
+    "mainDraftStack": {
+      "root": 88,
+      "tip": 169,
+      "count": 79,
+      "head": "94e0362037df3590c193fc522387fe256f40d826",
+      "savedGitHubReviews": 0,
+      "savedGitHubThreads": 0,
+      "paginationComplete": true
+    },
+    "separateMedicareDraft": {
+      "number": 168,
+      "observedHead": "557b4e524ead6f469e92150360a9e8a451c37cdd",
+      "scopeDecision": "Approved on 8 October; independently implemented and qualified in its own branch",
+      "approvalReadback": [
+        "DEV-68",
+        "DEV-73"
+      ],
+      "integratedHere": false,
+      "latestObservedHead": "2051a9870d2ede97ab30d72597c4bc2c90b20d53",
+      "qualificationReceipt": "https://github.com/crcorbett/taxkit/blob/2051a9870d2ede97ab30d72597c4bc2c90b20d53/docs/documentation-audit/medicare-2025-26-correction.json",
+      "observedQualification": "accepted-local-correction; aggregate passes at test-only checkpoint 557b4e524ead6f469e92150360a9e8a451c37cdd",
+      "adadApprovedSourceException": "0d82b82d1c48079fc4b8e2ec96abadfe12999789",
+      "consumerLimitation": "Later test/docs commits do not extend that exact consumer-source approval; adad qualification and enablement remain separately owned."
+    },
+    "deferred": [
+      "CSF-T008/DEV-79 PostHog",
+      "CSF-T009/DEV-80 metrics"
+    ],
+    "fullRebuildAccepted": false
+  },
+  "documentationImpact": [
+    {
+      "surface": "Current SPEC/task/plan",
+      "decision": "Change required",
+      "reason": "Record the bounded handover, both explicit deferrals and resolved separate Medicare decision."
+    },
+    {
+      "surface": "Architecture, current journey inventory, app/package README and release-readiness rollback",
+      "decision": "Change required",
+      "reason": "Correct stale agent acceptance/page-count/HTTP-service/retired-app claims against source and dated proof."
+    },
+    {
+      "surface": "Executable code, contracts, package manifests, lockfile, authored public MDX and accepted source records",
+      "decision": "Preserve",
+      "reason": "This handover changes current maintainer explanations and evidence only; existing tax results and runtime remain identical to the base."
+    },
+    {
+      "surface": "Changeset",
+      "decision": "N/A",
+      "reason": "No package-facing behaviour, public export, dependency or authored public guide changes. Existing pending notes own the earlier executable changes."
+    },
+    {
+      "surface": "Provider or deployment proof",
+      "decision": "N/A",
+      "reason": "No new operation; prior delivery receipts retain their exact source and limits."
+    }
+  ],
+  "requirementsToProof": [
+    {
+      "id": "HND-001",
+      "requirement": "Review the existing draft stack and resolve material findings",
+      "observable": "Complete open-PR/review pagination, exact stack ancestry, selected owning source/tests and corrected current explanations",
+      "expected": "79 stacked drafts are contained in the executable base; separate #168 remains separate; HND-R1/HND-R2 resolved",
+      "falseGreen": "A list of green checks or the tip PR alone is called a substantive source review",
+      "evidence": "Saved paginated GitHub query, ancestor readback, independent direct source/assertion review and final owner hashes",
+      "limitation": "Risk-selected cumulative review; not every line of every draft and not the full rebuild terminal audit"
+    },
+    {
+      "id": "HND-002",
+      "requirement": "Check package notes and release-group consequences without applying versions",
+      "observable": "Authored compatibility notes, fixed train configuration, manifests and Changesets status output",
+      "expected": "All ten fixed packages have authored major coverage and are proposed for 2.0.0; current manifest versions remain unchanged",
+      "falseGreen": "Changeset presence or a proposed version is represented as applied or published",
+      "evidence": "Changesets status log, ten-name fixed configuration and independent package-note review",
+      "limitation": "No package version application, tag, registry publication or release"
+    },
+    {
+      "id": "HND-003",
+      "requirement": "Run final local release and actual packed-SDK checks",
+      "observable": "The owning nine-check local report, true exits, exact detail paths/hashes and frozen source",
+      "expected": "Verification, test, build, docs validation, packed artifact, fresh downstream consumer, API smoke, freshly built native browser cases and Changesets status all pass",
+      "falseGreen": "A tarball, workspace-source import, neighbouring test or old receipt substitutes for the actual packed and freshly built consumer",
+      "evidence": "bun run release:check -- --ci report and exact detail readback",
+      "limitation": "Report mode creates no candidate/attempt packet and proves no external consumer, provider or deployment"
+    },
+    {
+      "id": "HND-004",
+      "requirement": "Record PostHog and metrics postponement in SPEC, tasks, plan and routine tracking",
+      "observable": "Current owning scope and independently read-back Linear delivery records",
+      "expected": "T008 and T009 remain incomplete, collection stays off, and current handover does not accept T010 or the whole rebuild",
+      "falseGreen": "Deferral is marked Done or a local report completes unmet analytics requirements",
+      "evidence": "Current SPEC/task/plan, documentation checks and saved Linear readback",
+      "limitation": "No browser sender, project, tracking activation, billing or provider work"
+    },
+    {
+      "id": "HND-005",
+      "requirement": "Obtain and record the Medicare scope decision while respecting unchanged-result scope",
+      "observable": "Fresh DEV-68/DEV-73 approval readback and separately owned #168 scope/source",
+      "expected": "The 8 October narrow correction is recorded; this handover changes no tax values and does not duplicate or accept the independent correction",
+      "falseGreen": "Old retained-output tests are called current-law correctness or a separate approved draft is silently integrated",
+      "evidence": "Separate #168 and immutable scope at 557b4e524ead6f469e92150360a9e8a451c37cdd; current changed-path readback",
+      "limitation": "No acceptance of #168, adad qualification or public enablement here"
+    },
+    {
+      "id": "HND-006",
+      "requirement": "Deliver tested commits, pushed source, draft PR and clear handover",
+      "observable": "Local commit/tree, exact remote SHA, attached draft PR head/base/body and saved issue/project update",
+      "expected": "Only the approved handover documents are delivered as a draft with exact local proof and outstanding work",
+      "falseGreen": "A local commit, successful tool call or earlier PR head substitutes for remote readback",
+      "evidence": "Git/PR/Linear independent readback after delivery",
+      "limitation": "No merge, publication, deployment, credential or provider change"
+    }
+  ],
+  "checks": [
+    {
+      "stage": "frozen-install",
+      "command": [
+        "bun",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.47,
+      "log": "taxkit-handover-final-frozen-install.log",
+      "sha256": "f6a2e009bc6ee6f76a49ebf437f7d2d2a5f272a0da48b171b40c2408b4f07bc1"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.48,
+      "log": "taxkit-handover-qualified-preflight-docs.log",
+      "sha256": "f220a7d71ae57e6f7306559a1ab76fac126e1ae2dd55c9eaae9491713ebcb57c"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.15,
+      "log": "taxkit-handover-qualified-preflight-runbooks.log",
+      "sha256": "c0f3097977793a9238188e36c1bd401471fd8bcc9eb84130dd276798fd171e2d"
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "log": "taxkit-handover-qualified-preflight-paths.log",
+      "sha256": "8292cd29d6865e3a045b6ec4dd233fdb5195207019ba445d51b737417a820e8e"
+    },
+    {
+      "stage": "release-boundary",
+      "command": [
+        "bun",
+        "run",
+        "test:release-readiness"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.78,
+      "log": "taxkit-handover-qualified-preflight-release-boundary.log",
+      "sha256": "2cdf64df336ba3b653ec877a56cfbbd5a652c3bac24c631b4138ef9e07b7ee1e"
+    },
+    {
+      "stage": "release-report",
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1086.17,
+      "log": "taxkit-handover-resumed-release-report.log",
+      "sha256": "74e4819ed8d0391ac083ff14535c5978140f27ee9ee178aca5c3ed12f6810232"
+    }
+  ],
+  "independentReview": {
+    "status": "Two material documentation findings resolved and independently read back; bounded review accepted",
+    "candidateCommit": "94e0362037df3590c193fc522387fe256f40d826",
+    "reportName": "taxkit-handover-independent-review.md",
+    "reportSha256": "b7ba7385333a44b4facb2dc7471e9dfda39b6a5d38732b80b7fec4cd76a7501b",
+    "identityManifestName": "taxkit-handover-review-inspected-identities.json",
+    "identityManifestSha256": "c9137eeb9bc08d516322947480cc6d71b3aa72c3382b946b3b003eae780c07d3",
+    "inspectedExecutableInputs": [
+      {
+        "path": "packages/sdk/typescript/src/client.runtime.ts",
+        "sha256": "994ce172f66923f8e5b9b19d83a481914226738e4dad2db0c398300824686739",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/src/effect.ts",
+        "sha256": "c3b178f657a931e199b2988dc52fc0c7c32f28a051685efd7a353b8213081425",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/src/index.ts",
+        "sha256": "706de753e08d9d49b23a2fe7b152ff108639cebb4f4d1b21911052ae85857f9d",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/src/live.layer.ts",
+        "sha256": "7ca87f0d7a933c47b030921d096e34443491e2e17d0c8c5ac1c3ff12599f8d4a",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/src/errors.ts",
+        "sha256": "48e8bb599aa11ab57187484646f5e9ec1aee22e4c402e07b7c81869fedb9b7de",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/src/client-lifetime.test.ts",
+        "sha256": "55a5fc6c78b55a2aaf3188f158fa3b0783eabf2412e010a6d46f91386a67fca2",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/package.json",
+        "sha256": "c66bdc59cd8a601cb75a8178205217832973c24b12948756fba4aa1e4a112b1f",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+        "sha256": "bbaa0e9af2e90482fe8fb0c641388c1fa4a6a5295114c605c07106c228419ce0",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "4aba34d518db3b81af7c8e63b37b46633cc9b59d77878d86a0fab81dfa314a29",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/src/live.layer.ts",
+        "sha256": "b478d4cb9168fef0849ffec73d664406af6442632a6a1bded328df103c052909",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/src/service.ts",
+        "sha256": "bae2a8c1a1bb3a809e568c75e42430c85b95d51d75bb655d666dfd897fb76594",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/src/work.layer.ts",
+        "sha256": "351917dbc73c0edb4de4457728f0c22d0f8e2523dad67b637ddd1dd43001734d",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/src/admission.layer.ts",
+        "sha256": "3e601d1a27ffada8bf0adea03ea58bc70e3e882d574551e23f43f6a86c8c2237",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/src/admission.schemas.ts",
+        "sha256": "5db03ecb2b85c0f12f07007701953f7e76385b406ac29cdb9b5b8abd70e17234",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/src/admission.service.ts",
+        "sha256": "9a5ec67e7b70730f9f1530a65ef4e34f5057d02757e136f327bb28013bda3efd",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/src/errors.ts",
+        "sha256": "1fd694df6c7e32d90dba4d4ee1c609998434e1efe8b4356ee000a5070217ffdd",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/__tests__/calculation-work.test.ts",
+        "sha256": "bf93e8dcf20f54f95c348a3257279d866d9775c8f4dac40e1e0d9957e42dc4af",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/api/http/src/handlers/calculators.ts",
+        "sha256": "5237333f6063cb5a760e454eb93a415cb5f8225efe5511b842890f1032e9f271",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/api/http/src/request-boundary.ts",
+        "sha256": "12ce561747fc91e8b404d8a0951591b8b160c37daa3a921ed831263d2d5bdfc8",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/api/http/package.json",
+        "sha256": "48b3ad6aa7fc372568e87be16052ab78988ae03acd694be416707ca58dd3e190",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/api/rpc/src/live.layer.ts",
+        "sha256": "3b7111516d440d2da8208c3bdbd769f1d34790586c4653cc7b3f2b7fd9eb2932",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/api/rpc/src/response-budget.boundary.ts",
+        "sha256": "1b446ef8fcc83ec0db4195c38b4d5220aca28e3f5d3c8a86093a2489940dcbde",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/api/rpc/src/client-response.boundary.ts",
+        "sha256": "bc7ca7cb784cb795ecd0d0257677512045e71a1d8ae29db089a510834880b475",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/api/rpc/src/server-serialization.boundary.ts",
+        "sha256": "7ef7d23cd9880d72778473c21fa57788930710e24e809bdb6944d14555712681",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/api/rpc/src/host-telemetry.ts",
+        "sha256": "a63ee5a9dfbc47671f720075703b16117bce3d1a58961dce9db70f40caed7404",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/api/src/worker.ts",
+        "sha256": "05ee33c7c47578b161538a81ad3816d5ccc53d5c2bad6febaeae4c3b67f6c106",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/api/src/worker.application.ts",
+        "sha256": "b21a04afd09a5955717ae7b0ba5f041f17b445e244d08990a68fd3fcfcfc422f",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/api/src/worker-admission.layer.ts",
+        "sha256": "c8385c8ef9bbf92edfa7a05bc1e67a4966db2924a11d165d763da6daca30b5ad",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/api/src/mcp.tools.layer.ts",
+        "sha256": "8590bffc112bd0952b05bde04093439f48f6a3a2f695890eafe03a98aeee3913",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/api/src/mcp-session.layer.ts",
+        "sha256": "d27abaeab6e7a7669cf814e6ece27649d9b6b2e36daf8506ebc183d3b46c83b7",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/api/src/mcp-cancellation.boundary.ts",
+        "sha256": "a9b95b6682eb2e40508c8b44857accb61f2bb8ed9ae43498cd40accf6cf4bedb",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/api/src/mcp-response.boundary.ts",
+        "sha256": "70083c2b56462c1e7522754b051c93fcda321c83d68dfa4f6deea4de3211c03a",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/api/src/mcp.schemas.ts",
+        "sha256": "f9aa41c1bac27397b0ff194abeea6b36f103265fa7469b7f8795f0a34cb177e9",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/web/src/lib/browser-tools.boundary.ts",
+        "sha256": "34a2fd27db38894679284c4b2ec18c051b6e415a68c96da64a0fd07a854809ad",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/web/src/lib/browser-tools.atoms.ts",
+        "sha256": "ea465ae32e5acecc0f991036518bbdda57ef4d387e67abc1bee68c6ccf1ea443",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/web/src/lib/calculator-page.container.tsx",
+        "sha256": "4b4f9ef071ba269acb61221c2be701a53e6cf254a5aa1b89dac0f8f933acaf7b",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/web/src/routes/agents.tsx",
+        "sha256": "3b09c93dff5f1e9263624d2b0c529a6bae7e15e4493c1298a1d47830d9ea83ce",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/web/test/native-mcp.boundary.test.ts",
+        "sha256": "134a5060af8ba4dbf979756c8ccd73a7ff2ba649e81aae71b7e71e58a57cb7e0",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/web/test/native-browser-tools.boundary.test.ts",
+        "sha256": "7ca8df2eebe4daf193cc56e8624e04d1965b82ad8e641ac5b5550ad575f96454",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "0ed04952e22aa2e24084f2dc01fdf41f01293f196995d4bcc0c0e85e1a20cfd1",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "apps/web/src/lib/docs/mdx.boundary.tsx",
+        "sha256": "7efcc5e0249fc5b258bf367f5354dd3d7ac3615b7763b9b802c0873d23218173",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/content/src/live.layer.ts",
+        "sha256": "30b2d4568da9df9b4f54a132d8ffa2b02365bd61b1c458cc6e532bba056bf9c7",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/docs-content/content/api/agent-tools.mdx",
+        "sha256": "44fc321edaad50d3c28c7f8a663d004a5000685add8708cc5128be690977bbd3",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": ".changeset/config.json",
+        "sha256": "2ff2f9fad0cca34fce847de2eec1b16b7f1154a762063c8ceb90f0a6721035c8",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "package.json",
+        "sha256": "2d6787c12197d763f113748d07565d05a5b4f77dbcead0368c261e051f5d5304",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/scripts/src/release-readiness/schemas.ts",
+        "sha256": "59ab849b8898f8e4b83e28d816eda80dc78a41999542c2bc5f2f1b1c91cf592b",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
+        "sha256": "307c71cb8d93e42800b966713be75a8ec956e55283ee7b8eaa525a22b5cf1741",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/src/catalog.ts",
+        "sha256": "8a348a0e4640579513708446612233f7bc1551a008c0f5b1f75b8d817230a74d",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/calculators/__tests__/public-calculator-service.test.ts",
+        "sha256": "29ccb8bee2cd389dfdd130916a99e2ffe00f649dec5e78e76adc5aae848279b5",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/api/http/__tests__/public-calculation-api.test.ts",
+        "sha256": "bf733966f3f03d9efdc2a338655b67af3ab25794d13ee10be81349ddec2c41ff",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/src/types.ts",
+        "sha256": "8501d4c8e0574a3c01a8f6165aac3c6159690e066c9c86c4a4045ca6fe0e4bd0",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": "packages/sdk/typescript/type-tests/plain-client.test.ts",
+        "sha256": "e6649ecd937e8f5ca9a872f3157f4d6993bcae401c77770e90a7afa17bc4923c",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": ".changeset/caller-owned-sdk-clients.md",
+        "sha256": "95503107d0bee7caae008289585bb3745bb739bf6c3f87302834185fa49116a9",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": ".changeset/modern-effect-contracts.md",
+        "sha256": "af666fb414df6767dacbdb0d5e11c9dccbc5a9e96065ef38ccb11bed42181b8f",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": ".changeset/fallible-money-calendar.md",
+        "sha256": "8b202fc9be8c49033f93e4bdc8b7008061a5a83c95dd241c3cca3c79a2879026",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": ".changeset/domain-contract-closeout.md",
+        "sha256": "429f7d4b08953c36bd32d675ec4bceb39acd1f105b730306f19c72cff2f565bd",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": ".changeset/immutable-rule-graph.md",
+        "sha256": "fc57b1e7beb13d5d42736c2f1688e00a25be4a5403096e95836db7589c189467",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": ".changeset/accepted-content-service.md",
+        "sha256": "ca2f643b2512cbbdd519202c1a0e0e203b4e03c0f9bbdd77fa2e18d85ede2b8a",
+        "workingCopyEqualsCandidate": true
+      },
+      {
+        "path": ".changeset/shared-taxkit-analytics-project.md",
+        "sha256": "6633b6d6680fdc2414c43cb5d6f524d48c09dfede08d47f9255c7a4d3952e215",
+        "workingCopyEqualsCandidate": true
+      }
+    ],
+    "correctedDocumentationInputs": [
+      {
+        "path": "apps/web/README.md",
+        "sha256": "915403edf8403205dcc5ab3025c653527d0948723cadbee1d8917f54a698bdf0",
+        "matchesPrimaryFreeze": true
+      },
+      {
+        "path": "packages/api/rpc/README.md",
+        "sha256": "6616e4ffb92156670da5bf20c9b6f512465d28c905944de6b7d654efdd65cffd",
+        "matchesPrimaryFreeze": true
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "a1fef7b5f0f4c91975a617c9c659ea6350bb4aafb0b652f00ecae85bbdf4ff40",
+        "matchesPrimaryFreeze": true
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "417337d7763241ec15268a2b2fcd2ec9812143dc4357fa739e1825aec18f05eb",
+        "matchesPrimaryFreeze": true
+      },
+      {
+        "path": "docs/runbooks/release-readiness.md",
+        "sha256": "8f9de09d613d4d854470b3a8d2af635288f35301ce0391a7f4f8f3505077f038",
+        "matchesPrimaryFreeze": true
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "da5d8a27f13bb5810bfcc6abd41d67df7190336254ba8082e4c27e6b456e2d3e",
+        "matchesPrimaryFreeze": true
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "22e591c83631c8f7d526dead28fcc868b4bd5febe82521de566546b371d5726d",
+        "matchesPrimaryFreeze": true
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "05a3f3deb0a6b436cb17ebc5e0835fc82bc3ca8f40d4904f8f08fc0c04de6e07",
+        "matchesPrimaryFreeze": true
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "d892f3d6cb14eb2b1248222d08199559c21a5536ea98bf001005312920ce1955",
+        "matchesPrimaryFreeze": true
+      }
+    ],
+    "findings": [
+      {
+        "id": "HND-R1",
+        "severity": "P2",
+        "status": "resolved",
+        "problem": "Current owners used old agent setup, accepted-page count, search and retirement checkpoints",
+        "correction": "Use current accepted-page scope and later setup/retirement evidence; retain modern five-second and autonomous-model limits."
+      },
+      {
+        "id": "HND-R2",
+        "severity": "P2",
+        "status": "resolved",
+        "problem": "API architecture named a production SDK call absent from the real HTTP handler",
+        "correction": "Describe direct PublicCalculatorService use and keep SDK proof at tests/packed-consumer boundary."
+      }
+    ],
+    "scope": "Risk-selected cumulative calculator/API/SDK/native docs and agent boundaries, package notes, current owner/proof consistency; not every line in every draft or T010 terminal audit",
+    "nonClaims": [
+      "No independent reviewer test run; fresh execution remains the primary owner duty",
+      "No acceptance of deferred analytics/metrics, separate Medicare/adad, current provider state, autonomous model behaviour or publication"
+    ]
+  },
+  "limitations": [
+    "T008 and T009 remain incomplete; T010 and the full rebuild are not accepted.",
+    "This checkout retains the earlier annual Medicare table; separately approved correction #168 is not integrated or accepted here.",
+    "Local report mode does not create a release candidate/attempt packet or establish registry, provider, deployment or adad consumer state.",
+    "The draft stack has no saved GitHub reviews; bounded independent source review is recorded separately."
+  ],
+  "sourceQualification": {
+    "executableBase": "94e0362037df3590c193fc522387fe256f40d826",
+    "frozenInputCount": 1790,
+    "manifestName": "taxkit-handover-source-freeze.json",
+    "manifestSha256": "2b3f10a2a26e738dc30c41f6c7c9e8dbe1caf32e5a8c8107889a84deee1ae134",
+    "postRunReadback": "Every frozen file matched immediately after the successful nine-check graph",
+    "excludedEvidenceOwner": "docs/documentation-audit/clean-slate-foundation/2026-10-08-review-handover.json",
+    "finalEvidenceOnlyUpdates": [
+      "This bounded receipt",
+      "Active plan qualification outcome, next action and native-goal pointer"
+    ],
+    "executableChanges": false
+  },
+  "releaseReport": {
+    "mode": "ci/report-only, executed locally",
+    "orderedChecks": [
+      {
+        "check": "verification",
+        "label": "Canonical repository verification",
+        "exitCode": 0,
+        "stdout": {
+          "path": "tmp/release-readiness/verification-stdout-d6SYHc/b739ff77b4d7.log",
+          "sha256": "sha256:e8a765117bcf718fba61d1f4d704330183ab5480eca1c11fc32d61ac0b692b8a"
+        },
+        "stderr": {
+          "path": "tmp/release-readiness/verification-stderr-iOx9nf/70677674d0e7.log",
+          "sha256": "sha256:59504b0ca83995236774089abf8bb6719a8207c574d1bf0f530b68d2dd7badca"
+        },
+        "detailsVerified": true,
+        "sdkTaskCacheLines": []
+      },
+      {
+        "check": "test",
+        "label": "Workspace tests including the direct calculator journey",
+        "exitCode": 0,
+        "stdout": {
+          "path": "tmp/release-readiness/test-stdout-cSg1RQ/41ec6678906d.log",
+          "sha256": "sha256:00108e7970b57485b9fb0d28ba98255d9d4c96a68b448101db2fed4477800d8a"
+        },
+        "stderr": {
+          "path": "tmp/release-readiness/test-stderr-XFR400/1d3f67aed512.log",
+          "sha256": "sha256:a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8"
+        },
+        "detailsVerified": true,
+        "sdkTaskCacheLines": []
+      },
+      {
+        "check": "build",
+        "label": "Workspace production builds",
+        "exitCode": 0,
+        "stdout": {
+          "path": "tmp/release-readiness/build-stdout-0GB4ll/bbd996111bf5.log",
+          "sha256": "sha256:2e0a5b9c403197ece978adf345654b13819c3be88f898ffd5d678a306a8bc45f"
+        },
+        "stderr": {
+          "path": "tmp/release-readiness/build-stderr-bUK1uC/e760711425a7.log",
+          "sha256": "sha256:844915855e64ad7359e63b5ba6df54e45ef4825107084cebde1492f28bf01a07"
+        },
+        "detailsVerified": true,
+        "sdkTaskCacheLines": []
+      },
+      {
+        "check": "docs-validation",
+        "label": "Documentation content validation",
+        "exitCode": 0,
+        "stdout": {
+          "path": "tmp/release-readiness/docs-validation-stdout-NgIUdV/4c7ba97357a8.log",
+          "sha256": "sha256:60c175514baa252fe9f9248e27c0f9f310d04e6f3073bb403d73b1c2c8574ebe"
+        },
+        "stderr": {
+          "path": "tmp/release-readiness/docs-validation-stderr-C1gO3y/46ba0fd3996e.log",
+          "sha256": "sha256:fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697"
+        },
+        "detailsVerified": true,
+        "sdkTaskCacheLines": []
+      },
+      {
+        "check": "packed-artifact",
+        "label": "Focused SDK packed artifact proof",
+        "exitCode": 0,
+        "stdout": {
+          "path": "tmp/release-readiness/packed-artifact-stdout-8hNaol/34affe9fd199.log",
+          "sha256": "sha256:e20eede3a5ed81e9dd9063964ea9038a7a39d98052ca59e0c25a0fdc49203716"
+        },
+        "stderr": {
+          "path": "tmp/release-readiness/packed-artifact-stderr-GF4JfW/d369cd96b79e.log",
+          "sha256": "sha256:06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7"
+        },
+        "detailsVerified": true,
+        "sdkTaskCacheLines": [
+          "@taxkit/sdk:check-packed-artifact: cache miss, executing 346f2a950717f6e2"
+        ]
+      },
+      {
+        "check": "downstream-consumer",
+        "label": "Strict downstream package proof",
+        "exitCode": 0,
+        "stdout": {
+          "path": "tmp/release-readiness/downstream-consumer-stdout-mYppPR/dde064ecc925.log",
+          "sha256": "sha256:a62eba09975312c6885b4456de251ef651334908683a8d43f8138bbd64c112f4"
+        },
+        "stderr": {
+          "path": "tmp/release-readiness/downstream-consumer-stderr-D3IMdz/6ff600c67925.log",
+          "sha256": "sha256:d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9"
+        },
+        "detailsVerified": true,
+        "sdkTaskCacheLines": [
+          "@taxkit/sdk:validate:downstream: cache miss, executing bbb33d4ef623f0cf"
+        ]
+      },
+      {
+        "check": "api-smoke",
+        "label": "Public API smoke evidence",
+        "exitCode": 0,
+        "stdout": {
+          "path": "tmp/release-readiness/api-smoke-stdout-SN08ni/7e90811fb48c.log",
+          "sha256": "sha256:17e5eb90cbad57252da2dc009d32e08f6b6cbde66db6c3585c17cb0f47f82ad1"
+        },
+        "stderr": {
+          "path": "tmp/release-readiness/api-smoke-stderr-n9Fw2o/47711322a318.log",
+          "sha256": "sha256:1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87"
+        },
+        "detailsVerified": true,
+        "sdkTaskCacheLines": []
+      },
+      {
+        "check": "docs-browser",
+        "label": "Built native Website and documentation evidence",
+        "exitCode": 0,
+        "stdout": {
+          "path": "tmp/release-readiness/docs-browser-stdout-OH0T2e/844474d2644e.log",
+          "sha256": "sha256:302a3046cef83d0b125e49ccbd0ba29796b9a3e1f4384ac1eea7505f282ca274"
+        },
+        "stderr": {
+          "path": "tmp/release-readiness/docs-browser-stderr-fxqxcU/d0795435a11e.log",
+          "sha256": "sha256:781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4"
+        },
+        "detailsVerified": true,
+        "sdkTaskCacheLines": []
+      },
+      {
+        "check": "changeset-status",
+        "label": "Pending release train status",
+        "exitCode": 0,
+        "stdout": {
+          "path": "tmp/release-readiness/changeset-status-stdout-EkhNrC/e27d9f8691b1.log",
+          "sha256": "sha256:a9f1f4558f42047f6b6b316e96b72446556d02950e3c5a3b47b6f2c37024963c"
+        },
+        "stderr": {
+          "path": "tmp/release-readiness/changeset-status-stderr-mvHZtO/4fa0e94a97b2.log",
+          "sha256": "sha256:26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3"
+        },
+        "detailsVerified": true,
+        "sdkTaskCacheLines": []
+      }
+    ],
+    "durationSeconds": 1086.17,
+    "createdCandidatePacket": false,
+    "createdAttemptReceipt": false,
+    "nativeRuns": [
+      {
+        "owner": "verification",
+        "passed": 22,
+        "files": 11
+      },
+      {
+        "owner": "docs-browser",
+        "passed": 22,
+        "files": 11
+      }
+    ],
+    "packedConsumerFreshness": "Both exact SDK tasks were cache misses and executed; all stdout/stderr file hashes independently match."
+  },
+  "interruptedHistory": [
+    {
+      "status": "interrupted/inconclusive",
+      "oldSessionId": 29211,
+      "lastCompletedStage": "frozen-install",
+      "releaseReportExitCode": null,
+      "observedState": "Session handle was missing; independent process readback found no runner or release runtime. No completed graph was inferred.",
+      "log": "taxkit-handover-final-release-report.log",
+      "sha256": "34055e82fa44f2e0e6de9d5621e0ca88192dfd6827a2c9ceb12e29be50bc2445",
+      "successor": "taxkit-handover-resumed-release-report.log",
+      "recovery": "A fresh same-source graph was started only after terminal process readback, with a saved process identity and true terminal result."
+    }
+  ],
+  "packageNotes": {
+    "fixedTrain": [
+      "@taxkit/core",
+      "@taxkit/api-http",
+      "@taxkit/calculators",
+      "@taxkit/content",
+      "@taxkit/rules-au-income-tax",
+      "@taxkit/rules-au-pay",
+      "@taxkit/rules-au-stsl",
+      "@taxkit/sdk",
+      "@taxkit/testing",
+      "@taxkit/tsconfig"
+    ],
+    "proposedFixedTrainVersion": "2.0.0",
+    "versionsApplied": false,
+    "authoredNotes": "Pending notes cover stable Effect, fallible primitives and Options, API/RPC error contracts, content and SDK caller disposal. The fresh independent review and Changesets status agree.",
+    "newChangeset": "N/A: current maintainer explanations and evidence only; earlier notes own executable changes."
+  },
+  "localCiGuidance": {
+    "source": "Commonplace development-workflows 0.6.7 release guidance permits the same local checks when CI cannot start because of account/runner limits; pinned TaxKit skills are unchanged.",
+    "commitDirective": "[skip ci]",
+    "owner": "https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs",
+    "limitation": "No exact-head hosted CI success is claimed; skipped required GitHub checks may stay pending."
+  },
+  "deliveryAuthority": {
+    "repository": "crcorbett/taxkit",
+    "remote": "https://github.com/crcorbett/taxkit.git",
+    "branch": "codex/dev-81-review-handover",
+    "baseBranch": "codex/dev-79-shared-posthog-project",
+    "expectedBase": "94e0362037df3590c193fc522387fe256f40d826",
+    "remoteBranchBeforePush": "Absent at independent readback",
+    "commitMessage": "docs: record reviewed handover and analytics deferrals [skip ci]",
+    "operation": "Commit, push new branch, create and attach draft PR; record routine Taxkit Linear progress",
+    "duration": "This handover only",
+    "rollback": "Revert only the delivered handover commit to its parent; preserve failed and accepted proof. No provider rollback is implicated."
+  }
+}

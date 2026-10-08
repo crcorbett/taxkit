@@ -23,6 +23,23 @@ record those operations. Merge, publication, credential creation and unrelated
 provider changes remain outside that authority; new provider operations need
 their concrete approval boundary.
 
+On 8 October Cooper postponed PostHog and confirmed a bounded review and
+handover as the next goal. The earlier metrics deferral still applies. This
+handover reviews the existing drafts, resolves material findings, checks
+Changesets and local release/packed-SDK evidence, and records both deferrals.
+It includes commits, pushes, draft PRs and routine Linear tracking. It does not
+merge, apply package versions, publish, deploy, upgrade billing, create
+credentials or change providers. T008 and T009 remain incomplete; this work
+does not accept T010 or close the full rebuild.
+
+The Medicare choice is resolved separately: Cooper approved the narrow
+2025–26 annual correction on 8 October, as recorded in
+[DEV-68](https://linear.app/coopers-personal/issue/DEV-68/cf-012-qualify-a-correct-effect-v4-taxkit-revision)
+and [draft #168](https://github.com/crcorbett/taxkit/pull/168). Its separate
+[accepted scope](https://github.com/crcorbett/taxkit/blob/557b4e524ead6f469e92150360a9e8a451c37cdd/docs/product-specs/medicare-2025-26-correction.md)
+owns that correction and its qualification. This handover branch keeps its
+existing results and does not integrate or accept the separate correction.
+
 ## Agreed direction
 
 Keep the TaxKit calculation packages, tax rules and calculation results. Rebuild
@@ -928,6 +945,25 @@ metrics/exporter/dataset/dashboard choices must be revisited before that task
 starts. This continuation does not implement or accept that prior metrics
 approach. Existing disabled collection and fixed safe failure containment stay
 in place while calculator/API and other authorised work proceed.
+
+## PostHog deferral and review handover — 8 October 2026
+
+Cooper postponed PostHog setup after reviewing the project-limit cost. Keep
+collection off and stop project creation, billing changes, browser-sender
+implementation and tracking activation until Cooper explicitly resumes that
+work. Preserve the locally qualified single-project draft #169 and its
+receipts. CSF-T008/DEV-79 remains unfinished; stage labels separate reports,
+not access to events within a shared project.
+
+The current handover may proceed independently of T008/T009. Review the exact
+draft stack and its saved review comments, inspect package compatibility notes
+and the ten-package fixed train, run the owning local release graph and packed
+consumer checks, and obtain a fresh bounded independent review. Resolve
+material findings and record source identity, actual command outcomes, remaining
+work and rollback. Preserve completed task receipts and all original acceptance
+conditions. Final rebuild acceptance still waits for the deferred requirements
+and their own exact proof; a green local report is not merge, publication,
+deployment, current-law Medicare correctness or adad qualification.
 
 
 ## T005 Website search contract

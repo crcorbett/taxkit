@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-api-sdk-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: API or SDK contracts, exports, lifetime or caller composition change
 ---
 
@@ -102,9 +102,10 @@ config schema.
 generation, typed HTTP clients, server route layers and thin handler adapters.
 Reusable calculator catalog entries, metadata transformations, graph assembly
 and schema-error shaping live in `@taxkit/calculators`. The calculate route
-executes through the request-preserving `@taxkit/sdk/effect`
-`calculateRunRequest` helper as a normal in-process consumer, proving the
-public SDK boundary without making the SDK depend on HTTP transport code.
+calls the supplied `PublicCalculatorService` directly and maps its checked
+result to the HTTP response. SDK parity is proved by the package tests and
+packed-consumer checks; the production HTTP handler does not execute through
+the SDK.
 
 `@taxkit/api-http/config` exports the package-owned HTTP API client config
 schema, type and keyed config fragment. Apps compose that fragment into their

@@ -19,7 +19,28 @@ provider changes and credential creation remain outside this authority. The
 [task ledger](../../product-specs/clean-slate-foundation.tasks.json) own scope,
 dependencies and acceptance; this plan owns execution evidence.
 
-## Persistent implementation goal
+## Current review and handover goal — 8 October 2026
+
+Cooper postponed PostHog and confirmed the remaining review and handover work
+as the current goal. Review the existing draft stack, resolve material findings,
+check package notes and final local release/packed-SDK proof, and record the
+PostHog and metrics deferrals. Deliver tested commits, pushes, draft PRs and
+routine Linear tracking. No merge, package version application, publication,
+deployment, billing upgrade, credential creation or provider change is part
+of this handover.
+
+The [dated handover receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-review-handover.json)
+records source identity, the draft-stack review, documentation impact, local
+checks, the separate Medicare draft and exact remaining limits. All nine local report checks passed in 1,086.17 seconds. Fresh packed/downstream
+SDK tasks executed; both native runs passed all 22 cases. The independent review
+resolved its two current-owner findings. Draft delivery and routine tracking
+readback remain the next actions; full rebuild acceptance is still deferred.
+
+T008 and T009 remain incomplete. The review is bounded readiness evidence;
+it is not T010's terminal rebuild audit. Keep the full plan active and preserve
+its original acceptance conditions until the deferred requirements resume.
+
+## Original implementation goal and retained limits
 
 Cooper explicitly confirmed on 4 October 2026: complete DEV-73's enforced
 dependency/Effect and host proof gates, then implement DEV-74–81's approved
@@ -27,25 +48,30 @@ rebuild through reviewable, tested draft PRs. Continue until implementation is
 finished and verified, or a concrete external blocker prevents every remaining
 safe action. A draft PR, checkpoint or completed slice is not the terminal goal.
 
-The local continuation also records this objective in the runtime's native goal
-manager. This active plan and the task ledger remain the durable repository
-continuation record.
-Medicare result changes remain gated on Cooper's concrete decision. Continue all
-independent work. Cooper's 7 October direction adds native Preview and Production
+The runtime's native goal manager now tracks the bounded handover above. This
+active plan and the task ledger retain the wider unfinished rebuild scope and
+its durable continuation record.
+Cooper approved the narrow 2025–26 annual Medicare correction on 8 October in
+the separate adad delivery conversation. Live DEV-68 and DEV-73 readback confirms
+that decision; draft [#168](https://github.com/crcorbett/taxkit/pull/168) owns the
+separate source correction. It is not integrated into this handover branch and
+its independent consumer qualification remains separate. Its later receipt at
+`2051a9870d2ede97ab30d72597c4bc2c90b20d53` records a local aggregate pass at
+`557b4e524ead6f469e92150360a9e8a451c37cdd`; Cooper's exact adad source exception
+stays `0d82b82d1c48079fc4b8e2ec96abadfe12999789`. Later test/docs commits do not
+extend that consumer approval or prove public enablement. Continue all
+independent work. Cooper's 7 October direction added native Preview and Production
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: qualify T008's single shared TaxKit project graph
-selected by Cooper on 8 October, then finish the browser sender and reviewed
-provider plan. Temporary management-read preparation and cleanup are complete.
-Cooper scheduled `adad test` for deletion. Direct browser readback shows a
-pending-deletion notice for 10 October at 10:43 am; the US organisation still
-lists six projects, so a free slot is not yet confirmed. Backend capture rules,
-Website calculator preferences, retained-project management and the bounded
-relay have complete local qualification. Draft #167's app pair is delivered to
-Preview `pr-167` and Production with collection off; its dated delivery receipt
-owns the exact source and readback. Browser pageviews, reviewed project ownership
-and stored-event proof remain unfinished. T007's operational handover is locally
+Next continuation milestone: deliver the locally qualified handover draft and
+record its exact source and proof limits in routine tracking. Draft #169's single-project graph and
+rejected-request cleanup passed local qualification; its
+[dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-shared-posthog-project.json)
+owns that result. PostHog remains deferred with collection off. Draft #167's
+app pair is the separately recorded Preview `pr-167` and Production delivery;
+#169 has not been deployed. Browser pageviews, actual project resources and
+stored-event proof remain unfinished. T007's operational handover is locally
 accepted and ready for draft review. T006 is locally accepted and ready for
 draft review with its documented five-second modern cancellation limit. All three calculator
 pages have local native/browser proof. T003's connection/containment
@@ -95,9 +121,9 @@ records command outcomes and log digests.
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | Complete locally; draft review outstanding | Six remote and five visible browser tools reuse the checked owners. All nine local checks pass at `72bfa16ac08dacc4c26f3de023a2880baefe1c55`, with both fourteen-case native runs. Draft #162 contains the stage-derived connection guide, deployed and read back on pr-162 and Production with both supported clients. The explicit modern five-second cleanup limit remains; no autonomous model session or prompt cleanup is claimed. |
 | T007 / DEV-78 | Complete locally; draft review outstanding | Exact native graph/source/secret/state/live plans are delivered in drafts #159–161, with #162 guide delivery. Draft #163 aligns the current native CLI/runbooks/recovery and paged provider reads. Full local verification passes `226c60bddb225467db64e772d48304af2368a216` in 684.12 seconds; all 1,750 frozen identities match, including the fourteen-case built app check. No new provider, state, credential or deployment mutation; rollback and no-op convergence remain unqualified. |
-| T008 / DEV-79 | In progress | Backend, Website calculator preferences, retained-project management and the bounded relay have dated local qualification. Draft #167's qualified app pair is delivered on pr-167 and Production with collection off; all 11 live checks pass in each. Temporary management reads and the old two-project no-apply plan passed, and key/Doppler cleanup is independently confirmed. Cooper selected one shared TaxKit project; adad test is scheduled for deletion on 10 October and still counts in the six-project list. The changed graph and fresh independent-review fixes are undergoing local qualification. Browser sender choice, actual project resources and final hosted/stored-event proof remain. |
+| T008 / DEV-79 | Deferred by Cooper on 8 October | Draft #169's single shared project graph and rejected-request cleanup are locally qualified at `94e0362037df3590c193fc522387fe256f40d826`; full verification and fresh bounded review pass. Collection stays off. Preserve earlier #167 delivery and temporary-key cleanup receipts. Browser sender, actual project resources and stored-event proof remain unfinished; do not resume them without Cooper's direction. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
-| T010 / DEV-81 | Awaiting T008 and deferred T009 | T007 is locally complete. The #167 local release graph and collection-off app delivery are bounded progress; final independent review, completed analytics and the deferred telemetry requirement remain outstanding. No final rebuild acceptance, package version application or publication is claimed. |
+| T010 / DEV-81 | Full acceptance awaits deferred T008/T009; bounded handover underway | Cooper authorised draft review, package-note checks, local release/packed-consumer proof and deferral reconciliation on 8 October. This independent subset does not accept T010 or close the full rebuild. No merge, version application, publication, deployment or provider change is included. |
 
 Adad must not qualify an invented replacement revision. The existing source
 baseline remains `8ed03f0e1a96d2cc258b68935b9f9be443666e1b`; a new compatible

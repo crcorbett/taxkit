@@ -11,7 +11,7 @@ review_trigger: website rendering, settings, transport, form, generated types or
 
 `apps/web` is the native TanStack Start Website candidate. Its calculator pages use
 native Effect RPC for the three supported Australian 2025–26 calculators and
-the 61 accepted documentation pages. Tax calculation stays
+all accepted documentation pages. Tax calculation stays
 in the separate API app. This Website also owns the accepted documentation reader. `apps/docs` is
 a retirement tombstone for the old source and dated recovery records.
 
@@ -310,10 +310,12 @@ The API and Website use the [calculator-owned rate contract](../../packages/calc
 The private request omits an explicit AbortSignal because the pinned native RPC cannot serialise it. Client cancellation stops local waiting; API work and reply budgets remain in force. This does not prove remote cancellation. The guarded disposable root selects `local-emulator` and one loopback allowance; hosted composition defaults to `edge`. [Infrastructure configuration](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns this distinction.
 
 The native pair test also uses the separate checked documentation RPC client
-against the actual built API. It compares navigation, every one of the 61
+against the actual built API. It compares navigation, every one of the
 accepted pages and exact Markdown, plus bounded search across separate Worker
 requests. The same saved journey now qualifies the Website page connection described below.
-Search and discovery are described below. Retirement of the old app remains T005 work.
+Search and discovery are described below. The
+[retirement receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement.json)
+records the old app's locally qualified retirement and retained recovery limits.
 
 ## Documentation pages
 
@@ -341,7 +343,7 @@ safe guidance. Canonical URLs use the checked Website origin. The article's
 Markdown link opens the same Website page's explicit `.md` address; its head
 links that address as an alternate Markdown representation.
 
-The native pair checks actual HTML for all 61 pages, native GET admission,
+The native pair checks actual HTML for all accepted pages, native GET admission,
 three source-built content mismatches, malformed browser transport, real
 sidebar/MDX navigation without document reload, heading focus, mobile
 navigation, table keyboard focus and reading without JavaScript. Saved local
@@ -443,7 +445,7 @@ input receives empty 400; missing/unavailable content gives empty 404/503 with
 `no-store`. Calculator forms/functions and search/agent landing pages keep their
 existing behaviour. No personal report becomes a download.
 
-The existing native journey compares all 61 actual page/file GET bodies and
+The existing native journey compares all accepted page/file GET bodies and
 HEAD headers with accepted content, tests real header choices and safe failures,
 and opens the real article link in Chromium. Exact decoding admissions have
 actual CLI positives and nearby negatives; encoder/runtime policy stays enforced.

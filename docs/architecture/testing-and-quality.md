@@ -1408,7 +1408,7 @@ progressive/multi-byte oversized replies before their tail. Controlled clocks
 observe deadline through headers/body, earlier interruption and scope cleanup;
 operation ingress observes credential/redirect policy.
 
-The native workerd/Chromium pair separately compares all 61 accepted pages and
+The native workerd/Chromium pair separately compares all accepted pages and
 exact Markdown through this client at the built API, retaining every existing
 calculator journey and public HTTP check. API/client tests do not establish
 Website rendering on their own. The extended native Website journey below
@@ -1493,7 +1493,7 @@ different file must be rejected; fixed discovery guidance cannot contain the
 private source diagnostic.
 
 The source-built native pair compares each Website GET body against the real
-checked API client and accepted catalogue, checks all 61 canonical sitemap
+checked API client and accepted catalogue, checks all accepted canonical sitemap
 addresses and parses XML in Chromium. It checks actual GET/HEAD media/cache/
 `nosniff` headers, explicit empty 200 HEAD, method/query rejection and a real
 unavailable binding's empty uncached 503. Exact processed Markdown comparison
@@ -1522,7 +1522,7 @@ false substring matches. Optional native RegExp capture values pass through
 nullish Options before use. Full-field coverage consumes each list separator;
 zero-width empty matches must not skip the next media range.
 
-The existing source-built native journey compares all 61 same-page and explicit
+The existing source-built native journey compares all accepted same-page and explicit
 `.md` GET bodies with the owning processed catalogue. It checks every HEAD's
 explicit 200, empty body and equal media/cache/`nosniff`/Vary/canonical headers.
 Real original addresses ignore forged native page headers. Actual weighted,
@@ -1562,7 +1562,7 @@ and safely encoded unusual title/description characters using the owning public
 page contract. The existing source-built native pair reruns the actual generator
 and compares every output byte with the previously copied build asset. The asset
 set must exactly match accepted paths. Actual static GET/HEAD media, cache,
-empty body and bytes are checked separately from generation. All 61 actual HTML
+empty body and bytes are checked separately from generation. All accepted HTML
 heads must contain matching canonical/image/card values and decoded TechArticle
 text/addresses. Chromium independently decodes each served image and observes
 its natural 1200 by 630 dimensions. A representative long-title image is viewed.
@@ -1598,9 +1598,12 @@ Historical HGI-203/DAR/HFI records and their Schemas keep their old identities.
 
 The old app workspace, build/test selection and writers are now retired.
 The verified retained-source and operation routes preserve history and refuse
-new old-resource operations. Final retirement qualification still needs its
-complete candidate checks; none of these local results proves provider state.
-See the [replacement-check receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json).
+new old-resource operations. The later
+[retirement receipt](../documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement.json)
+records the completed local retirement checks. None of these local results
+proves provider state; historical hosted resources require separate authority.
+The earlier [replacement-check receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json)
+retains its original checkpoint and limitations.
 
 
 ## Exact local CI detail identity
@@ -1638,7 +1641,10 @@ No vendor/library-check suppression or dependency upgrade is introduced.
 The [dated MCP record](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
 retains source/log identities, failed attempts and remaining work at that
 checkpoint. The newer session candidate below separately qualifies actual older
-calls. T006 stays in progress.
+calls. The later
+[agent setup receipt](../documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
+records T006's local acceptance and separately approved guide delivery. The
+documented modern cancellation limit remains.
 
 ## Native older-client lifetime candidate
 
@@ -1723,7 +1729,9 @@ general runtime execution, async/await, new Promises and Promise chains. The
 [dated browser receipt](../documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
 owns versions, source/check identities and failed attempts. This proves native
 protocol calls controlled by the test, not an autonomous model session. Prompt
-modern remote cleanup and public setup remain T006 work.
+modern remote cleanup remains unqualified: work ends at the five-second
+budget. The later agent setup receipt records the completed connection guide
+and its separate delivery; autonomous model-session behaviour remains unproved.
 
 
 ### Saved calculator state through a paused first render

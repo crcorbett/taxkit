@@ -4,7 +4,7 @@
   "title": "Clean slate TaxKit foundation \u2014 implementation slices",
   "status": "in_progress",
   "last_reviewed": "2026-10-08",
-  "authority": "Cooper explicitly authorised implementation, reviewable commits, pushes, draft PRs and routine Linear tracking on 2026-10-04. On 2026-10-07 Cooper separately authorised native TaxKit Preview and Production deployments from this Mac after exact source, plans, credentials, recovery and readback are qualified, and approved the existing Production token permission change. Merge, package version application, publication, credential creation and unrelated provider changes remain outside this authority; new provider operations require their concrete approval boundary. The sibling SPEC and active plan retain the authority and dated delivery receipts.",
+  "authority": "Cooper explicitly authorised implementation, reviewable commits, pushes, draft PRs and routine Linear tracking on 2026-10-04. On 2026-10-07 Cooper separately authorised native TaxKit Preview and Production deployments from this Mac after exact source, plans, credentials, recovery and readback are qualified, and approved the existing Production token permission change. Merge, package version application, publication, credential creation and unrelated provider changes remain outside this authority; new provider operations require their concrete approval boundary. The sibling SPEC and active plan retain the authority and dated delivery receipts. On 2026-10-08 Cooper postponed PostHog and confirmed bounded review/handover: review drafts, resolve material findings, inspect package notes and local release/packed-consumer proof, record PostHog/metrics deferrals and the separately approved Medicare scope, and deliver commits, pushes, draft PRs and routine Linear tracking. This handover excludes merge, package version application, publication, deployment, billing upgrades, credentials and provider changes; it does not accept T010 or the full rebuild.",
   "principles": [
     "Retain tax rules/results and their proof while replacing application foundations.",
     "Use immutable Schema-derived values and declarative, pipe-first Effect workflows across all owned apps/packages/tests/scripts/infrastructure; no local mutation, imperative loops or helper sprawl. Necessary state has a scoped React/Effect owner and pure updates.",
@@ -733,6 +733,7 @@
       ],
       "goal": "Only the documented events and fields leave the app; no persistent browser identity or consent dialogue is introduced.",
       "scope": [
+        "Deferred by Cooper on 8 October 2026. Preserve the qualified single-project draft #169 with collection off; do not create projects, change billing, implement the browser sender or activate tracking until Cooper explicitly resumes. Status retains started, incomplete work; no completion is claimed.",
         "Manage one retained TaxKit project shared by Production and controlled Previews through a private Alchemy Resource/Provider and current Distilled PostHog, with checked organisation/region/ownership and safe management failures. Filter events by project, application and exact stage; filters do not isolate access within the project.",
         "Implement explicit pageviews in a private React-owned browser service and one successful hosted-calculation event owner in the backend application; honour a checked browser opt-out without linking identities.",
         "Use a synchronous final-enrichment allowlist, memory-only persistence, explicit DNT and disabled automatic/replay/person features. Local and ordinary Preview capture stay off; no consent dialog.",
@@ -795,6 +796,7 @@
       ],
       "goal": "Exactly the three existing datasets are used; no retained foreign resource or retention setting is changed.",
       "scope": [
+        "Deferred by Cooper on 6 October 2026 because the metrics approach may change. Keep collection disabled and revisit the design before resuming; this task remains pending and incomplete.",
         "Reference Site's three retained dataset outputs from CooperCorbettSiteCloudflare/prod, never declare/adopt/change them; provision only TaxKit-owned retained ingest token, destination and dashboards under a reviewed plan.",
         "Use one canonical TaxKit identity/query owner and explicit native Worker mapping; separate logs/traces revision/request fields from bounded metric labels. Implement the SPEC's minimum request/calculation logs, named service spans, request/calculation counters and millisecond histograms with the stated boundaries; never label root-span/flush duration visitor response time.",
         "Keep one qualified native trace owner and event-scoped native Effect log/metric exporters with correct endpoints/Protobuf/header, bounded host completion and safe warning projections.",
@@ -867,6 +869,7 @@
       ],
       "goal": "Final accepted requirements, impacted owners, versioning and retained historical identities are reconciled without hidden failed checks.",
       "scope": [
+        "Cooper authorised an independent bounded review/handover subset on 8 October 2026: review existing draft source and comments, reconcile material findings, inspect package Changesets/fixed train, run local release and packed-consumer checks, and record PostHog/metrics deferrals and the separately approved Medicare correction in draft #168. This subset does not satisfy deferred T008/T009, accept T010, integrate the separate tax correction or authorise merge/versioning/publication/deployment/provider changes.",
         "Resolve remaining owner/pointer contradictions and remove only qualified obsolete app/wiring/tool paths listed in the retention manifest; preserve source history, binary evidence, deployed recovery identity and unrelated work.",
         "Finish changed package Changesets and the current ten-package fixed-train implications, including @taxkit/content, as owned by .changeset/config.json and docs/standards/versioning.md; retain local packed/downstream/release evidence without applying package versions or publishing packages.",
         "Update current journey inventory for each calculator path, docs/discovery, SDK consumer, remote/browser agents and analytics/telemetry privacy. Obtain one fresh independent review and reconcile material findings.",

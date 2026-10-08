@@ -233,7 +233,9 @@ Focused documentation tests cover all five calls, valid and incompatible
 versions, safe expected/global/procedure failures, damaged replies, unrelated
 adapter defects, exact/oversized encoded byte limits, headers/body deadlines,
 earlier cancellation, scope close and transport policy. The actual native pair
-check compares all 61 accepted page values and exact Markdown through these
+check compares all accepted page values and exact Markdown through these
 clients across separate Worker requests. Those checks qualify the API/client
 connection. The Website now composes page/navigation calls over its native
-binding and checks compiled presentation; search interaction remains T005 work.
+binding and checks compiled presentation. Its search interaction uses the same
+checked catalogue; the Website README and current native journey own the
+completed search and reader proof.

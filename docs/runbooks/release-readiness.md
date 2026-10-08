@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-release-readiness-operation-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: release graph, current or historical journey inventory, proof schema, package graph, or accepted HGI-203 evidence change
 ---
 
@@ -100,9 +100,10 @@ retaining accepted, failed, superseded and inconclusive evidence. Never delete
 or rewrite an immutable attempt to make a later run appear successful.
 To undo the current documentation check selection, restore the graph command,
 Quality Playwright owner/policy, current journey/profile and their guides
-together at the receipt's base revision. The old app and its deployment
-procedure remain retained pending their own replacement; this local check
-change does not redirect or roll back a provider.
+together at the receipt's base revision. The old docs app is retired;
+`apps/docs/README.md` routes to verified original sources and the deployment
+runbook's separately approved historical recovery procedure. A local check
+change does not redirect or roll back a provider or authorise that recovery.
 
 If the journey-epoch migration is reverted, revert its snapshot, contract,
 validator and documentation changes together; do not modify the original
