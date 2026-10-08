@@ -5,7 +5,7 @@
   "authority": "supporting",
   "owner": "taxkit-implementation-owner",
   "observedAt": "2026-10-08T01:57:34.372747+00:00",
-  "status": "Bounded review/handover locally qualified; draft delivery pending; full rebuild not accepted",
+  "status": "Bounded review/handover delivered as draft #170 with independently read-back tracking; full rebuild not accepted",
   "baseHead": "94e0362037df3590c193fc522387fe256f40d826",
   "branch": "codex/dev-81-review-handover",
   "actorAuthority": {
@@ -814,6 +814,210 @@
     "commitMessage": "docs: record reviewed handover and analytics deferrals [skip ci]",
     "operation": "Commit, push new branch, create and attach draft PR; record routine Taxkit Linear progress",
     "duration": "This handover only",
-    "rollback": "Revert only the delivered handover commit to its parent; preserve failed and accepted proof. No provider rollback is implicated."
-  }
+    "rollback": "Revert only the two delivered handover commits to the initial parent; preserve failed and accepted proof. No provider rollback is implicated.",
+    "followUpCommitMessage": "docs: record draft handover delivery and tracking readback [skip ci]"
+  },
+  "finalClaimReadback": {
+    "status": "Accepted before initial delivery; no material unsupported claim",
+    "reportName": "taxkit-handover-final-claim-readback.md",
+    "reportSha256": "4e5d68e4451df260dc7879794eaebe50e21497a501d464e27d8ac314f7e9cd85",
+    "acceptedReceiptSha256": "c01001adebd1ed008a633bffefb59e7f2f61b4dc10a2c2b8230902b44bbb7b6f",
+    "acceptedPlanSha256": "d325f4703fcfb65148d63334e3b45b8cac43425cf13dc94288e32c896339bb79",
+    "scope": "Exact nine-check/18-log readback, source identities, retained deferrals and separate Medicare sources; no new test execution or full rebuild acceptance"
+  },
+  "initialDelivery": {
+    "observedAt": "2026-10-08T02:06:58.320Z",
+    "sourceCommit": "fc4da30fdc6797ebed905c79823ff5e9508d33ba",
+    "parent": "94e0362037df3590c193fc522387fe256f40d826",
+    "remoteHeadReadback": "fc4da30fdc6797ebed905c79823ff5e9508d33ba",
+    "pullRequest": {
+      "number": 170,
+      "url": "https://github.com/crcorbett/taxkit/pull/170",
+      "title": "DEV-81: Record reviewed handover and analytics deferrals",
+      "state": "OPEN",
+      "isDraft": true,
+      "baseRefName": "codex/dev-79-shared-posthog-project",
+      "baseRefOid": "94e0362037df3590c193fc522387fe256f40d826",
+      "headRefName": "codex/dev-81-review-handover",
+      "headRefOid": "fc4da30fdc6797ebed905c79823ff5e9508d33ba"
+    },
+    "descriptionSha256": "9ebaa1a289cd0d2f89732435741806ad0a01776163b2eb4bb3a88e4aaad115ed",
+    "savedDescriptionMatchesPrepared": true,
+    "attachedToChat": true,
+    "readbackName": "taxkit-handover-pr-initial-readback.json",
+    "readbackSha256": "58989ebb823e1f677d8861f74fe916afa7e561c7b7b1c05edcb05f4d54f4d86f",
+    "limitation": "This records initial semantic delivery, before this delivery-only receipt/plan follow-up. Final draft-head readback is external; no self-referential commit identity is claimed."
+  },
+  "trackingReadback": {
+    "observedAt": "2026-10-08T02:06:58.320Z",
+    "workspace": "Personal",
+    "project": "Taxkit",
+    "projectId": "4e0eb6ef-1871-46d4-8f47-9c8f52a9c069",
+    "readbackName": "taxkit-handover-tracking-readback.json",
+    "readbackSha256": "6b079574bc4713d39264b9ad18ae7f125c7984fc92a1b51fd19b7d7a91788502",
+    "issues": [
+      {
+        "id": "DEV-79",
+        "uuid": "85150329-9061-4690-8f80-bfbc7af57ebe",
+        "url": "https://linear.app/coopers-personal/issue/DEV-79/csf-t008-track-visits-and-calculator-choice-with-minimal-posthog",
+        "status": "In Progress",
+        "updatedAt": "2026-10-08T02:05:15.134Z",
+        "preservedFields": [
+          "status",
+          "labels",
+          "relations",
+          "projectId",
+          "teamId",
+          "title",
+          "assigneeId",
+          "priority",
+          "dueDate",
+          "completedAt"
+        ],
+        "savedDescriptionMatchesReadback": true,
+        "descriptionSha256": "a669970eb7627c79d4c732a6a84c9bb8d6ee7845a498db8e631f7da1ff5ddb0a"
+      },
+      {
+        "id": "DEV-80",
+        "uuid": "17d02184-45d0-4203-9b86-963399b73dc3",
+        "url": "https://linear.app/coopers-personal/issue/DEV-80/csf-t009-send-safe-logs-traces-and-metrics-to-the-three-shared-axiom",
+        "status": "Backlog",
+        "updatedAt": "2026-10-08T02:05:29.705Z",
+        "preservedFields": [
+          "status",
+          "labels",
+          "relations",
+          "projectId",
+          "teamId",
+          "title",
+          "assigneeId",
+          "priority",
+          "dueDate",
+          "completedAt"
+        ],
+        "savedDescriptionMatchesReadback": true,
+        "descriptionSha256": "82ad6f0c4feffd6af3af5d770c09f707bcdf004400c5ead70499a5eb5513d562"
+      },
+      {
+        "id": "DEV-81",
+        "uuid": "d92d58fd-14d3-4911-bf79-e0a22f4613cc",
+        "url": "https://linear.app/coopers-personal/issue/DEV-81/csf-t010-finish-rebuild-checks-package-versioning-and-controlled",
+        "status": "Backlog",
+        "updatedAt": "2026-10-08T02:06:31.779Z",
+        "preservedFields": [
+          "status",
+          "labels",
+          "relations",
+          "projectId",
+          "teamId",
+          "title",
+          "assigneeId",
+          "priority",
+          "dueDate",
+          "completedAt"
+        ],
+        "savedDescriptionMatchesReadback": true,
+        "descriptionSha256": "a890133c6f3e5db7d89e307496076ee3ce348c2ddb9d3cbf454a14a1271c8a6f"
+      }
+    ],
+    "comment": {
+      "id": "142da599-2f9e-4ced-8287-6a971a297bd0",
+      "createdAt": "2026-10-08T02:05:37.700Z",
+      "updatedAt": "2026-10-08T02:05:37.642Z",
+      "issue": "DEV-81",
+      "bodySha256": "88da0162e153368adcf2b33042bbcfbea23b07f7b0392bf7bef87251596c0805",
+      "savedBodyMatchesReadback": true,
+      "paginationComplete": true
+    },
+    "projectUpdate": {
+      "id": "7698bed9-d230-496c-8574-71b68dd2da5a",
+      "url": "https://linear.app/coopers-personal/project/taxkit-c6ed29d0dbd4/activity#project-update-7698bed9",
+      "createdAt": "2026-10-08T02:05:49.185Z",
+      "updatedAt": "2026-10-08T02:05:49.185Z",
+      "bodySha256": "104fdc46743259ba27fbafcd270283a4347cc5b1267e876f4a56666d93e00547",
+      "savedBodyMatchesReadback": true
+    },
+    "incidentalFieldRestoration": {
+      "issue": "DEV-81",
+      "field": "assignee",
+      "before": null,
+      "incident": "An assignment to Cooper appeared between pre-write and post-write readbacks; no assignee was requested in the handover patch.",
+      "recovery": "Explicitly restored the original unassigned state and independently read it back."
+    },
+    "limitation": "Routine handover and deferral updates only. No Done state or full rebuild acceptance; Adad issues were not mutated."
+  },
+  "initialDeliveryMetadataChecks": [
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.6,
+      "log": "taxkit-handover-closeout-docs.log",
+      "sha256": "8c04d56f2cfea33a0f96235f6b7f492a73711488548bef737530a7e141dc2e51"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.17,
+      "log": "taxkit-handover-closeout-runbooks.log",
+      "sha256": "196d00118e4d9554e09d7b354d59817be0906fb30ec2008530b6371670c59021"
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.32,
+      "log": "taxkit-handover-closeout-paths.log",
+      "sha256": "80502e0507d2b44f482e20e18337615caf73740469683b31de5a69c2eb3d4ec6"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.79,
+      "log": "taxkit-handover-closeout-format.log",
+      "sha256": "8e80abebd0eeb691b2ee3943acb60b029e491c6e717a1f7524bb8357467fed1d"
+    },
+    {
+      "stage": "changesets",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "log": "taxkit-handover-closeout-changesets.log",
+      "sha256": "e878d7a5dbae8ba1dc1adabbc4e9b1e44dddfc1e695d52a32d569d58abc0114a"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "taxkit-handover-closeout-diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
 }

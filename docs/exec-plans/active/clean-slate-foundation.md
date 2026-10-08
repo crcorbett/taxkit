@@ -33,8 +33,9 @@ The [dated handover receipt](../../documentation-audit/clean-slate-foundation/20
 records source identity, the draft-stack review, documentation impact, local
 checks, the separate Medicare draft and exact remaining limits. All nine local report checks passed in 1,086.17 seconds. Fresh packed/downstream
 SDK tasks executed; both native runs passed all 22 cases. The independent review
-resolved its two current-owner findings. Draft delivery and routine tracking
-readback remain the next actions; full rebuild acceptance is still deferred.
+resolved its two current-owner findings. The reviewed handover is delivered in
+draft [#170](https://github.com/crcorbett/taxkit/pull/170), with independently
+read-back Linear issue and project updates. Full rebuild acceptance remains open.
 
 T008 and T009 remain incomplete. The review is bounded readiness evidence;
 it is not T010's terminal rebuild audit. Keep the full plan active and preserve
@@ -64,8 +65,8 @@ independent work. Cooper's 7 October direction added native Preview and Producti
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: deliver the locally qualified handover draft and
-record its exact source and proof limits in routine tracking. Draft #169's single-project graph and
+The current bounded handover is delivered. The wider rebuild can resume when
+Cooper directs the postponed requirements to proceed. Draft #169's single-project graph and
 rejected-request cleanup passed local qualification; its
 [dated receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-shared-posthog-project.json)
 owns that result. PostHog remains deferred with collection off. Draft #167's
@@ -6119,3 +6120,30 @@ metadata; all 1,799 other identities must match and focused closeout must pass.
 The first root suite results precede the test-only relocation; corrected focused
 tests and full verification own the final source. No provider apply, credential
 change, new deployment, activation, merge or publication is claimed.
+
+
+### 8 October 2026 — reviewed handover delivery and tracking readback
+
+The reviewed semantic handover is committed at
+`fc4da30fdc6797ebed905c79823ff5e9508d33ba`, pushed and independently read back
+in attached draft [#170](https://github.com/crcorbett/taxkit/pull/170), based on
+#169 at `94e0362037df3590c193fc522387fe256f40d826`. Its saved description
+matches the prepared review. The final claim readback accepts the exact nine
+checks, eighteen log hashes, source identities, deferrals and separate Medicare
+proof; it does not accept the full rebuild.
+
+DEV-79, DEV-80 and DEV-81 now describe the current postponements and bounded
+handover. Independent reads match the saved descriptions and preserve their
+statuses, labels, blockers and original acceptance conditions. DEV-81's
+incidental assignment was restored to its original unassigned state and read
+back. Comment `142da599-2f9e-4ced-8287-6a971a297bd0` and the
+[Taxkit project update](https://linear.app/coopers-personal/project/taxkit-c6ed29d0dbd4/activity#project-update-7698bed9)
+are saved and independently verified. No Adad issue was changed.
+
+Only this plan and the handover receipt receive this later delivery metadata.
+The initial semantic source and its complete local release result remain the
+proof owners; final draft-head readback follows this evidence-only commit. The
+receipt records the initial delivery identity to avoid claiming its own future
+commit hash. PostHog and metrics remain incomplete, collection remains off,
+and T010/full rebuild acceptance stays open. No merge, version application,
+publication, deployment, billing, credential or provider change is made.
