@@ -1,0 +1,94 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4CGQ5GT5DTQ5MHZ4W9P5YFH",
+  "session_id": "01a1055e-4560-7b33-82d2-226827c76159",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-08T01:06:16.008848Z",
+  "branch": "codex/dev-79-shared-posthog-project",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".changeset/shared-taxkit-analytics-project.md",
+    "apps/web/README.md",
+    "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
+    "apps/web/src/lib/analytics/relay/relay.boundary.test.ts",
+    "apps/web/test/native-cancellation.boundary.test.ts",
+    "docs/architecture/configuration.md",
+    "docs/architecture/deployment.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "packages/analytics/README.md",
+    "packages/analytics/src/live.layer.ts",
+    "packages/analytics/test/service.test.ts",
+    "packages/infrastructure/README.md",
+    "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    "packages/infrastructure/src/posthog/projects.provider.ts",
+    "packages/infrastructure/src/posthog/projects.test.ts",
+    "packages/infrastructure/src/posthog/schemas.ts",
+    "packages/infrastructure/src/posthog/stack.ts",
+    "packages/infrastructure/src/posthog/test.layer.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "27bca6c3cf8a",
+  "checkpoint_transcript_start": 74457,
+  "transcript_lines_at_start": 74457,
+  "compact_transcript_start": 8800,
+  "token_usage": {
+    "input_tokens": 370876,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 20493184,
+    "output_tokens": 79514,
+    "api_call_count": 167,
+    "subagent_tokens_complete": false
+  },
+  "session_metrics": {
+    "turn_count": 8
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-08T01:06:10.417804Z",
+    "agent_lines": 237,
+    "agent_removed": 46,
+    "human_added": 321,
+    "human_modified": 63,
+    "human_removed": 0,
+    "total_committed": 621,
+    "total_lines_changed": 667,
+    "agent_percentage": 42.4287856071964,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 37,
+      "user_lines_removed": 63,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts": 1,
+        "packages/analytics/src/live.layer.ts": 7,
+        "packages/infrastructure/src/posthog/management.adapter.layer.ts": 3,
+        "packages/infrastructure/src/posthog/management.boundary.test.ts": 2,
+        "packages/infrastructure/src/posthog/projects.provider.ts": 1,
+        "packages/infrastructure/src/posthog/projects.test.ts": 12,
+        "packages/infrastructure/src/posthog/schemas.ts": 3,
+        "packages/infrastructure/src/posthog/stack.ts": 6,
+        "packages/infrastructure/src/posthog/test.layer.ts": 2
+      },
+      "user_removed_per_file": {
+        "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts": 1,
+        "packages/analytics/src/live.layer.ts": 1,
+        "packages/infrastructure/src/posthog/management.adapter.layer.ts": 1,
+        "packages/infrastructure/src/posthog/management.boundary.test.ts": 3,
+        "packages/infrastructure/src/posthog/projects.provider.ts": 4,
+        "packages/infrastructure/src/posthog/projects.test.ts": 15,
+        "packages/infrastructure/src/posthog/schemas.ts": 17,
+        "packages/infrastructure/src/posthog/stack.ts": 17,
+        "packages/infrastructure/src/posthog/test.layer.ts": 4
+      }
+    }
+  ]
+}

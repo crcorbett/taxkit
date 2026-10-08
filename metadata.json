@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4CGQ5GT5DTQ5MHZ4W9P5YFH",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-79-shared-posthog-project",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".changeset/shared-taxkit-analytics-project.md",
+    "apps/web/README.md",
+    "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
+    "apps/web/src/lib/analytics/relay/relay.boundary.test.ts",
+    "apps/web/test/native-cancellation.boundary.test.ts",
+    "docs/architecture/configuration.md",
+    "docs/architecture/deployment.md",
+    "docs/architecture/effect-services.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.tasks.json",
+    "packages/analytics/README.md",
+    "packages/analytics/src/live.layer.ts",
+    "packages/analytics/test/service.test.ts",
+    "packages/infrastructure/README.md",
+    "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    "packages/infrastructure/src/posthog/projects.provider.ts",
+    "packages/infrastructure/src/posthog/projects.test.ts",
+    "packages/infrastructure/src/posthog/schemas.ts",
+    "packages/infrastructure/src/posthog/stack.ts",
+    "packages/infrastructure/src/posthog/test.layer.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 370876,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 20493184,
+    "output_tokens": 79514,
+    "api_call_count": 167,
+    "subagent_tokens_complete": false
+  }
+}

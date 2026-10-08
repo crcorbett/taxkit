@@ -1,0 +1,7 @@
+I've removed a posthog project to free up a slot
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_2a171a8003244f13a5a6c1dda0779bb3\",0]","question":"Which PostHog project did you remove? After a fresh reload, the US organisation “Cooper” still lists Calico, adad Production, adad test, Common Practice preview, Common Practice production and Site. I’m continuing the local one-project change while checking the freed slot.","answer":"I removed adad test"}]
+</send_user_message_question_reply>
