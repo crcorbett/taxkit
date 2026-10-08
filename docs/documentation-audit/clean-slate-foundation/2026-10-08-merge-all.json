@@ -21,7 +21,8 @@
     "Local merges resolve 60 main conflicts by preserving approved shared-plugin removals and stable rebuilt toolchain/Effect-native six-journey checks; the one Medicare plan conflict combines the dated scopes. No calculator rule was hand-edited during conflict resolution.",
     "Published Commonplace development-workflows manifest and matching release both report 0.6.10; this is the loaded installation. The unauthenticated web source returned 404; authenticated primary GitHub reads verified the manifest and release.",
     "Documentation impact: Change required for current checking architecture, profile, plugin profiles, retired task commands and active plan. Preserve accepted runtime/public content/Changesets, six journey oracles, original historical evidence, Entire settings, PostHog/metrics deferrals and consumer/provider limits. N/A for dependency or new tax/provider design changes.",
-    "The initial focused docs check failed on two references to the retired skill command. The corrected owner passed docs, governance types/tests/runtime. Frozen install, docs/runbooks/format/lint also passed before the complete graph."
+    "The initial focused docs check failed on two references to the retired skill command. The corrected owner passed docs, governance types/tests/runtime. Frozen install, docs/runbooks/format/lint also passed before the complete graph.",
+    "The first complete combined-source report at 12b6d7d765dc7c645e1034b967b1c33fd605528e stopped at verification in 7.31 seconds: the historical receipt checker still referenced the removed sha256 helper. Its existing runGit returns bytes; the resolved call uses the existing typed hashEpochBytes operation. The focused epoch type check now passes. No calculator source changed."
   ],
   "postconditions": [
     "Every one of the 81 recorded PR heads is an ancestor of the integration candidate. Complete combined-source release checks are not yet claimed."
@@ -54,6 +55,22 @@
     {
       "path": "taxkit-merge-qualified-preflight-results.jsonl",
       "sha256": "5856be6f1fd4672bcce7800e40ab7567a7931cd4b723659a23e3283cf052e17b"
+    },
+    {
+      "path": "taxkit-merge-final-results.jsonl",
+      "sha256": "7bbc183b30fb772422c1ff289cee45ced7d6d950d4ab6d252b20fbbb0d15760b"
+    },
+    {
+      "path": "taxkit-merge-final-release-report.log",
+      "sha256": "48b62e0e38d44e94474f615f6f5436c5770ebc1968918ae97ea715295cd2ae96"
+    },
+    {
+      "path": "taxkit-merge-epoch-diagnostic-results.jsonl",
+      "sha256": "e87a769c6560d545a270e71ffd959ddfde2c31399c115237224ee5d36e7dddbd"
+    },
+    {
+      "path": "taxkit-merge-epoch-recovery-results.jsonl",
+      "sha256": "cd9e58bb6947d4088207918cdd0dd948db389a5406fcfb65caeb484b5728e6f4"
     }
   ],
   "limitations": [

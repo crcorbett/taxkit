@@ -360,7 +360,7 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
               repositoryRoot,
               ["show", `${candidateCommit}:${artifact.path}`],
               artifact.path
-            ).pipe(Effect.flatMap(sha256));
+            ).pipe(Effect.flatMap(hashEpochBytes));
             return { actual, artifact };
           }
           const actual = yield* readHash(repositoryRoot, artifact.path);
