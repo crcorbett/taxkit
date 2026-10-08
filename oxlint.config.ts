@@ -110,8 +110,6 @@ const decodingBoundaryFiles = [
   "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   // Exact synchronous Oxlint rule-options ingress, decoded once and fail-closed.
   "tools/oxlint/taxkit-rules.ts",
-  // Exact fixture ingress: three Schema-owned historical policy corpora.
-  "tools/skills/skill-policies.test.ts",
   // Application configuration, executable smoke checks and checked examples.
   "apps/api/src/config.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
@@ -647,7 +645,6 @@ export default defineConfig({
         "tools/oxlint/.generated-strict-bindings.js",
         "tools/repository-paths/**",
         "tools/governance/**",
-        "tools/skills/**",
         "tools/quality-workflow/**",
         "tools/documentation/**",
         "tools/evals/**",

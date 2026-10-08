@@ -81,7 +81,8 @@
         "tsconfig*",
         "knip*.json",
         "tools/oxlint/**",
-        "tools/skills/**",
+        "docs/skills.md",
+        "docs/skill-profiles/**",
         ".agents/skills/**",
         "AGENTS.md",
         ".github/workflows/**",
@@ -253,15 +254,15 @@
       "scope": [
         "Resolve current official releases, including stable Effect module paths, then qualify one exact Bun/TypeScript/React/Atom/Alchemy/tooling graph in a fresh scratch fixture before integrating it.",
         "Qualify the proposed exact Scheduler peer-metadata correction, or use a newer upstream fix. Preserve valid tax outputs; update package exports/types/imports and versioning consequences deliberately.",
-        "Adopt the complete canonical current repository skills (0.6.1 successor of the designed 0.6.0 baseline) and declared TaxKit profiles/receipts, including the required Linear skill folder and Claude link without creating provider projects/issues. Merge all eleven portable strict Effect rules, including no-imperative-collections, and workspace-export direction into the actual lint config across source/tests/tools/config/infrastructure. Reuse baseline mutation/loop/collection checks; add only evidenced gaps and readonly-value checks. Exact Promise-returning/runtime host exceptions do not exempt other constructs.",
+        "Resolve the latest published Commonplace development-workflows plugin through docs/skills.md and read the TaxKit profiles alongside it. Preserve repository-specific skills, including the Linear folder and Claude link, without creating provider projects/issues. Historical copied-skill receipts retain their original identities and do not choose the current plugin version. Merge all eleven portable strict Effect rules, including no-imperative-collections, and workspace-export direction into the actual lint config across source/tests/tools/config/infrastructure. Reuse baseline mutation/loop/collection checks; add only evidenced gaps and readonly-value checks. Exact Promise-returning/runtime host exceptions do not exempt other constructs.",
         "Extend actual-command positive/negative fixtures under moved paths; assert admitted file counts, exit codes and expected rules. Prove removing/disabling required rules or broadening exact assignment/method exceptions fails the verifier. Refresh Turbo read/input/cache ownership, Knip inventories and CI commands; keep explicit generated/vendor exclusions.",
         "Qualify canonical rejection of let/var, assignments/writes/delete/updates, loops, native array traversal including forEach and mutators/constructors, transient Effect collection modes, switch and manual tag checks. Use existing restrictions and focused corrections for Object/Reflect writes, mutable class/contract values, WeakMap/WeakSet and demonstrated destructured/local aliases. Computed member access is already rejected by no-unchecked-index. Accept persistent collections, pure immutable Effect-managed state and qualified Alchemy Output operations. Preserve/qualify stronger lexical runtime callback/reference checks outside exact hosts. Review helper purpose, Schema ownership and pipe/flat-program call graphs separately; lint alone is not semantic proof.",
         "Cover owned .ts/.tsx/.js/.jsx/.mjs/.cjs files, including retained JavaScript policy tools, in actual lint scope; convert to checked TypeScript where necessary instead of treating the scaffold TypeScript-only override as complete. Executable MDX expressions/imports remain with the existing content-policy owner."
       ],
       "outputs": [
         "package.json, bun.lock, turbo.json, tsconfig*, oxlint.config.ts, oxfmt.config.ts, Knip config and .github/workflows/quality.yml",
-        "tools/oxlint/** policy/fixtures, tools/effect-language-service/** and tools/skills/canonical-skill-baseline.json",
-        "Canonical .agents/skills/** copies with explicit local profiles; AGENTS.md, README.md and affected package READMEs",
+        "tools/oxlint/** policy/fixtures, tools/effect-language-service/**, docs/skills.md and docs/skill-profiles/**",
+        "Latest published shared-plugin lookup and explicit local profiles; retained repository-specific .agents/skills/**, AGENTS.md, README.md and affected package READMEs",
         "Qualified version receipt, any exact-version patches/**, applicable .changeset/*.md and owning standards/architecture"
       ],
       "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",

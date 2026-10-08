@@ -26,7 +26,9 @@
     "The second report at 8cb46fca8f06e1c24fdd6b93293aabe70d35395a stopped at verification in 29.96 seconds. Two historical CLI cases still expected failure messages from before #140. The actual old checkers correctly refuse current source: the removed shared-skill input and changed historical source-artifact identity. Only those two expected diagnostics changed; nonzero refusal, bounded output, safe paths, recovery and invalid-option assertions remain. The full historical suite and Knip pass.",
     "The third report at 2a27c43d06626a8f1725538cda810d70efe975f7 stopped at verification in 73.14 seconds. Formatting rejected the changed historical test oracle line. The repository formatter corrected only that line wrapping; format:check now passes. The combined release graph remains unqualified until a complete passing report.",
     "The fourth report at 7ab9f80a14fda2ceec76b19c10b9ff623b3ab929 stopped in 36.79 seconds at the isolated release-workflow suite: 13 temporary offline fixture installs were blocked by the restricted shell (Bun tempdir EPERM). Earlier source/check/format stages passed. This is an execution-environment failure; no assertion or source was changed. The same full graph will run with approved local shell access.",
-    "The fifth graph ran with approved local access and reached real offline-installed fixture tests. One documentation CLI JSON success case exceeded its default five-second test timeout. The owning full graph was deliberately stopped after that confirmed nested test failure; it has no normal exit or complete report. Only the four process cases now use a finite 15-second test budget; all expected exit codes, safe output, Schema-decoded receipt fields, invalid options and failure assertions are preserved. The focused documentation suite (46 cases) and formatting pass. Documentation impact: Preserve the actual documentation command contract; N/A for public/package/provider semantics; Change required for this dated evidence."
+    "The fifth graph ran with approved local access and reached real offline-installed fixture tests. One documentation CLI JSON success case exceeded its default five-second test timeout. The owning full graph was deliberately stopped after that confirmed nested test failure; it has no normal exit or complete report. Only the four process cases now use a finite 15-second test budget; all expected exit codes, safe output, Schema-decoded receipt fields, invalid options and failure assertions are preserved. The focused documentation suite (46 cases) and formatting pass. Documentation impact: Preserve the actual documentation command contract; N/A for public/package/provider semantics; Change required for this dated evidence.",
+    "The sixth full report at 7fc58b39bfa349675c7010920f88621c917d8f41 ended with exit 1 after 1283.31 seconds. Canonical verification passed, including all 34 isolated release-workflow cases and all 22 built native app cases. The subsequent test stage passed 661 Oxlint cases and failed two fixtures for tools/skills, which #140 intentionally removed. Remove only that retired-host positive/negative pair and its unused exact lint admission/path; all active host cases, ten strict rules and historical input records remain. Documentation impact: Change required for the dated merge proof; Preserve every active runtime/lint/package contract; N/A for new public or provider behaviour.",
+    "The retired-host recovery passes all 661 remaining Oxlint cases in 74.24 seconds, formatting and lint. A transient API test-file replacement was traced to the existing scoped lint fixture test and independently restored to its original tracked bytes; no unrelated edit was included. Current testing architecture, SPEC and T002 routing now follow #140: latest published shared-plugin lookup plus local profiles and retained repository-specific skills, with the exact old receipt retained as history. Task statuses, dependencies, verification requirements and acceptance conditions are unchanged. Focused docs, runbooks and formatting pass."
   ],
   "postconditions": [
     "Every one of the 81 recorded PR heads is an ancestor of the integration candidate. Complete combined-source release checks are not yet claimed."
@@ -123,6 +125,30 @@
     {
       "path": "tmp/release-readiness/verification-stdout-GulsJD/70e0c6de34f6.log",
       "sha256": "41710caaa1409a617875a6f3dcb522696e873b8f011e65eb39a1ec38d62e3c90"
+    },
+    {
+      "path": "taxkit-merge-accepted-results.jsonl",
+      "sha256": "eaeea7453f971bbc4617ba0d4f67a50185d1721b4385ac351f46c64f143c8b7a"
+    },
+    {
+      "path": "taxkit-merge-accepted-release-report.log",
+      "sha256": "ac6d6209f796259329c56c80056b5c18ab785cd5288786aaf6689e8e940529ee"
+    },
+    {
+      "path": "taxkit-merge-accepted-source-freeze.json",
+      "sha256": "476541db6aae3d677d2236959b51b50fa0f3f16307d9c886ab47fc983e7b8500"
+    },
+    {
+      "path": "tmp/release-readiness/verification-stdout-fphTQL/987ac8f0aff7.log",
+      "sha256": "61b3770ebe71feddf87df79d5ee2693e3e82b8de18d321d4a42d0935fb55217c"
+    },
+    {
+      "path": "taxkit-merge-retired-fixture-recovery-results.jsonl",
+      "sha256": "7e4ad52e6c325290b682e8fc320090ec0c65af60d20e634e7b859bad0f071214"
+    },
+    {
+      "path": "taxkit-merge-owner-recovery-results.jsonl",
+      "sha256": "fecc18bbd690cf74ca737e8bf38697d067a636c08a5a1ddc783bd06f55ec242a"
     }
   ],
   "limitations": [
@@ -135,5 +161,5 @@
     "The exact adad source exception remains 0d82b82d1c48079fc4b8e2ec96abadfe12999789. No independent adad consumer acceptance or calculation enablement is claimed."
   ],
   "rollbackOrRecovery": "Before external merge, discard or revert only this isolated integration branch to the retained handover parent. After merge, prepare a reviewed revert of the actual main merge commit with first-parent selection, preserving the immutable source and receipts. Do not force-push main or change providers.",
-  "observedAt": "2026-10-08T04:13:47.071275+00:00"
+  "observedAt": "2026-10-08T07:48:21.227095+00:00"
 }

@@ -678,10 +678,12 @@ declared workspace development dependencies. Their server boundary tests run
 the retained weekly calculation and reject malformed input; generated-page
 tests prove processed-text selection, receiver identity and error redaction.
 
-Skill-policy fixture reads use Effect FileSystem and exact Schema-owned JSON
-ingress. Bounded Effect traversal owns repeated I/O; pure classification uses
-persistent collections. `check:skills:types` checks this suite during root
-verification. A readLink assertion proves the actual canonical symlink target.
+The copied shared-skill fixture suite and its commands were removed by #140.
+Current shared guidance is resolved through [the plugin lookup](../skills.md)
+and repository profiles. The code-rule suite checks every retained source host
+through the real lint command; no fixture or ingress permission remains for the
+removed `tools/skills` folder. Historical skill receipts retain their original
+source identities and do not qualify the current checkout.
 
 The Quality-workflow test owner uses Bun-hosted Effect Vitest, Effect FileSystem,
 and scoped platform child processes. Its isolated release-boundary suite runs

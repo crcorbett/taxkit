@@ -37,18 +37,23 @@ The Medicare choice is resolved separately: Cooper approved the narrow
 [DEV-68](https://linear.app/coopers-personal/issue/DEV-68/cf-012-qualify-a-correct-effect-v4-taxkit-revision)
 and [draft #168](https://github.com/crcorbett/taxkit/pull/168). Its separate
 [accepted scope](https://github.com/crcorbett/taxkit/blob/557b4e524ead6f469e92150360a9e8a451c37cdd/docs/product-specs/medicare-2025-26-correction.md)
-owns that correction and its qualification. This handover branch keeps its
-existing results and does not integrate or accept the separate correction.
+owns that correction and its qualification. The dated handover did not include
+that separate correction. Cooper's later 8 October "Merge everything" instruction
+authorises including #168 in the repository merge after combined local checks;
+it adds no deployment or adad enablement authority.
 
 ## Agreed direction
 
 Keep the TaxKit calculation packages, tax rules and calculation results. Rebuild
 the website and application wiring using the repository structure, Alchemy and
 strict Effect TypeScript skill requirements originally requested from
-development-workflows 0.5.1. The current adopted successor is 0.6.1 at commit
-`91a47d9fdde8aad214a0ab12742517cce344b709`; use its
-complete canonical baseline and qualify its stricter rules with TaxKit's
-existing checks. Earlier dated research retains its original skill version.
+development-workflows 0.5.1. Resolve current shared guidance through
+[the latest published plugin lookup](../skills.md) and read the local profiles
+alongside it. The copied 0.6.1 baseline at
+`91a47d9fdde8aad214a0ab12742517cce344b709` remains dated history; it does not
+select today's plugin. The qualified repository enforcement and installed
+dependency graph own compatibility. Earlier research retains its original
+skill version.
 Keeping packages allows edits needed for current dependencies. Cooper allowed
 a fresh package and SDK interface in Q3; keep the tax rules and calculation
 results while replacing the public interface deliberately.
@@ -286,7 +291,7 @@ keeps its original authority and target; it cannot prove the replacement.
 | ID | Required outcome | Owner and acceptance |
 | --- | --- | --- |
 | CSF-001 | Keep tax behaviour while allowing a fresh interface | Core, rule and calculator owners retain known-result tests and supported-year contracts. Reject invalid input with checked failures; compare old and new valid results. Record breaking exports with appropriate Changesets. |
-| CSF-002 | Qualify current dependencies and strict repository structure | Root manifest, lock, runtime, exports, TypeScript, formatting, lint, tests, Turbo, Knip and CI select one exact qualified graph. Update canonical repository skill copies and their local profiles together. Enforce immutable/declarative owned code as well as the portable Effect baseline. No silent version downgrade or blanket exception. |
+| CSF-002 | Qualify current dependencies and strict repository structure | Root manifest, lock, runtime, exports, TypeScript, formatting, lint, tests, Turbo, Knip and CI select one exact qualified graph. Resolve current shared guidance through the latest published plugin and read its local profiles; preserve the qualified repository enforcement. Enforce immutable/declarative owned code as well as the portable Effect baseline. No silent version downgrade or blanket exception. |
 | CSF-003 | Separate native backend and standard frontend | Native Alchemy API handlers keep request work and cleanup; no backend ManagedRuntime. The Website uses one server runner and one React-owned browser Atom graph. Native RPC clients use a same-stage server binding and checked public browser URL, implementing checked named operations with a complete-response deadline, revision agreement and caller cancellation. |
 | CSF-004 | Give visitors all existing calculators | Derive forms, calculator names, input contracts and result scope from the catalogue. Use a calculator-first homepage and explicit Calculate buttons; edits invalidate old results and interrupt old work. Show the main answer with expandable existing breakdown, assumptions, supported year and sources. Route owns restoration and result matching, feature container owns commands, focused leaves show readonly values and local input state. Keyboard, focus, loading, errors and cancellation work; unmount releases work. |
 | CSF-005 | Serve anonymous API, remote MCP and browser tools | HTTP/OpenAPI and native Effect MCP reuse checked named operations. Bound bodies, work, concurrency and request rates; return checked rate-limit/error responses. WebMCP can find, read, fill, calculate and read results through visible page commands. Feature detection keeps normal browser use working. |
@@ -453,8 +458,9 @@ decoding, mapping, error projection and matching inline. Ban dumping-ground
 `helpers`, `utils`, `common` and `shared` modules; naming a wrapper as a service
 does not give it semantic weight. Review the actual call graph in every slice.
 
-Adopt the current 0.6.1 portable strict Effect policy at its repository-owned
-canonical skill asset. Merge into `oxlint.config.ts` and retain useful existing TaxKit,
+Retain the qualified portable strict Effect policy in `oxlint.config.ts` and
+its owned source asset. The latest shared guidance does not automatically
+change that tested policy or TaxKit's dependency graph. Retain existing TaxKit,
 MDX and workspace checks. Enable `strict-effect/no-unchecked-index`,
 `no-native-at`, `runtime-file-convention`, `tagged-error-name`,
 `error-constructor-new`, `no-promise-workflow`, `no-unsafe-option-unwrap`,
@@ -721,8 +727,8 @@ reducing the tracing or privacy requirements.
 | RPC/HTTP/OpenAPI/SDK owners, export maps, snapshots, consumer fixtures and READMEs in `packages/api/rpc`, `packages/api/http`, `packages/sdk/typescript` | Change required | Agreed native RPC owner and named closed client operations, new lifetime/interface, current module paths and checked transport in T003/T004. Actual RPC and HTTP clients, wire privacy/version/cancellation tests, plus packed/downstream consumer proof. |
 | `apps/api`, `apps/web`, `apps/docs` and their READMEs; `docs/architecture/{package-ownership,effect-services,api-and-sdk,frontend}.md` | Change required | Native API/standard Website/React lifetime in T003/T004, agent adapters in T006. Retire the old docs app in T005 only after replacement/retention proof. Actual local/browser/agent journeys and bundle/import inspection. |
 | `packages/docs-content`, `packages/docs-fumadocs`, accepted public MDX/navigation, generated `.source`, `tools/documentation/owner-policy.json`, content architecture | Change required | One accepted publication/discovery owner in T005; exact status records, regenerated representations, source-faithful pages, processed Markdown and OG images. Content/docs/build/browser checks; never hand-edit generated output. |
-| Root manifests/lock/runtime, `turbo.json`, TypeScript, `oxlint.config.ts`, `oxfmt.config.ts`, `knip*.json`, `tools/oxlint/**`, language-service config, `tools/quality-workflow/**` and quality workflow | Change required | Exact qualified versions and the complete 0.6.0 baseline in T002; reroute inputs/scopes per later move. T005 replaces hard-coded apps/docs browser/cache paths and quality admission. Actual CLI rejected/accepted fixtures, type/lint/format/build/tests, source export/bundle audits and complete verification. |
-| `.agents/skills/**`, `tools/skills/canonical-skill-baseline.json`, `AGENTS.md`, linked `CLAUDE.md`, root/docs routes and affected standards | Change required | Complete canonical skill trees, including the required Linear skill, and local profiles teach the accepted implementation in T002 and each affected slice. Include the Linear folder/link in baseline receipts; this authorises no Linear project or issue write. Keep metadata/receipts/references coherent; test skills, harness governance and docs. Global installed skills remain outside write scope. |
+| Root manifests/lock/runtime, `turbo.json`, TypeScript, `oxlint.config.ts`, `oxfmt.config.ts`, `knip*.json`, `tools/oxlint/**`, language-service config, `tools/quality-workflow/**` and quality workflow | Change required | Exact qualified versions and the qualified portable strict Effect policy in T002; reroute inputs/scopes per later move. T005 replaces hard-coded apps/docs browser/cache paths and quality admission. Actual CLI rejected/accepted fixtures, type/lint/format/build/tests, source export/bundle audits and complete verification. |
+| `docs/skills.md`, `docs/skill-profiles/**`, retained repository-specific `.agents/skills/**`, `AGENTS.md`, linked `CLAUDE.md`, root/docs routes and affected standards | Change required | Resolve the latest published shared plugin and read local profiles in T002 and each affected slice. Preserve repository-specific Linear routing and the exact historical receipts; copied shared skill trees and their checks stay retired. Check harness governance and docs. This grants no Linear project/issue or provider mutation authority and no unrelated plugin-installation write. |
 | `alchemy.run.ts`, `packages/infrastructure`, `tools/docs-deployment/**`, deployment workflows and infrastructure README | Change required | Same-stage native pair, new graph admission, exact DNS/secrets/analytics/telemetry ownership in T003/T007/T008/T009. Current Alchemy types/tests and reviewed plans; retain ordinary native commands over a parallel verification framework. |
 | `docs/runbooks/{docs-deployment,recovery}.md`, operations authority model, `tools/documentation/runbook-contract.json` and router pointers | Change required | Replace the one-DocsWebsite procedures with exact pair/domain/secret/analytics/signal plans and recovery in the owning slice. Revise any changed procedure target/command contract together. Docs/runbook checks plus authorised independent readback. |
 | `.changeset/config.json`, changed package Changesets, SDK/release-readiness consumer graph including `packages/scripts/src/release-readiness/schemas.ts` and versioning standards | Change required | Fresh public interfaces require a major change at the affected owner; the current ten-package fixed train, including the compiled content contract, takes its highest required bump. T005 replaces the old docs browser command in the release graph. Reconcile additions/removals in T002/T004/T010 and retain local release/packed proof. No package publication is part of design approval. |
