@@ -23,7 +23,8 @@
     "Documentation impact: Change required for current checking architecture, profile, plugin profiles, retired task commands and active plan. Preserve accepted runtime/public content/Changesets, six journey oracles, original historical evidence, Entire settings, PostHog/metrics deferrals and consumer/provider limits. N/A for dependency or new tax/provider design changes.",
     "The initial focused docs check failed on two references to the retired skill command. The corrected owner passed docs, governance types/tests/runtime. Frozen install, docs/runbooks/format/lint also passed before the complete graph.",
     "The first complete combined-source report at 12b6d7d765dc7c645e1034b967b1c33fd605528e stopped at verification in 7.31 seconds: the historical receipt checker still referenced the removed sha256 helper. Its existing runGit returns bytes; the resolved call uses the existing typed hashEpochBytes operation. The focused epoch type check now passes. No calculator source changed.",
-    "The second report at 8cb46fca8f06e1c24fdd6b93293aabe70d35395a stopped at verification in 29.96 seconds. Two historical CLI cases still expected failure messages from before #140. The actual old checkers correctly refuse current source: the removed shared-skill input and changed historical source-artifact identity. Only those two expected diagnostics changed; nonzero refusal, bounded output, safe paths, recovery and invalid-option assertions remain. The full historical suite and Knip pass."
+    "The second report at 8cb46fca8f06e1c24fdd6b93293aabe70d35395a stopped at verification in 29.96 seconds. Two historical CLI cases still expected failure messages from before #140. The actual old checkers correctly refuse current source: the removed shared-skill input and changed historical source-artifact identity. Only those two expected diagnostics changed; nonzero refusal, bounded output, safe paths, recovery and invalid-option assertions remain. The full historical suite and Knip pass.",
+    "The third report at 2a27c43d06626a8f1725538cda810d70efe975f7 stopped at verification in 73.14 seconds. Formatting rejected the changed historical test oracle line. The repository formatter corrected only that line wrapping; format:check now passes. The combined release graph remains unqualified until a complete passing report."
   ],
   "postconditions": [
     "Every one of the 81 recorded PR heads is an ancestor of the integration candidate. Complete combined-source release checks are not yet claimed."
@@ -84,6 +85,18 @@
     {
       "path": "taxkit-merge-historical-recovery-results.jsonl",
       "sha256": "1d26aa46b04386cbedeafbe07931a1c3a6f9081707772790d000d835fbbb2951"
+    },
+    {
+      "path": "taxkit-merge-qualified-results.jsonl",
+      "sha256": "ea85694e3ef8de5f85e985f2ca6b039bb241a9fa2868a9ce065d6ae609bf3e2b"
+    },
+    {
+      "path": "taxkit-merge-qualified-release-report.log",
+      "sha256": "98f1aaac9c9e69891976c68fb11aad67c06ed9ab32732b003a40eaf811b19bca"
+    },
+    {
+      "path": "taxkit-merge-format-recovery-results.jsonl",
+      "sha256": "716279f4a0e6b6eb8d651f434dc1c4b80b1c367e2c903cd85d6885eae716ba07"
     }
   ],
   "limitations": [
@@ -96,5 +109,5 @@
     "The exact adad source exception remains 0d82b82d1c48079fc4b8e2ec96abadfe12999789. No independent adad consumer acceptance or calculation enablement is claimed."
   ],
   "rollbackOrRecovery": "Before external merge, discard or revert only this isolated integration branch to the retained handover parent. After merge, prepare a reviewed revert of the actual main merge commit with first-parent selection, preserving the immutable source and receipts. Do not force-push main or change providers.",
-  "observedAt": "2026-10-08T03:10:47.389782+00:00"
+  "observedAt": "2026-10-08T04:07:44.100355+00:00"
 }

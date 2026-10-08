@@ -7,8 +7,7 @@ test.effect.each([
   {
     args: [],
     command: "hgi-206",
-    oracle:
-      "FAIL [input] target=.agents/skills/docs-maintainer/SKILL.md",
+    oracle: "FAIL [input] target=.agents/skills/docs-maintainer/SKILL.md",
     source: "tools/evals/hgi-206/check.runtime.ts",
   },
   {
